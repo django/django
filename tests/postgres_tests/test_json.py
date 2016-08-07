@@ -3,7 +3,7 @@ import unittest
 
 from django.core import exceptions, serializers
 from django.db import connection
-from django.forms import CharField, Form
+from django.forms import CharField, Form, widgets
 from django.test import TestCase
 from django.utils.html import escape
 
@@ -33,7 +33,7 @@ class TestSaveLoad(TestCase):
         instance = JSONModel()
         instance.save()
         loaded = JSONModel.objects.get()
-        self.assertEqual(loaded.field, None)
+        self.assertIsNone(loaded.field)
 
     def test_empty_object(self):
         instance = JSONModel(field={})
@@ -51,7 +51,7 @@ class TestSaveLoad(TestCase):
         instance = JSONModel(field=True)
         instance.save()
         loaded = JSONModel.objects.get()
-        self.assertEqual(loaded.field, True)
+        self.assertIs(loaded.field, True)
 
     def test_string(self):
         instance = JSONModel(field='why?')
@@ -247,7 +247,7 @@ class TestFormField(PostgreSQLTestCase):
     def test_valid_empty(self):
         field = forms.JSONField(required=False)
         value = field.clean('')
-        self.assertEqual(value, None)
+        self.assertIsNone(value)
 
     def test_invalid(self):
         field = forms.JSONField()
@@ -291,3 +291,21 @@ class TestFormField(PostgreSQLTestCase):
         form = JsonForm({'name': 'xy', 'jfield': '{"foo"}'})
         # Appears once in the textarea and once in the error message
         self.assertEqual(form.as_p().count(escape('{"foo"}')), 2)
+
+    def test_widget(self):
+        """The default widget of a JSONField is a Textarea."""
+        field = forms.JSONField()
+        self.assertIsInstance(field.widget, widgets.Textarea)
+
+    def test_custom_widget_kwarg(self):
+        """The widget can be overridden with a kwarg."""
+        field = forms.JSONField(widget=widgets.Input)
+        self.assertIsInstance(field.widget, widgets.Input)
+
+    def test_custom_widget_attribute(self):
+        """The widget can be overridden with an attribute."""
+        class CustomJSONField(forms.JSONField):
+            widget = widgets.Input
+
+        field = CustomJSONField()
+        self.assertIsInstance(field.widget, widgets.Input)

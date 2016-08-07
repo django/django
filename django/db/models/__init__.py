@@ -12,6 +12,7 @@ from django.db.models.expressions import (  # NOQA
 from django.db.models.fields import *  # NOQA
 from django.db.models.fields.files import FileField, ImageField  # NOQA
 from django.db.models.fields.proxy import OrderWrt  # NOQA
+from django.db.models.indexes import *  # NOQA
 from django.db.models.lookups import Lookup, Transform  # NOQA
 from django.db.models.manager import Manager  # NOQA
 from django.db.models.query import (  # NOQA

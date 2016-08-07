@@ -85,5 +85,5 @@ class GeoRegressionTests(TestCase):
         self.assertIsInstance(val1, bool)
         self.assertIsInstance(val2, bool)
         # verify values
-        self.assertEqual(val1, True)
-        self.assertEqual(val2, False)
+        self.assertIs(val1, True)
+        self.assertIs(val2, False)

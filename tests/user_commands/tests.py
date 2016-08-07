@@ -146,7 +146,7 @@ class CommandTests(SimpleTestCase):
         self.counter = 0
 
         def patched_check(self_, **kwargs):
-            self.counter = self.counter + 1
+            self.counter += 1
 
         saved_check = BaseCommand.check
         BaseCommand.check = patched_check
@@ -160,7 +160,7 @@ class CommandTests(SimpleTestCase):
 
     def test_check_migrations(self):
         requires_migrations_checks = dance.Command.requires_migrations_checks
-        self.assertEqual(requires_migrations_checks, False)
+        self.assertIs(requires_migrations_checks, False)
         try:
             with mock.patch.object(BaseCommand, 'check_migrations') as check_migrations:
                 management.call_command('dance', verbosity=0)

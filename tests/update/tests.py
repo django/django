@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+from django.core.exceptions import FieldError
+from django.db.models import Count, F, Max
 from django.test import TestCase
 
 from .models import A, B, Bar, D, DataPoint, Foo, RelatedPoint
@@ -138,3 +140,41 @@ class AdvancedTests(TestCase):
         self.assertEqual(bar_qs[0].foo_id, a_foo.target)
         bar_qs.update(foo=b_foo)
         self.assertEqual(bar_qs[0].foo_id, b_foo.target)
+
+    def test_update_annotated_queryset(self):
+        """
+        Update of a queryset that's been annotated.
+        """
+        # Trivial annotated update
+        qs = DataPoint.objects.annotate(alias=F('value'))
+        self.assertEqual(qs.update(another_value='foo'), 3)
+        # Update where annotation is used for filtering
+        qs = DataPoint.objects.annotate(alias=F('value')).filter(alias='apple')
+        self.assertEqual(qs.update(another_value='foo'), 1)
+        # Update where annotation is used in update parameters
+        qs = DataPoint.objects.annotate(alias=F('value'))
+        self.assertEqual(qs.update(another_value=F('alias')), 3)
+        # Update where aggregation annotation is used in update parameters
+        qs = DataPoint.objects.annotate(max=Max('value'))
+        with self.assertRaisesMessage(FieldError, 'Aggregate functions are not allowed in this query'):
+            qs.update(another_value=F('max'))
+
+    def test_update_annotated_multi_table_queryset(self):
+        """
+        Update of a queryset that's been annotated and involves multiple tables.
+        """
+        # Trivial annotated update
+        qs = DataPoint.objects.annotate(related_count=Count('relatedpoint'))
+        self.assertEqual(qs.update(value='Foo'), 3)
+        # Update where annotation is used for filtering
+        qs = DataPoint.objects.annotate(related_count=Count('relatedpoint'))
+        self.assertEqual(qs.filter(related_count=1).update(value='Foo'), 1)
+        # Update where annotation is used in update parameters
+        # #26539 - This isn't forbidden but also doesn't generate proper SQL
+        # qs = RelatedPoint.objects.annotate(data_name=F('data__name'))
+        # updated = qs.update(name=F('data_name'))
+        # self.assertEqual(updated, 1)
+        # Update where aggregation annotation is used in update parameters
+        qs = RelatedPoint.objects.annotate(max=Max('data__value'))
+        with self.assertRaisesMessage(FieldError, 'Aggregate functions are not allowed in this query'):
+            qs.update(name=F('max'))

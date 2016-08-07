@@ -162,8 +162,8 @@ class HashedFilesMixin(object):
             """
             matched, url = matchobj.groups()
 
-            # Ignore absolute/protocol-relative, fragments and data-uri URLs.
-            if url.startswith(('http:', 'https:', '//', '#', 'data:')):
+            # Ignore absolute/protocol-relative and data-uri URLs.
+            if re.match(r'^[a-z]+:', url):
                 return matched
 
             # Ignore absolute URLs that don't point to a static file (dynamic

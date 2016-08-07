@@ -20,7 +20,9 @@ from django.test import (
 from django.utils import six
 from django.utils.encoding import force_text
 
-from .models import Article, Category, ProxySpy, Spy, Tag, Visa
+from .models import (
+    Article, Category, PrimaryKeyUUIDModel, ProxySpy, Spy, Tag, Visa,
+)
 
 
 class TestCaseFixtureLoadingTests(TestCase):
@@ -441,6 +443,18 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 '{"headline": "Copyright is fine the way it is", "pub_date": "2006-06-16T14:00:00"}}]',
                 primary_keys='2,3'
             )
+
+    def test_dumpdata_with_uuid_pks(self):
+        m1 = PrimaryKeyUUIDModel.objects.create()
+        m2 = PrimaryKeyUUIDModel.objects.create()
+        output = six.StringIO()
+        management.call_command(
+            'dumpdata', 'fixtures.PrimaryKeyUUIDModel', '--pks', ', '.join([str(m1.id), str(m2.id)]),
+            stdout=output,
+        )
+        result = output.getvalue()
+        self.assertIn('"pk": "%s"' % m1.id, result)
+        self.assertIn('"pk": "%s"' % m2.id, result)
 
     def test_dumpdata_with_file_output(self):
         management.call_command('loaddata', 'fixture1.json', verbosity=0)

@@ -43,7 +43,7 @@ DEFAULT_NAMES = (
     'auto_created', 'index_together', 'apps', 'default_permissions',
     'select_on_save', 'default_related_name', 'required_db_features',
     'required_db_vendor', 'base_manager_name', 'default_manager_name',
-    'manager_inheritance_from_future',
+    'manager_inheritance_from_future', 'indexes',
 )
 
 
@@ -99,6 +99,7 @@ class Options(object):
         self.db_table = ''
         self.ordering = []
         self._ordering_clash = False
+        self.indexes = []
         self.unique_together = []
         self.index_together = []
         self.select_on_save = False

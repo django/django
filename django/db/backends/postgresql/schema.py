@@ -17,15 +17,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def quote_value(self, value):
         return psycopg2.extensions.adapt(value)
 
-    def _model_indexes_sql(self, model):
-        output = super(DatabaseSchemaEditor, self)._model_indexes_sql(model)
-        if not model._meta.managed or model._meta.proxy or model._meta.swapped:
-            return output
-
-        for field in model._meta.local_fields:
-            like_index_statement = self._create_like_index_sql(model, field)
-            if like_index_statement is not None:
-                output.append(like_index_statement)
+    def _field_indexes_sql(self, model, field):
+        output = super(DatabaseSchemaEditor, self)._field_indexes_sql(model, field)
+        like_index_statement = self._create_like_index_sql(model, field)
+        if like_index_statement is not None:
+            output.append(like_index_statement)
         return output
 
     def _create_like_index_sql(self, model, field):
@@ -111,13 +107,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             new_db_params, strict,
         )
         # Added an index? Create any PostgreSQL-specific indexes.
-        if not old_field.db_index and not old_field.unique and (new_field.db_index or new_field.unique):
+        if ((not (old_field.db_index or old_field.unique) and new_field.db_index) or
+                (not old_field.unique and new_field.unique)):
             like_index_statement = self._create_like_index_sql(model, new_field)
             if like_index_statement is not None:
                 self.execute(like_index_statement)
 
         # Removed an index? Drop any PostgreSQL-specific indexes.
-        if (old_field.db_index or old_field.unique) and not (new_field.db_index or new_field.unique):
+        if old_field.unique and not (new_field.db_index or new_field.unique):
             index_to_remove = self._create_index_name(model, [old_field.column], suffix='_like')
             index_names = self._constraint_names(model, [old_field.column], index=True)
             for index_name in index_names:

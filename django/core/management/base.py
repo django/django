@@ -225,17 +225,6 @@ class BaseCommand(object):
         """
         return django.get_version()
 
-    def usage(self, subcommand):
-        """
-        Return a brief description of how to use this command, by
-        default from the attribute ``self.help``.
-        """
-        usage = '%%prog %s [options] %s' % (subcommand, self.args)
-        if self.help:
-            return '%s\n\n%s' % (usage, self.help)
-        else:
-            return usage
-
     def create_parser(self, prog_name, subcommand):
         """
         Create and return the ``ArgumentParser`` which will be used to

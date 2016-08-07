@@ -95,11 +95,9 @@ def instrumented_test_render(self, context):
 
 
 def setup_test_environment():
-    """Perform any global pre-test setup. This involves:
-
-        - Installing the instrumented test renderer
-        - Set the email backend to the locmem email backend.
-        - Setting the active locale to match the LANGUAGE_CODE setting.
+    """
+    Perform global pre-test setup, such as installing the instrumented template
+    renderer and setting the email backend to the locmem email backend.
     """
     Template._original_render = Template._render
     Template._render = instrumented_test_render
@@ -111,7 +109,8 @@ def setup_test_environment():
     settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
     request._original_allowed_hosts = settings.ALLOWED_HOSTS
-    settings.ALLOWED_HOSTS = ['*']
+    # Add the default host of the test client.
+    settings.ALLOWED_HOSTS = settings.ALLOWED_HOSTS + ['testserver']
 
     mail.outbox = []
 
@@ -119,10 +118,9 @@ def setup_test_environment():
 
 
 def teardown_test_environment():
-    """Perform any global post-test teardown. This involves:
-
-        - Restoring the original test renderer
-        - Restoring the email sending functions
+    """
+    Perform any global post-test teardown, such as restoring the original
+    template renderer and restoring the email sending functions.
     """
     Template._render = Template._original_render
     del Template._original_render
@@ -352,7 +350,7 @@ def compare_xml(want, got):
     ordering should not be important. Comment nodes are not considered in the
     comparison. Leading and trailing whitespace is ignored on both chunks.
 
-    Based on http://codespeak.net/svn/lxml/trunk/src/lxml/doctestcompare.py
+    Based on https://github.com/lxml/lxml/blob/master/src/lxml/doctestcompare.py
     """
     _norm_whitespace_re = re.compile(r'[ \t\n][ \t\n]+')
 

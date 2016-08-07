@@ -979,6 +979,18 @@ database.
     performance, since you have done a database query that you haven't used. So
     use this feature with caution!
 
+    Also, if you call the database-altering methods
+    :meth:`~django.db.models.fields.related.RelatedManager.add`,
+    :meth:`~django.db.models.fields.related.RelatedManager.remove`,
+    :meth:`~django.db.models.fields.related.RelatedManager.clear` or
+    :meth:`~django.db.models.fields.related.RelatedManager.set`, on
+    :class:`related managers<django.db.models.fields.related.RelatedManager>`,
+    any prefetched cache for the relation will be cleared.
+
+    .. versionchanged:: 1.11
+
+        The clearing of the prefetched cache described above was added.
+
 You can also use the normal join syntax to do related fields of related
 fields. Suppose we have an additional model to the example above::
 
@@ -2673,6 +2685,27 @@ are indexed with day 1 being Sunday and day 7 being Saturday.
 When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
 current time zone before filtering. This requires :ref:`time zone definitions
 in the database <database-time-zone-definitions>`.
+
+.. fieldlookup:: time
+
+``time``
+~~~~~~~~
+
+.. versionadded:: 1.11
+
+For datetime fields, casts the value as time. Allows chaining additional field
+lookups. Takes a :class:`datetime.time` value.
+
+Example::
+
+    Entry.objects.filter(pub_date__time=datetime.time(14, 30))
+    Entry.objects.filter(pub_date__time__between=(datetime.time(8), datetime.time(17)))
+
+(No equivalent SQL code fragment is included for this lookup because
+implementation of the relevant query varies among different database engines.)
+
+When :setting:`USE_TZ` is ``True``, fields are converted to the current time
+zone before filtering.
 
 .. fieldlookup:: hour
 

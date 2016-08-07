@@ -51,10 +51,8 @@ class MigrationLoader(object):
         if load:
             self.build_graph()
 
-    def migrations_module(self, app_label):
-        if (self.connection is not None and
-                not self.connection.settings_dict.get('TEST', {}).get('MIGRATE', True)):
-            return None
+    @classmethod
+    def migrations_module(cls, app_label):
         if app_label in settings.MIGRATION_MODULES:
             return settings.MIGRATION_MODULES[app_label]
         else:
@@ -282,6 +280,11 @@ class MigrationLoader(object):
                 continue
             for parent in self.graph.node_map[migration].parents:
                 if parent not in applied:
+                    # Skip unapplied squashed migrations that have all of their
+                    # `replaces` applied.
+                    if parent in self.replacements:
+                        if all(m in applied for m in self.replacements[parent].replaces):
+                            continue
                     raise InconsistentMigrationHistory(
                         "Migration {}.{} is applied before its dependency {}.{}".format(
                             migration[0], migration[1], parent[0], parent[1],

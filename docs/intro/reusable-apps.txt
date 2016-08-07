@@ -185,7 +185,7 @@ this. For a small app like polls, this process isn't too difficult.
 5. Next we'll create a ``setup.py`` file which provides details about how to
    build and install the app.  A full explanation of this file is beyond the
    scope of this tutorial, but the `setuptools docs
-   <https://pythonhosted.org/setuptools/setuptools.html>`_ have a good
+   <https://setuptools.readthedocs.io/en/latest/>`_ have a good
    explanation. Create a file ``django-polls/setup.py`` with the following
    contents:
 

@@ -115,7 +115,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         # do not have a db type cause they are added and removed via stored
         # procedures.
         if isinstance(field, GeometryField):
-            self._remake_table(model, delete_fields=[field])
+            self._remake_table(model, delete_field=field)
         else:
             super(SpatialiteSchemaEditor, self).remove_field(model, field)
 

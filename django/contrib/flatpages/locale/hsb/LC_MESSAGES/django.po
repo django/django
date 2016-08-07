@@ -1,0 +1,86 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Michael Wolf <milupo@sorbzilla.de>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-06-13 12:43+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
+"Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
+"language/hsb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: hsb\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
+"%100==4 ? 2 : 3);\n"
+
+msgid "Advanced options"
+msgstr "Rozšěrjene nastajenja"
+
+msgid "Flat Pages"
+msgstr "Statiske strony"
+
+msgid "URL"
+msgstr "URL"
+
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Přikład: '/about/contact/'. Přeswědčće so, zo sće wočinjace a začinjace "
+"nakósne smužki podał."
+
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr ""
+"Tuta hódnota smě jenož pismiki, ličby, dypki, podsmužki, wjazawki, nakósne "
+"smužki abo tildy wobsahować."
+
+msgid "URL is missing a leading slash."
+msgstr "URL wočinjacu nakósnu smužku nima."
+
+msgid "URL is missing a trailing slash."
+msgstr "URL začinjacu nakósnu smužku nima."
+
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr "Statiska strona z url %(url)s hižo za sydło %(site)s eksistuje"
+
+msgid "title"
+msgstr "titul"
+
+msgid "content"
+msgstr "wobsah"
+
+msgid "enable comments"
+msgstr "komentary zmóžnić"
+
+msgid "template name"
+msgstr "mjeno předłohi"
+
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"Přikład: 'flatpages/contact_page.html'. Jeli to njeje podate, budźe system "
+"'flatpages/default.html' wužiwać."
+
+msgid "registration required"
+msgstr "registrowanje trěbne"
+
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Jeli to je zmóžnjene, móža sej jenož přizjewjeni wužiwarjo stronu wobhladać."
+
+msgid "sites"
+msgstr "sydła"
+
+msgid "flat page"
+msgstr "statiska strona"
+
+msgid "flat pages"
+msgstr "statiske strony"

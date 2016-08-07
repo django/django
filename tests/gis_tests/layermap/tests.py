@@ -5,7 +5,6 @@ import os
 import unittest
 from copy import copy
 from decimal import Decimal
-from unittest import skipUnless
 
 from django.conf import settings
 from django.contrib.gis.gdal import HAS_GDAL
@@ -39,7 +38,6 @@ NUMS = [1, 2, 1, 19, 1]  # Number of polygons for each.
 STATES = ['Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado']
 
 
-@skipUnless(HAS_GDAL, "LayerMapTest needs GDAL support")
 @skipUnlessDBFeature("gis_enabled")
 class LayerMapTest(TestCase):
 
@@ -337,7 +335,6 @@ class OtherRouter(object):
         return True
 
 
-@skipUnless(HAS_GDAL, "LayerMapRouterTest needs GDAL support")
 @skipUnlessDBFeature("gis_enabled")
 @override_settings(DATABASE_ROUTERS=[OtherRouter()])
 class LayerMapRouterTest(TestCase):

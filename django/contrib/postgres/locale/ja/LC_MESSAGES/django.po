@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Shinya Okano <tokibito@gmail.com>, 2015
+# Shinya Okano <tokibito@gmail.com>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-31 12:15+0000\n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-07-21 13:53+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
@@ -42,6 +42,9 @@ msgstr "JSONとして正しい値にしてください。"
 
 msgid "Could not load JSON data."
 msgstr "JSONデータを読み込めませんでした。"
+
+msgid "Input must be a JSON dictionary."
+msgstr "JSON辞書を入力しなければなりません。"
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."

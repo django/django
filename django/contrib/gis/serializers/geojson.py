@@ -1,9 +1,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.gis.gdal import HAS_GDAL
-from django.core.serializers.base import (
-    SerializationError, SerializerDoesNotExist,
-)
+from django.core.serializers.base import SerializerDoesNotExist
 from django.core.serializers.json import Serializer as JSONSerializer
 
 if HAS_GDAL:
@@ -53,10 +51,6 @@ class Serializer(JSONSerializer):
         if self._geometry:
             if self._geometry.srid != self.srid:
                 # If needed, transform the geometry in the srid of the global geojson srid
-                if not HAS_GDAL:
-                    raise SerializationError(
-                        'Unable to convert geometry to SRID %s when GDAL is not installed.' % self.srid
-                    )
                 if self._geometry.srid not in self._cts:
                     srs = SpatialReference(self.srid)
                     self._cts[self._geometry.srid] = CoordTransform(self._geometry.srs, srs)

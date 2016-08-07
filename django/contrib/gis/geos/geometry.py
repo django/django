@@ -64,8 +64,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
                 g = wkb_r().read(force_bytes(geo_input))
             elif json_regex.match(geo_input):
                 # Handling GeoJSON input.
-                if not gdal.HAS_GDAL:
-                    raise ValueError('Initializing geometry from JSON input requires GDAL.')
                 g = wkb_r().read(gdal.OGRGeometry(geo_input).wkb)
             else:
                 raise ValueError('String or unicode input unrecognized as WKT EWKT, and HEXEWKB.')
@@ -167,6 +165,10 @@ class GEOSGeometry(GEOSBase, ListMixin):
             raise GEOSException('Invalid Geometry loaded from pickled state.')
         self.ptr = ptr
         self._post_init(srid)
+
+    @classmethod
+    def from_gml(cls, gml_string):
+        return gdal.OGRGeometry.from_gml(gml_string).geos
 
     # Comparison operators
     def __eq__(self, other):
@@ -476,8 +478,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def ogr(self):
         "Returns the OGR Geometry for this Geometry."
-        if not gdal.HAS_GDAL:
-            raise GEOSException('GDAL required to convert to an OGRGeometry.')
         if self.srid:
             try:
                 return gdal.OGRGeometry(self.wkb, self.srid)
@@ -488,8 +488,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def srs(self):
         "Returns the OSR SpatialReference for SRID of this Geometry."
-        if not gdal.HAS_GDAL:
-            raise GEOSException('GDAL required to return a SpatialReference object.')
         if self.srid:
             try:
                 return gdal.SpatialReference(self.srid)
@@ -519,9 +517,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
                 return self.clone()
             else:
                 return
-
-        if not gdal.HAS_GDAL:
-            raise GEOSException("GDAL library is not available to transform() geometry.")
 
         if isinstance(ct, gdal.CoordTransform):
             # We don't care about SRID because CoordTransform presupposes

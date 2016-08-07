@@ -1390,9 +1390,9 @@ Miscellaneous
 Features removed in 1.9
 =======================
 
-These features have reached the end of their deprecation cycle and so have been
-removed in Django 1.9 (please see the :ref:`deprecation timeline
-<deprecation-removed-in-1.9>` for more details):
+These features have reached the end of their deprecation cycle and are removed
+in Django 1.9. See :ref:`deprecated-features-1.7` for details, including how to
+remove usage of these features.
 
 * ``django.utils.dictconfig`` is removed.
 

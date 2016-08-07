@@ -35,31 +35,21 @@ class LiveServerBase(StaticLiveServerTestCase):
 
     @classmethod
     def tearDownClass(cls):
+        super(LiveServerBase, cls).tearDownClass()
         # Restore original settings
         cls.settings_override.disable()
-        super(LiveServerBase, cls).tearDownClass()
 
 
 class StaticLiveServerChecks(LiveServerBase):
 
     @classmethod
     def setUpClass(cls):
-        # Backup original environment variable
-        address_predefined = 'DJANGO_LIVE_TEST_SERVER_ADDRESS' in os.environ
-        old_address = os.environ.get('DJANGO_LIVE_TEST_SERVER_ADDRESS')
-
         # If contrib.staticfiles isn't configured properly, the exception
         # should bubble up to the main thread.
         old_STATIC_URL = TEST_SETTINGS['STATIC_URL']
         TEST_SETTINGS['STATIC_URL'] = None
-        cls.raises_exception('localhost:8081', ImproperlyConfigured)
+        cls.raises_exception()
         TEST_SETTINGS['STATIC_URL'] = old_STATIC_URL
-
-        # Restore original environment variable
-        if address_predefined:
-            os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = old_address
-        else:
-            del os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS']
 
     @classmethod
     def tearDownClass(cls):
@@ -67,12 +57,13 @@ class StaticLiveServerChecks(LiveServerBase):
         pass
 
     @classmethod
-    def raises_exception(cls, address, exception):
-        os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = address
+    def raises_exception(cls):
         try:
             super(StaticLiveServerChecks, cls).setUpClass()
             raise Exception("The line above should have raised an exception")
-        except exception:
+        except ImproperlyConfigured:
+            # This raises ImproperlyConfigured("You're using the staticfiles
+            # app without having set the required STATIC_URL setting.")
             pass
         finally:
             super(StaticLiveServerChecks, cls).tearDownClass()

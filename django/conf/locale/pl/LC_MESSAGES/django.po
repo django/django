@@ -14,7 +14,8 @@
 # konryd <inactive+konryd@transifex.com>, 2011
 # konryd <inactive+konryd@transifex.com>, 2011
 # Łukasz Rekucki <lrekucki@gmail.com>, 2011
-# Maciek Olko <maciej.olko@gmail.com>, 2015
+# m_aciek <maciej.olko@gmail.com>, 2016
+# m_aciek <maciej.olko@gmail.com>, 2015
 # Michał Pasternak <michal.dtz@gmail.com>, 2013
 # p <inactive+poczciwiec@transifex.com>, 2012
 # Piotr Meuś <piotr.meus@gmail.com>, 2014
@@ -28,9 +29,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-12-08 03:14+0000\n"
-"Last-Translator: Adam Stachowicz <saibamenppl@gmail.com>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-01 12:37+0000\n"
+"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -80,6 +81,9 @@ msgstr "duński"
 
 msgid "German"
 msgstr "niemiecki"
+
+msgid "Lower Sorbian"
+msgstr "dolnołużycki"
 
 msgid "Greek"
 msgstr "grecki"
@@ -150,6 +154,9 @@ msgstr "hindi"
 msgid "Croatian"
 msgstr "chorwacki"
 
+msgid "Upper Sorbian"
+msgstr "górnołużycki"
+
 msgid "Hungarian"
 msgstr "węgierski"
 
@@ -210,8 +217,8 @@ msgstr "marathi"
 msgid "Burmese"
 msgstr "birmański"
 
-msgid "Norwegian Bokmal"
-msgstr "norweski (Bokmal)"
+msgid "Norwegian Bokmål"
+msgstr "norweski (bokmål)"
 
 msgid "Nepali"
 msgstr "nepalski"
@@ -308,9 +315,6 @@ msgstr "Pliki statyczne"
 
 msgid "Syndication"
 msgstr "Syndykacja treści"
-
-msgid "Web Design"
-msgstr "Projektowanie stron"
 
 msgid "Enter a valid value."
 msgstr "Wpisz poprawną wartość."
@@ -462,6 +466,9 @@ msgstr "Liczba całkowita"
 msgid "'%(value)s' value must be an integer."
 msgstr "wartość '%(value)s' musi być liczbą całkowitą."
 
+msgid "Big (8 byte) integer"
+msgstr "Duża liczba całkowita (8 bajtów)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "wartość '%(value)s' musi być True lub False."
@@ -544,9 +551,6 @@ msgstr "wartość '%(value)s' musi być liczbą zmiennoprzecinkową."
 msgid "Floating point number"
 msgstr "Liczba zmiennoprzecinkowa"
 
-msgid "Big (8 byte) integer"
-msgstr "Duża liczba całkowita (8 bajtów)"
-
 msgid "IPv4 address"
 msgstr "adres IPv4"
 
@@ -620,6 +624,14 @@ msgstr "Klucz obcy (typ określony przez pole powiązane)"
 
 msgid "One-to-one relationship"
 msgstr "Powiązanie jeden do jednego"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "powiązanie %(from)s do %(to)s"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "powiązania %(from)s do %(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Powiązanie wiele do wiele"

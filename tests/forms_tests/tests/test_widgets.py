@@ -44,15 +44,15 @@ class FormsWidgetTests(SimpleTestCase):
                 )
             )
 
-        self.assertHTMLEqual('\n'.join(inp_set1), """<label><input checked="checked" type="radio" name="beatle" value="J" /> John</label>
+        self.assertHTMLEqual('\n'.join(inp_set1), """<label><input checked type="radio" name="beatle" value="J" /> John</label>
 <label><input type="radio" name="beatle" value="P" /> Paul</label>
 <label><input type="radio" name="beatle" value="G" /> George</label>
 <label><input type="radio" name="beatle" value="R" /> Ringo</label>""")
-        self.assertHTMLEqual('\n'.join(inp_set2), """<label><input checked="checked" type="radio" name="beatle" value="J" /> John</label><br />
+        self.assertHTMLEqual('\n'.join(inp_set2), """<label><input checked type="radio" name="beatle" value="J" /> John</label><br />
 <label><input type="radio" name="beatle" value="P" /> Paul</label><br />
 <label><input type="radio" name="beatle" value="G" /> George</label><br />
 <label><input type="radio" name="beatle" value="R" /> Ringo</label><br />""")
-        self.assertHTMLEqual('\n'.join(inp_set3), """<p><input checked="checked" type="radio" name="beatle" value="J" /> John</p>
+        self.assertHTMLEqual('\n'.join(inp_set3), """<p><input checked type="radio" name="beatle" value="J" /> John</p>
 <p><input type="radio" name="beatle" value="P" /> Paul</p>
 <p><input type="radio" name="beatle" value="G" /> George</p>
 <p><input type="radio" name="beatle" value="R" /> Ringo</p>""")
@@ -67,7 +67,7 @@ beatle J R Ringo False""")
         self.assertHTMLEqual(str(r[1]), '<label><input type="radio" name="beatle" value="P" /> Paul</label>')
         self.assertHTMLEqual(
             str(r[0]),
-            '<label><input checked="checked" type="radio" name="beatle" value="J" /> John</label>'
+            '<label><input checked type="radio" name="beatle" value="J" /> John</label>'
         )
         self.assertTrue(r[0].is_checked())
         self.assertFalse(r[1].is_checked())
@@ -91,7 +91,7 @@ beatle J R Ringo False""")
             w.render('beatle', 'G'),
             """<label><input type="radio" name="beatle" value="J" /> John</label><br />
 <label><input type="radio" name="beatle" value="P" /> Paul</label><br />
-<label><input checked="checked" type="radio" name="beatle" value="G" /> George</label><br />
+<label><input checked type="radio" name="beatle" value="G" /> George</label><br />
 <label><input type="radio" name="beatle" value="R" /> Ringo</label>"""
         )
 
@@ -103,7 +103,7 @@ beatle J R Ringo False""")
             w.render('beatle', 'G'),
             """<label><input type="radio" name="beatle" value="J" /> John</label><br />
 <label><input type="radio" name="beatle" value="P" /> Paul</label><br />
-<label><input checked="checked" type="radio" name="beatle" value="G" /> George</label><br />
+<label><input checked type="radio" name="beatle" value="G" /> George</label><br />
 <label><input type="radio" name="beatle" value="R" /> Ringo</label>"""
         )
 
@@ -118,7 +118,7 @@ beatle J R Ringo False""")
         self.assertHTMLEqual(
             output,
             """<div id="bar">
-<p><label for="bar_0"><input checked="checked" type="radio" id="bar_0" value="J" name="beatle" /> John</label></p>
+<p><label for="bar_0"><input checked type="radio" id="bar_0" value="J" name="beatle" /> John</label></p>
 <p><label for="bar_1"><input type="radio" id="bar_1" value="P" name="beatle" /> Paul</label></p>
 <p><label for="bar_2"><input type="radio" id="bar_2" value="G" name="beatle" /> George</label></p>
 <p><label for="bar_3"><input type="radio" id="bar_3" value="R" name="beatle" /> Ringo</label></p>
@@ -130,21 +130,21 @@ beatle J R Ringo False""")
             "\n".join(
                 c.tag() for c in CheckboxSelectMultiple(
                     attrs={'id': 'abc'},
-                    choices=zip(list('abc'), list('ABC'))
+                    choices=zip('abc', 'ABC')
                 ).subwidgets('letters', list('ac'))
             ),
-            """<input checked="checked" type="checkbox" name="letters" value="a" id="abc_0" />
+            """<input checked type="checkbox" name="letters" value="a" id="abc_0" />
 <input type="checkbox" name="letters" value="b" id="abc_1" />
-<input checked="checked" type="checkbox" name="letters" value="c" id="abc_2" />""")
+<input checked type="checkbox" name="letters" value="c" id="abc_2" />""")
 
         # Each subwidget tag does not get an ID if the widget does not have an ID specified
         self.assertHTMLEqual(
             "\n".join(c.tag() for c in CheckboxSelectMultiple(
-                choices=zip(list('abc'), list('ABC')),
+                choices=zip('abc', 'ABC'),
             ).subwidgets('letters', list('ac'))),
-            """<input checked="checked" type="checkbox" name="letters" value="a" />
+            """<input checked type="checkbox" name="letters" value="a" />
 <input type="checkbox" name="letters" value="b" />
-<input checked="checked" type="checkbox" name="letters" value="c" />""")
+<input checked type="checkbox" name="letters" value="c" />""")
 
         # The id_for_label property of the subwidget should return the ID that is used on the subwidget's tag
         self.assertHTMLEqual(
@@ -152,7 +152,7 @@ beatle J R Ringo False""")
                 '<input type="checkbox" name="letters" value="%s" id="%s" />'
                 % (c.choice_value, c.id_for_label) for c in CheckboxSelectMultiple(
                     attrs={'id': 'abc'},
-                    choices=zip(list('abc'), list('ABC')),
+                    choices=zip('abc', 'ABC'),
                 ).subwidgets('letters', [])
             ),
             """<input type="checkbox" name="letters" value="a" id="abc_0" />

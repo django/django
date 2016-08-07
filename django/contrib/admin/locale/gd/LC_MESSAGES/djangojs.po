@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# GunChleoc, 2015
+# GunChleoc, 2015-2016
 # GunChleoc, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-26 20:06+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 10:22+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -166,15 +166,69 @@ msgstr "An-dè"
 msgid "Tomorrow"
 msgstr "A-màireach"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Faoilleach Gearran Màirt Giblean Cèitean Ògmhios Iuchar Lùnastal Sultain "
-"Dàmhair Samhain Dùbhlachd"
+msgid "January"
+msgstr "Am Faoilleach"
 
-msgid "S M T W T F S"
-msgstr "D L M C D A S"
+msgid "February"
+msgstr "An Gearran"
+
+msgid "March"
+msgstr "Am Màrt"
+
+msgid "April"
+msgstr "An Giblean"
+
+msgid "May"
+msgstr "An Cèitean"
+
+msgid "June"
+msgstr "An t-Ògmhios"
+
+msgid "July"
+msgstr "An t-Iuchar"
+
+msgid "August"
+msgstr "An Lùnastal"
+
+msgid "September"
+msgstr "An t-Sultain"
+
+msgid "October"
+msgstr "An Dàmhair"
+
+msgid "November"
+msgstr "An t-Samhain"
+
+msgid "December"
+msgstr "An Dùbhlachd"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "Dò"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "Lu"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "Mà"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "Ci"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "Da"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "hA"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "Sa"
 
 msgid "Show"
 msgstr "Seall"

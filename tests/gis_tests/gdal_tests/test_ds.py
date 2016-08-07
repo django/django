@@ -80,12 +80,8 @@ class DataSourceTest(unittest.TestCase):
             self.assertEqual(source.driver, str(ds.driver))
 
             # Making sure indexing works
-            try:
+            with self.assertRaises(OGRIndexError):
                 ds[len(ds)]
-            except OGRIndexError:
-                pass
-            else:
-                self.fail('Expected an IndexError!')
 
     def test02_invalid_shp(self):
         "Testing invalid SHP files for the Data Source."
@@ -108,17 +104,11 @@ class DataSourceTest(unittest.TestCase):
                 self.assertEqual(source.nfld, len(layer.fields))
 
                 # Testing the layer's extent (an Envelope), and its properties
-                if source.driver == 'VRT' and (GDAL_VERSION >= (1, 7, 0) and GDAL_VERSION < (1, 7, 3)):
-                    # There's a known GDAL regression with retrieving the extent
-                    # of a VRT layer in versions 1.7.0-1.7.2:
-                    #  http://trac.osgeo.org/gdal/ticket/3783
-                    pass
-                else:
-                    self.assertIsInstance(layer.extent, Envelope)
-                    self.assertAlmostEqual(source.extent[0], layer.extent.min_x, 5)
-                    self.assertAlmostEqual(source.extent[1], layer.extent.min_y, 5)
-                    self.assertAlmostEqual(source.extent[2], layer.extent.max_x, 5)
-                    self.assertAlmostEqual(source.extent[3], layer.extent.max_y, 5)
+                self.assertIsInstance(layer.extent, Envelope)
+                self.assertAlmostEqual(source.extent[0], layer.extent.min_x, 5)
+                self.assertAlmostEqual(source.extent[1], layer.extent.min_y, 5)
+                self.assertAlmostEqual(source.extent[2], layer.extent.max_x, 5)
+                self.assertAlmostEqual(source.extent[3], layer.extent.max_y, 5)
 
                 # Now checking the field names.
                 flds = layer.fields

@@ -265,6 +265,17 @@ work::
                 return force_text(obj)
             return super(LazyEncoder, self).default(obj)
 
+You can then pass ``cls=LazyEncoder`` to the ``serializers.serialize()``
+function::
+
+    from django.core.serializers import serialize
+
+    serialize('json', SomeModel.objects.all(), cls=LazyEncoder)
+
+.. versionchanged:: 1.11
+
+    The ability to use a custom encoder using ``cls=...`` was added.
+
 Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
 </ref/contrib/gis/serializers>`.
 
@@ -286,12 +297,21 @@ The JSON serializer uses ``DjangoJSONEncoder`` for encoding. A subclass of
 :class:`~datetime.time`
    A string of the form ``HH:MM:ss.sss`` as defined in `ECMA-262`_.
 
+:class:`~datetime.timedelta`
+   A string representing a duration as defined in ISO-8601. For example,
+   ``timedelta(days=1, hours=2, seconds=3.4)`` is represented as
+   ``'P1DT02H00M03.400000S'``.
+
 :class:`~decimal.Decimal`, ``Promise`` (``django.utils.functional.lazy()`` objects), :class:`~uuid.UUID`
    A string representation of the object.
 
 .. versionchanged:: 1.10
 
     Support for ``Promise`` was added.
+
+.. versionchanged:: 1.11
+
+    Support for :class:`~datetime.timedelta` was added.
 
 .. _ecma-262: http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
 

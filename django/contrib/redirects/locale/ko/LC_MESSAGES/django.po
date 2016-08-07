@@ -2,7 +2,7 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jun-Gu Kang <chr0m3.kr@gmail.com>, 2015
+# Chr0m3 <chr0m3.kr@gmail.com>, 2015
 # minsung kang, 2015
 msgid ""
 msgstr ""

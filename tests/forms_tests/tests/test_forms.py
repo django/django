@@ -173,11 +173,9 @@ class FormsTestCase(SimpleTestCase):
         self.assertFalse(p.is_bound)
         self.assertEqual(p.errors, {})
         self.assertFalse(p.is_valid())
-        try:
+        with self.assertRaises(AttributeError):
             p.cleaned_data
-            self.fail('Attempts to access cleaned_data when validation fails should fail.')
-        except AttributeError:
-            pass
+
         self.assertHTMLEqual(
             str(p),
             """<tr><th><label for="id_first_name">First name:</label></th><td>
@@ -323,7 +321,7 @@ class FormsTestCase(SimpleTestCase):
         data = {'first_name': 'John', 'last_name': 'Lennon'}
         f = OptionalPersonForm(data)
         self.assertTrue(f.is_valid())
-        self.assertEqual(f.cleaned_data['birth_date'], None)
+        self.assertIsNone(f.cleaned_data['birth_date'])
         self.assertEqual(f.cleaned_data['first_name'], 'John')
         self.assertEqual(f.cleaned_data['last_name'], 'Lennon')
 
@@ -425,19 +423,19 @@ class FormsTestCase(SimpleTestCase):
         self.assertHTMLEqual(str(f['email']), '<input type="email" name="email" value="test@example.com" required />')
         self.assertHTMLEqual(
             str(f['get_spam']),
-            '<input checked="checked" type="checkbox" name="get_spam" required />',
+            '<input checked type="checkbox" name="get_spam" required />',
         )
 
         # 'True' or 'true' should be rendered without a value attribute
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'True'}, auto_id=False)
         self.assertHTMLEqual(
             str(f['get_spam']),
-            '<input checked="checked" type="checkbox" name="get_spam" required />',
+            '<input checked type="checkbox" name="get_spam" required />',
         )
 
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'true'}, auto_id=False)
         self.assertHTMLEqual(
-            str(f['get_spam']), '<input checked="checked" type="checkbox" name="get_spam" required />')
+            str(f['get_spam']), '<input checked type="checkbox" name="get_spam" required />')
 
         # A value of 'False' or 'false' should be rendered unchecked
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'False'}, auto_id=False)
@@ -648,9 +646,9 @@ Java</label></li>
         self.assertHTMLEqual(
             t.render(Context({'form': f})),
             """<div class="myradio"><label for="id_language_0">
-<input id="id_language_0" name="language" type="radio" value="P" /> Python</label></div>
+<input id="id_language_0" name="language" type="radio" value="P" required /> Python</label></div>
 <div class="myradio"><label for="id_language_1">
-<input id="id_language_1" name="language" type="radio" value="J" /> Java</label></div>"""
+<input id="id_language_1" name="language" type="radio" value="J" required /> Java</label></div>"""
         )
 
     def test_form_with_iterable_boundfield(self):
@@ -663,17 +661,17 @@ Java</label></li>
         f = BeatleForm(auto_id=False)
         self.assertHTMLEqual(
             '\n'.join(str(bf) for bf in f['name']),
-            """<label><input type="radio" name="name" value="john" /> John</label>
-<label><input type="radio" name="name" value="paul" /> Paul</label>
-<label><input type="radio" name="name" value="george" /> George</label>
-<label><input type="radio" name="name" value="ringo" /> Ringo</label>"""
+            """<label><input type="radio" name="name" value="john" required /> John</label>
+<label><input type="radio" name="name" value="paul" required /> Paul</label>
+<label><input type="radio" name="name" value="george" required /> George</label>
+<label><input type="radio" name="name" value="ringo" required /> Ringo</label>"""
         )
         self.assertHTMLEqual(
             '\n'.join('<div>%s</div>' % bf for bf in f['name']),
-            """<div><label><input type="radio" name="name" value="john" /> John</label></div>
-<div><label><input type="radio" name="name" value="paul" /> Paul</label></div>
-<div><label><input type="radio" name="name" value="george" /> George</label></div>
-<div><label><input type="radio" name="name" value="ringo" /> Ringo</label></div>"""
+            """<div><label><input type="radio" name="name" value="john" required /> John</label></div>
+<div><label><input type="radio" name="name" value="paul" required /> Paul</label></div>
+<div><label><input type="radio" name="name" value="george" required /> George</label></div>
+<div><label><input type="radio" name="name" value="ringo" required /> Ringo</label></div>"""
         )
 
     def test_form_with_noniterable_boundfield(self):
@@ -682,7 +680,7 @@ Java</label></li>
             name = CharField()
 
         f = BeatleForm(auto_id=False)
-        self.assertHTMLEqual('\n'.join(str(bf) for bf in f['name']), '<input type="text" name="name" />')
+        self.assertHTMLEqual('\n'.join(str(bf) for bf in f['name']), '<input type="text" name="name" required />')
 
     def test_boundfield_slice(self):
         class BeatleForm(Form):
@@ -805,25 +803,25 @@ Java</label></li>
 
         f = SongForm(auto_id=False)
         self.assertHTMLEqual(str(f['composers']), """<ul>
-<li><label><input type="checkbox" name="composers" value="J" required /> John Lennon</label></li>
-<li><label><input type="checkbox" name="composers" value="P" required /> Paul McCartney</label></li>
+<li><label><input type="checkbox" name="composers" value="J" /> John Lennon</label></li>
+<li><label><input type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>""")
         f = SongForm({'composers': ['J']}, auto_id=False)
         self.assertHTMLEqual(str(f['composers']), """<ul>
-<li><label><input checked="checked" type="checkbox" name="composers" value="J" required /> John Lennon</label></li>
-<li><label><input type="checkbox" name="composers" value="P" required /> Paul McCartney</label></li>
+<li><label><input checked type="checkbox" name="composers" value="J" /> John Lennon</label></li>
+<li><label><input type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>""")
         f = SongForm({'composers': ['J', 'P']}, auto_id=False)
         self.assertHTMLEqual(str(f['composers']), """<ul>
-<li><label><input checked="checked" type="checkbox" name="composers" value="J" required /> John Lennon</label></li>
-<li><label><input checked="checked" type="checkbox" name="composers" value="P" required /> Paul McCartney</label></li>
+<li><label><input checked type="checkbox" name="composers" value="J" /> John Lennon</label></li>
+<li><label><input checked type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>""")
         # Test iterating on individual checkboxes in a template
         t = Template('{% for checkbox in form.composers %}<div class="mycheckbox">{{ checkbox }}</div>{% endfor %}')
         self.assertHTMLEqual(t.render(Context({'form': f})), """<div class="mycheckbox"><label>
-<input checked="checked" name="composers" type="checkbox" value="J" /> John Lennon</label></div>
+<input checked name="composers" type="checkbox" value="J" /> John Lennon</label></div>
 <div class="mycheckbox"><label>
-<input checked="checked" name="composers" type="checkbox" value="P" /> Paul McCartney</label></div>""")
+<input checked name="composers" type="checkbox" value="P" /> Paul McCartney</label></div>""")
 
     def test_checkbox_auto_id(self):
         # Regarding auto_id, CheckboxSelectMultiple is a special case. Each checkbox
@@ -841,9 +839,9 @@ Java</label></li>
             str(f['composers']),
             """<ul id="composers_id">
 <li><label for="composers_id_0">
-<input type="checkbox" name="composers" value="J" id="composers_id_0" required /> John Lennon</label></li>
+<input type="checkbox" name="composers" value="J" id="composers_id_0" /> John Lennon</label></li>
 <li><label for="composers_id_1">
-<input type="checkbox" name="composers" value="P" id="composers_id_1" required /> Paul McCartney</label></li>
+<input type="checkbox" name="composers" value="P" id="composers_id_1" /> Paul McCartney</label></li>
 </ul>"""
         )
 
@@ -1926,10 +1924,10 @@ Password: <input type="password" name="password" required /></li>
 
         unbound = UserRegistration()
         bound = UserRegistration({'password': 'foo'})
-        self.assertEqual(bound['username'].value(), None)
+        self.assertIsNone(bound['username'].value())
         self.assertEqual(unbound['username'].value(), 'djangonaut')
         self.assertEqual(bound['password'].value(), 'foo')
-        self.assertEqual(unbound['password'].value(), None)
+        self.assertIsNone(unbound['password'].value())
 
     def test_boundfield_initial_called_once(self):
         """
@@ -2168,11 +2166,9 @@ Password: <input type="password" name="password" required />
         self.assertEqual(p.errors['last_name'], ['This field is required.'])
         self.assertEqual(p.errors['birthday'], ['This field is required.'])
         self.assertEqual(p['first_name'].errors, ['This field is required.'])
-        try:
+        # Accessing a nonexistent field.
+        with self.assertRaises(KeyError):
             p['person1-first_name'].errors
-            self.fail('Attempts to access non-existent fields should fail.')
-        except KeyError:
-            pass
 
         # In this example, the data doesn't have a prefix, but the form requires it, so
         # the form doesn't "see" the fields.
@@ -3089,7 +3085,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
                 raise ValidationError('Non-field error.', code='secret', params={'a': 1, 'b': 2})
 
         form = MyForm({})
-        self.assertEqual(form.is_valid(), False)
+        self.assertIs(form.is_valid(), False)
 
         errors = form.errors.as_text()
         control = [

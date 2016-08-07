@@ -4,6 +4,7 @@
 # Federico Capoano <federico.capoano@teletu.it>, 2011
 # Flavio Curella <flavio.curella@gmail.com>, 2013-2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Luciano De Falco Alfano, 2016
 # Marco Bonetti, 2014
 # palmux <palmux@gmail.com>, 2015
 # Mattia Procopio <promat85@gmail.com>, 2015
@@ -12,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-18 18:33+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-18 09:50+0000\n"
 "Last-Translator: palmux <palmux@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
@@ -121,6 +122,21 @@ msgstr "salt"
 msgid "hash"
 msgstr "hash"
 
+msgid "variety"
+msgstr "varietà"
+
+msgid "version"
+msgstr "versione"
+
+msgid "memory cost"
+msgstr "impegno di memoria"
+
+msgid "time cost"
+msgstr "impiego di tempo"
+
+msgid "parallelism"
+msgstr "parallelismo"
+
 msgid "work factor"
 msgstr "work factor"
 
@@ -174,15 +190,8 @@ msgstr "Permessi specifici per questo utente."
 msgid "username"
 msgstr "nome utente"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Obbligatorio. 30 caratteri o meno. Solo lettere, cifre e @/./+/-/_ ."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Inserisci un nome utente valido. Questo campo può contenere solamente "
-"lettere, numeri e i caratteri @/./+/-/_"
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Obbligatorio. 150 caratteri o meno.Solo lettere, cifre e @/./+/-/_"
 
 msgid "A user with that username already exists."
 msgstr "Un utente con questo nome è già presente."
@@ -265,6 +274,20 @@ msgstr "La tua password non può essere interamente numerica."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Password reset su %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Immetti un nome utente valido. Questo campo può contenere solo lettere "
+"dell'alfabeto inglese, numeri e caratteri @/./+/-/_ ."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Immetti un nome utente valido. Questo campo può contenere solo lettere "
+"dell'alfabeto inglese, numeri e caratteri @/./+/-/_ ."
 
 msgid "Logged out"
 msgstr "Accesso annullato"

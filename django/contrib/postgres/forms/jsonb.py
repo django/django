@@ -15,12 +15,11 @@ class JSONField(forms.CharField):
     default_error_messages = {
         'invalid': _("'%(value)s' value must be valid JSON."),
     }
-
-    def __init__(self, **kwargs):
-        kwargs.setdefault('widget', forms.Textarea)
-        super(JSONField, self).__init__(**kwargs)
+    widget = forms.Textarea
 
     def to_python(self, value):
+        if self.disabled:
+            return value
         if value in self.empty_values:
             return None
         try:

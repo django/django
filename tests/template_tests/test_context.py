@@ -193,10 +193,10 @@ class ContextTests(SimpleTestCase):
 
         with warnings.catch_warnings(record=True) as warns:
             warnings.simplefilter('always')
-            self.assertEqual(a.has_key('a'), True)
-            self.assertEqual(a.has_key('b'), False)
-            self.assertEqual(b.has_key('a'), True)
-            self.assertEqual(b.has_key('b'), False)
+            self.assertIs(a.has_key('a'), True)
+            self.assertIs(a.has_key('b'), False)
+            self.assertIs(b.has_key('a'), True)
+            self.assertIs(b.has_key('b'), False)
 
         self.assertEqual(len(warns), 4)
         self.assertEqual(str(warns[0].message), msg)

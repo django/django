@@ -262,7 +262,7 @@ class SerializersTestBase(object):
         self.assertFalse(pk_value)
 
         cat_obj = list(serializers.deserialize(self.serializer_name, serial_str))[0].object
-        self.assertEqual(cat_obj.id, None)
+        self.assertIsNone(cat_obj.id)
 
     def test_float_serialization(self):
         """Tests that float values serialize and deserialize intact"""

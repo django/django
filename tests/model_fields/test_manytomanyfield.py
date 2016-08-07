@@ -12,7 +12,9 @@ class ManyToManyFieldTests(SimpleTestCase):
             m2m = models.ManyToManyField('self', models.CASCADE)
 
         instance = ManyToManyModel()
-        self.assertEqual(instance._meta.get_field('m2m').value_from_object(instance), [])
+        qs = instance._meta.get_field('m2m').value_from_object(instance)
+        self.assertEqual(qs.model, ManyToManyModel)
+        self.assertEqual(list(qs), [])
 
     def test_abstract_model_pending_operations(self):
         """

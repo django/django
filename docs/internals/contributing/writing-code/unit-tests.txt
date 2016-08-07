@@ -45,6 +45,73 @@ See :ref:`installing-development-version`.
 
 Having problems? See :ref:`troubleshooting-unit-tests` for some common issues.
 
+Running tests using ``tox``
+---------------------------
+
+`Tox <http://tox.testrun.org/>`_ is a tool for running tests in different
+virtual environments. Django includes a basic ``tox.ini`` that automates some
+checks that our build server performs on pull requests. To run the unit tests
+and other checks (such as :ref:`import sorting <coding-style-imports>`, the
+:ref:`documentation spelling checker <documentation-spelling-check>`, and
+:ref:`code formatting <coding-style-python>`), install and run the ``tox``
+command from any place in the Django source tree::
+
+    $ pip install tox
+    $ tox
+
+By default, ``tox`` runs the test suite with the bundled test settings file for
+SQLite, ``flake8``, ``isort``, and the documentation spelling checker. In
+addition to the system dependencies noted elsewhere in this documentation,
+the commands ``python2`` and ``python3`` must be on your path and linked to
+the appropriate versions of Python. A list of default environments can be seen
+as follows::
+
+    $ tox -l
+    py3
+    flake8
+    docs
+    isort
+
+Testing other Python versions and database backends
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In addition to the default environments, ``tox`` supports running unit tests
+for other versions of Python and other database backends. Since Django's test
+suite doesn't bundle a settings file for database backends other than SQLite,
+however, you must :ref:`create and provide your own test settings
+<running-unit-tests-settings>`. For example, to run the tests on Python 3.5
+using PostgreSQL::
+
+    $ tox -e py35-postgres -- --settings=my_postgres_settings
+
+This command sets up a Python 3.5 virtual environment, installs Django's
+test suite dependencies (including those for PostgreSQL), and calls
+``runtests.py`` with the supplied arguments (in this case,
+``--settings=my_postgres_settings``).
+
+The remainder of this documentation shows commands for running tests without
+``tox``, however, any option passed to ``runtests.py`` can also be passed to
+``tox`` by prefixing the argument list with ``--``, as above.
+
+Tox also respects the ``DJANGO_SETTINGS_MODULE`` environment variable, if set.
+For example, the following is equivalent to the command above::
+
+    $ DJANGO_SETTINGS_MODULE=my_postgres_settings tox -e py35-postgres
+
+Running the JavaScript tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django includes a set of :ref:`JavaScript unit tests <javascript-tests>` for
+functions in certain contrib apps. The JavaScript tests aren't run by default
+using ``tox`` because they require `Node.js` to be installed and aren't
+necessary for the majority of patches. To run the JavaScript tests using
+``tox``::
+
+    $ tox -e javascript
+
+This command runs ``npm install`` to ensure test requirements are up to
+date and then runs ``npm test``.
+
 .. _running-unit-tests-settings:
 
 Using another ``settings`` module

@@ -9,7 +9,6 @@ import errno
 import os
 import socket
 
-from django.core.exceptions import ImproperlyConfigured
 from django.test import LiveServerTestCase, override_settings
 from django.utils._os import upath
 from django.utils.http import urlencode
@@ -44,54 +43,12 @@ class LiveServerBase(LiveServerTestCase):
 
 
 class LiveServerAddress(LiveServerBase):
-    """
-    Ensure that the address set in the environment variable is valid.
-    Refs #2879.
-    """
 
     @classmethod
     def setUpClass(cls):
-        # Backup original environment variable
-        address_predefined = 'DJANGO_LIVE_TEST_SERVER_ADDRESS' in os.environ
-        old_address = os.environ.get('DJANGO_LIVE_TEST_SERVER_ADDRESS')
-
-        # Just the host is not accepted
-        cls.raises_exception('localhost', ImproperlyConfigured)
-
-        # The host must be valid
-        cls.raises_exception('blahblahblah:8081', socket.error)
-
-        # The list of ports must be in a valid format
-        cls.raises_exception('localhost:8081,', ImproperlyConfigured)
-        cls.raises_exception('localhost:8081,blah', ImproperlyConfigured)
-        cls.raises_exception('localhost:8081-', ImproperlyConfigured)
-        cls.raises_exception('localhost:8081-blah', ImproperlyConfigured)
-        cls.raises_exception('localhost:8081-8082-8083', ImproperlyConfigured)
-
-        # Restore original environment variable
-        if address_predefined:
-            os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = old_address
-        else:
-            del os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS']
-
+        super(LiveServerAddress, cls).setUpClass()
         # put it in a list to prevent descriptor lookups in test
         cls.live_server_url_test = [cls.live_server_url]
-
-    @classmethod
-    def tearDownClass(cls):
-        # skip it, as setUpClass doesn't call its parent either
-        pass
-
-    @classmethod
-    def raises_exception(cls, address, exception):
-        os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = address
-        try:
-            super(LiveServerAddress, cls).setUpClass()
-            raise Exception("The line above should have raised an exception")
-        except exception:
-            pass
-        finally:
-            super(LiveServerAddress, cls).tearDownClass()
 
     def test_live_server_url_is_class_property(self):
         self.assertIsInstance(self.live_server_url_test[0], text_type)
@@ -104,12 +61,9 @@ class LiveServerViews(LiveServerBase):
         Ensure that the LiveServerTestCase serves 404s.
         Refs #2879.
         """
-        try:
+        with self.assertRaises(HTTPError) as err:
             self.urlopen('/')
-        except HTTPError as err:
-            self.assertEqual(err.code, 404, 'Expected 404 response')
-        else:
-            self.fail('Expected 404 response')
+        self.assertEqual(err.exception.code, 404, 'Expected 404 response')
 
     def test_view(self):
         """
@@ -133,12 +87,9 @@ class LiveServerViews(LiveServerBase):
         tries to access a static file that isn't explicitly put under
         STATIC_ROOT.
         """
-        try:
+        with self.assertRaises(HTTPError) as err:
             self.urlopen('/static/another_app/another_app_static_file.txt')
-        except HTTPError as err:
-            self.assertEqual(err.code, 404, 'Expected 404 response')
-        else:
-            self.fail('Expected 404 response (got %d)' % err.code)
+        self.assertEqual(err.exception.code, 404, 'Expected 404 response')
 
     def test_media_files(self):
         """

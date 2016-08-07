@@ -448,6 +448,12 @@ coordinate transformation::
 
     __ http://www.gdal.org/classOGRGeometry.html
 
+    .. classmethod:: from_gml(gml_string)
+
+    .. versionadded:: 1.11
+
+    Constructs an :class:`OGRGeometry` from the given GML string.
+
     .. classmethod:: from_bbox(bbox)
 
     Constructs a :class:`Polygon` from the given bounding-box (a 4-tuple).

@@ -479,6 +479,8 @@ will be automatically added to the result set. However, if the ``values()``
 clause is applied after the ``annotate()`` clause, you need to explicitly
 include the aggregate column.
 
+.. _aggregation-ordering-interaction:
+
 Interaction with default ordering or ``order_by()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

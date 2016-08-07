@@ -3,7 +3,11 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 
-from ..fields import *  # NOQA
+from ..fields import (
+    ArrayField, BigIntegerRangeField, DateRangeField, DateTimeRangeField,
+    FloatRangeField, HStoreField, IntegerRangeField, JSONField,
+    SearchVectorField,
+)
 from ..models import TagField
 
 

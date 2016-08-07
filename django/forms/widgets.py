@@ -481,9 +481,7 @@ class CheckboxInput(Widget):
         self.check_test = boolean_check if check_test is None else check_test
 
     def render(self, name, value, attrs=None):
-        final_attrs = self.build_attrs(attrs, type='checkbox', name=name)
-        if self.check_test(value):
-            final_attrs['checked'] = 'checked'
+        final_attrs = self.build_attrs(attrs, type='checkbox', name=name, checked=self.check_test(value))
         if not (value is True or value is False or value is None or value == ''):
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_text(value)
@@ -646,9 +644,13 @@ class ChoiceInput(SubWidget):
 
     def tag(self, attrs=None):
         attrs = attrs or self.attrs
-        final_attrs = dict(attrs, type=self.input_type, name=self.name, value=self.choice_value)
-        if self.is_checked():
-            final_attrs['checked'] = 'checked'
+        final_attrs = dict(
+            attrs,
+            type=self.input_type,
+            name=self.name,
+            value=self.choice_value,
+            checked=self.is_checked(),
+        )
         return format_html('<input{} />', flatatt(final_attrs))
 
     @property
@@ -693,8 +695,11 @@ class ChoiceFieldRenderer(object):
         self.choices = choices
 
     def __getitem__(self, idx):
-        choice = self.choices[idx]  # Let the IndexError propagate
-        return self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, idx)
+        return list(self)[idx]
+
+    def __iter__(self):
+        for idx, choice in enumerate(self.choices):
+            yield self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, idx)
 
     def __str__(self):
         return self.render()
@@ -786,6 +791,13 @@ class RadioSelect(RendererMixin, Select):
 class CheckboxSelectMultiple(RendererMixin, SelectMultiple):
     renderer = CheckboxFieldRenderer
     _empty_value = []
+
+    def build_attrs(self, extra_attrs=None, **kwargs):
+        attrs = super(CheckboxSelectMultiple, self).build_attrs(extra_attrs, **kwargs)
+        # Remove the 'required' attribute because browser validation would
+        # require all checkboxes to be checked instead of at least one.
+        attrs.pop('required', None)
+        return attrs
 
 
 class MultiWidget(Widget):

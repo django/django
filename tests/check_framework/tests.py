@@ -156,7 +156,7 @@ class CheckCommandTests(SimpleTestCase):
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_given_tag(self):
         call_command('check', tags=['simpletag'])
-        self.assertEqual(simple_system_check.kwargs, None)
+        self.assertIsNone(simple_system_check.kwargs)
         self.assertEqual(tagged_system_check.kwargs, {'app_configs': None})
 
     @override_system_checks([simple_system_check, tagged_system_check])
@@ -224,10 +224,7 @@ class SilencingCheckTests(SimpleTestCase):
     def test_silenced_error(self):
         out = StringIO()
         err = StringIO()
-        try:
-            call_command('check', stdout=out, stderr=err)
-        except CommandError:
-            self.fail("The mycheck.E001 check should be silenced.")
+        call_command('check', stdout=out, stderr=err)
         self.assertEqual(out.getvalue(), 'System check identified no issues (1 silenced).\n')
         self.assertEqual(err.getvalue(), '')
 
@@ -236,11 +233,7 @@ class SilencingCheckTests(SimpleTestCase):
     def test_silenced_warning(self):
         out = StringIO()
         err = StringIO()
-        try:
-            call_command('check', stdout=out, stderr=err)
-        except CommandError:
-            self.fail("The mycheck.E001 check should be silenced.")
-
+        call_command('check', stdout=out, stderr=err)
         self.assertEqual(out.getvalue(), 'System check identified no issues (1 silenced).\n')
         self.assertEqual(err.getvalue(), '')
 

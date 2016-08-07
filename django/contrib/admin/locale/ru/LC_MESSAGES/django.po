@@ -4,15 +4,16 @@
 # Ivan Ivaschenko <defuz.net@gmail.com>, 2013
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
+# inoks <inoks@mail.ru>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Алексей Борискин <sun.void@gmail.com>, 2012-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-26 10:17+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-03 13:13+0000\n"
+"Last-Translator: inoks <inoks@mail.ru>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -68,6 +69,12 @@ msgstr "Этот месяц"
 msgid "This year"
 msgstr "Этот год"
 
+msgid "No date"
+msgstr "Дата не указана"
+
+msgid "Has date"
+msgstr "Дата указана"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -78,6 +85,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Действие:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Добавить еще один %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Удалить"
 
 msgid "action time"
 msgstr "время действия"
@@ -91,6 +105,8 @@ msgstr "тип содержимого"
 msgid "object id"
 msgstr "идентификатор объекта"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "представление объекта"
 
@@ -121,6 +137,30 @@ msgstr "Удалено \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "Запись в журнале"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "Добавлен {name} \"{object}\"."
+
+msgid "Added."
+msgstr "Добавлено."
+
+msgid "and"
+msgstr "и"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "Изменено {fields} у {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Изменено {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Удален {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "Ни одно поле не изменено."
+
 msgid "None"
 msgstr "Нет"
 
@@ -130,66 +170,41 @@ msgstr ""
 "Удерживайте \"Control\" (или \"Command\" на Mac), чтобы выбрать несколько "
 "значений."
 
-msgid "Added."
-msgstr "Добавлено."
-
-#, python-format
-msgid "Changed %s."
-msgstr "Изменен %s."
-
-msgid "and"
-msgstr "и"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Добавлен %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Изменены %(list)s для %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Удален %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Ни одно поле не изменено."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" был успешно добавлен. Ниже вы можете снова его "
-"отредактировать."
+"{name} \"{obj}\" был успешно добавлен. Вы можете отредактировать его еще раз "
+"ниже."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" успешно добавлен. Ниже вы можете добавить еще %(name)s."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" был успешно добавлен."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"%(name)s \"%(obj)s\" успешно изменен. Ниже вы можете редактировать снова."
+"{name} \"{obj}\" был успешно добавлен. Вы можете добавить еще один {name} "
+"ниже."
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" было успешно добавлено."
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" успешно изменен. Ниже вы можете добавить еще %(name)s."
+"{name} \"{obj}\" был изменен успешно. Вы можете отредактировать его снова "
+"ниже."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" был успешно изменен."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr "{name} \"{obj}\" был изменен. Вы можете добавить еще один {name} ниже."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name} \"{obj}\" был изменен."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -350,18 +365,15 @@ msgstr "Документация"
 msgid "Log out"
 msgstr "Выйти"
 
-msgid "Add"
-msgstr "Добавить"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Добавить %(name)s"
 
 msgid "History"
 msgstr "История"
 
 msgid "View on site"
 msgstr "Смотреть на сайте"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Добавить %(name)s"
 
 msgid "Filter"
 msgstr "Фильтр"
@@ -445,13 +457,6 @@ msgstr ""
 msgid "Change"
 msgstr "Изменить"
 
-msgid "Remove"
-msgstr "Удалить"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Добавить еще один %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Удалить?"
 
@@ -466,13 +471,16 @@ msgstr "Краткая статистика"
 msgid "Models in the %(name)s application"
 msgstr "Модели в приложении %(name)s"
 
+msgid "Add"
+msgstr "Добавить"
+
 msgid "You don't have permission to edit anything."
 msgstr "У вас недостаточно прав для редактирования."
 
-msgid "Recent Actions"
-msgstr "Последние действия"
+msgid "Recent actions"
+msgstr "Крайние действия"
 
-msgid "My Actions"
+msgid "My actions"
 msgstr "Мои действия"
 
 msgid "None available"

@@ -195,8 +195,14 @@ Format                   Input Type
 WKT / EWKT               ``str`` or ``unicode``
 HEX / HEXEWKB            ``str`` or ``unicode``
 WKB / EWKB               ``buffer``
-GeoJSON (requires GDAL)  ``str`` or ``unicode``
+GeoJSON                  ``str`` or ``unicode``
 =======================  ======================
+
+.. classmethod:: GEOSGeometry.from_gml(gml_string)
+
+    .. versionadded:: 1.11
+
+    Constructs a :class:`GEOSGeometry` from the given GML string.
 
 Properties
 ~~~~~~~~~~
@@ -344,10 +350,6 @@ another object.
 
     Returns an :class:`~django.contrib.gis.gdal.OGRGeometry` object
     corresponding to the GEOS geometry.
-
-    .. note::
-
-        Requires GDAL.
 
 .. _wkb:
 
@@ -618,10 +620,6 @@ Other Properties & Methods
     Returns a :class:`~django.contrib.gis.gdal.SpatialReference` object
     corresponding to the SRID of the geometry or ``None``.
 
-    .. note::
-
-        Requires GDAL.
-
 .. method:: GEOSGeometry.transform(ct, clone=False)
 
     Transforms the geometry according to the given coordinate transformation
@@ -635,10 +633,10 @@ Other Properties & Methods
 
     .. note::
 
-        Requires GDAL. Raises :class:`~django.contrib.gis.geos.GEOSException` if
-        GDAL is not available or if the geometry's SRID is ``None`` or less than
-        0. It doesn't impose any constraints on the geometry's SRID if called
-        with a :class:`~django.contrib.gis.gdal.CoordTransform` object.
+        Raises :class:`~django.contrib.gis.geos.GEOSException` if GDAL is not
+        available or if the geometry's SRID is ``None`` or less than 0. It
+        doesn't impose any constraints on the geometry's SRID if called with a
+        :class:`~django.contrib.gis.gdal.CoordTransform` object.
 
         .. versionchanged:: 1.10
 

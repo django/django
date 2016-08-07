@@ -85,7 +85,7 @@ class ModelInstanceCreationTests(TestCase):
         a = Article(headline='Article 5', pub_date=datetime(2005, 7, 31))
         a.save()
         self.assertEqual(a.headline, 'Article 5')
-        self.assertNotEqual(a.id, None)
+        self.assertIsNotNone(a.id)
 
     def test_leaving_off_a_field_with_default_set_the_default_will_be_saved(self):
         a = Article(pub_date=datetime(2005, 7, 31))
@@ -358,7 +358,7 @@ class ModelTest(TestCase):
         with self.assertRaises(TypeError):
             EmptyQuerySet()
         self.assertIsInstance(Article.objects.none(), EmptyQuerySet)
-        self.assertFalse(isinstance('', EmptyQuerySet))
+        self.assertNotIsInstance('', EmptyQuerySet)
 
     def test_emptyqs_values(self):
         # test for #15959
@@ -420,6 +420,19 @@ class ModelTest(TestCase):
             # No PK value -> unhashable (because save() would then change
             # hash)
             hash(Article())
+
+    def test_delete_and_access_field(self):
+        # Accessing a field after it's deleted from a model reloads its value.
+        pub_date = datetime.now()
+        article = Article.objects.create(headline='foo', pub_date=pub_date)
+        new_pub_date = article.pub_date + timedelta(days=10)
+        article.headline = 'bar'
+        article.pub_date = new_pub_date
+        del article.headline
+        with self.assertNumQueries(1):
+            self.assertEqual(article.headline, 'foo')
+        # Fields that weren't deleted aren't reloaded.
+        self.assertEqual(article.pub_date, new_pub_date)
 
 
 class ModelLookupTest(TestCase):

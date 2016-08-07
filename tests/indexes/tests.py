@@ -46,7 +46,7 @@ class SchemaIndexesTests(TestCase):
         from .models import IndexedArticle
         index_sql = connection.schema_editor()._model_indexes_sql(IndexedArticle)
         self.assertEqual(len(index_sql), 5)
-        self.assertIn('("headline" varchar_pattern_ops)', index_sql[2])
+        self.assertIn('("headline" varchar_pattern_ops)', index_sql[1])
         self.assertIn('("body" text_pattern_ops)', index_sql[3])
         # unique=True and db_index=True should only create the varchar-specific
         # index (#19441).
@@ -62,7 +62,7 @@ class SchemaIndexesTests(TestCase):
     def test_no_index_for_foreignkey(self):
         """
         MySQL on InnoDB already creates indexes automatically for foreign keys.
-        (#14180).
+        (#14180). An index should be created if db_constraint=False (#26171).
         """
         storage = connection.introspection.get_storage_engine(
             connection.cursor(), ArticleTranslation._meta.db_table
@@ -70,4 +70,7 @@ class SchemaIndexesTests(TestCase):
         if storage != "InnoDB":
             self.skip("This test only applies to the InnoDB storage engine")
         index_sql = connection.schema_editor()._model_indexes_sql(ArticleTranslation)
-        self.assertEqual(index_sql, [])
+        self.assertEqual(index_sql, [
+            'CREATE INDEX `indexes_articletranslation_99fb53c2` '
+            'ON `indexes_articletranslation` (`article_no_constraint_id`)'
+        ])

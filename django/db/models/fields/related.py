@@ -926,7 +926,7 @@ class ForeignKey(ForeignObject):
         if value is None:
             return
 
-        using = router.db_for_read(model_instance.__class__, instance=model_instance)
+        using = router.db_for_read(self.remote_field.model, instance=model_instance)
         qs = self.remote_field.model._default_manager.using(using).filter(
             **{self.remote_field.field_name: value}
         )
@@ -1226,6 +1226,16 @@ class ManyToManyField(RelatedField):
                     'ManyToManyField does not support validators.',
                     obj=self,
                     id='fields.W341',
+                )
+            )
+        if (self.remote_field.limit_choices_to and self.remote_field.through and
+                not self.remote_field.through._meta.auto_created):
+            warnings.append(
+                checks.Warning(
+                    'limit_choices_to has no effect on ManyToManyField '
+                    'with a through model.',
+                    obj=self,
+                    id='fields.W343',
                 )
             )
 
@@ -1654,11 +1664,8 @@ class ManyToManyField(RelatedField):
         Return the value of this field in the given model instance.
         """
         if obj.pk is None:
-            return []
-        qs = getattr(obj, self.attname).all()
-        if qs._result_cache is not None:
-            return [item.pk for item in qs]
-        return list(qs.values_list('pk', flat=True))
+            return self.related_model.objects.none()
+        return getattr(obj, self.attname).all()
 
     def save_form_data(self, instance, data):
         getattr(instance, self.attname).set(data)

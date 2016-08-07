@@ -16,15 +16,20 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.template.response import TemplateResponse
-from django.urls import reverse
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
 from django.utils.encoding import force_text
 from django.utils.http import is_safe_url, urlsafe_base64_decode
 from django.utils.six.moves.urllib.parse import urlparse, urlunparse
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
+from django.views.generic.base import TemplateView
+from django.views.generic.edit import FormView
 
 
 def deprecate_current_app(func):
@@ -48,105 +53,148 @@ def deprecate_current_app(func):
     return inner
 
 
-def _get_login_redirect_url(request, redirect_to):
-    # Ensure the user-originating redirection URL is safe.
-    if not is_safe_url(url=redirect_to, host=request.get_host()):
-        return resolve_url(settings.LOGIN_REDIRECT_URL)
-    return redirect_to
-
-
-@deprecate_current_app
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
-def login(request, template_name='registration/login.html',
-          redirect_field_name=REDIRECT_FIELD_NAME,
-          authentication_form=AuthenticationForm,
-          extra_context=None, redirect_authenticated_user=False):
+class LoginView(FormView):
     """
     Displays the login form and handles the login action.
     """
-    redirect_to = request.POST.get(redirect_field_name, request.GET.get(redirect_field_name, ''))
+    form_class = AuthenticationForm
+    authentication_form = None
+    redirect_field_name = REDIRECT_FIELD_NAME
+    template_name = 'registration/login.html'
+    redirect_authenticated_user = False
+    extra_context = None
 
-    if redirect_authenticated_user and request.user.is_authenticated:
-        redirect_to = _get_login_redirect_url(request, redirect_to)
-        if redirect_to == request.path:
-            raise ValueError(
-                "Redirection loop for authenticated user detected. Check that "
-                "your LOGIN_REDIRECT_URL doesn't point to a login page."
-            )
-        return HttpResponseRedirect(redirect_to)
-    elif request.method == "POST":
-        form = authentication_form(request, data=request.POST)
-        if form.is_valid():
-            auth_login(request, form.get_user())
-            return HttpResponseRedirect(_get_login_redirect_url(request, redirect_to))
-    else:
-        form = authentication_form(request)
+    @method_decorator(sensitive_post_parameters())
+    @method_decorator(csrf_protect)
+    @method_decorator(never_cache)
+    def dispatch(self, request, *args, **kwargs):
+        if self.redirect_authenticated_user and self.request.user.is_authenticated:
+            redirect_to = self.get_success_url()
+            if redirect_to == self.request.path:
+                raise ValueError(
+                    "Redirection loop for authenticated user detected. Check that "
+                    "your LOGIN_REDIRECT_URL doesn't point to a login page."
+                )
+            return HttpResponseRedirect(redirect_to)
+        return super(LoginView, self).dispatch(request, *args, **kwargs)
 
-    current_site = get_current_site(request)
+    def get_success_url(self):
+        """Ensure the user-originating redirection URL is safe."""
+        redirect_to = self.request.POST.get(
+            self.redirect_field_name,
+            self.request.GET.get(self.redirect_field_name, '')
+        )
+        if not is_safe_url(url=redirect_to, host=self.request.get_host()):
+            return resolve_url(settings.LOGIN_REDIRECT_URL)
+        return redirect_to
 
-    context = {
-        'form': form,
-        redirect_field_name: redirect_to,
-        'site': current_site,
-        'site_name': current_site.name,
-    }
-    if extra_context is not None:
-        context.update(extra_context)
+    def get_form_class(self):
+        return self.authentication_form or self.form_class
 
-    return TemplateResponse(request, template_name, context)
+    def form_valid(self, form):
+        """Security check complete. Log the user in."""
+        auth_login(self.request, form.get_user())
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_context_data(self, **kwargs):
+        context = super(LoginView, self).get_context_data(**kwargs)
+        current_site = get_current_site(self.request)
+        context.update({
+            self.redirect_field_name: self.get_success_url(),
+            'site': current_site,
+            'site_name': current_site.name,
+        })
+        if self.extra_context is not None:
+            context.update(self.extra_context)
+        return context
 
 
 @deprecate_current_app
-@never_cache
-def logout(request, next_page=None,
-           template_name='registration/logged_out.html',
-           redirect_field_name=REDIRECT_FIELD_NAME,
-           extra_context=None):
+def login(request, *args, **kwargs):
+    warnings.warn(
+        'The login() view is superseded by the class-based LoginView().',
+        RemovedInDjango21Warning, stacklevel=2
+    )
+    return LoginView.as_view(**kwargs)(request, *args, **kwargs)
+
+
+class LogoutView(TemplateView):
     """
     Logs out the user and displays 'You are logged out' message.
     """
-    auth_logout(request)
+    next_page = None
+    redirect_field_name = REDIRECT_FIELD_NAME
+    template_name = 'registration/logged_out.html'
+    extra_context = None
 
-    if next_page is not None:
-        next_page = resolve_url(next_page)
-    elif settings.LOGOUT_REDIRECT_URL:
-        next_page = resolve_url(settings.LOGOUT_REDIRECT_URL)
+    @method_decorator(never_cache)
+    def dispatch(self, request, *args, **kwargs):
+        auth_logout(request)
+        next_page = self.get_next_page()
+        if next_page:
+            # Redirect to this page until the session has been cleared.
+            return HttpResponseRedirect(next_page)
+        return super(LogoutView, self).dispatch(request, *args, **kwargs)
 
-    if (redirect_field_name in request.POST or
-            redirect_field_name in request.GET):
-        next_page = request.POST.get(redirect_field_name,
-                                     request.GET.get(redirect_field_name))
-        # Security check -- don't allow redirection to a different host.
-        if not is_safe_url(url=next_page, host=request.get_host()):
-            next_page = request.path
+    def get_next_page(self):
+        if self.next_page is not None:
+            next_page = resolve_url(self.next_page)
+        elif settings.LOGOUT_REDIRECT_URL:
+            next_page = resolve_url(settings.LOGOUT_REDIRECT_URL)
+        else:
+            next_page = self.next_page
 
-    if next_page:
-        # Redirect to this page until the session has been cleared.
-        return HttpResponseRedirect(next_page)
+        if (self.redirect_field_name in self.request.POST or
+                self.redirect_field_name in self.request.GET):
+            next_page = self.request.POST.get(
+                self.redirect_field_name,
+                self.request.GET.get(self.redirect_field_name)
+            )
+            # Security check -- don't allow redirection to a different host.
+            if not is_safe_url(url=next_page, host=self.request.get_host()):
+                next_page = self.request.path
+        return next_page
 
-    current_site = get_current_site(request)
-    context = {
-        'site': current_site,
-        'site_name': current_site.name,
-        'title': _('Logged out')
-    }
-    if extra_context is not None:
-        context.update(extra_context)
-
-    return TemplateResponse(request, template_name, context)
+    def get_context_data(self, **kwargs):
+        context = super(LogoutView, self).get_context_data(**kwargs)
+        current_site = get_current_site(self.request)
+        context.update({
+            'site': current_site,
+            'site_name': current_site.name,
+            'title': _('Logged out'),
+        })
+        if self.extra_context is not None:
+            context.update(self.extra_context)
+        return context
 
 
 @deprecate_current_app
-def logout_then_login(request, login_url=None, extra_context=None):
+def logout(request, *args, **kwargs):
+    warnings.warn(
+        'The logout() view is superseded by the class-based LogoutView().',
+        RemovedInDjango21Warning, stacklevel=2
+    )
+    return LogoutView.as_view(**kwargs)(request, *args, **kwargs)
+
+
+_sentinel = object()
+
+
+@deprecate_current_app
+def logout_then_login(request, login_url=None, extra_context=_sentinel):
     """
     Logs out the user if they are logged in. Then redirects to the log-in page.
     """
+    if extra_context is not _sentinel:
+        warnings.warn(
+            "The unused `extra_context` parameter to `logout_then_login` "
+            "is deprecated.", RemovedInDjango21Warning
+        )
+
     if not login_url:
         login_url = settings.LOGIN_URL
     login_url = resolve_url(login_url)
-    return logout(request, login_url, extra_context=extra_context)
+    return LogoutView.as_view(next_page=login_url)(request)
 
 
 def redirect_to_login(next, login_url=None,
@@ -185,6 +233,9 @@ def password_reset(request,
                    extra_context=None,
                    html_email_template_name=None,
                    extra_email_context=None):
+    warnings.warn("The password_reset() view is superseded by the "
+                  "class-based PasswordResetView().",
+                  RemovedInDjango21Warning, stacklevel=2)
     if post_reset_redirect is None:
         post_reset_redirect = reverse('password_reset_done')
     else:
@@ -220,6 +271,9 @@ def password_reset(request,
 def password_reset_done(request,
                         template_name='registration/password_reset_done.html',
                         extra_context=None):
+    warnings.warn("The password_reset_done() view is superseded by the "
+                  "class-based PasswordResetDoneView().",
+                  RemovedInDjango21Warning, stacklevel=2)
     context = {
         'title': _('Password reset sent'),
     }
@@ -243,6 +297,9 @@ def password_reset_confirm(request, uidb64=None, token=None,
     View that checks the hash in a password reset link and presents a
     form for entering a new password.
     """
+    warnings.warn("The password_reset_confirm() view is superseded by the "
+                  "class-based PasswordResetConfirmView().",
+                  RemovedInDjango21Warning, stacklevel=2)
     UserModel = get_user_model()
     assert uidb64 is not None and token is not None  # checked by URLconf
     if post_reset_redirect is None:
@@ -285,6 +342,9 @@ def password_reset_confirm(request, uidb64=None, token=None,
 def password_reset_complete(request,
                             template_name='registration/password_reset_complete.html',
                             extra_context=None):
+    warnings.warn("The password_reset_complete() view is superseded by the "
+                  "class-based PasswordResetCompleteView().",
+                  RemovedInDjango21Warning, stacklevel=2)
     context = {
         'login_url': resolve_url(settings.LOGIN_URL),
         'title': _('Password reset complete'),
@@ -293,6 +353,116 @@ def password_reset_complete(request,
         context.update(extra_context)
 
     return TemplateResponse(request, template_name, context)
+
+
+# Class-based password reset views
+# - PasswordResetView sends the mail
+# - PasswordResetDoneView shows a success message for the above
+# - PasswordResetConfirmView checks the link the user clicked and
+#   prompts for a new password
+# - PasswordResetCompleteView shows a success message for the above
+
+class PasswordContextMixin(object):
+    extra_context = None
+
+    def get_context_data(self, **kwargs):
+        context = super(PasswordContextMixin, self).get_context_data(**kwargs)
+        context['title'] = self.title
+        if self.extra_context is not None:
+            context.update(self.extra_context)
+        return context
+
+
+class PasswordResetView(PasswordContextMixin, FormView):
+    email_template_name = 'registration/password_reset_email.html'
+    extra_email_context = None
+    form_class = PasswordResetForm
+    from_email = None
+    html_email_template_name = None
+    subject_template_name = 'registration/password_reset_subject.txt'
+    success_url = reverse_lazy('password_reset_done')
+    template_name = 'registration/password_reset_form.html'
+    title = _('Password reset')
+    token_generator = default_token_generator
+
+    @method_decorator(csrf_protect)
+    def dispatch(self, *args, **kwargs):
+        return super(PasswordResetView, self).dispatch(*args, **kwargs)
+
+    def form_valid(self, form):
+        opts = {
+            'use_https': self.request.is_secure(),
+            'token_generator': self.token_generator,
+            'from_email': self.from_email,
+            'email_template_name': self.email_template_name,
+            'subject_template_name': self.subject_template_name,
+            'request': self.request,
+            'html_email_template_name': self.html_email_template_name,
+            'extra_email_context': self.extra_email_context,
+        }
+        form.save(**opts)
+        return super(PasswordResetView, self).form_valid(form)
+
+
+class PasswordResetDoneView(PasswordContextMixin, TemplateView):
+    template_name = 'registration/password_reset_done.html'
+    title = _('Password reset sent')
+
+
+class PasswordResetConfirmView(PasswordContextMixin, FormView):
+    form_class = SetPasswordForm
+    success_url = reverse_lazy('password_reset_complete')
+    template_name = 'registration/password_reset_confirm.html'
+    title = _('Enter new password')
+    token_generator = default_token_generator
+
+    @method_decorator(sensitive_post_parameters())
+    @method_decorator(never_cache)
+    def dispatch(self, *args, **kwargs):
+        assert 'uidb64' in kwargs and 'token' in kwargs
+        return super(PasswordResetConfirmView, self).dispatch(*args, **kwargs)
+
+    def get_user(self, uidb64):
+        UserModel = get_user_model()
+        try:
+            # urlsafe_base64_decode() decodes to bytestring on Python 3
+            uid = force_text(urlsafe_base64_decode(uidb64))
+            user = UserModel._default_manager.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
+            user = None
+        return user
+
+    def get_form_kwargs(self):
+        kwargs = super(PasswordResetConfirmView, self).get_form_kwargs()
+        kwargs['user'] = self.get_user(self.kwargs['uidb64'])
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        return super(PasswordResetConfirmView, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(PasswordResetConfirmView, self).get_context_data(**kwargs)
+        user = context['form'].user
+        if user is not None and self.token_generator.check_token(user, self.kwargs['token']):
+            context['validlink'] = True
+        else:
+            context.update({
+                'form': None,
+                'title': _('Password reset unsuccessful'),
+                'validlink': False,
+            })
+        return context
+
+
+class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
+    template_name = 'registration/password_reset_complete.html'
+    title = _('Password reset complete')
+
+    def get_context_data(self, **kwargs):
+        context = super(PasswordResetCompleteView, self).get_context_data(**kwargs)
+        context['login_url'] = resolve_url(settings.LOGIN_URL)
+        return context
 
 
 @sensitive_post_parameters()
@@ -304,6 +474,9 @@ def password_change(request,
                     post_change_redirect=None,
                     password_change_form=PasswordChangeForm,
                     extra_context=None):
+    warnings.warn("The password_change() view is superseded by the "
+                  "class-based PasswordChangeView().",
+                  RemovedInDjango21Warning, stacklevel=2)
     if post_change_redirect is None:
         post_change_redirect = reverse('password_change_done')
     else:
@@ -333,6 +506,9 @@ def password_change(request,
 def password_change_done(request,
                          template_name='registration/password_change_done.html',
                          extra_context=None):
+    warnings.warn("The password_change_done() view is superseded by the "
+                  "class-based PasswordChangeDoneView().",
+                  RemovedInDjango21Warning, stacklevel=2)
     context = {
         'title': _('Password change successful'),
     }
@@ -340,3 +516,37 @@ def password_change_done(request,
         context.update(extra_context)
 
     return TemplateResponse(request, template_name, context)
+
+
+class PasswordChangeView(PasswordContextMixin, FormView):
+    form_class = PasswordChangeForm
+    success_url = reverse_lazy('password_change_done')
+    template_name = 'registration/password_change_form.html'
+    title = _('Password change')
+
+    @method_decorator(sensitive_post_parameters())
+    @method_decorator(csrf_protect)
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(PasswordChangeView, self).dispatch(*args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super(PasswordChangeView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        # Updating the password logs out all other sessions for the user
+        # except the current one.
+        update_session_auth_hash(self.request, form.user)
+        return super(PasswordChangeView, self).form_valid(form)
+
+
+class PasswordChangeDoneView(PasswordContextMixin, TemplateView):
+    template_name = 'registration/password_change_done.html'
+    title = _('Password change successful')
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(PasswordChangeDoneView, self).dispatch(*args, **kwargs)

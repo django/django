@@ -109,8 +109,7 @@ class ForwardManyToOneDescriptor(object):
     def get_queryset(self, **hints):
         related_model = self.field.remote_field.model
 
-        if (not related_model._meta.base_manager_name and
-                getattr(related_model._default_manager, 'use_for_related_fields', False)):
+        if getattr(related_model._default_manager, 'use_for_related_fields', False):
             if not getattr(related_model._default_manager, 'silence_use_for_related_fields_deprecation', False):
                 warnings.warn(
                     "use_for_related_fields is deprecated, instead "
@@ -326,8 +325,7 @@ class ReverseOneToOneDescriptor(object):
     def get_queryset(self, **hints):
         related_model = self.related.related_model
 
-        if (not related_model._meta.base_manager_name and
-                getattr(related_model._default_manager, 'use_for_related_fields', False)):
+        if getattr(related_model._default_manager, 'use_for_related_fields', False):
             if not getattr(related_model._default_manager, 'silence_use_for_related_fields_deprecation', False):
                 warnings.warn(
                     "use_for_related_fields is deprecated, instead "
@@ -511,6 +509,12 @@ class ReverseManyToOneDescriptor(object):
 
         return self.related_manager_cls(instance)
 
+    def _get_set_deprecation_msg_params(self):
+        return (  # RemovedInDjango20Warning
+            'reverse side of a related set',
+            self.rel.get_accessor_name(),
+        )
+
     def __set__(self, instance, value):
         """
         Set the related objects through the reverse relation.
@@ -522,9 +526,9 @@ class ReverseManyToOneDescriptor(object):
         - ``value`` is the ``children`` sequence on the right of the equal sign
         """
         warnings.warn(
-            'Direct assignment to the reverse side of a related set is '
-            'deprecated due to the implicit save() that happens. Use %s.set() '
-            'instead.' % self.rel.get_accessor_name(), RemovedInDjango20Warning, stacklevel=2,
+            'Direct assignment to the %s is deprecated due to the implicit '
+            'save() that happens. Use %s.set() instead.' % self._get_set_deprecation_msg_params(),
+            RemovedInDjango20Warning, stacklevel=2,
         )
         manager = self.__get__(instance)
         manager.set(value)
@@ -573,6 +577,12 @@ def create_reverse_many_to_one_manager(superclass, rel):
             queryset._known_related_objects = {self.field: {self.instance.pk: self.instance}}
             return queryset
 
+        def _remove_prefetched_objects(self):
+            try:
+                self.instance._prefetched_objects_cache.pop(self.field.related_query_name())
+            except (AttributeError, KeyError):
+                pass  # nothing to clear from cache
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.field.related_query_name()]
@@ -602,6 +612,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             return queryset, rel_obj_attr, instance_attr, False, cache_name
 
         def add(self, *objs, **kwargs):
+            self._remove_prefetched_objects()
             bulk = kwargs.pop('bulk', True)
             objs = list(objs)
             db = router.db_for_write(self.model, instance=self.instance)
@@ -676,6 +687,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
             clear.alters_data = True
 
             def _clear(self, queryset, bulk):
+                self._remove_prefetched_objects()
                 db = router.db_for_write(self.model, instance=self.instance)
                 queryset = queryset.using(db)
                 if bulk:
@@ -757,6 +769,12 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor):
             related_model._default_manager.__class__,
             self.rel,
             reverse=self.reverse,
+        )
+
+    def _get_set_deprecation_msg_params(self):
+        return (  # RemovedInDjango20Warning
+            '%s side of a many-to-many set' % ('reverse' if self.reverse else 'forward'),
+            self.rel.get_accessor_name() if self.reverse else self.field.name,
         )
 
 
@@ -846,6 +864,12 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 queryset = queryset.using(self._db)
             return queryset._next_is_sticky().filter(**self.core_filters)
 
+        def _remove_prefetched_objects(self):
+            try:
+                self.instance._prefetched_objects_cache.pop(self.prefetch_cache_name)
+            except (AttributeError, KeyError):
+                pass  # nothing to clear from cache
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
@@ -899,7 +923,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     "intermediary model. Use %s.%s's Manager instead." %
                     (opts.app_label, opts.object_name)
                 )
-
+            self._remove_prefetched_objects()
             db = router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 self._add_items(self.source_field_name, self.target_field_name, *objs)
@@ -917,6 +941,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     "an intermediary model. Use %s.%s's Manager instead." %
                     (opts.app_label, opts.object_name)
                 )
+            self._remove_prefetched_objects()
             self._remove_items(self.source_field_name, self.target_field_name, *objs)
         remove.alters_data = True
 
@@ -928,6 +953,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     instance=self.instance, reverse=self.reverse,
                     model=self.model, pk_set=None, using=db,
                 )
+                self._remove_prefetched_objects()
                 filters = self._build_remove_filters(super(ManyRelatedManager, self).get_queryset().using(db))
                 self.through._default_manager.using(db).filter(filters).delete()
 

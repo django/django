@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-02-15 10:29+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-08 09:35+0000\n"
 "Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
@@ -62,6 +62,9 @@ msgstr "Дански"
 
 msgid "German"
 msgstr "Германски"
+
+msgid "Lower Sorbian"
+msgstr "Долно Лужичко-Српски"
 
 msgid "Greek"
 msgstr "Грчки"
@@ -132,6 +135,9 @@ msgstr "Хинди"
 msgid "Croatian"
 msgstr "Хрватски"
 
+msgid "Upper Sorbian"
+msgstr "Горно Лужичко-Српски"
+
 msgid "Hungarian"
 msgstr "Унгарски"
 
@@ -192,8 +198,8 @@ msgstr "Марати"
 msgid "Burmese"
 msgstr "Бурмански"
 
-msgid "Norwegian Bokmal"
-msgstr "Бокманл норвешки"
+msgid "Norwegian Bokmål"
+msgstr "Норвешки Бокмел"
 
 msgid "Nepali"
 msgstr "Непалски"
@@ -290,9 +296,6 @@ msgstr "Статички датотеки"
 
 msgid "Syndication"
 msgstr "Синдикација"
-
-msgid "Web Design"
-msgstr "Веб дизајн"
 
 msgid "Enter a valid value."
 msgstr "Внесете правилна вредност."
@@ -438,6 +441,9 @@ msgstr "Цел број"
 msgid "'%(value)s' value must be an integer."
 msgstr "Вредноста '%(value)s' мора да биде цел број."
 
+msgid "Big (8 byte) integer"
+msgstr "Голем (8 бајти) цел број"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Вредноста '%(value)s' мора да биде точно или неточно."
@@ -520,9 +526,6 @@ msgstr "Вредноста '%(value)s' мора да биде децимален
 msgid "Floating point number"
 msgstr "Децимален број подвижна запирка"
 
-msgid "Big (8 byte) integer"
-msgstr "Голем (8 бајти) цел број"
-
 msgid "IPv4 address"
 msgstr "IPv4 адреса"
 
@@ -596,6 +599,14 @@ msgstr "Надворешен клуч (типот е одреден според
 
 msgid "One-to-one relationship"
 msgstr "Еден-према-еден релација"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s релација"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s релации"
 
 msgid "Many-to-many relationship"
 msgstr "Повеќе-према-повеќе релација"

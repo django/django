@@ -90,13 +90,17 @@ If the ``Host`` header (or ``X-Forwarded-Host`` if
 list, the :meth:`django.http.HttpRequest.get_host()` method will raise
 :exc:`~django.core.exceptions.SuspiciousOperation`.
 
-When :setting:`DEBUG` is ``True`` or when running tests, host validation is
-disabled; any host will be accepted. Thus it's usually only necessary to set it
-in production.
+When :setting:`DEBUG` is ``True``, host validation is disabled; any host will
+be accepted. ``ALLOWED_HOSTS`` is :ref:`checked when running tests
+<topics-testing-advanced-multiple-hosts>`.
 
 This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
+
+.. versionchanged:: 1.11
+
+    In older versions, ``ALLOWED_HOSTS`` wasn't checked when running tests.
 
 .. setting:: APPEND_SLASH
 
@@ -691,17 +695,6 @@ which has no dependencies.
 The creation-order dependencies of the database. See the documentation
 on :ref:`controlling the creation order of test databases
 <topics-testing-creation-dependencies>` for details.
-
-.. setting:: TEST_MIGRATE
-
-``MIGRATE``
-^^^^^^^^^^^
-
-.. versionadded:: 1.10
-
-Default: ``True``
-
-If set to ``False``, Django won't use migrations to create the test database.
 
 .. setting:: TEST_MIRROR
 
@@ -1939,11 +1932,27 @@ no grouping will be applied to the number. If this setting is greater than
 ``0``, then :setting:`THOUSAND_SEPARATOR` will be used as the separator between
 those groups.
 
+Some locales use non-uniform digit grouping, e.g. ``10,00,00,000`` in
+``en_IN``. For this case, you can provide a sequence with the number of digit
+group sizes to be applied. The first number defines the size of the group
+preceding the decimal delimiter, and each number that follows defines the size
+of preceding groups. If the sequence is terminated with ``-1``, no further
+grouping is performed. If the sequence terminates with a ``0``, the last group
+size is used for the remainder of the number.
+
+Example tuple for ``en_IN``::
+
+    NUMBER_GROUPING = (3, 2, 0)
+
 Note that if :setting:`USE_L10N` is set to ``True``, then the locale-dictated
 format has higher precedence and will be applied instead.
 
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
+
+.. versionchanged:: 1.11
+
+    Support for non-uniform digit grouping was added.
 
 .. setting:: PREPEND_WWW
 
@@ -2001,7 +2010,7 @@ The secret key is used for:
 * All :doc:`messages </ref/contrib/messages>` if you are using
   :class:`~django.contrib.messages.storage.cookie.CookieStorage` or
   :class:`~django.contrib.messages.storage.fallback.FallbackStorage`.
-* All :func:`~django.contrib.auth.views.password_reset` tokens.
+* All :class:`~django.contrib.auth.views.PasswordResetView` tokens.
 * Any usage of :doc:`cryptographic signing </topics/signing>`, unless a
   different key is provided.
 
@@ -2716,8 +2725,8 @@ the URL in two places (``settings`` and URLconf).
 
 Default: ``None``
 
-The URL where requests are redirected after a user logs out using the
-:func:`~django.contrib.auth.views.logout` view (if the view doesn't get a
+The URL where requests are redirected after a user logs out using
+:class:`~django.contrib.auth.views.LogoutView` (if the view doesn't get a
 ``next_page`` argument).
 
 If ``None``, no redirect will be performed and the logout view will be

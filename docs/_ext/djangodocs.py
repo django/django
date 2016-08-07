@@ -110,7 +110,7 @@ def visit_snippet(self, node):
                                                    linenos=linenos,
                                                    **highlight_args)
     starttag = self.starttag(node, 'div', suffix='',
-                             CLASS='highlight-%s' % lang)
+                             CLASS='highlight-%s snippet' % lang)
     self.body.append(starttag)
     self.body.append('<div class="snippet-filename">%s</div>\n''' % (fname,))
     self.body.append(highlighted)

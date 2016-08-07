@@ -78,7 +78,7 @@ class Command(BaseCommand):
         pks = options['primary_keys']
 
         if pks:
-            primary_keys = pks.split(',')
+            primary_keys = [pk.strip() for pk in pks.split(',')]
         else:
             primary_keys = []
 

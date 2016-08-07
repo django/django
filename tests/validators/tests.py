@@ -6,20 +6,29 @@ import os
 import re
 import types
 from datetime import datetime, timedelta
-from unittest import TestCase
+from unittest import TestCase, skipUnless
 
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.core.validators import (
-    BaseValidator, DecimalValidator, EmailValidator, MaxLengthValidator,
-    MaxValueValidator, MinLengthValidator, MinValueValidator, RegexValidator,
-    URLValidator, int_list_validator, validate_comma_separated_integer_list,
-    validate_email, validate_integer, validate_ipv4_address,
+    BaseValidator, DecimalValidator, EmailValidator, FileExtensionValidator,
+    MaxLengthValidator, MaxValueValidator, MinLengthValidator,
+    MinValueValidator, RegexValidator, URLValidator, int_list_validator,
+    validate_comma_separated_integer_list, validate_email,
+    validate_image_file_extension, validate_integer, validate_ipv4_address,
     validate_ipv6_address, validate_ipv46_address, validate_slug,
     validate_unicode_slug,
 )
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
 from django.utils._os import upath
+
+try:
+    from PIL import Image  # noqa
+except ImportError:
+    PILLOW_IS_INSTALLED = False
+else:
+    PILLOW_IS_INSTALLED = True
 
 NOW = datetime.now()
 EXTENDED_SCHEMES = ['http', 'https', 'ftp', 'ftps', 'git', 'file', 'git+ssh']
@@ -242,6 +251,17 @@ TEST_DATA = [
     (RegexValidator('x', flags=re.IGNORECASE), 'y', ValidationError),
     (RegexValidator('a'), 'A', ValidationError),
     (RegexValidator('a', flags=re.IGNORECASE), 'A', None),
+
+    (FileExtensionValidator(['txt']), ContentFile('contents', name='fileWithUnsupportedExt.jpg'), ValidationError),
+    (FileExtensionValidator(['txt']), ContentFile('contents', name='fileWithNoExtenstion'), ValidationError),
+    (FileExtensionValidator([]), ContentFile('contents', name='file.txt'), ValidationError),
+    (FileExtensionValidator(['txt']), ContentFile('contents', name='file.txt'), None),
+    (FileExtensionValidator(), ContentFile('contents', name='file.jpg'), None),
+
+    (validate_image_file_extension, ContentFile('contents', name='file.jpg'), None),
+    (validate_image_file_extension, ContentFile('contents', name='file.png'), None),
+    (validate_image_file_extension, ContentFile('contents', name='file.txt'), ValidationError),
+    (validate_image_file_extension, ContentFile('contents', name='file'), ValidationError),
 ]
 
 
@@ -286,6 +306,9 @@ def create_simple_test_method(validator, expected, value, num):
     else:
         val_name = validator.__class__.__name__
     test_name = test_mask % (val_name, num)
+    if validator is validate_image_file_extension:
+        SKIP_MSG = "Pillow is required to test validate_image_file_extension"
+        test_func = skipUnless(PILLOW_IS_INSTALLED, SKIP_MSG)(test_func)
     return test_name, test_func
 
 # Dynamically assemble a test class with the contents of TEST_DATA
@@ -308,12 +331,8 @@ class TestSimpleValidators(SimpleTestCase):
         self.assertEqual(repr(v), str_prefix("ValidationError({%(_)s'first': [%(_)s'First Problem']})"))
 
     def test_regex_validator_flags(self):
-        try:
+        with self.assertRaises(TypeError):
             RegexValidator(re.compile('a'), flags=re.IGNORECASE)
-        except TypeError:
-            pass
-        else:
-            self.fail("TypeError not raised when flags and pre-compiled regex in RegexValidator")
 
     def test_max_length_validator_message(self):
         v = MaxLengthValidator(16, message='"%(value)s" has more than %(limit_value)d characters.')
@@ -425,4 +444,34 @@ class TestValidatorEquality(TestCase):
         self.assertNotEqual(
             DecimalValidator(1, 2),
             MinValueValidator(11),
+        )
+
+    def test_file_extension_equality(self):
+        self.assertEqual(
+            FileExtensionValidator(),
+            FileExtensionValidator()
+        )
+        self.assertEqual(
+            FileExtensionValidator(['txt']),
+            FileExtensionValidator(['txt'])
+        )
+        self.assertEqual(
+            FileExtensionValidator(['txt']),
+            FileExtensionValidator(['txt'], code='invalid_extension')
+        )
+        self.assertNotEqual(
+            FileExtensionValidator(['txt']),
+            FileExtensionValidator(['png'])
+        )
+        self.assertNotEqual(
+            FileExtensionValidator(['txt']),
+            FileExtensionValidator(['png', 'jpg'])
+        )
+        self.assertNotEqual(
+            FileExtensionValidator(['txt']),
+            FileExtensionValidator(['txt'], code='custom_code')
+        )
+        self.assertNotEqual(
+            FileExtensionValidator(['txt']),
+            FileExtensionValidator(['txt'], message='custom error message')
         )

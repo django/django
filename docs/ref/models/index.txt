@@ -8,6 +8,7 @@ Model API reference. For introductory material, see :doc:`/topics/db/models`.
    :maxdepth: 1
 
    fields
+   indexes
    meta
    relations
    class

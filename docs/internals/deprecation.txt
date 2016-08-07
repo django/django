@@ -15,6 +15,14 @@ about each item can often be found in the release notes of two versions prior.
 See the :ref:`Django 1.11 release notes<deprecated-features-1.11>` for more
 details on these changes.
 
+* ``contrib.auth.views.login()``, ``logout()``, ``password_change()``,
+  ``password_change_done()``, ``password_reset()``, ``password_reset_done()``,
+  ``password_reset_confirm()``, and ``password_reset_complete()`` will be
+  removed.
+
+* The ``extra_context`` parameter of ``contrib.auth.views.logout_then_login()``
+  will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

@@ -1,6 +1,6 @@
 """
  The OGRGeometry is a wrapper for using the OGR Geometry class
- (see http://www.gdal.org/ogr/classOGRGeometry.html).  OGRGeometry
+ (see http://www.gdal.org/classOGRGeometry.html).  OGRGeometry
  may be instantiated when reading geometries from OGR Data Sources
  (e.g. SHP files), or when given OGC WKT (a string).
 
@@ -52,11 +52,12 @@ from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
 from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
 from django.utils import six
+from django.utils.encoding import force_bytes
 from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:
-#  http://www.gdal.org/ogr/ogr__api_8h.html
+#  http://www.gdal.org/ogr__api_8h.html
 #
 # The OGR_G_* routines are relevant here.
 class OGRGeometry(GDALBase):
@@ -149,6 +150,10 @@ class OGRGeometry(GDALBase):
         x0, y0, x1, y1 = bbox
         return OGRGeometry('POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' % (
             x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
+
+    @classmethod
+    def from_gml(cls, gml_string):
+        return cls(capi.from_gml(force_bytes(gml_string)))
 
     # ### Geometry set-like operations ###
     # g = g1 | g2

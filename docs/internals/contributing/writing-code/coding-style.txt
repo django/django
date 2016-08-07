@@ -4,6 +4,8 @@ Coding style
 
 Please follow these coding standards when writing code for inclusion in Django.
 
+.. _coding-style-python:
+
 Python style
 ============
 
@@ -32,7 +34,7 @@ Python style
 * Use four spaces for indentation.
 
 * Use underscores, not camelCase, for variable, function and method names
-  (i.e. ``poll.get_unique_voters()``, not ``poll.getUniqueVoters``).
+  (i.e. ``poll.get_unique_voters()``, not ``poll.getUniqueVoters()``).
 
 * Use ``InitialCaps`` for class names (or for factory functions that
   return classes).
@@ -50,6 +52,8 @@ Python style
   message. Use :meth:`~unittest.TestCase.assertRaisesRegex`
   (``six.assertRaisesRegex()`` as long as we support Python 2) only if you need
   to use regular expression matching.
+
+.. _coding-style-imports:
 
 Imports
 =======

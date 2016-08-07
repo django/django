@@ -6,14 +6,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lyuboslav  Petrov <petrov.lyuboslav@gmail.com>, 2014
 # Todor Lubenov <tgl.sysdev@gmail.com>, 2015
-# Venelin Stoykov <vkstoykov@gmail.com>, 2015
+# Venelin Stoykov <vkstoykov@gmail.com>, 2015-2016
 # vestimir <vestimir@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-11-27 16:56+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-30 17:32+0000\n"
 "Last-Translator: Venelin Stoykov <vkstoykov@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
@@ -120,6 +120,21 @@ msgstr "'salt'"
 msgid "hash"
 msgstr "хеш"
 
+msgid "variety"
+msgstr ""
+
+msgid "version"
+msgstr "версия"
+
+msgid "memory cost"
+msgstr ""
+
+msgid "time cost"
+msgstr ""
+
+msgid "parallelism"
+msgstr ""
+
 msgid "work factor"
 msgstr "работен фактор"
 
@@ -130,7 +145,7 @@ msgid "name"
 msgstr "име"
 
 msgid "content type"
-msgstr ""
+msgstr "тип на съдържанието"
 
 msgid "codename"
 msgstr "код"
@@ -173,15 +188,8 @@ msgstr "Специфични права за този потребител"
 msgid "username"
 msgstr "потребител"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Задължително. 30 знака или по-малко. Букви, цифри и @/./+/-/_ ."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Въведете валидно потребителско име. То може да съдържа само букви, цифри и "
-"@/./+/-/_ символи."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Задължително. 150 знака или по-малко. Букви, цифри и @/./+/-/_ ."
 
 msgid "A user with that username already exists."
 msgstr "Потребител с това потребителско име вече съществува.  "
@@ -260,6 +268,20 @@ msgstr "Вашата парола не може да бъде само от ци
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Променена парола на %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Въведете валидно потребителско име. То може да съдържа само букви на "
+"латиница, цифри и @/./+/-/_ символи."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Въведете валидно потребителско име. То може да съдържа само букви, цифри и "
+"@/./+/-/_ символи."
 
 msgid "Logged out"
 msgstr "Извън системата"

@@ -45,6 +45,11 @@ class DatabaseOperations(BaseDatabaseOperations):
         sql = '(%s)::date' % field_name
         return sql, params
 
+    def datetime_cast_time_sql(self, field_name, tzname):
+        field_name, params = self._convert_field_to_tz(field_name, tzname)
+        sql = '(%s)::time' % field_name
+        return sql, params
+
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         field_name, params = self._convert_field_to_tz(field_name, tzname)
         sql = self.date_extract_sql(lookup_type, field_name)
@@ -55,6 +60,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         sql = "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
         return sql, params
+
+    def time_trunc_sql(self, lookup_type, field_name):
+        return "DATE_TRUNC('%s', %s)::time" % (lookup_type, field_name)
 
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"

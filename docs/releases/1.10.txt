@@ -1,6 +1,8 @@
-=============================================
-Django 1.10 release notes - UNDER DEVELOPMENT
-=============================================
+=========================
+Django 1.10 release notes
+=========================
+
+*August 1, 2016*
 
 Welcome to Django 1.10!
 
@@ -131,6 +133,13 @@ Minor features
   :func:`~django.contrib.auth.views.login` view allows redirecting
   authenticated users visiting the login page.
 
+* The new :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend` and
+  :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend` ignore
+  the value of ``User.is_active``, while
+  :class:`~django.contrib.auth.backends.ModelBackend` and
+  :class:`~django.contrib.auth.backends.RemoteUserBackend` now reject inactive
+  users.
+
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -214,6 +223,9 @@ Minor features
   which can now always use ``{% load static %}`` (instead of
   ``{% load staticfiles %}`` or ``{% load static from staticfiles %}``) and
   not worry about whether or not the ``staticfiles`` app is installed.
+
+* You can :ref:`more easily customize <customize-staticfiles-ignore-patterns>`
+  the ``collectstatic --ignore_patterns`` option with a custom ``AppConfig``.
 
 Cache
 ~~~~~
@@ -479,9 +491,6 @@ Tests
 * Tests and test cases can be :ref:`marked with tags <topics-tagging-tests>`
   and run selectively with the new :option:`test --tag` and :option:`test
   --exclude-tag` options.
-
-* Added the :setting:`DATABASES['TEST']['MIGRATE'] <TEST_MIGRATE>` option to
-  allow disabling of migrations during test database creation.
 
 * You can now login and use sessions with the test client even if
   :mod:`django.contrib.sessions` is not in :setting:`INSTALLED_APPS`.
@@ -818,6 +827,9 @@ Miscellaneous
 * In light of the previous change, the test client's
   :meth:`~django.test.Client.login()` method no longer always rejects inactive
   users but instead delegates this decision to the authentication backend.
+  :meth:`~django.test.Client.force_login()` also delegates the decision to the
+  authentication backend, so if you're using the default backends, you need to
+  use an active user.
 
 * :func:`django.views.i18n.set_language` may now return a 204 status code for
   AJAX requests.
@@ -883,6 +895,16 @@ Miscellaneous
 
 * The ``_base_manager`` and ``_default_manager`` attributes are removed from
   model instances. They remain accessible on the model class.
+
+* Accessing a deleted field on a model instance, e.g. after ``del obj.field``,
+  reloads the field's value instead of raising ``AttributeError``.
+
+* If you subclass ``AbstractBaseUser`` and override ``clean()``, be sure it
+  calls ``super()``. :meth:`.AbstractBaseUser.normalize_username` is called in
+  a new :meth:`.AbstractBaseUser.clean` method.
+
+* Private API ``django.forms.models.model_to_dict()`` returns a queryset rather
+  than a list of primary keys for ``ManyToManyField``\s .
 
 .. _deprecated-features-1.10:
 
@@ -1045,6 +1067,14 @@ method, e.g.::
 If you override these methods in a custom user model, you must change them to
 properties or attributes.
 
+Django uses a ``CallableBool`` object to allow these attributes to work as both
+a property and a method. Thus, until the deprecation period ends, you cannot
+compare these properties using the ``is`` operator. That is, the following
+won't work::
+
+    if request.user.is_authenticated is True:
+        ...
+
 Custom manager classes available through ``prefetch_related`` must define a ``_apply_rel_filters()`` method
 -----------------------------------------------------------------------------------------------------------
 
@@ -1083,6 +1113,12 @@ managers. You'll either redeclare a manager from an abstract model on the child
 class to override the manager from the concrete model, or you'll set the
 model's ``Meta.manager_inheritance_from_future=True`` option to opt-in to the
 new inheritance behavior.
+
+During the deprecation period, ``use_for_related_fields`` will be honored and
+raise a warning, even if a ``base_manager_name`` is set. This allows
+third-party code to preserve legacy behavior while transitioning to the new
+API. The warning can be silenced by setting
+``silence_use_for_related_fields_deprecation=True`` on the manager.
 
 Miscellaneous
 -------------
@@ -1135,9 +1171,9 @@ Miscellaneous
 Features removed in 1.10
 ========================
 
-These features have reached the end of their deprecation cycle and so have been
-removed in Django 1.10 (please see the :ref:`deprecation timeline
-<deprecation-removed-in-1.10>` for more details):
+These features have reached the end of their deprecation cycle and are removed
+in Django 1.10. See :ref:`deprecated-features-1.8` for details, including how
+to remove usage of these features.
 
 * Support for calling a ``SQLCompiler`` directly as an alias for calling its
   ``quote_name_unless_alias`` method is removed.

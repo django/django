@@ -316,6 +316,18 @@ class BaseDatabaseSchemaEditor(object):
             "table": self.quote_name(model._meta.db_table),
         })
 
+    def add_index(self, model, index):
+        """
+        Add an index on a model.
+        """
+        self.execute(index.create_sql(model, self))
+
+    def remove_index(self, model, index):
+        """
+        Remove an index from a model.
+        """
+        self.execute(index.remove_sql(model, self))
+
     def alter_unique_together(self, model, old_unique_together, new_unique_together):
         """
         Deals with a model changing its unique_together.
@@ -363,7 +375,9 @@ class BaseDatabaseSchemaEditor(object):
         """
         Renames the table a model points to.
         """
-        if old_db_table == new_db_table:
+        if (old_db_table == new_db_table or
+            (self.connection.features.ignores_quoted_identifier_case and
+                old_db_table.lower() == new_db_table.lower())):
             return
         self.execute(self.sql_rename_table % {
             "old_table": self.quote_name(old_db_table),
@@ -416,8 +430,7 @@ class BaseDatabaseSchemaEditor(object):
             }
             self.execute(sql)
         # Add an index, if required
-        if field.db_index and not field.unique:
-            self.deferred_sql.append(self._create_index_sql(model, [field]))
+        self.deferred_sql.extend(self._field_indexes_sql(model, field))
         # Add any FK constraints later
         if field.remote_field and self.connection.features.supports_foreign_keys and field.db_constraint:
             self.deferred_sql.append(self._create_fk_sql(model, field, "_fk_%(to_table)s_%(to_column)s"))
@@ -533,9 +546,16 @@ class BaseDatabaseSchemaEditor(object):
                 for fk_name in rel_fk_names:
                     self.execute(self._delete_constraint_sql(self.sql_delete_fk, new_rel.related_model, fk_name))
         # Removed an index? (no strict check, as multiple indexes are possible)
-        if (old_field.db_index and not new_field.db_index and
-                not old_field.unique and not
-                (not new_field.unique and old_field.unique)):
+        # Remove indexes if db_index switched to False or a unique constraint
+        # will now be used in lieu of an index. The following lines from the
+        # truth table show all True cases; the rest are False:
+        #
+        # old_field.db_index | old_field.unique | new_field.db_index | new_field.unique
+        # ------------------------------------------------------------------------------
+        # True               | False            | False              | False
+        # True               | False            | False              | True
+        # True               | False            | True               | True
+        if old_field.db_index and not old_field.unique and (not new_field.db_index or new_field.unique):
             # Find the index for this field
             index_names = self._constraint_names(model, [old_field.column], index=True)
             for index_name in index_names:
@@ -674,11 +694,17 @@ class BaseDatabaseSchemaEditor(object):
             old_field.primary_key and not new_field.primary_key and new_field.unique
         ):
             self.execute(self._create_unique_sql(model, [new_field.column]))
-        # Added an index?
-        if (not old_field.db_index and new_field.db_index and
-                not new_field.unique and not
-                (not old_field.unique and new_field.unique)):
-            self.execute(self._create_index_sql(model, [new_field], suffix="_uniq"))
+        # Added an index? Add an index if db_index switched to True or a unique
+        # constraint will no longer be used in lieu of an index. The following
+        # lines from the truth table show all True cases; the rest are False:
+        #
+        # old_field.db_index | old_field.unique | new_field.db_index | new_field.unique
+        # ------------------------------------------------------------------------------
+        # False              | False            | True               | False
+        # False              | True             | True               | False
+        # True               | True             | True               | False
+        if (not old_field.db_index or old_field.unique) and new_field.db_index and not new_field.unique:
+            self.execute(self._create_index_sql(model, [new_field]))
         # Type alteration on primary key? Then we need to alter the column
         # referring to us.
         rels_to_update = []
@@ -834,12 +860,7 @@ class BaseDatabaseSchemaEditor(object):
             index_name = "D%s" % index_name[:-1]
         return index_name
 
-    def _create_index_sql(self, model, fields, suffix="", sql=None):
-        """
-        Return the SQL statement to create the index for one or several fields.
-        `sql` can be specified if the syntax differs from the standard (GIS
-        indexes, ...).
-        """
+    def _get_index_tablespace_sql(self, model, fields):
         if len(fields) == 1 and fields[0].db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(fields[0].db_tablespace)
         elif model._meta.db_tablespace:
@@ -848,7 +869,15 @@ class BaseDatabaseSchemaEditor(object):
             tablespace_sql = ""
         if tablespace_sql:
             tablespace_sql = " " + tablespace_sql
+        return tablespace_sql
 
+    def _create_index_sql(self, model, fields, suffix="", sql=None):
+        """
+        Return the SQL statement to create the index for one or several fields.
+        `sql` can be specified if the syntax differs from the standard (GIS
+        indexes, ...).
+        """
+        tablespace_sql = self._get_index_tablespace_sql(model, fields)
         columns = [field.column for field in fields]
         sql_create_index = sql or self.sql_create_index
         return sql_create_index % {
@@ -860,20 +889,34 @@ class BaseDatabaseSchemaEditor(object):
 
     def _model_indexes_sql(self, model):
         """
-        Return all index SQL statements (field indexes, index_together) for the
-        specified model, as a list.
+        Return all index SQL statements (field indexes, index_together,
+        Meta.indexes) for the specified model, as a list.
         """
         if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
         output = []
         for field in model._meta.local_fields:
-            if field.db_index and not field.unique:
-                output.append(self._create_index_sql(model, [field], suffix=""))
+            output.extend(self._field_indexes_sql(model, field))
 
         for field_names in model._meta.index_together:
             fields = [model._meta.get_field(field) for field in field_names]
             output.append(self._create_index_sql(model, fields, suffix="_idx"))
+
+        for index in model._meta.indexes:
+            output.append(index.create_sql(model, self))
         return output
+
+    def _field_indexes_sql(self, model, field):
+        """
+        Return a list of all index SQL statements for the specified field.
+        """
+        output = []
+        if self._field_should_be_indexed(model, field):
+            output.append(self._create_index_sql(model, [field]))
+        return output
+
+    def _field_should_be_indexed(self, model, field):
+        return field.db_index and not field.unique
 
     def _rename_field_sql(self, table, old_field, new_field, new_type):
         return self.sql_rename_column % {
@@ -921,7 +964,11 @@ class BaseDatabaseSchemaEditor(object):
         """
         Returns all constraint names matching the columns and conditions
         """
-        column_names = list(column_names) if column_names else None
+        if column_names is not None:
+            column_names = [
+                self.connection.introspection.column_name_converter(name)
+                for name in column_names
+            ]
         with self.connection.cursor() as cursor:
             constraints = self.connection.introspection.get_constraints(cursor, model._meta.db_table)
         result = []

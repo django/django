@@ -72,20 +72,17 @@ class GeomValue(Value):
         return self.value.srid
 
     def as_sql(self, compiler, connection):
+        return '%s(%%s, %s)' % (connection.ops.from_text, self.srid), [connection.ops.Adapter(self.value)]
+
+    def as_mysql(self, compiler, connection):
+        return '%s(%%s)' % (connection.ops.from_text), [connection.ops.Adapter(self.value)]
+
+    def as_postgresql(self, compiler, connection):
         if self.geography:
             self.value = connection.ops.Adapter(self.value, geography=self.geography)
         else:
             self.value = connection.ops.Adapter(self.value)
         return super(GeomValue, self).as_sql(compiler, connection)
-
-    def as_mysql(self, compiler, connection):
-        return 'GeomFromText(%%s, %s)' % self.srid, [connection.ops.Adapter(self.value)]
-
-    def as_sqlite(self, compiler, connection):
-        return 'GeomFromText(%%s, %s)' % self.srid, [connection.ops.Adapter(self.value)]
-
-    def as_oracle(self, compiler, connection):
-        return 'SDO_GEOMETRY(%%s, %s)' % self.srid, [connection.ops.Adapter(self.value)]
 
 
 class GeoFuncWithGeoParam(GeoFunc):
@@ -435,12 +432,9 @@ class Transform(GeoFunc):
 
 class Translate(Scale):
     def as_sqlite(self, compiler, connection):
-        func_name = connection.ops.spatial_function_name(self.name)
-        if func_name == 'ST_Translate' and len(self.source_expressions) < 4:
-            # Always provide the z parameter for ST_Translate (Spatialite >= 3.1)
+        if len(self.source_expressions) < 4:
+            # Always provide the z parameter for ST_Translate
             self.source_expressions.append(Value(0))
-        elif func_name == 'ShiftCoords' and len(self.source_expressions) > 3:
-            raise ValueError("This version of Spatialite doesn't support 3D")
         return super(Translate, self).as_sqlite(compiler, connection)
 
 

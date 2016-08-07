@@ -176,12 +176,32 @@ class RelativeFieldTests(SimpleTestCase):
         field = Model._meta.get_field('m2m')
         self.assertEqual(field.check(from_model=Model), [])
 
+    def test_many_to_many_with_limit_choices_auto_created_no_warning(self):
+        class Model(models.Model):
+            name = models.CharField(max_length=20)
+
+        class ModelM2M(models.Model):
+            m2m = models.ManyToManyField(Model, limit_choices_to={'name': 'test_name'})
+
+        self.assertEqual(ModelM2M.check(), [])
+
     def test_many_to_many_with_useless_options(self):
         class Model(models.Model):
             name = models.CharField(max_length=20)
 
         class ModelM2M(models.Model):
-            m2m = models.ManyToManyField(Model, null=True, validators=[''])
+            m2m = models.ManyToManyField(
+                Model,
+                null=True,
+                validators=[''],
+                limit_choices_to={'name': 'test_name'},
+                through='ThroughModel',
+                through_fields=('modelm2m', 'model'),
+            )
+
+        class ThroughModel(models.Model):
+            model = models.ForeignKey('Model', models.CASCADE)
+            modelm2m = models.ForeignKey('ModelM2M', models.CASCADE)
 
         errors = ModelM2M.check()
         field = ModelM2M._meta.get_field('m2m')
@@ -191,15 +211,19 @@ class RelativeFieldTests(SimpleTestCase):
                 'null has no effect on ManyToManyField.',
                 obj=field,
                 id='fields.W340',
-            )
-        ]
-        expected.append(
+            ),
             DjangoWarning(
                 'ManyToManyField does not support validators.',
                 obj=field,
                 id='fields.W341',
-            )
-        )
+            ),
+            DjangoWarning(
+                'limit_choices_to has no effect on ManyToManyField '
+                'with a through model.',
+                obj=field,
+                id='fields.W343',
+            ),
+        ]
 
         self.assertEqual(errors, expected)
 
@@ -306,6 +330,22 @@ class RelativeFieldTests(SimpleTestCase):
             ),
         ]
         self.assertEqual(errors, expected)
+
+    def test_missing_relationship_model_on_model_check(self):
+        class Person(models.Model):
+            pass
+
+        class Group(models.Model):
+            members = models.ManyToManyField('Person', through='MissingM2MModel')
+
+        self.assertEqual(Group.check(), [
+            Error(
+                "Field specifies a many-to-many relation through model "
+                "'MissingM2MModel', which has not been installed.",
+                obj=Group._meta.get_field('members'),
+                id='fields.E331',
+            ),
+        ])
 
     @isolate_apps('invalid_models_tests')
     def test_many_to_many_through_isolate_apps_model(self):

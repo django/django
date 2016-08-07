@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2016-02-17 21:41+0000\n"
-"Last-Translator: Emin Mastizada <emin@mastizada.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -62,6 +62,12 @@ msgstr "Bu ay"
 msgid "This year"
 msgstr "Bu il"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -72,6 +78,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Əməliyyat:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Daha bir %(verbose_name)s əlavə et"
+
+msgid "Remove"
+msgstr "Yığışdır"
 
 msgid "action time"
 msgstr "əməliyyat vaxtı"
@@ -85,6 +98,8 @@ msgstr "məzmun növü"
 msgid "object id"
 msgstr "obyekt id"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "obyekt repr"
 
@@ -115,6 +130,30 @@ msgstr "\"%(object)s\" silindi."
 msgid "LogEntry Object"
 msgstr "LogEntry obyekti"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr "Əlavə edildi."
+
+msgid "and"
+msgstr "və"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Heç bir sahə dəyişmədi."
+
 msgid "None"
 msgstr "Heç nə"
 
@@ -124,68 +163,35 @@ msgstr ""
 "Birdən çox seçmək üçün \"Control\" və ya Mac üçün \"Command\" düyməsini "
 "basılı tutun."
 
-msgid "Added."
-msgstr "Əlavə edildi."
-
-#, python-format
-msgid "Changed %s."
-msgstr "%s dəyişdi."
-
-msgid "and"
-msgstr "və"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" əlavə olundu."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr " %(list)s %(name)s \"%(object)s\" üçün dəyişdi."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" siyahısından silindi."
-
-msgid "No fields changed."
-msgstr "Heç bir sahə dəyişmədi."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" siyahısına uğurla əlavə olundu. Yenə onu aşağıda "
-"redaktə edə bilərsiniz."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"\"%(obj)s\" %(name)s uğurla əlavə edildi. Aşağıdan başqa bir %(name)s əlavə "
-"edə bilərsiz."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" siyahısına uğurla əlavə edildi."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"\"%(obj)s\" %(name)s uğurla dəyişdirildi. Bunu aşağıda yenidən dəyişdirə "
-"bilərsiniz."
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
-"\"%(obj)s\" %(name)s uğurla dəyişdirildi. Digər %(name)s əlavə edə bilərsiz."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" siyahısında uğurla dəyişdirildi."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -344,18 +350,15 @@ msgstr "Sənədləşdirmə"
 msgid "Log out"
 msgstr "Çıx"
 
-msgid "Add"
-msgstr "Əlavə et"
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s əlavə et"
 
 msgid "History"
 msgstr "Tarix"
 
 msgid "View on site"
 msgstr "Saytda göstər"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "%(name)s əlavə et"
 
 msgid "Filter"
 msgstr "Süzgəc"
@@ -440,13 +443,6 @@ msgstr ""
 msgid "Change"
 msgstr "Dəyiş"
 
-msgid "Remove"
-msgstr "Yığışdır"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Daha bir %(verbose_name)s əlavə et"
-
 msgid "Delete?"
 msgstr "Silək?"
 
@@ -461,14 +457,17 @@ msgstr "İcmal"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s proqramındakı modellər"
 
+msgid "Add"
+msgstr "Əlavə et"
+
 msgid "You don't have permission to edit anything."
 msgstr "Üzrlər, amma sizin nəyisə dəyişməyə səlahiyyətiniz çatmır."
 
-msgid "Recent Actions"
-msgstr "Son əməliyyatlar"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "Mənim etdiklərim"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Heç nə yoxdur"

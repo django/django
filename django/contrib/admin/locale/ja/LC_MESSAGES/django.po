@@ -2,15 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Shinya Okano <tokibito@gmail.com>, 2012-2015
+# Shinya Okano <tokibito@gmail.com>, 2012-2016
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 # 上田慶祐 <kei.mokusyun@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-28 03:04+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-26 16:20+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
@@ -65,6 +65,12 @@ msgstr "今月"
 msgid "This year"
 msgstr "今年"
 
+msgid "No date"
+msgstr "日付なし"
+
+msgid "Has date"
+msgstr "日付あり"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -75,6 +81,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "操作:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "%(verbose_name)s の追加"
+
+msgid "Remove"
+msgstr "削除"
 
 msgid "action time"
 msgstr "操作時刻"
@@ -88,6 +101,8 @@ msgstr "コンテンツタイプ"
 msgid "object id"
 msgstr "オブジェクト ID"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "オブジェクトの文字列表現"
 
@@ -118,6 +133,30 @@ msgstr "\"%(object)s\"を削除しました。"
 msgid "LogEntry Object"
 msgstr "ログエントリー オブジェクト"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "{name} \"{object}\" を追加しました。"
+
+msgid "Added."
+msgstr "追加されました。"
+
+msgid "and"
+msgstr "と"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "{name} \"{object}\" の {list} を変更しました。"
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "{fields} を変更しました。"
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "{name} \"{object}\" を削除しました。"
+
+msgid "No fields changed."
+msgstr "変更はありませんでした。"
+
 msgid "None"
 msgstr "None"
 
@@ -127,63 +166,35 @@ msgstr ""
 "複数選択するときには Control キーを押したまま選択してください。Mac では "
 "Command キーを使ってください"
 
-msgid "Added."
-msgstr "追加されました。"
-
-#, python-format
-msgid "Changed %s."
-msgstr "%s を変更しました。"
-
-msgid "and"
-msgstr "と"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\"を追加しました。"
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" の %(list)s を変更しました。"
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" を削除しました。"
-
-msgid "No fields changed."
-msgstr "変更はありませんでした。"
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" を追加しました。続けて編集できます。"
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" を追加しました。続けて編集できます。"
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" を追加しました。 別の %(name)s を以下から追加できます。"
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" を追加しました。"
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr "%(name)s \"%(obj)s\" を変更しました。 以下から再度編集できます。"
+msgstr "{name} \"{obj}\" を追加しました。 別の {name} を以下から追加できます。"
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" を追加しました。"
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" を変更しました。 別の %(name)s を以下から追加できます。"
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" を変更しました。 以下から再度編集できます。"
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" を変更しました。"
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr "{name} \"{obj}\" を変更しました。 別の {name} を以下から追加できます。"
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name} \"{obj}\" を変更しました。"
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -338,18 +349,15 @@ msgstr "ドキュメント"
 msgid "Log out"
 msgstr "ログアウト"
 
-msgid "Add"
-msgstr "追加"
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s を追加"
 
 msgid "History"
 msgstr "履歴"
 
 msgid "View on site"
 msgstr "サイト上で表示"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "%(name)s を追加"
 
 msgid "Filter"
 msgstr "フィルター"
@@ -433,13 +441,6 @@ msgstr ""
 msgid "Change"
 msgstr "変更"
 
-msgid "Remove"
-msgstr "削除"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "%(verbose_name)s の追加"
-
 msgid "Delete?"
 msgstr "削除しますか?"
 
@@ -454,14 +455,17 @@ msgstr "概要"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s アプリケーション内のモデル"
 
+msgid "Add"
+msgstr "追加"
+
 msgid "You don't have permission to edit anything."
 msgstr "変更のためのパーミッションがありません。"
 
-msgid "Recent Actions"
+msgid "Recent actions"
 msgstr "最近行った操作"
 
-msgid "My Actions"
-msgstr "操作"
+msgid "My actions"
+msgstr "自分の操作"
 
 msgid "None available"
 msgstr "利用不可"

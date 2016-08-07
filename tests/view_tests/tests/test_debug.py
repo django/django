@@ -169,6 +169,14 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
             }]):
                 response = self.client.get(reverse('raises_template_does_not_exist', kwargs={"path": template_name}))
             self.assertContains(response, "%s (Source does not exist)" % template_path, status_code=500, count=2)
+            # Assert as HTML.
+            self.assertContains(
+                response,
+                '<li><code>django.template.loaders.filesystem.Loader</code>: '
+                '%s (Source does not exist)</li>' % os.path.join(tempdir, 'notfound.html'),
+                status_code=500,
+                html=True,
+            )
 
     def test_no_template_source_loaders(self):
         """
@@ -442,15 +450,9 @@ class ExceptionReporterTests(SimpleTestCase):
         except BrokenEvaluation:
             exc_type, exc_value, tb = sys.exc_info()
 
-        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
-        try:
-            html = reporter.get_traceback_html()
-        except BrokenEvaluation:
-            self.fail("Broken evaluation in traceback is not caught.")
-
         self.assertIn(
             "BrokenEvaluation",
-            html,
+            ExceptionReporter(request, exc_type, exc_value, tb).get_traceback_html(),
             "Evaluation exception reason not mentioned in traceback"
         )
 

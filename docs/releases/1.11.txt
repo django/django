@@ -66,15 +66,34 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased by
   20%.
 
+* The :class:`~django.contrib.auth.views.LoginView` and
+  :class:`~django.contrib.auth.views.LogoutView` class-based views supersede the
+  deprecated ``login()`` and ``logout()`` function-based views.
+
+* The :class:`~django.contrib.auth.views.PasswordChangeView`,
+  :class:`~django.contrib.auth.views.PasswordChangeDoneView`,
+  :class:`~django.contrib.auth.views.PasswordResetView`,
+  :class:`~django.contrib.auth.views.PasswordResetDoneView`,
+  :class:`~django.contrib.auth.views.PasswordResetConfirmView`, and
+  :class:`~django.contrib.auth.views.PasswordResetCompleteView` class-based
+  views supersede the deprecated ``password_change()``,
+  ``password_change_done()``, ``password_reset()``, ``password_reset_done()``,
+  ``password_reset_confirm()``, and ``password_reset_complete()`` function-based
+  views.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* When stale content types are detected during a management command, there is
+  now an expansive list of objects that will be deleted. Previously, only
+  the content type objects themselves were listed, even if there were objects
+  with foreign keys towards the content types that would be deleted also.
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :meth:`.GEOSGeometry.from_gml` and :meth:`.OGRGeometry.from_gml`
+  methods allow creating geometries from GML.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -154,7 +173,8 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The new :attr:`CharField.empty_value <django.forms.CharField.empty_value>`
+  attribute allows specifying the Python value to use to represent "empty".
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -164,7 +184,8 @@ Generic Views
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Number formatting and the :setting:`NUMBER_GROUPING` setting support
+  non-uniform digit grouping.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -185,16 +206,37 @@ Models
   <django.db.models.query.QuerySet.update_or_create>` and
   :meth:`~django.db.models.query.QuerySet.get_or_create`.
 
+* :class:`~django.db.models.ImageField` now has a default
+  :data:`~django.core.validators.validate_image_file_extension` validator.
+
+* Added support for time truncation to
+  :class:`~django.db.models.functions.datetime.Trunc` functions.
+
+* Added the :class:`~django.db.models.functions.datetime.TruncTime` function
+  to truncate :class:`~django.db.models.DateTimeField` to its time component
+  and exposed it through the :lookup:`time` lookup.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
 * Added :meth:`QueryDict.fromkeys() <django.http.QueryDict.fromkeys>`.
+
+* :class:`~django.middleware.common.CommonMiddleware` now sets the
+  ``Content-Length`` response header for non-streaming responses.
 
 Serialization
 ~~~~~~~~~~~~~
 
 * The new ``django.core.serializers.base.Serializer.stream_class`` attribute
   allows subclasses to customize the default stream.
+
+* The encoder used by the :ref:`JSON serializer <serialization-formats-json>`
+  can now be customized by passing a ``cls`` keyword argument to the
+  ``serializers.serialize()`` function.
+
+* :class:`~django.core.serializers.json.DjangoJSONEncoder` now serializes
+  :class:`~datetime.timedelta` objects (used by
+  :class:`~django.db.models.DurationField`).
 
 Signals
 ~~~~~~~
@@ -206,10 +248,15 @@ Templates
 
 * :meth:`~django.utils.safestring.mark_safe` can now be used as a decorator.
 
+* The :class:`~django.template.backends.jinja2.Jinja2` template backend now
+  supports context processors by setting the ``'context_processors'`` option in
+  :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
+
 Tests
 ~~~~~
 
-* ...
+* Added :meth:`.DiscoverRunner.get_test_runner_kwargs` to allow customizing the
+  keyword arguments passed to the test runner.
 
 URLs
 ~~~~
@@ -219,26 +266,54 @@ URLs
 Validators
 ~~~~~~~~~~
 
-* ...
+* Added :class:`~django.core.validators.FileExtensionValidator` to validate
+  file extensions and
+  :data:`~django.core.validators.validate_image_file_extension` to validate
+  image files.
 
 .. _backwards-incompatible-1.11:
 
 Backwards incompatible changes in 1.11
 ======================================
 
+:mod:`django.contrib.gis`
+-------------------------
+
+* To simplify the codebase and because it's easier to install than when
+  ``contrib.gis`` was first released, :ref:`gdalbuild` is now a required
+  dependency for GeoDjango. In older versions, it's only required for SQLite.
+
 Database backend API
 --------------------
 
-* ...
+* The ``DatabaseOperations.time_trunc_sql()`` method is added to support
+  ``TimeField`` truncation. It accepts a ``lookup_type`` and ``field_name``
+  arguments and returns the appropriate SQL to truncate the given time field
+  ``field_name`` to a time object with only the given specificity. The
+  ``lookup_type`` argument can be either ``'hour'``, ``'minute'``, or
+  ``'second'``.
+
+* The ``DatabaseOperations.datetime_cast_time_sql()`` method is added to
+  support the :lookup:`time` lookup. It accepts a ``field_name`` and ``tzname``
+  arguments and returns the SQL necessary to cast a datetime value to time value.
 
 Dropped support for PostgreSQL 9.2 and PostGIS 2.0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------
 
 Upstream support for PostgreSQL 9.2 ends in September 2017. As a consequence,
 Django 1.11 sets PostgreSQL 9.3 as the minimum version it officially supports.
 
 Support for PostGIS 2.0 is also removed as PostgreSQL 9.2 is the last version
 to support it.
+
+``LiveServerTestCase`` binds to port zero
+-----------------------------------------
+
+Rather than taking a port range and iterating to find a free port,
+``LiveServerTestCase`` binds to port zero and relies on the operating system
+to assign a free port. The ``DJANGO_LIVE_TEST_SERVER_ADDRESS`` environment
+variable is no longer used, and as it's also no longer used, the
+``manage.py test --liveserver`` option is removed.
 
 Miscellaneous
 -------------
@@ -251,12 +326,43 @@ Miscellaneous
 
 * Support for SpatiaLite < 4.0 is dropped.
 
-* CSRF failures are logged to the ``django.security.csrf ``` logger instead of
+* CSRF failures are logged to the ``django.security.csrf`` logger instead of
   ``django.request``.
+
+* :setting:`ALLOWED_HOSTS` validation is no longer disabled when running tests.
+  If your application includes tests with custom host names, you must include
+  those host names in :setting:`ALLOWED_HOSTS`. See
+  :ref:`topics-testing-advanced-multiple-hosts`.
 
 * Using a foreign key's id (e.g. ``'field_id'``) in ``ModelAdmin.list_display``
   displays the related object's ID. Remove the ``_id`` suffix if you want the
   old behavior of the string representation of the object.
+
+* In model forms, :class:`~django.db.models.CharField` with ``null=True`` now
+  saves ``NULL`` for blank values instead of empty strings.
+
+* On Oracle, :meth:`Model.validate_unique()
+  <django.db.models.Model.validate_unique>` no longer checks empty strings for
+  uniqueness as the database interprets the value as ``NULL``.
+
+* If you subclass :class:`.AbstractUser` and override ``clean()``, be sure it
+  calls ``super()``. :meth:`.BaseUserManager.normalize_email` is called in a
+  new :meth:`.AbstractUser.clean` method so that normalization is applied in
+  cases like model form validation.
+
+* ``EmailField`` and ``URLField`` no longer accept the ``strip`` keyword
+  argument. Remove it because it doesn't have an effect in older versions of
+  Django as these fields alway strip whitespace.
+
+* The ``checked`` attribute rendered by form widgets now uses HTML5 boolean
+  syntax rather than XHTML's ``checked='checked'``.
+
+* :meth:`RelatedManager.add()
+  <django.db.models.fields.related.RelatedManager.add>`,
+  :meth:`~django.db.models.fields.related.RelatedManager.remove`,
+  :meth:`~django.db.models.fields.related.RelatedManager.clear`, and
+  :meth:`~django.db.models.fields.related.RelatedManager.set` now
+  clear the ``prefetch_related()`` cache.
 
 .. _deprecated-features-1.11:
 
@@ -266,4 +372,21 @@ Features deprecated in 1.11
 Miscellaneous
 -------------
 
-* ...
+* ``contrib.auth``’s ``login()`` and ``logout()`` function-based views are
+  deprecated in favor of new class-based views
+  :class:`~django.contrib.auth.views.LoginView` and
+  :class:`~django.contrib.auth.views.LogoutView`.
+
+* The unused ``extra_context`` parameter of
+  ``contrib.auth.views.logout_then_login()``  is deprecated.
+
+* ``contrib.auth``’s ``password_change()``, ``password_change_done()``,
+  ``password_reset()``, ``password_reset_done()``, ``password_reset_confirm()``,
+  and ``password_reset_complete()`` function-based views are deprecated in favor
+  of new class-based views
+  :class:`~django.contrib.auth.views.PasswordChangeView`,
+  :class:`~django.contrib.auth.views.PasswordChangeDoneView`,
+  :class:`~django.contrib.auth.views.PasswordResetView`,
+  :class:`~django.contrib.auth.views.PasswordResetDoneView`,
+  :class:`~django.contrib.auth.views.PasswordResetConfirmView`, and
+  :class:`~django.contrib.auth.views.PasswordResetCompleteView`.

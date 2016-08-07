@@ -525,13 +525,15 @@ Localized names of languages
 The ``get_language_info()`` function provides detailed information about
 languages::
 
-    >>> from django.utils.translation import get_language_info
+    >>> from django.utils.translation import activate, get_language_info
+    >>> activate('fr')
     >>> li = get_language_info('de')
-    >>> print(li['name'], li['name_local'], li['bidi'])
-    German Deutsch False
+    >>> print(li['name'], li['name_local'], li['name_translated'], li['bidi'])
+    German Deutsch Allemand False
 
-The ``name`` and ``name_local`` attributes of the dictionary contain the name of
-the language in English and in the language itself, respectively.  The ``bidi``
+The ``name``, ``name_local``, and ``name_translated`` attributes of the
+dictionary contain the name of the language in English, in the language
+itself, and in your current active language respectively.  The ``bidi``
 attribute is True only for bi-directional languages.
 
 The source of the language information is the ``django.conf.locale`` module.
@@ -1411,7 +1413,7 @@ Language prefix in URL patterns
 .. function:: i18n_patterns(*urls, prefix_default_language=True)
 
 This function can be used in a root URLconf and Django will automatically
-prepend the current active language code to all url patterns defined within
+prepend the current active language code to all URL patterns defined within
 :func:`~django.conf.urls.i18n.i18n_patterns`.
 
 Setting ``prefix_default_language`` to ``False`` removes the prefix from the
@@ -1665,9 +1667,9 @@ multiple times::
     in general, and doesn't depend on ``gettext``. For more information, read
     its documentation about `working with message catalogs`_.
 
-    .. _Message extracting: http://babel.pocoo.org/docs/messages/#message-extraction
+    .. _Message extracting: http://babel.pocoo.org/en/latest/messages.html#message-extraction
     .. _Babel: http://babel.pocoo.org/
-    .. _working with message catalogs: http://babel.pocoo.org/docs/messages/
+    .. _working with message catalogs: http://babel.pocoo.org/en/latest/messages.html
 
 .. admonition:: No gettext?
 

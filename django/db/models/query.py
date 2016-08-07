@@ -25,7 +25,7 @@ from django.db.models.query_utils import (
 from django.db.models.sql.constants import CURSOR
 from django.utils import six, timezone
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.functional import partition
+from django.utils.functional import cached_property, partition
 from django.utils.version import get_version
 
 # The maximum number of items to display in a QuerySet.__repr__
@@ -452,8 +452,10 @@ class QuerySet(object):
                     ids = self._batched_insert(objs_without_pk, fields, batch_size)
                     if connection.features.can_return_ids_from_bulk_insert:
                         assert len(ids) == len(objs_without_pk)
-                    for i in range(len(ids)):
-                        objs_without_pk[i].pk = ids[i]
+                    for obj_without_pk, pk in zip(objs_without_pk, ids):
+                        obj_without_pk.pk = pk
+                        obj_without_pk._state.adding = False
+                        obj_without_pk._state.db = self.db
 
         return objs
 
@@ -482,15 +484,16 @@ class QuerySet(object):
         defaults = defaults or {}
         lookup, params = self._extract_model_params(defaults, **kwargs)
         self._for_write = True
-        try:
-            obj = self.get(**lookup)
-        except self.model.DoesNotExist:
-            obj, created = self._create_object_from_params(lookup, params)
-            if created:
-                return obj, created
-        for k, v in six.iteritems(defaults):
-            setattr(obj, k, v)
-        obj.save(using=self.db)
+        with transaction.atomic(using=self.db):
+            try:
+                obj = self.select_for_update().get(**lookup)
+            except self.model.DoesNotExist:
+                obj, created = self._create_object_from_params(lookup, params)
+                if created:
+                    return obj, created
+            for k, v in six.iteritems(defaults):
+                setattr(obj, k, v() if callable(v) else v)
+            obj.save(using=self.db)
         return obj, False
 
     def _create_object_from_params(self, lookup, params):
@@ -632,6 +635,8 @@ class QuerySet(object):
         self._for_write = True
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
+        # Clear any annotations so that they won't be present in subqueries.
+        query._annotations = None
         with transaction.atomic(using=self.db, savepoint=False):
             rows = query.get_compiler(self.db).execute_sql(CURSOR)
         self._result_cache = None
@@ -1542,7 +1547,12 @@ def get_prefetcher(instance, through_attr, to_attr):
                 if hasattr(rel_obj, 'get_prefetch_queryset'):
                     prefetcher = rel_obj
                 if through_attr != to_attr:
-                    is_fetched = hasattr(instance, to_attr)
+                    # Special case cached_property instances because hasattr
+                    # triggers attribute computation and assignment.
+                    if isinstance(getattr(instance.__class__, to_attr, None), cached_property):
+                        is_fetched = to_attr in instance.__dict__
+                    else:
+                        is_fetched = hasattr(instance, to_attr)
                 else:
                     is_fetched = through_attr in instance._prefetched_objects_cache
     return prefetcher, rel_obj_descriptor, attr_found, is_fetched

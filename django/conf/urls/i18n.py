@@ -12,7 +12,7 @@ def i18n_patterns(*urls, **kwargs):
     URLconf.
     """
     if not settings.USE_I18N:
-        return urls
+        return list(urls)
     prefix_default_language = kwargs.pop('prefix_default_language', True)
     assert not kwargs, 'Unexpected kwargs for i18n_patterns(): %s' % kwargs
     return [LocaleRegexURLResolver(list(urls), prefix_default_language=prefix_default_language)]

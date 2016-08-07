@@ -2,6 +2,7 @@ import os
 import warnings
 
 from django.core.management.base import BaseCommand
+from django.utils.datastructures import OrderedSet
 from django.utils.deprecation import RemovedInDjango20Warning
 
 
@@ -88,10 +89,9 @@ class Command(BaseCommand):
         # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow system
         # conventions and get $PYTHONSTARTUP first then .pythonrc.py.
         if not options['no_startup']:
-            for pythonrc in (os.environ.get("PYTHONSTARTUP"), '~/.pythonrc.py'):
+            for pythonrc in OrderedSet([os.environ.get("PYTHONSTARTUP"), os.path.expanduser('~/.pythonrc.py')]):
                 if not pythonrc:
                     continue
-                pythonrc = os.path.expanduser(pythonrc)
                 if not os.path.isfile(pythonrc):
                     continue
                 try:

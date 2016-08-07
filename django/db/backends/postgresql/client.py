@@ -55,7 +55,7 @@ class DatabaseClient(BaseDatabaseClient):
                     # If the current locale can't encode the data, we let
                     # the user input the password manually.
                     pass
-            subprocess.call(args)
+            subprocess.check_call(args)
         finally:
             if temp_pgpass:
                 temp_pgpass.close()

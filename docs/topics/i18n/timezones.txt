@@ -315,9 +315,9 @@ You can get the name of the current time zone using the
 
     {% get_current_timezone as TIME_ZONE %}
 
-If you enable the ``django.template.context_processors.tz`` context processor,
-each :class:`~django.template.RequestContext` will contain a ``TIME_ZONE``
-variable with the value of ``get_current_timezone()``.
+Alternatively, you can activate the
+:func:`~django.template.context_processors.tz` context processor and
+use the ``TIME_ZONE`` context variable.
 
 Template filters
 ----------------

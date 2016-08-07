@@ -816,7 +816,9 @@ For example::
         url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
     ], 'polls')
 
-    url(r'^polls/', include(polls_patterns)),
+    urlpatterns = [
+        url(r'^polls/', include(polls_patterns)),
+    ]
 
 This will include the nominated URL patterns into the given application
 namespace.

@@ -51,6 +51,11 @@ class DatabaseOperations(BaseDatabaseOperations):
         sql = "DATE(%s)" % field_name
         return sql, params
 
+    def datetime_cast_time_sql(self, field_name, tzname):
+        field_name, params = self._convert_field_to_tz(field_name, tzname)
+        sql = "TIME(%s)" % field_name
+        return sql, params
+
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         field_name, params = self._convert_field_to_tz(field_name, tzname)
         sql = self.date_extract_sql(lookup_type, field_name)
@@ -70,6 +75,18 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
         return sql, params
 
+    def time_trunc_sql(self, lookup_type, field_name):
+        fields = {
+            'hour': '%%H:00:00',
+            'minute': '%%H:%%i:00',
+            'second': '%%H:%%i:%%s',
+        }  # Use double percents to escape.
+        if lookup_type in fields:
+            format_str = fields[lookup_type]
+            return "CAST(DATE_FORMAT(%s, '%s') AS TIME)" % (field_name, format_str)
+        else:
+            return "TIME(%s)" % (field_name)
+
     def date_interval_sql(self, timedelta):
         return "INTERVAL '%d 0:0:%d:%d' DAY_MICROSECOND" % (
             timedelta.days, timedelta.seconds, timedelta.microseconds), []
@@ -79,9 +96,6 @@ class DatabaseOperations(BaseDatabaseOperations):
             return 'INTERVAL %s MICROSECOND' % sql
         else:
             return 'INTERVAL FLOOR(%s / 1000000) SECOND' % sql
-
-    def drop_foreignkey_sql(self):
-        return "DROP FOREIGN KEY"
 
     def force_no_ordering(self):
         """

@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import get_hasher
@@ -143,6 +146,21 @@ class UserManagerTestCase(TestCase):
             )
 
 
+class AbstractBaseUserTests(TestCase):
+
+    def test_clean_normalize_username(self):
+        # The normalization happens in AbstractBaseUser.clean()
+        ohm_username = 'iamtheΩ'  # U+2126 OHM SIGN
+        for model in ('auth.User', 'auth_tests.CustomUser'):
+            with self.settings(AUTH_USER_MODEL=model):
+                User = get_user_model()
+                user = User(**{User.USERNAME_FIELD: ohm_username, 'password': 'foo'})
+                user.clean()
+                username = user.get_username()
+                self.assertNotEqual(username, ohm_username)
+                self.assertEqual(username, 'iamtheΩ')  # U+03A9 GREEK CAPITAL LETTER OMEGA
+
+
 class AbstractUserTestCase(TestCase):
     def test_email_user(self):
         # valid send_mail parameters
@@ -175,6 +193,11 @@ class AbstractUserTestCase(TestCase):
 
         user2 = User.objects.create_user(username='user2')
         self.assertIsNone(user2.last_login)
+
+    def test_user_clean_normalize_email(self):
+        user = User(username='user', password='foo', email='foo@BAR.com')
+        user.clean()
+        self.assertEqual(user.email, 'foo@bar.com')
 
     def test_user_double_save(self):
         """
@@ -220,7 +243,7 @@ class IsActiveTestCase(TestCase):
     def test_builtin_user_isactive(self):
         user = User.objects.create(username='foo', email='foo@bar.com')
         # is_active is true by default
-        self.assertEqual(user.is_active, True)
+        self.assertIs(user.is_active, True)
         user.is_active = False
         user.save()
         user_fetched = User.objects.get(pk=user.pk)
@@ -234,14 +257,14 @@ class IsActiveTestCase(TestCase):
         """
         UserModel = get_user_model()
         user = UserModel(username='foo')
-        self.assertEqual(user.is_active, True)
+        self.assertIs(user.is_active, True)
         # you can set the attribute - but it will not save
         user.is_active = False
         # there should be no problem saving - but the attribute is not saved
         user.save()
         user_fetched = UserModel._default_manager.get(pk=user.pk)
         # the attribute is always true for newly retrieved instance
-        self.assertEqual(user_fetched.is_active, True)
+        self.assertIs(user_fetched.is_active, True)
 
 
 class TestCreateSuperUserSignals(TestCase):

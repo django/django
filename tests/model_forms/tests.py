@@ -28,9 +28,10 @@ from .models import (
     CustomErrorMessage, CustomFF, CustomFieldForExclusionModel, DateTimePost,
     DerivedBook, DerivedPost, Document, ExplicitPK, FilePathModel,
     FlexibleDatePost, Homepage, ImprovedArticle, ImprovedArticleWithParentLink,
-    Inventory, Person, Photo, Post, Price, Product, Publication,
-    PublicationDefaults, StrictAssignmentAll, StrictAssignmentFieldSpecific,
-    Student, StumpJoke, TextFile, Triple, Writer, WriterProfile, test_images,
+    Inventory, NullableUniqueCharFieldModel, Person, Photo, Post, Price,
+    Product, Publication, PublicationDefaults, StrictAssignmentAll,
+    StrictAssignmentFieldSpecific, Student, StumpJoke, TextFile, Triple,
+    Writer, WriterProfile, test_images,
 )
 
 if test_images:
@@ -270,6 +271,21 @@ class ModelFormBaseTest(TestCase):
         obj = form.save()
         self.assertEqual(obj.name, '')
 
+    def test_save_blank_null_unique_charfield_saves_null(self):
+        form_class = modelform_factory(model=NullableUniqueCharFieldModel, fields=['codename'])
+        empty_value = '' if connection.features.interprets_empty_strings_as_nulls else None
+
+        form = form_class(data={'codename': ''})
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(form.instance.codename, empty_value)
+
+        # Save a second form to verify there isn't a unique constraint violation.
+        form = form_class(data={'codename': ''})
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(form.instance.codename, empty_value)
+
     def test_missing_fields_attribute(self):
         message = (
             "Creating a ModelForm without either the 'fields' attribute "
@@ -289,7 +305,7 @@ class ModelFormBaseTest(TestCase):
                          ['name', 'slug', 'url', 'some_extra_field'])
 
     def test_extra_field_model_form(self):
-        try:
+        with self.assertRaisesMessage(FieldError, 'no-field'):
             class ExtraPersonForm(forms.ModelForm):
                 """ ModelForm with an extra field """
                 age = forms.IntegerField()
@@ -297,24 +313,15 @@ class ModelFormBaseTest(TestCase):
                 class Meta:
                     model = Person
                     fields = ('name', 'no-field')
-        except FieldError as e:
-            # Make sure the exception contains some reference to the
-            # field responsible for the problem.
-            self.assertIn('no-field', e.args[0])
-        else:
-            self.fail('Invalid "no-field" field not caught')
 
     def test_extra_declared_field_model_form(self):
-        try:
-            class ExtraPersonForm(forms.ModelForm):
-                """ ModelForm with an extra field """
-                age = forms.IntegerField()
+        class ExtraPersonForm(forms.ModelForm):
+            """ ModelForm with an extra field """
+            age = forms.IntegerField()
 
-                class Meta:
-                    model = Person
-                    fields = ('name', 'age')
-        except FieldError:
-            self.fail('Declarative field raised FieldError incorrectly')
+            class Meta:
+                model = Person
+                fields = ('name', 'age')
 
     def test_extra_field_modelform_factory(self):
         with self.assertRaises(FieldError):
@@ -800,10 +807,14 @@ class UniqueTest(TestCase):
         form.save()
         form = ExplicitPKForm({'key': 'key1', 'desc': ''})
         self.assertFalse(form.is_valid())
-        self.assertEqual(len(form.errors), 3)
-        self.assertEqual(form.errors['__all__'], ['Explicit pk with this Key and Desc already exists.'])
-        self.assertEqual(form.errors['desc'], ['Explicit pk with this Desc already exists.'])
-        self.assertEqual(form.errors['key'], ['Explicit pk with this Key already exists.'])
+        if connection.features.interprets_empty_strings_as_nulls:
+            self.assertEqual(len(form.errors), 1)
+            self.assertEqual(form.errors['key'], ['Explicit pk with this Key already exists.'])
+        else:
+            self.assertEqual(len(form.errors), 3)
+            self.assertEqual(form.errors['__all__'], ['Explicit pk with this Key and Desc already exists.'])
+            self.assertEqual(form.errors['desc'], ['Explicit pk with this Desc already exists.'])
+            self.assertEqual(form.errors['key'], ['Explicit pk with this Key already exists.'])
 
     def test_unique_for_date(self):
         p = Post.objects.create(
@@ -950,78 +961,6 @@ class UniqueTest(TestCase):
         form = CustomPostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['title'], ["Post's Title not unique for Posted date."])
-
-
-class ModelToDictTests(TestCase):
-    """
-    Tests for forms.models.model_to_dict
-    """
-    def test_model_to_dict_many_to_many(self):
-        categories = [
-            Category(name='TestName1', slug='TestName1', url='url1'),
-            Category(name='TestName2', slug='TestName2', url='url2'),
-            Category(name='TestName3', slug='TestName3', url='url3')
-        ]
-        for c in categories:
-            c.save()
-        writer = Writer(name='Test writer')
-        writer.save()
-
-        art = Article(
-            headline='Test article',
-            slug='test-article',
-            pub_date=datetime.date(1988, 1, 4),
-            writer=writer,
-            article='Hello.'
-        )
-        art.save()
-        for c in categories:
-            art.categories.add(c)
-        art.save()
-
-        with self.assertNumQueries(1):
-            d = model_to_dict(art)
-
-        # Ensure all many-to-many categories appear in model_to_dict
-        for c in categories:
-            self.assertIn(c.pk, d['categories'])
-        # Ensure many-to-many relation appears as a list
-        self.assertIsInstance(d['categories'], list)
-
-    def test_reuse_prefetched(self):
-        # model_to_dict should not hit the database if it can reuse
-        # the data populated by prefetch_related.
-        categories = [
-            Category(name='TestName1', slug='TestName1', url='url1'),
-            Category(name='TestName2', slug='TestName2', url='url2'),
-            Category(name='TestName3', slug='TestName3', url='url3')
-        ]
-        for c in categories:
-            c.save()
-        writer = Writer(name='Test writer')
-        writer.save()
-
-        art = Article(
-            headline='Test article',
-            slug='test-article',
-            pub_date=datetime.date(1988, 1, 4),
-            writer=writer,
-            article='Hello.'
-        )
-        art.save()
-        for c in categories:
-            art.categories.add(c)
-
-        art = Article.objects.prefetch_related('categories').get(pk=art.pk)
-
-        with self.assertNumQueries(0):
-            d = model_to_dict(art)
-
-        # Ensure all many-to-many categories appear in model_to_dict
-        for c in categories:
-            self.assertIn(c.pk, d['categories'])
-        # Ensure many-to-many relation appears as a list
-        self.assertIsInstance(d['categories'], list)
 
 
 class ModelFormBasicTests(TestCase):
@@ -1573,6 +1512,53 @@ class ModelChoiceFieldTests(TestCase):
         with self.assertNumQueries(1):
             template.render(Context({'field': field}))
 
+    def test_modelchoicefield_index_renderer(self):
+        field = forms.ModelChoiceField(Category.objects.all(), widget=forms.RadioSelect)
+        self.assertEqual(
+            str(field.widget.get_renderer('foo', [])[0]),
+            '<label><input name="foo" type="radio" value="" /> ---------</label>'
+        )
+
+    def test_disabled_modelchoicefield(self):
+        class ModelChoiceForm(forms.ModelForm):
+            author = forms.ModelChoiceField(Author.objects.all(), disabled=True)
+
+            class Meta:
+                model = Book
+                fields = ['author']
+
+        book = Book.objects.create(author=Writer.objects.create(name='Test writer'))
+        form = ModelChoiceForm({}, instance=book)
+        self.assertEqual(
+            form.errors['author'],
+            ['Select a valid choice. That choice is not one of the available choices.']
+        )
+
+    def test_disabled_multiplemodelchoicefield(self):
+        class ArticleForm(forms.ModelForm):
+            categories = forms.ModelMultipleChoiceField(Category.objects.all(), required=False)
+
+            class Meta:
+                model = Article
+                fields = ['categories']
+
+        category1 = Category.objects.create(name='cat1')
+        category2 = Category.objects.create(name='cat2')
+        article = Article.objects.create(
+            pub_date=datetime.date(1988, 1, 4),
+            writer=Writer.objects.create(name='Test writer'),
+        )
+        article.categories.set([category1.pk])
+
+        form = ArticleForm(data={'categories': [category2.pk]}, instance=article)
+        self.assertEqual(form.errors, {})
+        self.assertEqual([x.pk for x in form.cleaned_data['categories']], [category2.pk])
+        # Disabled fields use the value from `instance` rather than `data`.
+        form = ArticleForm(data={'categories': [category2.pk]}, instance=article)
+        form.fields['categories'].disabled = True
+        self.assertEqual(form.errors, {})
+        self.assertEqual([x.pk for x in form.cleaned_data['categories']], [category1.pk])
+
     def test_modelchoicefield_iterator(self):
         """
         Iterator defaults to ModelChoiceIterator and can be overridden with
@@ -1589,6 +1575,14 @@ class ModelChoiceFieldTests(TestCase):
 
         field = CustomModelChoiceField(Category.objects.all())
         self.assertIsInstance(field.choices, CustomModelChoiceIterator)
+
+    def test_radioselect_num_queries(self):
+        class CategoriesForm(forms.Form):
+            categories = forms.ModelChoiceField(Category.objects.all(), widget=forms.RadioSelect)
+
+        template = Template('{% for widget in form.categories %}{{ widget }}{% endfor %}')
+        with self.assertNumQueries(2):
+            template.render(Context({'form': CategoriesForm()}))
 
 
 class ModelMultipleChoiceFieldTests(TestCase):
@@ -1770,6 +1764,25 @@ class ModelMultipleChoiceFieldTests(TestCase):
         sql, params = queryset.query.sql_with_params()
         self.assertEqual(len(params), 1)
 
+    def test_to_field_name_with_initial_data(self):
+        class ArticleCategoriesForm(forms.ModelForm):
+            categories = forms.ModelMultipleChoiceField(Category.objects.all(), to_field_name='slug')
+
+            class Meta:
+                model = Article
+                fields = ['categories']
+
+        article = Article.objects.create(
+            headline='Test article',
+            slug='test-article',
+            pub_date=datetime.date(1988, 1, 4),
+            writer=Writer.objects.create(name='Test writer'),
+            article='Hello.',
+        )
+        article.categories.add(self.c2, self.c3)
+        form = ArticleCategoriesForm(instance=article)
+        self.assertEqual(form['categories'].value(), [self.c2.slug, self.c3.slug])
+
 
 class ModelOneToOneFieldTests(TestCase):
     def test_modelform_onetoonefield(self):
@@ -1857,12 +1870,12 @@ class ModelOneToOneFieldTests(TestCase):
         author = Author.objects.create(publication=publication, full_name='John Doe')
         form = AuthorForm({'publication': '', 'full_name': 'John Doe'}, instance=author)
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data['publication'], None)
+        self.assertIsNone(form.cleaned_data['publication'])
         author = form.save()
         # author object returned from form still retains original publication object
         # that's why we need to retrieve it from database again
         new_author = Author.objects.get(pk=author.pk)
-        self.assertEqual(new_author.publication, None)
+        self.assertIsNone(new_author.publication)
 
     def test_assignment_of_none_null_false(self):
         class AuthorForm(forms.ModelForm):
@@ -1884,8 +1897,8 @@ class FileAndImageFieldTests(TestCase):
         of the value of ``initial``.
         """
         f = forms.FileField(required=False)
-        self.assertEqual(f.clean(False), False)
-        self.assertEqual(f.clean(False, 'initial'), False)
+        self.assertIs(f.clean(False), False)
+        self.assertIs(f.clean(False, 'initial'), False)
 
     def test_clean_false_required(self):
         """
@@ -1919,7 +1932,7 @@ class FileAndImageFieldTests(TestCase):
         self.assertIn('myfile-clear', six.text_type(form))
         form = DocumentForm(instance=doc, data={'myfile-clear': 'true'})
         doc = form.save(commit=False)
-        self.assertEqual(bool(doc.myfile), False)
+        self.assertFalse(doc.myfile)
 
     def test_clear_and_file_contradiction(self):
         """
@@ -2192,8 +2205,8 @@ class FileAndImageFieldTests(TestCase):
         self.assertTrue(f.is_valid())
         instance = f.save()
         self.assertEqual(instance.image.name, expected_null_imagefield_repr)
-        self.assertEqual(instance.width, None)
-        self.assertEqual(instance.height, None)
+        self.assertIsNone(instance.width)
+        self.assertIsNone(instance.height)
 
         f = OptionalImageFileForm(
             data={'description': 'And a final one'},

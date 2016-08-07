@@ -15,7 +15,9 @@ from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, SetPasswordForm,
 )
 from django.contrib.auth.models import User
-from django.contrib.auth.views import login as login_view, redirect_to_login
+from django.contrib.auth.views import (
+    LoginView, logout_then_login, redirect_to_login,
+)
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
 from django.core import mail
@@ -25,6 +27,7 @@ from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.test import TestCase, override_settings
 from django.test.utils import patch_logger
 from django.urls import NoReverseMatch, reverse, reverse_lazy
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import ParseResult, urlparse
@@ -553,10 +556,10 @@ class LoginTest(AuthViewsTestCase):
         # Do a GET to establish a CSRF token
         # TestClient isn't used here as we're testing middleware, essentially.
         req = HttpRequest()
-        CsrfViewMiddleware().process_view(req, login_view, (), {})
+        CsrfViewMiddleware().process_view(req, LoginView.as_view(), (), {})
         # get_token() triggers CSRF token inclusion in the response
         get_token(req)
-        resp = login_view(req)
+        resp = LoginView.as_view()(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
         csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, None)
         token1 = csrf_cookie.coded_value
@@ -569,10 +572,10 @@ class LoginTest(AuthViewsTestCase):
 
         # Use POST request to log in
         SessionMiddleware().process_request(req)
-        CsrfViewMiddleware().process_view(req, login_view, (), {})
+        CsrfViewMiddleware().process_view(req, LoginView.as_view(), (), {})
         req.META["SERVER_NAME"] = "testserver"  # Required to have redirect work in login view
         req.META["SERVER_PORT"] = 80
-        resp = login_view(req)
+        resp = LoginView.as_view()(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
         csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, None)
         token2 = csrf_cookie.coded_value
@@ -705,6 +708,36 @@ class RedirectToLoginTests(AuthViewsTestCase):
         login_redirect_response = redirect_to_login(next='/else/where/झ/')
         expected = '/login/?next=/else/where/%E0%A4%9D/'
         self.assertEqual(expected, login_redirect_response.url)
+
+
+class LogoutThenLoginTests(AuthViewsTestCase):
+    """Tests for the logout_then_login view"""
+
+    def confirm_logged_out(self):
+        self.assertNotIn(SESSION_KEY, self.client.session)
+
+    @override_settings(LOGIN_URL='/login/')
+    def test_default_logout_then_login(self):
+        self.login()
+        req = HttpRequest()
+        req.method = 'GET'
+        req.session = self.client.session
+        response = logout_then_login(req)
+        self.confirm_logged_out()
+        self.assertRedirects(response, '/login/', fetch_redirect_response=False)
+
+    def test_logout_then_login_with_custom_login(self):
+        self.login()
+        req = HttpRequest()
+        req.method = 'GET'
+        req.session = self.client.session
+        response = logout_then_login(req, login_url='/custom/')
+        self.confirm_logged_out()
+        self.assertRedirects(response, '/custom/', fetch_redirect_response=False)
+
+    def test_deprecated_extra_context(self):
+        with self.assertRaisesMessage(RemovedInDjango21Warning, 'The unused `extra_context` parameter'):
+            logout_then_login(None, extra_context={})
 
 
 class LoginRedirectAuthenticatedUser(AuthViewsTestCase):

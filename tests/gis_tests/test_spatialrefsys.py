@@ -1,8 +1,7 @@
 import re
 import unittest
 
-from django.contrib.gis.gdal import HAS_GDAL
-from django.test import mock, skipUnlessDBFeature
+from django.test import skipUnlessDBFeature
 from django.utils import six
 
 from .utils import SpatialRefSys, oracle, postgis, spatialite
@@ -51,18 +50,10 @@ test_srs = ({
 })
 
 
-@unittest.skipUnless(HAS_GDAL, "SpatialRefSysTest needs gdal support")
 @skipUnlessDBFeature("has_spatialrefsys_table")
 class SpatialRefSysTest(unittest.TestCase):
 
     def test_get_units(self):
-        epsg_4326 = next(f for f in test_srs if f['srid'] == 4326)
-        unit, unit_name = SpatialRefSys().get_units(epsg_4326['wkt'])
-        self.assertEqual(unit_name, 'degree')
-        self.assertAlmostEqual(unit, 0.01745329251994328)
-
-    @mock.patch('django.contrib.gis.gdal.HAS_GDAL', False)
-    def test_get_units_without_gdal(self):
         epsg_4326 = next(f for f in test_srs if f['srid'] == 4326)
         unit, unit_name = SpatialRefSys().get_units(epsg_4326['wkt'])
         self.assertEqual(unit_name, 'degree')

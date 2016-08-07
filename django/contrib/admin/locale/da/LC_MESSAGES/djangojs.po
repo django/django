@@ -2,7 +2,7 @@
 #
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
-# Erik Wognsen <r4mses@gmail.com>, 2012,2015
+# Erik Wognsen <r4mses@gmail.com>, 2012,2015-2016
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # valberg <valberg@orn.li>, 2014
@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-12-01 20:04+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 10:16+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -149,15 +149,69 @@ msgstr "I går"
 msgid "Tomorrow"
 msgstr "I morgen"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Januar Februar Marts April Maj Juni Juli August September Oktober November "
-"December"
+msgid "January"
+msgstr "Januar"
 
-msgid "S M T W T F S"
-msgstr "S M T O T F L"
+msgid "February"
+msgstr "Februar"
+
+msgid "March"
+msgstr "Marts"
+
+msgid "April"
+msgstr "April"
+
+msgid "May"
+msgstr "Maj"
+
+msgid "June"
+msgstr "Juni"
+
+msgid "July"
+msgstr "Juli"
+
+msgid "August"
+msgstr "August"
+
+msgid "September"
+msgstr "September"
+
+msgid "October"
+msgstr "Oktober"
+
+msgid "November"
+msgstr "November"
+
+msgid "December"
+msgstr "December"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "S"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "M"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "T"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "O"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "T"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "F"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "L"
 
 msgid "Show"
 msgstr "Vis"

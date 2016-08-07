@@ -1,16 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Andre Machado <csantos.machado@gmail.com>, 2016
+# Carlos E C Leite <caduado@gmail.com>, 2016
 # Claudemiro Alves Feitosa Neto <dimiro1@gmail.com>, 2015
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
 # Lucas Infante <maccinza@gmail.com>, 2015
+# rafaelribeiroo <pereiraribeirorafael@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-27 18:38+0000\n"
-"Last-Translator: Lucas Infante <maccinza@gmail.com>\n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-07-23 14:48+0000\n"
+"Last-Translator: rafaelribeiroo <pereiraribeirorafael@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -27,10 +30,10 @@ msgid "Item %(nth)s in the array did not validate: "
 msgstr "O item %(nth)s no array não pode ser validado:"
 
 msgid "Nested arrays must have the same length."
-msgstr "Nested matrizes devem ter o mesmo comprimento."
+msgstr "Matrizes aninhadas devem ter o mesmo comprimento."
 
 msgid "Map of strings to strings"
-msgstr "Mapa de strings para cordas"
+msgstr "Mapa de strings para strings"
 
 #, python-format
 msgid "The value of \"%(key)s\" is not a string."
@@ -45,6 +48,9 @@ msgstr "O valor deve ser um JSON válido."
 msgid "Could not load JSON data."
 msgstr "Não foi possível carregar dados JSON."
 
+msgid "Input must be a JSON dictionary."
+msgstr "Input deve ser um dicionário JSON"
+
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
 msgstr "'%(value)s' deve ser um JSON válido."
@@ -56,16 +62,16 @@ msgid "The start of the range must not exceed the end of the range."
 msgstr "O inicio do intervalo não deve exceder o fim do intervalo."
 
 msgid "Enter two whole numbers."
-msgstr "Entre com dois números cheios."
+msgstr "Insira dois números cheios."
 
 msgid "Enter two numbers."
-msgstr "Entre com dois números"
+msgstr "Insira dois números"
 
 msgid "Enter two valid date/times."
-msgstr "Entre com duas data/hora válidas."
+msgstr "Insira duas datas/horas válidas."
 
 msgid "Enter two valid dates."
-msgstr "Entre com duas datas válidas."
+msgstr "Insira duas datas válidas."
 
 #, python-format
 msgid ""
@@ -92,7 +98,7 @@ msgstr[0] ""
 "A lista contém um item %(show_value)d, deveria conter não menos que "
 "%(limit_value)d."
 msgstr[1] ""
-"A lista contém itens %(show_value)d, deveria conter não menos que "
+"A lista contém %(show_value)d itens, deveria conter não menos que "
 "%(limit_value)d."
 
 #, python-format

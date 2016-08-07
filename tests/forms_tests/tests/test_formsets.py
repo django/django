@@ -1012,11 +1012,8 @@ class FormsFormsetTestCase(SimpleTestCase):
 
         # confirm indexing of formset
         self.assertEqual(formset[0], forms[0])
-        try:
+        with self.assertRaises(IndexError):
             formset[3]
-            self.fail('Requesting an invalid formset index should raise an exception')
-        except IndexError:
-            pass
 
         # Formsets can override the default iteration order
         class BaseReverseFormSet(BaseFormSet):
@@ -1319,10 +1316,10 @@ class TestIsBoundBehavior(SimpleTestCase):
         unbound_formset = ArticleFormSet()
         bound_formset = ArticleFormSet(data)
 
-        empty_forms = []
-
-        empty_forms.append(unbound_formset.empty_form)
-        empty_forms.append(bound_formset.empty_form)
+        empty_forms = [
+            unbound_formset.empty_form,
+            bound_formset.empty_form
+        ]
 
         # Empty forms should be unbound
         self.assertFalse(empty_forms[0].is_bound)

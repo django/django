@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import copy
+import warnings
 from collections import OrderedDict
 from contextlib import contextmanager
 
@@ -13,6 +14,7 @@ from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.utils import make_model_tuple
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
@@ -328,6 +330,7 @@ class ModelState(object):
         self.name = force_text(name)
         self.fields = fields
         self.options = options or {}
+        self.options.setdefault('indexes', [])
         self.bases = bases or (models.Model, )
         self.managers = managers or []
         # Sanity-check that fields is NOT a dict. It must be ordered.
@@ -349,6 +352,13 @@ class ModelState(object):
                 raise ValueError(
                     'ModelState.fields cannot refer to a model class - "%s.through" does. '
                     'Use a string reference instead.' % name
+                )
+        # Sanity-check that indexes have their name set.
+        for index in self.options['indexes']:
+            if not index.name:
+                raise ValueError(
+                    "Indexes passed to ModelState require a name attribute. "
+                    "%r doesn't have one." % index
                 )
 
     @cached_property
@@ -444,28 +454,32 @@ class ModelState(object):
             bases = (models.Model,)
 
         managers = []
-
-        # Make sure the default manager is always first since ordering chooses
-        # the default manager.
-        if not model._default_manager.auto_created:
-            if model._default_manager.use_in_migrations:
-                default_manager = copy.copy(model._default_manager)
-                default_manager._set_creation_counter()
-
-            # If the default manager doesn't have `use_in_migrations = True`,
-            # shim a default manager so another manager isn't promoted in its
-            # place.
-            else:
-                default_manager = models.Manager()
-                default_manager.model = model
-                default_manager.name = model._default_manager.name
-            managers.append((force_text(default_manager.name), default_manager))
-
+        manager_names = set()
+        default_manager_shim = None
         for manager in model._meta.managers:
-            if manager.use_in_migrations and manager is not model._default_manager:
-                manager = copy.copy(manager)
-                manager._set_creation_counter()
-                managers.append((force_text(manager.name), manager))
+            manager_name = force_text(manager.name)
+            if manager_name in manager_names:
+                # Skip overridden managers.
+                continue
+            elif manager.use_in_migrations:
+                # Copy managers usable in migrations.
+                new_manager = copy.copy(manager)
+                new_manager._set_creation_counter()
+            elif manager is model._base_manager or manager is model._default_manager:
+                # Shim custom managers used as default and base managers.
+                new_manager = models.Manager()
+                new_manager.model = manager.model
+                new_manager.name = manager.name
+                if manager is model._default_manager:
+                    default_manager_shim = new_manager
+            else:
+                continue
+            manager_names.add(manager_name)
+            managers.append((manager_name, new_manager))
+
+        # Ignore a shimmed default manager called objects if it's the only one.
+        if managers == [('objects', default_manager_shim)]:
+            managers = []
 
         # Construct the new ModelState
         return cls(
@@ -541,18 +555,29 @@ class ModelState(object):
         # Restore managers
         body.update(self.construct_managers())
 
-        # Then, make a Model object (apps.register_model is called in __new__)
-        return type(
-            str(self.name),
-            bases,
-            body,
-        )
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore", "Managers from concrete parents will soon qualify as default managers",
+                RemovedInDjango20Warning)
+
+            # Then, make a Model object (apps.register_model is called in __new__)
+            return type(
+                str(self.name),
+                bases,
+                body,
+            )
 
     def get_field_by_name(self, name):
         for fname, field in self.fields:
             if fname == name:
                 return field
         raise ValueError("No field called %s on model %s" % (name, self.name))
+
+    def get_index_by_name(self, name):
+        for index in self.options['indexes']:
+            if index.name == name:
+                return index
+        raise ValueError("No index named %s on model %s" % (name, self.name))
 
     def __repr__(self):
         return "<ModelState: '%s.%s'>" % (self.app_label, self.name)

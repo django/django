@@ -532,11 +532,29 @@ class ClientTest(TestCase):
 
         # Log in
         self.client.force_login(self.u1, backend='test_client.auth_backends.TestClientBackend')
+        self.assertEqual(self.u1.backend, 'test_client.auth_backends.TestClientBackend')
 
         # Request a page that requires a login
         response = self.client.get('/login_protected_view/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
+
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            'django.contrib.auth.backends.ModelBackend',
+            'test_client.auth_backends.TestClientBackend',
+        ],
+    )
+    def test_force_login_without_backend(self):
+        """
+        force_login() without passing a backend and with multiple backends
+        configured should automatically use the first backend.
+        """
+        self.client.force_login(self.u1)
+        response = self.client.get('/login_protected_view/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'].username, 'testclient')
+        self.assertEqual(self.u1.backend, 'django.contrib.auth.backends.ModelBackend')
 
     @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies")
     def test_logout_cookie_sessions(self):
@@ -601,20 +619,22 @@ class ClientTest(TestCase):
         a relevant ValueError rather than a non-descript AssertionError.
         """
         response = self.client.get('/django_project_redirect/')
-        with self.assertRaisesMessage(ValueError, 'unable to fetch'):
+        msg = (
+            "The test client is unable to fetch remote URLs (got "
+            "https://www.djangoproject.com/). If the host is served by Django, "
+            "add 'www.djangoproject.com' to ALLOWED_HOSTS. "
+            "Otherwise, use assertRedirects(..., fetch_redirect_response=False)."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             self.assertRedirects(response, 'https://www.djangoproject.com/')
 
     def test_session_modifying_view(self):
         "Request a page that modifies the session"
         # Session value isn't set initially
-        try:
+        with self.assertRaises(KeyError):
             self.client.session['tobacconist']
-            self.fail("Shouldn't have a session value")
-        except KeyError:
-            pass
 
         self.client.post('/session_view/')
-
         # Check that the session was modified
         self.assertEqual(self.client.session['tobacconist'], 'hovercraft')
 
@@ -637,13 +657,6 @@ class ClientTest(TestCase):
         "Request a page that is known to throw an error"
         with self.assertRaises(KeyError):
             self.client.get("/broken_view/")
-
-        # Try the same assertion, a different way
-        try:
-            self.client.get('/broken_view/')
-            self.fail('Should raise an error')
-        except KeyError:
-            pass
 
     def test_mail_sending(self):
         "Test that mail is redirected to a dummy outbox during test setup"
@@ -730,7 +743,7 @@ class CustomTestClientTest(SimpleTestCase):
 
     def test_custom_test_client(self):
         """A test case can specify a custom class for self.client."""
-        self.assertEqual(hasattr(self.client, "i_am_customized"), True)
+        self.assertIs(hasattr(self.client, "i_am_customized"), True)
 
 
 def _generic_view(request):

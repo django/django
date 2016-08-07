@@ -67,6 +67,7 @@ class ColumnTypes(models.Model):
     text_field = models.TextField()
     time_field = models.TimeField()
     url_field = models.URLField()
+    uuid_field = models.UUIDField()
 
 
 class UniqueTogether(models.Model):

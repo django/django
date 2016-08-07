@@ -95,7 +95,7 @@ class ChangeListTests(TestCase):
             request, Child,
             *get_changelist_args(ia, list_select_related=ia.get_list_select_related(request))
         )
-        self.assertEqual(cl.queryset.query.select_related, False)
+        self.assertIs(cl.queryset.query.select_related, False)
 
     def test_get_select_related_custom_method(self):
         class GetListSelectRelatedAdmin(admin.ModelAdmin):

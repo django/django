@@ -110,6 +110,12 @@ class CallableBool:
     def __repr__(self):
         return 'CallableBool(%r)' % self.value
 
+    def __eq__(self, other):
+        return self.value == other
+
+    def __ne__(self, other):
+        return self.value != other
+
 CallableFalse = CallableBool(False)
 CallableTrue = CallableBool(True)
 
@@ -124,13 +130,7 @@ class MiddlewareMixin(object):
         if hasattr(self, 'process_request'):
             response = self.process_request(request)
         if not response:
-            try:
-                response = self.get_response(request)
-            except Exception as e:
-                if hasattr(self, 'process_exception'):
-                    return self.process_exception(request, e)
-                else:
-                    raise
+            response = self.get_response(request)
         if hasattr(self, 'process_response'):
             response = self.process_response(request, response)
         return response

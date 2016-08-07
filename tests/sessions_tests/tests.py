@@ -59,7 +59,7 @@ class SessionTestsMixin(object):
         self.assertFalse(self.session.accessed)
 
     def test_get_empty(self):
-        self.assertEqual(self.session.get('cat'), None)
+        self.assertIsNone(self.session.get('cat'))
 
     def test_store(self):
         self.session['cat'] = "dog"
@@ -75,7 +75,7 @@ class SessionTestsMixin(object):
         self.assertEqual(self.session.pop('some key'), 'exists')
         self.assertTrue(self.session.accessed)
         self.assertTrue(self.session.modified)
-        self.assertEqual(self.session.get('some key'), None)
+        self.assertIsNone(self.session.get('some key'))
 
     def test_pop_default(self):
         self.assertEqual(self.session.pop('some key', 'does not exist'),
@@ -198,15 +198,9 @@ class SessionTestsMixin(object):
         # removed the key) results in a new key being generated.
         try:
             session = self.backend('1')
-            try:
-                session.save()
-            except AttributeError:
-                self.fail(
-                    "The session object did not save properly. "
-                    "Middleware may be saving cache items without namespaces."
-                )
+            session.save()
             self.assertNotEqual(session.session_key, '1')
-            self.assertEqual(session.get('cat'), None)
+            self.assertIsNone(session.get('cat'))
             session.delete()
         finally:
             # Some backends leave a stale cache entry for the invalid
@@ -479,7 +473,7 @@ class CustomDatabaseSessionTests(DatabaseSessionTests):
 
         # Make sure that save() on an existing session did the right job.
         s = self.model.objects.get(session_key=self.session.session_key)
-        self.assertEqual(s.account_id, None)
+        self.assertIsNone(s.account_id)
 
 
 class CacheDBSessionTests(SessionTestsMixin, TestCase):
@@ -605,7 +599,7 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
 
     def test_default_cache(self):
         self.session.save()
-        self.assertNotEqual(caches['default'].get(self.session.cache_key), None)
+        self.assertIsNotNone(caches['default'].get(self.session.cache_key))
 
     @override_settings(CACHES={
         'default': {
@@ -621,8 +615,8 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
         self.session = self.backend()
 
         self.session.save()
-        self.assertEqual(caches['default'].get(self.session.cache_key), None)
-        self.assertNotEqual(caches['sessions'].get(self.session.cache_key), None)
+        self.assertIsNone(caches['default'].get(self.session.cache_key))
+        self.assertIsNotNone(caches['sessions'].get(self.session.cache_key))
 
     def test_create_and_save(self):
         self.session = self.backend()
@@ -746,8 +740,8 @@ class SessionMiddlewareTests(TestCase):
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
 
-    @override_settings(SESSION_COOKIE_DOMAIN='.example.local')
-    def test_session_delete_on_end_with_custom_domain(self):
+    @override_settings(SESSION_COOKIE_DOMAIN='.example.local', SESSION_COOKIE_PATH='/example/')
+    def test_session_delete_on_end_with_custom_domain_and_path(self):
         request = RequestFactory().get('/')
         response = HttpResponse('Session test')
         middleware = SessionMiddleware()
@@ -763,12 +757,13 @@ class SessionMiddlewareTests(TestCase):
         response = middleware.process_response(request, response)
 
         # Check that the cookie was deleted, not recreated.
-        # A deleted cookie header with a custom domain looks like:
+        # A deleted cookie header with a custom domain and path looks like:
         #  Set-Cookie: sessionid=; Domain=.example.local;
-        #              expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
+        #              expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0;
+        #              Path=/example/
         self.assertEqual(
             'Set-Cookie: {}={}; Domain=.example.local; expires=Thu, '
-            '01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/'.format(
+            '01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/example/'.format(
                 settings.SESSION_COOKIE_NAME,
                 '""' if sys.version_info >= (3, 5) else '',
             ),

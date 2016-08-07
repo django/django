@@ -16,6 +16,7 @@ from django.core.serializers.python import (
     Deserializer as PythonDeserializer, Serializer as PythonSerializer,
 )
 from django.utils import six
+from django.utils.duration import duration_iso_string
 from django.utils.functional import Promise
 from django.utils.timezone import is_aware
 
@@ -37,6 +38,7 @@ class Serializer(PythonSerializer):
         if self.options.get('indent'):
             # Prevent trailing spaces
             self.json_kwargs['separators'] = (',', ': ')
+        self.json_kwargs.setdefault('cls', DjangoJSONEncoder)
 
     def start_serialization(self):
         self._init_options()
@@ -58,8 +60,7 @@ class Serializer(PythonSerializer):
                 self.stream.write(" ")
         if indent:
             self.stream.write("\n")
-        json.dump(self.get_dump_object(obj), self.stream,
-                  cls=DjangoJSONEncoder, **self.json_kwargs)
+        json.dump(self.get_dump_object(obj), self.stream, **self.json_kwargs)
         self._current = None
 
     def getvalue(self):
@@ -108,6 +109,8 @@ class DjangoJSONEncoder(json.JSONEncoder):
             if o.microsecond:
                 r = r[:12]
             return r
+        elif isinstance(o, datetime.timedelta):
+            return duration_iso_string(o)
         elif isinstance(o, decimal.Decimal):
             return str(o)
         elif isinstance(o, uuid.UUID):

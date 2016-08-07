@@ -5,7 +5,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
 # madisvain <madisvain@gmail.com>, 2011
-# Martin <martinpajuste@gmail.com>, 2015
+# Martin Pajuste <martinpajuste@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"

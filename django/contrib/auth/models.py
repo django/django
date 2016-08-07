@@ -145,7 +145,7 @@ class UserManager(BaseUserManager):
         if not username:
             raise ValueError('The given username must be set')
         email = self.normalize_email(email)
-        username = self.normalize_username(username)
+        username = self.model.normalize_username(username)
         user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -343,6 +343,10 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         verbose_name = _('user')
         verbose_name_plural = _('users')
         abstract = True
+
+    def clean(self):
+        super(AbstractUser, self).clean()
+        self.email = self.__class__.objects.normalize_email(self.email)
 
     def get_full_name(self):
         """

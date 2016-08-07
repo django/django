@@ -67,6 +67,7 @@ LANGUAGES = [
     ('cy', gettext_noop('Welsh')),
     ('da', gettext_noop('Danish')),
     ('de', gettext_noop('German')),
+    ('dsb', gettext_noop('Lower Sorbian')),
     ('el', gettext_noop('Greek')),
     ('en', gettext_noop('English')),
     ('en-au', gettext_noop('Australian English')),
@@ -90,6 +91,7 @@ LANGUAGES = [
     ('he', gettext_noop('Hebrew')),
     ('hi', gettext_noop('Hindi')),
     ('hr', gettext_noop('Croatian')),
+    ('hsb', gettext_noop('Upper Sorbian')),
     ('hu', gettext_noop('Hungarian')),
     ('ia', gettext_noop('Interlingua')),
     ('id', gettext_noop('Indonesian')),
@@ -302,12 +304,12 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
 FILE_UPLOAD_TEMP_DIR = None
 
 # The numeric mode to set newly-uploaded files to. The value should be a mode
-# you'd pass directly to os.chmod; see http://docs.python.org/lib/os-file-dir.html.
+# you'd pass directly to os.chmod; see https://docs.python.org/3/library/os.html#files-and-directories.
 FILE_UPLOAD_PERMISSIONS = None
 
 # The numeric mode to assign to newly-created directories, when uploading files.
 # The value should be a mode as you'd pass to os.chmod;
-# see http://docs.python.org/lib/os-file-dir.html.
+# see https://docs.python.org/3/library/os.html#files-and-directories.
 FILE_UPLOAD_DIRECTORY_PERMISSIONS = None
 
 # Python module path where user will place custom format definition.

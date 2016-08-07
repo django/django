@@ -4,9 +4,12 @@
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # andrewsmedina <andrewsmedina@gmail.com>, 2014-2015
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
+# Carlos E C Leite <caduado@gmail.com>, 2016
+# FilipeCifali <cifali.filipe@gmail.com>, 2016
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2014-2015
+# Felipe Rodrigues <bidu.pub@gmail.com>, 2016
 # Gladson <gladsonbrito@gmail.com>, 2013
 # Guilherme Gondim, 2011-2014
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -18,9 +21,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 19:35+0000\n"
-"Last-Translator: Sergio Garcia <sergio@ginx.com.br>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-04 00:25+0000\n"
+"Last-Translator: andrewsmedina <andrewsmedina@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -70,6 +73,9 @@ msgstr "Dinamarquês"
 
 msgid "German"
 msgstr "Alemão"
+
+msgid "Lower Sorbian"
+msgstr "Sorábio Baixo"
 
 msgid "Greek"
 msgstr "Grego"
@@ -140,6 +146,9 @@ msgstr "Hindi"
 msgid "Croatian"
 msgstr "Croata"
 
+msgid "Upper Sorbian"
+msgstr "Sorábio Alto"
+
 msgid "Hungarian"
 msgstr "Húngaro"
 
@@ -200,7 +209,7 @@ msgstr "Marathi"
 msgid "Burmese"
 msgstr "Birmanês"
 
-msgid "Norwegian Bokmal"
+msgid "Norwegian Bokmål"
 msgstr "Dano-norueguês"
 
 msgid "Nepali"
@@ -299,9 +308,6 @@ msgstr "Arquivos Estáticos"
 msgid "Syndication"
 msgstr "Syndication"
 
-msgid "Web Design"
-msgstr "Web Design"
-
 msgid "Enter a valid value."
 msgstr "Informe um valor válido."
 
@@ -324,7 +330,8 @@ msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Insira um 'slug' válido composto de letras, números, sublinhados ou hífens."
+"Insira um 'slug' válido composto de letras Unicode, números, sublinhados ou "
+"hífens."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Insira um endereço IPv4 válido."
@@ -441,6 +448,9 @@ msgstr "Inteiro"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' valor deve ser um inteiro."
 
+msgid "Big (8 byte) integer"
+msgstr "Inteiro grande (8 byte)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' valor deve ser True ou False."
@@ -524,9 +534,6 @@ msgstr "'%(value)s' valor deve ser um float."
 msgid "Floating point number"
 msgstr "Número de ponto flutuante"
 
-msgid "Big (8 byte) integer"
-msgstr "Inteiro grande (8 byte)"
-
 msgid "IPv4 address"
 msgstr "Endereço IPv4"
 
@@ -600,6 +607,14 @@ msgstr "Chave Estrangeira (tipo determinado pelo campo relacionado)"
 
 msgid "One-to-one relationship"
 msgstr "Relacionamento um-para-um"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "Relacionamento %(from)s-%(to)s"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "Relacionamentos %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Relacionamento muitos-para-muitos"
@@ -1105,7 +1120,7 @@ msgid ""
 msgstr ""
 "Você está vendo esta mensagem, porque este site requer um cookie CSRF no "
 "envio de formulários. Este cookie é necessário por razões de segurança, para "
-"garantir que o seu browser não está sendo invadido por terceiros."
+"garantir que o seu browser não está sendo sequestrado por terceiros."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
@@ -1176,7 +1191,8 @@ msgid "No %(verbose_name)s found matching the query"
 msgstr "%(verbose_name)s  não encontrado de acordo com a consulta"
 
 msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "A página não é 'last', nem pode ser convertido para um inteiro."
+msgstr ""
+"A página não é 'final', nem tampouco pode ser convertido para um inteiro."
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"

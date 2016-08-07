@@ -11,7 +11,6 @@ import warnings
 import django
 from django.core import management, serializers
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management.base import CommandError
 from django.core.serializers.base import DeserializationError
 from django.db import IntegrityError, transaction
 from django.db.models import signals
@@ -131,8 +130,8 @@ class TestFixtures(TestCase):
             'pretty.xml',
             verbosity=0,
         )
-        self.assertEqual(Stuff.objects.all()[0].name, None)
-        self.assertEqual(Stuff.objects.all()[0].owner, None)
+        self.assertIsNone(Stuff.objects.all()[0].name)
+        self.assertIsNone(Stuff.objects.all()[0].owner)
 
     @skipUnlessDBFeature('interprets_empty_strings_as_nulls')
     def test_pretty_print_xml_empty_strings(self):
@@ -147,7 +146,7 @@ class TestFixtures(TestCase):
             verbosity=0,
         )
         self.assertEqual(Stuff.objects.all()[0].name, '')
-        self.assertEqual(Stuff.objects.all()[0].owner, None)
+        self.assertIsNone(Stuff.objects.all()[0].owner)
 
     def test_absolute_path(self):
         """
@@ -838,15 +837,9 @@ class M2MNaturalKeyFixtureTests(TestCase):
         A, B, C, AtoB, BtoC, CtoA = (M2MComplexCircular1A, M2MComplexCircular1B,
                                      M2MComplexCircular1C, M2MCircular1ThroughAB,
                                      M2MCircular1ThroughBC, M2MCircular1ThroughCA)
-        try:
-            sorted_deps = serializers.sort_dependencies(
-                [('fixtures_regress', [A, B, C, AtoB, BtoC, CtoA])]
-            )
-        except CommandError:
-            self.fail("Serialization dependency solving algorithm isn't "
-                      "capable of handling circular M2M setups with "
-                      "intermediate models.")
-
+        sorted_deps = serializers.sort_dependencies(
+            [('fixtures_regress', [A, B, C, AtoB, BtoC, CtoA])]
+        )
         # The dependency sorting should not result in an error, and the
         # through model should have dependencies to the other models and as
         # such come last in the list.
@@ -858,17 +851,9 @@ class M2MNaturalKeyFixtureTests(TestCase):
         Circular M2M relations with explicit through models should be serializable
         This test tests the circularity with explicit natural_key.dependencies
         """
-        try:
-            sorted_deps = serializers.sort_dependencies([
-                ('fixtures_regress', [
-                    M2MComplexCircular2A,
-                    M2MComplexCircular2B,
-                    M2MCircular2ThroughAB])
-            ])
-        except CommandError:
-            self.fail("Serialization dependency solving algorithm isn't "
-                      "capable of handling circular M2M setups with "
-                      "intermediate models plus natural key dependency hints.")
+        sorted_deps = serializers.sort_dependencies([
+            ('fixtures_regress', [M2MComplexCircular2A, M2MComplexCircular2B, M2MCircular2ThroughAB])
+        ])
         self.assertEqual(sorted_deps[:2], [M2MComplexCircular2A, M2MComplexCircular2B])
         self.assertEqual(sorted_deps[2:], [M2MCircular2ThroughAB])
 

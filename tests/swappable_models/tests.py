@@ -44,9 +44,5 @@ class SwappableModelTests(TestCase):
     @override_settings(TEST_ARTICLE_MODEL='swappable_models.article')
     def test_case_insensitive(self):
         "Model names are case insensitive. Check that model swapping honors this."
-        try:
-            Article.objects.all()
-        except AttributeError:
-            self.fail('Swappable model names should be case insensitive.')
-
+        Article.objects.all()
         self.assertIsNone(Article._meta.swapped)

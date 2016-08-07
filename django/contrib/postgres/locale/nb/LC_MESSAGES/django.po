@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jon <jon@funkbit.no>, 2015
+# Jon <jon@funkbit.no>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-17 11:50+0000\n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-07-27 09:02+0000\n"
 "Last-Translator: Jon <jon@funkbit.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
@@ -42,6 +42,9 @@ msgstr "Verdi må være gyldig JSON."
 
 msgid "Could not load JSON data."
 msgstr "Kunne ikke laste JSON-data."
+
+msgid "Input must be a JSON dictionary."
+msgstr "Input må være en JSON-dictionary."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."

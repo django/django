@@ -128,7 +128,7 @@ a different language parsers and dictionaries as defined by the database::
 
 The value of ``config`` could also be stored in another column::
 
-    >>> from djanog.db.models import F
+    >>> from django.db.models import F
     >>> Entry.objects.annotate(
     ...     search=SearchVector('body_text', config=F('blog__language')),
     ... ).filter(search=SearchQuery('œuf', config=F('blog__language')))
@@ -217,7 +217,7 @@ Usage example::
     >>> Author.objects.annotate(
     ...     similarity=TrigramSimilarity('name', test),
     ... ).filter(similarity__gt=0.3).order_by('-similarity')
-    [<Author: Katy Stephens>, <Author: Stephen Keats>]
+    [<Author: Katy Stevens>, <Author: Stephen Keats>]
 
 ``TrigramDistance``
 -------------------
@@ -238,4 +238,4 @@ Usage example::
     >>> Author.objects.annotate(
     ...     distance=TrigramDistance('name', test),
     ... ).filter(distance__lte=0.7).order_by('distance')
-    [<Author: Katy Stephens>, <Author: Stephen Keats>]
+    [<Author: Katy Stevens>, <Author: Stephen Keats>]

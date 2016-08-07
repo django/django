@@ -1,11 +1,8 @@
 from __future__ import unicode_literals
 
 import difflib
-import errno
 import json
-import os
 import posixpath
-import socket
 import sys
 import threading
 import unittest
@@ -19,7 +16,7 @@ from unittest.util import safe_repr
 from django.apps import apps
 from django.conf import settings
 from django.core import mail
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import ValidationError
 from django.core.files import locks
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.core.management import call_command
@@ -29,6 +26,7 @@ from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
+from django.http.request import split_domain_port, validate_host
 from django.test.client import Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import setting_changed, template_rendered
@@ -66,7 +64,7 @@ def assert_and_parse_html(self, html, user_msg, msg):
     try:
         dom = parse_html(html)
     except HTMLParseError as e:
-        standardMsg = '%s\n%s' % (msg, e.msg)
+        standardMsg = '%s\n%s' % (msg, e)
         self.fail(self._formatMessage(user_msg, standardMsg))
     return dom
 
@@ -306,10 +304,13 @@ class SimpleTestCase(unittest.TestCase):
                 # netloc might be empty, or in cases where Django tests the
                 # HTTP scheme, the convention is for netloc to be 'testserver'.
                 # Trust both as "internal" URLs here.
-                if netloc and netloc != 'testserver':
+                domain, port = split_domain_port(netloc)
+                if domain and not validate_host(domain, settings.ALLOWED_HOSTS):
                     raise ValueError(
-                        "The Django test client is unable to fetch remote URLs (got %s). "
-                        "Use assertRedirects(..., fetch_redirect_response=False) instead." % url
+                        "The test client is unable to fetch remote URLs (got %s). "
+                        "If the host is served by Django, add '%s' to ALLOWED_HOSTS. "
+                        "Otherwise, use assertRedirects(..., fetch_redirect_response=False)."
+                        % (url, domain)
                     )
                 redirect_response = response.client.get(path, QueryDict(query), secure=(scheme == 'https'))
 
@@ -1231,10 +1232,9 @@ class LiveServerThread(threading.Thread):
     Thread for running a live http server while the tests are running.
     """
 
-    def __init__(self, host, possible_ports, static_handler, connections_override=None):
+    def __init__(self, host, static_handler, connections_override=None):
         self.host = host
         self.port = None
-        self.possible_ports = possible_ports
         self.is_ready = threading.Event()
         self.error = None
         self.static_handler = static_handler
@@ -1254,28 +1254,8 @@ class LiveServerThread(threading.Thread):
         try:
             # Create the handler for serving static and media files
             handler = self.static_handler(_MediaFilesHandler(WSGIHandler()))
-
-            # Go through the list of possible ports, hoping that we can find
-            # one that is free to use for the WSGI server.
-            for index, port in enumerate(self.possible_ports):
-                try:
-                    self.httpd = self._create_server(port)
-                except socket.error as e:
-                    if (index + 1 < len(self.possible_ports) and
-                            e.errno == errno.EADDRINUSE):
-                        # This port is already in use, so we go on and try with
-                        # the next one in the list.
-                        continue
-                    else:
-                        # Either none of the given ports are free or the error
-                        # is something else than "Address already in use". So
-                        # we let that error bubble up to the main thread.
-                        raise
-                else:
-                    # A free port was found.
-                    self.port = port
-                    break
-
+            self.httpd = self._create_server(0)
+            self.port = self.httpd.server_address[1]
             self.httpd.set_app(handler)
             self.is_ready.set()
             self.httpd.serve_forever()
@@ -1304,13 +1284,13 @@ class LiveServerTestCase(TransactionTestCase):
     sqlite) and each thread needs to commit all their transactions so that the
     other thread can see the changes.
     """
-
+    host = 'localhost'
+    server_thread_class = LiveServerThread
     static_handler = _StaticFilesHandler
 
     @classproperty
     def live_server_url(cls):
-        return 'http://%s:%s' % (
-            cls.server_thread.host, cls.server_thread.port)
+        return 'http://%s:%s' % (cls.host, cls.server_thread.port)
 
     @classmethod
     def setUpClass(cls):
@@ -1324,31 +1304,11 @@ class LiveServerTestCase(TransactionTestCase):
                 conn.allow_thread_sharing = True
                 connections_override[conn.alias] = conn
 
-        # Launch the live server's thread
-        specified_address = os.environ.get(
-            'DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:8081-8179')
-
-        # The specified ports may be of the form '8000-8010,8080,9200-9300'
-        # i.e. a comma-separated list of ports or ranges of ports, so we break
-        # it down into a detailed list of all possible ports.
-        possible_ports = []
-        try:
-            host, port_ranges = specified_address.split(':')
-            for port_range in port_ranges.split(','):
-                # A port range can be of either form: '8000' or '8000-8010'.
-                extremes = list(map(int, port_range.split('-')))
-                assert len(extremes) in [1, 2]
-                if len(extremes) == 1:
-                    # Port range of the form '8000'
-                    possible_ports.append(extremes[0])
-                else:
-                    # Port range of the form '8000-8010'
-                    for port in range(extremes[0], extremes[1] + 1):
-                        possible_ports.append(port)
-        except Exception:
-            msg = 'Invalid address ("%s") for live server.' % specified_address
-            six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg), sys.exc_info()[2])
-        cls.server_thread = cls._create_server_thread(host, possible_ports, connections_override)
+        cls._live_server_modified_settings = modify_settings(
+            ALLOWED_HOSTS={'append': cls.host},
+        )
+        cls._live_server_modified_settings.enable()
+        cls.server_thread = cls._create_server_thread(connections_override)
         cls.server_thread.daemon = True
         cls.server_thread.start()
 
@@ -1361,10 +1321,9 @@ class LiveServerTestCase(TransactionTestCase):
             raise cls.server_thread.error
 
     @classmethod
-    def _create_server_thread(cls, host, possible_ports, connections_override):
-        return LiveServerThread(
-            host,
-            possible_ports,
+    def _create_server_thread(cls, connections_override):
+        return cls.server_thread_class(
+            cls.host,
             cls.static_handler,
             connections_override=connections_override,
         )
@@ -1386,6 +1345,7 @@ class LiveServerTestCase(TransactionTestCase):
     @classmethod
     def tearDownClass(cls):
         cls._tearDownClassInternal()
+        cls._live_server_modified_settings.disable()
         super(LiveServerTestCase, cls).tearDownClass()
 
 

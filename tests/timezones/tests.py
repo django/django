@@ -588,7 +588,7 @@ class NewDatabaseTests(TestCase):
     def test_null_datetime(self):
         # Regression test for #17294
         e = MaybeEvent.objects.create()
-        self.assertEqual(e.dt, None)
+        self.assertIsNone(e.dt)
 
 
 @override_settings(TIME_ZONE='Africa/Nairobi', USE_TZ=True)

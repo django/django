@@ -25,7 +25,10 @@ try:
     import MySQLdb as Database
 except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
+    raise ImproperlyConfigured(
+        'Error loading MySQLdb module: %s.\n'
+        'Did you install mysqlclient or MySQL-python?' % e
+    )
 
 from MySQLdb.constants import CLIENT, FIELD_TYPE                # isort:skip
 from MySQLdb.converters import Thing2Literal, conversions       # isort:skip
@@ -366,8 +369,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def mysql_version(self):
-        with self.temporary_connection():
-            server_info = self.connection.get_server_info()
+        with self.temporary_connection() as cursor:
+            cursor.execute('SELECT VERSION()')
+            server_info = cursor.fetchone()[0]
         match = server_version_re.match(server_info)
         if not match:
             raise Exception('Unable to determine MySQL version from version string %r' % server_info)

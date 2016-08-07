@@ -51,7 +51,7 @@ class OperationTestBase(MigrationTestBase):
         return project_state, new_state
 
     def set_up_test_model(
-            self, app_label, second_model=False, third_model=False,
+            self, app_label, second_model=False, third_model=False, index=False, multicol_index=False,
             related_model=False, mti_model=False, proxy_model=False, manager_model=False,
             unique_together=False, options=False, db_table=None, index_together=False):
         """
@@ -96,6 +96,16 @@ class OperationTestBase(MigrationTestBase):
             ],
             options=model_options,
         )]
+        if index:
+            operations.append(migrations.AddIndex(
+                "Pony",
+                models.Index(fields=["pink"], name="pony_pink_idx")
+            ))
+        if multicol_index:
+            operations.append(migrations.AddIndex(
+                "Pony",
+                models.Index(fields=["pink", "weight"], name="pony_test_idx")
+            ))
         if second_model:
             operations.append(migrations.CreateModel(
                 "Stable",
@@ -1149,6 +1159,13 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2], {'name': "Pony", 'table': "test_almota_pony_2"})
 
+    def test_alter_model_table_none(self):
+        """
+        Tests the AlterModelTable operation if the table name is set to None.
+        """
+        operation = migrations.AlterModelTable("Pony", None)
+        self.assertEqual(operation.describe(), "Rename table for Pony to (default)")
+
     def test_alter_model_table_noop(self):
         """
         Tests the AlterModelTable operation if the table name is not changed.
@@ -1210,8 +1227,8 @@ class OperationTests(OperationTestBase):
         self.assertEqual(operation.describe(), "Alter field pink on Pony")
         new_state = project_state.clone()
         operation.state_forwards("test_alfl", new_state)
-        self.assertEqual(project_state.models["test_alfl", "pony"].get_field_by_name("pink").null, False)
-        self.assertEqual(new_state.models["test_alfl", "pony"].get_field_by_name("pink").null, True)
+        self.assertIs(project_state.models["test_alfl", "pony"].get_field_by_name("pink").null, False)
+        self.assertIs(new_state.models["test_alfl", "pony"].get_field_by_name("pink").null, True)
         # Test the database alteration
         self.assertColumnNotNull("test_alfl_pony", "pink")
         with connection.schema_editor() as editor:
@@ -1374,6 +1391,103 @@ class OperationTests(OperationTestBase):
     def test_alter_unique_together_remove(self):
         operation = migrations.AlterUniqueTogether("Pony", None)
         self.assertEqual(operation.describe(), "Alter unique_together for Pony (0 constraint(s))")
+
+    def test_add_index(self):
+        """
+        Test the AddIndex operation.
+        """
+        project_state = self.set_up_test_model("test_adin")
+        msg = (
+            "Indexes passed to AddIndex operations require a name argument. "
+            "<Index: fields='pink'> doesn't have one."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            migrations.AddIndex("Pony", models.Index(fields=["pink"]))
+        index = models.Index(fields=["pink"], name="test_adin_pony_pink_idx")
+        operation = migrations.AddIndex("Pony", index)
+        self.assertEqual(operation.describe(), "Create index on field(s) pink of model Pony")
+        new_state = project_state.clone()
+        operation.state_forwards("test_adin", new_state)
+        # Test the database alteration
+        self.assertEqual(len(new_state.models["test_adin", "pony"].options['indexes']), 1)
+        self.assertIndexNotExists("test_adin_pony", ["pink"])
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_adin", editor, project_state, new_state)
+        self.assertIndexExists("test_adin_pony", ["pink"])
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_adin", editor, new_state, project_state)
+        self.assertIndexNotExists("test_adin_pony", ["pink"])
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AddIndex")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'model_name': "Pony", 'index': index})
+
+    def test_remove_index(self):
+        """
+        Test the RemoveIndex operation.
+        """
+        project_state = self.set_up_test_model("test_rmin", multicol_index=True)
+        self.assertTableExists("test_rmin_pony")
+        self.assertIndexExists("test_rmin_pony", ["pink", "weight"])
+        operation = migrations.RemoveIndex("Pony", "pony_test_idx")
+        self.assertEqual(operation.describe(), "Remove index pony_test_idx from Pony")
+        new_state = project_state.clone()
+        operation.state_forwards("test_rmin", new_state)
+        # Test the state alteration
+        self.assertEqual(len(new_state.models["test_rmin", "pony"].options['indexes']), 0)
+        self.assertIndexExists("test_rmin_pony", ["pink", "weight"])
+        # Test the database alteration
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_rmin", editor, project_state, new_state)
+        self.assertIndexNotExists("test_rmin_pony", ["pink", "weight"])
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_rmin", editor, new_state, project_state)
+        self.assertIndexExists("test_rmin_pony", ["pink", "weight"])
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "RemoveIndex")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'model_name': "Pony", 'name': "pony_test_idx"})
+
+        # Also test a field dropped with index - sqlite remake issue
+        operations = [
+            migrations.RemoveIndex("Pony", "pony_test_idx"),
+            migrations.RemoveField("Pony", "pink"),
+        ]
+        self.assertColumnExists("test_rmin_pony", "pink")
+        self.assertIndexExists("test_rmin_pony", ["pink", "weight"])
+        # Test database alteration
+        new_state = project_state.clone()
+        self.apply_operations('test_rmin', new_state, operations=operations)
+        self.assertColumnNotExists("test_rmin_pony", "pink")
+        self.assertIndexNotExists("test_rmin_pony", ["pink", "weight"])
+        # And test reversal
+        self.unapply_operations("test_rmin", project_state, operations=operations)
+        self.assertIndexExists("test_rmin_pony", ["pink", "weight"])
+
+    def test_alter_field_with_index(self):
+        """
+        Test AlterField operation with an index to ensure indexes created via
+        Meta.indexes don't get dropped with sqlite3 remake.
+        """
+        project_state = self.set_up_test_model("test_alflin", index=True)
+        operation = migrations.AlterField("Pony", "pink", models.IntegerField(null=True))
+        new_state = project_state.clone()
+        operation.state_forwards("test_alflin", new_state)
+        # Test the database alteration
+        self.assertColumnNotNull("test_alflin_pony", "pink")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_alflin", editor, project_state, new_state)
+        # Ensure that index hasn't been dropped
+        self.assertIndexExists("test_alflin_pony", ["pink"])
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_alflin", editor, new_state, project_state)
+        # Ensure the index is still there
+        self.assertIndexExists("test_alflin_pony", ["pink"])
 
     def test_alter_index_together(self):
         """
@@ -2063,7 +2177,7 @@ class OperationTests(OperationTestBase):
 
         state = new_state.clone()
         blog = state.apps.get_model("test_blog.Blog")
-        self.assertTrue(isinstance(blog._meta.pk, models.BigAutoField))
+        self.assertIsInstance(blog._meta.pk, models.BigAutoField)
 
         project_state = new_state
         new_state = new_state.clone()
@@ -2282,3 +2396,21 @@ class SwappableOperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_adfligsw", editor, new_state, project_state)
         self.assertTableNotExists("test_adfligsw_pony")
+
+    @override_settings(TEST_SWAP_MODEL='migrations.SomeFakeModel')
+    def test_indexes_ignore_swapped(self):
+        """
+        Add/RemoveIndex operations ignore swapped models.
+        """
+        operation = migrations.AddIndex('Pony', models.Index(fields=['pink'], name='my_name_idx'))
+        project_state, new_state = self.make_test_state('test_adinigsw', operation)
+        with connection.schema_editor() as editor:
+            # No database queries should be run for swapped models
+            operation.database_forwards('test_adinigsw', editor, project_state, new_state)
+            operation.database_backwards('test_adinigsw', editor, new_state, project_state)
+
+        operation = migrations.RemoveIndex('Pony', models.Index(fields=['pink'], name='my_name_idx'))
+        project_state, new_state = self.make_test_state("test_rminigsw", operation)
+        with connection.schema_editor() as editor:
+            operation.database_forwards('test_rminigsw', editor, project_state, new_state)
+            operation.database_backwards('test_rminigsw', editor, new_state, project_state)

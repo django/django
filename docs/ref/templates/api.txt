@@ -736,6 +736,14 @@ tag for protection against :doc:`Cross Site Request Forgeries
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``request``, which is the current :class:`~django.http.HttpRequest`.
 
+``django.template.context_processors.tz``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function:: tz
+
+If this processor is enabled, every ``RequestContext`` will contain a variable
+``TIME_ZONE``, providing the name of the currently active time zone.
+
 ``django.contrib.messages.context_processors.messages``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -750,7 +758,7 @@ variables:
 Writing your own context processors
 -----------------------------------
 
-A context processor has a very simple interface: It's just a Python function
+A context processor has a very simple interface: It's a Python function
 that takes one argument, an :class:`~django.http.HttpRequest` object, and
 returns a dictionary that gets added to the template context. Each context
 processor *must* return a dictionary.

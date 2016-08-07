@@ -4,15 +4,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kostas <tamosiunas@gmail.com>, 2014
 # lauris <lauris@runbox.com>, 2011
-# Matas Dailyda <matas@dailyda.com>, 2015
+# Matas Dailyda <matas@dailyda.com>, 2015-2016
 # Povilas Balzaravičius <pavvka@gmail.com>, 2014
 # Simonas Kazlauskas <simonas@kazlauskas.me>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-12 10:06+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-23 12:00+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
@@ -144,7 +144,7 @@ msgstr "Metodas"
 msgid "Arguments"
 msgstr "Argumentai"
 
-msgid "Back to Model Documentation"
+msgid "Back to Model documentation"
 msgstr "Grįžti į modelio dokumentaciją"
 
 msgid "Model documentation"
@@ -164,6 +164,7 @@ msgstr "Šablonas: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Šablonas: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Ieškoti kelio šablonui \"%(name)s\":"
@@ -218,8 +219,8 @@ msgstr "Konstekstas:"
 msgid "Templates:"
 msgstr "Šablonai:"
 
-msgid "Back to Views Documentation"
-msgstr "Grįžti į rodinių dokumentaciją"
+msgid "Back to View documentation"
+msgstr "Grįžti į rodinio dokumentaciją"
 
 msgid "View documentation"
 msgstr "Žiūrėti dokumentaciją"

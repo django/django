@@ -44,6 +44,7 @@ getz = pnt_func(lgdal.OGR_G_GetZ)
 # Geometry creation routines.
 from_wkb = geom_output(lgdal.OGR_G_CreateFromWkb, [c_char_p, c_void_p, POINTER(c_void_p), c_int], offset=-2)
 from_wkt = geom_output(lgdal.OGR_G_CreateFromWkt, [POINTER(c_char_p), c_void_p, POINTER(c_void_p)], offset=-1)
+from_gml = geom_output(lgdal.OGR_G_CreateFromGML, [c_char_p])
 create_geom = geom_output(lgdal.OGR_G_CreateGeometry, [c_int])
 clone_geom = geom_output(lgdal.OGR_G_Clone, [c_void_p])
 get_geom_ref = geom_output(lgdal.OGR_G_GetGeometryRef, [c_void_p, c_int])

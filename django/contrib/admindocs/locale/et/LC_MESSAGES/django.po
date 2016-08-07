@@ -3,14 +3,15 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013,2015
+# Martin Pajuste <martinpajuste@gmail.com>, 2016
 # Marti Raudsepp <marti@juffo.org>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-11 20:51+0000\n"
-"Last-Translator: Janno Liivak <jannolii@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-29 10:28+0000\n"
+"Last-Translator: Martin Pajuste <martinpajuste@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -138,8 +139,8 @@ msgstr "Meetod"
 msgid "Arguments"
 msgstr "Parameetrid"
 
-msgid "Back to Model Documentation"
-msgstr "Tagasi Mudeli Dokumentatsiooni"
+msgid "Back to Model documentation"
+msgstr "Tagasi Mudeli dokumentatsiooni"
 
 msgid "Model documentation"
 msgstr "Mudeli dokumentatsioon"
@@ -158,6 +159,7 @@ msgstr "Mall: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Mall: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Otsinguteekond mallile \"%(name)s\":"
@@ -212,8 +214,8 @@ msgstr "Kontekst:"
 msgid "Templates:"
 msgstr "Mallid:"
 
-msgid "Back to Views Documentation"
-msgstr "Tagasi Vaadete dokumentatsiooni"
+msgid "Back to View documentation"
+msgstr "Tagasi Vaate dokumentatsiooni"
 
 msgid "View documentation"
 msgstr "Vaata dokumentatsiooni"

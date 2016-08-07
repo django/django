@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-20 12:19+0000\n"
-"Last-Translator: Razvan Stefanescu <razvan.stefanescu@gmail.com>\n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-07-15 09:52+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -43,6 +43,9 @@ msgstr "Valoarea trebuie să fie validă JSON."
 
 msgid "Could not load JSON data."
 msgstr "Nu am putut încărca datele JSON."
+
+msgid "Input must be a JSON dictionary."
+msgstr ""
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."

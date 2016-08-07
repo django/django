@@ -1,0 +1,688 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Michael Wolf <milupo@sorbzilla.de>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-12 16:37+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
+"Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
+"language/dsb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: dsb\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
+"%100==4 ? 2 : 3);\n"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "%(count)d %(items)s su se wulašowali."
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "%(name)s njedajo se lašowaś"
+
+msgid "Are you sure?"
+msgstr "Sćo se wěsty?"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Wubrane %(verbose_name_plural)s lašowaś"
+
+msgid "Administration"
+msgstr "Administracija"
+
+msgid "All"
+msgstr "Wšykne"
+
+msgid "Yes"
+msgstr "Jo"
+
+msgid "No"
+msgstr "Ně"
+
+msgid "Unknown"
+msgstr "Njeznaty"
+
+msgid "Any date"
+msgstr "Někaki datum"
+
+msgid "Today"
+msgstr "Źinsa"
+
+msgid "Past 7 days"
+msgstr "Zachadne 7 dnjow"
+
+msgid "This month"
+msgstr "Toś ten mjasec"
+
+msgid "This year"
+msgstr "W tom lěśe"
+
+msgid "No date"
+msgstr "Žeden datum"
+
+msgid "Has date"
+msgstr "Ma datum"
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"Pšosym zapódajśo korektne %(username)s a gronidło za personalne konto. "
+"Źiwajśo na to, až wobej póli móžotej mjazy wjeliko- a małopisanim rozeznawaś."
+
+msgid "Action:"
+msgstr "Akcija:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Dalšne %(verbose_name)s pśidaś"
+
+msgid "Remove"
+msgstr "Wótpóraś"
+
+msgid "action time"
+msgstr "akciski cas"
+
+msgid "user"
+msgstr "wužywaŕ"
+
+msgid "content type"
+msgstr "wopśimjeśowy typ"
+
+msgid "object id"
+msgstr "objektowy id"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
+msgid "object repr"
+msgstr "objektowa reprezentacija"
+
+msgid "action flag"
+msgstr "akciske markěrowanje"
+
+msgid "change message"
+msgstr "změnowa powěźeńka"
+
+msgid "log entry"
+msgstr "protokolowy zapisk"
+
+msgid "log entries"
+msgstr "protokolowe zapiski"
+
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr "„%(object)s“ pśidane."
+
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr "„%(object)s“ změnjone - %(changes)s"
+
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr "„%(object)s“ wulašowane."
+
+msgid "LogEntry Object"
+msgstr "Objekt LogEntry"
+
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "{name} „{object} pśidany."
+
+msgid "Added."
+msgstr "Pśidany."
+
+msgid "and"
+msgstr "a"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "{fields} za {name} „{object} změnjone."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "{fields} změnjone."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Deleted {name} „{object} wulašowane."
+
+msgid "No fields changed."
+msgstr "Žedne póla změnjone."
+
+msgid "None"
+msgstr "Žeden"
+
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "´Źaržćo „ctrl“ abo „cmd“ na Mac tłocony, aby wusej jadnogo wubrał."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\" jo se wuspěšnje pśidał. Móžośo jen dołojce znowego "
+"wobźěłowaś."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"below."
+msgstr ""
+"{name} \"{obj}\" jo se wuspěšnje pśidał. Móžośo dołojce dalšne {name} pśidaś."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" jo se wuspěšnje pśidał."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\" jo se wuspěšnje změnił. Móžośo jen dołojce znowego "
+"wobźěłowaś."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"{name} \"{obj}\" jo se wuspěšnje změnił. Móžośo dołojce dalšne {name} pśidaś."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name} \"{obj}\" jo se wuspěšnje změnił."
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Zapiski muse se wubraś, aby akcije na nje nałožowało. Zapiski njejsu se "
+"změnili."
+
+msgid "No action selected."
+msgstr "Žedna akcija wubrana."
+
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" jo se wuspěšnje wulašował."
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Objekt %(name)s z primarnym klucom %(key)r njeeksistěrujo."
+
+#, python-format
+msgid "Add %s"
+msgstr "%s pśidaś"
+
+#, python-format
+msgid "Change %s"
+msgstr "%s změniś"
+
+msgid "Database error"
+msgstr "Zmólka datoweje banki"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s jo se wuspěšnje změnił."
+msgstr[1] "%(count)s %(name)s stej se wuspěšnje změniłej."
+msgstr[2] "%(count)s %(name)s su se wuspěšnje změnili."
+msgstr[3] "%(count)s %(name)s jo se wuspěšnje změniło."
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s wubrany"
+msgstr[1] "Wšykne %(total_count)s wubranej"
+msgstr[2] "Wšykne %(total_count)s wubrane"
+msgstr[3] "Wšykne %(total_count)s wubranych"
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "0 z %(cnt)s wubranych"
+
+#, python-format
+msgid "Change history: %s"
+msgstr "Změnowa historija: %s"
+
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"Aby se %(class_name)s %(instance)s lašowało, muse se slědujuce šćitane "
+"objekty lašowaś: %(related_objects)s"
+
+msgid "Django site admin"
+msgstr "Administrator sedła Django"
+
+msgid "Django administration"
+msgstr "Administracija Django"
+
+msgid "Site administration"
+msgstr "Sedłowa administracija"
+
+msgid "Log in"
+msgstr "Pśizjawiś"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr "Administracija %(app)s"
+
+msgid "Page not found"
+msgstr "Bok njejo se namakał"
+
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Jo nam luto, ale pominany bok njedajo se namakaś."
+
+msgid "Home"
+msgstr "Startowy bok"
+
+msgid "Server error"
+msgstr "Serwerowa zmólka"
+
+msgid "Server error (500)"
+msgstr "Serwerowa zmólka (500)"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "Serwerowa zmólka <em>(500)</em>"
+
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Zmólka jo nastała. Jo se sedłowym administratoram pśez e-mail k wěsći dała a "
+"by dejała se skóro wótpóraś. Źěkujomse za wašu sćerpmosć."
+
+msgid "Run the selected action"
+msgstr "Wubranu akciju wuwjasć"
+
+msgid "Go"
+msgstr "Start"
+
+msgid "Click here to select the objects across all pages"
+msgstr "Klikniśo how, aby objekty wšych bokow wubrał"
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Wubjeŕśo wšykne %(total_count)s %(module_name)s"
+
+msgid "Clear selection"
+msgstr "Wuběrk lašowaś"
+
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Zapódajśo nejpjerwjej wužywarske mě a gronidło. Pótom móžośo dalšne "
+"wužywarske nastajenja wobźěłowaś."
+
+msgid "Enter a username and password."
+msgstr "Zapódajśo wužywarske mě a gronidło."
+
+msgid "Change password"
+msgstr "Gronidło změniś"
+
+msgid "Please correct the error below."
+msgstr "Pšosym skorigěrujśo slědujucu zmólku."
+
+msgid "Please correct the errors below."
+msgstr "Pšosym skorigěrujśo slědujuce zmólki."
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Zapódajśo nowe gronidło za wužywarja <strong>%(username)s</strong>."
+
+msgid "Welcome,"
+msgstr "Witajśo,"
+
+msgid "View site"
+msgstr "Sedło pokazaś"
+
+msgid "Documentation"
+msgstr "Dokumentacija"
+
+msgid "Log out"
+msgstr "Wótzjawiś"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s pśidaś"
+
+msgid "History"
+msgstr "Historija"
+
+msgid "View on site"
+msgstr "Na sedle pokazaś"
+
+msgid "Filter"
+msgstr "Filtrowaś"
+
+msgid "Remove from sorting"
+msgstr "Ze sortěrowanja wótpóraś"
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Sortěrowański rěd: %(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "Sortěrowanje pśešaltowaś"
+
+msgid "Delete"
+msgstr "Lašowaś"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"Gaž se %(object_name)s '%(escaped_object)s' lašujo, se pśisłušne objekty "
+"wulašuju, ale wašo konto njama pšawo slědujuce typy objektow lašowaś: "
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Aby se %(object_name)s '%(escaped_object)s' lašujo, muse se slědujuce "
+"šćitane pśisłušne objekty lašowaś:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Cośo napšawdu %(object_name)s „%(escaped_object)s“ lašowaś? Wšykne slědujuce "
+"pśisłušne zapiski se wulašuju: "
+
+msgid "Objects"
+msgstr "Objekty"
+
+msgid "Yes, I'm sure"
+msgstr "Jo, som se wěsty"
+
+msgid "No, take me back"
+msgstr "Ně, pšosym slědk"
+
+msgid "Delete multiple objects"
+msgstr "Někotare objekty lašowaś"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Gaž lašujośo wubrany %(objects_name)s, se pśisłušne objekty wulašuju, ale "
+"wašo konto njama pšawo slědujuce typy objektow lašowaś: "
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Aby wubrany %(objects_name)s lašowało, muse se slědujuce šćitane pśisłušne "
+"objekty lašowaś:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"Cośo napšawdu wubrany %(objects_name)s lašowaś? Wšykne slědujuce objekty a "
+"jich pśisłušne zapiski se wulašuju:"
+
+msgid "Change"
+msgstr "Změniś"
+
+msgid "Delete?"
+msgstr "Lašowaś?"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " Pó %(filter_title)s "
+
+msgid "Summary"
+msgstr "Zespominanje"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modele w nałoženju %(name)s"
+
+msgid "Add"
+msgstr "Pśidaś"
+
+msgid "You don't have permission to edit anything."
+msgstr "Njejsćo pšawo něco wobźěłowaś."
+
+msgid "Recent actions"
+msgstr "Nejnowše akcije"
+
+msgid "My actions"
+msgstr "Móje akcije"
+
+msgid "None available"
+msgstr "Žeden k dispoziciji"
+
+msgid "Unknown content"
+msgstr "Njeznate wopśimjeśe"
+
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Něco jo z wašeju instalaciju datoweje banki kśiwje šło. Pśeznańśo se, až "
+"wótpowědne tabele datoweje banki su se napórali a pótom, až datowa banka "
+"dajo se wót wótpówědnego wužywarja cytaś."
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Sćo ako %(username)s awtentificěrowany, ale njamaśo pśistup na toś ten bok. "
+"Cośo se pla drugego konta pśizjawiś?"
+
+msgid "Forgotten your password or username?"
+msgstr "Sćo swójo gronidło abo wužywarske mě zabył?"
+
+msgid "Date/time"
+msgstr "Datum/cas"
+
+msgid "User"
+msgstr "Wužywaŕ"
+
+msgid "Action"
+msgstr "Akcija"
+
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Toś ten objekt njama změnowu historiju. Jo se nejskerjej pśez toś to "
+"administratorowe sedło pśidał."
+
+msgid "Show all"
+msgstr "Wšykne pokazaś"
+
+msgid "Save"
+msgstr "Składowaś"
+
+msgid "Popup closing..."
+msgstr "Wuskokujuce wokno se zacynja..."
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Wubrane %(model)s změniś"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Dalšny %(model)s pśidaś"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Wubrane %(model)s lašowaś"
+
+msgid "Search"
+msgstr "Pytaś"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s wuslědk"
+msgstr[1] "%(counter)s wuslědka"
+msgstr[2] "%(counter)s wuslědki"
+msgstr[3] "%(counter)s wuslědkow"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s dogromady"
+
+msgid "Save as new"
+msgstr "Ako nowy składowaś"
+
+msgid "Save and add another"
+msgstr "Składowaś a dalšny pśidaś"
+
+msgid "Save and continue editing"
+msgstr "Składowaś a dalej wobźěłowaś"
+
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Źěkujomy se, až sćo źinsa wěsty cas na websedle pśebywał."
+
+msgid "Log in again"
+msgstr "Hyšći raz pśizjawiś"
+
+msgid "Password change"
+msgstr "Gronidło změniś"
+
+msgid "Your password was changed."
+msgstr "Wašo gronidło jo se změniło."
+
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Pšosym zapódajśo k swójej wěstośe swójo stare gronidło a pótom swójo nowe "
+"gronidło dwójcy, aby my mógli pśeglědowaś, lěc sćo jo korektnje zapisał."
+
+msgid "Change my password"
+msgstr "Mójo gronidło změniś"
+
+msgid "Password reset"
+msgstr "Gronidło jo se slědk stajiło"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Wašo gronidło jo se póstajiło. Móžośo pókšacowaś a se něnto pśizjawiś."
+
+msgid "Password reset confirmation"
+msgstr "Wobkšuśenje slědkstajenja gronidła"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Pšosym zapódajśo swójo nowe gronidło dwójcy, aby my mógli pśeglědowaś, lěc "
+"sći jo korektnje zapisał."
+
+msgid "New password:"
+msgstr "Nowe gronidło:"
+
+msgid "Confirm password:"
+msgstr "Gronidło wobkšuśiś:"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Wótkaz za slědkstajenje gronidła jo njepłaśiwy był, snaź dokulaž jo se južo "
+"wužył. Pšosym pšosćo wó nowe slědkstajenje gronidła."
+
+msgid ""
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+"Smy wam instrukcije za nastajenje wašogo gronidła pśez e-mail pósłali, jolic "
+"konto ze zapódaneju e-mailoweju adresu eksistěrujo. Wy by dejał ju skóro "
+"dostaś."
+
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Jolic mejlku njedostawaśo, pśeznańśo se, až sćo adresu zapódał, z kótarejuž "
+"sćo zregistrěrował, a pśeglědajśo swój spamowy zarědnik."
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"Dostawaśo toś tu mejlku, dokulaž sćo za swójo wužywarske konto na "
+"%(site_name)s wó slědkstajenje gronidła  pšosył."
+
+msgid "Please go to the following page and choose a new password:"
+msgstr "Pšosym źiśo k slědujucemu bokoju a wubjeŕśo nowe gronidło:"
+
+msgid "Your username, in case you've forgotten:"
+msgstr "Wašo wužywarske mě, jolic sćo jo zabył:"
+
+msgid "Thanks for using our site!"
+msgstr "Wjeliki źěk za wužywanje našogo sedła!"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Team %(site_name)s"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr ""
+"Sćo swójo gronidło zabył? Zapódajśo dołojce swóju e-mailowu adresu a "
+"pósćelomy wam instrukcije za nastajenje nowego gronidła pśez e-mail."
+
+msgid "Email address:"
+msgstr "E-mailowa adresa:"
+
+msgid "Reset my password"
+msgstr "Mójo gronidło slědk stajiś"
+
+msgid "All dates"
+msgstr "Wšykne daty"
+
+#, python-format
+msgid "Select %s"
+msgstr "%s wubraś"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "%s wubraś, aby se změniło"
+
+msgid "Date:"
+msgstr "Datum:"
+
+msgid "Time:"
+msgstr "Cas:"
+
+msgid "Lookup"
+msgstr "Pytanje"
+
+msgid "Currently:"
+msgstr "Tuchylu:"
+
+msgid "Change:"
+msgstr "Změniś:"

@@ -68,7 +68,7 @@ class TestSaveLoad(PostgreSQLTestCase):
         instance = NullableIntegerArrayModel()
         instance.save()
         loaded = NullableIntegerArrayModel.objects.get(pk=instance.pk)
-        self.assertEqual(loaded.field, None)
+        self.assertIsNone(loaded.field)
         self.assertEqual(instance.field, loaded.field)
 
     def test_null_handling(self):

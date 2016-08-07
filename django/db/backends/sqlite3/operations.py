@@ -70,6 +70,13 @@ class DatabaseOperations(BaseDatabaseOperations):
         # cause a collision with a field name).
         return "django_date_trunc('%s', %s)" % (lookup_type.lower(), field_name)
 
+    def time_trunc_sql(self, lookup_type, field_name):
+        # sqlite doesn't support DATE_TRUNC, so we fake it with a user-defined
+        # function django_date_trunc that's registered in connect(). Note that
+        # single quotes are used because this is a string (and could otherwise
+        # cause a collision with a field name).
+        return "django_time_trunc('%s', %s)" % (lookup_type.lower(), field_name)
+
     def _require_pytz(self):
         if settings.USE_TZ and pytz is None:
             raise ImproperlyConfigured("This query requires pytz, but it isn't installed.")
@@ -77,6 +84,10 @@ class DatabaseOperations(BaseDatabaseOperations):
     def datetime_cast_date_sql(self, field_name, tzname):
         self._require_pytz()
         return "django_datetime_cast_date(%s, %%s)" % field_name, [tzname]
+
+    def datetime_cast_time_sql(self, field_name, tzname):
+        self._require_pytz()
+        return "django_datetime_cast_time(%s, %%s)" % field_name, [tzname]
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         # Same comment as in date_extract_sql.
@@ -96,9 +107,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         # single quotes are used because this is a string (and could otherwise
         # cause a collision with a field name).
         return "django_time_extract('%s', %s)" % (lookup_type.lower(), field_name)
-
-    def drop_foreignkey_sql(self):
-        return ""
 
     def pk_default_value(self):
         return "NULL"

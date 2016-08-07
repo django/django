@@ -3,13 +3,13 @@
 # Translators:
 # Fandekasp <lemaire.adrien@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Shinya Okano <tokibito@gmail.com>, 2013-2015
+# Shinya Okano <tokibito@gmail.com>, 2013-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-31 12:07+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-26 16:21+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
@@ -137,7 +137,7 @@ msgstr "メソッド"
 msgid "Arguments"
 msgstr "引数"
 
-msgid "Back to Model Documentation"
+msgid "Back to Model documentation"
 msgstr "モデルドキュメントに戻る"
 
 msgid "Model documentation"
@@ -157,6 +157,7 @@ msgstr "テンプレート: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "テンプレート: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "テンプレートの検索パス \"%(name)s\":"
@@ -211,7 +212,7 @@ msgstr "コンテキスト:"
 msgid "Templates:"
 msgstr "テンプレート:"
 
-msgid "Back to Views Documentation"
+msgid "Back to View documentation"
 msgstr "ビュードキュメントに戻る"
 
 msgid "View documentation"

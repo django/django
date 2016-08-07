@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Danni Randeris <danniranderis+djangocore@gmail.com>, 2014
-# Erik Wognsen <r4mses@gmail.com>, 2013-2015
+# Erik Wognsen <r4mses@gmail.com>, 2013-2016
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jonaskoelker <jonaskoelker@gnu.org>, 2012
@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-12-01 19:50+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 19:27+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -64,6 +64,9 @@ msgstr "dansk"
 
 msgid "German"
 msgstr "tysk"
+
+msgid "Lower Sorbian"
+msgstr "nedresorbisk"
 
 msgid "Greek"
 msgstr "græsk"
@@ -134,6 +137,9 @@ msgstr "hindi"
 msgid "Croatian"
 msgstr "kroatisk"
 
+msgid "Upper Sorbian"
+msgstr "øvresorbisk"
+
 msgid "Hungarian"
 msgstr "ungarsk"
 
@@ -194,7 +200,7 @@ msgstr "Marathi"
 msgid "Burmese"
 msgstr "burmesisk"
 
-msgid "Norwegian Bokmal"
+msgid "Norwegian Bokmål"
 msgstr "norsk bokmål"
 
 msgid "Nepali"
@@ -292,9 +298,6 @@ msgstr "Static Files"
 
 msgid "Syndication"
 msgstr "Syndication"
-
-msgid "Web Design"
-msgstr "Web Design"
 
 msgid "Enter a valid value."
 msgstr "Indtast en gyldig værdi."
@@ -429,6 +432,9 @@ msgstr "Heltal"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s'-værdien skal være et heltal."
 
+msgid "Big (8 byte) integer"
+msgstr "Stort heltal (8 byte)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s'-værdien skal være enten True eller False."
@@ -512,9 +518,6 @@ msgstr "'%(value)s'-værdien skal være en float (et kommatal)."
 msgid "Floating point number"
 msgstr "Flydende-komma-tal"
 
-msgid "Big (8 byte) integer"
-msgstr "Stort heltal (8 byte)"
-
 msgid "IPv4 address"
 msgstr "IPv4-adresse"
 
@@ -588,6 +591,14 @@ msgstr "Fremmednøgle (type bestemt af relateret felt)"
 
 msgid "One-to-one relationship"
 msgstr "En-til-en-relation"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s-relation"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s-relationer"
 
 msgid "Many-to-many relationship"
 msgstr "Mange-til-mange-relation"

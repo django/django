@@ -60,6 +60,27 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
     """
     Non-backend specific tests.
     """
+    def get_decoded_attachments(self, django_message):
+        """
+        Encode the specified django.core.mail.message.EmailMessage, then decode
+        it using Python's email.parser module and, for each attachment of the
+        message, return a list of tuples with (filename, content, mimetype).
+        """
+        msg_bytes = django_message.message().as_bytes()
+        email_message = message_from_bytes(msg_bytes)
+
+        def iter_attachments():
+            for i in email_message.walk():
+                # Once support for Python<3.5 has been dropped, we can use
+                # i.get_content_disposition() here instead.
+                content_disposition = i.get('content-disposition', '').split(';')[0].lower()
+                if content_disposition == 'attachment':
+                    filename = i.get_filename()
+                    content = i.get_payload(decode=True)
+                    mimetype = i.get_content_type()
+                    yield filename, content, mimetype
+
+        return list(iter_attachments())
 
     def test_ascii(self):
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
@@ -389,6 +410,17 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 self.assertIn(basename, email.attachments[0])
                 msgs_sent_num = email.send()
                 self.assertEqual(msgs_sent_num, 1)
+
+    def test_attach_text_as_bytes(self):
+        msg = EmailMessage('subject', 'body', 'from@example.com', ['to@example.com'])
+        msg.attach('file.txt', b'file content')
+        # Check that the message would be sent at all.
+        sent_num = msg.send()
+        self.assertEqual(sent_num, 1)
+        filename, content, mimetype = self.get_decoded_attachments(msg)[0]
+        self.assertEqual(filename, 'file.txt')
+        self.assertEqual(content, b'file content')
+        self.assertEqual(mimetype, 'text/plain')
 
     def test_dummy_backend(self):
         """
@@ -1249,7 +1281,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
     def test_email_ssl_certfile_default_disabled(self):
         backend = smtp.EmailBackend()
-        self.assertEqual(backend.ssl_certfile, None)
+        self.assertIsNone(backend.ssl_certfile)
 
     @override_settings(EMAIL_SSL_KEYFILE='foo')
     def test_email_ssl_keyfile_use_settings(self):
@@ -1263,7 +1295,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
     def test_email_ssl_keyfile_default_disabled(self):
         backend = smtp.EmailBackend()
-        self.assertEqual(backend.ssl_keyfile, None)
+        self.assertIsNone(backend.ssl_keyfile)
 
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_attempts_starttls(self):
@@ -1288,7 +1320,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     def test_connection_timeout_default(self):
         """Test that the connection's timeout value is None by default."""
         connection = mail.get_connection('django.core.mail.backends.smtp.EmailBackend')
-        self.assertEqual(connection.timeout, None)
+        self.assertIsNone(connection.timeout)
 
     def test_connection_timeout_custom(self):
         """Test that the timeout parameter can be customized."""

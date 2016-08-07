@@ -465,7 +465,10 @@ class AlterModelTable(ModelOperation):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
 
     def describe(self):
-        return "Rename table for %s to %s" % (self.name, self.table)
+        return "Rename table for %s to %s" % (
+            self.name,
+            self.table if self.table is not None else "(default)"
+        )
 
     def reduce(self, operation, in_between, app_label=None):
         if isinstance(operation, (AlterModelTable, DeleteModel)) and self.name_lower == operation.name_lower:
@@ -665,6 +668,8 @@ class AlterModelOptions(ModelOptionOperation):
 
     # Model options we want to compare and preserve in an AlterModelOptions op
     ALTER_OPTION_KEYS = [
+        "base_manager_name",
+        "default_manager_name",
         "get_latest_by",
         "managed",
         "ordering",
@@ -740,3 +745,100 @@ class AlterModelManagers(ModelOptionOperation):
 
     def describe(self):
         return "Change managers on %s" % (self.name, )
+
+
+class IndexOperation(Operation):
+    option_name = 'indexes'
+
+    @cached_property
+    def model_name_lower(self):
+        return self.model_name.lower()
+
+
+class AddIndex(IndexOperation):
+    """
+    Add an index on a model.
+    """
+
+    def __init__(self, model_name, index):
+        self.model_name = model_name
+        if not index.name:
+            raise ValueError(
+                "Indexes passed to AddIndex operations require a name "
+                "argument. %r doesn't have one." % index
+            )
+        self.index = index
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.model_name_lower]
+        model_state.options[self.option_name].append(self.index)
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        model = to_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            schema_editor.add_index(model, self.index)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        model = from_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            schema_editor.remove_index(model, self.index)
+
+    def deconstruct(self):
+        kwargs = {
+            'model_name': self.model_name,
+            'index': self.index,
+        }
+        return (
+            self.__class__.__name__,
+            [],
+            kwargs,
+        )
+
+    def describe(self):
+        return 'Create index on field(s) %s of model %s' % (
+            ', '.join(self.index.fields),
+            self.model_name,
+        )
+
+
+class RemoveIndex(IndexOperation):
+    """
+    Remove an index from a model.
+    """
+
+    def __init__(self, model_name, name):
+        self.model_name = model_name
+        self.name = name
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.model_name_lower]
+        indexes = model_state.options[self.option_name]
+        model_state.options[self.option_name] = [idx for idx in indexes if idx.name != self.name]
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        model = from_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            from_model_state = from_state.models[app_label, self.model_name_lower]
+            index = from_model_state.get_index_by_name(self.name)
+            schema_editor.remove_index(model, index)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        model = to_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            to_model_state = to_state.models[app_label, self.model_name_lower]
+            index = to_model_state.get_index_by_name(self.name)
+            schema_editor.add_index(model, index)
+
+    def deconstruct(self):
+        kwargs = {
+            'model_name': self.model_name,
+            'name': self.name,
+        }
+        return (
+            self.__class__.__name__,
+            [],
+            kwargs,
+        )
+
+    def describe(self):
+        return 'Remove index %s from %s' % (self.name, self.model_name)

@@ -53,13 +53,14 @@ class TestHashedFiles(object):
 
     def test_path_ignored_completely(self):
         relpath = self.hashed_file_path("cached/css/ignored.css")
-        self.assertEqual(relpath, "cached/css/ignored.6c77f2643390.css")
+        self.assertEqual(relpath, "cached/css/ignored.554da52152af.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertIn(b'#foobar', content)
             self.assertIn(b'http:foobar', content)
             self.assertIn(b'https:foobar', content)
             self.assertIn(b'data:foobar', content)
+            self.assertIn(b'chrome:foobar', content)
             self.assertIn(b'//foobar', content)
 
     def test_path_with_querystring(self):
@@ -214,7 +215,7 @@ class TestCollectionCachedStorage(TestHashedFiles, CollectionTestCase):
         # clearing the cache to make sure we re-set it correctly in the url method
         storage.staticfiles_storage.hashed_files.clear()
         cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
-        self.assertEqual(cached_name, None)
+        self.assertIsNone(cached_name)
         self.assertEqual(self.hashed_file_path(name), hashed_name)
         cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
         self.assertEqual(cached_name, hashed_name)

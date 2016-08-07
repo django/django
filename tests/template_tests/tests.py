@@ -16,7 +16,7 @@ class TemplateTests(SimpleTestCase):
     def test_string_origin(self):
         template = Engine().from_string('string template')
         self.assertEqual(template.origin.name, UNKNOWN_SOURCE)
-        self.assertEqual(template.origin.loader_name, None)
+        self.assertIsNone(template.origin.loader_name)
         self.assertEqual(template.source, 'string template')
 
     @override_settings(SETTINGS_MODULE=None)

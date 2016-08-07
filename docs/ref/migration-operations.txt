@@ -192,6 +192,25 @@ field like ``models.IntegerField()`` on most databases.
 Changes a field's name (and, unless :attr:`~django.db.models.Field.db_column`
 is set, its column name).
 
+``AddIndex``
+------------
+
+.. class:: AddIndex(model_name, index)
+
+.. versionadded:: 1.11
+
+Creates an index in the database table for the model with ``model_name``.
+``index`` is an instance of the :class:`~django.db.models.Index` class.
+
+``RemoveIndex``
+---------------
+
+.. class:: RemoveIndex(model_name, name)
+
+.. versionadded:: 1.11
+
+Removes the index named ``name`` from the model with ``model_name``.
+
 Special Operations
 ==================
 

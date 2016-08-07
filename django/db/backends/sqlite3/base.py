@@ -210,9 +210,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("django_date_extract", 2, _sqlite_date_extract)
         conn.create_function("django_date_trunc", 2, _sqlite_date_trunc)
         conn.create_function("django_datetime_cast_date", 2, _sqlite_datetime_cast_date)
+        conn.create_function("django_datetime_cast_time", 2, _sqlite_datetime_cast_time)
         conn.create_function("django_datetime_extract", 3, _sqlite_datetime_extract)
         conn.create_function("django_datetime_trunc", 3, _sqlite_datetime_trunc)
         conn.create_function("django_time_extract", 2, _sqlite_time_extract)
+        conn.create_function("django_time_trunc", 2, _sqlite_time_trunc)
         conn.create_function("django_time_diff", 2, _sqlite_time_diff)
         conn.create_function("django_timestamp_diff", 2, _sqlite_timestamp_diff)
         conn.create_function("regexp", 2, _sqlite_regexp)
@@ -370,6 +372,19 @@ def _sqlite_date_trunc(lookup_type, dt):
         return "%i-%02i-%02i" % (dt.year, dt.month, dt.day)
 
 
+def _sqlite_time_trunc(lookup_type, dt):
+    try:
+        dt = backend_utils.typecast_time(dt)
+    except (ValueError, TypeError):
+        return None
+    if lookup_type == 'hour':
+        return "%02i:00:00" % dt.hour
+    elif lookup_type == 'minute':
+        return "%02i:%02i:00" % (dt.hour, dt.minute)
+    elif lookup_type == 'second':
+        return "%02i:%02i:%02i" % (dt.hour, dt.minute, dt.second)
+
+
 def _sqlite_datetime_parse(dt, tzname):
     if dt is None:
         return None
@@ -387,6 +402,13 @@ def _sqlite_datetime_cast_date(dt, tzname):
     if dt is None:
         return None
     return dt.date().isoformat()
+
+
+def _sqlite_datetime_cast_time(dt, tzname):
+    dt = _sqlite_datetime_parse(dt, tzname)
+    if dt is None:
+        return None
+    return dt.time().isoformat()
 
 
 def _sqlite_datetime_extract(lookup_type, dt, tzname):

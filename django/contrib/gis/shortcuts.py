@@ -15,9 +15,8 @@ except ImportError:
 def compress_kml(kml):
     "Returns compressed KMZ from the given KML string."
     kmz = BytesIO()
-    zf = zipfile.ZipFile(kmz, 'a', zipfile.ZIP_DEFLATED)
-    zf.writestr('doc.kml', kml.encode(settings.DEFAULT_CHARSET))
-    zf.close()
+    with zipfile.ZipFile(kmz, 'a', zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr('doc.kml', kml.encode(settings.DEFAULT_CHARSET))
     kmz.seek(0)
     return kmz.read()
 

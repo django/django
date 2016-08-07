@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from unittest import skipIf
 
-from django.db import ConnectionHandler, connection, connections
+from django.db import connection, connections
 from django.db.migrations.exceptions import (
     AmbiguityError, InconsistentMigrationHistory, NodeNotFoundError,
 )
@@ -204,23 +204,6 @@ class LoaderTests(TestCase):
         self.assertEqual(migration_loader.migrated_apps, set())
         self.assertEqual(migration_loader.unmigrated_apps, {'migrated_app'})
 
-    @override_settings(
-        INSTALLED_APPS=['migrations.migrations_test_apps.migrated_app'],
-    )
-    def test_disable_migrations(self):
-        connections = ConnectionHandler({
-            'default': {
-                'NAME': ':memory:',
-                'ENGINE': 'django.db.backends.sqlite3',
-                'TEST': {
-                    'MIGRATE': False,
-                },
-            },
-        })
-        migration_loader = MigrationLoader(connections['default'])
-        self.assertEqual(migration_loader.migrated_apps, set())
-        self.assertEqual(migration_loader.unmigrated_apps, {'migrated_app'})
-
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_loading_squashed(self):
         "Tests loading a squashed migration"
@@ -397,6 +380,23 @@ class LoaderTests(TestCase):
         msg = "Migration migrations.0002_second is applied before its dependency migrations.0001_initial"
         with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
             loader.check_consistent_history(connection)
+
+    @override_settings(
+        MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed_extra'},
+        INSTALLED_APPS=['migrations'],
+    )
+    def test_check_consistent_history_squashed(self):
+        """
+        MigrationLoader.check_consistent_history() should ignore unapplied
+        squashed migrations that have all of their `replaces` applied.
+        """
+        loader = MigrationLoader(connection=None)
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied('migrations', '0001_initial')
+        recorder.record_applied('migrations', '0002_second')
+        loader.check_consistent_history(connection)
+        recorder.record_applied('migrations', '0003_third')
+        loader.check_consistent_history(connection)
 
     @override_settings(MIGRATION_MODULES={
         "app1": "migrations.test_migrations_squashed_ref_squashed.app1",

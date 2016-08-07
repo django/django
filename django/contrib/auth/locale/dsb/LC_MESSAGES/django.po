@@ -1,0 +1,316 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Michael Wolf <milupo@sorbzilla.de>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-12 18:25+0000\n"
+"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
+"Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
+"language/dsb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: dsb\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
+"%100==4 ? 2 : 3);\n"
+
+msgid "Personal info"
+msgstr "Wósobinske informacije"
+
+msgid "Permissions"
+msgstr "Pšawa"
+
+msgid "Important dates"
+msgstr "Wažne daty"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Objekt %(name)s z primarnym klucom %(key)r njeeksistěrujo."
+
+msgid "Password changed successfully."
+msgstr "Gronidło jo se změniło."
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Gronidło změniś: %s"
+
+msgid "Authentication and Authorization"
+msgstr "Awtentifikacija a awtorizacija"
+
+msgid "password"
+msgstr "gronidło"
+
+msgid "last login"
+msgstr "slědne pśizjawjenje"
+
+msgid "No password set."
+msgstr "Žedno gronidło nastajone."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Njepłaśiwy gronidłowy format abo njeznaty kontrolny algoritmus."
+
+msgid "The two password fields didn't match."
+msgstr "Gronidle njejstej jadnak."
+
+msgid "Password"
+msgstr "Gronidło"
+
+msgid "Password confirmation"
+msgstr "Gronidłowe wobkšuśenje"
+
+msgid "Enter the same password as before, for verification."
+msgstr "Zapódajśo to samske gronidło, za pśespytanje."
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
+msgstr ""
+"Gropne gronidła se njeskładuju, togodla njamóžośo gronidło wužywarja wiźeś, "
+"ale móžośo gronidło z pomocu <a href=\"../password/\">toś togo formulara</a> "
+"změniś."
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Pšosym zapódajśo pšawe %(username)s a gronidło. Źiwajśo na to, až wobej póli "
+"móžotej mjazy wjeliko- a małopisanim rozeznawaś."
+
+msgid "This account is inactive."
+msgstr "Toś to konto jo inaktiwne."
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "New password"
+msgstr "Nowe gronidło"
+
+msgid "New password confirmation"
+msgstr "Wobkšuśenje nowego gronidła"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+"Wašo stare gronidło jo se wopak zapódało. Pšosym zapódajśo jo hyšći raz."
+
+msgid "Old password"
+msgstr "Stare gronidło"
+
+msgid "Password (again)"
+msgstr "Gronidło (znowego)"
+
+msgid "algorithm"
+msgstr "algoritmus"
+
+msgid "iterations"
+msgstr "wóspjetowanja"
+
+msgid "salt"
+msgstr "sol"
+
+msgid "hash"
+msgstr "hash"
+
+msgid "variety"
+msgstr "warianta"
+
+msgid "version"
+msgstr "wersija"
+
+msgid "memory cost"
+msgstr "składowa pśetrjeba"
+
+msgid "time cost"
+msgstr "casowa pśetrjeba"
+
+msgid "parallelism"
+msgstr "paralelizm"
+
+msgid "work factor"
+msgstr "źěłowy faktor"
+
+msgid "checksum"
+msgstr "kontrolna suma"
+
+msgid "name"
+msgstr "mě"
+
+msgid "content type"
+msgstr "wopśimjeśowy typ"
+
+msgid "codename"
+msgstr "kodowe mě"
+
+msgid "permission"
+msgstr "pšawo"
+
+msgid "permissions"
+msgstr "pšawa"
+
+msgid "group"
+msgstr "kupka"
+
+msgid "groups"
+msgstr "kupki"
+
+msgid "superuser status"
+msgstr "status superwužywarja"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Wóznamjenijo, lěc toś ten wužywaŕ ma wšykne pšawa bźez togo, aby mógał je "
+"pśipokazaś."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+"Kupki, ku kótarymž toś ten wužywaŕ słuša. Wužywaŕ dóstanjo wšykne pšawa, "
+"kótarež jomu kupki dawaju."
+
+msgid "user permissions"
+msgstr "wužywarske pšawa"
+
+msgid "Specific permissions for this user."
+msgstr "Wěste pšawa za toś togo wužywarja."
+
+msgid "username"
+msgstr "wužywarske mě"
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Trěbne. 150 znamuškow abo mjenjej. Jano pismiki, cyfry a @/./+/-/_."
+
+msgid "A user with that username already exists."
+msgstr "Wužywaŕ z toś tym wužywarskim mjenim južo eksistěrujo."
+
+msgid "first name"
+msgstr "pśedmě"
+
+msgid "last name"
+msgstr "familijowe mě"
+
+msgid "email address"
+msgstr "e-mailowa adresa"
+
+msgid "staff status"
+msgstr "personalny status"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+"Wóznamjenijo, lěc wužywaŕ móžo se pla administratorowego sedła pśizjawiś."
+
+msgid "active"
+msgstr "aktiwny"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Wóznamjenijo, lěc deje z toś tym wužywarjom ako z aktiwnym wobchadás. "
+"Znjemóžniśo to město togo, aby konta wulašował."
+
+msgid "date joined"
+msgstr "cłonk wót"
+
+msgid "user"
+msgstr "wužywaŕ"
+
+msgid "users"
+msgstr "wužywarje"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %(min_length)d znamuško "
+"wopśimowaś."
+msgstr[1] ""
+"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %(min_length)d znamušce "
+"wopśimowaś."
+msgstr[2] ""
+"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %(min_length)d znamuška "
+"wopśimowaś."
+msgstr[3] ""
+"Toś to gronidło jo pśekrotke. Musy nanejmjenjej %(min_length)d znamuškow "
+"wopśimowaś."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Wašo gronidło musy nanejmjenjej %(min_length)d znamuško wopśimowaś."
+msgstr[1] "Wašo gronidło musy nanejmjenjej %(min_length)d znamušce wopśimowaś."
+msgstr[2] "Wašo gronidło musy nanejmjenjej %(min_length)d znamuška wopśimowaś."
+msgstr[3] ""
+"Wašo gronidło musy nanejmjenjej %(min_length)d znamuškow wopśimowaś."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Gronidło jo na %(verbose_name)s pśepódobne."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr "Wašo gronidło njesmějo na waše druge wósobinske daty pśepódobne byś."
+
+msgid "This password is too common."
+msgstr "Toś to gronidło jo pśepowšykne."
+
+msgid "Your password can't be a commonly used password."
+msgstr "Wašo gronidło njesmějo cesto wužywane gronidło byś."
+
+msgid "This password is entirely numeric."
+msgstr "Toś to gronidło jo cele numeriske."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Wašo gronidło njesmějo cele numeriske byś."
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Slědkstajenje gronidła na %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Zapódajśo płaśiwe wužywarske mě. Toś ta gódnota smějo jano engelske pismiki, "
+"licby a znamuška @/./+/-/_  wopśimowaś."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Zapódajśo płaśiwe wužywarske mě. Toś ta gódnota smějo jano pismiki, licby a "
+"znamuška @/./+/-/_ wopśimowaś."
+
+msgid "Logged out"
+msgstr "Wótzjawjony"
+
+msgid "Password reset"
+msgstr "Slědkstajenje gronidła"
+
+msgid "Password reset sent"
+msgstr "Slědkstajenje gronidła wótpósłane"
+
+msgid "Enter new password"
+msgstr "Zapódajśo nowe gronidło"
+
+msgid "Password reset unsuccessful"
+msgstr "Slědkstajenje gronidła njejo se raźiło"
+
+msgid "Password reset complete"
+msgstr "Slědkstajenje gronidła dokóńcone"
+
+msgid "Password change"
+msgstr "Změnjenje gronidła"
+
+msgid "Password change successful"
+msgstr "Gronidło jo se wuspěšnje změniło"

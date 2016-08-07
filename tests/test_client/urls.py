@@ -36,6 +36,6 @@ urlpatterns = [
 
     url(r'^accounts/$', RedirectView.as_view(url='login/')),
     url(r'^accounts/no_trailing_slash$', RedirectView.as_view(url='login/')),
-    url(r'^accounts/login/$', auth_views.login, {'template_name': 'login.html'}),
-    url(r'^accounts/logout/$', auth_views.logout),
+    url(r'^accounts/login/$', auth_views.LoginView.as_view(template_name='login.html')),
+    url(r'^accounts/logout/$', auth_views.LogoutView.as_view()),
 ]

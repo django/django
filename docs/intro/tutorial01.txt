@@ -17,7 +17,7 @@ tell Django is installed and which version by running the following command:
 
 .. code-block:: console
 
-    $ python -c "import django; print(django.get_version())"
+    $ python -m django --version
 
 If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
@@ -383,9 +383,10 @@ aren't going to use this feature of Django in the tutorial.
 :func:`~django.conf.urls.url` argument: name
 ---------------------------------------------
 
-Naming your URL lets you refer to it unambiguously from elsewhere in Django
-especially templates. This powerful feature allows you to make  global changes
-to the url patterns of your project while only touching a single file.
+Naming your URL lets you refer to it unambiguously from elsewhere in Django,
+especially from within templates. This powerful feature allows you to make
+global changes to the URL patterns of your project while only touching a single
+file.
 
 When you're comfortable with the basic request and response flow, read
 :doc:`part 2 of this tutorial </intro/tutorial02>` to start working with the

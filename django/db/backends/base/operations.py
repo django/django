@@ -96,6 +96,12 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_cast_date() method')
 
+    def datetime_cast_time_sql(self, field_name, tzname):
+        """
+        Returns the SQL necessary to cast a datetime value to time value.
+        """
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_cast_time_sql() method')
+
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         """
         Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute' or
@@ -112,6 +118,14 @@ class BaseDatabaseOperations(object):
         a tuple of parameters.
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_trunk_sql() method')
+
+    def time_trunc_sql(self, lookup_type, field_name):
+        """
+        Given a lookup_type of 'hour', 'minute' or 'second', returns the SQL
+        that truncates the given time field field_name to a time object with
+        only the given specificity.
+        """
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a time_trunc_sql() method')
 
     def time_extract_sql(self, lookup_type, field_name):
         """
@@ -137,19 +151,6 @@ class BaseDatabaseOperations(object):
             raise NotImplementedError('DISTINCT ON fields is not supported by this database backend')
         else:
             return 'DISTINCT'
-
-    def drop_foreignkey_sql(self):
-        """
-        Returns the SQL command that drops a foreign key.
-        """
-        return "DROP CONSTRAINT"
-
-    def drop_sequence_sql(self, table):
-        """
-        Returns any SQL necessary to drop the sequence for the given table.
-        Returns None if no SQL is necessary.
-        """
-        return None
 
     def fetch_returned_insert_id(self, cursor):
         """

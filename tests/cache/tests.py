@@ -213,12 +213,14 @@ class DummyCacheTests(SimpleTestCase):
 
     def test_get_or_set(self):
         self.assertEqual(cache.get_or_set('mykey', 'default'), 'default')
+        self.assertEqual(cache.get_or_set('mykey', None), None)
 
     def test_get_or_set_callable(self):
         def my_callable():
             return 'default'
 
         self.assertEqual(cache.get_or_set('mykey', my_callable), 'default')
+        self.assertEqual(cache.get_or_set('mykey', my_callable()), 'default')
 
 
 def custom_key_func(key, key_prefix, version):
@@ -523,7 +525,7 @@ class BaseCacheTests(object):
         cache.add('key2', 'ham', None)
         self.assertEqual(cache.get('key2'), 'ham')
         added = cache.add('key1', 'new eggs', None)
-        self.assertEqual(added, False)
+        self.assertIs(added, False)
         self.assertEqual(cache.get('key1'), 'eggs')
 
         cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, None)
@@ -558,7 +560,7 @@ class BaseCacheTests(object):
         # Count how many keys are left in the cache.
         for i in range(1, initial_count):
             if cull_cache.has_key('cull%d' % i):
-                count = count + 1
+                count += 1
         self.assertEqual(count, final_count)
 
     def test_cull(self):
@@ -918,18 +920,25 @@ class BaseCacheTests(object):
         self.assertIsNone(cache.get('projector'))
         self.assertEqual(cache.get_or_set('projector', 42), 42)
         self.assertEqual(cache.get('projector'), 42)
+        self.assertEqual(cache.get_or_set('null', None), None)
 
     def test_get_or_set_callable(self):
         def my_callable():
             return 'value'
 
         self.assertEqual(cache.get_or_set('mykey', my_callable), 'value')
+        self.assertEqual(cache.get_or_set('mykey', my_callable()), 'value')
 
     def test_get_or_set_version(self):
+        msg = (
+            "get_or_set() missing 1 required positional argument: 'default'"
+            if six.PY3
+            else 'get_or_set() takes at least 3 arguments'
+        )
         cache.get_or_set('brian', 1979, version=2)
-        with self.assertRaisesMessage(ValueError, 'You need to specify a value.'):
+        with self.assertRaisesMessage(TypeError, msg):
             cache.get_or_set('brian')
-        with self.assertRaisesMessage(ValueError, 'You need to specify a value.'):
+        with self.assertRaisesMessage(TypeError, msg):
             cache.get_or_set('brian', version=1)
         self.assertIsNone(cache.get('brian', version=1))
         self.assertEqual(cache.get_or_set('brian', 42, version=1), 42)
@@ -1393,6 +1402,7 @@ class DefaultNonExpiringCacheKeyTests(SimpleTestCase):
         },
     },
     USE_I18N=False,
+    ALLOWED_HOSTS=['.example.com'],
 )
 class CacheUtils(SimpleTestCase):
     """TestCase for django.utils.cache functions."""
