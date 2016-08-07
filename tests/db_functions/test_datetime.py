@@ -5,9 +5,7 @@ from unittest import skipIf
 
 from django.conf import settings
 from django.db import connection
-from django.db.models import (
-    DateField, DateTimeField, IntegerField, TimeField,
-)
+from django.db.models import DateField, DateTimeField, IntegerField, TimeField
 from django.db.models.functions import (
     Extract, ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
     ExtractSecond, ExtractWeekDay, ExtractYear, Trunc, TruncDate, TruncDay,
@@ -449,12 +447,6 @@ class DateFunctionTests(TestCase):
         self.assertEqual(qs.count(), 2)
 
     def test_trunc_year_func(self):
-        self.create_model(None, None)
-        self.assertIsNone(
-            DTModel.objects.annotate(extracted=TruncYear('start_date')).values_list('extracted', flat=True).get()
-        )
-        DTModel.objects.get(start_time=None).delete()
-
         start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
         end_datetime = truncate_to(microsecond_support(datetime(2016, 6, 15, 14, 10, 50, 123)), 'year')
         if settings.USE_TZ:
@@ -487,13 +479,15 @@ class DateFunctionTests(TestCase):
         with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncYear('start_time', output_field=TimeField())))
 
-    def test_trunc_month_func(self):
         self.create_model(None, None)
         self.assertIsNone(
-            DTModel.objects.annotate(extracted=TruncMonth('start_date')).values_list('extracted', flat=True).get()
+            DTModel.objects.filter(start_datetime=None).annotate(
+                extracted=TruncYear('start_date')
+            ).values_list('extracted', flat=True).get()
         )
-        DTModel.objects.get(start_time=None).delete()
 
+
+    def test_trunc_month_func(self):
         start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
         end_datetime = truncate_to(microsecond_support(datetime(2016, 6, 15, 14, 10, 50, 123)), 'month')
         if settings.USE_TZ:
@@ -525,13 +519,14 @@ class DateFunctionTests(TestCase):
         with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncMonth('start_time', output_field=TimeField())))
 
-    def test_trunc_date_func(self):
         self.create_model(None, None)
         self.assertIsNone(
-            DTModel.objects.annotate(extracted=TruncDate('start_date')).values_list('extracted', flat=True).get()
+            DTModel.objects.filter(start_datetime=None).annotate(
+                extracted=TruncMonth('start_date')
+            ).values_list('extracted', flat=True).get()
         )
-        DTModel.objects.get(start_time=None).delete()
 
+    def test_trunc_date_func(self):
         start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
         end_datetime = microsecond_support(datetime(2016, 6, 15, 14, 10, 50, 123))
         if settings.USE_TZ:
@@ -555,13 +550,15 @@ class DateFunctionTests(TestCase):
         with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateField"):
             list(DTModel.objects.annotate(truncated=TruncDate('start_time', output_field=TimeField())))
 
-    def test_trunc_time_func(self):
         self.create_model(None, None)
         self.assertIsNone(
-            DTModel.objects.annotate(extracted=TruncTime('start_time')).values_list('extracted', flat=True).get()
+            DTModel.objects.filter(start_datetime=None).annotate(
+                extracted=TruncDate('start_date')
+            ).values_list('extracted', flat=True).get()
         )
-        DTModel.objects.get(start_time=None).delete()
 
+
+    def test_trunc_time_func(self):
         start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
         end_datetime = microsecond_support(datetime(2016, 6, 15, 14, 10, 50, 123))
         if settings.USE_TZ:
@@ -585,13 +582,14 @@ class DateFunctionTests(TestCase):
         with self.assertRaisesMessage(ValueError, "Cannot truncate DateField 'start_date' to TimeField"):
             list(DTModel.objects.annotate(truncated=TruncTime('start_date', output_field=DateField())))
 
-    def test_trunc_day_func(self):
         self.create_model(None, None)
         self.assertIsNone(
-            DTModel.objects.annotate(extracted=TruncDay('start_date')).values_list('extracted', flat=True).get()
+            DTModel.objects.filter(start_datetime=None).annotate(
+                extracted=TruncTime('start_time')
+            ).values_list('extracted', flat=True).get()
         )
-        DTModel.objects.get(start_time=None).delete()
 
+    def test_trunc_day_func(self):
         start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
         end_datetime = truncate_to(microsecond_support(datetime(2016, 6, 15, 14, 10, 50, 123)), 'day')
         if settings.USE_TZ:
@@ -615,13 +613,14 @@ class DateFunctionTests(TestCase):
         with self.assertRaisesMessage(ValueError, "Cannot truncate TimeField 'start_time' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncDay('start_time', output_field=TimeField())))
 
-    def test_trunc_hour_func(self):
         self.create_model(None, None)
         self.assertIsNone(
-            DTModel.objects.annotate(extracted=TruncHour('start_time')).values_list('extracted', flat=True).get()
+            DTModel.objects.filter(start_datetime=None).annotate(
+                extracted=TruncDay('start_date')
+            ).values_list('extracted', flat=True).get()
         )
-        DTModel.objects.get(start_time=None).delete()
 
+    def test_trunc_hour_func(self):
         start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
         end_datetime = truncate_to(microsecond_support(datetime(2016, 6, 15, 14, 10, 50, 123)), 'hour')
         if settings.USE_TZ:
@@ -653,14 +652,14 @@ class DateFunctionTests(TestCase):
         with self.assertRaisesMessage(ValueError, "Cannot truncate DateField 'start_date' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncHour('start_date', output_field=DateField())))
 
-    def test_trunc_minute_func(self):
-
         self.create_model(None, None)
         self.assertIsNone(
-            DTModel.objects.annotate(extracted=TruncMinute('start_time')).values_list('extracted', flat=True).get()
+            DTModel.objects.filter(start_datetime=None).annotate(
+                extracted=TruncHour('start_time')
+            ).values_list('extracted', flat=True).get()
         )
-        DTModel.objects.get(start_time=None).delete()
 
+    def test_trunc_minute_func(self):
         start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
         end_datetime = truncate_to(microsecond_support(datetime(2016, 6, 15, 14, 10, 50, 123)), 'minute')
         if settings.USE_TZ:
@@ -692,13 +691,14 @@ class DateFunctionTests(TestCase):
         with self.assertRaisesMessage(ValueError, "Cannot truncate DateField 'start_date' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncMinute('start_date', output_field=DateField())))
 
-    def test_trunc_second_func(self):
         self.create_model(None, None)
         self.assertIsNone(
-            DTModel.objects.annotate(extracted=TruncSecond('start_time')).values_list('extracted', flat=True).get()
+            DTModel.objects.filter(start_datetime=None).annotate(
+                extracted=TruncMinute('start_time')
+            ).values_list('extracted', flat=True).get()
         )
-        DTModel.objects.get(start_time=None).delete()
 
+    def test_trunc_second_func(self):
         start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
         end_datetime = truncate_to(microsecond_support(datetime(2016, 6, 15, 14, 10, 50, 123)), 'second')
         if settings.USE_TZ:
@@ -731,6 +731,13 @@ class DateFunctionTests(TestCase):
 
         with self.assertRaisesMessage(ValueError, "Cannot truncate DateField 'start_date' to DateTimeField"):
             list(DTModel.objects.annotate(truncated=TruncSecond('start_date', output_field=DateField())))
+
+        self.create_model(None, None)
+        self.assertIsNone(
+            DTModel.objects.filter(start_datetime=None).annotate(
+                extracted=TruncSecond('start_time')
+            ).values_list('extracted', flat=True).get()
+        )
 
 
 @skipIf(pytz is None, "this test requires pytz")
