@@ -132,12 +132,12 @@ class SelectForUpdateTests(TransactionTestCase):
     @skipUnlessDBFeature('has_select_for_update')
     def test_unsupported_nowait_raises_error(self):
         """
-        If a SELECT...FOR UPDATE NOWAIT is run on a database backend
-        that supports FOR UPDATE but not NOWAIT, then we should find
-        that a DatabaseError is raised.
+        DatabaseError is raised if a SELECT...FOR UPDATE NOWAIT is run on
+        a database backend that supports FOR UPDATE but not NOWAIT.
         """
-        with self.assertRaises(DatabaseError):
-            list(Person.objects.all().select_for_update(nowait=True))
+        with self.assertRaisesMessage(DatabaseError, 'NOWAIT is not supported on this database backend.'):
+            with transaction.atomic():
+                Person.objects.select_for_update(nowait=True).get()
 
     @skipIfDBFeature('has_select_for_update_skip_locked')
     @skipUnlessDBFeature('has_select_for_update')
