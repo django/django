@@ -44,3 +44,13 @@ the ``django.contrib.postgres.operations`` module.
 
     A subclass of :class:`~django.contrib.postgres.operations.CreateExtension`
     which will install the ``unaccent`` extension.
+
+``BtreeGinExtension``
+=====================
+
+.. class:: BtreeGinExtension()
+
+    .. versionadded:: 1.11
+
+    A subclass of :class:`~django.contrib.postgres.operations.CreateExtension`
+    which will install the ``btree_gin`` extension.
