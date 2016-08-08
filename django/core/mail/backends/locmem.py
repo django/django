@@ -24,6 +24,6 @@ class EmailBackend(BaseEmailBackend):
         msg_count = 0
         for message in messages:  # .message() triggers header validation
             message.message()
+            mail.outbox.append(message)
             msg_count += 1
-        mail.outbox.extend(messages)
         return msg_count
