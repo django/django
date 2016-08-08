@@ -748,12 +748,16 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
     def test_send_many(self):
         email1 = EmailMessage('Subject', 'Content1', 'from@example.com', ['to@example.com'])
         email2 = EmailMessage('Subject', 'Content2', 'from@example.com', ['to@example.com'])
-        num_sent = mail.get_connection().send_messages([email1, email2])
-        self.assertEqual(num_sent, 2)
-        messages = self.get_mailbox_content()
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(messages[0].get_payload(), "Content1")
-        self.assertEqual(messages[1].get_payload(), "Content2")
+        # send_messages() may take a list or a generator.
+        emails_lists = ([email1, email2], (email for email in [email1, email2]))
+        for emails_list in emails_lists:
+            num_sent = mail.get_connection().send_messages(emails_list)
+            self.assertEqual(num_sent, 2)
+            messages = self.get_mailbox_content()
+            self.assertEqual(len(messages), 2)
+            self.assertEqual(messages[0].get_payload(), 'Content1')
+            self.assertEqual(messages[1].get_payload(), 'Content2')
+            self.flush_mailbox()
 
     def test_send_verbose_name(self):
         email = EmailMessage("Subject", "Content", '"Firstname Sürname" <from@example.com>',
