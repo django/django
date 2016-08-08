@@ -42,3 +42,6 @@ Bugfixes
   backends, such as PostgreSQL, that support returning the IDs of the created
   records so that many-to-many relationships can be used on the new objects
   (:ticket:`27026`).
+
+* Fixed crash of ``django.views.static.serve()`` with ``show_indexes`` enabled
+  (:ticket:`26973`).
