@@ -160,6 +160,9 @@ class BaseDatabaseFeatures(object):
     # Can the backend introspect a TimeField, instead of a DateTimeField?
     can_introspect_time_field = True
 
+    # Can the backend introspect the type of index created e.g. btree, gin, etc.
+    can_introspect_index_type = False
+
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
 
