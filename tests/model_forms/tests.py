@@ -1576,11 +1576,26 @@ class ModelChoiceFieldTests(TestCase):
         field = CustomModelChoiceField(Category.objects.all())
         self.assertIsInstance(field.choices, CustomModelChoiceIterator)
 
-    def test_radioselect_num_queries(self):
+    def test_renderermixin_num_queries(self):
+        """
+        Widgets that render multiple subwidgets shouldn't need to make more
+        than one database query.
+        """
         class CategoriesForm(forms.Form):
-            categories = forms.ModelChoiceField(Category.objects.all(), widget=forms.RadioSelect)
+            radio = forms.ModelChoiceField(
+                queryset=Category.objects.all(),
+                widget=forms.RadioSelect
+            )
+            checkbox = forms.ModelMultipleChoiceField(
+                queryset=Category.objects.all(),
+                widget=forms.CheckboxSelectMultiple
+            )
 
-        template = Template('{% for widget in form.categories %}{{ widget }}{% endfor %}')
+        template = Template("""
+            {% for widget in form.checkbox %}{{ widget }}{% endfor %}
+            {% for widget in form.radio %}{{ widget }}{% endfor %}
+        """)
+
         with self.assertNumQueries(2):
             template.render(Context({'form': CategoriesForm()}))
 
