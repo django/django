@@ -126,7 +126,7 @@ Here's the error encountered while trying to pickle the exception:
 
 {}
 
-You should re-run this test without the --parallel option to reproduce the
+You should re-run this test with the --parallel=1 option to reproduce the
 failure and get a correct traceback.
 """.format(test, original_exc_txt, pickle_exc_txt))
             raise
