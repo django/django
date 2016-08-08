@@ -745,10 +745,25 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
             ('Content-Transfer-Encoding', 'quoted-printable'),
         })
 
-    def test_send_many(self):
+    def test_send_many_with_list(self):
         email1 = EmailMessage('Subject', 'Content1', 'from@example.com', ['to@example.com'])
         email2 = EmailMessage('Subject', 'Content2', 'from@example.com', ['to@example.com'])
-        num_sent = mail.get_connection().send_messages([email1, email2])
+        emails_list = [email1, email2]
+        num_sent = mail.get_connection().send_messages(emails_list)
+        self.assertEqual(num_sent, 2)
+        messages = self.get_mailbox_content()
+        self.assertEqual(len(messages), 2)
+        self.assertEqual(messages[0].get_payload(), "Content1")
+        self.assertEqual(messages[1].get_payload(), "Content2")
+
+    def test_send_many_with_generator(self):
+        """
+        Regression test for #27036
+        """
+        email1 = EmailMessage('Subject', 'Content1', 'from@example.com', ['to@example.com'])
+        email2 = EmailMessage('Subject', 'Content2', 'from@example.com', ['to@example.com'])
+        emails_generator = (email for email in [email1, email2])
+        num_sent = mail.get_connection().send_messages(emails_generator)
         self.assertEqual(num_sent, 2)
         messages = self.get_mailbox_content()
         self.assertEqual(len(messages), 2)
