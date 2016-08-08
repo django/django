@@ -42,7 +42,7 @@ class Index(object):
             self.name = 'D%s' % self.name[1:]
         return errors
 
-    def create_sql(self, model, schema_editor):
+    def create_sql(self, model, schema_editor, using=''):
         fields = [model._meta.get_field(field_name) for field_name, order in self.fields_orders]
         tablespace_sql = schema_editor._get_index_tablespace_sql(model, fields)
         quote_name = schema_editor.quote_name
@@ -54,6 +54,7 @@ class Index(object):
             'table': quote_name(model._meta.db_table),
             'name': quote_name(self.name),
             'columns': ', '.join(columns),
+            'using': using,
             'extra': tablespace_sql,
         }
 

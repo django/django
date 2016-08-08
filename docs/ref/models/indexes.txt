@@ -56,3 +56,8 @@ case, a descending index is created as a normal index.
 The name of the index. If ``name`` isn't provided Django will auto-generate a
 name. For compatibility with different databases, index names cannot be longer
 than 30 characters and shouldn't start with a number (0-9) or underscore (_).
+
+.. seealso::
+
+    For a list of PostgreSQL-specific indexes, see
+    :mod:`django.contrib.postgres.indexes`.
