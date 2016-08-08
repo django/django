@@ -605,10 +605,17 @@ Testing utilities
 To assist in the creation of your own test runner, Django provides a number of
 utility methods in the ``django.test.utils`` module.
 
-.. function:: setup_test_environment()
+.. function:: setup_test_environment(debug=None)
 
     Performs global pre-test setup, such as installing instrumentation for the
     template rendering system and setting up the dummy email outbox.
+
+    If ``debug`` isn't ``None``, the :setting:`DEBUG` setting is also updated
+    to this value.
+
+    .. versionchanged:: 1.11
+
+        The ``debug`` argument was added.
 
 .. function:: teardown_test_environment()
 
