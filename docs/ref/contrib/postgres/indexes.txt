@@ -1,0 +1,25 @@
+=================================
+PostgreSQL specific model indexes
+=================================
+
+.. module:: django.contrib.postgres.indexes
+
+.. versionadded:: 1.11
+
+The following are the PostgreSQL specific :doc:`indexes </ref/models/indexes>`
+supported by Django and are available from the
+``django.contrib.postgres.indexes`` module.
+
+``GinIndex``
+============
+
+.. class:: GinIndex()
+
+    A subclass of :class:`~django.db.models.Index` which will install the
+    `gin index <https://www.postgresql.org/docs/current/static/gin.html>`_.
+
+    To use this index, you might need to activate the `btree_gin extension
+    <https://www.postgresql.org/docs/current/static/btree-gin.html>`_ on
+    PostgreSQL. You can install it using the
+    :class:`~django.contrib.postgres.operations.BtreeGinExtension` migration
+    operation.
