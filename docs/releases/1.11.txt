@@ -364,6 +364,10 @@ Miscellaneous
   :meth:`~django.db.models.fields.related.RelatedManager.set` now
   clear the ``prefetch_related()`` cache.
 
+* :func:`~django.test.utils.setup_test_environment` now raises an exception
+  if called a second time before calling
+  :func:`~django.test.utils.teardown_test_environment`.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11

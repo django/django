@@ -20,6 +20,7 @@ from django.test import (
 from django.test.html import HTMLParseError, parse_html
 from django.test.utils import (
     CaptureQueriesContext, isolate_apps, override_settings,
+    setup_test_environment,
 )
 from django.urls import NoReverseMatch, reverse
 from django.utils import six
@@ -862,6 +863,13 @@ class FirstUrls:
 
 class SecondUrls:
     urlpatterns = [url(r'second/$', empty_response, name='second')]
+
+
+class SetupTestEnvironmentTests(SimpleTestCase):
+
+    def test_setup_test_environment_calling_more_than_once(self):
+        with self.assertRaisesMessage(RuntimeError, "setup_test_environment() was already called"):
+            setup_test_environment()
 
 
 class OverrideSettingsTests(SimpleTestCase):
