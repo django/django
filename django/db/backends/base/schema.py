@@ -883,6 +883,7 @@ class BaseDatabaseSchemaEditor(object):
         return sql_create_index % {
             "table": self.quote_name(model._meta.db_table),
             "name": self.quote_name(self._create_index_name(model, columns, suffix=suffix)),
+            "using": "",
             "columns": ", ".join(self.quote_name(column) for column in columns),
             "extra": tablespace_sql,
         }

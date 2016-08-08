@@ -46,6 +46,7 @@ class Index(object):
         return schema_editor.sql_create_index % {
             'table': quote_name(model._meta.db_table),
             'name': quote_name(self.name),
+            'using': '',
             'columns': ', '.join(quote_name(column) for column in columns),
             'extra': tablespace_sql,
         }
