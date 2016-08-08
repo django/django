@@ -99,6 +99,12 @@ def setup_test_environment():
     Perform global pre-test setup, such as installing the instrumented template
     renderer and setting the email backend to the locmem email backend.
     """
+    if hasattr(Template, '_original_render'):
+        # Executing this function twice would overwrite the saved, pre-setup values.
+        raise RuntimeError(
+            "setup_test_environment() was already called and can't be called "
+            "again without first calling teardown_test_environment().")
+
     Template._original_render = Template._render
     Template._render = instrumented_test_render
 
