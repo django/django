@@ -18,6 +18,15 @@ the ``django.contrib.postgres.operations`` module.
 
         This is a required argument. The name of the extension to be installed.
 
+``BtreeGinExtension``
+=====================
+
+.. class:: BtreeGinExtension()
+
+    .. versionadded:: 1.11
+
+    Install the ``btree_gin`` extension.
+
 ``HStoreExtension``
 ===================
 
