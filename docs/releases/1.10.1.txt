@@ -45,3 +45,6 @@ Bugfixes
 
 * Fixed crash of ``django.views.static.serve()`` with ``show_indexes`` enabled
   (:ticket:`26973`).
+
+* Fixed ``ClearableFileInput`` to avoid the ``required`` HTML attribute when
+  initial data exists (:ticket:`27037`).
