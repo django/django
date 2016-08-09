@@ -43,7 +43,7 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
             # from OGC geom type name to Django field.
             ogr_type = row[2]
             if isinstance(ogr_type, six.integer_types) and ogr_type > 1000:
-                # Spatialite versions >= 4 use the new SFSQL 1.2 offsets
+                # SpatiaLite versions >= 4 use the new SFSQL 1.2 offsets
                 # 1000 (Z), 2000 (M), and 3000 (ZM) to indicate the presence of
                 # higher dimensional coordinates (M not yet supported by Django).
                 ogr_type = ogr_type % 1000 + OGRGeomType.wkb25bit

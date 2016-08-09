@@ -122,7 +122,7 @@ a flat surface is a straight line, the shortest path between two points on a cur
 surface (such as the earth) is an *arc* of a `great circle`__. [#fnthematic]_  Thus,
 additional computation is required to obtain distances in planar units (e.g.,
 kilometers and miles).  Using a geographic coordinate system may introduce
-complications for the developer later on. For example, Spatialite does not have
+complications for the developer later on. For example, SpatiaLite does not have
 the capability to perform distance calculations between geometries using
 geographic coordinate systems, e.g. constructing a query to  find all points
 within 5 miles of a county boundary stored as WGS84.

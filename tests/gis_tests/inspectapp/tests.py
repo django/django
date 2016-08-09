@@ -189,7 +189,7 @@ def get_ogr_db_string():
     except GDALException:
         return None
 
-    # SQLite/Spatialite in-memory databases
+    # SQLite/SpatiaLite in-memory databases
     if db['NAME'] == ":memory:":
         return None
 

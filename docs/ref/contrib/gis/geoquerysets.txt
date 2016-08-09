@@ -1329,7 +1329,7 @@ Example::
 
 .. class:: Collect(geo_field)
 
-*Availability*: PostGIS, Spatialite
+*Availability*: PostGIS, SpatiaLite
 
 Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
 column. This is analogous to a simplified version of the :class:`Union`
@@ -1342,7 +1342,7 @@ not caring about dissolving boundaries.
 
 .. class:: Extent(geo_field)
 
-*Availability*: PostGIS, Oracle, Spatialite
+*Availability*: PostGIS, Oracle, SpatiaLite
 
 Returns the extent of all ``geo_field`` in the ``QuerySet`` as a four-tuple,
 comprising the lower left coordinate and the upper right coordinate.

@@ -451,7 +451,7 @@ ST_Perimeter(geom1)                           |    OK              |   :-( (degr
 
 
 ================================
-Distance functions on Spatialite
+Distance functions on SpatiaLite
 ================================
 
                                                 | Projected Geometry | Lon/lat Geometry
