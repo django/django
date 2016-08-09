@@ -311,7 +311,8 @@ Upgrading pre-Django 1.10-style middleware
 
 Django provides ``django.utils.deprecation.MiddlewareMixin`` to ease creating
 middleware classes that are compatible with both :setting:`MIDDLEWARE` and the
-old :setting:`MIDDLEWARE_CLASSES`.
+old :setting:`MIDDLEWARE_CLASSES`. All middleware classes included with Django
+are compatible with both settings.
 
 The mixin provides an ``__init__()`` method that accepts an optional
 ``get_response`` argument and stores it in ``self.get_response``.
