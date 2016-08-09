@@ -232,6 +232,11 @@ like so::
 
    $ pip install -r tests/requirements/py3.txt  # Python 2: py2.txt
 
+If you experience any problems during the installation,
+your system might be missing a dependency for one or more 
+of the Python packages. Please consult failing package's documentationfor requirements.
+
+
 You can also install the database adapter(s) of your choice using
 ``oracle.txt``, ``mysql.txt``, or ``postgres.txt``.
 
@@ -244,14 +249,14 @@ and install the Geospatial libraries</ref/contrib/gis/install/index>`.
 Each of these dependencies is optional. If you're missing any of them, the
 associated tests will be skipped.
 
-.. _argon2-cffi: https://pypi.python.org/pypi/argon2_cffi
+.. _argon2-cffi: https://argon2-cffi.readthedocs.io/en/stable/installation.html
 .. _bcrypt: https://pypi.python.org/pypi/bcrypt
 .. _docutils: https://pypi.python.org/pypi/docutils
 .. _enum34: https://pypi.python.org/pypi/enum34
 .. _geoip2: https://pypi.python.org/pypi/geoip2
 .. _jinja2: https://pypi.python.org/pypi/jinja2
 .. _numpy: https://pypi.python.org/pypi/numpy
-.. _Pillow: https://pypi.python.org/pypi/Pillow/
+.. _Pillow: http://pillow.readthedocs.io/en/stable/installation.html
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
 .. _pytz: https://pypi.python.org/pypi/pytz/
 .. _setuptools: https://pypi.python.org/pypi/setuptools/

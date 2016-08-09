@@ -252,6 +252,11 @@ into the Django ``tests/`` directory and then running:
 
     $ pip install -r requirements/py3.txt
 
+If you experience any problems during the installation,
+your system might be missing a dependency for one or more 
+of the Python packages. Please consult failing package's 
+documentation for requirements.
+
 Now we are ready to run the test suite. If you're using GNU/Linux, Mac OS X or
 some other flavor of Unix, run:
 
