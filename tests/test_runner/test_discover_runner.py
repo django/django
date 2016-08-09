@@ -20,6 +20,10 @@ def change_cwd(directory):
 
 class DiscoverRunnerTest(TestCase):
 
+    def test_init_debug_mode(self):
+        runner = DiscoverRunner()
+        self.assertFalse(runner.debug_mode)
+
     def test_dotted_test_module(self):
         count = DiscoverRunner().build_suite(
             ["test_discovery_sample.tests_sample"],
