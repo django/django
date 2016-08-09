@@ -212,9 +212,10 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
         ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
-    ], options={"order_with_respect_to": "book",
-        "unique_together": {("book", "_order")},
-    })
+    ], options={
+        "order_with_respect_to": "book",
+        "unique_together": {("book", "_order")},}
+    )
     author_renamed_with_book = ModelState("testapp", "Writer", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
