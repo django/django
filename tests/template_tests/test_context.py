@@ -204,6 +204,38 @@ class ContextTests(SimpleTestCase):
         self.assertEqual(str(warns[2].message), msg2)
         self.assertEqual(str(warns[3].message), msg2)
 
+    def test_set_upward_empty_context(self):
+        empty_context = Context()
+        empty_context.set_upward('a', 1)
+
+        self.assertEquals(empty_context.get('a'), 1)
+
+    def test_set_upward_with_push(self):
+        """
+        The highest context which has the given key should be used.
+        """
+        c = Context({'a': 1})
+        c.push({'a': 2})
+        c.set_upward('a', 3)
+        self.assertEquals(c.get('a'), 3)
+        c.pop()
+        self.assertEquals(c.get('a'), 1)
+
+    def test_set_upward_with_push_no_match(self):
+        """
+        Use the highest context if the given key is not found.
+        """
+        c = Context({'b': 1})
+        c.push({'b': 2})
+        c.set_upward('a', 2)
+        self.assertEquals(len(c.dicts), 3)
+        self.assertEquals(c.dicts[-1]['a'], 2)
+
+    def test_set_upward(self):
+        c = Context({'a': 1})
+        c.set_upward('a', 2)
+        self.assertEquals(c.get('a'), 2)
+
 
 class RequestContextTests(SimpleTestCase):
 
