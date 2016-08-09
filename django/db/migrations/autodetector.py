@@ -180,10 +180,10 @@ class MigrationAutodetector(object):
         self.generate_removed_fields()
         self.generate_added_fields()
         self.generate_altered_fields()
+        self.generate_altered_order_with_respect_to()
         self.generate_altered_unique_together()
         self.generate_altered_index_together()
         self.generate_altered_db_table()
-        self.generate_altered_order_with_respect_to()
 
         self._sort_migrations()
         self._build_migration_list(graph)
@@ -522,9 +522,9 @@ class MigrationAutodetector(object):
                 if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
                     related_fields[field.name] = field
             # Are there unique/index_together to defer?
+            order_with_respect_to = model_state.options.pop('order_with_respect_to', None)
             unique_together = model_state.options.pop('unique_together', None)
             index_together = model_state.options.pop('index_together', None)
-            order_with_respect_to = model_state.options.pop('order_with_respect_to', None)
             # Depend on the deletion of any possible proxy version of us
             dependencies = [
                 (app_label, model_name, None, False),
@@ -581,6 +581,18 @@ class MigrationAutodetector(object):
                 for name, field in sorted(related_fields.items())
             ]
             related_dependencies.append((app_label, model_name, None, True))
+            if order_with_respect_to:
+                self.add_operation(
+                    app_label,
+                    operations.AlterOrderWithRespectTo(
+                        name=model_name,
+                        order_with_respect_to=order_with_respect_to,
+                    ),
+                    dependencies=[
+                        (app_label, model_name, order_with_respect_to, True),
+                        (app_label, model_name, None, True),
+                    ]
+                )
             if unique_together:
                 self.add_operation(
                     app_label,
@@ -598,18 +610,6 @@ class MigrationAutodetector(object):
                         index_together=index_together,
                     ),
                     dependencies=related_dependencies
-                )
-            if order_with_respect_to:
-                self.add_operation(
-                    app_label,
-                    operations.AlterOrderWithRespectTo(
-                        name=model_name,
-                        order_with_respect_to=order_with_respect_to,
-                    ),
-                    dependencies=[
-                        (app_label, model_name, order_with_respect_to, True),
-                        (app_label, model_name, None, True),
-                    ]
                 )
 
             # Fix relationships if the model changed from a proxy model to a

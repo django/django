@@ -208,6 +208,13 @@ class AutodetectorTests(TestCase):
         ("name", models.CharField(max_length=200)),
         ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
     ], options={"order_with_respect_to": "book"})
+    author_with_book_order_wrt_together = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200)),
+        ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
+    ], options={"order_with_respect_to": "book",
+        "unique_together": {("book", "_order")},
+    })
     author_renamed_with_book = ModelState("testapp", "Writer", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
@@ -1799,6 +1806,68 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "AlterOrderWithRespectTo"])
         self.assertOperationAttributes(changes, 'testapp', 0, 1, name="author", order_with_respect_to="book")
         self.assertNotIn("_order", [name for name, field in changes['testapp'][0].operations[0].fields])
+
+    def test_create_add_order_with_respect_to_unique_together(self):
+        """
+        Tests that setting create a model and order_with_respect_to option set
+        along with a unique_together which involves the implicit _order
+        field created by order_with_respect_to.
+        """
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([
+            self.book,
+            self.author_with_book_order_wrt_together
+        ])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, [
+            "CreateModel",
+            "AlterOrderWithRespectTo",
+            "AlterUniqueTogether"
+        ])
+        self.assertOperationAttributes(
+            changes, 'testapp', 0, 1, name="author",
+            order_with_respect_to="book"
+        )
+        self.assertOperationAttributes(
+            changes, 'testapp', 0, 2, name="author",
+            unique_together={("book", "_order")}
+        )
+
+    def test_add_order_with_respect_to_and_unique_together(self):
+        """
+        Tests that setting order_with_respect_to option set along
+        with a unique_together which involves the implicit _order
+        field created by order_with_respect_to
+        """
+        # Make state
+        before = self.make_project_state([
+            self.book,
+            self.author_with_book
+        ])
+        after = self.make_project_state([
+            self.book,
+            self.author_with_book_order_wrt_together
+        ])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, [
+            "AlterOrderWithRespectTo",
+            "AlterUniqueTogether"
+        ])
+        self.assertOperationAttributes(
+            changes, 'testapp', 0, 0, name="author",
+            order_with_respect_to="book"
+        )
+        self.assertOperationAttributes(
+            changes, 'testapp', 0, 1, name="author",
+            unique_together={("book", "_order")}
+        )
 
     def test_alter_model_managers(self):
         """
