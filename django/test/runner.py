@@ -9,7 +9,6 @@ import textwrap
 import unittest
 from importlib import import_module
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import SimpleTestCase, TestCase
@@ -412,8 +411,7 @@ class DiscoverRunner(object):
         )
 
     def setup_test_environment(self, **kwargs):
-        setup_test_environment()
-        settings.DEBUG = False
+        setup_test_environment(debug=False)
         unittest.installHandler()
 
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
