@@ -117,6 +117,7 @@ Authenticating users
 
 .. function:: authenticate(\**credentials)
 
+    Django authenticates user using :ref:`authentication backends <authentication-backends>`.
     To authenticate a given username and password, use
     :func:`~django.contrib.auth.authenticate()`. It takes credentials in the
     form of keyword arguments, for the default configuration this is
@@ -129,13 +130,11 @@ Authenticating users
         user = authenticate(username='john', password='secret')
         if user is not None:
             # the password verified for the user
-            if user.is_active:
-                print("User is valid, active and authenticated")
-            else:
-                print("The password is valid, but the account has been disabled!")
+            print("User is valid, active and authenticated")
         else:
-            # the authentication system was unable to verify the username and password
-            print("The username and password were incorrect.")
+            # the authentication system was unable to verify 
+            # the username and password or user is not active
+            print("The username and password were incorrect, or user is inactive.")
 
     .. note::
 
@@ -348,12 +347,9 @@ If you have an authenticated user you want to attach to the current session
             password = request.POST['password']
             user = authenticate(username=username, password=password)
             if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    # Redirect to a success page.
-                else:
-                    # Return a 'disabled account' error message
-                    ...
+                login(request, user)
+                # Redirect to a success page.
+                ...
             else:
                 # Return an 'invalid login' error message.
                 ...
