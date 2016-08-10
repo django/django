@@ -263,9 +263,9 @@ Tests
 * Added :meth:`.DiscoverRunner.get_test_runner_kwargs` to allow customizing the
   keyword arguments passed to the test runner.
 
-* Added the ``debug_mode`` keyword argument to
-  :class:`~django.test.runner.DiscoverRunner` to make it easier to customize
-  the :setting:`DEBUG` setting when running tests.
+* Added a ``--debug-mode`` option and ``debug_mode`` keyword argument to
+  :class:`~django.test.runner.DiscoverRunner` that sets the :setting:`DEBUG`
+  setting to true as a way to help troubleshoot test failures.
 
 URLs
 ~~~~
