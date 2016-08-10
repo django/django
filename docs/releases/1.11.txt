@@ -80,6 +80,10 @@ Minor features
   ``password_reset_confirm()``, and ``password_reset_complete()`` function-based
   views.
 
+* The :class:`~django.contrib.auth.views.PasswordResetConfirmView` accepts a new
+  ``post_reset_login`` argument to decide whether a user gets automatically logged in
+  after a successful password reset or not.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
