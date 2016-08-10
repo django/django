@@ -13,6 +13,8 @@ from django.contrib.auth.password_validation import (
     validate_password,
 )
 from django.core.exceptions import ValidationError
+from django.db.models import Model
+from django.db.models.fields import EmailField
 from django.test import TestCase, override_settings
 from django.utils._os import upath
 
@@ -126,6 +128,26 @@ class UserAttributeSimilarityValidatorTest(TestCase):
         self.assertIsNone(
             UserAttributeSimilarityValidator(user_attributes=['first_name']).validate('testclient', user=user)
         )
+
+    def test_validate_property(self):
+        class TestUser(Model):
+            email = EmailField()
+
+            @property
+            def username(self):
+                return 'foobar'
+
+        user = TestUser()
+        user.email = 'testclient@example.com'
+
+        expected_error = "The password is too similar to the %s."
+        with self.assertRaises(ValidationError) as cm:
+            UserAttributeSimilarityValidator().validate('foobar', user=user),
+        self.assertEqual(cm.exception.messages, [expected_error % "username"])
+
+        with self.assertRaises(ValidationError) as cm:
+            UserAttributeSimilarityValidator().validate('example.com', user=user),
+        self.assertEqual(cm.exception.messages, [expected_error % "email"])
 
     def test_help_text(self):
         self.assertEqual(
