@@ -117,25 +117,21 @@ Authenticating users
 
 .. function:: authenticate(\**credentials)
 
-    To authenticate a given username and password, use
-    :func:`~django.contrib.auth.authenticate()`. It takes credentials in the
-    form of keyword arguments, for the default configuration this is
-    ``username`` and ``password``, and it returns
-    a :class:`~django.contrib.auth.models.User` object if the password is valid
-    for the given username. If the password is invalid,
-    :func:`~django.contrib.auth.authenticate()` returns ``None``. Example::
+    Use :func:`~django.contrib.auth.authenticate()` to verify a set of
+    credentials. It takes credentials as keyword arguments, ``username`` and
+    ``password`` for the default case, checks them against each
+    :ref:`authentication backend <authentication-backends>`, and returns a
+    :class:`~django.contrib.auth.models.User` object if the credentials are
+    valid for a backend. If the credentials aren't valid for any backend or if
+    a backend raises :class:`~django.core.exceptions.PermissionDenied`, it
+    returns ``None``. For example::
 
         from django.contrib.auth import authenticate
         user = authenticate(username='john', password='secret')
         if user is not None:
-            # the password verified for the user
-            if user.is_active:
-                print("User is valid, active and authenticated")
-            else:
-                print("The password is valid, but the account has been disabled!")
+            # A backend authenticated the credentials
         else:
-            # the authentication system was unable to verify the username and password
-            print("The username and password were incorrect.")
+            # No backend authenticated the credentials
 
     .. note::
 
@@ -348,12 +344,9 @@ If you have an authenticated user you want to attach to the current session
             password = request.POST['password']
             user = authenticate(username=username, password=password)
             if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    # Redirect to a success page.
-                else:
-                    # Return a 'disabled account' error message
-                    ...
+                login(request, user)
+                # Redirect to a success page.
+                ...
             else:
                 # Return an 'invalid login' error message.
                 ...
@@ -513,7 +506,8 @@ The ``login_required`` decorator
 .. note::
 
     The ``login_required`` decorator does NOT check the ``is_active`` flag on a
-    user.
+    user, but the default :setting:`AUTHENTICATION_BACKENDS` reject inactive
+    users.
 
 .. seealso::
 
@@ -553,7 +547,8 @@ inheritance list.
 .. note::
 
     Just as the ``login_required`` decorator, this mixin does NOT check the
-    ``is_active`` flag on a user.
+    ``is_active`` flag on a user, but the default
+    :setting:`AUTHENTICATION_BACKENDS` reject inactive users.
 
 .. currentmodule:: django.contrib.auth.decorators
 
@@ -1610,6 +1605,10 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
             class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
                 def confirm_login_allowed(self, user):
                     pass
+
+        (In this case, you'll also need to use an authentication backend that
+        allows inactive users, such as as
+        :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend`.)
 
         Or to allow only some active users to log in::
 
