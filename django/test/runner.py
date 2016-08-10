@@ -394,6 +394,10 @@ class DiscoverRunner(object):
             help='Reverses test cases order.',
         )
         parser.add_argument(
+            '--debug-mode', action='store_true', dest='debug_mode', default=False,
+            help='Sets settings.DEBUG to True.',
+        )
+        parser.add_argument(
             '-d', '--debug-sql', action='store_true', dest='debug_sql', default=False,
             help='Prints logged SQL queries on failure.',
         )

@@ -1,4 +1,5 @@
 import os
+from argparse import ArgumentParser
 from contextlib import contextmanager
 from unittest import TestSuite, TextTestRunner, defaultTestLoader
 
@@ -23,6 +24,15 @@ class DiscoverRunnerTest(TestCase):
     def test_init_debug_mode(self):
         runner = DiscoverRunner()
         self.assertFalse(runner.debug_mode)
+
+    def test_add_arguments_debug_mode(self):
+        parser = ArgumentParser()
+        DiscoverRunner.add_arguments(parser)
+
+        ns = parser.parse_args([])
+        self.assertFalse(ns.debug_mode)
+        ns = parser.parse_args(["--debug-mode"])
+        self.assertTrue(ns.debug_mode)
 
     def test_dotted_test_module(self):
         count = DiscoverRunner().build_suite(
