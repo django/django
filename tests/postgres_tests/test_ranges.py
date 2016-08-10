@@ -87,7 +87,7 @@ class TestSaveLoad(PostgreSQLTestCase):
         self.assertEqual(field.base_field.model, RangesModel)
 
 
-class TestQuerying(PostgreSQLTestCase):
+class TestRangeContainsLookup(PostgreSQLTestCase):
 
     @classmethod
     def setUpTestData(cls):
@@ -105,61 +105,70 @@ class TestQuerying(PostgreSQLTestCase):
             datetime.date(year=2016, month=1, day=4),
         ]
 
-        cls.objs = [
-            RangesModel.objects.create(ints=NumericRange(0, 10)),
-            RangesModel.objects.create(ints=NumericRange(5, 15)),
-            RangesModel.objects.create(ints=NumericRange(None, 0)),
-            RangesModel.objects.create(ints=NumericRange(empty=True)),
-            RangesModel.objects.create(
-                ints=None, dates=(cls.dates[0], cls.dates[3]), timestamps=(cls.timestamps[0], cls.timestamps[3])
-            ),
-        ]
+        cls.obj = RangesModel.objects.create(
+            ints=None,
+            dates=(cls.dates[0], cls.dates[3]),
+            timestamps=(cls.timestamps[0], cls.timestamps[3]),
+        )
 
     def test_datetime_range_contains_date(self):
         self.assertSequenceEqual(
             RangesModel.objects.filter(timestamps__contains=self.timestamps[1]),
-            [self.objs[4]],
+            [self.obj],
         )
 
     def test_datetime_range_contains_range(self):
         self.assertSequenceEqual(
             RangesModel.objects.filter(timestamps__contains=(self.timestamps[1], self.timestamps[2])),
-            [self.objs[4]],
+            [self.obj],
         )
 
     def test_datetime_range_contains_with_expression(self):
         self.assertSequenceEqual(
             RangesModel.objects.filter(timestamps__contains=Value(self.dates[0], output_field=DateTimeField())),
-            [self.objs[4]],
+            [self.obj],
         )
         self.assertSequenceEqual(
             RangesModel.objects.filter(timestamps__contains=Func(
                 F('dates'), function='lower', output_field=DateTimeField())),
-            [self.objs[4]],
+            [self.obj],
         )
 
     def test_date_range_contains_date(self):
         self.assertSequenceEqual(
             RangesModel.objects.filter(dates__contains=self.timestamps[1]),
-            [self.objs[4]],
+            [self.obj],
         )
 
     def test_date_range_contains_range(self):
         self.assertSequenceEqual(
             RangesModel.objects.filter(dates__contains=(self.dates[1], self.dates[2])),
-            [self.objs[4]],
+            [self.obj],
         )
 
     def test_date_range_contains_with_expression(self):
         self.assertSequenceEqual(
             RangesModel.objects.filter(dates__contains=Value(self.dates[0], output_field=DateField())),
-            [self.objs[4]],
+            [self.obj],
         )
         self.assertSequenceEqual(
             RangesModel.objects.filter(dates__contains=Func(
                 F('timestamps'), function='lower', output_field=DateField())),
-            [self.objs[4]],
+            [self.obj],
         )
+
+
+class TestQuerying(PostgreSQLTestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.objs = [
+            RangesModel.objects.create(ints=NumericRange(0, 10)),
+            RangesModel.objects.create(ints=NumericRange(5, 15)),
+            RangesModel.objects.create(ints=NumericRange(None, 0)),
+            RangesModel.objects.create(ints=NumericRange(empty=True)),
+            RangesModel.objects.create(ints=None),
+        ]
 
     def test_exact(self):
         self.assertSequenceEqual(
