@@ -103,7 +103,7 @@ urlpatterns = [
     url(r'^jsoni18n/$', i18n.JSONCatalog.as_view(packages=['view_tests'])),
 
     # Static views
-    url(r'^site_media/(?P<path>.*)$', static.serve, {'document_root': media_dir}),
+    url(r'^site_media/(?P<path>.*)$', static.serve, {'document_root': media_dir, 'show_indexes': True}),
 ]
 
 urlpatterns += i18n_patterns(

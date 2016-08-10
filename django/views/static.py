@@ -107,7 +107,7 @@ def directory_index(path, fullpath):
             'static/directory_index',
         ])
     except TemplateDoesNotExist:
-        t = Engine().from_string(DEFAULT_DIRECTORY_INDEX_TEMPLATE)
+        t = Engine(libraries={'i18n': 'django.templatetags.i18n'}).from_string(DEFAULT_DIRECTORY_INDEX_TEMPLATE)
     files = []
     for f in os.listdir(fullpath):
         if not f.startswith('.'):
