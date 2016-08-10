@@ -410,3 +410,12 @@ Miscellaneous
   :class:`~django.contrib.auth.views.PasswordResetDoneView`,
   :class:`~django.contrib.auth.views.PasswordResetConfirmView`, and
   :class:`~django.contrib.auth.views.PasswordResetCompleteView`.
+
+* The new :func:`~django.test.utils.teardown_databases` makes it easier to
+  build custom test runners. :func:`~django.test.utils.teardown_databases` was
+  previously only available on the :class:`~django.test.runner.DiscoverRunner`
+  as a method.
+
+  To be consistent with the :func:`~django.test.utils.teardown_databases` and
+  the other test runner utils, :func:`~django.test.utils.setup_databases` has
+  also been moved to :mod:`django.test.utils`.
