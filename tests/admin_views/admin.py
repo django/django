@@ -46,6 +46,7 @@ from .models import (
     UndeletableObject, UnorderedObject, UserMessenger, Villain, Vodcast,
     Whatsit, Widget, Worker, WorkHour,
 )
+from .forms import SubscriberActionForm
 
 
 def callable_year(dt_value):
@@ -235,6 +236,7 @@ class PersonaAdmin(admin.ModelAdmin):
 
 class SubscriberAdmin(admin.ModelAdmin):
     actions = ['mail_admin']
+    action_form = SubscriberActionForm
 
     def mail_admin(self, request, selected):
         EmailMessage(
