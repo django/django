@@ -239,12 +239,26 @@ Methods
     as registering signals. It is called as soon as the registry is fully
     populated.
 
-    You cannot import models in modules that define application configuration
-    classes, but you can use :meth:`get_model` to access a model class by
-    name, like this::
+    Although you can't import models at the module-level where
+    :class:`~django.apps.AppConfig` classes are defined, you can import them in
+    ``ready()``, using either an ``import`` statement or
+    :meth:`~AppConfig.get_model`.
+
+    If you're registering :mod:`model signals <django.db.models.signals>`, you
+    can refer to the sender by its string label instead of using the model
+    class itself.
+
+    Example::
+
+        from django.db.models.signals import pre_save
 
         def ready(self):
+            # importing model classes
+            from .models import MyModel  # or...
             MyModel = self.get_model('MyModel')
+
+            # registering signals with the model's string label
+            pre_save.connect(receiver, sender='app_label.MyModel')
 
     .. warning::
 
