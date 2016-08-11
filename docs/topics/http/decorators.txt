@@ -106,6 +106,13 @@ Caching
 The decorators in :mod:`django.views.decorators.cache` control server and
 client-side caching.
 
+.. function:: cache_control(**kwargs)
+
+    This decorator patches the response's ``Cache-Control`` header by adding
+    all of the keyword arguments to it. See
+    :func:`~django.utils.cache.patch_cache_control` for the details of the
+    transformation.
+
 .. function:: never_cache(view_func)
 
     This decorator adds a ``Cache-Control: max-age=0, no-cache, no-store,
