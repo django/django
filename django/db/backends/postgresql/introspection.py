@@ -134,7 +134,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # row[1] (idx.indkey) is stored in the DB as an array. It comes out as
             # a string of space-separated integers. This designates the field
             # indexes (1-based) of the fields that have indexes on the table.
-            # row[4] is the type of index, eg. btree, hash, etc.
+            # row[4] is the type of index, e.g. btree, hash, etc.
             # Here, we skip any indexes across multiple fields.
             if ' ' in row[1]:
                 continue
