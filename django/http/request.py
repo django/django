@@ -24,7 +24,7 @@ from django.utils.six.moves.urllib.parse import (
 )
 
 RAISE_ERROR = object()
-host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9:]+\])(:\d+)?$")
+host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
 
 
 class UnreadablePostError(IOError):
