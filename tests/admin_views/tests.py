@@ -3374,6 +3374,20 @@ action)</option>
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a function action')
 
+    def test_included_media_from_actions_form(self):
+        """
+        Test that admin action form's media included in changelist view's media
+        Refs #26919.
+        """
+        response = self.client.get(
+            reverse('admin:admin_views_subscriber_changelist')
+        )
+        media_path = 'path/to/media.js'
+        self.assertIsNotNone(response.context['action_form'])
+        self.assertIn('media', response.context)
+        self.assertIn(media_path, response.context['media']._js)
+        self.assertContains(response, media_path)
+
     def test_user_message_on_none_selected(self):
         """
         User should see a warning when 'Go' is pressed and no items are selected.

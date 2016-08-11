@@ -22,6 +22,7 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.six import StringIO
 
+from .forms import SubscriberActionForm
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
     AdminOrderedModelMethod, Album, Answer, Article, BarAccount, Book,
@@ -235,6 +236,7 @@ class PersonaAdmin(admin.ModelAdmin):
 
 class SubscriberAdmin(admin.ModelAdmin):
     actions = ['mail_admin']
+    action_form = SubscriberActionForm
 
     def mail_admin(self, request, selected):
         EmailMessage(
