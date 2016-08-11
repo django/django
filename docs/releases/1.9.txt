@@ -794,6 +794,15 @@ no longer include the scheme and domain part of the URLs. For example,
 replaced by ``self.assertRedirects(response, '/some-url/')`` (unless the
 redirection specifically contained an absolute URL, of course).
 
+If you still need the old behavior, you can restore it by writing a :doc:`custom
+middleware </topics/http/middleware>` like this::
+
+    class LocationHeaderFix(object):
+        def process_response(self, request, response):
+            if 'Location' in response:
+                response['Location'] = request.build_absolute_uri(response['Location'])
+            return response
+
 Dropped support for PostgreSQL 9.0
 ----------------------------------
 
