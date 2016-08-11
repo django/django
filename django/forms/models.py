@@ -52,6 +52,11 @@ def construct_instance(form, instance, fields=None, exclude=None):
             continue
         if exclude and f.name in exclude:
             continue
+        # Leave defaults for fields that aren't in POST data, except for
+        # checkbox inputs because they don't appear in POST data if not checked.
+        if (f.has_default() and f.name not in form.data and
+                not getattr(form[f.name].field.widget, 'dont_use_model_field_default_for_empty_data', False)):
+            continue
         # Defer saving file-type fields until after the other fields, so a
         # callable upload_to can use the values from other fields.
         if isinstance(f, models.FileField):
