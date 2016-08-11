@@ -839,6 +839,10 @@ class BaseDatabaseSchemaEditor(object):
         hash_data = [table_name] + list(column_names)
         hash_suff_part = '%s%s' % (self._digest(*hash_data), suffix)
         max_length = self.connection.ops.max_name_length() or 200
+        # If everything fits into max_length, just return that perfect name
+        index_name = '%s_%s_%s' % (table_name, '_'.join(column_names), hash_suff_part)
+        if len(index_name) <= max_length:
+            return index_name
         # Unusually long suffix needs to be shortened
         if len(hash_suff_part) > max_length / 3:
             hash_suff_part = hash_suff_part[:max_length // 3]

@@ -15,28 +15,35 @@ class SchemaIndexesTests(TestCase):
         """
         Index names should be deterministic.
         """
+
         with connection.schema_editor() as editor:
             index_name = editor._create_index_name(
                 model=Article,
-                column_names=("c1", "c2", "c3"),
+                column_names=("c1",),
                 suffix="123",
             )
-        self.assertEqual(index_name, "indexes_article_c1_c2_c3_7ce4cc86123")
+        self.assertEqual(index_name, "indexes_article_c1_a52bd80b123")
 
-    def test_index_name_trucation(self):
-        # Test truncation on various databases.
-        long_name = 'l%sng' % ('o' * 86)
+    def test_index_name(self):
+        """
+        Only for built-in database backends.
+        Properties:
+            * Truncation on various databases.
+            * All columns are included while naming.
+            * Index hash is deterministic.
+        """
+        long_name = 'l%sng' % ('o' * 100)
         with connection.schema_editor() as editor:
             index_name = editor._create_index_name(
                 model=Article,
-                column_names=(long_name, 'c1', 'c2'),
+                column_names=('c1', 'c2', long_name),
                 suffix='ix',
             )
         expected = {
-            'mysql': 'indexes_article_looooooooooooooooooooooooo_2ccf1189ix',
-            'oracle': 'indexes_a_loooooooo_2ccf1189ix',
-            'postgresql': 'indexes_article_loooooooooooooooooooooooo_2ccf1189ix',
-            'sqlite': 'indexes_article_l%sng_c1_c_2ccf1189ix' % ('o' * 86),
+            'mysql': 'indexes_article_c1_c2_looooooooooooooooooo_255179b2ix',
+            'oracle': 'indexes_a_c1_c2_loo_255179b2ix',
+            'postgresql': 'indexes_article_c1_c2_loooooooooooooooooo_255179b2ix',
+            'sqlite': 'indexes_article_c1_c2_l%sng_255179b2ix' % ('o' * 100),
         }
         if connection.vendor not in expected:
             self.skipTest("This test is only supported on the built-in database backends.")

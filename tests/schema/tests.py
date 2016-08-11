@@ -1503,8 +1503,6 @@ class SchemaTests(TransactionTestCase):
                 if c['columns'] == ["slug", "title"]
             ),
         )
-        # Check the index name
-        self.assertIn("schema_tag_slug_title_9c7a1732_idx", self.get_constraints("schema_tag"))
         # Alter it back
         new_field2 = SlugField(unique=True)
         new_field2.set_attributes_from_name("slug")
