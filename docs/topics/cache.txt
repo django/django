@@ -496,9 +496,10 @@ If a view sets its own cache expiry time (i.e. it has a ``max-age`` section in
 its ``Cache-Control`` header) then the page will be cached until the expiry
 time, rather than :setting:`CACHE_MIDDLEWARE_SECONDS`. Using the decorators in
 ``django.views.decorators.cache`` you can easily set a view's expiry time
-(using the ``cache_control`` decorator) or disable caching for a view (using
-the ``never_cache`` decorator). See the `using other headers`__ section for
-more on these decorators.
+(using the :func:`~django.views.decorators.cache.cache_control` decorator) or
+disable caching for a view (using the
+:func:`~django.views.decorators.cache.never_cache` decorator). See the
+`using other headers`__ section for more on these decorators.
 
 .. _i18n-cache-key:
 
@@ -1143,7 +1144,8 @@ public cache. So Web applications need a way to tell caches which data is
 private and which is public.
 
 The solution is to indicate a page's cache should be "private." To do this in
-Django, use the ``cache_control`` view decorator. Example::
+Django, use the :func:`~django.views.decorators.cache.cache_control` view
+decorator. Example::
 
     from django.views.decorators.cache import cache_control
 
@@ -1159,9 +1161,9 @@ exclusive. The decorator ensures that the "public" directive is removed if
 "private" should be set (and vice versa). An example use of the two directives
 would be a blog site that offers both private and public entries. Public
 entries may be cached on any shared cache. The following code uses
-:func:`django.utils.cache.patch_cache_control`, the manual way to modify the
-cache control header (it is internally called by the ``cache_control``
-decorator)::
+:func:`~django.utils.cache.patch_cache_control`, the manual way to modify the
+cache control header (it is internally called by the
+:func:`~django.views.decorators.cache.cache_control` decorator)::
 
     from django.views.decorators.cache import patch_cache_control
     from django.views.decorators.vary import vary_on_cookie
@@ -1191,7 +1193,8 @@ directive::
 
 (If you *do* use the caching middleware, it already sets the ``max-age`` with
 the value of the :setting:`CACHE_MIDDLEWARE_SECONDS` setting. In that case,
-the custom ``max_age`` from the ``cache_control`` decorator will take
+the custom ``max_age`` from the
+:func:`~django.views.decorators.cache.cache_control` decorator will take
 precedence, and the header values will be merged correctly.)
 
 Any valid ``Cache-Control`` response directive is valid in ``cache_control()``.
@@ -1207,9 +1210,9 @@ The full list of known directives can be found in the `IANA registry`_
 .. _IANA registry: http://www.iana.org/assignments/http-cache-directives/http-cache-directives.xhtml
 
 If you want to use headers to disable caching altogether,
-:func:`django.views.decorators.cache.never_cache` is a view decorator that adds
-headers to ensure the response won't be cached by browsers or other caches.
-Example::
+:func:`~django.views.decorators.cache.never_cache` is a view decorator that
+adds headers to ensure the response won't be cached by browsers or other
+caches. Example::
 
     from django.views.decorators.cache import never_cache
 
