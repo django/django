@@ -23,6 +23,10 @@ except ImportError:
             })
             return name, path, args, kwargs
 
+    class DummyJSONField(models.Field):
+        def __init__(self, encoder=None, **kwargs):
+            super(DummyJSONField, self).__init__(**kwargs)
+
     ArrayField = DummyArrayField
     BigIntegerRangeField = models.Field
     DateRangeField = models.Field
@@ -30,5 +34,5 @@ except ImportError:
     FloatRangeField = models.Field
     HStoreField = models.Field
     IntegerRangeField = models.Field
-    JSONField = models.Field
+    JSONField = DummyJSONField
     SearchVectorField = models.Field

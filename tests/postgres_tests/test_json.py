@@ -1,7 +1,12 @@
+from __future__ import unicode_literals
+
 import datetime
 import unittest
+import uuid
+from decimal import Decimal
 
 from django.core import exceptions, serializers
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import connection
 from django.forms import CharField, Form, widgets
 from django.test import TestCase
@@ -78,6 +83,27 @@ class TestSaveLoad(TestCase):
         instance.save()
         loaded = JSONModel.objects.get()
         self.assertEqual(loaded.field, obj)
+
+    def test_custom_encoding(self):
+        """
+        JSONModel.field_custom has a custom DjangoJSONEncoder.
+        """
+        some_uuid = uuid.uuid4()
+        obj_before = {
+            'date': datetime.date(2016, 8, 12),
+            'datetime': datetime.datetime(2016, 8, 12, 13, 44, 47, 575981),
+            'decimal': Decimal('10.54'),
+            'uuid': some_uuid,
+        }
+        obj_after = {
+            'date': '2016-08-12',
+            'datetime': '2016-08-12T13:44:47.575',
+            'decimal': '10.54',
+            'uuid': str(some_uuid),
+        }
+        JSONModel.objects.create(field_custom=obj_before)
+        loaded = JSONModel.objects.get()
+        self.assertEqual(loaded.field_custom, obj_after)
 
 
 @skipUnlessPG94
@@ -215,7 +241,10 @@ class TestQuerying(TestCase):
 
 @skipUnlessPG94
 class TestSerialization(TestCase):
-    test_data = '[{"fields": {"field": {"a": "b", "c": null}}, "model": "postgres_tests.jsonmodel", "pk": null}]'
+    test_data = (
+        '[{"fields": {"field": {"a": "b", "c": null}, "field_custom": null}, '
+        '"model": "postgres_tests.jsonmodel", "pk": null}]'
+    )
 
     def test_dumping(self):
         instance = JSONModel(field={'a': 'b', 'c': None})
@@ -235,6 +264,12 @@ class TestValidation(PostgreSQLTestCase):
             field.clean(datetime.timedelta(days=1), None)
         self.assertEqual(cm.exception.code, 'invalid')
         self.assertEqual(cm.exception.message % cm.exception.params, "Value must be valid JSON.")
+
+    def test_custom_encoder(self):
+        with self.assertRaisesMessage(ValueError, "The encoder parameter must be a callable object."):
+            field = JSONField(encoder=DjangoJSONEncoder())
+        field = JSONField(encoder=DjangoJSONEncoder)
+        self.assertEqual(field.clean(datetime.timedelta(days=1), None), datetime.timedelta(days=1))
 
 
 class TestFormField(PostgreSQLTestCase):

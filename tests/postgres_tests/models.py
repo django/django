@@ -1,3 +1,4 @@
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import connection, models
 
 from .fields import (
@@ -132,6 +133,7 @@ class RangeLookupsModel(PostgreSQLModel):
 if connection.vendor == 'postgresql' and connection.pg_version >= 90400:
     class JSONModel(models.Model):
         field = JSONField(blank=True, null=True)
+        field_custom = JSONField(blank=True, null=True, encoder=DjangoJSONEncoder)
 else:
     # create an object with this name so we don't have failing imports
     class JSONModel(object):

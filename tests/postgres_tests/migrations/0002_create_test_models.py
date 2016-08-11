@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import migrations, models
 
 from ..fields import (
@@ -223,6 +224,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('field', JSONField(null=True, blank=True)),
+                ('field_custom', JSONField(null=True, blank=True, encoder=DjangoJSONEncoder)),
             ],
             options={
             },

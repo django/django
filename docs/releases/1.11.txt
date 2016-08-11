@@ -129,6 +129,10 @@ Minor features
 * The new :class:`~django.contrib.postgres.indexes.GinIndex` class allows
   creating gin indexes in the database.
 
+* :class:`~django.contrib.postgres.fields.JSONField` accepts a new ``encoder``
+  parameter to specify a custom class to encode data types not supported by the
+  standard encoder.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
