@@ -13,6 +13,10 @@ class Author(models.Model):
         return self.name
 
 
+class Article(models.Model):
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+
+
 @python_2_unicode_compatible
 class MySQLUnixTimestamp(models.Model):
     timestamp = models.PositiveIntegerField()
