@@ -269,6 +269,9 @@ Tests
   :class:`~django.test.runner.DiscoverRunner` to make it easier to customize
   the :setting:`DEBUG` setting when running tests.
 
+* Added support for :meth:`python:unittest.TestCase.subTest`’s when using the
+  :option:`test --parallel` option.
+
 URLs
 ~~~~
 
