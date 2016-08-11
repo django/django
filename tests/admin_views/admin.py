@@ -22,6 +22,7 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.six import StringIO
 
+from .forms import SubscriberActionForm
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
     AdminOrderedModelMethod, Album, Answer, Article, BarAccount, Book,
@@ -46,7 +47,6 @@ from .models import (
     UndeletableObject, UnorderedObject, UserMessenger, Villain, Vodcast,
     Whatsit, Widget, Worker, WorkHour,
 )
-from .forms import SubscriberActionForm
 
 
 def callable_year(dt_value):
