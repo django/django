@@ -481,6 +481,10 @@ def boolean_check(v):
 
 
 class CheckboxInput(Widget):
+    # Don't use model field defaults for fields that aren't in POST data,
+    # because checkboxes don't appear in POST data if not checked.
+    dont_use_model_field_default_for_empty_data = True
+
     def __init__(self, attrs=None, check_test=None):
         super(CheckboxInput, self).__init__(attrs)
         # check_test is a callable that takes a value and returns True

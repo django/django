@@ -79,3 +79,6 @@ Bugfixes
 
 * Reallowed subclassing ``UserCreationForm`` without ``USERNAME_FIELD`` in
   ``Meta.fields`` (:ticket:`27111`).
+
+* Fixed a regression in model forms where model fields with a ``default`` that
+  didn't appear in POST data no longer used the ``default`` (:ticket:`27039`).
