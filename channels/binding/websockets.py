@@ -147,10 +147,17 @@ class WebsocketBindingWithMembers(WebsocketBinding):
 
     def serialize_data(self, instance):
         data = super(WebsocketBindingWithMembers, self).serialize_data(instance)
+        member_data = {}
         for m in self.send_members:
-            member = getattr(instance, m)
+            member = instance
+            for s in m.split('.'):
+                member = getattr(member, s)
             if callable(member):
-                data[m] = self.encoder.encode(member())
+                member_data[m.replace('.', '__')] = member()
             else:
-                data[m] = self.encoder.encode(member)
+                member_data[m.replace('.', '__')] = member
+        member_data = json.loads(self.encoder.encode(member_data))
+        # the update never overwrites any value from data,
+        # because an object can't have two attributes with the same name
+        data.update(member_data)
         return data
