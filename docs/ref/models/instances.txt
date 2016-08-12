@@ -155,8 +155,10 @@ following is done:
    be thrown away, and when next accessed it will be reloaded with the value of
    ``obj.author_id``.
 
-Note that only fields of the model are reloaded from the database. Other
-database dependent values such as annotations are not reloaded.
+Only fields of the model are reloaded from the database. Other
+database-dependent values such as annotations aren't reloaded. Any
+:func:`@cached_property <django.utils.functional.cached_property>` attributes
+aren't cleared either.
 
 The reloading happens from the database the instance was loaded from, or from
 the default database if the instance wasn't loaded from the database. The
