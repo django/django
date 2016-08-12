@@ -249,6 +249,9 @@ class Widget(six.with_metaclass(RenameWidgetMethods)):
         """
         return id_
 
+    def use_required_attribute(self, initial):
+        return not self.is_hidden
+
 
 class Input(Widget):
     """
@@ -427,6 +430,9 @@ class ClearableFileInput(FileInput):
             # False signals to clear any existing value, as opposed to just None
             return False
         return upload
+
+    def use_required_attribute(self, initial):
+        return super(ClearableFileInput, self).use_required_attribute(initial) and not initial
 
 
 class Textarea(Widget):
@@ -790,12 +796,10 @@ class CheckboxSelectMultiple(RendererMixin, SelectMultiple):
     renderer = CheckboxFieldRenderer
     _empty_value = []
 
-    def build_attrs(self, extra_attrs=None, **kwargs):
-        attrs = super(CheckboxSelectMultiple, self).build_attrs(extra_attrs, **kwargs)
-        # Remove the 'required' attribute because browser validation would
+    def use_required_attribute(self, initial):
+        # Don't use the 'required' attribute because browser validation would
         # require all checkboxes to be checked instead of at least one.
-        attrs.pop('required', None)
-        return attrs
+        return False
 
 
 class MultiWidget(Widget):

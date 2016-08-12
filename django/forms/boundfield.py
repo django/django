@@ -129,18 +129,7 @@ class BoundField(object):
         the form is not bound or the data otherwise.
         """
         if not self.form.is_bound:
-            data = self.form.initial.get(self.name, self.field.initial)
-            if callable(data):
-                if self._initial_value is not UNSET:
-                    data = self._initial_value
-                else:
-                    data = data()
-                    # If this is an auto-generated default date, nix the
-                    # microseconds for standardized handling. See #22502.
-                    if (isinstance(data, (datetime.datetime, datetime.time)) and
-                            not self.field.widget.supports_microseconds):
-                        data = data.replace(microsecond=0)
-                    self._initial_value = data
+            data = self.initial
         else:
             data = self.field.bound_data(
                 self.data, self.form.initial.get(self.name, self.field.initial)
@@ -226,11 +215,27 @@ class BoundField(object):
         id_ = widget.attrs.get('id') or self.auto_id
         return widget.id_for_label(id_)
 
+    @property
+    def initial(self):
+        data = self.form.initial.get(self.name, self.field.initial)
+        if callable(data):
+            if self._initial_value is not UNSET:
+                data = self._initial_value
+            else:
+                data = data()
+                # If this is an auto-generated default date, nix the
+                # microseconds for standardized handling. See #22502.
+                if (isinstance(data, (datetime.datetime, datetime.time)) and
+                        not self.field.widget.supports_microseconds):
+                    data = data.replace(microsecond=0)
+                self._initial_value = data
+        return data
+
     def build_widget_attrs(self, attrs, widget=None):
         if not widget:
             widget = self.field.widget
         attrs = dict(attrs)  # Copy attrs to avoid modifying the argument.
-        if not widget.is_hidden and self.field.required and self.form.use_required_attribute:
+        if widget.use_required_attribute(self.initial) and self.field.required and self.form.use_required_attribute:
             attrs['required'] = True
         if self.field.disabled:
             attrs['disabled'] = True
