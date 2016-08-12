@@ -2,9 +2,7 @@ from __future__ import unicode_literals
 
 import cgi
 import codecs
-import logging
 import re
-import sys
 from io import BytesIO
 
 from django import http
@@ -13,10 +11,11 @@ from django.core import signals
 from django.core.handlers import base
 from django.urls import set_script_prefix
 from django.utils import six
-from django.utils.encoding import force_str, force_text
-from django.utils.functional import cached_property
+from django.utils.encoding import (
+    force_str, force_text, repercent_broken_unicode,
+)
 
-logger = logging.getLogger('django.request')
+from django.utils.functional import cached_property
 
 # encode() and decode() expect the charset to be a native string.
 ISO_8859_1, UTF_8 = str('iso-8859-1'), str('utf-8')
@@ -155,19 +154,8 @@ class WSGIHandler(base.BaseHandler):
     def __call__(self, environ, start_response):
         set_script_prefix(get_script_name(environ))
         signals.request_started.send(sender=self.__class__, environ=environ)
-        try:
-            request = self.request_class(environ)
-        except UnicodeDecodeError:
-            logger.warning(
-                'Bad Request (UnicodeDecodeError)',
-                exc_info=sys.exc_info(),
-                extra={
-                    'status_code': 400,
-                }
-            )
-            response = http.HttpResponseBadRequest()
-        else:
-            response = self.get_response(request)
+        request = self.request_class(environ)
+        response = self.get_response(request)
 
         response._handler_class = self.__class__
 
@@ -187,7 +175,7 @@ def get_path_info(environ):
     """
     path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '/')
 
-    return path_info.decode(UTF_8)
+    return repercent_broken_unicode(path_info).decode(UTF_8)
 
 
 def get_script_name(environ):
