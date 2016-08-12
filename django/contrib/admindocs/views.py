@@ -13,6 +13,7 @@ from django.db import models
 from django.http import Http404
 from django.template.engine import Engine
 from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
+from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.inspect import (
     func_accepts_kwargs, func_accepts_var_args, func_has_no_args,
@@ -126,13 +127,23 @@ class TemplateFilterIndexView(BaseAdminDocsView):
 class ViewIndexView(BaseAdminDocsView):
     template_name = 'admin_doc/view_index.html'
 
+    @staticmethod
+    def _get_full_name(func):
+        mod_name = func.__module__
+        if six.PY3:
+            return '%s.%s' % (mod_name, func.__qualname__)
+        else:
+            # PY2 does not support __qualname__
+            func_name = getattr(func, '__name__', func.__class__.__name__)
+            return '%s.%s' % (mod_name, func_name)
+
     def get_context_data(self, **kwargs):
         views = []
         urlconf = import_module(settings.ROOT_URLCONF)
         view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
         for (func, regex, namespace, name) in view_functions:
             views.append({
-                'full_name': '%s.%s' % (func.__module__, getattr(func, '__name__', func.__class__.__name__)),
+                'full_name': self._get_full_name(func),
                 'url': simplify_regex(regex),
                 'url_name': ':'.join((namespace or []) + (name and [name] or [])),
                 'namespace': ':'.join((namespace or [])),
@@ -145,13 +156,34 @@ class ViewIndexView(BaseAdminDocsView):
 class ViewDetailView(BaseAdminDocsView):
     template_name = 'admin_doc/view_detail.html'
 
-    def get_context_data(self, **kwargs):
-        view = self.kwargs['view']
+    @staticmethod
+    def _get_view_func(view):
         urlconf = get_urlconf()
         if get_resolver(urlconf)._is_callback(view):
             mod, func = get_mod_func(view)
-            view_func = getattr(import_module(mod), func)
-        else:
+            try:
+                # Separate the module and function, e.g.
+                # 'mymodule.views.myview' -> 'mymodule.views', 'myview').
+                return getattr(import_module(mod), func)
+            except ImportError:
+                # Import may fail because view contains a class name, e.g.
+                # 'mymodule.views.ViewContainer.my_view', so mod takes the form
+                # 'mymodule.views.ViewContainer'. Parse it again to separate
+                # the module and class.
+                mod, klass = get_mod_func(mod)
+                return getattr(getattr(import_module(mod), klass), func)
+            except AttributeError:
+                # PY2 generates incorrect paths for views that are methods,
+                # e.g. 'mymodule.views.ViewContainer.my_view' will be
+                # listed as 'mymodule.views.my_view' because the class name
+                # can't be detected. This causes an AttributeError when
+                # trying to resolve the view.
+                return None
+
+    def get_context_data(self, **kwargs):
+        view = self.kwargs['view']
+        view_func = self._get_view_func(view)
+        if view_func is None:
             raise Http404
         title, body, metadata = utils.parse_docstring(view_func.__doc__)
         if title:
