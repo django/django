@@ -796,7 +796,7 @@ redirection specifically contained an absolute URL, of course).
 
 In the rare case that you need the old behavior (discovered with an ancient
 version of Apache with ``mod_scgi`` that interprets a relative redirect as an
-"internal redirect", you can restore it by writing a custom middleware::
+"internal redirect"), you can restore it by writing a custom middleware::
 
     class LocationHeaderFix(object):
         def process_response(self, request, response):
