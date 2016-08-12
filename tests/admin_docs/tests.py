@@ -9,6 +9,7 @@ from django.contrib.sites.models import Site
 from django.test import TestCase, modify_settings, override_settings
 from django.test.utils import captured_stderr
 from django.urls import reverse
+from django.utils import six
 
 from .models import Company, Person
 
@@ -82,6 +83,18 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         self.assertContains(response, 'Views by namespace test')
         self.assertContains(response, 'Name: <code>test:func</code>.')
 
+    @unittest.skipIf(six.PY2, "Python 2 doesn't support __qualname__.")
+    def test_view_index_with_method(self):
+        """
+        Views that are methods are listed correctly.
+        """
+        response = self.client.get(reverse('django-admindocs-views-index'))
+        self.assertContains(
+            response,
+            '<h3><a href="/admindocs/views/django.contrib.admin.sites.AdminSite.index/">/admin/</a></h3>',
+            html=True
+        )
+
     def test_view_detail(self):
         url = reverse('django-admindocs-views-detail', args=['django.contrib.admindocs.views.BaseAdminDocsView'])
         response = self.client.get(url)
@@ -102,6 +115,14 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
         self.assertNotIn("urlpatterns_reverse.nonimported_module", sys.modules)
+
+    def test_view_detail_as_method(self):
+        """
+        Views that are methods can be displayed.
+        """
+        url = reverse('django-admindocs-views-detail', args=['django.contrib.admin.sites.AdminSite.index'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200 if six.PY3 else 404)
 
     def test_model_index(self):
         response = self.client.get(reverse('django-admindocs-models-index'))
