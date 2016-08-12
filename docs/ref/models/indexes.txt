@@ -34,6 +34,25 @@ options`_.
 
 A list of the name of the fields on which the index is desired.
 
+By default the indexes are created with an ascending order for all the columns.
+To define an index with a descending order for a particular column, a hyphen
+(-) can be added before the field's name while defining the index.
+
+For example::
+
+    Index(fields=['headline', '-pub_date'], name='headline_pub_date_reverse_idx')
+
+The above index would issue an SQL with ``(headline, pub_date DESC)``. This is
+supported only for PostgreSQL, Oracle and SQLite. Databases that don't
+support defining ordering on index columns simply ignore the ``ASC/DESC``
+keywords in the executed SQL.
+
+  .. admonition:: Support for column ordering on SQLite
+
+    Column ordering is supported by SQLite only for versions>=3.3.0 and some
+    database file formats. Please refer the `official docs
+    <https://www.sqlite.org/lang_createindex.html>`_ of SQLite for specifics.
+
 ``name``
 --------
 

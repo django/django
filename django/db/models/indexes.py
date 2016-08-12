@@ -17,6 +17,8 @@ class Index(object):
         if not fields:
             raise ValueError('At least one field is required to define an index.')
         self.fields = fields
+        # A list of 2-tuple with the name and ordering (DESC for reverse) of the field
+        self.fields_orders = [(f[1:], 'DESC') if f.startswith('-') else (f, '') for f in self.fields]
         self.name = name or ''
         if self.name:
             errors = self.check_name()
@@ -38,15 +40,15 @@ class Index(object):
         return errors
 
     def create_sql(self, model, schema_editor):
-        fields = [model._meta.get_field(field) for field in self.fields]
+        fields = [model._meta.get_field(fo[0]) for fo in self.fields_orders]
         tablespace_sql = schema_editor._get_index_tablespace_sql(model, fields)
-        columns = [field.column for field in fields]
 
         quote_name = schema_editor.quote_name
+        columns = [('%s %s' % (quote_name(f.column), fo[1])).strip() for f, fo in zip(fields, self.fields_orders)]
         return schema_editor.sql_create_index % {
             'table': quote_name(model._meta.db_table),
             'name': quote_name(self.name),
-            'columns': ', '.join(quote_name(column) for column in columns),
+            'columns': ', '.join(columns),
             'extra': tablespace_sql,
         }
 
@@ -82,8 +84,11 @@ class Index(object):
         fit its size by truncating the excess length.
         """
         table_name = model._meta.db_table
-        column_names = [model._meta.get_field(field).column for field in self.fields]
-        hash_data = [table_name] + column_names + [self.suffix]
+        column_names = [model._meta.get_field(fo[0]).column for fo in self.fields_orders]
+        column_names_with_order = [
+            (('-%s' if fo[1] else '%s') % cn) for cn, fo in zip(column_names, self.fields_orders)
+        ]
+        hash_data = [table_name] + column_names_with_order + [self.suffix]
         self.name = '%s_%s_%s' % (
             table_name[:11],
             column_names[0][:7],

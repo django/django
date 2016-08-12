@@ -182,6 +182,18 @@ class IntrospectionTests(TransactionTestCase):
         self.assertNotIn('first_name', indexes)
         self.assertIn('id', indexes)
 
+    @skipUnlessDBFeature('supports_index_column_ordering')
+    def test_get_constraints_indexes_orders(self):
+        """
+        Indexes should have the "orders" key.
+        """
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(cursor, Article._meta.db_table)
+        for key, val in constraints.items():
+            if val['index'] and not (val['primary_key'] or val['unique']):
+                self.assertIn('orders', val)
+                self.assertEqual(len(val['columns']), len(val['orders']))
+
 
 def datatype(dbtype, description):
     """Helper to convert a data type into a string."""

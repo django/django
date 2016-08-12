@@ -255,6 +255,18 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                         "index": True,
                     }
                 constraints[index]['columns'].append(column)
+            # Add column orders for indexes
+            if constraints[index]['index'] and not constraints[index]['unique']:
+                cursor.execute(
+                    "SELECT sql FROM sqlite_master "
+                    "WHERE type='index' AND name=%s" % self.connection.ops.quote_name(index)
+                )
+                orders = []
+                # There would be only 1 row to loop over
+                for sql, in cursor.fetchall():
+                    order_info = sql.split('(')[-1].split(')')[0].split(',')
+                    orders = ['DESC' if info.endswith('DESC') else 'ASC' for info in order_info]
+                constraints[index]['orders'] = orders
         # Get the PK
         pk_column = self.get_primary_key_column(cursor, table_name)
         if pk_column:
