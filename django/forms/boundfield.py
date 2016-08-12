@@ -16,9 +16,6 @@ from django.utils.translation import ugettext_lazy as _
 __all__ = ('BoundField',)
 
 
-UNSET = object()
-
-
 @html_safe
 @python_2_unicode_compatible
 class BoundField(object):
@@ -35,7 +32,6 @@ class BoundField(object):
         else:
             self.label = self.field.label
         self.help_text = field.help_text or ''
-        self._initial_value = UNSET
 
     def __str__(self):
         """Renders this field as an HTML widget."""
@@ -220,20 +216,16 @@ class BoundField(object):
         id_ = widget.attrs.get('id') or self.auto_id
         return widget.id_for_label(id_)
 
-    @property
+    @cached_property
     def initial(self):
         data = self.form.initial.get(self.name, self.field.initial)
         if callable(data):
-            if self._initial_value is not UNSET:
-                data = self._initial_value
-            else:
-                data = data()
-                # If this is an auto-generated default date, nix the
-                # microseconds for standardized handling. See #22502.
-                if (isinstance(data, (datetime.datetime, datetime.time)) and
-                        not self.field.widget.supports_microseconds):
-                    data = data.replace(microsecond=0)
-                self._initial_value = data
+            data = data()
+            # If this is an auto-generated default date, nix the microseconds
+            # for standardized handling. See #22502.
+            if (isinstance(data, (datetime.datetime, datetime.time)) and
+                    not self.field.widget.supports_microseconds):
+                data = data.replace(microsecond=0)
         return data
 
     def build_widget_attrs(self, attrs, widget=None):
