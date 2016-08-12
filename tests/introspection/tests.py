@@ -170,6 +170,9 @@ class IntrospectionTests(TransactionTestCase):
     def test_get_indexes(self):
         with connection.cursor() as cursor:
             indexes = connection.introspection.get_indexes(cursor, Article._meta.db_table)
+        if connection.features.can_introspect_index_type:
+            index_type = indexes['reporter_id'].pop('type', None)
+            self.assertEqual(index_type, 'btree')
         self.assertEqual(indexes['reporter_id'], {'unique': False, 'primary_key': False})
 
     def test_get_indexes_multicol(self):

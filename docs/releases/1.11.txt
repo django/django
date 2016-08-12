@@ -311,6 +311,10 @@ Database backend API
 * To enable ``FOR UPDATE SKIP LOCKED`` support, set
   ``DatabaseFeatures.has_select_for_update_skip_locked = True``.
 
+* The  ``DatabaseFeatures.can_introspect_index_type`` flag was added. Set it to
+  ``True`` if the backend can introspect the type (``btree``, ``gin``) of an
+  index.
+
 Dropped support for PostgreSQL 9.2 and PostGIS 2.0
 --------------------------------------------------
 

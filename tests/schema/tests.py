@@ -1779,6 +1779,7 @@ class SchemaTests(TransactionTestCase):
                 editor.sql_create_index % {
                     "table": editor.quote_name(table),
                     "name": editor.quote_name(constraint_name),
+                    "using": "",
                     "columns": editor.quote_name(column),
                     "extra": "",
                 }

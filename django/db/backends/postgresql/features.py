@@ -22,6 +22,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_introspect_autofield = True
     can_introspect_ip_address_field = True
     can_introspect_small_integer_field = True
+    can_introspect_index_type = True
     can_distinct_on_fields = True
     can_rollback_ddl = True
     supports_combined_alters = True

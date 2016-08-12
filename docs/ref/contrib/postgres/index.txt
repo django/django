@@ -35,6 +35,7 @@ release. Some fields require higher versions.
     fields
     forms
     functions
+    indexes
     lookups
     operations
     search
