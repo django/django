@@ -84,6 +84,12 @@ class CacheHandler(object):
     def all(self):
         return getattr(self._caches, 'caches', {}).values()
 
+    def get(self, alias, default=DEFAULT_CACHE_ALIAS):
+        try:
+            return self[alias]
+        except InvalidCacheBackendError:
+            return self[default]
+
 caches = CacheHandler()
 
 
