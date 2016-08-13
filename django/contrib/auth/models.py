@@ -280,10 +280,7 @@ class PermissionsMixin(models.Model):
         object is passed, it checks if the user has all required perms for this
         object.
         """
-        for perm in perm_list:
-            if not self.has_perm(perm, obj):
-                return False
-        return True
+        return all(self.has_perm(perm, obj) for perm in perm_list)
 
     def has_module_perms(self, app_label):
         """
