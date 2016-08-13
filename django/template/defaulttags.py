@@ -189,10 +189,6 @@ class ForNode(Node):
                 if unpack:
                     # If there are multiple loop variables, unpack the item into
                     # them.
-
-                    # To complete this deprecation, remove from here to the
-                    # try/except block as well as the try/except itself,
-                    # leaving `unpacked_vars = ...` and the "else" statements.
                     if not isinstance(item, (list, tuple)):
                         len_item = 1
                     else:
@@ -203,13 +199,9 @@ class ForNode(Node):
                             "Need {} values to unpack in for loop; got {}. "
                             .format(num_loopvars, len_item),
                         )
-                    try:
-                        unpacked_vars = dict(zip(self.loopvars, item))
-                    except TypeError:
-                        pass
-                    else:
-                        pop_context = True
-                        context.update(unpacked_vars)
+                    unpacked_vars = dict(zip(self.loopvars, item))
+                    pop_context = True
+                    context.update(unpacked_vars)
                 else:
                     context[self.loopvars[0]] = item
 
