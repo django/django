@@ -270,7 +270,7 @@ Tests
   keyword arguments passed to the test runner.
 
 * Added the :option:`test --debug-mode` option to help troubleshoot test
-  test failures by setting the :setting:`DEBUG` setting to ``True``.
+  failures by setting the :setting:`DEBUG` setting to ``True``.
 
 URLs
 ~~~~
