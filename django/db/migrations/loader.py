@@ -6,6 +6,7 @@ from importlib import import_module
 
 from django.apps import apps
 from django.conf import settings
+from django.db.migrations.exceptions import MigrationSchemaMissing
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
 from django.utils import six
@@ -273,7 +274,12 @@ class MigrationLoader(object):
         unapplied dependencies.
         """
         recorder = MigrationRecorder(connection)
-        applied = recorder.applied_migrations()
+        try:
+            applied = recorder.applied_migrations()
+        except MigrationSchemaMissing:
+            # If the django_migrations table is missing and cannot be created,
+            # skip checking for consistent history because there is no history.
+            return
         for migration in applied:
             # If the migration is unknown, skip it.
             if migration not in self.graph.nodes:
