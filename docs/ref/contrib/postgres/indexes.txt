@@ -17,7 +17,10 @@ available from the ``django.contrib.postgres.indexes`` module.
     Creates a `gin index
     <https://www.postgresql.org/docs/current/static/gin.html>`_.
 
-    To use this index, you need to activate the `btree_gin extension
+    To use this index on data types not supported by the `built-in operator
+    classes
+    <https://www.postgresql.org/docs/current/static/gin-builtin-opclasses.html>`_
+    you need to activate the `btree_gin extension
     <https://www.postgresql.org/docs/current/static/btree-gin.html>`_ on
     PostgreSQL. You can install it using the
     :class:`~django.contrib.postgres.operations.BtreeGinExtension` migration
