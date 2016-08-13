@@ -36,10 +36,7 @@ class CacheNode(Node):
             except InvalidCacheBackendError:
                 raise TemplateSyntaxError('Invalid cache name specified for cache tag: %r' % cache_name)
         else:
-            try:
-                fragment_cache = caches['template_fragments']
-            except InvalidCacheBackendError:
-                fragment_cache = caches['default']
+            fragment_cache = caches.get('template_fragments')
 
         vary_on = [var.resolve(context) for var in self.vary_on]
         cache_key = make_template_fragment_key(self.fragment_name, vary_on)
