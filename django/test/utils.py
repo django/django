@@ -15,7 +15,6 @@ from django.core import mail
 from django.core.signals import request_started
 from django.db import reset_queries
 from django.db.models.options import Options
-from django.http import request
 from django.template import Template
 from django.test.signals import setting_changed, template_rendered
 from django.urls import get_script_prefix, set_script_prefix
@@ -23,6 +22,12 @@ from django.utils import six
 from django.utils.decorators import available_attrs
 from django.utils.encoding import force_str
 from django.utils.translation import deactivate
+
+try:
+    from types import SimpleNamespace
+except ImportError:  # Python < 3.3
+    class SimpleNamespace(object):
+        pass
 
 try:
     import jinja2
@@ -94,7 +99,7 @@ def instrumented_test_render(self, context):
     return self.nodelist.render(context)
 
 
-class _SavedSettings(object):
+class _TestState(object):
     pass
 
 
@@ -103,7 +108,7 @@ def setup_test_environment(debug=None):
     Perform global pre-test setup, such as installing the instrumented template
     renderer and setting the email backend to the locmem email backend.
     """
-    if hasattr(_SavedSettings, 'debug'):
+    if hasattr(_TestState, 'saved_data'):
         # Executing this function twice would overwrite the saved values.
         raise RuntimeError(
             "setup_test_environment() was already called and can't be called "
@@ -113,21 +118,22 @@ def setup_test_environment(debug=None):
     if debug is None:
         debug = settings.DEBUG
 
-    _SavedSettings.debug = settings.DEBUG
-    settings.DEBUG = debug
+    # Use an object that creates new attributes on assignment.
+    saved_data = SimpleNamespace()
+    _TestState.saved_data = saved_data
 
-    Template._original_render = Template._render
-    Template._render = instrumented_test_render
-
-    # Storing previous values in the settings module itself is problematic.
-    # Store them in arbitrary (but related) modules instead. See #20636.
-
-    mail._original_email_backend = settings.EMAIL_BACKEND
-    settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
-
-    request._original_allowed_hosts = settings.ALLOWED_HOSTS
+    saved_data.allowed_hosts = settings.ALLOWED_HOSTS
     # Add the default host of the test client.
     settings.ALLOWED_HOSTS = settings.ALLOWED_HOSTS + ['testserver']
+
+    saved_data.debug = settings.DEBUG
+    settings.DEBUG = debug
+
+    saved_data.email_backend = settings.EMAIL_BACKEND
+    settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+
+    saved_data.template_render = Template._render
+    Template._render = instrumented_test_render
 
     mail.outbox = []
 
@@ -139,18 +145,14 @@ def teardown_test_environment():
     Perform any global post-test teardown, such as restoring the original
     template renderer and restoring the email sending functions.
     """
-    settings.DEBUG = _SavedSettings.debug
-    del _SavedSettings.debug
+    saved_data = _TestState.saved_data
 
-    Template._render = Template._original_render
-    del Template._original_render
+    settings.ALLOWED_HOSTS = saved_data.allowed_hosts
+    settings.DEBUG = saved_data.debug
+    settings.EMAIL_BACKEND = saved_data.email_backend
+    Template._render = saved_data.template_render
 
-    settings.EMAIL_BACKEND = mail._original_email_backend
-    del mail._original_email_backend
-
-    settings.ALLOWED_HOSTS = request._original_allowed_hosts
-    del request._original_allowed_hosts
-
+    del _TestState.saved_data
     del mail.outbox
 
 
