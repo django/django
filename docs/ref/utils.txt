@@ -868,6 +868,26 @@ appropriate entities.
 .. module:: django.utils.text
     :synopsis: Text manipulation.
 
+.. function:: format_lazy(format_string, *args, **kwargs)
+
+    .. versionadded:: 1.11
+
+    A version of :meth:`str.format` for when ``format_string``, ``args``,
+    and/or ``kwargs`` contain lazy objects. The first argument is the string to
+    be formatted. For example::
+
+        from django.utils.text import format_lazy
+        from django.utils.translation import pgettext_lazy
+
+        urlpatterns = [
+            url(format_lazy(r'{person}/(?P<pk>\d+)/$', person=pgettext_lazy('URL', 'person')),
+                PersonDetailView.as_view()),
+        ]
+
+    This example allows translators to translate part of the URL. If "person"
+    is translated to "persona", the regular expression will match
+    ``persona/(?P<pk>\d+)/$``, e.g. ``persona/5/``.
+
 .. function:: slugify(allow_unicode=False)
 
     Converts to ASCII if ``allow_unicode`` is ``False`` (default). Converts spaces to
