@@ -22,6 +22,13 @@ class IndexesTests(TestCase):
         self.assertEqual(index, same_index)
         self.assertNotEqual(index, another_index)
 
+    def test_index_fields_type(self):
+        index = models.Index(fields=('title', ))
+        self.assertEqual(index.fields, ['title'])
+        msg = 'Index.fields must be a list or tuple.'
+        with self.assertRaisesMessage(ValueError, msg):
+            models.Index(fields='title')
+
     def test_raises_error_without_field(self):
         msg = 'At least one field is required to define an index.'
         with self.assertRaisesMessage(ValueError, msg):

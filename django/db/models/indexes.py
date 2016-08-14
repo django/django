@@ -14,9 +14,11 @@ class Index(object):
     suffix = 'idx'
 
     def __init__(self, fields=[], name=None):
+        if not isinstance(fields, (list, tuple)):
+            raise ValueError('Index.fields must be a list or tuple.')
         if not fields:
             raise ValueError('At least one field is required to define an index.')
-        self.fields = fields
+        self.fields = list(fields)
         # A list of 2-tuple with the field name and ordering ('' or 'DESC').
         self.fields_orders = [
             (field_name[1:], 'DESC') if field_name.startswith('-') else (field_name, '')
