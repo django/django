@@ -55,8 +55,12 @@ class CommandTests(SimpleTestCase):
         """
         with self.assertRaises(CommandError):
             management.call_command('dance', example="raise")
-        with captured_stderr() as stderr, self.assertRaises(SystemExit):
-            management.ManagementUtility(['manage.py', 'dance', '--example=raise']).execute()
+        dance.Command.requires_system_checks = False
+        try:
+            with captured_stderr() as stderr, self.assertRaises(SystemExit):
+                management.ManagementUtility(['manage.py', 'dance', '--example=raise']).execute()
+        finally:
+            dance.Command.requires_system_checks = True
         self.assertIn("CommandError", stderr.getvalue())
 
     def test_deactivate_locale_set(self):
