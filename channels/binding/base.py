@@ -104,7 +104,7 @@ class Binding(object):
     @classmethod
     def delete_receiver(cls, instance, **kwargs):
         """
-        Entry point for triggering the binding from save signals.
+        Entry point for triggering the binding from delete signals.
         """
         cls.trigger_outbound(instance, "delete")
 
