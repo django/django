@@ -108,7 +108,7 @@ def geos_version_info():
     is a release candidate (and what number release candidate), and the C API
     version.
     """
-    ver = geos_version()
+    ver = geos_version().split(' ')[0]
     m = version_regex.match(ver)
     if not m: raise GEOSException('Could not parse version info string "%s"' % ver)
     return dict((key, m.group(key)) for key in ('version', 'release_candidate', 'capi_version', 'major', 'minor', 'subminor'))
