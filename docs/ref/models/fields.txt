@@ -207,20 +207,20 @@ support tablespaces for indexes, this option is ignored.
 The default value for the field. This can be a value or a callable object. If
 callable it will be called every time a new object is created.
 
-The default cannot be a mutable object (model instance, list, set, etc.), as a
-reference to the same instance of that object would be used as the default
+The default can't be a mutable object (model instance, ``list``, ``set``, etc.),
+as a reference to the same instance of that object would be used as the default
 value in all new model instances. Instead, wrap the desired default in a
-callable.  For example, if you had a custom ``JSONField`` and wanted to specify
-a dictionary as the default, use a function as follows::
+callable. For example, if you want to specify a default ``dict`` for
+:class:`~django.contrib.postgres.fields.JSONField`, use a function::
 
     def contact_default():
         return {"email": "to1@example.com"}
 
     contact_info = JSONField("ContactInfo", default=contact_default)
 
-Note that ``lambda``\s cannot be used for field options like ``default``
-because they cannot be :ref:`serialized by migrations <migration-serializing>`.
-See that documentation for other caveats.
+``lambda``\s can't be used for field options like ``default`` because they
+can't be :ref:`serialized by migrations <migration-serializing>`. See that
+documentation for other caveats.
 
 For fields like :class:`ForeignKey` that map to model instances, defaults
 should be the value of the field they reference (``pk`` unless
