@@ -15,7 +15,7 @@ from django.core.signals import setting_changed
 from django.dispatch import receiver
 from django.utils.safestring import SafeData, mark_safe
 
-from . import LANGUAGE_SESSION_KEY, to_language, to_locale
+from . import to_language, to_locale
 
 # Translations are cached in a dictionary for every language.
 # The active translations are stored by threadid to make them thread local.
@@ -456,14 +456,9 @@ def get_language_from_request(request, check_path=False):
         if lang_code is not None:
             return lang_code
 
-    supported_lang_codes = get_languages()
-
-    if hasattr(request, 'session'):
-        lang_code = request.session.get(LANGUAGE_SESSION_KEY)
-        if lang_code in supported_lang_codes and lang_code is not None and check_for_language(lang_code):
-            return lang_code
-
     lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
+    if lang_code is not None and lang_code in get_languages() and check_for_language(lang_code):
+        return lang_code
 
     try:
         return get_supported_language_variant(lang_code)

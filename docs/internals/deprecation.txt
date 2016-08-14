@@ -24,6 +24,9 @@ details on these changes.
   ``ugettext_noop()``, ``ungettext()``, and ``ungettext_lazy()`` will be
   removed.
 
+* ``django.views.i18n.set_language()`` will no longer set the user language in
+  ``request.session`` (key ``django.utils.translation.LANGUAGE_SESSION_KEY``).
+
 .. _deprecation-removed-in-3.1:
 
 3.1

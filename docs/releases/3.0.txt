@@ -302,6 +302,11 @@ Miscellaneous
 * ``ContentType.__str__()`` now includes the model's ``app_label`` to
   disambiguate model's with the same name in different apps.
 
+* Because accessing the language in the session rather than in the cookie is
+  deprecated, ``LocaleMiddleware`` no longer looks for the user's language in
+  the session and :func:`django.contrib.auth.logout` no longer preserves the
+  session's language after logout.
+
 .. _deprecated-features-3.0:
 
 Features deprecated in 3.0
@@ -331,6 +336,11 @@ Miscellaneous
   :func:`~django.utils.translation.gettext_noop`,
   :func:`~django.utils.translation.ngettext`, and
   :func:`~django.utils.translation.ngettext_lazy`.
+
+* To limit creation of sessions and hence favor some caching strategies,
+  :func:`django.views.i18n.set_language` will stop setting the user's language
+  in the session in Django 4.0. Since Django 2.1, the language is always stored
+  in the :setting:`LANGUAGE_COOKIE_NAME` cookie.
 
 .. _removed-features-3.0:
 

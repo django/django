@@ -47,6 +47,8 @@ def set_language(request):
                 if next_trans != next:
                     response = HttpResponseRedirect(next_trans)
             if hasattr(request, 'session'):
+                # Storing the language in the session is deprecated.
+                # (RemovedInDjango40Warning)
                 request.session[LANGUAGE_SESSION_KEY] = lang_code
             response.set_cookie(
                 settings.LANGUAGE_COOKIE_NAME, lang_code,

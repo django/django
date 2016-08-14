@@ -1106,3 +1106,8 @@ functions without the ``u``.
 
     Session key under which the active language for the current session is
     stored.
+
+    .. deprecated:: 3.0
+
+        The language won't be stored in the session in Django 4.0. Use the
+        :setting:`LANGUAGE_COOKIE_NAME` cookie instead.

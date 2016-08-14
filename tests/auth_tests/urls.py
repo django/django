@@ -9,6 +9,7 @@ from django.shortcuts import render
 from django.template import RequestContext, Template
 from django.urls import path, re_path, reverse_lazy
 from django.views.decorators.cache import never_cache
+from django.views.i18n import set_language
 
 
 class CustomRequestAuthenticationForm(AuthenticationForm):
@@ -148,6 +149,7 @@ urlpatterns = auth_urlpatterns + [
     path('permission_required_exception/', permission_required_exception),
     path('login_and_permission_required_exception/', login_and_permission_required_exception),
 
+    path('setlang/', set_language, name='set_language'),
     # This line is only required to render the password reset with is_admin=True
     path('admin/', admin.site.urls),
 ]
