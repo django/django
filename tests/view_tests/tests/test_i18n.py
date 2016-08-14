@@ -14,7 +14,9 @@ from django.test.utils import ignore_warnings
 from django.urls import reverse
 from django.utils import six
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, get_language, override,
 )
@@ -31,6 +33,7 @@ class I18NTests(TestCase):
         current_language = get_language()
         return [code for code, name in settings.LANGUAGES if not code == current_language][0]
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_setlang(self):
         """
         The set_language view can be used to change the session language.
@@ -41,8 +44,15 @@ class I18NTests(TestCase):
         post_data = dict(language=lang_code, next='/')
         response = self.client.post('/i18n/setlang/', post_data, HTTP_REFERER='/i_should_not_be_used/')
         self.assertRedirects(response, '/')
+        # Session assertion removed in Django 2.1
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        language_cookie = self.client.cookies[settings.LANGUAGE_COOKIE_NAME]
+        self.assertEqual(language_cookie.value, lang_code)
+        self.assertEqual(language_cookie['domain'], '')
+        self.assertEqual(language_cookie['path'], '/')
+        self.assertEqual(language_cookie['max-age'], '')
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_setlang_unsafe_next(self):
         """
         The set_language view only redirects to the 'next' argument if it is
@@ -52,8 +62,11 @@ class I18NTests(TestCase):
         post_data = dict(language=lang_code, next='//unsafe/redirection/')
         response = self.client.post('/i18n/setlang/', data=post_data)
         self.assertEqual(response.url, '/')
+        # Session assertion removed in Django 2.1
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_setlang_redirect_to_referer(self):
         """
         The set_language view redirects to the URL in the referer header when
@@ -63,8 +76,11 @@ class I18NTests(TestCase):
         post_data = dict(language=lang_code)
         response = self.client.post('/i18n/setlang/', post_data, HTTP_REFERER='/i18n/')
         self.assertRedirects(response, '/i18n/', fetch_redirect_response=False)
+        # Session assertion removed in Django 2.1
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_setlang_default_redirect(self):
         """
         The set_language view redirects to '/' when there isn't a referer or
@@ -74,8 +90,11 @@ class I18NTests(TestCase):
         post_data = dict(language=lang_code)
         response = self.client.post('/i18n/setlang/', post_data)
         self.assertRedirects(response, '/')
+        # Session assertion removed in Django 2.1
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_setlang_performs_redirect_for_ajax_if_explicitly_requested(self):
         """
         The set_language view redirects to the "next" parameter for AJAX calls.
@@ -84,8 +103,11 @@ class I18NTests(TestCase):
         post_data = dict(language=lang_code, next='/')
         response = self.client.post('/i18n/setlang/', post_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertRedirects(response, '/')
+        # Session assertion removed in Django 2.1
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_setlang_doesnt_perform_a_redirect_to_referer_for_ajax(self):
         """
         The set_language view doesn't redirect to the HTTP referer header for
@@ -96,8 +118,11 @@ class I18NTests(TestCase):
         headers = {'HTTP_REFERER': '/', 'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
         response = self.client.post('/i18n/setlang/', post_data, **headers)
         self.assertEqual(response.status_code, 204)
+        # Session assertion removed in Django 2.1
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_setlang_doesnt_perform_a_default_redirect_for_ajax(self):
         """
         The set_language view returns 204 for AJAX calls by default.
@@ -106,8 +131,11 @@ class I18NTests(TestCase):
         post_data = dict(language=lang_code)
         response = self.client.post('/i18n/setlang/', post_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, 204)
+        # Session assertion removed in Django 2.1
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_setlang_unsafe_next_for_ajax(self):
         """
         The fallback to root URL for the set_language view works for AJAX calls.
@@ -116,7 +144,9 @@ class I18NTests(TestCase):
         post_data = dict(language=lang_code, next='//unsafe/redirection/')
         response = self.client.post('/i18n/setlang/', post_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.url, '/')
+        # Session assertion removed in Django 2.1
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
 
     def test_setlang_reversal(self):
         self.assertEqual(reverse('set_language'), '/i18n/setlang/')
@@ -161,6 +191,7 @@ class I18NTests(TestCase):
             self.assertEqual(language_cookie['path'], '/test/')
             self.assertEqual(language_cookie['max-age'], 3600 * 7 * 2)
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_setlang_decodes_http_referer_url(self):
         """
         The set_language view decodes the HTTP_REFERER URL.
@@ -171,17 +202,22 @@ class I18NTests(TestCase):
         encoded_url = '/test-setlang/%C3%A4/'  # (%C3%A4 decodes to ä)
         response = self.client.post('/i18n/setlang/', {'language': lang_code}, HTTP_REFERER=encoded_url)
         self.assertRedirects(response, encoded_url, fetch_redirect_response=False)
+        # Session assertion removed in Django 2.1
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
 
     @modify_settings(MIDDLEWARE={
         'append': 'django.middleware.locale.LocaleMiddleware',
     })
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_lang_from_translated_i18n_pattern(self):
         response = self.client.post(
             '/i18n/setlang/', data={'language': 'nl'},
             follow=True, HTTP_REFERER='/en/translated/'
         )
+        # Session assertion removed in Django 2.1
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'nl')
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, 'nl')
         self.assertRedirects(response, '/nl/vertaald/')
         # And reverse
         response = self.client.post(
@@ -191,6 +227,7 @@ class I18NTests(TestCase):
         self.assertRedirects(response, '/en/translated/')
 
     @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango21Warning)
     @override_settings(
         MIDDLEWARE=None,
         MIDDLEWARE_CLASSES=[
@@ -203,7 +240,9 @@ class I18NTests(TestCase):
             '/i18n/setlang/', data={'language': 'nl'},
             follow=True, HTTP_REFERER='/en/translated/'
         )
+        # Session assertion removed in Django 2.1
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'nl')
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, 'nl')
         self.assertRedirects(response, '/nl/vertaald/')
         # And reverse
         response = self.client.post(

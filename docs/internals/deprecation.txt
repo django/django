@@ -25,6 +25,9 @@ details on these changes.
 
 * ``django.test.runner.setup_databases()`` will be removed.
 
+* Setting and checking the user language in ``request.session`` (key
+  ``django.utils.translation.LANGUAGE_SESSION_KEY``) will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

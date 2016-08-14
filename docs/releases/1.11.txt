@@ -439,3 +439,7 @@ Miscellaneous
 
 * ``django.test.runner.setup_databases()`` is moved to
   :func:`django.test.utils.setup_databases`. The old location is deprecated.
+
+* Django stopped checking the current user language in
+  ``request.session[django.utils.translation.LANGUAGE_SESSION_KEY]`` and only
+  uses the :setting:`LANGUAGE_COOKIE_NAME` cookie for that purpose.
