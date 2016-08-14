@@ -6,6 +6,7 @@ import json
 from django.test import SimpleTestCase
 from django.utils import six, text
 from django.utils.functional import lazystr
+from django.utils.text import format_lazy
 from django.utils.translation import override
 
 IS_WIDE_BUILD = (len('\U0001F4A9') == 1)
@@ -225,3 +226,17 @@ class TestUtilsText(SimpleTestCase):
         out = text.compress_sequence(seq)
         compressed_length = len(b''.join(out))
         self.assertTrue(compressed_length < actual_length)
+
+    def test_format_lazy(self):
+        """
+        Test the format_lazy function
+        """
+        self.assertEqual('django/test', six.text_type(format_lazy('{}/{}', 'django', 'test')))
+        self.assertEqual('django/test', six.text_type(format_lazy('{0}/{1}', *('django', 'test'))))
+        self.assertEqual('django/test', six.text_type(format_lazy('{a}/{b}', **{'a': 'django', 'b': 'test'})))
+        self.assertEqual('django/test', six.text_type(format_lazy('{a[0]}/{a[1]}', a=('django', 'test'))))
+
+        t = {}
+        s = format_lazy('{0[a]}-{p[a]}', t, p=t)
+        t['a'] = 'django'
+        self.assertEqual('django-django', six.text_type(s))

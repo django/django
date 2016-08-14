@@ -888,6 +888,32 @@ appropriate entities.
 
     If ``value`` is ``"你好 World"``, the output will be ``"你好-world"``.
 
+.. function:: format_lazy(format, *args, **kwargs)
+
+    .. versionadded:: 1.11
+
+    Lazy version of string format, useful when args and/or kwargs contains
+    lazy objects. First argument should be the string to be formatted.
+    For example::
+
+        from django.utils.text import format_lazy
+        from django.utils.translation import pgettext_lazy
+        ...
+        t = {
+            'auction': pgettext_lazy('Url', 'auction'),
+            'star': pgettext_lazy('Url', 'star')
+        }
+
+        urlpatterns = [
+            url(format_lazy(r'{auction}/(?P<pk>\d+)/{star}/$', **t),
+                StarAuction.as_view()
+            )
+        ]
+
+    Syntax is similar to the standard Python str.format() method
+    (see https://docs.python.org/3/library/string.html#formatstrings for
+    documentation and examples).
+
 .. _time-zone-selection-functions:
 
 ``django.utils.timezone``
