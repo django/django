@@ -54,7 +54,7 @@ class CommandTests(SimpleTestCase):
             call_command, but SystemExit when run from command line
         """
         with self.assertRaises(CommandError):
-            management.call_command('dance', example="raise")
+            management.call_command('dance', skip_checks=True, example="raise")
         with captured_stderr() as stderr, self.assertRaises(SystemExit):
             management.ManagementUtility(['manage.py', 'dance', '--example=raise']).execute()
         self.assertIn("CommandError", stderr.getvalue())
