@@ -212,7 +212,8 @@ callable it will be called every time a new object is created.
 The default cannot be a mutable object (model instance, list, set, etc.), as a
 reference to the same instance of that object would be used as the default
 value in all new model instances. Instead, wrap the desired default in a
-callable.  For example, if you had a custom ``JSONField`` and wanted to specify
+callable.  For example, if you had a custom
+:class:`~django.contrib.postgres.fields.JSONField` and wanted to specify
 a dictionary as the default, use a function as follows::
 
     def contact_default():
