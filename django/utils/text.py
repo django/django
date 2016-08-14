@@ -7,7 +7,7 @@ from io import BytesIO
 
 from django.utils import six
 from django.utils.encoding import force_text
-from django.utils.functional import SimpleLazyObject, keep_lazy, keep_lazy_text
+from django.utils.functional import SimpleLazyObject, keep_lazy, keep_lazy_text, lazy
 from django.utils.safestring import SafeText, mark_safe
 from django.utils.six.moves import html_entities
 from django.utils.translation import pgettext, ugettext as _, ugettext_lazy
@@ -434,3 +434,17 @@ def camel_case_to_spaces(value):
     trailing whitespace.
     """
     return re_camel_case.sub(r' \1', value).strip().lower()
+
+
+def _format_lazy(string, *args, **kwargs):
+    """
+    Lazy variant of string format, useful when formatting strings with
+    1 or more lazy variables in args and/or kwargs
+    """
+    return force_text(
+        string.format(
+            *args,
+            **kwargs
+        )
+    )
+format_lazy = lazy(_format_lazy, six.text_type)
