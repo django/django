@@ -1246,6 +1246,21 @@ class ModelFormsetTest(TestCase):
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset.errors, [{'slug': ['Product with this Slug already exists.']}])
 
+    def test_inlineformset_unique_validation_with_arrayfield(self):
+        # call_command('migrate', 'postgres_tests', verbosity=0)
+        mapspotformset = inlineformset_factory(Map, MapSpot, can_delete=False, extra=3, fields="__all__")
+        data = {
+            'mapspot_set-TOTAL_FORMS': '3',  # the number of forms rendered
+            'mapspot_set-INITIAL_FORMS': '0',  # the number of forms with initial data
+            'mapspot_set-MAX_NUM_FORMS': '',  # the max number of forms
+            'mapspot_set-0-position': '10,20',
+            'mapspot_set-1-position': '10,20',
+            'mapspot_set-2-position': '30,40',
+        }
+        map_obj = Map.objects.create(name='SanFrancisco')
+        formset = mapspotformset(data, instance=map_obj)
+        self.assertEqual(formset.errors, [{}, {'__all__': ['Please correct the duplicate values below.']}, {}])
+
     def test_modelformset_validate_max_flag(self):
         # If validate_max is set and max_num is less than TOTAL_FORMS in the
         # data, then throw an exception. MAX_NUM_FORMS in the data is

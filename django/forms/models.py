@@ -673,8 +673,13 @@ class BaseModelFormSet(BaseFormSet):
                     for field in unique_check if field in form.cleaned_data
                 )
                 # Reduce Model instances to their primary key values
+                # row_data = tuple(d._get_pk_val() if hasattr(d, '_get_pk_val') else tuple(d)
+                #                   if type(d) is list else d for d in row_data)
+                print('row_data == ',row_data)
                 row_data = tuple(d._get_pk_val() if hasattr(d, '_get_pk_val') else d
                                  for d in row_data)
+                print('row_data == ',row_data)
+                print('seen_data == ',seen_data)
                 if row_data and None not in row_data:
                     # if we've already seen it then we have a uniqueness failure
                     if row_data in seen_data:

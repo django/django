@@ -182,6 +182,27 @@ class Migration(migrations.Migration):
             ]
         ),
         migrations.CreateModel(
+            name='Map',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=128)),
+            ],
+            options={
+                'indexes': [],
+            },
+        ),
+        migrations.CreateModel(
+            name='MapSpot',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('position', ArrayField(base_field=models.IntegerField(), size=2)),
+                ('map', models.ForeignKey(on_delete=models.CASCADE, to='postgres_tests.Map')),
+            ],
+            options={
+                'indexes': [],
+            },
+        ),
+        migrations.CreateModel(
             name='RangesModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
