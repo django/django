@@ -841,16 +841,16 @@ The default password change views included with Django,
 the session with the new password hash so that a user changing their own
 password won't log themselves out. If you have a custom password change view
 and wish to have similar behavior, use the :func:`update_session_auth_hash`
-function. In this case, however, if a user also wants to invalidate the session
-from which they're changing their password (for example, if they believe the
-session cookie on their machine was stolen), then they also need to log out
-that session.
+function.
 
 .. function:: update_session_auth_hash(request, user)
 
     This function takes the current request and the updated user object from
     which the new session hash will be derived and updates the session hash
-    appropriately. Example usage::
+    appropriately. It also rotates the session key so that a stolen session
+    cookie will be invalidated.
+
+    Example usage::
 
         from django.contrib.auth import update_session_auth_hash
 
@@ -862,6 +862,10 @@ that session.
                     update_session_auth_hash(request, form.user)
             else:
                 ...
+
+    .. versionchanged:: 1.11
+
+        Rotating of the session key was added.
 
 .. note::
 

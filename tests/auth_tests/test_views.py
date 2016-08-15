@@ -479,6 +479,7 @@ class SessionAuthenticationTests(AuthViewsTestCase):
         session auth hash after a password change so the session isn't logged out.
         """
         self.login()
+        original_session_key = self.client.session.session_key
         response = self.client.post('/password_change/', {
             'old_password': 'password',
             'new_password1': 'password1',
@@ -486,6 +487,8 @@ class SessionAuthenticationTests(AuthViewsTestCase):
         })
         # if the hash isn't updated, retrieving the redirection page will fail.
         self.assertRedirects(response, '/password_change/done/')
+        # The session key is rotated.
+        self.assertNotEqual(original_session_key, self.client.session.session_key)
 
 
 class LoginTest(AuthViewsTestCase):

@@ -84,6 +84,9 @@ Minor features
   :class:`~django.contrib.auth.views.PasswordResetConfirmView` allows
   automatically logging in a user after a successful password reset.
 
+* :func:`~django.contrib.auth.update_session_auth_hash` now rotates the session
+  key to allow a password change to invalidate stolen session cookies.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
