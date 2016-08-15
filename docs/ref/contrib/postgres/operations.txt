@@ -18,14 +18,22 @@ the ``django.contrib.postgres.operations`` module.
 
         This is a required argument. The name of the extension to be installed.
 
+``BtreeGinExtension``
+=====================
+
+.. class:: BtreeGinExtension()
+
+    .. versionadded:: 1.11
+
+    Install the ``btree_gin`` extension.
+
 ``HStoreExtension``
 ===================
 
 .. class:: HStoreExtension()
 
-    A subclass of :class:`~django.contrib.postgres.operations.CreateExtension`
-    which will install the ``hstore`` extension and also immediately set up the
-    connection to interpret hstore data.
+    Installs the ``hstore`` extension and also sets up the connection to
+    interpret hstore data for possible use in subsequent migrations.
 
 ``TrigramExtension``
 ====================
@@ -34,13 +42,11 @@ the ``django.contrib.postgres.operations`` module.
 
     .. versionadded:: 1.10
 
-    A subclass of :class:`~django.contrib.postgres.operations.CreateExtension`
-    that installs the ``pg_trgm`` extension.
+    Installs the ``pg_trgm`` extension.
 
 ``UnaccentExtension``
 =====================
 
 .. class:: UnaccentExtension()
 
-    A subclass of :class:`~django.contrib.postgres.operations.CreateExtension`
-    which will install the ``unaccent`` extension.
+    Installs the ``unaccent`` extension.

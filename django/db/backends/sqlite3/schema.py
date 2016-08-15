@@ -156,12 +156,20 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             for index in model._meta.index_together
         ]
 
+        indexes = model._meta.indexes
+        if delete_field:
+            indexes = [
+                index for index in indexes
+                if delete_field.name not in index.fields
+            ]
+
         # Construct a new model for the new state
         meta_contents = {
             'app_label': model._meta.app_label,
             'db_table': model._meta.db_table,
             'unique_together': unique_together,
             'index_together': index_together,
+            'indexes': indexes,
             'apps': apps,
         }
         meta = type("Meta", tuple(), meta_contents)

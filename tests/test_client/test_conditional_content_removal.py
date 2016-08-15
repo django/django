@@ -11,11 +11,8 @@ from django.test.client import conditional_content_removal
 # based on Python 3.3's gzip.compress
 def gzip_compress(data):
     buf = io.BytesIO()
-    f = gzip.GzipFile(fileobj=buf, mode='wb', compresslevel=0)
-    try:
+    with gzip.GzipFile(fileobj=buf, mode='wb', compresslevel=0) as f:
         f.write(data)
-    finally:
-        f.close()
     return buf.getvalue()
 
 

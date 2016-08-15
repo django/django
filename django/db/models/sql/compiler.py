@@ -1,14 +1,13 @@
 import re
 from itertools import chain
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import EmptyResultSet, FieldError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import OrderBy, Random, RawSQL, Ref
 from django.db.models.query_utils import QueryWrapper, select_related_descend
 from django.db.models.sql.constants import (
     CURSOR, GET_ITERATOR_CHUNK_SIZE, MULTI, NO_RESULTS, ORDER_DIR, SINGLE,
 )
-from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError
@@ -223,7 +222,12 @@ class SQLCompiler(object):
 
         ret = []
         for col, alias in select:
-            ret.append((col, self.compile(col, select_format=True), alias))
+            try:
+                sql, params = self.compile(col, select_format=True)
+            except EmptyResultSet:
+                # Select a predicate that's always False.
+                sql, params = '0', ()
+            ret.append((col, (sql, params), alias))
         return ret, klass_info, annotations
 
     def get_order_by(self):
@@ -441,13 +445,16 @@ class SQLCompiler(object):
                         "select_for_update cannot be used outside of a transaction."
                     )
 
-                # If we've been asked for a NOWAIT query but the backend does
-                # not support it, raise a DatabaseError otherwise we could get
-                # an unexpected deadlock.
                 nowait = self.query.select_for_update_nowait
+                skip_locked = self.query.select_for_update_skip_locked
+                # If we've been asked for a NOWAIT/SKIP LOCKED query but the
+                # backend does not support it, raise a DatabaseError otherwise
+                # we could get an unexpected deadlock.
                 if nowait and not self.connection.features.has_select_for_update_nowait:
                     raise DatabaseError('NOWAIT is not supported on this database backend.')
-                result.append(self.connection.ops.for_update_sql(nowait=nowait))
+                elif skip_locked and not self.connection.features.has_select_for_update_skip_locked:
+                    raise DatabaseError('SKIP LOCKED is not supported on this database backend.')
+                result.append(self.connection.ops.for_update_sql(nowait=nowait, skip_locked=skip_locked))
 
             return ' '.join(result), tuple(params)
         finally:

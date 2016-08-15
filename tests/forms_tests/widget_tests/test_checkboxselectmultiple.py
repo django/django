@@ -9,7 +9,7 @@ class CheckboxSelectMultipleTest(WidgetTest):
     def test_render_value(self):
         self.check_html(self.widget(choices=self.beatles), 'beatles', ['J'], html=(
             """<ul>
-            <li><label><input checked="checked" type="checkbox" name="beatles" value="J" /> John</label></li>
+            <li><label><input checked type="checkbox" name="beatles" value="J" /> John</label></li>
             <li><label><input type="checkbox" name="beatles" value="P" /> Paul</label></li>
             <li><label><input type="checkbox" name="beatles" value="G" /> George</label></li>
             <li><label><input type="checkbox" name="beatles" value="R" /> Ringo</label></li>
@@ -19,8 +19,8 @@ class CheckboxSelectMultipleTest(WidgetTest):
     def test_render_value_multiple(self):
         self.check_html(self.widget(choices=self.beatles), 'beatles', ['J', 'P'], html=(
             """<ul>
-            <li><label><input checked="checked" type="checkbox" name="beatles" value="J" /> John</label></li>
-            <li><label><input checked="checked" type="checkbox" name="beatles" value="P" /> Paul</label></li>
+            <li><label><input checked type="checkbox" name="beatles" value="J" /> John</label></li>
+            <li><label><input checked type="checkbox" name="beatles" value="P" /> Paul</label></li>
             <li><label><input type="checkbox" name="beatles" value="G" /> George</label></li>
             <li><label><input type="checkbox" name="beatles" value="R" /> Ringo</label></li>
             </ul>"""
@@ -53,7 +53,7 @@ class CheckboxSelectMultipleTest(WidgetTest):
         <li>Audio<ul id="media_1">
         <li>
         <label for="media_1_0">
-        <input checked="checked" id="media_1_0" name="nestchoice" type="checkbox" value="vinyl" /> Vinyl
+        <input checked id="media_1_0" name="nestchoice" type="checkbox" value="vinyl" /> Vinyl
         </label>
         </li>
         <li>
@@ -66,7 +66,7 @@ class CheckboxSelectMultipleTest(WidgetTest):
         </li>
         <li>
         <label for="media_2_1">
-        <input checked="checked" id="media_2_1" name="nestchoice" type="checkbox" value="dvd" /> DVD
+        <input checked id="media_2_1" name="nestchoice" type="checkbox" value="dvd" /> DVD
         </label>
         </li>
         </ul></li>
@@ -85,11 +85,11 @@ class CheckboxSelectMultipleTest(WidgetTest):
         html = """
         <ul id="abc">
         <li>
-        <label for="abc_0"><input checked="checked" type="checkbox" name="letters" value="a" id="abc_0" /> A</label>
+        <label for="abc_0"><input checked type="checkbox" name="letters" value="a" id="abc_0" /> A</label>
         </li>
         <li><label for="abc_1"><input type="checkbox" name="letters" value="b" id="abc_1" /> B</label></li>
         <li>
-        <label for="abc_2"><input checked="checked" type="checkbox" name="letters" value="c" id="abc_2" /> C</label>
+        <label for="abc_2"><input checked type="checkbox" name="letters" value="c" id="abc_2" /> C</label>
         </li>
         </ul>
         """
@@ -103,12 +103,20 @@ class CheckboxSelectMultipleTest(WidgetTest):
         html = """
         <ul id="abc">
         <li>
-        <label for="abc_0"><input checked="checked" type="checkbox" name="letters" value="a" id="abc_0" /> A</label>
+        <label for="abc_0"><input checked type="checkbox" name="letters" value="a" id="abc_0" /> A</label>
         </li>
         <li><label for="abc_1"><input type="checkbox" name="letters" value="b" id="abc_1" /> B</label></li>
         <li>
-        <label for="abc_2"><input checked="checked" type="checkbox" name="letters" value="c" id="abc_2" /> C</label>
+        <label for="abc_2"><input checked type="checkbox" name="letters" value="c" id="abc_2" /> C</label>
         </li>
         </ul>
         """
         self.check_html(widget, 'letters', ['a', 'c'], html=html)
+
+    def test_use_required_attribute(self):
+        widget = self.widget(choices=self.beatles)
+        # Always False because browser validation would require all checkboxes
+        # to be checked instead of at least one.
+        self.assertIs(widget.use_required_attribute(None), False)
+        self.assertIs(widget.use_required_attribute([]), False)
+        self.assertIs(widget.use_required_attribute(['J', 'P']), False)

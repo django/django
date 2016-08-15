@@ -154,22 +154,20 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
                 for obj_type, objs in collector.data.items():
                     if objs == {ct}:
                         continue
-                    ct_info.append('    - %s object%s of type %s.%s:' % (
+                    ct_info.append('    - %s %s object(s)' % (
                         len(objs),
-                        's' if len(objs) != 1 else '',
-                        obj_type._meta.app_label,
-                        obj_type._meta.model_name)
-                    )
+                        obj_type._meta.label,
+                    ))
 
             content_type_display = '\n'.join(ct_info)
             print("""Some content types in your database are stale and can be deleted.
-Any objects that depend on these content types will then also be deleted.
-The content types, and the dependent objects that would be deleted, are:
+Any objects that depend on these content types will also be deleted.
+The content types and dependent objects that would be deleted are:
 
 %s
 
-This list does not include data that might be in your database
-outside of Django's models.
+This list doesn't include any cascade deletions to data outside of Django's
+models (uncommon).
 
 Are you sure you want to delete these content types?
 If you're unsure, answer 'no'.
@@ -191,7 +189,6 @@ If you're unsure, answer 'no'.
 class NoFastDeleteCollector(Collector):
     def can_fast_delete(self, *args, **kwargs):
         """
-        We always want to load the objects into memory so that we can display
-        them to the user when asking confirmation.
+        Always load related objects to display them when showing confirmation.
         """
         return False

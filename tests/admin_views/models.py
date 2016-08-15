@@ -397,7 +397,7 @@ class Recommender(Title):
 
 
 class Recommendation(Title):
-    recommender = models.ForeignKey(Recommender, models.CASCADE)
+    the_recommender = models.ForeignKey(Recommender, models.CASCADE)
 
 
 class Collector(models.Model):

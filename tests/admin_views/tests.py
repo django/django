@@ -43,6 +43,7 @@ from django.utils.six.moves.urllib.parse import parse_qsl, urljoin, urlparse
 
 from . import customadmin
 from .admin import CityAdmin, site, site2
+from .forms import MediaActionForm
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
     AdminOrderedModelMethod, Answer, Article, BarAccount, Book, Bookmark,
@@ -2957,9 +2958,9 @@ class AdminSearchTest(TestCase):
         cls.per3 = Person.objects.create(name='Guido van Rossum', gender=1, alive=True)
 
         cls.t1 = Recommender.objects.create()
-        cls.t2 = Recommendation.objects.create(recommender=cls.t1)
+        cls.t2 = Recommendation.objects.create(the_recommender=cls.t1)
         cls.t3 = Recommender.objects.create()
-        cls.t4 = Recommendation.objects.create(recommender=cls.t3)
+        cls.t4 = Recommendation.objects.create(the_recommender=cls.t3)
 
         cls.tt1 = TitleTranslation.objects.create(title=cls.t1, text='Bar')
         cls.tt2 = TitleTranslation.objects.create(title=cls.t2, text='Foo')
@@ -3373,6 +3374,17 @@ action)</option>
         # Send mail, don't delete.
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a function action')
+
+    def test_media_from_actions_form(self):
+        """
+        The action form's media is included in changelist view's media.
+        """
+        response = self.client.get(reverse('admin:admin_views_subscriber_changelist'))
+        media_path = MediaActionForm.Media.js[0]
+        self.assertIsInstance(response.context['action_form'], MediaActionForm)
+        self.assertIn('media', response.context)
+        self.assertIn(media_path, response.context['media']._js)
+        self.assertContains(response, media_path)
 
     def test_user_message_on_none_selected(self):
         """

@@ -344,13 +344,13 @@ application registry.
 
 .. currentmodule:: django
 
-.. function:: setup(set_script=True)
+.. function:: setup(set_prefix=True)
 
     Configures Django by:
 
     * Loading the settings.
     * Setting up logging.
-    * If ``set_script`` is True, setting the URL resolver script prefix to
+    * If ``set_prefix`` is True, setting the URL resolver script prefix to
       :setting:`FORCE_SCRIPT_NAME` if defined, or ``/`` otherwise.
     * Initializing the application registry.
 

@@ -46,3 +46,9 @@ class TrigramExtension(CreateExtension):
 
     def __init__(self):
         self.name = 'pg_trgm'
+
+
+class BtreeGinExtension(CreateExtension):
+
+    def __init__(self):
+        self.name = 'btree_gin'

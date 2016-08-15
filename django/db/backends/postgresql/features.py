@@ -1,5 +1,6 @@
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.utils import InterfaceError
+from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
@@ -21,6 +22,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_introspect_autofield = True
     can_introspect_ip_address_field = True
     can_introspect_small_integer_field = True
+    can_introspect_index_type = True
     can_distinct_on_fields = True
     can_rollback_ddl = True
     supports_combined_alters = True
@@ -31,3 +33,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     greatest_least_ignores_nulls = True
     can_clone_databases = True
     supports_temporal_subtraction = True
+
+    @cached_property
+    def has_select_for_update_skip_locked(self):
+        return self.connection.pg_version >= 90500

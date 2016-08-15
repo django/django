@@ -9,7 +9,6 @@ import textwrap
 import unittest
 from importlib import import_module
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import SimpleTestCase, TestCase
@@ -126,7 +125,7 @@ Here's the error encountered while trying to pickle the exception:
 
 {}
 
-You should re-run this test without the --parallel option to reproduce the
+You should re-run this test with the --parallel=1 option to reproduce the
 failure and get a correct traceback.
 """.format(test, original_exc_txt, pickle_exc_txt))
             raise
@@ -360,7 +359,7 @@ class DiscoverRunner(object):
 
     def __init__(self, pattern=None, top_level=None, verbosity=1,
                  interactive=True, failfast=False, keepdb=False,
-                 reverse=False, debug_sql=False, parallel=0,
+                 reverse=False, debug_mode=False, debug_sql=False, parallel=0,
                  tags=None, exclude_tags=None, **kwargs):
 
         self.pattern = pattern
@@ -370,6 +369,7 @@ class DiscoverRunner(object):
         self.failfast = failfast
         self.keepdb = keepdb
         self.reverse = reverse
+        self.debug_mode = debug_mode
         self.debug_sql = debug_sql
         self.parallel = parallel
         self.tags = set(tags or [])
@@ -394,6 +394,10 @@ class DiscoverRunner(object):
             help='Reverses test cases order.',
         )
         parser.add_argument(
+            '--debug-mode', action='store_true', dest='debug_mode', default=False,
+            help='Sets settings.DEBUG to True.',
+        )
+        parser.add_argument(
             '-d', '--debug-sql', action='store_true', dest='debug_sql', default=False,
             help='Prints logged SQL queries on failure.',
         )
@@ -412,8 +416,7 @@ class DiscoverRunner(object):
         )
 
     def setup_test_environment(self, **kwargs):
-        setup_test_environment()
-        settings.DEBUG = False
+        setup_test_environment(debug=self.debug_mode)
         unittest.installHandler()
 
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
@@ -503,13 +506,17 @@ class DiscoverRunner(object):
     def get_resultclass(self):
         return DebugSQLTextTestResult if self.debug_sql else None
 
-    def run_suite(self, suite, **kwargs):
-        resultclass = self.get_resultclass()
-        return self.test_runner(
-            verbosity=self.verbosity,
+    def get_test_runner_kwargs(self):
+        return dict(
             failfast=self.failfast,
-            resultclass=resultclass,
-        ).run(suite)
+            resultclass=self.get_resultclass(),
+            verbosity=self.verbosity,
+        )
+
+    def run_suite(self, suite, **kwargs):
+        kwargs = self.get_test_runner_kwargs()
+        runner = self.test_runner(**kwargs)
+        return runner.run(suite)
 
     def teardown_databases(self, old_config, **kwargs):
         """

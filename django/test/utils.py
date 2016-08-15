@@ -94,13 +94,28 @@ def instrumented_test_render(self, context):
     return self.nodelist.render(context)
 
 
-def setup_test_environment():
-    """Perform any global pre-test setup. This involves:
+class _SavedSettings(object):
+    pass
 
-        - Installing the instrumented test renderer
-        - Set the email backend to the locmem email backend.
-        - Setting the active locale to match the LANGUAGE_CODE setting.
+
+def setup_test_environment(debug=None):
     """
+    Perform global pre-test setup, such as installing the instrumented template
+    renderer and setting the email backend to the locmem email backend.
+    """
+    if hasattr(_SavedSettings, 'debug'):
+        # Executing this function twice would overwrite the saved values.
+        raise RuntimeError(
+            "setup_test_environment() was already called and can't be called "
+            "again without first calling teardown_test_environment()."
+        )
+
+    if debug is None:
+        debug = settings.DEBUG
+
+    _SavedSettings.debug = settings.DEBUG
+    settings.DEBUG = debug
+
     Template._original_render = Template._render
     Template._render = instrumented_test_render
 
@@ -120,11 +135,13 @@ def setup_test_environment():
 
 
 def teardown_test_environment():
-    """Perform any global post-test teardown. This involves:
-
-        - Restoring the original test renderer
-        - Restoring the email sending functions
     """
+    Perform any global post-test teardown, such as restoring the original
+    template renderer and restoring the email sending functions.
+    """
+    settings.DEBUG = _SavedSettings.debug
+    del _SavedSettings.debug
+
     Template._render = Template._original_render
     del Template._original_render
 

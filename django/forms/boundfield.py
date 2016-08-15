@@ -8,14 +8,12 @@ from django.utils import six
 from django.utils.encoding import (
     force_text, python_2_unicode_compatible, smart_text,
 )
+from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 __all__ = ('BoundField',)
-
-
-UNSET = object()
 
 
 @html_safe
@@ -34,7 +32,6 @@ class BoundField(object):
         else:
             self.label = self.field.label
         self.help_text = field.help_text or ''
-        self._initial_value = UNSET
 
     def __str__(self):
         """Renders this field as an HTML widget."""
@@ -42,28 +39,32 @@ class BoundField(object):
             return self.as_widget() + self.as_hidden(only_initial=True)
         return self.as_widget()
 
-    def __iter__(self):
+    @cached_property
+    def subwidgets(self):
         """
-        Yields rendered strings that comprise all widgets in this BoundField.
+        Most widgets yield a single subwidget, but others like RadioSelect and
+        CheckboxSelectMultiple produce one subwidget for each choice.
 
-        This really is only useful for RadioSelect widgets, so that you can
-        iterate over individual radio buttons in a template.
+        This property is cached so that only one database query occurs when
+        rendering ModelChoiceFields.
         """
         id_ = self.field.widget.attrs.get('id') or self.auto_id
         attrs = {'id': id_} if id_ else {}
         attrs = self.build_widget_attrs(attrs)
-        for subwidget in self.field.widget.subwidgets(self.html_name, self.value(), attrs):
-            yield subwidget
+        return list(self.field.widget.subwidgets(self.html_name, self.value(), attrs))
+
+    def __iter__(self):
+        return iter(self.subwidgets)
 
     def __len__(self):
-        return len(list(self.__iter__()))
+        return len(self.subwidgets)
 
     def __getitem__(self, idx):
         # Prevent unnecessary reevaluation when accessing BoundField's attrs
         # from templates.
         if not isinstance(idx, six.integer_types + (slice,)):
             raise TypeError
-        return list(self.__iter__())[idx]
+        return self.subwidgets[idx]
 
     @property
     def errors(self):
@@ -129,18 +130,7 @@ class BoundField(object):
         the form is not bound or the data otherwise.
         """
         if not self.form.is_bound:
-            data = self.form.initial.get(self.name, self.field.initial)
-            if callable(data):
-                if self._initial_value is not UNSET:
-                    data = self._initial_value
-                else:
-                    data = data()
-                    # If this is an auto-generated default date, nix the
-                    # microseconds for standardized handling. See #22502.
-                    if (isinstance(data, (datetime.datetime, datetime.time)) and
-                            not self.field.widget.supports_microseconds):
-                        data = data.replace(microsecond=0)
-                    self._initial_value = data
+            data = self.initial
         else:
             data = self.field.bound_data(
                 self.data, self.form.initial.get(self.name, self.field.initial)
@@ -226,11 +216,23 @@ class BoundField(object):
         id_ = widget.attrs.get('id') or self.auto_id
         return widget.id_for_label(id_)
 
+    @cached_property
+    def initial(self):
+        data = self.form.initial.get(self.name, self.field.initial)
+        if callable(data):
+            data = data()
+            # If this is an auto-generated default date, nix the microseconds
+            # for standardized handling. See #22502.
+            if (isinstance(data, (datetime.datetime, datetime.time)) and
+                    not self.field.widget.supports_microseconds):
+                data = data.replace(microsecond=0)
+        return data
+
     def build_widget_attrs(self, attrs, widget=None):
         if not widget:
             widget = self.field.widget
         attrs = dict(attrs)  # Copy attrs to avoid modifying the argument.
-        if not widget.is_hidden and self.field.required and self.form.use_required_attribute:
+        if widget.use_required_attribute(self.initial) and self.field.required and self.form.use_required_attribute:
             attrs['required'] = True
         if self.field.disabled:
             attrs['disabled'] = True

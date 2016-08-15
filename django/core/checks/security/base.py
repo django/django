@@ -101,6 +101,12 @@ W020 = Warning(
     id='security.W020',
 )
 
+W021 = Warning(
+    "You have not set the SECURE_HSTS_PRELOAD setting to True. Without this, "
+    "your site cannot be submitted to the browser preload list.",
+    id='security.W021',
+)
+
 
 def _security_middleware():
     return ("django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE_CLASSES or
@@ -138,6 +144,16 @@ def check_sts_include_subdomains(app_configs, **kwargs):
         settings.SECURE_HSTS_INCLUDE_SUBDOMAINS is True
     )
     return [] if passed_check else [W005]
+
+
+@register(Tags.security, deploy=True)
+def check_sts_preload(app_configs, **kwargs):
+    passed_check = (
+        not _security_middleware() or
+        not settings.SECURE_HSTS_SECONDS or
+        settings.SECURE_HSTS_PRELOAD is True
+    )
+    return [] if passed_check else [W021]
 
 
 @register(Tags.security, deploy=True)

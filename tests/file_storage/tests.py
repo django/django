@@ -742,6 +742,16 @@ class FileFieldStorageTests(TestCase):
         self.assertEqual(list(obj.normal.chunks(chunk_size=2)), [b"co", b"nt", b"en", b"t"])
         obj.normal.close()
 
+    def test_filefield_write(self):
+        # Files can be written to.
+        obj = Storage.objects.create(normal=SimpleUploadedFile('rewritten.txt', b'content'))
+        with obj.normal as normal:
+            normal.open('wb')
+            normal.write(b'updated')
+        obj.refresh_from_db()
+        self.assertEqual(obj.normal.read(), b'updated')
+        obj.normal.close()
+
     def test_filefield_reopen(self):
         obj = Storage.objects.create(normal=SimpleUploadedFile('reopen.txt', b'content'))
         with obj.normal as normal:

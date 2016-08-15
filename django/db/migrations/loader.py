@@ -280,6 +280,11 @@ class MigrationLoader(object):
                 continue
             for parent in self.graph.node_map[migration].parents:
                 if parent not in applied:
+                    # Skip unapplied squashed migrations that have all of their
+                    # `replaces` applied.
+                    if parent in self.replacements:
+                        if all(m in applied for m in self.replacements[parent].replaces):
+                            continue
                     raise InconsistentMigrationHistory(
                         "Migration {}.{} is applied before its dependency {}.{}".format(
                             migration[0], migration[1], parent[0], parent[1],

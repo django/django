@@ -324,10 +324,15 @@ class TemplateDetailView(BaseAdminDocsView):
             # This doesn't account for template loaders (#24128).
             for index, directory in enumerate(default_engine.dirs):
                 template_file = os.path.join(directory, template)
+                if os.path.exists(template_file):
+                    with open(template_file) as f:
+                        template_contents = f.read()
+                else:
+                    template_contents = ''
                 templates.append({
                     'file': template_file,
                     'exists': os.path.exists(template_file),
-                    'contents': lambda: open(template_file).read() if os.path.exists(template_file) else '',
+                    'contents': template_contents,
                     'order': index,
                 })
         kwargs.update({

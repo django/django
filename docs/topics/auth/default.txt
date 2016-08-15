@@ -117,25 +117,21 @@ Authenticating users
 
 .. function:: authenticate(\**credentials)
 
-    To authenticate a given username and password, use
-    :func:`~django.contrib.auth.authenticate()`. It takes credentials in the
-    form of keyword arguments, for the default configuration this is
-    ``username`` and ``password``, and it returns
-    a :class:`~django.contrib.auth.models.User` object if the password is valid
-    for the given username. If the password is invalid,
-    :func:`~django.contrib.auth.authenticate()` returns ``None``. Example::
+    Use :func:`~django.contrib.auth.authenticate()` to verify a set of
+    credentials. It takes credentials as keyword arguments, ``username`` and
+    ``password`` for the default case, checks them against each
+    :ref:`authentication backend <authentication-backends>`, and returns a
+    :class:`~django.contrib.auth.models.User` object if the credentials are
+    valid for a backend. If the credentials aren't valid for any backend or if
+    a backend raises :class:`~django.core.exceptions.PermissionDenied`, it
+    returns ``None``. For example::
 
         from django.contrib.auth import authenticate
         user = authenticate(username='john', password='secret')
         if user is not None:
-            # the password verified for the user
-            if user.is_active:
-                print("User is valid, active and authenticated")
-            else:
-                print("The password is valid, but the account has been disabled!")
+            # A backend authenticated the credentials
         else:
-            # the authentication system was unable to verify the username and password
-            print("The username and password were incorrect.")
+            # No backend authenticated the credentials
 
     .. note::
 
@@ -348,12 +344,9 @@ If you have an authenticated user you want to attach to the current session
             password = request.POST['password']
             user = authenticate(username=username, password=password)
             if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    # Redirect to a success page.
-                else:
-                    # Return a 'disabled account' error message
-                    ...
+                login(request, user)
+                # Redirect to a success page.
+                ...
             else:
                 # Return an 'invalid login' error message.
                 ...
@@ -513,7 +506,8 @@ The ``login_required`` decorator
 .. note::
 
     The ``login_required`` decorator does NOT check the ``is_active`` flag on a
-    user.
+    user, but the default :setting:`AUTHENTICATION_BACKENDS` reject inactive
+    users.
 
 .. seealso::
 
@@ -553,7 +547,8 @@ inheritance list.
 .. note::
 
     Just as the ``login_required`` decorator, this mixin does NOT check the
-    ``is_active`` flag on a user.
+    ``is_active`` flag on a user, but the default
+    :setting:`AUTHENTICATION_BACKENDS` reject inactive users.
 
 .. currentmodule:: django.contrib.auth.decorators
 
@@ -815,6 +810,8 @@ user to the login page or issue an HTTP 403 Forbidden response.
         redirects the user to the ``login_url``, optionally including the
         ``redirect_field_name`` if it is set.
 
+.. currentmodule:: django.contrib.auth
+
 .. _session-invalidation-on-password-change:
 
 Session invalidation on password change
@@ -834,16 +831,20 @@ If your :setting:`AUTH_USER_MODEL` inherits from
 :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`
 method, authenticated sessions will include the hash returned by this function.
 In the :class:`~django.contrib.auth.models.AbstractBaseUser` case, this is an
-HMAC of the password field. Django verifies that the hash sent along with each
-request matches the one that's computed server-side. This allows a user to log
-out all of their sessions by changing their password.
+HMAC of the password field. Django verifies that the hash in the session for
+each request matches the one that's computed during the request. This allows a
+user to log out all of their sessions by changing their password.
 
 The default password change views included with Django,
-:class:`django.contrib.auth.views.PasswordChangeView` and the
+:class:`~django.contrib.auth.views.PasswordChangeView` and the
 ``user_change_password`` view in the :mod:`django.contrib.auth` admin, update
 the session with the new password hash so that a user changing their own
 password won't log themselves out. If you have a custom password change view
-and wish to have similar behavior, use this function:
+and wish to have similar behavior, use the :func:`update_session_auth_hash`
+function. In this case, however, if a user also wants to invalidate the session
+from which they're changing their password (for example, if they believe the
+session cookie on their machine was stolen), then they also need to log out
+that session.
 
 .. function:: update_session_auth_hash(request, user)
 
@@ -1480,6 +1481,10 @@ implementation details see :ref:`using-the-views`.
       will default to ``default_token_generator``, it's an instance of
       ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
 
+    * ``post_reset_login``: A boolean indicating if the user should be
+      automatically authenticated after a successful password reset. Defaults
+      to ``False``.
+
     * ``form_class``: Form that will be used to set the password. Defaults to
       :class:`~django.contrib.auth.forms.SetPasswordForm`.
 
@@ -1606,6 +1611,10 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
             class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
                 def confirm_login_allowed(self, user):
                     pass
+
+        (In this case, you'll also need to use an authentication backend that
+        allows inactive users, such as as
+        :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend`.)
 
         Or to allow only some active users to log in::
 

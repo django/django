@@ -624,3 +624,48 @@ class ManyToOneTests(TestCase):
         # doesn't exist should be an instance of a subclass of `AttributeError`
         # refs #21563
         self.assertFalse(hasattr(Article(), 'reporter'))
+
+    def test_clear_after_prefetch(self):
+        c = City.objects.create(name='Musical City')
+        District.objects.create(name='Ladida', city=c)
+        city = City.objects.prefetch_related('districts').get(id=c.id)
+        self.assertQuerysetEqual(city.districts.all(), ['<District: Ladida>'])
+        city.districts.clear()
+        self.assertQuerysetEqual(city.districts.all(), [])
+
+    def test_remove_after_prefetch(self):
+        c = City.objects.create(name='Musical City')
+        d = District.objects.create(name='Ladida', city=c)
+        city = City.objects.prefetch_related('districts').get(id=c.id)
+        self.assertQuerysetEqual(city.districts.all(), ['<District: Ladida>'])
+        city.districts.remove(d)
+        self.assertQuerysetEqual(city.districts.all(), [])
+
+    def test_add_after_prefetch(self):
+        c = City.objects.create(name='Musical City')
+        District.objects.create(name='Ladida', city=c)
+        d2 = District.objects.create(name='Ladidu')
+        city = City.objects.prefetch_related('districts').get(id=c.id)
+        self.assertEqual(city.districts.count(), 1)
+        city.districts.add(d2)
+        self.assertEqual(city.districts.count(), 2)
+
+    def test_set_after_prefetch(self):
+        c = City.objects.create(name='Musical City')
+        District.objects.create(name='Ladida', city=c)
+        d2 = District.objects.create(name='Ladidu')
+        city = City.objects.prefetch_related('districts').get(id=c.id)
+        self.assertEqual(city.districts.count(), 1)
+        city.districts.set([d2])
+        self.assertQuerysetEqual(city.districts.all(), ['<District: Ladidu>'])
+
+    def test_add_then_remove_after_prefetch(self):
+        c = City.objects.create(name='Musical City')
+        District.objects.create(name='Ladida', city=c)
+        d2 = District.objects.create(name='Ladidu')
+        city = City.objects.prefetch_related('districts').get(id=c.id)
+        self.assertEqual(city.districts.count(), 1)
+        city.districts.add(d2)
+        self.assertEqual(city.districts.count(), 2)
+        city.districts.remove(d2)
+        self.assertEqual(city.districts.count(), 1)

@@ -307,6 +307,14 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertURLEqual(response.url, '/password_reset/')
 
+    def test_confirm_login_post_reset(self):
+        url, path = self._test_confirm_start()
+        path = path.replace('/reset/', '/reset/post_reset_login/')
+        response = self.client.post(path, {'new_password1': 'anewpassword', 'new_password2': 'anewpassword'})
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, '/reset/done/')
+        self.assertIn(SESSION_KEY, self.client.session)
+
     def test_confirm_display_user_from_form(self):
         url, path = self._test_confirm_start()
         response = self.client.get(path)

@@ -21,6 +21,7 @@ from django.utils.encoding import DEFAULT_LOCALE_ENCODING, force_str
 from django.utils.functional import cached_property
 from django.utils.jslex import prepare_js_for_gettext
 from django.utils.text import get_text_list
+from django.utils.translation import templatize
 
 plural_forms_re = re.compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
 STATUS_OK = 0
@@ -99,8 +100,6 @@ class BuildFile(object):
         Preprocess (if necessary) a translatable file before passing it to
         xgettext GNU gettext utility.
         """
-        from django.utils.translation import templatize
-
         if not self.is_templatized:
             return
 
@@ -276,12 +275,6 @@ class Command(BaseCommand):
         process_all = options['all']
         extensions = options['extensions']
         self.symlinks = options['symlinks']
-
-        # Need to ensure that the i18n framework is enabled
-        if settings.configured:
-            settings.USE_I18N = True
-        else:
-            settings.configure(USE_I18N=True)
 
         ignore_patterns = options['ignore_patterns']
         if options['use_default_ignore_patterns']:

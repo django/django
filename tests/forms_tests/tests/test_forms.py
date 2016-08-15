@@ -41,6 +41,11 @@ class PersonNew(Form):
     birthday = DateField()
 
 
+class MultiValueDictLike(dict):
+    def getlist(self, key):
+        return [self[key]]
+
+
 class FormsTestCase(SimpleTestCase):
     # A Form is a collection of Fields. It knows how to validate a set of data and it
     # knows how to render itself in a couple of default ways (e.g., an HTML table).
@@ -423,19 +428,19 @@ class FormsTestCase(SimpleTestCase):
         self.assertHTMLEqual(str(f['email']), '<input type="email" name="email" value="test@example.com" required />')
         self.assertHTMLEqual(
             str(f['get_spam']),
-            '<input checked="checked" type="checkbox" name="get_spam" required />',
+            '<input checked type="checkbox" name="get_spam" required />',
         )
 
         # 'True' or 'true' should be rendered without a value attribute
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'True'}, auto_id=False)
         self.assertHTMLEqual(
             str(f['get_spam']),
-            '<input checked="checked" type="checkbox" name="get_spam" required />',
+            '<input checked type="checkbox" name="get_spam" required />',
         )
 
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'true'}, auto_id=False)
         self.assertHTMLEqual(
-            str(f['get_spam']), '<input checked="checked" type="checkbox" name="get_spam" required />')
+            str(f['get_spam']), '<input checked type="checkbox" name="get_spam" required />')
 
         # A value of 'False' or 'false' should be rendered unchecked
         f = SignupForm({'email': 'test@example.com', 'get_spam': 'False'}, auto_id=False)
@@ -808,20 +813,20 @@ Java</label></li>
 </ul>""")
         f = SongForm({'composers': ['J']}, auto_id=False)
         self.assertHTMLEqual(str(f['composers']), """<ul>
-<li><label><input checked="checked" type="checkbox" name="composers" value="J" /> John Lennon</label></li>
+<li><label><input checked type="checkbox" name="composers" value="J" /> John Lennon</label></li>
 <li><label><input type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>""")
         f = SongForm({'composers': ['J', 'P']}, auto_id=False)
         self.assertHTMLEqual(str(f['composers']), """<ul>
-<li><label><input checked="checked" type="checkbox" name="composers" value="J" /> John Lennon</label></li>
-<li><label><input checked="checked" type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
+<li><label><input checked type="checkbox" name="composers" value="J" /> John Lennon</label></li>
+<li><label><input checked type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>""")
         # Test iterating on individual checkboxes in a template
         t = Template('{% for checkbox in form.composers %}<div class="mycheckbox">{{ checkbox }}</div>{% endfor %}')
         self.assertHTMLEqual(t.render(Context({'form': f})), """<div class="mycheckbox"><label>
-<input checked="checked" name="composers" type="checkbox" value="J" /> John Lennon</label></div>
+<input checked name="composers" type="checkbox" value="J" /> John Lennon</label></div>
 <div class="mycheckbox"><label>
-<input checked="checked" name="composers" type="checkbox" value="P" /> Paul McCartney</label></div>""")
+<input checked name="composers" type="checkbox" value="P" /> Paul McCartney</label></div>""")
 
     def test_checkbox_auto_id(self):
         # Regarding auto_id, CheckboxSelectMultiple is a special case. Each checkbox
@@ -867,6 +872,12 @@ Java</label></li>
         f = SongForm(data)
         self.assertEqual(f.errors, {})
 
+        # SelectMultiple uses ducktyping so that MultiValueDictLike.getlist()
+        # is called.
+        f = SongForm(MultiValueDictLike({'name': 'Yesterday', 'composers': 'J'}))
+        self.assertEqual(f.errors, {})
+        self.assertEqual(f.cleaned_data['composers'], ['J'])
+
     def test_multiple_hidden(self):
         class SongForm(Form):
             name = CharField()
@@ -903,6 +914,12 @@ Java</label></li>
         self.assertEqual(f.errors, {})
         self.assertEqual(f.cleaned_data['composers'], ['J', 'P'])
         self.assertEqual(f.cleaned_data['name'], 'Yesterday')
+
+        # MultipleHiddenInput uses ducktyping so that
+        # MultiValueDictLike.getlist() is called.
+        f = SongForm(MultiValueDictLike({'name': 'Yesterday', 'composers': 'J'}))
+        self.assertEqual(f.errors, {})
+        self.assertEqual(f.cleaned_data['composers'], ['J'])
 
     def test_escaping(self):
         # Validation errors are HTML-escaped when output as HTML.
@@ -2341,6 +2358,15 @@ Password: <input type="password" name="password" required />
         self.assertHTMLEqual(
             f.as_table(),
             '<tr><th>File1:</th><td><input type="file" name="file1" required /></td></tr>',
+        )
+
+        # A required file field with initial data should not contain the
+        # required HTML attribute. The file input is left blank by the user to
+        # keep the existing, initial value.
+        f = FileForm(initial={'file1': 'resume.txt'}, auto_id=False)
+        self.assertHTMLEqual(
+            f.as_table(),
+            '<tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>',
         )
 
     def test_basic_processing_in_view(self):

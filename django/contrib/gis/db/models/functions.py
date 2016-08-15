@@ -340,7 +340,7 @@ class NumPoints(GeoFunc):
 
     def as_sqlite(self, compiler, connection):
         if self.source_expressions[self.geom_param_pos].output_field.geom_type != 'LINESTRING':
-            raise TypeError("Spatialite NumPoints can only operate on LineString content")
+            raise TypeError("SpatiaLite NumPoints can only operate on LineString content")
         return super(NumPoints, self).as_sql(compiler, connection)
 
 

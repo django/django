@@ -202,22 +202,6 @@ is set, its column name).
 Creates an index in the database table for the model with ``model_name``.
 ``index`` is an instance of the :class:`~django.db.models.Index` class.
 
-For example, to add an index on the ``title`` and ``author`` fields of the
-``Book`` model::
-
-    from django.db import migrations, models
-
-    class Migration(migrations.Migration):
-        operations = [
-            migrations.AddIndex(
-                'Book',
-                models.Index(fields=['title', 'author'], name='my_index_name'),
-            ),
-        ]
-
-If you're writing your own migration to add an index, you must assign a
-``name`` to the ``index`` as done above.
-
 ``RemoveIndex``
 ---------------
 

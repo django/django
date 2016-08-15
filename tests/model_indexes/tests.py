@@ -16,6 +16,9 @@ class IndexesTests(TestCase):
         index = models.Index(fields=['title'])
         same_index = models.Index(fields=['title'])
         another_index = models.Index(fields=['title', 'author'])
+        index.model = Book
+        same_index.model = Book
+        another_index.model = Book
         self.assertEqual(index, same_index)
         self.assertNotEqual(index, another_index)
 
@@ -43,6 +46,11 @@ class IndexesTests(TestCase):
         index.set_name_with_model(Book)
         self.assertEqual(index.name, 'model_index_author_0f5565_idx')
 
+        # '-' for DESC columns should be accounted for in the index name.
+        index = models.Index(fields=['-author'])
+        index.set_name_with_model(Book)
+        self.assertEqual(index.name, 'model_index_author_708765_idx')
+
         # fields may be truncated in the name. db_column is used for naming.
         long_field_index = models.Index(fields=['pages'])
         long_field_index.set_name_with_model(Book)
@@ -56,7 +64,8 @@ class IndexesTests(TestCase):
 
     def test_deconstruction(self):
         index = models.Index(fields=['title'])
+        index.set_name_with_model(Book)
         path, args, kwargs = index.deconstruct()
         self.assertEqual(path, 'django.db.models.Index')
         self.assertEqual(args, ())
-        self.assertEqual(kwargs, {'fields': ['title']})
+        self.assertEqual(kwargs, {'fields': ['title'], 'name': 'model_index_title_196f42_idx'})

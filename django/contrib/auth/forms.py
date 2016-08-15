@@ -186,7 +186,7 @@ class AuthenticationForm(forms.Form):
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
 
-        if username and password:
+        if username is not None and password:
             self.user_cache = authenticate(username=username, password=password)
             if self.user_cache is None:
                 raise forms.ValidationError(

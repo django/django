@@ -211,7 +211,8 @@ def get_language_from_path(path):
 
 
 def templatize(src, origin=None):
-    return _trans.templatize(src, origin)
+    from .template import templatize
+    return templatize(src, origin)
 
 
 def deactivate_all():

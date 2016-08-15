@@ -36,13 +36,15 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     ignored_tables = []
 
     _get_indexes_query = """
-        SELECT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
+        SELECT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary,
+            am.amname
         FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
-            pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
+            pg_catalog.pg_index idx, pg_catalog.pg_attribute attr, pg_catalog.pg_am am
         WHERE c.oid = idx.indrelid
             AND idx.indexrelid = c2.oid
             AND attr.attrelid = c.oid
             AND attr.attnum = idx.indkey[0]
+            AND c2.relam = am.oid
             AND c.relname = %s"""
 
     def get_field_type(self, data_type, description):
@@ -132,6 +134,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # row[1] (idx.indkey) is stored in the DB as an array. It comes out as
             # a string of space-separated integers. This designates the field
             # indexes (1-based) of the fields that have indexes on the table.
+            # row[4] is the type of index, e.g. btree, hash, etc.
             # Here, we skip any indexes across multiple fields.
             if ' ' in row[1]:
                 continue
@@ -142,6 +145,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 indexes[row[0]]['primary_key'] = True
             if row[2]:
                 indexes[row[0]]['unique'] = True
+            indexes[row[0]]['type'] = row[4]
         return indexes
 
     def get_constraints(self, cursor, table_name):
@@ -211,23 +215,36 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Now get indexes
         cursor.execute("""
             SELECT
-                c2.relname,
-                ARRAY(
-                    SELECT (SELECT attname FROM pg_catalog.pg_attribute WHERE attnum = i AND attrelid = c.oid)
-                    FROM unnest(idx.indkey) i
-                ),
-                idx.indisunique,
-                idx.indisprimary
-            FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
-                pg_catalog.pg_index idx
-            WHERE c.oid = idx.indrelid
-                AND idx.indexrelid = c2.oid
-                AND c.relname = %s
+                indexname, array_agg(attname), indisunique, indisprimary,
+                array_agg(ordering)
+            FROM (
+                SELECT
+                    c2.relname as indexname, idx.*, attr.attname,
+                    CASE
+                        WHEN am.amcanorder THEN
+                            CASE (option & 1)
+                                WHEN 1 THEN 'DESC' ELSE 'ASC'
+                            END
+                    END as ordering
+                FROM (
+                    SELECT
+                        *, unnest(i.indkey) as key, unnest(i.indoption) as option
+                    FROM pg_index i
+                ) idx, pg_class c, pg_class c2, pg_am am, pg_attribute attr
+                WHERE c.oid=idx.indrelid
+                    AND idx.indexrelid=c2.oid
+                    AND attr.attrelid=c.oid
+                    AND attr.attnum=idx.key
+                    AND c2.relam=am.oid
+                    AND c.relname = %s
+            ) s2
+            GROUP BY indexname, indisunique, indisprimary;
         """, [table_name])
-        for index, columns, unique, primary in cursor.fetchall():
+        for index, columns, unique, primary, orders in cursor.fetchall():
             if index not in constraints:
                 constraints[index] = {
-                    "columns": list(columns),
+                    "columns": columns,
+                    "orders": orders,
                     "primary_key": primary,
                     "unique": unique,
                     "foreign_key": None,
