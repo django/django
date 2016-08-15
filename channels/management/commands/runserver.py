@@ -65,7 +65,8 @@ class Command(RunserverCommand):
 
         # Launch workers as subthreads
         if options.get("run_worker", True):
-            for _ in range(4):
+            worker_count = 4 if options.get("use_threading", True) else 1
+            for _ in range(worker_count):
                 worker = WorkerThread(self.channel_layer, self.logger)
                 worker.daemon = True
                 worker.start()
