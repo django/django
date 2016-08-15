@@ -160,10 +160,7 @@ A database Router is a class that provides up to four methods:
 
     Determine if the migration operation is allowed to run on the database with
     alias ``db``. Return ``True`` if the operation should run, ``False`` if it
-    shouldn't run, or ``None`` if the router has no opinion. While this will
-    keep the ``migrate`` command from running, the command ``makemigrations``
-    will continue to operate. The migrations will just not be applied to the
-    database with the ``migrate`` command.
+    shouldn't run, or ``None`` if the router has no opinion.
 
     The ``app_label`` positional argument is the label of the application
     being migrated.
@@ -186,10 +183,12 @@ A database Router is a class that provides up to four methods:
     This method can also be used to determine the availability of a model on a
     given database.
 
-    Note that migrations will just silently not perform any operations on a
-    model for which this returns ``False``. This may result in broken foreign
-    keys, extra tables, or missing tables if you change it once you have
-    applied some migrations.
+    :djadmin:`makemigrations` always creates migrations for model changes, but
+    if ``allow_migrate()`` returns ``False``, any migration operations for the
+    ``model_name`` will be silently skipped when running :djadmin:`migrate` on
+    the ``db``. Changing the behavior of ``allow_migrate()`` for models that
+    already have migrations may result in broken foreign keys, extra tables,
+    or missing tables.
 
 A router doesn't have to provide *all* these methods -- it may omit one
 or more of them. If one of the methods is omitted, Django will skip
