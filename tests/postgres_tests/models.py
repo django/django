@@ -163,3 +163,16 @@ class StatTestModel(models.Model):
 
 class NowTestModel(models.Model):
     when = models.DateTimeField(null=True, default=None)
+
+
+# Map and MapSpot Model has been added to test the inlineformset forms.
+class Map(models.Model):
+    name = models.CharField(max_length=128)
+
+
+class MapSpot(models.Model):
+    map = models.ForeignKey('postgres_tests.Map', models.CASCADE)
+    position = ArrayField(models.IntegerField(), size=2)
+
+    class Meta:
+        unique_together = (('map', 'position'))
