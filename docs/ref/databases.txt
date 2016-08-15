@@ -164,6 +164,16 @@ lookups that use the ``LIKE`` operator in their SQL, as is done with the
 
 .. _PostgreSQL operator class: http://www.postgresql.org/docs/current/static/indexes-opclass.html
 
+Test database templates
+-----------------------
+
+.. versionadded:: 1.11
+
+You can use the :setting:`TEST['TEMPLATE'] <TEST_TEMPLATE>` setting to specify
+a `template`_ (e.g. ``'template0'``) from which to create a test database.
+
+.. _template: https://www.postgresql.org/docs/current/static/sql-createdatabase.html
+
 Speeding up test execution with non-durable settings
 ----------------------------------------------------
 

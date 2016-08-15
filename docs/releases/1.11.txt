@@ -159,6 +159,9 @@ Database backends
   on PostgreSQL 9.5+ and Oracle to execute queries with
   ``FOR UPDATE SKIP LOCKED``.
 
+* Added the :setting:`TEST['TEMPLATE'] <TEST_TEMPLATE>` setting to let
+  PostgreSQL users specify a template for creating the test database.
+
 Email
 ~~~~~
 
