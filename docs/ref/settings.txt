@@ -738,6 +738,20 @@ the database state between tests if you don't have transactions). You can set
 this to ``False`` to speed up creation time if you don't have any test classes
 with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
 
+.. setting:: TEST_TEMPLATE
+
+``TEMPLATE``
+^^^^^^^^^^^^
+
+.. versionadded:: 1.11
+
+This is a PostgreSQL-specific setting.
+
+The name of a `template`_ (e.g. ``'template0'``) from which to create the test
+database.
+
+.. _template: https://www.postgresql.org/docs/current/static/sql-createdatabase.html
+
 .. setting:: TEST_CREATE
 
 ``CREATE_DB``
