@@ -160,7 +160,10 @@ A database Router is a class that provides up to four methods:
 
     Determine if the migration operation is allowed to run on the database with
     alias ``db``. Return ``True`` if the operation should run, ``False`` if it
-    shouldn't run, or ``None`` if the router has no opinion.
+    shouldn't run, or ``None`` if the router has no opinion. While this will
+    keep the ``migrate`` command from running, the command ``makemigrations``
+    will continue to operate. The migrations will just not be applied to the
+    database with the ``migrate`` command.
 
     The ``app_label`` positional argument is the label of the application
     being migrated.
