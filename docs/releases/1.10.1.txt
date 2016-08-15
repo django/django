@@ -48,3 +48,6 @@ Bugfixes
 
 * Fixed ``ClearableFileInput`` to avoid the ``required`` HTML attribute when
   initial data exists (:ticket:`27037`).
+
+* Fixed annotations with database functions when combined with lookups on
+  PostGIS (:ticket:`27014`).

@@ -144,6 +144,9 @@ class GeographyFunctionTests(TestCase):
         qs = Zipcode.objects.annotate(distance=Distance('poly', htown.point))
         for z, ref in zip(qs, ref_dists):
             self.assertAlmostEqual(z.distance.m, ref, 2)
+        # Distance function in combination with a lookup.
+        hzip = Zipcode.objects.get(code='77002')
+        self.assertEqual(qs.get(distance__lte=0), hzip)
 
     @skipUnlessDBFeature("has_Area_function", "supports_distance_geodetic")
     def test_geography_area(self):
