@@ -189,10 +189,10 @@ class ForNode(Node):
                 if unpack:
                     # If there are multiple loop variables, unpack the item into
                     # them.
-                    if not isinstance(item, (list, tuple)):
-                        len_item = 1
-                    else:
+                    try:
                         len_item = len(item)
+                    except TypeError:  # not an iterable
+                        len_item = 1
                     # Check loop variable count before unpacking
                     if num_loopvars != len_item:
                         raise ValueError(

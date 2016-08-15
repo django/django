@@ -51,3 +51,5 @@ Bugfixes
 
 * Fixed annotations with database functions when combined with lookups on
   PostGIS (:ticket:`27014`).
+
+* Reallowed the ``{% for %}`` tag to unpack any iterable (:ticket:`27058`).
