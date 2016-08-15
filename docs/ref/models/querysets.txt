@@ -540,13 +540,15 @@ Example::
 
 The ``values()`` method also takes optional keyword arguments, ``**expressions``,
 which are passed through to the ``annotate()`` method. This avoids repetition
-of the annotation alias.
+of the annotation alias. Each value passed must be the name of a field or an 
+expression.
 
 Example::
 
     >>> Blog.objects.values(lower_name=Lower('name'))
     <QuerySet [{'lower_name': 'beatles blog'}]>
-
+    >>> Blog.objects.values(title='name')
+    <QuerySet [{'title': 'Beatles Blog'}]>
 
 An aggregate added within a values clause will be applied before other
 arguments within the same values clause. If you need to group by another
@@ -626,7 +628,7 @@ You can also refer to fields on related models with reverse relations through
 
 .. versionchanged:: 1.11
 
-    Added support for expressions via keyword arguments.
+    Added support for expressions and aliases via keyword arguments.
 
 ``values_list()``
 ~~~~~~~~~~~~~~~~~

@@ -64,6 +64,14 @@ class BasicExpressionsTests(TestCase):
             [{'salary': 10}, {'salary': 20}, {'salary': 30}],
         )
 
+    def test_values_expression_alias(self):
+        companies = Company.objects.values(salary='ceo__salary')
+
+        self.assertSequenceEqual(
+            companies,
+            [{'salary': 10}, {'salary': 20}, {'salary': 30}],
+        )
+
     def test_values_expression_group_by(self):
         # values applies annotate first, so values selected are
         # grouped by id, not firstname

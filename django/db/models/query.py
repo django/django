@@ -679,10 +679,13 @@ class QuerySet(object):
         return RawQuerySet(raw_query, model=self.model, params=params, translations=translations, using=using)
 
     def _values(self, *fields, **expressions):
-        clone = self._clone()
-
         if expressions:
-            clone = clone.annotate(**expressions)
+            for name, expression in expressions.items():
+                if not hasattr(expression, 'resolve_expression'):
+                    expressions[name] = F(expression)
+            clone = self.annotate(**expressions)
+        else:
+            clone = self._clone()
 
         clone._fields = fields
         clone.query.set_values(fields)
