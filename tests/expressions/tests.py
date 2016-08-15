@@ -58,6 +58,49 @@ class BasicExpressionsTests(TestCase):
         )
         self.assertEqual(companies['result'], 2395)
 
+    def test_values_expression(self):
+        self.assertSequenceEqual(
+            Company.objects.values(salary=F('ceo__salary')),
+            [{'salary': 10}, {'salary': 20}, {'salary': 30}],
+        )
+
+    def test_values_expression_group_by(self):
+        # values applies annotate first, so values selected are
+        # grouped by id, not firstname
+        Employee.objects.create(firstname='Joe', lastname='Jones', salary=2)
+
+        joes = Employee.objects.filter(firstname='Joe')
+        values = joes.values('firstname', sum_salary=Sum('salary'))
+        values_annotated = joes.values('firstname').annotate(sum_salary=Sum('salary'))
+
+        self.assertSequenceEqual(
+            values,
+            [{'firstname': 'Joe', 'sum_salary': 10}, {'firstname': 'Joe', 'sum_salary': 2}],
+        )
+        self.assertSequenceEqual(values_annotated, [{'firstname': 'Joe', 'sum_salary': 12}])
+
+    def test_chained_values_with_expression(self):
+        Employee.objects.create(firstname='Joe', lastname='Jones', salary=2)
+
+        joes = Employee.objects.filter(firstname='Joe').values('firstname')
+        duplicate_firstname = joes.values('firstname', sum_salary=Sum('salary'))
+        single_firstname = joes.values(sum_salary=Sum('salary'))
+
+        self.assertSequenceEqual(duplicate_firstname, [{'firstname': 'Joe', 'sum_salary': 12}])
+        self.assertSequenceEqual(single_firstname, [{'sum_salary': 12}])
+
+    def test_values_list_expression(self):
+        companies = Company.objects.values_list('name', F('ceo__salary'))
+
+        self.assertSequenceEqual(
+            companies,
+            [('Example Inc.', 10), ('Foobar Ltd.', 20), ('Test GmbH', 30)],
+        )
+
+    def test_values_list_expression_flat(self):
+        companies = Company.objects.values_list(F('ceo__salary'), flat=True)
+        self.assertSequenceEqual(companies, (10, 20, 30))
+
     def test_annotate_values_filter(self):
         companies = Company.objects.annotate(
             foo=RawSQL('%s', ['value']),

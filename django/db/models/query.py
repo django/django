@@ -678,14 +678,19 @@ class QuerySet(object):
             using = self.db
         return RawQuerySet(raw_query, model=self.model, params=params, translations=translations, using=using)
 
-    def _values(self, *fields):
+    def _values(self, *fields, **expressions):
         clone = self._clone()
+
+        if expressions:
+            clone = clone.annotate(**expressions)
+
         clone._fields = fields
         clone.query.set_values(fields)
         return clone
 
-    def values(self, *fields):
-        clone = self._values(*fields)
+    def values(self, *fields, **expressions):
+        fields += tuple(expressions)
+        clone = self._values(*fields, **expressions)
         clone._iterable_class = ValuesIterable
         return clone
 
@@ -697,7 +702,17 @@ class QuerySet(object):
         if flat and len(fields) > 1:
             raise TypeError("'flat' is not valid when values_list is called with more than one field.")
 
-        clone = self._values(*fields)
+        _fields = []
+        expressions = {}
+        for field in fields:
+            if hasattr(field, 'resolve_expression'):
+                field_id = str(id(field))
+                expressions[field_id] = field
+                _fields.append(field_id)
+            else:
+                _fields.append(field)
+
+        clone = self._values(*_fields, **expressions)
         clone._iterable_class = FlatValuesListIterable if flat else ValuesListIterable
         return clone
 
