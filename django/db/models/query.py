@@ -681,42 +681,7 @@ class QuerySet(object):
     def _values(self, *fields):
         clone = self._clone()
         clone._fields = fields
-
-        query = clone.query
-        query.select_related = False
-        query.clear_deferred_loading()
-        query.clear_select_fields()
-
-        if query.group_by is True:
-            query.add_fields((f.attname for f in self.model._meta.concrete_fields), False)
-            query.set_group_by()
-            query.clear_select_fields()
-
-        if fields:
-            field_names = []
-            extra_names = []
-            annotation_names = []
-            if not query._extra and not query._annotations:
-                # Shortcut - if there are no extra or annotations, then
-                # the values() clause must be just field names.
-                field_names = list(fields)
-            else:
-                query.default_cols = False
-                for f in fields:
-                    if f in query.extra_select:
-                        extra_names.append(f)
-                    elif f in query.annotation_select:
-                        annotation_names.append(f)
-                    else:
-                        field_names.append(f)
-            query.set_extra_mask(extra_names)
-            query.set_annotation_mask(annotation_names)
-        else:
-            field_names = [f.attname for f in self.model._meta.concrete_fields]
-
-        query.values_select = field_names
-        query.add_fields(field_names, True)
-
+        clone.query.set_values(fields)
         return clone
 
     def values(self, *fields):
