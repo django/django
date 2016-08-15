@@ -15,7 +15,7 @@ class PostGISAdapter(object):
         """
         Initialize on the spatial object.
         """
-        self.is_geometry = isinstance(obj, Geometry)
+        self.is_geometry = isinstance(obj, (Geometry, PostGISAdapter))
 
         # Getting the WKB (in string form, to allow easy pickling of
         # the adaptor) and the SRID from the geometry or raster.

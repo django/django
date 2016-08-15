@@ -1,7 +1,8 @@
 from decimal import Decimal
 
-from django.contrib.gis.db.models.fields import GeometryField
+from django.contrib.gis.db.models.fields import GeometryField, RasterField
 from django.contrib.gis.db.models.sql import AreaField
+from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import (
     Area as AreaMeasure, Distance as DistanceMeasure,
 )
@@ -40,6 +41,8 @@ class GeoFunc(Func):
     def as_sql(self, compiler, connection):
         if self.function is None:
             self.function = connection.ops.spatial_function_name(self.name)
+        if any(isinstance(field, RasterField) for field in self.get_source_fields()):
+            raise TypeError("Geometry functions not supported for raster fields.")
         return super(GeoFunc, self).as_sql(compiler, connection)
 
     def resolve_expression(self, *args, **kwargs):
@@ -87,6 +90,8 @@ class GeomValue(Value):
 
 class GeoFuncWithGeoParam(GeoFunc):
     def __init__(self, expression, geom, *expressions, **extra):
+        if not isinstance(geom, Geometry):
+            raise TypeError("Please provide a geometry object.")
         if not hasattr(geom, 'srid') or not geom.srid:
             raise ValueError("Please provide a geometry attribute with a defined SRID.")
         super(GeoFuncWithGeoParam, self).__init__(expression, GeomValue(geom), *expressions, **extra)
