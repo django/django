@@ -7,7 +7,7 @@ import re
 import shutil
 import time
 import warnings
-from unittest import SkipTest, skipUnless
+from unittest import skipUnless
 
 from django.core import management
 from django.core.management import execute_from_command_line
@@ -498,7 +498,7 @@ class SymlinkExtractorTests(ExtractorTests):
                 try:
                     os.symlink(os.path.join(self.test_dir, 'templates'), self.symlinked_dir)
                 except (OSError, NotImplementedError):
-                    raise SkipTest("os.symlink() is available on this OS but can't be used by this user.")
+                    self.skipTest("os.symlink() is available on this OS but can't be used by this user.")
             os.chdir(self.test_dir)
             management.call_command('makemessages', locale=[LOCALE], verbosity=0, symlinks=True)
             self.assertTrue(os.path.exists(self.PO_FILE))
@@ -507,7 +507,7 @@ class SymlinkExtractorTests(ExtractorTests):
                 self.assertMsgId('This literal should be included.', po_contents)
             self.assertLocationCommentPresent(self.PO_FILE, None, 'templates_symlinked', 'test.html')
         else:
-            raise SkipTest("os.symlink() not available on this OS + Python version combination.")
+            self.skipTest("os.symlink() not available on this OS + Python version combination.")
 
 
 class CopyPluralFormsExtractorTests(ExtractorTests):

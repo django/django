@@ -156,7 +156,7 @@ class CompilationErrorHandling(MessageCompilationTests):
             else:
                 cmd = MakeMessagesCommand()
                 if cmd.gettext_version < (0, 18, 3):
-                    raise unittest.SkipTest("python-brace-format is a recent gettext addition.")
+                    self.skipTest("python-brace-format is a recent gettext addition.")
                 with self.assertRaisesMessage(CommandError, "' cannot start a field name"):
                     call_command('compilemessages', locale=['ko'], verbosity=0)
 
