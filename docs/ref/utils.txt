@@ -1107,6 +1107,12 @@ For a complete discussion on the usage of the following see the
 
 .. function:: string_concat(*strings)
 
+    .. deprecated:: 1.11
+
+        Use :meth:`django.utils.text.format_lazy` instead.
+        ``string_concat(*strings)`` can be replaced by
+        ``format_lazy('{}' * len(strings), *strings)``.
+
     Lazy variant of string concatenation, needed for translations that are
     constructed from multiple parts.
 

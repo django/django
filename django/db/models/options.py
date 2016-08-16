@@ -22,8 +22,8 @@ from django.utils.encoding import (
     force_text, python_2_unicode_compatible, smart_text,
 )
 from django.utils.functional import cached_property
-from django.utils.text import camel_case_to_spaces
-from django.utils.translation import override, string_concat
+from django.utils.text import camel_case_to_spaces, format_lazy
+from django.utils.translation import override
 
 NOT_PROVIDED = object()
 
@@ -197,7 +197,7 @@ class Options(object):
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
             if self.verbose_name_plural is None:
-                self.verbose_name_plural = string_concat(self.verbose_name, 's')
+                self.verbose_name_plural = format_lazy('{}s', self.verbose_name)
 
             # order_with_respect_and ordering are mutually exclusive.
             self._ordering_clash = bool(self.ordering and self.order_with_respect_to)
@@ -206,7 +206,7 @@ class Options(object):
             if meta_attrs != {}:
                 raise TypeError("'class Meta' got invalid attribute(s): %s" % ','.join(meta_attrs.keys()))
         else:
-            self.verbose_name_plural = string_concat(self.verbose_name, 's')
+            self.verbose_name_plural = format_lazy('{}s', self.verbose_name)
         del self.meta
 
         # If the db_table wasn't provided, use the app_label + model_name.

@@ -16,10 +16,12 @@ from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.template import Context, Template, TemplateSyntaxError
 from django.test import (
-    RequestFactory, SimpleTestCase, TestCase, override_settings,
+    RequestFactory, SimpleTestCase, TestCase, ignore_warnings,
+    override_settings,
 )
 from django.utils import six, translation
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.formats import (
     date_format, get_format, get_format_modules, iter_format_modules, localize,
     localize_input, reset_format_cache, sanitize_separators, time_format,
@@ -417,6 +419,7 @@ class TranslationTests(SimpleTestCase):
                     ' super results{% endblocktrans %}'
                 )
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_string_concat(self):
         """
         six.text_type(string_concat(...)) should not raise a TypeError - #4796
