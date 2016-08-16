@@ -46,7 +46,7 @@ class TimezoneTests(SimpleTestCase):
         except (OverflowError, ValueError) as exc:
             self.assertIn("install pytz", exc.args[0])
         else:
-            raise unittest.SkipTest("Failed to trigger an OverflowError or ValueError")
+            self.skipTest("Failed to trigger an OverflowError or ValueError")
 
     def test_now(self):
         with override_settings(USE_TZ=True):
