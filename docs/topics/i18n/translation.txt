@@ -70,6 +70,16 @@ as a shorter alias, ``_``, to save typing.
        global ``_()`` function causes interference. Explicitly importing
        ``ugettext()`` as ``_()`` avoids this problem.
 
+.. admonition:: What functions may be aliased as ``_``?
+
+    Because of how ``xgettext`` (used by :djadmin:`makemessages`) works, only
+    functions that take a single string argument can be imported as ``_``:
+
+    * :func:`~django.utils.translation.gettext`
+    * :func:`~django.utils.translation.gettext_lazy`
+    * :func:`~django.utils.translation.ugettext`
+    * :func:`~django.utils.translation.ugettext_lazy`
+
 In this example, the text ``"Welcome to my site."`` is marked as a translation
 string::
 
