@@ -795,7 +795,8 @@ class AddIndex(IndexOperation):
         )
 
     def describe(self):
-        return 'Create index on field(s) %s of model %s' % (
+        return 'Create index %s on field(s) %s of model %s' % (
+            self.index.name,
             ', '.join(self.index.fields),
             self.model_name,
         )
