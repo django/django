@@ -204,7 +204,7 @@ Using managers for related object access
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, Django uses an instance of the ``Model._base_manager`` manager
-class when accessing related objects (i.e. ``choice.poll``), not the
+class when accessing related objects (i.e. ``choice.question``), not the
 ``_default_manager`` on the related object. This is because Django needs to be
 able to retrieve the related object, even if it would otherwise be filtered out
 (and hence be inaccessible) by the default manager.
@@ -213,6 +213,12 @@ If the normal base manager class (:class:`django.db.models.Manager`) isn't
 appropriate for your circumstances, you can tell Django which class to use by
 setting :attr:`Meta.base_manager_name
 <django.db.models.Options.base_manager_name>`.
+
+Manager's aren't used when querying on related models. For example, if the
+``Question`` model :ref:`from the tutorial <creating-models>` had a ``deleted``
+field and a base manager that filters out instances with ``deleted=True``, a
+queryset like ``Choice.objects.filter(question__name__startswith='What')``
+would include choices related to deleted questions.
 
 Don't filter away any results in this type of manager subclass
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
