@@ -6,6 +6,7 @@ from datetime import date, datetime, timedelta
 from threading import Thread
 
 from django.db import DatabaseError, IntegrityError, connection
+from django.db.models import Q
 from django.test import (
     TestCase, TransactionTestCase, ignore_warnings, skipUnlessDBFeature,
 )
@@ -160,6 +161,39 @@ class GetOrCreateTests(TestCase):
         )
         self.assertTrue(created)
         self.assertEqual(date(1943, 2, 25), obj.birthday)
+
+    def test_q_lookup_created(self):
+        """
+
+        """
+        obj, created = Person.objects.get_or_create(
+            query=Q(first_name="George") | Q(first_name='Bruce'),
+            defaults={"first_name": "George", "last_name": "Harrison", "birthday": lambda: date(1943, 2, 25)},
+        )
+        self.assertTrue(created)
+        self.assertEqual(date(1943, 2, 25), obj.birthday)
+
+    def test_q_lookup_found(self):
+        """
+
+        """
+        obj, created = Person.objects.get_or_create(
+            query=Q(first_name="George") | Q(first_name='John'),
+            defaults={"first_name": "George", "last_name": "Harrison", "birthday": lambda: date(1943, 2, 25)},
+        )
+        self.assertFalse(created)
+        self.assertNotEqual(date(1943, 2, 25), obj.birthday)
+
+    def test_q_lookup_ambiguous(self):
+        """
+
+        """
+        self.assertRaises(
+            ValueError,
+            Person.objects.get_or_create,
+            query=Q(first_name="George") | Q(first_name='Bruce'),
+            defaults={"last_name": "Harrison"}
+        )
 
     def test_callable_defaults_not_called(self):
         def raise_exception():
