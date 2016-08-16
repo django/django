@@ -17,7 +17,8 @@ class TestsBinding(ChannelTestCase):
             stream = 'test'
             fields = ['username', 'email', 'password', 'last_name']
 
-            def group_names(self, instance, action):
+            @classmethod
+            def group_names(cls, instance):
                 return ["users"]
 
             def has_permission(self, user, action, pk):
@@ -58,7 +59,8 @@ class TestsBinding(ChannelTestCase):
             stream = 'test'
             fields = ['__all__']
 
-            def group_names(self, instance, action):
+            @classmethod
+            def group_names(cls, instance):
                 return ["users2"]
 
             def has_permission(self, user, action, pk):
@@ -102,7 +104,8 @@ class TestsBinding(ChannelTestCase):
             stream = 'test'
             fields = ['username']
 
-            def group_names(self, instance, action):
+            @classmethod
+            def group_names(cls, instance):
                 return ["users3"]
 
             def has_permission(self, user, action, pk):
