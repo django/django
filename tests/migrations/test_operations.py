@@ -1405,7 +1405,7 @@ class OperationTests(OperationTestBase):
             migrations.AddIndex("Pony", models.Index(fields=["pink"]))
         index = models.Index(fields=["pink"], name="test_adin_pony_pink_idx")
         operation = migrations.AddIndex("Pony", index)
-        self.assertEqual(operation.describe(), "Create index on field(s) pink of model Pony")
+        self.assertEqual(operation.describe(), "Create index test_adin_pony_pink_idx on field(s) pink of model Pony")
         new_state = project_state.clone()
         operation.state_forwards("test_adin", new_state)
         # Test the database alteration
