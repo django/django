@@ -13,6 +13,8 @@ using the :meth:`~django.dispatch.Signal.send` method.
     The :doc:`authentication framework </topics/auth/index>` sends :ref:`signals when
     a user is logged in / out <topics-auth-signals>`.
 
+.. _model-signals:
+
 Model signals
 =============
 
