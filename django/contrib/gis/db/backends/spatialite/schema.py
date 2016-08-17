@@ -9,6 +9,10 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
     )
     sql_add_spatial_index = "SELECT CreateSpatialIndex(%(table)s, %(column)s)"
     sql_drop_spatial_index = "DROP TABLE idx_%(table)s_%(column)s"
+    sql_recover_geometry_metadata = (
+        "SELECT RecoverGeometryColumn(%(table)s, %(column)s, %(srid)s, "
+        "%(geom_type)s, %(dim)s)"
+    )
     sql_remove_geometry_metadata = "SELECT DiscardGeometryColumn(%(table)s, %(column)s)"
     sql_discard_geometry_columns = "DELETE FROM %(geom_table)s WHERE f_table_name = %(table)s"
     sql_update_geometry_columns = (
@@ -147,13 +151,12 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         # Re-add geometry-ness and rename spatial index tables
         for field in model._meta.local_fields:
             if isinstance(field, GeometryField):
-                self.execute(self.sql_add_geometry_column % {
+                self.execute(self.sql_recover_geometry_metadata % {
                     "table": self.geo_quote_name(new_db_table),
                     "column": self.geo_quote_name(field.column),
                     "srid": field.srid,
                     "geom_type": self.geo_quote_name(field.geom_type),
                     "dim": field.dim,
-                    "null": int(not field.null),
                 })
             if getattr(field, 'spatial_index', False):
                 self.execute(self.sql_rename_table % {
