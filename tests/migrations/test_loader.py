@@ -378,7 +378,10 @@ class LoaderTests(TestCase):
         loader.check_consistent_history(connection)
         recorder = MigrationRecorder(connection)
         recorder.record_applied('migrations', '0002_second')
-        msg = "Migration migrations.0002_second is applied before its dependency migrations.0001_initial"
+        msg = (
+            "Migration migrations.0002_second is applied before its dependency "
+            "migrations.0001_initial on database 'default'."
+        )
         with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
             loader.check_consistent_history(connection)
 
