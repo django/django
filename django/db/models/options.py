@@ -14,6 +14,7 @@ from django.db.models import Manager
 from django.db.models.fields import AutoField
 from django.db.models.fields.proxy import OrderWrt
 from django.db.models.fields.related import OneToOneField
+from django.db.models.query_utils import PathInfo
 from django.utils import six
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.deprecation import (
@@ -669,6 +670,28 @@ class Options(object):
                 # of the chain to the ancestor is that parent
                 # links
                 return self.parents[parent] or parent_link
+
+    def get_path_to_parent(self, parent):
+        """
+        Get path from current model to a parent model.
+
+        Returns an empty list if parent is not a parent of the current model.
+        """
+        if self.model is parent:
+            return []
+        # Skip the chain of proxy to the concrete proxied model
+        proxied_model = self.concrete_model
+        path = []
+        opts = self
+        for int_model in self.get_base_chain(parent):
+            if int_model is proxied_model:
+                opts = int_model._meta
+            else:
+                final_field = opts.parents[int_model]
+                targets = (final_field.remote_field.get_related_field(),)
+                opts = int_model._meta
+                path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
+        return path
 
     def _populate_directed_relation_graph(self):
         """
