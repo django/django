@@ -360,6 +360,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     )
 
     def is_usable(self):
+        if self.connection is None:
+            return False
         try:
             self.connection.ping()
         except Database.Error:
