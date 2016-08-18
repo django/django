@@ -385,10 +385,10 @@ class UUIDUserPasswordResetTest(CustomUserPasswordResetTest):
 
 class ChangePasswordTest(AuthViewsTestCase):
 
-    def fail_login(self, password='password'):
+    def fail_login(self):
         response = self.client.post('/login/', {
             'username': 'testclient',
-            'password': password,
+            'password': 'password',
         })
         self.assertFormError(response, AuthenticationForm.error_messages['invalid_login'] % {
             'username': User._meta.get_field('username').verbose_name
@@ -505,7 +505,7 @@ class LoginTest(AuthViewsTestCase):
             self.assertIsInstance(response.context['site'], RequestSite)
         self.assertIsInstance(response.context['form'], AuthenticationForm)
 
-    def test_security_check(self, password='password'):
+    def test_security_check(self):
         login_url = reverse('login')
 
         # Those URLs should not pass the security check
@@ -524,7 +524,7 @@ class LoginTest(AuthViewsTestCase):
             }
             response = self.client.post(nasty_url, {
                 'username': 'testclient',
-                'password': password,
+                'password': 'password',
             })
             self.assertEqual(response.status_code, 302)
             self.assertNotIn(bad_url, response.url,
@@ -546,7 +546,7 @@ class LoginTest(AuthViewsTestCase):
             }
             response = self.client.post(safe_url, {
                 'username': 'testclient',
-                'password': password,
+                'password': 'password',
             })
             self.assertEqual(response.status_code, 302)
             self.assertIn(good_url, response.url, "%s should be allowed" % good_url)
@@ -560,7 +560,7 @@ class LoginTest(AuthViewsTestCase):
         # the custom authentication form used by this login asserts
         # that a request is passed to the form successfully.
 
-    def test_login_csrf_rotate(self, password='password'):
+    def test_login_csrf_rotate(self):
         """
         Makes sure that a login rotates the currently-used CSRF token.
         """
@@ -579,7 +579,7 @@ class LoginTest(AuthViewsTestCase):
         req = HttpRequest()
         req.COOKIES[settings.CSRF_COOKIE_NAME] = token1
         req.method = "POST"
-        req.POST = {'username': 'testclient', 'password': password, 'csrfmiddlewaretoken': token1}
+        req.POST = {'username': 'testclient', 'password': 'password', 'csrfmiddlewaretoken': token1}
 
         # Use POST request to log in
         SessionMiddleware().process_request(req)
@@ -876,7 +876,7 @@ class LogoutTest(AuthViewsTestCase):
         self.assertURLEqual(response.url, '/password_reset/')
         self.confirm_logged_out()
 
-    def test_security_check(self, password='password'):
+    def test_security_check(self):
         logout_url = reverse('logout')
 
         # Those URLs should not pass the security check
