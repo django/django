@@ -227,6 +227,14 @@ Models
   to truncate :class:`~django.db.models.DateTimeField` to its time component
   and exposed it through the :lookup:`time` lookup.
 
+* Added support for expressions in :meth:`Queryset.values()
+  <django.db.models.query.QuerySet.values>` and
+  :meth:`Queryset.values_list()
+  <django.db.models.query.QuerySet.values_list>`.
+
+* Added support for aliases in :meth:`Queryset.values()
+  <django.db.models.query.QuerySet.values>`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
