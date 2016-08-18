@@ -2482,7 +2482,22 @@ class ToFieldTests(TestCase):
             [node1]
         )
 
-    def test_isnull_query(self):
+class IsNullTests(TestCase):
+    def test_primary_key(self):
+        custom = CustomPk.objects.create(name="pk")
+        Related.objects.create(name="null")
+        Related.objects.create(name="not null", custom=custom)
+        self.assertQuerysetEqual(
+            Related.objects.filter(custom__isnull=False),
+            ['<Related: not null>']
+        )
+        self.assertQuerysetEqual(
+            Related.objects.filter(custom__isnull=True),
+            ['<Related: null>']
+
+        )
+
+    def test_to_field(self):
         apple = Food.objects.create(name="apple")
         Eaten.objects.create(food=apple, meal="lunch")
         Eaten.objects.create(meal="lunch")

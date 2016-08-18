@@ -261,7 +261,11 @@ class CustomPk(models.Model):
 
 
 class Related(models.Model):
-    custom = models.ForeignKey(CustomPk, models.CASCADE)
+    custom = models.ForeignKey(CustomPk, models.CASCADE, null=True)
+    name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
 
 
 class CustomPkTag(models.Model):
