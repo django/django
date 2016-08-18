@@ -292,8 +292,10 @@ class MigrationLoader(object):
                         if all(m in applied for m in self.replacements[parent].replaces):
                             continue
                     raise InconsistentMigrationHistory(
-                        "Migration {}.{} is applied before its dependency {}.{}".format(
+                        "Migration {}.{} is applied before its dependency "
+                        "{}.{} on database '{}'.".format(
                             migration[0], migration[1], parent[0], parent[1],
+                            connection.alias,
                         )
                     )
 

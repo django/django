@@ -65,3 +65,6 @@ Bugfixes
 * Reverted a few admin checks that checked ``field.many_to_many`` back to
   ``isinstance(field, models.ManyToManyField)`` since it turned out the checks
   weren't suitable to be generalized like that (:ticket:`26998`).
+
+* Added the database alias to the ``InconsistentMigrationHistory`` message
+  raised by ``makemigrations`` and ``migrate`` (:ticket:`27089`).
