@@ -227,6 +227,9 @@ Models
   to truncate :class:`~django.db.models.DateTimeField` to its time component
   and exposed it through the :lookup:`time` lookup.
 
+* :attr:`~django.db.models.Options.permissions` now supports class interpolation
+  using the ``'%(class)s'`` and ``'%(verbose_name)s'`` string.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

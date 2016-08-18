@@ -299,6 +299,34 @@ example, the following checks if a user may view tasks::
 
     user.has_perm('app.view_task')
 
+Custom permissions may contain the ``%(class)s`` and ``%(verbose_name)s``
+placeholders. Child models will then inherit the specific permission::
+
+    class BaseTask(models.Model):
+        ...
+        class Meta:
+            abstract = True
+            permissions = (
+                ("view_%(class)s", "Can view %(verbose_name)s"),
+            )
+
+
+    class Task(BaseTask):
+        ...
+        class Meta(BaseTask.Meta):
+            permissions = BaseTask.Meta.permissions + (
+                ("close_task", "Can remove a task by setting its status as closed"),
+            )
+
+
+The ``Task`` model will have two custom permissions: ``app.view_task`` and
+``app.close_task``.
+
+.. versionadded:: 1.11
+
+    Added ``%(class)s`` and ``%(verbose_name)s`` interpolation for custom
+    permissions.
+
 .. _extending-user:
 
 Extending the existing ``User`` model

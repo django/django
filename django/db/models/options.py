@@ -194,6 +194,16 @@ class Options(object):
             self.unique_together = normalize_together(self.unique_together)
             self.index_together = normalize_together(self.index_together)
 
+            # Replace any %(model_name)s / %(verbose_name)s placeholders.
+            perms = meta_attrs.pop('permissions', self.permissions)
+            interpolated_perms = []
+            if perms:
+                for codename, name in perms:
+                    codename %= {'class': self.model_name}
+                    name = name % {'verbose_name': self.verbose_name}
+                    interpolated_perms.append((codename, name))
+            self.permissions = interpolated_perms
+
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
             if self.verbose_name_plural is None:

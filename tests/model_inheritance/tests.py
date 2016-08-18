@@ -155,6 +155,36 @@ class ModelInheritanceTests(TestCase):
 
         self.assertIs(C._meta.parents[A], C._meta.get_field('a'))
 
+    @isolate_apps('model_inheritance')
+    def test_permission_inheritance_abstract(self):
+        """
+        Abstract permissions with %class interpolation should become concrete
+        """
+        class A(models.Model):
+            class Meta:
+                app_label = 'model_inheritance'
+                abstract = True
+                permissions = [
+                    ('view_%(class)s', 'View %(verbose_name)s'),
+                ]
+
+        class B(A):
+            pass
+
+        class C(A):
+            class Meta(A.Meta):
+                app_label = 'model_inheritance'
+                permissions = A.Meta.permissions + [
+                    ('concrete_c_permission', 'Concrete C permission'),
+                ]
+
+        self.assertEqual(A._meta.permissions, [('view_a', 'View a')])
+        self.assertEqual(B._meta.permissions, [('view_b', 'View b')])
+        self.assertEqual(
+            C._meta.permissions,
+            [('view_c', 'View c'), ('concrete_c_permission', 'Concrete C permission')]
+        )
+
 
 class ModelInheritanceDataTests(TestCase):
     @classmethod
