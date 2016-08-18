@@ -579,8 +579,8 @@ against ``dict``::
 
 .. _subclassing-context-requestcontext:
 
-Subclassing ``Context``: ``RequestContext``
--------------------------------------------
+Using ``RequestContext``
+------------------------
 
 .. class:: RequestContext(request, dict_=None, processors=None)
 
@@ -646,17 +646,17 @@ using the optional, third positional argument, ``processors``. In this
 example, the :class:`RequestContext` instance gets a ``ip_address`` variable::
 
     from django.http import HttpResponse
-    from django.template import RequestContext
+    from django.template import RequestContext, Template
 
     def ip_address_processor(request):
         return {'ip_address': request.META['REMOTE_ADDR']}
 
-    def some_view(request):
-        # ...
-        c = RequestContext(request, {
-            'foo': 'bar',
+    def client_ip_view(request):
+        template = Template('{{ title }}: {{ ip_address }}')
+        context = RequestContext(request, {
+            'title': 'Your IP Address',
         }, [ip_address_processor])
-        return HttpResponse(t.render(c))
+        return HttpResponse(template.render(context))
 
 .. _context-processors:
 
