@@ -302,7 +302,7 @@ with the admin site:
   ``fields``.
 * **admin.E012**: There are duplicate field(s) in ``fieldsets[n][1]``.
 * **admin.E013**: ``fields[n]/fieldsets[n][m]`` cannot include the
-  many-to-many field ``<field name>``, because that field manually specifies a
+  ``ManyToManyField`` ``<field name>``, because that field manually specifies a
   relationship model.
 * **admin.E014**: The value of ``exclude`` must be a list or tuple.
 * **admin.E015**: The value of ``exclude`` contains duplicate field(s).
@@ -326,8 +326,8 @@ with the admin site:
 * **admin.E027**: The value of ``prepopulated_fields`` refers to
   ``<field name>``, which is not an attribute of ``<model>``.
 * **admin.E028**: The value of ``prepopulated_fields`` refers to
-  ``<field name>``, which must not be a ``DateTimeField``, a foreign key or a
-  many-to-many field.
+  ``<field name>``, which must not be a ``DateTimeField``, a ``ForeignKey``, or a
+  ``ManyToManyField`` field.
 * **admin.E029**: The value of ``prepopulated_fields[<field name>]`` must be a
   list or tuple.
 * **admin.E030**: The value of ``prepopulated_fields`` refers to
@@ -361,7 +361,7 @@ with the admin site:
   which is not a callable, an attribute of ``<ModelAdmin class>``, or an
   attribute or method on ``<model>``.
 * **admin.E109**: The value of ``list_display[n]`` must not be a
-  many-to-many field.
+  ``ManyToManyField`` field.
 * **admin.E110**: The value of ``list_display_links`` must be a list, a tuple,
   or ``None``.
 * **admin.E111**: The value of ``list_display_links[n]`` refers to ``<label>``,
