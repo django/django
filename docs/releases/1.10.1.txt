@@ -61,3 +61,7 @@ Bugfixes
 
 * Fixed ``contrib.admindocs`` crash when a view is in a class, such as some of
   the admin views (:ticket:`27018`).
+
+* Fixed a regressions in admin checks ``admin.E013``, ``admin.E029``, and
+  ``admin.E109`` which were too strict regarding many-to-many fields
+  (:ticket:`26998`).

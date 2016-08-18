@@ -925,7 +925,7 @@ class PrepopulatedFieldsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             ("The value of 'prepopulated_fields' refers to 'users', which must not be "
-             "a DateTimeField, a foreign key, or a many-to-many field."),
+             "a DateTimeField, a ForeignKey, or a ManyToManyField."),
             'admin.E028')
 
     def test_valid_case(self):
@@ -963,7 +963,7 @@ class ListDisplayTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            "The value of 'list_display[0]' must not be a many-to-many field.",
+            "The value of 'list_display[0]' must not be a ManyToManyField.",
             'admin.E109')
 
     def test_valid_case(self):
