@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# xiu1 <d84ea@hotmail.co.jp>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kentaro Hori <kentaro0919@gmail.com>, 2015
-# Shinya Okano <tokibito@gmail.com>, 2012-2015
+# Shinya Okano <tokibito@gmail.com>, 2012-2016
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-28 03:10+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-10 13:16+0000\n"
+"Last-Translator: xiu1 <d84ea@hotmail.co.jp>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -61,6 +62,9 @@ msgstr "デンマーク語"
 
 msgid "German"
 msgstr "ドイツ語"
+
+msgid "Lower Sorbian"
+msgstr "低地ソルブ語"
 
 msgid "Greek"
 msgstr "ギリシャ語"
@@ -131,6 +135,9 @@ msgstr "ヒンディー語"
 msgid "Croatian"
 msgstr "クロアチア語"
 
+msgid "Upper Sorbian"
+msgstr "高地ソルブ語"
+
 msgid "Hungarian"
 msgstr "ハンガリー語"
 
@@ -191,7 +198,7 @@ msgstr "マラーティー語"
 msgid "Burmese"
 msgstr "ビルマ語"
 
-msgid "Norwegian Bokmal"
+msgid "Norwegian Bokmål"
 msgstr "ノルウェーのブークモール"
 
 msgid "Nepali"
@@ -289,9 +296,6 @@ msgstr "静的ファイル"
 
 msgid "Syndication"
 msgstr "シンジケーション"
-
-msgid "Web Design"
-msgstr "ウェブデザイン"
 
 msgid "Enter a valid value."
 msgstr "値を正しく入力してください。"
@@ -422,6 +426,9 @@ msgstr "整数"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' は整数値にしなければなりません。"
 
+msgid "Big (8 byte) integer"
+msgstr "大きな(8バイト)整数"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' は真偽値にしなければなりません。"
@@ -502,9 +509,6 @@ msgstr "'%(value)s' は小数値にしなければなりません。"
 msgid "Floating point number"
 msgstr "浮動小数点"
 
-msgid "Big (8 byte) integer"
-msgstr "大きな(8バイト)整数"
-
 msgid "IPv4 address"
 msgstr "IPv4アドレス"
 
@@ -576,6 +580,14 @@ msgstr "外部キー(型は関連フィールドによって決まります)"
 
 msgid "One-to-one relationship"
 msgstr "1対1の関連"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s の関連"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s の関連"
 
 msgid "Many-to-many relationship"
 msgstr "多対多の関連"

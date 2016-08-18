@@ -4,32 +4,38 @@ import sys
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.base.creation import BaseDatabaseCreation
+from django.utils.encoding import force_text
 from django.utils.six.moves import input
 
 
 class DatabaseCreation(BaseDatabaseCreation):
 
+    @staticmethod
+    def is_in_memory_db(database_name):
+        return database_name == ':memory:' or 'mode=memory' in force_text(database_name)
+
     def _get_test_db_name(self):
         test_database_name = self.connection.settings_dict['TEST']['NAME']
         can_share_in_memory_db = self.connection.features.can_share_in_memory_db
-        if test_database_name and test_database_name != ':memory:':
-            if 'mode=memory' in test_database_name and not can_share_in_memory_db:
-                raise ImproperlyConfigured(
-                    "Using a shared memory database with `mode=memory` in the "
-                    "database name is not supported in your environment, "
-                    "use `:memory:` instead."
-                )
-            return test_database_name
+        if not test_database_name:
+            test_database_name = ':memory:'
         if can_share_in_memory_db:
-            return 'file:memorydb_%s?mode=memory&cache=shared' % self.connection.alias
-        return ':memory:'
+            if test_database_name == ':memory:':
+                return 'file:memorydb_%s?mode=memory&cache=shared' % self.connection.alias
+        elif 'mode=memory' in test_database_name:
+            raise ImproperlyConfigured(
+                "Using a shared memory database with `mode=memory` in the "
+                "database name is not supported in your environment, "
+                "use `:memory:` instead."
+            )
+        return test_database_name
 
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
         test_database_name = self._get_test_db_name()
 
         if keepdb:
             return test_database_name
-        if not self.connection.is_in_memory_db(test_database_name):
+        if not self.is_in_memory_db(test_database_name):
             # Erase the old test database
             if verbosity >= 1:
                 print("Destroying old test database for alias %s..." % (
@@ -55,7 +61,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     def get_test_db_clone_settings(self, number):
         orig_settings_dict = self.connection.settings_dict
         source_database_name = orig_settings_dict['NAME']
-        if self.connection.is_in_memory_db(source_database_name):
+        if self.is_in_memory_db(source_database_name):
             return orig_settings_dict
         else:
             new_settings_dict = orig_settings_dict.copy()
@@ -67,7 +73,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         source_database_name = self.connection.settings_dict['NAME']
         target_database_name = self.get_test_db_clone_settings(number)['NAME']
         # Forking automatically makes a copy of an in-memory database.
-        if not self.connection.is_in_memory_db(source_database_name):
+        if not self.is_in_memory_db(source_database_name):
             # Erase the old test database
             if os.access(target_database_name, os.F_OK):
                 if keepdb:
@@ -88,7 +94,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 sys.exit(2)
 
     def _destroy_test_db(self, test_database_name, verbosity):
-        if test_database_name and not self.connection.is_in_memory_db(test_database_name):
+        if test_database_name and not self.is_in_memory_db(test_database_name):
             # Remove the SQLite database file
             os.remove(test_database_name)
 
@@ -102,6 +108,6 @@ class DatabaseCreation(BaseDatabaseCreation):
         """
         test_database_name = self._get_test_db_name()
         sig = [self.connection.settings_dict['NAME']]
-        if self.connection.is_in_memory_db(test_database_name):
+        if self.is_in_memory_db(test_database_name):
             sig.append(self.connection.alias)
         return tuple(sig)

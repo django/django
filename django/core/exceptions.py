@@ -187,3 +187,8 @@ class ValidationError(Exception):
 
     def __repr__(self):
         return 'ValidationError(%s)' % self
+
+
+class EmptyResultSet(Exception):
+    """A database query predicate is impossible."""
+    pass

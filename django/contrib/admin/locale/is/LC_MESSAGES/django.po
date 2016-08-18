@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
@@ -64,6 +64,12 @@ msgstr "Þessi mánuður"
 msgid "This year"
 msgstr "Þetta ár"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -74,6 +80,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Aðgerð:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Bæta við öðrum %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Fjarlægja"
 
 msgid "action time"
 msgstr "tími aðgerðar"
@@ -87,6 +100,8 @@ msgstr ""
 msgid "object id"
 msgstr "kenni hlutar"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "framsetning hlutar"
 
@@ -117,6 +132,30 @@ msgstr "Eyddi \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "LogEntry hlutur"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "og"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Engum reitum breytt."
+
 msgid "None"
 msgstr "Ekkert"
 
@@ -124,65 +163,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-msgid "Added."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
-#, python-format
-msgid "Changed %s."
-msgstr "Breytti %s."
-
-msgid "and"
-msgstr "og"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Bætti við %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Breytti %(list)s fyrir %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Eyddi %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Engum reitum breytt."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"%(name)s „%(obj)s“ hefur verið bætt við. Þú getur breytt því aftur að neðan."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s „%(obj)s“ var bætt við."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"%(name)s \"%(obj)s\" hefur verið breytt. Þú getur breytt því aftur að neðan."
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
-"%(name)s \"%(obj)s\" hefur verið breytt. Þú getur bætt við öðru %(name)s að "
-"neðan."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s „%(obj)s“ hefur verið breytt."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -335,18 +344,15 @@ msgstr "Skjölun"
 msgid "Log out"
 msgstr "Skrá út"
 
-msgid "Add"
-msgstr "Bæta við"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Bæta við %(name)s"
 
 msgid "History"
 msgstr "Saga"
 
 msgid "View on site"
 msgstr "Skoða á vef"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Bæta við %(name)s"
 
 msgid "Filter"
 msgstr "Sía"
@@ -429,13 +435,6 @@ msgstr ""
 msgid "Change"
 msgstr "Breyta"
 
-msgid "Remove"
-msgstr "Fjarlægja"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Bæta við öðrum %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Eyða?"
 
@@ -450,14 +449,17 @@ msgstr ""
 msgid "Models in the %(name)s application"
 msgstr ""
 
+msgid "Add"
+msgstr "Bæta við"
+
 msgid "You don't have permission to edit anything."
 msgstr "Þú hefur ekki réttindi til að breyta neinu"
 
-msgid "Recent Actions"
-msgstr "Nýlegar aðgerðir"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "Mínar aðgerðir"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Engin fáanleg"

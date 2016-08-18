@@ -5,13 +5,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lyuboslav  Petrov <petrov.lyuboslav@gmail.com>, 2014
 # Todor Lubenov <tgl.sysdev@gmail.com>, 2011,2015
+# Venelin Stoykov <vkstoykov@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-11 10:05+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-30 17:52+0000\n"
+"Last-Translator: Venelin Stoykov <vkstoykov@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +22,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "Административна Документация"
 
 msgid "Home"
 msgstr "Начало"
@@ -40,6 +41,10 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"За да инсталирате bookmarklet-и, задърпайте линка в лентата с отметки "
+"(bookmarks toolbar), или щракнете с десния бутон и добавете линка в "
+"отметките. Сега можете да изберете bookmarklet-а от която и да е страница на "
+"сайта."
 
 msgid "Documentation for this page"
 msgstr "Документация за тази страница"
@@ -119,7 +124,7 @@ msgid "Model: %(name)s"
 msgstr "Модел: %(name)s"
 
 msgid "Fields"
-msgstr ""
+msgstr "Полета"
 
 msgid "Field"
 msgstr "Поле"
@@ -131,16 +136,16 @@ msgid "Description"
 msgstr "Описание"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "Методи и аргументи"
 
 msgid "Method"
-msgstr ""
+msgstr "Метод"
 
 msgid "Arguments"
-msgstr ""
+msgstr "Аргументи"
 
-msgid "Back to Model Documentation"
-msgstr ""
+msgid "Back to Model documentation"
+msgstr " Върни се в документацията на модела"
 
 msgid "Model documentation"
 msgstr "Модел документация"
@@ -159,9 +164,10 @@ msgstr "Template: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Шаблон: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
-msgstr ""
+msgstr "Път за търсене на шаблон \"%(name)s\""
 
 msgid "(does not exist)"
 msgstr "(Не съществува)"
@@ -213,8 +219,8 @@ msgstr "Контекст:"
 msgid "Templates:"
 msgstr "Шаблони:"
 
-msgid "Back to Views Documentation"
-msgstr "Обратно към документацията за Изгледите"
+msgid "Back to View documentation"
+msgstr ""
 
 msgid "View documentation"
 msgstr "Документация за Изгледи"
@@ -257,7 +263,7 @@ msgstr "изглед:"
 
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr ""
+msgstr "Приложението %(app_label)r не е намерено"
 
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"

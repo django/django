@@ -22,6 +22,7 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.six import StringIO
 
+from .forms import MediaActionForm
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
     AdminOrderedModelMethod, Album, Answer, Article, BarAccount, Book,
@@ -235,6 +236,7 @@ class PersonaAdmin(admin.ModelAdmin):
 
 class SubscriberAdmin(admin.ModelAdmin):
     actions = ['mail_admin']
+    action_form = MediaActionForm
 
     def mail_admin(self, request, selected):
         EmailMessage(
@@ -344,7 +346,7 @@ class LanguageAdmin(admin.ModelAdmin):
 
 class RecommendationAdmin(admin.ModelAdmin):
     show_full_result_count = False
-    search_fields = ('=titletranslation__text', '=recommender__titletranslation__text',)
+    search_fields = ('=titletranslation__text', '=the_recommender__titletranslation__text',)
 
 
 class WidgetInline(admin.StackedInline):

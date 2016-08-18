@@ -1,0 +1,58 @@
+===========================
+Django 1.10.1 release notes
+===========================
+
+*Under development*
+
+Django 1.10.1 fixes several bugs in 1.10.
+
+Bugfixes
+========
+
+* Fixed a crash in MySQL connections where ``SELECT @@SQL_AUTO_IS_NULL``
+  doesn't return a result (:ticket:`26991`).
+
+* Allowed ``User.is_authenticated`` and ``User.is_anonymous`` properties to be
+  compared using ``==`` and ``!=`` (:ticket:`26988`).
+
+* Removed the broken ``BaseCommand.usage()`` method which was for
+  ``optparse`` support (:ticket:`27000`).
+
+* Fixed a checks framework crash with an empty ``Meta.default_permissions``
+  (:ticket:`26997`).
+
+* Fixed a regression in the number of queries when using ``RadioSelect`` with a
+  ``ModelChoiceField`` form field (:ticket:`27001`).
+
+* Fixed a crash if ``request.META['CONTENT_LENGTH']`` is an empty string
+  (:ticket:`27005`).
+
+* Fixed the ``isnull`` lookup on a ``ForeignKey`` with its ``to_field``
+  pointing to a ``CharField`` or pointing to a ``CharField`` defined with
+  ``primary_key=True`` (:ticket:`26983`).
+
+* Prevented the ``migrate`` command from raising
+  ``InconsistentMigrationHistory`` in the presence of unapplied squashed
+  migrations (:ticket:`27004`).
+
+* Fixed a regression in ``Client.force_login()`` which required specifying a
+  ``backend`` rather than automatically using the first one if multiple
+  backends are configured (:ticket:`27027`).
+
+* Made ``QuerySet.bulk_create()`` properly initialize model instances on
+  backends, such as PostgreSQL, that support returning the IDs of the created
+  records so that many-to-many relationships can be used on the new objects
+  (:ticket:`27026`).
+
+* Fixed crash of ``django.views.static.serve()`` with ``show_indexes`` enabled
+  (:ticket:`26973`).
+
+* Fixed ``ClearableFileInput`` to avoid the ``required`` HTML attribute when
+  initial data exists (:ticket:`27037`).
+
+* Fixed annotations with database functions when combined with lookups on
+  PostGIS (:ticket:`27014`).
+
+* Reallowed the ``{% for %}`` tag to unpack any iterable (:ticket:`27058`).
+
+* Fixed ``makemigrations`` crash if a database is read-only (:ticket:`27054`).

@@ -7,7 +7,7 @@ requests. If you're interested in how core developers handle them, see
 :doc:`../committing-code`.
 
 Below, we are going to show how to create a GitHub pull request containing the
-changes for Trac ticket #xxxxx. By creating a fully-ready pull request you
+changes for Trac ticket #xxxxx. By creating a fully-ready pull request, you
 will make the reviewer's job easier, meaning that your work is more likely to
 be merged into Django.
 
@@ -24,7 +24,7 @@ your operating system's package manager.
 Django's `Git repository`_ is hosted on `GitHub`_, and it is recommended
 that you also work using GitHub.
 
-After installing Git the first thing you should do is setup your name and
+After installing Git, the first thing you should do is setup your name and
 email::
 
   $ git config --global user.name "Your Real Name"
@@ -48,7 +48,7 @@ forked Django's repository, create a local copy of your fork::
 
 This will create a new directory "django", containing a clone of your GitHub
 repository. The rest of the git commands on this page need to be run within the
-cloned directory so switch to it now::
+cloned directory, so switch to it now::
 
     cd django
 
@@ -67,7 +67,7 @@ You can add other remotes similarly, for example::
 Working on a ticket
 ===================
 
-When working on a ticket create a new branch for the work, and base that work
+When working on a ticket, create a new branch for the work, and base that work
 on upstream/master::
 
     git checkout -b ticket_xxxxx upstream/master
@@ -79,7 +79,7 @@ If instead you were working for a fix on the 1.4 branch, you would do::
 
     git checkout -b ticket_xxxxx_1_4 upstream/stable/1.4.x
 
-Assume the work is carried on ticket_xxxxx branch. Make some changes and
+Assume the work is carried on the ticket_xxxxx branch. Make some changes and
 commit them::
 
     git commit
@@ -101,7 +101,7 @@ You can publish your work on GitHub just by doing::
 
   git push origin ticket_xxxxx
 
-When you go to your GitHub page you will notice a new branch has been created.
+When you go to your GitHub page, you will notice a new branch has been created.
 
 If you are working on a Trac ticket, you should mention in the ticket that
 your work is available from branch ticket_xxxxx of your GitHub repo. Include a
@@ -133,7 +133,7 @@ a pull request at GitHub. A good pull request means:
 The test suite must pass and the documentation must build without warnings.
 
 Once you have created your pull request, you should add a comment in the
-related Trac ticket explaining what you've done. In particular you should note
+related Trac ticket explaining what you've done. In particular, you should note
 the environment in which you ran the tests, for instance: "all tests pass
 under SQLite and MySQL".
 
@@ -146,7 +146,7 @@ himself.
 Rebasing branches
 -----------------
 
-In the example above you created two commits, the "Fixed ticket_xxxxx" commit
+In the example above, you created two commits, the "Fixed ticket_xxxxx" commit
 and "Added two more tests" commit.
 
 We do not want to have the entire history of your working process in your
@@ -174,7 +174,7 @@ commit, for example to fix a typo in a docstring::
     # Now you are able to rework the commit (use git add normally to add changes)
     # When finished, commit work with "--amend" and continue
     git commit --amend
-    # reword the commit message if needed
+    # Reword the commit message if needed
     git rebase --continue
     # The second and third commits should be applied.
 
@@ -186,7 +186,7 @@ push the changes::
 
 Note that this will rewrite history of ticket_xxxxx - if you check the commit
 hashes before and after the operation at GitHub you will notice that the
-commit hashes do not match any more. This is acceptable, as the branch is merely
+commit hashes do not match anymore. This is acceptable, as the branch is merely
 a topic branch, and nobody should be basing their work on it.
 
 After upstream has changed
@@ -204,7 +204,7 @@ example case using upstream/master.
 The rebase command removes all your local commits temporarily, applies the
 upstream commits, and then applies your local commits again on the work.
 
-If there are merge conflicts you will need to resolve them and then use ``git
+If there are merge conflicts, you will need to resolve them and then use ``git
 rebase --continue``. At any point you can use ``git rebase --abort`` to return
 to the original state.
 
@@ -237,7 +237,7 @@ of::
     - Fixed whitespace errors in foobar
     - Reworded the docstring of bar()
 
-Finally push your work back to your GitHub repository. Since you didn't touch
+Finally, push your work back to your GitHub repository. Since you didn't touch
 the public commits during the rebase, you should not need to force-push::
 
     git push origin ticket_xxxxx

@@ -152,19 +152,6 @@ class BaseDatabaseOperations(object):
         else:
             return 'DISTINCT'
 
-    def drop_foreignkey_sql(self):
-        """
-        Returns the SQL command that drops a foreign key.
-        """
-        return "DROP CONSTRAINT"
-
-    def drop_sequence_sql(self, table):
-        """
-        Returns any SQL necessary to drop the sequence for the given table.
-        Returns None if no SQL is necessary.
-        """
-        return None
-
     def fetch_returned_insert_id(self, cursor):
         """
         Given a cursor object that has just performed an INSERT...RETURNING
@@ -190,12 +177,14 @@ class BaseDatabaseOperations(object):
         """
         return []
 
-    def for_update_sql(self, nowait=False):
+    def for_update_sql(self, nowait=False, skip_locked=False):
         """
         Returns the FOR UPDATE SQL clause to lock rows for an update operation.
         """
         if nowait:
             return 'FOR UPDATE NOWAIT'
+        elif skip_locked:
+            return 'FOR UPDATE SKIP LOCKED'
         else:
             return 'FOR UPDATE'
 

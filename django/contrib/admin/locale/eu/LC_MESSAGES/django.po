@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
@@ -64,6 +64,12 @@ msgstr "Hilabete hau"
 msgid "This year"
 msgstr "Urte hau"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -74,6 +80,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Ekintza:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Gehitu beste %(verbose_name)s bat"
+
+msgid "Remove"
+msgstr "Kendu"
 
 msgid "action time"
 msgstr "Ekintza hordua"
@@ -87,6 +100,8 @@ msgstr ""
 msgid "object id"
 msgstr "Objetuaren id-a"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "Objeturaren aurkezpena"
 
@@ -117,6 +132,30 @@ msgstr "\"%(object)s\" ezabatuta."
 msgid "LogEntry Object"
 msgstr "LogEntry objektua"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "eta"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Ez da eremurik aldatu."
+
 msgid "None"
 msgstr "Bat ere ez"
 
@@ -124,67 +163,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-msgid "Added."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
-#, python-format
-msgid "Changed %s."
-msgstr "%s aldatuta."
-
-msgid "and"
-msgstr "eta"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" gehituta."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Changed %(list)s for %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" ezabatuta."
-
-msgid "No fields changed."
-msgstr "Ez da eremurik aldatu."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" ondo gehitu da. Jarraian aldatu dezakezu berriro."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" ondo gehitu da. Beste %(name)s bat gehitu dezakezu "
-"jarraian."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" ondo gehitu da."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"%(name)s \"%(obj)s\" ondo aldatu da. Aldaketa gehiago egin ditzazkezu "
-"jarraian."
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
-"%(name)s \"%(obj)s\" ondo aldatu da. Beste %(name)s bat gehitu dezakezu "
-"jarraian."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" ondo aldatu da."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -343,18 +350,15 @@ msgstr "Dokumentazioa"
 msgid "Log out"
 msgstr "Irten"
 
-msgid "Add"
-msgstr "Gehitu"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Gehitu  %(name)s"
 
 msgid "History"
 msgstr "Historia"
 
 msgid "View on site"
 msgstr "Ikusi gunean"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Gehitu  %(name)s"
 
 msgid "Filter"
 msgstr "Iragazkia"
@@ -438,13 +442,6 @@ msgstr ""
 msgid "Change"
 msgstr "Aldatu"
 
-msgid "Remove"
-msgstr "Kendu"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Gehitu beste %(verbose_name)s bat"
-
 msgid "Delete?"
 msgstr "Ezabatu?"
 
@@ -459,14 +456,17 @@ msgstr ""
 msgid "Models in the %(name)s application"
 msgstr "%(name)s aplikazioaren modeloak"
 
+msgid "Add"
+msgstr "Gehitu"
+
 msgid "You don't have permission to edit anything."
 msgstr "Ez daukazu ezer aldatzeko baimenik."
 
-msgid "Recent Actions"
-msgstr "Azken ekintzak"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "Nire ekintzak"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Ez dago ezer"

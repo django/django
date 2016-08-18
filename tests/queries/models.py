@@ -261,7 +261,7 @@ class CustomPk(models.Model):
 
 
 class Related(models.Model):
-    custom = models.ForeignKey(CustomPk, models.CASCADE)
+    custom = models.ForeignKey(CustomPk, models.CASCADE, null=True)
 
 
 class CustomPkTag(models.Model):

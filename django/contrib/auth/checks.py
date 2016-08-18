@@ -111,7 +111,10 @@ def check_models_permissions(app_configs=None, **kwargs):
         opts = model._meta
         builtin_permissions = dict(_get_builtin_permissions(opts))
         # Check builtin permission name length.
-        max_builtin_permission_name_length = max(len(name) for name in builtin_permissions.values())
+        max_builtin_permission_name_length = (
+            max(len(name) for name in builtin_permissions.values())
+            if builtin_permissions else 0
+        )
         if max_builtin_permission_name_length > permission_name_max_length:
             verbose_name_max_length = (
                 permission_name_max_length - (max_builtin_permission_name_length - len(opts.verbose_name_raw))

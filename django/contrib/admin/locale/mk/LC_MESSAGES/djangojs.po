@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-02-15 10:39+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-15 11:07+0000\n"
 "Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
@@ -148,15 +148,69 @@ msgstr "Вчера"
 msgid "Tomorrow"
 msgstr "Утре"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Јануари Февруари Март Април Мај Јуни Јули Август Септември Октомври Ноември "
-"Декември"
+msgid "January"
+msgstr "Јануари"
 
-msgid "S M T W T F S"
-msgstr "Н П В С Ч П С"
+msgid "February"
+msgstr "Февруари"
+
+msgid "March"
+msgstr "Март"
+
+msgid "April"
+msgstr "Април"
+
+msgid "May"
+msgstr "Мај"
+
+msgid "June"
+msgstr "Јуни"
+
+msgid "July"
+msgstr "Јули"
+
+msgid "August"
+msgstr "Август"
+
+msgid "September"
+msgstr "Септември"
+
+msgid "October"
+msgstr "Октомври"
+
+msgid "November"
+msgstr "Ноември"
+
+msgid "December"
+msgstr "Декември"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "Н"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "П"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "В"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "С"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "Ч"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "П"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "С"
 
 msgid "Show"
 msgstr "Прикажи"

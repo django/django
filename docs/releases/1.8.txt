@@ -225,10 +225,10 @@ Minor features
 * It is now allowed to include a subquery as a geographic lookup argument, for
   example ``City.objects.filter(point__within=Country.objects.filter(continent='Africa').values('mpoly'))``.
 
-* The Spatialite backend now supports ``Collect`` and ``Extent`` aggregates
+* The SpatiaLite backend now supports ``Collect`` and ``Extent`` aggregates
   when the database version is 3.0 or later.
 
-* The PostGIS 2 ``CREATE EXTENSION postgis`` and the Spatialite
+* The PostGIS 2 ``CREATE EXTENSION postgis`` and the SpatiaLite
   ``SELECT InitSpatialMetaData`` initialization commands are now automatically
   run by :djadmin:`migrate`.
 

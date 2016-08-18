@@ -4,13 +4,14 @@
 # eallik <eallik@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
+# Martin Pajuste <martinpajuste@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-11 20:52+0000\n"
-"Last-Translator: Janno Liivak <jannolii@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 11:01+0000\n"
+"Last-Translator: Martin Pajuste <martinpajuste@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -148,15 +149,69 @@ msgstr "Eile"
 msgid "Tomorrow"
 msgstr "Homme"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Jaanuar Veebruar Märts Aprill Mai Juuni Juuli August September Oktoober "
-"November Detsember"
+msgid "January"
+msgstr "jaanuar"
 
-msgid "S M T W T F S"
-msgstr "P E T K N R L"
+msgid "February"
+msgstr "veebruar"
+
+msgid "March"
+msgstr "märts"
+
+msgid "April"
+msgstr "aprill"
+
+msgid "May"
+msgstr "mai"
+
+msgid "June"
+msgstr "juuni"
+
+msgid "July"
+msgstr "juuli"
+
+msgid "August"
+msgstr "august"
+
+msgid "September"
+msgstr "september"
+
+msgid "October"
+msgstr "oktoober"
+
+msgid "November"
+msgstr "november"
+
+msgid "December"
+msgstr "detsember"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "P"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "E"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "T"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "K"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "N"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "R"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "L"
 
 msgid "Show"
 msgstr "Näita"

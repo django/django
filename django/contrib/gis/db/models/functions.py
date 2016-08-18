@@ -74,6 +74,9 @@ class GeomValue(Value):
     def as_sql(self, compiler, connection):
         return '%s(%%s, %s)' % (connection.ops.from_text, self.srid), [connection.ops.Adapter(self.value)]
 
+    def as_mysql(self, compiler, connection):
+        return '%s(%%s)' % (connection.ops.from_text), [connection.ops.Adapter(self.value)]
+
     def as_postgresql(self, compiler, connection):
         if self.geography:
             self.value = connection.ops.Adapter(self.value, geography=self.geography)
@@ -337,7 +340,7 @@ class NumPoints(GeoFunc):
 
     def as_sqlite(self, compiler, connection):
         if self.source_expressions[self.geom_param_pos].output_field.geom_type != 'LINESTRING':
-            raise TypeError("Spatialite NumPoints can only operate on LineString content")
+            raise TypeError("SpatiaLite NumPoints can only operate on LineString content")
         return super(NumPoints, self).as_sql(compiler, connection)
 
 

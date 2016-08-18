@@ -1642,6 +1642,7 @@ class ModelAdmin(BaseModelAdmin):
         if actions:
             action_form = self.action_form(auto_id=None)
             action_form.fields['action'].choices = self.get_action_choices(request)
+            media += action_form.media
         else:
             action_form = None
 

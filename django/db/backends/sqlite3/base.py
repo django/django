@@ -233,7 +233,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # If database is in memory, closing the connection destroys the
         # database. To prevent accidental data loss, ignore close requests on
         # an in-memory db.
-        if not self.is_in_memory_db(self.settings_dict['NAME']):
+        if not self.is_in_memory_db():
             BaseDatabaseWrapper.close(self)
 
     def _savepoint_allowed(self):
@@ -319,8 +319,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         """
         self.cursor().execute("BEGIN")
 
-    def is_in_memory_db(self, name):
-        return name == ":memory:" or "mode=memory" in force_text(name)
+    def is_in_memory_db(self):
+        return self.creation.is_in_memory_db(self.settings_dict['NAME'])
 
 
 FORMAT_QMARK_REGEX = re.compile(r'(?<!%)%s')

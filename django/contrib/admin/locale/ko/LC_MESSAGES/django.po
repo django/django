@@ -1,18 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Hoseok Lee <ihooi77@gmail.com>, 2016
 # Ian Y. Choi <ianyrchoi@gmail.com>, 2015
 # Jaehong Kim <mixe@korea.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jeong Seongtae <magno79@gmail.com>, 2014
+# Jeong Seongtae <magno79@gmail.com>, 2014,2016
 # Taesik Yoon <xotlr43@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-12-02 17:26+0000\n"
-"Last-Translator: Ian Y. Choi <ianyrchoi@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-12 18:25+0000\n"
+"Last-Translator: Jeong Seongtae <magno79@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -65,6 +66,12 @@ msgstr "이번 달"
 msgid "This year"
 msgstr "이번 해"
 
+msgid "No date"
+msgstr "날짜 없음"
+
+msgid "Has date"
+msgstr "날짜 있음"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -75,6 +82,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "액션:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "%(verbose_name)s 더 추가하기"
+
+msgid "Remove"
+msgstr "삭제하기"
 
 msgid "action time"
 msgstr "액션 타임"
@@ -88,6 +102,8 @@ msgstr "콘텐츠 타입"
 msgid "object id"
 msgstr "오브젝트 아이디"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "오브젝트 표현"
 
@@ -118,6 +134,30 @@ msgstr "\"%(object)s.\"를 삭제하였습니다."
 msgid "LogEntry Object"
 msgstr "LogEntry 객체"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "{name} \"{object}\"를 추가하였습니다."
+
+msgid "Added."
+msgstr "추가하였습니다."
+
+msgid "and"
+msgstr "또한"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "{name} \"{object}\"의 {fields}가 변경되었습니다."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "{fields}가 변경되었습니다."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "{name} \"{object}\"가 삭제되었습니다."
+
+msgid "No fields changed."
+msgstr "변경된 필드가 없습니다."
+
 msgid "None"
 msgstr "없음"
 
@@ -125,65 +165,43 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "하나 이상을 선택하려면 \"Control\" 키, Mac은 \"Command\"키를 누르세요."
 
-msgid "Added."
-msgstr "추가하였습니다."
-
-#, python-format
-msgid "Changed %s."
-msgstr "%s 이/가 변경되었습니다."
-
-msgid "and"
-msgstr "또한"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" 을/를 추가하였습니다."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "%(list)s에 대한 %(name)s \"%(object)s\" 을/를 변경하였습니다."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" 을/를 삭제하였습니다."
-
-msgid "No fields changed."
-msgstr "변경된 필드가 없습니다."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" 이/가 추가되었습니다. 계속해서 편집하세요."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" 이/가 추가되었습니다.  다른 %(name)s 을(를) 추가할 수 있"
-"습니다."
+"{name} \"{obj}\"가 성공적으로 추가되었습니다. 아래에서 다시 수정할 수 있습니"
+"다."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" 이/가 추가되었습니다."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr "%(name)s \"%(obj)s\" 이/가 변경되었습니다. 계속해서 편집하세요."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
 msgstr ""
-" %(name)s \"%(obj)s\" 이/가 변경되었습니다. 다른 %(name)s 을/를 추가할 수 있"
-"습니다."
+"{name} \"{obj}\"가 성공적으로 추가되었습니다.  아래에서 다른 {name}을 추가할 "
+"수 있습니다."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" 이/가 변경되었습니다."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\"가 성공적으로 추가되었습니다."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\"가 성공적으로 추가되었습니다. 아래에서 다시 수정할 수 있습니"
+"다."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"{name} \"{obj}\"가 성공적으로 추가되었습니다.  아래에서 다른 {name}을 추가할 "
+"수 있습니다."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name} \"{obj}\"가 성공적으로 추가되었습니다."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -337,18 +355,15 @@ msgstr "문서"
 msgid "Log out"
 msgstr "로그아웃"
 
-msgid "Add"
-msgstr "추가"
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s 추가"
 
 msgid "History"
 msgstr "히스토리"
 
 msgid "View on site"
 msgstr "사이트에서 보기"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "%(name)s 추가"
 
 msgid "Filter"
 msgstr "필터"
@@ -432,13 +447,6 @@ msgstr ""
 msgid "Change"
 msgstr "변경"
 
-msgid "Remove"
-msgstr "삭제하기"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "%(verbose_name)s 더 추가하기"
-
 msgid "Delete?"
 msgstr "삭제"
 
@@ -453,14 +461,17 @@ msgstr "개요"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s 애플리케이션의 "
 
+msgid "Add"
+msgstr "추가"
+
 msgid "You don't have permission to edit anything."
 msgstr "수정할 권한이 없습니다."
 
-msgid "Recent Actions"
-msgstr "최근 액션"
+msgid "Recent actions"
+msgstr "최근 액션들"
 
-msgid "My Actions"
-msgstr "나의 액션"
+msgid "My actions"
+msgstr "내 액션들"
 
 msgid "None available"
 msgstr "이용할 수 없습니다."

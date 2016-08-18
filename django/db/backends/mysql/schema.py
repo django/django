@@ -27,8 +27,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def skip_default(self, field):
         """
-        MySQL doesn't accept default values for TEXT and BLOB types, and
-        implicitly treats these columns as nullable.
+        MySQL doesn't accept default values for some data types and implicitly
+        treats these columns as nullable.
         """
         db_type = field.db_type(self.connection)
         return (
@@ -36,6 +36,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             db_type.lower() in {
                 'tinyblob', 'blob', 'mediumblob', 'longblob',
                 'tinytext', 'text', 'mediumtext', 'longtext',
+                'json',
             }
         )
 

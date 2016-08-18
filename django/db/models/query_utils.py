@@ -13,6 +13,7 @@ from collections import namedtuple
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
+from django.utils.lru_cache import lru_cache
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
@@ -25,6 +26,15 @@ class InvalidQuery(Exception):
     The query passed to raw isn't a safe query to use with raw.
     """
     pass
+
+
+def subclasses(cls):
+    yield cls
+    # Python 2 lacks 'yield from', which could replace the inner loop
+    for subclass in cls.__subclasses__():
+        # yield from subclasses(subclass)
+        for item in subclasses(subclass):
+            yield item
 
 
 class QueryWrapper(object):
@@ -132,20 +142,16 @@ class DeferredAttribute(object):
 
 
 class RegisterLookupMixin(object):
-    def _get_lookup(self, lookup_name):
-        try:
-            return self.class_lookups[lookup_name]
-        except KeyError:
-            # To allow for inheritance, check parent class' class_lookups.
-            for parent in inspect.getmro(self.__class__):
-                if 'class_lookups' not in parent.__dict__:
-                    continue
-                if lookup_name in parent.class_lookups:
-                    return parent.class_lookups[lookup_name]
-        except AttributeError:
-            # This class didn't have any class_lookups
-            pass
-        return None
+
+    @classmethod
+    def _get_lookup(cls, lookup_name):
+        return cls.get_lookups().get(lookup_name, None)
+
+    @classmethod
+    @lru_cache(maxsize=None)
+    def get_lookups(cls):
+        class_lookups = [parent.__dict__.get('class_lookups', {}) for parent in inspect.getmro(cls)]
+        return cls.merge_dicts(class_lookups)
 
     def get_lookup(self, lookup_name):
         from django.db.models.lookups import Lookup
@@ -165,6 +171,22 @@ class RegisterLookupMixin(object):
             return None
         return found
 
+    @staticmethod
+    def merge_dicts(dicts):
+        """
+        Merge dicts in reverse to preference the order of the original list. e.g.,
+        merge_dicts([a, b]) will preference the keys in 'a' over those in 'b'.
+        """
+        merged = {}
+        for d in reversed(dicts):
+            merged.update(d)
+        return merged
+
+    @classmethod
+    def _clear_cached_lookups(cls):
+        for subclass in subclasses(cls):
+            subclass.get_lookups.cache_clear()
+
     @classmethod
     def register_lookup(cls, lookup, lookup_name=None):
         if lookup_name is None:
@@ -172,6 +194,7 @@ class RegisterLookupMixin(object):
         if 'class_lookups' not in cls.__dict__:
             cls.class_lookups = {}
         cls.class_lookups[lookup_name] = lookup
+        cls._clear_cached_lookups()
         return lookup
 
     @classmethod

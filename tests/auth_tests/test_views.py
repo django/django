@@ -27,6 +27,7 @@ from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.test import TestCase, override_settings
 from django.test.utils import patch_logger
 from django.urls import NoReverseMatch, reverse, reverse_lazy
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import ParseResult, urlparse
@@ -306,6 +307,14 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertURLEqual(response.url, '/password_reset/')
 
+    def test_confirm_login_post_reset(self):
+        url, path = self._test_confirm_start()
+        path = path.replace('/reset/', '/reset/post_reset_login/')
+        response = self.client.post(path, {'new_password1': 'anewpassword', 'new_password2': 'anewpassword'})
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, '/reset/done/')
+        self.assertIn(SESSION_KEY, self.client.session)
+
     def test_confirm_display_user_from_form(self):
         url, path = self._test_confirm_start()
         response = self.client.get(path)
@@ -470,6 +479,7 @@ class SessionAuthenticationTests(AuthViewsTestCase):
         session auth hash after a password change so the session isn't logged out.
         """
         self.login()
+        original_session_key = self.client.session.session_key
         response = self.client.post('/password_change/', {
             'old_password': 'password',
             'new_password1': 'password1',
@@ -477,6 +487,8 @@ class SessionAuthenticationTests(AuthViewsTestCase):
         })
         # if the hash isn't updated, retrieving the redirection page will fail.
         self.assertRedirects(response, '/password_change/done/')
+        # The session key is rotated.
+        self.assertNotEqual(original_session_key, self.client.session.session_key)
 
 
 class LoginTest(AuthViewsTestCase):
@@ -733,6 +745,10 @@ class LogoutThenLoginTests(AuthViewsTestCase):
         response = logout_then_login(req, login_url='/custom/')
         self.confirm_logged_out()
         self.assertRedirects(response, '/custom/', fetch_redirect_response=False)
+
+    def test_deprecated_extra_context(self):
+        with self.assertRaisesMessage(RemovedInDjango21Warning, 'The unused `extra_context` parameter'):
+            logout_then_login(None, extra_context={})
 
 
 class LoginRedirectAuthenticatedUser(AuthViewsTestCase):

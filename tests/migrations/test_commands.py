@@ -9,8 +9,12 @@ import sys
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
-from django.db import DatabaseError, connection, connections, models
-from django.db.migrations.exceptions import InconsistentMigrationHistory
+from django.db import (
+    ConnectionHandler, DatabaseError, connection, connections, models,
+)
+from django.db.migrations.exceptions import (
+    InconsistentMigrationHistory, MigrationSchemaMissing,
+)
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import ignore_warnings, mock, override_settings
 from django.utils import six
@@ -579,6 +583,40 @@ class MakeMigrationsTests(MigrationTestBase):
                 importlib.invalidate_caches()
             call_command('makemigrations', 'migrations', '--empty', '-n', 'a', '-v', '0')
             self.assertTrue(os.path.exists(os.path.join(migration_dir, '0002_a.py')))
+
+    def test_makemigrations_empty_connections(self):
+        empty_connections = ConnectionHandler({'default': {}})
+        with mock.patch('django.core.management.commands.makemigrations.connections', new=empty_connections):
+            # with no apps
+            out = six.StringIO()
+            call_command('makemigrations', stdout=out)
+            self.assertIn('No changes detected', out.getvalue())
+            # with an app
+            with self.temporary_migration_module() as migration_dir:
+                call_command('makemigrations', 'migrations', verbosity=0)
+                init_file = os.path.join(migration_dir, '__init__.py')
+                self.assertTrue(os.path.exists(init_file))
+
+    def test_makemigrations_other_datbase_is_readonly(self):
+        """
+        makemigrations ignores the non-default database if it's read-only.
+        """
+        def patched_ensure_schema(migration_recorder):
+            from django.db import connections
+            if migration_recorder.connection is connections['other']:
+                raise MigrationSchemaMissing()
+            else:
+                return mock.DEFAULT
+
+        self.assertTableNotExists('migrations_unicodemodel')
+        apps.register_model('migrations', UnicodeModel)
+        with mock.patch.object(
+                MigrationRecorder, 'ensure_schema',
+                autospec=True, side_effect=patched_ensure_schema):
+            with self.temporary_migration_module() as migration_dir:
+                call_command("makemigrations", "migrations", verbosity=0)
+                initial_file = os.path.join(migration_dir, "0001_initial.py")
+                self.assertTrue(os.path.exists(initial_file))
 
     def test_failing_migration(self):
         # If a migration fails to serialize, it shouldn't generate an empty file. #21280

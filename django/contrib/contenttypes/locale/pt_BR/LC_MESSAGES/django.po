@@ -2,6 +2,7 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
+# Carlos E C Leite <caduado@gmail.com>, 2016
 # Guilherme Gondim, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-10-13 15:47+0000\n"
-"Last-Translator: andrewsmedina <andrewsmedina@gmail.com>\n"
+"PO-Revision-Date: 2016-06-05 14:09+0000\n"
+"Last-Translator: Carlos E C Leite <caduado@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +24,7 @@ msgid "Content Types"
 msgstr "Tipos de Conteúdo"
 
 msgid "python model class name"
-msgstr "nome da classe model em python"
+msgstr "nome da classe de modelo em python"
 
 msgid "content type"
 msgstr "tipo de conteúdo"

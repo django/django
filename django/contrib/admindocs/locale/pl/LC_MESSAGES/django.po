@@ -5,16 +5,17 @@
 # angularcircle, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janusz Harkot <jh@blueice.pl>, 2015
-# Maciek Olko <maciej.olko@gmail.com>, 2014
+# m_aciek <maciej.olko@gmail.com>, 2016
+# m_aciek <maciej.olko@gmail.com>, 2014
 # p <inactive+poczciwiec@transifex.com>, 2014
 # Mattia Procopio <promat85@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-11-25 17:02+0000\n"
-"Last-Translator: Janusz Harkot <jh@blueice.pl>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-06 22:22+0000\n"
+"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -144,7 +145,7 @@ msgstr "Metoda"
 msgid "Arguments"
 msgstr "Parametry"
 
-msgid "Back to Model Documentation"
+msgid "Back to Model documentation"
 msgstr "Powrót do dokumentacji modelu"
 
 msgid "Model documentation"
@@ -164,6 +165,7 @@ msgstr "Szablon: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Szablon: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Szukaj ścieżki dla szablonu \"%(name)s\":"
@@ -218,8 +220,8 @@ msgstr "Kontekst:"
 msgid "Templates:"
 msgstr "Szablony:"
 
-msgid "Back to Views Documentation"
-msgstr "Powrót do dokumentacji widoków"
+msgid "Back to View documentation"
+msgstr "Powrót do dokumentacji widoku"
 
 msgid "View documentation"
 msgstr "Zobacz dokumentację"

@@ -3,22 +3,25 @@
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
+# FilipeCifali <cifali.filipe@gmail.com>, 2016
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
+# Francisco Petry Rauber <xico.petry@gmail.com>, 2016
 # Gladson <gladsonbrito@gmail.com>, 2013
 # Guilherme Gondim, 2012-2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Marco Rougeth <marco@rougeth.com>, 2015
+# Raysa Dutra, 2016
 # Sergio Garcia <sergio@ginx.com.br>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-27 19:20+0000\n"
-"Last-Translator: Sergio Garcia <sergio@ginx.com.br>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-28 23:31+0000\n"
+"Last-Translator: andrewsmedina <andrewsmedina@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -72,6 +75,12 @@ msgstr "Este mês"
 msgid "This year"
 msgstr "Este ano"
 
+msgid "No date"
+msgstr "Sem data"
+
+msgid "Has date"
+msgstr "Tem data"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -82,6 +91,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Ação:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Adicionar outro(a) %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Remover"
 
 msgid "action time"
 msgstr "hora da ação"
@@ -95,6 +111,8 @@ msgstr "tipo de conteúdo"
 msgid "object id"
 msgstr "id do objeto"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "repr do objeto"
 
@@ -125,6 +143,30 @@ msgstr "Removido \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "Objeto LogEntry"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "Adicionado {name} \"{object}\"."
+
+msgid "Added."
+msgstr "Adicionado."
+
+msgid "and"
+msgstr "e"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "Alterado {fields} para {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Alterado {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Removido {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "Nenhum campo modificado."
+
 msgid "None"
 msgstr "Nenhum"
 
@@ -134,75 +176,50 @@ msgstr ""
 "Mantenha pressionado o \"Control\", ou \"Command\" no Mac, para selecionar "
 "mais de uma opção."
 
-msgid "Added."
-msgstr "Adicionado."
-
-#, python-format
-msgid "Changed %s."
-msgstr "Modificado %s."
-
-msgid "and"
-msgstr "e"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Adicionado %(name)s \"%(object)s\""
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Modificado %(list)s para %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Deletado %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Nenhum campo modificado."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s adicionado com sucesso. Você pode editar novamente abaixo."
+"O {name} \"{obj}\" foi adicionado com sucesso. Você pode editar ele "
+"novamente abaixo."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s adicionado com sucesso. Você pode adicionar um outro "
-"%(name)s abaixo."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" foi adicionado com sucesso."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"%(name)s \"%(obj)s\" modificado com sucesso. Você pode editá-lo novamente "
-"abaixo."
+"O {name} \"{obj}\" foi adicionado com sucesso. Você pode adicionar outro "
+"{name} abaixo."
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "O {name} \"{obj}\" foi adicionado com sucesso."
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" alterado com sucesso. Você pode adicionar um outro "
-"%(name)s abaixo."
+"O {name} \"{obj}\" foi alterado com sucesso. Você pode modificar ele "
+"novamente abaixo."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" modificado com sucesso."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"O {name} \"{obj}\" foi alterado com sucesso. Você pode adicionar outro "
+"{name} abaixo."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "O {name} \"{obj}\" foi alterado com sucesso."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
-"Os itens devem ser selecionados a fim de executar ações sobre eles. Nenhum "
-"item foi modificado."
+"Os itens devem ser selecionados em ordem a fim de executar ações sobre eles. "
+"Nenhum item foi modificado."
 
 msgid "No action selected."
 msgstr "Nenhuma ação selecionada."
@@ -213,7 +230,7 @@ msgstr "%(name)s \"%(obj)s\": excluído com sucesso."
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Objeto %(name)s com chave primária %(key)r não existe."
+msgstr "Objeto %(name)s com chave primária %(key)r não existe. "
 
 #, python-format
 msgid "Add %s"
@@ -305,7 +322,7 @@ msgid "Run the selected action"
 msgstr "Executar ação selecionada"
 
 msgid "Go"
-msgstr "Fazer"
+msgstr "Ir"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Clique aqui para selecionar os objetos de todas as páginas"
@@ -352,18 +369,15 @@ msgstr "Documentação"
 msgid "Log out"
 msgstr "Encerrar sessão"
 
-msgid "Add"
-msgstr "Adicionar"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Adicionar %(name)s"
 
 msgid "History"
 msgstr "Histórico"
 
 msgid "View on site"
 msgstr "Ver no site"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Adicionar %(name)s"
 
 msgid "Filter"
 msgstr "Filtro"
@@ -448,13 +462,6 @@ msgstr ""
 msgid "Change"
 msgstr "Modificar"
 
-msgid "Remove"
-msgstr "Remover"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Adicionar outro(a) %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Apagar?"
 
@@ -469,13 +476,16 @@ msgstr "Resumo"
 msgid "Models in the %(name)s application"
 msgstr "Modelos na aplicação %(name)s"
 
+msgid "Add"
+msgstr "Adicionar"
+
 msgid "You don't have permission to edit anything."
 msgstr "Você não tem permissão para edição."
 
-msgid "Recent Actions"
-msgstr "Ações Recentes"
+msgid "Recent actions"
+msgstr "Ações recentes"
 
-msgid "My Actions"
+msgid "My actions"
 msgstr "Minhas Ações"
 
 msgid "None available"
@@ -611,15 +621,16 @@ msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
-"O link para a recuperação de senha era inválido, possivelmente porque jã foi "
+"O link para a recuperação de senha era inválido, possivelmente porque já foi "
 "utilizado. Por favor, solicite uma nova recuperação de senha."
 
 msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Nós te enviamos as instruções para redefinição de sua senha, se existir uma "
-"conta com o e-mail que você forneceu. Você receberá a mensagem em breve."
+"Nós te enviamos por e-mail as instruções para redefinição de sua senha, se "
+"existir uma conta com o e-mail que você forneceu. Você receberá a mensagem "
+"em breve."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
@@ -680,7 +691,7 @@ msgid "Time:"
 msgstr "Hora:"
 
 msgid "Lookup"
-msgstr "Olhar"
+msgstr "Procurar"
 
 msgid "Currently:"
 msgstr "Atualmente:"

@@ -400,14 +400,23 @@ class ManyToManyTests(TestCase):
         self.a4.publications.set([], clear=True)
         self.assertQuerysetEqual(self.a4.publications.all(), [])
 
-    def test_assign_deprecation(self):
+    def test_assign_forward_deprecation(self):
         msg = (
-            "Direct assignment to the reverse side of a related set is "
+            "Direct assignment to the reverse side of a many-to-many set is "
             "deprecated due to the implicit save() that happens. Use "
             "article_set.set() instead."
         )
         with self.assertRaisesMessage(RemovedInDjango20Warning, msg):
             self.p2.article_set = [self.a4, self.a3]
+
+    def test_assign_reverse_deprecation(self):
+        msg = (
+            "Direct assignment to the forward side of a many-to-many "
+            "set is deprecated due to the implicit save() that happens. Use "
+            "publications.set() instead."
+        )
+        with self.assertRaisesMessage(RemovedInDjango20Warning, msg):
+            self.a1.publications = [self.p1, self.p2]
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_assign_deprecated(self):
@@ -508,6 +517,40 @@ class ManyToManyTests(TestCase):
         self.a4.publications.clear()
         self.assertQuerysetEqual(self.a4.publications.all(), [])
         self.assertQuerysetEqual(self.p2.article_set.all(), ['<Article: NASA finds intelligent life on Earth>'])
+
+    def test_clear_after_prefetch(self):
+        a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
+        self.assertQuerysetEqual(a4.publications.all(), ['<Publication: Science News>'])
+        a4.publications.clear()
+        self.assertQuerysetEqual(a4.publications.all(), [])
+
+    def test_remove_after_prefetch(self):
+        a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
+        self.assertQuerysetEqual(a4.publications.all(), ['<Publication: Science News>'])
+        a4.publications.remove(self.p2)
+        self.assertQuerysetEqual(a4.publications.all(), [])
+
+    def test_add_after_prefetch(self):
+        a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
+        self.assertEqual(a4.publications.count(), 1)
+        a4.publications.add(self.p1)
+        self.assertEqual(a4.publications.count(), 2)
+
+    def test_set_after_prefetch(self):
+        a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
+        self.assertEqual(a4.publications.count(), 1)
+        a4.publications.set([self.p2, self.p1])
+        self.assertEqual(a4.publications.count(), 2)
+        a4.publications.set([self.p1])
+        self.assertEqual(a4.publications.count(), 1)
+
+    def test_add_then_remove_after_prefetch(self):
+        a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
+        self.assertEqual(a4.publications.count(), 1)
+        a4.publications.add(self.p1)
+        self.assertEqual(a4.publications.count(), 2)
+        a4.publications.remove(self.p1)
+        self.assertQuerysetEqual(a4.publications.all(), ['<Publication: Science News>'])
 
     def test_inherited_models_selects(self):
         """

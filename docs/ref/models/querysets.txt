@@ -979,6 +979,18 @@ database.
     performance, since you have done a database query that you haven't used. So
     use this feature with caution!
 
+    Also, if you call the database-altering methods
+    :meth:`~django.db.models.fields.related.RelatedManager.add`,
+    :meth:`~django.db.models.fields.related.RelatedManager.remove`,
+    :meth:`~django.db.models.fields.related.RelatedManager.clear` or
+    :meth:`~django.db.models.fields.related.RelatedManager.set`, on
+    :class:`related managers<django.db.models.fields.related.RelatedManager>`,
+    any prefetched cache for the relation will be cleared.
+
+    .. versionchanged:: 1.11
+
+        The clearing of the prefetched cache described above was added.
+
 You can also use the normal join syntax to do related fields of related
 fields. Suppose we have an additional model to the example above::
 
@@ -1516,7 +1528,7 @@ For example::
 ``select_for_update()``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: select_for_update(nowait=False)
+.. method:: select_for_update(nowait=False, skip_locked=False)
 
 Returns a queryset that will lock rows until the end of the transaction,
 generating a ``SELECT ... FOR UPDATE`` SQL statement on supported databases.
@@ -1534,16 +1546,19 @@ selected rows, the query will block until the lock is released. If this is
 not the behavior you want, call ``select_for_update(nowait=True)``. This will
 make the call non-blocking. If a conflicting lock is already acquired by
 another transaction, :exc:`~django.db.DatabaseError` will be raised when the
-queryset is evaluated.
+queryset is evaluated. You can also ignore locked rows by using
+``select_for_update(skip_locked=True)`` instead. The ``nowait`` and
+``skip_locked`` are mutually exclusive and attempts to call
+``select_for_update()`` with both options enabled will result in a
+:exc:`ValueError`.
 
 Currently, the ``postgresql``, ``oracle``, and ``mysql`` database
-backends support ``select_for_update()``. However, MySQL has no support for the
-``nowait`` argument. Obviously, users of external third-party backends should
-check with their backend's documentation for specifics in those cases.
+backends support ``select_for_update()``. However, MySQL doesn't support the
+``nowait`` and ``skip_locked`` arguments.
 
-Passing ``nowait=True`` to ``select_for_update()`` using database backends that
-do not support ``nowait``, such as MySQL, will cause a
-:exc:`~django.db.DatabaseError` to be raised. This is in order to prevent code
+Passing ``nowait=True`` or ``skip_locked=True`` to ``select_for_update()``
+using database backends that do not support these options, such as MySQL, will
+cause a :exc:`~django.db.DatabaseError` to be raised. This prevents code from
 unexpectedly blocking.
 
 Evaluating a queryset with ``select_for_update()`` in autocommit mode on
@@ -1567,6 +1582,10 @@ raised if ``select_for_update()`` is used in autocommit mode.
     pass without raising a ``TransactionManagementError``. To properly test
     ``select_for_update()`` you should use
     :class:`~django.test.TransactionTestCase`.
+
+.. versionchanged:: 1.11
+
+    The ``skip_locked`` argument was added.
 
 ``raw()``
 ~~~~~~~~~

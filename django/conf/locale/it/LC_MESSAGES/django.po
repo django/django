@@ -4,9 +4,10 @@
 # C8E <C8E@miron.it>, 2011
 # C8E <C8E@miron.it>, 2014
 # Denis Darii <denis.darii@gmail.com>, 2011
-# Flavio Curella <flavio.curella@gmail.com>, 2013
+# Flavio Curella <flavio.curella@gmail.com>, 2013,2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Themis Savvidis <themhs@gmail.com>, 2013
+# Luciano De Falco Alfano, 2016
 # Marco Bonetti, 2014
 # Nicola Larosa <transifex@teknico.net>, 2013
 # palmux <palmux@gmail.com>, 2014-2015
@@ -16,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 20:21+0000\n"
-"Last-Translator: palmux <palmux@gmail.com>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-18 21:06+0000\n"
+"Last-Translator: Flavio Curella <flavio.curella@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -68,6 +69,9 @@ msgstr "Danese"
 
 msgid "German"
 msgstr "Tedesco"
+
+msgid "Lower Sorbian"
+msgstr "Basso-Sorbiano"
 
 msgid "Greek"
 msgstr "Greco"
@@ -138,6 +142,9 @@ msgstr "Hindi"
 msgid "Croatian"
 msgstr "Croato"
 
+msgid "Upper Sorbian"
+msgstr "Alto-Sorbiano"
+
 msgid "Hungarian"
 msgstr "Ungherese"
 
@@ -198,8 +205,8 @@ msgstr "Marathi"
 msgid "Burmese"
 msgstr "Birmano"
 
-msgid "Norwegian Bokmal"
-msgstr "Norvegese Bokmal"
+msgid "Norwegian Bokmål"
+msgstr "Norvegese Bokmål"
 
 msgid "Nepali"
 msgstr "Nepali"
@@ -296,9 +303,6 @@ msgstr "File statici"
 
 msgid "Syndication"
 msgstr "Aggregazione"
-
-msgid "Web Design"
-msgstr "Web Design"
 
 msgid "Enter a valid value."
 msgstr "Inserisci un valore valido."
@@ -439,6 +443,9 @@ msgstr "Intero"
 msgid "'%(value)s' value must be an integer."
 msgstr "Il valore di '%(value)s' deve essere un intero."
 
+msgid "Big (8 byte) integer"
+msgstr "Intero grande (8 byte)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Il valore dir '%(value)s' deve essere Vero oppure Falso."
@@ -522,9 +529,6 @@ msgstr "Il valore di '%(value)s' deve essere un numero a virgola mobile."
 msgid "Floating point number"
 msgstr "Numero in virgola mobile"
 
-msgid "Big (8 byte) integer"
-msgstr "Intero grande (8 byte)"
-
 msgid "IPv4 address"
 msgstr "Indirizzo IPv4"
 
@@ -598,6 +602,14 @@ msgstr "Foreign Key (tipo determinato dal campo collegato)"
 
 msgid "One-to-one relationship"
 msgstr "Relazione uno a uno"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "relazione %(from)s-%(to)s"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "relazioni %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Relazione molti a molti"

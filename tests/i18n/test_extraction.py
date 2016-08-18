@@ -7,7 +7,7 @@ import re
 import shutil
 import time
 import warnings
-from unittest import SkipTest, skipUnless
+from unittest import skipUnless
 
 from django.core import management
 from django.core.management import execute_from_command_line
@@ -134,6 +134,19 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
 
 
 class BasicExtractorTests(ExtractorTests):
+
+    @override_settings(USE_I18N=False)
+    def test_use_i18n_false(self):
+        """
+        makemessages also runs successfully when USE_I18N is False.
+        """
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with io.open(self.PO_FILE, 'r', encoding='utf-8') as fp:
+            po_contents = fp.read()
+            # Check two random strings
+            self.assertIn('#. Translators: One-line translator comment #1', po_contents)
+            self.assertIn('msgctxt "Special trans context #1"', po_contents)
 
     def test_comments_extractor(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
@@ -485,7 +498,7 @@ class SymlinkExtractorTests(ExtractorTests):
                 try:
                     os.symlink(os.path.join(self.test_dir, 'templates'), self.symlinked_dir)
                 except (OSError, NotImplementedError):
-                    raise SkipTest("os.symlink() is available on this OS but can't be used by this user.")
+                    self.skipTest("os.symlink() is available on this OS but can't be used by this user.")
             os.chdir(self.test_dir)
             management.call_command('makemessages', locale=[LOCALE], verbosity=0, symlinks=True)
             self.assertTrue(os.path.exists(self.PO_FILE))
@@ -494,7 +507,7 @@ class SymlinkExtractorTests(ExtractorTests):
                 self.assertMsgId('This literal should be included.', po_contents)
             self.assertLocationCommentPresent(self.PO_FILE, None, 'templates_symlinked', 'test.html')
         else:
-            raise SkipTest("os.symlink() not available on this OS + Python version combination.")
+            self.skipTest("os.symlink() not available on this OS + Python version combination.")
 
 
 class CopyPluralFormsExtractorTests(ExtractorTests):

@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-04-13 09:17+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-19 07:42+0000\n"
 "Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
@@ -150,15 +150,69 @@ msgstr "Tegnap"
 msgid "Tomorrow"
 msgstr "Holnap"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"január február március április május június július augusztus szeptember "
-"október november december"
+msgid "January"
+msgstr "január"
 
-msgid "S M T W T F S"
-msgstr "V H K Sz Cs P Szo"
+msgid "February"
+msgstr "február"
+
+msgid "March"
+msgstr "március"
+
+msgid "April"
+msgstr "április"
+
+msgid "May"
+msgstr "május"
+
+msgid "June"
+msgstr "június"
+
+msgid "July"
+msgstr "július"
+
+msgid "August"
+msgstr "augusztus"
+
+msgid "September"
+msgstr "szeptember"
+
+msgid "October"
+msgstr "október"
+
+msgid "November"
+msgstr "november"
+
+msgid "December"
+msgstr "december"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "V"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "H"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "K"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "S"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "C"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "P"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "S"
 
 msgid "Show"
 msgstr "Mutat"

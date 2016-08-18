@@ -13,7 +13,6 @@ from django.conf import settings
 from django.forms.utils import flatatt, to_current_timezone
 from django.templatetags.static import static
 from django.utils import datetime_safe, formats, six
-from django.utils.datastructures import MultiValueDict
 from django.utils.dates import MONTHS
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RenameMethodsBase,
@@ -249,6 +248,9 @@ class Widget(six.with_metaclass(RenameWidgetMethods)):
         """
         return id_
 
+    def use_required_attribute(self, initial):
+        return not self.is_hidden
+
 
 class Input(Widget):
     """
@@ -331,9 +333,11 @@ class MultipleHiddenInput(HiddenInput):
         return mark_safe('\n'.join(inputs))
 
     def value_from_datadict(self, data, files, name):
-        if isinstance(data, MultiValueDict):
-            return data.getlist(name)
-        return data.get(name)
+        try:
+            getter = data.getlist
+        except AttributeError:
+            getter = data.get
+        return getter(name)
 
 
 class FileInput(Input):
@@ -428,6 +432,9 @@ class ClearableFileInput(FileInput):
             return False
         return upload
 
+    def use_required_attribute(self, initial):
+        return super(ClearableFileInput, self).use_required_attribute(initial) and not initial
+
 
 class Textarea(Widget):
     def __init__(self, attrs=None):
@@ -481,9 +488,7 @@ class CheckboxInput(Widget):
         self.check_test = boolean_check if check_test is None else check_test
 
     def render(self, name, value, attrs=None):
-        final_attrs = self.build_attrs(attrs, type='checkbox', name=name)
-        if self.check_test(value):
-            final_attrs['checked'] = 'checked'
+        final_attrs = self.build_attrs(attrs, type='checkbox', name=name, checked=self.check_test(value))
         if not (value is True or value is False or value is None or value == ''):
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_text(value)
@@ -604,9 +609,11 @@ class SelectMultiple(Select):
         return mark_safe('\n'.join(output))
 
     def value_from_datadict(self, data, files, name):
-        if isinstance(data, MultiValueDict):
-            return data.getlist(name)
-        return data.get(name)
+        try:
+            getter = data.getlist
+        except AttributeError:
+            getter = data.get
+        return getter(name)
 
 
 @html_safe
@@ -646,9 +653,13 @@ class ChoiceInput(SubWidget):
 
     def tag(self, attrs=None):
         attrs = attrs or self.attrs
-        final_attrs = dict(attrs, type=self.input_type, name=self.name, value=self.choice_value)
-        if self.is_checked():
-            final_attrs['checked'] = 'checked'
+        final_attrs = dict(
+            attrs,
+            type=self.input_type,
+            name=self.name,
+            value=self.choice_value,
+            checked=self.is_checked(),
+        )
         return format_html('<input{} />', flatatt(final_attrs))
 
     @property
@@ -693,8 +704,11 @@ class ChoiceFieldRenderer(object):
         self.choices = choices
 
     def __getitem__(self, idx):
-        choice = list(self.choices)[idx]  # Let the IndexError propagate
-        return self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, idx)
+        return list(self)[idx]
+
+    def __iter__(self):
+        for idx, choice in enumerate(self.choices):
+            yield self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, idx)
 
     def __str__(self):
         return self.render()
@@ -786,6 +800,11 @@ class RadioSelect(RendererMixin, Select):
 class CheckboxSelectMultiple(RendererMixin, SelectMultiple):
     renderer = CheckboxFieldRenderer
     _empty_value = []
+
+    def use_required_attribute(self, initial):
+        # Don't use the 'required' attribute because browser validation would
+        # require all checkboxes to be checked instead of at least one.
+        return False
 
 
 class MultiWidget(Widget):

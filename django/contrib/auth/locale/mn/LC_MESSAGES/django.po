@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2016-02-25 09:06+0000\n"
-"Last-Translator: dolugen <dolugen@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 08:38+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -118,6 +118,21 @@ msgstr "давс"
 msgid "hash"
 msgstr "хаш"
 
+msgid "variety"
+msgstr ""
+
+msgid "version"
+msgstr ""
+
+msgid "memory cost"
+msgstr ""
+
+msgid "time cost"
+msgstr ""
+
+msgid "parallelism"
+msgstr ""
+
 msgid "work factor"
 msgstr "ажлын байгуулагч"
 
@@ -169,17 +184,8 @@ msgstr "Хэрэглэгчид тодорхойлж өгсөн эрх"
 msgid "username"
 msgstr "хэрэглэгчийн нэр"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Заавал. 30 ба түүнээс бага үсэгтэй. Зөвхөн латин үсэг, тоо болон @/./+/-/_ "
-"тэмдэгтүүдийг зөвшөөрнө."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Хүчинтэй хэрэглэгчийн нэрийг оруулна. Зөвхөн үсэг, тоо болон тусгай "
-"тэмдэгт / @ . + - , _ /  байж болно."
 
 msgid "A user with that username already exists."
 msgstr "Ийм хэрэглэгчийн нэртэй хэрэглэгч өмнө нь бүртгүүлсэн байна."
@@ -257,6 +263,16 @@ msgstr ""
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s cайт дээрх нууц үг сэргээлт"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
 
 msgid "Logged out"
 msgstr "Гарсан"

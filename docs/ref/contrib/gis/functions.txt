@@ -261,12 +261,15 @@ right-hand rule.
 ``GeoHash``
 ===========
 
-.. class:: GeoHash(expression, **extra)
+.. class:: GeoHash(expression, precision=None, **extra)
 
 *Availability*: PostGIS, SpatiaLite (LWGEOM)
 
 Accepts a single geographic field or expression and returns a `GeoHash`__
 representation of the geometry.
+
+The ``precision`` keyword argument controls the number of characters in the
+result.
 
 .. versionchanged:: 1.10
 

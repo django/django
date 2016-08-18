@@ -167,6 +167,7 @@ class Query(object):
         self.distinct_fields = []
         self.select_for_update = False
         self.select_for_update_nowait = False
+        self.select_for_update_skip_locked = False
 
         self.select_related = False
         # Arbitrary limit for select_related to prevents infinite recursion.
@@ -286,6 +287,7 @@ class Query(object):
         obj.distinct_fields = self.distinct_fields[:]
         obj.select_for_update = self.select_for_update
         obj.select_for_update_nowait = self.select_for_update_nowait
+        obj.select_for_update_skip_locked = self.select_for_update_skip_locked
         obj.select_related = self.select_related
         obj.values_select = self.values_select[:]
         obj._annotations = self._annotations.copy() if self._annotations is not None else None
@@ -1844,6 +1846,41 @@ class Query(object):
         else:
             self.extra_select_mask = set(names)
         self._extra_select_cache = None
+
+    def set_values(self, fields):
+        self.select_related = False
+        self.clear_deferred_loading()
+        self.clear_select_fields()
+
+        if self.group_by is True:
+            self.add_fields((f.attname for f in self.model._meta.concrete_fields), False)
+            self.set_group_by()
+            self.clear_select_fields()
+
+        if fields:
+            field_names = []
+            extra_names = []
+            annotation_names = []
+            if not self._extra and not self._annotations:
+                # Shortcut - if there are no extra or annotations, then
+                # the values() clause must be just field names.
+                field_names = list(fields)
+            else:
+                self.default_cols = False
+                for f in fields:
+                    if f in self.extra_select:
+                        extra_names.append(f)
+                    elif f in self.annotation_select:
+                        annotation_names.append(f)
+                    else:
+                        field_names.append(f)
+            self.set_extra_mask(extra_names)
+            self.set_annotation_mask(annotation_names)
+        else:
+            field_names = [f.attname for f in self.model._meta.concrete_fields]
+
+        self.values_select = field_names
+        self.add_fields(field_names, True)
 
     @property
     def annotation_select(self):

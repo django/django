@@ -427,7 +427,7 @@ behavior. This class defines the ``run_tests()`` entry point, plus a
 selection of other methods that are used to by ``run_tests()`` to set up,
 execute and tear down the test suite.
 
-.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_sql=False, **kwargs)
+.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, **kwargs)
 
     ``DiscoverRunner`` will search for tests in any file matching ``pattern``.
 
@@ -458,6 +458,9 @@ execute and tear down the test suite.
     and have side effects. :ref:`Grouping by test class <order-of-tests>` is
     preserved when using this option.
 
+    ``debug_mode`` specifies what the :setting:`DEBUG` setting should be
+    set to prior to running tests.
+
     If ``debug_sql`` is ``True``, failing test cases will output SQL queries
     logged to the :ref:`django.db.backends logger <django-db-logger>` as well
     as the traceback. If ``verbosity`` is ``2``, then queries in all tests are
@@ -472,6 +475,10 @@ execute and tear down the test suite.
     Create or override an ``add_arguments(cls, parser)`` class method and add
     custom arguments by calling ``parser.add_argument()`` inside the method, so
     that the :djadmin:`test` command will be able to use those arguments.
+
+    .. versionadded:: 1.11
+
+        The ``debug_mode`` keyword argument was added.
 
 Attributes
 ~~~~~~~~~~
@@ -526,7 +533,7 @@ Methods
 
     Sets up the test environment by calling
     :func:`~django.test.utils.setup_test_environment` and setting
-    :setting:`DEBUG` to ``False``.
+    :setting:`DEBUG` to ``self.debug_mode`` (defaults to ``False``).
 
 .. method:: DiscoverRunner.build_suite(test_labels, extra_tests=None, **kwargs)
 
@@ -556,11 +563,8 @@ Methods
 
 .. method:: DiscoverRunner.setup_databases(**kwargs)
 
-    Creates the test databases.
-
-    Returns a data structure that provides enough detail to undo the changes
-    that have been made. This data will be provided to the ``teardown_databases()``
-    function at the conclusion of testing.
+    Creates the test databases by calling
+    :func:`~django.test.utils.setup_databases`.
 
 .. method:: DiscoverRunner.run_suite(suite, **kwargs)
 
@@ -568,13 +572,17 @@ Methods
 
     Returns the result produced by the running the test suite.
 
+.. method:: DiscoverRunner.get_test_runner_kwargs()
+
+    .. versionadded:: 1.11
+
+    Returns the keyword arguments to instantiate the
+    ``DiscoverRunner.test_runner`` with.
+
 .. method:: DiscoverRunner.teardown_databases(old_config, **kwargs)
 
-    Destroys the test databases, restoring pre-test conditions.
-
-    ``old_config`` is a data structure defining the changes in the
-    database configuration that need to be reversed. It is the return
-    value of the ``setup_databases()`` method.
+    Destroys the test databases, restoring pre-test conditions by calling
+    :func:`~django.test.utils.teardown_databases`.
 
 .. method:: DiscoverRunner.teardown_test_environment(**kwargs)
 
@@ -598,17 +606,42 @@ Testing utilities
 To assist in the creation of your own test runner, Django provides a number of
 utility methods in the ``django.test.utils`` module.
 
-.. function:: setup_test_environment()
+.. function:: setup_test_environment(debug=None)
 
-    Performs any global pre-test setup, such as the installing the
-    instrumentation of the template rendering system and setting up
-    the dummy email outbox.
+    Performs global pre-test setup, such as installing instrumentation for the
+    template rendering system and setting up the dummy email outbox.
+
+    If ``debug`` isn't ``None``, the :setting:`DEBUG` setting is updated to its
+    value.
+
+    .. versionchanged:: 1.11
+
+        The ``debug`` argument was added.
 
 .. function:: teardown_test_environment()
 
-    Performs any global post-test teardown, such as removing the black
-    magic hooks into the template system and restoring normal email
-    services.
+    Performs global post-test teardown, such as removing instrumentation from
+    the template system and restoring normal email services.
+
+.. function:: setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, **kwargs)
+
+    .. versionadded:: 1.11
+
+    Creates the test databases.
+
+    Returns a data structure that provides enough detail to undo the changes
+    that have been made. This data will be provided to the
+    :func:`teardown_databases` function at the conclusion of testing.
+
+.. function:: teardown_databases(old_config, parallel=0, keepdb=False)
+
+    .. versionadded:: 1.11
+
+    Destroys the test databases, restoring pre-test conditions.
+
+    ``old_config`` is a data structure defining the changes in the database
+    configuration that need to be reversed. It's the return value of the
+    :meth:`setup_databases` method.
 
 ``django.db.connection.creation``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

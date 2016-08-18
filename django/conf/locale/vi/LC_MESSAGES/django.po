@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/django/django/language/"
 "vi/)\n"
@@ -64,6 +64,9 @@ msgstr "Tiếng Đan Mạch"
 
 msgid "German"
 msgstr "Tiếng Đức"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "Tiếng Hy Lạp"
@@ -134,6 +137,9 @@ msgstr "Tiếng Hindi"
 msgid "Croatian"
 msgstr "Tiếng Croatia"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "Tiếng Hung-ga-ri"
 
@@ -194,8 +200,8 @@ msgstr "Marathi"
 msgid "Burmese"
 msgstr "My-an-ma"
 
-msgid "Norwegian Bokmal"
-msgstr "Tiếng Na Uy Bokmål"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Nê-pan"
@@ -292,9 +298,6 @@ msgstr "Tập tin tĩnh"
 
 msgid "Syndication"
 msgstr "Syndication"
-
-msgid "Web Design"
-msgstr "Thiết kế Web"
 
 msgid "Enter a valid value."
 msgstr "Nhập một giá trị hợp lệ."
@@ -419,6 +422,9 @@ msgstr "Số nguyên"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' phải là một số nguyên"
 
+msgid "Big (8 byte) integer"
+msgstr "Big (8 byte) integer"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' phải là True hoặc False (Đúng hoặc Sai)"
@@ -495,9 +501,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr "Giá trị dấu chấm động"
 
-msgid "Big (8 byte) integer"
-msgstr "Big (8 byte) integer"
-
 msgid "IPv4 address"
 msgstr "Địa chỉ IPv4"
 
@@ -567,6 +570,14 @@ msgstr "Khóa ngoại (kiểu được xác định bởi trường liên hệ)"
 
 msgid "One-to-one relationship"
 msgstr "Mối quan hệ một-một"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "Mối quan hệ nhiều-nhiều"

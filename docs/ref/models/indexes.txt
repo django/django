@@ -8,8 +8,10 @@ Model index reference
 
 .. versionadded:: 1.11
 
-Index classes ease creating database indexes. This document explains the API
-references of :class:`Index` which includes the `index options`_.
+Index classes ease creating database indexes. They can be added using the
+:attr:`Meta.indexes <django.db.models.Options.indexes>` option. This document
+explains the API references of :class:`Index` which includes the `index
+options`_.
 
 .. admonition:: Referencing built-in indexes
 
@@ -32,6 +34,20 @@ references of :class:`Index` which includes the `index options`_.
 
 A list of the name of the fields on which the index is desired.
 
+By default, indexes are created with an ascending order for each column. To
+define an index with a descending order for a column, add a hyphen before the
+field's name.
+
+For example ``Index(fields=['headline', '-pub_date'])`` would create SQL with
+``(headline, pub_date DESC)``. Index ordering isn't supported on MySQL. In that
+case, a descending index is created as a normal index.
+
+.. admonition:: Support for column ordering on SQLite
+
+    Column ordering is supported on SQLite 3.3.0+ and only for some database
+    file formats. Refer to the `SQLite docs
+    <https://www.sqlite.org/lang_createindex.html>`_ for specifics.
+
 ``name``
 --------
 
@@ -43,6 +59,5 @@ than 30 characters and shouldn't start with a number (0-9) or underscore (_).
 
 .. seealso::
 
-    Use the :class:`~django.db.migrations.operations.AddIndex` and
-    :class:`~django.db.migrations.operations.RemoveIndex` operations to add
-    and remove indexes.
+    For a list of PostgreSQL-specific indexes, see
+    :mod:`django.contrib.postgres.indexes`.

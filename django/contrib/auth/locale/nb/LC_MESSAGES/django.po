@@ -3,15 +3,15 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jensadne <jensadne@pvv.ntnu.no>, 2014
-# Jon <jon@funkbit.no>, 2015
+# Jon <jon@funkbit.no>, 2015-2016
 # Jon <jon@funkbit.no>, 2013
 # Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-11-17 12:44+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-27 09:09+0000\n"
 "Last-Translator: Jon <jon@funkbit.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
@@ -118,6 +118,21 @@ msgstr "salt"
 msgid "hash"
 msgstr "hash"
 
+msgid "variety"
+msgstr "variasjon"
+
+msgid "version"
+msgstr "versjon"
+
+msgid "memory cost"
+msgstr "minnekostnad"
+
+msgid "time cost"
+msgstr "tidskostnad"
+
+msgid "parallelism"
+msgstr "parallellitet"
+
 msgid "work factor"
 msgstr "arbeidsfaktor"
 
@@ -170,15 +185,8 @@ msgstr "Spesifikke tilganger for denne brukeren."
 msgid "username"
 msgstr "brukernavn"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Påkrevet. 30 tegn eller færre. Kun bokstaver, tall og @/./+/-/_."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Oppgi et gyldig brukernavn. Denne verdien kan kun inneholde bokstaver, tall "
-"og @/./+/-/_ "
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Påkrevet. 150 tegn eller færre. Kun bokstaver, tall og @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Det eksisterer allerede en bruker med dette brukernavnet."
@@ -254,6 +262,20 @@ msgstr "Passordet ditt kan ikke inneholde bare tall."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Passord-nullstilling på %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Oppgi et gyldig brukernavn. Denne verdien kan kun inneholde bokstaver, tall "
+"og @/./+/-/_"
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Oppgi et gyldig brukernavn. Denne verdien kan kun inneholde bokstaver, tall "
+"og @/./+/-/_"
 
 msgid "Logged out"
 msgstr "Logget ut"

@@ -13,7 +13,9 @@ from django.contrib.auth.password_validation import (
     validate_password,
 )
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.test import TestCase, override_settings
+from django.test.utils import isolate_apps
 from django.utils._os import upath
 
 
@@ -126,6 +128,19 @@ class UserAttributeSimilarityValidatorTest(TestCase):
         self.assertIsNone(
             UserAttributeSimilarityValidator(user_attributes=['first_name']).validate('testclient', user=user)
         )
+
+    @isolate_apps('auth_tests')
+    def test_validate_property(self):
+        class TestUser(models.Model):
+            pass
+
+            @property
+            def username(self):
+                return 'foobar'
+
+        with self.assertRaises(ValidationError) as cm:
+            UserAttributeSimilarityValidator().validate('foobar', user=TestUser()),
+        self.assertEqual(cm.exception.messages, ['The password is too similar to the username.'])
 
     def test_help_text(self):
         self.assertEqual(

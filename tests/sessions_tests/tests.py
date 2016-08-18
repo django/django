@@ -188,6 +188,10 @@ class SessionTestsMixin(object):
         self.assertNotEqual(self.session.session_key, prev_key)
         self.assertEqual(list(self.session.items()), prev_data)
 
+    def test_cycle_with_no_session_cache(self):
+        self.assertFalse(hasattr(self.session, '_session_cache'))
+        self.session.cycle_key()
+
     def test_save_doesnt_clear_data(self):
         self.session['a'] = 'b'
         self.session.save()

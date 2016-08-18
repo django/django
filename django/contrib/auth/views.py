@@ -177,11 +177,20 @@ def logout(request, *args, **kwargs):
     return LogoutView.as_view(**kwargs)(request, *args, **kwargs)
 
 
+_sentinel = object()
+
+
 @deprecate_current_app
-def logout_then_login(request, login_url=None, extra_context=None):
+def logout_then_login(request, login_url=None, extra_context=_sentinel):
     """
     Logs out the user if they are logged in. Then redirects to the log-in page.
     """
+    if extra_context is not _sentinel:
+        warnings.warn(
+            "The unused `extra_context` parameter to `logout_then_login` "
+            "is deprecated.", RemovedInDjango21Warning
+        )
+
     if not login_url:
         login_url = settings.LOGIN_URL
     login_url = resolve_url(login_url)
@@ -402,6 +411,7 @@ class PasswordResetDoneView(PasswordContextMixin, TemplateView):
 
 class PasswordResetConfirmView(PasswordContextMixin, FormView):
     form_class = SetPasswordForm
+    post_reset_login = False
     success_url = reverse_lazy('password_reset_complete')
     template_name = 'registration/password_reset_confirm.html'
     title = _('Enter new password')
@@ -429,7 +439,9 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        form.save()
+        user = form.save()
+        if self.post_reset_login:
+            auth_login(self.request, user)
         return super(PasswordResetConfirmView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):

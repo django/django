@@ -4,14 +4,16 @@
 # André Hagenbruch, 2011
 # Florian Apolloner <florian@apolloner.eu>, 2012
 # Jannis Vajen, 2013
-# Jannis Leidel <jannis@leidel.info>, 2013-2015
+# Jannis Leidel <jannis@leidel.info>, 2013-2016
+# Jannis Vajen, 2016
+# Jens Neuhaus <kontakt@jensneuhaus.de>, 2016
 # Markus Holtermann <inyoka@markusholtermann.eu>, 2013,2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-12 12:47+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-26 11:38+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -117,6 +119,21 @@ msgstr "Salt"
 msgid "hash"
 msgstr "Hash"
 
+msgid "variety"
+msgstr "Vielfalt"
+
+msgid "version"
+msgstr "Version"
+
+msgid "memory cost"
+msgstr "Speicherbedarf"
+
+msgid "time cost"
+msgstr "Zeitbedarf"
+
+msgid "parallelism"
+msgstr "Parallelität"
+
 msgid "work factor"
 msgstr "Arbeitsfaktor"
 
@@ -170,17 +187,10 @@ msgstr "Spezifische Berechtigungen für diesen Benutzer."
 msgid "username"
 msgstr "Benutzername"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Erforderlich. 30 Zeichen oder weniger. Nur alphanumerische Zeichen "
-"(Buchstaben, Ziffern und @/./+/-/_) sind erlaubt."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Bitte einen gültigen Benutzernamen eingeben. Dieser Wert darf nur "
-"Buchstaben, Ziffern und @/./+/-/_ enthalten."
+"Erforderlich. 150 Zeichen oder weniger. Nur Buchstaben, Ziffern und @/./+/-/"
+"_."
 
 msgid "A user with that username already exists."
 msgstr "Dieser Benutzername ist bereits vergeben."
@@ -237,8 +247,8 @@ msgstr[1] ""
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] "Ihr Passwort muss mindestens %(min_length)d Zeichen enthalten."
-msgstr[1] "Ihr Passwort muss mindestens %(min_length)d Zeichen enthalten."
+msgstr[0] "Das Passwort muss mindestens %(min_length)d Zeichen enthalten."
+msgstr[1] "Das Passwort muss mindestens %(min_length)d Zeichen enthalten."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
@@ -246,24 +256,38 @@ msgstr "Das Passwort ist zu ähnlich zu %(verbose_name)s."
 
 msgid "Your password can't be too similar to your other personal information."
 msgstr ""
-"Ihr Passwort darf nicht zu ähnlich zu Ihren anderen persönlichen "
+"Das Passwort darf nicht zu ähnlich zu Ihren anderen persönlichen "
 "Informationen sein."
 
 msgid "This password is too common."
 msgstr "Dieses Passwort ist zu üblich."
 
 msgid "Your password can't be a commonly used password."
-msgstr "Ihr Passwort darf nicht allgemein üblich sein."
+msgstr "Das Passwort darf nicht allgemein üblich sein."
 
 msgid "This password is entirely numeric."
 msgstr "Dieses Passwort ist komplett numerisch. "
 
 msgid "Your password can't be entirely numeric."
-msgstr "Ihr Passwort darf nicht komplett aus Ziffern bestehen."
+msgstr "Das Passwort darf nicht komplett aus Ziffern bestehen."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Passwort auf %(site_name)s zurücksetzen"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Bitte einen gültigen Benutzernamen eingeben, bestehend aus Buchstaben des "
+"Englischen Alphabets, Ziffern und @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Bitte einen gültigen Benutzernamen eingeben, bestehend aus Buchstaben, "
+"Ziffern und @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Abgemeldet"

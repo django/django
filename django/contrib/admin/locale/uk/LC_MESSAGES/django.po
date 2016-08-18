@@ -4,6 +4,7 @@
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
 # Andriy Sokolovskiy <me@asokolovskiy.com>, 2015
 # Boryslav Larin <brabadu@gmail.com>, 2011
+# Denis Podlesniy <haos616@gmail.com>, 2016
 # Igor Melnyk, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
@@ -11,13 +12,14 @@
 # Mikhail Kolesnik <mike@openbunker.org>, 2015
 # Mykola Zamkovoi <nickzam@gmail.com>, 2014
 # Sergiy Kuzmenko <s.kuzmenko@gmail.com>, 2011
+# Zoriana Zaiats, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-12-01 21:41+0000\n"
-"Last-Translator: Mikhail Kolesnik <mike@openbunker.org>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-07 22:38+0000\n"
+"Last-Translator: Denis Podlesniy <haos616@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -72,6 +74,12 @@ msgstr "Цього місяця"
 msgid "This year"
 msgstr "Цього року"
 
+msgid "No date"
+msgstr "Без дати"
+
+msgid "Has date"
+msgstr "Має дату"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -82,6 +90,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Дія:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Додати ще %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Видалити"
 
 msgid "action time"
 msgstr "час дії"
@@ -95,6 +110,8 @@ msgstr "тип вмісту"
 msgid "object id"
 msgstr "id об'єкта"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "представлення об'єкта (repr)"
 
@@ -125,6 +142,30 @@ msgstr "Видалено \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "Об'єкт журнального запису"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "Додано {name} \"{object}\"."
+
+msgid "Added."
+msgstr "Додано."
+
+msgid "and"
+msgstr "та"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "Змінені {fields} для {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Змінені {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Видалено {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "Поля не змінені."
+
 msgid "None"
 msgstr "Ніщо"
 
@@ -134,69 +175,39 @@ msgstr ""
 "Затисніть клавішу \"Control\", або \"Command\" на Mac, щоб обрати більше "
 "однієї опції."
 
-msgid "Added."
-msgstr "Додано."
-
-#, python-format
-msgid "Changed %s."
-msgstr "Змінено %s."
-
-msgid "and"
-msgstr "та"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Додано %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Змінено %(list)s для %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Видалено %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Поля не змінені."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\"  був успішно доданий. Нижче, Ви можете редагувати його "
-"знову."
+"{name} \"{obj}\" було додано успішно. Нижче Ви можете редагувати його знову."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" було успішно додано. Ви можете додати ще одну %(name)s "
-"нижче."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" було додано успішно."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"%(name)s \"%(obj)s\" було успішно змінено. Ви можете знову відредагувати її "
-"нижче."
+"{name} \"{obj}\" було додано успішно. Нижче Ви можете додати інше {name}."
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" було додано успішно."
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" було успішно змінено. Ви можете додати ще одну %(name)s "
-"нижче."
+"{name} \"{obj}\" було змінено успішно. Нижче Ви можете редагувати його знову."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" був успішно змінений."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"{name} \"{obj}\" було змінено успішно. Нижче Ви можете додати інше {name}."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name} \"{obj}\" було змінено успішно."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -354,18 +365,15 @@ msgstr "Документація"
 msgid "Log out"
 msgstr "Вийти"
 
-msgid "Add"
-msgstr "Додати"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Додати %(name)s"
 
 msgid "History"
 msgstr "Історія"
 
 msgid "View on site"
 msgstr "Дивитися на сайті"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Додати %(name)s"
 
 msgid "Filter"
 msgstr "Відфільтрувати"
@@ -449,13 +457,6 @@ msgstr ""
 msgid "Change"
 msgstr "Змінити"
 
-msgid "Remove"
-msgstr "Видалити"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Додати ще %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Видалити?"
 
@@ -470,13 +471,16 @@ msgstr "Резюме"
 msgid "Models in the %(name)s application"
 msgstr "Моделі у %(name)s додатку"
 
+msgid "Add"
+msgstr "Додати"
+
 msgid "You don't have permission to edit anything."
 msgstr "У вас немає дозволу на редагування будь-чого."
 
-msgid "Recent Actions"
+msgid "Recent actions"
 msgstr "Недавні дії"
 
-msgid "My Actions"
+msgid "My actions"
 msgstr "Мої дії"
 
 msgid "None available"

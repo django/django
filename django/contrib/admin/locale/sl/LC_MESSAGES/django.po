@@ -2,14 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# zejn <zejn@kiberpipa.org>, 2013
+# zejn <zejn@kiberpipa.org>, 2013,2016
 # zejn <zejn@kiberpipa.org>, 2011-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
@@ -36,7 +36,7 @@ msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Izbriši izbrano: %(verbose_name_plural)s"
 
 msgid "Administration"
-msgstr ""
+msgstr "Administracija"
 
 msgid "All"
 msgstr "Vse"
@@ -65,6 +65,12 @@ msgstr "Ta mesec"
 msgid "This year"
 msgstr "Letos"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -76,18 +82,27 @@ msgstr ""
 msgid "Action:"
 msgstr "Dejanje:"
 
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Dodaj še en %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Odstrani"
+
 msgid "action time"
 msgstr "čas dejanja"
 
 msgid "user"
-msgstr ""
+msgstr "uporabnik"
 
 msgid "content type"
-msgstr ""
+msgstr "vrsta vsebine"
 
 msgid "object id"
 msgstr "id objekta"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "predstavitev objekta"
 
@@ -118,75 +133,66 @@ msgstr "Izbrisan \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "Dnevniški vnos"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr "Dodano."
+
+msgid "and"
+msgstr "in"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Nobeno polje ni bilo spremenjeno."
+
 msgid "None"
 msgstr "Brez vrednosti"
 
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
+msgstr "Držite \"Control\" (ali \"Command\" na Mac-u) za izbiro več kot enega."
 
-msgid "Added."
-msgstr ""
-
-#, python-format
-msgid "Changed %s."
-msgstr "Spremenjen %s."
-
-msgid "and"
-msgstr "in"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Dodal %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Spremenjeno %(list)s za %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Izbrisan %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Nobeno polje ni bilo spremenjeno."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" je bil uspešno dodan. Ponovno ga lahko uredite spodaj."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" je bil uspešno dodan. Spodaj lahko dodate še kak "
-"%(name)s."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" je bil uspešno dodan."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"%(name)s \"%(obj)s\" je bil uspešno posodobljen. Spodaj ga lahko urejate še "
-"dalje."
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
-"%(name)s \"%(obj)s\" je bil uspešno posodobljen. Spodaj lahko dodate še kak "
-"%(name)s."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" je bil uspešno spremenjen."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -252,6 +258,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
+"Brisanje %(class_name)s %(instance)s bi zahtevalo brisanje naslednjih "
+"zaščitenih povezanih objektov: %(related_objects)s"
 
 msgid "Django site admin"
 msgstr "Django administrativni vmesnik"
@@ -267,7 +275,7 @@ msgstr "Prijavite se"
 
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "Administracija %(app)s"
 
 msgid "Page not found"
 msgstr "Strani ni mogoče najti"
@@ -337,7 +345,7 @@ msgid "Welcome,"
 msgstr "Dobrodošli,"
 
 msgid "View site"
-msgstr ""
+msgstr "Poglej stran"
 
 msgid "Documentation"
 msgstr "Dokumentacija"
@@ -345,18 +353,15 @@ msgstr "Dokumentacija"
 msgid "Log out"
 msgstr "Odjava"
 
-msgid "Add"
-msgstr "Dodaj"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Dodaj %(name)s"
 
 msgid "History"
 msgstr "Zgodovina"
 
 msgid "View on site"
 msgstr "Poglej na strani"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Dodaj %(name)s"
 
 msgid "Filter"
 msgstr "Filter"
@@ -400,13 +405,13 @@ msgstr ""
 "Vsi naslednji povezani elementi bodo izbrisani:"
 
 msgid "Objects"
-msgstr ""
+msgstr "Objekti"
 
 msgid "Yes, I'm sure"
 msgstr "Ja, prepričan sem"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Ne, vrni me nazaj"
 
 msgid "Delete multiple objects"
 msgstr "Izbriši več objektov"
@@ -440,13 +445,6 @@ msgstr ""
 msgid "Change"
 msgstr "Spremeni"
 
-msgid "Remove"
-msgstr "Odstrani"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Dodaj še en %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Izbrišem?"
 
@@ -455,20 +453,23 @@ msgid " By %(filter_title)s "
 msgstr " Po %(filter_title)s "
 
 msgid "Summary"
-msgstr ""
+msgstr "Povzetek"
 
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Model v %(name)s aplikaciji"
 
+msgid "Add"
+msgstr "Dodaj"
+
 msgid "You don't have permission to edit anything."
 msgstr "Nimate dovoljenja za urejanje."
 
-msgid "Recent Actions"
-msgstr "Zadnja dejanja"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "Moja dejanja"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Ni na voljo"
@@ -490,6 +491,8 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"Prijavljeni ste kot %(username)s in nimate pravic za dostop do te strani. Bi "
+"se želeli prijaviti z drugim računom?"
 
 msgid "Forgotten your password or username?"
 msgstr "Ste pozabili geslo ali uporabniško ime?"
@@ -517,19 +520,19 @@ msgid "Save"
 msgstr "Shrani"
 
 msgid "Popup closing..."
-msgstr ""
+msgstr "Zapiram pojavno okno ..."
 
 #, python-format
 msgid "Change selected %(model)s"
-msgstr ""
+msgstr "Spremeni izbran %(model)s"
 
 #, python-format
 msgid "Add another %(model)s"
-msgstr ""
+msgstr "Dodaj še en %(model)s "
 
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr ""
+msgstr "Izbriši izbran %(model)s"
 
 msgid "Search"
 msgstr "Išči"
@@ -608,6 +611,8 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Če obstaja račun z navedenim e-poštnim naslovom, smo vam prek epošte poslali "
+"navodila za nastavitev vašega gesla. Prejeti bi jih morali v kratkem."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "

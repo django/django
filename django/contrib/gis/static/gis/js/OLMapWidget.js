@@ -184,7 +184,7 @@
             default_lat: 0,
             default_lon: 0,
             default_zoom: 4,
-            is_collection: new options.geom_type() instanceof OpenLayers.Geometry.Collection,
+            is_collection: options.geom_name.indexOf('Multi') > -1 || options.geom_name.indexOf('Collection') > -1,
             layerswitcher: false,
             map_options: {},
             map_srid: 4326,

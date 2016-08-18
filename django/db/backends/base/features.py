@@ -36,6 +36,7 @@ class BaseDatabaseFeatures(object):
     allow_sliced_subqueries = True
     has_select_for_update = False
     has_select_for_update_nowait = False
+    has_select_for_update_skip_locked = False
 
     supports_select_related = True
 
@@ -158,6 +159,12 @@ class BaseDatabaseFeatures(object):
 
     # Can the backend introspect a TimeField, instead of a DateTimeField?
     can_introspect_time_field = True
+
+    # Can the backend introspect the column order (ASC/DESC) for indexes?
+    supports_index_column_ordering = True
+
+    # Can the backend introspect the type of index created?
+    can_introspect_index_type = False
 
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False

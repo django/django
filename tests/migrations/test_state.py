@@ -65,6 +65,7 @@ class StateTests(SimpleTestCase):
                 apps = new_apps
                 verbose_name = "tome"
                 db_table = "test_tome"
+                indexes = [models.Index(fields=['title'])]
 
         class Food(models.Model):
 
@@ -116,6 +117,8 @@ class StateTests(SimpleTestCase):
         food_no_managers_state = project_state.models['migrations', 'foodnomanagers']
         food_no_default_manager_state = project_state.models['migrations', 'foodnodefaultmanager']
         food_order_manager_state = project_state.models['migrations', 'foodorderedmanagers']
+        book_index = models.Index(fields=['title'])
+        book_index.set_name_with_model(Book)
 
         self.assertEqual(author_state.app_label, "migrations")
         self.assertEqual(author_state.name, "Author")
@@ -135,7 +138,10 @@ class StateTests(SimpleTestCase):
         self.assertEqual(book_state.fields[1][1].max_length, 1000)
         self.assertIs(book_state.fields[2][1].null, False)
         self.assertEqual(book_state.fields[3][1].__class__.__name__, "ManyToManyField")
-        self.assertEqual(book_state.options, {"verbose_name": "tome", "db_table": "test_tome", "indexes": []})
+        self.assertEqual(
+            book_state.options,
+            {"verbose_name": "tome", "db_table": "test_tome", "indexes": [book_index]},
+        )
         self.assertEqual(book_state.bases, (models.Model, ))
 
         self.assertEqual(author_proxy_state.app_label, "migrations")
@@ -946,6 +952,13 @@ class ModelStateTests(SimpleTestCase):
             'Use a string reference instead.'
         ):
             ModelState('app', 'Model', [('field', field)])
+
+    def test_sanity_index_name(self):
+        field = models.IntegerField()
+        options = {'indexes': [models.Index(fields=['field'])]}
+        msg = "Indexes passed to ModelState require a name attribute. <Index: fields='field'> doesn't have one."
+        with self.assertRaisesMessage(ValueError, msg):
+            ModelState('app', 'Model', [('field', field)], options=options)
 
     def test_fields_immutability(self):
         """

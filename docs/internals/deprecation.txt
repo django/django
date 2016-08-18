@@ -20,6 +20,11 @@ details on these changes.
   ``password_reset_confirm()``, and ``password_reset_complete()`` will be
   removed.
 
+* The ``extra_context`` parameter of ``contrib.auth.views.logout_then_login()``
+  will be removed.
+
+* ``django.test.runner.setup_databases()`` will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

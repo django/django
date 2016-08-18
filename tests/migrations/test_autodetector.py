@@ -370,6 +370,20 @@ class AutodetectorTests(TestCase):
         ("authors", models.ManyToManyField("testapp.Author", through="otherapp.Attribution")),
         ("title", models.CharField(max_length=200)),
     ])
+    book_indexes = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+        ("title", models.CharField(max_length=200)),
+    ], {
+        "indexes": [models.Index(fields=["author", "title"], name="book_title_author_idx")],
+    })
+    book_unordered_indexes = ModelState("otherapp", "Book", [
+        ("id", models.AutoField(primary_key=True)),
+        ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+        ("title", models.CharField(max_length=200)),
+    ], {
+        "indexes": [models.Index(fields=["title", "author"], name="book_author_title_idx")],
+    })
     book_foo_together = ModelState("otherapp", "Book", [
         ("id", models.AutoField(primary_key=True)),
         ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
@@ -432,7 +446,10 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("knight", models.ForeignKey("eggs.Knight", models.CASCADE)),
         ("parent", models.ForeignKey("eggs.Rabbit", models.CASCADE)),
-    ], {"unique_together": {("parent", "knight")}})
+    ], {
+        "unique_together": {("parent", "knight")},
+        "indexes": [models.Index(fields=["parent", "knight"], name='rabbit_circular_fk_index')],
+    })
 
     def repr_changes(self, changes, include_dependencies=False):
         output = ""
@@ -978,16 +995,18 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "testapp", 0, 2, name="publisher")
         self.assertMigrationDependencies(changes, 'testapp', 0, [])
 
-    def test_same_app_circular_fk_dependency_and_unique_together(self):
+    def test_same_app_circular_fk_dependency_with_unique_together_and_indexes(self):
         """
         #22275 - Tests that a migration with circular FK dependency does not try
-        to create unique together constraint before creating all required fields
-        first.
+        to create unique together constraint and indexes before creating all
+        required fields first.
         """
         changes = self.get_changes([], [self.knight, self.rabbit])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'eggs', 1)
-        self.assertOperationTypes(changes, 'eggs', 0, ["CreateModel", "CreateModel", "AlterUniqueTogether"])
+        self.assertOperationTypes(
+            changes, 'eggs', 0, ["CreateModel", "CreateModel", "AddIndex", "AlterUniqueTogether"]
+        )
         self.assertNotIn("unique_together", changes['eggs'][0].operations[0].options)
         self.assertNotIn("unique_together", changes['eggs'][0].operations[1].options)
         self.assertMigrationDependencies(changes, 'eggs', 0, [])
@@ -1134,6 +1153,51 @@ class AutodetectorTests(TestCase):
 
         for t in tests:
             test(*t)
+
+    def test_create_model_with_indexes(self):
+        """Test creation of new model with indexes already defined."""
+        author = ModelState('otherapp', 'Author', [
+            ('id', models.AutoField(primary_key=True)),
+            ('name', models.CharField(max_length=200)),
+        ], {'indexes': [models.Index(fields=['name'], name='create_model_with_indexes_idx')]})
+        changes = self.get_changes([], [author])
+        added_index = models.Index(fields=['name'], name='create_model_with_indexes_idx')
+        # Right number of migrations?
+        self.assertEqual(len(changes['otherapp']), 1)
+        # Right number of actions?
+        migration = changes['otherapp'][0]
+        self.assertEqual(len(migration.operations), 2)
+        # Right actions order?
+        self.assertOperationTypes(changes, 'otherapp', 0, ['CreateModel', 'AddIndex'])
+        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name='Author')
+        self.assertOperationAttributes(changes, 'otherapp', 0, 1, model_name='author', index=added_index)
+
+    def test_add_indexes(self):
+        """Test change detection of new indexes."""
+        changes = self.get_changes([self.author_empty, self.book], [self.author_empty, self.book_indexes])
+        self.assertNumberMigrations(changes, 'otherapp', 1)
+        self.assertOperationTypes(changes, 'otherapp', 0, ['AddIndex'])
+        added_index = models.Index(fields=['author', 'title'], name='book_title_author_idx')
+        self.assertOperationAttributes(changes, 'otherapp', 0, 0, model_name='book', index=added_index)
+
+    def test_remove_indexes(self):
+        """Test change detection of removed indexes."""
+        changes = self.get_changes([self.author_empty, self.book_indexes], [self.author_empty, self.book])
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'otherapp', 1)
+        self.assertOperationTypes(changes, 'otherapp', 0, ['RemoveIndex'])
+        self.assertOperationAttributes(changes, 'otherapp', 0, 0, model_name='book', name='book_title_author_idx')
+
+    def test_order_fields_indexes(self):
+        """Test change detection of reordering of fields in indexes."""
+        changes = self.get_changes(
+            [self.author_empty, self.book_indexes], [self.author_empty, self.book_unordered_indexes]
+        )
+        self.assertNumberMigrations(changes, 'otherapp', 1)
+        self.assertOperationTypes(changes, 'otherapp', 0, ['RemoveIndex', 'AddIndex'])
+        self.assertOperationAttributes(changes, 'otherapp', 0, 0, model_name='book', name='book_title_author_idx')
+        added_index = models.Index(fields=['title', 'author'], name='book_author_title_idx')
+        self.assertOperationAttributes(changes, 'otherapp', 0, 1, model_name='book', index=added_index)
 
     def test_add_foo_together(self):
         """Tests index/unique_together detection."""

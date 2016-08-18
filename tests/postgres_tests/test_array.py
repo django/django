@@ -448,13 +448,13 @@ class TestMigrations(TransactionTestCase):
         table_name = 'postgres_tests_chartextarrayindexmodel'
         call_command('migrate', 'postgres_tests', verbosity=0)
         with connection.cursor() as cursor:
-            like_constraint_field_names = [
-                c.rsplit('_', 2)[0][len(table_name) + 1:]
-                for c in connection.introspection.get_constraints(cursor, table_name)
-                if c.endswith('_like')
+            like_constraint_columns_list = [
+                v['columns']
+                for k, v in list(connection.introspection.get_constraints(cursor, table_name).items())
+                if k.endswith('_like')
             ]
         # Only the CharField should have a LIKE index.
-        self.assertEqual(like_constraint_field_names, ['char2'])
+        self.assertEqual(like_constraint_columns_list, [['char2']])
         with connection.cursor() as cursor:
             indexes = connection.introspection.get_indexes(cursor, table_name)
         # All fields should have regular indexes.

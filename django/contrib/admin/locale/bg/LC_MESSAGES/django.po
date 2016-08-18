@@ -6,13 +6,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lyuboslav  Petrov <petrov.lyuboslav@gmail.com>, 2014
 # Todor Lubenov <tgl.sysdev@gmail.com>, 2014-2015
-# Venelin Stoykov <vkstoykov@gmail.com>, 2015
+# Venelin Stoykov <vkstoykov@gmail.com>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-27 16:13+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-30 17:44+0000\n"
 "Last-Translator: Venelin Stoykov <vkstoykov@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
@@ -67,6 +67,12 @@ msgstr "Този месец"
 msgid "This year"
 msgstr "Тази година"
 
+msgid "No date"
+msgstr "Няма дата"
+
+msgid "Has date"
+msgstr "Има дата"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -78,18 +84,27 @@ msgstr ""
 msgid "Action:"
 msgstr "Действие:"
 
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Добави друг %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Премахване"
+
 msgid "action time"
 msgstr "време на действие"
 
 msgid "user"
-msgstr ""
+msgstr "потребител"
 
 msgid "content type"
-msgstr ""
+msgstr "тип на съдържанието"
 
 msgid "object id"
 msgstr "id на обекта"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "repr на обекта"
 
@@ -120,6 +135,30 @@ msgstr "Изтрит \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "LogEntry обект"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "Добавено {name} \"{object}\"."
+
+msgid "Added."
+msgstr "Добавено."
+
+msgid "and"
+msgstr "и"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "Променени {fields} за {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Променени {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Изтрит {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "Няма променени полета."
+
 msgid "None"
 msgstr "Празно"
 
@@ -128,69 +167,43 @@ msgid ""
 msgstr ""
 "Задръжте \"Control\", или \"Command\" на Mac, за да изберете повече от един."
 
-msgid "Added."
-msgstr "Добавено."
-
-#, python-format
-msgid "Changed %s."
-msgstr "Променено %s."
-
-msgid "and"
-msgstr "и"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Добавени %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Променени %(list)s за %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Изтрити %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Няма променени полета."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"Обектът %(name)s \"%(obj)s\" бе успешно добавен.  Може да го редактирате по-"
+"Обектът {name} \"{obj}\" бе успешно добавен.  Може да го редактирате по-"
 "долу.  "
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s и \"%(obj)s\" са добавени успешно. Можете да добавите още едно "
-"%(name)s по-долу."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "Обектът %(name)s \"%(obj)s\" бе успешно добавен.  "
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"%(name)s \"%(obj)s\" Бяха променени успешно. Можете да ги промените отново "
-"по-долу."
+"Обектът {name} \"{obj}\" бе успешно добавен.  Можете да добавите още един "
+"обект {name} по-долу."
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "Обектът {name} \"{obj}\" бе успешно добавен.  "
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" бяха променени успешно. Можете да добавите ново "
-"%(name)s по-долу."
+"Обектът {name} \"{obj}\" бе успешно променен.  Може да го редактирате по-"
+"долу.  "
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "Обектът %(name)s \"%(obj)s\" бе успешно актуализиран.  "
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"Обектът {name} \"{obj}\" бе успешно променен.  Можете да добавите още един "
+"обект {name} по-долу."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "Обектът {name} \"{obj}\" бе успешно променен."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -300,7 +313,7 @@ msgid "Run the selected action"
 msgstr "Стартирай избраните действия"
 
 msgid "Go"
-msgstr "Действай"
+msgstr "Напред"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Щракнете тук, за да изберете обектите във всички страници"
@@ -347,18 +360,15 @@ msgstr "Документация"
 msgid "Log out"
 msgstr "Изход"
 
-msgid "Add"
-msgstr "Добави"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Добави %(name)s"
 
 msgid "History"
 msgstr "История"
 
 msgid "View on site"
 msgstr "Разгледай в сайта"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Добави %(name)s"
 
 msgid "Filter"
 msgstr "Филтър"
@@ -442,13 +452,6 @@ msgstr ""
 msgid "Change"
 msgstr "Промени"
 
-msgid "Remove"
-msgstr "Премахване"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Добави друг %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Изтриване?"
 
@@ -463,13 +466,16 @@ msgstr "Резюме"
 msgid "Models in the %(name)s application"
 msgstr "Моделите в %(name)s приложение"
 
+msgid "Add"
+msgstr "Добави"
+
 msgid "You don't have permission to edit anything."
 msgstr "Нямате права да редактирате каквото и да е."
 
-msgid "Recent Actions"
+msgid "Recent actions"
 msgstr "Последни действия"
 
-msgid "My Actions"
+msgid "My actions"
 msgstr "Моите действия"
 
 msgid "None available"

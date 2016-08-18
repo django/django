@@ -223,7 +223,7 @@ class GISFunctionsTests(TestCase):
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(inter=functions.Intersection('mpoly', geom))
         for c in qs:
-            if spatialite or mysql or oracle:
+            if spatialite or (mysql and not connection.ops.uses_invalid_empty_geometry_collection) or oracle:
                 # When the intersection is empty, some databases return None.
                 expected = None
             else:
@@ -292,7 +292,7 @@ class GISFunctionsTests(TestCase):
         qs = Track.objects.annotate(num_points=functions.NumPoints('line'))
         self.assertEqual(qs.first().num_points, 2)
         if spatialite or mysql:
-            # Spatialite and MySQL can only count points on LineStrings
+            # SpatiaLite and MySQL can only count points on LineStrings
             return
 
         for c in Country.objects.annotate(num_points=functions.NumPoints('mpoly')):
@@ -321,7 +321,7 @@ class GISFunctionsTests(TestCase):
 
         qs = Country.objects.annotate(point_on_surface=functions.PointOnSurface('mpoly'))
         for country in qs:
-            tol = 0.00001  # Spatialite might have WKT-translation-related precision issues
+            tol = 0.00001  # SpatiaLite might have WKT-translation-related precision issues
             self.assertTrue(ref[country.name].equals_exact(country.point_on_surface, tol))
 
     @skipUnlessDBFeature("has_Reverse_function")

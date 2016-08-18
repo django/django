@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-12-11 09:12+0000\n"
-"Last-Translator: Mislav Cimperšak <mislav.cimpersak@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 08:38+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Croatian (http://www.transifex.com/django/django/language/"
 "hr/)\n"
 "MIME-Version: 1.0\n"
@@ -121,6 +121,21 @@ msgstr "slučajna vrijednost"
 msgid "hash"
 msgstr "hash"
 
+msgid "variety"
+msgstr ""
+
+msgid "version"
+msgstr ""
+
+msgid "memory cost"
+msgstr ""
+
+msgid "time cost"
+msgstr ""
+
+msgid "parallelism"
+msgstr ""
+
 msgid "work factor"
 msgstr "količina rada"
 
@@ -174,17 +189,8 @@ msgstr "Određene privilegije za korisnika."
 msgid "username"
 msgstr "korisničko ime"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Obavezan unos. 30 alfanumeričkih znakova ili manje. Samo slova, brojevi i "
-"@/./+/-/_ znakovi."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Unesite ispravno korisničko ime. Ova vrijednost može sadržavati samo slova, "
-"brojeve i @/./+/-/_ znakove."
 
 msgid "A user with that username already exists."
 msgstr "Korisnik sa navedenim imenom već postoji."
@@ -268,6 +274,16 @@ msgstr "Lozinka se ne smije u potpunosti sastojati od brojeva."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Resetiranje lozinke na %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
 
 msgid "Logged out"
 msgstr "Niste logirani"

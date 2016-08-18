@@ -108,6 +108,10 @@ class StaticTests(SimpleTestCase):
         response = self.client.get('/%s/non_existing_resource' % self.prefix)
         self.assertEqual(404, response.status_code)
 
+    def test_index(self):
+        response = self.client.get('/%s/' % self.prefix)
+        self.assertContains(response, 'Index of /')
+
 
 class StaticHelperTest(StaticTests):
     """

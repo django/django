@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-12-07 08:11+0000\n"
-"Last-Translator: Aarni Koskela\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -62,6 +62,9 @@ msgstr "tanska"
 
 msgid "German"
 msgstr "saksa"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "kreikka"
@@ -132,6 +135,9 @@ msgstr "hindi"
 msgid "Croatian"
 msgstr "kroatia"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "unkari"
 
@@ -192,8 +198,8 @@ msgstr "marathi"
 msgid "Burmese"
 msgstr "burman kieli"
 
-msgid "Norwegian Bokmal"
-msgstr "norja (kirjanorja)"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "nepalin kieli"
@@ -290,9 +296,6 @@ msgstr "Staattiset tiedostot"
 
 msgid "Syndication"
 msgstr "Syndikointi"
-
-msgid "Web Design"
-msgstr "Websuunnittelu"
 
 msgid "Enter a valid value."
 msgstr "Syötä oikea arvo."
@@ -434,6 +437,9 @@ msgstr "Kokonaisluku"
 msgid "'%(value)s' value must be an integer."
 msgstr "%(value)s-arvo tulee olla kokonaisluku."
 
+msgid "Big (8 byte) integer"
+msgstr "Suuri (8-tavuinen) kokonaisluku"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "%(value)s-arvo pitää olla joko tosi tai epätosi."
@@ -515,9 +521,6 @@ msgstr "%(value)s-arvo tulee olla liukuluku."
 msgid "Floating point number"
 msgstr "Liukuluku"
 
-msgid "Big (8 byte) integer"
-msgstr "Suuri (8-tavuinen) kokonaisluku"
-
 msgid "IPv4 address"
 msgstr "IPv4-osoite"
 
@@ -589,6 +592,14 @@ msgstr "Vierasavain (tyyppi määräytyy liittyvän kentän mukaan)"
 
 msgid "One-to-one relationship"
 msgstr "Yksi-yhteen relaatio"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "Moni-moneen relaatio"

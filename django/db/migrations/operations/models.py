@@ -465,7 +465,10 @@ class AlterModelTable(ModelOperation):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
 
     def describe(self):
-        return "Rename table for %s to %s" % (self.name, self.table)
+        return "Rename table for %s to %s" % (
+            self.name,
+            self.table if self.table is not None else "(default)"
+        )
 
     def reduce(self, operation, in_between, app_label=None):
         if isinstance(operation, (AlterModelTable, DeleteModel)) and self.name_lower == operation.name_lower:
@@ -759,7 +762,7 @@ class AddIndex(IndexOperation):
 
     def __init__(self, model_name, index):
         self.model_name = model_name
-        if not index._name:
+        if not index.name:
             raise ValueError(
                 "Indexes passed to AddIndex operations require a name "
                 "argument. %r doesn't have one." % index
@@ -792,7 +795,8 @@ class AddIndex(IndexOperation):
         )
 
     def describe(self):
-        return 'Create index on field(s) %s of model %s' % (
+        return 'Create index %s on field(s) %s of model %s' % (
+            self.index.name,
             ', '.join(self.index.fields),
             self.model_name,
         )

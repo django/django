@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011,2013-2014
+# Jannis Leidel <jannis@leidel.info>, 2011,2013-2014,2016
 # Markus Holtermann <inyoka@markusholtermann.eu>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-10-23 10:17+0000\n"
+"PO-Revision-Date: 2016-07-26 11:56+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Sites"
-msgstr "Seiten"
+msgstr "Websites"
 
 msgid "The domain name cannot contain any spaces or tabs."
 msgstr "Der Domainname darf keine Leerzeichen oder Tabs enthalten."
@@ -30,7 +30,7 @@ msgid "display name"
 msgstr "Anzeigename"
 
 msgid "site"
-msgstr "Seite"
+msgstr "Website"
 
 msgid "sites"
-msgstr "Seiten"
+msgstr "Websites"

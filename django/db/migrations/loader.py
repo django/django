@@ -6,6 +6,7 @@ from importlib import import_module
 
 from django.apps import apps
 from django.conf import settings
+from django.db.migrations.exceptions import MigrationSchemaMissing
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
 from django.utils import six
@@ -273,13 +274,23 @@ class MigrationLoader(object):
         unapplied dependencies.
         """
         recorder = MigrationRecorder(connection)
-        applied = recorder.applied_migrations()
+        try:
+            applied = recorder.applied_migrations()
+        except MigrationSchemaMissing:
+            # Skip check if the django_migrations table is missing and can't be
+            # created.
+            return
         for migration in applied:
             # If the migration is unknown, skip it.
             if migration not in self.graph.nodes:
                 continue
             for parent in self.graph.node_map[migration].parents:
                 if parent not in applied:
+                    # Skip unapplied squashed migrations that have all of their
+                    # `replaces` applied.
+                    if parent in self.replacements:
+                        if all(m in applied for m in self.replacements[parent].replaces):
+                            continue
                     raise InconsistentMigrationHistory(
                         "Migration {}.{} is applied before its dependency {}.{}".format(
                             migration[0], migration[1], parent[0], parent[1],

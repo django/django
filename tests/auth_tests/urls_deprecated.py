@@ -3,7 +3,6 @@ from django.contrib import admin
 from django.contrib.auth import views
 from django.contrib.auth.decorators import login_required
 
-
 # special urls for deprecated function-based views
 urlpatterns = [
     url(r'^login/$', views.login, name='login'),

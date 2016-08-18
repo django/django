@@ -5,9 +5,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-25 16:12+0000\n"
-"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-07-15 09:52+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -41,6 +41,9 @@ msgstr "Vlera duhet të jetë JSON i vlefshëm."
 
 msgid "Could not load JSON data."
 msgstr "S’u ngarkuan dot të dhëna JSON."
+
+msgid "Input must be a JSON dictionary."
+msgstr ""
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."

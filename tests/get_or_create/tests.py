@@ -5,7 +5,7 @@ import traceback
 from datetime import date, datetime, timedelta
 from threading import Thread
 
-from django.db import DatabaseError, IntegrityError
+from django.db import DatabaseError, IntegrityError, connection
 from django.test import (
     TestCase, TransactionTestCase, ignore_warnings, skipUnlessDBFeature,
 )
@@ -441,14 +441,27 @@ class UpdateOrCreateTransactionTests(TransactionTestCase):
         while it holds the lock. The updated field isn't a field in 'defaults',
         so update_or_create() shouldn't have an effect on it.
         """
+        lock_status = {'has_grabbed_lock': False}
+
         def birthday_sleep():
-            time.sleep(0.3)
+            lock_status['has_grabbed_lock'] = True
+            time.sleep(0.5)
             return date(1940, 10, 10)
 
         def update_birthday_slowly():
             Person.objects.update_or_create(
                 first_name='John', defaults={'birthday': birthday_sleep}
             )
+            # Avoid leaking connection for Oracle
+            connection.close()
+
+        def lock_wait():
+            # timeout after ~0.5 seconds
+            for i in range(20):
+                time.sleep(0.025)
+                if lock_status['has_grabbed_lock']:
+                    return True
+            return False
 
         Person.objects.create(first_name='John', last_name='Lennon', birthday=date(1940, 10, 9))
 
@@ -457,8 +470,8 @@ class UpdateOrCreateTransactionTests(TransactionTestCase):
         before_start = datetime.now()
         t.start()
 
-        # Wait for lock to begin
-        time.sleep(0.05)
+        if not lock_wait():
+            self.skipTest('Database took too long to lock the row')
 
         # Update during lock
         Person.objects.filter(first_name='John').update(last_name='NotLennon')
@@ -469,5 +482,5 @@ class UpdateOrCreateTransactionTests(TransactionTestCase):
 
         # The update remains and it blocked.
         updated_person = Person.objects.get(first_name='John')
-        self.assertGreater(after_update - before_start, timedelta(seconds=0.3))
+        self.assertGreater(after_update - before_start, timedelta(seconds=0.5))
         self.assertEqual(updated_person.last_name, 'NotLennon')

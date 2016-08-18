@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2016-04-13 09:12+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-19 07:39+0000\n"
 "Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
@@ -68,6 +68,12 @@ msgstr "Ez a hónap"
 msgid "This year"
 msgstr "Ez az év"
 
+msgid "No date"
+msgstr "Nincs dátuma"
+
+msgid "Has date"
+msgstr "Van dátuma"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -78,6 +84,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Művelet:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Újabb %(verbose_name)s hozzáadása"
+
+msgid "Remove"
+msgstr "Törlés"
 
 msgid "action time"
 msgstr "művelet időpontja"
@@ -91,6 +104,8 @@ msgstr "tartalom típusa"
 msgid "object id"
 msgstr "objektum id"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "objektum repr"
 
@@ -121,6 +136,30 @@ msgstr "\"%(object)s\" törölve."
 msgid "LogEntry Object"
 msgstr "Naplóbejegyzés objektum"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "\"{object}\" {name} létrehozva."
+
+msgid "Added."
+msgstr "Hozzáadva."
+
+msgid "and"
+msgstr "és"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "\"{object}\" {name} tulajdonságai ({fields}) megváltoztak."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "{fields} módosítva."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "\"{object}\" {name} törlésre került."
+
+msgid "No fields changed."
+msgstr "Egy mező sem változott."
+
 msgid "None"
 msgstr "Egyik sem"
 
@@ -130,64 +169,37 @@ msgstr ""
 "Tartsa lenyomva a \"Control\"-t, vagy Mac-en a \"Command\"-ot több elem "
 "kiválasztásához."
 
-msgid "Added."
-msgstr "Hozzáadva."
-
-#, python-format
-msgid "Changed %s."
-msgstr "%s módosítva."
-
-msgid "and"
-msgstr "és"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "\"%(object)s\" %(name)s létrehozva."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "\"%(object)s\" %(name)s tulajdonságai (%(list)s) megváltoztak."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "\"%(object)s\" %(name)s törlésre került."
-
-msgid "No fields changed."
-msgstr "Egy mező sem változott."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "\"%(obj)s\" %(name)s sikeresen létrehozva. Alább ismét szerkesztheti."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "\"{obj}\" {name} sikeresen létrehozva. Alább ismét szerkesztheti."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"\"%(obj)s\" %(name)s sikeresen létrehozva. Alább újabb %(name)s hozható "
-"létre."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "\"%(obj)s\" %(name)s sikeresen létrehozva."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr "\"%(obj)s\" %(name)s sikeresen létrehozva. Alább ismét szerkeszthető."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
 msgstr ""
-"\"%(obj)s\" %(name)s sikeresen módosítva. Alább újabb %(name)s hozható létre."
+"\"{obj}\" {name} sikeresen létrehozva. Alább újabb {name} hozható létre."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "\"%(obj)s\" %(name)s sikeresen módosítva."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "\"{obj}\" {name} sikeresen létrehozva."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr "\"{obj}\" {name} sikeresen módosítva. Alább ismét szerkesztheti."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"\"{obj}\" {name} sikeresen módosítva. Alább újabb {name} hozható létre."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "\"{obj}\" {name} sikeresen módosítva."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -345,18 +357,15 @@ msgstr "Dokumentáció"
 msgid "Log out"
 msgstr "Kijelentkezés"
 
-msgid "Add"
-msgstr "Új"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Új %(name)s"
 
 msgid "History"
 msgstr "Történet"
 
 msgid "View on site"
 msgstr "Megtekintés a honlapon"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Új %(name)s"
 
 msgid "Filter"
 msgstr "Szűrő"
@@ -441,13 +450,6 @@ msgstr ""
 msgid "Change"
 msgstr "Módosítás"
 
-msgid "Remove"
-msgstr "Törlés"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Újabb %(verbose_name)s hozzáadása"
-
 msgid "Delete?"
 msgstr "Törli?"
 
@@ -462,13 +464,16 @@ msgstr "Összegzés"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s alkalmazásban elérhető modellek."
 
+msgid "Add"
+msgstr "Új"
+
 msgid "You don't have permission to edit anything."
 msgstr "Nincs joga szerkeszteni."
 
-msgid "Recent Actions"
-msgstr "Utolsó műveletek"
+msgid "Recent actions"
+msgstr "Legutóbbi műveletek"
 
-msgid "My Actions"
+msgid "My actions"
 msgstr "Az én műveleteim"
 
 msgid "None available"

@@ -353,6 +353,13 @@ class ModelState(object):
                     'ModelState.fields cannot refer to a model class - "%s.through" does. '
                     'Use a string reference instead.' % name
                 )
+        # Sanity-check that indexes have their name set.
+        for index in self.options['indexes']:
+            if not index.name:
+                raise ValueError(
+                    "Indexes passed to ModelState require a name attribute. "
+                    "%r doesn't have one." % index
+                )
 
     @cached_property
     def name_lower(self):

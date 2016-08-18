@@ -1254,6 +1254,13 @@ Sorts test cases in the opposite execution order. This may help in debugging
 the side effects of tests that aren't properly isolated. :ref:`Grouping by test
 class <order-of-tests>` is preserved when using this option.
 
+.. django-admin-option:: --debug-mode
+
+.. versionadded:: 1.11
+
+Sets the :setting:`DEBUG` setting to ``True`` prior to running tests. This may
+help troubleshoot test failures.
+
 .. django-admin-option:: --debug-sql, -d
 
 Enables :ref:`SQL logging <django-db-logger>` for failing tests. If

@@ -176,7 +176,7 @@ Raster Lookups
 .. versionadded:: 1.10
 
 The raster lookup syntax is similar to the syntax for geometries. The only
-difference is that a band index can specified as additional input. If no band
+difference is that a band index can be specified as additional input. If no band
 index is specified, the first band is used by default (index ``0``). In that
 case the syntax is identical to the syntax for geometry lookups.
 
@@ -192,7 +192,7 @@ This results in the following general form for lookups involving rasters
     >>> qs = Elevation.objects.filter(<field>__<band_index>__<lookup_type>=<parameter>)
     >>> qs = Elevation.objects.filter(<field>__<lookup_type>=(<raster_input, <band_index>)
 
-Fore example::
+For example::
 
     >>> qs = Elevation.objects.filter(rast__contains=geom)
     >>> qs = Elevation.objects.filter(rast__contains=rst)

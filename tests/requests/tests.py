@@ -589,7 +589,7 @@ class HostValidationTests(SimpleTestCase):
         ALLOWED_HOSTS=[
             'forward.com', 'example.com', 'internal.com', '12.34.56.78',
             '[2001:19f0:feee::dead:beef:cafe]', 'xn--4ca9at.com',
-            '.multitenant.com', 'INSENSITIVE.com',
+            '.multitenant.com', 'INSENSITIVE.com', '[::ffff:169.254.169.254]',
         ])
     def test_http_get_host(self):
         # Check if X_FORWARDED_HOST is provided.
@@ -641,6 +641,7 @@ class HostValidationTests(SimpleTestCase):
             'insensitive.com',
             'example.com.',
             'example.com.:80',
+            '[::ffff:169.254.169.254]',
         ]
 
         for host in legit_hosts:

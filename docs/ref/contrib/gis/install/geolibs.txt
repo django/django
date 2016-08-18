@@ -37,10 +37,10 @@ totally fine with GeoDjango. Your mileage may vary.
     GDAL 2.1.0 2016-04
     PostGIS 2.1.0 2013-08-17
     PostGIS 2.2.0 2015-10-17
-    Spatialite 4.0.0 2012-11-25
-    Spatialite 4.1.0 2013-06-04
-    Spatialite 4.2.0 2014-07-25
-    Spatialite 4.3.0 2015-09-07
+    SpatiaLite 4.0.0 2012-11-25
+    SpatiaLite 4.1.0 2013-06-04
+    SpatiaLite 4.2.0 2014-07-25
+    SpatiaLite 4.3.0 2015-09-07
 
 .. note::
 

@@ -4,11 +4,12 @@ from unittest import skipIf
 
 from django.db import connection, connections
 from django.db.migrations.exceptions import (
-    AmbiguityError, InconsistentMigrationHistory, NodeNotFoundError,
+    AmbiguityError, InconsistentMigrationHistory, MigrationSchemaMissing,
+    NodeNotFoundError,
 )
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import TestCase, modify_settings, override_settings
+from django.test import TestCase, mock, modify_settings, override_settings
 from django.utils import six
 
 
@@ -381,6 +382,23 @@ class LoaderTests(TestCase):
         with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
             loader.check_consistent_history(connection)
 
+    @override_settings(
+        MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed_extra'},
+        INSTALLED_APPS=['migrations'],
+    )
+    def test_check_consistent_history_squashed(self):
+        """
+        MigrationLoader.check_consistent_history() should ignore unapplied
+        squashed migrations that have all of their `replaces` applied.
+        """
+        loader = MigrationLoader(connection=None)
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied('migrations', '0001_initial')
+        recorder.record_applied('migrations', '0002_second')
+        loader.check_consistent_history(connection)
+        recorder.record_applied('migrations', '0003_third')
+        loader.check_consistent_history(connection)
+
     @override_settings(MIGRATION_MODULES={
         "app1": "migrations.test_migrations_squashed_ref_squashed.app1",
         "app2": "migrations.test_migrations_squashed_ref_squashed.app2",
@@ -447,3 +465,12 @@ class LoaderTests(TestCase):
             ('app1', '4_auto'),
         }
         self.assertEqual(plan, expected_plan)
+
+    def test_readonly_database(self):
+        """
+        check_consistent_history() ignores read-only databases, possibly
+        without a django_migrations table.
+        """
+        with mock.patch.object(MigrationRecorder, 'ensure_schema', side_effect=MigrationSchemaMissing()):
+            loader = MigrationLoader(connection=None)
+            loader.check_consistent_history(connection)

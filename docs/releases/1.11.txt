@@ -15,8 +15,7 @@ project.
 
 Django 1.11 is designated as a :term:`long-term support release`. It will
 receive security updates for at least three years after its release. Support
-for the previous LTS, Django 1.8, will end 6 months after the release date of
-Django 1.11.
+for the previous LTS, Django 1.8, will end in April 2018.
 
 Python compatibility
 ====================
@@ -81,13 +80,19 @@ Minor features
   ``password_reset_confirm()``, and ``password_reset_complete()`` function-based
   views.
 
+* The new ``post_reset_login`` attribute for
+  :class:`~django.contrib.auth.views.PasswordResetConfirmView` allows
+  automatically logging in a user after a successful password reset.
+
+* :func:`~django.contrib.auth.update_session_auth_hash` now rotates the session
+  key to allow a password change to invalidate stolen session cookies.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* When stale content types are detected during a management command, there is
-  now an expansive list of objects that will be deleted. Previously, only
-  the content type objects themselves were listed, even if there were objects
-  with foreign keys towards the content types that would be deleted also.
+* When stale content types are detected after the ``migrate`` command, there's
+  now a list of related objects such as ``auth.Permission``\s that will also be
+  deleted. Previously, only the content types were listed.
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -150,13 +155,19 @@ CSRF
 Database backends
 ~~~~~~~~~~~~~~~~~
 
-* ...
+* Added the ``skip_locked`` argument to :meth:`.QuerySet.select_for_update()`
+  on PostgreSQL 9.5+ and Oracle to execute queries with
+  ``FOR UPDATE SKIP LOCKED``.
 
 Email
 ~~~~~
 
 * Added the :setting:`EMAIL_USE_LOCALTIME` setting to allow sending SMTP date
   headers in the local time zone rather than in UTC.
+
+* ``EmailMessage.attach()`` and ``attach_file()`` now fall back to MIME type
+  ``application/octet-stream`` when binary content that can't be decoded as
+  UTF-8 is specified for a ``text/*`` attachment.
 
 File Storage
 ~~~~~~~~~~~~
@@ -224,6 +235,9 @@ Requests and Responses
 * :class:`~django.middleware.common.CommonMiddleware` now sets the
   ``Content-Length`` response header for non-streaming responses.
 
+* Added the :setting:`SECURE_HSTS_PRELOAD` setting to allow appending the
+  ``preload`` directive to the ``Strict-Transport-Security`` header.
+
 Serialization
 ~~~~~~~~~~~~~
 
@@ -255,7 +269,15 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* Added :meth:`.DiscoverRunner.get_test_runner_kwargs` to allow customizing the
+  keyword arguments passed to the test runner.
+
+* Added the :option:`test --debug-mode` option to help troubleshoot test
+  failures by setting the :setting:`DEBUG` setting to ``True``.
+
+* The new :func:`django.test.utils.setup_databases` (moved from
+  ``django.test.runner``) and :func:`~django.test.utils.teardown_databases`
+  functions make it easier to build custom test runners.
 
 URLs
 ~~~~
@@ -295,6 +317,16 @@ Database backend API
 * The ``DatabaseOperations.datetime_cast_time_sql()`` method is added to
   support the :lookup:`time` lookup. It accepts a ``field_name`` and ``tzname``
   arguments and returns the SQL necessary to cast a datetime value to time value.
+
+* To enable ``FOR UPDATE SKIP LOCKED`` support, set
+  ``DatabaseFeatures.has_select_for_update_skip_locked = True``.
+
+* The new ``DatabaseFeatures.supports_index_column_ordering`` attribute
+  specifies if a database allows defining ordering for columns in indexes. The
+  default value is ``True`` and the ``DatabaseIntrospection.get_constraints()``
+  method should include an ``'orders'`` key in each of the returned
+  dictionaries with a list of ``'ASC'`` and/or ``'DESC'`` values corresponding
+  to the the ordering of each column in the index.
 
 Dropped support for PostgreSQL 9.2 and PostGIS 2.0
 --------------------------------------------------
@@ -353,6 +385,24 @@ Miscellaneous
   argument. Remove it because it doesn't have an effect in older versions of
   Django as these fields alway strip whitespace.
 
+* The ``checked`` attribute rendered by form widgets now uses HTML5 boolean
+  syntax rather than XHTML's ``checked='checked'``.
+
+* :meth:`RelatedManager.add()
+  <django.db.models.fields.related.RelatedManager.add>`,
+  :meth:`~django.db.models.fields.related.RelatedManager.remove`,
+  :meth:`~django.db.models.fields.related.RelatedManager.clear`, and
+  :meth:`~django.db.models.fields.related.RelatedManager.set` now
+  clear the ``prefetch_related()`` cache.
+
+* To prevent possible loss of saved settings,
+  :func:`~django.test.utils.setup_test_environment` now raises an exception if
+  called a second time before calling
+  :func:`~django.test.utils.teardown_test_environment`.
+
+* The :djadmin:`makemessages` command now requires configured settings, like
+  most other commands.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
@@ -366,6 +416,9 @@ Miscellaneous
   :class:`~django.contrib.auth.views.LoginView` and
   :class:`~django.contrib.auth.views.LogoutView`.
 
+* The unused ``extra_context`` parameter of
+  ``contrib.auth.views.logout_then_login()``  is deprecated.
+
 * ``contrib.auth``’s ``password_change()``, ``password_change_done()``,
   ``password_reset()``, ``password_reset_done()``, ``password_reset_confirm()``,
   and ``password_reset_complete()`` function-based views are deprecated in favor
@@ -376,3 +429,6 @@ Miscellaneous
   :class:`~django.contrib.auth.views.PasswordResetDoneView`,
   :class:`~django.contrib.auth.views.PasswordResetConfirmView`, and
   :class:`~django.contrib.auth.views.PasswordResetCompleteView`.
+
+* ``django.test.runner.setup_databases()`` is moved to
+  :func:`django.test.utils.setup_databases`. The old location is deprecated.

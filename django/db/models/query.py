@@ -452,8 +452,10 @@ class QuerySet(object):
                     ids = self._batched_insert(objs_without_pk, fields, batch_size)
                     if connection.features.can_return_ids_from_bulk_insert:
                         assert len(ids) == len(objs_without_pk)
-                    for i in range(len(ids)):
-                        objs_without_pk[i].pk = ids[i]
+                    for obj_without_pk, pk in zip(objs_without_pk, ids):
+                        obj_without_pk.pk = pk
+                        obj_without_pk._state.adding = False
+                        obj_without_pk._state.db = self.db
 
         return objs
 
@@ -679,42 +681,7 @@ class QuerySet(object):
     def _values(self, *fields):
         clone = self._clone()
         clone._fields = fields
-
-        query = clone.query
-        query.select_related = False
-        query.clear_deferred_loading()
-        query.clear_select_fields()
-
-        if query.group_by is True:
-            query.add_fields((f.attname for f in self.model._meta.concrete_fields), False)
-            query.set_group_by()
-            query.clear_select_fields()
-
-        if fields:
-            field_names = []
-            extra_names = []
-            annotation_names = []
-            if not query._extra and not query._annotations:
-                # Shortcut - if there are no extra or annotations, then
-                # the values() clause must be just field names.
-                field_names = list(fields)
-            else:
-                query.default_cols = False
-                for f in fields:
-                    if f in query.extra_select:
-                        extra_names.append(f)
-                    elif f in query.annotation_select:
-                        annotation_names.append(f)
-                    else:
-                        field_names.append(f)
-            query.set_extra_mask(extra_names)
-            query.set_annotation_mask(annotation_names)
-        else:
-            field_names = [f.attname for f in self.model._meta.concrete_fields]
-
-        query.values_select = field_names
-        query.add_fields(field_names, True)
-
+        clone.query.set_values(fields)
         return clone
 
     def values(self, *fields):
@@ -833,15 +800,18 @@ class QuerySet(object):
         else:
             return self._filter_or_exclude(None, **filter_obj)
 
-    def select_for_update(self, nowait=False):
+    def select_for_update(self, nowait=False, skip_locked=False):
         """
         Returns a new QuerySet instance that will select objects with a
         FOR UPDATE lock.
         """
+        if nowait and skip_locked:
+            raise ValueError('The nowait option cannot be used with skip_locked.')
         obj = self._clone()
         obj._for_write = True
         obj.query.select_for_update = True
         obj.query.select_for_update_nowait = nowait
+        obj.query.select_for_update_skip_locked = skip_locked
         return obj
 
     def select_related(self, *fields):

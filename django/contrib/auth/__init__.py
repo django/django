@@ -215,6 +215,7 @@ def update_session_auth_hash(request, user):
     appropriately to prevent a password change from logging out the session
     from which the password was changed.
     """
+    request.session.cycle_key()
     if hasattr(user, 'get_session_auth_hash') and request.user == user:
         request.session[HASH_SESSION_KEY] = user.get_session_auth_hash()
 

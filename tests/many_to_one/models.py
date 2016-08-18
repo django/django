@@ -43,7 +43,7 @@ class City(models.Model):
 
 @python_2_unicode_compatible
 class District(models.Model):
-    city = models.ForeignKey(City, models.CASCADE)
+    city = models.ForeignKey(City, models.CASCADE, related_name='districts', null=True)
     name = models.CharField(max_length=50)
 
     def __str__(self):

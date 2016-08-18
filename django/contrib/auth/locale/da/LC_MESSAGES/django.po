@@ -2,16 +2,16 @@
 #
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
-# Erik Wognsen <r4mses@gmail.com>, 2013-2015
+# Erik Wognsen <r4mses@gmail.com>, 2013-2016
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Stevenn <steven.gandso@gmail.com>, 2013
+# Stevenn, 2013
 # valberg <valberg@orn.li>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-12-01 20:28+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:45+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -118,6 +118,21 @@ msgstr "salt"
 msgid "hash"
 msgstr "hash"
 
+msgid "variety"
+msgstr "variation"
+
+msgid "version"
+msgstr "version"
+
+msgid "memory cost"
+msgstr "hukommelsesomkostning"
+
+msgid "time cost"
+msgstr "tidsomkostning"
+
+msgid "parallelism"
+msgstr "parallelitet"
+
 msgid "work factor"
 msgstr "work factor"
 
@@ -170,14 +185,8 @@ msgstr "Specifikke rettigheder for denne bruger."
 msgid "username"
 msgstr "brugernavn"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Påkrævet. Højst 30 tegn. Kun  bogstaver og cifre samt @/./+/-/_"
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Dette felt må kun indeholde bogstaver og cifre samt disse tegn: @/./+/-/_"
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Påkrævet. Højst 150 tegn. Kun bogstaver og cifre samt @/./+/-/_"
 
 msgid "A user with that username already exists."
 msgstr "En bruger med dette brugernavn findes allerede."
@@ -256,6 +265,20 @@ msgstr "Din adgangskode må ikke være udelukkende numerisk."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Adgangskode nulstillet på %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Indtast et gyldigt brugernavn. Dette felt må kun indeholde engelske "
+"bogstaver, cifre og disse tegn: @/./+/-/_"
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Indtast et gyldigt brugernavn. Dette felt må kun indeholde bogstaver og "
+"cifre samt disse tegn: @/./+/-/_"
 
 msgid "Logged out"
 msgstr "Logget ud"

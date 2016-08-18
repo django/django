@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-12-05 12:16+0000\n"
-"Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
@@ -63,6 +63,9 @@ msgstr "Dana"
 
 msgid "German"
 msgstr "Germana"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "Greka"
@@ -133,6 +136,9 @@ msgstr "Hinda"
 msgid "Croatian"
 msgstr "Kroata"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "Hungara"
 
@@ -193,8 +199,8 @@ msgstr "Marata"
 msgid "Burmese"
 msgstr "Birma"
 
-msgid "Norwegian Bokmal"
-msgstr "Norvega (bokmål)"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Nepala"
@@ -291,9 +297,6 @@ msgstr "Statikaj dosieroj"
 
 msgid "Syndication"
 msgstr "Abonrilato"
-
-msgid "Web Design"
-msgstr "Reteja dezajno"
 
 msgid "Enter a valid value."
 msgstr "Enigu validan valoron."
@@ -432,6 +435,9 @@ msgstr "Entjero"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' valoro devas esti entjero."
 
+msgid "Big (8 byte) integer"
+msgstr "Granda (8 bitoka) entjero"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' valoro devas esti Vera aŭ Malvera"
@@ -515,9 +521,6 @@ msgstr "'%(value)s' valoro devas esti glitkoma nombro."
 msgid "Floating point number"
 msgstr "Glitkoma nombro"
 
-msgid "Big (8 byte) integer"
-msgstr "Granda (8 bitoka) entjero"
-
 msgid "IPv4 address"
 msgstr "IPv4-adreso"
 
@@ -591,6 +594,14 @@ msgstr "Fremda ŝlosilo (tipo determinita per rilata kampo)"
 
 msgid "One-to-one relationship"
 msgstr "Unu-al-unu rilato"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "Mult-al-multa rilato"

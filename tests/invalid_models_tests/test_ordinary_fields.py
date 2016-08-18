@@ -157,6 +157,27 @@ class CharFieldTests(TestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_iterable_of_iterable_choices(self):
+        class ThingItem(object):
+            def __init__(self, value, display):
+                self.value = value
+                self.display = display
+
+            def __iter__(self):
+                return (x for x in [self.value, self.display])
+
+            def __len__(self):
+                return 2
+
+        class Things(object):
+            def __iter__(self):
+                return (x for x in [ThingItem(1, 2), ThingItem(3, 4)])
+
+        class ThingWithIterableChoices(models.Model):
+            thing = models.CharField(max_length=100, blank=True, choices=Things())
+
+        self.assertEqual(ThingWithIterableChoices._meta.get_field('thing').check(), [])
+
     def test_choices_containing_non_pairs(self):
         class Model(models.Model):
             field = models.CharField(max_length=10, choices=[(1, 2, 3), (1, 2, 3)])

@@ -241,9 +241,6 @@ WHEN (new.%(col_name)s IS NULL)
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
-    def drop_sequence_sql(self, table):
-        return "DROP SEQUENCE %s;" % self.quote_name(self._get_sequence_name(table))
-
     def fetch_returned_insert_id(self, cursor):
         return int(cursor._insert_id_var.getvalue())
 

@@ -17,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 15:58+0000\n"
-"Last-Translator: Ilja Maas <iljamaas@dreamsolution.nl>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -68,6 +68,9 @@ msgstr "Deens"
 
 msgid "German"
 msgstr "Duits"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "Grieks"
@@ -138,6 +141,9 @@ msgstr "Hindi"
 msgid "Croatian"
 msgstr "Kroatisch"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "Hongaars"
 
@@ -198,8 +204,8 @@ msgstr "Marathi"
 msgid "Burmese"
 msgstr "Birmaans"
 
-msgid "Norwegian Bokmal"
-msgstr "Noorse Bokmål"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Nepalees"
@@ -296,9 +302,6 @@ msgstr "Statische bestanden"
 
 msgid "Syndication"
 msgstr "Syndicatie"
-
-msgid "Web Design"
-msgstr "Webdesign"
 
 msgid "Enter a valid value."
 msgstr "Geef een geldige waarde."
@@ -439,6 +442,9 @@ msgstr "Geheel getal"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' waarde moet een geheel getal zijn."
 
+msgid "Big (8 byte) integer"
+msgstr "Groot (8 byte) geheel getal"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' waarde moet True of False zijn."
@@ -522,9 +528,6 @@ msgstr "'%(value)s' waarde moet een decimaal getal zijn."
 msgid "Floating point number"
 msgstr "Decimaal getal"
 
-msgid "Big (8 byte) integer"
-msgstr "Groot (8 byte) geheel getal"
-
 msgid "IPv4 address"
 msgstr "IPv4 address"
 
@@ -598,6 +601,14 @@ msgstr "Refererende sleutel (type wordt bepaalde door gerelateerde veld)"
 
 msgid "One-to-one relationship"
 msgstr "Één-op-één relatie"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "Veel-op-veel relatie"

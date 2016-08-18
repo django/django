@@ -6,11 +6,10 @@ import unittest
 from collections import OrderedDict
 from operator import attrgetter
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import EmptyResultSet, FieldError
 from django.db import DEFAULT_DB_ALIAS, connection
 from django.db.models import Count, F, Q
 from django.db.models.sql.constants import LOUTER
-from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.where import NothingNode, WhereNode
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
@@ -2481,6 +2480,28 @@ class ToFieldTests(TestCase):
         self.assertEqual(
             list(Node.objects.filter(node=node2)),
             [node1]
+        )
+
+
+class IsNullTests(TestCase):
+    def test_primary_key(self):
+        custom = CustomPk.objects.create(name='pk')
+        null = Related.objects.create()
+        notnull = Related.objects.create(custom=custom)
+        self.assertSequenceEqual(Related.objects.filter(custom__isnull=False), [notnull])
+        self.assertSequenceEqual(Related.objects.filter(custom__isnull=True), [null])
+
+    def test_to_field(self):
+        apple = Food.objects.create(name="apple")
+        Eaten.objects.create(food=apple, meal="lunch")
+        Eaten.objects.create(meal="lunch")
+        self.assertQuerysetEqual(
+            Eaten.objects.filter(food__isnull=False),
+            ['<Eaten: apple at lunch>']
+        )
+        self.assertQuerysetEqual(
+            Eaten.objects.filter(food__isnull=True),
+            ['<Eaten: None at lunch>']
         )
 
 

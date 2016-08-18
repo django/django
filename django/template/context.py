@@ -67,6 +67,18 @@ class BaseContext(object):
         "Set a variable in the current context"
         self.dicts[-1][key] = value
 
+    def set_upward(self, key, value):
+        """
+        Set a variable in one of the higher contexts if it exists there,
+        otherwise in the current context.
+        """
+        context = self.dicts[-1]
+        for d in reversed(self.dicts):
+            if key in d.keys():
+                context = d
+                break
+        context[key] = value
+
     def __getitem__(self, key):
         "Get a variable's value, starting at the current context and going upward"
         for d in reversed(self.dicts):

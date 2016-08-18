@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Alex Gaynor <alex.gaynor@gmail.com>, 2011
+# Alex Gaynor <inactive+Alex@transifex.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Meir Kriheli <mkriheli@gmail.com>, 2011-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-28 16:13+0000\n"
-"Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -63,6 +63,12 @@ msgstr "החודש"
 msgid "This year"
 msgstr "השנה"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -73,6 +79,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "פעולה"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "הוספת %(verbose_name)s"
+
+msgid "Remove"
+msgstr "להסיר"
 
 msgid "action time"
 msgstr "זמן פעולה"
@@ -86,6 +99,8 @@ msgstr "סוג תוכן"
 msgid "object id"
 msgstr "מזהה אובייקט"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "ייצוג אובייקט"
 
@@ -116,6 +131,30 @@ msgstr "בוצעה מחיקת \"%(object)s\"."
 msgid "LogEntry Object"
 msgstr "אובייקט LogEntry"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr "נוסף."
+
+msgid "and"
+msgstr "ו"
+
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "אף שדה לא השתנה."
+
 msgid "None"
 msgstr "ללא"
 
@@ -124,62 +163,35 @@ msgid ""
 msgstr ""
 "יש להחזיק את \"Control\", או \"Command\" על מק, לחוץ כדי לבחור יותר מאחד."
 
-msgid "Added."
-msgstr "נוסף."
-
-#, python-format
-msgid "Changed %s."
-msgstr "%s שונה."
-
-msgid "and"
-msgstr "ו"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "בוצעה הוספת %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "בוצע שינוי %(list)s עבור %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "בוצעה מחיקת %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "אף שדה לא השתנה."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה. ניתן לערוך אותו שוב מתחת."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה. ניתן להוסיף עוד %(name)s מתחת."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr "עדכון %(name)s \"%(obj)s\" בוצע בהצלחה. ניתן לערוך שוב מתחת."
+msgstr ""
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
-msgstr "עדכון %(name)s \"%(obj)s\" בוצע בהצלחה. ניתן להוסיף עוד %(name)s מתחת."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "שינוי %(name)s \"%(obj)s\" בוצע בהצלחה."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -333,18 +345,15 @@ msgstr "תיעוד"
 msgid "Log out"
 msgstr "יציאה"
 
-msgid "Add"
-msgstr "הוספה"
+#, python-format
+msgid "Add %(name)s"
+msgstr "הוספת %(name)s"
 
 msgid "History"
 msgstr "היסטוריה"
 
 msgid "View on site"
 msgstr "צפיה באתר"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "הוספת %(name)s"
 
 msgid "Filter"
 msgstr "סינון"
@@ -427,13 +436,6 @@ msgstr ""
 msgid "Change"
 msgstr "שינוי"
 
-msgid "Remove"
-msgstr "להסיר"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "הוספת %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "מחיקה ?"
 
@@ -448,14 +450,17 @@ msgstr "סיכום"
 msgid "Models in the %(name)s application"
 msgstr "מודלים ביישום %(name)s"
 
+msgid "Add"
+msgstr "הוספה"
+
 msgid "You don't have permission to edit anything."
 msgstr "אין לך הרשאות לעריכה."
 
-msgid "Recent Actions"
-msgstr "פעולות אחרונות"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "הפעולות שלי"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "לא נמצאו"
