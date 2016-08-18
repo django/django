@@ -56,3 +56,5 @@ Bugfixes
 * Reallowed the ``{% for %}`` tag to unpack any iterable (:ticket:`27058`).
 
 * Fixed ``makemigrations`` crash if a database is read-only (:ticket:`27054`).
+
+* Removed duplicated managers in ``Model._meta.managers`` (:ticket:`27073`).
