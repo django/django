@@ -373,7 +373,7 @@ including ``datetime`` and ``Decimal`` in JSON backed sessions, you will need
 to write a custom serializer (or convert such values to a JSON serializable
 object before storing them in ``request.session``). While serializing these
 values is fairly straightforward
-(``django.core.serializers.json.DateTimeAwareJSONEncoder`` may be helpful),
+(:class:`~django.core.serializers.json.DjangoJSONEncoder` may be helpful),
 writing a decoder that can reliably get back the same thing that you put in is
 more fragile. For example, you run the risk of returning a ``datetime`` that
 was actually a string that just happened to be in the same format chosen for
