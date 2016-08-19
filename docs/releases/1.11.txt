@@ -302,10 +302,24 @@ Validators
   :data:`~django.core.validators.validate_image_file_extension` to validate
   image files.
 
+Miscellaneous
+~~~~~~~~~~~~~
+
+* ``utils.http.is_safe_url()`` accepts a new ``require_https`` argument. If
+  ``require_https`` is ``True``, only HTTPS will be considered as a valid
+  scheme as opposed to both HTTP and HTTPS with the default ``False``.
+
 .. _backwards-incompatible-1.11:
 
 Backwards incompatible changes in 1.11
 ======================================
+
+:mod:`django.contrib.auth`
+--------------------------
+
+* ``LoginView`` and ``LogoutView`` protect users against being redirected to non
+  HTTPS ``next`` URLs when the app is running behind HTTPS. This is done by
+  using the ``require_https`` argument to ``is_safe_url()``.
 
 :mod:`django.contrib.gis`
 -------------------------
@@ -346,6 +360,14 @@ Django 1.11 sets PostgreSQL 9.3 as the minimum version it officially supports.
 
 Support for PostGIS 2.0 is also removed as PostgreSQL 9.2 is the last version
 to support it.
+
+Internationalization
+--------------------
+
+* The :func:`django.views.i18n.set_language` view now protects users against
+  being redirected to non HTTPS ``next`` URLs when the app is running behind
+  HTTPS. This is done by using the ``require_https`` argument to
+  ``is_safe_url()``.
 
 ``LiveServerTestCase`` binds to port zero
 -----------------------------------------
