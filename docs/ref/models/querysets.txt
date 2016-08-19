@@ -1654,6 +1654,7 @@ than one object was found. The
 :exc:`~django.core.exceptions.MultipleObjectsReturned` exception is an
 attribute of the model class.
 
+
 ``get()`` raises a :exc:`~django.db.models.Model.DoesNotExist` exception if an
 object wasn't found for the given parameters. This exception is an attribute
 of the model class. Example::
@@ -1670,6 +1671,14 @@ The :exc:`~django.db.models.Model.DoesNotExist` exception inherits from
         b = Blog.objects.get(id=1)
     except ObjectDoesNotExist:
         print("Either the entry or blog doesn't exist.")
+
+In case a ``filter()`` is used to return exactly one column or the model contains only one column,
+``get()`` with no parameters returns the object for that column.
+For example::
+	if Entry.models.objects.all().count() == 1:
+		print(Entry.models.objects.get()) 
+		
+	obj = Entry.models.objects.filter(...).get()
 
 ``create()``
 ~~~~~~~~~~~~
