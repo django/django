@@ -187,6 +187,10 @@ Forms
 * The new :attr:`CharField.empty_value <django.forms.CharField.empty_value>`
   attribute allows specifying the Python value to use to represent "empty".
 
+* The new :meth:`Form.get_initial_for_field()
+  <django.forms.Form.get_initial_for_field>` method returns initial data for a
+  form field.
+
 Generic Views
 ~~~~~~~~~~~~~
 

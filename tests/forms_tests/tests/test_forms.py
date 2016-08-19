@@ -1904,6 +1904,21 @@ Password: <input type="password" name="password" required /></li>
 </select></li>"""
         )
 
+    def test_get_initial_for_field(self):
+        class PersonForm(Form):
+            first_name = CharField(initial='John')
+            last_name = CharField(initial='Doe')
+            age = IntegerField()
+            occupation = CharField(initial=lambda: 'Unknown')
+
+        form = PersonForm(initial={'first_name': 'Jane'})
+        self.assertEqual(form.get_initial_for_field(form.fields['age'], 'age'), None)
+        self.assertEqual(form.get_initial_for_field(form.fields['last_name'], 'last_name'), 'Doe')
+        # Form.initial overrides Field.initial.
+        self.assertEqual(form.get_initial_for_field(form.fields['first_name'], 'first_name'), 'Jane')
+        # Callables are evaluated.
+        self.assertEqual(form.get_initial_for_field(form.fields['occupation'], 'occupation'), 'Unknown')
+
     def test_changed_data(self):
         class Person(Form):
             first_name = CharField(initial='Hans')
@@ -1959,6 +1974,19 @@ Password: <input type="password" name="password" required /></li>
         self.assertEqual(name.value(), name.value())
         # BoundField is also cached
         self.assertIs(form['name'], name)
+
+    def test_boundfield_value_disabled_callable_initial(self):
+        class PersonForm(Form):
+            name = CharField(initial=lambda: 'John Doe', disabled=True)
+
+        # Without form data.
+        form = PersonForm()
+        self.assertEqual(form['name'].value(), 'John Doe')
+
+        # With form data. As the field is disabled, the value should not be
+        # affected by the form data.
+        form = PersonForm({})
+        self.assertEqual(form['name'].value(), 'John Doe')
 
     def test_boundfield_rendering(self):
         """
@@ -2020,6 +2048,23 @@ Password: <input type="password" name="password" required /></li>
         self.assertEqual(unbound['hi_default_microsec'].value(), now)
         self.assertEqual(unbound['hi_without_microsec'].value(), now_no_ms)
         self.assertEqual(unbound['ti_without_microsec'].value(), now_no_ms)
+
+    def test_datetime_clean_initial_callable_disabled(self):
+        now = datetime.datetime(2006, 10, 25, 14, 30, 45, 123456)
+
+        class DateTimeForm(forms.Form):
+            dt = DateTimeField(initial=lambda: now, disabled=True)
+
+        form = DateTimeForm({})
+        self.assertEqual(form.errors, {})
+        self.assertEqual(form.cleaned_data, {'dt': now})
+
+    def test_datetime_changed_data_callable_with_microseconds(self):
+        class DateTimeForm(forms.Form):
+            dt = DateTimeField(initial=lambda: datetime.datetime(2006, 10, 25, 14, 30, 45, 123456), disabled=True)
+
+        form = DateTimeForm({'dt': '2006-10-25 14:30:45'})
+        self.assertEqual(form.changed_data, [])
 
     def test_help_text(self):
         # You can specify descriptive text for a field by using the 'help_text' argument)
@@ -2368,6 +2413,14 @@ Password: <input type="password" name="password" required />
             f.as_table(),
             '<tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>',
         )
+
+    def test_filefield_initial_callable(self):
+        class FileForm(forms.Form):
+            file1 = forms.FileField(initial=lambda: 'resume.txt')
+
+        f = FileForm({})
+        self.assertEqual(f.errors, {})
+        self.assertEqual(f.cleaned_data['file1'], 'resume.txt')
 
     def test_basic_processing_in_view(self):
         class UserRegistration(Form):

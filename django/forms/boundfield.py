@@ -129,12 +129,9 @@ class BoundField(object):
         Returns the value for this BoundField, using the initial value if
         the form is not bound or the data otherwise.
         """
-        if not self.form.is_bound:
-            data = self.initial
-        else:
-            data = self.field.bound_data(
-                self.data, self.form.initial.get(self.name, self.field.initial)
-            )
+        data = self.initial
+        if self.form.is_bound:
+            data = self.field.bound_data(self.data, data)
         return self.field.prepare_value(data)
 
     def label_tag(self, contents=None, attrs=None, label_suffix=None):
@@ -218,14 +215,12 @@ class BoundField(object):
 
     @cached_property
     def initial(self):
-        data = self.form.initial.get(self.name, self.field.initial)
-        if callable(data):
-            data = data()
-            # If this is an auto-generated default date, nix the microseconds
-            # for standardized handling. See #22502.
-            if (isinstance(data, (datetime.datetime, datetime.time)) and
-                    not self.field.widget.supports_microseconds):
-                data = data.replace(microsecond=0)
+        data = self.form.get_initial_for_field(self.field, self.name)
+        # If this is an auto-generated default date, nix the microseconds for
+        # standardized handling. See #22502.
+        if (isinstance(data, (datetime.datetime, datetime.time)) and
+                not self.field.widget.supports_microseconds):
+            data = data.replace(microsecond=0)
         return data
 
     def build_widget_attrs(self, attrs, widget=None):

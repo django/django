@@ -377,12 +377,12 @@ class BaseForm(object):
             # Each widget type knows how to retrieve its own data, because some
             # widgets split data over several HTML fields.
             if field.disabled:
-                value = self.initial.get(name, field.initial)
+                value = self.get_initial_for_field(field, name)
             else:
                 value = field.widget.value_from_datadict(self.data, self.files, self.add_prefix(name))
             try:
                 if isinstance(field, FileField):
-                    initial = self.initial.get(name, field.initial)
+                    initial = self.get_initial_for_field(field, name)
                     value = field.clean(value, initial)
                 else:
                     value = field.clean(value)
@@ -431,9 +431,9 @@ class BaseForm(object):
             prefixed_name = self.add_prefix(name)
             data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
             if not field.show_hidden_initial:
-                initial_value = self.initial.get(name, field.initial)
-                if callable(initial_value):
-                    initial_value = initial_value()
+                # Use the BoundField's initial as this is the value passed to
+                # the widget.
+                initial_value = self[name].initial
             else:
                 initial_prefixed_name = self.add_initial_prefix(name)
                 hidden_widget = field.hidden_widget()
@@ -481,6 +481,16 @@ class BaseForm(object):
         The opposite of the hidden_fields() method.
         """
         return [field for field in self if not field.is_hidden]
+
+    def get_initial_for_field(self, field, field_name):
+        """
+        Return initial data for field on form. Use initial data from the form
+        or the field, in that order. Evaluate callable values.
+        """
+        value = self.initial.get(field_name, field.initial)
+        if callable(value):
+            value = value()
+        return value
 
 
 class Form(six.with_metaclass(DeclarativeFieldsMetaclass, BaseForm)):
