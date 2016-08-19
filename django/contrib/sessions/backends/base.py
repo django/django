@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import base64
 import logging
 import string
+import warnings
 from datetime import datetime, timedelta
 
 from django.conf import settings
@@ -12,8 +13,10 @@ from django.utils import timezone
 from django.utils.crypto import (
     constant_time_compare, get_random_string, salted_hmac,
 )
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_bytes, force_text
 from django.utils.module_loading import import_string
+from django.utils.translation import LANGUAGE_SESSION_KEY
 
 # session_key should not be case sensitive because some backends can store it
 # on case insensitive file systems.
@@ -54,6 +57,12 @@ class SessionBase(object):
         return key in self._session
 
     def __getitem__(self, key):
+        if key == LANGUAGE_SESSION_KEY:
+            warnings.warn(
+                "Storing the client language in the session is deprecated. "
+                "Check the cookie named django.utils.translation.LANGUAGE_COOKIE_NAME instead.",
+                RemovedInDjango21Warning, stacklevel=2
+            )
         return self._session[key]
 
     def __setitem__(self, key, value):

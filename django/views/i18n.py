@@ -52,14 +52,14 @@ def set_language(request):
                 if next_trans != next:
                     response = http.HttpResponseRedirect(next_trans)
             if hasattr(request, 'session'):
+                # Storing language in sessions is deprecated and will be removed in Django 2.1
                 request.session[LANGUAGE_SESSION_KEY] = lang_code
-            else:
-                response.set_cookie(
-                    settings.LANGUAGE_COOKIE_NAME, lang_code,
-                    max_age=settings.LANGUAGE_COOKIE_AGE,
-                    path=settings.LANGUAGE_COOKIE_PATH,
-                    domain=settings.LANGUAGE_COOKIE_DOMAIN,
-                )
+            response.set_cookie(
+                settings.LANGUAGE_COOKIE_NAME, lang_code,
+                max_age=settings.LANGUAGE_COOKIE_AGE,
+                path=settings.LANGUAGE_COOKIE_PATH,
+                domain=settings.LANGUAGE_COOKIE_DOMAIN,
+            )
     return response
 
 

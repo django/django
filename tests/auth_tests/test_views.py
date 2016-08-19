@@ -31,7 +31,6 @@ from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import ParseResult, urlparse
-from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from .models import CustomUser, UUIDUser
 from .settings import AUTH_TEMPLATES
@@ -920,16 +919,11 @@ class LogoutTest(AuthViewsTestCase):
             self.confirm_logged_out()
 
     def test_logout_preserve_language(self):
-        """Check that language stored in session is preserved after logout"""
-        # Create a new session with language
-        engine = import_module(settings.SESSION_ENGINE)
-        session = engine.SessionStore()
-        session[LANGUAGE_SESSION_KEY] = 'pl'
-        session.save()
-        self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
-
+        """Check that language is preserved after logout"""
+        self.login()
+        self.client.post('/setlang/', {'language': 'pl'})
         self.client.get('/logout/')
-        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'pl')
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, 'pl')
 
     @override_settings(LOGOUT_REDIRECT_URL='/custom/')
     def test_logout_redirect_url_setting(self):

@@ -19,7 +19,6 @@ from django.utils import lru_cache, six
 from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.safestring import SafeData, mark_safe
-from django.utils.translation import LANGUAGE_SESSION_KEY
 
 # Translations are cached in a dictionary for every language.
 # The active translations are stored by threadid to make them thread local.
@@ -512,12 +511,9 @@ def get_language_from_request(request, check_path=False):
 
     supported_lang_codes = get_languages()
 
-    if hasattr(request, 'session'):
-        lang_code = request.session.get(LANGUAGE_SESSION_KEY)
-        if lang_code in supported_lang_codes and lang_code is not None and check_for_language(lang_code):
-            return lang_code
-
     lang_code = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
+    if lang_code in supported_lang_codes and lang_code is not None and check_for_language(lang_code):
+        return lang_code
 
     try:
         return get_supported_language_variant(lang_code)

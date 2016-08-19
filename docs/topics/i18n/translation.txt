@@ -1929,20 +1929,8 @@ You may want to set the active language for the current session explicitly. Perh
 a user's language preference is retrieved from another system, for example.
 You've already been introduced to :func:`django.utils.translation.activate()`. That
 applies to the current thread only. To persist the language for the entire
-session, also modify :data:`~django.utils.translation.LANGUAGE_SESSION_KEY`
-in the session::
-
-    from django.utils import translation
-    user_language = 'fr'
-    translation.activate(user_language)
-    request.session[translation.LANGUAGE_SESSION_KEY] = user_language
-
-You would typically want to use both: :func:`django.utils.translation.activate()`
-will change the language for this thread, and modifying the session makes this
-preference persist in future requests.
-
-If you are not using sessions, the language will persist in a cookie, whose name
-is configured in :setting:`LANGUAGE_COOKIE_NAME`. For example::
+session in a cookie, set the :setting:`LANGUAGE_COOKIE_NAME` cookie on any
+response::
 
     from django.utils import translation
     from django import http
@@ -1951,6 +1939,14 @@ is configured in :setting:`LANGUAGE_COOKIE_NAME`. For example::
     translation.activate(user_language)
     response = http.HttpResponse(...)
     response.set_cookie(settings.LANGUAGE_COOKIE_NAME, user_language)
+
+.. versionchanged:: 1.11
+
+    In older versions, you could set the language in the current session.
+
+You would typically want to use both: :func:`django.utils.translation.activate()`
+will change the language for this thread, and setting the cookie makes this
+preference persist in future requests.
 
 Using translations outside views and templates
 ----------------------------------------------
@@ -2086,7 +2082,8 @@ following this algorithm:
   about the language prefix and how to internationalize URL patterns.
 
 * Failing that, it looks for the :data:`~django.utils.translation.LANGUAGE_SESSION_KEY`
-  key in the current user's session.
+  key in the current user's session. This is only kept for backwards
+  compatibility reasons and will be removed in Django 2.1.
 
 * Failing that, it looks for a cookie.
 
