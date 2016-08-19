@@ -288,6 +288,13 @@ Validators
   :data:`~django.core.validators.validate_image_file_extension` to validate
   image files.
 
+Miscellaneous
+~~~~~~~~~~~~~
+
+* ``utils.http.is_safe_url()`` accepts a new ``require_https`` argument. If
+  ``require_https`` is ``True``, only HTTPS will be considered as a valid
+  scheme as opposed to both HTTP and HTTPS with the default ``False``.
+
 .. _backwards-incompatible-1.11:
 
 Backwards incompatible changes in 1.11
