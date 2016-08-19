@@ -153,4 +153,5 @@ class LiveServerPort(LiveServerBase):
                 "Acquired duplicate server addresses for server threads: %s" % self.live_server_url
             )
         finally:
-            TestCase.tearDownClass()
+            if hasattr(TestCase, 'server_thread'):
+                TestCase.server_thread.terminate()
