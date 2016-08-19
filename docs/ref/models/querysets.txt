@@ -1671,6 +1671,11 @@ The :exc:`~django.db.models.Model.DoesNotExist` exception inherits from
     except ObjectDoesNotExist:
         print("Either the entry or blog doesn't exist.")
 
+If you expect a queryset to return one row, you can use ``get()`` without any
+arguments to return the object for that row::
+
+    entry = Entry.objects.filter(...).exclude(...).get()
+
 ``create()``
 ~~~~~~~~~~~~
 
