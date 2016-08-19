@@ -693,6 +693,24 @@ class Options(object):
                 path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
         return path
 
+    def get_path_from_parent(self, parent):
+        """
+        Get path from parent model to current model.
+
+        Returns an empty list if parent is not a parent of the current model.
+        """
+        if self.model is parent:
+            return []
+        model = self.concrete_model
+        chain = model._meta.get_base_chain(parent)
+        chain.reverse()
+        chain.append(model)
+        path = []
+        for i in range(len(chain) - 1):
+            link = chain[i + 1]._meta.get_ancestor_link(chain[i])
+            path.extend(link.get_reverse_path_info())
+        return path
+
     def _populate_directed_relation_graph(self):
         """
         This method is used by each model to find its reverse objects. As this

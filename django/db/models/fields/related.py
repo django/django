@@ -1526,10 +1526,27 @@ class ManyToManyField(RelatedField):
         if direct:
             join1infos = linkfield1.get_reverse_path_info()
             join2infos = linkfield2.get_path_info()
+            join1_final = join1infos[-1].to_opts
+            join2_initial = join2infos[0].from_opts
+            if join1_final is join2_initial:
+                intermediate_infos = []
+            elif issubclass(join1_final.model, join2_initial.model):
+                intermediate_infos = join1_final.get_path_to_parent(join2_initial.model)
+            else:
+                intermediate_infos = join2_initial.get_path_from_parent(join1_final.model)
         else:
             join1infos = linkfield2.get_reverse_path_info()
             join2infos = linkfield1.get_path_info()
+            join1_final = join1infos[-1].to_opts
+            join2_initial = join2infos[0].from_opts
+            if join1_final is join2_initial:
+                intermediate_infos = []
+            elif issubclass(join1_final.model, join2_initial.model):
+                intermediate_infos = join1_final.get_path_to_parent(join2_initial.model)
+            else:
+                intermediate_infos = join2_initial.get_path_from_parent(join1_final.model)
         pathinfos.extend(join1infos)
+        pathinfos.extend(intermediate_infos)
         pathinfos.extend(join2infos)
         return pathinfos
 
