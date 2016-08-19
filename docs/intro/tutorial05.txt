@@ -225,7 +225,7 @@ What happened is this:
 * in ``test_was_published_recently_with_future_question`` it created a ``Question``
   instance whose ``pub_date`` field is 30 days in the future
 
-* ... and using the ``assertEqual()`` method, it discovered that its
+* ... and using the ``assertIs()`` method, it discovered that its
   ``was_published_recently()`` returns ``True``, though we wanted it to return
   ``False``
 
