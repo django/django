@@ -1654,6 +1654,12 @@ than one object was found. The
 :exc:`~django.core.exceptions.MultipleObjectsReturned` exception is an
 attribute of the model class.
 
+.. note::
+	In case of no parameters, column of single-row queryset is returned.
+	For example::
+		if Entry.models.objects.all().count() == 1:
+			print(Entry.models.objects.get()) 
+
 ``get()`` raises a :exc:`~django.db.models.Model.DoesNotExist` exception if an
 object wasn't found for the given parameters. This exception is an attribute
 of the model class. Example::
