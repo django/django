@@ -1,4 +1,5 @@
 from django.db import connection, models
+from django.utils.encoding import python_2_unicode_compatible
 
 from .fields import (
     ArrayField, BigIntegerRangeField, DateRangeField, DateTimeRangeField,
@@ -43,8 +44,12 @@ class IntegerArrayModel(PostgreSQLModel):
     field = ArrayField(models.IntegerField())
 
 
+@python_2_unicode_compatible
 class NullableIntegerArrayModel(PostgreSQLModel):
     field = ArrayField(models.IntegerField(), blank=True, null=True)
+
+    def __str__(self):
+        return str(self.field)
 
 
 class CharArrayModel(PostgreSQLModel):

@@ -233,6 +233,8 @@ Models
 
 * Added support for expressions in :meth:`.QuerySet.values` and
   :meth:`~.QuerySet.values_list`.
+* Added support for query expressions on lookups that take multiple arguments,
+  such as ``range``.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

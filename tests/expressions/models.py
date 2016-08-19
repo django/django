@@ -62,11 +62,30 @@ class Experiment(models.Model):
 
 
 @python_2_unicode_compatible
+class Result(models.Model):
+    experiment = models.ForeignKey(Experiment, on_delete=models.CASCADE)
+    result_time = models.DateTimeField()
+
+    def __str__(self):
+        return "Result at %s" % self.result_time
+
+
+@python_2_unicode_compatible
 class Time(models.Model):
     time = models.TimeField(null=True)
 
     def __str__(self):
         return "%s" % self.time
+
+
+@python_2_unicode_compatible
+class SimulationRun(models.Model):
+    start = models.ForeignKey(Time, null=True, on_delete=models.CASCADE)
+    end = models.ForeignKey(Time, null=True, on_delete=models.CASCADE)
+    midpoint = models.TimeField()
+
+    def __str__(self):
+        return "%s (%s to %s)" % (self.midpoint, self.start, self.end)
 
 
 @python_2_unicode_compatible

@@ -173,9 +173,39 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:2]
         )
 
+    @unittest.expectedFailure
+    def test_in_including_F_object(self):
+        # This test asserts that Array objects passed to filters can be
+        # constructed to contain F objects. This currently does not work as the
+        # psycopg2 mogrify method that generates the ARRAY() syntax is
+        # expecting literals, not column references.
+        # See #27095.
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__in=[[models.F('id')]]),
+            self.objs[:2]
+        )
+
+    def test_in_as_F_object(self):
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__in=[models.F('field')]),
+            self.objs[:4]
+        )
+
     def test_contained_by(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__contained_by=[1, 2]),
+            self.objs[:2]
+        )
+
+    @unittest.expectedFailure
+    def test_contained_by_including_F_object(self):
+        # This test asserts that Array objects passed to filters can be
+        # constructed to contain F objects. This currently does not work as the
+        # psycopg2 mogrify method that generates the ARRAY() syntax is
+        # expecting literals, not column references.
+        # See #27095.
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__contained_by=[models.F('id'), 2]),
             self.objs[:2]
         )
 

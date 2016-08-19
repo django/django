@@ -239,7 +239,13 @@ class ArrayInLookup(In):
         values = super(ArrayInLookup, self).get_prep_lookup()
         # In.process_rhs() expects values to be hashable, so convert lists
         # to tuples.
-        return [tuple(value) for value in values]
+        prepared_values = []
+        for value in values:
+            if hasattr(value, 'resolve_expression'):
+                prepared_values.append(value)
+            else:
+                prepared_values.append(tuple(value))
+        return prepared_values
 
 
 class IndexTransform(Transform):
