@@ -413,6 +413,10 @@ Miscellaneous
 * The :djadmin:`makemessages` command now requires configured settings, like
   most other commands.
 
+* The undocumented ``DateTimeAwareJSONEncoder`` alias for
+  :class:`~django.core.serializers.json.DjangoJSONEncoder` (renamed in Django
+  1.0) is removed.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
