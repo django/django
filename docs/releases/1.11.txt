@@ -347,6 +347,14 @@ Django 1.11 sets PostgreSQL 9.3 as the minimum version it officially supports.
 Support for PostGIS 2.0 is also removed as PostgreSQL 9.2 is the last version
 to support it.
 
+Internationalization
+--------------------
+
+* The :func:`django.views.i18n.set_language` view now protects users against
+  being redirected to non HTTPS ``next`` URLs when the app is running behind
+  HTTPS. This is done by using the ``require_https`` argument to
+  ``is_safe_url()``.
+
 ``LiveServerTestCase`` binds to port zero
 -----------------------------------------
 
