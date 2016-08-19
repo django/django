@@ -151,10 +151,8 @@ used.
     backwards-compatibility with applications that still rely on local time.
     However, :ref:`as explained above <naive-datetime-objects>`, this isn't
     entirely reliable, and you should always work with aware datetimes in UTC
-    in your own code. For instance, use
-    :meth:`~datetime.datetime.utcfromtimestamp` instead of
-    :meth:`~datetime.datetime.fromtimestamp` -- and don't forget to set
-    ``tzinfo`` to :data:`~django.utils.timezone.utc`.
+    in your own code. For instance, use :meth:`~datetime.datetime.fromtimestamp`
+    and set the ``tz`` parameter to :data:`~django.utils.timezone.utc`.
 
 Selecting the current time zone
 -------------------------------
