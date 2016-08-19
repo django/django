@@ -356,6 +356,13 @@ to assign a free port. The ``DJANGO_LIVE_TEST_SERVER_ADDRESS`` environment
 variable is no longer used, and as it's also no longer used, the
 ``manage.py test --liveserver`` option is removed.
 
+Protection against insecure redirects in :mod:`django.contrib.auth` views
+-------------------------------------------------------------------------
+
+``LoginView`` and ``LogoutView`` (and the deprecated function-based equivalents)
+protect users from being redirected to non-HTTPS ``next`` URLs when the app
+is running over HTTPS.
+
 Miscellaneous
 -------------
 
