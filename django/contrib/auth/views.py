@@ -84,7 +84,12 @@ class LoginView(FormView):
             self.redirect_field_name,
             self.request.GET.get(self.redirect_field_name, '')
         )
-        if not is_safe_url(url=redirect_to, host=self.request.get_host()):
+        url_is_safe = is_safe_url(
+            url=redirect_to,
+            host=self.request.get_host(),
+            require_https=self.request.is_secure(),
+        )
+        if not url_is_safe:
             return resolve_url(settings.LOGIN_REDIRECT_URL)
         return redirect_to
 
@@ -150,8 +155,13 @@ class LogoutView(TemplateView):
                 self.redirect_field_name,
                 self.request.GET.get(self.redirect_field_name)
             )
+            url_is_safe = is_safe_url(
+                url=next_page,
+                host=self.request.get_host(),
+                require_https=self.request.is_secure(),
+            )
             # Security check -- don't allow redirection to a different host.
-            if not is_safe_url(url=next_page, host=self.request.get_host()):
+            if not url_is_safe:
                 next_page = self.request.path
         return next_page
 

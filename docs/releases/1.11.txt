@@ -300,6 +300,13 @@ Miscellaneous
 Backwards incompatible changes in 1.11
 ======================================
 
+:mod:`django.contrib.auth`
+--------------------------
+
+* ``LoginView`` and ``LogoutView`` protect users against being redirected to non
+  HTTPS ``next`` URLs when the app is running behind HTTPS. This is done by
+  using the ``require_https`` argument to ``is_safe_url()``.
+
 :mod:`django.contrib.gis`
 -------------------------
 

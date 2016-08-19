@@ -551,6 +551,23 @@ class LoginTest(AuthViewsTestCase):
             self.assertEqual(response.status_code, 302)
             self.assertIn(good_url, response.url, "%s should be allowed" % good_url)
 
+    def test_security_check_https(self):
+        login_url = reverse('login')
+        non_https_next_url = 'http://testserver/path'
+        not_secured_url = '%(url)s?%(next)s=%(next_url)s' % {
+            'url': login_url,
+            'next': REDIRECT_FIELD_NAME,
+            'next_url': urlquote(non_https_next_url),
+        }
+        post_data = {
+            'username': 'testclient',
+            'password': 'password',
+        }
+        response = self.client.post(not_secured_url, post_data, secure=True)
+        self.assertEqual(response.status_code, 302)
+        self.assertNotEqual(response.url, non_https_next_url)
+        self.assertEqual(response.url, settings.LOGIN_REDIRECT_URL)
+
     def test_login_form_contains_request(self):
         # 15198
         self.client.post('/custom_requestauth_login/', {
@@ -918,6 +935,21 @@ class LogoutTest(AuthViewsTestCase):
             self.assertEqual(response.status_code, 302)
             self.assertIn(good_url, response.url, "%s should be allowed" % good_url)
             self.confirm_logged_out()
+
+    def test_security_check_https(self):
+        logout_url = reverse('logout')
+        non_https_next_url = 'http://testserver/'
+        url = '%(url)s?%(next)s=%(next_url)s' % {
+            'url': logout_url,
+            'next': REDIRECT_FIELD_NAME,
+            'next_url': urlquote(non_https_next_url),
+        }
+        self.login()
+        response = self.client.get(url, secure=True)
+        self.assertEqual(response.status_code, 302)
+        self.assertNotEqual(response.url, non_https_next_url)
+        self.assertEqual(response.url, logout_url)
+        self.confirm_logged_out()
 
     def test_logout_preserve_language(self):
         """Check that language stored in session is preserved after logout"""
