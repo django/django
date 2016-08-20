@@ -133,7 +133,7 @@ class ViewIndexView(BaseAdminDocsView):
         if six.PY3:
             return '%s.%s' % (mod_name, func.__qualname__)
         else:
-            # PY2 does not support __qualname__ (#27018)
+            # PY2 does not support __qualname__
             func_name = getattr(func, '__name__', func.__class__.__name__)
             return '%s.%s' % (mod_name, func_name)
 
@@ -162,22 +162,27 @@ class ViewDetailView(BaseAdminDocsView):
         if get_resolver(urlconf)._is_callback(view):
             mod, func = get_mod_func(view)
             try:
+                # Separate the module and function
+                # (e.g. 'mymodule.views.myview' -> 'mymodule.views', 'myview')
                 return getattr(import_module(mod), func)
             except ImportError:
-                # Unable to import the module - try processing it again to get the class.
+                # Import may have failed because view contained a class name
+                # e.g. 'mymodule.views.ViewContainer.my_view'
+                # so mod takes the form 'mymodule.views.ViewContainer'
+                # Parse it one more time to separate the module and class
                 mod, klass = get_mod_func(mod)
                 return getattr(getattr(import_module(mod), klass), func)
+            except AttributeError:
+                # PY2 generates incorrect paths for views that are methods
+                # e.g. mymodule.views.ViewContainer.my_view will be
+                # listed as mymodule.views.my_view because the class name
+                # cannot be detected. This causes an AttributeError when
+                # we try to resolve the view.
+                return None
 
     def get_context_data(self, **kwargs):
         view = self.kwargs['view']
-        try:
-            view_func = self._get_view_func(view)
-        except AttributeError:
-            # PY2 generates incorrect paths for views that are methods
-            # (e.g. django.contrib.admin.sites.index)
-            # because it cannot detect the class name.
-            # This will cause an AttributeError in _get_view_func (see #27018).
-            raise Http404
+        view_func = self._get_view_func(view)
         if view_func is None:
             raise Http404
         title, body, metadata = utils.parse_docstring(view_func.__doc__)

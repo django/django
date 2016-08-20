@@ -146,7 +146,7 @@ class RegexURLPattern(LocaleRegexProvider):
         elif six.PY3:
             return callback.__module__ + "." + callback.__qualname__
         else:
-            # PY2 does not support __qualname__ (#27018)
+            # PY2 does not support __qualname__
             return callback.__module__ + "." + callback.__name__
 
 

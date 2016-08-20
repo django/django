@@ -58,3 +58,6 @@ Bugfixes
 * Fixed ``makemigrations`` crash if a database is read-only (:ticket:`27054`).
 
 * Removed duplicated managers in ``Model._meta.managers`` (:ticket:`27073`).
+
+* Fixed crash of admindocs with ``AttributeError`` when view is in a class
+  (:ticket:`27018`).

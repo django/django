@@ -434,7 +434,7 @@ class ResolverTests(SimpleTestCase):
     @unittest.skipIf(six.PY2, "Python 2 doesn't support __qualname__.")
     def test_view_detail_as_method(self):
         """
-        #27018 - with class name as part of the view path
+        View which has a class name as part of its path
         """
         resolver = get_resolver('urlpatterns_reverse.method_view_urls')
         self.assertTrue(resolver._is_callback('urlpatterns_reverse.method_view_urls.ViewContainer.method_view'))

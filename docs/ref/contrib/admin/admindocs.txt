@@ -108,19 +108,6 @@ For example::
         context = {'mymodel': MyModel.objects.get(slug=slug)}
         return render(request, 'myapp/my_template.html', context)
 
-Due to the fact ``__qualname__`` was only introduced in Python 3, Django cannot
-correctly generate admindocs URLS for views that are methods on a class in Python 2.
-
-This includes some of the views belonging to the admin and any view in the
-following format::
-
-    class MyViewContainer(object):
-        def my_view(self, request):
-            pass
-
-If you are using admindocs with Python 2, we recommend you define views as
-module level functions or use :doc:`/topics/class-based-views/index`.
-
 
 Template tags and filters reference
 ===================================

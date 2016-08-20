@@ -1,14 +1,13 @@
 from django.conf.urls import url
-from django.http import HttpResponse
 
 
 class ViewContainer(object):
     def method_view(self, request):
-        return HttpResponse('')
+        pass
 
     @classmethod
     def classmethod_view(cls, request):
-        return HttpResponse('')
+        pass
 
 view_container = ViewContainer()
 

@@ -86,7 +86,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
     @unittest.skipIf(six.PY2, "Python 2 doesn't support __qualname__.")
     def test_view_index_with_method(self):
         """
-        #27018 - Ensure views that are methods are listed correctly.
+        Ensure views that are methods are listed correctly.
         """
         response = self.client.get(reverse('django-admindocs-views-index'))
         self.assertContains(
@@ -116,30 +116,13 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         self.assertEqual(response.status_code, 404)
         self.assertNotIn("urlpatterns_reverse.nonimported_module", sys.modules)
 
-    @unittest.skipIf(six.PY2, "Python 2 doesn't support __qualname__.")
     def test_view_detail_as_method(self):
         """
-        #27018 - Ensure views that are methods can be displayed
+        Ensure views that are methods can be displayed
         """
-        url = reverse(
-            'django-admindocs-views-detail',
-            args=['django.contrib.admin.sites.AdminSite.index'],
-        )
+        url = reverse('django-admindocs-views-detail', args=['django.contrib.admin.sites.AdminSite.index'])
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-    @unittest.skipUnless(six.PY2, "Python 2 doesn't support __qualname__.")
-    def test_view_detail_incorrect_method_path(self):
-        """
-        #27018 - Views that are methods can't be made to work on python 2
-        but should raise a 404
-        """
-        url = reverse(
-            'django-admindocs-views-detail',
-            args=['django.contrib.admin.sites.index'],
-        )
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200 if six.PY3 else 404)
 
     def test_model_index(self):
         response = self.client.get(reverse('django-admindocs-models-index'))
