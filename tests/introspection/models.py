@@ -15,7 +15,7 @@ class City(models.Model):
 
 @python_2_unicode_compatible
 class District(models.Model):
-    city = models.ForeignKey(City, models.CASCADE)
+    city = models.ForeignKey(City, models.CASCADE, primary_key=True)
     name = models.CharField(max_length=50)
 
     def __str__(self):
