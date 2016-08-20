@@ -68,3 +68,7 @@ Bugfixes
 
 * Added the database alias to the ``InconsistentMigrationHistory`` message
   raised by ``makemigrations`` and ``migrate`` (:ticket:`27089`).
+
+* Fixed the creation of ``ContentType`` and ``Permission`` objects for models
+  of applications without migrations when calling the ``migrate`` command with
+  no migrations to apply (:ticket:`27044`).

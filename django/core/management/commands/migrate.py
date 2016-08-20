@@ -175,7 +175,6 @@ class Command(BaseCommand):
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Running migrations:"))
         if not plan:
-            executor.check_replacements()
             if self.verbosity >= 1:
                 self.stdout.write("  No migrations to apply.")
                 # If there's changes that aren't in migrations yet, tell them how to fix it.
@@ -194,14 +193,15 @@ class Command(BaseCommand):
                         "migrations, and then re-run 'manage.py migrate' to "
                         "apply them."
                     ))
-            post_migrate_apps = pre_migrate_apps
+            fake = False
+            fake_initial = False
         else:
             fake = options['fake']
             fake_initial = options['fake_initial']
-            post_migrate_project_state = executor.migrate(
-                targets, plan, fake=fake, fake_initial=fake_initial
-            )
-            post_migrate_apps = post_migrate_project_state.apps
+        post_migrate_project_state = executor.migrate(
+            targets, plan, fake=fake, fake_initial=fake_initial
+        )
+        post_migrate_apps = post_migrate_project_state.apps
 
         # Re-render models of real apps to include relationships now that
         # we've got a final state. This wouldn't be necessary if real apps
