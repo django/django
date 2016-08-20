@@ -82,9 +82,15 @@ class MigrationExecutor(object):
         all_backwards = all(backwards for mig, backwards in plan)
 
         if not plan:
-            # Nothing to do for an empty plan, except for building the post
-            # migrate project state
+            # The resulting state should include applied migrations.
             state = self._create_project_state()
+            applied_migrations = {
+                self.loader.graph.nodes[key] for key in self.loader.applied_migrations
+                if key in self.loader.graph.nodes
+            }
+            for migration, _ in full_plan:
+                if migration in applied_migrations:
+                    migration.mutate_state(state, preserve=False)
         elif all_forwards == all_backwards:
             # This should only happen if there's a mixed plan
             raise InvalidMigrationPlan(

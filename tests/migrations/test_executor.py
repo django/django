@@ -168,6 +168,14 @@ class ExecutorTests(MigrationTestBase):
             ("migrations2", "0001_initial"),
         ])
         self.assertEqual(plan, [])
+        # The resulting state should include applied migrations.
+        state = executor.migrate([
+            ("migrations", "0002_second"),
+            ("migrations2", "0001_initial"),
+        ])
+        self.assertIn(('migrations', 'book'), state.models)
+        self.assertIn(('migrations', 'author'), state.models)
+        self.assertIn(('migrations2', 'otherauthor'), state.models)
         # Erase all the fake records
         executor.recorder.record_unapplied("migrations2", "0001_initial")
         executor.recorder.record_unapplied("migrations", "0002_second")
