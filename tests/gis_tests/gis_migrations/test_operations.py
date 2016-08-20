@@ -69,8 +69,8 @@ class OperationTests(TransactionTestCase):
 
     def assertSpatialIndexExists(self, table, column):
         with connection.cursor() as cursor:
-            indexes = connection.introspection.get_indexes(cursor, table)
-        self.assertIn(column, indexes)
+            constraints = connection.introspection.get_constraints(cursor, table)
+        self.assertIn([column], [c['columns'] for c in constraints.values()])
 
     def alter_gis_model(self, migration_class, model_name, field_name,
                         blank=False, field_class=None):

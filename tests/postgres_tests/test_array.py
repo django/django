@@ -483,9 +483,13 @@ class TestMigrations(TransactionTestCase):
             ]
         # Only the CharField should have a LIKE index.
         self.assertEqual(like_constraint_columns_list, [['char2']])
-        with connection.cursor() as cursor:
-            indexes = connection.introspection.get_indexes(cursor, table_name)
         # All fields should have regular indexes.
+        with connection.cursor() as cursor:
+            indexes = [
+                c['columns'][0]
+                for c in connection.introspection.get_constraints(cursor, table_name).values()
+                if c['index'] and len(c['columns']) == 1
+            ]
         self.assertIn('char', indexes)
         self.assertIn('char2', indexes)
         self.assertIn('text', indexes)

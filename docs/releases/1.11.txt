@@ -399,6 +399,10 @@ Database backend API
   dictionaries with a list of ``'ASC'`` and/or ``'DESC'`` values corresponding
   to the the ordering of each column in the index.
 
+* :djadmin:`inspectdb` no longer calls ``DatabaseIntrospection.get_indexes()``
+  which is deprecated. Custom database backends should ensure all types of
+  indexes are returned by ``DatabaseIntrospection.get_constraints()``.
+
 Dropped support for PostgreSQL 9.2 and PostGIS 2.0
 --------------------------------------------------
 
@@ -549,3 +553,6 @@ Miscellaneous
   :ttag:`{% include %} <include>` template tag is deprecated as the behavior is
   often more confusing than helpful. In Django 2.1, the exception will be
   raised.
+
+* ``DatabaseIntrospection.get_indexes()`` is deprecated in favor of
+  ``DatabaseIntrospection.get_constraints()``.

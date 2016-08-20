@@ -71,13 +71,14 @@ class Command(BaseCommand):
                     except NotImplementedError:
                         relations = {}
                     try:
-                        indexes = connection.introspection.get_indexes(cursor, table_name)
-                    except NotImplementedError:
-                        indexes = {}
-                    try:
                         constraints = connection.introspection.get_constraints(cursor, table_name)
                     except NotImplementedError:
                         constraints = {}
+                    primary_key_column = connection.introspection.get_primary_key_column(cursor, table_name)
+                    unique_columns = [
+                        c['columns'][0] for c in constraints.values()
+                        if c['unique'] and len(c['columns']) == 1
+                    ]
                     table_description = connection.introspection.get_table_description(cursor, table_name)
                 except Exception as e:
                     yield "# Unable to inspect table '%s'" % table_name
@@ -105,11 +106,10 @@ class Command(BaseCommand):
                     column_to_field_name[column_name] = att_name
 
                     # Add primary_key and unique, if necessary.
-                    if column_name in indexes:
-                        if indexes[column_name]['primary_key']:
-                            extra_params['primary_key'] = True
-                        elif indexes[column_name]['unique']:
-                            extra_params['unique'] = True
+                    if column_name == primary_key_column:
+                        extra_params['primary_key'] = True
+                    elif column_name in unique_columns:
+                        extra_params['unique'] = True
 
                     if is_relation:
                         rel_to = (

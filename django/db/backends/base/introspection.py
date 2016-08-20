@@ -1,7 +1,5 @@
 from collections import namedtuple
 
-from django.utils import six
-
 # Structure returned by DatabaseIntrospection.get_table_list()
 TableInfo = namedtuple('TableInfo', ['name', 'type'])
 
@@ -143,13 +141,14 @@ class BaseDatabaseIntrospection(object):
         """
         Returns the name of the primary key column for the given table.
         """
-        for column in six.iteritems(self.get_indexes(cursor, table_name)):
-            if column[1]['primary_key']:
-                return column[0]
+        for constraint in self.get_constraints(cursor, table_name).values():
+            if constraint['primary_key']:
+                return constraint['columns'][0]
         return None
 
     def get_indexes(self, cursor, table_name):
         """
+        Deprecated in Django 1.11, use get_constraints instead.
         Returns a dictionary of indexed fieldname -> infodict for the given
         table, where each infodict is in the format:
             {'primary_key': boolean representing whether it's the primary key,

@@ -36,6 +36,8 @@ details on these changes.
 * Silencing of exceptions raised while rendering the ``{% include %}`` template
   tag will be removed.
 
+* ``DatabaseIntrospection.get_indexes()`` will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

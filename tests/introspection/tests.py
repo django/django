@@ -5,6 +5,8 @@ from unittest import skipUnless
 from django.db import connection
 from django.db.utils import DatabaseError
 from django.test import TransactionTestCase, mock, skipUnlessDBFeature
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango21Warning
 
 from .models import Article, ArticleReporter, City, District, Reporter
 
@@ -169,11 +171,13 @@ class IntrospectionTests(TransactionTestCase):
         self.assertEqual(primary_key_column, 'id')
         self.assertEqual(pk_fk_column, 'city_id')
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_get_indexes(self):
         with connection.cursor() as cursor:
             indexes = connection.introspection.get_indexes(cursor, Article._meta.db_table)
         self.assertEqual(indexes['reporter_id'], {'unique': False, 'primary_key': False})
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_get_indexes_multicol(self):
         """
         Test that multicolumn indexes are not included in the introspection
