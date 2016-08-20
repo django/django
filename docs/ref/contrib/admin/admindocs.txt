@@ -108,6 +108,7 @@ For example::
         context = {'mymodel': MyModel.objects.get(slug=slug)}
         return render(request, 'myapp/my_template.html', context)
 
+
 Template tags and filters reference
 ===================================
 
