@@ -299,13 +299,18 @@ def template_localtime(value, use_tz=None):
 
 # Utilities
 
-def localtime(value, timezone=None):
+def localtime(value=None, timezone=None):
     """
     Converts an aware datetime.datetime to local time.
+
+    Only aware datetimes are allowed. When value is omitted, it defaults to
+    now().
 
     Local time is defined by the current time zone, unless another time zone
     is specified.
     """
+    if value is None:
+        value = now()
     if timezone is None:
         timezone = get_current_timezone()
     # If `value` is naive, astimezone() will raise a ValueError,
@@ -315,6 +320,19 @@ def localtime(value, timezone=None):
         # This method is available for pytz time zones.
         value = timezone.normalize(value)
     return value
+
+
+def localdate(value=None, timezone=None):
+    """
+    Convert an aware datetime to local time and return the value's date.
+
+    Only aware datetimes are allowed. When value is omitted, it defaults to
+    now().
+
+    Local time is defined by the current time zone, unless another time zone is
+    specified.
+    """
+    return localtime(value, timezone).date()
 
 
 def now():
