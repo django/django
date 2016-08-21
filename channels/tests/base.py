@@ -5,7 +5,7 @@ import random
 import string
 from functools import wraps
 
-from django.test.testcases import TestCase
+from django.test.testcases import TestCase, TransactionTestCase
 from .. import DEFAULT_CHANNEL_LAYER
 from ..channel import Group
 from ..routing import Router, include
@@ -14,7 +14,7 @@ from ..message import Message
 from asgiref.inmemory import ChannelLayer as InMemoryChannelLayer
 
 
-class ChannelTestCase(TestCase):
+class ChannelTestCaseMixin(object):
     """
     TestCase subclass that provides easy methods for testing channels using
     an in-memory backend to capture messages, and assertion methods to allow
@@ -31,7 +31,7 @@ class ChannelTestCase(TestCase):
         """
         Initialises in memory channel layer for the duration of the test
         """
-        super(ChannelTestCase, self)._pre_setup()
+        super(ChannelTestCaseMixin, self)._pre_setup()
         self._old_layers = {}
         for alias in self.test_channel_aliases:
             # Swap in an in memory layer wrapper and keep the old one around
@@ -52,7 +52,7 @@ class ChannelTestCase(TestCase):
             # Swap in an in memory layer wrapper and keep the old one around
             channel_layers.set(alias, self._old_layers[alias])
         del self._old_layers
-        super(ChannelTestCase, self)._post_teardown()
+        super(ChannelTestCaseMixin, self)._post_teardown()
 
     def get_next_message(self, channel, alias=DEFAULT_CHANNEL_LAYER, require=False):
         """
@@ -68,6 +68,14 @@ class ChannelTestCase(TestCase):
             else:
                 return None
         return Message(content, recv_channel, channel_layers[alias])
+
+
+class ChannelTestCase(ChannelTestCaseMixin, TestCase):
+    pass
+
+
+class TransactionChannelTestCase(ChannelTestCaseMixin, TransactionTestCase):
+    pass
 
 
 class Client(object):
