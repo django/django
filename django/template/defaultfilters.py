@@ -131,7 +131,7 @@ def floatformat(text, arg=-1):
 
     If arg is "n", it will use Decimal normalize function:
 
-    * {{ num1|floatformat:"n" }} displays "34.232"
+    * {{ num1|floatformat:"n" }} displays "34.23234"
     * {{ num2|floatformat:"n" }} displays "34"
     * {{ num3|floatformat:"n" }} displays "34.26"
 
