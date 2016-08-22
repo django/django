@@ -1,6 +1,7 @@
 import unittest
 
 from django.contrib.gis.gdal import HAS_GDAL
+from django.test import mock
 
 if HAS_GDAL:
     from django.contrib.gis.gdal import Driver, GDALException
@@ -48,3 +49,13 @@ class DriverTest(unittest.TestCase):
         for alias, full_name in aliases.items():
             dr = Driver(alias)
             self.assertEqual(full_name, str(dr))
+
+    @mock.patch('django.contrib.gis.gdal.driver.vcapi.get_driver_count')
+    @mock.patch('django.contrib.gis.gdal.driver.rcapi.get_driver_count')
+    @mock.patch('django.contrib.gis.gdal.driver.vcapi.register_all')
+    def test04_registered(self, vreg, rcount, vcount):
+        "Testing driver registration"
+        rcount.return_value = 120
+        vcount.return_value = 0
+        Driver.ensure_registered()
+        vreg.assert_called_with()
