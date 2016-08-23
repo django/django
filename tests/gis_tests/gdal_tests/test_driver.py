@@ -63,11 +63,11 @@ class DriverTest(unittest.TestCase):
             vcount.return_value = v
             Driver.ensure_registered()
             if r:
-                rreg.assert_not_called()
+                self.assertFalse(rreg.called)
             else:
                 rreg.assert_called_once_with()
             if v:
-                vreg.assert_not_called()
+                self.assertFalse(vreg.called)
             else:
                 vreg.assert_called_once_with()
 
