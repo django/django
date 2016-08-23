@@ -58,11 +58,17 @@ class MigrationRecorder(object):
         except DatabaseError as exc:
             raise MigrationSchemaMissing("Unable to create the django_migrations table (%s)" % exc)
 
-    def applied_migrations(self):
+    def applied_migrations(self, ensure_schema=True):
         """
         Returns a set of (app, name) of applied migrations.
+
+        The `ensure_schema` parameter controls whether or not the
+        'django_migrations' table should be created.
         """
-        self.ensure_schema()
+        if ensure_schema:
+            self.ensure_schema()
+        elif self.Migration._meta.db_table not in self.connection.introspection.table_names(self.connection.cursor()):
+            return set()
         return set(tuple(x) for x in self.migration_qs.values_list("app", "name"))
 
     def record_applied(self, app, name):

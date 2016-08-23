@@ -4,13 +4,16 @@ from unittest import skipIf
 
 from django.db import connection, connections
 from django.db.migrations.exceptions import (
-    AmbiguityError, InconsistentMigrationHistory, MigrationSchemaMissing,
-    NodeNotFoundError,
+    AmbiguityError, InconsistentMigrationHistory, NodeNotFoundError,
 )
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import TestCase, mock, modify_settings, override_settings
+from django.test import (
+    TestCase, TransactionTestCase, mock, modify_settings, override_settings,
+)
 from django.utils import six
+
+from .utils import without_django_migrations_table
 
 
 class RecorderTests(TestCase):
@@ -469,11 +472,18 @@ class LoaderTests(TestCase):
         }
         self.assertEqual(plan, expected_plan)
 
-    def test_readonly_database(self):
+
+class LoaderTransactionsTests(TransactionTestCase):
+    available_apps = ['migrations']
+
+    @mock.patch.object(MigrationRecorder, 'ensure_schema')
+    @without_django_migrations_table()
+    def test_readonly_database(self, ensure_schema):
         """
         check_consistent_history() ignores read-only databases, possibly
-        without a django_migrations table.
+        without a django_migrations table. The django_migrations table
+        shouldn't be created so ensure_schema() shouldn't be called.
         """
-        with mock.patch.object(MigrationRecorder, 'ensure_schema', side_effect=MigrationSchemaMissing()):
-            loader = MigrationLoader(connection=None)
-            loader.check_consistent_history(connection)
+        loader = MigrationLoader(connection=None)
+        loader.check_consistent_history(connection)
+        ensure_schema.assert_not_called()
