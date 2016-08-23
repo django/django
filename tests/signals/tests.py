@@ -269,7 +269,7 @@ class SignalTests(BaseSignalTest):
 
         signals.pre_init.connect(callback, weak=False)
         signals.pre_init.disconnect(callback)
-        ref.assert_not_called()
+        self.assertFalse(ref.called)
 
 
 class LazyModelRefTest(BaseSignalTest):

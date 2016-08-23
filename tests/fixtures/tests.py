@@ -710,8 +710,8 @@ class NonExistentFixtureTests(TestCase):
         """
         with self.assertRaisesMessage(CommandError, "No fixture named 'this_fixture_doesnt_exist' found."):
             management.call_command('loaddata', 'this_fixture_doesnt_exist', verbosity=0)
-        disable_constraint_checking.assert_not_called()
-        enable_constraint_checking.assert_not_called()
+        self.assertFalse(disable_constraint_checking.called)
+        self.assertFalse(enable_constraint_checking.called)
 
 
 class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
