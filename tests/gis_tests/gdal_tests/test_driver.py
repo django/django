@@ -53,9 +53,25 @@ class DriverTest(unittest.TestCase):
     @mock.patch('django.contrib.gis.gdal.driver.vcapi.get_driver_count')
     @mock.patch('django.contrib.gis.gdal.driver.rcapi.get_driver_count')
     @mock.patch('django.contrib.gis.gdal.driver.vcapi.register_all')
-    def test04_registered(self, vreg, rcount, vcount):
-        "Testing driver registration"
-        rcount.return_value = 120
-        vcount.return_value = 0
-        Driver.ensure_registered()
-        vreg.assert_called_with()
+    @mock.patch('django.contrib.gis.gdal.driver.rcapi.register_all')
+    def test_registered(self, rreg, vreg, rcount, vcount):
+        "Prototypes are registered only if their respective driver counts are zero"
+        def check(r, v):
+            vreg.reset_mock()
+            rreg.reset_mock()
+            rcount.return_value = r
+            vcount.return_value = v
+            Driver.ensure_registered()
+            if r:
+                rreg.assert_not_called()
+            else:
+                rreg.assert_called_once_with()
+            if v:
+                vreg.assert_not_called()
+            else:
+                vreg.assert_called_once_with()
+
+        check(0, 0)
+        check(120, 0)
+        check(0, 120)
+        check(120, 120)
