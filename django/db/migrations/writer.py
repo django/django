@@ -221,7 +221,7 @@ class MigrationWriter(object):
 
     @property
     def basedir(self):
-        migrations_package_name = MigrationLoader.migrations_module(self.migration.app_label)
+        migrations_package_name = MigrationLoader(None, load=False).migrations_module(self.migration.app_label)
 
         if migrations_package_name is None:
             raise ValueError(

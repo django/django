@@ -59,6 +59,8 @@ class BaseDatabaseCreation(object):
         settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
         self.connection.settings_dict["NAME"] = test_database_name
 
+        self.connection._run_in_test_case = True
+
         # We report migrate messages at one level lower than that requested.
         # This ensures we don't get flooded with messages during testing
         # (unless you really ask to be flooded).
@@ -243,6 +245,7 @@ class BaseDatabaseCreation(object):
         Destroy a test database, prompting the user for confirmation if the
         database already exists.
         """
+        self.connection._run_in_test_case = False
         self.connection.close()
         if number is None:
             test_database_name = self.connection.settings_dict['NAME']

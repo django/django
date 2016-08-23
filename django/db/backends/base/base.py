@@ -88,6 +88,9 @@ class BaseDatabaseWrapper(object):
         # is called?
         self.run_commit_hooks_on_set_autocommit_on = False
 
+        # This will be used by BaseDatabaseCreation.create_test_db().
+        self._run_in_test_case = None
+
     def ensure_timezone(self):
         """
         Ensure the connection's timezone is set to `self.timezone_name` and
