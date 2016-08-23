@@ -305,3 +305,13 @@ class M2MThroughMultiTableTestCase(TestCase):
         result = self.chris.special_event_set.all()
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0], self.event)
+
+    def test_m2m_prefetch_proxied(self):
+        result = Event.objects.filter(name='Exposition Match').prefetch_related('special_people')
+        # Trigger Queryset evaluation
+        str(result)
+
+    def test_m2m_prefetch_reverse_proxied(self):
+        result = Person.objects.filter(name='Alice').prefetch_related('special_event_set')
+        # Trigger Queryset evaluation
+        str(result)
