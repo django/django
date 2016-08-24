@@ -14,7 +14,6 @@ from django.utils import six
 from django.utils.encoding import (
     force_str, force_text, repercent_broken_unicode,
 )
-
 from django.utils.functional import cached_property
 
 # encode() and decode() expect the charset to be a native string.
