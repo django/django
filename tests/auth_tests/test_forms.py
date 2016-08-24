@@ -22,7 +22,9 @@ from django.utils.encoding import force_text
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
-from .models.custom_user import CustomUser, ExtensionUser
+from .models.custom_user import (
+    CustomUser, CustomUserWithoutIsActiveField, ExtensionUser,
+)
 from .settings import AUTH_TEMPLATES
 
 
@@ -204,6 +206,20 @@ class UserCreationFormTest(TestDataMixin, TestCase):
             'password1': 'testclient',
             'password2': 'testclient',
             'date_of_birth': '1988-02-24',
+        }
+        form = CustomUserCreationForm(data)
+        self.assertTrue(form.is_valid())
+
+    def test_custom_form_hidden_username_field(self):
+        class CustomUserCreationForm(UserCreationForm):
+            class Meta(UserCreationForm.Meta):
+                model = CustomUserWithoutIsActiveField
+                fields = ('email',)  # without USERNAME_FIELD
+
+        data = {
+            'email': 'testclient@example.com',
+            'password1': 'testclient',
+            'password2': 'testclient',
         }
         form = CustomUserCreationForm(data)
         self.assertTrue(form.is_valid())
