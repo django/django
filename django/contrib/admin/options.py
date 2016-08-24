@@ -560,9 +560,9 @@ class ModelAdmin(BaseModelAdmin):
         ]
         return urlpatterns
 
+    @property
     def urls(self):
         return self.get_urls()
-    urls = property(urls)
 
     @property
     def media(self):
