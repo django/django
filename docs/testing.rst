@@ -69,7 +69,7 @@ You can test Groups in the same way as Channels inside a ``ChannelTestCase``;
 the entire channel layer is flushed each time a test is run, so it's safe to
 do group adds and sends during a test. For example::
 
-    from channels import Channel
+    from channels import Group
     from channels.tests import ChannelTestCase
 
     class MyTests(ChannelTestCase):
