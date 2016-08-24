@@ -362,7 +362,7 @@ with the admin site:
 * **admin.E102**: The value of ``save_on_top`` must be a boolean.
 * **admin.E103**: The value of ``inlines`` must be a list or tuple.
 * **admin.E104**: ``<InlineModelAdmin class>`` must inherit from
-  ``BaseModelAdmin``.
+  ``InlineModelAdmin``.
 * **admin.E105**: ``<InlineModelAdmin class>`` must have a ``model`` attribute.
 * **admin.E106**: The value of ``<InlineModelAdmin class>.model`` must be a
   ``Model``.

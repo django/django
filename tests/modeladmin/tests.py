@@ -1339,7 +1339,7 @@ class InlinesCheckTests(CheckTestCase):
 
         self.assertIsInvalidRegexp(
             ValidationTestModelAdmin, ValidationTestModel,
-            r"'.*\.ValidationTestInline' must inherit from 'BaseModelAdmin'\.",
+            r"'.*\.ValidationTestInline' must inherit from 'InlineModelAdmin'\.",
             'admin.E104')
 
     def test_missing_model_field(self):
