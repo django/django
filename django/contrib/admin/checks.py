@@ -561,12 +561,12 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check one inline model admin. """
         inline_label = '.'.join([inline.__module__, inline.__name__])
 
-        from django.contrib.admin.options import BaseModelAdmin
+        from django.contrib.admin.options import InlineModelAdmin
 
-        if not issubclass(inline, BaseModelAdmin):
+        if not issubclass(inline, InlineModelAdmin):
             return [
                 checks.Error(
-                    "'%s' must inherit from 'BaseModelAdmin'." % inline_label,
+                    "'%s' must inherit from 'InlineModelAdmin'." % inline_label,
                     obj=obj.__class__,
                     id='admin.E104',
                 )
