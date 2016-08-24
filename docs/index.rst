@@ -39,3 +39,4 @@ Contents:
    faqs
    asgi
    community
+   contributing
