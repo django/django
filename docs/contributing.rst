@@ -15,9 +15,13 @@ We're looking for help with the following areas:
  * Feature polish and occasional new feature design
  * Case studies and writeups
 
-You can find a particular list of what we're looking to work on right now
-on the `ChannelsTasks Django wiki page <https://code.djangoproject.com/wiki/ChannelsTasks>`_,
-but this is just a suggested list - any offer to help is welcome.
+You can find what we're looking to work on right now in two places:
+
+ * Specific bugs are in the `GitHub issues <https://github.com/andrewgodwin/channels/issues>`_
+ * Higher-level tasks are on the `ChannelsTasks Django wiki page <https://code.djangoproject.com/wiki/ChannelsTasks>`_
+
+These are, however, just a suggested list - any offer to help is welcome as long
+as it fits the project goals.
 
 
 I'm interested, how should I get started?
