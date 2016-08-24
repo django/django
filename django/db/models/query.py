@@ -993,6 +993,7 @@ class QuerySet(object):
     # PUBLIC INTROSPECTION ATTRIBUTES #
     ###################################
 
+    @property
     def ordered(self):
         """
         Returns True if the QuerySet is ordered -- i.e. has an order_by()
@@ -1004,7 +1005,6 @@ class QuerySet(object):
             return True
         else:
             return False
-    ordered = property(ordered)
 
     @property
     def db(self):
