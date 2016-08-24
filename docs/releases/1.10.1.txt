@@ -76,3 +76,6 @@ Bugfixes
 * Included the already applied migration state changes in the ``Apps`` instance
   provided to the ``pre_migrate`` signal receivers to allow ``ContentType``
   renaming to be performed on model rename (:ticket:`27100`).
+
+* Reallowed subclassing ``UserCreationForm`` without ``USERNAME_FIELD`` in
+  ``Meta.fields`` (:ticket:`27111`).

@@ -94,7 +94,8 @@ class UserCreationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(UserCreationForm, self).__init__(*args, **kwargs)
-        self.fields[self._meta.model.USERNAME_FIELD].widget.attrs.update({'autofocus': ''})
+        if self._meta.model.USERNAME_FIELD in self.fields:
+            self.fields[self._meta.model.USERNAME_FIELD].widget.attrs.update({'autofocus': ''})
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
