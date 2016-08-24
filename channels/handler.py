@@ -84,7 +84,7 @@ class AsgiRequest(http.HttpRequest):
             # HTTPbis say only ASCII chars are allowed in headers, but we latin1 just in case
             value = value.decode("latin1")
             if corrected_name in self.META:
-                value = self.META[corrected_name] + "," + value.decode("latin1")
+                value = self.META[corrected_name] + "," + value
             self.META[corrected_name] = value
         # Pull out request encoding if we find it
         if "CONTENT_TYPE" in self.META:
