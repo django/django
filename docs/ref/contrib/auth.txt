@@ -645,3 +645,26 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
    Same as :class:`RemoteUserBackend` except that it doesn't reject inactive
    users because :attr:`~RemoteUserBackend.user_can_authenticate` always
    returns ``True``.
+
+Utility functions
+=================
+
+.. currentmodule:: django.contrib.auth
+
+.. function:: get_user(request)
+
+    Returns the user model instance associated with the given ``request``’s
+    session.
+
+    It checks if the authentication backend stored in the session is present in
+    :setting:`AUTHENTICATION_BACKENDS`. If so, it uses the backend's
+    ``get_user()`` method to retrieve the user model instance and then verifies
+    the session by calling the user model's
+    :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash`
+    method.
+
+    Returns an instance of :class:`~django.contrib.auth.models.AnonymousUser`
+    if the authentication backend stored in the session is no longer in
+    :setting:`AUTHENTICATION_BACKENDS`, if a user isn't returned by the
+    backend's ``get_user()`` method, or if the session auth hash doesn't
+    validate.
