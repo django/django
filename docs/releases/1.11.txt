@@ -46,18 +46,18 @@ be compatible with Django 2.0.
 What's new in Django 1.11
 =========================
 
-Class based indexes
--------------------
+Class-based model indexes
+-------------------------
 
-``django.models.indexes`` has been introduced with the
-:class:`~django.db.models.Index` class which creates the default (b-tree)
-index in the database and makes it easy to extend support for different type of
-indexes like :class:`~django.contrib.postgres.indexes.GinIndex`. They
-can be added using the :attr:`Meta.indexes <django.db.models.Options.indexes>`
-model option.
-
-The ``Index`` class also allows defining the order (ASC/DESC) for the columns of
-the database index.
+:mod:`django.db.models.indexes` eases creating database indexes. The
+:class:`~django.db.models.Index` class creates a b-tree index, as if you
+used :attr:`~django.db.models.Field.db_index` on the model field or
+:attr:`~django.db.models.Options.index_together` on the model ``Meta`` class.
+``Index`` can be subclassed to support different index types, such as
+:class:`~django.contrib.postgres.indexes.GinIndex`. Indexes are added to models
+using the :attr:`Meta.indexes <django.db.models.Options.indexes>` option.
+The ``Index`` class also allows defining the order (ASC/DESC) for the columns
+of the index.
 
 Minor features
 --------------
@@ -125,8 +125,8 @@ Minor features
   :class:`~django.contrib.postgres.aggregates.StringAgg` determines if
   concatenated values will be distinct.
 
-* The new :class:`~django.contrib.postgres.indexes.GinIndex` class was added
-  to create gin indexes in the database.
+* The new :class:`~django.contrib.postgres.indexes.GinIndex` class allows
+  creating gin indexes in the database.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
