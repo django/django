@@ -163,9 +163,6 @@ class BaseDatabaseFeatures(object):
     # Can the backend introspect the column order (ASC/DESC) for indexes?
     supports_index_column_ordering = True
 
-    # Can the backend introspect the type of index created?
-    can_introspect_index_type = False
-
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
 

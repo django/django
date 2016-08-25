@@ -184,13 +184,14 @@ class IntrospectionTests(TransactionTestCase):
         self.assertNotIn('first_name', indexes)
         self.assertIn('id', indexes)
 
-    @skipUnlessDBFeature('can_introspect_index_type')
     def test_get_constraints_index_types(self):
         with connection.cursor() as cursor:
             constraints = connection.introspection.get_constraints(cursor, Article._meta.db_table)
+        index = {}
         for key, val in constraints.items():
-            if val['index'] and not (val['primary_key'] or val['unique']):
-                self.assertEqual(val['type'], 'btree')
+            if val['columns'] == ['headline', 'pub_date']:
+                index = val
+        self.assertEqual(index['type'], 'btree')
 
     @skipUnlessDBFeature('supports_index_column_ordering')
     def test_get_constraints_indexes_orders(self):
