@@ -44,15 +44,14 @@ class SchemaTests(PostgreSQLTestCase):
         # Ensure the table is there and doesn't have an index.
         self.assertNotIn('field', self.get_constraints(IntegerArrayModel._meta.db_table))
         # Add the index
-        index = GinIndex(fields=['field'], name='integer_array_model_field_gin')
+        index_name = 'integer_array_model_field_gin'
+        index = GinIndex(fields=['field'], name=index_name)
         with connection.schema_editor() as editor:
             editor.add_index(IntegerArrayModel, index)
-        self.assertIn('integer_array_model_field_gin', self.get_constraints(IntegerArrayModel._meta.db_table))
-        self.assertEqual(
-            self.get_constraints(IntegerArrayModel._meta.db_table)['integer_array_model_field_gin']['type'],
-            'gin'
-        )
+        constraints = self.get_constraints(IntegerArrayModel._meta.db_table)
+        # Check gin index was added
+        self.assertEqual(constraints[index_name]['type'], 'gin')
         # Drop the index
         with connection.schema_editor() as editor:
             editor.remove_index(IntegerArrayModel, index)
-        self.assertNotIn('integer_array_model_field_gin', self.get_constraints(IntegerArrayModel._meta.db_table))
+        self.assertNotIn(index_name, self.get_constraints(IntegerArrayModel._meta.db_table))

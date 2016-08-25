@@ -255,8 +255,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                         "index": True,
                     }
                 constraints[index]['columns'].append(column)
-            # Add column orders for indexes
+            # Add type and column orders for indexes
             if constraints[index]['index'] and not constraints[index]['unique']:
+                # SQLite doesn't support any index type other than b-tree
+                constraints[index]['type'] = 'btree'
                 cursor.execute(
                     "SELECT sql FROM sqlite_master "
                     "WHERE type='index' AND name=%s" % self.connection.ops.quote_name(index)
