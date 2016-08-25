@@ -1,3 +1,6 @@
+from django.contrib.auth.models import User
+from django.db import models
+
 from .custom_permissions import CustomPermissionsUser
 from .custom_user import (
     CustomUser, CustomUserWithoutIsActiveField, ExtensionUser,
@@ -18,4 +21,9 @@ __all__ = (
     'ExtensionUser', 'IntegerUsernameUser', 'IsActiveTestUser1', 'MinimalUser',
     'NoPasswordUser', 'Proxy', 'UUIDUser', 'UserProxy',
     'UserWithDisabledLastLoginField',
+    'CustomModel',
 )
+
+
+class CustomModel(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)

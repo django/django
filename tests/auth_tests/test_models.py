@@ -14,6 +14,7 @@ from django.test import SimpleTestCase, TestCase, override_settings
 
 from .models import IntegerUsernameUser
 from .models.with_custom_email_field import CustomEmailField
+from .models import CustomModel
 
 
 class NaturalKeysTestCase(TestCase):
@@ -259,6 +260,152 @@ class AbstractUserTestCase(TestCase):
             self.assertNotEqual(initial_password, user.password)
         finally:
             hasher.iterations = old_iterations
+
+
+class UserWithPermTestCase(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.content_type = ContentType.objects.get_for_model(Group)
+        cls.permission = Permission.objects.create(
+            name='test', content_type=cls.content_type, codename='test'
+        )
+        cls.user1 = User.objects.create_user('user1', 'foo@example.com')
+        cls.user1.user_permissions.add(cls.permission)
+
+        cls.group = Group.objects.create(name='test')
+        cls.group.permissions.add(cls.permission)
+        cls.group2 = Group.objects.create(name='test2')
+        cls.group2.permissions.add(cls.permission)
+        cls.user2 = User.objects.create_user('user2', 'bar@example.com')
+        cls.user2.groups.add(cls.group, cls.group2)
+
+        cls.user3 = User.objects.create_user('user3', 'baz@example.com')
+        cls.superuser = User.objects.create_superuser(
+            'superuser', 'superuser@example.com', 'superpassword'
+        )
+        cls.inactive_user = User.objects.create_user(
+            'inactive_user', 'baz@example.com', is_active=False
+        )
+        cls.inactive_user.user_permissions.add(cls.permission)
+        cls.charlie = User.objects.create_user('charlie', 'charlie@example.com')
+        cls.charlie_brown = User.objects.create_user('charliebrown', 'charlie@brown.com')
+
+    def test_with_perm_invalid_permission_name(self):
+        msg = "Permission name should be in the form 'app_label.perm_name'."
+        for perm in ('nodots', 'too.many.dots', '...', ''):
+            with self.assertRaisesMessage(ValueError, msg):
+                User.objects.with_perm(perm)
+
+    def test_with_perm_user_permissions(self):
+        six.assertCountEqual(
+            self,
+            User.objects.with_perm('auth.test'),
+            [self.user1, self.user2, self.superuser]
+        )
+
+    def test_with_perm_group_permissions(self):
+        six.assertCountEqual(
+            self,
+            User.objects.with_perm('auth.test'),
+            [self.user1, self.user2, self.superuser]
+        )
+
+    def test_with_perm_no_permissions(self):
+        self.assertNotIn(self.user3, User.objects.with_perm('auth.test'))
+
+    def test_with_perm_superuser(self):
+        self.assertIn(self.superuser, User.objects.with_perm('auth.test'))
+
+    def test_with_perm_exclude_superuser(self):
+        users = User.objects.with_perm('auth.test', is_superuser=False)
+        self.assertNotIn(self.superuser, users)
+        self.assertIn(self.user1, users)
+
+    def test_with_perm_exclude_inactive(self):
+        self.assertNotIn(self.inactive_user, User.objects.with_perm('auth.test'))
+
+    def test_with_perm_inactive(self):
+        users = User.objects.with_perm('auth.test', is_active=False)
+        self.assertIn(self.inactive_user, users)
+        self.assertNotIn(self.user1, users)
+
+    def test_with_perm_non_duplicate_users(self):
+        six.assertCountEqual(
+            self,
+            User.objects.with_perm('auth.test'),
+            [self.user1, self.user2, self.superuser]
+        )
+
+    @override_settings(AUTHENTICATION_BACKENDS=[
+        'auth_tests.test_auth_backends.CustomModelBackend',
+        'django.contrib.auth.backends.ModelBackend',
+    ])
+    def test_with_perm_custom_backend(self):
+        msg = (
+            'You have multiple authentication backends configured and '
+            'therefore must provide the `backend` argument.'
+        )
+        backend = 'auth_tests.test_auth_backends.CustomModelBackend'
+        with self.assertRaisesMessage(ValueError, msg):
+            User.objects.with_perm('auth.test')
+        six.assertCountEqual(
+            self,
+            User.objects.with_perm('auth.test', backend=backend),
+            [self.charlie, self.charlie_brown]
+        )
+        self.assertNotIn(self.user1, User.objects.with_perm('auth.test', backend=backend))
+
+    def test_with_perm_default_backend_with_obj(self):
+        obj = CustomModel.objects.create(user=self.charlie_brown)
+        six.assertCountEqual(
+            self,
+            User.objects.with_perm('auth.test', obj=obj),
+            []
+        )
+
+    @override_settings(AUTHENTICATION_BACKENDS=[
+        'auth_tests.test_auth_backends.CustomModelBackend',
+    ])
+    def test_with_perm_custom_backend_with_obj(self):
+        obj = CustomModel.objects.create(user=self.charlie_brown)
+        six.assertCountEqual(
+            self,
+            User.objects.with_perm('auth.test', obj=obj),
+            [self.charlie_brown]
+        )
+
+    def test_with_perm_invalid_backend_type(self):
+        msg = 'The `backend` argument must be a string.'
+        with self.assertRaisesMessage(TypeError, msg):
+            User.objects.with_perm(
+                'auth.test',
+                backend=b'auth_tests.test_auth_backends.CustomModelBackend',
+            )
+
+    def test_with_perm_nonexistent_backend(self):
+        with self.assertRaises(ImportError):
+            User.objects.with_perm(
+                'auth.test',
+                backend='invalid.backend.CustomModelBackend',
+            )
+
+    def test_with_perm_invalid_permission(self):
+        six.assertCountEqual(
+            self,
+            User.objects.with_perm('invalid.perm'),
+            [self.superuser]
+        )
+
+    @override_settings(AUTHENTICATION_BACKENDS=[
+        'auth_tests.test_auth_backends.BareModelBackend',
+    ])
+    def test_backend_without_with_perm(self):
+        six.assertCountEqual(
+            self,
+            User.objects.with_perm('auth.test'),
+            []
+        )
 
 
 class IsActiveTestCase(TestCase):

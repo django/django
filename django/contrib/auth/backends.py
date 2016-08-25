@@ -4,6 +4,7 @@ import warnings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.utils.deprecation import RemovedInDjango31Warning
+from django.db.models import Q
 
 UserModel = get_user_model()
 
@@ -96,6 +97,23 @@ class ModelBackend:
             perm[:perm.index('.')] == app_label
             for perm in self.get_all_permissions(user_obj)
         )
+
+    def with_perm(self, perm, is_active=True, is_superuser=True, obj=None):
+        UserModel = get_user_model()
+        try:
+            app_label, codename = perm.split('.')
+        except ValueError:
+            raise ValueError("Permission name should be in the form 'app_label.perm_name'.")
+        if obj is not None:
+            return UserModel._default_manager.none()
+
+        user_q = Q(user_permissions__codename=codename,
+                   user_permissions__content_type__app_label=app_label)
+        group_q = Q(groups__permissions__codename=codename,
+                    groups__permissions__content_type__app_label=app_label)
+        has_permission_q = Q(is_active=is_active) & (Q(is_superuser=is_superuser) | user_q | group_q)
+
+        return UserModel._default_manager.filter(has_permission_q).distinct()
 
     def get_user(self, user_id):
         try:

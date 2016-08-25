@@ -652,11 +652,22 @@ class ImportedModelBackend(ModelBackend):
 
 
 class CustomModelBackend(ModelBackend):
-    pass
+    def with_perm(self, perm, is_active=True, is_superuser=True, backend=None, obj=None):
+        if obj is not None and obj.user.username == 'charliebrown':
+            return User.objects.filter(username='charliebrown')
+        return User.objects.filter(username__startswith='charlie')
 
 
 class OtherModelBackend(ModelBackend):
     pass
+
+
+class BareModelBackend(object):
+    def authenticate(self, username, password):
+        return None
+
+    def get_user(self, user_id):
+        return None
 
 
 class ImportedBackendTests(TestCase):
