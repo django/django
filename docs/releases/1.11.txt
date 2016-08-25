@@ -46,6 +46,20 @@ be compatible with Django 2.0.
 What's new in Django 1.11
 =========================
 
+Class-based model indexes
+-------------------------
+
+The new :mod:`django.db.models.indexes` module would constitute of the index
+classes which ease creating database indexes.
+
+The :class:`~django.db.models.Index` class creates a b-tree index, as if you
+used :attr:`~django.db.models.Field.db_index` on the model field or
+:attr:`~django.db.models.Options.index_together` on the model ``Meta`` class.
+It can be subclassed to support different index types, such as
+:class:`~django.contrib.postgres.indexes.GinIndex`. Indexes are added to models
+using the :attr:`Meta.indexes <django.db.models.Options.indexes>` option.
+It also allows defining the order (ASC/DESC) for the columns of the index.
+
 Minor features
 --------------
 
@@ -111,6 +125,9 @@ Minor features
 * The new ``distinct`` argument for
   :class:`~django.contrib.postgres.aggregates.StringAgg` determines if
   concatenated values will be distinct.
+
+* The new :class:`~django.contrib.postgres.indexes.GinIndex` class allows
+  creating gin indexes in the database.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
