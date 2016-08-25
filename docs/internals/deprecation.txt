@@ -25,6 +25,8 @@ details on these changes.
 
 * ``django.test.runner.setup_databases()`` will be removed.
 
+* ``django.utils.translation.string_concat()`` will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

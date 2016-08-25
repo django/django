@@ -477,3 +477,9 @@ Miscellaneous
 
 * ``django.test.runner.setup_databases()`` is moved to
   :func:`django.test.utils.setup_databases`. The old location is deprecated.
+
+* ``django.utils.translation.string_concat()`` is deprecated in
+  favor of :func:`django.utils.text.format_lazy`. ``string_concat(*strings)``
+  can be directly replaced by::
+
+      format_lazy('{}' * len(strings), *strings)
