@@ -134,13 +134,13 @@ class WSGIRequest(http.HttpRequest):
         raw_cookie = get_str_from_wsgi(self.environ, 'HTTP_COOKIE', '')
         return http.parse_cookie(raw_cookie)
 
-    def _get_files(self):
+    @property
+    def FILES(self):
         if not hasattr(self, '_files'):
             self._load_post_and_files()
         return self._files
 
     POST = property(_get_post, _set_post)
-    FILES = property(_get_files)
 
 
 class WSGIHandler(base.BaseHandler):
