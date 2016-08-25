@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import os
-import unittest
 from datetime import datetime
 from itertools import islice
 
@@ -9,7 +8,7 @@ from django.http import (
     FileResponse, HttpResponse, HttpResponseRedirect, JsonResponse,
     StreamingHttpResponse,
 )
-from six import BytesIO, StringIO
+from six import BytesIO
 
 from channels import Channel
 from channels.handler import AsgiHandler
@@ -357,18 +356,3 @@ class HandlerTests(ChannelTestCase):
             self.assertEqual(reply_messages[0]['status'], 302)
             header_dict = dict(reply_messages[0]['headers'])
             self.assertEqual(header_dict[b'Location'].decode(), redirect_to)
-
-    @unittest.skip("failing under python 3")
-    def test_stringio_file_response(self):
-        Channel("test").send({
-            "reply_channel": "test",
-            "http_version": "1.1",
-            "method": "GET",
-            "path": b"/test/",
-        })
-        response = FileResponse(StringIO('sadfdasfsdfsadf'))
-        handler = FakeAsgiHandler(response)
-        # Use islice because the generator never ends.
-        reply_messages = list(
-            islice(handler(self.get_next_message("test", require=True)), 5))
-        self.assertEqual(len(reply_messages), 2, reply_messages)
