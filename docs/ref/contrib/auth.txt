@@ -291,6 +291,28 @@ Manager methods
 
             The ``email`` and ``password`` parameters were made optional.
 
+    .. method:: with_perm(perm, is_active=True, include_superusers=True, backend=None, obj=None)
+
+        .. versionadded:: 3.0
+
+        Returns users that have the given permission ``perm`` either in the
+        ``"<app label>.<permission codename>"`` format or as a
+        :class:`~django.contrib.auth.models.Permission` instance. Returns an
+        empty queryset if no users who have the ``perm`` found.
+
+        If ``is_active`` is ``True`` (default), returns only active users, or
+        if ``False``, returns only inactive users. Use ``None`` to return all
+        users irrespective of active state.
+
+        If ``include_superusers`` is ``True`` (default), the result will
+        include superusers.
+
+        If ``backend`` is passed in and it's defined in
+        :setting:`AUTHENTICATION_BACKENDS`, then this method will use it.
+        Otherwise, it will use the ``backend`` in
+        :setting:`AUTHENTICATION_BACKENDS`, if there is only one, or raise an
+        exception.
+
 ``AnonymousUser`` object
 ========================
 
@@ -520,6 +542,9 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     implement them other than returning an empty set of permissions if
     ``obj is not None``.
 
+    :meth:`with_perm` also allows an object to be passed as a parameter, but
+    unlike others methods it returns an empty queryset if ``obj is not None``.
+
     .. method:: authenticate(request, username=None, password=None, **kwargs)
 
         Tries to authenticate ``username`` with ``password`` by calling
@@ -576,6 +601,22 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         <django.contrib.auth.models.User.is_active>`. Custom user models that
         don't have an :attr:`~django.contrib.auth.models.CustomUser.is_active`
         field are allowed.
+
+    .. method:: with_perm(perm, is_active=True, include_superusers=True, obj=None)
+
+        .. versionadded:: 3.0
+
+        Returns all active users who have the permission ``perm`` either in
+        the form of ``"<app label>.<permission codename>"`` or a
+        :class:`~django.contrib.auth.models.Permission` instance. Returns an
+        empty queryset if no users who have the ``perm`` found.
+
+        If ``is_active`` is ``True`` (default), returns only active users, or
+        if ``False``, returns only inactive users. Use ``None`` to return all
+        users irrespective of active state.
+
+        If ``include_superusers`` is ``True`` (default), the result will
+        include superusers.
 
 .. class:: AllowAllUsersModelBackend
 

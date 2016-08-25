@@ -128,6 +128,9 @@ Minor features
 * :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` now supports
   :class:`~django.db.models.ManyToManyField`\s.
 
+* The new :meth:`.UserManager.with_perm` method returns users that have the
+  specified permission.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
