@@ -18,9 +18,7 @@ from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.deprecation import (
     RemovedInDjango20Warning, warn_about_renamed_method,
 )
-from django.utils.encoding import (
-    force_text, python_2_unicode_compatible, smart_text,
-)
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.text import camel_case_to_spaces, format_lazy
 from django.utils.translation import override
@@ -313,7 +311,7 @@ class Options(object):
         return '<Options for %s>' % self.object_name
 
     def __str__(self):
-        return "%s.%s" % (smart_text(self.app_label), smart_text(self.model_name))
+        return "%s.%s" % (self.app_label, self.model_name)
 
     def can_migrate(self, connection):
         """
