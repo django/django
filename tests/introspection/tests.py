@@ -172,11 +172,6 @@ class IntrospectionTests(TransactionTestCase):
     def test_get_indexes(self):
         with connection.cursor() as cursor:
             indexes = connection.introspection.get_indexes(cursor, Article._meta.db_table)
-        if connection.features.can_introspect_index_type:
-            index_type = indexes['reporter_id'].pop('type', None)
-            self.assertIsNotNone(index_type)
-            if connection.vendor == 'postgresql':
-                self.assertEqual(index_type, 'btree')
         self.assertEqual(indexes['reporter_id'], {'unique': False, 'primary_key': False})
 
     def test_get_indexes_multicol(self):
@@ -188,6 +183,14 @@ class IntrospectionTests(TransactionTestCase):
             indexes = connection.introspection.get_indexes(cursor, Reporter._meta.db_table)
         self.assertNotIn('first_name', indexes)
         self.assertIn('id', indexes)
+
+    @skipUnlessDBFeature('can_introspect_index_type')
+    def test_get_constraints_index_types(self):
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(cursor, Article._meta.db_table)
+        for key, val in constraints.items():
+            if val['index'] and not (val['primary_key'] or val['unique']):
+                self.assertEqual(val['type'], 'btree')
 
     @skipUnlessDBFeature('supports_index_column_ordering')
     def test_get_constraints_indexes_orders(self):
