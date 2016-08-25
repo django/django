@@ -24,16 +24,14 @@ class PostGISIntrospection(DatabaseIntrospection):
     # expression over the raster column through the ST_ConvexHull function.
     # So the default query has to be adapted to include raster indices.
     _get_indexes_query = """
-        SELECT DISTINCT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary,
-            am.amname
+        SELECT DISTINCT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
         FROM pg_catalog.pg_class c, pg_catalog.pg_class c2, pg_catalog.pg_index idx,
-            pg_catalog.pg_attribute attr, pg_catalog.pg_type t, pg_catalog.pg_am am
+            pg_catalog.pg_attribute attr, pg_catalog.pg_type t
         WHERE
             c.oid = idx.indrelid
             AND idx.indexrelid = c2.oid
             AND attr.attrelid = c.oid
             AND t.oid = attr.atttypid
-            AND c2.relam = am.oid
             AND (
                 attr.attnum = idx.indkey[0] OR
                 (t.typname LIKE 'raster' AND idx.indkey = '0')
