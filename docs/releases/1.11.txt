@@ -49,15 +49,16 @@ What's new in Django 1.11
 Class-based model indexes
 -------------------------
 
-:mod:`django.db.models.indexes` eases creating database indexes. The
-:class:`~django.db.models.Index` class creates a b-tree index, as if you
+The new :mod:`django.db.models.indexes` module would constitute of the index
+classes which ease creating database indexes.
+
+The :class:`~django.db.models.Index` class creates a b-tree index, as if you
 used :attr:`~django.db.models.Field.db_index` on the model field or
 :attr:`~django.db.models.Options.index_together` on the model ``Meta`` class.
-``Index`` can be subclassed to support different index types, such as
+It can be subclassed to support different index types, such as
 :class:`~django.contrib.postgres.indexes.GinIndex`. Indexes are added to models
 using the :attr:`Meta.indexes <django.db.models.Options.indexes>` option.
-The ``Index`` class also allows defining the order (ASC/DESC) for the columns
-of the index.
+It also allows defining the order (ASC/DESC) for the columns of the index.
 
 Minor features
 --------------
