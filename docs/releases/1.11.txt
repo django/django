@@ -313,6 +313,9 @@ Tests
   ``django.test.runner``) and :func:`~django.test.utils.teardown_databases`
   functions make it easier to build custom test runners.
 
+* Added support for :meth:`python:unittest.TestCase.subTest`’s when using the
+  :option:`test --parallel` option.
+
 URLs
 ~~~~
 

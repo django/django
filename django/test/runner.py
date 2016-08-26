@@ -77,6 +77,9 @@ class RemoteTestResult(object):
     """
 
     def __init__(self):
+        if tblib is not None:
+            tblib.pickling_support.install()
+
         self.events = []
         self.failfast = False
         self.shouldStop = False
@@ -85,6 +88,22 @@ class RemoteTestResult(object):
     @property
     def test_index(self):
         return self.testsRun - 1
+
+    def _print_unpicklable_subtest(self, test, subtest, pickle_exc):
+        print("""
+Subtest failed:
+
+    test: {}
+ subtest: {}
+
+Unfortunately, the subtest that failed cannot be pickled, so the parallel
+test runner cannot handle it cleanly. Here is the pickling error:
+
+> {}
+
+You should re-run this test with --parallel=1 to reproduce the failure
+with a cleaner failure message.
+""".format(test, subtest, pickle_exc))
 
     def check_picklable(self, test, err):
         # Ensure that sys.exc_info() tuples are picklable. This displays a
@@ -133,6 +152,13 @@ failure and get a correct traceback.
 """.format(test, original_exc_txt, pickle_exc_txt))
             raise
 
+    def check_subtest_picklable(self, test, subtest):
+        try:
+            pickle.dumps(subtest)
+        except Exception as exc:
+            self._print_unpicklable_subtest(test, subtest, exc)
+            raise
+
     def stop_if_failfast(self):
         if self.failfast:
             self.stop()
@@ -164,7 +190,15 @@ failure and get a correct traceback.
         self.stop_if_failfast()
 
     def addSubTest(self, test, subtest, err):
-        raise NotImplementedError("subtests aren't supported at this time")
+        # Follow Python 3.5's implementation of unittest.TestResult.addSubTest()
+        # by not doing anything when a subtest is successful.
+        if err is not None:
+            # Call check_picklable() before check_subtest_picklable() since
+            # check_picklable() performs the tblib check.
+            self.check_picklable(test, err)
+            self.check_subtest_picklable(test, subtest)
+            self.events.append(('addSubTest', self.test_index, subtest, err))
+            self.stop_if_failfast()
 
     def addSuccess(self, test):
         self.events.append(('addSuccess', self.test_index))
@@ -307,9 +341,6 @@ class ParallelTestSuite(unittest.TestSuite):
         Even with tblib, errors may still occur for dynamically created
         exception classes such Model.DoesNotExist which cannot be unpickled.
         """
-        if tblib is not None:
-            tblib.pickling_support.install()
-
         counter = multiprocessing.Value(ctypes.c_int, 0)
         pool = multiprocessing.Pool(
             processes=self.processes,
