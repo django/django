@@ -27,6 +27,8 @@ class WebsocketConsumer(BaseConsumer):
     slight_ordering = False
     strict_ordering = False
 
+    groups = None
+
     def get_handler(self, message, **kwargs):
         """
         Pulls out the path onto an instance variable, and optionally
@@ -54,7 +56,7 @@ class WebsocketConsumer(BaseConsumer):
         Group(s) to make people join when they connect and leave when they
         disconnect. Make sure to return a list/tuple, not a string!
         """
-        return []
+        return self.groups or []
 
     def raw_connect(self, message, **kwargs):
         """
