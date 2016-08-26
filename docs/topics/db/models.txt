@@ -751,10 +751,10 @@ For example, this model has a few custom methods::
             else:
                 return "Post-boomer"
 
-        def _get_full_name(self):
+        @property
+        def full_name(self):
             "Returns the person's full name."
             return '%s %s' % (self.first_name, self.last_name)
-        full_name = property(_get_full_name)
 
 The last method in this example is a :term:`property`.
 

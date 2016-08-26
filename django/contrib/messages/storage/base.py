@@ -38,7 +38,8 @@ class Message(object):
     def __str__(self):
         return force_text(self.message)
 
-    def _get_tags(self):
+    @property
+    def tags(self):
         extra_tags = force_text(self.extra_tags, strings_only=True)
         if extra_tags and self.level_tag:
             return ' '.join([extra_tags, self.level_tag])
@@ -47,7 +48,6 @@ class Message(object):
         elif self.level_tag:
             return self.level_tag
         return ''
-    tags = property(_get_tags)
 
     @property
     def level_tag(self):

@@ -412,10 +412,10 @@ class AdminPasswordChangeForm(forms.Form):
             self.user.save()
         return self.user
 
-    def _get_changed_data(self):
+    @property
+    def changed_data(self):
         data = super(AdminPasswordChangeForm, self).changed_data
         for name in self.fields.keys():
             if name not in data:
                 return []
         return ['password']
-    changed_data = property(_get_changed_data)
