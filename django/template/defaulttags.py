@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import re
 import sys
 import warnings
+from collections import namedtuple
 from datetime import datetime
 from itertools import cycle as itertools_cycle, groupby
 
@@ -335,6 +336,9 @@ class LoremNode(Node):
         return '\n\n'.join(paras)
 
 
+GroupedResult = namedtuple('GroupedResult', ['grouper', 'list'])
+
+
 class RegroupNode(Node):
     def __init__(self, target, expression, var_name):
         self.target, self.expression = target, expression
@@ -355,7 +359,7 @@ class RegroupNode(Node):
         # List of dictionaries in the format:
         # {'grouper': 'key', 'list': [list of contents]}.
         context[self.var_name] = [
-            {'grouper': key, 'list': list(val)}
+            GroupedResult(grouper=key, list=list(val))
             for key, val in
             groupby(obj_list, lambda obj: self.resolve_expression(obj, context))
         ]
