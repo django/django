@@ -14,7 +14,7 @@ import uuid
 from decimal import Decimal, DecimalException
 from io import BytesIO
 
-from django.core import validators
+from django.core import validators as validators_
 from django.core.exceptions import ValidationError
 # Provide this import for backwards compatibility.
 from django.core.validators import EMPTY_VALUES  # NOQA
@@ -55,7 +55,7 @@ class Field(object):
     default_error_messages = {
         'required': _('This field is required.'),
     }
-    empty_values = list(validators.EMPTY_VALUES)
+    empty_values = list(validators_.EMPTY_VALUES)
 
     # Tracks each time a Field instance is created. Used to retain order.
     creation_counter = 0
@@ -221,9 +221,9 @@ class CharField(Field):
         self.empty_value = empty_value
         super(CharField, self).__init__(*args, **kwargs)
         if min_length is not None:
-            self.validators.append(validators.MinLengthValidator(int(min_length)))
+            self.validators.append(validators_.MinLengthValidator(int(min_length)))
         if max_length is not None:
-            self.validators.append(validators.MaxLengthValidator(int(max_length)))
+            self.validators.append(validators_.MaxLengthValidator(int(max_length)))
 
     def to_python(self, value):
         "Returns a Unicode object."
@@ -260,9 +260,9 @@ class IntegerField(Field):
         super(IntegerField, self).__init__(*args, **kwargs)
 
         if max_value is not None:
-            self.validators.append(validators.MaxValueValidator(max_value))
+            self.validators.append(validators_.MaxValueValidator(max_value))
         if min_value is not None:
-            self.validators.append(validators.MinValueValidator(min_value))
+            self.validators.append(validators_.MinValueValidator(min_value))
 
     def to_python(self, value):
         """
@@ -336,7 +336,7 @@ class DecimalField(IntegerField):
     def __init__(self, max_value=None, min_value=None, max_digits=None, decimal_places=None, *args, **kwargs):
         self.max_digits, self.decimal_places = max_digits, decimal_places
         super(DecimalField, self).__init__(max_value, min_value, *args, **kwargs)
-        self.validators.append(validators.DecimalValidator(max_digits, decimal_places))
+        self.validators.append(validators_.DecimalValidator(max_digits, decimal_places))
 
     def to_python(self, value):
         """
@@ -522,7 +522,7 @@ class RegexField(CharField):
         self._regex = regex
         if hasattr(self, '_regex_validator') and self._regex_validator in self.validators:
             self.validators.remove(self._regex_validator)
-        self._regex_validator = validators.RegexValidator(regex=regex)
+        self._regex_validator = validators_.RegexValidator(regex=regex)
         self.validators.append(self._regex_validator)
 
     regex = property(_get_regex, _set_regex)
@@ -530,7 +530,7 @@ class RegexField(CharField):
 
 class EmailField(CharField):
     widget = EmailInput
-    default_validators = [validators.validate_email]
+    default_validators = [validators_.validate_email]
 
     def __init__(self, *args, **kwargs):
         super(EmailField, self).__init__(*args, strip=True, **kwargs)
@@ -662,7 +662,7 @@ class URLField(CharField):
     default_error_messages = {
         'invalid': _('Enter a valid URL.'),
     }
-    default_validators = [validators.URLValidator()]
+    default_validators = [validators_.URLValidator()]
 
     def __init__(self, *args, **kwargs):
         super(URLField, self).__init__(*args, strip=True, **kwargs)
@@ -1167,7 +1167,7 @@ class SplitDateTimeField(MultiValueField):
 class GenericIPAddressField(CharField):
     def __init__(self, protocol='both', unpack_ipv4=False, *args, **kwargs):
         self.unpack_ipv4 = unpack_ipv4
-        self.default_validators = validators.ip_address_validators(protocol, unpack_ipv4)[0]
+        self.default_validators = validators_.ip_address_validators(protocol, unpack_ipv4)[0]
         super(GenericIPAddressField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
@@ -1180,12 +1180,12 @@ class GenericIPAddressField(CharField):
 
 
 class SlugField(CharField):
-    default_validators = [validators.validate_slug]
+    default_validators = [validators_.validate_slug]
 
     def __init__(self, *args, **kwargs):
         self.allow_unicode = kwargs.pop('allow_unicode', False)
         if self.allow_unicode:
-            self.default_validators = [validators.validate_unicode_slug]
+            self.default_validators = [validators_.validate_unicode_slug]
         super(SlugField, self).__init__(*args, **kwargs)
 
 
