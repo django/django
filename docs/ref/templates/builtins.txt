@@ -896,12 +896,35 @@ resulting list. Here, we're regrouping the ``cities`` list by the ``country``
 attribute and calling the result ``country_list``.
 
 ``{% regroup %}`` produces a list (in this case, ``country_list``) of
-**group objects**. Each group object has two attributes:
+**group objects**. Group objects are instances of
+:py:func:`~collections.namedtuple` with two fields:
 
 * ``grouper`` -- the item that was grouped by (e.g., the string "India" or
   "Japan").
 * ``list`` -- a list of all items in this group (e.g., a list of all cities
   with country='India').
+
+.. versionchanged:: 1.11
+
+    The group object was changed from a dictionary to a
+    :py:func:`~collections.namedtuple`.
+
+Because ``{% regroup %}`` produces :py:func:`~collections.namedtuple` objects,
+you can also write the previous example as::
+
+    {% regroup cities by country as country_list %}
+
+    <ul>
+    {% for country, local_cities in country_list %}
+        <li>{{ country }}
+        <ul>
+            {% for city in local_cities %}
+              <li>{{ city.name }}: {{ city.population }}</li>
+            {% endfor %}
+        </ul>
+        </li>
+    {% endfor %}
+    </ul>
 
 Note that ``{% regroup %}`` does not order its input! Our example relies on
 the fact that the ``cities`` list was ordered by ``country`` in the first place.

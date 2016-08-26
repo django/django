@@ -300,6 +300,10 @@ Templates
   supports context processors by setting the ``'context_processors'`` option in
   :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
 
+* The :ttag:`regroup` tag now returns ``namedtuple``\s instead of dictionaries
+  so you can unpack the group object directly in a loop, e.g.
+  ``{% for grouper, list in regrouped %}``.
+
 Tests
 ~~~~~
 
