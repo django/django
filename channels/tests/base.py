@@ -129,7 +129,7 @@ class Client(object):
 
     def send_and_consume(self, channel, content={}, fail_on_none=True):
         """
-        Reproduce full live cycle of the message
+        Reproduce full life cycle of the message
         """
         self.send(channel, content)
         return self.consume(channel, fail_on_none=fail_on_none)

@@ -10,7 +10,7 @@ from .base import Client
 
 class HttpClient(Client):
     """
-    Channel http/ws client abstraction that provides easy methods for testing full live cycle of message in channels
+    Channel http/ws client abstraction that provides easy methods for testing full life cycle of message in channels
     with determined reply channel, auth opportunity, cookies, headers and so on
     """
 
@@ -61,7 +61,7 @@ class HttpClient(Client):
         if content:
             return json.loads(content['text'])
 
-    def send(self, to, text=None, content={}, path='/'):
+    def send(self, to, content={}, text=None, path='/'):
         """
         Send a message to a channel.
         Adds reply_channel name and channel_session to the message.
@@ -74,6 +74,13 @@ class HttpClient(Client):
         if text:
             content['text'] = json.dumps(text)
         self.channel_layer.send(to, content)
+
+    def send_and_consume(self, channel, content={}, text=None, path='/', fail_on_none=True):
+        """
+        Reproduce full life cycle of the message
+        """
+        self.send(channel, content, text, path)
+        return self.consume(channel, fail_on_none=fail_on_none)
 
     def login(self, **credentials):
         """
