@@ -120,7 +120,10 @@ class Field(object):
         messages.update(error_messages or {})
         self.error_messages = messages
 
-        self.validators = list(itertools.chain(self.default_validators, validators))
+        if validators_.REPLACE_DEFAULTS in validators:
+            self.validators = [v for v in validators if v is not validators_.REPLACE_DEFAULTS]
+        else:
+            self.validators = list(itertools.chain(self.default_validators, validators))
 
         super(Field, self).__init__()
 

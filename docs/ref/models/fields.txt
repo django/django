@@ -365,8 +365,17 @@ underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 
 .. attribute:: Field.validators
 
-A list of validators to run for this field. See the :doc:`validators
-documentation </ref/validators>` for more information.
+A list of validators to run for this field. If you'd like to replace any
+default validator of the field, you can add the special value
+``django.core.validators.REPLACE_DEFAULTS`` to this list to specify that only
+the validators you specify must be used.
+
+.. versionchanged:: 1.11
+
+    The ability to specify ``REPLACE_DEFAULTS`` to replace any default
+    validator is new.
+
+See the :doc:`validators documentation </ref/validators>` for more information.
 
 Registering and fetching lookups
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

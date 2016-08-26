@@ -285,7 +285,14 @@ error message keys it uses.
 .. attribute:: Field.validators
 
 The ``validators`` argument lets you provide a list of validation functions
-for this field.
+for this field. If you'd like to replace any default validator of the field,
+you can add the special value ``django.core.validators.REPLACE_DEFAULTS`` to
+this list to specify that only the validators you specify must be used.
+
+.. versionchanged:: 1.11
+
+    The ability to specify ``REPLACE_DEFAULTS`` to replace any default
+    validator is new.
 
 See the :doc:`validators documentation </ref/validators>` for more information.
 

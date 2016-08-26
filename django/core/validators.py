@@ -15,6 +15,9 @@ from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, '', [], (), {})
 
+# Sentinel value to signal defaults validators of a form or model field should
+# be replaced by a given list which contains this value.
+REPLACE_DEFAULTS = object()
 
 def _lazy_re_compile(regex, flags=0):
     """Lazily compile a regex with flags."""
