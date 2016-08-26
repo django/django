@@ -19,6 +19,7 @@ EMPTY_VALUES = (None, '', [], (), {})
 # be replaced by a given list which contains this value.
 REPLACE_DEFAULTS = object()
 
+
 def _lazy_re_compile(regex, flags=0):
     """Lazily compile a regex with flags."""
     def _compile():

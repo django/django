@@ -869,6 +869,10 @@ class Field(RegisterLookupMixin):
                              'widget', 'label', 'initial', 'help_text',
                              'error_messages', 'show_hidden_initial'):
                     del kwargs[k]
+        elif self.validators:
+            # Propagate model validators to the form field and replace defaults
+            defaults['validators'] = self.validators + [validators.REPLACE_DEFAULTS]
+
         defaults.update(kwargs)
         if form_class is None:
             form_class = forms.CharField

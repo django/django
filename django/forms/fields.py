@@ -226,7 +226,10 @@ class CharField(Field):
         if min_length is not None:
             self.validators.append(validators_.MinLengthValidator(int(min_length)))
         if max_length is not None:
-            self.validators.append(validators_.MaxLengthValidator(int(max_length)))
+            # A max length validator is sometimes already present
+            has_max_length = any(getattr(v, 'code', '') == 'max_length' for v in self.validators)
+            if not has_max_length:
+                self.validators.append(validators_.MaxLengthValidator(int(max_length)))
 
     def to_python(self, value):
         "Returns a Unicode object."
@@ -263,9 +266,13 @@ class IntegerField(Field):
         super(IntegerField, self).__init__(*args, **kwargs)
 
         if max_value is not None:
-            self.validators.append(validators_.MaxValueValidator(max_value))
+            has_max_value = any(getattr(v, 'code', '') == 'max_value' for v in self.validators)
+            if not has_max_value:
+                self.validators.append(validators_.MaxValueValidator(max_value))
         if min_value is not None:
-            self.validators.append(validators_.MinValueValidator(min_value))
+            has_min_value = any(getattr(v, 'code', '') == 'min_value' for v in self.validators)
+            if not has_min_value:
+                self.validators.append(validators_.MinValueValidator(min_value))
 
     def to_python(self, value):
         """

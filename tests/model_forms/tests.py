@@ -2575,10 +2575,15 @@ class ModelFormCustomErrorTests(SimpleTestCase):
             str(errors['name1']),
             '<ul class="errorlist"><li>Form custom error message.</li></ul>'
         )
+        # That error message comes from the propagated validator.
         self.assertHTMLEqual(
             str(errors['name2']),
-            '<ul class="errorlist"><li>Model custom error message.</li></ul>'
+            '<ul class="errorlist"><li>Enter a valid &39;slug&39; consisting of '
+            'letters, numbers, underscores or hyphens.</li></ul>'
         )
+        model = CustomErrorMessage(name1='ok', name2='not#ok')
+        with self.assertRaisesMessage(ValidationError, "Model custom error message"):
+            model.full_clean()
 
     def test_model_clean_error_messages(self):
         data = {'name1': 'FORBIDDEN_VALUE', 'name2': 'ABC'}

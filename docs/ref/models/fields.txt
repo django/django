@@ -370,10 +370,15 @@ default validator of the field, you can add the special value
 ``django.core.validators.REPLACE_DEFAULTS`` to this list to specify that only
 the validators you specify must be used.
 
+All validators defined at the model level are also propagated to the respective
+form fields of the auto-generated :class:`~django.forms.ModelForm` for the
+model.
+
 .. versionchanged:: 1.11
 
     The ability to specify ``REPLACE_DEFAULTS`` to replace any default
-    validator is new.
+    validator is new. Also the automatic propagation of the model validators to
+    the ``ModelForm`` fields was added.
 
 See the :doc:`validators documentation </ref/validators>` for more information.
 
