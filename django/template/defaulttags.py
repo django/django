@@ -1148,46 +1148,47 @@ def regroup(parser, token):
     """
     Regroups a list of alike objects by a common attribute.
 
-    This complex tag is best illustrated by use of an example:  say that
-    ``people`` is a list of ``Person`` objects that have ``first_name``,
-    ``last_name``, and ``gender`` attributes, and you'd like to display a list
-    that looks like:
+    This complex tag is best illustrated by use of an example: say that
+    ``musicians`` is a list of ``Musician`` objects that have ``name`` and
+    ``instrument`` attributes, and you'd like to display a list that
+    looks like:
 
-        * Male:
-            * George Bush
-            * Bill Clinton
-        * Female:
-            * Margaret Thatcher
-            * Colendeeza Rice
-        * Unknown:
-            * Pat Smith
+        * Guitar:
+            * Django Reinhardt
+            * Emily Remler
+        * Piano:
+            * Lovie Austin
+            * Bud Powell
+        * Trumpet:
+            * Duke Ellington
 
     The following snippet of template code would accomplish this dubious task::
 
-        {% regroup people by gender as grouped %}
+        {% regroup musicians by instrument as grouped %}
         <ul>
         {% for group in grouped %}
             <li>{{ group.grouper }}
             <ul>
-                {% for item in group.list %}
-                <li>{{ item }}</li>
+                {% for musician in group.list %}
+                <li>{{ musician.name }}</li>
                 {% endfor %}
             </ul>
         {% endfor %}
         </ul>
 
     As you can see, ``{% regroup %}`` populates a variable with a list of
-    objects with ``grouper`` and ``list`` attributes.  ``grouper`` contains the
+    objects with ``grouper`` and ``list`` attributes. ``grouper`` contains the
     item that was grouped by; ``list`` contains the list of objects that share
-    that ``grouper``.  In this case, ``grouper`` would be ``Male``, ``Female``
-    and ``Unknown``, and ``list`` is the list of people with those genders.
+    that ``grouper``. In this case, ``grouper`` would be ``Guitar``, ``Piano``
+    and ``Trumpet``, and ``list`` is the list of musicians who play this
+    instrument.
 
     Note that ``{% regroup %}`` does not work when the list to be grouped is not
-    sorted by the key you are grouping by!  This means that if your list of
-    people was not sorted by gender, you'd need to make sure it is sorted
+    sorted by the key you are grouping by! This means that if your list of
+    musicians was not sorted by instrument, you'd need to make sure it is sorted
     before using it, i.e.::
 
-        {% regroup people|dictsort:"gender" by gender as grouped %}
+        {% regroup musicians|dictsort:"instrument" by instrument as grouped %}
     """
     bits = token.split_contents()
     if len(bits) != 6:
