@@ -236,14 +236,17 @@ _caches_setting_base = {
 }
 
 
-def caches_setting_for_tests(base=None, **params):
+def caches_setting_for_tests(base=None, exclude=None, **params):
     # `base` is used to pull in the memcached config from the original settings,
+    # `exclude` is a set of cache names denoting which `_caches_setting_base` keys
+    # should be omitted.
     # `params` are test specific overrides and `_caches_settings_base` is the
     # base config for the tests.
     # This results in the following search order:
     # params -> _caches_setting_base -> base
     base = base or {}
-    setting = {k: base.copy() for k in _caches_setting_base.keys()}
+    exclude = exclude or set()
+    setting = {k: base.copy() for k in _caches_setting_base.keys() if k not in exclude}
     for key, cache_params in setting.items():
         cache_params.update(_caches_setting_base[key])
         cache_params.update(params)
@@ -1138,15 +1141,15 @@ for _cache_params in settings.CACHES.values():
     if _cache_params['BACKEND'].startswith('django.core.cache.backends.memcached.'):
         memcached_params = _cache_params
 
-memcached_never_expiring_params = memcached_params.copy()
-memcached_never_expiring_params['TIMEOUT'] = None
-
-memcached_far_future_params = memcached_params.copy()
-memcached_far_future_params['TIMEOUT'] = 31536000  # 60*60*24*365, 1 year
+# The memcached backends don't support cull-related options like `MAX_ENTRIES`.
+memcached_excluded_caches = {'cull', 'zero_cull'}
 
 
 @unittest.skipUnless(memcached_params, "memcached not available")
-@override_settings(CACHES=caches_setting_for_tests(base=memcached_params))
+@override_settings(CACHES=caches_setting_for_tests(
+    base=memcached_params,
+    exclude=memcached_excluded_caches,
+))
 class MemcachedCacheTests(BaseCacheTests, TestCase):
 
     def test_invalid_keys(self):
@@ -1176,13 +1179,21 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
                 self.assertEqual(caches[cache_key]._cache.pickleProtocol,
                                  pickle.HIGHEST_PROTOCOL)
 
-    @override_settings(CACHES=caches_setting_for_tests(base=memcached_never_expiring_params))
+    @override_settings(CACHES=caches_setting_for_tests(
+        base=memcached_params,
+        exclude=memcached_excluded_caches,
+        TIMEOUT=None,
+    ))
     def test_default_never_expiring_timeout(self):
         # Regression test for #22845
         cache.set('infinite_foo', 'bar')
         self.assertEqual(cache.get('infinite_foo'), 'bar')
 
-    @override_settings(CACHES=caches_setting_for_tests(base=memcached_far_future_params))
+    @override_settings(CACHES=caches_setting_for_tests(
+        base=memcached_params,
+        exclude=memcached_excluded_caches,
+        TIMEOUT=31536000,  # 60*60*24*365, 1 year
+    ))
     def test_default_far_future_timeout(self):
         # Regression test for #22845
         cache.set('future_foo', 'bar')
