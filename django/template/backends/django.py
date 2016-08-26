@@ -27,7 +27,8 @@ class DjangoTemplates(BaseEngine):
         options.setdefault('debug', settings.DEBUG)
         options.setdefault('file_charset', settings.FILE_CHARSET)
         libraries = options.get('libraries', {})
-        options['libraries'] = self.get_templatetag_libraries(libraries)
+        if libraries:
+            options['libraries'] = self.get_templatetag_libraries(libraries)
         super(DjangoTemplates, self).__init__(params)
         self.engine = Engine(self.dirs, self.app_dirs, **options)
 
