@@ -645,7 +645,7 @@ def slice_filter(value, arg):
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
-def unordered_list(value, autoescape=True):
+def unordered_list(value, autoescape=True, html_classes={}):
     """
     Recursively takes a self-nested list and returns an HTML unordered list --
     WITHOUT opening and closing <ul> tags.
@@ -699,12 +699,22 @@ def unordered_list(value, autoescape=True):
     def list_formatter(item_list, tabs=1):
         indent = '\t' * tabs
         output = []
+        ul_class = html_classes.get('ul')
+        li_class = html_classes.get('li')
+        if not ul_class:
+            ul_formatter = '\n%s<ul>\n%s\n%s</ul>\n%s'
+        else:
+            ul_formatter = '\n%s<ul class="%{ul}s">\n%s\n%s</ul>\n%s' % html_classes
+        if not li_class:
+            li_formatter = '%s<li>%s%s</li>'
+        else:
+            li_formatter = '%s<li class="%{li}s">%s%s</li>' % html_classes
         for item, children in walk_items(item_list):
             sublist = ''
             if children:
-                sublist = '\n%s<ul>\n%s\n%s</ul>\n%s' % (
+                sublist = ul_formatter % (
                     indent, list_formatter(children, tabs + 1), indent, indent)
-            output.append('%s<li>%s%s</li>' % (
+            output.append(li_formatter % (
                 indent, escaper(force_text(item)), sublist))
         return '\n'.join(output)
 
