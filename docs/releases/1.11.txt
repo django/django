@@ -300,6 +300,9 @@ Templates
   supports context processors by setting the ``'context_processors'`` option in
   :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
 
+* Added a :ttag:`resetcycle` template tag to allow resetting the sequence of
+  the :ttag:`cycle` template tag.
+
 Tests
 ~~~~~
 
