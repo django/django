@@ -179,6 +179,7 @@ class TestCollectionClear(CollectionTestCase):
 class TestInteractiveMessages(CollectionTestCase):
     overwrite_warning_msg = "This will overwrite existing files!"
     delete_warning_msg = "This will DELETE ALL FILES in this location!"
+    files_copied_msg = "static files copied"
 
     @staticmethod
     def mock_input(stdout):
@@ -208,6 +209,29 @@ class TestInteractiveMessages(CollectionTestCase):
         output = force_text(stdout.getvalue())
         self.assertIn(self.overwrite_warning_msg, output)
         self.assertNotIn(self.delete_warning_msg, output)
+
+    def test_no_warning_when_staticdir_does_not_exist(self):
+        stdout = six.StringIO()
+        shutil.rmtree(six.text_type(settings.STATIC_ROOT))
+        call_command('collectstatic', interactive=True, stdout=stdout)
+
+        output = force_text(stdout.getvalue())
+        self.assertNotIn(self.overwrite_warning_msg, output)
+        self.assertNotIn(self.delete_warning_msg, output)
+        self.assertIn(self.files_copied_msg, output)
+
+    def test_no_warning_for_empty_staticdir(self):
+        stdout = six.StringIO()
+        # Use an empty directory instead of the directory from setUp that contains files
+        static_dir = tempfile.mkdtemp(prefix='collectstatic_empty_staticdir_test')
+        with override_settings(STATIC_ROOT=static_dir):
+            call_command('collectstatic', interactive=True, stdout=stdout)
+
+        shutil.rmtree(six.text_type(static_dir))
+        output = force_text(stdout.getvalue())
+        self.assertNotIn(self.overwrite_warning_msg, output)
+        self.assertNotIn(self.delete_warning_msg, output)
+        self.assertIn(self.files_copied_msg, output)
 
 
 class TestCollectionExcludeNoDefaultIgnore(TestDefaults, CollectionTestCase):

@@ -173,22 +173,28 @@ class Command(BaseCommand):
         if self.is_local_storage() and self.storage.location:
             destination_path = self.storage.location
             message.append(':\n\n    %s\n\n' % destination_path)
+            should_warn_user = (
+                self.storage.exists(destination_path) and
+                any(self.storage.listdir(destination_path))
+            )
         else:
             destination_path = None
             message.append('.\n\n')
+            # Destination files existence not checked, better play safe and warn the user
+            should_warn_user = True
 
-        if self.clear:
-            message.append('This will DELETE ALL FILES in this location!\n')
-        else:
-            message.append('This will overwrite existing files!\n')
+        if self.interactive and should_warn_user:
+            if self.clear:
+                message.append('This will DELETE ALL FILES in this location!\n')
+            else:
+                message.append('This will overwrite existing files!\n')
 
-        message.append(
-            'Are you sure you want to do this?\n\n'
-            "Type 'yes' to continue, or 'no' to cancel: "
-        )
-
-        if self.interactive and input(''.join(message)) != 'yes':
-            raise CommandError("Collecting static files cancelled.")
+            message.append(
+                'Are you sure you want to do this?\n\n'
+                "Type 'yes' to continue, or 'no' to cancel: "
+            )
+            if input(''.join(message)) != 'yes':
+                raise CommandError("Collecting static files cancelled.")
 
         collected = self.collect()
         modified_count = len(collected['modified'])
