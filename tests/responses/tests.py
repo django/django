@@ -63,10 +63,32 @@ class HttpResponseTests(SimpleTestCase):
         self.assertEqual(resp.status_code, 503)
         self.assertEqual(resp.reason_phrase, "Service Unavailable")
 
+    def test_valid_status_code_string(self):
+        resp = HttpResponse(status='100')
+        self.assertEqual(resp.status_code, 100)
+        resp = HttpResponse(status='404')
+        self.assertEqual(resp.status_code, 404)
+        resp = HttpResponse(status='599')
+        self.assertEqual(resp.status_code, 599)
+
+    def test_invalid_status_code(self):
+        with self.assertRaisesMessage(TypeError, 'HTTP status code must be an integer.'):
+            HttpResponse(status=object())
+        with self.assertRaisesMessage(TypeError, 'HTTP status code must be an integer.'):
+            HttpResponse(status="J'attendrai")
+        with self.assertRaisesMessage(ValueError, 'HTTP status code must be an integer from 100 to 599.'):
+            HttpResponse(status='99')
+        with self.assertRaisesMessage(ValueError, 'HTTP status code must be an integer from 100 to 599.'):
+            HttpResponse(status='600')
+        with self.assertRaisesMessage(ValueError, 'HTTP status code must be an integer from 100 to 599.'):
+            HttpResponse(status=99)
+        with self.assertRaisesMessage(ValueError, 'HTTP status code must be an integer from 100 to 599.'):
+            HttpResponse(status=600)
+
     def test_reason_phrase(self):
         reason = "I'm an anarchist coffee pot on crack."
-        resp = HttpResponse(status=814, reason=reason)
-        self.assertEqual(resp.status_code, 814)
+        resp = HttpResponse(status=419, reason=reason)
+        self.assertEqual(resp.status_code, 419)
         self.assertEqual(resp.reason_phrase, reason)
 
     def test_charset_detection(self):
