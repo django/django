@@ -569,7 +569,7 @@ class BaseCacheTests(object):
     def test_zero_cull(self):
         self._perform_cull_test(caches['zero_cull'], 50, 19)
 
-    def test_invalid_keys(self):
+    def _perform_invalid_key_test(self, key, expected_warning):
         """
         All the builtin backends (except memcached, see below) should warn on
         keys that would be refused by memcached. This encourages portable
@@ -587,34 +587,30 @@ class BaseCacheTests(object):
         try:
             with warnings.catch_warnings(record=True) as w:
                 warnings.simplefilter("always")
-                # memcached does not allow whitespace or control characters in keys
-                key = 'key with spaces and 清'
                 cache.set(key, 'value')
                 self.assertEqual(len(w), 1)
                 self.assertIsInstance(w[0].message, CacheKeyWarning)
-                self.assertEqual(
-                    # warnings.warn() crashes on Python 2 if message isn't
-                    # coercible to str.
-                    str(w[0].message.args[0]),
-                    "Cache key contains characters that will cause errors if used "
-                    "with memcached: %r" % key,
-                )
-            with warnings.catch_warnings(record=True) as w:
-                warnings.simplefilter("always")
-                # memcached limits key length to 250
-                key = ('a' * 250) + '清'
-                cache.set(key, 'value')
-                self.assertEqual(len(w), 1)
-                self.assertIsInstance(w[0].message, CacheKeyWarning)
-                self.assertEqual(
-                    # warnings.warn() crashes on Python 2 if message isn't
-                    # coercible to str.
-                    str(w[0].message.args[0]),
-                    'Cache key will cause errors if used with memcached: '
-                    '%r (longer than %s)' % (key, 250),
-                )
+                self.assertEqual(str(w[0].message.args[0]), expected_warning)
         finally:
             cache.key_func = old_func
+
+    def test_invalid_key_characters(self):
+        # memcached doesn't allow whitespace or control characters in keys.
+        key = 'key with spaces and 清'
+        expected_warning = (
+            "Cache key contains characters that will cause errors if used "
+            "with memcached: %r" % key
+        )
+        self._perform_invalid_key_test(key, expected_warning)
+
+    def test_invalid_key_length(self):
+        # memcached limits key length to 250.
+        key = ('a' * 250) + '清'
+        expected_warning = (
+            'Cache key will cause errors if used with memcached: '
+            '%r (longer than %s)' % (key, 250)
+        )
+        self._perform_invalid_key_test(key, expected_warning)
 
     def test_cache_versioning_get_set(self):
         # set, using default version = 1
@@ -1152,7 +1148,7 @@ memcached_excluded_caches = {'cull', 'zero_cull'}
 ))
 class MemcachedCacheTests(BaseCacheTests, TestCase):
 
-    def test_invalid_keys(self):
+    def test_invalid_key_characters(self):
         """
         On memcached, we don't introduce a duplicate key validation
         step (for speed reasons), we just let the memcached API
@@ -1162,8 +1158,11 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
         that a generic exception of some kind is raised.
         """
         # memcached does not allow whitespace or control characters in keys
+        # when using the ascii protocol.
         with self.assertRaises(Exception):
             cache.set('key with spaces', 'value')
+
+    def test_invalid_key_length(self):
         # memcached limits key length to 250
         with self.assertRaises(Exception):
             cache.set('a' * 251, 'value')
