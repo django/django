@@ -6,7 +6,7 @@ from django.db.utils import DatabaseError
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 
-from .exceptions import MigrationSchemaMissing
+from .exceptions import MigrationInformationMissing
 
 
 class MigrationRecorder(object):
@@ -56,14 +56,17 @@ class MigrationRecorder(object):
             with self.connection.schema_editor() as editor:
                 editor.create_model(self.Migration)
         except DatabaseError as exc:
-            raise MigrationSchemaMissing("Unable to create the django_migrations table (%s)" % exc)
+            raise MigrationInformationMissing("Unable to create the django_migrations table (%s)" % exc)
 
     def applied_migrations(self):
         """
         Returns a set of (app, name) of applied migrations.
         """
         self.ensure_schema()
-        return set(tuple(x) for x in self.migration_qs.values_list("app", "name"))
+        try:
+            return set(tuple(x) for x in self.migration_qs.values_list("app", "name"))
+        except DatabaseError as exc:
+            raise MigrationInformationMissing("Unable to access the django_migrations table (%s)" % exc)
 
     def record_applied(self, app, name):
         """
