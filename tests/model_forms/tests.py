@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
 import datetime
-import os
 from decimal import Decimal
+import os
 from unittest import skipUnless
 
 from django import forms
@@ -23,13 +23,14 @@ from django.utils import six
 from django.utils._os import upath
 
 from .models import (
-    Article, ArticleStatus, Author, Author1, Award, BetterWriter, BigInt, Book,
-    Category, Character, Colour, ColourfulItem, CommaSeparatedInteger,
-    CustomErrorMessage, CustomFF, CustomFieldForExclusionModel, DateTimePost,
-    DerivedBook, DerivedPost, Document, ExplicitPK, FilePathModel,
-    FlexibleDatePost, Homepage, ImprovedArticle, ImprovedArticleWithParentLink,
-    Inventory, NullableUniqueCharFieldModel, Person, Photo, Post, Price,
-    Product, Publication, PublicationDefaults, StrictAssignmentAll,
+    UUIDPK, Article, ArticleStatus, Author, Author1, Award, BetterWriter,
+    BigInt, Book, Category, Character, Colour, ColourfulItem,
+    CommaSeparatedInteger, CustomErrorMessage, CustomFF,
+    CustomFieldForExclusionModel, DateTimePost, DerivedBook, DerivedPost,
+    Document, ExplicitPK, FilePathModel, FlexibleDatePost, Homepage,
+    ImprovedArticle, ImprovedArticleWithParentLink, Inventory,
+    NullableUniqueCharFieldModel, Person, Photo, Post, Price, Product,
+    Publication, PublicationDefaults, StrictAssignmentAll,
     StrictAssignmentFieldSpecific, Student, StumpJoke, TextFile, Triple,
     Writer, WriterProfile, test_images,
 )
@@ -1697,6 +1698,11 @@ class ModelMultipleChoiceFieldTests(TestCase):
         Category.objects.get(url='6th').delete()
         with self.assertRaises(ValidationError):
             f.clean([c6.id])
+
+    def test_model_multiple_choice_field_uuid_pk(self):
+        f = forms.ModelMultipleChoiceField(UUIDPK.objects.all())
+        with self.assertRaises(ValidationError):
+            f.clean(['invalid_uuid'])
 
     def test_model_multiple_choice_required_false(self):
         f = forms.ModelMultipleChoiceField(Category.objects.all(), required=False)
