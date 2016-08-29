@@ -1228,6 +1228,16 @@ method::
 
         Same as :class:`ModelChoiceField.to_field_name`.
 
+.. method:: ModelMultipleChoiceField.validate_choices(qs, key, values)
+
+``validate_choices`` gets called with the filtered queryset (``qs``), the name
+of the field, and the list of selected values.  It should return the queryset.
+
+The default implementation raises a ``ValidationError`` in case any of the
+``values`` is not in the list of attribute lookups of ``field_name`` in ``qs``
+(using the string representations for comparison).
+
+
 Creating custom fields
 ======================
 

@@ -1317,8 +1317,11 @@ class ModelMultipleChoiceField(ModelChoiceField):
                     params={'pk': pk},
                 )
         qs = self.queryset.filter(**{'%s__in' % key: value})
-        pks = {str(getattr(o, key)) for o in qs}
-        for val in value:
+        return self.validate_choices(qs, key, value)
+
+    def validate_choices(self, qs, field_name, values):
+        pks = {str(getattr(o, field_name)) for o in qs}
+        for val in values:
             if str(val) not in pks:
                 raise ValidationError(
                     self.error_messages['invalid_choice'],
