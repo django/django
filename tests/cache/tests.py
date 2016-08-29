@@ -1214,7 +1214,14 @@ class BaseMemcachedTests(BaseCacheTests):
         self.assertEqual(cache.get('small_value'), 'a')
 
         large_value = 'a' * (max_value_length + 1)
-        cache.set('small_value', large_value)
+        try:
+            cache.set('small_value', large_value)
+        except Exception:
+            # Some clients (eg pylibmc) raise when the value is too large, others
+            # (eg python-memcached) intentionally return True (ie indicate success)
+            # This test is primarily checking that the key was deleted, so the
+            # return/exception behavior for the set() itself is not important.
+            pass
         # small_value should be deleted, or set if configured to accept larger values
         value = cache.get('small_value')
         self.assertTrue(value is None or value == large_value)
@@ -1243,6 +1250,15 @@ class MemcachedCacheTests(BaseMemcachedTests, TestCase):
 class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
 
     base_params = PyLibMCCache_params
+
+    # By default pylibmc/libmemcached don't verify keys client-side and so this
+    # test triggers a server-side bug that causes later tests to fail (see #19914).
+    # The `verify_keys` behavior option could be set to True (which would avoid
+    # triggering the server-side bug), however this test would still fail due to:
+    # https://github.com/lericson/pylibmc/issues/219
+    @unittest.skip("triggers a memcached-server bug, causing subsequent tests to fail")
+    def test_invalid_key_characters(self):
+        pass
 
 
 @override_settings(CACHES=caches_setting_for_tests(
