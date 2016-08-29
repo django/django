@@ -175,6 +175,11 @@ class PyLibMCCache(BaseMemcachedCache):
                                            library=pylibmc,
                                            value_not_found_exception=pylibmc.NotFound)
 
+    def close(self, **kwargs):
+        # Override base behavior of calling disconnect_all() as this resets the
+        # failover state, and creates an unnecessary amount of reconnects.
+        pass
+
     @cached_property
     def _cache(self):
         client = self._lib.Client(self._servers)
