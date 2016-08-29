@@ -591,6 +591,8 @@ class HTMLEqualTests(SimpleTestCase):
         self.assertIn(dom1, dom2)
         dom1 = parse_html('<p>bar</p>')
         self.assertIn(dom1, dom2)
+        dom1 = parse_html('<div><p>foo</p><p>bar</p></div>')
+        self.assertIn(dom2, dom1)
 
     def test_count(self):
         # equal html contains each other one time
@@ -625,6 +627,11 @@ class HTMLEqualTests(SimpleTestCase):
 
         dom2 = parse_html('<p>foo<p>bar</p></p>')
         self.assertEqual(dom2.count(dom1), 0)
+
+        # html with a root element contains the same html with no root element
+        dom1 = parse_html('<p>foo</p><p>bar</p>')
+        dom2 = parse_html('<div><p>foo</p><p>bar</p></div>')
+        self.assertEqual(dom2.count(dom1), 1)
 
     def test_parsing_errors(self):
         with self.assertRaises(AssertionError):

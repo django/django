@@ -94,6 +94,9 @@ class Element(object):
         if not isinstance(element, six.string_types):
             if self == element:
                 return 1
+        if isinstance(element, RootElement):
+            if self.children == element.children:
+                return 1
         i = 0
         for child in self.children:
             # child is text content and element is also text content, then
