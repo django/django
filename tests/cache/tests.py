@@ -1142,21 +1142,18 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
 # To check the memcached backend, the test settings file will
 # need to contain at least one cache backend setting that points at
 # your memcache server.
-memcached_params = {}
+configured_caches = {}
 for _cache_params in settings.CACHES.values():
-    if _cache_params['BACKEND'].startswith('django.core.cache.backends.memcached.'):
-        memcached_params = _cache_params
+    configured_caches[_cache_params['BACKEND']] = _cache_params
+
+MemcachedCache_params = configured_caches.get('django.core.cache.backends.memcached.MemcachedCache')
+PyLibMCCache_params = configured_caches.get('django.core.cache.backends.memcached.PyLibMCCache')
 
 # The memcached backends don't support cull-related options like `MAX_ENTRIES`.
 memcached_excluded_caches = {'cull', 'zero_cull'}
 
 
-@unittest.skipUnless(memcached_params, "memcached not available")
-@override_settings(CACHES=caches_setting_for_tests(
-    base=memcached_params,
-    exclude=memcached_excluded_caches,
-))
-class MemcachedCacheTests(BaseCacheTests, TestCase):
+class BaseMemcachedTests(BaseCacheTests):
 
     def test_invalid_key_characters(self):
         """
@@ -1177,36 +1174,24 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
         with self.assertRaises(Exception):
             cache.set('a' * 251, 'value')
 
-    # Explicitly display a skipped test if no configured cache uses MemcachedCache
-    @unittest.skipUnless(
-        memcached_params.get('BACKEND') == 'django.core.cache.backends.memcached.MemcachedCache',
-        "cache with python-memcached library not available")
-    def test_memcached_uses_highest_pickle_version(self):
-        # Regression test for #19810
-        for cache_key, cache_config in settings.CACHES.items():
-            if cache_config['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache':
-                self.assertEqual(caches[cache_key]._cache.pickleProtocol,
-                                 pickle.HIGHEST_PROTOCOL)
-
-    @override_settings(CACHES=caches_setting_for_tests(
-        base=memcached_params,
-        exclude=memcached_excluded_caches,
-        TIMEOUT=None,
-    ))
     def test_default_never_expiring_timeout(self):
         # Regression test for #22845
-        cache.set('infinite_foo', 'bar')
-        self.assertEqual(cache.get('infinite_foo'), 'bar')
+        with self.settings(CACHES=caches_setting_for_tests(
+                base=self.base_params,
+                exclude=memcached_excluded_caches,
+                TIMEOUT=None)):
+            cache.set('infinite_foo', 'bar')
+            self.assertEqual(cache.get('infinite_foo'), 'bar')
 
-    @override_settings(CACHES=caches_setting_for_tests(
-        base=memcached_params,
-        exclude=memcached_excluded_caches,
-        TIMEOUT=31536000,  # 60*60*24*365, 1 year
-    ))
     def test_default_far_future_timeout(self):
         # Regression test for #22845
-        cache.set('future_foo', 'bar')
-        self.assertEqual(cache.get('future_foo'), 'bar')
+        with self.settings(CACHES=caches_setting_for_tests(
+                base=self.base_params,
+                exclude=memcached_excluded_caches,
+                # 60*60*24*365, 1 year
+                TIMEOUT=31536000)):
+            cache.set('future_foo', 'bar')
+            self.assertEqual(cache.get('future_foo'), 'bar')
 
     def test_cull(self):
         # culling isn't implemented, memcached deals with it.
@@ -1229,10 +1214,51 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(cache.get('small_value'), 'a')
 
         large_value = 'a' * (max_value_length + 1)
-        cache.set('small_value', large_value)
+        try:
+            cache.set('small_value', large_value)
+        except Exception:
+            # Some clients (eg pylibmc) raise when the value is too large, others
+            # (eg python-memcached) intentionally return True (ie indicate success)
+            # This test is primarily checking that the key was deleted, so the
+            # return/exception behavior for the set() itself is not important.
+            pass
         # small_value should be deleted, or set if configured to accept larger values
         value = cache.get('small_value')
         self.assertTrue(value is None or value == large_value)
+
+
+@unittest.skipUnless(MemcachedCache_params, "MemcachedCache backend not configured")
+@override_settings(CACHES=caches_setting_for_tests(
+    base=MemcachedCache_params,
+    exclude=memcached_excluded_caches,
+))
+class MemcachedCacheTests(BaseMemcachedTests, TestCase):
+
+    base_params = MemcachedCache_params
+
+    def test_memcached_uses_highest_pickle_version(self):
+        # Regression test for #19810
+        for cache_key, cache_config in settings.CACHES.items():
+            self.assertEqual(caches[cache_key]._cache.pickleProtocol, pickle.HIGHEST_PROTOCOL)
+
+
+@unittest.skipUnless(PyLibMCCache_params, "PyLibMCCache backend not configured")
+@override_settings(CACHES=caches_setting_for_tests(
+    base=PyLibMCCache_params,
+    exclude=memcached_excluded_caches,
+))
+class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
+
+    base_params = PyLibMCCache_params
+
+    # By default pylibmc/libmemcached don't verify keys client-side and so this
+    # test triggers a server-side bug that causes later tests to fail (see #19914).
+    # The `verify_keys` behavior option could be set to True (which would avoid
+    # triggering the server-side bug), however this test would still fail due to:
+    # https://github.com/lericson/pylibmc/issues/219
+    @unittest.skip("triggers a memcached-server bug, causing subsequent tests to fail")
+    def test_invalid_key_characters(self):
+        pass
 
 
 @override_settings(CACHES=caches_setting_for_tests(
