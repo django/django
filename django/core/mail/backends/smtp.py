@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import sanitize_address
 from django.core.mail.utils import DNS_NAME
+from django.utils.encoding import force_str
 
 
 class EmailBackend(BaseEmailBackend):
@@ -34,6 +35,10 @@ class EmailBackend(BaseEmailBackend):
         self.connection = None
         self._lock = threading.RLock()
 
+    @property
+    def connection_class(self):
+        return smtplib.SMTP_SSL if self.use_ssl else smtplib.SMTP
+
     def open(self):
         """
         Ensures we have a connection to the email server. Returns whether or
@@ -43,7 +48,6 @@ class EmailBackend(BaseEmailBackend):
             # Nothing to do if the connection is already open.
             return False
 
-        connection_class = smtplib.SMTP_SSL if self.use_ssl else smtplib.SMTP
         # If local_hostname is not specified, socket.getfqdn() gets used.
         # For performance, we use the cached FQDN for local_hostname.
         connection_params = {'local_hostname': DNS_NAME.get_fqdn()}
@@ -55,7 +59,7 @@ class EmailBackend(BaseEmailBackend):
                 'certfile': self.ssl_certfile,
             })
         try:
-            self.connection = connection_class(self.host, self.port, **connection_params)
+            self.connection = self.connection_class(self.host, self.port, **connection_params)
 
             # TLS/SSL are mutually exclusive, so only attempt TLS over
             # non-secure connections.
@@ -64,7 +68,7 @@ class EmailBackend(BaseEmailBackend):
                 self.connection.starttls(keyfile=self.ssl_keyfile, certfile=self.ssl_certfile)
                 self.connection.ehlo()
             if self.username and self.password:
-                self.connection.login(self.username, self.password)
+                self.connection.login(force_str(self.username), force_str(self.password))
             return True
         except smtplib.SMTPException:
             if not self.fail_silently:
