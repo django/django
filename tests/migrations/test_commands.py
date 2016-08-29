@@ -13,7 +13,7 @@ from django.db import (
     ConnectionHandler, DatabaseError, connection, connections, models,
 )
 from django.db.migrations.exceptions import (
-    InconsistentMigrationHistory, MigrationSchemaMissing,
+    InconsistentMigrationHistory, MigrationInformationMissing,
 )
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import ignore_warnings, mock, override_settings
@@ -601,18 +601,18 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         makemigrations ignores the non-default database if it's read-only.
         """
-        def patched_ensure_schema(migration_recorder):
+        def patched_applied_migrations(migration_recorder):
             from django.db import connections
             if migration_recorder.connection is connections['other']:
-                raise MigrationSchemaMissing()
+                raise MigrationInformationMissing()
             else:
                 return mock.DEFAULT
 
         self.assertTableNotExists('migrations_unicodemodel')
         apps.register_model('migrations', UnicodeModel)
         with mock.patch.object(
-                MigrationRecorder, 'ensure_schema',
-                autospec=True, side_effect=patched_ensure_schema):
+                MigrationRecorder, 'applied_migrations',
+                autospec=True, side_effect=patched_applied_migrations):
             with self.temporary_migration_module() as migration_dir:
                 call_command("makemigrations", "migrations", verbosity=0)
                 initial_file = os.path.join(migration_dir, "0001_initial.py")

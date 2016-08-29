@@ -64,7 +64,7 @@ class NodeNotFoundError(LookupError):
         return "NodeNotFoundError(%r)" % (self.node, )
 
 
-class MigrationSchemaMissing(DatabaseError):
+class MigrationInformationMissing(DatabaseError):
     pass
 
 

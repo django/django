@@ -23,7 +23,7 @@ from django.core.management import (
     BaseCommand, CommandError, call_command, color,
 )
 from django.db import ConnectionHandler
-from django.db.migrations.exceptions import MigrationSchemaMissing
+from django.db.migrations.exceptions import MigrationInformationMissing
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, mock, override_settings,
@@ -1349,7 +1349,7 @@ class ManageRunserver(AdminScriptTestCase):
         """
         with mock.patch.object(
                 MigrationRecorder, 'ensure_schema',
-                side_effect=MigrationSchemaMissing()):
+                side_effect=MigrationInformationMissing()):
             self.cmd.check_migrations()
         # Check a warning is emitted
         self.assertIn("Not checking migrations", self.output.getvalue())

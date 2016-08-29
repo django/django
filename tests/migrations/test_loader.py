@@ -4,7 +4,7 @@ from unittest import skipIf
 
 from django.db import connection, connections
 from django.db.migrations.exceptions import (
-    AmbiguityError, InconsistentMigrationHistory, MigrationSchemaMissing,
+    AmbiguityError, InconsistentMigrationHistory, MigrationInformationMissing,
     NodeNotFoundError,
 )
 from django.db.migrations.loader import MigrationLoader
@@ -474,6 +474,6 @@ class LoaderTests(TestCase):
         check_consistent_history() ignores read-only databases, possibly
         without a django_migrations table.
         """
-        with mock.patch.object(MigrationRecorder, 'ensure_schema', side_effect=MigrationSchemaMissing()):
+        with mock.patch.object(MigrationRecorder, 'applied_migrations', side_effect=MigrationInformationMissing()):
             loader = MigrationLoader(connection=None)
             loader.check_consistent_history(connection)

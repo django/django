@@ -14,7 +14,7 @@ from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import DEFAULT_DB_ALIAS, connections
-from django.db.migrations.exceptions import MigrationSchemaMissing
+from django.db.migrations.exceptions import MigrationInformationMissing
 from django.utils.encoding import force_str
 
 
@@ -438,7 +438,7 @@ class BaseCommand(object):
         except ImproperlyConfigured:
             # No databases are configured (or the dummy one)
             return
-        except MigrationSchemaMissing:
+        except MigrationInformationMissing:
             self.stdout.write(self.style.NOTICE(
                 "\nNot checking migrations as it is not possible to access/create the django_migrations table."
             ))
