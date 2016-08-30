@@ -704,6 +704,9 @@ Keys:
 
 * ``reply_channel``: Channel name responses would have been sent on. No longer
   valid after this message is sent; all messages to it will be dropped.
+  
+* ``path``: Unicode string HTTP path from URL, with percent escapes decoded
+  and UTF8 byte sequences decoded into characters.
 
 
 WebSocket
