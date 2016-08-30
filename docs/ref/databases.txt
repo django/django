@@ -69,7 +69,10 @@ this database small.
 
 The development server creates a new thread for each request it handles,
 negating the effect of persistent connections. Don't enable them during
-development.
+development. You can use the following code to check if the runserver command
+is being used with threading::
+
+    sys.argv[1] == 'runserver' and '--nothreading' not in sys.argv[2:]
 
 When Django establishes a connection to the database, it sets up appropriate
 parameters, depending on the backend being used. If you enable persistent
