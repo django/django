@@ -234,7 +234,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     AND c2.relam=am.oid
                     AND c.relname = %s
             ) s2
-            GROUP BY indexname, indisunique, indisprimary, amname;;
+            GROUP BY indexname, indisunique, indisprimary, amname;
         """, [table_name])
         for index, columns, unique, primary, orders, type_ in cursor.fetchall():
             if index not in constraints:
