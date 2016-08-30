@@ -19,6 +19,7 @@
 
 .selector-chosen select {
     border-top: none;
+    height: 20.8em;
 }
 
 .selector-available h2, .selector-chosen h2 {

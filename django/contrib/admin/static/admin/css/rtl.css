@@ -162,6 +162,10 @@ thead th.sorted .text {
     margin-left: 2px;
 }
 
+.aligned .form-row {
+    display: table;
+}
+
 .aligned .form-row input {
     margin-left: 5px;
 }
