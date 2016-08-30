@@ -210,7 +210,7 @@ Include a form in ``template.html`` that will ``POST`` to this view:
         <label for="timezone">Time zone:</label>
         <select name="timezone">
             {% for tz in timezones %}
-            <option value="{{ tz }}"{% if tz == TIME_ZONE %} selected="selected"{% endif %}>{{ tz }}</option>
+            <option value="{{ tz }}"{% if tz == TIME_ZONE %} selected{% endif %}>{{ tz }}</option>
             {% endfor %}
         </select>
         <input type="submit" value="Set" />

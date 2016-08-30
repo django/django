@@ -508,19 +508,19 @@ class FormsTestCase(SimpleTestCase):
 </select>""")
         f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
         self.assertHTMLEqual(str(f['language']), """<select name="language" required>
-<option value="P" selected="selected">Python</option>
+<option value="P" selected>Python</option>
 <option value="J">Java</option>
 </select>""")
 
         # A subtlety: If one of the choices' value is the empty string and the form is
-        # unbound, then the <option> for the empty-string choice will get selected="selected".
+        # unbound, then the <option> for the empty-string choice will get selected.
         class FrameworkForm(Form):
             name = CharField()
             language = ChoiceField(choices=[('', '------'), ('P', 'Python'), ('J', 'Java')])
 
         f = FrameworkForm(auto_id=False)
         self.assertHTMLEqual(str(f['language']), """<select name="language" required>
-<option value="" selected="selected">------</option>
+<option value="" selected>------</option>
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
@@ -537,7 +537,7 @@ class FormsTestCase(SimpleTestCase):
 </select>""")
         f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
         self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language" required>
-<option value="P" selected="selected">Python</option>
+<option value="P" selected>Python</option>
 <option value="J">Java</option>
 </select>""")
 
@@ -558,7 +558,7 @@ class FormsTestCase(SimpleTestCase):
 </select>""")
         f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
         self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language" required>
-<option value="P" selected="selected">Python</option>
+<option value="P" selected>Python</option>
 <option value="J">Java</option>
 </select>""")
 
@@ -724,7 +724,7 @@ Java</label></li>
         self.assertHTMLEqual(str(f['name']), '<input type="text" name="name" value="Yesterday" required />')
         self.assertHTMLEqual(str(f['composers']), """<select multiple="multiple" name="composers" required>
 <option value="J">John Lennon</option>
-<option value="P" selected="selected">Paul McCartney</option>
+<option value="P" selected>Paul McCartney</option>
 </select>""")
 
     def test_form_with_disabled_fields(self):
@@ -1814,8 +1814,8 @@ Password: <input type="password" name="password" required /></li>"""
             """<li>Username: <input type="text" name="username" value="django" maxlength="10" required /></li>
 <li>Password: <input type="password" name="password" required /></li>
 <li>Options: <select multiple="multiple" name="options" required>
-<option value="f" selected="selected">foo</option>
-<option value="b" selected="selected">bar</option>
+<option value="f" selected>foo</option>
+<option value="b" selected>bar</option>
 <option value="w">whiz</option>
 </select></li>"""
         )
@@ -1858,8 +1858,8 @@ Options: <select multiple="multiple" name="options" required>
 <li><ul class="errorlist"><li>This field is required.</li></ul>
 Password: <input type="password" name="password" required /></li>
 <li>Options: <select multiple="multiple" name="options" required>
-<option value="f" selected="selected">foo</option>
-<option value="b" selected="selected">bar</option>
+<option value="f" selected>foo</option>
+<option value="b" selected>bar</option>
 <option value="w">whiz</option>
 </select></li>"""
         )
@@ -1888,8 +1888,8 @@ Password: <input type="password" name="password" required /></li>
 <li>Password: <input type="password" name="password" required /></li>
 <li>Options: <select multiple="multiple" name="options" required>
 <option value="f">foo</option>
-<option value="b" selected="selected">bar</option>
-<option value="w" selected="selected">whiz</option>
+<option value="b" selected>bar</option>
+<option value="w" selected>whiz</option>
 </select></li>"""
         )
         p = UserRegistration(initial={'username': initial_stephane, 'options': initial_options}, auto_id=False)
@@ -1898,8 +1898,8 @@ Password: <input type="password" name="password" required /></li>
             """<li>Username: <input type="text" name="username" value="stephane" maxlength="10" required /></li>
 <li>Password: <input type="password" name="password" required /></li>
 <li>Options: <select multiple="multiple" name="options" required>
-<option value="f" selected="selected">foo</option>
-<option value="b" selected="selected">bar</option>
+<option value="f" selected>foo</option>
+<option value="b" selected>bar</option>
 <option value="w">whiz</option>
 </select></li>"""
         )
@@ -2319,39 +2319,39 @@ Password: <input type="password" name="password" required />
 
         p = Person({'name': 'Joe'}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
-<option value="1" selected="selected">Unknown</option>
+<option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': '1'}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
-<option value="1" selected="selected">Unknown</option>
+<option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': '2'}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
 <option value="1">Unknown</option>
-<option value="2" selected="selected">Yes</option>
+<option value="2" selected>Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': '3'}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
 <option value="1">Unknown</option>
 <option value="2">Yes</option>
-<option value="3" selected="selected">No</option>
+<option value="3" selected>No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': True}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
 <option value="1">Unknown</option>
-<option value="2" selected="selected">Yes</option>
+<option value="2" selected>Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': False}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
 <option value="1">Unknown</option>
 <option value="2">Yes</option>
-<option value="3" selected="selected">No</option>
+<option value="3" selected>No</option>
 </select>""")
 
     def test_forms_with_file_fields(self):
@@ -2715,7 +2715,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
 <label class="required" for="id_name">Name:</label> <input type="text" name="name" id="id_name" required /></li>
 <li class="required"><label class="required" for="id_is_cool">Is cool:</label>
 <select name="is_cool" id="id_is_cool" required>
-<option value="1" selected="selected">Unknown</option>
+<option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select></li>
@@ -2731,7 +2731,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
 <input type="text" name="name" id="id_name" required /></p>
 <p class="required"><label class="required" for="id_is_cool">Is cool:</label>
 <select name="is_cool" id="id_is_cool" required>
-<option value="1" selected="selected">Unknown</option>
+<option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select></p>
@@ -2749,7 +2749,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
 <input type="text" name="name" id="id_name" required /></td></tr>
 <tr class="required"><th><label class="required" for="id_is_cool">Is cool:</label></th>
 <td><select name="is_cool" id="id_is_cool" required>
-<option value="1" selected="selected">Unknown</option>
+<option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select></td></tr>

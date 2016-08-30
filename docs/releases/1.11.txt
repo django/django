@@ -478,8 +478,9 @@ Miscellaneous
   argument. Remove it because it doesn't have an effect in older versions of
   Django as these fields alway strip whitespace.
 
-* The ``checked`` attribute rendered by form widgets now uses HTML5 boolean
-  syntax rather than XHTML's ``checked='checked'``.
+* The ``checked`` and ``selected`` attribute rendered by form widgets now uses
+  HTML5 boolean syntax rather than XHTML's ``checked='checked'`` and
+  ``selected='selected'``.
 
 * :meth:`RelatedManager.add()
   <django.db.models.fields.related.RelatedManager.add>`,

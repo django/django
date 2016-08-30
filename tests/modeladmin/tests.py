@@ -360,7 +360,7 @@ class ModelAdminTests(TestCase):
             str(form["main_band"]),
             '<div class="related-widget-wrapper">'
             '<select name="main_band" id="id_main_band" required>'
-            '<option value="" selected="selected">---------</option>'
+            '<option value="" selected>---------</option>'
             '<option value="%d">The Beatles</option>'
             '<option value="%d">The Doors</option>'
             '</select></div>' % (band2.id, self.band.id)
@@ -381,7 +381,7 @@ class ModelAdminTests(TestCase):
             str(form["main_band"]),
             '<div class="related-widget-wrapper">'
             '<select name="main_band" id="id_main_band" required>'
-            '<option value="" selected="selected">---------</option>'
+            '<option value="" selected>---------</option>'
             '<option value="%d">The Doors</option>'
             '</select></div>' % self.band.id
         )

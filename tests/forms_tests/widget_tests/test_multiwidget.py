@@ -141,8 +141,8 @@ class MultiWidgetTest(WidgetTest):
             """
             <input type="text" name="name_0" value="some text" />
             <select multiple="multiple" name="name_1">
-                <option value="J" selected="selected">John</option>
-                <option value="P" selected="selected">Paul</option>
+                <option value="J" selected>John</option>
+                <option value="P" selected>Paul</option>
                 <option value="G">George</option>
                 <option value="R">Ringo</option>
             </select>
