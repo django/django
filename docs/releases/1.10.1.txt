@@ -55,7 +55,9 @@ Bugfixes
 
 * Reallowed the ``{% for %}`` tag to unpack any iterable (:ticket:`27058`).
 
-* Fixed ``makemigrations`` crash if a database is read-only (:ticket:`27054`).
+* Fixed ``makemigrations`` crash if a database is read-only and prevented the
+  command from creating a ``django_migrations`` table in all databases
+  (:ticket:`27054`, :ticket:`27110`).
 
 * Removed duplicated managers in ``Model._meta.managers`` (:ticket:`27073`).
 
