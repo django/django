@@ -137,6 +137,10 @@ class SomeClass:
     def attribute_error_attribute(self):
         raise AttributeError
 
+    @property
+    def type_error_attribute(self):
+        raise TypeError
+
 
 class OtherClass:
     def method(self):
