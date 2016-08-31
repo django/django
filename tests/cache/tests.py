@@ -40,6 +40,7 @@ from django.utils.cache import (
     get_cache_key, learn_cache_key, patch_cache_control,
     patch_response_headers, patch_vary_headers,
 )
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 from django.views.decorators.cache import cache_page
 
@@ -1241,6 +1242,14 @@ class MemcachedCacheTests(BaseMemcachedTests, TestCase):
         for cache_key in settings.CACHES:
             self.assertEqual(caches[cache_key]._cache.pickleProtocol, pickle.HIGHEST_PROTOCOL)
 
+    @override_settings(CACHES=caches_setting_for_tests(
+        base=MemcachedCache_params,
+        exclude=memcached_excluded_caches,
+        OPTIONS={'server_max_value_length': 9999},
+    ))
+    def test_memcached_options(self):
+        self.assertEqual(cache._cache.server_max_value_length, 9999)
+
 
 @unittest.skipUnless(PyLibMCCache_params, "PyLibMCCache backend not configured")
 @override_settings(CACHES=caches_setting_for_tests(
@@ -1258,6 +1267,36 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
     @unittest.skip("triggers a memcached-server bug, causing subsequent tests to fail")
     def test_invalid_key_characters(self):
         pass
+
+    @override_settings(CACHES=caches_setting_for_tests(
+        base=PyLibMCCache_params,
+        exclude=memcached_excluded_caches,
+        OPTIONS={
+            'binary': True,
+            'behaviors': {'tcp_nodelay': True},
+        },
+    ))
+    def test_pylibmc_options(self):
+        self.assertTrue(cache._cache.binary)
+        self.assertEqual(cache._cache.behaviors['tcp_nodelay'], int(True))
+
+    @override_settings(CACHES=caches_setting_for_tests(
+        base=PyLibMCCache_params,
+        exclude=memcached_excluded_caches,
+        OPTIONS={'tcp_nodelay': True},
+    ))
+    def test_pylibmc_legacy_options(self):
+        deprecation_message = (
+            "Specifying pylibmc cache behaviors as a top-level property "
+            "within `OPTIONS` is deprecated. Move `tcp_nodelay` into a dict named "
+            "`behaviors` inside `OPTIONS` instead."
+        )
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter("always")
+            self.assertEqual(cache._cache.behaviors['tcp_nodelay'], int(True))
+        self.assertEqual(len(warns), 1)
+        self.assertIsInstance(warns[0].message, RemovedInDjango21Warning)
+        self.assertEqual(str(warns[0].message), deprecation_message)
 
 
 @override_settings(CACHES=caches_setting_for_tests(

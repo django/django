@@ -168,7 +168,10 @@ Minor features
 Cache
 ~~~~~
 
-* ...
+* Memcached backends now pass the contents of :setting:`OPTIONS <CACHES-OPTIONS>`
+  as keyword arguments to the client constructors, allowing for more advanced
+  control of client behavior. See the :ref:`cache arguments <cache_arguments>`
+  documentation for examples.
 
 CSRF
 ~~~~
@@ -490,3 +493,7 @@ Miscellaneous
 * ``django.utils.translation.string_concat()`` is deprecated in
   favor of :func:`django.utils.text.format_lazy`. ``string_concat(*strings)``
   can be replaced by ``format_lazy('{}' * len(strings), *strings)``.
+
+* For the ``PyLibMCCache`` cache backend, passing ``pylibmc`` behavior settings
+  as top-level attributes of ``OPTIONS`` is deprecated. Set them under a
+  ``behaviors`` key within ``OPTIONS`` instead.
