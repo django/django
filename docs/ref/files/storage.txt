@@ -221,8 +221,8 @@ The ``Storage`` class
         :meth:`get_available_name`.
 
         The ``content`` argument must be an instance of
-        :class:`django.core.files.File` or of a subclass of
-        :class:`~django.core.files.File`.
+        :class:`django.core.files.File` or a file-like object that can be
+        wrapped in ``File``.
 
     .. method:: size(name)
 
