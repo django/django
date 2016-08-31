@@ -1156,6 +1156,17 @@ memcached_excluded_caches = {'cull', 'zero_cull'}
 
 class BaseMemcachedTests(BaseCacheTests):
 
+    def test_location_multiple_servers(self):
+        locations = [
+            ['server1.tld', 'server2:11211'],
+            'server1.tld;server2:11211',
+            'server1.tld,server2:11211',
+        ]
+        for location in locations:
+            params = {'BACKEND': self.base_params['BACKEND'], 'LOCATION': location}
+            with self.settings(CACHES={'default': params}):
+                self.assertEqual(cache._servers, ['server1.tld', 'server2:11211'])
+
     def test_invalid_key_characters(self):
         """
         On memcached, we don't introduce a duplicate key validation

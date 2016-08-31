@@ -173,6 +173,10 @@ Cache
   control of client behavior. See the :ref:`cache arguments <cache_arguments>`
   documentation for examples.
 
+* For memcached backends, the :setting:`LOCATION <CACHES-LOCATION>` setting now
+  supports defining multiple servers as a comma-delimited string, for convenience
+  with third-party services that use such strings in environment variables.
+
 CSRF
 ~~~~
 
