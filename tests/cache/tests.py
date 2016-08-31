@@ -1238,7 +1238,7 @@ class MemcachedCacheTests(BaseMemcachedTests, TestCase):
 
     def test_memcached_uses_highest_pickle_version(self):
         # Regression test for #19810
-        for cache_key, cache_config in settings.CACHES.items():
+        for cache_key in settings.CACHES:
             self.assertEqual(caches[cache_key]._cache.pickleProtocol, pickle.HIGHEST_PROTOCOL)
 
 
