@@ -1,6 +1,7 @@
 "Memcached cache backend"
 
 import pickle
+import re
 import time
 import warnings
 
@@ -15,7 +16,7 @@ class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
         super(BaseMemcachedCache, self).__init__(params)
         if isinstance(server, six.string_types):
-            self._servers = server.split(';')
+            self._servers = re.split('[;,]', server)
         else:
             self._servers = server
 

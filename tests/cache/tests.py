@@ -1160,6 +1160,7 @@ class BaseMemcachedTests(BaseCacheTests):
         locations = [
             ['server1.tld', 'server2:11211'],
             'server1.tld;server2:11211',
+            'server1.tld,server2:11211',
         ]
         for location in locations:
             params = {'BACKEND': self.base_params['BACKEND'], 'LOCATION': location}

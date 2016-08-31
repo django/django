@@ -128,8 +128,8 @@ multiple servers. This means you can run Memcached daemons on multiple
 machines, and the program will treat the group of machines as a *single*
 cache, without the need to duplicate cache values on each machine. To take
 advantage of this feature, include all server addresses in
-:setting:`LOCATION <CACHES-LOCATION>`, either separated by semicolons or as
-a list.
+:setting:`LOCATION <CACHES-LOCATION>`, either as a semicolon or comma
+delimited string, or as a list.
 
 In this example, the cache is shared over Memcached instances running on IP
 address 172.19.26.240 and 172.19.26.242, both on port 11211::
@@ -167,6 +167,11 @@ Without a doubt, *none* of the Django caching backends should be used for
 permanent storage -- they're all intended to be solutions for caching, not
 storage -- but we point this out here because memory-based caching is
 particularly temporary.
+
+.. versionchanged:: 1.11
+
+    The :setting:`LOCATION <CACHES-LOCATION>` setting now supports defining
+    multiple servers as a comma-delimited string.
 
 .. _database-caching:
 
