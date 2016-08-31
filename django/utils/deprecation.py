@@ -116,6 +116,9 @@ class CallableBool:
     def __ne__(self, other):
         return self.value != other
 
+    def __or__(self, other):
+        return bool(self.value or other)
+
 CallableFalse = CallableBool(False)
 CallableTrue = CallableBool(True)
 
