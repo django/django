@@ -13,7 +13,7 @@ Bugfixes
   doesn't return a result (:ticket:`26991`).
 
 * Allowed ``User.is_authenticated`` and ``User.is_anonymous`` properties to be
-  compared using ``==`` and ``!=`` (:ticket:`26988`).
+  compared using ``==``, ``!=``, and ``|`` (:ticket:`26988`, :ticket:`27154`).
 
 * Removed the broken ``BaseCommand.usage()`` method which was for
   ``optparse`` support (:ticket:`27000`).
