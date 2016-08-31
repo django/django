@@ -364,6 +364,8 @@ Note: Without a really compelling reason, such as a host that doesn't support
 them, you should stick to the cache backends included with Django. They've
 been well-tested and are easy to use.
 
+.. _cache_arguments:
+
 Cache arguments
 ---------------
 
