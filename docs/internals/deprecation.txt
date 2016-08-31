@@ -27,6 +27,9 @@ details on these changes.
 
 * ``django.utils.translation.string_concat()`` will be removed.
 
+* ``django.core.cache.backends.memcached.PyLibMCCache`` will no longer support
+  passing ``pylibmc`` behavior settings as top-level attributes of ``OPTIONS``.
+
 .. _deprecation-removed-in-2.0:
 
 2.0
