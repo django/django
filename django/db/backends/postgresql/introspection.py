@@ -210,13 +210,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     SELECT
                         *, unnest(i.indkey) as key, unnest(i.indoption) as option
                     FROM pg_index i
-                ) idx, pg_class c, pg_class c2, pg_am am, pg_attribute attr
-                WHERE c.oid=idx.indrelid
-                    AND idx.indexrelid=c2.oid
-                    AND attr.attrelid=c.oid
-                    AND attr.attnum=idx.key
-                    AND c2.relam=am.oid
-                    AND c.relname = %s
+                ) idx
+                LEFT JOIN pg_class c ON idx.indrelid = c.oid
+                LEFT JOIN pg_class c2 ON idx.indexrelid = c2.oid
+                LEFT JOIN pg_am am ON c2.relam = am.oid
+                LEFT JOIN pg_attribute attr ON attr.attrelid = c.oid AND attr.attnum = idx.key
+                WHERE c.relname = %s
             ) s2
             GROUP BY indexname, indisunique, indisprimary, amname;
         """, [table_name])
