@@ -67,10 +67,17 @@ class OperationTests(TransactionTestCase):
             expected_count
         )
 
-    def assertSpatialIndexExists(self, table, column):
+    def assertSpatialIndexExists(self, table, column, raster=False):
         with connection.cursor() as cursor:
             constraints = connection.introspection.get_constraints(cursor, table)
-        self.assertIn([column], [c['columns'] for c in constraints.values()])
+        if raster:
+            self.assertTrue(any(
+                'st_convexhull(%s)' % column in c['definition']
+                for c in constraints.values()
+                if c['definition'] is not None
+            ))
+        else:
+            self.assertIn([column], [c['columns'] for c in constraints.values()])
 
     def alter_gis_model(self, migration_class, model_name, field_name,
                         blank=False, field_class=None):
@@ -111,7 +118,7 @@ class OperationTests(TransactionTestCase):
 
         # Test spatial indices when available
         if self.has_spatial_indexes:
-            self.assertSpatialIndexExists('gis_neighborhood', 'heatmap')
+            self.assertSpatialIndexExists('gis_neighborhood', 'heatmap', raster=True)
 
     @skipIfDBFeature('supports_raster')
     def test_create_raster_model_on_db_without_raster_support(self):
@@ -159,7 +166,7 @@ class OperationTests(TransactionTestCase):
 
         # Test spatial indices when available
         if self.has_spatial_indexes:
-            self.assertSpatialIndexExists('gis_neighborhood', 'heatmap')
+            self.assertSpatialIndexExists('gis_neighborhood', 'heatmap', raster=True)
 
     def test_remove_geom_field(self):
         """
@@ -189,7 +196,7 @@ class OperationTests(TransactionTestCase):
         self.assertSpatialIndexExists('gis_neighborhood', 'geom')
 
         if connection.features.supports_raster:
-            self.assertSpatialIndexExists('gis_neighborhood', 'rast')
+            self.assertSpatialIndexExists('gis_neighborhood', 'rast', raster=True)
 
     @property
     def has_spatial_indexes(self):

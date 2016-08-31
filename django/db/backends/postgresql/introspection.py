@@ -152,7 +152,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_constraints(self, cursor, table_name):
         """
-        Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
+        Retrieve any constraints or keys (unique, pk, fk, check, index) across
+        one or more columns. Also retrieve the definition of expression-based
+        indexes.
         """
         constraints = {}
         # Loop over the key table, collecting things as constraints. The column
@@ -191,15 +193,20 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 "foreign_key": tuple(used_cols.split(".", 1)) if kind == "f" else None,
                 "check": kind == "c",
                 "index": False,
+                "definition": None,
             }
         # Now get indexes
         cursor.execute("""
             SELECT
                 indexname, array_agg(attname), indisunique, indisprimary,
-                array_agg(ordering), amname
+                array_agg(ordering), amname, exprdef
             FROM (
                 SELECT
                     c2.relname as indexname, idx.*, attr.attname, am.amname,
+                    CASE
+                        WHEN idx.indexprs IS NOT NULL THEN
+                            pg_get_indexdef(idx.indexrelid)
+                    END AS exprdef,
                     CASE
                         WHEN am.amcanorder THEN
                             CASE (option & 1)
@@ -217,18 +224,19 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 LEFT JOIN pg_attribute attr ON attr.attrelid = c.oid AND attr.attnum = idx.key
                 WHERE c.relname = %s
             ) s2
-            GROUP BY indexname, indisunique, indisprimary, amname;
+            GROUP BY indexname, indisunique, indisprimary, amname, exprdef;
         """, [table_name])
-        for index, columns, unique, primary, orders, type_ in cursor.fetchall():
+        for index, columns, unique, primary, orders, type_, definition in cursor.fetchall():
             if index not in constraints:
                 constraints[index] = {
-                    "columns": columns,
-                    "orders": orders,
+                    "columns": columns if columns != [None] else [],
+                    "orders": orders if orders != [None] else [],
                     "primary_key": primary,
                     "unique": unique,
                     "foreign_key": None,
                     "check": False,
                     "index": True,
                     "type": type_,
+                    "definition": definition,
                 }
         return constraints
