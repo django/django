@@ -83,6 +83,25 @@ class RelatedIn(In):
         else:
             return super(RelatedIn, self).as_sql(compiler, connection)
 
+    def __getstate__(self):
+        """
+        Prevent pickling a query with an __in=inner_qs lookup from evaluating
+        inner_qs.
+        """
+        from django.db.models.query import QuerySet  # Avoid circular import
+        state = self.__dict__.copy()
+        if isinstance(self.rhs, QuerySet):
+            state['rhs'] = (self.rhs.__class__, self.rhs.query)
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        if isinstance(self.rhs, tuple):
+            queryset_class, query = self.rhs
+            queryset = queryset_class()
+            queryset.query = query
+            self.rhs = queryset
+
 
 class RelatedLookupMixin(object):
     def get_prep_lookup(self):
