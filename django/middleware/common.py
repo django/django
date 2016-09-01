@@ -10,7 +10,6 @@ from django.utils.cache import (
 )
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import force_text
-from django.utils.http import unquote_etag
 from django.utils.six.moves.urllib.parse import urlparse
 
 
@@ -122,7 +121,7 @@ class CommonMiddleware(MiddlewareMixin):
             if response.has_header('ETag'):
                 return get_conditional_response(
                     request,
-                    etag=unquote_etag(response['ETag']),
+                    etag=response['ETag'],
                     response=response,
                 )
         # Add the Content-Length header to non-streaming responses if not

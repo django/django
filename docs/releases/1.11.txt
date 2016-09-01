@@ -491,6 +491,9 @@ Miscellaneous
 * The admin's widget for ``IntegerField`` uses ``type="number"`` rather than
   ``type="text"``.
 
+* ETags are now parsed according to the :rfc:`7232` Conditional Requests
+  specification rather than the syntax from :rfc:`2616`.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11

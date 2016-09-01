@@ -207,15 +207,24 @@ class TestUtilsHttp(unittest.TestCase):
 
 
 class ETagProcessingTests(unittest.TestCase):
+
     def test_parsing(self):
-        etags = http.parse_etags(r'"", "etag", "e\"t\"ag", "e\\tag", W/"weak"')
-        self.assertEqual(etags, ['', 'etag', 'e"t"ag', r'e\tag', 'weak'])
+        etags = http.parse_etags(r'"" ,  "etag", "e\\tag", W/"weak"')
+        self.assertEqual(etags, ['""', '"etag"', r'"e\\tag"', 'W/"weak"'])
+        etags = http.parse_etags('*')
+        self.assertEqual(etags, ['*'])
+
+        # Ignore RFC 2616 ETags that are invalid according to RFC 7232.
+        etags = http.parse_etags(r'"etag", "e\"t\"ag"')
+        self.assertEqual(etags, ['"etag"'])
 
     def test_quoting(self):
-        original_etag = r'e\t"ag'
-        quoted_etag = http.quote_etag(original_etag)
-        self.assertEqual(quoted_etag, r'"e\\t\"ag"')
-        self.assertEqual(http.unquote_etag(quoted_etag), original_etag)
+        quoted_etag = http.quote_etag('etag')  # unquoted
+        self.assertEqual(quoted_etag, '"etag"')
+        quoted_etag = http.quote_etag('"etag"')  # already quoted
+        self.assertEqual(quoted_etag, '"etag"')
+        quoted_etag = http.quote_etag('W/"etag"')  # already quoted, weak
+        self.assertEqual(quoted_etag, 'W/"etag"')
 
 
 class HttpDateProcessingTests(unittest.TestCase):
