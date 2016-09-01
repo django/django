@@ -4,7 +4,7 @@ import pickle
 import sys
 import unittest
 
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, mock, override_settings
 from django.utils import timezone
 
 try:
@@ -27,7 +27,10 @@ class TimezoneTests(SimpleTestCase):
     def test_localtime(self):
         now = datetime.datetime.utcnow().replace(tzinfo=timezone.utc)
         local_tz = timezone.LocalTimezone()
-        local_now = timezone.localtime(now, local_tz)
+        with timezone.override(local_tz):
+            local_now = timezone.localtime(now)
+            self.assertEqual(local_now.tzinfo, local_tz)
+        local_now = timezone.localtime(now, timezone=local_tz)
         self.assertEqual(local_now.tzinfo, local_tz)
 
     def test_localtime_naive(self):
@@ -53,6 +56,27 @@ class TimezoneTests(SimpleTestCase):
             self.assertTrue(timezone.is_aware(timezone.now()))
         with override_settings(USE_TZ=False):
             self.assertTrue(timezone.is_naive(timezone.now()))
+
+    def test_localdate(self):
+        naive = datetime.datetime(2015, 1, 1, 0, 0, 1)
+        if PY36:
+            self.assertEqual(timezone.localdate(naive), datetime.date(2015, 1, 1))
+            self.assertEqual(timezone.localdate(naive, timezone=EAT), datetime.date(2015, 1, 1))
+        else:
+            with self.assertRaisesMessage(ValueError, 'astimezone() cannot be applied to a naive datetime'):
+                timezone.localdate(naive)
+            with self.assertRaisesMessage(ValueError, 'astimezone() cannot be applied to a naive datetime'):
+                timezone.localdate(naive, timezone=EAT)
+
+        aware = datetime.datetime(2015, 1, 1, 0, 0, 1, tzinfo=ICT)
+        self.assertEqual(timezone.localdate(aware, timezone=EAT), datetime.date(2014, 12, 31))
+        with timezone.override(EAT):
+            self.assertEqual(timezone.localdate(aware), datetime.date(2014, 12, 31))
+
+        with mock.patch('django.utils.timezone.now', return_value=aware):
+            self.assertEqual(timezone.localdate(timezone=EAT), datetime.date(2014, 12, 31))
+            with timezone.override(EAT):
+                self.assertEqual(timezone.localdate(), datetime.date(2014, 12, 31))
 
     def test_override(self):
         default = timezone.get_default_timezone()

@@ -974,13 +974,31 @@ appropriate entities.
 
     ``override`` is also usable as a function decorator.
 
-.. function:: localtime(value, timezone=None)
+.. function:: localtime(value=None, timezone=None)
 
     Converts an aware :class:`~datetime.datetime` to a different time zone,
     by default the :ref:`current time zone <default-current-time-zone>`.
 
+    When ``value`` is omitted, it defaults to :func:`now`.
+
     This function doesn't work on naive datetimes; use :func:`make_aware`
     instead.
+
+    .. versionchanged:: 1.11
+
+        In older versions, ``value`` is a required argument.
+
+.. function:: localdate(value=None, timezone=None)
+
+    .. versionadded:: 1.11
+
+    Uses :func:`localtime` to convert an aware :class:`~datetime.datetime` to a
+    :meth:`~datetime.datetime.date` in a different time zone, by default the
+    :ref:`current time zone <default-current-time-zone>`.
+
+    When ``value`` is omitted, it defaults to :func:`now`.
+
+    This function doesn't work on naive datetimes.
 
 .. function:: now()
 
