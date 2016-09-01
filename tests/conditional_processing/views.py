@@ -27,3 +27,19 @@ etag_view1 = condition(etag_func=lambda r: ETAG)(etag_view1)
 def etag_view2(request):
     return HttpResponse(FULL_RESPONSE)
 etag_view2 = etag(lambda r: ETAG)(etag_view2)
+
+
+@condition(etag_func=lambda r: ETAG.strip('"'))
+def etag_view_unquoted(request):
+    """
+    Use an etag_func() that returns an unquoted ETag.
+    """
+    return HttpResponse(FULL_RESPONSE)
+
+
+@condition(etag_func=lambda r: None)
+def etag_view_none(request):
+    """
+    Use an etag_func() that returns None, as opposed to setting etag_func=None.
+    """
+    return HttpResponse(FULL_RESPONSE)
