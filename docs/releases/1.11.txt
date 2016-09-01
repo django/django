@@ -109,6 +109,10 @@ Minor features
 * Added password validators ``help_text`` to
   :class:`~django.contrib.auth.forms.UserCreationForm`.
 
+* The new :class:`~django.contrib.auth.apps.BaseAuthConfig` ``AppConfig``
+  allows using the authentication system :ref:`without any of the built-in
+  models <using-auth-without-models>`.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
