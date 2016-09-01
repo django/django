@@ -97,8 +97,11 @@ def check_pattern_startswith_slash(pattern):
     regex_pattern = pattern.regex.pattern
     if regex_pattern.startswith('/') or regex_pattern.startswith('^/'):
         warning = Warning(
-            "Your URL pattern {} has a regex beginning with a '/'. "
-            "Remove this slash as it is unnecessary.".format(describe_pattern(pattern)),
+            "Your URL pattern {} has a regex beginning with a '/'. Remove this "
+            "slash as it is unnecessary. If this pattern is targeted in an "
+            "include(), ensure the include() pattern has a trailing '/'.".format(
+                describe_pattern(pattern)
+            ),
             id="urls.W002",
         )
         return [warning]
