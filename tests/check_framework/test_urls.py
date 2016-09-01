@@ -46,7 +46,13 @@ class CheckUrlsTest(SimpleTestCase):
         self.assertEqual(len(result), 1)
         warning = result[0]
         self.assertEqual(warning.id, 'urls.W002')
-        expected_msg = "Your URL pattern '/starting-with-slash/$' has a regex beginning with a '/'"
+        expected_msg = (
+            "Your URL pattern '/starting-with-slash/$' has a regex beginning "
+            "with a '/'. Remove this slash as it is unnecessary. If this "
+            "pattern is targeted in an include(), ensure the include() pattern "
+            "has a trailing '/'."
+        )
+
         self.assertIn(expected_msg, warning.msg)
 
     @override_settings(ROOT_URLCONF='check_framework.urls.name_with_colon')
