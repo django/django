@@ -98,9 +98,17 @@ the database name would raise an error. For the second example::
 Using other management commands
 -------------------------------
 
-The other ``django-admin`` commands that interact with the database operate in
+Most other ``django-admin`` commands that interact with the database operate in
 the same way as :djadmin:`migrate` -- they only ever operate on one database at
 a time, using ``--database`` to control the database used.
+
+The exception to this rule is the :djadmin:`makemigrations` command. In
+principle, it does not need to interact with the database at all, but in
+practice, it validates the migration history (against the database). This is done
+in order to catch problems with the existing migration files (which could be
+caused by editing them) before creating new migrations based on them. By default,
+:djadmin:`makemigrations` checks only the ``default`` database, but it consults
+:ref:`routers<topics-db-multi-db-routing>` if any are installed.
 
 .. _topics-db-multi-db-routing:
 
@@ -188,7 +196,8 @@ A database Router is a class that provides up to four methods:
     ``model_name`` will be silently skipped when running :djadmin:`migrate` on
     the ``db``. Changing the behavior of ``allow_migrate()`` for models that
     already have migrations may result in broken foreign keys, extra tables,
-    or missing tables.
+    or missing tables. When :djadmin:`makemigrations` verifies the migration
+    history, it skips databases where no app is allowed to migrate.
 
 A router doesn't have to provide *all* these methods -- it may omit one
 or more of them. If one of the methods is omitted, Django will skip
