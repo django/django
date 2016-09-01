@@ -5,11 +5,14 @@ import logging
 import signal
 import sys
 import time
+import multiprocessing
+import threading
 
 from .signals import consumer_started, consumer_finished
 from .exceptions import ConsumeLater
 from .message import Message
 from .utils import name_that_thing
+from .signals import worker_ready
 
 logger = logging.getLogger('django.channels')
 
@@ -65,6 +68,12 @@ class Worker(object):
                 if not any(fnmatch.fnmatchcase(channel, pattern) for pattern in self.exclude_channels)
             ]
         return channels
+
+    def ready(self):
+        """
+        Called once worker setup is complete.
+        """
+        worker_ready.send(sender=self)
 
     def run(self):
         """
@@ -134,3 +143,41 @@ class Worker(object):
             else:
                 # Send consumer finished so DB conns close etc.
                 consumer_finished.send(sender=self.__class__)
+
+
+class WorkerGroup(Worker):
+    """
+    Group several workers together in threads. Manages the sub-workers,
+    terminating them if a signal is received.
+    """
+
+    def __init__(self, *args, **kwargs):
+        n_threads = kwargs.pop('n_threads', multiprocessing.cpu_count()) - 1
+        super(WorkerGroup, self).__init__(*args, **kwargs)
+        kwargs['signal_handlers'] = False
+        self.workers = [Worker(*args, **kwargs) for ii in range(n_threads)]
+
+    def sigterm_handler(self, signo, stack_frame):
+        self.termed = True
+        for wkr in self.workers:
+            wkr.termed = True
+        logger.info("Shutdown signal received while busy, waiting for "
+                    "loop termination")
+
+    def ready(self):
+        super(WorkerGroup, self).ready()
+        for wkr in self.workers:
+            wkr.ready()
+
+    def run(self):
+        """
+        Launch sub-workers before running.
+        """
+        self.threads = [threading.Thread(target=self.workers[ii].run)
+                        for ii in range(len(self.workers))]
+        for t in self.threads:
+            t.start()
+        super(WorkerGroup, self).run()
+        # Join threads once completed.
+        for t in self.threads:
+            t.join()
