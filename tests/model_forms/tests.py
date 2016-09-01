@@ -601,6 +601,23 @@ class ModelFormBaseTest(TestCase):
         self.assertIsInstance(mf1.fields['active'].widget, forms.CheckboxInput)
         self.assertIs(m1._meta.get_field('active').get_default(), True)
 
+    def test_prefixed_form_with_default_field(self):
+        class PubForm(forms.ModelForm):
+            class Meta:
+                model = PublicationDefaults
+                fields = ('mode',)
+            prefix = 'sometext'
+
+        not_default_mode = next(
+            m for m, _ in PublicationDefaults.MODE_CHOICES
+            if m != PublicationDefaults._meta.get_field('mode').get_default()
+        )
+
+        mf1 = PubForm({'sometext-mode': not_default_mode})
+        self.assertEqual(mf1.errors, {})
+        m1 = mf1.save(commit=False)
+        self.assertEqual(m1.mode, not_default_mode)
+
 
 class FieldOverridesByFormMetaForm(forms.ModelForm):
     class Meta:
