@@ -65,7 +65,17 @@ functionality::
 
 The database user must be a superuser in order to run
 ``CREATE EXTENSION postgis;``. The command is run during the :djadmin:`migrate`
-process.
+process. An alternative is to use a migration operation in your project::
+
+    from django.contrib.postgresql.operations import CreateExtension
+    from django.db import migrations
+
+    class Migration(migrations.Migration):
+
+        operations = [
+            CreateExtension('postgis'),
+            ...
+        ]
 
 GeoDjango does not currently leverage any `PostGIS topology functionality`__.
 If you plan to use those features at some point, you can also install the
