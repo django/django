@@ -1156,6 +1156,10 @@ memcached_excluded_caches = {'cull', 'zero_cull'}
 
 class BaseMemcachedTests(BaseCacheTests):
 
+    # By default it's presumed that the client doesn't clean up connections
+    # properly itself, in which case the backend must do so after each request.
+    should_disconnect_on_close = True
+
     def test_location_multiple_servers(self):
         locations = [
             ['server1.tld', 'server2:11211'],
@@ -1239,6 +1243,13 @@ class BaseMemcachedTests(BaseCacheTests):
         value = cache.get('small_value')
         self.assertTrue(value is None or value == large_value)
 
+    def test_close(self):
+        # For clients that do not manage their own connections properly, the
+        # connection must be closed when the request is complete.
+        with mock.patch.object(cache._lib.Client, 'disconnect_all', autospec=True) as mock_disconnect:
+            signals.request_finished.send(self.__class__)
+            self.assertIs(mock_disconnect.called, self.should_disconnect_on_close)
+
 
 @unittest.skipUnless(MemcachedCache_params, "MemcachedCache backend not configured")
 @override_settings(CACHES=caches_setting_for_tests(
@@ -1269,6 +1280,8 @@ class MemcachedCacheTests(BaseMemcachedTests, TestCase):
 ))
 class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
     base_params = PyLibMCCache_params
+    # libmemcached manages its own connections.
+    should_disconnect_on_close = False
 
     # By default, pylibmc/libmemcached don't verify keys client-side and so
     # this test triggers a server-side bug that causes later tests to fail
