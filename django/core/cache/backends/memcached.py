@@ -103,6 +103,7 @@ class BaseMemcachedCache(BaseCache):
         return ret
 
     def close(self, **kwargs):
+        # Many clients don't clean up connections properly themselves.
         self._cache.disconnect_all()
 
     def incr(self, key, delta=1, version=None):
