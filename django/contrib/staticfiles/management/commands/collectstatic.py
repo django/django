@@ -9,7 +9,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
-from django.utils.encoding import smart_text
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.six.moves import input
 
@@ -237,10 +237,9 @@ class Command(BaseCommand):
         for f in files:
             fpath = os.path.join(path, f)
             if self.dry_run:
-                self.log("Pretending to delete '%s'" %
-                         smart_text(fpath), level=1)
+                self.log("Pretending to delete '%s'" % force_text(fpath), level=1)
             else:
-                self.log("Deleting '%s'" % smart_text(fpath), level=1)
+                self.log("Deleting '%s'" % force_text(fpath), level=1)
                 try:
                     full_path = self.storage.path(fpath)
                 except NotImplementedError:

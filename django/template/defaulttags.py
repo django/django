@@ -10,7 +10,7 @@ from itertools import cycle as itertools_cycle, groupby
 
 from django.conf import settings
 from django.utils import six, timezone
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
 from django.utils.safestring import mark_safe
@@ -440,7 +440,7 @@ class URLNode(Node):
         from django.urls import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
         kwargs = {
-            smart_text(k, 'ascii'): v.resolve(context)
+            force_text(k, 'ascii'): v.resolve(context)
             for k, v in self.kwargs.items()
         }
         view_name = self.view_name.resolve(context)

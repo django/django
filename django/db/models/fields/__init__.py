@@ -817,7 +817,7 @@ class Field(RegisterLookupMixin):
         Returns a string value of this field from the passed obj.
         This is used by the serialization framework.
         """
-        return smart_text(self.value_from_object(obj))
+        return force_text(self.value_from_object(obj))
 
     def _get_flatchoices(self):
         """Flattened version of choices tuple."""
@@ -1075,7 +1075,7 @@ class CharField(Field):
     def to_python(self, value):
         if isinstance(value, six.string_types) or value is None:
             return value
-        return smart_text(value)
+        return force_text(value)
 
     def get_prep_value(self, value):
         value = super(CharField, self).get_prep_value(value)
@@ -2129,7 +2129,7 @@ class TextField(Field):
     def to_python(self, value):
         if isinstance(value, six.string_types) or value is None:
             return value
-        return smart_text(value)
+        return force_text(value)
 
     def get_prep_value(self, value):
         value = super(TextField, self).get_prep_value(value)

@@ -435,7 +435,7 @@ def display_for_value(value, empty_value_display, boolean=False):
     elif isinstance(value, (list, tuple)):
         return ', '.join(force_text(v) for v in value)
     else:
-        return smart_text(value)
+        return force_text(value)
 
 
 class NotRelationField(Exception):

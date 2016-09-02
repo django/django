@@ -15,7 +15,7 @@ from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -209,7 +209,7 @@ class AdminReadonlyField(object):
                     if hasattr(value, "__html__"):
                         result_repr = value
                     else:
-                        result_repr = smart_text(value)
+                        result_repr = force_text(value)
                         if getattr(attr, "allow_tags", False):
                             warnings.warn(
                                 "Deprecated allow_tags attribute used on %s. "

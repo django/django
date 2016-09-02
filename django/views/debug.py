@@ -11,7 +11,7 @@ from django.template.defaultfilters import force_escape, pprint
 from django.urls import Resolver404, resolve
 from django.utils import lru_cache, six, timezone
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_bytes, smart_text
+from django.utils.encoding import force_bytes, force_text
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
 
@@ -280,7 +280,7 @@ class ExceptionReporter(object):
             end = getattr(self.exc_value, 'end', None)
             if start is not None and end is not None:
                 unicode_str = self.exc_value.args[1]
-                unicode_hint = smart_text(
+                unicode_hint = force_text(
                     unicode_str[max(start - 5, 0):min(end + 5, len(unicode_str))],
                     'ascii', errors='replace'
                 )
@@ -305,7 +305,7 @@ class ExceptionReporter(object):
         if self.exc_type:
             c['exception_type'] = self.exc_type.__name__
         if self.exc_value:
-            c['exception_value'] = smart_text(self.exc_value, errors='replace')
+            c['exception_value'] = force_text(self.exc_value, errors='replace')
         if frames:
             c['lastframe'] = frames[-1]
         return c

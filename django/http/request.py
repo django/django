@@ -521,7 +521,7 @@ class QueryDict(MultiValueDict):
 
 
 # It's neither necessary nor appropriate to use
-# django.utils.encoding.smart_text for parsing URLs and form inputs. Thus,
+# django.utils.encoding.force_text for parsing URLs and form inputs. Thus,
 # this slightly more restricted function, used by QueryDict.
 def bytes_to_text(s, encoding):
     """

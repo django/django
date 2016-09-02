@@ -30,7 +30,7 @@ from django.forms.widgets import (
 from django.utils import formats, six
 from django.utils.dateparse import parse_duration
 from django.utils.duration import duration_string
-from django.utils.encoding import force_str, force_text, smart_text
+from django.utils.encoding import force_str, force_text
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
@@ -349,7 +349,7 @@ class DecimalField(IntegerField):
             return None
         if self.localize:
             value = formats.sanitize_separators(value)
-        value = smart_text(value).strip()
+        value = force_text(value).strip()
         try:
             value = Decimal(value)
         except DecimalException:
@@ -799,7 +799,7 @@ class ChoiceField(Field):
         "Returns a Unicode object."
         if value in self.empty_values:
             return ''
-        return smart_text(value)
+        return force_text(value)
 
     def validate(self, value):
         """
@@ -868,7 +868,7 @@ class MultipleChoiceField(ChoiceField):
             return []
         elif not isinstance(value, (list, tuple)):
             raise ValidationError(self.error_messages['invalid_list'], code='invalid_list')
-        return [smart_text(val) for val in value]
+        return [force_text(val) for val in value]
 
     def validate(self, value):
         """

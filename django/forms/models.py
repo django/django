@@ -19,7 +19,7 @@ from django.forms.widgets import (
     HiddenInput, MultipleHiddenInput, SelectMultiple,
 )
 from django.utils import six
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_text
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext, ugettext_lazy as _
 
@@ -1186,7 +1186,7 @@ class ModelChoiceField(ChoiceField):
         generate the labels for the choices presented by this object. Subclasses
         can override this method to customize the display of the choices.
         """
-        return smart_text(obj)
+        return force_text(obj)
 
     def _get_choices(self):
         # If self._choices is set, then somebody must have manually set

@@ -12,7 +12,7 @@ from django.urls import translate_url
 from django.utils import six
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import smart_text
+from django.utils.encoding import force_text
 from django.utils.formats import get_format
 from django.utils.http import is_safe_url, urlunquote
 from django.utils.translation import (
@@ -81,9 +81,9 @@ def get_formats():
     formats = {}
     for k, v in result.items():
         if isinstance(v, (six.string_types, int)):
-            formats[k] = smart_text(v)
+            formats[k] = force_text(v)
         elif isinstance(v, (tuple, list)):
-            formats[k] = [smart_text(value) for value in v]
+            formats[k] = [force_text(value) for value in v]
     return formats
 
 
