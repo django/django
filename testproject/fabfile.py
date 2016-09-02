@@ -13,7 +13,7 @@ def setup_redis():
 def setup_channels():
     sudo("apt-get update && apt-get install -y git python-dev python-setuptools python-pip")
     sudo("pip install -U pip")
-    sudo("pip install -U asgi_redis git+https://github.com/andrewgodwin/daphne.git@#egg=daphne")
+    sudo("pip install -U asgi_redis asgi_ipc git+https://github.com/andrewgodwin/daphne.git@#egg=daphne")
     sudo("rm -rf /srv/channels")
     sudo("git clone https://github.com/andrewgodwin/channels.git /srv/channels/")
     with cd("/srv/channels/"):
@@ -43,7 +43,13 @@ def setup_load_tester(src="https://github.com/andrewgodwin/channels.git"):
 # Run current loadtesting setup
 # example usage: $ fab run_loadtest:http://127.0.0.1,rps=10 -i "id_rsa" -H ubuntu@example.com
 @task
-def run_loadtest(host, t=90, rps=200):
+def run_loadtest(host, t=90):
+    sudo("loadtest -c 10 -t {t} {h}".format(h=host, t=t))
+
+# Run current loadtesting setup
+# example usage: $ fab run_loadtest:http://127.0.0.1,rps=10 -i "id_rsa" -H ubuntu@example.com
+@task
+def run_loadtest_rps(host, t=90, rps=200):
     sudo("loadtest -c 10 --rps {rps} -t {t} {h}".format(h=host, t=t, rps=rps))
 
 
