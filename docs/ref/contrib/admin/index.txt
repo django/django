@@ -966,6 +966,9 @@ subclass::
         The ``FieldListFilter`` API is considered internal and might be
         changed.
 
+    List filter's typically appear only if the filter has more than one choice.
+    A filter's ``has_output()`` method controls whether or not it appears.
+
     It is possible to specify a custom template for rendering a list filter::
 
         class FilterWithCustomTemplate(admin.SimpleListFilter):
