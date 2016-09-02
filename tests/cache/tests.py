@@ -1239,6 +1239,13 @@ class BaseMemcachedTests(BaseCacheTests):
         value = cache.get('small_value')
         self.assertTrue(value is None or value == large_value)
 
+    def test_close(self):
+        # For clients that don't manage their connections properly, the
+        # connection is closed when the request is complete.
+        with mock.patch.object(cache._lib.Client, 'disconnect_all', autospec=True) as mock_disconnect:
+            signals.request_finished.send(self.__class__)
+            self.assertIs(mock_disconnect.called, True)
+
 
 @unittest.skipUnless(MemcachedCache_params, "MemcachedCache backend not configured")
 @override_settings(CACHES=caches_setting_for_tests(
