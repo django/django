@@ -59,12 +59,14 @@ class Command(BaseCommand):
         self.callback = callback
         self.options = options
         # Choose an appropriate worker.
+        worker_kwargs = {}
         if self.n_threads == 1:
             self.logger.info("Using single-threaded worker.")
             worker_cls = Worker
         else:
             self.logger.info("Using multi-threaded worker, {} thread(s).".format(self.n_threads))
             worker_cls = WorkerGroup
+            worker_kwargs['n_threads'] = self.n_threads
         # Run the worker
         self.logger.info("Running worker against channel layer %s", self.channel_layer)
         try:
@@ -73,6 +75,7 @@ class Command(BaseCommand):
                 callback=self.callback,
                 only_channels=self.options.get("only_channels", None),
                 exclude_channels=self.options.get("exclude_channels", None),
+                **worker_kwargs
             )
             worker_process_ready.send(sender=worker)
             worker.ready()
