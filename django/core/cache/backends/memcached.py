@@ -103,6 +103,7 @@ class BaseMemcachedCache(BaseCache):
         return ret
 
     def close(self, **kwargs):
+        # Many clients don't clean up connections properly.
         self._cache.disconnect_all()
 
     def incr(self, key, delta=1, version=None):
@@ -202,3 +203,8 @@ class PyLibMCCache(BaseMemcachedCache):
     @cached_property
     def _cache(self):
         return self._lib.Client(self._servers, **self._options)
+
+    def close(self, **kwargs):
+        # libmemcached manages its own connections. Don't call disconnect_all()
+        # as it resets the failover state and creates unnecessary reconnects.
+        pass
