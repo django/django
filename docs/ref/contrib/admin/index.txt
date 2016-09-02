@@ -969,6 +969,11 @@ subclass::
         The ``FieldListFilter`` API is considered internal and might be
         changed.
 
+      .. note::
+
+        If there is only one possible option for a list filter, then the filter
+        will not be displayed in the admin site.
+
     It is possible to specify a custom template for rendering a list filter::
 
         class FilterWithCustomTemplate(admin.SimpleListFilter):
