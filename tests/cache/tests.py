@@ -1280,6 +1280,8 @@ class MemcachedCacheTests(BaseMemcachedTests, TestCase):
 ))
 class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
     base_params = PyLibMCCache_params
+    # libmemcached manages its own connections.
+    should_disconnect_on_close = False
 
     # By default, pylibmc/libmemcached don't verify keys client-side and so
     # this test triggers a server-side bug that causes later tests to fail

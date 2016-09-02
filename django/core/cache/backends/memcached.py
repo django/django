@@ -203,3 +203,9 @@ class PyLibMCCache(BaseMemcachedCache):
     @cached_property
     def _cache(self):
         return self._lib.Client(self._servers, **self._options)
+
+    def close(self, **kwargs):
+        # Override base behavior since libmemcached manages its own connections,
+        # and calling disconnect_all() resets the failover state and creates an
+        # unnecessary amount of reconnects.
+        pass
