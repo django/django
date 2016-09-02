@@ -384,6 +384,9 @@ contains a reference to them. On the plus side, methods and managers from these
 base classes inherit normally, so if you absolutely need access to these you
 can opt to move them into a superclass.
 
+To remove old references, you can :ref:`squash migrations <migration-squashing>`
+or, if there aren't many references, copy them into the migration files.
+
 .. _migrations-removing-model-fields:
 
 Considerations when removing model fields
