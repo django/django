@@ -1,5 +1,4 @@
-from django.core.management.commands.inspectdb import \
-    Command as InspectDBCommand
+from django.core.management.commands.inspectdb import Command as InspectDBCommand
 
 
 class Command(InspectDBCommand):
