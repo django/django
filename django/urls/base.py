@@ -2,10 +2,11 @@ from __future__ import unicode_literals
 
 from threading import local
 
+from django.conf import settings
 from django.utils import six
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.functional import lazy
-from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
+from django.utils.six.moves.urllib.parse import urljoin, urlsplit, urlunsplit
 from django.utils.translation import override
 
 from .exceptions import NoReverseMatch, Resolver404
@@ -181,3 +182,19 @@ def translate_url(url, lang_code):
             else:
                 url = urlunsplit((parsed.scheme, parsed.netloc, url, parsed.query, parsed.fragment))
     return url
+
+
+def get_prefixed_static_url():
+    """
+    Helper function that returns concatenated
+    ``SCRIPT_NAME`` prefix and ``settings.STATIC_URL``.
+    """
+    return urljoin(get_script_prefix(), settings.STATIC_URL.lstrip('/'))
+
+
+def get_prefixed_media_url():
+    """
+    Helper function that returns concatenated
+    ``SCRIPT_NAME`` prefix and ``settings.MEDIA_URL``.
+    """
+    return urljoin(get_script_prefix(), settings.MEDIA_URL.lstrip('/'))

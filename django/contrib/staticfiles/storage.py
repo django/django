@@ -8,13 +8,16 @@ import re
 from collections import OrderedDict
 
 from django.conf import settings
-from django.contrib.staticfiles.utils import check_settings, matches_patterns
+from django.contrib.staticfiles.utils import (
+    check_base_url, check_settings, matches_patterns,
+)
 from django.core.cache import (
     InvalidCacheBackendError, cache as default_cache, caches,
 )
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
+from django.urls import get_prefixed_static_url
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import LazyObject
 from django.utils.six import iteritems
@@ -34,10 +37,10 @@ class StaticFilesStorage(FileSystemStorage):
         if location is None:
             location = settings.STATIC_ROOT
         if base_url is None:
-            base_url = settings.STATIC_URL
-        check_settings(base_url)
-        super(StaticFilesStorage, self).__init__(location, base_url,
-                                                 *args, **kwargs)
+            base_url = get_prefixed_static_url()
+        check_settings()
+        check_base_url(base_url)
+        super(StaticFilesStorage, self).__init__(location, base_url, *args, **kwargs)
         # FileSystemStorage fallbacks to MEDIA_ROOT when location
         # is empty, so we restore the empty value.
         if not location:
@@ -161,6 +164,7 @@ class HashedFilesMixin(object):
             to and calling the url() method of the storage.
             """
             matched, url = matchobj.groups()
+            static_url = get_prefixed_static_url()
 
             # Ignore absolute/protocol-relative and data-uri URLs.
             if re.match(r'^[a-z]+:', url):
@@ -168,7 +172,7 @@ class HashedFilesMixin(object):
 
             # Ignore absolute URLs that don't point to a static file (dynamic
             # CSS / JS?). Note that STATIC_URL cannot be empty.
-            if url.startswith('/') and not url.startswith(settings.STATIC_URL):
+            if url.startswith('/') and not url.startswith(static_url):
                 return matched
 
             # Strip off the fragment so a path-like fragment won't interfere.
@@ -176,8 +180,8 @@ class HashedFilesMixin(object):
 
             if url_path.startswith('/'):
                 # Otherwise the condition above would have returned prematurely.
-                assert url_path.startswith(settings.STATIC_URL)
-                target_name = url_path[len(settings.STATIC_URL):]
+                assert url_path.startswith(static_url)
+                target_name = url_path[len(static_url):]
             else:
                 # We're using the posixpath module to mix paths and URLs conveniently.
                 source_name = name if os.sep == '/' else name.replace(os.sep, '/')

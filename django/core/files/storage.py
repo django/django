@@ -284,9 +284,10 @@ class FileSystemStorage(Storage):
 
     @cached_property
     def base_url(self):
+        from django.urls import get_prefixed_media_url
         if self._base_url is not None and not self._base_url.endswith('/'):
             self._base_url += '/'
-        return self._value_or_setting(self._base_url, settings.MEDIA_URL)
+        return self._value_or_setting(self._base_url, get_prefixed_media_url())
 
     @cached_property
     def file_permissions_mode(self):
