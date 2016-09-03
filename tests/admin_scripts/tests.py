@@ -630,6 +630,9 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
             with open(os.path.join(app_path, 'admin.py'), 'r') as fp:
                 content = fp.read()
             self.assertIn(unicode_literals_import, content)
+            with open(os.path.join(app_path, 'tests.py'), 'r') as fp:
+                content = fp.read()
+            self.assertIn(unicode_literals_import, content)
 
     def test_setup_environ_custom_template(self):
         "directory: startapp creates the correct directory with a custom template"
