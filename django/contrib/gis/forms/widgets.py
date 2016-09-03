@@ -81,6 +81,7 @@ class OpenLayersWidget(BaseGeometryWidget):
         js = (
             'https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/OpenLayers.js',
             'gis/js/OLMapWidget.js',
+            'gis/js/OLInit.js',
         )
 
 
@@ -97,6 +98,7 @@ class OSMWidget(BaseGeometryWidget):
         js = (
             'https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/OpenLayers.js',
             'gis/js/OLMapWidget.js',
+            'gis/js/OLInitOSM.js',
         )
 
     def __init__(self, attrs=None):

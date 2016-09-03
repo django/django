@@ -190,9 +190,10 @@ class SpecializedFieldTest(SimpleTestCase):
         """
         self.assertTrue(form_instance.is_valid())
         rendered = form_instance.as_p()
-        self.assertIn('new MapWidget(options);', rendered)
-        self.assertIn('map_srid: 4326,', rendered)
+        self.assertIn('class="geodjangoDivMap"', rendered)
+        self.assertIn('data-gis-mapsrid="4326"', rendered)
         self.assertIn('gis/js/OLMapWidget.js', str(form_instance.media))
+        self.assertIn('gis/js/OLInit.js', str(form_instance.media))
 
     def assertTextarea(self, geom, rendered):
         """Makes sure the wkt and a textarea are in the content"""
@@ -313,8 +314,8 @@ class OSMWidgetTest(SimpleTestCase):
         form = PointForm(data={'p': geom})
         rendered = form.as_p()
 
-        self.assertIn("OpenStreetMap (Mapnik)", rendered)
-        self.assertIn("id: 'id_p',", rendered)
+        self.assertIn('class="geodjangoDivMapOSM"', rendered)
+        self.assertIn('data-gis-id="id_p"', rendered)
 
     def test_default_lat_lon(self):
         class PointForm(forms.Form):
@@ -327,15 +328,15 @@ class OSMWidgetTest(SimpleTestCase):
         form = PointForm()
         rendered = form.as_p()
 
-        self.assertIn("options['default_lon'] = 20;", rendered)
-        self.assertIn("options['default_lat'] = 30;", rendered)
+        self.assertIn('data-gis-defaultlon="20"', rendered)
+        self.assertIn('data-gis-defaultlat="30"', rendered)
         if forms.OSMWidget.default_lon != 20:
             self.assertNotIn(
-                "options['default_lon'] = %d;" % forms.OSMWidget.default_lon,
+                'data-gis-defaultlon="%d"' % forms.OSMWidget.default_lon,
                 rendered)
         if forms.OSMWidget.default_lat != 30:
             self.assertNotIn(
-                "options['default_lat'] = %d;" % forms.OSMWidget.default_lat,
+                'data-gis-defaultlat="%d"' % forms.OSMWidget.default_lat,
                 rendered)
 
 

@@ -361,6 +361,13 @@ Backwards incompatible changes in 1.11
   ``contrib.gis`` was first released, :ref:`gdalbuild` is now a required
   dependency for GeoDjango. In older versions, it's only required for SQLite.
 
+* To comply with Content Security Policies, the JavaScript code previously
+  included in ``gis/openlayers.html`` and ``gis/openlayers-osm.html`` templates
+  is now isolated in separate ``gis/js/OLInit.js`` and ``gis/js/OLInitOSM.js``
+  external files. Those are automatically included in pages through form media.
+  However, if you overwrote those templates, you should probably revise them
+  with regard to their newest structure.
+
 Database backend API
 --------------------
 

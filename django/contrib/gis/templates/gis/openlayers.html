@@ -14,22 +14,12 @@
     }{% endblock %}
 </style>
 
-<div id="{{ id }}_div_map">
+<div id="{{ id }}_div_map" class="{% block divclass %}geodjangoDivMap{% endblock %}"
+     {% block gisdata %}data-gis-geomname="{{ geom_type }}" data-gis-id="{{ id }}"
+     data-gis-name="{{ name }}" data-gis-mapsrid="{{ map_srid|unlocalize }}"
+     {% endblock %}>
     <div id="{{ id }}_map"></div>
-    <span class="clear_features"><a href="javascript:{{ module }}.clearFeatures()">{% trans "Delete all Features" %}</a></span>
+    <span class="clear_features"><a href="#">{% trans "Delete all Features" %}</a></span>
     {% if display_raw %}<p>{% trans "Debugging window (serialized value)" %}</p>{% endif %}
     <textarea id="{{ id }}" class="vSerializedField required" cols="150" rows="10" name="{{ name }}">{{ serialized }}</textarea>
-    <script type="text/javascript">
-        {% block map_options %}var map_options = {};{% endblock %}
-        {% block options %}var options = {
-            geom_name: '{{ geom_type }}',
-            id: '{{ id }}',
-            map_id: '{{ id }}_map',
-            map_options: map_options,
-            map_srid: {{ map_srid|unlocalize }},
-            name: '{{ name }}'
-        };
-        {% endblock %}
-        var {{ module }} = new MapWidget(options);
-    </script>
 </div>
