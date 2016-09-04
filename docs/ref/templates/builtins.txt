@@ -731,6 +731,11 @@ is turned off, ``{% include %}`` logs a warning to the ``django.template``
 logger with the exception that happens while rendering the included template
 and returns an empty string.
 
+.. deprecated:: 1.11
+
+    Silencing exceptions raised while rendering the ``{% include %}`` template
+    tag is deprecated. In Django 2.1, the exception will be raised.
+
 .. note::
     The :ttag:`include` tag should be considered as an implementation of
     "render this subtemplate and include the HTML", not as "parse this
