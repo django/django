@@ -14,7 +14,7 @@
     }{% endblock %}
 </style>
 
-<div id="{{ id }}_div_map" class="{% block divclass %}geodjangoDivMap{% endblock %}"
+<div id="{{ id }}_div_map" class="{% block divclass %}geodjango-map{% endblock %}"
      {% block gisdata %}data-gis-geomname="{{ geom_type }}" data-gis-id="{{ id }}"
      data-gis-name="{{ name }}" data-gis-mapsrid="{{ map_srid|unlocalize }}"
      {% endblock %}>

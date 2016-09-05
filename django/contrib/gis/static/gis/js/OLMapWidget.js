@@ -385,26 +385,32 @@
     window.MapWidget = MapWidget;
 })();
 
+function forEach(array, callback) {
+    var i = 0;
+    for (i = 0; i < array.length; i++) {
+        callback(array[i]);
+    }
+};
+
 document.addEventListener("DOMContentLoaded", function(event) {
     'use strict';
-    var divs = document.querySelectorAll("div.geodjangoDivMap");
-    for (var i = 0; i < divs.length; ++i) {
+    forEach(document.querySelectorAll("div.geodjango-map"), function(el) {
         var options = {
-            geom_name: divs[i].getAttribute('data-gis-geomname'),
-            id: divs[i].getAttribute('data-gis-id'),
-            map_id: divs[i].getAttribute('data-gis-id') + '_map',
+            geom_name: el.getAttribute('data-gis-geomname'),
+            id: el.getAttribute('data-gis-id'),
+            map_id: el.getAttribute('data-gis-id') + '_map',
             map_options: {},
-            map_srid: divs[i].getAttribute('data-gis-mapsrid'),
-            name: divs[i].getAttribute('data-gis-name')
+            map_srid: el.getAttribute('data-gis-mapsrid'),
+            name: el.getAttribute('data-gis-name')
         };
         var widget = new MapWidget(options);
-        var clear = divs[i].querySelector('span.clear_features');
+        var clear = el.querySelector('span.clear_features');
         if (clear) {
             clear.addEventListener("click", function(ev) {
                 widget.clearFeatures();
             });
         }
-    }
+    });
 
     var map_options = {
         maxExtend: new OpenLayers.Bounds(-20037508, -20037508, 20037508, 20037508),
@@ -412,28 +418,27 @@ document.addEventListener("DOMContentLoaded", function(event) {
         numZoomLevels: 20,
         units: 'm'
     };
-    var divs = document.querySelectorAll("div.geodjangoDivMapOSM");
-    for (var i = 0; i < divs.length; ++i) {
+    forEach(document.querySelectorAll("div.geodjango-map-osm"), function(el) {
         var options = {
-            geom_name: divs[i].getAttribute('data-gis-geomname'),
-            id: divs[i].getAttribute('data-gis-id'),
-            map_id: divs[i].getAttribute('data-gis-id') + '_map',
+            geom_name: el.getAttribute('data-gis-geomname'),
+            id: el.getAttribute('data-gis-id'),
+            map_id: el.getAttribute('data-gis-id') + '_map',
             map_options: map_options,
-            map_srid: divs[i].getAttribute('data-gis-mapsrid'),
-            name: divs[i].getAttribute('data-gis-name'),
+            map_srid: el.getAttribute('data-gis-mapsrid'),
+            name: el.getAttribute('data-gis-name'),
             // OSM-specific
             scale_text: true,
             mouse_position: true,
             base_layer: new OpenLayers.Layer.OSM("OpenStreetMap (Mapnik)"),
-            default_lon: divs[i].getAttribute('data-gis-defaultlon'),
-            default_lat: divs[i].getAttribute('data-gis-defaultlat')
+            default_lon: el.getAttribute('data-gis-defaultlon'),
+            default_lat: el.getAttribute('data-gis-defaultlat')
         };
         var widget = new MapWidget(options);
-        var clear = divs[i].querySelector('span.clear_features');
+        var clear = el.querySelector('span.clear_features');
         if (clear) {
             clear.addEventListener("click", function(ev) {
                 widget.clearFeatures();
             });
         }
-    }
+    });
 });

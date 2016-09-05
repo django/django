@@ -1,7 +1,7 @@
 {% extends "gis/openlayers.html" %}
 {% load l10n %}
 
-{% block divclass %}geodjangoDivMapOSM{% endblock %}
+{% block divclass %}geodjango-map-osm{% endblock %}
 {% block gisdata %}{{ block.super }}
     data-gis-defaultlon="{{ default_lon|unlocalize }}"
     data-gis-defaultlat="{{ default_lat|unlocalize }}"
