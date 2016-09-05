@@ -193,7 +193,6 @@ class SpecializedFieldTest(SimpleTestCase):
         self.assertIn('class="geodjangoDivMap"', rendered)
         self.assertIn('data-gis-mapsrid="4326"', rendered)
         self.assertIn('gis/js/OLMapWidget.js', str(form_instance.media))
-        self.assertIn('gis/js/OLInit.js', str(form_instance.media))
 
     def assertTextarea(self, geom, rendered):
         """Makes sure the wkt and a textarea are in the content"""
