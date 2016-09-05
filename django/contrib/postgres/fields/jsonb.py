@@ -106,7 +106,7 @@ class KeyTransform(Transform):
             lookup = "'%s'" % self.key_name
         else:
             lookup = "%s" % self.key_name
-        return "%s -> %s" % (lhs, lookup), params
+        return "(%s -> %s)" % (lhs, lookup), params
 
 
 class KeyTransformFactory(object):
