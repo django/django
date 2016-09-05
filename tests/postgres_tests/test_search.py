@@ -236,6 +236,13 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
                 dialogue__search=SearchQuery('kneecaps', config='german') | SearchQuery('nostrils', config='english')
             )
 
+    def test_query_raises_error_message(self):
+        with self.assertRaisesMessage(TypeError, 'SearchQuery can only be combined with other SearchQuerys, got '):
+            Line.objects.filter(dialogue__search=None | SearchQuery('kneecaps'))
+
+        with self.assertRaisesMessage(TypeError, 'SearchQuery can only be combined with other SearchQuerys, got '):
+            Line.objects.filter(dialogue__search=None & SearchQuery('kneecaps'))
+
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
 class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
