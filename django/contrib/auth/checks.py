@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from itertools import chain
+from types import MethodType
 
 from django.apps import apps
 from django.conf import settings
@@ -74,7 +75,7 @@ def check_user_model(app_configs=None, **kwargs):
                 )
             )
 
-    if isinstance(cls().is_anonymous, six.types.MethodType):
+    if isinstance(cls().is_anonymous, MethodType):
         errors.append(
             checks.Critical(
                 '%s.is_anonymous must be an attribute or property rather than '
@@ -84,7 +85,7 @@ def check_user_model(app_configs=None, **kwargs):
                 id='auth.C009',
             )
         )
-    if isinstance(cls().is_authenticated, six.types.MethodType):
+    if isinstance(cls().is_authenticated, MethodType):
         errors.append(
             checks.Critical(
                 '%s.is_authenticated must be an attribute or property rather '
