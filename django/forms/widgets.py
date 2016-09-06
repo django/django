@@ -237,6 +237,9 @@ class Widget(six.with_metaclass(RenameWidgetMethods)):
         """
         return data.get(name)
 
+    def value_omitted_from_data(self, data, files, name):
+        return name not in data
+
     def id_for_label(self, id_):
         """
         Returns the HTML ID attribute of this Widget for use by a <label>,
@@ -349,6 +352,9 @@ class FileInput(Input):
     def value_from_datadict(self, data, files, name):
         "File widgets take data from FILES, not POST"
         return files.get(name)
+
+    def value_omitted_from_data(self, data, files, name):
+        return name not in files
 
 
 FILE_INPUT_CONTRADICTION = object()
@@ -480,10 +486,6 @@ def boolean_check(v):
 
 
 class CheckboxInput(Widget):
-    # Don't use model field defaults for fields that aren't in POST data,
-    # because checkboxes don't appear in POST data if not checked.
-    dont_use_model_field_default_for_empty_data = True
-
     def __init__(self, attrs=None, check_test=None):
         super(CheckboxInput, self).__init__(attrs)
         # check_test is a callable that takes a value and returns True
@@ -510,6 +512,11 @@ class CheckboxInput(Widget):
         if isinstance(value, six.string_types):
             value = values.get(value.lower(), value)
         return bool(value)
+
+    def value_omitted_from_data(self, data, files, name):
+        # HTML checkboxes don't appear in POST data if not checked, so it's
+        # never known if the value is actually omitted.
+        return False
 
 
 class Select(Widget):
@@ -871,6 +878,12 @@ class MultiWidget(Widget):
     def value_from_datadict(self, data, files, name):
         return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
 
+    def value_omitted_from_data(self, data, files, name):
+        return all(
+            widget.value_omitted_from_data(data, files, name + '_%s' % i)
+            for i, widget in enumerate(self.widgets)
+        )
+
     def format_output(self, rendered_widgets):
         """
         Given a list of rendered widgets (as strings), returns a Unicode string
@@ -1055,6 +1068,12 @@ class SelectDateWidget(Widget):
             else:
                 return '%s-%s-%s' % (y, m, d)
         return data.get(name)
+
+    def value_omitted_from_data(self, data, files, name):
+        return not any(
+            ('{}_{}'.format(name, interval) in data)
+            for interval in ('year', 'month', 'day')
+        )
 
     def create_select(self, name, field, value, val, choices, none_value):
         if 'id' in self.attrs:

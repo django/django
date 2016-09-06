@@ -20,7 +20,9 @@ from .models import (
 
 try:
     from django.contrib.postgres.fields import ArrayField
-    from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
+    from django.contrib.postgres.forms import (
+        SimpleArrayField, SplitArrayField, SplitArrayWidget,
+    )
 except ImportError:
     pass
 
@@ -714,3 +716,26 @@ class TestSplitFormField(PostgreSQLTestCase):
             'Item 0 in the array did not validate: Ensure this value has at most 2 characters (it has 3).',
             'Item 2 in the array did not validate: Ensure this value has at most 2 characters (it has 4).',
         ])
+
+    def test_splitarraywidget_value_omitted_from_data(self):
+        class Form(forms.ModelForm):
+            field = SplitArrayField(forms.IntegerField(), required=False, size=2)
+
+            class Meta:
+                model = IntegerArrayModel
+                fields = ('field',)
+
+        form = Form({'field_0': '1', 'field_1': '2'})
+        self.assertEqual(form.errors, {})
+        obj = form.save(commit=False)
+        self.assertEqual(obj.field, [1, 2])
+
+
+class TestSplitFormWidget(PostgreSQLTestCase):
+
+    def test_value_omitted_from_data(self):
+        widget = SplitArrayWidget(forms.TextInput(), size=2)
+        self.assertIs(widget.value_omitted_from_data({}, {}, 'field'), True)
+        self.assertIs(widget.value_omitted_from_data({'field_0': 'value'}, {}, 'field'), False)
+        self.assertIs(widget.value_omitted_from_data({'field_1': 'value'}, {}, 'field'), False)
+        self.assertIs(widget.value_omitted_from_data({'field_0': 'value', 'field_1': 'value'}, {}, 'field'), False)
