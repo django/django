@@ -204,6 +204,9 @@ But first we need to tell our project that the ``polls`` app is installed.
     you can distribute apps, because they don't have to be tied to a given
     Django installation.
 
+To include the app in our project, we will need to include it's configuration
+file which is present in the :file:`apps` directory inside the app folder.
+The configuration file for our app is present at :file:`polls/apps/PollsConfig.py`
 Edit the :file:`mysite/settings.py` file again, and change the
 :setting:`INSTALLED_APPS` setting to include the string
 ``'polls.apps.PollsConfig'``. It'll look like this:
