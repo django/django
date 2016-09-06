@@ -617,6 +617,58 @@ class ModelFormBaseTest(TestCase):
         m1 = mf1.save(commit=False)
         self.assertEqual(m1.mode, mode)
 
+    def test_default_splitdatetime_field(self):
+        class PubForm(forms.ModelForm):
+            datetime_published = forms.SplitDateTimeField(required=False)
+
+            class Meta:
+                model = PublicationDefaults
+                fields = ('datetime_published',)
+
+        mf1 = PubForm({})
+        self.assertEqual(mf1.errors, {})
+        m1 = mf1.save(commit=False)
+        self.assertEqual(m1.datetime_published, datetime.datetime(2000, 1, 1))
+
+        mf2 = PubForm({'datetime_published_0': '2010-01-01', 'datetime_published_1': '0:00:00'})
+        self.assertEqual(mf2.errors, {})
+        m2 = mf2.save(commit=False)
+        self.assertEqual(m2.datetime_published, datetime.datetime(2010, 1, 1))
+
+    def test_default_filefield(self):
+        class PubForm(forms.ModelForm):
+            class Meta:
+                model = PublicationDefaults
+                fields = ('file',)
+
+        mf1 = PubForm({})
+        self.assertEqual(mf1.errors, {})
+        m1 = mf1.save(commit=False)
+        self.assertEqual(m1.file.name, 'default.txt')
+
+        mf2 = PubForm({}, {'file': SimpleUploadedFile('name', b'foo')})
+        self.assertEqual(mf2.errors, {})
+        m2 = mf2.save(commit=False)
+        self.assertEqual(m2.file.name, 'name')
+
+    def test_selectdatewidget(self):
+        class PubForm(forms.ModelForm):
+            date_published = forms.DateField(required=False, widget=forms.SelectDateWidget)
+
+            class Meta:
+                model = PublicationDefaults
+                fields = ('date_published',)
+
+        mf1 = PubForm({})
+        self.assertEqual(mf1.errors, {})
+        m1 = mf1.save(commit=False)
+        self.assertEqual(m1.date_published, datetime.date.today())
+
+        mf2 = PubForm({'date_published_year': '2010', 'date_published_month': '1', 'date_published_day': '1'})
+        self.assertEqual(mf2.errors, {})
+        m2 = mf2.save(commit=False)
+        self.assertEqual(m2.date_published, datetime.date(2010, 1, 1))
+
 
 class FieldOverridesByFormMetaForm(forms.ModelForm):
     class Meta:
