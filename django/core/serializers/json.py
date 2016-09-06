@@ -72,7 +72,7 @@ def Deserializer(stream_or_string, **options):
     """
     Deserialize a stream or string of JSON data.
     """
-    if not isinstance(stream_or_string, (bytes, six.string_types)):
+    if not isinstance(stream_or_string, (bytes,) + six.string_types):
         stream_or_string = stream_or_string.read()
     if isinstance(stream_or_string, bytes):
         stream_or_string = stream_or_string.decode('utf-8')
