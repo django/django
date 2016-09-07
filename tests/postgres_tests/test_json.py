@@ -136,6 +136,14 @@ class TestQuerying(TestCase):
                 'k': True,
                 'l': False,
             }),
+            JSONModel.objects.create(field='z'),
+            JSONModel.objects.create(field='Z'),
+            JSONModel.objects.create(field={
+                'x': 'y'
+            }),
+            JSONModel.objects.create(field={
+                'x': 'Y'
+            })
         ]
 
     def test_exact(self):
@@ -247,6 +255,30 @@ class TestQuerying(TestCase):
         self.assertSequenceEqual(
             JSONModel.objects.filter(id__in=JSONModel.objects.filter(field__c=1)),
             self.objs[7:9]
+        )
+
+    def test_regex(self):
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__regex=r'z'),
+            [self.objs[11]]
+        )
+
+    def test_iregex(self):
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__iregex=r'z'),
+            [self.objs[11], self.objs[12]]
+        )
+
+    def test_regex_subkey(self):
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__x__regex=r'y'),
+            [self.objs[13]]
+        )
+
+    def test_iregex_subkey(self):
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__x__iregex=r'y'),
+            [self.objs[13], self.objs[14]]
         )
 
 
