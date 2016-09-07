@@ -13,7 +13,12 @@ class DatabaseValidation(BaseDatabaseValidation):
         with self.connection.cursor() as cursor:
             cursor.execute("SELECT @@sql_mode")
             sql_mode = cursor.fetchone()
-        modes = set(sql_mode[0].split(','))
+
+        if sql_mode:
+            modes = set(sql_mode[0].split(','))
+        else:
+            modes = set()
+
         if not (modes & {'STRICT_TRANS_TABLES', 'STRICT_ALL_TABLES'}):
             return [checks.Warning(
                 "MySQL Strict Mode is not set for database connection '%s'" % self.connection.alias,
