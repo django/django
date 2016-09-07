@@ -506,7 +506,7 @@ routing our chat from above::
     ]
 
     chat_routing = [
-        route("websocket.connect", chat_connect, path=r"^/(?P<room>[a-zA-Z0-9_]+)/$),
+        route("websocket.connect", chat_connect, path=r"^/(?P<room>[a-zA-Z0-9_]+)/$"),
         route("websocket.disconnect", chat_disconnect),
     ]
 
