@@ -21,6 +21,7 @@ from django.db.transaction import atomic
 from django.test import (
     TransactionTestCase, mock, skipIfDBFeature, skipUnlessDBFeature,
 )
+from django.test.utils import CaptureQueriesContext
 from django.utils.timezone import UTC
 
 from .fields import (
@@ -347,8 +348,12 @@ class SchemaTests(TransactionTestCase):
         # Add the new field
         new_field = IntegerField(null=True)
         new_field.set_attributes_from_name("age")
-        with connection.schema_editor() as editor:
+        with CaptureQueriesContext(connection) as ctx, connection.schema_editor() as editor:
             editor.add_field(Author, new_field)
+        drop_default_sql = editor.sql_alter_column_no_default % {
+            'column': editor.quote_name(new_field.name),
+        }
+        self.assertFalse(any(drop_default_sql in query['sql'] for query in ctx.captured_queries))
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertEqual(columns['age'][0], "IntegerField")
