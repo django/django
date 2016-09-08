@@ -488,6 +488,9 @@ Miscellaneous
   ``migrate`` command. Use the new :djadmin:`remove_stale_contenttypes` command
   instead.
 
+* The admin's widget for ``IntegerField`` uses ``type="number"`` rather than
+  ``type="text"``.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11

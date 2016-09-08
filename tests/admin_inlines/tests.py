@@ -366,13 +366,13 @@ class TestInline(TestDataMixin, TestCase):
         self.assertContains(
             response,
             '<input class="vIntegerField" id="id_editablepkbook_set-0-manual_pk" '
-            'name="editablepkbook_set-0-manual_pk" type="text" />',
+            'name="editablepkbook_set-0-manual_pk" type="number" />',
             html=True, count=1
         )
         self.assertContains(
             response,
             '<input class="vIntegerField" id="id_editablepkbook_set-2-0-manual_pk" '
-            'name="editablepkbook_set-2-0-manual_pk" type="text" />',
+            'name="editablepkbook_set-2-0-manual_pk" type="number" />',
             html=True, count=1
         )
 
