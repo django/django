@@ -105,6 +105,13 @@ class Client(object):
             return
         return Message(content, recv_channel, channel_layers[self.alias])
 
+    def get_consumer_by_channel(self, channel):
+        message = Message({'text': ''}, channel, self.channel_layer)
+        match = self.channel_layer.router.match(message)
+        if match:
+            consumer, kwargs = match
+            return consumer
+
     def send(self, to, content={}):
         """
         Send a message to a channel.

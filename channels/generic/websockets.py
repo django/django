@@ -225,3 +225,77 @@ class WebsocketDemultiplexer(JsonWebsocketConsumer):
             "stream": stream,
             "payload": payload,
         }, cls=DjangoJSONEncoder)}
+
+
+class WebsocketConsumerDemultiplexer(WebsocketDemultiplexer):
+    """
+    Demultiplexer but for consumer classes.
+
+    Set a mapping of streams to consumer classes in the dict "consumers".
+
+    The demultiplexer dispatch the payload of incoming messages to the corresponding
+    consumers. The demultiplexer is forwarded to the consumer as a kwargs "demultiplexer".
+    This allows the consumer to answer with a multiplexed message using a send method
+    from the demultiplexer.
+    """
+
+    # Put your JSON consumers here: {stream_name : consumer}
+    consumers = {}
+
+    def receive(self, content, **kwargs):
+        """Forward messages to all consumers."""
+        # Check the frame looks good
+        if isinstance(content, dict) and "stream" in content and "payload" in content:
+            # Match it to a channel
+            for stream, consumer in self.consumers.items():
+                if stream == content['stream']:
+                    # Extract payload and add in reply_channel
+                    payload = content['payload']
+                    if not isinstance(payload, dict):
+                        raise ValueError("Multiplexed frame payload is not a dict")
+                    # The json consumer expects serialized JSON
+                    self.message.content['text'] = json.dumps(payload)
+                    # Send demultiplexer to the consumer, to be able to answer
+                    kwargs['multiplexer'] = Multiplexer(stream, self)
+                    consumer(self.message, **kwargs)
+                    return
+
+            raise ValueError("Invalid multiplexed frame received (stream not mapped)")
+        else:
+            raise ValueError("Invalid multiplexed **frame received (no channel/payload key)")
+
+    def connect(self, message, **kwargs):
+        """Forward connection to all consumers."""
+        for stream, consumer in self.consumers.items():
+            kwargs['multiplexer'] = Multiplexer(stream, self)
+            consumer(message, **kwargs)
+
+    def disconnect(self, message, **kwargs):
+        """Forward disconnection to all consumers."""
+        for stream, consumer in self.consumers.items():
+            kwargs['multiplexer'] = Multiplexer(stream, self)
+            consumer(message, **kwargs)
+
+
+class Multiplexer(object):
+    """
+    The opposite of the demultiplexer, to send a message though a multiplexed channel.
+
+    The demultiplexer holds the mapping and the basic send function.
+    The multiplexer allows the consumer class to be independant of the stream name.
+    """
+
+    stream = None
+    demultiplexer = None
+
+    def __init__(self, stream, demultiplexer):
+        self.stream = stream
+        self.demultiplexer = demultiplexer
+
+    def send(self, payload):
+        """Multiplex the payload using the stream name and send it."""
+        self.demultiplexer.send(self.stream, payload)
+
+    def group_send(self, name, payload, close=False):
+        """Proxy that abstracts the stream name"""
+        self.demultiplexer.group_send(name, self.stream, payload, close)

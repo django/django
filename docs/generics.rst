@@ -198,11 +198,31 @@ channel name. It will then forward the message onto that channel while
 preserving ``reply_channel``, so you can hook consumers up to them directly
 in the ``routing.py`` file, and use authentication decorators as you wish.
 
-You cannot use class-based consumers this way as the messages are no
-longer in WebSocket format, though. If you need to do operations on
-``connect`` or ``disconnect``, override those methods on the ``Demultiplexer``
-itself (you can also provide a ``connection_groups`` method, as it's just
-based on the JSON WebSocket generic consumer).
+
+Example using class-based consumer::
+
+    from channels.generic.websockets import WebsocketConsumerDemultiplexer, JsonWebsocketConsumer
+
+    class MyWebsocketConsumer(JsonWebsocketConsumer):
+        def connect(self, message, multiplexer=None, **kwargs):
+            multiplexer.send({"status": "I just connected!"})
+
+        def disconnect(self, message, multiplexer=None, **kwargs):
+            print(multiplexer.stream)
+
+        def receive(self, content, multiplexer=None, **kwargs):
+            # simple echo
+            multiplexer.send(content)
+
+    class Demultiplexer(WebsocketConsumerDemultiplexer):
+
+        # Put your JSON consumers here: {stream_name : consumer}
+        consumers = {
+            "mystream": MyWebsocketConsumer
+        }
+
+The ``multiplexer`` allows the consumer class to be independant of the stream name.
+It holds the stream name and the demultiplexer on the attributes ``stream`` and ``demultiplexer``.
 
 The :doc:`data binding <binding>` code will also send out messages to clients
 in the same format, and you can encode things in this format yourself by
