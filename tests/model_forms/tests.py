@@ -1453,6 +1453,22 @@ class ModelFormBasicTests(TestCase):
 <option value="3">Live</option>
 </select></li>''' % (self.w_woodward.pk, w_bernstein.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk, c4.pk))
 
+    def test_recleaning_model_form_instance(self):
+        """
+        Re-cleaning an instance that was added via a ModelForm shouldn't raise
+        a pk uniqueness error.
+        """
+        class AuthorForm(forms.ModelForm):
+            class Meta:
+                model = Author
+                fields = '__all__'
+
+        form = AuthorForm({'full_name': 'Bob'})
+        self.assertTrue(form.is_valid())
+        obj = form.save()
+        obj.name = 'Alice'
+        obj.full_clean()
+
 
 class ModelChoiceFieldTests(TestCase):
     def setUp(self):

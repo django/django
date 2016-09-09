@@ -9,9 +9,12 @@ from django.forms import (
     ModelMultipleChoiceField, MultipleChoiceField, RegexField,
     SplitDateTimeField, TimeField, URLField, ValidationError, utils,
 )
+from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
+
+from ..models import ChoiceModel
 
 
 class AssertFormErrorsMixin(object):
@@ -242,11 +245,50 @@ class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
         self.assertHTMLEqual(str(form2['last_name'].errors), '<div class="error"><p>This field is required.</p></div>')
         self.assertHTMLEqual(str(form2.errors['__all__']), '<div class="error"><p>I like to be awkward.</p></div>')
 
+    def test_error_messages_escaping(self):
+        # The forms layer doesn't escape input values directly because error
+        # messages might be presented in non-HTML contexts. Instead, the
+        # message is marked for escaping by the template engine, so a template
+        # is needed to trigger the escaping.
+        t = Template('{{ form.errors }}')
+
+        class SomeForm(Form):
+            field = ChoiceField(choices=[('one', 'One')])
+
+        f = SomeForm({'field': '<script>'})
+        self.assertHTMLEqual(
+            t.render(Context({'form': f})),
+            '<ul class="errorlist"><li>field<ul class="errorlist">'
+            '<li>Select a valid choice. &lt;script&gt; is not one of the '
+            'available choices.</li></ul></li></ul>'
+        )
+
+        class SomeForm(Form):
+            field = MultipleChoiceField(choices=[('one', 'One')])
+
+        f = SomeForm({'field': ['<script>']})
+        self.assertHTMLEqual(
+            t.render(Context({'form': f})),
+            '<ul class="errorlist"><li>field<ul class="errorlist">'
+            '<li>Select a valid choice. &lt;script&gt; is not one of the '
+            'available choices.</li></ul></li></ul>'
+        )
+
+        class SomeForm(Form):
+            field = ModelMultipleChoiceField(ChoiceModel.objects.all())
+
+        f = SomeForm({'field': ['<script>']})
+        self.assertHTMLEqual(
+            t.render(Context({'form': f})),
+            '<ul class="errorlist"><li>field<ul class="errorlist">'
+            '<li>&quot;&lt;script&gt;&quot; is not a valid value for a '
+            'primary key.</li></ul></li></ul>'
+        )
+
 
 class ModelChoiceFieldErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
     def test_modelchoicefield(self):
         # Create choices for the model choice field tests below.
-        from forms_tests.models import ChoiceModel
         ChoiceModel.objects.create(pk=1, name='a')
         ChoiceModel.objects.create(pk=2, name='b')
         ChoiceModel.objects.create(pk=3, name='c')
