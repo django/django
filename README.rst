@@ -41,7 +41,9 @@ To report security issues, please contact security@djangoproject.com. For GPG
 signatures and more security process information, see
 https://docs.djangoproject.com/en/dev/internals/security/.
 
-To report bugs or request new features, please open a new GitHub issue.
+To report bugs or request new features, please open a new GitHub issue. For
+larger discussions, please post to the
+`django-developers mailing list <https://groups.google.com/d/forum/django-developers>`_.
 
 Django Core Shepherd: Andrew Godwin <andrew@aeracode.org>
 
