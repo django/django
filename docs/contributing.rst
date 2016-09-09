@@ -18,7 +18,7 @@ We're looking for help with the following areas:
 You can find what we're looking to work on in the GitHub issues list for each
 of the Channels sub-projects:
 
- * `Channels issues <https://github.com/django/channels/issues/>`_, for the Django integration
+ * `Channels issues <https://github.com/django/channels/issues/>`_, for the Django integration and overall project efforts
  * `Daphne issues <https://github.com/django/daphne/issues/>`_, for the HTTP and Websocket termination
  * `asgiref issues <https://github.com/django/asgiref/issues/>`_, for the base ASGI library/memory backend
  * `asgi_redis issues <https://github.com/django/asgi_redis/issues/>`_, for the Redis channel backend
