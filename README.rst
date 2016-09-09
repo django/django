@@ -6,7 +6,7 @@ Django Channels
     
 .. image:: https://readthedocs.org/projects/channels/badge/?version=latest
     :target: http://channels.readthedocs.org/en/latest/?badge=latest
-    
+
 .. image:: https://img.shields.io/pypi/v/channels.svg
     :target: https://pypi.python.org/pypi/channels
 
@@ -46,6 +46,7 @@ To report bugs or request new features, please open a new GitHub issue.
 Django Core Shepherd: Andrew Godwin <andrew@aeracode.org>
 
 Maintenance team:
+
 * Andrew Godwin <andrew@aeracode.org>
 * Steven Davidson
 * Jeremy Spencer
