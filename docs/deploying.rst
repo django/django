@@ -134,7 +134,7 @@ If you want to support WebSockets, long-poll HTTP requests and other Channels
 features, you'll need to run a native ASGI interface server, as the WSGI
 specification has no support for running these kinds of requests concurrently.
 We ship with an interface server that we recommend you use called
-`Daphne <http://github.com/andrewgodwin/daphne/>`_; it supports WebSockets,
+`Daphne <http://github.com/django/daphne/>`_; it supports WebSockets,
 long-poll HTTP requests, HTTP/2 *(soon)* and performs quite well.
 
 You can just keep running your Django code as a WSGI app if you like, behind

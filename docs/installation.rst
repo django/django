@@ -28,7 +28,7 @@ To install the latest version of Channels, clone the repo, change to the repo,
 change to the repo directory, and pip install it into your current virtual
 environment::
 
-    $ git clone git@github.com:andrewgodwin/channels.git
+    $ git clone git@github.com:django/channels.git
     $ cd channels
     $ <activate your project’s virtual environment>
     (environment) $ pip install -e .  # the dot specifies the current repo

@@ -1,9 +1,9 @@
 Django Channels
 ===============
 
-.. image:: https://api.travis-ci.org/andrewgodwin/channels.svg
-    :target: https://travis-ci.org/andrewgodwin/channels
-    
+.. image:: https://api.travis-ci.org/django/channels.svg
+    :target: https://travis-ci.org/django/channels
+
 .. image:: https://readthedocs.org/projects/channels/badge/?version=latest
     :target: http://channels.readthedocs.org/en/latest/?badge=latest
 

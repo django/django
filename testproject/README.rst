@@ -74,7 +74,7 @@ Install fabric on your machine. This is highly dependent on what your environmen
 
 Git clone this project down to your machine::
 
-    git clone https://github.com/andrewgodwin/channels/
+    git clone https://github.com/django/channels/
 
 Relative to where you cloned the directory, move up a couple levels::
 

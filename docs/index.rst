@@ -17,9 +17,26 @@ WebSockets with only 30 lines of code.
 
 If you want a quick overview, start with :doc:`inshort`.
 
-You can find the Channels repository `on GitHub <http://github.com/andrewgodwin/channels/>`_.
+If you are interested in contributing, please read our :doc:`contributing` docs!
 
-Contents:
+
+Projects
+--------
+
+Channels is comprised of five packages:
+
+ * `Channels <https://github.com/django/channels/>`_, the Django integration layer
+ * `Daphne <https://github.com/django/daphne/>`_, the HTTP and Websocket termination server
+ * `asgiref <https://github.com/django/asgiref/>`_, the base ASGI library/memory backend
+ * `asgi_redis <https://github.com/django/asgi_redis/>`_, the Redis channel backend
+ * `asgi_ipc <https://github.com/django/asgi_ipc/>`_, the POSIX IPC channel backend
+
+This documentation covers the system as a whole; individual release notes and
+instructions can be found in the individual repositories.
+
+
+Topics
+------
 
 .. toctree::
    :maxdepth: 2

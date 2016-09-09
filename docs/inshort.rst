@@ -36,7 +36,7 @@ I have to change how I run Django?
 No, all the new stuff is entirely optional. If you want it, however, you'll
 change from running Django under a WSGI server, to running:
 
-* An ASGI server, probably `Daphne <http://github.com/andrewgodwin/daphne/>`_
+* An ASGI server, probably `Daphne <http://github.com/django/daphne/>`_
 * Django worker servers, using ``manage.py runworker``
 * Something to route ASGI requests over, like Redis.
 

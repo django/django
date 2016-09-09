@@ -10,8 +10,10 @@ Examples of contributions include:
 * Documentation improvements
 * Bug reports and patch reviews
 
-Setup
------
+For more information, please see our `contribution guide <http://channels.readthedocs.io/en/latest/contributing.html>`_.
+
+Quick Setup
+-----------
 
 Fork, then clone the repo:
 
@@ -25,9 +27,4 @@ Make your change. Add tests for your change. Make the tests pass:
 
     tox
 
-Push to your fork and `submit a pull request <https://github.com/andrewgodwin/channels/compare/>`_.
-
-
-At this point you're waiting on us. We like to at least comment on pull requests
-within three business days (and, typically, one business day). We may suggest
-some changes or improvements or alternatives.
+Push to your fork and `submit a pull request <https://github.com/django/channels/compare/>`_.

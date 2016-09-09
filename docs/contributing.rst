@@ -15,34 +15,46 @@ We're looking for help with the following areas:
  * Feature polish and occasional new feature design
  * Case studies and writeups
 
-You can find what we're looking to work on right now in two places:
+You can find what we're looking to work on in the GitHub issues list for each
+of the Channels sub-projects:
 
- * Specific bugs are in the `GitHub issues <https://github.com/andrewgodwin/channels/issues>`_
- * Higher-level tasks are on the `ChannelsTasks Django wiki page <https://code.djangoproject.com/wiki/ChannelsTasks>`_
+ * `Channels issues <https://github.com/django/channels/issues/>`_, for the Django integration
+ * `Daphne issues <https://github.com/django/daphne/issues/>`_, for the HTTP and Websocket termination
+ * `asgiref issues <https://github.com/django/asgiref/issues/>`_, for the base ASGI library/memory backend
+ * `asgi_redis issues <https://github.com/django/asgi_redis/issues/>`_, for the Redis channel backend
+ * `asgi_ipc issues <https://github.com/django/asgi_ipc/issues/>`_, for the POSIX IPC channel backend
 
-These are, however, just a suggested list - any offer to help is welcome as long
-as it fits the project goals.
+Issues are categorized by difficulty level:
 
+ * ``exp/beginner``: Easy issues suitable for a first-time contributor.
+ * ``exp/intermediate``: Moderate issues that need skill and a day or two to solve.
+ * ``exp/advanced``: Difficult issues that require expertise and potentially weeks of work.
 
-I'm interested, how should I get started?
------------------------------------------
+They are also classified by type:
 
-The best thing to do is to see if there's a `GitHub issue <https://github.com/andrewgodwin/channels/issues>`_
-for the thing you wish to work on - if there is, leave a comment saying you're
-going to take it on, and if not, open one describing what you're doing so there's
-a place to record information around.
+ * ``documentation``: Documentation issues. Pick these if you want to help us by writing docs.
+ * ``bug``: A bug in existing code. Usually easier for beginners as there's a defined thing to fix.
+ * ``enhancement``: A new feature for the code; may be a bit more open-ended.
 
-If you have questions, you can either open an issue with the questions detailed,
-hop on the ``#django-channels`` channel on Freenode IRC, or email Andrew directly
-at ``andrew@aeracode.org``.
+You should filter the issues list by the experience level and type of work
+you'd like to do, and then if you want to take something on leave a comment
+and assign yourself to it. If you want advice about how to take on a bug,
+leave a comment asking about it, or pop into the IRC channel at
+``#django-channels`` on Freenode and we'll be happy to help.
+
+The issues are also just a suggested list - any offer to help is welcome as long
+as it fits the project goals, but you should make an issue for the thing you
+wish to do and discuss it first if it's relatively large (but if you just found
+a small bug and want to fix it, sending us a pull request straight away is fine).
 
 
 I'm a novice contributor/developer - can I help?
 ------------------------------------------------
 
-Of course - just get in touch like above and mention your experience level,
-and we'll try the best we can to match you up with someone to mentor you through
-the task.
+Of course! The issues labelled with ``exp/beginner`` are a perfect place to
+get started, as they're usually small and well defined. If you want help with
+one of them, pop into the IRC channel at ``#django-channels`` on Freenode or
+get in touch with Andrew directly at andrew@aeracode.org.
 
 
 Can you pay me for my time?

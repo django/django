@@ -4,9 +4,9 @@ from channels import __version__
 setup(
     name='channels',
     version=__version__,
-    url='http://github.com/andrewgodwin/channels',
-    author='Andrew Godwin',
-    author_email='andrew@aeracode.org',
+    url='http://github.com/django/channels',
+    author='Django Software Foundation',
+    author_email='foundation@djangoproject.com',
     description="Brings event-driven capabilities to Django with a channel system. Django 1.8 and up only.",
     license='BSD',
     packages=find_packages(),
