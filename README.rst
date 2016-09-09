@@ -50,3 +50,7 @@ Maintenance team:
 * Andrew Godwin <andrew@aeracode.org>
 * Steven Davidson
 * Jeremy Spencer
+
+If you are interested in joining the maintenance team, please
+`read more about contributing <http://channels.readthedocs.io/en/latest/contributing.html>`_
+and get in touch!
