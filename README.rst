@@ -32,3 +32,20 @@ channel on Freenode.
 
 You can also install channels from PyPI as the ``channels`` package.
 You'll likely also want ``asgi_redis`` to provide the Redis channel layer.
+
+
+Maintenance and Security
+------------------------
+
+To report security issues, please contact security@djangoproject.com. For GPG
+signatures and more security process information, see
+https://docs.djangoproject.com/en/dev/internals/security/.
+
+To report bugs or request new features, please open a new GitHub issue.
+
+Django Core Shepherd: Andrew Godwin <andrew@aeracode.org>
+
+Maintenance team:
+* Andrew Godwin <andrew@aeracode.org>
+* Steven Davidson
+* Jeremy Spencer
