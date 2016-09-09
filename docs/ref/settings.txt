@@ -2527,7 +2527,7 @@ to ensure your processes are running in the correct environment.
 
 Default: ``False``
 
-A boolean that specifies whether to output the "Etag" header. This saves
+A boolean that specifies whether to output the ``ETag`` header. This saves
 bandwidth but slows down performance. This is used by the ``CommonMiddleware``
 (see :doc:`/topics/http/middleware`) and in the``Cache Framework``
 (see :doc:`/topics/cache`).

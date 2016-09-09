@@ -64,7 +64,7 @@ order, as the view function they are helping to wrap. The function passed
 ``last_modified_func`` should return a standard datetime value specifying the
 last time the resource was modified, or ``None`` if the resource doesn't
 exist. The function passed to the ``etag`` decorator should return a string
-representing the `Etag`_ for the resource, or ``None`` if it doesn't exist.
+representing the `ETag`_ for the resource, or ``None`` if it doesn't exist.
 
 Using this feature usefully is probably best explained with an example.
 Suppose you have this pair of models, representing a simple blog system::

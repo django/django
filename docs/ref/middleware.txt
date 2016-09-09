@@ -472,7 +472,7 @@ Here are some hints about the ordering of various Django middleware classes:
 
 #. :class:`~django.middleware.http.ConditionalGetMiddleware`
 
-   Before ``CommonMiddleware``: uses its ``Etag`` header when
+   Before ``CommonMiddleware``: uses its ``ETag`` header when
    :setting:`USE_ETAGS` = ``True``.
 
 #. :class:`~django.contrib.sessions.middleware.SessionMiddleware`

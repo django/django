@@ -2163,7 +2163,7 @@ class TestWithTemplateResponse(SimpleTestCase):
     Tests various headers w/ TemplateResponse.
 
     Most are probably redundant since they manipulate the same object
-    anyway but the Etag header is 'special' because it relies on the
+    anyway but the ETag header is 'special' because it relies on the
     content being complete (which is not necessarily always the case
     with a TemplateResponse)
     """
