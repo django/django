@@ -5990,7 +5990,7 @@ class InlineAdminViewOnSiteTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
-class TestEtagWithAdminView(SimpleTestCase):
+class TestETagWithAdminView(SimpleTestCase):
     # See https://code.djangoproject.com/ticket/16003
 
     def test_admin(self):
