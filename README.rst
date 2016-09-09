@@ -62,3 +62,14 @@ Maintenance team:
 If you are interested in joining the maintenance team, please
 `read more about contributing <http://channels.readthedocs.io/en/latest/contributing.html>`_
 and get in touch!
+
+
+Other Projects
+--------------
+
+The Channels project is made up of several packages; the others are:
+
+ * `Daphne <https://github.com/django/daphne/>`_, the HTTP and Websocket termination server
+ * `asgiref <https://github.com/django/asgiref/>`_, the base ASGI library/memory backend
+ * `asgi_redis <https://github.com/django/asgi_redis/>`_, the Redis channel backend
+ * `asgi_ipc <https://github.com/django/asgi_ipc/>`_, the POSIX IPC channel backend
