@@ -33,6 +33,9 @@ details on these changes.
 * The ``host`` parameter of ``django.utils.http.is_safe_url()`` will be
   removed.
 
+* Silencing of exceptions raised while rendering the ``{% include %}`` template
+  tag will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

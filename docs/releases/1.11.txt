@@ -528,3 +528,8 @@ Miscellaneous
 
 * The ``host`` parameter of ``django.utils.http.is_safe_url()`` is deprecated
   in favor of the new ``allowed_hosts`` parameter.
+
+* Silencing exceptions raised while rendering the
+  :ttag:`{% include %} <include>` template tag is deprecated as the behavior is
+  often more confusing than helpful. In Django 2.1, the exception will be
+  raised.
