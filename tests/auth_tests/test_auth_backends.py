@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from datetime import date
 
 from django.contrib.auth import (
@@ -604,6 +606,50 @@ class TypeErrorBackendTest(TestCase):
     def test_type_error_raised(self):
         with self.assertRaises(TypeError):
             authenticate(username='test', password='test')
+
+
+class AcceptsRequestBackend(object):
+    """
+    Authenticate method accepts a request parameter.
+    """
+
+    def authenticate(self, request, username=None, password=None):
+        pass
+
+
+class NoRequestBackend(object):
+    """
+    Authenticate method accepts no request parameter.
+    """
+
+    def authenticate(self, username=None, password=None):
+        pass
+
+
+class AcceptsRequestBackendTest(SimpleTestCase):
+    """
+    Tests that backends authenticate method can accept a request parameter
+    and a deprecation warning is shown for backends authenticate method
+    without a request parameter.
+    """
+    accepts_request_backend = 'auth_tests.test_auth_backends.AcceptsRequestBackend'
+    no_request_backend = 'auth_tests.test_auth_backends.NoRequestBackend'
+
+    @override_settings(AUTHENTICATION_BACKENDS=[accepts_request_backend])
+    def test_accepts_request(self):
+        request = HttpRequest()
+        authenticate(request, username='test', password='test')
+
+    @override_settings(AUTHENTICATION_BACKENDS=[no_request_backend])
+    def test_no_request_deprecation_warning(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            authenticate(username='test', password='test')
+        self.assertEqual(len(warns), 1)
+        msg = str(warns[0].message)
+        self.assertEqual(msg, "Update authentication backend auth_tests."
+                              "test_auth_backends.NoRequestBackend to accept "
+                              "a positional `request` argument.")
 
 
 class ImproperlyConfiguredUserModelTest(TestCase):

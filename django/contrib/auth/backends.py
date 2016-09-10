@@ -8,8 +8,8 @@ class ModelBackend(object):
     """
     Authenticates against settings.AUTH_USER_MODEL.
     """
-
-    def authenticate(self, username=None, password=None, **kwargs):
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        self.request = request
         UserModel = get_user_model()
         if username is None:
             username = kwargs.get(UserModel.USERNAME_FIELD)
@@ -125,7 +125,7 @@ class RemoteUserBackend(ModelBackend):
     # Create a User object if not already in the database?
     create_unknown_user = True
 
-    def authenticate(self, remote_user):
+    def authenticate(self, request, remote_user):
         """
         The username passed as ``remote_user`` is considered trusted.  This
         method simply returns the ``User`` object with the given username,
@@ -134,6 +134,7 @@ class RemoteUserBackend(ModelBackend):
         Returns None if ``create_unknown_user`` is ``False`` and a ``User``
         object with the given username is not found in the database.
         """
+        self.request = request
         if not remote_user:
             return
         user = None
