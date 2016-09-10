@@ -109,7 +109,7 @@ class MultiValueDict(dict):
 
     def __getstate__(self):
         obj_dict = self.__dict__.copy()
-        obj_dict['_data'] = {k: self.getlist(k) for k in self}
+        obj_dict['_data'] = {k: self._getlist(k) for k in self}
         return obj_dict
 
     def __setstate__(self, obj_dict):
@@ -131,17 +131,30 @@ class MultiValueDict(dict):
             return default
         return val
 
-    def getlist(self, key, default=None):
+    def _getlist(self, key, default=None, force_list=False):
         """
-        Returns the list of values for the passed key. If key doesn't exist,
-        then a default value is returned.
+        Return a list of values for the key.
+
+        Used internally to manipulate values list. If force_list is True,
+        return a new copy of values.
         """
         try:
-            return super(MultiValueDict, self).__getitem__(key)
+            values = super(MultiValueDict, self).__getitem__(key)
         except KeyError:
             if default is None:
                 return []
             return default
+        else:
+            if force_list:
+                values = list(values)
+            return values
+
+    def getlist(self, key, default=None):
+        """
+        Return the list of values for the key. If key doesn't exist, return a
+        default value.
+        """
+        return self._getlist(key, default, force_list=True)
 
     def setlist(self, key, list_):
         super(MultiValueDict, self).__setitem__(key, list_)
@@ -160,7 +173,7 @@ class MultiValueDict(dict):
             self.setlist(key, default_list)
             # Do not return default_list here because setlist() may store
             # another value -- QueryDict.setlist() does. Look it up.
-        return self.getlist(key)
+        return self._getlist(key)
 
     def appendlist(self, key, value):
         """Appends an item to the internal list associated with key."""
