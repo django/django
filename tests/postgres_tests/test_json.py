@@ -1,15 +1,13 @@
 from __future__ import unicode_literals
 
 import datetime
-import unittest
 import uuid
 from decimal import Decimal
 
 from django.core import exceptions, serializers
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import connection
 from django.forms import CharField, Form, widgets
-from django.test import TestCase
+from django.test import skipUnlessDBFeature
 from django.utils.html import escape
 
 from . import PostgreSQLTestCase
@@ -22,18 +20,8 @@ except ImportError:
     pass
 
 
-def skipUnlessPG94(test):
-    try:
-        PG_VERSION = connection.pg_version
-    except AttributeError:
-        PG_VERSION = 0
-    if PG_VERSION < 90400:
-        return unittest.skip('PostgreSQL >= 9.4 required')(test)
-    return test
-
-
-@skipUnlessPG94
-class TestSaveLoad(TestCase):
+@skipUnlessDBFeature('has_jsonb_datatype')
+class TestSaveLoad(PostgreSQLTestCase):
     def test_null(self):
         instance = JSONModel()
         instance.save()
@@ -106,8 +94,8 @@ class TestSaveLoad(TestCase):
         self.assertEqual(loaded.field_custom, obj_after)
 
 
-@skipUnlessPG94
-class TestQuerying(TestCase):
+@skipUnlessDBFeature('has_jsonb_datatype')
+class TestQuerying(PostgreSQLTestCase):
     @classmethod
     def setUpTestData(cls):
         cls.objs = [
@@ -250,8 +238,8 @@ class TestQuerying(TestCase):
         )
 
 
-@skipUnlessPG94
-class TestSerialization(TestCase):
+@skipUnlessDBFeature('has_jsonb_datatype')
+class TestSerialization(PostgreSQLTestCase):
     test_data = (
         '[{"fields": {"field": {"a": "b", "c": null}, "field_custom": null}, '
         '"model": "postgres_tests.jsonmodel", "pk": null}]'

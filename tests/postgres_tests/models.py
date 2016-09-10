@@ -1,5 +1,5 @@
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import connection, models
+from django.db import models
 
 from .fields import (
     ArrayField, BigIntegerRangeField, DateRangeField, DateTimeRangeField,
@@ -129,15 +129,12 @@ class RangeLookupsModel(PostgreSQLModel):
     date = models.DateField(blank=True, null=True)
 
 
-# Only create this model for postgres >= 9.4
-if connection.vendor == 'postgresql' and connection.pg_version >= 90400:
-    class JSONModel(models.Model):
-        field = JSONField(blank=True, null=True)
-        field_custom = JSONField(blank=True, null=True, encoder=DjangoJSONEncoder)
-else:
-    # create an object with this name so we don't have failing imports
-    class JSONModel(object):
-        pass
+class JSONModel(models.Model):
+    field = JSONField(blank=True, null=True)
+    field_custom = JSONField(blank=True, null=True, encoder=DjangoJSONEncoder)
+
+    class Meta:
+        required_db_features = ['has_jsonb_datatype']
 
 
 class ArrayFieldSubclass(ArrayField):

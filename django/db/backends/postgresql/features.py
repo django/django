@@ -36,3 +36,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def has_select_for_update_skip_locked(self):
         return self.connection.pg_version >= 90500
+
+    @cached_property
+    def has_jsonb_datatype(self):
+        return self.connection.pg_version >= 90400
