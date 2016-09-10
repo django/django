@@ -78,9 +78,6 @@ class StringLookupTests(TestCase):
         """
         a = Article(name='IP test', text='The body', submitted_from='192.0.2.100')
         a.save()
-        self.assertQuerysetEqual(
-            Article.objects.filter(submitted_from__contains='192.0.2'),
-            [a], lambda x: x
-        )
+        self.assertSequenceEqual(Article.objects.filter(submitted_from__contains='192.0.2'), [a])
         # Test that the searches do not match the subnet mask (/32 in this case)
         self.assertEqual(Article.objects.filter(submitted_from__contains='32').count(), 0)

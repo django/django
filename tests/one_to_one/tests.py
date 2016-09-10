@@ -519,12 +519,12 @@ class OneToOneTests(TestCase):
         # Test that subquery using primary key and a query against the
         # same model works correctly.
         q2 = Restaurant.objects.filter(place_id__in=q1)
-        self.assertQuerysetEqual(q2, [r], lambda x: x)
+        self.assertSequenceEqual(q2, [r])
         # Test that subquery using 'pk__in' instead of 'place_id__in' work, too.
         q2 = Restaurant.objects.filter(
             pk__in=Restaurant.objects.filter(place__id=r.place.pk)
         )
-        self.assertQuerysetEqual(q2, [r], lambda x: x)
+        self.assertSequenceEqual(q2, [r])
 
     def test_rel_pk_exact(self):
         r = Restaurant.objects.first()
@@ -534,5 +534,5 @@ class OneToOneTests(TestCase):
     def test_primary_key_to_field_filter(self):
         target = Target.objects.create(name='foo')
         pointer = ToFieldPointer.objects.create(target=target)
-        self.assertQuerysetEqual(ToFieldPointer.objects.filter(target=target), [pointer], lambda x: x)
-        self.assertQuerysetEqual(ToFieldPointer.objects.filter(pk__exact=pointer), [pointer], lambda x: x)
+        self.assertSequenceEqual(ToFieldPointer.objects.filter(target=target), [pointer])
+        self.assertSequenceEqual(ToFieldPointer.objects.filter(pk__exact=pointer), [pointer])

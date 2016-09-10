@@ -137,9 +137,7 @@ class LookupTests(TestCase):
     def test_values(self):
         # values() returns a list of dictionaries instead of object instances --
         # and you can specify which fields you want to retrieve.
-        def identity(x):
-            return x
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.values('headline'),
             [
                 {'headline': 'Article 5'},
@@ -150,14 +148,12 @@ class LookupTests(TestCase):
                 {'headline': 'Article 7'},
                 {'headline': 'Article 1'},
             ],
-            transform=identity
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(pub_date__exact=datetime(2005, 7, 27)).values('id'),
             [{'id': self.a2.id}, {'id': self.a3.id}, {'id': self.a7.id}],
-            transform=identity
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.values('id', 'headline'),
             [
                 {'id': self.a5.id, 'headline': 'Article 5'},
@@ -168,12 +164,11 @@ class LookupTests(TestCase):
                 {'id': self.a7.id, 'headline': 'Article 7'},
                 {'id': self.a1.id, 'headline': 'Article 1'},
             ],
-            transform=identity
         )
         # You can use values() with iterator() for memory savings,
         # because iterator() uses database-level iteration.
-        self.assertQuerysetEqual(
-            Article.objects.values('id', 'headline').iterator(),
+        self.assertSequenceEqual(
+            list(Article.objects.values('id', 'headline').iterator()),
             [
                 {'headline': 'Article 5', 'id': self.a5.id},
                 {'headline': 'Article 6', 'id': self.a6.id},
@@ -183,10 +178,9 @@ class LookupTests(TestCase):
                 {'headline': 'Article 7', 'id': self.a7.id},
                 {'headline': 'Article 1', 'id': self.a1.id},
             ],
-            transform=identity
         )
         # The values() method works with "extra" fields specified in extra(select).
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.extra(select={'id_plus_one': 'id + 1'}).values('id', 'id_plus_one'),
             [
                 {'id': self.a5.id, 'id_plus_one': self.a5.id + 1},
@@ -197,7 +191,6 @@ class LookupTests(TestCase):
                 {'id': self.a7.id, 'id_plus_one': self.a7.id + 1},
                 {'id': self.a1.id, 'id_plus_one': self.a1.id + 1},
             ],
-            transform=identity
         )
         data = {
             'id_plus_one': 'id+1',
@@ -209,7 +202,7 @@ class LookupTests(TestCase):
             'id_plus_seven': 'id+7',
             'id_plus_eight': 'id+8',
         }
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(id=self.a1.id).extra(select=data).values(*data.keys()),
             [{
                 'id_plus_one': self.a1.id + 1,
@@ -220,10 +213,10 @@ class LookupTests(TestCase):
                 'id_plus_six': self.a1.id + 6,
                 'id_plus_seven': self.a1.id + 7,
                 'id_plus_eight': self.a1.id + 8,
-            }], transform=identity
+            }],
         )
         # You can specify fields from forward and reverse relations, just like filter().
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.values('headline', 'author__name'),
             [
                 {'headline': self.a5.headline, 'author__name': self.au2.name},
@@ -233,9 +226,9 @@ class LookupTests(TestCase):
                 {'headline': self.a3.headline, 'author__name': self.au1.name},
                 {'headline': self.a7.headline, 'author__name': self.au2.name},
                 {'headline': self.a1.headline, 'author__name': self.au1.name},
-            ], transform=identity
+            ],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Author.objects.values('name', 'article__headline').order_by('name', 'article__headline'),
             [
                 {'name': self.au1.name, 'article__headline': self.a1.headline},
@@ -245,9 +238,9 @@ class LookupTests(TestCase):
                 {'name': self.au2.name, 'article__headline': self.a5.headline},
                 {'name': self.au2.name, 'article__headline': self.a6.headline},
                 {'name': self.au2.name, 'article__headline': self.a7.headline},
-            ], transform=identity
+            ],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             (
                 Author.objects
                 .values('name', 'article__headline', 'article__tag__name')
@@ -263,7 +256,7 @@ class LookupTests(TestCase):
                 {'name': self.au2.name, 'article__headline': self.a5.headline, 'article__tag__name': self.t3.name},
                 {'name': self.au2.name, 'article__headline': self.a6.headline, 'article__tag__name': self.t3.name},
                 {'name': self.au2.name, 'article__headline': self.a7.headline, 'article__tag__name': self.t3.name},
-            ], transform=identity
+            ],
         )
         # However, an exception FieldDoesNotExist will be thrown if you specify
         # a non-existent field name in values() (a field that is neither in the
@@ -271,7 +264,7 @@ class LookupTests(TestCase):
         with self.assertRaises(FieldError):
             Article.objects.extra(select={'id_plus_one': 'id + 1'}).values('id', 'id_plus_two')
         # If you don't specify field names to values(), all are returned.
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(id=self.a5.id).values(),
             [{
                 'id': self.a5.id,
@@ -279,7 +272,6 @@ class LookupTests(TestCase):
                 'headline': 'Article 5',
                 'pub_date': datetime(2005, 8, 1, 9, 0)
             }],
-            transform=identity
         )
 
     def test_values_list(self):
@@ -287,9 +279,7 @@ class LookupTests(TestCase):
         # returned as a list of tuples, rather than a list of dictionaries.
         # Within each tuple, the order of the elements is the same as the order
         # of fields in the values_list() call.
-        def identity(x):
-            return x
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.values_list('headline'),
             [
                 ('Article 5',),
@@ -299,24 +289,21 @@ class LookupTests(TestCase):
                 ('Article 3',),
                 ('Article 7',),
                 ('Article 1',),
-            ], transform=identity
+            ],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.values_list('id').order_by('id'),
             [(self.a1.id,), (self.a2.id,), (self.a3.id,), (self.a4.id,), (self.a5.id,), (self.a6.id,), (self.a7.id,)],
-            transform=identity
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.values_list('id', flat=True).order_by('id'),
             [self.a1.id, self.a2.id, self.a3.id, self.a4.id, self.a5.id, self.a6.id, self.a7.id],
-            transform=identity
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').values_list('id'),
             [(self.a1.id,), (self.a2.id,), (self.a3.id,), (self.a4.id,), (self.a5.id,), (self.a6.id,), (self.a7.id,)],
-            transform=identity
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').values_list('id_plus_one', 'id'),
             [
                 (self.a1.id + 1, self.a1.id),
@@ -327,9 +314,8 @@ class LookupTests(TestCase):
                 (self.a6.id + 1, self.a6.id),
                 (self.a7.id + 1, self.a7.id)
             ],
-            transform=identity
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').values_list('id', 'id_plus_one'),
             [
                 (self.a1.id, self.a1.id + 1),
@@ -340,10 +326,9 @@ class LookupTests(TestCase):
                 (self.a6.id, self.a6.id + 1),
                 (self.a7.id, self.a7.id + 1)
             ],
-            transform=identity
         )
         args = ('name', 'article__headline', 'article__tag__name')
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Author.objects.values_list(*args).order_by(*args),
             [
                 (self.au1.name, self.a1.headline, self.t1.name),
@@ -355,7 +340,7 @@ class LookupTests(TestCase):
                 (self.au2.name, self.a5.headline, self.t3.name),
                 (self.au2.name, self.a6.headline, self.t3.name),
                 (self.au2.name, self.a7.headline, self.t3.name),
-            ], transform=identity
+            ],
         )
         with self.assertRaises(TypeError):
             Article.objects.values_list('id', 'headline', flat=True)
@@ -812,6 +797,4 @@ class LookupTransactionTests(TransactionTestCase):
             # NOTE: Needs to be created after the article has been saved.
             cursor.execute(
                 'CREATE FULLTEXT INDEX myisam_article_ft ON myisam_article (headline)')
-            self.assertQuerysetEqual(
-                MyISAMArticle.objects.filter(headline__search='Reinhardt'),
-                [dr], lambda x: x)
+            self.assertSequenceEqual(MyISAMArticle.objects.filter(headline__search='Reinhardt'), [dr])
