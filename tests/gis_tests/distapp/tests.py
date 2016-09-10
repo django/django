@@ -426,7 +426,7 @@ class DistanceTest(TestCase):
         qs = SouthTexasCity.objects.distance(Point(3, 3)).order_by(
             'distance'
         ).values_list('name', flat=True).filter(name__in=('San Antonio', 'Pearland'))
-        self.assertQuerysetEqual(qs, ['San Antonio', 'Pearland'], lambda x: x)
+        self.assertSequenceEqual(qs, ['San Antonio', 'Pearland'])
 
 
 '''
@@ -641,7 +641,7 @@ class DistanceFunctionsTests(TestCase):
         qs = SouthTexasCity.objects.annotate(distance=Distance('point', Point(3, 3, srid=32140))).order_by(
             'distance'
         ).values_list('name', flat=True).filter(name__in=('San Antonio', 'Pearland'))
-        self.assertQuerysetEqual(qs, ['San Antonio', 'Pearland'], lambda x: x)
+        self.assertSequenceEqual(qs, ['San Antonio', 'Pearland'])
 
     @skipUnlessDBFeature("has_Length_function")
     def test_length(self):

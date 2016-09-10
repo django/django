@@ -32,12 +32,11 @@ class ModelInheritanceTests(TestCase):
 
         # The children inherit the Meta class of their parents (if they don't
         # specify their own).
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Worker.objects.values("name"), [
                 {"name": "Barney"},
                 {"name": "Fred"},
             ],
-            lambda o: o
         )
 
         # Since Student does not subclass CommonInfo's Meta, it has the effect
@@ -313,11 +312,10 @@ class ModelInheritanceDataTests(TestCase):
 
     def test_values_works_on_parent_model_fields(self):
         # The values() command also works on fields from parent models.
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             ItalianRestaurant.objects.values("name", "rating"), [
                 {"rating": 4, "name": "Ristorante Miron"},
             ],
-            lambda o: o
         )
 
     def test_select_related_works_on_parent_model_fields(self):

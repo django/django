@@ -46,44 +46,39 @@ class DatesTests(TestCase):
         c = Category.objects.create(name="serious-news")
         c.articles.add(a1, a3)
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Comment.objects.dates("article__pub_date", "year"), [
                 datetime.date(2005, 1, 1),
                 datetime.date(2010, 1, 1),
             ],
-            lambda d: d,
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Comment.objects.dates("article__pub_date", "month"), [
                 datetime.date(2005, 7, 1),
                 datetime.date(2010, 7, 1),
             ],
-            lambda d: d
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Comment.objects.dates("article__pub_date", "day"), [
                 datetime.date(2005, 7, 28),
                 datetime.date(2010, 7, 28),
             ],
-            lambda d: d
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.dates("comments__pub_date", "day"), [
                 datetime.date(2005, 7, 28),
                 datetime.date(2005, 7, 29),
                 datetime.date(2005, 8, 29),
                 datetime.date(2010, 7, 28),
             ],
-            lambda d: d
         )
         self.assertQuerysetEqual(
             Article.objects.dates("comments__approval_date", "day"), []
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Category.objects.dates("articles__pub_date", "day"), [
                 datetime.date(2005, 7, 28),
             ],
-            lambda d: d,
         )
 
     def test_dates_fails_when_no_arguments_are_provided(self):
@@ -120,10 +115,10 @@ class DatesTests(TestCase):
                 datetime.datetime(2015, 10, 22, 18, 2),
             ]
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.dates('pub_datetime', 'day', order='ASC'), [
-                "datetime.date(2015, 10, 21)",
-                "datetime.date(2015, 10, 22)",
+                datetime.date(2015, 10, 21),
+                datetime.date(2015, 10, 22),
             ]
         )
 

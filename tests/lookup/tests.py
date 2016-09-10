@@ -812,6 +812,6 @@ class LookupTransactionTests(TransactionTestCase):
             # NOTE: Needs to be created after the article has been saved.
             cursor.execute(
                 'CREATE FULLTEXT INDEX myisam_article_ft ON myisam_article (headline)')
-            self.assertQuerysetEqual(
+            self.assertSequenceEqual(
                 MyISAMArticle.objects.filter(headline__search='Reinhardt'),
-                [dr], lambda x: x)
+                [dr])

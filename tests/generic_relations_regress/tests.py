@@ -149,12 +149,12 @@ class GenericRelationTests(TestCase):
         hs4 = HasLinkThing.objects.create()
         l1 = Link.objects.create(content_object=hs3)
         l2 = Link.objects.create(content_object=hs4)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             HasLinkThing.objects.filter(links=l1),
-            [hs3], lambda x: x)
-        self.assertQuerysetEqual(
+            [hs3])
+        self.assertSequenceEqual(
             HasLinkThing.objects.filter(links=l2),
-            [hs4], lambda x: x)
+            [hs4])
         self.assertQuerysetEqual(
             HasLinkThing.objects.exclude(links=l2),
             [hs1, hs2, hs3], lambda x: x, ordered=False)
@@ -171,13 +171,13 @@ class GenericRelationTests(TestCase):
         c3 = C.objects.create(b=b3)
         A.objects.create(flag=None, content_object=b1)
         A.objects.create(flag=True, content_object=b2)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             C.objects.filter(b__a__flag=None),
-            [c1, c3], lambda x: x
+            [c1, c3]
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             C.objects.exclude(b__a__flag=None),
-            [c2], lambda x: x
+            [c2]
         )
 
     def test_ticket_20564_nullable_fk(self):
@@ -191,22 +191,19 @@ class GenericRelationTests(TestCase):
         A.objects.create(flag=None, content_object=b1)
         A.objects.create(flag=True, content_object=b1)
         A.objects.create(flag=True, content_object=b2)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             D.objects.exclude(b__a__flag=None),
-            [d2], lambda x: x
+            [d2]
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             D.objects.filter(b__a__flag=None),
-            [d1, d3, d4], lambda x: x
-        )
-        self.assertQuerysetEqual(
+            [d1, d3, d4])
+        self.assertSequenceEqual(
             B.objects.filter(a__flag=None),
-            [b1, b3], lambda x: x
-        )
-        self.assertQuerysetEqual(
+            [b1, b3])
+        self.assertSequenceEqual(
             B.objects.exclude(a__flag=None),
-            [b2], lambda x: x
-        )
+            [b2])
 
     def test_extra_join_condition(self):
         # A crude check that content_type_id is taken in account in the
@@ -249,9 +246,9 @@ class GenericRelationTests(TestCase):
         hs2 = HasLinkThing.objects.create()
         l = Link.objects.create(content_object=hs2)
         self.assertNotEqual(l.object_id, l.pk)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             HasLinkThing.objects.filter(links=l.pk),
-            [hs2], lambda x: x)
+            [hs2])
 
     def test_editable_generic_rel(self):
         GenericRelationForm = modelform_factory(HasLinkThing, fields='__all__')
