@@ -317,7 +317,7 @@ def _get_non_gfk_field(opts, name):
         raise FieldDoesNotExist()
 
     # Avoid coercing <FK>_id fields to FK
-    if field.is_relation and hasattr(field, 'attname') and field.attname == name:
+    if field.is_relation and not field.many_to_many and hasattr(field, 'attname') and field.attname == name:
         raise FieldIsAForeignKeyColumnName()
 
     return field
