@@ -359,6 +359,15 @@ class DeletionTests(TestCase):
         self.assertFalse(RChild.objects.filter(id=child.id).exists())
         self.assertTrue(R.objects.filter(id=parent_id).exists())
 
+    def test_delete_with_keeping_parents_relationships(self):
+        child = RChild.objects.create()
+        parent_id = child.r_ptr_id
+        parent_referent_id = S.objects.create(r=child.r_ptr).pk
+        child.delete(keep_parents=True)
+        self.assertFalse(RChild.objects.filter(id=child.id).exists())
+        self.assertTrue(R.objects.filter(id=parent_id).exists())
+        self.assertTrue(S.objects.filter(pk=parent_referent_id).exists())
+
     def test_queryset_delete_returns_num_rows(self):
         """
         QuerySet.delete() should return the number of deleted rows and a
