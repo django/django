@@ -224,6 +224,16 @@ This will run the appropriate decorator around your handler methods, and provide
 the one passed in to your handler as an argument as well as ``self.message``,
 as they point to the same instance.
 
+And if you just want to use same old django session just use ``http_session`` or
+``http_session_user``::
+
+    class MyConsumer(WebsocketConsumer):
+
+        http_session_user = True
+
+That gives you ``message.user`` which is same as ``request.user`` and ``message.http_session``
+is same as of ``request.session``
+
 Applying Decorators
 -------------------
 
