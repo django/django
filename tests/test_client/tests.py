@@ -22,6 +22,8 @@ rather than the HTML rendered to the end-user.
 """
 from __future__ import unicode_literals
 
+import tempfile
+
 from django.contrib.auth.models import User
 from django.core import mail
 from django.http import HttpResponse
@@ -713,6 +715,11 @@ class ClientTest(TestCase):
         """
         with self.assertRaisesMessage(Exception, 'exception message'):
             self.client.get('/nesting_exception_view/')
+
+    def test_uploading_temp_file(self):
+        test_file = tempfile.TemporaryFile()
+        response = self.client.post('/upload_view/', data={'temp_file': test_file})
+        self.assertEqual(response.content, b'temp_file')
 
 
 @override_settings(

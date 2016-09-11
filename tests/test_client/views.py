@@ -324,3 +324,8 @@ def nesting_exception_view(request):
 
 def django_project_redirect(request):
     return HttpResponseRedirect('https://www.djangoproject.com/')
+
+
+def upload_view(request):
+    """Prints keys of request.FILES to the response."""
+    return HttpResponse(', '.join(request.FILES.keys()))
