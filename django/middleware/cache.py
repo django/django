@@ -111,7 +111,7 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         patch_response_headers(response, timeout)
         if timeout:
             cache_updater = ResponseCacheUpdater(request, response, self.cache, self.key_prefix, timeout)
-            response._closable_objects.append(cache_updater)
+            response.add_closable_object(cache_updater)
         return response
 
 

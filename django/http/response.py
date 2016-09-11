@@ -226,6 +226,12 @@ class HttpResponseBase(six.Iterator):
         self.set_cookie(key, max_age=0, path=path, domain=domain,
                         expires='Thu, 01-Jan-1970 00:00:00 GMT')
 
+    def add_closable_object(self, closable):
+        if self.closed:
+            closable.close()
+        else:
+            self._closable_objects.append(closable)
+
     # Common methods used by subclasses
 
     def make_bytes(self, value):
@@ -390,7 +396,7 @@ class StreamingHttpResponse(HttpResponseBase):
         # Ensure we can never iterate on "value" more than once.
         self._iterator = iter(value)
         if hasattr(value, 'close'):
-            self._closable_objects.append(value)
+            self.add_closable_object(value)
 
     def __iter__(self):
         return self.streaming_content
@@ -410,7 +416,7 @@ class FileResponse(StreamingHttpResponse):
             self.file_to_stream = value
             filelike = value
             if hasattr(filelike, 'close'):
-                self._closable_objects.append(filelike)
+                self.add_closable_object(filelike)
             value = iter(lambda: filelike.read(self.block_size), b'')
         else:
             self.file_to_stream = None

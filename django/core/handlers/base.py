@@ -139,7 +139,7 @@ class BaseHandler(object):
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, get_resolver(get_urlconf()), sys.exc_info())
 
-        response._closable_objects.append(request)
+        response.add_closable_object(request)
 
         # If the exception handler returns a TemplateResponse that has not
         # been rendered, force it to be rendered.
