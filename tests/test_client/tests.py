@@ -22,6 +22,8 @@ rather than the HTML rendered to the end-user.
 """
 from __future__ import unicode_literals
 
+import tempfile
+
 from django.contrib.auth.models import User
 from django.core import mail
 from django.http import HttpResponse
@@ -713,6 +715,34 @@ class ClientTest(TestCase):
         """
         with self.assertRaisesMessage(Exception, 'exception message'):
             self.client.get('/nesting_exception_view/')
+
+    def test_uploading_temp_file(self):
+        """
+        Test that we don't hit any exceptions when uploading a file made with
+        tempfile.TemporaryFile().
+
+        Regression test for ticket #27184:
+        https://code.djangoproject.com/ticket/27184
+        """
+        test_file = tempfile.TemporaryFile()
+        try:
+            self.client.post('/minimal_view/', data={'file': test_file})
+        except:
+            self.fail('No exception should be raised.')
+
+    def test_uploading_named_temp_file(self):
+        """
+        Test that we don't hit any exceptions when uploading a file made with
+        tempfile.NamedTemporaryFile().
+
+        Regression test for ticket #27184:
+        https://code.djangoproject.com/ticket/27184
+        """
+        test_file = tempfile.NamedTemporaryFile()
+        try:
+            self.client.post('/minimal_view/', data={'file': test_file})
+        except:
+            self.fail('No exception should be raised.')
 
 
 @override_settings(

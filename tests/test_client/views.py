@@ -16,6 +16,11 @@ from django.utils.decorators import method_decorator
 from django.utils.six.moves.urllib.parse import urlencode
 
 
+def minimal_view(request):
+    "A simple stub view that just returns an empty HttpResponse"
+    return HttpResponse('')
+
+
 def get_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
     t = Template('This is a test. {{ var }} is the value.', name='GET Template')
