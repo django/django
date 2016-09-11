@@ -251,7 +251,8 @@ class HttpResponseBase(six.Iterator):
     # The WSGI server must call this method upon completion of the request.
     # See http://blog.dscpl.com.au/2012/10/obligations-for-calling-close-on.html
     def close(self):
-        for closable in self._closable_objects:
+        while self._closable_objects:
+            closable = self._closable_objects.pop()
             try:
                 closable.close()
             except Exception:

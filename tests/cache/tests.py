@@ -4,6 +4,7 @@
 # Uses whatever cache backend is set in the test settings file.
 from __future__ import unicode_literals
 
+import contextlib
 import copy
 import io
 import os
@@ -895,6 +896,7 @@ class BaseCacheTests(object):
         response.set_cookie('foo', 'bar')
 
         update_middleware.process_response(request, response)
+        response.close()
 
         get_cache_data = fetch_middleware.process_request(request)
         self.assertIsNotNone(get_cache_data)
@@ -1662,9 +1664,9 @@ class CacheHEADTest(SimpleTestCase):
         cache.clear()
 
     def _set_cache(self, request, msg):
-        response = HttpResponse()
-        response.content = msg
-        return UpdateCacheMiddleware().process_response(request, response)
+        with contextlib.closing(HttpResponse()) as response:
+            response.content = msg
+            return UpdateCacheMiddleware().process_response(request, response)
 
     def test_head_caches_correctly(self):
         test_content = 'test content'
@@ -1858,10 +1860,10 @@ class CacheI18nTest(TestCase):
     )
     def test_middleware(self):
         def set_cache(request, lang, msg):
-            translation.activate(lang)
-            response = HttpResponse()
-            response.content = msg
-            return UpdateCacheMiddleware().process_response(request, response)
+            with contextlib.closing(HttpResponse()) as response:
+                translation.activate(lang)
+                response.content = msg
+                return UpdateCacheMiddleware().process_response(request, response)
 
         # cache with non empty request.GET
         request = self.factory.get(self.path, {'foo': 'bar', 'other': 'true'})
@@ -1874,6 +1876,7 @@ class CacheI18nTest(TestCase):
         content = 'Check for cache with QUERY_STRING'
         response.content = content
         UpdateCacheMiddleware().process_response(request, response)
+        response.close()
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         # cache must return content
         self.assertIsNotNone(get_cache_data)
@@ -2033,7 +2036,8 @@ class CacheMiddlewareTest(SimpleTestCase):
         response = hello_world_view(request, '1')
 
         # Now put the response through the response middleware
-        response = middleware.process_response(request, response)
+        middleware.process_response(request, response)
+        response.close()
 
         # Repeating the request should result in a cache hit
         result = middleware.process_request(request)
@@ -2050,15 +2054,21 @@ class CacheMiddlewareTest(SimpleTestCase):
         self.assertEqual(result.content, b'Hello World 1')
 
     def test_view_decorator(self):
+        def closing(view):
+            def _view(*args, **kwargs):
+                with contextlib.closing(view(*args, **kwargs)) as response:
+                    return response
+            return _view
+
         # decorate the same view with different cache decorators
-        default_view = cache_page(3)(hello_world_view)
-        default_with_prefix_view = cache_page(3, key_prefix='prefix1')(hello_world_view)
+        default_view = closing(cache_page(3)(hello_world_view))
+        default_with_prefix_view = closing(cache_page(3, key_prefix='prefix1')(hello_world_view))
 
-        explicit_default_view = cache_page(3, cache='default')(hello_world_view)
-        explicit_default_with_prefix_view = cache_page(3, cache='default', key_prefix='prefix1')(hello_world_view)
+        explicit_default_view = closing(cache_page(3, cache='default')(hello_world_view))
+        explicit_default_with_prefix_view = closing(cache_page(3, cache='default', key_prefix='prefix1')(hello_world_view))
 
-        other_view = cache_page(1, cache='other')(hello_world_view)
-        other_with_prefix_view = cache_page(1, cache='other', key_prefix='prefix2')(hello_world_view)
+        other_view = closing(cache_page(1, cache='other')(hello_world_view))
+        other_with_prefix_view = closing(cache_page(1, cache='other', key_prefix='prefix2')(hello_world_view))
 
         request = self.factory.get('/view/')
 

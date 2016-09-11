@@ -52,6 +52,20 @@ from django.utils.cache import (
 from django.utils.deprecation import MiddlewareMixin
 
 
+class ResponseCacheUpdater(object):
+
+    def __init__(self, request, response, cache, key_prefix, timeout):
+        self.request = request
+        self.response = response
+        self.cache = cache
+        self.key_prefix = key_prefix
+        self.timeout = timeout
+
+    def close(self):
+        cache_key = learn_cache_key(self.request, self.response, self.timeout, self.key_prefix, cache=self.cache)
+        self.cache.set(cache_key, self.response, self.timeout)
+
+
 class UpdateCacheMiddleware(MiddlewareMixin):
     """
     Response-phase cache middleware that updates the cache if the response is
@@ -96,13 +110,8 @@ class UpdateCacheMiddleware(MiddlewareMixin):
             return response
         patch_response_headers(response, timeout)
         if timeout:
-            cache_key = learn_cache_key(request, response, timeout, self.key_prefix, cache=self.cache)
-            if hasattr(response, 'render') and callable(response.render):
-                response.add_post_render_callback(
-                    lambda r: self.cache.set(cache_key, r, timeout)
-                )
-            else:
-                self.cache.set(cache_key, response, timeout)
+            cache_updater = ResponseCacheUpdater(request, response, self.cache, self.key_prefix, timeout)
+            response._closable_objects.append(cache_updater)
         return response
 
 

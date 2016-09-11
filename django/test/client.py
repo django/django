@@ -144,10 +144,6 @@ class ClientHandler(BaseHandler):
         # Simulate behaviors of most Web servers.
         conditional_content_removal(request, response)
 
-        # Attach the originating request to the response so that it could be
-        # later retrieved.
-        response.wsgi_request = request
-
         # We're emulating a WSGI server; we must call the close method
         # on completion.
         if response.streaming:
@@ -157,6 +153,10 @@ class ClientHandler(BaseHandler):
             request_finished.disconnect(close_old_connections)
             response.close()                    # will fire request_finished
             request_finished.connect(close_old_connections)
+
+        # Attach the originating request to the response so that it could be
+        # later retrieved.
+        response.wsgi_request = request
 
         return response
 
