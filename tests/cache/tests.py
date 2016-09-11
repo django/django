@@ -41,7 +41,9 @@ from django.utils.cache import (
     get_cache_key, learn_cache_key, patch_cache_control,
     patch_response_headers, patch_vary_headers,
 )
-from django.utils.deprecation import RemovedInDjango21Warning, MiddlewareMixin
+from django.utils.deprecation import (
+    RemovedInDjango21Warning, MiddlewareMixin,
+)
 from django.utils.encoding import force_text
 from django.views.decorators.cache import cache_page
 
@@ -2093,7 +2095,8 @@ class CacheMiddlewareTest(SimpleTestCase):
         default_with_prefix_view = closing(cache_page(3, key_prefix='prefix1')(hello_world_view))
 
         explicit_default_view = closing(cache_page(3, cache='default')(hello_world_view))
-        explicit_default_with_prefix_view = closing(cache_page(3, cache='default', key_prefix='prefix1')(hello_world_view))
+        explicit_default_with_prefix_view = closing(
+            cache_page(3, cache='default', key_prefix='prefix1')(hello_world_view))
 
         other_view = closing(cache_page(1, cache='other')(hello_world_view))
         other_with_prefix_view = closing(cache_page(1, cache='other', key_prefix='prefix2')(hello_world_view))
