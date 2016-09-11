@@ -16,3 +16,6 @@ Bugfixes
 * Fixed incorrect ``app_label`` / ``model_name`` arguments for
   ``allow_migrate()`` in ``makemigrations`` migration consistency checks
   (:ticket:`27461`).
+
+* Made ``Model.delete(keep_parents=True)`` preserve parent reverse
+  relationships in multi-table inheritance (:ticket:`27407`).
