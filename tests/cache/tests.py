@@ -41,7 +41,7 @@ from django.utils.cache import (
     get_cache_key, learn_cache_key, patch_cache_control,
     patch_response_headers, patch_vary_headers,
 )
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango21Warning, MiddlewareMixin
 from django.utils.encoding import force_text
 from django.views.decorators.cache import cache_page
 
@@ -2023,21 +2023,29 @@ class CacheMiddlewareTest(SimpleTestCase):
         self.assertEqual(as_view_decorator_with_custom.cache_alias, 'other')
 
     def test_middleware(self):
+        class VaryMiddleware(MiddlewareMixin):
+            def process_response(self, request, response):
+                response['Vary'] = 'Pony'
+                return response
+
+        vary_middleware = VaryMiddleware()
         middleware = CacheMiddleware()
         prefix_middleware = CacheMiddleware(key_prefix='prefix1')
         timeout_middleware = CacheMiddleware(cache_timeout=1)
 
         request = self.factory.get('/view/')
+        pink_request = self.factory.get('/view/', HTTP_PONY='Pink')
+        green_request = self.factory.get('/view/', HTTP_PONY='Green')
 
         # Put the request through the request middleware
         result = middleware.process_request(request)
         self.assertIsNone(result)
 
-        response = hello_world_view(request, '1')
+        with contextlib.closing(hello_world_view(request, '1')) as response:
 
-        # Now put the response through the response middleware
-        middleware.process_response(request, response)
-        response.close()
+            # Now put the response through the response middleware
+            middleware.process_response(request, response)
+            vary_middleware.process_response(request, response)
 
         # Repeating the request should result in a cache hit
         result = middleware.process_request(request)
@@ -2053,10 +2061,30 @@ class CacheMiddlewareTest(SimpleTestCase):
         self.assertIsNotNone(result)
         self.assertEqual(result.content, b'Hello World 1')
 
+        # Put the request with a header from Vary
+        result = prefix_middleware.process_request(pink_request)
+        self.assertIsNone(result)
+
+        with contextlib.closing(hello_world_view(pink_request, 'vary 1')) as response:
+
+            # Now put the response through the response middleware
+            middleware.process_response(pink_request, response)
+            vary_middleware.process_response(pink_request, response)
+
+        # Repeating the request with the same header from Vary should result in a cache hit
+        result = middleware.process_request(pink_request)
+        self.assertIsNotNone(result)
+        self.assertEqual(result.content, b'Hello World vary 1')
+
+        # The same request with a different header from Vary won't hit
+        result = prefix_middleware.process_request(green_request)
+        self.assertIsNone(result)
+
     def test_view_decorator(self):
         def closing(view):
             def _view(*args, **kwargs):
                 with contextlib.closing(view(*args, **kwargs)) as response:
+                    response['Vary'] = 'Pony'
                     return response
             return _view
 
@@ -2071,6 +2099,8 @@ class CacheMiddlewareTest(SimpleTestCase):
         other_with_prefix_view = closing(cache_page(1, cache='other', key_prefix='prefix2')(hello_world_view))
 
         request = self.factory.get('/view/')
+        pink_request = self.factory.get('/view/', HTTP_PONY='Pink')
+        green_request = self.factory.get('/view/', HTTP_PONY='Green')
 
         # Request the view once
         response = default_view(request, '1')
@@ -2079,6 +2109,18 @@ class CacheMiddlewareTest(SimpleTestCase):
         # Request again -- hit the cache
         response = default_view(request, '2')
         self.assertEqual(response.content, b'Hello World 1')
+
+        # Request the view with header from Vary
+        response = default_view(pink_request, 'vary 1')
+        self.assertEqual(response.content, b'Hello World vary 1')
+
+        # Request again with the same header from Vary -- hit the cache
+        response = default_view(pink_request, 'vary 2')
+        self.assertEqual(response.content, b'Hello World vary 1')
+
+        # Requesting the same view with different header from Vary -- miss the cache
+        response = default_view(green_request, 'vary 2')
+        self.assertEqual(response.content, b'Hello World vary 2')
 
         # Requesting the same view with the explicit cache should yield the same result
         response = explicit_default_view(request, '3')
