@@ -1,11 +1,15 @@
 import json
 import copy
 
+import six
+
 from django.apps import apps
 from django.conf import settings
 
 from ..sessions import session_for_reply_channel
 from .base import Client
+
+json_module = json  # alias for using at functions with json kwarg
 
 
 class HttpClient(Client):
@@ -56,10 +60,14 @@ class HttpClient(Client):
             self._session = session_for_reply_channel(self.reply_channel)
         return self._session
 
-    def receive(self):
+    def receive(self, json=True):
+        """
+        Return text content of a message for client channel and decoding it if json kwarg is set
+        """
         content = super(HttpClient, self).receive()
-        if content:
-            return json.loads(content['text'])
+        if content and json:
+            return json_module.loads(content['text'])
+        return content['text'] if content else None
 
     def send(self, to, content={}, text=None, path='/'):
         """
@@ -71,8 +79,11 @@ class HttpClient(Client):
         content.setdefault('path', path)
         content.setdefault('headers', self.headers)
         text = text or content.get('text', None)
-        if text:
-            content['text'] = json.dumps(text)
+        if text is not None:
+            if not isinstance(text, six.string_types):
+                content['text'] = json.dumps(text)
+            else:
+                content['text'] = text
         self.channel_layer.send(to, content)
 
     def send_and_consume(self, channel, content={}, text=None, path='/', fail_on_none=True):

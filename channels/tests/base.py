@@ -135,7 +135,7 @@ class Client(object):
         return self.consume(channel, fail_on_none=fail_on_none)
 
     def receive(self):
-        """self.get_next_message(self.reply_channel)
+        """
         Get content of next message for reply channel if message exists
         """
         message = self.get_next_message(self.reply_channel)

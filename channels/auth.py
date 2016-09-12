@@ -82,6 +82,7 @@ def channel_session_user_from_http(func):
     """
     @http_session_user
     @channel_session
+    @functools.wraps(func)
     def inner(message, *args, **kwargs):
         if message.http_session is not None:
             transfer_user(message.http_session, message.channel_session)
