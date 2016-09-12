@@ -595,7 +595,7 @@ have a ChatMessage model with ``message`` and ``room`` fields::
     def ws_message(message):
         # Stick the message onto the processing queue
         Channel("chat-messages").send({
-            "room": channel_session['room'],
+            "room": message.channel_session['room'],
             "message": message['text'],
         })
 
