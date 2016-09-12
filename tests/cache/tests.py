@@ -22,7 +22,9 @@ from django.core.cache import (
 )
 from django.core.cache.utils import make_template_fragment_key
 from django.db import connection, connections
-from django.http import HttpRequest, HttpResponse, HttpResponseNotModified, StreamingHttpResponse
+from django.http import (
+    HttpRequest, HttpResponse, HttpResponseNotModified, StreamingHttpResponse,
+)
 from django.middleware.cache import (
     CacheMiddleware, FetchFromCacheMiddleware, UpdateCacheMiddleware,
 )
