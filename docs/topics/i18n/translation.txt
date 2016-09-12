@@ -1921,6 +1921,8 @@ Here's example HTML template code:
 In this example, Django looks up the URL of the page to which the user will be
 redirected in the ``redirect_to`` context variable.
 
+.. _explicitly-setting-the-active-language:
+
 Explicitly setting the active language
 --------------------------------------
 
