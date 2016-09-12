@@ -19,7 +19,7 @@ Configuring static files
       STATIC_URL = '/static/'
 
 3. In your templates, either hardcode the url like
-   ``/static/my_app/myexample.jpg`` or, preferably, use the :ttag:`static`
+   ``/static/my_app/example.jpg`` or, preferably, use the :ttag:`static`
    template tag to build the URL for the given relative path by using the
    configured :setting:`STATICFILES_STORAGE` storage (this makes it much easier
    when you want to switch to a content delivery network (CDN) for serving
@@ -30,10 +30,10 @@ Configuring static files
    .. code-block:: html+django
 
         {% load static %}
-        <img src="{% static "my_app/myexample.jpg" %}" alt="My image"/>
+        <img src="{% static "my_app/example.jpg" %}" alt="My image"/>
 
 4. Store your static files in a folder called ``static`` in your app. For
-   example ``my_app/static/my_app/myimage.jpg``.
+   example ``my_app/static/my_app/example.jpg``.
 
 .. admonition:: Serving the files
 
