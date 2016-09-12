@@ -110,7 +110,8 @@ class WebsocketBinding(Binding):
         instance = self.model.objects.get(pk=pk)
         hydrated = self._hydrate(pk, data)
         for name in data.keys():
-            setattr(instance, name, getattr(hydrated.object, name))
+            if name in self.fields or self.fields == ['__all__']:
+                setattr(instance, name, getattr(hydrated.object, name))
         instance.save()
 
 
