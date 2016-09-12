@@ -5,7 +5,7 @@ The goal of these tests is to see how channels performs with normal HTTP traffic
 
 In order to control for variances, several measures were taken:
 
-- the same testing tool was used across all tests, `loadtest <https://github.com/alexfernandez/loadtes/>`_.
+- the same testing tool was used across all tests, `loadtest <https://github.com/alexfernandez/loadtest/>`_.
 - all target machines were identical
 - all target code variances were separated into appropriate files in the dir of /testproject in this repo
 - all target config variances necessary to the different setups were controlled by supervisord so that human error was limited
