@@ -229,7 +229,7 @@ def items_for_result(cl, result, form):
                 if allow_tags:
                     warnings.warn(
                         "Deprecated allow_tags attribute used on field {}. "
-                        "Use django.utils.safestring.format_html(), "
+                        "Use django.utils.html.format_html(), "
                         "format_html_join(), or mark_safe() instead.".format(field_name),
                         RemovedInDjango20Warning
                     )
