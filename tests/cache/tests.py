@@ -2074,6 +2074,8 @@ class CacheMiddlewareTest(SimpleTestCase):
         # Repeating the request with the same header from Vary should result in a cache hit
         result = middleware.process_request(pink_request)
         self.assertIsNotNone(result)
+        self.assertIn('Vary', result)
+        self.assertEqual('Pony', result['Vary'])
         self.assertEqual(result.content, b'Hello World vary 1')
 
         # The same request with a different header from Vary won't hit
@@ -2117,6 +2119,8 @@ class CacheMiddlewareTest(SimpleTestCase):
 
         # Request again with the same header from Vary -- hit the cache
         response = default_view(pink_request, 'vary 2')
+        self.assertIn('Vary', response)
+        self.assertEqual('Pony', response['Vary'])
         self.assertEqual(response.content, b'Hello World vary 1')
 
         # Requesting the same view with different header from Vary -- miss the cache
