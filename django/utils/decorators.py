@@ -1,4 +1,4 @@
-"Functions that help with dynamically creating decorators for views."
+"""Functions that help with dynamically creating decorators for views."""
 
 try:
     from contextlib import ContextDecorator

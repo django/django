@@ -235,7 +235,7 @@ class MethodDecoratorTests(SimpleTestCase):
             @myattr_dec_m
             @myattr2_dec_m
             def method(self):
-                "A method"
+                """A method"""
                 pass
 
         # Decorate using method_decorator() on both the class and the method.
@@ -245,7 +245,7 @@ class MethodDecoratorTests(SimpleTestCase):
         class TestMethodAndClass(object):
             @method_decorator(myattr2_dec_m)
             def method(self):
-                "A method"
+                """A method"""
                 pass
 
         # Decorate using an iterable of decorators.
@@ -254,7 +254,7 @@ class MethodDecoratorTests(SimpleTestCase):
         @method_decorator(decorators, "method")
         class TestIterable(object):
             def method(self):
-                "A method"
+                """A method"""
                 pass
 
         for Test in (TestPlain, TestMethodAndClass, TestIterable):
@@ -274,7 +274,7 @@ class MethodDecoratorTests(SimpleTestCase):
             @method_decorator(decorators, "method")
             class TestIterable(object):
                 def method(self):
-                    "A method"
+                    """A method"""
                     pass
 
     # Test for argumented decorator

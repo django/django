@@ -144,7 +144,7 @@ class GeoIP2(object):
         }
 
     def _check_query(self, query, country=False, city=False, city_or_country=False):
-        "Helper routine for checking the query and database availability."
+        """Helper routine for checking the query and database availability."""
         # Making sure a string was passed in for the query.
         if not isinstance(query, six.string_types):
             raise TypeError('GeoIP query must be a string, not type %s' % type(query).__name__)
@@ -173,12 +173,12 @@ class GeoIP2(object):
         return City(self._city.city(enc_query))
 
     def country_code(self, query):
-        "Return the country code for the given IP Address or FQDN."
+        """Return the country code for the given IP Address or FQDN."""
         enc_query = self._check_query(query, city_or_country=True)
         return self.country(enc_query)['country_code']
 
     def country_name(self, query):
-        "Return the country name for the given IP Address or FQDN."
+        """Return the country name for the given IP Address or FQDN."""
         enc_query = self._check_query(query, city_or_country=True)
         return self.country(enc_query)['country_name']
 
@@ -201,15 +201,15 @@ class GeoIP2(object):
             return tuple(cdict[o] for o in ordering)
 
     def lon_lat(self, query):
-        "Return a tuple of the (longitude, latitude) for the given query."
+        """Return a tuple of the (longitude, latitude) for the given query."""
         return self.coords(query)
 
     def lat_lon(self, query):
-        "Return a tuple of the (latitude, longitude) for the given query."
+        """Return a tuple of the (latitude, longitude) for the given query."""
         return self.coords(query, ('latitude', 'longitude'))
 
     def geos(self, query):
-        "Return a GEOS Point object for the given query."
+        """Return a GEOS Point object for the given query."""
         ll = self.lon_lat(query)
         if ll:
             from django.contrib.gis.geos import Point
@@ -220,7 +220,7 @@ class GeoIP2(object):
     # #### GeoIP Database Information Routines ####
     @property
     def info(self):
-        "Return information about the GeoIP library and databases in use."
+        """Return information about the GeoIP library and databases in use."""
         meta = self._reader.metadata()
         return 'GeoIP Library:\n\t%s.%s\n' % (meta.binary_format_major_version, meta.binary_format_minor_version)
 

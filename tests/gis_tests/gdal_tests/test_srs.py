@@ -154,12 +154,12 @@ bad_srlist = (
 class SpatialRefTest(unittest.TestCase):
 
     def test01_wkt(self):
-        "Testing initialization on valid OGC WKT."
+        """Testing initialization on valid OGC WKT."""
         for s in srlist:
             SpatialReference(s.wkt)
 
     def test02_bad_wkt(self):
-        "Testing initialization on invalid WKT."
+        """Testing initialization on invalid WKT."""
         for bad in bad_srlist:
             try:
                 srs = SpatialReference(bad)
@@ -170,13 +170,13 @@ class SpatialRefTest(unittest.TestCase):
                 self.fail('Should not have initialized on bad WKT "%s"!')
 
     def test03_get_wkt(self):
-        "Testing getting the WKT."
+        """Testing getting the WKT."""
         for s in srlist:
             srs = SpatialReference(s.wkt)
             self.assertEqual(s.wkt, srs.wkt)
 
     def test04_proj(self):
-        "Test PROJ.4 import and export."
+        """Test PROJ.4 import and export."""
         proj_parts = [
             '+proj=longlat', '+ellps=WGS84', '+towgs84=0,0,0,0,0,0,0', '+datum=WGS84', '+no_defs'
         ]
@@ -186,7 +186,7 @@ class SpatialRefTest(unittest.TestCase):
         self.assertTrue(all([part in proj_parts for part in srs2.proj.split()]))
 
     def test05_epsg(self):
-        "Test EPSG import."
+        """Test EPSG import."""
         for s in srlist:
             if s.epsg:
                 srs1 = SpatialReference(s.wkt)
@@ -198,14 +198,14 @@ class SpatialRefTest(unittest.TestCase):
                         self.assertEqual(expected, srs[attr])
 
     def test07_boolean_props(self):
-        "Testing the boolean properties."
+        """Testing the boolean properties."""
         for s in srlist:
             srs = SpatialReference(s.wkt)
             self.assertEqual(s.projected, srs.projected)
             self.assertEqual(s.geographic, srs.geographic)
 
     def test08_angular_linear(self):
-        "Testing the linear and angular units routines."
+        """Testing the linear and angular units routines."""
         for s in srlist:
             srs = SpatialReference(s.wkt)
             self.assertEqual(s.ang_name, srs.angular_name)
@@ -214,7 +214,7 @@ class SpatialRefTest(unittest.TestCase):
             self.assertAlmostEqual(s.lin_units, srs.linear_units, 9)
 
     def test09_authority(self):
-        "Testing the authority name & code routines."
+        """Testing the authority name & code routines."""
         for s in srlist:
             if hasattr(s, 'auth'):
                 srs = SpatialReference(s.wkt)
@@ -223,7 +223,7 @@ class SpatialRefTest(unittest.TestCase):
                     self.assertEqual(tup[1], srs.auth_code(target))
 
     def test10_attributes(self):
-        "Testing the attribute retrieval routines."
+        """Testing the attribute retrieval routines."""
         for s in srlist:
             srs = SpatialReference(s.wkt)
             for tup in s.attr:
@@ -232,7 +232,7 @@ class SpatialRefTest(unittest.TestCase):
                 self.assertEqual(exp, srs[att])
 
     def test11_wellknown(self):
-        "Testing Well Known Names of Spatial References."
+        """Testing Well Known Names of Spatial References."""
         for s in well_known:
             srs = SpatialReference(s.wk)
             self.assertEqual(s.name, srs.name)
@@ -246,12 +246,12 @@ class SpatialRefTest(unittest.TestCase):
                 self.assertEqual(srs[key], exp)
 
     def test12_coordtransform(self):
-        "Testing initialization of a CoordTransform."
+        """Testing initialization of a CoordTransform."""
         target = SpatialReference('WGS84')
         CoordTransform(SpatialReference(srlist[0].wkt), target)
 
     def test13_attr_value(self):
-        "Testing the attr_value() method."
+        """Testing the attr_value() method."""
         s1 = SpatialReference('WGS84')
         with self.assertRaises(TypeError):
             s1.__getitem__(0)

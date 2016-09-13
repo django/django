@@ -2311,13 +2311,13 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_get_change_view(self):
-        "Retrieving the object using urlencoded form of primary key should work"
+        """Retrieving the object using urlencoded form of primary key should work"""
         response = self.client.get(reverse('admin:admin_views_modelwithstringprimarykey_change', args=(self.pk,)))
         self.assertContains(response, escape(self.pk))
         self.assertEqual(response.status_code, 200)
 
     def test_changelist_to_changeform_link(self):
-        "Link to the changeform of the object in changelist should use reverse() and be quoted -- #18072"
+        """Link to the changeform of the object in changelist should use reverse() and be quoted -- #18072"""
         response = self.client.get(reverse('admin:admin_views_modelwithstringprimarykey_changelist'))
         # this URL now comes through reverse(), thus url quoting and iri_to_uri encoding
         pk_final_url = escape(iri_to_uri(quote(self.pk)))
@@ -2328,14 +2328,16 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         self.assertContains(response, should_contain)
 
     def test_recentactions_link(self):
-        "The link from the recent actions list referring to the changeform of the object should be quoted"
+        """The link from the recent actions list referring to the changeform of the object should be quoted"""
         response = self.client.get(reverse('admin:index'))
         link = reverse('admin:admin_views_modelwithstringprimarykey_change', args=(quote(self.pk),))
         should_contain = """<a href="%s">%s</a>""" % (escape(link), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_deleteconfirmation_link(self):
-        "The link from the delete confirmation page referring back to the changeform of the object should be quoted"
+        """
+        The link from the delete confirmation page referring back to the changeform of the object should be quoted
+        """
         url = reverse('admin:admin_views_modelwithstringprimarykey_delete', args=(quote(self.pk),))
         response = self.client.get(url)
         # this URL now comes through reverse(), thus url quoting and iri_to_uri encoding
@@ -2346,7 +2348,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         self.assertContains(response, should_contain)
 
     def test_url_conflicts_with_add(self):
-        "A model with a primary key that ends with add or is `add` should be visible"
+        """A model with a primary key that ends with add or is `add` should be visible"""
         add_model = ModelWithStringPrimaryKey.objects.create(pk="i have something to add")
         add_model.save()
         response = self.client.get(
@@ -2361,7 +2363,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         self.assertNotEqual(add_url, change_url)
 
     def test_url_conflicts_with_delete(self):
-        "A model with a primary key that ends with delete should be visible"
+        """A model with a primary key that ends with delete should be visible"""
         delete_model = ModelWithStringPrimaryKey(pk="delete")
         delete_model.save()
         response = self.client.get(
@@ -2371,7 +2373,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         self.assertContains(response, should_contain)
 
     def test_url_conflicts_with_history(self):
-        "A model with a primary key that ends with history should be visible"
+        """A model with a primary key that ends with history should be visible"""
         history_model = ModelWithStringPrimaryKey(pk="history")
         history_model.save()
         response = self.client.get(
@@ -2381,7 +2383,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         self.assertContains(response, should_contain)
 
     def test_shortcut_view_with_escaping(self):
-        "'View on site should' work properly with char fields"
+        """'View on site should' work properly with char fields"""
         model = ModelWithStringPrimaryKey(pk='abc_123')
         model.save()
         response = self.client.get(
@@ -2656,9 +2658,9 @@ class AdminViewListEditable(TestCase):
         self.assertIs(Person.objects.get(name="John Mauchly").alive, False)
 
     def test_non_field_errors(self):
-        ''' Ensure that non field errors are displayed for each of the
+        """ Ensure that non field errors are displayed for each of the
             forms in the changelist's formset. Refs #13126.
-        '''
+        """
         fd1 = FoodDelivery.objects.create(reference='123', driver='bill', restaurant='thai')
         fd2 = FoodDelivery.objects.create(reference='456', driver='bill', restaurant='india')
         fd3 = FoodDelivery.objects.create(reference='789', driver='bill', restaurant='pizza')
@@ -2983,7 +2985,7 @@ class AdminSearchTest(TestCase):
         self.client.force_login(self.superuser)
 
     def test_search_on_sibling_models(self):
-        "Check that a search that mentions sibling models"
+        """Check that a search that mentions sibling models"""
         response = self.client.get(reverse('admin:admin_views_recommendation_changelist') + '?q=bar')
         # confirm the search returned 1 object
         self.assertContains(response, "\n1 recommendation\n")
@@ -3074,7 +3076,7 @@ class AdminInheritedInlinesTest(TestCase):
         self.client.force_login(self.superuser)
 
     def test_inline(self):
-        "Ensure that inline models which inherit from a common parent are correctly handled by admin."
+        """Ensure that inline models which inherit from a common parent are correctly handled by admin."""
         foo_user = "foo username"
         bar_user = "bar username"
 
@@ -3162,7 +3164,7 @@ class AdminActionsTest(TestCase):
         self.client.force_login(self.superuser)
 
     def test_model_admin_custom_action(self):
-        "Tests a custom action defined in a ModelAdmin method"
+        """Tests a custom action defined in a ModelAdmin method"""
         action_data = {
             ACTION_CHECKBOX_NAME: [1],
             'action': 'mail_admin',
@@ -3173,7 +3175,7 @@ class AdminActionsTest(TestCase):
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a ModelAdmin action')
 
     def test_model_admin_default_delete_action(self):
-        "Tests the default delete action defined as a ModelAdmin method"
+        """Tests the default delete action defined as a ModelAdmin method"""
         action_data = {
             ACTION_CHECKBOX_NAME: [1, 2],
             'action': 'delete_selected',
@@ -3270,7 +3272,7 @@ class AdminActionsTest(TestCase):
         self.assertContains(response, "<li>Unchangeable object: UnchangeableObject object</li>", 1, html=True)
 
     def test_custom_function_mail_action(self):
-        "Tests a custom action defined in a function"
+        """Tests a custom action defined in a function"""
         action_data = {
             ACTION_CHECKBOX_NAME: [1],
             'action': 'external_mail',
@@ -3281,7 +3283,7 @@ class AdminActionsTest(TestCase):
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a function action')
 
     def test_custom_function_action_with_redirect(self):
-        "Tests a custom action defined in a function"
+        """Tests a custom action defined in a function"""
         action_data = {
             ACTION_CHECKBOX_NAME: [1],
             'action': 'redirect_to',
@@ -3346,7 +3348,7 @@ action)</option>
 </select>''', html=True)
 
     def test_model_without_action(self):
-        "Tests a ModelAdmin without any action"
+        """"Tests a ModelAdmin without any action"""
         response = self.client.get(reverse('admin:admin_views_oldsubscriber_changelist'))
         self.assertIsNone(response.context["action_form"])
         self.assertNotContains(
@@ -3356,7 +3358,7 @@ action)</option>
         self.assertNotContains(response, '<input type="checkbox" class="action-select"')
 
     def test_model_without_action_still_has_jquery(self):
-        "Tests that a ModelAdmin without any actions still gets jQuery included in page"
+        """Tests that a ModelAdmin without any actions still gets jQuery included in page"""
         response = self.client.get(reverse('admin:admin_views_oldsubscriber_changelist'))
         self.assertIsNone(response.context["action_form"])
         self.assertContains(
@@ -3365,7 +3367,7 @@ action)</option>
         )
 
     def test_action_column_class(self):
-        "Tests that the checkbox column class is present in the response"
+        """Tests that the checkbox column class is present in the response"""
         response = self.client.get(reverse('admin:admin_views_subscriber_changelist'))
         self.assertIsNotNone(response.context["action_form"])
         self.assertContains(response, 'action-checkbox-column')
@@ -3918,7 +3920,7 @@ class AdminInlineTests(TestCase):
         self.collector.save()
 
     def test_simple_inline(self):
-        "A simple model can be saved as inlines"
+        """A simple model can be saved as inlines"""
         # First add a new inline
         self.post_data['widget_set-0-name'] = "Widget 1"
         collector_url = reverse('admin:admin_views_collector_change', args=(self.collector.pk,))
@@ -3951,7 +3953,7 @@ class AdminInlineTests(TestCase):
         self.assertEqual(Widget.objects.all()[0].name, "Widget 1 Updated")
 
     def test_explicit_autofield_inline(self):
-        "A model with an explicit autofield primary key can be saved as inlines. Regression for #8093"
+        """A model with an explicit autofield primary key can be saved as inlines. Regression for #8093"""
         # First add a new inline
         self.post_data['grommet_set-0-name'] = "Grommet 1"
         collector_url = reverse('admin:admin_views_collector_change', args=(self.collector.pk,))
@@ -3983,7 +3985,7 @@ class AdminInlineTests(TestCase):
         self.assertEqual(Grommet.objects.all()[0].name, "Grommet 1 Updated")
 
     def test_char_pk_inline(self):
-        "A model with a character PK can be saved as inlines. Regression for #10992"
+        """A model with a character PK can be saved as inlines. Regression for #10992"""
         # First add a new inline
         self.post_data['doohickey_set-0-code'] = "DH1"
         self.post_data['doohickey_set-0-name'] = "Doohickey 1"
@@ -4016,7 +4018,7 @@ class AdminInlineTests(TestCase):
         self.assertEqual(DooHickey.objects.all()[0].name, "Doohickey 1 Updated")
 
     def test_integer_pk_inline(self):
-        "A model with an integer PK can be saved as inlines. Regression for #10992"
+        """A model with an integer PK can be saved as inlines. Regression for #10992"""
         # First add a new inline
         self.post_data['whatsit_set-0-index'] = "42"
         self.post_data['whatsit_set-0-name'] = "Whatsit 1"
@@ -4049,7 +4051,7 @@ class AdminInlineTests(TestCase):
         self.assertEqual(Whatsit.objects.all()[0].name, "Whatsit 1 Updated")
 
     def test_inherited_inline(self):
-        "An inherited model can be saved as inlines. Regression for #11042"
+        """An inherited model can be saved as inlines. Regression for #11042"""
         # First add a new inline
         self.post_data['fancydoodad_set-0-name'] = "Fancy Doodad 1"
         collector_url = reverse('admin:admin_views_collector_change', args=(self.collector.pk,))
@@ -4151,64 +4153,64 @@ class NeverCacheTests(TestCase):
         self.client.force_login(self.superuser)
 
     def test_admin_index(self):
-        "Check the never-cache status of the main index"
+        """Check the never-cache status of the main index"""
         response = self.client.get(reverse('admin:index'))
         self.assertEqual(get_max_age(response), 0)
 
     def test_app_index(self):
-        "Check the never-cache status of an application index"
+        """Check the never-cache status of an application index"""
         response = self.client.get(reverse('admin:app_list', args=('admin_views',)))
         self.assertEqual(get_max_age(response), 0)
 
     def test_model_index(self):
-        "Check the never-cache status of a model index"
+        """Check the never-cache status of a model index"""
         response = self.client.get(reverse('admin:admin_views_fabric_changelist'))
         self.assertEqual(get_max_age(response), 0)
 
     def test_model_add(self):
-        "Check the never-cache status of a model add page"
+        """Check the never-cache status of a model add page"""
         response = self.client.get(reverse('admin:admin_views_fabric_add'))
         self.assertEqual(get_max_age(response), 0)
 
     def test_model_view(self):
-        "Check the never-cache status of a model edit page"
+        """Check the never-cache status of a model edit page"""
         response = self.client.get(reverse('admin:admin_views_section_change', args=(self.s1.pk,)))
         self.assertEqual(get_max_age(response), 0)
 
     def test_model_history(self):
-        "Check the never-cache status of a model history page"
+        """Check the never-cache status of a model history page"""
         response = self.client.get(reverse('admin:admin_views_section_history', args=(self.s1.pk,)))
         self.assertEqual(get_max_age(response), 0)
 
     def test_model_delete(self):
-        "Check the never-cache status of a model delete page"
+        """Check the never-cache status of a model delete page"""
         response = self.client.get(reverse('admin:admin_views_section_delete', args=(self.s1.pk,)))
         self.assertEqual(get_max_age(response), 0)
 
     def test_login(self):
-        "Check the never-cache status of login views"
+        """Check the never-cache status of login views"""
         self.client.logout()
         response = self.client.get(reverse('admin:index'))
         self.assertEqual(get_max_age(response), 0)
 
     def test_logout(self):
-        "Check the never-cache status of logout view"
+        """Check the never-cache status of logout view"""
         response = self.client.get(reverse('admin:logout'))
         self.assertEqual(get_max_age(response), 0)
 
     def test_password_change(self):
-        "Check the never-cache status of the password change view"
+        """Check the never-cache status of the password change view"""
         self.client.logout()
         response = self.client.get(reverse('admin:password_change'))
         self.assertIsNone(get_max_age(response))
 
     def test_password_change_done(self):
-        "Check the never-cache status of the password change done view"
+        """Check the never-cache status of the password change done view"""
         response = self.client.get(reverse('admin:password_change_done'))
         self.assertIsNone(get_max_age(response))
 
     def test_JS_i18n(self):
-        "Check the never-cache status of the JavaScript i18n view"
+        """Check the never-cache status of the JavaScript i18n view"""
         response = self.client.get(reverse('admin:jsi18n'))
         self.assertIsNone(get_max_age(response))
 
@@ -4442,7 +4444,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
 
     def test_cancel_delete_confirmation(self):
-        "Cancelling the deletion of an object takes the user back one page."
+        """Cancelling the deletion of an object takes the user back one page."""
         pizza = Pizza.objects.create(name="Double Cheese")
         url = reverse('admin:admin_views_pizza_change', args=(pizza.id,))
         full_url = self.live_server_url + url
@@ -4679,7 +4681,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertEqual(p.posted, datetime.date.today())
 
     def test_readonly_manytomany(self):
-        "Regression test for #13004"
+        """Regression test for #13004"""
         response = self.client.get(reverse('admin:admin_views_pizza_add'))
         self.assertEqual(response.status_code, 200)
 
@@ -5978,7 +5980,7 @@ class AdminViewOnSiteTests(TestCase):
                              error_set.get('__all__'))
 
     def test_check(self):
-        "Ensure that the view_on_site value is either a boolean or a callable"
+        """Ensure that the view_on_site value is either a boolean or a callable"""
         try:
             admin = CityAdmin(City, AdminSite())
             CityAdmin.view_on_site = True
@@ -6000,24 +6002,24 @@ class AdminViewOnSiteTests(TestCase):
             CityAdmin.view_on_site = True
 
     def test_false(self):
-        "Ensure that the 'View on site' button is not displayed if view_on_site is False"
+        """Ensure that the 'View on site' button is not displayed if view_on_site is False"""
         response = self.client.get(reverse('admin:admin_views_restaurant_change', args=(self.r1.pk,)))
         content_type_pk = ContentType.objects.get_for_model(Restaurant).pk
         self.assertNotContains(response, reverse('admin:view_on_site', args=(content_type_pk, 1)))
 
     def test_true(self):
-        "Ensure that the default behavior is followed if view_on_site is True"
+        """Ensure that the default behavior is followed if view_on_site is True"""
         response = self.client.get(reverse('admin:admin_views_city_change', args=(self.c1.pk,)))
         content_type_pk = ContentType.objects.get_for_model(City).pk
         self.assertContains(response, reverse('admin:view_on_site', args=(content_type_pk, self.c1.pk)))
 
     def test_callable(self):
-        "Ensure that the right link is displayed if view_on_site is a callable"
+        """Ensure that the right link is displayed if view_on_site is a callable"""
         response = self.client.get(reverse('admin:admin_views_worker_change', args=(self.w1.pk,)))
         self.assertContains(response, '"/worker/%s/%s/"' % (self.w1.surname, self.w1.name))
 
     def test_missing_get_absolute_url(self):
-        "Ensure None is returned if model doesn't have get_absolute_url"
+        """Ensure None is returned if model doesn't have get_absolute_url"""
         model_admin = ModelAdmin(Worker, None)
         self.assertIsNone(model_admin.get_view_on_site_url(Worker()))
 
@@ -6049,19 +6051,19 @@ class InlineAdminViewOnSiteTest(TestCase):
         self.client.force_login(self.superuser)
 
     def test_false(self):
-        "Ensure that the 'View on site' button is not displayed if view_on_site is False"
+        """Ensure that the 'View on site' button is not displayed if view_on_site is False"""
         response = self.client.get(reverse('admin:admin_views_state_change', args=(self.s1.pk,)))
         content_type_pk = ContentType.objects.get_for_model(City).pk
         self.assertNotContains(response, reverse('admin:view_on_site', args=(content_type_pk, self.c1.pk)))
 
     def test_true(self):
-        "Ensure that the 'View on site' button is displayed if view_on_site is True"
+        """Ensure that the 'View on site' button is displayed if view_on_site is True"""
         response = self.client.get(reverse('admin:admin_views_city_change', args=(self.c1.pk,)))
         content_type_pk = ContentType.objects.get_for_model(Restaurant).pk
         self.assertContains(response, reverse('admin:view_on_site', args=(content_type_pk, self.r1.pk)))
 
     def test_callable(self):
-        "Ensure that the right link is displayed if view_on_site is a callable"
+        """Ensure that the right link is displayed if view_on_site is a callable"""
         response = self.client.get(reverse('admin:admin_views_restaurant_change', args=(self.r1.pk,)))
         self.assertContains(response, '"/worker_inline/%s/%s/"' % (self.w1.surname, self.w1.name))
 

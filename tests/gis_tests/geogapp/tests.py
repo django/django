@@ -24,12 +24,12 @@ class GeographyTest(TestCase):
     fixtures = ['initial']
 
     def test01_fixture_load(self):
-        "Ensure geography features loaded properly."
+        """Ensure geography features loaded properly."""
         self.assertEqual(8, City.objects.count())
 
     @skipUnlessDBFeature("supports_distances_lookups", "supports_distance_geodetic")
     def test02_distance_lookup(self):
-        "Testing GeoQuerySet distance lookup support on non-point geography fields."
+        """Testing GeoQuerySet distance lookup support on non-point geography fields."""
         z = Zipcode.objects.get(code='77002')
         cities1 = list(City.objects
                        .filter(point__distance_lte=(z.poly, D(mi=500)))
@@ -45,14 +45,14 @@ class GeographyTest(TestCase):
     @skipUnlessDBFeature("has_distance_method", "supports_distance_geodetic")
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test03_distance_method(self):
-        "Testing GeoQuerySet.distance() support on non-point geography fields."
+        """Testing GeoQuerySet.distance() support on non-point geography fields."""
         # `GeoQuerySet.distance` is not allowed geometry fields.
         htown = City.objects.get(name='Houston')
         Zipcode.objects.distance(htown.point)
 
     @skipUnless(postgis, "This is a PostGIS-specific test")
     def test04_invalid_operators_functions(self):
-        "Ensuring exceptions are raised for operators & functions invalid on geography fields."
+        """Ensuring exceptions are raised for operators & functions invalid on geography fields."""
         # Only a subset of the geometry functions & operator are available
         # to PostGIS geography types.  For more information, visit:
         # http://postgis.refractions.net/documentation/manual-1.5/ch08.html#PostGIS_GeographyFunctions
@@ -70,7 +70,7 @@ class GeographyTest(TestCase):
             City.objects.get(point__exact=htown.point)
 
     def test05_geography_layermapping(self):
-        "Testing LayerMapping support on models with geography fields."
+        """Testing LayerMapping support on models with geography fields."""
         # There is a similar test in `layermap` that uses the same data set,
         # but the County model here is a bit different.
         from django.contrib.gis.utils import LayerMapping
@@ -100,7 +100,7 @@ class GeographyTest(TestCase):
     @skipUnlessDBFeature("has_area_method", "supports_distance_geodetic")
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test06_geography_area(self):
-        "Testing that Area calculations work on geography columns."
+        """Testing that Area calculations work on geography columns."""
         # SELECT ST_Area(poly) FROM geogapp_zipcode WHERE code='77002';
         z = Zipcode.objects.area().get(code='77002')
         # Round to the nearest thousand as possible values (depending on

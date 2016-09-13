@@ -1838,7 +1838,7 @@ class Query(object):
         target[model] = {f.attname for f in fields}
 
     def set_annotation_mask(self, names):
-        "Set the mask of annotations that will actually be returned by the SELECT"
+        """Set the mask of annotations that will actually be returned by the SELECT"""
         if names is None:
             self.annotation_select_mask = None
         else:

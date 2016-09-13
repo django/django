@@ -21,7 +21,7 @@ from .models import TestModel
 class HTTPSitemapTests(SitemapTestsBase):
 
     def test_simple_sitemap_index(self):
-        "A simple sitemap index can be rendered"
+        """A simple sitemap index can be rendered"""
         response = self.client.get('/simple/index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -35,7 +35,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
     }])
     def test_simple_sitemap_custom_index(self):
-        "A simple sitemap index can be rendered with a custom template"
+        """A simple sitemap index can be rendered with a custom template"""
         response = self.client.get('/simple/custom-index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customised template -->
@@ -46,7 +46,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     def test_simple_sitemap_section(self):
-        "A simple sitemap section can be rendered"
+        """A simple sitemap section can be rendered"""
         response = self.client.get('/simple/sitemap-simple.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -56,7 +56,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     def test_simple_sitemap(self):
-        "A simple sitemap can be rendered"
+        """A simple sitemap can be rendered"""
         response = self.client.get('/simple/sitemap.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -70,7 +70,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
     }])
     def test_simple_custom_sitemap(self):
-        "A simple sitemap can be rendered with a custom template"
+        """A simple sitemap can be rendered with a custom template"""
         response = self.client.get('/simple/custom-sitemap.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <!-- This is a customised template -->
@@ -81,7 +81,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     def test_sitemap_last_modified(self):
-        "Tests that Last-Modified header is set correctly"
+        """Tests that Last-Modified header is set correctly"""
         response = self.client.get('/lastmod/sitemap.xml')
         self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 10:00:00 GMT')
 
@@ -101,12 +101,12 @@ class HTTPSitemapTests(SitemapTestsBase):
         self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 15:00:00 GMT')
 
     def test_sitemap_last_modified_missing(self):
-        "Tests that Last-Modified header is missing when sitemap has no lastmod"
+        """Tests that Last-Modified header is missing when sitemap has no lastmod"""
         response = self.client.get('/generic/sitemap.xml')
         self.assertFalse(response.has_header('Last-Modified'))
 
     def test_sitemap_last_modified_mixed(self):
-        "Tests that Last-Modified header is omitted when lastmod not on all items"
+        """Tests that Last-Modified header is omitted when lastmod not on all items"""
         response = self.client.get('/lastmod-mixed/sitemap.xml')
         self.assertFalse(response.has_header('Last-Modified'))
 
@@ -145,7 +145,7 @@ class HTTPSitemapTests(SitemapTestsBase):
     @skipUnless(settings.USE_I18N, "Internationalization is not enabled")
     @override_settings(USE_L10N=True)
     def test_localized_priority(self):
-        "The priority value should not be localized (Refs #14164)"
+        """The priority value should not be localized (Refs #14164)"""
         activate('fr')
         self.assertEqual('0,3', localize(0.3))
 
@@ -226,7 +226,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 
     @override_settings(LANGUAGES=(('en', 'English'), ('pt', 'Portuguese')))
     def test_simple_i18nsitemap_index(self):
-        "A simple i18n sitemap index can be rendered"
+        """A simple i18n sitemap index can be rendered"""
         response = self.client.get('/simple/i18n.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

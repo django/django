@@ -29,7 +29,7 @@ class TestCaseFixtureLoadingTests(TestCase):
     fixtures = ['fixture1.json', 'fixture2.json']
 
     def testClassFixtures(self):
-        "Check that test case has installed 3 fixture objects"
+        """Check that test case has installed 3 fixture objects"""
         self.assertEqual(Article.objects.count(), 3)
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: Django conquers world!>',
@@ -45,7 +45,7 @@ class SubclassTestCaseFixtureLoadingTests(TestCaseFixtureLoadingTests):
     fixtures = []
 
     def testClassFixtures(self):
-        "Check that there were no fixture objects installed"
+        """Check that there were no fixture objects installed"""
         self.assertEqual(Article.objects.count(), 0)
 
 

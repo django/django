@@ -59,7 +59,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return [TableInfo(row[0].lower(), row[1]) for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):
-        "Returns a description of the table, with the DB-API cursor.description interface."
+        """Returns a description of the table, with the DB-API cursor.description interface."""
         self.cache_bust_counter += 1
         cursor.execute("SELECT * FROM {} WHERE ROWNUM < 2 AND {} > 0".format(
             self.connection.ops.quote_name(table_name),
@@ -72,7 +72,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return description
 
     def table_name_converter(self, name):
-        "Table name comparison is case insensitive under Oracle"
+        """Table name comparison is case insensitive under Oracle"""
         return name.lower()
 
     def _name_to_index(self, cursor, table_name):

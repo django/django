@@ -10,14 +10,14 @@ from django.contrib.gis.geos.prototypes.errcheck import check_predicate
 
 # ## Binary & unary predicate factories ##
 class UnaryPredicate(GEOSFuncFactory):
-    "For GEOS unary predicate functions."
+    """For GEOS unary predicate functions."""
     argtypes = [GEOM_PTR]
     restype = c_char
     errcheck = staticmethod(check_predicate)
 
 
 class BinaryPredicate(UnaryPredicate):
-    "For GEOS binary predicate functions."
+    """For GEOS binary predicate functions."""
     argtypes = [GEOM_PTR, GEOM_PTR]
 
 

@@ -64,7 +64,7 @@ bad_ds = (TestDS('foo'),)
 class DataSourceTest(unittest.TestCase):
 
     def test01_valid_shp(self):
-        "Testing valid SHP Data Source files."
+        """Testing valid SHP Data Source files."""
 
         for source in ds_list:
             # Loading up the data source
@@ -84,13 +84,13 @@ class DataSourceTest(unittest.TestCase):
                 ds[len(ds)]
 
     def test02_invalid_shp(self):
-        "Testing invalid SHP files for the Data Source."
+        """Testing invalid SHP files for the Data Source."""
         for source in bad_ds:
             with self.assertRaises(GDALException):
                 DataSource(source.ds)
 
     def test03a_layers(self):
-        "Testing Data Source Layers."
+        """Testing Data Source Layers."""
         for source in ds_list:
             ds = DataSource(source.ds)
 
@@ -138,7 +138,7 @@ class DataSourceTest(unittest.TestCase):
                             self.assertEqual(source.field_values[fld_name][i], feat.get(fld_name))
 
     def test03b_layer_slice(self):
-        "Test indexing and slicing on Layers."
+        """Test indexing and slicing on Layers."""
         # Using the first data-source because the same slice
         # can be used for both the layer and the control values.
         source = ds_list[0]
@@ -175,7 +175,7 @@ class DataSourceTest(unittest.TestCase):
         self.assertEqual(str(lyr[0]['str']), "1")
 
     def test04_features(self):
-        "Testing Data Source Features."
+        """Testing Data Source Features."""
         for source in ds_list:
             ds = DataSource(source.ds)
 
@@ -199,7 +199,7 @@ class DataSourceTest(unittest.TestCase):
                         self.assertIn(fld.name, source.fields.keys())
 
     def test05_geometries(self):
-        "Testing Geometries from Data Source Features."
+        """Testing Geometries from Data Source Features."""
         for source in ds_list:
             ds = DataSource(source.ds)
 
@@ -221,7 +221,7 @@ class DataSourceTest(unittest.TestCase):
                         )
 
     def test06_spatial_filter(self):
-        "Testing the Layer.spatial_filter property."
+        """Testing the Layer.spatial_filter property."""
         ds = DataSource(get_ds_file('cities', 'shp'))
         lyr = ds[0]
 
@@ -261,7 +261,7 @@ class DataSourceTest(unittest.TestCase):
         self.assertEqual(3, len(lyr))
 
     def test07_integer_overflow(self):
-        "Testing that OFTReal fields, treated as OFTInteger, do not overflow."
+        """Testing that OFTReal fields, treated as OFTInteger, do not overflow."""
         # Using *.dbf from Census 2010 TIGER Shapefile for Texas,
         # which has land area ('ALAND10') stored in a Real field
         # with no precision.

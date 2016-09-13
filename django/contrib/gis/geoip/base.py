@@ -157,7 +157,7 @@ class GeoIP(object):
         }
 
     def _check_query(self, query, country=False, city=False, city_or_country=False):
-        "Helper routine for checking the query and database availability."
+        """Helper routine for checking the query and database availability."""
         # Making sure a string was passed in for the query.
         if not isinstance(query, six.string_types):
             raise TypeError('GeoIP query must be a string, not type %s' % type(query).__name__)
@@ -188,7 +188,7 @@ class GeoIP(object):
             return GeoIP_record_by_name(self._city, c_char_p(enc_query))
 
     def country_code(self, query):
-        "Returns the country code for the given IP Address or FQDN."
+        """Returns the country code for the given IP Address or FQDN."""
         enc_query = self._check_query(query, city_or_country=True)
         if self._country:
             if ipv4_re.match(query):
@@ -199,7 +199,7 @@ class GeoIP(object):
             return self.city(query)['country_code']
 
     def country_name(self, query):
-        "Returns the country name for the given IP Address or FQDN."
+        """Returns the country name for the given IP Address or FQDN."""
         enc_query = self._check_query(query, city_or_country=True)
         if self._country:
             if ipv4_re.match(query):
@@ -229,15 +229,15 @@ class GeoIP(object):
             return tuple(cdict[o] for o in ordering)
 
     def lon_lat(self, query):
-        "Returns a tuple of the (longitude, latitude) for the given query."
+        """Returns a tuple of the (longitude, latitude) for the given query."""
         return self.coords(query)
 
     def lat_lon(self, query):
-        "Returns a tuple of the (latitude, longitude) for the given query."
+        """Returns a tuple of the (latitude, longitude) for the given query."""
         return self.coords(query, ('latitude', 'longitude'))
 
     def geos(self, query):
-        "Returns a GEOS Point object for the given query."
+        """Returns a GEOS Point object for the given query."""
         ll = self.lon_lat(query)
         if ll:
             from django.contrib.gis.geos import Point
@@ -248,7 +248,7 @@ class GeoIP(object):
     # #### GeoIP Database Information Routines ####
     @property
     def country_info(self):
-        "Returns information about the GeoIP country database."
+        """Returns information about the GeoIP country database."""
         if self._country is None:
             ci = 'No GeoIP Country data in "%s"' % self._country_file
         else:
@@ -257,7 +257,7 @@ class GeoIP(object):
 
     @property
     def city_info(self):
-        "Returns information about the GeoIP city database."
+        """Returns information about the GeoIP city database."""
         if self._city is None:
             ci = 'No GeoIP City data in "%s"' % self._city_file
         else:
@@ -266,7 +266,7 @@ class GeoIP(object):
 
     @property
     def info(self):
-        "Returns information about the GeoIP library and databases in use."
+        """Returns information about the GeoIP library and databases in use."""
         info = ''
         if GeoIP_lib_version:
             info += 'GeoIP Library:\n\t%s\n' % GeoIP_lib_version()

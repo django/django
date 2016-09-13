@@ -16,12 +16,12 @@ class CustomTestException(Exception):
 
 
 def no_template_view(request):
-    "A simple view that expects a GET request, and returns a rendered template"
+    """A simple view that expects a GET request, and returns a rendered template"""
     return HttpResponse("No template used. Sample content: twice once twice. Content ends.")
 
 
 def staff_only_view(request):
-    "A view that can only be visited by staff. Non staff members get an exception"
+    """A view that can only be visited by staff. Non staff members get an exception"""
     if request.user.is_staff:
         return HttpResponse('')
     else:
@@ -29,13 +29,13 @@ def staff_only_view(request):
 
 
 def get_view(request):
-    "A simple login protected view"
+    """A simple login protected view"""
     return HttpResponse("Hello world")
 get_view = login_required(get_view)
 
 
 def request_data(request, template='base.html', data='sausage'):
-    "A simple view that returns the request data in the context"
+    """A simple view that returns the request data in the context"""
     return render(request, template, {
         'get-foo': request.GET.get('foo'),
         'get-bar': request.GET.get('bar'),
@@ -68,7 +68,7 @@ def nested_view(request):
 
 
 def login_protected_redirect_view(request):
-    "A view that redirects all requests to the GET view"
+    """A view that redirects all requests to the GET view"""
     return HttpResponseRedirect('/get_view/')
 login_protected_redirect_view = login_required(login_protected_redirect_view)
 
@@ -80,18 +80,18 @@ def redirect_to_self_with_changing_query_view(request):
 
 
 def set_session_view(request):
-    "A view that sets a session variable"
+    """A view that sets a session variable"""
     request.session['session_var'] = 'YES'
     return HttpResponse('set_session')
 
 
 def check_session_view(request):
-    "A view that reads a session variable"
+    """A view that reads a session variable"""
     return HttpResponse(request.session.get('session_var', 'NO'))
 
 
 def request_methods_view(request):
-    "A view that responds with the request method"
+    """A view that responds with the request method"""
     return HttpResponse('request method: %s' % request.method)
 
 
@@ -110,7 +110,7 @@ def return_json_response(request):
 
 
 def return_json_file(request):
-    "A view that parses and returns a JSON string as a file."
+    """A view that parses and returns a JSON string as a file."""
     match = CONTENT_TYPE_RE.match(request.META['CONTENT_TYPE'])
     if match:
         charset = match.group(1)
@@ -127,22 +127,22 @@ def return_json_file(request):
 
 
 def check_headers(request):
-    "A view that responds with value of the X-ARG-CHECK header"
+    """A view that responds with value of the X-ARG-CHECK header"""
     return HttpResponse('HTTP_X_ARG_CHECK: %s' % request.META.get('HTTP_X_ARG_CHECK', 'Undefined'))
 
 
 def body(request):
-    "A view that is requested with GET and accesses request.body. Refs #14753."
+    """A view that is requested with GET and accesses request.body. Refs #14753."""
     return HttpResponse(request.body)
 
 
 def read_all(request):
-    "A view that is requested with accesses request.read()."
+    """A view that is requested with accesses request.read()."""
     return HttpResponse(request.read())
 
 
 def read_buffer(request):
-    "A view that is requested with accesses request.read(LARGE_BUFFER)."
+    """A view that is requested with accesses request.read(LARGE_BUFFER)."""
     return HttpResponse(request.read(99999))
 
 

@@ -14,39 +14,39 @@ from django.utils.six.moves import range
 
 
 class GEOSCoordSeq(GEOSBase):
-    "The internal representation of a list of coordinates inside a Geometry."
+    """The internal representation of a list of coordinates inside a Geometry."""
 
     ptr_type = CS_PTR
 
     def __init__(self, ptr, z=False):
-        "Initializes from a GEOS pointer."
+        """Initializes from a GEOS pointer."""
         if not isinstance(ptr, CS_PTR):
             raise TypeError('Coordinate sequence should initialize with a CS_PTR.')
         self._ptr = ptr
         self._z = z
 
     def __iter__(self):
-        "Iterates over each point in the coordinate sequence."
+        """Iterates over each point in the coordinate sequence."""
         for i in range(self.size):
             yield self[i]
 
     def __len__(self):
-        "Returns the number of points in the coordinate sequence."
+        """Returns the number of points in the coordinate sequence."""
         return int(self.size)
 
     def __str__(self):
-        "Returns the string representation of the coordinate sequence."
+        """Returns the string representation of the coordinate sequence."""
         return str(self.tuple)
 
     def __getitem__(self, index):
-        "Returns the coordinate sequence value at the given index."
+        """Returns the coordinate sequence value at the given index."""
         coords = [self.getX(index), self.getY(index)]
         if self.dims == 3 and self._z:
             coords.append(self.getZ(index))
         return tuple(coords)
 
     def __setitem__(self, index, value):
-        "Sets the coordinate sequence value at the given index."
+        """Sets the coordinate sequence value at the given index."""
         # Checking the input value
         if isinstance(value, (list, tuple)):
             pass
@@ -71,62 +71,62 @@ class GEOSCoordSeq(GEOSBase):
 
     # #### Internal Routines ####
     def _checkindex(self, index):
-        "Checks the given index."
+        """Checks the given index."""
         sz = self.size
         if (sz < 1) or (index < 0) or (index >= sz):
             raise IndexError('invalid GEOS Geometry index: %s' % str(index))
 
     def _checkdim(self, dim):
-        "Checks the given dimension."
+        """Checks the given dimension."""
         if dim < 0 or dim > 2:
             raise GEOSException('invalid ordinate dimension "%d"' % dim)
 
     # #### Ordinate getting and setting routines ####
     def getOrdinate(self, dimension, index):
-        "Returns the value for the given dimension and index."
+        """Returns the value for the given dimension and index."""
         self._checkindex(index)
         self._checkdim(dimension)
         return capi.cs_getordinate(self.ptr, index, dimension, byref(c_double()))
 
     def setOrdinate(self, dimension, index, value):
-        "Sets the value for the given dimension and index."
+        """Sets the value for the given dimension and index."""
         self._checkindex(index)
         self._checkdim(dimension)
         capi.cs_setordinate(self.ptr, index, dimension, value)
 
     def getX(self, index):
-        "Get the X value at the index."
+        """Get the X value at the index."""
         return self.getOrdinate(0, index)
 
     def setX(self, index, value):
-        "Set X with the value at the given index."
+        """Set X with the value at the given index."""
         self.setOrdinate(0, index, value)
 
     def getY(self, index):
-        "Get the Y value at the given index."
+        """Get the Y value at the given index."""
         return self.getOrdinate(1, index)
 
     def setY(self, index, value):
-        "Set Y with the value at the given index."
+        """Set Y with the value at the given index."""
         self.setOrdinate(1, index, value)
 
     def getZ(self, index):
-        "Get Z with the value at the given index."
+        """Get Z with the value at the given index."""
         return self.getOrdinate(2, index)
 
     def setZ(self, index, value):
-        "Set Z with the value at the given index."
+        """Set Z with the value at the given index."""
         self.setOrdinate(2, index, value)
 
     # ### Dimensions ###
     @property
     def size(self):
-        "Returns the size of this coordinate sequence."
+        """Returns the size of this coordinate sequence."""
         return capi.cs_getsize(self.ptr, byref(c_uint()))
 
     @property
     def dims(self):
-        "Returns the dimensions of this coordinate sequence."
+        """Returns the dimensions of this coordinate sequence."""
         return capi.cs_getdims(self.ptr, byref(c_uint()))
 
     @property
@@ -139,12 +139,12 @@ class GEOSCoordSeq(GEOSBase):
 
     # ### Other Methods ###
     def clone(self):
-        "Clones this coordinate sequence."
+        """Clones this coordinate sequence."""
         return GEOSCoordSeq(capi.cs_clone(self.ptr), self.hasz)
 
     @property
     def kml(self):
-        "Returns the KML representation for the coordinates."
+        """Returns the KML representation for the coordinates."""
         # Getting the substitution string depending on whether the coordinates have
         #  a Z dimension.
         if self.hasz:
@@ -156,7 +156,7 @@ class GEOSCoordSeq(GEOSBase):
 
     @property
     def tuple(self):
-        "Returns a tuple version of this coordinate sequence."
+        """Returns a tuple version of this coordinate sequence."""
         n = self.size
         if n == 1:
             return self[0]

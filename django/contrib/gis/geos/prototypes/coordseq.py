@@ -8,7 +8,7 @@ from django.contrib.gis.geos.prototypes.errcheck import (
 
 # ## Error-checking routines specific to coordinate sequences. ##
 def check_cs_op(result, func, cargs):
-    "Checks the status code of a coordinate sequence operation."
+    """Checks the status code of a coordinate sequence operation."""
     if result == 0:
         raise GEOSException('Could not set value on coordinate sequence')
     else:
@@ -16,7 +16,7 @@ def check_cs_op(result, func, cargs):
 
 
 def check_cs_get(result, func, cargs):
-    "Checking the coordinate sequence retrieval."
+    """Checking the coordinate sequence retrieval."""
     check_cs_op(result, func, cargs)
     # Object in by reference, return its value.
     return last_arg_byref(cargs)
@@ -24,14 +24,14 @@ def check_cs_get(result, func, cargs):
 
 # ## Coordinate sequence prototype factory classes. ##
 class CsInt(GEOSFuncFactory):
-    "For coordinate sequence routines that return an integer."
+    """For coordinate sequence routines that return an integer."""
     argtypes = [CS_PTR, POINTER(c_uint)]
     restype = c_int
     errcheck = staticmethod(check_cs_get)
 
 
 class CsOperation(GEOSFuncFactory):
-    "For coordinate sequence operations."
+    """For coordinate sequence operations."""
     restype = c_int
 
     def get_func(self, ordinate=False, get=False):

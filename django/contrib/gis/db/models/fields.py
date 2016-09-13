@@ -404,7 +404,7 @@ class GeometryCollectionField(GeometryField):
 
 
 class ExtentField(GeoSelectFormatMixin, Field):
-    "Used as a return value from an extent aggregate"
+    """Used as a return value from an extent aggregate"""
 
     description = _("Extent Aggregate Field")
 

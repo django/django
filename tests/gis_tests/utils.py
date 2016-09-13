@@ -22,7 +22,7 @@ def skipUnlessGISLookup(*gis_lookups):
 
 
 def no_backend(test_func, backend):
-    "Use this decorator to disable test on specified backend."
+    """Use this decorator to disable test on specified backend."""
     if settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'].rsplit('.')[-1] == backend:
         @unittest.skip("This test is skipped on '%s' backend" % backend)
         def inner():

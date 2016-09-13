@@ -19,7 +19,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 
 
 class GeoQuerySet(QuerySet):
-    "The Geographic QuerySet."
+    """The Geographic QuerySet."""
 
     # ### GeoQuerySet Methods ###
     def area(self, tolerance=0.05, **kwargs):

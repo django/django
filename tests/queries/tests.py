@@ -2003,7 +2003,7 @@ class SubqueryTests(TestCase):
         DumbCategory.objects.create(id=4)
 
     def test_ordered_subselect(self):
-        "Subselects honor any manual ordering"
+        """Subselects honor any manual ordering"""
         query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:2])
         self.assertEqual(set(query.values_list('id', flat=True)), {3, 4})
 
@@ -2046,7 +2046,7 @@ class SubqueryTests(TestCase):
         self.assertEqual({x.id for x in query}, {mm2.id})
 
     def test_sliced_delete(self):
-        "Delete queries can safely contain sliced subqueries"
+        """Delete queries can safely contain sliced subqueries"""
         DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:1]).delete()
         self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), {1, 2, 3})
 
@@ -2060,7 +2060,7 @@ class SubqueryTests(TestCase):
 class CloneTests(TestCase):
 
     def test_evaluated_queryset_as_argument(self):
-        "#13227 -- If a queryset is already evaluated, it can still be used as a query arg"
+        """#13227 -- If a queryset is already evaluated, it can still be used as a query arg"""
         n = Note(note='Test1', misc='misc')
         n.save()
         e = ExtraInfo(info='good', note=n)

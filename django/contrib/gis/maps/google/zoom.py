@@ -27,7 +27,7 @@ class GoogleZoom(object):
     """
 
     def __init__(self, num_zoom=19, tilesize=256):
-        "Initializes the Google Zoom object."
+        """Initializes the Google Zoom object."""
         # Google's tilesize is 256x256, square tiles are assumed.
         self._tilesize = tilesize
 
@@ -53,11 +53,11 @@ class GoogleZoom(object):
             z *= 2
 
     def __len__(self):
-        "Returns the number of zoom levels."
+        """Returns the number of zoom levels."""
         return self._nzoom
 
     def get_lon_lat(self, lonlat):
-        "Unpacks longitude, latitude from GEOS Points and 2-tuples."
+        """Unpacks longitude, latitude from GEOS Points and 2-tuples."""
         if isinstance(lonlat, Point):
             lon, lat = lonlat.coords
         else:
@@ -65,7 +65,7 @@ class GoogleZoom(object):
         return lon, lat
 
     def lonlat_to_pixel(self, lonlat, zoom):
-        "Converts a longitude, latitude coordinate pair for the given zoom level."
+        """Converts a longitude, latitude coordinate pair for the given zoom level."""
         # Setting up, unpacking the longitude, latitude values and getting the
         # number of pixels for the given zoom level.
         lon, lat = self.get_lon_lat(lonlat)
@@ -88,7 +88,7 @@ class GoogleZoom(object):
         return (px_x, px_y)
 
     def pixel_to_lonlat(self, px, zoom):
-        "Converts a pixel to a longitude, latitude pair at the given zoom level."
+        """Converts a pixel to a longitude, latitude pair at the given zoom level."""
         if len(px) != 2:
             raise TypeError('Pixel should be a sequence of two elements.')
 
@@ -126,7 +126,7 @@ class GoogleZoom(object):
         return Polygon(LinearRing(ll, (ll[0], ur[1]), ur, (ur[0], ll[1]), ll), srid=4326)
 
     def get_zoom(self, geom):
-        "Returns the optimal Zoom level for the given geometry."
+        """Returns the optimal Zoom level for the given geometry."""
         # Checking the input type.
         if not isinstance(geom, GEOSGeometry) or geom.srid != 4326:
             raise TypeError('get_zoom() expects a GEOS Geometry with an SRID of 4326.')

@@ -10,14 +10,14 @@ from django.utils.html import escape
 class GeometryFieldTest(SimpleTestCase):
 
     def test_init(self):
-        "Testing GeometryField initialization with defaults."
+        """Testing GeometryField initialization with defaults."""
         fld = forms.GeometryField()
         for bad_default in ('blah', 3, 'FoO', None, 0):
             with self.assertRaises(ValidationError):
                 fld.clean(bad_default)
 
     def test_srid(self):
-        "Testing GeometryField with a SRID set."
+        """Testing GeometryField with a SRID set."""
         # Input that doesn't specify the SRID is assumed to be in the SRID
         # of the input field.
         fld = forms.GeometryField(srid=4326)
@@ -33,7 +33,7 @@ class GeometryFieldTest(SimpleTestCase):
         self.assertTrue(xform_geom.equals_exact(cleaned_geom, tol))
 
     def test_null(self):
-        "Testing GeometryField's handling of null (None) geometries."
+        """Testing GeometryField's handling of null (None) geometries."""
         # Form fields, by default, are required (`required=True`)
         fld = forms.GeometryField()
         with self.assertRaisesMessage(forms.ValidationError, "No geometry value provided."):
@@ -44,7 +44,7 @@ class GeometryFieldTest(SimpleTestCase):
         self.assertIsNone(fld.clean(None))
 
     def test_geom_type(self):
-        "Testing GeometryField's handling of different geometry types."
+        """Testing GeometryField's handling of different geometry types."""
         # By default, all geometry types are allowed.
         fld = forms.GeometryField()
         for wkt in ('POINT(5 23)', 'MULTIPOLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'LINESTRING(0 0, 1 1)'):

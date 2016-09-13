@@ -1,4 +1,4 @@
-"Dummy cache backend"
+"""Dummy cache backend"""
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 

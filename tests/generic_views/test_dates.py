@@ -362,7 +362,7 @@ class MonthArchiveViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.status_code, 404)
 
     def test_previous_month_without_content(self):
-        "Content can exist on any day of the previous month. Refs #14711"
+        """Content can exist on any day of the previous month. Refs #14711"""
         self.pubdate_list = [
             datetime.date(2010, month, day)
             for month, day in ((9, 1), (10, 2), (11, 3))

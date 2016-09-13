@@ -6,7 +6,7 @@ these implementations if necessary.
 
 
 def is_iterable(x):
-    "A implementation independent way of checking for iterables"
+    """A implementation independent way of checking for iterables"""
     try:
         iter(x)
     except TypeError:

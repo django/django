@@ -199,7 +199,7 @@ class Template(object):
         return self.nodelist.render(context)
 
     def render(self, context):
-        "Display stage -- can be called many times"
+        """Display stage -- can be called many times"""
         context.render_context.push()
         try:
             if context.template is None:
@@ -997,7 +997,7 @@ class NodeList(list):
         return mark_safe(''.join(bits))
 
     def get_nodes_by_type(self, nodetype):
-        "Return a list of all nodes of the given type"
+        """Return a list of all nodes of the given type"""
         nodes = []
         for node in self:
             nodes.extend(node.get_nodes_by_type(nodetype))

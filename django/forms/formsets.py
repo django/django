@@ -415,7 +415,7 @@ class BaseFormSet(object):
             return self.empty_form.media
 
     def as_table(self):
-        "Returns this formset rendered as HTML <tr>s -- excluding the <table></table>."
+        """Returns this formset rendered as HTML <tr>s -- excluding the <table></table>."""
         # XXX: there is no semantic division between forms here, there
         # probably should be. It might make sense to render each form as a
         # table row with each field as a td.
@@ -423,12 +423,12 @@ class BaseFormSet(object):
         return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
     def as_p(self):
-        "Returns this formset rendered as HTML <p>s."
+        """Returns this formset rendered as HTML <p>s."""
         forms = ' '.join(form.as_p() for form in self)
         return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
     def as_ul(self):
-        "Returns this formset rendered as HTML <li>s."
+        """Returns this formset rendered as HTML <li>s."""
         forms = ' '.join(form.as_ul() for form in self)
         return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 

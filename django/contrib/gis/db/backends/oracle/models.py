@@ -14,7 +14,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 @python_2_unicode_compatible
 class OracleGeometryColumns(models.Model):
-    "Maps to the Oracle USER_SDO_GEOM_METADATA table."
+    """Maps to the Oracle USER_SDO_GEOM_METADATA table."""
     table_name = models.CharField(max_length=32)
     column_name = models.CharField(max_length=1024)
     srid = models.IntegerField(primary_key=True)
@@ -46,7 +46,7 @@ class OracleGeometryColumns(models.Model):
 
 
 class OracleSpatialRefSys(models.Model, SpatialRefSysMixin):
-    "Maps to the Oracle MDSYS.CS_SRS table."
+    """Maps to the Oracle MDSYS.CS_SRS table."""
     cs_name = models.CharField(max_length=68)
     srid = models.IntegerField(primary_key=True)
     auth_srid = models.IntegerField()

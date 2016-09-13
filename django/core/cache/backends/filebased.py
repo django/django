@@ -1,4 +1,4 @@
-"File-based cache backend"
+"""File-based cache backend"""
 import errno
 import glob
 import hashlib

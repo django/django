@@ -8,7 +8,7 @@ from django.db import models
 
 
 class CurrentSiteManager(models.Manager):
-    "Use this to limit objects to those associated with the current site."
+    """Use this to limit objects to those associated with the current site."""
 
     use_in_migrations = True
 

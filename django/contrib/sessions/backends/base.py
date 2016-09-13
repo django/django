@@ -94,7 +94,7 @@ class SessionBase(object):
         return salted_hmac(key_salt, value).hexdigest()
 
     def encode(self, session_dict):
-        "Returns the given session dictionary serialized and encoded as a string."
+        """Returns the given session dictionary serialized and encoded as a string."""
         serialized = self.serializer().dumps(session_dict)
         hash = self._hash(serialized)
         return base64.b64encode(hash.encode() + b":" + serialized).decode('ascii')
@@ -151,14 +151,14 @@ class SessionBase(object):
         self.modified = True
 
     def is_empty(self):
-        "Returns True when there is no session_key and the session is empty"
+        """Returns True when there is no session_key and the session is empty"""
         try:
             return not bool(self._session_key) and not self._session_cache
         except AttributeError:
             return True
 
     def _get_new_session_key(self):
-        "Returns session key that isn't being used."
+        """Returns session key that isn't being used."""
         while True:
             session_key = get_random_string(32, VALID_KEY_CHARS)
             if not self.exists(session_key):

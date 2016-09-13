@@ -42,7 +42,7 @@ class DefaultsTests(TestCase):
         Site(id=1, domain='testserver', name='testserver').save()
 
     def test_page_not_found(self):
-        "A 404 status is returned by the page_not_found view"
+        """A 404 status is returned by the page_not_found view"""
         for url in self.non_existing_urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
@@ -68,7 +68,7 @@ class DefaultsTests(TestCase):
             self.assertNotEqual(response.content, '')
 
     def test_server_error(self):
-        "The server_error view raises a 500 status"
+        """The server_error view raises a 500 status"""
         response = self.client.get('/server_error/')
         self.assertEqual(response.status_code, 500)
 
@@ -98,7 +98,7 @@ class DefaultsTests(TestCase):
         self.assertContains(response, 'exception: Testing technical 404.', status_code=404)
 
     def test_get_absolute_url_attributes(self):
-        "A model can set attributes on the get_absolute_url method"
+        """A model can set attributes on the get_absolute_url method"""
         self.assertTrue(getattr(UrlArticle.get_absolute_url, 'purge', False),
                         'The attributes of the original get_absolute_url must be added.')
         article = UrlArticle.objects.get(pk=1)

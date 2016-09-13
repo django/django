@@ -140,7 +140,7 @@ class ForeignObjectRel(object):
         ]
 
     def is_hidden(self):
-        "Should the related object be hidden?"
+        """Should the related object be hidden?"""
         return bool(self.related_name) and self.related_name[-1] == '+'
 
     def get_joining_columns(self):

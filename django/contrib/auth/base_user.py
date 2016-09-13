@@ -61,7 +61,7 @@ class AbstractBaseUser(models.Model):
         abstract = True
 
     def get_username(self):
-        "Return the identifying username for this User"
+        """Return the identifying username for this User"""
         return getattr(self, self.USERNAME_FIELD)
 
     def __init__(self, *args, **kwargs):

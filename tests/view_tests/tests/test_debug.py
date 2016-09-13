@@ -270,7 +270,7 @@ class ExceptionReporterTests(SimpleTestCase):
     rf = RequestFactory()
 
     def test_request_and_exception(self):
-        "A simple exception report can be generated"
+        """A simple exception report can be generated"""
         try:
             request = self.rf.get('/test_view/')
             request.user = User()
@@ -292,7 +292,7 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertNotIn('<p>Request data not supplied</p>', html)
 
     def test_no_request(self):
-        "An exception report can be generated without request"
+        """An exception report can be generated without request"""
         try:
             raise ValueError("Can't find my keys")
         except ValueError:
@@ -329,7 +329,7 @@ class ExceptionReporterTests(SimpleTestCase):
                 os.unlink(filename)
 
     def test_no_exception(self):
-        "An exception report can be generated for just a request"
+        """An exception report can be generated for just a request"""
         request = self.rf.get('/test_view/')
         reporter = ExceptionReporter(request, None, None, None)
         html = reporter.get_traceback_html()
@@ -344,7 +344,7 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertNotIn('<p>Request data not supplied</p>', html)
 
     def test_request_and_message(self):
-        "A message can be provided in addition to a request"
+        """A message can be provided in addition to a request"""
         request = self.rf.get('/test_view/')
         reporter = ExceptionReporter(request, None, "I'm a little teapot", None)
         html = reporter.get_traceback_html()
@@ -372,7 +372,7 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn('<p>Request data not supplied</p>', html)
 
     def test_non_utf8_values_handling(self):
-        "Non-UTF-8 exceptions/values should not make the output generation choke."
+        """Non-UTF-8 exceptions/values should not make the output generation choke."""
         try:
             class NonUtf8Output(Exception):
                 def __repr__(self):
@@ -387,7 +387,7 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn('EXC\\xe9EXC', html)
 
     def test_unprintable_values_handling(self):
-        "Unprintable values should not make the output generation choke."
+        """Unprintable values should not make the output generation choke."""
         try:
             class OomOutput(object):
                 def __repr__(self):
@@ -401,7 +401,7 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn('<td class="code"><pre>Error in formatting', html)
 
     def test_too_large_values_handling(self):
-        "Large values should not create a large HTML."
+        """Large values should not create a large HTML."""
         large = 256 * 1024
         repr_of_str_adds = len(repr(''))
         try:
@@ -458,7 +458,7 @@ class ExceptionReporterTests(SimpleTestCase):
 
     @override_settings(ALLOWED_HOSTS='example.com')
     def test_disallowed_host(self):
-        "An exception report can be generated even for a disallowed host."
+        """An exception report can be generated even for a disallowed host."""
         request = self.rf.get('/', HTTP_HOST='evil.com')
         reporter = ExceptionReporter(request, None, None, None)
         html = reporter.get_traceback_html()
@@ -506,7 +506,7 @@ class PlainTextReportTests(SimpleTestCase):
     rf = RequestFactory()
 
     def test_request_and_exception(self):
-        "A simple exception report can be generated"
+        """A simple exception report can be generated"""
         try:
             request = self.rf.get('/test_view/')
             request.user = User()
@@ -527,7 +527,7 @@ class PlainTextReportTests(SimpleTestCase):
         self.assertNotIn('Request data not supplied', text)
 
     def test_no_request(self):
-        "An exception report can be generated without request"
+        """An exception report can be generated without request"""
         try:
             raise ValueError("Can't find my keys")
         except ValueError:
@@ -545,13 +545,13 @@ class PlainTextReportTests(SimpleTestCase):
         self.assertIn('Request data not supplied', text)
 
     def test_no_exception(self):
-        "An exception report can be generated for just a request"
+        """An exception report can be generated for just a request"""
         request = self.rf.get('/test_view/')
         reporter = ExceptionReporter(request, None, None, None)
         reporter.get_traceback_text()
 
     def test_request_and_message(self):
-        "A message can be provided in addition to a request"
+        """A message can be provided in addition to a request"""
         request = self.rf.get('/test_view/')
         reporter = ExceptionReporter(request, None, "I'm a little teapot", None)
         reporter.get_traceback_text()
@@ -595,7 +595,7 @@ class PlainTextReportTests(SimpleTestCase):
 
     @override_settings(ALLOWED_HOSTS='example.com')
     def test_disallowed_host(self):
-        "An exception report can be generated even for a disallowed host."
+        """An exception report can be generated even for a disallowed host."""
         request = self.rf.get('/', HTTP_HOST='evil.com')
         reporter = ExceptionReporter(request, None, None, None)
         text = reporter.get_traceback_text()

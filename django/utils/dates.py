@@ -1,4 +1,4 @@
-"Commonly-used date structures"
+"""Commonly-used date structures"""
 
 from django.utils.translation import pgettext_lazy, ugettext_lazy as _
 

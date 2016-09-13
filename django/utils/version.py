@@ -8,7 +8,7 @@ from django.utils.lru_cache import lru_cache
 
 
 def get_version(version=None):
-    "Returns a PEP 440-compliant version number from VERSION."
+    """Returns a PEP 440-compliant version number from VERSION."""
     version = get_complete_version(version)
 
     # Now build the two parts of the version number:
@@ -32,7 +32,7 @@ def get_version(version=None):
 
 
 def get_main_version(version=None):
-    "Returns main version (X.Y[.Z]) from VERSION."
+    """Returns main version (X.Y[.Z]) from VERSION."""
     version = get_complete_version(version)
     parts = 2 if version[2] == 0 else 3
     return '.'.join(str(x) for x in version[:parts])

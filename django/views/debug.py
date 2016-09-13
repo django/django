@@ -63,7 +63,7 @@ def cleanse_setting(key, value):
 
 
 def get_safe_settings():
-    "Returns a dictionary of the settings module, with sensitive settings blurred out."
+    """Returns a dictionary of the settings module, with sensitive settings blurred out."""
     settings_dict = {}
     for k in dir(settings):
         if k.isupper():
@@ -315,13 +315,13 @@ class ExceptionReporter(object):
         return c
 
     def get_traceback_html(self):
-        "Return HTML version of debug 500 HTTP error page."
+        """Return HTML version of debug 500 HTTP error page."""
         t = DEBUG_ENGINE.from_string(TECHNICAL_500_TEMPLATE)
         c = Context(self.get_traceback_data(), use_l10n=False)
         return t.render(c)
 
     def get_traceback_text(self):
-        "Return plain text version of debug 500 HTTP error page."
+        """Return plain text version of debug 500 HTTP error page."""
         t = DEBUG_ENGINE.from_string(TECHNICAL_500_TEXT_TEMPLATE)
         c = Context(self.get_traceback_data(), autoescape=False, use_l10n=False)
         return t.render(c)
@@ -452,7 +452,7 @@ class ExceptionReporter(object):
 
 
 def technical_404_response(request, exception):
-    "Create a technical 404 error response. The exception should be the Http404."
+    """Create a technical 404 error response. The exception should be the Http404."""
     try:
         error_url = exception.args[0]['path']
     except (IndexError, TypeError, KeyError):
@@ -507,7 +507,7 @@ def technical_404_response(request, exception):
 
 
 def default_urlconf(request):
-    "Create an empty URLconf 404 error response."
+    """Create an empty URLconf 404 error response."""
     t = DEBUG_ENGINE.from_string(DEFAULT_URLCONF_TEMPLATE)
     c = Context({
         "title": _("Welcome to Django"),

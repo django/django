@@ -13,12 +13,12 @@ free.argtypes = [c_void_p]
 
 
 def last_arg_byref(args):
-    "Returns the last C argument's value by reference."
+    """Returns the last C argument's value by reference."""
     return args[-1]._obj.value
 
 
 def check_dbl(result, func, cargs):
-    "Checks the status code and returns the double value passed in by reference."
+    """Checks the status code and returns the double value passed in by reference."""
     # Checking the status code
     if result != 1:
         return None
@@ -27,14 +27,14 @@ def check_dbl(result, func, cargs):
 
 
 def check_geom(result, func, cargs):
-    "Error checking on routines that return Geometries."
+    """Error checking on routines that return Geometries."""
     if not result:
         raise GEOSException('Error encountered checking Geometry returned from GEOS C function "%s".' % func.__name__)
     return result
 
 
 def check_minus_one(result, func, cargs):
-    "Error checking on routines that should not return -1."
+    """Error checking on routines that should not return -1."""
     if result == -1:
         raise GEOSException('Error encountered in GEOS C function "%s".' % func.__name__)
     else:
@@ -42,7 +42,7 @@ def check_minus_one(result, func, cargs):
 
 
 def check_predicate(result, func, cargs):
-    "Error checking for unary/binary predicate functions."
+    """Error checking for unary/binary predicate functions."""
     val = ord(result)  # getting the ordinal from the character
     if val == 1:
         return True
@@ -85,7 +85,7 @@ def check_string(result, func, cargs):
 
 
 def check_zero(result, func, cargs):
-    "Error checking on routines that should not return 0."
+    """Error checking on routines that should not return 0."""
     if result == 0:
         raise GEOSException('Error encountered in GEOS C function "%s".' % func.__name__)
     else:

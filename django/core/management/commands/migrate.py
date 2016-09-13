@@ -259,7 +259,7 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(" DONE" + elapsed))
 
     def sync_apps(self, connection, app_labels):
-        "Runs the old syncdb-style operation on a list of app_labels."
+        """Runs the old syncdb-style operation on a list of app_labels."""
         cursor = connection.cursor()
 
         try:

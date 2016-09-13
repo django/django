@@ -122,11 +122,11 @@ class MigrationLoader(object):
                 )
 
     def get_migration(self, app_label, name_prefix):
-        "Gets the migration exactly named, or raises `graph.NodeNotFoundError`"
+        """Gets the migration exactly named, or raises `graph.NodeNotFoundError`"""
         return self.graph.nodes[app_label, name_prefix]
 
     def get_migration_by_prefix(self, app_label, name_prefix):
-        "Returns the migration(s) which match the given app label and name _prefix_"
+        """Returns the migration(s) which match the given app label and name _prefix_"""
         # Do the search
         results = []
         for l, n in self.disk_migrations:

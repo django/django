@@ -162,7 +162,7 @@ class ProjectState(object):
             self.apps.render_multiple(states_to_be_rendered)
 
     def clone(self):
-        "Returns an exact copy of this ProjectState"
+        """Returns an exact copy of this ProjectState"""
         new_state = ProjectState(
             models={k: v.clone() for k, v in self.models.items()},
             real_apps=self.real_apps,
@@ -182,7 +182,7 @@ class ProjectState(object):
 
     @classmethod
     def from_apps(cls, apps):
-        "Takes in an Apps and returns a ProjectState matching it"
+        """Takes in an Apps and returns a ProjectState matching it"""
         app_models = {}
         for model in apps.get_models(include_swapped=True):
             model_state = ModelState.from_model(model)
@@ -509,7 +509,7 @@ class ModelState(object):
         return value
 
     def construct_managers(self):
-        "Deep-clone the managers using deconstruction"
+        """Deep-clone the managers using deconstruction"""
         # Sort all managers by their creation counter
         sorted_managers = sorted(self.managers, key=lambda v: v[1].creation_counter)
         for mgr_name, manager in sorted_managers:
@@ -523,7 +523,7 @@ class ModelState(object):
                 yield mgr_name, manager_class(*args, **kwargs)
 
     def clone(self):
-        "Returns an exact copy of this ModelState"
+        """Returns an exact copy of this ModelState"""
         return self.__class__(
             app_label=self.app_label,
             name=self.name,
@@ -534,7 +534,7 @@ class ModelState(object):
         )
 
     def render(self, apps):
-        "Creates a Model object from our current state into the given apps"
+        """Creates a Model object from our current state into the given apps"""
         # First, make a Meta object
         meta_contents = {'app_label': self.app_label, "apps": apps}
         meta_contents.update(self.options)

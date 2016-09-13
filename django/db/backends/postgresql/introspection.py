@@ -72,7 +72,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 if row[0] not in self.ignored_tables]
 
     def get_table_description(self, cursor, table_name):
-        "Returns a description of the table, with the DB-API cursor.description interface."
+        """Returns a description of the table, with the DB-API cursor.description interface."""
         # As cursor.description does not return reliably the nullable property,
         # we have to query the information_schema (#7783)
         cursor.execute("""

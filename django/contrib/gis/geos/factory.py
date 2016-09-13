@@ -29,5 +29,5 @@ def fromfile(file_h):
 
 
 def fromstr(string, **kwargs):
-    "Given a string value, returns a GEOSGeometry object."
+    """Given a string value, returns a GEOSGeometry object."""
     return GEOSGeometry(string, **kwargs)

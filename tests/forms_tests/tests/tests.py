@@ -83,7 +83,7 @@ class TestTicket14567(TestCase):
     Check that the return values of ModelMultipleChoiceFields are QuerySets
     """
     def test_empty_queryset_return(self):
-        "If a model's ManyToManyField has blank=True and is saved with no data, a queryset is returned."
+        """If a model's ManyToManyField has blank=True and is saved with no data, a queryset is returned."""
         option = ChoiceOptionModel.objects.create(name='default')
         form = OptionalMultiChoiceModelForm({'multi_choice_optional': '', 'multi_choice': [option.pk]})
         self.assertTrue(form.is_valid())
@@ -95,7 +95,7 @@ class TestTicket14567(TestCase):
 
 class ModelFormCallableModelDefault(TestCase):
     def test_no_empty_option(self):
-        "If a model's ForeignKey has blank=False and a default, no empty option is created (Refs #10792)."
+        """If a model's ForeignKey has blank=False and a default, no empty option is created (Refs #10792)."""
         option = ChoiceOptionModel.objects.create(name='default')
 
         choices = list(ChoiceFieldForm().fields['choice'].choices)
@@ -103,7 +103,7 @@ class ModelFormCallableModelDefault(TestCase):
         self.assertEqual(choices[0], (option.pk, six.text_type(option)))
 
     def test_callable_initial_value(self):
-        "The initial value for a callable default returning a queryset is the pk (refs #13769)"
+        """The initial value for a callable default returning a queryset is the pk (refs #13769)"""
         ChoiceOptionModel.objects.create(id=1, name='default')
         ChoiceOptionModel.objects.create(id=2, name='option 2')
         ChoiceOptionModel.objects.create(id=3, name='option 3')
@@ -134,7 +134,7 @@ class ModelFormCallableModelDefault(TestCase):
         )
 
     def test_initial_instance_value(self):
-        "Initial instances for model fields may also be instances (refs #7287)"
+        """Initial instances for model fields may also be instances (refs #7287)"""
         ChoiceOptionModel.objects.create(id=1, name='default')
         obj2 = ChoiceOptionModel.objects.create(id=2, name='option 2')
         obj3 = ChoiceOptionModel.objects.create(id=3, name='option 3')

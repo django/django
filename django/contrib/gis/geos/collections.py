@@ -21,7 +21,7 @@ class GeometryCollection(GEOSGeometry):
     _typeid = 7
 
     def __init__(self, *args, **kwargs):
-        "Initializes a Geometry Collection from a sequence of Geometry objects."
+        """Initializes a Geometry Collection from a sequence of Geometry objects."""
 
         # Checking the arguments
         if len(args) == 1:
@@ -43,12 +43,12 @@ class GeometryCollection(GEOSGeometry):
         super(GeometryCollection, self).__init__(collection, **kwargs)
 
     def __iter__(self):
-        "Iterates over each Geometry in the Collection."
+        """Iterates over each Geometry in the Collection."""
         for i in range(len(self)):
             yield self[i]
 
     def __len__(self):
-        "Returns the number of geometries in this Collection."
+        """Returns the number of geometries in this Collection."""
         return self.num_geom
 
     # ### Methods for compatibility with ListMixin ###
@@ -66,12 +66,12 @@ class GeometryCollection(GEOSGeometry):
         return capi.get_geomn(self.ptr, index)
 
     def _get_single_external(self, index):
-        "Returns the Geometry from this Collection at the given index (0-based)."
+        """Returns the Geometry from this Collection at the given index (0-based)."""
         # Checking the index and returning the corresponding GEOS geometry.
         return GEOSGeometry(capi.geom_clone(self._get_single_internal(index)), srid=self.srid)
 
     def _set_list(self, length, items):
-        "Create a new collection, and destroy the contents of the previous pointer."
+        """Create a new collection, and destroy the contents of the previous pointer."""
         prev_ptr = self.ptr
         srid = self.srid
         self.ptr = self._create_collection(length, items)
@@ -97,12 +97,12 @@ class GeometryCollection(GEOSGeometry):
 
     @property
     def kml(self):
-        "Returns the KML for this Geometry Collection."
+        """Returns the KML for this Geometry Collection."""
         return '<MultiGeometry>%s</MultiGeometry>' % ''.join(g.kml for g in self)
 
     @property
     def tuple(self):
-        "Returns a tuple of all the coordinates in this Geometry Collection"
+        """Returns a tuple of all the coordinates in this Geometry Collection"""
         return tuple(g.tuple for g in self)
     coords = tuple
 
@@ -130,7 +130,7 @@ class MultiPolygon(GeometryCollection):
 
     @property
     def cascaded_union(self):
-        "Returns a cascaded union of this MultiPolygon."
+        """Returns a cascaded union of this MultiPolygon."""
         warnings.warn(
             "`cascaded_union` is deprecated, use the `unary_union` property instead.",
             RemovedInDjango20Warning, 2

@@ -28,7 +28,7 @@ class GeoIPTest(unittest.TestCase):
     fqdn = 'tmc.edu'
 
     def test01_init(self):
-        "GeoIP initialization."
+        """GeoIP initialization."""
         g1 = GeoIP2()  # Everything inferred from GeoIP path
         path = settings.GEOIP_PATH
         g2 = GeoIP2(path, 0)  # Passing in data path explicitly.
@@ -59,7 +59,7 @@ class GeoIPTest(unittest.TestCase):
                 GeoIP2(bad, 0)
 
     def test02_bad_query(self):
-        "GeoIP query parameter checking."
+        """GeoIP query parameter checking."""
         cntry_g = GeoIP2(city='<foo>')
         # No city database available, these calls should fail.
         with self.assertRaises(GeoIP2Exception):
@@ -75,7 +75,7 @@ class GeoIPTest(unittest.TestCase):
 
     @mock.patch('socket.gethostbyname')
     def test03_country(self, gethostbyname):
-        "GeoIP country querying methods."
+        """GeoIP country querying methods."""
         gethostbyname.return_value = '128.249.1.1'
         g = GeoIP2(city='<foo>')
 
@@ -98,7 +98,7 @@ class GeoIPTest(unittest.TestCase):
     @skipUnless(HAS_GEOS, "Geos is required")
     @mock.patch('socket.gethostbyname')
     def test04_city(self, gethostbyname):
-        "GeoIP city querying methods."
+        """GeoIP city querying methods."""
         gethostbyname.return_value = '128.249.1.1'
         g = GeoIP2(country='<foo>')
 
@@ -136,7 +136,7 @@ class GeoIPTest(unittest.TestCase):
 
     @mock.patch('socket.gethostbyname')
     def test05_unicode_response(self, gethostbyname):
-        "GeoIP strings should be properly encoded (#16553)."
+        """GeoIP strings should be properly encoded (#16553)."""
         gethostbyname.return_value = '194.27.42.76'
         g = GeoIP2()
         d = g.city("nigde.edu.tr")
@@ -146,7 +146,7 @@ class GeoIPTest(unittest.TestCase):
         self.assertIn(d['country_name'], ('Curaçao', 'Curacao'))
 
     def test06_ipv6_query(self):
-        "GeoIP can lookup IPv6 addresses."
+        """GeoIP can lookup IPv6 addresses."""
         g = GeoIP2()
         d = g.city('2002:81ed:c9a5::81ed:c9a5')  # IPv6 address for www.nhm.ku.edu
         self.assertEqual('US', d['country_code'])

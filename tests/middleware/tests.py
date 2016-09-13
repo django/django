@@ -406,7 +406,7 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
             ignored_user_agent_patterns = (re.compile(r'Spider.*'), re.compile(r'Robot.*'))
 
             def is_ignorable_request(self, request, uri, domain, referer):
-                '''Check user-agent in addition to normal checks.'''
+                """Check user-agent in addition to normal checks."""
                 if super(SubclassedMiddleware, self).is_ignorable_request(request, uri, domain, referer):
                     return True
                 user_agent = request.META['HTTP_USER_AGENT']

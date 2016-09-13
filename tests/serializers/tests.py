@@ -35,7 +35,7 @@ class SerializerRegistrationTests(SimpleTestCase):
         serializers._serializers = self.old_serializers
 
     def test_register(self):
-        "Registering a new serializer populates the full registry. Refs #14823"
+        """Registering a new serializer populates the full registry. Refs #14823"""
         serializers.register_serializer('json3', 'django.core.serializers.json')
 
         public_formats = serializers.get_public_serializer_formats()
@@ -44,7 +44,7 @@ class SerializerRegistrationTests(SimpleTestCase):
         self.assertIn('xml', public_formats)
 
     def test_unregister(self):
-        "Unregistering a serializer doesn't cause the registry to be repopulated. Refs #14823"
+        """Unregistering a serializer doesn't cause the registry to be repopulated. Refs #14823"""
         serializers.unregister_serializer('xml')
         serializers.register_serializer('json3', 'django.core.serializers.json')
 
@@ -58,7 +58,7 @@ class SerializerRegistrationTests(SimpleTestCase):
             serializers.unregister_serializer("nonsense")
 
     def test_builtin_serializers(self):
-        "Requesting a list of serializer formats popuates the registry"
+        """Requesting a list of serializer formats popuates the registry"""
         all_formats = set(serializers.get_serializer_formats())
         public_formats = set(serializers.get_public_serializer_formats())
 

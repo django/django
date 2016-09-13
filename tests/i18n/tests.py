@@ -1917,10 +1917,10 @@ class TranslationFilesMissing(SimpleTestCase):
         gettext_module.find = lambda *args, **kw: None
 
     def test_failure_finding_default_mo_files(self):
-        '''
+        """
         Ensure IOError is raised if the default language is unparseable.
         Refs: #18192
-        '''
+        """
         self.patchGettextFind()
         trans_real._translations = {}
         with self.assertRaises(IOError):

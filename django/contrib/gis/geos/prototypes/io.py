@@ -111,7 +111,7 @@ wkb_writer_set_include_srid = WKBWriterSet('GEOSWKBWriter_setIncludeSRID', argty
 
 # ### Base I/O Class ###
 class IOBase(GEOSBase):
-    "Base class for GEOS I/O objects."
+    """Base class for GEOS I/O objects."""
     def __init__(self):
         # Getting the pointer with the constructor.
         self.ptr = self._constructor()
@@ -151,7 +151,7 @@ class _WKBReader(IOBase):
     ptr_type = WKB_READ_PTR
 
     def read(self, wkb):
-        "Returns a _pointer_ to C GEOS Geometry object from the given WKB."
+        """Returns a _pointer_ to C GEOS Geometry object from the given WKB."""
         if isinstance(wkb, six.memoryview):
             wkb_s = bytes(wkb)
             return wkb_reader_read(self.ptr, wkb_s, len(wkb_s))
@@ -179,7 +179,7 @@ class WKTWriter(IOBase):
         self.outdim = dim
 
     def write(self, geom):
-        "Returns the WKT representation of the given geometry."
+        """Returns the WKT representation of the given geometry."""
         return wkt_writer_write(self.ptr, geom.ptr)
 
     @property
@@ -225,11 +225,11 @@ class WKBWriter(IOBase):
         self.outdim = dim
 
     def write(self, geom):
-        "Returns the WKB representation of the given geometry."
+        """Returns the WKB representation of the given geometry."""
         return six.memoryview(wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t())))
 
     def write_hex(self, geom):
-        "Returns the HEXEWKB representation of the given geometry."
+        """Returns the HEXEWKB representation of the given geometry."""
         return wkb_writer_write_hex(self.ptr, geom.ptr, byref(c_size_t()))
 
     # ### WKBWriter Properties ###

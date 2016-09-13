@@ -207,7 +207,7 @@ class RequestsTests(SimpleTestCase):
         )
 
     def test_near_expiration(self):
-        "Cookie will expire when an near expiration time is provided"
+        """Cookie will expire when an near expiration time is provided"""
         response = HttpResponse()
         # There is a timing weakness in this test; The
         # expected result for max-age requires that there be
@@ -223,7 +223,7 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(datetime_cookie['max-age'], 10)
 
     def test_aware_expiration(self):
-        "Cookie accepts an aware datetime as expiration time"
+        """Cookie accepts an aware datetime as expiration time"""
         response = HttpResponse()
         expires = (datetime.utcnow() + timedelta(seconds=10)).replace(tzinfo=utc)
         time.sleep(0.001)
@@ -244,7 +244,7 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(response.cookies['c']['expires'], '')
 
     def test_far_expiration(self):
-        "Cookie will expire when an distant expiration time is provided"
+        """Cookie will expire when an distant expiration time is provided"""
         response = HttpResponse()
         response.set_cookie('datetime', expires=datetime(2028, 1, 1, 4, 5, 6))
         datetime_cookie = response.cookies['datetime']
@@ -255,7 +255,7 @@ class RequestsTests(SimpleTestCase):
         )
 
     def test_max_age_expiration(self):
-        "Cookie will expire if max_age is provided"
+        """Cookie will expire if max_age is provided"""
         response = HttpResponse()
         set_cookie_time = time.time()
         with freeze_time(set_cookie_time):
@@ -274,7 +274,7 @@ class RequestsTests(SimpleTestCase):
         self.assertTrue(example_cookie['httponly'])
 
     def test_unicode_cookie(self):
-        "Verify HttpResponse.set_cookie() works with unicode data."
+        """Verify HttpResponse.set_cookie() works with unicode data."""
         response = HttpResponse()
         cookie_value = '清風'
         response.set_cookie('test', cookie_value)

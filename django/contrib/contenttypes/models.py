@@ -154,7 +154,7 @@ class ContentType(models.Model):
         return force_text(model._meta.verbose_name)
 
     def model_class(self):
-        "Returns the Python model class for this type of content."
+        """Returns the Python model class for this type of content."""
         try:
             return apps.get_model(self.app_label, self.model)
         except LookupError:

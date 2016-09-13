@@ -14,11 +14,11 @@ class Guitarist(models.Model):
 
     @models.permalink
     def url(self):
-        "Returns the URL for this guitarist."
+        """Returns the URL for this guitarist."""
         return ('guitarist_detail', [self.slug])
 
     @models.permalink
     @set_attr('attribute', 'value')
     def url_with_attribute(self):
-        "Returns the URL for this guitarist and holds an attribute"
+        """Returns the URL for this guitarist and holds an attribute"""
         return ('guitarist_detail', [self.slug])

@@ -1,4 +1,4 @@
-"Database cache backend."
+"""Database cache backend."""
 import base64
 from datetime import datetime
 

@@ -23,10 +23,10 @@ if HAS_GDAL:
 
 @skipUnless(HAS_GDAL, "GDAL is required")
 class OGRGeomTest(unittest.TestCase, TestDataMixin):
-    "This tests the OGR Geometry."
+    """This tests the OGR Geometry."""
 
     def test_geomtype(self):
-        "Testing OGRGeomType object."
+        """Testing OGRGeomType object."""
 
         # OGRGeomType should initialize on all these inputs.
         OGRGeomType(1)
@@ -66,20 +66,20 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         self.assertEqual('Unknown', gt.name)
 
     def test_geomtype_25d(self):
-        "Testing OGRGeomType object with 25D types."
+        """Testing OGRGeomType object with 25D types."""
         wkb25bit = OGRGeomType.wkb25bit
         self.assertEqual(OGRGeomType(wkb25bit + 1), 'Point25D')
         self.assertEqual(OGRGeomType('MultiLineString25D'), (5 + wkb25bit))
         self.assertEqual('GeometryCollectionField', OGRGeomType('GeometryCollection25D').django)
 
     def test_wkt(self):
-        "Testing WKT output."
+        """Testing WKT output."""
         for g in self.geometries.wkt_out:
             geom = OGRGeometry(g.wkt)
             self.assertEqual(g.wkt, geom.wkt)
 
     def test_ewkt(self):
-        "Testing EWKT input/output."
+        """Testing EWKT input/output."""
         for ewkt_val in ('POINT (1 2 3)', 'LINEARRING (0 0,1 1,2 1,0 0)'):
             # First with ewkt output when no SRID in EWKT
             self.assertEqual(ewkt_val, OGRGeometry(ewkt_val).ewkt)
@@ -90,7 +90,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(4326, geom.srs.srid)
 
     def test_gml(self):
-        "Testing GML output."
+        """Testing GML output."""
         for g in self.geometries.wkt_out:
             geom = OGRGeometry(g.wkt)
             exp_gml = g.gml
@@ -101,7 +101,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(exp_gml, geom.gml)
 
     def test_hex(self):
-        "Testing HEX input/output."
+        """Testing HEX input/output."""
         for g in self.geometries.hex_wkt:
             geom1 = OGRGeometry(g.wkt)
             self.assertEqual(g.hex.encode(), geom1.hex)
@@ -110,7 +110,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(geom1, geom2)
 
     def test_wkb(self):
-        "Testing WKB input/output."
+        """Testing WKB input/output."""
         for g in self.geometries.hex_wkt:
             geom1 = OGRGeometry(g.wkt)
             wkb = geom1.wkb
@@ -120,7 +120,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(geom1, geom2)
 
     def test_json(self):
-        "Testing GeoJSON input/output."
+        """Testing GeoJSON input/output."""
         for g in self.geometries.json_geoms:
             geom = OGRGeometry(g.wkt)
             if not hasattr(g, 'not_equal'):
@@ -133,7 +133,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         self.assertIsInstance(geom, OGRGeometry)
 
     def test_points(self):
-        "Testing Point objects."
+        """Testing Point objects."""
 
         OGRGeometry('POINT(0 0)')
         for p in self.geometries.points:
@@ -146,7 +146,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual((p.x, p.y), pnt.tuple)
 
     def test_multipoints(self):
-        "Testing MultiPoint objects."
+        """Testing MultiPoint objects."""
         for mp in self.geometries.multipoints:
             mgeom1 = OGRGeometry(mp.wkt)  # First one from WKT
             self.assertEqual(4, mgeom1.geom_type)
@@ -162,7 +162,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(mp.n_p, mgeom2.point_count)
 
     def test_linestring(self):
-        "Testing LineString objects."
+        """Testing LineString objects."""
         prev = OGRGeometry('POINT(0 0)')
         for ls in self.geometries.linestrings:
             linestr = OGRGeometry(ls.wkt)
@@ -183,7 +183,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(y, linestr.y)
 
     def test_multilinestring(self):
-        "Testing MultiLineString objects."
+        """Testing MultiLineString objects."""
         prev = OGRGeometry('POINT(0 0)')
         for mls in self.geometries.multilinestrings:
             mlinestr = OGRGeometry(mls.wkt)
@@ -201,7 +201,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
                 mlinestr.__getitem__(len(mlinestr))
 
     def test_linearring(self):
-        "Testing LinearRing objects."
+        """Testing LinearRing objects."""
         prev = OGRGeometry('POINT(0 0)')
         for rr in self.geometries.linearrings:
             lr = OGRGeometry(rr.wkt)
@@ -213,7 +213,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             prev = lr
 
     def test_polygons(self):
-        "Testing Polygon objects."
+        """Testing Polygon objects."""
 
         # Testing `from_bbox` class method
         bbox = (-180, -90, 180, 90)
@@ -248,7 +248,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual('LINEARRING', r.geom_name)
 
     def test_closepolygons(self):
-        "Testing closing Polygon objects."
+        """Testing closing Polygon objects."""
         # Both rings in this geometry are not closed.
         poly = OGRGeometry('POLYGON((0 0, 5 0, 5 5, 0 5), (1 1, 2 1, 2 2, 2 1))')
         self.assertEqual(8, poly.point_count)
@@ -260,7 +260,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         self.assertEqual(OGRGeometry('POINT(2.5 2.5)'), poly.centroid)
 
     def test_multipolygons(self):
-        "Testing MultiPolygon objects."
+        """Testing MultiPolygon objects."""
         OGRGeometry('POINT(0 0)')
         for mp in self.geometries.multipolygons:
             mpoly = OGRGeometry(mp.wkt)
@@ -277,7 +277,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(mpoly.wkt, OGRGeometry(mp.wkt).wkt)
 
     def test_srs(self):
-        "Testing OGR Geometries with Spatial Reference objects."
+        """Testing OGR Geometries with Spatial Reference objects."""
         for mp in self.geometries.multipolygons:
             # Creating a geometry w/spatial reference
             sr = SpatialReference('WGS84')
@@ -333,7 +333,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             mpoly.srid = mpoly.srid
 
     def test_srs_transform(self):
-        "Testing transform()."
+        """Testing transform()."""
         orig = OGRGeometry('POINT (-104.609 38.255)', 4326)
         trans = OGRGeometry('POINT (992385.4472045 481455.4944650)', 2774)
 
@@ -357,7 +357,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertAlmostEqual(trans.y, p.y, prec)
 
     def test_transform_dim(self):
-        "Testing coordinate dimension is the same on transformed geometries."
+        """Testing coordinate dimension is the same on transformed geometries."""
         ls_orig = OGRGeometry('LINESTRING(-104.609 38.255)', 4326)
         ls_trans = OGRGeometry('LINESTRING(992385.4472045 481455.4944650)', 2774)
 
@@ -369,7 +369,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         self.assertAlmostEqual(ls_trans.y[0], ls_orig.y[0], prec)
 
     def test_difference(self):
-        "Testing difference()."
+        """Testing difference()."""
         for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
@@ -381,7 +381,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(d1, a)
 
     def test_intersection(self):
-        "Testing intersects() and intersection()."
+        """Testing intersects() and intersection()."""
         for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
@@ -394,7 +394,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(i1, a)
 
     def test_symdifference(self):
-        "Testing sym_difference()."
+        """Testing sym_difference()."""
         for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
@@ -406,7 +406,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(d1, a)
 
     def test_union(self):
-        "Testing union()."
+        """Testing union()."""
         for i in range(len(self.geometries.topology_geoms)):
             a = OGRGeometry(self.geometries.topology_geoms[i].wkt_a)
             b = OGRGeometry(self.geometries.topology_geoms[i].wkt_b)
@@ -418,7 +418,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(u1, a)
 
     def test_add(self):
-        "Testing GeometryCollection.add()."
+        """Testing GeometryCollection.add()."""
         # Can't insert a Point into a MultiPolygon.
         mp = OGRGeometry('MultiPolygon')
         pnt = OGRGeometry('POINT(5 23)')
@@ -441,7 +441,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(mpoly, tmp)
 
     def test_extent(self):
-        "Testing `extent` property."
+        """Testing `extent` property."""
         # The xmin, ymin, xmax, ymax of the MultiPoint should be returned.
         mp = OGRGeometry('MULTIPOINT(5 23, 0 0, 10 50)')
         self.assertEqual((0.0, 0.0, 10.0, 50.0), mp.extent)
@@ -454,7 +454,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         self.assertEqual((xmin, ymin, xmax, ymax), poly.extent)
 
     def test_25D(self):
-        "Testing 2.5D geometries."
+        """Testing 2.5D geometries."""
         pnt_25d = OGRGeometry('POINT(1 2 3)')
         self.assertEqual('Point25D', pnt_25d.geom_type.name)
         self.assertEqual(3.0, pnt_25d.z)
@@ -465,7 +465,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         self.assertEqual(3, ls_25d.coord_dim)
 
     def test_pickle(self):
-        "Testing pickle support."
+        """Testing pickle support."""
         g1 = OGRGeometry('LINESTRING(1 1 1,2 2 2,3 3 3)', 'WGS84')
         g2 = pickle.loads(pickle.dumps(g1))
         self.assertEqual(g1, g2)
@@ -473,7 +473,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         self.assertEqual(g1.srs.wkt, g2.srs.wkt)
 
     def test_ogrgeometry_transform_workaround(self):
-        "Testing coordinate dimensions on geometries after transformation."
+        """Testing coordinate dimensions on geometries after transformation."""
         # A bug in GDAL versions prior to 1.7 changes the coordinate
         # dimension of a geometry after it has been transformed.
         # This test ensures that the bug workarounds employed within
@@ -500,7 +500,7 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
     # Testing binary predicates, `assertIs` is used to check that bool is returned.
 
     def test_equivalence_regression(self):
-        "Testing equivalence methods with non-OGRGeometry instances."
+        """Testing equivalence methods with non-OGRGeometry instances."""
         self.assertIsNotNone(OGRGeometry('POINT(0 0)'))
         self.assertNotEqual(OGRGeometry('LINESTRING(0 0, 1 1)'), 3)
 

@@ -296,7 +296,7 @@ class RequestFactory(object):
         return environ
 
     def request(self, **request):
-        "Construct a generic request object."
+        """Construct a generic request object."""
         return WSGIRequest(self._base_environ(**request))
 
     def _encode_data(self, data, content_type):
@@ -323,7 +323,7 @@ class RequestFactory(object):
         return path.decode(ISO_8859_1) if six.PY3 else path
 
     def get(self, path, data=None, secure=False, **extra):
-        "Construct a GET request."
+        """Construct a GET request."""
 
         data = {} if data is None else data
         r = {
@@ -334,7 +334,7 @@ class RequestFactory(object):
 
     def post(self, path, data=None, content_type=MULTIPART_CONTENT,
              secure=False, **extra):
-        "Construct a POST request."
+        """Construct a POST request."""
 
         data = {} if data is None else data
         post_data = self._encode_data(data, content_type)
@@ -343,7 +343,7 @@ class RequestFactory(object):
                             secure=secure, **extra)
 
     def head(self, path, data=None, secure=False, **extra):
-        "Construct a HEAD request."
+        """Construct a HEAD request."""
 
         data = {} if data is None else data
         r = {
@@ -353,30 +353,30 @@ class RequestFactory(object):
         return self.generic('HEAD', path, secure=secure, **r)
 
     def trace(self, path, secure=False, **extra):
-        "Construct a TRACE request."
+        """Construct a TRACE request."""
         return self.generic('TRACE', path, secure=secure, **extra)
 
     def options(self, path, data='', content_type='application/octet-stream',
                 secure=False, **extra):
-        "Construct an OPTIONS request."
+        """Construct an OPTIONS request."""
         return self.generic('OPTIONS', path, data, content_type,
                             secure=secure, **extra)
 
     def put(self, path, data='', content_type='application/octet-stream',
             secure=False, **extra):
-        "Construct a PUT request."
+        """Construct a PUT request."""
         return self.generic('PUT', path, data, content_type,
                             secure=secure, **extra)
 
     def patch(self, path, data='', content_type='application/octet-stream',
               secure=False, **extra):
-        "Construct a PATCH request."
+        """Construct a PATCH request."""
         return self.generic('PATCH', path, data, content_type,
                             secure=secure, **extra)
 
     def delete(self, path, data='', content_type='application/octet-stream',
                secure=False, **extra):
-        "Construct a DELETE request."
+        """Construct a DELETE request."""
         return self.generic('DELETE', path, data, content_type,
                             secure=secure, **extra)
 
@@ -686,7 +686,7 @@ class Client(RequestFactory):
         return json.loads(response.content.decode(), **extra)
 
     def _handle_redirects(self, response, **extra):
-        "Follows any redirects by requesting responses from the server using GET."
+        """Follows any redirects by requesting responses from the server using GET."""
 
         response.redirect_chain = []
         while response.status_code in (301, 302, 303, 307):

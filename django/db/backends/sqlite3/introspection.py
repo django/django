@@ -71,7 +71,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return [TableInfo(row[0], row[1][0]) for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):
-        "Returns a description of the table, with the DB-API cursor.description interface."
+        """Returns a description of the table, with the DB-API cursor.description interface."""
         return [
             FieldInfo(
                 info['name'],

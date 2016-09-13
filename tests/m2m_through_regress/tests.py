@@ -91,7 +91,9 @@ class M2MThroughTestCase(TestCase):
         )
 
     def test_join_trimming_forwards(self):
-        "Check that we don't involve too many copies of the intermediate table when doing a join. Refs #8046, #8254"
+        """
+        Check that we don't involve too many copies of the intermediate table when doing a join. Refs #8046, #8254
+        """
         self.assertQuerysetEqual(
             self.rock.members.filter(membership__price=50), [
                 "<Person: Jim>",
@@ -114,7 +116,7 @@ class M2MThroughSerializationTestCase(TestCase):
         cls.bob_roll = Membership.objects.create(person=cls.bob, group=cls.roll)
 
     def test_serialization(self):
-        "m2m-through models aren't serialized as m2m fields. Refs #8134"
+        """m2m-through models aren't serialized as m2m fields. Refs #8134"""
         pks = {"p_pk": self.bob.pk, "g_pk": self.roll.pk, "m_pk": self.bob_roll.pk}
 
         out = StringIO()

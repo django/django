@@ -22,7 +22,7 @@ class BaseField(object):
 
 
 class AreaField(BaseField):
-    "Wrapper for Area values."
+    """Wrapper for Area values."""
     def __init__(self, area_att=None):
         self.area_att = area_att
 
@@ -43,7 +43,7 @@ class AreaField(BaseField):
 
 
 class DistanceField(BaseField):
-    "Wrapper for Distance values."
+    """Wrapper for Distance values."""
     def __init__(self, distance_att):
         self.distance_att = distance_att
 

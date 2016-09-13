@@ -90,7 +90,7 @@ class Media(object):
         return static(path)
 
     def __getitem__(self, name):
-        "Returns a Media object that only contains media of the given type"
+        """Returns a Media object that only contains media of the given type"""
         if name in MEDIA_TYPES:
             return Media(**{str(name): getattr(self, '_' + name)})
         raise KeyError('Unknown media type "%s"' % name)
@@ -223,7 +223,7 @@ class Widget(six.with_metaclass(RenameWidgetMethods)):
         raise NotImplementedError('subclasses of Widget must provide a render() method')
 
     def build_attrs(self, extra_attrs=None, **kwargs):
-        "Helper function for building an attribute dictionary."
+        """Helper function for building an attribute dictionary."""
         attrs = dict(self.attrs, **kwargs)
         if extra_attrs:
             attrs.update(extra_attrs)
@@ -348,7 +348,7 @@ class FileInput(Input):
         return super(FileInput, self).render(name, None, attrs=attrs)
 
     def value_from_datadict(self, data, files, name):
-        "File widgets take data from FILES, not POST"
+        """File widgets take data from FILES, not POST"""
         return files.get(name)
 
 
@@ -895,7 +895,7 @@ class MultiWidget(Widget):
         raise NotImplementedError('Subclasses must implement this method.')
 
     def _get_media(self):
-        "Media for a multiwidget is the combination of all media of the subwidgets"
+        """Media for a multiwidget is the combination of all media of the subwidgets"""
         media = Media()
         for w in self.widgets:
             media = media + w.media

@@ -22,7 +22,7 @@ class geos_char_p(c_char_p):
 
 # ### ctypes factory classes ###
 class BinConstructor(GEOSFuncFactory):
-    "Generates a prototype for binary construction (HEX, WKB) GEOS routines."
+    """Generates a prototype for binary construction (HEX, WKB) GEOS routines."""
     argtypes = [c_char_p, c_size_t]
     restype = GEOM_PTR
     errcheck = staticmethod(check_geom)
@@ -30,14 +30,14 @@ class BinConstructor(GEOSFuncFactory):
 
 # HEX & WKB output
 class BinOutput(GEOSFuncFactory):
-    "Generates a prototype for the routines that return a sized string."
+    """Generates a prototype for the routines that return a sized string."""
     argtypes = [GEOM_PTR, POINTER(c_size_t)]
     restype = c_uchar_p
     errcheck = staticmethod(check_sized_string)
 
 
 class GeomOutput(GEOSFuncFactory):
-    "For GEOS routines that return a geometry."
+    """For GEOS routines that return a geometry."""
     restype = GEOM_PTR
     errcheck = staticmethod(check_geom)
 
@@ -47,7 +47,7 @@ class GeomOutput(GEOSFuncFactory):
 
 
 class IntFromGeom(GEOSFuncFactory):
-    "Argument is a geometry, return type is an integer."
+    """Argument is a geometry, return type is an integer."""
     argtypes = [GEOM_PTR]
     restype = c_int
 
@@ -60,7 +60,7 @@ class IntFromGeom(GEOSFuncFactory):
 
 
 class StringFromGeom(GEOSFuncFactory):
-    "Argument is a Geometry, return type is a string."
+    """Argument is a Geometry, return type is a string."""
     argtypes = [GEOM_PTR]
     restype = geos_char_p
     errcheck = staticmethod(check_string)

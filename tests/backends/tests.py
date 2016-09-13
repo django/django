@@ -239,7 +239,7 @@ class PostgreSQLTests(TestCase):
 
         # Helper mocks
         class CursorMock(object):
-            "Very simple mock of DB-API cursor"
+            """Very simple mock of DB-API cursor"""
             def execute(self, arg):
                 pass
 
@@ -253,7 +253,7 @@ class PostgreSQLTests(TestCase):
                 pass
 
         class OlderConnectionMock(object):
-            "Mock of psycopg2 (< 2.0.12) connection"
+            """Mock of psycopg2 (< 2.0.12) connection"""
             def cursor(self):
                 return CursorMock()
 
@@ -465,7 +465,7 @@ class LastExecutedQueryTest(TestCase):
 class ParameterHandlingTest(TestCase):
 
     def test_bad_parameter_count(self):
-        "An executemany call with too many/not enough parameters will raise an exception (Refs #12612)"
+        """An executemany call with too many/not enough parameters will raise an exception (Refs #12612)"""
         cursor = connection.cursor()
         query = ('INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (
             connection.introspection.table_name_converter('backends_square'),
@@ -529,7 +529,7 @@ class LongNameTest(TransactionTestCase):
 class SequenceResetTest(TestCase):
 
     def test_generic_relation(self):
-        "Sequence names are correct when resetting generic relations (Ref #13941)"
+        """Sequence names are correct when resetting generic relations (Ref #13941)"""
         # Create an object with a manually specified PK
         models.Post.objects.create(id=10, name='1st post', text='hello world')
 

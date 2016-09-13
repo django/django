@@ -3,7 +3,7 @@ from django.utils import six
 
 
 class OGRGeomType(object):
-    "Encapsulates OGR Geometry Types."
+    """Encapsulates OGR Geometry Types."""
 
     wkb25bit = -2147483648
 
@@ -31,7 +31,7 @@ class OGRGeomType(object):
     _str_types = {v.lower(): k for k, v in _types.items()}
 
     def __init__(self, type_input):
-        "Figures out the correct OGR Type based upon the input."
+        """Figures out the correct OGR Type based upon the input."""
         if isinstance(type_input, OGRGeomType):
             num = type_input.num
         elif isinstance(type_input, six.string_types):
@@ -52,7 +52,7 @@ class OGRGeomType(object):
         self.num = num
 
     def __str__(self):
-        "Returns the value of the name property."
+        """Returns the value of the name property."""
         return self.name
 
     def __eq__(self, other):
@@ -74,12 +74,12 @@ class OGRGeomType(object):
 
     @property
     def name(self):
-        "Returns a short-hand string form of the OGR Geometry type."
+        """Returns a short-hand string form of the OGR Geometry type."""
         return self._types[self.num]
 
     @property
     def django(self):
-        "Returns the Django GeometryField for this OGR Type."
+        """Returns the Django GeometryField for this OGR Type."""
         s = self.name.replace('25D', '')
         if s in ('LinearRing', 'None'):
             return None

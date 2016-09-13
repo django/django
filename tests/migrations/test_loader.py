@@ -148,7 +148,7 @@ class LoaderTests(TestCase):
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_name_match(self):
-        "Tests prefix name matching"
+        """Tests prefix name matching"""
         migration_loader = MigrationLoader(connection)
         self.assertEqual(
             migration_loader.get_migration_by_prefix("migrations", "0001").name,
@@ -222,7 +222,7 @@ class LoaderTests(TestCase):
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_loading_squashed(self):
-        "Tests loading a squashed migration"
+        """Tests loading a squashed migration"""
         migration_loader = MigrationLoader(connection)
         recorder = MigrationRecorder(connection)
         self.addCleanup(recorder.flush)
@@ -241,7 +241,7 @@ class LoaderTests(TestCase):
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed_complex"})
     def test_loading_squashed_complex(self):
-        "Tests loading a complex set of squashed migrations"
+        """Tests loading a complex set of squashed migrations"""
 
         loader = MigrationLoader(connection)
         recorder = MigrationRecorder(connection)
@@ -334,7 +334,7 @@ class LoaderTests(TestCase):
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed_erroneous"})
     def test_loading_squashed_erroneous(self):
-        "Tests loading a complex but erroneous set of squashed migrations"
+        """Tests loading a complex but erroneous set of squashed migrations"""
 
         loader = MigrationLoader(connection)
         recorder = MigrationRecorder(connection)
@@ -426,7 +426,7 @@ class LoaderTests(TestCase):
         "migrations.test_migrations_squashed_ref_squashed.app2",
     ]})
     def test_loading_squashed_ref_squashed(self):
-        "Tests loading a squashed migration with a new migration referencing it"
+        """Tests loading a squashed migration with a new migration referencing it"""
         """
         The sample migrations are structred like this:
 

@@ -21,13 +21,13 @@ class GeoFeedTest(TestCase):
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
 
     def assertChildNodes(self, elem, expected):
-        "Taken from syndication/tests.py."
+        """Taken from syndication/tests.py."""
         actual = set(n.nodeName for n in elem.childNodes)
         expected = set(expected)
         self.assertEqual(actual, expected)
 
     def test_geofeed_rss(self):
-        "Tests geographic feeds using GeoRSS over RSSv2."
+        """Tests geographic feeds using GeoRSS over RSSv2."""
         # Uses `GEOSGeometry` in `item_geometry`
         doc1 = minidom.parseString(self.client.get('/feeds/rss1/').content)
         # Uses a 2-tuple in `item_geometry`
@@ -53,7 +53,7 @@ class GeoFeedTest(TestCase):
                 self.assertChildNodes(item, ['title', 'link', 'description', 'guid', 'georss:point'])
 
     def test_geofeed_atom(self):
-        "Testing geographic feeds using GeoRSS over Atom."
+        """Testing geographic feeds using GeoRSS over Atom."""
         doc1 = minidom.parseString(self.client.get('/feeds/atom1/').content)
         doc2 = minidom.parseString(self.client.get('/feeds/atom2/').content)
         feed1, feed2 = doc1.firstChild, doc2.firstChild
@@ -72,7 +72,7 @@ class GeoFeedTest(TestCase):
                 self.assertChildNodes(entry, ['title', 'link', 'id', 'summary', 'georss:point'])
 
     def test_geofeed_w3c(self):
-        "Testing geographic feeds using W3C Geo."
+        """Testing geographic feeds using W3C Geo."""
         doc = minidom.parseString(self.client.get('/feeds/w3cgeo1/').content)
         feed = doc.firstChild
         # Ensuring the geo namespace was added to the <feed> element.
