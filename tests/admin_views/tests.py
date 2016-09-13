@@ -52,9 +52,9 @@ from .models import (
     CyclicOne, CyclicTwo, DooHickey, Employee, EmptyModel, ExternalSubscriber,
     Fabric, FancyDoodad, FieldOverridePost, FilteredManager, FooAccount,
     FoodDelivery, FunkyTag, Gallery, Grommet, Inquisition, Language, Link,
-    MainPrepopulated, ModelWithStringPrimaryKey, OtherStory, Paper, Parent,
-    ParentWithDependentChildren, ParentWithUUIDPK, Person, Persona, Picture,
-    Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
+    MainPrepopulated, Media, ModelWithStringPrimaryKey, OtherStory, Paper,
+    Parent, ParentWithDependentChildren, ParentWithUUIDPK, Person, Persona,
+    Picture, Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
     PrePopulatedPost, Promo, Question, Recommendation, Recommender,
     RelatedPrepopulated, RelatedWithUUIDPKModel, Report, Restaurant,
     RowLevelChangePermissionModel, SecretHideout, Section, ShortMessage,
@@ -539,7 +539,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             self.assertContentBefore(response, 'The First Item', 'The Middle Item')
             self.assertContentBefore(response, 'The Middle Item', 'The Last Item')
 
-    def test_has_related_field_in_list_display(self):
+    def test_has_related_field_in_list_display_fk(self):
         """Joins shouldn't be performed for <FK>_id fields in list display."""
         state = State.objects.create(name='Karnataka')
         City.objects.create(state=state, name='Bangalore')
@@ -549,6 +549,18 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertIs(response.context['cl'].has_related_field_in_list_display(), True)
 
         response.context['cl'].list_display = ['id', 'name', 'state_id']
+        self.assertIs(response.context['cl'].has_related_field_in_list_display(), False)
+
+    def test_has_related_field_in_list_display_o2o(self):
+        """Joins shouldn't be performed for <O2O>_id fields in list display."""
+        media = Media.objects.create(name='Foo')
+        Vodcast.objects.create(media=media)
+        response = self.client.get(reverse('admin:admin_views_vodcast_changelist'), {})
+
+        response.context['cl'].list_display = ['media']
+        self.assertIs(response.context['cl'].has_related_field_in_list_display(), True)
+
+        response.context['cl'].list_display = ['media_id']
         self.assertIs(response.context['cl'].has_related_field_in_list_display(), False)
 
     def test_limited_filter(self):
