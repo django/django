@@ -109,11 +109,11 @@ class PickleabilityTestCase(TestCase):
 
         # First pickling
         groups = pickle.loads(pickle.dumps(groups))
-        self.assertQuerysetEqual(groups, [g], lambda x: x)
+        self.assertSequenceEqual(groups, [g])
 
         # Second pickling
         groups = pickle.loads(pickle.dumps(groups))
-        self.assertQuerysetEqual(groups, [g], lambda x: x)
+        self.assertSequenceEqual(groups, [g])
 
     def test_pickle_prefetch_related_with_m2m_and_objects_deletion(self):
         """
@@ -127,7 +127,7 @@ class PickleabilityTestCase(TestCase):
 
         m2ms = M2MModel.objects.prefetch_related('groups')
         m2ms = pickle.loads(pickle.dumps(m2ms))
-        self.assertQuerysetEqual(m2ms, [m2m], lambda x: x)
+        self.assertSequenceEqual(m2ms, [m2m])
 
     def test_annotation_with_callable_default(self):
         # Happening.when has a callable default of datetime.datetime.now.

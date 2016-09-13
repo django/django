@@ -303,13 +303,13 @@ class ProxyModelTests(TestCase):
         issue = Issue.objects.create(assignee=tu)
         self.assertEqual(tu.issues.get(), issue)
         self.assertEqual(ptu.issues.get(), issue)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             TrackerUser.objects.filter(issues=issue),
-            [tu], lambda x: x
+            [tu]
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             ProxyTrackerUser.objects.filter(issues=issue),
-            [ptu], lambda x: x
+            [ptu]
         )
 
     def test_proxy_bug(self):

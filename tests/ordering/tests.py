@@ -323,4 +323,4 @@ class OrderingTests(TestCase):
         self.a2.save()
         r1 = Reference.objects.create(article_id=self.a1.pk)
         r2 = Reference.objects.create(article_id=self.a2.pk)
-        self.assertQuerysetEqual(Reference.objects.all(), [r2, r1], lambda x: x)
+        self.assertSequenceEqual(Reference.objects.all(), [r2, r1])

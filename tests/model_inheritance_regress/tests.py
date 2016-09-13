@@ -487,14 +487,14 @@ class ModelInheritanceTest(TestCase):
         )
         s = Supplier.objects.create(restaurant=r)
         with self.assertNumQueries(1):
-            self.assertQuerysetEqual(
+            self.assertSequenceEqual(
                 Supplier.objects.filter(restaurant=r),
-                [s], lambda x: x,
+                [s],
             )
         with self.assertNumQueries(1):
-            self.assertQuerysetEqual(
+            self.assertSequenceEqual(
                 r.supplier_set.all(),
-                [s], lambda x: x,
+                [s]
             )
 
     def test_queries_on_parent_access(self):

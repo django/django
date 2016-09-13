@@ -35,7 +35,7 @@ from .models import (
 
 class BaseQuerysetTest(TestCase):
     def assertValueQuerysetEqual(self, qs, values):
-        return self.assertQuerysetEqual(qs, values, transform=lambda x: x)
+        return self.assertSequenceEqual(qs, values)
 
 
 class Queries1Tests(BaseQuerysetTest):
@@ -1458,9 +1458,9 @@ class Queries4Tests(BaseQuerysetTest):
         CategoryItem.objects.create(category=c1)
         CategoryItem.objects.create(category=c2)
         CategoryItem.objects.create(category=c1)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             SimpleCategory.objects.order_by('categoryitem', 'pk'),
-            [c1, c2, c1], lambda x: x)
+            [c1, c2, c1])
 
     def test_ticket10181(self):
         # Avoid raising an EmptyResultSet if an inner query is probably
@@ -2696,11 +2696,11 @@ class ExcludeTests(TestCase):
 
         alex_tech_employers = alex.employers.filter(
             employment__title__in=('Engineer', 'Developer')).distinct().order_by('name')
-        self.assertQuerysetEqual(alex_tech_employers, [google, oracle], lambda x: x)
+        self.assertSequenceEqual(alex_tech_employers, [google, oracle])
 
         alex_nontech_employers = alex.employers.exclude(
             employment__title__in=('Engineer', 'Developer')).distinct().order_by('name')
-        self.assertQuerysetEqual(alex_nontech_employers, [google, intel, microsoft], lambda x: x)
+        self.assertSequenceEqual(alex_nontech_employers, [google, intel, microsoft])
 
 
 class ExcludeTest17600(TestCase):
@@ -3056,8 +3056,8 @@ class NullJoinPromotionOrTest(TestCase):
         )
         self.assertEqual(str(qs.query).count('LEFT OUTER JOIN'), 2)
         self.assertEqual(str(qs.query).count(' JOIN '), 2)
-        self.assertQuerysetEqual(
-            qs.order_by('name'), [r2, r1], lambda x: x)
+        self.assertSequenceEqual(
+            qs.order_by('name'), [r2, r1])
 
     def test_ticket_21748(self):
         i1 = Identifier.objects.create(name='i1')
@@ -3066,12 +3066,12 @@ class NullJoinPromotionOrTest(TestCase):
         Program.objects.create(identifier=i1)
         Channel.objects.create(identifier=i1)
         Program.objects.create(identifier=i2)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Identifier.objects.filter(program=None, channel=None),
-            [i3], lambda x: x)
-        self.assertQuerysetEqual(
+            [i3])
+        self.assertSequenceEqual(
             Identifier.objects.exclude(program=None, channel=None).order_by('name'),
-            [i1, i2], lambda x: x)
+            [i1, i2])
 
     def test_ticket_21748_double_negated_and(self):
         i1 = Identifier.objects.create(name='i1')
@@ -3192,7 +3192,7 @@ class DisjunctionPromotionTests(TestCase):
         self.assertEqual(str(qs.query).count(' INNER JOIN '), 0)
         self.assertEqual(str(qs.query).count(' LEFT OUTER JOIN '), 2)
         with self.assertNumQueries(1):
-            self.assertQuerysetEqual(qs, [basea], lambda x: x)
+            self.assertSequenceEqual(qs, [basea])
             self.assertEqual(qs[0].a, fk1)
             self.assertIs(qs[0].b, None)
 
@@ -3428,8 +3428,8 @@ class DoubleInSubqueryTests(TestCase):
         leaf_as = LeafA.objects.filter(data='foo').values_list('pk', flat=True)
         joins = Join.objects.filter(a__in=leaf_as).values_list('b__id', flat=True)
         qs = LeafB.objects.filter(pk__in=joins)
-        self.assertQuerysetEqual(
-            qs, [lfb1], lambda x: x)
+        self.assertSequenceEqual(
+            qs, [lfb1])
 
 
 class Ticket18785Tests(TestCase):
@@ -3459,8 +3459,8 @@ class Ticket20788Tests(TestCase):
 
         sentences_not_in_pub = Book.objects.exclude(
             chapter__paragraph__page=page)
-        self.assertQuerysetEqual(
-            sentences_not_in_pub, [book2], lambda x: x)
+        self.assertSequenceEqual(
+            sentences_not_in_pub, [book2])
 
 
 class Ticket12807Tests(TestCase):
@@ -3470,7 +3470,7 @@ class Ticket12807Tests(TestCase):
         # The ORed condition below should have no effect on the query - the
         # ~Q(pk__in=[]) will always be True.
         qs = Paragraph.objects.filter((Q(pk=p2.pk) | ~Q(pk__in=[])) & Q(pk=p1.pk))
-        self.assertQuerysetEqual(qs, [p1], lambda x: x)
+        self.assertSequenceEqual(qs, [p1])
 
 
 class RelatedLookupTypeTests(TestCase):
@@ -3581,9 +3581,9 @@ class Ticket14056Tests(TestCase):
             [s1, s3, s2] if connection.features.nulls_order_largest
             else [s2, s1, s3]
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             SharedConnection.objects.order_by('-pointera__connection', 'pk'),
-            expected_ordering, lambda x: x
+            expected_ordering
         )
 
 
@@ -3615,7 +3615,7 @@ class Ticket21203Tests(TestCase):
         p = Ticket21203Parent.objects.create(parent_bool=True)
         c = Ticket21203Child.objects.create(parent=p)
         qs = Ticket21203Child.objects.select_related('parent').defer('parent__created')
-        self.assertQuerysetEqual(qs, [c], lambda x: x)
+        self.assertSequenceEqual(qs, [c])
         self.assertIs(qs[0].parent.parent_bool, True)
 
 
@@ -3654,15 +3654,14 @@ class ForeignKeyToBaseExcludeTests(TestCase):
         sc3 = SpecialCategory.objects.create(special_name='sc3', name='sc3')
         c1 = CategoryItem.objects.create(category=sc1)
         CategoryItem.objects.create(category=sc2)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             SpecialCategory.objects.exclude(
                 categoryitem__id=c1.pk).order_by('name'),
-            [sc2, sc3], lambda x: x
+            [sc2, sc3]
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             SpecialCategory.objects.filter(categoryitem__id=c1.pk),
-            [sc1], lambda x: x
-        )
+            [sc1])
 
 
 class ReverseM2MCustomPkTests(TestCase):
@@ -3670,12 +3669,10 @@ class ReverseM2MCustomPkTests(TestCase):
         cpt1 = CustomPkTag.objects.create(id='cpt1', tag='cpt1')
         cp1 = CustomPk.objects.create(name='cp1', extra='extra')
         cp1.custompktag_set.add(cpt1)
-        self.assertQuerysetEqual(
-            CustomPk.objects.filter(custompktag=cpt1), [cp1],
-            lambda x: x)
-        self.assertQuerysetEqual(
-            CustomPkTag.objects.filter(custom_pk=cp1), [cpt1],
-            lambda x: x)
+        self.assertSequenceEqual(
+            CustomPk.objects.filter(custompktag=cpt1), [cp1])
+        self.assertSequenceEqual(
+            CustomPkTag.objects.filter(custom_pk=cp1), [cpt1])
 
 
 class Ticket22429Tests(TestCase):
@@ -3690,7 +3687,7 @@ class Ticket22429Tests(TestCase):
         cr.students.add(st1)
 
         queryset = Student.objects.filter(~Q(classroom__school=F('school')))
-        self.assertQuerysetEqual(queryset, [st2], lambda x: x)
+        self.assertSequenceEqual(queryset, [st2])
 
 
 class Ticket23605Tests(TestCase):
@@ -3724,9 +3721,9 @@ class Ticket23605Tests(TestCase):
                 )
             ))).filter(ticket23605b__field_b1=True))
         qs1 = Ticket23605A.objects.filter(complex_q)
-        self.assertQuerysetEqual(qs1, [a1], lambda x: x)
+        self.assertSequenceEqual(qs1, [a1])
         qs2 = Ticket23605A.objects.exclude(complex_q)
-        self.assertQuerysetEqual(qs2, [a2], lambda x: x)
+        self.assertSequenceEqual(qs2, [a2])
 
 
 class TestTicket24279(TestCase):
@@ -3756,15 +3753,14 @@ class TestTicket24605(TestCase):
         i3 = Individual.objects.create(alive=True)
         i4 = Individual.objects.create(alive=False)
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Individual.objects.filter(Q(alive=False), Q(related_individual__isnull=True)),
-            [i4], lambda x: x
-        )
-        self.assertQuerysetEqual(
+            [i4])
+        self.assertSequenceEqual(
             Individual.objects.exclude(
                 Q(alive=False), Q(related_individual__isnull=True)
             ).order_by('pk'),
-            [i1, i2, i3], lambda x: x
+            [i1, i2, i3]
         )
 
 
@@ -3830,7 +3826,7 @@ class Ticket23622Tests(TestCase):
             set(Ticket23605A.objects.filter(qx).values_list('pk', flat=True)),
             set(Ticket23605A.objects.filter(qy).values_list('pk', flat=True))
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Ticket23605A.objects.filter(qx),
-            [a2], lambda x: x
+            [a2]
         )

@@ -79,7 +79,7 @@ class BasicExpressionsTests(TestCase):
         # We can filter on attribute relationships on same model obj, e.g.
         # find companies where the number of employees is greater
         # than the number of chairs.
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.company_query.filter(num_employees__gt=F("num_chairs")), [
                 {
                     "num_chairs": 5,
@@ -92,14 +92,13 @@ class BasicExpressionsTests(TestCase):
                     "num_employees": 32
                 },
             ],
-            lambda o: o
         )
 
     def test_update(self):
         # We can set one field to have the value of another field
         # Make sure we have enough chairs
         self.company_query.update(num_chairs=F("num_employees"))
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.company_query, [
                 {
                     "num_chairs": 2300,
@@ -117,14 +116,13 @@ class BasicExpressionsTests(TestCase):
                     "num_employees": 32
                 }
             ],
-            lambda o: o
         )
 
     def test_arithmetic(self):
         # We can perform arithmetic operations in expressions
         # Make sure we have 2 spare chairs
         self.company_query.update(num_chairs=F("num_employees") + 2)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.company_query, [
                 {
                     'num_chairs': 2302,
@@ -142,7 +140,6 @@ class BasicExpressionsTests(TestCase):
                     'num_employees': 32
                 }
             ],
-            lambda o: o,
         )
 
     def test_order_of_operations(self):
@@ -150,7 +147,7 @@ class BasicExpressionsTests(TestCase):
         self. company_query.update(
             num_chairs=F('num_employees') + 2 * F('num_employees')
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.company_query, [
                 {
                     'num_chairs': 6900,
@@ -168,7 +165,6 @@ class BasicExpressionsTests(TestCase):
                     'num_employees': 32
                 }
             ],
-            lambda o: o,
         )
 
     def test_parenthesis_priority(self):
@@ -176,7 +172,7 @@ class BasicExpressionsTests(TestCase):
         self.company_query.update(
             num_chairs=((F('num_employees') + 2) * F('num_employees'))
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.company_query, [
                 {
                     'num_chairs': 5294600,
@@ -194,7 +190,6 @@ class BasicExpressionsTests(TestCase):
                     'num_employees': 32
                 }
             ],
-            lambda o: o,
         )
 
     def test_update_with_fk(self):
@@ -349,12 +344,12 @@ class BasicExpressionsTests(TestCase):
         Employee.objects.create(firstname="John", lastname="Doe")
         e2 = Employee.objects.create(firstname="Jack", lastname="Jackson")
         e3 = Employee.objects.create(firstname="Jack", lastname="jackson")
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Employee.objects.filter(lastname__startswith=F('firstname')),
-            [e2], lambda x: x)
-        self.assertQuerysetEqual(
+            [e2])
+        self.assertSequenceEqual(
             Employee.objects.filter(lastname__istartswith=F('firstname')).order_by('pk'),
-            [e2, e3], lambda x: x)
+            [e2, e3])
 
     def test_ticket_18375_join_reuse(self):
         # Test that reverse multijoin F() references and the lookup target
