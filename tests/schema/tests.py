@@ -74,7 +74,7 @@ class SchemaTests(TransactionTestCase):
                 del new_apps.all_models['schema'][model._meta.model_name]
 
     def delete_tables(self):
-        "Deletes all model tables for our models for a clean test environment"
+        """Deletes all model tables for our models for a clean test environment"""
         converter = connection.introspection.table_name_converter
         with atomic():
             connection.disable_constraint_checking()
@@ -190,7 +190,7 @@ class SchemaTests(TransactionTestCase):
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_fk(self):
-        "Tests that creating tables out of FK order, then repointing, works"
+        """Tests that creating tables out of FK order, then repointing, works"""
         # Create the table
         with connection.schema_editor() as editor:
             editor.create_model(Book)
@@ -223,7 +223,7 @@ class SchemaTests(TransactionTestCase):
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_fk_to_proxy(self):
-        "Tests that creating a FK to a proxy model creates database constraints."
+        """Tests that creating a FK to a proxy model creates database constraints."""
         class AuthorProxy(Author):
             class Meta:
                 app_label = 'schema'
@@ -253,7 +253,7 @@ class SchemaTests(TransactionTestCase):
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_fk_db_constraint(self):
-        "Tests that the db_constraint parameter is respected"
+        """Tests that the db_constraint parameter is respected"""
         # Create the table
         with connection.schema_editor() as editor:
             editor.create_model(Tag)

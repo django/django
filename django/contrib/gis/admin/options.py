@@ -45,7 +45,7 @@ class GeoModelAdmin(ModelAdmin):
 
     @property
     def media(self):
-        "Injects OpenLayers JavaScript into the admin."
+        """Injects OpenLayers JavaScript into the admin."""
         media = super(GeoModelAdmin, self).media
         media.add_js([self.openlayers_url])
         media.add_js(self.extra_js)

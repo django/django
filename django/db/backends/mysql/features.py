@@ -37,7 +37,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def _mysql_storage_engine(self):
-        "Internal method used in Django tests. Don't rely on this from your code"
+        """Internal method used in Django tests. Don't rely on this from your code"""
         with self.connection.cursor() as cursor:
             cursor.execute("SELECT ENGINE FROM INFORMATION_SCHEMA.ENGINES WHERE SUPPORT = 'DEFAULT'")
             result = cursor.fetchone()
@@ -45,7 +45,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def can_introspect_foreign_keys(self):
-        "Confirm support for introspected foreign keys"
+        """Confirm support for introspected foreign keys"""
         return self._mysql_storage_engine != 'MyISAM'
 
     @cached_property

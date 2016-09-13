@@ -9,10 +9,10 @@ from django.contrib.gis.measure import A, Area, D, Distance
 
 
 class DistanceTest(unittest.TestCase):
-    "Testing the Distance object"
+    """Testing the Distance object"""
 
     def testInit(self):
-        "Testing initialization from valid units"
+        """Testing initialization from valid units"""
         d = Distance(m=100)
         self.assertEqual(d.m, 100)
 
@@ -33,23 +33,23 @@ class DistanceTest(unittest.TestCase):
             self.assertEqual(d.mm, 1000.0)
 
     def testInitInvalid(self):
-        "Testing initialization from invalid units"
+        """Testing initialization from invalid units"""
         with self.assertRaises(AttributeError):
             D(banana=100)
 
     def testAccess(self):
-        "Testing access in different units"
+        """Testing access in different units"""
         d = D(m=100)
         self.assertEqual(d.km, 0.1)
         self.assertAlmostEqual(d.ft, 328.084, 3)
 
     def testAccessInvalid(self):
-        "Testing access in invalid units"
+        """Testing access in invalid units"""
         d = D(m=100)
         self.assertFalse(hasattr(d, 'banana'))
 
     def testAddition(self):
-        "Test addition & subtraction"
+        """Test addition & subtraction"""
         d1 = D(m=100)
         d2 = D(m=200)
 
@@ -76,7 +76,7 @@ class DistanceTest(unittest.TestCase):
             d1 -= 1
 
     def testMultiplication(self):
-        "Test multiplication & division"
+        """Test multiplication & division"""
         d1 = D(m=100)
 
         d3 = d1 * 2
@@ -104,7 +104,7 @@ class DistanceTest(unittest.TestCase):
             d1 /= D(m=1)
 
     def testUnitConversions(self):
-        "Testing default units during maths"
+        """Testing default units during maths"""
         d1 = D(m=100)
         d2 = D(km=1)
 
@@ -118,7 +118,7 @@ class DistanceTest(unittest.TestCase):
         self.assertEqual(d6._default_unit, 'm')
 
     def testComparisons(self):
-        "Testing comparisons"
+        """Testing comparisons"""
         d1 = D(m=100)
         d2 = D(km=1)
         d3 = D(km=0)
@@ -129,7 +129,7 @@ class DistanceTest(unittest.TestCase):
         self.assertFalse(d3)
 
     def testUnitsStr(self):
-        "Testing conversion to strings"
+        """Testing conversion to strings"""
         d1 = D(m=100)
         d2 = D(km=3.5)
 
@@ -139,7 +139,7 @@ class DistanceTest(unittest.TestCase):
         self.assertEqual(repr(d2), 'Distance(km=3.5)')
 
     def testUnitAttName(self):
-        "Testing the `unit_attname` class method"
+        """Testing the `unit_attname` class method"""
         unit_tuple = [('Yard', 'yd'), ('Nautical Mile', 'nm'), ('German legal metre', 'german_m'),
                       ('Indian yard', 'indian_yd'), ('Chain (Sears)', 'chain_sears'), ('Chain', 'chain')]
         for nm, att in unit_tuple:
@@ -147,10 +147,10 @@ class DistanceTest(unittest.TestCase):
 
 
 class AreaTest(unittest.TestCase):
-    "Testing the Area object"
+    """Testing the Area object"""
 
     def testInit(self):
-        "Testing initialization from valid units"
+        """Testing initialization from valid units"""
         a = Area(sq_m=100)
         self.assertEqual(a.sq_m, 100)
 
@@ -161,23 +161,23 @@ class AreaTest(unittest.TestCase):
         self.assertEqual(a.sq_m, 258998811.0336)
 
     def testInitInvaliA(self):
-        "Testing initialization from invalid units"
+        """Testing initialization from invalid units"""
         with self.assertRaises(AttributeError):
             A(banana=100)
 
     def testAccess(self):
-        "Testing access in different units"
+        """Testing access in different units"""
         a = A(sq_m=100)
         self.assertEqual(a.sq_km, 0.0001)
         self.assertAlmostEqual(a.sq_ft, 1076.391, 3)
 
     def testAccessInvaliA(self):
-        "Testing access in invalid units"
+        """Testing access in invalid units"""
         a = A(sq_m=100)
         self.assertFalse(hasattr(a, 'banana'))
 
     def testAddition(self):
-        "Test addition & subtraction"
+        """Test addition & subtraction"""
         a1 = A(sq_m=100)
         a2 = A(sq_m=200)
 
@@ -204,7 +204,7 @@ class AreaTest(unittest.TestCase):
             a1 -= 1
 
     def testMultiplication(self):
-        "Test multiplication & division"
+        """Test multiplication & division"""
         a1 = A(sq_m=100)
 
         a3 = a1 * 2
@@ -232,7 +232,7 @@ class AreaTest(unittest.TestCase):
             a1 /= A(sq_m=1)
 
     def testUnitConversions(self):
-        "Testing default units during maths"
+        """Testing default units during maths"""
         a1 = A(sq_m=100)
         a2 = A(sq_km=1)
 
@@ -246,7 +246,7 @@ class AreaTest(unittest.TestCase):
         self.assertEqual(a6._default_unit, 'sq_m')
 
     def testComparisons(self):
-        "Testing comparisons"
+        """Testing comparisons"""
         a1 = A(sq_m=100)
         a2 = A(sq_km=1)
         a3 = A(sq_km=0)
@@ -257,7 +257,7 @@ class AreaTest(unittest.TestCase):
         self.assertFalse(a3)
 
     def testUnitsStr(self):
-        "Testing conversion to strings"
+        """Testing conversion to strings"""
         a1 = A(sq_m=100)
         a2 = A(sq_km=3.5)
 

@@ -80,7 +80,7 @@ class OpenLayersWidget(Textarea):
         return loader.render_to_string(self.template, self.params)
 
     def map_options(self):
-        "Builds the map options hash for the OpenLayers template."
+        """Builds the map options hash for the OpenLayers template."""
 
         # JavaScript construction utilities for the Bounds and Projection.
         def ol_bounds(extent):

@@ -244,7 +244,7 @@ class GDALRaster(GDALBase):
 
     @geotransform.setter
     def geotransform(self, values):
-        "Sets the geotransform for the data source."
+        """Sets the geotransform for the data source."""
         if sum([isinstance(x, (int, float)) for x in values]) != 6:
             raise ValueError('Geotransform must consist of 6 numeric values.')
         # Create ctypes double array with input and write data

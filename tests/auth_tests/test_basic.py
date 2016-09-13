@@ -15,7 +15,7 @@ from .models import CustomUser
 
 class BasicTestCase(TestCase):
     def test_user(self):
-        "Check that users can be created and can set their password"
+        """Check that users can be created and can set their password"""
         u = User.objects.create_user('testuser', 'test@example.com', 'testpw')
         self.assertTrue(u.has_usable_password())
         self.assertFalse(u.check_password('bad'))
@@ -76,7 +76,7 @@ class BasicTestCase(TestCase):
             self.assertEqual(str(warns[0].message), deprecation_message)
 
     def test_user_no_email(self):
-        "Check that users can be created without an email"
+        """Check that users can be created without an email"""
         u = User.objects.create_user('testuser1')
         self.assertEqual(u.email, '')
 
@@ -87,7 +87,7 @@ class BasicTestCase(TestCase):
         self.assertEqual(u3.email, '')
 
     def test_anonymous_user(self):
-        "Check the properties of the anonymous user"
+        """Check the properties of the anonymous user"""
         a = AnonymousUser()
         self.assertIsNone(a.pk)
         self.assertEqual(a.username, '')
@@ -121,37 +121,37 @@ class BasicTestCase(TestCase):
             self.assertEqual(str(warns[0].message), deprecation_message)
 
     def test_superuser(self):
-        "Check the creation and properties of a superuser"
+        """Check the creation and properties of a superuser"""
         super = User.objects.create_superuser('super', 'super@example.com', 'super')
         self.assertTrue(super.is_superuser)
         self.assertTrue(super.is_active)
         self.assertTrue(super.is_staff)
 
     def test_get_user_model(self):
-        "The current user model can be retrieved"
+        """The current user model can be retrieved"""
         self.assertEqual(get_user_model(), User)
 
     @override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
     def test_swappable_user(self):
-        "The current user model can be swapped out for another"
+        """The current user model can be swapped out for another"""
         self.assertEqual(get_user_model(), CustomUser)
         with self.assertRaises(AttributeError):
             User.objects.all()
 
     @override_settings(AUTH_USER_MODEL='badsetting')
     def test_swappable_user_bad_setting(self):
-        "The alternate user setting must point to something in the format app.model"
+        """The alternate user setting must point to something in the format app.model"""
         with self.assertRaises(ImproperlyConfigured):
             get_user_model()
 
     @override_settings(AUTH_USER_MODEL='thismodel.doesntexist')
     def test_swappable_user_nonexistent_model(self):
-        "The current user model must point to an installed model"
+        """The current user model must point to an installed model"""
         with self.assertRaises(ImproperlyConfigured):
             get_user_model()
 
     def test_user_verbose_names_translatable(self):
-        "Default User model verbose names are translatable (#19945)"
+        """Default User model verbose names are translatable (#19945)"""
         with translation.override('en'):
             self.assertEqual(User._meta.verbose_name, 'user')
             self.assertEqual(User._meta.verbose_name_plural, 'users')

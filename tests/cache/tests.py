@@ -82,24 +82,24 @@ class DummyCacheTests(SimpleTestCase):
     # so it has its own test case.
 
     def test_simple(self):
-        "Dummy cache backend ignores cache set calls"
+        """Dummy cache backend ignores cache set calls"""
         cache.set("key", "value")
         self.assertIsNone(cache.get("key"))
 
     def test_add(self):
-        "Add doesn't do anything in dummy cache backend"
+        """Add doesn't do anything in dummy cache backend"""
         cache.add("addkey1", "value")
         result = cache.add("addkey1", "newvalue")
         self.assertTrue(result)
         self.assertIsNone(cache.get("addkey1"))
 
     def test_non_existent(self):
-        "Non-existent keys aren't found in the dummy cache backend"
+        """Non-existent keys aren't found in the dummy cache backend"""
         self.assertIsNone(cache.get("does_not_exist"))
         self.assertEqual(cache.get("does_not_exist", "bang!"), "bang!")
 
     def test_get_many(self):
-        "get_many returns nothing for the dummy cache backend"
+        """get_many returns nothing for the dummy cache backend"""
         cache.set('a', 'a')
         cache.set('b', 'b')
         cache.set('c', 'c')
@@ -108,7 +108,7 @@ class DummyCacheTests(SimpleTestCase):
         self.assertEqual(cache.get_many(['a', 'b', 'e']), {})
 
     def test_delete(self):
-        "Cache deletion is transparently ignored on the dummy cache backend"
+        """Cache deletion is transparently ignored on the dummy cache backend"""
         cache.set("key1", "spam")
         cache.set("key2", "eggs")
         self.assertIsNone(cache.get("key1"))
@@ -117,19 +117,19 @@ class DummyCacheTests(SimpleTestCase):
         self.assertIsNone(cache.get("key2"))
 
     def test_has_key(self):
-        "The has_key method doesn't ever return True for the dummy cache backend"
+        """The has_key method doesn't ever return True for the dummy cache backend"""
         cache.set("hello1", "goodbye1")
         self.assertFalse(cache.has_key("hello1"))
         self.assertFalse(cache.has_key("goodbye1"))
 
     def test_in(self):
-        "The in operator doesn't ever return True for the dummy cache backend"
+        """The in operator doesn't ever return True for the dummy cache backend"""
         cache.set("hello2", "goodbye2")
         self.assertNotIn("hello2", cache)
         self.assertNotIn("goodbye2", cache)
 
     def test_incr(self):
-        "Dummy cache values can't be incremented"
+        """Dummy cache values can't be incremented"""
         cache.set('answer', 42)
         with self.assertRaises(ValueError):
             cache.incr('answer')
@@ -137,7 +137,7 @@ class DummyCacheTests(SimpleTestCase):
             cache.incr('does_not_exist')
 
     def test_decr(self):
-        "Dummy cache values can't be decremented"
+        """Dummy cache values can't be decremented"""
         cache.set('answer', 42)
         with self.assertRaises(ValueError):
             cache.decr('answer')
@@ -145,7 +145,7 @@ class DummyCacheTests(SimpleTestCase):
             cache.decr('does_not_exist')
 
     def test_data_types(self):
-        "All data types are ignored equally by the dummy cache"
+        """All data types are ignored equally by the dummy cache"""
         stuff = {
             'string': 'this is a string',
             'int': 42,
@@ -159,7 +159,7 @@ class DummyCacheTests(SimpleTestCase):
         self.assertIsNone(cache.get("stuff"))
 
     def test_expiration(self):
-        "Expiration has no effect on the dummy cache"
+        """Expiration has no effect on the dummy cache"""
         cache.set('expire1', 'very quickly', 1)
         cache.set('expire2', 'very quickly', 1)
         cache.set('expire3', 'very quickly', 1)
@@ -172,7 +172,7 @@ class DummyCacheTests(SimpleTestCase):
         self.assertFalse(cache.has_key("expire3"))
 
     def test_unicode(self):
-        "Unicode values are ignored by the dummy cache"
+        """Unicode values are ignored by the dummy cache"""
         stuff = {
             'ascii': 'ascii_value',
             'unicode_ascii': 'Iñtërnâtiônàlizætiøn1',
@@ -184,20 +184,20 @@ class DummyCacheTests(SimpleTestCase):
             self.assertIsNone(cache.get(key))
 
     def test_set_many(self):
-        "set_many does nothing for the dummy cache backend"
+        """set_many does nothing for the dummy cache backend"""
         cache.set_many({'a': 1, 'b': 2})
         cache.set_many({'a': 1, 'b': 2}, timeout=2, version='1')
 
     def test_delete_many(self):
-        "delete_many does nothing for the dummy cache backend"
+        """delete_many does nothing for the dummy cache backend"""
         cache.delete_many(['a', 'b'])
 
     def test_clear(self):
-        "clear does nothing for the dummy cache backend"
+        """clear does nothing for the dummy cache backend"""
         cache.clear()
 
     def test_incr_version(self):
-        "Dummy cache versions can't be incremented"
+        """Dummy cache versions can't be incremented"""
         cache.set('answer', 42)
         with self.assertRaises(ValueError):
             cache.incr_version('answer')
@@ -205,7 +205,7 @@ class DummyCacheTests(SimpleTestCase):
             cache.incr_version('does_not_exist')
 
     def test_decr_version(self):
-        "Dummy cache versions can't be decremented"
+        """Dummy cache versions can't be decremented"""
         cache.set('answer', 42)
         with self.assertRaises(ValueError):
             cache.decr_version('answer')
@@ -225,7 +225,7 @@ class DummyCacheTests(SimpleTestCase):
 
 
 def custom_key_func(key, key_prefix, version):
-    "A customized cache key function"
+    """A customized cache key function"""
     return 'CUSTOM-' + '-'.join([key_prefix, str(version), key])
 
 
@@ -504,11 +504,11 @@ class BaseCacheTests(object):
         self.assertIsNone(cache.get("key2"))
 
     def test_long_timeout(self):
-        '''
+        """
         Using a timeout greater than 30 days makes memcached think
         it is an absolute expiration timestamp instead of a relative
         offset. Test that we honour this convention. Refs #12399.
-        '''
+        """
         cache.set('key1', 'eggs', 60 * 60 * 24 * 30 + 1)  # 30 days + 1 second
         self.assertEqual(cache.get('key1'), 'eggs')
 
@@ -520,9 +520,9 @@ class BaseCacheTests(object):
         self.assertEqual(cache.get('key4'), 'lobster bisque')
 
     def test_forever_timeout(self):
-        '''
+        """
         Passing in None into timeout results in a value that is cached forever
-        '''
+        """
         cache.set('key1', 'eggs', None)
         self.assertEqual(cache.get('key1'), 'eggs')
 
@@ -537,9 +537,9 @@ class BaseCacheTests(object):
         self.assertEqual(cache.get('key4'), 'lobster bisque')
 
     def test_zero_timeout(self):
-        '''
+        """
         Passing in zero into timeout results in a value that is not cached
-        '''
+        """
         cache.set('key1', 'eggs', 0)
         self.assertIsNone(cache.get('key1'))
 
@@ -1113,7 +1113,7 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         },
     })
     def test_multiple_caches(self):
-        "Check that multiple locmem caches are isolated"
+        """Check that multiple locmem caches are isolated"""
         cache.set('value', 42)
         self.assertEqual(caches['default'].get('value'), 42)
         self.assertIsNone(caches['other'].get('value'))

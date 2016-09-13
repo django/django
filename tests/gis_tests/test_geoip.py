@@ -47,7 +47,7 @@ class GeoIPTest(unittest.TestCase):
             return False
 
     def test01_init(self):
-        "Testing GeoIP initialization."
+        """Testing GeoIP initialization."""
         g1 = GeoIP()  # Everything inferred from GeoIP path
         path = settings.GEOIP_PATH
         g2 = GeoIP(path, 0)  # Passing in data path explicitly.
@@ -78,7 +78,7 @@ class GeoIPTest(unittest.TestCase):
                 GeoIP(bad, 0)
 
     def test02_bad_query(self):
-        "Testing GeoIP query parameter checking."
+        """Testing GeoIP query parameter checking."""
         cntry_g = GeoIP(city='<foo>')
         # No city database available, these calls should fail.
         with self.assertRaises(GeoIPException):
@@ -93,7 +93,7 @@ class GeoIPTest(unittest.TestCase):
             cntry_g.country_name(GeoIP)
 
     def test03_country(self):
-        "Testing GeoIP country querying methods."
+        """Testing GeoIP country querying methods."""
         g = GeoIP(city='<foo>')
 
         queries = [self.addr]
@@ -109,7 +109,7 @@ class GeoIPTest(unittest.TestCase):
 
     @skipUnless(HAS_GEOS, "Geos is required")
     def test04_city(self):
-        "Testing GeoIP city querying methods."
+        """Testing GeoIP city querying methods."""
         g = GeoIP(country='<foo>')
 
         queries = [self.addr]
@@ -140,7 +140,7 @@ class GeoIPTest(unittest.TestCase):
                 self.assertAlmostEqual(lat, tup[1], 0)
 
     def test05_unicode_response(self):
-        "Testing that GeoIP strings are properly encoded, see #16553."
+        """Testing that GeoIP strings are properly encoded, see #16553."""
         g = GeoIP()
         fqdn = "hs-duesseldorf.de"
         if self._is_dns_available(fqdn):

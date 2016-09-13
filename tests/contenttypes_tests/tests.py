@@ -56,7 +56,7 @@ class ContentTypesViewsTests(TestCase):
         Site.objects.clear_cache()
 
     def test_shortcut_with_absolute_url(self):
-        "Can view a shortcut for an Author object that has a get_absolute_url method"
+        """Can view a shortcut for an Author object that has a get_absolute_url method"""
         for obj in Author.objects.all():
             short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, obj.pk)
             response = self.client.get(short_url)
@@ -76,7 +76,7 @@ class ContentTypesViewsTests(TestCase):
                                  fetch_redirect_response=False)
 
     def test_shortcut_no_absolute_url(self):
-        "Shortcuts for an object that has no get_absolute_url method raises 404"
+        """Shortcuts for an object that has no get_absolute_url method raises 404"""
         for obj in Article.objects.all():
             short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Article).id, obj.pk)
             response = self.client.get(short_url)

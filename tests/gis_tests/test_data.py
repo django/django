@@ -14,14 +14,14 @@ TEST_DATA = os.path.join(os.path.dirname(upath(__file__)), 'data')
 
 
 def tuplize(seq):
-    "Turn all nested sequences to tuples in given sequence."
+    """Turn all nested sequences to tuples in given sequence."""
     if isinstance(seq, (list, tuple)):
         return tuple(tuplize(i) for i in seq)
     return seq
 
 
 def strconvert(d):
-    "Converts all keys in dictionary to str type."
+    """Converts all keys in dictionary to str type."""
     return {str(k): v for k, v in six.iteritems(d)}
 
 

@@ -50,7 +50,7 @@ from django.utils.six.moves import range
 #
 # The OGR_DS_* routines are relevant here.
 class DataSource(GDALBase):
-    "Wraps an OGR Data Source object."
+    """Wraps an OGR Data Source object."""
 
     def __init__(self, ds_input, ds_driver=False, write=False, encoding='utf-8'):
         # The write flag.
@@ -86,19 +86,19 @@ class DataSource(GDALBase):
             raise GDALException('Invalid data source file "%s"' % ds_input)
 
     def __del__(self):
-        "Destroys this DataStructure object."
+        """Destroys this DataStructure object."""
         try:
             capi.destroy_ds(self._ptr)
         except (AttributeError, TypeError):
             pass  # Some part might already have been garbage collected
 
     def __iter__(self):
-        "Allows for iteration over the layers in a data source."
+        """Allows for iteration over the layers in a data source."""
         for i in range(self.layer_count):
             yield self[i]
 
     def __getitem__(self, index):
-        "Allows use of the index [] operator to get a layer at the index."
+        """Allows use of the index [] operator to get a layer at the index."""
         if isinstance(index, six.string_types):
             l = capi.get_layer_by_name(self.ptr, force_bytes(index))
             if not l:
@@ -112,20 +112,20 @@ class DataSource(GDALBase):
         return Layer(l, self)
 
     def __len__(self):
-        "Returns the number of layers within the data source."
+        """Returns the number of layers within the data source."""
         return self.layer_count
 
     def __str__(self):
-        "Returns OGR GetName and Driver for the Data Source."
+        """Returns OGR GetName and Driver for the Data Source."""
         return '%s (%s)' % (self.name, str(self.driver))
 
     @property
     def layer_count(self):
-        "Returns the number of layers in the data source."
+        """Returns the number of layers in the data source."""
         return capi.get_layer_count(self._ptr)
 
     @property
     def name(self):
-        "Returns the name of the data source."
+        """Returns the name of the data source."""
         name = capi.get_ds_name(self._ptr)
         return force_text(name, self.encoding, strings_only=True)

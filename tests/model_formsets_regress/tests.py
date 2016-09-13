@@ -18,7 +18,7 @@ from .models import (
 
 class InlineFormsetTests(TestCase):
     def test_formset_over_to_field(self):
-        "A formset over a ForeignKey with a to_field can be saved. Regression for #10243"
+        """A formset over a ForeignKey with a to_field can be saved. Regression for #10243"""
         Form = modelform_factory(User, fields="__all__")
         FormSet = inlineformset_factory(User, UserSite, fields="__all__")
 
@@ -94,7 +94,7 @@ class InlineFormsetTests(TestCase):
             self.fail('Errors found on formset:%s' % form_set.errors)
 
     def test_formset_over_inherited_model(self):
-        "A formset over a ForeignKey with a to_field can be saved. Regression for #11120"
+        """A formset over a ForeignKey with a to_field can be saved. Regression for #11120"""
         Form = modelform_factory(Restaurant, fields="__all__")
         FormSet = inlineformset_factory(Restaurant, Manager, fields="__all__")
 
@@ -192,7 +192,7 @@ class InlineFormsetTests(TestCase):
         self.assertEqual(formset[0].instance.profile_id, 1)
 
     def test_formset_with_none_instance(self):
-        "A formset with instance=None can be created. Regression for #11872"
+        """A formset with instance=None can be created. Regression for #11872"""
         Form = modelform_factory(User, fields="__all__")
         FormSet = inlineformset_factory(User, UserSite, fields="__all__")
 
@@ -257,9 +257,9 @@ class InlineFormsetTests(TestCase):
 
 class FormsetTests(TestCase):
     def test_error_class(self):
-        '''
+        """
         Test the type of Formset and Form error attributes
-        '''
+        """
         Formset = modelformset_factory(User, fields="__all__")
         data = {
             'form-TOTAL_FORMS': '2',

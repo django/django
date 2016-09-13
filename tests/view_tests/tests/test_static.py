@@ -21,7 +21,7 @@ class StaticTests(SimpleTestCase):
     prefix = 'site_media'
 
     def test_serve(self):
-        "The static view can serve static media"
+        """The static view can serve static media"""
         media_files = ['file.txt', 'file.txt.gz']
         for filename in media_files:
             response = self.client.get('/%s/%s' % (self.prefix, filename))
@@ -33,7 +33,7 @@ class StaticTests(SimpleTestCase):
             self.assertEqual(mimetypes.guess_type(file_path)[1], response.get('Content-Encoding', None))
 
     def test_chunked(self):
-        "The static view should stream files in chunks to avoid large memory usage"
+        """The static view should stream files in chunks to avoid large memory usage"""
         response = self.client.get('/%s/%s' % (self.prefix, 'long-line.txt'))
         first_chunk = next(response.streaming_content)
         self.assertEqual(len(first_chunk), FileResponse.block_size)

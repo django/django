@@ -1,4 +1,4 @@
-"Thread-safe in-memory cache backend."
+"""Thread-safe in-memory cache backend."""
 
 import time
 from contextlib import contextmanager

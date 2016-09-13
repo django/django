@@ -19,7 +19,7 @@ from django.contrib.gis.gdal.error import GDALException
 #  See the 'ogr_core.h' source file for more information:
 #   http://www.gdal.org/ogr__core_8h_source.html
 class OGREnvelope(Structure):
-    "Represents the OGREnvelope C Structure."
+    """Represents the OGREnvelope C Structure."""
     _fields_ = [("MinX", c_double),
                 ("MaxX", c_double),
                 ("MinY", c_double),
@@ -80,11 +80,11 @@ class Envelope(object):
             raise GDALException('Equivalence testing only works with other Envelopes.')
 
     def __str__(self):
-        "Returns a string representation of the tuple."
+        """Returns a string representation of the tuple."""
         return str(self.tuple)
 
     def _from_sequence(self, seq):
-        "Initializes the C OGR Envelope structure from the given sequence."
+        """Initializes the C OGR Envelope structure from the given sequence."""
         self._envelope = OGREnvelope()
         self._envelope.MinX = seq[0]
         self._envelope.MinY = seq[1]
@@ -135,42 +135,42 @@ class Envelope(object):
 
     @property
     def min_x(self):
-        "Returns the value of the minimum X coordinate."
+        """Returns the value of the minimum X coordinate."""
         return self._envelope.MinX
 
     @property
     def min_y(self):
-        "Returns the value of the minimum Y coordinate."
+        """Returns the value of the minimum Y coordinate."""
         return self._envelope.MinY
 
     @property
     def max_x(self):
-        "Returns the value of the maximum X coordinate."
+        """Returns the value of the maximum X coordinate."""
         return self._envelope.MaxX
 
     @property
     def max_y(self):
-        "Returns the value of the maximum Y coordinate."
+        """Returns the value of the maximum Y coordinate."""
         return self._envelope.MaxY
 
     @property
     def ur(self):
-        "Returns the upper-right coordinate."
+        """Returns the upper-right coordinate."""
         return (self.max_x, self.max_y)
 
     @property
     def ll(self):
-        "Returns the lower-left coordinate."
+        """Returns the lower-left coordinate."""
         return (self.min_x, self.min_y)
 
     @property
     def tuple(self):
-        "Returns a tuple representing the envelope."
+        """Returns a tuple representing the envelope."""
         return (self.min_x, self.min_y, self.max_x, self.max_y)
 
     @property
     def wkt(self):
-        "Returns WKT representing a Polygon for this envelope."
+        """Returns WKT representing a Polygon for this envelope."""
         # TODO: Fix significant figures.
         return 'POLYGON((%s %s,%s %s,%s %s,%s %s,%s %s))' % \
                (self.min_x, self.min_y, self.min_x, self.max_y,

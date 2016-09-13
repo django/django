@@ -211,7 +211,7 @@ class ViewTest(unittest.TestCase):
         self._assert_allows(response, 'POST')
 
     def _assert_allows(self, response, *expected_methods):
-        "Assert allowed HTTP methods reported in the Allow response header"
+        """Assert allowed HTTP methods reported in the Allow response header"""
         response_allows = set(response['Allow'].split(', '))
         self.assertEqual(set(expected_methods + ('OPTIONS',)), response_allows)
 
@@ -353,30 +353,30 @@ class RedirectViewTest(SimpleTestCase):
     rf = RequestFactory()
 
     def test_no_url(self):
-        "Without any configuration, returns HTTP 410 GONE"
+        """Without any configuration, returns HTTP 410 GONE"""
         response = RedirectView.as_view()(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 410)
 
     def test_default_redirect(self):
-        "Default is a temporary redirect"
+        """Default is a temporary redirect"""
         response = RedirectView.as_view(url='/bar/')(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
 
     def test_permanent_redirect(self):
-        "Permanent redirects are an option"
+        """Permanent redirects are an option"""
         response = RedirectView.as_view(url='/bar/', permanent=True)(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response.url, '/bar/')
 
     def test_temporary_redirect(self):
-        "Temporary redirects are an option"
+        """Temporary redirects are an option"""
         response = RedirectView.as_view(url='/bar/', permanent=False)(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
 
     def test_include_args(self):
-        "GET arguments can be included in the redirected URL"
+        """GET arguments can be included in the redirected URL"""
         response = RedirectView.as_view(url='/bar/')(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
@@ -386,20 +386,20 @@ class RedirectViewTest(SimpleTestCase):
         self.assertEqual(response.url, '/bar/?pork=spam')
 
     def test_include_urlencoded_args(self):
-        "GET arguments can be URL-encoded when included in the redirected URL"
+        """GET arguments can be URL-encoded when included in the redirected URL"""
         response = RedirectView.as_view(url='/bar/', query_string=True)(
             self.rf.get('/foo/?unicode=%E2%9C%93'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/?unicode=%E2%9C%93')
 
     def test_parameter_substitution(self):
-        "Redirection URLs can be parameterized"
+        """Redirection URLs can be parameterized"""
         response = RedirectView.as_view(url='/bar/%(object_id)d/')(self.rf.get('/foo/42/'), object_id=42)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/42/')
 
     def test_named_url_pattern(self):
-        "Named pattern parameter should reverse to the matching pattern"
+        """Named pattern parameter should reverse to the matching pattern"""
         response = RedirectView.as_view(pattern_name='artist_detail')(self.rf.get('/foo/'), pk=1)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], '/detail/artist/1/')
@@ -410,48 +410,48 @@ class RedirectViewTest(SimpleTestCase):
         self.assertEqual(response['Location'], '/detail/artist/1/')
 
     def test_wrong_named_url_pattern(self):
-        "A wrong pattern name returns 410 GONE"
+        """A wrong pattern name returns 410 GONE"""
         response = RedirectView.as_view(pattern_name='wrong.pattern_name')(self.rf.get('/foo/'))
         self.assertEqual(response.status_code, 410)
 
     def test_redirect_POST(self):
-        "Default is a temporary redirect"
+        """Default is a temporary redirect"""
         response = RedirectView.as_view(url='/bar/')(self.rf.post('/foo/'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
 
     def test_redirect_HEAD(self):
-        "Default is a temporary redirect"
+        """Default is a temporary redirect"""
         response = RedirectView.as_view(url='/bar/')(self.rf.head('/foo/'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
 
     def test_redirect_OPTIONS(self):
-        "Default is a temporary redirect"
+        """Default is a temporary redirect"""
         response = RedirectView.as_view(url='/bar/')(self.rf.options('/foo/'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
 
     def test_redirect_PUT(self):
-        "Default is a temporary redirect"
+        """Default is a temporary redirect"""
         response = RedirectView.as_view(url='/bar/')(self.rf.put('/foo/'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
 
     def test_redirect_PATCH(self):
-        "Default is a temporary redirect"
+        """Default is a temporary redirect"""
         response = RedirectView.as_view(url='/bar/')(self.rf.patch('/foo/'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
 
     def test_redirect_DELETE(self):
-        "Default is a temporary redirect"
+        """Default is a temporary redirect"""
         response = RedirectView.as_view(url='/bar/')(self.rf.delete('/foo/'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/bar/')
 
     def test_redirect_when_meta_contains_no_query_string(self):
-        "regression for #16705"
+        """regression for #16705"""
         # we can't use self.rf.get because it always sets QUERY_STRING
         response = RedirectView.as_view(url='/bar/')(self.rf.request(PATH_INFO='/foo/'))
         self.assertEqual(response.status_code, 302)

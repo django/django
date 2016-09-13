@@ -21,7 +21,7 @@ class QueryTestCase(TestCase):
     multi_db = True
 
     def test_db_selection(self):
-        "Check that querysets will use the default database by default"
+        """Check that querysets will use the default database by default"""
         self.assertEqual(Book.objects.db, DEFAULT_DB_ALIAS)
         self.assertEqual(Book.objects.all().db, DEFAULT_DB_ALIAS)
 
@@ -31,7 +31,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(Book.objects.db_manager('other').all().db, 'other')
 
     def test_default_creation(self):
-        "Objects created on the default database don't leak onto other databases"
+        """Objects created on the default database don't leak onto other databases"""
         # Create a book on the default database using create()
         Book.objects.create(title="Pro Django", published=datetime.date(2008, 12, 16))
 
@@ -61,7 +61,7 @@ class QueryTestCase(TestCase):
             Book.objects.using('other').get(title="Dive into Python")
 
     def test_other_creation(self):
-        "Objects created on another database don't leak onto the default database"
+        """Objects created on another database don't leak onto the default database"""
         # Create a book on the second database
         Book.objects.using('other').create(title="Pro Django",
                                            published=datetime.date(2008, 12, 16))
@@ -106,7 +106,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(dive._state.db, "default")
 
     def test_basic_queries(self):
-        "Queries are constrained to a single database"
+        """Queries are constrained to a single database"""
         dive = Book.objects.using('other').create(title="Dive into Python", published=datetime.date(2009, 5, 4))
 
         dive = Book.objects.using('other').get(published=datetime.date(2009, 5, 4))
@@ -141,7 +141,7 @@ class QueryTestCase(TestCase):
         self.assertEqual([o.month for o in months], [])
 
     def test_m2m_separation(self):
-        "M2M fields are constrained to a single database"
+        """M2M fields are constrained to a single database"""
         # Create a book and author on the default database
         pro = Book.objects.create(title="Pro Django",
                                   published=datetime.date(2008, 12, 16))
@@ -191,7 +191,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(list(mark.book_set.all().values_list('title', flat=True)), ['Dive into Python'])
 
     def test_m2m_forward_operations(self):
-        "M2M forward manipulations are all constrained to a single DB"
+        """M2M forward manipulations are all constrained to a single DB"""
         # Create a book and author on the other database
         dive = Book.objects.using('other').create(title="Dive into Python", published=datetime.date(2009, 5, 4))
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
@@ -250,7 +250,7 @@ class QueryTestCase(TestCase):
         )
 
     def test_m2m_reverse_operations(self):
-        "M2M reverse manipulations are all constrained to a single DB"
+        """M2M reverse manipulations are all constrained to a single DB"""
         # Create a book and author on the other database
         dive = Book.objects.using('other').create(title="Dive into Python", published=datetime.date(2009, 5, 4))
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
@@ -312,7 +312,7 @@ class QueryTestCase(TestCase):
         )
 
     def test_m2m_cross_database_protection(self):
-        "Operations that involve sharing M2M objects across databases raise an error"
+        """Operations that involve sharing M2M objects across databases raise an error"""
         # Create a book and author on the default database
         pro = Book.objects.create(title="Pro Django", published=datetime.date(2008, 12, 16))
 
@@ -348,7 +348,7 @@ class QueryTestCase(TestCase):
                 dive.authors.set([mark, marty])
 
     def test_m2m_deletion(self):
-        "Cascaded deletions of m2m relations issue queries on the right database"
+        """Cascaded deletions of m2m relations issue queries on the right database"""
         # Create a book and author on the other database
         dive = Book.objects.using('other').create(title="Dive into Python", published=datetime.date(2009, 5, 4))
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
@@ -405,7 +405,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(Book.authors.through.objects.using('other').count(), 0)
 
     def test_foreign_key_separation(self):
-        "FK fields are constrained to a single database"
+        """FK fields are constrained to a single database"""
         # Create a book and author on the default database
         pro = Book.objects.create(title="Pro Django", published=datetime.date(2008, 12, 16))
 
@@ -459,7 +459,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(list(chris.edited.values_list('title', flat=True)), ['Dive into Python'])
 
     def test_foreign_key_reverse_operations(self):
-        "FK reverse manipulations are all constrained to a single DB"
+        """FK reverse manipulations are all constrained to a single DB"""
         dive = Book.objects.using('other').create(title="Dive into Python", published=datetime.date(2009, 5, 4))
         chris = Person.objects.using('other').create(name="Chris Mills")
 
@@ -530,7 +530,7 @@ class QueryTestCase(TestCase):
         )
 
     def test_foreign_key_cross_database_protection(self):
-        "Operations that involve sharing FK objects across databases raise an error"
+        """Operations that involve sharing FK objects across databases raise an error"""
         # Create a book and author on the default database
         pro = Book.objects.create(title="Pro Django", published=datetime.date(2008, 12, 16))
         marty = Person.objects.create(name="Marty Alchin")
@@ -553,7 +553,7 @@ class QueryTestCase(TestCase):
                 marty.edited.add(dive)
 
     def test_foreign_key_deletion(self):
-        "Cascaded deletions of Foreign Key relations issue queries on the right database"
+        """Cascaded deletions of Foreign Key relations issue queries on the right database"""
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
         Pet.objects.using('other').create(name="Fido", owner=mark)
 
@@ -575,7 +575,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(Pet.objects.using('other').count(), 0)
 
     def test_foreign_key_validation(self):
-        "ForeignKey.validate() uses the correct database"
+        """ForeignKey.validate() uses the correct database"""
         mickey = Person.objects.using('other').create(name="Mickey")
         pluto = Pet.objects.using('other').create(name="Pluto", owner=mickey)
         self.assertIsNone(pluto.full_clean())
@@ -592,7 +592,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(owner_field.clean(mickey.pk, None), mickey.pk)
 
     def test_o2o_separation(self):
-        "OneToOne fields are constrained to a single database"
+        """OneToOne fields are constrained to a single database"""
         # Create a user and profile on the default database
         alice = User.objects.db_manager('default').create_user('alice', 'alice@example.com')
         alice_profile = UserProfile.objects.using('default').create(user=alice, flavor='chocolate')
@@ -648,7 +648,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(bob_profile.user.username, 'bob')
 
     def test_o2o_cross_database_protection(self):
-        "Operations that involve sharing FK objects across databases raise an error"
+        """Operations that involve sharing FK objects across databases raise an error"""
         # Create a user and profile on the default database
         alice = User.objects.db_manager('default').create_user('alice', 'alice@example.com')
 
@@ -718,7 +718,7 @@ class QueryTestCase(TestCase):
         )
 
     def test_generic_key_separation(self):
-        "Generic fields are constrained to a single database"
+        """Generic fields are constrained to a single database"""
         # Create a book and author on the default database
         pro = Book.objects.create(title="Pro Django", published=datetime.date(2008, 12, 16))
         review1 = Review.objects.create(source="Python Monthly", content_object=pro)
@@ -741,7 +741,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(list(dive.reviews.all().values_list('source', flat=True)), ['Python Weekly'])
 
     def test_generic_key_reverse_operations(self):
-        "Generic reverse manipulations are all constrained to a single DB"
+        """Generic reverse manipulations are all constrained to a single DB"""
         dive = Book.objects.using('other').create(title="Dive into Python", published=datetime.date(2009, 5, 4))
         temp = Book.objects.using('other').create(title="Temp", published=datetime.date(2009, 5, 4))
         review1 = Review.objects.using('other').create(source="Python Weekly", content_object=dive)
@@ -801,7 +801,7 @@ class QueryTestCase(TestCase):
         )
 
     def test_generic_key_cross_database_protection(self):
-        "Operations that involve sharing generic key objects across databases raise an error"
+        """Operations that involve sharing generic key objects across databases raise an error"""
         # Create a book and author on the default database
         pro = Book.objects.create(title="Pro Django", published=datetime.date(2008, 12, 16))
         review1 = Review.objects.create(source="Python Monthly", content_object=pro)
@@ -852,7 +852,7 @@ class QueryTestCase(TestCase):
         )
 
     def test_generic_key_deletion(self):
-        "Cascaded deletions of Generic Key relations issue queries on the right database"
+        """Cascaded deletions of Generic Key relations issue queries on the right database"""
         dive = Book.objects.using('other').create(title="Dive into Python", published=datetime.date(2009, 5, 4))
         Review.objects.using('other').create(source="Python Weekly", content_object=dive)
 
@@ -874,7 +874,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(Review.objects.using('other').count(), 0)
 
     def test_ordering(self):
-        "get_next_by_XXX commands stick to a single database"
+        """get_next_by_XXX commands stick to a single database"""
         Book.objects.create(title="Pro Django", published=datetime.date(2008, 12, 16))
         dive = Book.objects.using('other').create(title="Dive into Python", published=datetime.date(2009, 5, 4))
         learn = Book.objects.using('other').create(title="Learning Python", published=datetime.date(2008, 7, 16))
@@ -883,7 +883,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(dive.get_previous_by_published().title, "Learning Python")
 
     def test_raw(self):
-        "test the raw() method across databases"
+        """test the raw() method across databases"""
         dive = Book.objects.using('other').create(title="Dive into Python", published=datetime.date(2009, 5, 4))
         val = Book.objects.db_manager("other").raw('SELECT id FROM multiple_database_book')
         self.assertQuerysetEqual(val, [dive.pk], attrgetter("pk"))
@@ -892,7 +892,7 @@ class QueryTestCase(TestCase):
         self.assertQuerysetEqual(val, [dive.pk], attrgetter("pk"))
 
     def test_select_related(self):
-        "Database assignment is retained if an object is retrieved with select_related()"
+        """Database assignment is retained if an object is retrieved with select_related()"""
         # Create a book and author on the other database
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
         Book.objects.using('other').create(
@@ -924,7 +924,7 @@ class QueryTestCase(TestCase):
                 pass
 
     def test_related_manager(self):
-        "Related managers return managers, not querysets"
+        """Related managers return managers, not querysets"""
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
 
         # extra_arg is removed by the BookManager's implementation of
@@ -962,7 +962,7 @@ class RouterTestCase(TestCase):
     multi_db = True
 
     def test_db_selection(self):
-        "Check that querysets obey the router for db suggestions"
+        """Check that querysets obey the router for db suggestions"""
         self.assertEqual(Book.objects.db, 'other')
         self.assertEqual(Book.objects.all().db, 'other')
 
@@ -972,7 +972,7 @@ class RouterTestCase(TestCase):
         self.assertEqual(Book.objects.db_manager('default').all().db, 'default')
 
     def test_migrate_selection(self):
-        "Synchronization behavior is predictable"
+        """Synchronization behavior is predictable"""
 
         self.assertTrue(router.allow_migrate_model('default', User))
         self.assertTrue(router.allow_migrate_model('default', Book))
@@ -998,7 +998,7 @@ class RouterTestCase(TestCase):
             self.assertTrue(router.allow_migrate_model('other', Book))
 
     def test_partial_router(self):
-        "A router can choose to implement a subset of methods"
+        """A router can choose to implement a subset of methods"""
         dive = Book.objects.using('other').create(title="Dive into Python",
                                                   published=datetime.date(2009, 5, 4))
 
@@ -1095,7 +1095,7 @@ class RouterTestCase(TestCase):
             marty.edited.set([dive])
 
     def test_foreign_key_cross_database_protection(self):
-        "Foreign keys can cross databases if they two databases have a common source"
+        """Foreign keys can cross databases if they two databases have a common source"""
         # Create a book and author on the default database
         pro = Book.objects.using('default').create(title="Pro Django",
                                                    published=datetime.date(2008, 12, 16))
@@ -1210,7 +1210,7 @@ class RouterTestCase(TestCase):
         self.assertEqual(puddles._state.db, 'default')
 
     def test_m2m_cross_database_protection(self):
-        "M2M relations can cross databases if the database share a source"
+        """M2M relations can cross databases if the database share a source"""
         # Create books and authors on the inverse to the usual database
         pro = Book.objects.using('other').create(pk=1, title="Pro Django",
                                                  published=datetime.date(2008, 12, 16))
@@ -1314,7 +1314,7 @@ class RouterTestCase(TestCase):
         self.assertEqual(bob._state.db, 'default')
 
     def test_o2o_cross_database_protection(self):
-        "Operations that involve sharing FK objects across databases raise an error"
+        """Operations that involve sharing FK objects across databases raise an error"""
         # Create a user and profile on the default database
         alice = User.objects.db_manager('default').create_user('alice', 'alice@example.com')
 
@@ -1335,7 +1335,7 @@ class RouterTestCase(TestCase):
         self.assertEqual(bob._state.db, 'default')
 
     def test_generic_key_cross_database_protection(self):
-        "Generic Key operations can span databases if they share a source"
+        """Generic Key operations can span databases if they share a source"""
         # Create a book and author on the default database
         pro = Book.objects.using(
             'default').create(title="Pro Django", published=datetime.date(2008, 12, 16))
@@ -1406,7 +1406,7 @@ class RouterTestCase(TestCase):
         self.assertEqual(nyt._state.db, 'default')
 
     def test_m2m_managers(self):
-        "M2M relations are represented by managers, and can be controlled like managers"
+        """M2M relations are represented by managers, and can be controlled like managers"""
         pro = Book.objects.using('other').create(pk=1, title="Pro Django",
                                                  published=datetime.date(2008, 12, 16))
 
@@ -1421,7 +1421,7 @@ class RouterTestCase(TestCase):
         self.assertEqual(marty.book_set.db_manager('default').all().db, 'default')
 
     def test_foreign_key_managers(self):
-        "FK reverse relations are represented by managers, and can be controlled like managers"
+        """FK reverse relations are represented by managers, and can be controlled like managers"""
         marty = Person.objects.using('other').create(pk=1, name="Marty Alchin")
         Book.objects.using('other').create(pk=1, title="Pro Django",
                                            published=datetime.date(2008, 12, 16),
@@ -1432,7 +1432,7 @@ class RouterTestCase(TestCase):
         self.assertEqual(marty.edited.db_manager('default').all().db, 'default')
 
     def test_generic_key_managers(self):
-        "Generic key relations are represented by managers, and can be controlled like managers"
+        """Generic key relations are represented by managers, and can be controlled like managers"""
         pro = Book.objects.using('other').create(title="Pro Django",
                                                  published=datetime.date(2008, 12, 16))
 
@@ -1483,7 +1483,7 @@ class AuthTestCase(TestCase):
     multi_db = True
 
     def test_auth_manager(self):
-        "The methods on the auth manager obey database hints"
+        """The methods on the auth manager obey database hints"""
         # Create one user using default allocation policy
         User.objects.create_user('alice', 'alice@example.com')
 
@@ -1513,7 +1513,7 @@ class AuthTestCase(TestCase):
         self.assertEqual(User.objects.using('other').count(), 1)
 
     def test_dumpdata(self):
-        "Check that dumpdata honors allow_migrate restrictions on the router"
+        """Check that dumpdata honors allow_migrate restrictions on the router"""
         User.objects.create_user('alice', 'alice@example.com')
         User.objects.db_manager('default').create_user('bob', 'bob@example.com')
 
@@ -1548,7 +1548,7 @@ class FixtureTestCase(TestCase):
 
     @override_settings(DATABASE_ROUTERS=[AntiPetRouter()])
     def test_fixture_loading(self):
-        "Multi-db fixtures are loaded correctly"
+        """Multi-db fixtures are loaded correctly"""
         # Check that "Pro Django" exists on the default database, but not on other database
         Book.objects.get(title="Pro Django")
         Book.objects.using('default').get(title="Pro Django")
@@ -1702,7 +1702,7 @@ class SignalTests(TestCase):
 
 
 class AttributeErrorRouter(object):
-    "A router to test the exception handling of ConnectionRouter"
+    """A router to test the exception handling of ConnectionRouter"""
     def db_for_read(self, model, **hints):
         raise AttributeError
 
@@ -1717,7 +1717,7 @@ class RouterAttributeErrorTestCase(TestCase):
         return override_settings(DATABASE_ROUTERS=[AttributeErrorRouter()])
 
     def test_attribute_error_read(self):
-        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        """Check that the AttributeError from AttributeErrorRouter bubbles up"""
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
         with self.override_router():
@@ -1725,7 +1725,7 @@ class RouterAttributeErrorTestCase(TestCase):
                 Book.objects.get(pk=b.pk)
 
     def test_attribute_error_save(self):
-        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        """Check that the AttributeError from AttributeErrorRouter bubbles up"""
         dive = Book()
         dive.title = "Dive into Python"
         dive.published = datetime.date(2009, 5, 4)
@@ -1734,7 +1734,7 @@ class RouterAttributeErrorTestCase(TestCase):
                 dive.save()
 
     def test_attribute_error_delete(self):
-        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        """Check that the AttributeError from AttributeErrorRouter bubbles up"""
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
         p = Person.objects.create(name="Marty Alchin")
@@ -1745,7 +1745,7 @@ class RouterAttributeErrorTestCase(TestCase):
                 b.delete()
 
     def test_attribute_error_m2m(self):
-        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        """Check that the AttributeError from AttributeErrorRouter bubbles up"""
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
         p = Person.objects.create(name="Marty Alchin")
@@ -1755,7 +1755,7 @@ class RouterAttributeErrorTestCase(TestCase):
 
 
 class ModelMetaRouter(object):
-    "A router to ensure model arguments are real model classes"
+    """A router to ensure model arguments are real model classes"""
     def db_for_write(self, model, **hints):
         if not hasattr(model, '_meta'):
             raise ValueError

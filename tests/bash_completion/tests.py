@@ -57,44 +57,44 @@ class BashCompletionTests(unittest.TestCase):
         return stdout.getvalue().strip().split('\n')
 
     def test_django_admin_py(self):
-        "django_admin.py will autocomplete option flags"
+        """django_admin.py will autocomplete option flags"""
         self._user_input('django-admin sqlmigrate --verb')
         output = self._run_autocomplete()
         self.assertEqual(output, ['--verbosity='])
 
     def test_manage_py(self):
-        "manage.py will autocomplete option flags"
+        """manage.py will autocomplete option flags"""
         self._user_input('manage.py sqlmigrate --verb')
         output = self._run_autocomplete()
         self.assertEqual(output, ['--verbosity='])
 
     def test_custom_command(self):
-        "A custom command can autocomplete option flags"
+        """A custom command can autocomplete option flags"""
         self._user_input('django-admin test_command --l')
         output = self._run_autocomplete()
         self.assertEqual(output, ['--list'])
 
     def test_subcommands(self):
-        "Subcommands can be autocompleted"
+        """Subcommands can be autocompleted"""
         self._user_input('django-admin sql')
         output = self._run_autocomplete()
         self.assertEqual(output, ['sqlflush sqlmigrate sqlsequencereset'])
 
     def test_completed_subcommand(self):
-        "Show option flags in case a subcommand is completed"
+        """Show option flags in case a subcommand is completed"""
         self._user_input('django-admin startproject ')  # Trailing whitespace
         output = self._run_autocomplete()
         for item in output:
             self.assertTrue(item.startswith('--'))
 
     def test_help(self):
-        "No errors, just an empty list if there are no autocomplete options"
+        """No errors, just an empty list if there are no autocomplete options"""
         self._user_input('django-admin help --')
         output = self._run_autocomplete()
         self.assertEqual(output, [''])
 
     def test_app_completion(self):
-        "Application names will be autocompleted for an AppCommand"
+        """Application names will be autocompleted for an AppCommand"""
         self._user_input('django-admin sqlmigrate a')
         output = self._run_autocomplete()
         a_labels = sorted(

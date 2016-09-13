@@ -204,11 +204,11 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         return row[0]
 
     def geos_version(self):
-        "Returns the version of GEOS used by SpatiaLite as a string."
+        """Returns the version of GEOS used by SpatiaLite as a string."""
         return self._get_spatialite_func('geos_version()')
 
     def proj4_version(self):
-        "Returns the version of the PROJ.4 library used by SpatiaLite."
+        """Returns the version of the PROJ.4 library used by SpatiaLite."""
         return self._get_spatialite_func('proj4_version()')
 
     def lwgeom_version(self):
@@ -216,7 +216,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         return self._get_spatialite_func('lwgeom_version()')
 
     def spatialite_version(self):
-        "Returns the SpatiaLite library version as a string."
+        """Returns the SpatiaLite library version as a string."""
         return self._get_spatialite_func('spatialite_version()')
 
     def spatialite_version_tuple(self):

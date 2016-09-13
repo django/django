@@ -12,7 +12,7 @@ from django.contrib.gis.geos.prototypes.geom import geos_char_p
 
 
 class Topology(GEOSFuncFactory):
-    "For GEOS unary topology functions."
+    """For GEOS unary topology functions."""
     argtypes = [GEOM_PTR]
     restype = GEOM_PTR
     errcheck = staticmethod(check_geom)

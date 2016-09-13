@@ -92,7 +92,7 @@ class SpatialReference(GDALBase):
             self.import_epsg(srs_input)
 
     def __del__(self):
-        "Destroys this spatial reference."
+        """Destroys this spatial reference."""
         try:
             capi.release_srs(self._ptr)
         except (AttributeError, TypeError):
@@ -127,7 +127,7 @@ class SpatialReference(GDALBase):
             return self.attr_value(target)
 
     def __str__(self):
-        "The string representation uses 'pretty' WKT."
+        """The string representation uses 'pretty' WKT."""
         return self.pretty_wkt
 
     # #### SpatialReference Methods ####
@@ -141,19 +141,19 @@ class SpatialReference(GDALBase):
         return capi.get_attr_value(self.ptr, force_bytes(target), index)
 
     def auth_name(self, target):
-        "Returns the authority name for the given string target node."
+        """Returns the authority name for the given string target node."""
         return capi.get_auth_name(self.ptr, force_bytes(target))
 
     def auth_code(self, target):
-        "Returns the authority code for the given string target node."
+        """Returns the authority code for the given string target node."""
         return capi.get_auth_code(self.ptr, force_bytes(target))
 
     def clone(self):
-        "Returns a clone of this SpatialReference object."
+        """Returns a clone of this SpatialReference object."""
         return SpatialReference(capi.clone_srs(self.ptr))
 
     def from_esri(self):
-        "Morphs this SpatialReference from ESRI's format to EPSG."
+        """Morphs this SpatialReference from ESRI's format to EPSG."""
         capi.morph_from_esri(self.ptr)
 
     def identify_epsg(self):
@@ -164,17 +164,17 @@ class SpatialReference(GDALBase):
         capi.identify_epsg(self.ptr)
 
     def to_esri(self):
-        "Morphs this SpatialReference to ESRI's format."
+        """Morphs this SpatialReference to ESRI's format."""
         capi.morph_to_esri(self.ptr)
 
     def validate(self):
-        "Checks to see if the given spatial reference is valid."
+        """Checks to see if the given spatial reference is valid."""
         capi.srs_validate(self.ptr)
 
     # #### Name & SRID properties ####
     @property
     def name(self):
-        "Returns the name of this Spatial Reference."
+        """Returns the name of this Spatial Reference."""
         if self.projected:
             return self.attr_value('PROJCS')
         elif self.geographic:
@@ -186,7 +186,7 @@ class SpatialReference(GDALBase):
 
     @property
     def srid(self):
-        "Returns the SRID of top-level authority, or None if undefined."
+        """Returns the SRID of top-level authority, or None if undefined."""
         try:
             return int(self.attr_value('AUTHORITY', 1))
         except (TypeError, ValueError):
@@ -195,25 +195,25 @@ class SpatialReference(GDALBase):
     # #### Unit Properties ####
     @property
     def linear_name(self):
-        "Returns the name of the linear units."
+        """Returns the name of the linear units."""
         units, name = capi.linear_units(self.ptr, byref(c_char_p()))
         return name
 
     @property
     def linear_units(self):
-        "Returns the value of the linear units."
+        """Returns the value of the linear units."""
         units, name = capi.linear_units(self.ptr, byref(c_char_p()))
         return units
 
     @property
     def angular_name(self):
-        "Returns the name of the angular units."
+        """Returns the name of the angular units."""
         units, name = capi.angular_units(self.ptr, byref(c_char_p()))
         return name
 
     @property
     def angular_units(self):
-        "Returns the value of the angular units."
+        """Returns the value of the angular units."""
         units, name = capi.angular_units(self.ptr, byref(c_char_p()))
         return units
 
@@ -244,17 +244,17 @@ class SpatialReference(GDALBase):
 
     @property
     def semi_major(self):
-        "Returns the Semi Major Axis for this Spatial Reference."
+        """Returns the Semi Major Axis for this Spatial Reference."""
         return capi.semi_major(self.ptr, byref(c_int()))
 
     @property
     def semi_minor(self):
-        "Returns the Semi Minor Axis for this Spatial Reference."
+        """Returns the Semi Minor Axis for this Spatial Reference."""
         return capi.semi_minor(self.ptr, byref(c_int()))
 
     @property
     def inverse_flattening(self):
-        "Returns the Inverse Flattening for this Spatial Reference."
+        """Returns the Inverse Flattening for this Spatial Reference."""
         return capi.invflattening(self.ptr, byref(c_int()))
 
     # #### Boolean Properties ####
@@ -268,7 +268,7 @@ class SpatialReference(GDALBase):
 
     @property
     def local(self):
-        "Returns True if this SpatialReference is local (root node is LOCAL_CS)."
+        """Returns True if this SpatialReference is local (root node is LOCAL_CS)."""
         return bool(capi.islocal(self.ptr))
 
     @property
@@ -281,57 +281,57 @@ class SpatialReference(GDALBase):
 
     # #### Import Routines #####
     def import_epsg(self, epsg):
-        "Imports the Spatial Reference from the EPSG code (an integer)."
+        """Imports the Spatial Reference from the EPSG code (an integer)."""
         capi.from_epsg(self.ptr, epsg)
 
     def import_proj(self, proj):
-        "Imports the Spatial Reference from a PROJ.4 string."
+        """Imports the Spatial Reference from a PROJ.4 string."""
         capi.from_proj(self.ptr, proj)
 
     def import_user_input(self, user_input):
-        "Imports the Spatial Reference from the given user input string."
+        """Imports the Spatial Reference from the given user input string."""
         capi.from_user_input(self.ptr, force_bytes(user_input))
 
     def import_wkt(self, wkt):
-        "Imports the Spatial Reference from OGC WKT (string)"
+        """Imports the Spatial Reference from OGC WKT (string)"""
         capi.from_wkt(self.ptr, byref(c_char_p(force_bytes(wkt))))
 
     def import_xml(self, xml):
-        "Imports the Spatial Reference from an XML string."
+        """Imports the Spatial Reference from an XML string."""
         capi.from_xml(self.ptr, xml)
 
     # #### Export Properties ####
     @property
     def wkt(self):
-        "Returns the WKT representation of this Spatial Reference."
+        """Returns the WKT representation of this Spatial Reference."""
         return capi.to_wkt(self.ptr, byref(c_char_p()))
 
     @property
     def pretty_wkt(self, simplify=0):
-        "Returns the 'pretty' representation of the WKT."
+        """Returns the 'pretty' representation of the WKT."""
         return capi.to_pretty_wkt(self.ptr, byref(c_char_p()), simplify)
 
     @property
     def proj(self):
-        "Returns the PROJ.4 representation for this Spatial Reference."
+        """Returns the PROJ.4 representation for this Spatial Reference."""
         return capi.to_proj(self.ptr, byref(c_char_p()))
 
     @property
     def proj4(self):
-        "Alias for proj()."
+        """Alias for proj()."""
         return self.proj
 
     @property
     def xml(self, dialect=''):
-        "Returns the XML representation of this Spatial Reference."
+        """Returns the XML representation of this Spatial Reference."""
         return capi.to_xml(self.ptr, byref(c_char_p()), force_bytes(dialect))
 
 
 class CoordTransform(GDALBase):
-    "The coordinate system transformation object."
+    """The coordinate system transformation object."""
 
     def __init__(self, source, target):
-        "Initializes on a source and target SpatialReference objects."
+        """Initializes on a source and target SpatialReference objects."""
         if not isinstance(source, SpatialReference) or not isinstance(target, SpatialReference):
             raise TypeError('source and target must be of type SpatialReference')
         self.ptr = capi.new_ct(source._ptr, target._ptr)
@@ -339,7 +339,7 @@ class CoordTransform(GDALBase):
         self._srs2_name = target.name
 
     def __del__(self):
-        "Deletes this Coordinate Transformation object."
+        """Deletes this Coordinate Transformation object."""
         try:
             capi.destroy_ct(self._ptr)
         except (AttributeError, TypeError):

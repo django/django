@@ -17,7 +17,7 @@ from django.utils.six.moves.urllib.parse import urlencode
 
 
 def get_view(request):
-    "A simple view that expects a GET request, and returns a rendered template"
+    """A simple view that expects a GET request, and returns a rendered template"""
     t = Template('This is a test. {{ var }} is the value.', name='GET Template')
     c = Context({'var': request.GET.get('var', 42)})
 
@@ -68,7 +68,7 @@ def post_view(request):
 
 
 def view_with_header(request):
-    "A view that has a custom header"
+    """A view that has a custom header"""
     response = HttpResponse()
     response['X-DJANGO-TEST'] = 'Slartibartfast'
     return response
@@ -91,7 +91,7 @@ def raw_post_view(request):
 
 
 def redirect_view(request):
-    "A view that redirects all requests to the GET view"
+    """A view that redirects all requests to the GET view"""
     if request.GET:
         query = '?' + urlencode(request.GET, True)
     else:
@@ -100,7 +100,7 @@ def redirect_view(request):
 
 
 def view_with_secure(request):
-    "A view that indicates if the request was secure"
+    """A view that indicates if the request was secure"""
     response = HttpResponse()
     response.test_was_secure_request = request.is_secure()
     response.test_server_port = request.META.get('SERVER_PORT', 80)
@@ -108,12 +108,12 @@ def view_with_secure(request):
 
 
 def double_redirect_view(request):
-    "A view that redirects all requests to a redirection view"
+    """A view that redirects all requests to a redirection view"""
     return HttpResponseRedirect('/permanent_redirect_view/')
 
 
 def bad_view(request):
-    "A view that returns a 404 with some error content"
+    """A view that returns a 404 with some error content"""
     return HttpResponseNotFound('Not found!. This page contains some MAGIC content')
 
 TestChoices = (
@@ -140,7 +140,7 @@ class TestForm(Form):
 
 
 def form_view(request):
-    "A view that tests a simple form"
+    """A view that tests a simple form"""
     if request.method == 'POST':
         form = TestForm(request.POST)
         if form.is_valid():
@@ -158,7 +158,7 @@ def form_view(request):
 
 
 def form_view_with_template(request):
-    "A view that tests a simple form"
+    """A view that tests a simple form"""
     if request.method == 'POST':
         form = TestForm(request.POST)
         if form.is_valid():
@@ -195,7 +195,7 @@ TestFormSet = formset_factory(TestForm, BaseTestFormSet)
 
 
 def formset_view(request):
-    "A view that tests a simple formset"
+    """A view that tests a simple formset"""
     if request.method == 'POST':
         formset = TestFormSet(request.POST)
         if formset.is_valid():
@@ -214,7 +214,7 @@ def formset_view(request):
 
 
 def login_protected_view(request):
-    "A simple view that is login protected."
+    """A simple view that is login protected."""
     t = Template('This is a login protected test. Username is {{ user.username }}.', name='Login Template')
     c = Context({'user': request.user})
 
@@ -223,7 +223,7 @@ login_protected_view = login_required(login_protected_view)
 
 
 def login_protected_view_changed_redirect(request):
-    "A simple view that is login protected with a custom redirect field set"
+    """A simple view that is login protected with a custom redirect field set"""
     t = Template('This is a login protected test. Username is {{ user.username }}.', name='Login Template')
     c = Context({'user': request.user})
 
@@ -234,7 +234,7 @@ login_protected_view_changed_redirect = (
 
 
 def _permission_protected_view(request):
-    "A simple view that is permission protected."
+    """A simple view that is permission protected."""
     t = Template('This is a permission protected test. '
                  'Username is {{ user.username }}. '
                  'Permissions are {{ user.get_all_permissions }}.',
@@ -271,7 +271,7 @@ permission_protected_method_view = _view_manager.permission_protected_view
 
 
 def session_view(request):
-    "A view that modifies the session"
+    """A view that modifies the session"""
     request.session['tobacconist'] = 'hovercraft'
 
     t = Template('This is a view that modifies the session.',

@@ -6,7 +6,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 
 
 class GeoManager(Manager.from_queryset(GeoQuerySet)):
-    "Overrides Manager to return Geographic QuerySets."
+    """Overrides Manager to return Geographic QuerySets."""
 
     # This manager should be used for queries on related fields
     # so that geometry columns on Oracle and MySQL are selected

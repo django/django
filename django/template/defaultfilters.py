@@ -591,7 +591,7 @@ def join(value, arg, autoescape=True):
 
 @register.filter(is_safe=True)
 def last(value):
-    "Returns the last item in a list"
+    """Returns the last item in a list"""
     try:
         return value[-1]
     except IndexError:

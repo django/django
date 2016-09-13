@@ -46,57 +46,57 @@ class SpatialRefSysMixin(object):
 
     @property
     def name(self):
-        "Returns the projection name."
+        """Returns the projection name."""
         return self.srs.name
 
     @property
     def spheroid(self):
-        "Returns the spheroid name for this spatial reference."
+        """Returns the spheroid name for this spatial reference."""
         return self.srs['spheroid']
 
     @property
     def datum(self):
-        "Returns the datum for this spatial reference."
+        """Returns the datum for this spatial reference."""
         return self.srs['datum']
 
     @property
     def projected(self):
-        "Is this Spatial Reference projected?"
+        """Is this Spatial Reference projected?"""
         return self.srs.projected
 
     @property
     def local(self):
-        "Is this Spatial Reference local?"
+        """Is this Spatial Reference local?"""
         return self.srs.local
 
     @property
     def geographic(self):
-        "Is this Spatial Reference geographic?"
+        """Is this Spatial Reference geographic?"""
         return self.srs.geographic
 
     @property
     def linear_name(self):
-        "Returns the linear units name."
+        """Returns the linear units name."""
         return self.srs.linear_name
 
     @property
     def linear_units(self):
-        "Returns the linear units."
+        """Returns the linear units."""
         return self.srs.linear_units
 
     @property
     def angular_name(self):
-        "Returns the name of the angular units."
+        """Returns the name of the angular units."""
         return self.srs.angular_name
 
     @property
     def angular_units(self):
-        "Returns the angular units."
+        """Returns the angular units."""
         return self.srs.angular_units
 
     @property
     def units(self):
-        "Returns a tuple of the units and the name."
+        """Returns a tuple of the units and the name."""
         if self.projected or self.local:
             return (self.linear_units, self.linear_name)
         elif self.geographic:

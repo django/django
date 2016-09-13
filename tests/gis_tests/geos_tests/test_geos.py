@@ -32,7 +32,7 @@ from ..test_data import TestDataMixin
 class GEOSTest(SimpleTestCase, TestDataMixin):
 
     def test_base(self):
-        "Tests out the GEOSBase class."
+        """Tests out the GEOSBase class."""
         # Testing out GEOSBase class, which provides a `ptr` property
         # that abstracts out access to underlying C pointers.
         class FakeGeom1(GEOSBase):
@@ -78,20 +78,20 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 fg2._set_ptr(bad_ptr)
 
     def test_wkt(self):
-        "Testing WKT output."
+        """Testing WKT output."""
         for g in self.geometries.wkt_out:
             geom = fromstr(g.wkt)
             if geom.hasz:
                 self.assertEqual(g.ewkt, geom.wkt)
 
     def test_hex(self):
-        "Testing HEX output."
+        """Testing HEX output."""
         for g in self.geometries.hex_wkt:
             geom = fromstr(g.wkt)
             self.assertEqual(g.hex, geom.hex.decode())
 
     def test_hexewkb(self):
-        "Testing (HEX)EWKB output."
+        """Testing (HEX)EWKB output."""
         # For testing HEX(EWKB).
         ogc_hex = b'01010000000000000000000000000000000000F03F'
         ogc_hex_3d = b'01010000800000000000000000000000000000F03F0000000000000040'
@@ -122,7 +122,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(4326, GEOSGeometry(hexewkb_2d).srid)
 
     def test_kml(self):
-        "Testing KML output."
+        """Testing KML output."""
         for tg in self.geometries.wkt_out:
             geom = fromstr(tg.wkt)
             kml = getattr(tg, 'kml', False)
@@ -130,7 +130,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 self.assertEqual(kml, geom.kml)
 
     def test_errors(self):
-        "Testing the Error handlers."
+        """Testing the Error handlers."""
         # string-based
         for err in self.geometries.errors:
             with self.assertRaises((GEOSException, ValueError)):
@@ -151,14 +151,14 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             GEOSGeometry(None)
 
     def test_wkb(self):
-        "Testing WKB output."
+        """Testing WKB output."""
         for g in self.geometries.hex_wkt:
             geom = fromstr(g.wkt)
             wkb = geom.wkb
             self.assertEqual(b2a_hex(wkb).decode().upper(), g.hex)
 
     def test_create_hex(self):
-        "Testing creation from HEX."
+        """Testing creation from HEX."""
         for g in self.geometries.hex_wkt:
             geom_h = GEOSGeometry(g.hex)
             # we need to do this so decimal places get normalized
@@ -166,7 +166,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(geom_t.wkt, geom_h.wkt)
 
     def test_create_wkb(self):
-        "Testing creation from WKB."
+        """Testing creation from WKB."""
         for g in self.geometries.hex_wkt:
             wkb = six.memoryview(a2b_hex(g.hex.encode()))
             geom_h = GEOSGeometry(wkb)
@@ -175,7 +175,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(geom_t.wkt, geom_h.wkt)
 
     def test_ewkt(self):
-        "Testing EWKT."
+        """Testing EWKT."""
         srids = (-1, 32140)
         for srid in srids:
             for p in self.geometries.polygons:
@@ -187,7 +187,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
     @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_json(self):
-        "Testing GeoJSON input/output (via GDAL)."
+        """Testing GeoJSON input/output (via GDAL)."""
         for g in self.geometries.json_geoms:
             geom = GEOSGeometry(g.wkt)
             if not hasattr(g, 'not_equal'):
@@ -197,7 +197,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(GEOSGeometry(g.wkt), GEOSGeometry(geom.json))
 
     def test_fromfile(self):
-        "Testing the fromfile() factory."
+        """Testing the fromfile() factory."""
         ref_pnt = GEOSGeometry('POINT(5 23)')
 
         wkt_f = BytesIO()
@@ -213,7 +213,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(ref_pnt, pnt)
 
     def test_eq(self):
-        "Testing equivalence."
+        """Testing equivalence."""
         p = fromstr('POINT(5 23)')
         self.assertEqual(p, p.wkt)
         self.assertNotEqual(p, 'foo')
@@ -228,7 +228,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertNotEqual(g, False)
 
     def test_points(self):
-        "Testing Point objects."
+        """Testing Point objects."""
         prev = fromstr('POINT(0 0)')
         for p in self.geometries.points:
             # Creating the point from the WKT
@@ -284,7 +284,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             prev = pnt  # setting the previous geometry
 
     def test_multipoints(self):
-        "Testing MultiPoint objects."
+        """Testing MultiPoint objects."""
         for mp in self.geometries.multipoints:
             mpnt = fromstr(mp.wkt)
             self.assertEqual(mpnt.geom_type, 'MultiPoint')
@@ -305,7 +305,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 self.assertIs(p.valid, True)
 
     def test_linestring(self):
-        "Testing LineString objects."
+        """Testing LineString objects."""
         prev = fromstr('POINT(0 0)')
         for l in self.geometries.linestrings:
             ls = fromstr(l.wkt)
@@ -349,7 +349,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 LineString('wrong input')
 
     def test_multilinestring(self):
-        "Testing MultiLineString objects."
+        """Testing MultiLineString objects."""
         prev = fromstr('POINT(0 0)')
         for l in self.geometries.multilinestrings:
             ml = fromstr(l.wkt)
@@ -375,7 +375,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(ml, MultiLineString(*tuple(LineString(s.tuple) for s in ml)))
 
     def test_linearring(self):
-        "Testing LinearRing objects."
+        """Testing LinearRing objects."""
         for rr in self.geometries.linearrings:
             lr = fromstr(rr.wkt)
             self.assertEqual(lr.geom_type, 'LinearRing')
@@ -403,7 +403,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 LinearRing(numpy.array([(0, 0)]))
 
     def test_polygons_from_bbox(self):
-        "Testing `from_bbox` class method."
+        """Testing `from_bbox` class method."""
         bbox = (-180, -90, 180, 90)
         p = Polygon.from_bbox(bbox)
         self.assertEqual(bbox, p.extent)
@@ -416,7 +416,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(format(x, '.13f'), format(y, '.13f'))
 
     def test_polygons(self):
-        "Testing Polygon objects."
+        """Testing Polygon objects."""
 
         prev = fromstr('POINT(0 0)')
         for p in self.geometries.polygons:
@@ -501,7 +501,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertLess(p3, p4)
 
     def test_multipolygons(self):
-        "Testing MultiPolygon objects."
+        """Testing MultiPolygon objects."""
         fromstr('POINT (0 0)')
         for mp in self.geometries.multipolygons:
             mpoly = fromstr(mp.wkt)
@@ -523,7 +523,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 self.assertEqual(mpoly.wkt, MultiPolygon(*tuple(poly.clone() for poly in mpoly)).wkt)
 
     def test_memory_hijinks(self):
-        "Testing Geometry __del__() on rings and polygons."
+        """Testing Geometry __del__() on rings and polygons."""
         # #### Memory issues with rings and poly
 
         # These tests are needed to ensure sanity with writable geometries.
@@ -547,7 +547,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         str(ring2)
 
     def test_coord_seq(self):
-        "Testing Coordinate Sequence objects."
+        """Testing Coordinate Sequence objects."""
         for p in self.geometries.polygons:
             if p.ext_ring_cs:
                 # Constructing the polygon and getting the coordinate sequence
@@ -576,7 +576,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                         self.assertEqual(tset[j], cs[i][j])
 
     def test_relate_pattern(self):
-        "Testing relate() and relate_pattern()."
+        """Testing relate() and relate_pattern()."""
         g = fromstr('POINT (0 0)')
         with self.assertRaises(GEOSException):
             g.relate_pattern(0, 'invalid pattern, yo')
@@ -587,7 +587,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(rg.pattern, a.relate(b))
 
     def test_intersection(self):
-        "Testing intersects() and intersection()."
+        """Testing intersects() and intersection()."""
         for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
@@ -600,7 +600,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(i1, a)
 
     def test_union(self):
-        "Testing union()."
+        """Testing union()."""
         for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
@@ -612,7 +612,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(u1, a)
 
     def test_unary_union(self):
-        "Testing unary_union."
+        """Testing unary_union."""
         for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
@@ -621,7 +621,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertTrue(u1.equals(u2))
 
     def test_difference(self):
-        "Testing difference()."
+        """Testing difference()."""
         for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
@@ -633,7 +633,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(d1, a)
 
     def test_symdifference(self):
-        "Testing sym_difference()."
+        """Testing sym_difference()."""
         for i in range(len(self.geometries.topology_geoms)):
             a = fromstr(self.geometries.topology_geoms[i].wkt_a)
             b = fromstr(self.geometries.topology_geoms[i].wkt_b)
@@ -645,7 +645,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(d1, a)
 
     def test_buffer(self):
-        "Testing buffer()."
+        """Testing buffer()."""
         for bg in self.geometries.buffer_geoms:
             g = fromstr(bg.wkt)
 
@@ -693,7 +693,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 MultiLineString().closed
 
     def test_srid(self):
-        "Testing the SRID property and keyword."
+        """Testing the SRID property and keyword."""
         # Testing SRID keyword on Point
         pnt = Point(5, 23, srid=4326)
         self.assertEqual(4326, pnt.srid)
@@ -754,7 +754,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertAlmostEqual(new_pnt.y, 2, 3)
 
     def test_mutable_geometries(self):
-        "Testing the mutability of Polygons and Geometry Collections."
+        """Testing the mutability of Polygons and Geometry Collections."""
         # ### Testing the mutability of Polygons ###
         for p in self.geometries.polygons:
             poly = fromstr(p.wkt)
@@ -881,7 +881,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(gc, GeometryCollection())
 
     def test_threed(self):
-        "Testing three-dimensional geometries."
+        """Testing three-dimensional geometries."""
         # Testing a 3D Point
         pnt = Point(2, 3, 8)
         self.assertEqual((2., 3., 8.), pnt.coords)
@@ -899,7 +899,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual((1., 2., 3.), ls[0])
 
     def test_distance(self):
-        "Testing the distance() function."
+        """Testing the distance() function."""
         # Distance to self should be 0.
         pnt = Point(0, 0)
         self.assertEqual(0.0, pnt.distance(Point(0, 0)))
@@ -917,7 +917,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(3, ls1.distance(ls2))
 
     def test_length(self):
-        "Testing the length property."
+        """Testing the length property."""
         # Points have 0 length.
         pnt = Point(0, 0)
         self.assertEqual(0.0, pnt.length)
@@ -935,7 +935,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(8.0, mpoly.length)
 
     def test_emptyCollections(self):
-        "Testing empty geometries and collections."
+        """Testing empty geometries and collections."""
         geoms = [
             GeometryCollection([]),
             fromstr('GEOMETRYCOLLECTION EMPTY'),
@@ -1000,7 +1000,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(gc.dims, 2)
 
     def test_collections_of_collections(self):
-        "Testing GeometryCollection handling of other collections."
+        """Testing GeometryCollection handling of other collections."""
         # Creating a GeometryCollection WKT string composed of other
         # collections and polygons.
         coll = [mp.wkt for mp in self.geometries.multipolygons if mp.valid]
@@ -1020,7 +1020,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
     @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_gdal(self):
-        "Testing `ogr` and `srs` properties."
+        """Testing `ogr` and `srs` properties."""
         g1 = fromstr('POINT(5 23)')
         self.assertIsInstance(g1.ogr, gdal.OGRGeometry)
         self.assertIsNone(g1.srs)
@@ -1036,7 +1036,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual('WGS 84', g2.srs.name)
 
     def test_copy(self):
-        "Testing use with the Python `copy` module."
+        """Testing use with the Python `copy` module."""
         import copy
         poly = GEOSGeometry('POLYGON((0 0, 0 23, 23 23, 23 0, 0 0), (5 5, 5 10, 10 10, 10 5, 5 5))')
         cpy1 = copy.copy(poly)
@@ -1046,7 +1046,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
     @skipUnless(HAS_GDAL, "GDAL is required to transform geometries")
     def test_transform(self):
-        "Testing `transform` method."
+        """Testing `transform` method."""
         orig = GEOSGeometry('POINT (-104.609 38.255)', 4326)
         trans = GEOSGeometry('POINT (992385.4472045 481455.4944650)', 2774)
 
@@ -1113,7 +1113,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             g.transform(2774, clone=True)
 
     def test_extent(self):
-        "Testing `extent` method."
+        """Testing `extent` method."""
         # The xmin, ymin, xmax, ymax of the MultiPoint should be returned.
         mp = MultiPoint(Point(5, 23), Point(0, 0), Point(10, 50))
         self.assertEqual((0.0, 0.0, 10.0, 50.0), mp.extent)
@@ -1129,7 +1129,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual((xmin, ymin, xmax, ymax), poly.extent)
 
     def test_pickle(self):
-        "Testing pickling and unpickling support."
+        """Testing pickling and unpickling support."""
         # Using both pickle and cPickle -- just 'cause.
         from django.utils.six.moves import cPickle
         import pickle
@@ -1151,7 +1151,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 self.assertEqual(geom.srid, tmpg.srid)
 
     def test_prepared(self):
-        "Testing PreparedGeometry support."
+        """Testing PreparedGeometry support."""
         # Creating a simple multipolygon and getting a prepared version.
         mpoly = GEOSGeometry('MULTIPOLYGON(((0 0,0 5,5 5,5 0,0 0)),((5 5,5 10,10 10,10 5,5 5)))')
         prep = mpoly.prepared
@@ -1178,7 +1178,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertTrue(prep.covers(Point(5, 5)))
 
     def test_line_merge(self):
-        "Testing line merge support"
+        """Testing line merge support"""
         ref_geoms = (fromstr('LINESTRING(1 1, 1 1, 3 3)'),
                      fromstr('MULTILINESTRING((1 1, 3 3), (3 3, 4 2))'),
                      )
@@ -1189,7 +1189,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(merged, geom.merged)
 
     def test_valid_reason(self):
-        "Testing IsValidReason support"
+        """Testing IsValidReason support"""
 
         g = GEOSGeometry("POINT(0 0)")
         self.assertTrue(g.valid)
@@ -1203,7 +1203,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertTrue(g.valid_reason.startswith("Too few points in geometry component"))
 
     def test_linearref(self):
-        "Testing linear referencing"
+        """Testing linear referencing"""
 
         ls = fromstr('LINESTRING(0 0, 0 10, 10 10, 10 0)')
         mls = fromstr('MULTILINESTRING((0 0, 0 10), (10 0, 10 10))')

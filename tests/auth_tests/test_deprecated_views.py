@@ -88,7 +88,7 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     def test_email_found(self):
-        "Email is sent if a valid email address is provided for password reset"
+        """Email is sent if a valid email address is provided for password reset"""
         response = self.client.post('/password_reset/', {'email': 'staffmember@example.com'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
@@ -127,7 +127,9 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertIn('<html>', message.get_payload(1).get_payload())
 
     def test_email_found_custom_from(self):
-        "Email is sent if a valid email address is provided for password reset when a custom from_email is provided."
+        """
+        Email is sent if a valid email address is provided for password reset when a custom from_email is provided.
+        """
         response = self.client.post('/password_reset_from_email/', {'email': 'staffmember@example.com'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
@@ -136,7 +138,7 @@ class PasswordResetTest(AuthViewsTestCase):
     # Skip any 500 handler action (like sending more mail...)
     @override_settings(DEBUG_PROPAGATE_EXCEPTIONS=True)
     def test_poisoned_http_host(self):
-        "Poisoned HTTP_HOST headers can't be used for reset emails"
+        """Poisoned HTTP_HOST headers can't be used for reset emails"""
         # This attack is based on the way browsers handle URLs. The colon
         # should be used to separate the port, but if the URL contains an @,
         # the colon is interpreted as part of a username for login purposes,
@@ -157,7 +159,7 @@ class PasswordResetTest(AuthViewsTestCase):
     # Skip any 500 handler action (like sending more mail...)
     @override_settings(DEBUG_PROPAGATE_EXCEPTIONS=True)
     def test_poisoned_http_host_admin_site(self):
-        "Poisoned HTTP_HOST headers can't be used for reset emails on admin views"
+        """Poisoned HTTP_HOST headers can't be used for reset emails on admin views"""
         with patch_logger('django.security.DisallowedHost', 'error') as logger_calls:
             response = self.client.post(
                 '/admin_password_reset/',

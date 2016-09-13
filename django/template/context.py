@@ -9,7 +9,7 @@ _builtin_context_processors = ('django.template.context_processors.csrf',)
 
 
 class ContextPopException(Exception):
-    "pop() has been called more times than push()"
+    """pop() has been called more times than push()"""
     pass
 
 
@@ -64,7 +64,7 @@ class BaseContext(object):
         return self.dicts.pop()
 
     def __setitem__(self, key, value):
-        "Set a variable in the current context"
+        """Set a variable in the current context"""
         self.dicts[-1][key] = value
 
     def set_upward(self, key, value):
@@ -80,14 +80,14 @@ class BaseContext(object):
         context[key] = value
 
     def __getitem__(self, key):
-        "Get a variable's value, starting at the current context and going upward"
+        """Get a variable's value, starting at the current context and going upward"""
         for d in reversed(self.dicts):
             if key in d:
                 return d[key]
         raise KeyError(key)
 
     def __delitem__(self, key):
-        "Delete a variable from the current context"
+        """Delete a variable from the current context"""
         del self.dicts[-1][key]
 
     def has_key(self, key):
@@ -148,7 +148,7 @@ class BaseContext(object):
 
 
 class Context(BaseContext):
-    "A stack container for variable context"
+    """A stack container for variable context"""
     def __init__(self, dict_=None, autoescape=True, use_l10n=None, use_tz=None):
         self.autoescape = autoescape
         self.use_l10n = use_l10n
@@ -176,7 +176,7 @@ class Context(BaseContext):
         return duplicate
 
     def update(self, other_dict):
-        "Pushes other_dict to the stack of dictionaries in the Context"
+        """Pushes other_dict to the stack of dictionaries in the Context"""
         if not hasattr(other_dict, '__getitem__'):
             raise TypeError('other_dict must be a mapping (dictionary-like) object.')
         if isinstance(other_dict, BaseContext):

@@ -46,7 +46,7 @@ class MissingForeignKey(LayerMapError):
 
 
 class LayerMapping(object):
-    "A class that maps OGR Layers to GeoDjango Models."
+    """A class that maps OGR Layers to GeoDjango Models."""
 
     # Acceptable 'base' types for a multi-geometry type.
     MULTI_TYPES = {1: OGRGeomType('MultiPoint'),
@@ -151,7 +151,7 @@ class LayerMapping(object):
 
     # #### Checking routines used during initialization ####
     def check_fid_range(self, fid_range):
-        "This checks the `fid_range` keyword."
+        """This checks the `fid_range` keyword."""
         if fid_range:
             if isinstance(fid_range, (tuple, list)):
                 return slice(*fid_range)
@@ -260,7 +260,7 @@ class LayerMapping(object):
             self.fields[field_name] = fields_val
 
     def check_srs(self, source_srs):
-        "Checks the compatibility of the given spatial reference object."
+        """Checks the compatibility of the given spatial reference object."""
 
         if isinstance(source_srs, SpatialReference):
             sr = source_srs
@@ -278,7 +278,7 @@ class LayerMapping(object):
             return sr
 
     def check_unique(self, unique):
-        "Checks the `unique` keyword parameter -- may be a sequence or string."
+        """Checks the `unique` keyword parameter -- may be a sequence or string."""
         if isinstance(unique, (list, tuple)):
             # List of fields to determine uniqueness with
             for attr in unique:
@@ -448,7 +448,7 @@ class LayerMapping(object):
 
     # #### Other model methods ####
     def coord_transform(self):
-        "Returns the coordinate transformation object."
+        """Returns the coordinate transformation object."""
         SpatialRefSys = self.spatial_backend.spatial_ref_sys()
         try:
             # Getting the target spatial reference system
@@ -461,7 +461,7 @@ class LayerMapping(object):
             six.reraise(LayerMapError, LayerMapError(new_msg), sys.exc_info()[2])
 
     def geometry_field(self):
-        "Returns the GeometryField instance associated with the geographic column."
+        """Returns the GeometryField instance associated with the geographic column."""
         # Use `get_field()` on the model's options so that we
         # get the correct field instance if there's model inheritance.
         opts = self.model._meta

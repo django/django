@@ -42,7 +42,7 @@ STATES = ['Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado']
 class LayerMapTest(TestCase):
 
     def test_init(self):
-        "Testing LayerMapping initialization."
+        """Testing LayerMapping initialization."""
 
         # Model field that does not exist.
         bad1 = copy(city_mapping)
@@ -67,7 +67,7 @@ class LayerMapTest(TestCase):
             LayerMapping(City, city_shp, city_mapping, encoding='foobar')
 
     def test_simple_layermap(self):
-        "Test LayerMapping import of a simple point shapefile."
+        """Test LayerMapping import of a simple point shapefile."""
         # Setting up for the LayerMapping.
         lm = LayerMapping(City, city_shp, city_mapping)
         lm.save()
@@ -91,7 +91,7 @@ class LayerMapTest(TestCase):
             self.assertAlmostEqual(pnt1.y, pnt2.y, 5)
 
     def test_layermap_strict(self):
-        "Testing the `strict` keyword, and import of a LineString shapefile."
+        """Testing the `strict` keyword, and import of a LineString shapefile."""
         # When the `strict` keyword is set an error encountered will force
         # the importation to stop.
         with self.assertRaises(InvalidDecimal):
@@ -126,7 +126,7 @@ class LayerMapTest(TestCase):
                 self.assertAlmostEqual(p1[1], p2[1], 6)
 
     def county_helper(self, county_feat=True):
-        "Helper function for ensuring the integrity of the mapped County models."
+        """Helper function for ensuring the integrity of the mapped County models."""
         for name, n, st in zip(NAMES, NUMS, STATES):
             # Should only be one record b/c of `unique` keyword.
             c = County.objects.get(name=name)
@@ -139,7 +139,7 @@ class LayerMapTest(TestCase):
                 self.assertEqual(n, qs.count())
 
     def test_layermap_unique_multigeometry_fk(self):
-        "Testing the `unique`, and `transform`, geometry collection conversion, and ForeignKey mappings."
+        """Testing the `unique`, and `transform`, geometry collection conversion, and ForeignKey mappings."""
         # All the following should work.
 
         # Telling LayerMapping that we want no transformations performed on the data.
@@ -213,7 +213,7 @@ class LayerMapTest(TestCase):
         self.county_helper()
 
     def test_test_fid_range_step(self):
-        "Tests the `fid_range` keyword and the `step` keyword of .save()."
+        """Tests the `fid_range` keyword and the `step` keyword of .save()."""
         # Function for clearing out all the counties before testing.
         def clear_counties():
             County.objects.all().delete()
@@ -270,7 +270,7 @@ class LayerMapTest(TestCase):
             self.county_helper(county_feat=False)
 
     def test_model_inheritance(self):
-        "Tests LayerMapping on inherited models.  See #12093."
+        """Tests LayerMapping on inherited models.  See #12093."""
         icity_mapping = {'name': 'Name',
                          'population': 'Population',
                          'density': 'Density',
@@ -290,7 +290,7 @@ class LayerMapTest(TestCase):
         self.assertEqual(3, ICity2.objects.count())
 
     def test_invalid_layer(self):
-        "Tests LayerMapping on invalid geometries.  See #15378."
+        """Tests LayerMapping on invalid geometries.  See #15378."""
         invalid_mapping = {'point': 'POINT'}
         lm = LayerMapping(Invalid, invalid_shp, invalid_mapping,
                           source_srs=4326)
@@ -304,7 +304,7 @@ class LayerMapTest(TestCase):
             lm.save(silent=True, strict=True)
 
     def test_textfield(self):
-        "Tests that String content fits also in a TextField"
+        """Tests that String content fits also in a TextField"""
         mapping = copy(city_mapping)
         mapping['name_txt'] = 'Name'
         lm = LayerMapping(City, city_shp, mapping)

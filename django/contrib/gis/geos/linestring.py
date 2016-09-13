@@ -90,12 +90,12 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         super(LineString, self).__init__(self._init_func(cs.ptr), srid=srid)
 
     def __iter__(self):
-        "Allows iteration over this LineString."
+        """Allows iteration over this LineString."""
         for i in range(len(self)):
             yield self[i]
 
     def __len__(self):
-        "Returns the number of points in this LineString."
+        """Returns the number of points in this LineString."""
         return len(self._cs)
 
     def _get_single_external(self, index):
@@ -132,7 +132,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
     # #### Sequence Properties ####
     @property
     def tuple(self):
-        "Returns a tuple version of the geometry from the coordinate sequence."
+        """Returns a tuple version of the geometry from the coordinate sequence."""
         return self._cs.tuple
     coords = tuple
 
@@ -149,22 +149,22 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 
     @property
     def array(self):
-        "Returns a numpy array for the LineString."
+        """Returns a numpy array for the LineString."""
         return self._listarr(self._cs.__getitem__)
 
     @property
     def x(self):
-        "Returns a list or numpy array of the X variable."
+        """Returns a list or numpy array of the X variable."""
         return self._listarr(self._cs.getX)
 
     @property
     def y(self):
-        "Returns a list or numpy array of the Y variable."
+        """Returns a list or numpy array of the Y variable."""
         return self._listarr(self._cs.getY)
 
     @property
     def z(self):
-        "Returns a list or numpy array of the Z variable."
+        """Returns a list or numpy array of the Z variable."""
         if not self.hasz:
             return None
         else:

@@ -10,7 +10,7 @@ from .models import TestModel
 class GenericViewsSitemapTests(SitemapTestsBase):
 
     def test_generic_sitemap(self):
-        "A minimal generic sitemap can be rendered"
+        """A minimal generic sitemap can be rendered"""
         response = self.client.get('/generic/sitemap.xml')
         expected = ''
         for pk in TestModel.objects.values_list("id", flat=True):

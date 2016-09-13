@@ -50,17 +50,17 @@ class Polygon(GEOSGeometry):
         super(Polygon, self).__init__(polygon, **kwargs)
 
     def __iter__(self):
-        "Iterates over each ring in the polygon."
+        """Iterates over each ring in the polygon."""
         for i in range(len(self)):
             yield self[i]
 
     def __len__(self):
-        "Returns the number of rings in this Polygon."
+        """Returns the number of rings in this Polygon."""
         return self.num_interior_rings + 1
 
     @classmethod
     def from_bbox(cls, bbox):
-        "Constructs a Polygon from a bounding box (4-tuple)."
+        """Constructs a Polygon from a bounding box (4-tuple)."""
         x0, y0, x1, y1 = bbox
         for z in bbox:
             if not isinstance(z, six.integer_types + (float,)):
@@ -105,7 +105,7 @@ class Polygon(GEOSGeometry):
 
     def _construct_ring(self, param, msg=(
             'Parameter must be a sequence of LinearRings or objects that can initialize to LinearRings')):
-        "Helper routine for trying to construct a ring from the given parameter."
+        """Helper routine for trying to construct a ring from the given parameter."""
         if isinstance(param, LinearRing):
             return param
         try:
@@ -151,16 +151,16 @@ class Polygon(GEOSGeometry):
     # #### Polygon Properties ####
     @property
     def num_interior_rings(self):
-        "Returns the number of interior rings."
+        """Returns the number of interior rings."""
         # Getting the number of rings
         return capi.get_nrings(self.ptr)
 
     def _get_ext_ring(self):
-        "Gets the exterior ring of the Polygon."
+        """Gets the exterior ring of the Polygon."""
         return self[0]
 
     def _set_ext_ring(self, ring):
-        "Sets the exterior ring of the Polygon."
+        """Sets the exterior ring of the Polygon."""
         self[0] = ring
 
     # Properties for the exterior ring/shell.
@@ -169,13 +169,13 @@ class Polygon(GEOSGeometry):
 
     @property
     def tuple(self):
-        "Gets the tuple for each ring in this Polygon."
+        """Gets the tuple for each ring in this Polygon."""
         return tuple(self[i].tuple for i in range(len(self)))
     coords = tuple
 
     @property
     def kml(self):
-        "Returns the KML representation of this Polygon."
+        """Returns the KML representation of this Polygon."""
         inner_kml = ''.join(
             "<innerBoundaryIs>%s</innerBoundaryIs>" % self[i + 1].kml
             for i in range(self.num_interior_rings)

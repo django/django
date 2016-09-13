@@ -514,7 +514,7 @@ class SuperVillain(Villain):
 
 @python_2_unicode_compatible
 class FunkyTag(models.Model):
-    "Because we all know there's only one real use case for GFKs."
+    """Because we all know there's only one real use case for GFKs."""
     name = models.CharField(max_length=25)
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()

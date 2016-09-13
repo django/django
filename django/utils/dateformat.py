@@ -61,19 +61,19 @@ class TimeFormat(Formatter):
                 self.timezone = obj.tzinfo
 
     def a(self):
-        "'a.m.' or 'p.m.'"
+        """'a.m.' or 'p.m.'"""
         if self.data.hour > 11:
             return _('p.m.')
         return _('a.m.')
 
     def A(self):
-        "'AM' or 'PM'"
+        """'AM' or 'PM'"""
         if self.data.hour > 11:
             return _('PM')
         return _('AM')
 
     def B(self):
-        "Swatch Internet time"
+        """Swatch Internet time"""
         raise NotImplementedError('may be implemented in a future release')
 
     def e(self):
@@ -103,11 +103,11 @@ class TimeFormat(Formatter):
         Proprietary extension.
         """
         if self.data.minute == 0:
-            return self.g()
-        return '%s:%s' % (self.g(), self.i())
+            return self.g
+        return '%s:%s' % (self.g, self.i())
 
     def g(self):
-        "Hour, 12-hour format without leading zeros; i.e. '1' to '12'"
+        """"Hour, 12-hour format without leading zeros; i.e. '1' to '12'"""
         if self.data.hour == 0:
             return 12
         if self.data.hour > 12:
@@ -115,19 +115,19 @@ class TimeFormat(Formatter):
         return self.data.hour
 
     def G(self):
-        "Hour, 24-hour format without leading zeros; i.e. '0' to '23'"
+        """Hour, 24-hour format without leading zeros; i.e. '0' to '23'"""
         return self.data.hour
 
     def h(self):
-        "Hour, 12-hour format; i.e. '01' to '12'"
-        return '%02d' % self.g()
+        """Hour, 12-hour format; i.e. '01' to '12'"""
+        return '%02d' % self.g
 
     def H(self):
-        "Hour, 24-hour format; i.e. '00' to '23'"
+        """Hour, 24-hour format; i.e. '00' to '23'"""
         return '%02d' % self.G()
 
     def i(self):
-        "Minutes; i.e. '00' to '59'"
+        """Minutes; i.e. '00' to '59'"""
         return '%02d' % self.data.minute
 
     def O(self):
@@ -158,10 +158,10 @@ class TimeFormat(Formatter):
             return _('midnight')
         if self.data.minute == 0 and self.data.hour == 12:
             return _('noon')
-        return '%s %s' % (self.f(), self.a())
+        return '%s %s' % (self.f(), self.a)
 
     def s(self):
-        "Seconds; i.e. '00' to '59'"
+        """Seconds; i.e. '00' to '59'"""
         return '%02d' % self.data.second
 
     def T(self):
@@ -186,8 +186,9 @@ class TimeFormat(Formatter):
             name = self.format('O')
         return six.text_type(name)
 
+    @property
     def u(self):
-        "Microseconds; i.e. '000000' to '999999'"
+        """Microseconds; i.e. '000000' to '999999'"""
         return '%06d' % self.data.microsecond
 
     def Z(self):
@@ -221,7 +222,7 @@ class DateFormat(TimeFormat):
     year_days = [None, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
 
     def b(self):
-        "Month, textual, 3 letters, lowercase; e.g. 'jan'"
+        """Month, textual, 3 letters, lowercase; e.g. 'jan'"""
         return MONTHS_3[self.data.month]
 
     def c(self):
@@ -232,23 +233,23 @@ class DateFormat(TimeFormat):
         return self.data.isoformat()
 
     def d(self):
-        "Day of the month, 2 digits with leading zeros; i.e. '01' to '31'"
+        """Day of the month, 2 digits with leading zeros; i.e. '01' to '31'"""
         return '%02d' % self.data.day
 
     def D(self):
-        "Day of the week, textual, 3 letters; e.g. 'Fri'"
+        """Day of the week, textual, 3 letters; e.g. 'Fri'"""
         return WEEKDAYS_ABBR[self.data.weekday()]
 
     def E(self):
-        "Alternative month names as required by some locales. Proprietary extension."
+        """Alternative month names as required by some locales. Proprietary extension."""
         return MONTHS_ALT[self.data.month]
 
     def F(self):
-        "Month, textual, long; e.g. 'January'"
+        """Month, textual, long; e.g. 'January'"""
         return MONTHS[self.data.month]
 
     def I(self):
-        "'1' if Daylight Savings Time, '0' otherwise."
+        """'1' if Daylight Savings Time, '0' otherwise."""
         try:
             if self.timezone and self.timezone.dst(self.data):
                 return '1'
@@ -261,43 +262,44 @@ class DateFormat(TimeFormat):
             return ''
 
     def j(self):
-        "Day of the month without leading zeros; i.e. '1' to '31'"
+        """Day of the month without leading zeros; i.e. '1' to '31'"""
         return self.data.day
 
     def l(self):
-        "Day of the week, textual, long; e.g. 'Friday'"
+        """Day of the week, textual, long; e.g. 'Friday'"""
         return WEEKDAYS[self.data.weekday()]
 
     def L(self):
-        "Boolean for whether it is a leap year; i.e. True or False"
+        """Boolean for whether it is a leap year; i.e. True or False"""
         return calendar.isleap(self.data.year)
 
     def m(self):
-        "Month; i.e. '01' to '12'"
+        """Month; i.e. '01' to '12'"""
         return '%02d' % self.data.month
 
     def M(self):
-        "Month, textual, 3 letters; e.g. 'Jan'"
+        """Month, textual, 3 letters; e.g. 'Jan'"""
         return MONTHS_3[self.data.month].title()
 
     def n(self):
-        "Month without leading zeros; i.e. '1' to '12'"
+        """Month without leading zeros; i.e. '1' to '12'"""
         return self.data.month
 
     def N(self):
-        "Month abbreviation in Associated Press style. Proprietary extension."
+        """Month abbreviation in Associated Press style. Proprietary extension."""
         return MONTHS_AP[self.data.month]
 
     def o(self):
-        "ISO 8601 year number matching the ISO week number (W)"
+        """ISO 8601 year number matching the ISO week number (W)"""
         return self.data.isocalendar()[0]
 
+    @property
     def r(self):
-        "RFC 5322 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
+        """RFC 5322 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"""
         return self.format('D, j M Y H:i:s O')
 
     def S(self):
-        "English ordinal suffix for the day of the month, 2 characters; i.e. 'st', 'nd', 'rd' or 'th'"
+        """"English ordinal suffix for the day of the month, 2 characters; i.e. 'st', 'nd', 'rd' or 'th'"""
         if self.data.day in (11, 12, 13):  # Special case
             return 'th'
         last = self.data.day % 10
@@ -310,22 +312,22 @@ class DateFormat(TimeFormat):
         return 'th'
 
     def t(self):
-        "Number of days in the given month; i.e. '28' to '31'"
+        """Number of days in the given month; i.e. '28' to '31'"""
         return '%02d' % calendar.monthrange(self.data.year, self.data.month)[1]
 
     def U(self):
-        "Seconds since the Unix epoch (January 1 1970 00:00:00 GMT)"
+        """Seconds since the Unix epoch (January 1 1970 00:00:00 GMT)"""
         if isinstance(self.data, datetime.datetime) and is_aware(self.data):
             return int(calendar.timegm(self.data.utctimetuple()))
         else:
             return int(time.mktime(self.data.timetuple()))
 
     def w(self):
-        "Day of the week, numeric, i.e. '0' (Sunday) to '6' (Saturday)"
+        """Day of the week, numeric, i.e. '0' (Sunday) to '6' (Saturday)"""
         return (self.data.weekday() + 1) % 7
 
     def W(self):
-        "ISO-8601 week number of year, weeks starting on Monday"
+        """ISO-8601 week number of year, weeks starting on Monday"""
         # Algorithm from http://www.personal.ecu.edu/mccartyr/ISOwdALG.txt
         week_number = None
         jan1_weekday = self.data.replace(month=1, day=1).weekday() + 1
@@ -351,15 +353,15 @@ class DateFormat(TimeFormat):
         return week_number
 
     def y(self):
-        "Year, 2 digits; e.g. '99'"
+        """Year, 2 digits; e.g. '99'"""
         return six.text_type(self.data.year)[2:]
 
     def Y(self):
-        "Year, 4 digits; e.g. '1999'"
+        """Year, 4 digits; e.g. '1999'"""
         return self.data.year
 
     def z(self):
-        "Day of the year; i.e. '0' to '365'"
+        """Day of the year; i.e. '0' to '365'"""
         doy = self.year_days[self.data.month] + self.data.day
         if self.L() and self.data.month > 2:
             doy += 1
@@ -367,12 +369,12 @@ class DateFormat(TimeFormat):
 
 
 def format(value, format_string):
-    "Convenience function"
+    """Convenience function"""
     df = DateFormat(value)
     return df.format(format_string)
 
 
 def time_format(value, format_string):
-    "Convenience function"
+    """Convenience function"""
     tf = TimeFormat(value)
     return tf.format(format_string)

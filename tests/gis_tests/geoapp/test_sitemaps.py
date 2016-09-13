@@ -23,13 +23,13 @@ class GeoSitemapTest(TestCase):
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
 
     def assertChildNodes(self, elem, expected):
-        "Taken from syndication/tests.py."
+        """Taken from syndication/tests.py."""
         actual = set(n.nodeName for n in elem.childNodes)
         expected = set(expected)
         self.assertEqual(actual, expected)
 
     def test_geositemap_kml(self):
-        "Tests KML/KMZ geographic sitemaps."
+        """Tests KML/KMZ geographic sitemaps."""
         for kml_type in ('kml', 'kmz'):
             doc = minidom.parseString(self.client.get('/sitemaps/%s.xml' % kml_type).content)
 

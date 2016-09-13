@@ -330,7 +330,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         return mark_safe(render_to_string(self.template, context))
 
     def build_attrs(self, extra_attrs=None, **kwargs):
-        "Helper function for building an attribute dictionary."
+        """Helper function for building an attribute dictionary."""
         self.attrs = self.widget.build_attrs(extra_attrs=None, **kwargs)
         return self.attrs
 

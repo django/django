@@ -440,7 +440,7 @@ WHEN (new.%(col_name)s IS NULL)
                                value.second, value.microsecond)
 
     def combine_expression(self, connector, sub_expressions):
-        "Oracle requires special cases for %% and & operators in query expressions"
+        """Oracle requires special cases for %% and & operators in query expressions"""
         if connector == '%%':
             return 'MOD(%s)' % ','.join(sub_expressions)
         elif connector == '&':

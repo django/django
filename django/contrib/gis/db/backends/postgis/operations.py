@@ -367,23 +367,23 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             return cursor.fetchone()[0]
 
     def postgis_geos_version(self):
-        "Returns the version of the GEOS library used with PostGIS."
+        """Returns the version of the GEOS library used with PostGIS."""
         return self._get_postgis_func('postgis_geos_version')
 
     def postgis_lib_version(self):
-        "Returns the version number of the PostGIS library used with PostgreSQL."
+        """Returns the version number of the PostGIS library used with PostgreSQL."""
         return self._get_postgis_func('postgis_lib_version')
 
     def postgis_proj_version(self):
-        "Returns the version of the PROJ.4 library used with PostGIS."
+        """Returns the version of the PROJ.4 library used with PostGIS."""
         return self._get_postgis_func('postgis_proj_version')
 
     def postgis_version(self):
-        "Returns PostGIS version number and compile-time options."
+        """Returns PostGIS version number and compile-time options."""
         return self._get_postgis_func('postgis_version')
 
     def postgis_full_version(self):
-        "Returns PostGIS version number and compile-time options."
+        """Returns PostGIS version number and compile-time options."""
         return self._get_postgis_func('postgis_full_version')
 
     def postgis_version_tuple(self):

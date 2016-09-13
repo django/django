@@ -604,7 +604,7 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         self.assertIn(_("Invalid password format or unknown hashing algorithm."), form.as_table())
 
     def test_bug_19133(self):
-        "The change form does not return the password value"
+        """The change form does not return the password value"""
         # Use the form to construct the POST data
         user = User.objects.get(username='testclient')
         form_for_data = UserChangeForm(instance=user)

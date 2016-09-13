@@ -20,7 +20,7 @@ GOOGLE_MAPS_URL = 'http://maps.google.com/maps?file=api&v=%s&key='
 
 
 class GoogleMap(object):
-    "A class for generating Google Maps JavaScript."
+    """A class for generating Google Maps JavaScript."""
 
     # String constants
     onunload = mark_safe('onunload="GUnload()"')  # Cleans up after Google Maps
@@ -121,44 +121,44 @@ class GoogleMap(object):
 
     @property
     def body(self):
-        "Returns HTML body tag for loading and unloading Google Maps javascript."
+        """Returns HTML body tag for loading and unloading Google Maps javascript."""
         return format_html('<body {} {}>', self.onload, self.onunload)
 
     @property
     def onload(self):
-        "Returns the `onload` HTML <body> attribute."
+        """Returns the `onload` HTML <body> attribute."""
         return format_html('onload="{}.{}_load()"', self.js_module, self.dom_id)
 
     @property
     def api_script(self):
-        "Returns the <script> tag for the Google Maps API javascript."
+        """Returns the <script> tag for the Google Maps API javascript."""
         return format_html('<script src="{}{}" type="text/javascript"></script>',
                            self.api_url, self.key)
 
     @property
     def js(self):
-        "Returns only the generated Google Maps JavaScript (no <script> tags)."
+        """Returns only the generated Google Maps JavaScript (no <script> tags)."""
         return self.render()
 
     @property
     def scripts(self):
-        "Returns all <script></script> tags required with Google Maps JavaScript."
+        """Returns all <script></script> tags required with Google Maps JavaScript."""
         return format_html('{}\n  <script type="text/javascript">\n//<![CDATA[\n{}//]]>\n  </script>',
                            self.api_script, mark_safe(self.js))
 
     @property
     def style(self):
-        "Returns additional CSS styling needed for Google Maps on IE."
+        """Returns additional CSS styling needed for Google Maps on IE."""
         return format_html('<style type="text/css">{}</style>', self.vml_css)
 
     @property
     def xhtml(self):
-        "Returns XHTML information needed for IE VML overlays."
+        """Returns XHTML information needed for IE VML overlays."""
         return format_html('<html xmlns="http://www.w3.org/1999/xhtml" {}>', self.xmlns)
 
     @property
     def icons(self):
-        "Returns a sequence of GIcon objects in this map."
+        """Returns a sequence of GIcon objects in this map."""
         return set(marker.icon for marker in self.markers if marker.icon)
 
 
@@ -229,7 +229,7 @@ class GoogleMapSet(GoogleMap):
 
     @property
     def onload(self):
-        "Returns the `onload` HTML <body> attribute."
+        """Returns the `onload` HTML <body> attribute."""
         # Overloaded to use the `load` function defined in the
         # `google-multi.js`, which calls the load routines for
         # each one of the individual maps in the set.
@@ -237,7 +237,7 @@ class GoogleMapSet(GoogleMap):
 
     @property
     def icons(self):
-        "Returns a sequence of all icons in each map of the set."
+        """Returns a sequence of all icons in each map of the set."""
         icons = set()
         for map in self.maps:
             icons |= map.icons

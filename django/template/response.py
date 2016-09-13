@@ -61,7 +61,7 @@ class SimpleTemplateResponse(HttpResponse):
         return obj_dict
 
     def resolve_template(self, template):
-        "Accepts a template object, path-to-template or list of paths"
+        """Accepts a template object, path-to-template or list of paths"""
         if isinstance(template, (list, tuple)):
             return select_template(template, using=self.using)
         elif isinstance(template, six.string_types):

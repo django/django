@@ -19,7 +19,7 @@ class RelatedGeoModelTest(TestCase):
     fixtures = ['initial']
 
     def test02_select_related(self):
-        "Testing `select_related` on geographic models (see #7126)."
+        """Testing `select_related` on geographic models (see #7126)."""
         qs1 = City.objects.order_by('id')
         qs2 = City.objects.order_by('id').select_related()
         qs3 = City.objects.order_by('id').select_related('location')
@@ -40,7 +40,7 @@ class RelatedGeoModelTest(TestCase):
 
     @skipUnlessDBFeature("has_transform_method")
     def test03_transform_related(self):
-        "Testing the `transform` GeoQuerySet method on related geographic models."
+        """Testing the `transform` GeoQuerySet method on related geographic models."""
         # All the transformations are to state plane coordinate systems using
         # US Survey Feet (thus a tolerance of 0 implies error w/in 1 survey foot).
         tol = 0
@@ -67,7 +67,7 @@ class RelatedGeoModelTest(TestCase):
 
     @skipUnlessDBFeature("supports_extent_aggr")
     def test_related_extent_aggregate(self):
-        "Testing the `Extent` aggregate on related geographic models."
+        """Testing the `Extent` aggregate on related geographic models."""
         # This combines the Extent and Union aggregates into one query
         aggs = City.objects.aggregate(Extent('location__point'))
 
@@ -100,7 +100,7 @@ class RelatedGeoModelTest(TestCase):
 
     @skipUnlessDBFeature("has_unionagg_method")
     def test_related_union_aggregate(self):
-        "Testing the `Union` aggregate on related geographic models."
+        """Testing the `Union` aggregate on related geographic models."""
         # This combines the Extent and Union aggregates into one query
         aggs = City.objects.aggregate(Union('location__point'))
 
@@ -133,12 +133,12 @@ class RelatedGeoModelTest(TestCase):
         self.assertSetEqual({p.ewkt for p in ref_u1}, {p.ewkt for p in u3})
 
     def test05_select_related_fk_to_subclass(self):
-        "Testing that calling select_related on a query over a model with an FK to a model subclass works"
+        """Testing that calling select_related on a query over a model with an FK to a model subclass works"""
         # Regression test for #9752.
         list(DirectoryEntry.objects.all().select_related())
 
     def test06_f_expressions(self):
-        "Testing F() expressions on GeometryFields."
+        """Testing F() expressions on GeometryFields."""
         # Constructing a dummy parcel border and getting the City instance for
         # assigning the FK.
         b1 = GEOSGeometry(
@@ -190,7 +190,7 @@ class RelatedGeoModelTest(TestCase):
             self.assertEqual('P1', qs[0].name)
 
     def test07_values(self):
-        "Testing values() and values_list() and GeoQuerySets."
+        """Testing values() and values_list() and GeoQuerySets."""
         gqs = Location.objects.all()
         gvqs = Location.objects.values()
         gvlqs = Location.objects.values_list()
@@ -207,19 +207,19 @@ class RelatedGeoModelTest(TestCase):
 
     @override_settings(USE_TZ=True)
     def test_07b_values(self):
-        "Testing values() and values_list() with aware datetime. See #21565."
+        """Testing values() and values_list() with aware datetime. See #21565."""
         Event.objects.create(name="foo", when=timezone.now())
         list(Event.objects.values_list('when'))
 
     def test08_defer_only(self):
-        "Testing defer() and only() on Geographic models."
+        """Testing defer() and only() on Geographic models."""
         qs = Location.objects.all()
         def_qs = Location.objects.defer('point')
         for loc, def_loc in zip(qs, def_qs):
             self.assertEqual(loc.point, def_loc.point)
 
     def test09_pk_relations(self):
-        "Ensuring correct primary key column is selected across relations. See #10757."
+        """Ensuring correct primary key column is selected across relations. See #10757."""
         # The expected ID values -- notice the last two location IDs
         # are out of order.  Dallas and Houston have location IDs that differ
         # from their PKs -- this is done to ensure that the related location
@@ -234,7 +234,7 @@ class RelatedGeoModelTest(TestCase):
     # TODO: fix on Oracle -- qs2 returns an empty result for an unknown reason
     @no_oracle
     def test10_combine(self):
-        "Testing the combination of two GeoQuerySets.  See #10807."
+        """Testing the combination of two GeoQuerySets.  See #10807."""
         buf1 = City.objects.get(name='Aurora').location.point.buffer(0.1)
         buf2 = City.objects.get(name='Kecksburg').location.point.buffer(0.1)
         qs1 = City.objects.filter(location__point__within=buf1)
@@ -250,7 +250,7 @@ class RelatedGeoModelTest(TestCase):
     #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
     @no_oracle
     def test12a_count(self):
-        "Testing `Count` aggregate on geo-fields."
+        """Testing `Count` aggregate on geo-fields."""
         # The City, 'Fort Worth' uses the same location as Dallas.
         dallas = City.objects.get(name='Dallas')
 
@@ -259,7 +259,7 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(2, loc.num_cities)
 
     def test12b_count(self):
-        "Testing `Count` aggregate on non geo-fields."
+        """Testing `Count` aggregate on non geo-fields."""
         # Should only be one author (Trevor Paglen) returned by this query, and
         # the annotation should have 3 for the number of books, see #11087.
         # Also testing with a values(), see #11489.
@@ -275,7 +275,7 @@ class RelatedGeoModelTest(TestCase):
     #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
     @no_oracle
     def test13c_count(self):
-        "Testing `Count` aggregate with `.values()`.  See #15305."
+        """Testing `Count` aggregate with `.values()`.  See #15305."""
         qs = Location.objects.filter(id=5).annotate(num_cities=Count('city')).values('id', 'point', 'num_cities')
         self.assertEqual(1, len(qs))
         self.assertEqual(2, qs[0]['num_cities'])
@@ -284,7 +284,7 @@ class RelatedGeoModelTest(TestCase):
     # TODO: The phantom model does appear on Oracle.
     @no_oracle
     def test13_select_related_null_fk(self):
-        "Testing `select_related` on a nullable ForeignKey."
+        """Testing `select_related` on a nullable ForeignKey."""
         Book.objects.create(title='Without Author')
         b = Book.objects.select_related('author').get(title='Without Author')
         # Should be `None`, and not a 'dummy' model.
@@ -311,7 +311,7 @@ class RelatedGeoModelTest(TestCase):
         self.assertTrue(ref_geom.equals(coll))
 
     def test15_invalid_select_related(self):
-        "Testing doing select_related on the related name manager of a unique FK. See #13934."
+        """Testing doing select_related on the related name manager of a unique FK. See #13934."""
         qs = Article.objects.select_related('author__article')
         # This triggers TypeError when `get_default_columns` has no `local_only`
         # keyword.  The TypeError is swallowed if QuerySet is actually
@@ -319,7 +319,7 @@ class RelatedGeoModelTest(TestCase):
         str(qs.query)
 
     def test16_annotated_date_queryset(self):
-        "Ensure annotated date querysets work if spatial backend is used.  See #14648."
+        """Ensure annotated date querysets work if spatial backend is used.  See #14648."""
         birth_years = [dt.year for dt in
                        list(Author.objects.annotate(num_books=Count('books')).dates('dob', 'year'))]
         birth_years.sort()

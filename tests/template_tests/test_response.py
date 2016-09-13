@@ -139,7 +139,7 @@ class SimpleTemplateResponseTest(SimpleTestCase):
         self.assertEqual(response.content, b'Jinja2\n')
 
     def test_post_callbacks(self):
-        "Rendering a template response triggers the post-render callbacks"
+        """Rendering a template response triggers the post-render callbacks"""
         post = []
 
         def post1(obj):

@@ -79,7 +79,7 @@ class GEOSMutationTest(unittest.TestCase):
     """
 
     def test00_GEOSIndexException(self):
-        'Testing Geometry IndexError'
+        """Testing Geometry IndexError"""
         p = Point(1, 2)
         for i in range(-2, 2):
             p._checkindex(i)
@@ -89,7 +89,7 @@ class GEOSMutationTest(unittest.TestCase):
             p._checkindex(-3)
 
     def test01_PointMutations(self):
-        'Testing Point mutations'
+        """Testing Point mutations"""
         for p in (Point(1, 2, 3), fromstr('POINT (1 2 3)')):
             self.assertEqual(p._get_single_external(1), 2.0, 'Point _get_single_external')
 
@@ -102,14 +102,14 @@ class GEOSMutationTest(unittest.TestCase):
             self.assertEqual(p.coords, (50.0, 3141.0), 'Point _set_list')
 
     def test02_PointExceptions(self):
-        'Testing Point exceptions'
+        """Testing Point exceptions"""
         with self.assertRaises(TypeError):
             Point(range(1))
         with self.assertRaises(TypeError):
             Point(range(4))
 
     def test03_PointApi(self):
-        'Testing Point API'
+        """Testing Point API"""
         q = Point(4, 5, 3)
         for p in (Point(1, 2, 3), fromstr('POINT (1 2 3)')):
             p[0:2] = [4, 5]
@@ -117,7 +117,7 @@ class GEOSMutationTest(unittest.TestCase):
                 self.assertEqual(f(q), f(p), 'Point ' + f.__name__)
 
     def test04_LineStringMutations(self):
-        'Testing LineString mutations'
+        """Testing LineString mutations"""
         for ls in (LineString((1, 0), (4, 1), (6, -1)),
                    fromstr('LINESTRING (1 0,4 1,6 -1)')):
             self.assertEqual(ls._get_single_external(1), (4.0, 1.0), 'LineString _get_single_external')
@@ -135,7 +135,7 @@ class GEOSMutationTest(unittest.TestCase):
                 self.assertEqual(f(lsa), f(ls), 'LineString ' + f.__name__)
 
     def test05_Polygon(self):
-        'Testing Polygon mutations'
+        """Testing Polygon mutations"""
         for pg in (Polygon(((1, 0), (4, 1), (6, -1), (8, 10), (1, 0)),
                            ((5, 4), (6, 4), (6, 3), (5, 4))),
                    fromstr('POLYGON ((1 0,4 1,6 -1,8 10,1 0),(5 4,6 4,6 3,5 4))')):
@@ -159,7 +159,7 @@ class GEOSMutationTest(unittest.TestCase):
                 self.assertEqual(f(lsa), f(pg), 'Polygon ' + f.__name__)
 
     def test06_Collection(self):
-        'Testing Collection mutations'
+        """Testing Collection mutations"""
         points = (
             MultiPoint(*map(Point, ((3, 4), (-1, 2), (5, -4), (2, 8)))),
             fromstr('MULTIPOINT (3 4,-1 2,5 -4,2 8)'),

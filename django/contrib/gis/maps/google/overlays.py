@@ -58,7 +58,7 @@ class GEvent(object):
         self.action = action
 
     def __str__(self):
-        "Returns the parameter part of a GEvent."
+        """Returns the parameter part of a GEvent."""
         return '"%s", %s' % (self.event, self.action)
 
 
@@ -69,15 +69,15 @@ class GOverlayBase(object):
         self.events = []
 
     def latlng_from_coords(self, coords):
-        "Generates a JavaScript array of GLatLng objects for the given coordinates."
+        """Generates a JavaScript array of GLatLng objects for the given coordinates."""
         return '[%s]' % ','.join('new GLatLng(%s,%s)' % (y, x) for x, y in coords)
 
     def add_event(self, event):
-        "Attaches a GEvent to the overlay object."
+        """Attaches a GEvent to the overlay object."""
         self.events.append(event)
 
     def __str__(self):
-        "The string representation is the JavaScript API call."
+        """The string representation is the JavaScript API call."""
         return '%s(%s)' % (self.__class__.__name__, self.js_params)
 
 

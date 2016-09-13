@@ -14,7 +14,7 @@ VERSION_RE = re.compile(r'\S+ (\d+)\.(\d+)\.?(\d+)?')
 
 
 def _parse_version(text):
-    "Internal parsing method. Factored out for testing purposes."
+    """Internal parsing method. Factored out for testing purposes."""
     major, major2, minor = VERSION_RE.search(text).groups()
     try:
         return int(major) * 10000 + int(major2) * 100 + int(minor)

@@ -2381,7 +2381,7 @@ class ModelOtherFieldTests(SimpleTestCase):
         self.assertEqual(f.errors, {'field': ['Enter only digits separated by commas.']})
 
     def test_url_on_modelform(self):
-        "Check basic URL field validation on model forms"
+        """Check basic URL field validation on model forms"""
         class HomepageForm(forms.ModelForm):
             class Meta:
                 model = Homepage

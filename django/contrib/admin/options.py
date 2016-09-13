@@ -478,7 +478,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
 
 @python_2_unicode_compatible
 class ModelAdmin(BaseModelAdmin):
-    "Encapsulates all admin options and functionality for a given model."
+    """Encapsulates all admin options and functionality for a given model."""
 
     list_display = ('__str__',)
     list_display_links = ()
@@ -1683,7 +1683,7 @@ class ModelAdmin(BaseModelAdmin):
     @csrf_protect_m
     @transaction.atomic
     def delete_view(self, request, object_id, extra_context=None):
-        "The 'delete' admin view for this model."
+        """The 'delete' admin view for this model."""
         opts = self.model._meta
         app_label = opts.app_label
 
@@ -1748,7 +1748,7 @@ class ModelAdmin(BaseModelAdmin):
         return self.render_delete_form(request, context)
 
     def history_view(self, request, object_id, extra_context=None):
-        "The 'history' admin view for this model."
+        """The 'history' admin view for this model."""
         from django.contrib.admin.models import LogEntry
         # First check if the user can see this history.
         model = self.model
@@ -1790,7 +1790,7 @@ class ModelAdmin(BaseModelAdmin):
         ], context)
 
     def _create_formsets(self, request, obj, change):
-        "Helper function to generate formsets for add/change_view."
+        """Helper function to generate formsets for add/change_view."""
         formsets = []
         inline_instances = []
         prefixes = {}

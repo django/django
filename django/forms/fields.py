@@ -226,7 +226,7 @@ class CharField(Field):
             self.validators.append(validators.MaxLengthValidator(int(max_length)))
 
     def to_python(self, value):
-        "Returns a Unicode object."
+        """Returns a Unicode object."""
         if value in self.empty_values:
             return self.empty_value
         value = force_text(value)
@@ -796,7 +796,7 @@ class ChoiceField(Field):
     choices = property(_get_choices, _set_choices)
 
     def to_python(self, value):
-        "Returns a Unicode object."
+        """Returns a Unicode object."""
         if value in self.empty_values:
             return ''
         return force_text(value)
@@ -814,7 +814,7 @@ class ChoiceField(Field):
             )
 
     def valid_value(self, value):
-        "Check to see if the provided value is a valid choice"
+        """Check to see if the provided value is a valid choice"""
         text_value = force_text(value)
         for k, v in self.choices:
             if isinstance(v, (list, tuple)):

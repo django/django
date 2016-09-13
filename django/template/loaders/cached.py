@@ -168,7 +168,7 @@ class Loader(BaseLoader):
         return self.template_cache[key]
 
     def reset(self):
-        "Empty the template cache."
+        """Empty the template cache."""
         self.template_cache.clear()
         self.find_template_cache.clear()  # RemovedInDjango20Warning
         self.get_template_cache.clear()

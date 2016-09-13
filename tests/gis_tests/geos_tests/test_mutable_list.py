@@ -75,7 +75,7 @@ class ListMixinTest(unittest.TestCase):
         return list(range(-1 - self.limit, 0)) + list(range(1, 1 + self.limit))
 
     def test01_getslice(self):
-        'Slice retrieval'
+        """Slice retrieval"""
         pl, ul = self.lists_of_len()
         for i in self.limits_plus(1):
             self.assertEqual(pl[i:], ul[i:], 'slice [%d:]' % (i))
@@ -94,7 +94,7 @@ class ListMixinTest(unittest.TestCase):
             self.assertEqual(pl[::k], ul[::k], 'slice [::%d]' % (k))
 
     def test02_setslice(self):
-        'Slice assignment'
+        """Slice assignment"""
         def setfcn(x, i, j, k, L):
             x[i:j:k] = range(L)
         pl, ul = self.lists_of_len()
@@ -152,7 +152,7 @@ class ListMixinTest(unittest.TestCase):
                 self.assertEqual(pl, ul[:], 'set slice [::%d]' % (k))
 
     def test03_delslice(self):
-        'Delete slice'
+        """Delete slice"""
         for Len in range(self.limit):
             pl, ul = self.lists_of_len(Len)
             del pl[:]
@@ -196,7 +196,7 @@ class ListMixinTest(unittest.TestCase):
                 self.assertEqual(pl[:], ul[:], 'del slice [::%d]' % (k))
 
     def test04_get_set_del_single(self):
-        'Get/set/delete single item'
+        """Get/set/delete single item"""
         pl, ul = self.lists_of_len()
         for i in self.limits_plus(0):
             self.assertEqual(pl[i], ul[i], 'get single item [%d]' % i)
@@ -214,7 +214,7 @@ class ListMixinTest(unittest.TestCase):
             self.assertEqual(pl[:], ul[:], 'del single item [%d]' % i)
 
     def test05_out_of_range_exceptions(self):
-        'Out of range exceptions'
+        """Out of range exceptions"""
         def setfcn(x, i):
             x[i] = 20
 
@@ -233,7 +233,7 @@ class ListMixinTest(unittest.TestCase):
                 delfcn(ul, i)
 
     def test06_list_methods(self):
-        'List methods'
+        """List methods"""
         pl, ul = self.lists_of_len()
         pl.append(40)
         ul.append(40)
@@ -295,7 +295,7 @@ class ListMixinTest(unittest.TestCase):
             removefcn(ul, 40)
 
     def test07_allowed_types(self):
-        'Type-restricted list'
+        """Type-restricted list"""
         pl, ul = self.lists_of_len()
         ul._allowed = six.integer_types
         ul[1] = 50
@@ -309,7 +309,7 @@ class ListMixinTest(unittest.TestCase):
             setfcn(ul, slice(0, 3, 2), ('hello', 'goodbye'))
 
     def test08_min_length(self):
-        'Length limits'
+        """Length limits"""
         pl, ul = self.lists_of_len(5)
         ul._minlength = 3
 
@@ -332,7 +332,7 @@ class ListMixinTest(unittest.TestCase):
             ul.append(10)
 
     def test09_iterable_check(self):
-        'Error on assigning non-iterable to slice'
+        """Error on assigning non-iterable to slice"""
         pl, ul = self.lists_of_len(self.limit + 1)
 
         def setfcn(x, i, v):
@@ -341,7 +341,7 @@ class ListMixinTest(unittest.TestCase):
             setfcn(ul, slice(0, 3, 2), 2)
 
     def test10_checkindex(self):
-        'Index check'
+        """Index check"""
         pl, ul = self.lists_of_len()
         for i in self.limits_plus(0):
             if i < 0:
@@ -354,7 +354,7 @@ class ListMixinTest(unittest.TestCase):
                 ul._checkindex(i)
 
     def test_11_sorting(self):
-        'Sorting'
+        """Sorting"""
         pl, ul = self.lists_of_len()
         pl.insert(0, pl.pop())
         ul.insert(0, ul.pop())
@@ -377,7 +377,7 @@ class ListMixinTest(unittest.TestCase):
         self.assertEqual(pl[:], ul[:], 'sort w/ key')
 
     def test_12_arithmetic(self):
-        'Arithmetic'
+        """Arithmetic"""
         pl, ul = self.lists_of_len()
         al = list(range(10, 14))
         self.assertEqual(list(pl + al), list(ul + al), 'add')

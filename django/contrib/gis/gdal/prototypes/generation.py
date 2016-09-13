@@ -16,7 +16,7 @@ class gdal_char_p(c_char_p):
 
 
 def double_output(func, argtypes, errcheck=False, strarg=False, cpl=False):
-    "Generates a ctypes function that returns a double value."
+    """Generates a ctypes function that returns a double value."""
     func.argtypes = argtypes
     func.restype = c_double
     if errcheck:
@@ -50,14 +50,14 @@ def geom_output(func, argtypes, offset=None):
 
 
 def int_output(func, argtypes):
-    "Generates a ctypes function that returns an integer value."
+    """Generates a ctypes function that returns an integer value."""
     func.argtypes = argtypes
     func.restype = c_int
     return func
 
 
 def int64_output(func, argtypes):
-    "Generates a ctypes function that returns a 64-bit integer value."
+    """Generates a ctypes function that returns a 64-bit integer value."""
     func.argtypes = argtypes
     func.restype = c_int64
     return func
@@ -139,7 +139,7 @@ def void_output(func, argtypes, errcheck=True, cpl=False):
 
 
 def voidptr_output(func, argtypes, errcheck=True):
-    "For functions that return c_void_p."
+    """For functions that return c_void_p."""
     func.argtypes = argtypes
     func.restype = c_void_p
     if errcheck:

@@ -22,7 +22,7 @@ class DefaultLoader(unittest.TestCase):
         sys.meta_path.pop(0)
 
     def test_loader(self):
-        "Normal module existence can be tested"
+        """Normal module existence can be tested"""
         test_module = import_module('utils_tests.test_module')
         test_no_submodule = import_module(
             'utils_tests.test_no_submodule')
@@ -73,7 +73,7 @@ class EggLoader(unittest.TestCase):
         sys.modules.pop('egg_module', None)
 
     def test_shallow_loader(self):
-        "Module existence can be tested inside eggs"
+        """Module existence can be tested inside eggs"""
         egg_name = '%s/test_egg.egg' % self.egg_dir
         with extend_sys_path(egg_name):
             egg_module = import_module('egg_module')
@@ -94,7 +94,7 @@ class EggLoader(unittest.TestCase):
                 import_module('egg_module.no_such_module')
 
     def test_deep_loader(self):
-        "Modules deep inside an egg can still be tested for existence"
+        """Modules deep inside an egg can still be tested for existence"""
         egg_name = '%s/test_egg.egg' % self.egg_dir
         with extend_sys_path(egg_name):
             egg_module = import_module('egg_module.sub1.sub2')

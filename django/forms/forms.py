@@ -139,7 +139,7 @@ class BaseForm(object):
             yield self[name]
 
     def __getitem__(self, name):
-        "Returns a BoundField with the given name."
+        """Returns a BoundField with the given name."""
         try:
             field = self.fields[name]
         except KeyError:
@@ -156,7 +156,7 @@ class BaseForm(object):
 
     @property
     def errors(self):
-        "Returns an ErrorDict for the data provided for the form"
+        """Returns an ErrorDict for the data provided for the form"""
         if self._errors is None:
             self.full_clean()
         return self._errors
@@ -184,7 +184,7 @@ class BaseForm(object):
         return 'initial-%s' % self.add_prefix(field_name)
 
     def _html_output(self, normal_row, error_row, row_ender, help_text_html, errors_on_separate_row):
-        "Helper function for outputting HTML. Used by as_table(), as_ul(), as_p()."
+        """Helper function for outputting HTML. Used by as_table(), as_ul(), as_p()."""
         top_errors = self.non_field_errors()  # Errors that should be displayed above all fields.
         output, hidden_fields = [], []
 
@@ -262,7 +262,7 @@ class BaseForm(object):
         return mark_safe('\n'.join(output))
 
     def as_table(self):
-        "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
+        """Returns this form rendered as HTML <tr>s -- excluding the <table></table>."""
         return self._html_output(
             normal_row='<tr%(html_class_attr)s><th>%(label)s</th><td>%(errors)s%(field)s%(help_text)s</td></tr>',
             error_row='<tr><td colspan="2">%s</td></tr>',
@@ -271,7 +271,7 @@ class BaseForm(object):
             errors_on_separate_row=False)
 
     def as_ul(self):
-        "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
+        """Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."""
         return self._html_output(
             normal_row='<li%(html_class_attr)s>%(errors)s%(label)s %(field)s%(help_text)s</li>',
             error_row='<li>%s</li>',
@@ -280,7 +280,7 @@ class BaseForm(object):
             errors_on_separate_row=False)
 
     def as_p(self):
-        "Returns this form rendered as HTML <p>s."
+        """Returns this form rendered as HTML <p>s."""
         return self._html_output(
             normal_row='<p%(html_class_attr)s>%(label)s %(field)s%(help_text)s</p>',
             error_row='%s',
@@ -494,7 +494,7 @@ class BaseForm(object):
 
 
 class Form(six.with_metaclass(DeclarativeFieldsMetaclass, BaseForm)):
-    "A collection of Fields, plus their associated data."
+    """A collection of Fields, plus their associated data."""
     # This is a separate class from BaseForm in order to abstract the way
     # self.fields is specified. This class (Form) is the one that does the
     # fancy metaclass stuff purely for the semantic sugar -- it allows one

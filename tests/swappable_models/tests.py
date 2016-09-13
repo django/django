@@ -19,7 +19,7 @@ class SwappableModelTests(TestCase):
 
     @override_settings(TEST_ARTICLE_MODEL='swappable_models.AlternateArticle')
     def test_generated_data(self):
-        "Permissions and content types are not created for a swapped model"
+        """Permissions and content types are not created for a swapped model"""
 
         # Delete all permissions and content_types
         Permission.objects.filter(content_type__app_label='swappable_models').delete()
@@ -43,6 +43,6 @@ class SwappableModelTests(TestCase):
 
     @override_settings(TEST_ARTICLE_MODEL='swappable_models.article')
     def test_case_insensitive(self):
-        "Model names are case insensitive. Check that model swapping honors this."
+        """Model names are case insensitive. Check that model swapping honors this."""
         Article.objects.all()
         self.assertIsNone(Article._meta.swapped)

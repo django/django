@@ -281,7 +281,7 @@ class FileField(Field):
         return "FileField"
 
     def get_prep_value(self, value):
-        "Returns field's value prepared for saving into a database."
+        """Returns field's value prepared for saving into a database."""
         value = super(FileField, self).get_prep_value(value)
         # Need to convert File objects provided via a form to unicode for database insertion
         if value is None:
@@ -289,7 +289,7 @@ class FileField(Field):
         return six.text_type(value)
 
     def pre_save(self, model_instance, add):
-        "Returns field's value just before saving."
+        """Returns field's value just before saving."""
         file = super(FileField, self).pre_save(model_instance, add)
         if file and not file._committed:
             # Commit the file to storage prior to saving the model

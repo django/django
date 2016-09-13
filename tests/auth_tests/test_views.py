@@ -93,7 +93,7 @@ class AuthViewsTestCase(TestCase):
 class AuthViewNamedURLTests(AuthViewsTestCase):
 
     def test_named_urls(self):
-        "Named URLs should be reversible"
+        """Named URLs should be reversible"""
         expected_named_urls = [
             ('login', [], {}),
             ('logout', [], {}),
@@ -126,7 +126,7 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     def test_email_found(self):
-        "Email is sent if a valid email address is provided for password reset"
+        """Email is sent if a valid email address is provided for password reset"""
         response = self.client.post('/password_reset/', {'email': 'staffmember@example.com'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
@@ -165,7 +165,10 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertIn('<html>', message.get_payload(1).get_payload())
 
     def test_email_found_custom_from(self):
-        "Email is sent if a valid email address is provided for password reset when a custom from_email is provided."
+        """
+        Email is sent if a valid email address is provided for password reset when a
+        custom from_email is provided.
+        """
         response = self.client.post('/password_reset_from_email/', {'email': 'staffmember@example.com'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
@@ -174,7 +177,7 @@ class PasswordResetTest(AuthViewsTestCase):
     # Skip any 500 handler action (like sending more mail...)
     @override_settings(DEBUG_PROPAGATE_EXCEPTIONS=True)
     def test_poisoned_http_host(self):
-        "Poisoned HTTP_HOST headers can't be used for reset emails"
+        """Poisoned HTTP_HOST headers can't be used for reset emails"""
         # This attack is based on the way browsers handle URLs. The colon
         # should be used to separate the port, but if the URL contains an @,
         # the colon is interpreted as part of a username for login purposes,
@@ -195,7 +198,7 @@ class PasswordResetTest(AuthViewsTestCase):
     # Skip any 500 handler action (like sending more mail...)
     @override_settings(DEBUG_PROPAGATE_EXCEPTIONS=True)
     def test_poisoned_http_host_admin_site(self):
-        "Poisoned HTTP_HOST headers can't be used for reset emails on admin views"
+        """Poisoned HTTP_HOST headers can't be used for reset emails on admin views"""
         with patch_logger('django.security.DisallowedHost', 'error') as logger_calls:
             response = self.client.post(
                 '/admin_password_reset/',
@@ -860,7 +863,7 @@ class LogoutTest(AuthViewsTestCase):
         self.assertNotIn(SESSION_KEY, self.client.session)
 
     def test_logout_default(self):
-        "Logout without next_page option renders the default template"
+        """Logout without next_page option renders the default template"""
         self.login()
         response = self.client.get('/logout/')
         self.assertContains(response, 'Logged out')
@@ -894,7 +897,7 @@ class LogoutTest(AuthViewsTestCase):
         self.confirm_logged_out()
 
     def test_logout_with_next_page_specified(self):
-        "Logout with next_page option given redirects to specified resource"
+        """Logout with next_page option given redirects to specified resource"""
         self.login()
         response = self.client.get('/logout/next_page/')
         self.assertEqual(response.status_code, 302)
@@ -902,7 +905,7 @@ class LogoutTest(AuthViewsTestCase):
         self.confirm_logged_out()
 
     def test_logout_with_redirect_argument(self):
-        "Logout with query string redirects to specified resource"
+        """Logout with query string redirects to specified resource"""
         self.login()
         response = self.client.get('/logout/?next=/login/')
         self.assertEqual(response.status_code, 302)
@@ -910,7 +913,7 @@ class LogoutTest(AuthViewsTestCase):
         self.confirm_logged_out()
 
     def test_logout_with_custom_redirect_argument(self):
-        "Logout with custom query string redirects to specified resource"
+        """Logout with custom query string redirects to specified resource"""
         self.login()
         response = self.client.get('/logout/custom_query/?follow=/somewhere/')
         self.assertEqual(response.status_code, 302)
@@ -918,7 +921,7 @@ class LogoutTest(AuthViewsTestCase):
         self.confirm_logged_out()
 
     def test_logout_with_named_redirect(self):
-        "Logout resolves names or URLs passed as next_page."
+        """Logout resolves names or URLs passed as next_page."""
         self.login()
         response = self.client.get('/logout/next_page/named/')
         self.assertEqual(response.status_code, 302)

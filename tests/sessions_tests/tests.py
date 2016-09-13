@@ -391,7 +391,7 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         return self.backend.get_model_class()
 
     def test_session_str(self):
-        "Session repr should be the session key."
+        """Session repr should be the session key."""
         self.session['x'] = 1
         self.session.save()
 

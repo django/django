@@ -12,7 +12,7 @@ from django.utils.encoding import force_str
 class TestSigner(SimpleTestCase):
 
     def test_signature(self):
-        "signature() method should generate a signature"
+        """signature() method should generate a signature"""
         signer = signing.Signer('predictable-secret')
         signer2 = signing.Signer('predictable-secret2')
         for s in (
@@ -27,7 +27,7 @@ class TestSigner(SimpleTestCase):
             self.assertNotEqual(signer.signature(s), signer2.signature(s))
 
     def test_signature_with_salt(self):
-        "signature(value, salt=...) should work"
+        """signature(value, salt=...) should work"""
         signer = signing.Signer('predictable-secret', salt='extra-salt')
         self.assertEqual(
             signer.signature('hello'),
@@ -38,7 +38,7 @@ class TestSigner(SimpleTestCase):
             signing.Signer('predictable-secret', salt='two').signature('hello'))
 
     def test_sign_unsign(self):
-        "sign/unsign should be reversible"
+        """sign/unsign should be reversible"""
         signer = signing.Signer('predictable-secret')
         examples = [
             'q;wjmbk;wkmb',
@@ -56,7 +56,7 @@ class TestSigner(SimpleTestCase):
             self.assertEqual(example, signer.unsign(signed))
 
     def test_unsign_detects_tampering(self):
-        "unsign should raise an exception if the value has been tampered with"
+        """unsign should raise an exception if the value has been tampered with"""
         signer = signing.Signer('predictable-secret')
         value = 'Another string'
         signed_value = signer.sign(value)
@@ -72,7 +72,7 @@ class TestSigner(SimpleTestCase):
                 signer.unsign(transform(signed_value))
 
     def test_dumps_loads(self):
-        "dumps and loads be reversible for any JSON serializable object"
+        """dumps and loads be reversible for any JSON serializable object"""
         objects = [
             ['a', 'list'],
             'a unicode string \u2019',
@@ -87,7 +87,7 @@ class TestSigner(SimpleTestCase):
             self.assertEqual(o, signing.loads(signing.dumps(o, compress=True)))
 
     def test_decode_detects_tampering(self):
-        "loads should raise exception for tampered objects"
+        """loads should raise exception for tampered objects"""
         transforms = (
             lambda s: s.upper(),
             lambda s: s + 'a',

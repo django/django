@@ -451,7 +451,7 @@ class GISFunctionsTests(TestCase):
         "has_Difference_function", "has_Intersection_function",
         "has_SymDifference_function", "has_Union_function")
     def test_diff_intersection_union(self):
-        "Testing the `difference`, `intersection`, `sym_difference`, and `union` GeoQuerySet methods."
+        """Testing the `difference`, `intersection`, `sym_difference`, and `union` GeoQuerySet methods."""
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.all().annotate(
             difference=functions.Difference('mpoly', geom),

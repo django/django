@@ -14,12 +14,12 @@ from django.utils import six
 # Helper routines for retrieving pointers and/or values from
 # arguments passed in by reference.
 def arg_byref(args, offset=-1):
-    "Returns the pointer argument's by-reference value."
+    """Returns the pointer argument's by-reference value."""
     return args[offset]._obj.value
 
 
 def ptr_byref(args, offset=-1):
-    "Returns the pointer argument passed in by-reference."
+    """Returns the pointer argument passed in by-reference."""
     return args[offset]._obj
 
 
@@ -69,14 +69,14 @@ def check_string(result, func, cargs, offset=-1, str_result=False):
 
 # ### Envelope checking ###
 def check_envelope(result, func, cargs, offset=-1):
-    "Checks a function that returns an OGR Envelope by reference."
+    """Checks a function that returns an OGR Envelope by reference."""
     env = ptr_byref(cargs, offset)
     return env
 
 
 # ### Geometry error-checking routines ###
 def check_geom(result, func, cargs):
-    "Checks a function that returns a geometry."
+    """Checks a function that returns a geometry."""
     # OGR_G_Clone may return an integer, even though the
     # restype is set to c_void_p
     if isinstance(result, six.integer_types):
@@ -87,7 +87,7 @@ def check_geom(result, func, cargs):
 
 
 def check_geom_offset(result, func, cargs, offset=-1):
-    "Chcks the geometry at the given offset in the C parameter list."
+    """Chcks the geometry at the given offset in the C parameter list."""
     check_err(result)
     geom = ptr_byref(cargs, offset=offset)
     return check_geom(geom, func, cargs)
@@ -120,7 +120,7 @@ def check_errcode(result, func, cargs, cpl=False):
 
 
 def check_pointer(result, func, cargs):
-    "Makes sure the result pointer is valid."
+    """Makes sure the result pointer is valid."""
     if isinstance(result, six.integer_types):
         result = c_void_p(result)
     if result:

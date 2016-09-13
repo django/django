@@ -27,14 +27,14 @@ class GeoModelTest(TestCase):
     fixtures = ['initial']
 
     def test_fixtures(self):
-        "Testing geographic model initialization from fixtures."
+        """Testing geographic model initialization from fixtures."""
         # Ensuring that data was loaded from initial data fixtures.
         self.assertEqual(2, Country.objects.count())
         self.assertEqual(8, City.objects.count())
         self.assertEqual(2, State.objects.count())
 
     def test_proxy(self):
-        "Testing Lazy-Geometry support (using the GeometryProxy)."
+        """Testing Lazy-Geometry support (using the GeometryProxy)."""
         # Testing on a Point
         pnt = Point(0, 0)
         nullcity = City(name='NullCity', point=pnt)
@@ -99,7 +99,7 @@ class GeoModelTest(TestCase):
 
     @skipUnlessDBFeature("supports_transform")
     def test_lookup_insert_transform(self):
-        "Testing automatic transform for lookups and inserts."
+        """Testing automatic transform for lookups and inserts."""
         # San Antonio in 'WGS84' (SRID 4326)
         sa_4326 = 'POINT (-98.493183 29.424170)'
         wgs_pnt = fromstr(sa_4326, srid=4326)  # Our reference point in WGS84
@@ -145,12 +145,12 @@ class GeoModelTest(TestCase):
         self.assertEqual(-1, m1.geom.srid)
 
     def test_createnull(self):
-        "Testing creating a model instance and the geometry being None"
+        """Testing creating a model instance and the geometry being None"""
         c = City()
         self.assertIsNone(c.point)
 
     def test_geometryfield(self):
-        "Testing the general GeometryField."
+        """Testing the general GeometryField."""
         Feature(name='Point', geom=Point(1, 1)).save()
         Feature(name='LineString', geom=LineString((0, 0), (1, 1), (5, 5))).save()
         Feature(name='Polygon', geom=Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0)))).save()
@@ -173,7 +173,7 @@ class GeoModelTest(TestCase):
 
     @skipUnlessDBFeature("supports_transform")
     def test_inherited_geofields(self):
-        "Test GeoQuerySet methods on inherited Geometry fields."
+        """Test GeoQuerySet methods on inherited Geometry fields."""
         # Creating a Pennsylvanian city.
         PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)')
 
@@ -186,7 +186,7 @@ class GeoModelTest(TestCase):
             self.assertEqual(32128, pc.point.srid)
 
     def test_raw_sql_query(self):
-        "Testing raw SQL query."
+        """Testing raw SQL query."""
         cities1 = City.objects.all()
         # Only PostGIS would support a 'select *' query because of its recognized
         # HEXEWKB format for geometry fields
@@ -221,7 +221,7 @@ class GeoLookupTest(TestCase):
     fixtures = ['initial']
 
     def test_disjoint_lookup(self):
-        "Testing the `disjoint` lookup type."
+        """Testing the `disjoint` lookup type."""
         ptown = City.objects.get(name='Pueblo')
         qs1 = City.objects.filter(point__disjoint=ptown.point)
         self.assertEqual(7, qs1.count())
@@ -232,7 +232,7 @@ class GeoLookupTest(TestCase):
             self.assertEqual('Kansas', qs2[0].name)
 
     def test_contains_contained_lookups(self):
-        "Testing the 'contained', 'contains', and 'bbcontains' lookup types."
+        """Testing the 'contained', 'contains', and 'bbcontains' lookup types."""
         # Getting Texas, yes we were a country -- once ;)
         texas = Country.objects.get(name='Texas')
 
@@ -300,7 +300,7 @@ class GeoLookupTest(TestCase):
 
     @skipUnlessDBFeature("supports_left_right_lookups")
     def test_left_right_lookups(self):
-        "Testing the 'left' and 'right' lookup types."
+        """Testing the 'left' and 'right' lookup types."""
         # Left: A << B => true if xmax(A) < xmin(B)
         # Right: A >> B => true if xmin(A) > xmax(B)
         # See: BOX2D_left() and BOX2D_right() in lwgeom_box2dfloat4.c in PostGIS source.
@@ -353,7 +353,7 @@ class GeoLookupTest(TestCase):
         )
 
     def test_equals_lookups(self):
-        "Testing the 'same_as' and 'equals' lookup types."
+        """Testing the 'same_as' and 'equals' lookup types."""
         pnt = fromstr('POINT (-95.363151 29.763374)', srid=4326)
         c1 = City.objects.get(point=pnt)
         c2 = City.objects.get(point__same_as=pnt)
@@ -363,7 +363,7 @@ class GeoLookupTest(TestCase):
 
     @skipUnlessDBFeature("supports_null_geometries")
     def test_null_geometries(self):
-        "Testing NULL geometry support, and the `isnull` lookup type."
+        """Testing NULL geometry support, and the `isnull` lookup type."""
         # Creating a state with a NULL boundary.
         State.objects.create(name='Puerto Rico')
 
@@ -393,7 +393,7 @@ class GeoLookupTest(TestCase):
 
     @skipUnlessDBFeature("supports_relate_lookup")
     def test_relate_lookup(self):
-        "Testing the 'relate' lookup type."
+        """Testing the 'relate' lookup type."""
         # To make things more interesting, we will have our Texas reference point in
         # different SRIDs.
         pnt1 = fromstr('POINT (649287.0363174 4177429.4494686)', srid=2847)
@@ -446,7 +446,7 @@ class GeoQuerySetTest(TestCase):
 
     @skipUnlessDBFeature("has_centroid_method")
     def test_centroid(self):
-        "Testing the `centroid` GeoQuerySet method."
+        """Testing the `centroid` GeoQuerySet method."""
         qs = State.objects.exclude(poly__isnull=True).centroid()
         if oracle:
             tol = 0.1
@@ -461,7 +461,7 @@ class GeoQuerySetTest(TestCase):
         "has_difference_method", "has_intersection_method",
         "has_sym_difference_method", "has_union_method")
     def test_diff_intersection_union(self):
-        "Testing the `difference`, `intersection`, `sym_difference`, and `union` GeoQuerySet methods."
+        """Testing the `difference`, `intersection`, `sym_difference`, and `union` GeoQuerySet methods."""
         geom = Point(5, 23)
         qs = Country.objects.all().difference(geom).sym_difference(geom).union(geom)
 
@@ -490,7 +490,7 @@ class GeoQuerySetTest(TestCase):
 
     @skipUnlessDBFeature("has_envelope_method")
     def test_envelope(self):
-        "Testing the `envelope` GeoQuerySet method."
+        """Testing the `envelope` GeoQuerySet method."""
         countries = Country.objects.all().envelope()
         for country in countries:
             self.assertIsInstance(country.envelope, Polygon)
@@ -522,7 +522,7 @@ class GeoQuerySetTest(TestCase):
 
     @skipUnlessDBFeature("has_force_rhr_method")
     def test_force_rhr(self):
-        "Testing GeoQuerySet.force_rhr()."
+        """Testing GeoQuerySet.force_rhr()."""
         rings = (
             ((0, 0), (5, 0), (0, 5), (0, 0)),
             ((1, 1), (1, 3), (3, 1), (1, 1)),
@@ -537,7 +537,7 @@ class GeoQuerySetTest(TestCase):
 
     @skipUnlessDBFeature("has_geohash_method")
     def test_geohash(self):
-        "Testing GeoQuerySet.geohash()."
+        """Testing GeoQuerySet.geohash()."""
         # Reference query:
         # SELECT ST_GeoHash(point) FROM geoapp_city WHERE name='Houston';
         # SELECT ST_GeoHash(point, 5) FROM geoapp_city WHERE name='Houston';
@@ -548,7 +548,7 @@ class GeoQuerySetTest(TestCase):
         self.assertEqual(ref_hash[:5], h2.geohash)
 
     def test_geojson(self):
-        "Testing GeoJSON output from the database using GeoQuerySet.geojson()."
+        """Testing GeoJSON output from the database using GeoQuerySet.geojson()."""
         # Only PostGIS and SpatiaLite support GeoJSON.
         if not connection.ops.geojson:
             with self.assertRaises(NotImplementedError):
@@ -603,7 +603,7 @@ class GeoQuerySetTest(TestCase):
 
     @skipUnlessDBFeature("has_gml_method")
     def test_gml(self):
-        "Testing GML output from the database using GeoQuerySet.gml()."
+        """Testing GML output from the database using GeoQuerySet.gml()."""
         # Should throw a TypeError when trying to obtain GML from a
         # non-geometry field.
         qs = City.objects.all()
@@ -633,7 +633,7 @@ class GeoQuerySetTest(TestCase):
 
     @skipUnlessDBFeature("has_kml_method")
     def test_kml(self):
-        "Testing KML output from the database using GeoQuerySet.kml()."
+        """Testing KML output from the database using GeoQuerySet.kml()."""
         # Should throw a TypeError when trying to obtain KML from a
         #  non-geometry field.
         qs = City.objects.all()
@@ -675,7 +675,7 @@ class GeoQuerySetTest(TestCase):
 
     @skipUnlessDBFeature("has_num_geom_method")
     def test_num_geom(self):
-        "Testing the `num_geom` GeoQuerySet method."
+        """Testing the `num_geom` GeoQuerySet method."""
         # Both 'countries' only have two geometries.
         for c in Country.objects.num_geom():
             self.assertEqual(2, c.num_geom)
@@ -687,7 +687,7 @@ class GeoQuerySetTest(TestCase):
 
     @skipUnlessDBFeature("supports_num_points_poly")
     def test_num_points(self):
-        "Testing the `num_points` GeoQuerySet method."
+        """Testing the `num_points` GeoQuerySet method."""
         for c in Country.objects.num_points():
             self.assertEqual(c.mpoly.num_points, c.num_points)
 
@@ -698,7 +698,7 @@ class GeoQuerySetTest(TestCase):
 
     @skipUnlessDBFeature("has_point_on_surface_method")
     def test_point_on_surface(self):
-        "Testing the `point_on_surface` GeoQuerySet method."
+        """Testing the `point_on_surface` GeoQuerySet method."""
         # Reference values.
         if oracle:
             # SELECT SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOM.SDO_POINTONSURFACE(GEOAPP_COUNTRY.MPOLY, 0.05))
@@ -724,7 +724,7 @@ class GeoQuerySetTest(TestCase):
 
     @skipUnlessDBFeature("has_reverse_method")
     def test_reverse_geom(self):
-        "Testing GeoQuerySet.reverse_geom()."
+        """Testing GeoQuerySet.reverse_geom()."""
         coords = [(-95.363151, 29.763374), (-95.448601, 29.713803)]
         Track.objects.create(name='Foo', line=LineString(coords))
         t = Track.objects.reverse_geom().get(name='Foo')
@@ -736,7 +736,7 @@ class GeoQuerySetTest(TestCase):
 
     @skipUnlessDBFeature("has_scale_method")
     def test_scale(self):
-        "Testing the `scale` GeoQuerySet method."
+        """Testing the `scale` GeoQuerySet method."""
         xfac, yfac = 2, 3
         tol = 5  # XXX The low precision tolerance is for SpatiaLite
         qs = Country.objects.scale(xfac, yfac, model_att='scaled')
@@ -749,7 +749,7 @@ class GeoQuerySetTest(TestCase):
 
     @skipUnlessDBFeature("has_snap_to_grid_method")
     def test_snap_to_grid(self):
-        "Testing GeoQuerySet.snap_to_grid()."
+        """Testing GeoQuerySet.snap_to_grid()."""
         # Let's try and break snap_to_grid() with bad combinations of arguments.
         for bad_args in ((), range(3), range(5)):
             with self.assertRaises(ValueError):
@@ -800,7 +800,7 @@ class GeoQuerySetTest(TestCase):
 
     @skipUnlessDBFeature("has_svg_method")
     def test_svg(self):
-        "Testing SVG output using GeoQuerySet.svg()."
+        """Testing SVG output using GeoQuerySet.svg()."""
 
         with self.assertRaises(TypeError):
             City.objects.svg(precision='foo')
@@ -814,7 +814,7 @@ class GeoQuerySetTest(TestCase):
 
     @skipUnlessDBFeature("has_transform_method")
     def test_transform(self):
-        "Testing the transform() GeoQuerySet method."
+        """Testing the transform() GeoQuerySet method."""
         # Pre-transformed points for Houston and Pueblo.
         htown = fromstr('POINT(1947516.83115183 6322297.06040572)', srid=3084)
         ptown = fromstr('POINT(992363.390841912 481455.395105533)', srid=2774)
@@ -837,7 +837,7 @@ class GeoQuerySetTest(TestCase):
 
     @skipUnlessDBFeature("has_translate_method")
     def test_translate(self):
-        "Testing the `translate` GeoQuerySet method."
+        """Testing the `translate` GeoQuerySet method."""
         xfac, yfac = 5, -23
         qs = Country.objects.translate(xfac, yfac, model_att='translated')
         for c in qs:

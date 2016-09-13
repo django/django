@@ -1008,7 +1008,7 @@ class QuerySet(object):
 
     @property
     def db(self):
-        "Return the database that will be used if this query is executed now"
+        """Return the database that will be used if this query is executed now"""
         if self._for_write:
             return self._db or router.db_for_write(self.model, **self._hints)
         return self._db or router.db_for_read(self.model, **self._hints)
@@ -1263,7 +1263,7 @@ class RawQuerySet(object):
 
     @property
     def db(self):
-        "Return the database that will be used if this query is executed now"
+        """Return the database that will be used if this query is executed now"""
         return self._db or router.db_for_read(self.model, **self._hints)
 
     def using(self, alias):

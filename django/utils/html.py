@@ -197,7 +197,7 @@ def strip_spaces_between_tags(value):
 
 
 def smart_urlquote(url):
-    "Quotes a URL if it isn't already quoted."
+    """Quotes a URL if it isn't already quoted."""
     def unquote_quote(segment):
         segment = unquote(force_str(segment))
         # Tilde is part of RFC3986 Unreserved Characters

@@ -75,12 +75,12 @@ _version_info.restype = c_char_p
 
 
 def gdal_version():
-    "Returns only the GDAL version number information."
+    """Returns only the GDAL version number information."""
     return _version_info(b'RELEASE_NAME')
 
 
 def gdal_full_version():
-    "Returns the full GDAL version information."
+    """Returns the full GDAL version information."""
     return _version_info('')
 
 version_regex = re.compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<subminor>\d+))?')

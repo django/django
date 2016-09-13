@@ -92,7 +92,7 @@ class BaseDatabaseIntrospection(object):
         return tables
 
     def installed_models(self, tables):
-        "Returns a set of all models represented by the provided list of table names."
+        """Returns a set of all models represented by the provided list of table names."""
         from django.apps import apps
         from django.db import router
         all_models = []
@@ -105,7 +105,7 @@ class BaseDatabaseIntrospection(object):
         }
 
     def sequence_list(self):
-        "Returns a list of information about all DB sequences for all models in all apps."
+        """Returns a list of information about all DB sequences for all models in all apps."""
         from django.apps import apps
         from django.db import models, router
 

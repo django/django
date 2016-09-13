@@ -126,7 +126,7 @@ CONTEXT_PTR = POINTER(GEOSContextHandle_t)
 # Used specifically by the GEOSGeom_createPolygon and GEOSGeom_createCollection
 #  GEOS routines
 def get_pointer_arr(n):
-    "Gets a ctypes pointer array (of length `n`) for GEOSGeom_t opaque pointer."
+    """Gets a ctypes pointer array (of length `n`) for GEOSGeom_t opaque pointer."""
     GeomArr = GEOM_PTR * n
     return GeomArr()
 

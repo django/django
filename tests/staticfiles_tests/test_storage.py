@@ -126,7 +126,7 @@ class TestHashedFiles(object):
             self.assertIn(b"../cached/styles.bb84a0240107.css", content)
 
     def test_import_replacement(self):
-        "See #18050"
+        """See #18050"""
         relpath = self.hashed_file_path("cached/import.css")
         self.assertEqual(relpath, "cached/import.2b1d40b0bbd4.css")
         with storage.staticfiles_storage.open(relpath) as relfile:

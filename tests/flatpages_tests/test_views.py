@@ -55,17 +55,17 @@ class TestDataMixin(object):
 class FlatpageViewTests(TestDataMixin, TestCase):
 
     def test_view_flatpage(self):
-        "A flatpage can be served through a view"
+        """A flatpage can be served through a view"""
         response = self.client.get('/flatpage_root/flatpage/')
         self.assertContains(response, "<p>Isn't it flat!</p>")
 
     def test_view_non_existent_flatpage(self):
-        "A non-existent flatpage raises 404 when served through a view"
+        """A non-existent flatpage raises 404 when served through a view"""
         response = self.client.get('/flatpage_root/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
     def test_view_authenticated_flatpage(self):
-        "A flatpage served through a view can require authentication"
+        """A flatpage served through a view can require authentication"""
         response = self.client.get('/flatpage_root/sekrit/')
         self.assertRedirects(response, '/accounts/login/?next=/flatpage_root/sekrit/')
         user = User.objects.create_user('testuser', 'test@example.com', 's3krit')
@@ -74,17 +74,17 @@ class FlatpageViewTests(TestDataMixin, TestCase):
         self.assertContains(response, "<p>Isn't it sekrit!</p>")
 
     def test_fallback_flatpage(self):
-        "A fallback flatpage won't be served if the middleware is disabled"
+        """A fallback flatpage won't be served if the middleware is disabled"""
         response = self.client.get('/flatpage/')
         self.assertEqual(response.status_code, 404)
 
     def test_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage won't be served if the fallback middleware is disabled"
+        """A non-existent flatpage won't be served if the fallback middleware is disabled"""
         response = self.client.get('/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
     def test_view_flatpage_special_chars(self):
-        "A flatpage with special chars in the URL can be served through a view"
+        """A flatpage with special chars in the URL can be served through a view"""
         fp = FlatPage.objects.create(
             url="/some.very_special~chars-here/",
             title="A very special page",
@@ -117,27 +117,27 @@ class FlatpageViewTests(TestDataMixin, TestCase):
 class FlatpageViewAppendSlashTests(TestDataMixin, TestCase):
 
     def test_redirect_view_flatpage(self):
-        "A flatpage can be served through a view and should add a slash"
+        """A flatpage can be served through a view and should add a slash"""
         response = self.client.get('/flatpage_root/flatpage')
         self.assertRedirects(response, '/flatpage_root/flatpage/', status_code=301)
 
     def test_redirect_view_non_existent_flatpage(self):
-        "A non-existent flatpage raises 404 when served through a view and should not add a slash"
+        """A non-existent flatpage raises 404 when served through a view and should not add a slash"""
         response = self.client.get('/flatpage_root/no_such_flatpage')
         self.assertEqual(response.status_code, 404)
 
     def test_redirect_fallback_flatpage(self):
-        "A fallback flatpage won't be served if the middleware is disabled and should not add a slash"
+        """A fallback flatpage won't be served if the middleware is disabled and should not add a slash"""
         response = self.client.get('/flatpage')
         self.assertEqual(response.status_code, 404)
 
     def test_redirect_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage won't be served if the fallback middleware is disabled and should not add a slash"
+        """A non-existent flatpage won't be served if the fallback middleware is disabled and should not add a slash"""
         response = self.client.get('/no_such_flatpage')
         self.assertEqual(response.status_code, 404)
 
     def test_redirect_view_flatpage_special_chars(self):
-        "A flatpage with special chars in the URL can be served through a view and should add a slash"
+        """A flatpage with special chars in the URL can be served through a view and should add a slash"""
         fp = FlatPage.objects.create(
             url="/some.very_special~chars-here/",
             title="A very special page",

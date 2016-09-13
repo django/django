@@ -28,7 +28,7 @@ class Feature(GDALBase):
         self._layer = layer
 
     def __del__(self):
-        "Releases a reference to this object."
+        """Releases a reference to this object."""
         try:
             capi.destroy_feature(self._ptr)
         except (AttributeError, TypeError):
@@ -50,20 +50,20 @@ class Feature(GDALBase):
         return Field(self, i)
 
     def __iter__(self):
-        "Iterates over each field in the Feature."
+        """Iterates over each field in the Feature."""
         for i in range(self.num_fields):
             yield self[i]
 
     def __len__(self):
-        "Returns the count of fields in this feature."
+        """Returns the count of fields in this feature."""
         return self.num_fields
 
     def __str__(self):
-        "The string name of the feature."
+        """The string name of the feature."""
         return 'Feature FID %d in Layer<%s>' % (self.fid, self.layer_name)
 
     def __eq__(self, other):
-        "Does equivalence testing on the features."
+        """Does equivalence testing on the features."""
         return bool(capi.feature_equal(self.ptr, other._ptr))
 
     # #### Feature Properties ####
@@ -73,36 +73,36 @@ class Feature(GDALBase):
 
     @property
     def fid(self):
-        "Returns the feature identifier."
+        """Returns the feature identifier."""
         return capi.get_fid(self.ptr)
 
     @property
     def layer_name(self):
-        "Returns the name of the layer for the feature."
+        """Returns the name of the layer for the feature."""
         name = capi.get_feat_name(self._layer._ldefn)
         return force_text(name, self.encoding, strings_only=True)
 
     @property
     def num_fields(self):
-        "Returns the number of fields in the Feature."
+        """Returns the number of fields in the Feature."""
         return capi.get_feat_field_count(self.ptr)
 
     @property
     def fields(self):
-        "Returns a list of fields in the Feature."
+        """Returns a list of fields in the Feature."""
         return [capi.get_field_name(capi.get_field_defn(self._layer._ldefn, i))
                 for i in range(self.num_fields)]
 
     @property
     def geom(self):
-        "Returns the OGR Geometry for this Feature."
+        """Returns the OGR Geometry for this Feature."""
         # Retrieving the geometry pointer for the feature.
         geom_ptr = capi.get_feat_geom_ref(self.ptr)
         return OGRGeometry(geom_api.clone_geom(geom_ptr))
 
     @property
     def geom_type(self):
-        "Returns the OGR Geometry Type for this Feture."
+        """Returns the OGR Geometry Type for this Feture."""
         return OGRGeomType(capi.get_fd_geom_type(self._layer._ldefn))
 
     # #### Feature Methods ####
@@ -116,7 +116,7 @@ class Feature(GDALBase):
         return self[field_name].value
 
     def index(self, field_name):
-        "Returns the index of the given field name."
+        """Returns the index of the given field name."""
         i = capi.get_field_index(self.ptr, force_bytes(field_name))
         if i < 0:
             raise OGRIndexError('invalid OFT field name given: "%s"' % field_name)

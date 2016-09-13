@@ -17,7 +17,7 @@ class GeoRegressionTests(TestCase):
     fixtures = ['initial']
 
     def test_update(self):
-        "Testing GeoQuerySet.update(). See #10411."
+        """Testing GeoQuerySet.update(). See #10411."""
         pnt = City.objects.get(name='Pueblo').point
         bak = pnt.clone()
         pnt.y += 0.005
@@ -29,7 +29,7 @@ class GeoRegressionTests(TestCase):
         self.assertEqual(bak, City.objects.get(name='Pueblo').point)
 
     def test_kmz(self):
-        "Testing `render_to_kmz` with non-ASCII data. See #11624."
+        """Testing `render_to_kmz` with non-ASCII data. See #11624."""
         name = "Åland Islands"
         places = [{
             'name': name,
@@ -40,7 +40,7 @@ class GeoRegressionTests(TestCase):
 
     @skipUnlessDBFeature("supports_extent_aggr")
     def test_extent(self):
-        "Testing `extent` on a table with a single point. See #11827."
+        """Testing `extent` on a table with a single point. See #11827."""
         pnt = City.objects.get(name='Pueblo').point
         ref_ext = (pnt.x, pnt.y, pnt.x, pnt.y)
         extent = City.objects.filter(name='Pueblo').aggregate(Extent('point'))['point__extent']
@@ -48,7 +48,7 @@ class GeoRegressionTests(TestCase):
             self.assertAlmostEqual(ref_val, val, 4)
 
     def test_unicode_date(self):
-        "Testing dates are converted properly, even on SpatiaLite. See #16408."
+        """Testing dates are converted properly, even on SpatiaLite. See #16408."""
         founded = datetime(1857, 5, 23)
         PennsylvaniaCity.objects.create(name='Mansfield', county='Tioga', point='POINT(-77.071445 41.823881)',
                                         founded=founded)
@@ -56,7 +56,7 @@ class GeoRegressionTests(TestCase):
         self.assertEqual(founded, PennsylvaniaCity.objects.aggregate(Min('founded'))['founded__min'])
 
     def test_empty_count(self):
-        "Testing that PostGISAdapter.__eq__ does check empty strings. See #13670."
+        """Testing that PostGISAdapter.__eq__ does check empty strings. See #13670."""
         # contrived example, but need a geo lookup paired with an id__in lookup
         pueblo = City.objects.get(name='Pueblo')
         state = State.objects.filter(poly__contains=pueblo.point)
@@ -70,12 +70,12 @@ class GeoRegressionTests(TestCase):
     #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
     @no_oracle
     def test_defer_or_only_with_annotate(self):
-        "Regression for #16409. Make sure defer() and only() work with annotate()"
+        """Regression for #16409. Make sure defer() and only() work with annotate()"""
         self.assertIsInstance(list(City.objects.annotate(Count('point')).defer('name')), list)
         self.assertIsInstance(list(City.objects.annotate(Count('point')).only('name')), list)
 
     def test_boolean_conversion(self):
-        "Testing Boolean value conversion with the spatial backend, see #15169."
+        """Testing Boolean value conversion with the spatial backend, see #15169."""
         t1 = Truth.objects.create(val=True)
         t2 = Truth.objects.create(val=False)
 

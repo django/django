@@ -329,7 +329,7 @@ class SystemChecksTestCase(SimpleTestCase):
         self.assertEqual(errors, expected)
 
     def test_generic_inline_model_admin_bad_ct_field(self):
-        "A GenericInlineModelAdmin raises problems if the ct_field points to a non-existent field."
+        """A GenericInlineModelAdmin raises problems if the ct_field points to a non-existent field."""
         class InfluenceInline(GenericStackedInline):
             model = Influence
             ct_field = 'nonexistent'
@@ -348,7 +348,7 @@ class SystemChecksTestCase(SimpleTestCase):
         self.assertEqual(errors, expected)
 
     def test_generic_inline_model_admin_bad_fk_field(self):
-        "A GenericInlineModelAdmin raises problems if the ct_fk_field points to a non-existent field."
+        """A GenericInlineModelAdmin raises problems if the ct_fk_field points to a non-existent field."""
         class InfluenceInline(GenericStackedInline):
             model = Influence
             ct_fk_field = 'nonexistent'
