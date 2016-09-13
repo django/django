@@ -1518,7 +1518,7 @@ class Queries4Tests(TestCase):
         ci2 = CategoryItem.objects.create(category=c0)
         ci3 = CategoryItem.objects.create(category=c1)
 
-        qs = CategoryItem.objects.filter(category__onetoonecategory__isnull=False)
+        qs = CategoryItem.objects.filter(category__onetoonecategory__isnull=False).order_by('pk')
         self.assertEqual(qs.count(), 2)
         self.assertSequenceEqual(qs, [ci2, ci3])
 
@@ -1566,7 +1566,7 @@ class Queries4Tests(TestCase):
         ci2 = CategoryItem.objects.create(category=c0)
         ci3 = CategoryItem.objects.create(category=c1)
 
-        qs = CategoryItem.objects.exclude(category__onetoonecategory__isnull=True)
+        qs = CategoryItem.objects.exclude(category__onetoonecategory__isnull=True).order_by('pk')
         self.assertEqual(qs.count(), 2)
         self.assertSequenceEqual(qs, [ci2, ci3])
 
