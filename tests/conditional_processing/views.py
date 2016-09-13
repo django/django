@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.views.decorators.http import condition, etag, last_modified
 
-from .tests import ETAG, FULL_RESPONSE, LAST_MODIFIED
+from .tests import ETAG, FULL_RESPONSE, LAST_MODIFIED, WEAK_ETAG
 
 
 @condition(lambda r: ETAG, lambda r: LAST_MODIFIED)
@@ -33,6 +33,14 @@ def etag_view2(request):
 def etag_view_unquoted(request):
     """
     Use an etag_func() that returns an unquoted ETag.
+    """
+    return HttpResponse(FULL_RESPONSE)
+
+
+@condition(etag_func=lambda r: WEAK_ETAG)
+def etag_view_weak(request):
+    """
+    Use an etag_func() that returns a weak ETag.
     """
     return HttpResponse(FULL_RESPONSE)
 

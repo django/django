@@ -12,6 +12,7 @@ LAST_MODIFIED_NEWER_STR = 'Mon, 18 Oct 2010 16:56:23 GMT'
 LAST_MODIFIED_INVALID_STR = 'Mon, 32 Oct 2010 16:56:23 GMT'
 EXPIRED_LAST_MODIFIED_STR = 'Sat, 20 Oct 2007 23:21:47 GMT'
 ETAG = '"b4246ffc4f62314ca13147c9d4f76974"'
+WEAK_ETAG = 'W/"b4246ffc4f62314ca13147c9d4f76974"'  # weak match to ETAG
 EXPIRED_ETAG = '"7fae4cd4b0f81e7d2914700043aa8ed6"'
 
 
@@ -38,9 +39,13 @@ class ConditionalGet(SimpleTestCase):
         self.client.defaults['HTTP_IF_MODIFIED_SINCE'] = LAST_MODIFIED_STR
         response = self.client.get('/condition/')
         self.assertNotModified(response)
+        response = self.client.put('/condition/')
+        self.assertFullResponse(response)
         self.client.defaults['HTTP_IF_MODIFIED_SINCE'] = LAST_MODIFIED_NEWER_STR
         response = self.client.get('/condition/')
         self.assertNotModified(response)
+        response = self.client.put('/condition/')
+        self.assertFullResponse(response)
         self.client.defaults['HTTP_IF_MODIFIED_SINCE'] = LAST_MODIFIED_INVALID_STR
         response = self.client.get('/condition/')
         self.assertFullResponse(response)
@@ -66,6 +71,8 @@ class ConditionalGet(SimpleTestCase):
         self.client.defaults['HTTP_IF_NONE_MATCH'] = ETAG
         response = self.client.get('/condition/')
         self.assertNotModified(response)
+        response = self.client.put('/condition/')
+        self.assertEqual(response.status_code, 412)
         self.client.defaults['HTTP_IF_NONE_MATCH'] = EXPIRED_ETAG
         response = self.client.get('/condition/')
         self.assertFullResponse(response)
@@ -75,16 +82,68 @@ class ConditionalGet(SimpleTestCase):
         response = self.client.get('/condition/')
         self.assertNotModified(response)
 
+    def test_weak_if_none_match(self):
+        """
+        If-None-Match comparisons should use weak matching, so weak and strong
+        ETags with the same value should result in a 304 response.
+        """
+        self.client.defaults['HTTP_IF_NONE_MATCH'] = ETAG
+        response = self.client.get('/condition/weak_etag/')
+        self.assertNotModified(response)
+        response = self.client.put('/condition/weak_etag/')
+        self.assertEqual(response.status_code, 412)
+
+        self.client.defaults['HTTP_IF_NONE_MATCH'] = WEAK_ETAG
+        response = self.client.get('/condition/weak_etag/')
+        self.assertNotModified(response)
+        response = self.client.put('/condition/weak_etag/')
+        self.assertEqual(response.status_code, 412)
+        response = self.client.get('/condition/')
+        self.assertNotModified(response)
+        response = self.client.put('/condition/')
+        self.assertEqual(response.status_code, 412)
+
+    def test_all_if_none_match(self):
+        self.client.defaults['HTTP_IF_NONE_MATCH'] = '*'
+        response = self.client.get('/condition/')
+        self.assertNotModified(response)
+        response = self.client.put('/condition/')
+        self.assertEqual(response.status_code, 412)
+        response = self.client.get('/condition/no_etag/')
+        self.assertFullResponse(response, check_last_modified=False, check_etag=False)
+
     def test_if_match(self):
         self.client.defaults['HTTP_IF_MATCH'] = ETAG
-        response = self.client.put('/condition/etag/')
-        self.assertEqual(response.status_code, 200)
+        response = self.client.put('/condition/')
+        self.assertFullResponse(response)
         self.client.defaults['HTTP_IF_MATCH'] = EXPIRED_ETAG
-        response = self.client.put('/condition/etag/')
+        response = self.client.put('/condition/')
+        self.assertEqual(response.status_code, 412)
+
+    def test_weak_if_match(self):
+        """
+        If-Match comparisons should use strong matching, so any comparison
+        involving a weak ETag should return a 412 response.
+        """
+        self.client.defaults['HTTP_IF_MATCH'] = ETAG
+        response = self.client.get('/condition/weak_etag/')
+        self.assertEqual(response.status_code, 412)
+
+        self.client.defaults['HTTP_IF_MATCH'] = WEAK_ETAG
+        response = self.client.get('/condition/weak_etag/')
+        self.assertEqual(response.status_code, 412)
+        response = self.client.get('/condition/')
+        self.assertEqual(response.status_code, 412)
+
+    def test_all_if_match(self):
+        self.client.defaults['HTTP_IF_MATCH'] = '*'
+        response = self.client.get('/condition/')
+        self.assertFullResponse(response)
+        response = self.client.get('/condition/no_etag/')
         self.assertEqual(response.status_code, 412)
 
     def test_both_headers(self):
-        # see http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html#sec13.3.4
+        # see https://tools.ietf.org/html/rfc7232#section-6
         self.client.defaults['HTTP_IF_MODIFIED_SINCE'] = LAST_MODIFIED_STR
         self.client.defaults['HTTP_IF_NONE_MATCH'] = ETAG
         response = self.client.get('/condition/')
@@ -93,7 +152,7 @@ class ConditionalGet(SimpleTestCase):
         self.client.defaults['HTTP_IF_MODIFIED_SINCE'] = EXPIRED_LAST_MODIFIED_STR
         self.client.defaults['HTTP_IF_NONE_MATCH'] = ETAG
         response = self.client.get('/condition/')
-        self.assertFullResponse(response)
+        self.assertNotModified(response)
 
         self.client.defaults['HTTP_IF_MODIFIED_SINCE'] = LAST_MODIFIED_STR
         self.client.defaults['HTTP_IF_NONE_MATCH'] = EXPIRED_ETAG
@@ -114,7 +173,7 @@ class ConditionalGet(SimpleTestCase):
         self.client.defaults['HTTP_IF_UNMODIFIED_SINCE'] = EXPIRED_LAST_MODIFIED_STR
         self.client.defaults['HTTP_IF_MATCH'] = ETAG
         response = self.client.get('/condition/')
-        self.assertEqual(response.status_code, 412)
+        self.assertFullResponse(response)
 
         self.client.defaults['HTTP_IF_UNMODIFIED_SINCE'] = EXPIRED_LAST_MODIFIED_STR
         self.client.defaults['HTTP_IF_MATCH'] = EXPIRED_ETAG
@@ -169,7 +228,7 @@ class ConditionalGet(SimpleTestCase):
         response = self.client.get('/condition/last_modified/')
         self.assertEqual(response.status_code, 412)
         response = self.client.get('/condition/etag/')
-        self.assertFullResponse(response, check_last_modified=False)
+        self.assertEqual(response.status_code, 412)
 
     def test_single_condition_8(self):
         self.client.defaults['HTTP_IF_UNMODIFIED_SINCE'] = LAST_MODIFIED_STR
@@ -181,7 +240,7 @@ class ConditionalGet(SimpleTestCase):
         response = self.client.get('/condition/last_modified2/')
         self.assertEqual(response.status_code, 412)
         response = self.client.get('/condition/etag2/')
-        self.assertFullResponse(response, check_last_modified=False)
+        self.assertEqual(response.status_code, 412)
 
     def test_single_condition_head(self):
         self.client.defaults['HTTP_IF_MODIFIED_SINCE'] = LAST_MODIFIED_STR
@@ -204,16 +263,11 @@ class ConditionalGet(SimpleTestCase):
         self.client.defaults['HTTP_IF_NONE_MATCH'] = ETAG
         response = self.client.get('/condition/unquoted_etag/')
         self.assertNotModified(response)
+        response = self.client.put('/condition/unquoted_etag/')
+        self.assertEqual(response.status_code, 412)
         self.client.defaults['HTTP_IF_NONE_MATCH'] = EXPIRED_ETAG
         response = self.client.get('/condition/unquoted_etag/')
         self.assertFullResponse(response, check_last_modified=False)
-
-    def test_all_if_none_match(self):
-        self.client.defaults['HTTP_IF_NONE_MATCH'] = '*'
-        response = self.client.get('/condition/etag/')
-        self.assertNotModified(response)
-        response = self.client.get('/condition/no_etag/')
-        self.assertFullResponse(response, check_last_modified=False, check_etag=False)
 
     def test_invalid_etag(self):
         self.client.defaults['HTTP_IF_NONE_MATCH'] = '"""'

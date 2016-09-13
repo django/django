@@ -509,8 +509,9 @@ Miscellaneous
 * The admin's widget for ``IntegerField`` uses ``type="number"`` rather than
   ``type="text"``.
 
-* ETags are now parsed according to the :rfc:`7232` Conditional Requests
-  specification rather than the syntax from :rfc:`2616`.
+* Conditional HTTP headers are now parsed and compared according to the
+  :rfc:`7232` Conditional Requests specification rather than the older
+  :rfc:`2616`.
 
 * In the admin templates, ``<p class="help">`` is replaced with a ``<div>`` tag
   to allow including lists inside help text.
