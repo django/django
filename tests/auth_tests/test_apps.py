@@ -7,6 +7,7 @@ import unittest
 
 from django.db import ConnectionHandler
 
+
 SETTINGS = """
 SECRET_KEY = 'django_auth_tests_secret_key'
 
