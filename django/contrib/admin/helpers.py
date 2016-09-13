@@ -213,8 +213,8 @@ class AdminReadonlyField(object):
                         if getattr(attr, "allow_tags", False):
                             warnings.warn(
                                 "Deprecated allow_tags attribute used on %s. "
-                                "Use django.utils.safestring.format_html(), "
-                                "format_html_join(), or mark_safe() instead." % attr,
+                                "Use django.utils.html.format_html(), format_html_join(), "
+                                "or django.utils.safestring.mark_safe() instead." % attr,
                                 RemovedInDjango20Warning
                             )
                             result_repr = mark_safe(value)
