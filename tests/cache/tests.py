@@ -21,7 +21,7 @@ from django.core.cache import (
     DEFAULT_CACHE_ALIAS, CacheKeyWarning, cache, caches,
 )
 from django.core.cache.utils import make_template_fragment_key
-from django.db import connection, connections
+from django.db import close_old_connections, connection, connections
 from django.http import (
     HttpRequest, HttpResponse, HttpResponseNotModified, StreamingHttpResponse,
 )
@@ -1248,9 +1248,13 @@ class BaseMemcachedTests(BaseCacheTests):
     def test_close(self):
         # For clients that don't manage their connections properly, the
         # connection is closed when the request is complete.
-        with mock.patch.object(cache._lib.Client, 'disconnect_all', autospec=True) as mock_disconnect:
-            signals.request_finished.send(self.__class__)
-            self.assertIs(mock_disconnect.called, self.should_disconnect_on_close)
+        signals.request_finished.disconnect(close_old_connections)
+        try:
+            with mock.patch.object(cache._lib.Client, 'disconnect_all', autospec=True) as mock_disconnect:
+                signals.request_finished.send(self.__class__)
+                self.assertIs(mock_disconnect.called, self.should_disconnect_on_close)
+        finally:
+            signals.request_finished.connect(close_old_connections)
 
 
 @unittest.skipUnless(MemcachedCache_params, "MemcachedCache backend not configured")
