@@ -152,7 +152,7 @@ Minor features
   creating :class:`~django.contrib.gis.gdal.GDALRaster` objects.
 
 * Added SpatiaLite support for the
-  :class:`~django.contrib.gis.db.models.functions.IsValid` function,
+  :class:`~django.contrib.gis.db.models.functions.IsValid` function,expressions
   :class:`~django.contrib.gis.db.models.functions.MakeValid` function, and
   :lookup:`isvalid` lookup.
 
@@ -328,6 +328,9 @@ Models
 
 * You can now use the ``unique=True`` option with
   :class:`~django.db.models.FileField`.
+
+* ``Model.save()`` now refreshes the value of any model fields that are
+  assigned to expressions.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

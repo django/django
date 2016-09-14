@@ -446,10 +446,18 @@ When you save an object, Django performs the following steps:
    data is then composed into an SQL statement for insertion into the
    database.
 
-5. **Emit a post-save signal.** The signal
+5. **Refresh any expressions.** Any fields that are assigned to expressions
+   such as ``F('field') + 1`` or ``Lower('field')`` are refreshed with the
+   value from the database.
+
+6. **Emit a post-save signal.** The signal
    :attr:`django.db.models.signals.post_save` is sent, allowing
    any functions listening for that signal to take some customized
    action.
+
+.. versionchanged:: 1.11
+
+    The refresh expressions step was added.
 
 How Django knows to UPDATE vs. INSERT
 -------------------------------------
