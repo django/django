@@ -570,6 +570,64 @@ can access these properties as part of a test condition.
             session['somekey'] = 'test'
             session.save()
 
+Setting the language
+--------------------
+
+When testing web applications which support internationalization and
+localizations, the language for a test client request can be set within a test
+case. The method of doing so depends on whether the
+:class:`~django.middleware.locale.LocaleMiddleware` is activated or not.
+
+If the middleware has been activated then the language can be set by
+specifying the language preference. This can be done by either creating a
+cookie with a name of :setting:`LANGUAGE_COOKIE_NAME` and a value of the
+language code, or by including the ``Accept-Language`` HTTP header in the
+request. More details on the topic of language preference can be found in the
+:ref:`internationalization documentation <how-django-discovers-language-preference>`
+and an example of both approaches is given below::
+
+    def test_language_using_cookie(self):
+        expected_content = b"Bienvenue sur mon site."
+
+        user_language = 'fr'
+        # set the desired language via the language code cookie
+        self.client.cookies.load({settings.LANGUAGE_COOKIE_NAME: user_language)
+
+        response = self.client.get('/polls/')
+        actual_content = response.content
+
+        self.assertEqual(actual_content, expected_content)
+
+    def test_language_using_header(self):
+        expected_content = b"Bienvenue sur mon site."
+
+        user_language = 'fr'
+        # set the desired language via the Accept-Language HTTP header
+        response = self.client.get('/polls/',
+            HTTP_ACCEPT_LANGUAGE=user_language,
+        )
+        actual_content = response.content
+
+        self.assertEqual(actual_content, expected_content)
+
+
+If the middleware has not been activated, then instead the active language
+must be explicitly set. This process is detailed in the
+:ref:`internationalization documentation <explicitly-setting-the-active-language>`
+and an example is given below::
+
+    def test_language(self):
+        expected_content = b"Bienvenue sur mon site."
+
+        user_language = 'fr'
+        # explicitly set the language for the request
+        with translation.override(user_language):
+            response = self.client.get('/polls/')
+
+        actual_content = response.content
+
+        self.assertEqual(actual_content, expected_content)
+
 Example
 -------
 
