@@ -1405,9 +1405,11 @@ class ModelAdmin(BaseModelAdmin):
         return initial
 
     @csrf_protect_m
-    @transaction.atomic
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+        with transaction.atomic(using=router.db_for_write(self.model)):
+            return self._changeform_view(request, object_id, form_url, extra_context)
 
+    def _changeform_view(self, request, object_id, form_url, extra_context):
         to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
         if to_field and not self.to_field_allowed(request, to_field):
             raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
@@ -1681,8 +1683,11 @@ class ModelAdmin(BaseModelAdmin):
         ], context)
 
     @csrf_protect_m
-    @transaction.atomic
     def delete_view(self, request, object_id, extra_context=None):
+        with transaction.atomic(using=router.db_for_write(self.model)):
+            return self._delete_view(request, object_id, extra_context)
+
+    def _delete_view(self, request, object_id, extra_context):
         "The 'delete' admin view for this model."
         opts = self.model._meta
         app_label = opts.app_label
