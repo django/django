@@ -2150,21 +2150,18 @@ class CacheMiddlewareTest(SimpleTestCase):
         self.assertIsNone(cache_middleware.process_request(request))
 
     def test_304_response_has_http_caching_headers_but_not_cached(self):
-        def original_view(request):
-            original_view.calls += 1
-            return HttpResponseNotModified()
-        original_view.calls = 0
+        original_view = mock.Mock(return_value=HttpResponseNotModified())
         view = cache_page(2)(original_view)
         request = self.factory.get('/view/')
 
-        # Request the view once
+        # Request the view twice to verify it's called twice and not cached
+        # the second time.
         view(request).close()
 
-        # Request again
         response = view(request)
         response.close()
 
-        self.assertEqual(2, original_view.calls)
+        self.assertEqual(original_view.call_count, 2)
         self.assertIsInstance(response, HttpResponseNotModified)
         self.assertIn('Cache-Control', response)
         self.assertIn('Expires', response)
