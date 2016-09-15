@@ -382,6 +382,10 @@ Backwards incompatible changes in 1.11
   ``contrib.gis`` was first released, :ref:`gdalbuild` is now a required
   dependency for GeoDjango. In older versions, it's only required for SQLite.
 
+* ``contrib.gis.maps`` is removed as it interfaces with a retired version of
+  the Google Maps API and seems to be unmaintained. If you're using it, `let
+  us know <https://code.djangoproject.com/ticket/14284>`_.
+
 Database backend API
 --------------------
 
