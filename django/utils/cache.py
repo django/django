@@ -72,8 +72,10 @@ def patch_cache_control(response, **kwargs):
     # If there's already a max-age header but we're being asked to set a new
     # max-age, use the minimum of the two ages. In practice this happens when
     # a decorator and a piece of middleware both operate on a given view.
-    if 'max-age' in cc and 'max_age' in kwargs:
-        kwargs['max_age'] = min(int(cc['max-age']), kwargs['max_age'])
+    if 'max_age' in kwargs:
+        kwargs['max_age'] = max_age = int(kwargs['max_age'])
+        if 'max-age' in cc:
+            kwargs['max_age'] = min(int(cc['max-age']), max_age)
 
     # Allow overriding private caching and vice versa
     if 'private' in cc and 'public' in kwargs:
