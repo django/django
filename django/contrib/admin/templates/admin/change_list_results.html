@@ -33,6 +33,11 @@
 <tr class="{% cycle 'row1' 'row2' %}">{% for item in result %}{{ item }}{% endfor %}</tr>
 {% endfor %}
 </tbody>
+{% if result_footers %}
+<tfoot>
+<tr>{% for aggregate in result_footers %}<th title="{{ aggregate.fn_name }}">{{ aggregate.text }}</th>{% endfor %}</tr>
+</tfoot>
+{% endif %}
 </table>
 </div>
 {% endif %}

@@ -482,6 +482,7 @@ class ModelAdmin(BaseModelAdmin):
 
     list_display = ('__str__',)
     list_display_links = ()
+    list_aggregates = ()
     list_filter = ()
     list_select_related = False
     list_per_page = 100

@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Avg
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
@@ -39,6 +40,11 @@ class ChildAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super(ChildAdmin, self).get_queryset(request).select_related("parent")
+
+
+class ChildAggregateAdmin(admin.ModelAdmin):
+    list_display = ['name', 'age']
+    list_aggregates = [('age', Avg)]
 
 
 class CustomPaginationAdmin(ChildAdmin):
