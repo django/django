@@ -36,6 +36,8 @@ from ..views import (
 if six.PY3:
     from .py3_test_debug import Py3ExceptionReporterTests  # NOQA
 
+PY36 = sys.version_info >= (3, 6)
+
 
 class User(object):
     def __str__(self):
@@ -430,7 +432,7 @@ class ExceptionReporterTests(SimpleTestCase):
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(request, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
-        self.assertIn('<h1>ImportError at /test_view/</h1>', html)
+        self.assertIn('<h1>%sError at /test_view/</h1>' % 'ModuleNotFound' if PY36 else 'Import', html)
 
     def test_ignore_traceback_evaluation_exceptions(self):
         """
