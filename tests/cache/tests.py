@@ -1955,7 +1955,7 @@ class PrefixedCacheI18nTest(CacheI18nTest):
     pass
 
 
-def hello_world_view(request, value):
+def hello_world_view(request, value=None):
     return HttpResponse('Hello World %s' % value)
 
 
@@ -2161,6 +2161,28 @@ class CacheMiddlewareTest(SimpleTestCase):
         self.assertIsInstance(response, HttpResponseNotModified)
         self.assertIn('Cache-Control', response)
         self.assertIn('Expires', response)
+
+    def test_cache_control_max_age(self):
+        view = cache_page(2)(hello_world_view)
+        request = self.factory.get('/view/')
+
+        # Request once
+        with mock.patch.object(time, 'time', return_value=1468749600):  # Sun, 17 Jul 2016 10:00:00 GMT
+            response = view(request)
+            response.close()
+            self.assertIn('Expires', response)
+            self.assertEqual('Sun, 17 Jul 2016 10:00:02 GMT', response['Expires'])
+            self.assertIn('Cache-Control', response)
+            self.assertEqual('max-age=2', response['Cache-Control'])
+
+        # Second request made later should have different Cache-Control's max-age
+        with mock.patch.object(time, 'time', return_value=1468749601):  # Sun, 17 Jul 2016 10:00:01 GMT
+            response = view(request)
+            response.close()
+            self.assertIn('Expires', response)
+            self.assertEqual('Sun, 17 Jul 2016 10:00:02 GMT', response['Expires'])
+            self.assertIn('Cache-Control', response)
+            self.assertEqual('max-age=1', response['Cache-Control'])
 
 
 @override_settings(
