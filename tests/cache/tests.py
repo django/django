@@ -39,8 +39,7 @@ from django.test import (
 from django.test.signals import setting_changed
 from django.utils import six, timezone, translation
 from django.utils.cache import (
-    get_cache_key, learn_cache_key, patch_cache_control,
-    patch_response_headers, patch_vary_headers,
+    get_cache_key, learn_cache_key, patch_cache_control, patch_vary_headers,
 )
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
