@@ -300,7 +300,7 @@ class InspectDBTestCase(TestCase):
         # The error message depends on the backend
         self.assertIn("# The error was:", output)
 
-    def test_indexes_introspection(self):
+    def test_indexes_inspection(self):
         out = StringIO()
         call_command('inspectdb', table_name_filter=lambda tn: tn.startswith('inspectdb_indexes'), stdout=out)
         output = out.getvalue()

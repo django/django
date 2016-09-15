@@ -62,6 +62,15 @@ class InspectDbTests(TestCase):
             self.assertIn('line = models.GeometryField(', output)
             self.assertIn('poly = models.GeometryField(', output)
 
+    def test_indexes(self):
+        out = StringIO()
+        call_command('inspectdb', table_name_filter=lambda tn: tn.startswith('inspectapp_indexes'), stdout=out)
+        output = out.getvalue()
+        self.assertIn('        indexes = [', output, msg='inspectdb should generate indexes.')
+        index = "models.Index(fields=['point'], name="
+        self.assertIn(index, output)
+        self.assertIn('        ]', output)
+
 
 @skipUnlessDBFeature("gis_enabled")
 @modify_settings(

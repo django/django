@@ -393,8 +393,8 @@ it because ``True`` is its default value).
 
 .. versionadded:: 1.11
 
-  Indexes associated with the table are added using the
-  :attr:`~django.db.models.Options.indexes` model option.
+    Indexes associated with the table are added using the
+    :attr:`~django.db.models.Options.indexes` model option.
 
 .. django-admin-option:: --database DATABASE
 

@@ -25,3 +25,10 @@ class Fields3D(models.Model):
 
     class Meta:
         required_db_features = ['gis_enabled']
+
+
+class Indexes(models.Model):
+    point = models.PointField(db_index=True)
+
+    class Meta:
+        required_db_features = ['gis_enabled']

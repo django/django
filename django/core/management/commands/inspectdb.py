@@ -284,7 +284,7 @@ class Command(BaseCommand):
                 index_fields = ', '.join("'%s'" % f for f in fields)
                 indexes.append("models.Index(fields=[%s], name='%s')," % (index_fields, index))
                 if params['type'] != 'btree':
-                    indexes[-1] += ' # The type of this index is not b-tree'
+                    indexes[-1] += ' # The type of this index is %s' % params['type']
         meta = ["",
                 "    class Meta:",
                 "        managed = False",
