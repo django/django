@@ -7,6 +7,7 @@ import functools
 import math
 import os
 import re
+import sys
 import tokenize
 import unittest
 
@@ -34,6 +35,8 @@ try:
     import enum
 except ImportError:
     enum = None
+
+PY36 = sys.version_info >= (3, 6)
 
 
 class Money(decimal.Decimal):
@@ -412,7 +415,10 @@ class WriterTests(SimpleTestCase):
         # Test a string regex with flag
         validator = RegexValidator(r'^[0-9]+$', flags=re.U)
         string = MigrationWriter.serialize(validator)[0]
-        self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=32)")
+        if PY36:
+            self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=re.RegexFlag(32))")
+        else:
+            self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=32)")
         self.serialize_round_trip(validator)
 
         # Test message and code
