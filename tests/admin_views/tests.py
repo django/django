@@ -27,8 +27,8 @@ from django.forms.utils import ErrorList
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.test import (
-    SimpleTestCase, TestCase, ignore_warnings, modify_settings,
-    override_settings, skipUnlessDBFeature,
+    TestCase, ignore_warnings, modify_settings, override_settings,
+    skipUnlessDBFeature,
 )
 from django.test.utils import override_script_prefix, patch_logger
 from django.urls import NoReverseMatch, resolve, reverse
