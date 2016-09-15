@@ -201,6 +201,8 @@ def patch_response_headers(response, cache_timeout=None):
     """
     Adds HTTP-caching headers to the given HttpResponse object: Expires and Cache-Control
 
+    Each header is only added if it isn't already set.
+
     cache_timeout is in seconds. The CACHE_MIDDLEWARE_SECONDS setting is used
     by default.
     """
@@ -208,7 +210,8 @@ def patch_response_headers(response, cache_timeout=None):
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
     if cache_timeout < 0:
         cache_timeout = 0  # Can't have max-age negative
-    response['Expires'] = http_date(time.time() + cache_timeout)
+    if 'Expires' not in response:
+        response['Expires'] = http_date(time.time() + cache_timeout)
     patch_cache_control(response, max_age=cache_timeout)
 
 
