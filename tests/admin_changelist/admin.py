@@ -1,8 +1,8 @@
 from django.contrib import admin
-from django.db.models import Avg
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
+from django.db.models import Avg
 
 from .models import Child, Event, Parent, Swallow
 

@@ -9,7 +9,8 @@ from django.contrib.admin.options import (
     IS_POPUP_VAR, TO_FIELD_VAR, IncorrectLookupParameters,
 )
 from django.contrib.admin.utils import (
-    get_fields_from_path, lookup_needs_distinct, prepare_lookup_value, quote, label_for_field,
+    get_fields_from_path, label_for_field, lookup_needs_distinct,
+    prepare_lookup_value, quote,
 )
 from django.core.exceptions import (
     FieldDoesNotExist, ImproperlyConfigured, SuspiciousOperation,
