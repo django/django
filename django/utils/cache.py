@@ -229,8 +229,8 @@ def _if_modified_since_passes(last_modified, if_modified_since):
 
 def patch_response_headers(response, cache_timeout=None):
     """
-    Adds some useful headers to the given HttpResponse object:
-        ETag, Last-Modified, Expires and Cache-Control
+    Add HTTP caching headers to the given HttpResponse: Expires and
+    Cache-Control.
 
     Each header is only added if it isn't already set.
 
@@ -246,8 +246,6 @@ def patch_response_headers(response, cache_timeout=None):
             response.add_post_render_callback(set_response_etag)
         else:
             response = set_response_etag(response)
-    if not response.has_header('Last-Modified'):
-        response['Last-Modified'] = http_date()
     if not response.has_header('Expires'):
         response['Expires'] = http_date(time.time() + cache_timeout)
     patch_cache_control(response, max_age=cache_timeout)

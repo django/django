@@ -528,14 +528,15 @@ return a cached GET response for HEAD request.
 Additionally, ``UpdateCacheMiddleware`` automatically sets a few headers in each
 :class:`~django.http.HttpResponse`:
 
-* Sets the ``Last-Modified`` header to the current date/time when a fresh
-  (not cached) version of the page is requested.
-
 * Sets the ``Expires`` header to the current date/time plus the defined
   :setting:`CACHE_MIDDLEWARE_SECONDS`.
 
 * Sets the ``Cache-Control`` header to give a max age for the page --
   again, from the :setting:`CACHE_MIDDLEWARE_SECONDS` setting.
+
+.. versionchanged:: 1.11
+
+    In older versions, the ``Last-Modified`` header was also set.
 
 See :doc:`/topics/http/middleware` for more on middleware.
 

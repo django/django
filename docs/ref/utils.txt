@@ -53,7 +53,6 @@ need to distinguish caches by the ``Accept-language`` header.
     Adds some useful headers to the given ``HttpResponse`` object:
 
     * ``ETag``
-    * ``Last-Modified``
     * ``Expires``
     * ``Cache-Control``
 
@@ -61,6 +60,10 @@ need to distinguish caches by the ``Accept-language`` header.
 
     ``cache_timeout`` is in seconds. The :setting:`CACHE_MIDDLEWARE_SECONDS`
     setting is used by default.
+
+    .. versionchanged:: 1.11
+
+        In older versions, the ``Last-Modified`` header was also set.
 
 .. function:: add_never_cache_headers(response)
 
