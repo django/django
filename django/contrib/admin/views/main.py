@@ -211,7 +211,7 @@ class ChangeList(object):
 
             fields[model_field_name] = (field_name, field_attr)
             aggregate_funcs[model_field_name] = aggregate_class(model_field_name)
-        
+
         result_aggregates = {}
 
         # Call QuerySet.aggregate() and process the results.
@@ -223,9 +223,8 @@ class ChangeList(object):
                         aggregate_funcs[model_field_name].name,
                         field_attr(result) if callable(field_attr) else result
                     )
-        
-        return result_aggregates
 
+        return result_aggregates
 
     def _get_default_ordering(self):
         ordering = []
