@@ -6067,22 +6067,6 @@ class InlineAdminViewOnSiteTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
-class TestETagWithAdminView(SimpleTestCase):
-    # See https://code.djangoproject.com/ticket/16003
-
-    def test_admin(self):
-        with self.settings(USE_ETAGS=False):
-            response = self.client.get(reverse('admin:index'))
-            self.assertEqual(response.status_code, 302)
-            self.assertFalse(response.has_header('ETag'))
-
-        with self.settings(USE_ETAGS=True):
-            response = self.client.get(reverse('admin:index'))
-            self.assertEqual(response.status_code, 302)
-            self.assertTrue(response.has_header('ETag'))
-
-
-@override_settings(ROOT_URLCONF='admin_views.urls')
 class GetFormsetsWithInlinesArgumentTest(TestCase):
     """
     #23934 - When adding a new model instance in the admin, the 'obj' argument
