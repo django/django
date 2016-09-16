@@ -94,7 +94,7 @@ class BaseDatabaseSchemaEditor(object):
 
     # Core utility functions
 
-    def execute(self, sql, params=[]):
+    def execute(self, sql, params=()):
         """
         Executes the given SQL statement, with optional parameters.
         """
