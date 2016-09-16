@@ -142,7 +142,7 @@ class Field(RegisterLookupMixin):
                  db_index=False, rel=None, default=NOT_PROVIDED, editable=True,
                  serialize=True, unique_for_date=None, unique_for_month=None,
                  unique_for_year=None, choices=None, help_text='', db_column=None,
-                 db_tablespace=None, auto_created=False, validators=[],
+                 db_tablespace=None, auto_created=False, validators=(),
                  error_messages=None):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
@@ -175,7 +175,7 @@ class Field(RegisterLookupMixin):
             self.creation_counter = Field.creation_counter
             Field.creation_counter += 1
 
-        self._validators = validators  # Store for deconstruction later
+        self._validators = list(validators)  # Store for deconstruction later
 
         messages = {}
         for c in reversed(self.__class__.__mro__):
