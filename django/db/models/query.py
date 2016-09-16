@@ -527,6 +527,18 @@ class QuerySet(object):
                 lookup[f.name] = lookup.pop(f.attname)
         params = {k: v for k, v in kwargs.items() if LOOKUP_SEP not in k}
         params.update(defaults)
+        invalid_params = []
+        for param in params:
+            try:
+                self.model._meta.get_field(param)
+            except exceptions.FieldDoesNotExist:
+                invalid_params.append(param)
+        if invalid_params:
+            raise exceptions.FieldError(
+                "Invalid field name(s) for model %s: '%s'." % (
+                    self.model._meta.object_name,
+                    "', '".join(sorted(invalid_params)),
+                ))
         return lookup, params
 
     def _earliest_or_latest(self, field_name=None, direction="-"):
