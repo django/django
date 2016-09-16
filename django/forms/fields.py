@@ -62,7 +62,7 @@ class Field(object):
 
     def __init__(self, required=True, widget=None, label=None, initial=None,
                  help_text='', error_messages=None, show_hidden_initial=False,
-                 validators=[], localize=False, disabled=False, label_suffix=None):
+                 validators=(), localize=False, disabled=False, label_suffix=None):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
         # widget -- A Widget class, or instance of a Widget class, that should

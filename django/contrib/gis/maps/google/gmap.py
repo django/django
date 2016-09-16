@@ -29,10 +29,10 @@ class GoogleMap(object):
 
     def __init__(self, key=None, api_url=None, version=None,
                  center=None, zoom=None, dom_id='map',
-                 kml_urls=[], polylines=None, polygons=None, markers=None,
+                 kml_urls=(), polylines=None, polygons=None, markers=None,
                  template='gis/google/google-map.js',
                  js_module='geodjango',
-                 extra_context={}):
+                 extra_context=None):
 
         # The Google Maps API Key defined in the settings will be used
         # if not passed in as a parameter.  The use of an API key is
@@ -64,7 +64,7 @@ class GoogleMap(object):
         # Setting the DOM id of the map, the load function, the JavaScript
         # template, and the KML URLs array.
         self.dom_id = dom_id
-        self.extra_context = extra_context
+        self.extra_context = extra_context or {}
         self.js_module = js_module
         self.template = template
         self.kml_urls = kml_urls
