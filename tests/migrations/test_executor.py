@@ -686,7 +686,7 @@ class ExecutorUnitTests(TestCase):
         self.assertEqual(plan, [(a2_impl, True)])
 
     def test_minimize_rollbacks_branchy(self):
-        """
+        r"""
         Minimize rollbacks when target has multiple in-app children.
 
         a: 1 <---- 3 <--\
@@ -731,7 +731,7 @@ class ExecutorUnitTests(TestCase):
         self.assertEqual(plan, exp)
 
     def test_backwards_nothing_to_do(self):
-        """
+        r"""
         If the current state satisfies the given target, do nothing.
 
         a: 1 <--- 2

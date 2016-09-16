@@ -181,7 +181,7 @@ class MigrationWriter(object):
         # for comments
         migration_imports = set()
         for line in list(imports):
-            if re.match("^import (.*)\.\d+[^\s]*$", line):
+            if re.match(r"^import (.*)\.\d+[^\s]*$", line):
                 migration_imports.add(line.split("import")[1].strip())
                 imports.remove(line)
                 self.needs_manual_porting = True

@@ -143,7 +143,7 @@ class UserAttributeSimilarityValidator(object):
             value = getattr(user, attribute_name, None)
             if not value or not isinstance(value, string_types):
                 continue
-            value_parts = re.split('\W+', value) + [value]
+            value_parts = re.split(r'\W+', value) + [value]
             for value_part in value_parts:
                 if SequenceMatcher(a=password.lower(), b=value_part.lower()).quick_ratio() > self.max_similarity:
                     try:

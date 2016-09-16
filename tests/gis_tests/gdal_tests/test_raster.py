@@ -71,7 +71,7 @@ class GDALRasterTests(unittest.TestCase):
 
     def test_rs_name_repr(self):
         self.assertEqual(self.rs_path, self.rs.name)
-        six.assertRegex(self, repr(self.rs), "<Raster object at 0x\w+>")
+        six.assertRegex(self, repr(self.rs), r"<Raster object at 0x\w+>")
 
     def test_rs_driver(self):
         self.assertEqual(self.rs.driver.name, 'GTiff')

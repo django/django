@@ -423,11 +423,11 @@ def slugify(value, allow_unicode=False):
     value = force_text(value)
     if allow_unicode:
         value = unicodedata.normalize('NFKC', value)
-        value = re.sub('[^\w\s-]', '', value, flags=re.U).strip().lower()
-        return mark_safe(re.sub('[-\s]+', '-', value, flags=re.U))
+        value = re.sub(r'[^\w\s-]', '', value, flags=re.U).strip().lower()
+        return mark_safe(re.sub(r'[-\s]+', '-', value, flags=re.U))
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
-    value = re.sub('[^\w\s-]', '', value).strip().lower()
-    return mark_safe(re.sub('[-\s]+', '-', value))
+    value = re.sub(r'[^\w\s-]', '', value).strip().lower()
+    return mark_safe(re.sub(r'[-\s]+', '-', value))
 
 
 def camel_case_to_spaces(value):

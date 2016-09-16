@@ -33,7 +33,7 @@ __all__ = ('Client', 'RedirectCycleError', 'RequestFactory', 'encode_file', 'enc
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
-CONTENT_TYPE_RE = re.compile('.*; charset=([\w\d-]+);?')
+CONTENT_TYPE_RE = re.compile(r'.*; charset=([\w\d-]+);?')
 
 
 class RedirectCycleError(Exception):

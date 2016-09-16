@@ -2914,7 +2914,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
         six.assertRaisesRegex(
             self, ValidationError,
-            "'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home']
+            r"'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home']
         )
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(['61', '287654321', '123', 'Home'])
@@ -2930,7 +2930,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
         six.assertRaisesRegex(
             self, ValidationError,
-            "'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home']
+            r"'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home']
         )
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(['61', '287654321', '123', 'Home'])

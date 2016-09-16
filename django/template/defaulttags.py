@@ -1329,7 +1329,7 @@ def templatetag(parser, token):
 
 @register.tag
 def url(parser, token):
-    """
+    r"""
     Return an absolute URL matching the given view with its parameters.
 
     This is a way to define links that aren't tied to a particular URL

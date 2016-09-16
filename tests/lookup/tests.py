@@ -411,7 +411,7 @@ class LookupTests(TestCase):
         Article.objects.create(headline='Article with \\ backslash', pub_date=datetime(2005, 11, 22))
         self.assertQuerysetEqual(
             Article.objects.filter(headline__contains='\\'),
-            ['<Article: Article with \ backslash>']
+            [r'<Article: Article with \ backslash>']
         )
 
     def test_exclude(self):

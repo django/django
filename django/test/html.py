@@ -10,7 +10,7 @@ from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html_parser import HTMLParseError, HTMLParser
 
-WHITESPACE = re.compile('\s+')
+WHITESPACE = re.compile(r'\s+')
 
 
 def normalize_whitespace(string):

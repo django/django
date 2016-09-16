@@ -419,7 +419,7 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         self.assertHTMLEqual(
             w.render('test', self.album.cover_art),
             '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/'
-            'hybrid_theory.jpg">albums\hybrid_theory.jpg</a> '
+            r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a> '
             '<span class="clearable-file-input">'
             '<input type="checkbox" name="test-clear" id="test-clear_id" /> '
             '<label for="test-clear_id">Clear</label></span><br />'
@@ -441,7 +441,7 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         self.assertContains(
             response,
             '<p><a href="%(STORAGE_URL)salbums/hybrid_theory.jpg">'
-            'albums\hybrid_theory.jpg</a></p>' % {'STORAGE_URL': default_storage.url('')},
+            r'albums\hybrid_theory.jpg</a></p>' % {'STORAGE_URL': default_storage.url('')},
             html=True,
         )
         self.assertNotContains(

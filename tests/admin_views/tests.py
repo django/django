@@ -2289,7 +2289,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         cls.p1 = PrePopulatedPost.objects.create(title='A Long Title', published=True, slug='a-long-title')
         cls.pk = (
             "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890 "
-            """-_.!~*'() ;/?:@&=+$, <>#%" {}|\^[]`"""
+            r"""-_.!~*'() ;/?:@&=+$, <>#%" {}|\^[]`"""
         )
         cls.m1 = ModelWithStringPrimaryKey.objects.create(string_pk=cls.pk)
         content_type_pk = ContentType.objects.get_for_model(ModelWithStringPrimaryKey).pk
@@ -4323,7 +4323,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
         self.get_select_option('#id_relatedprepopulated_set-2-1-status', 'option one').click()
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-name').send_keys(
-            'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters'
+            r'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters'
         )
         slug1 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-slug2').get_attribute('value')
@@ -4365,7 +4365,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             slug2='option-two-and-now-tabular-inline',
         )
         RelatedPrepopulated.objects.get(
-            name='a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters',
+            name=r'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters',
             pubdate='1981-08-22',
             status='option one',
             slug1='tabular-inline-ignored-characters-1981-08-22',

@@ -158,11 +158,11 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(kwargs, {"upload_to": "foo/bar", "max_length": 200})
 
     def test_file_path_field(self):
-        field = models.FilePathField(match=".*\.txt$")
+        field = models.FilePathField(match=r".*\.txt$")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.FilePathField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"match": ".*\.txt$"})
+        self.assertEqual(kwargs, {"match": r".*\.txt$"})
         field = models.FilePathField(recursive=True, allow_folders=True, max_length=123)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.FilePathField")

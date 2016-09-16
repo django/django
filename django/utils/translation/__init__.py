@@ -255,7 +255,7 @@ def get_language_info(lang_code):
         info['name_translated'] = ugettext_lazy(info['name'])
     return info
 
-trim_whitespace_re = re.compile('\s*\n\s*')
+trim_whitespace_re = re.compile(r'\s*\n\s*')
 
 
 def trim_whitespace(s):

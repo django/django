@@ -747,7 +747,7 @@ class FormattingTests(SimpleTestCase):
         self.maxDiff = 3000
         # Catalan locale
         with translation.override('ca', deactivate=True):
-            self.assertEqual('j \d\e F \d\e Y', get_format('DATE_FORMAT'))
+            self.assertEqual(r'j \d\e F \d\e Y', get_format('DATE_FORMAT'))
             self.assertEqual(1, get_format('FIRST_DAY_OF_WEEK'))
             self.assertEqual(',', get_format('DECIMAL_SEPARATOR'))
             self.assertEqual('10:15', time_format(self.t))

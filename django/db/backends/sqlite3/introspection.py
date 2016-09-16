@@ -125,14 +125,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             if field_desc.startswith("UNIQUE"):
                 continue
 
-            m = re.search('references (\S*) ?\(["|]?(.*)["|]?\)', field_desc, re.I)
+            m = re.search(r'references (\S*) ?\(["|]?(.*)["|]?\)', field_desc, re.I)
             if not m:
                 continue
             table, column = [s.strip('"') for s in m.groups()]
 
             if field_desc.startswith("FOREIGN KEY"):
                 # Find name of the target FK field
-                m = re.match('FOREIGN KEY\(([^\)]*)\).*', field_desc, re.I)
+                m = re.match(r'FOREIGN KEY\(([^\)]*)\).*', field_desc, re.I)
                 field_name = m.groups()[0].strip('"')
             else:
                 field_name = field_desc.split()[0].strip('"')
@@ -175,7 +175,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             if field_desc.startswith("UNIQUE"):
                 continue
 
-            m = re.search('"(.*)".*references (.*) \(["|](.*)["|]\)', field_desc, re.I)
+            m = re.search(r'"(.*)".*references (.*) \(["|](.*)["|]\)', field_desc, re.I)
             if not m:
                 continue
 

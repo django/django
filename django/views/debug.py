@@ -537,7 +537,7 @@ TECHNICAL_500_TEMPLATE = ("""
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="robots" content="NONE,NOARCHIVE">
   <title>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}"""
-"""{% if request %} at {{ request.path_info|escape }}{% endif %}</title>
+r"""{% if request %} at {{ request.path_info|escape }}{% endif %}</title>
   <style type="text/css">
     html * { padding:0; margin:0; }
     body * { padding:10px 20px; }
