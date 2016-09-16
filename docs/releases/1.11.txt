@@ -446,6 +446,15 @@ Protection against insecure redirects in :mod:`django.contrib.auth` and ``i18n``
 and :func:`~django.views.i18n.set_language` protect users from being redirected
 to non-HTTPS ``next`` URLs when the app is running over HTTPS.
 
+``QuerySet.get_or_create()`` and ``update_or_create()`` validate arguments
+--------------------------------------------------------------------------
+
+To prevent typos from passing silently,
+:meth:`~django.db.models.query.QuerySet.get_or_create` and
+:meth:`~django.db.models.query.QuerySet.update_or_create` check that their
+arguments are model fields. This should be backwards-incompatible only in the
+fact that it might expose a bug in your project.
+
 Miscellaneous
 -------------
 
