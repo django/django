@@ -1897,8 +1897,8 @@ Field API reference
         :class:`~django.forms.ModelForm`.
 
         By default, if both ``form_class`` and ``choices_form_class`` are
-        ``None``, it uses :class:`~django.forms.CharField`; if
-        ``choices_form_class`` is given, it returns
+        ``None``, it uses :class:`~django.forms.CharField`; if attribute `choices`
+        is given while ``choices_form_class`` not, it returns 
         :class:`~django.forms.TypedChoiceField`.
 
         See :ref:`specifying-form-field-for-model-field` for usage.
