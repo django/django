@@ -9,9 +9,8 @@ from django.utils.encoding import python_2_unicode_compatible
 @python_2_unicode_compatible
 class PostGISGeometryColumns(models.Model):
     """
-    The 'geometry_columns' table from the PostGIS. See the PostGIS
+    The 'geometry_columns' view from PostGIS. See the PostGIS
     documentation at Ch. 4.3.2.
-    On PostGIS 2, this is a view.
     """
     f_table_catalog = models.CharField(max_length=256)
     f_table_schema = models.CharField(max_length=256)
