@@ -6,7 +6,6 @@ from unittest import skipUnless
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.test import TestCase, override_settings
-from django.utils import six
 
 from .models import Article, Category, Comment
 
@@ -86,10 +85,9 @@ class DatesTests(TestCase):
             Article.objects.dates()
 
     def test_dates_fails_when_given_invalid_field_argument(self):
-        six.assertRaisesRegex(
-            self,
+        self.assertRaisesMessage(
             FieldError,
-            "Cannot resolve keyword u?'invalid_field' into field. Choices are: "
+            "Cannot resolve keyword 'invalid_field' into field. Choices are: "
             "categories, comments, id, pub_date, pub_datetime, title",
             Article.objects.dates,
             "invalid_field",

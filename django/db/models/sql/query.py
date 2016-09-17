@@ -1339,7 +1339,7 @@ class Query(object):
                 if pos == -1 or fail_on_missing:
                     field_names = list(get_field_names_from_opts(opts))
                     available = sorted(field_names + list(self.annotation_select))
-                    raise FieldError("Cannot resolve keyword %r into field. "
+                    raise FieldError("Cannot resolve keyword '%s' into field. "
                                      "Choices are: %s" % (name, ", ".join(available)))
                 break
             # Check if we need any joins for concrete inheritance cases (the
