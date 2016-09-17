@@ -223,7 +223,7 @@ class Options(object):
                     if f.name == query or f.attname == query
                 )
             except StopIteration:
-                raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, query))
+                raise FieldDoesNotExist("%s has no field named '%s'" % (self.object_name, query))
 
             self.ordering = ('_order',)
             if not any(isinstance(field, OrderWrt) for field in model._meta.local_fields):
@@ -605,7 +605,7 @@ class Options(object):
             # unavailable, therefore we throw a FieldDoesNotExist exception.
             if not self.apps.models_ready:
                 raise FieldDoesNotExist(
-                    "%s has no field named %r. The app cache isn't ready yet, "
+                    "%s has no field named '%s'. The app cache isn't ready yet, "
                     "so if this is an auto-created related field, it won't "
                     "be available yet." % (self.object_name, field_name)
                 )
@@ -615,7 +615,7 @@ class Options(object):
             # field map.
             return self.fields_map[field_name]
         except KeyError:
-            raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
+            raise FieldDoesNotExist("%s has no field named '%s'" % (self.object_name, field_name))
 
     def get_base_chain(self, model):
         """

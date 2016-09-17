@@ -307,7 +307,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             self.assertEqual(book.rating, 5)
             self.assertEqual(book.other_rating, 4)
 
-        with six.assertRaisesRegex(self, FieldDoesNotExist, "\w has no field named u?'other_rating'"):
+        with self.assertRaisesMessage(FieldDoesNotExist, "Book has no field named 'other_rating'"):
             book = qs.defer('other_rating').get(other_rating=4)
 
     def test_mti_annotations(self):
