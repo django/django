@@ -237,7 +237,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             self.assertEqual(book.sum_rating, book.rating)
 
     def test_filter_wrong_annotation(self):
-        with six.assertRaisesRegex(self, FieldError, "Cannot resolve keyword .*"):
+        with self.assertRaisesMessage(FieldError, "Cannot resolve keyword 'nope' into field."):
             list(Book.objects.annotate(
                 sum_rating=Sum('rating')
             ).filter(sum_rating=F('nope')))
