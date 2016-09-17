@@ -1370,8 +1370,8 @@ implementation details see :ref:`using-the-views`.
       for generating a ``text/html`` multipart email with the password reset
       link. By default, HTML email is not sent.
 
-    * ``extra_email_context``: A dictionary of context data that will available
-      in the email template.
+    * ``extra_email_context``: A dictionary of context data that will be
+      available in the email template.
 
     **Template context:**
 
