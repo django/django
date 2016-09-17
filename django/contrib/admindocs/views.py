@@ -442,7 +442,8 @@ def simplify_regex(pattern):
     pattern = non_named_group_matcher.sub("<var>", pattern)
 
     # clean up any outstanding regex-y characters.
-    pattern = pattern.replace('^', '').replace('$', '').replace('?', '').replace('//', '/').replace('\\', '')
+    pattern = pattern.replace('^', '').replace('$', '').replace('?', '').replace('//', '/') \
+                                                                        .replace('\\', '').replace(')', '')
     if not pattern.startswith('/'):
         pattern = '/' + pattern
     return pattern

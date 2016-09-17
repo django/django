@@ -155,6 +155,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
             ('^a', '/a'),
             ('^(?P<a>\w+)/b/(?P<c>\w+)/$', '/<a>/b/<c>/'),
             ('^(?P<a>\w+)/b/(?P<c>\w+)$', '/<a>/b/<c>'),
+            ('^(?P<a>(\w+))/b/(?P<c>(\w+))$', '/<a>/b/<c>')
         )
         for pattern, output in tests:
             self.assertEqual(simplify_regex(pattern), output)
