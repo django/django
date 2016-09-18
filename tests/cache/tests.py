@@ -2174,6 +2174,7 @@ class CacheMiddlewareTest(SimpleTestCase):
             self.assertEqual('Sun, 17 Jul 2016 10:00:02 GMT', response['Expires'])
             self.assertIn('Cache-Control', response)
             self.assertEqual('max-age=2', response['Cache-Control'])
+            self.assertNotIn('Age', response)
 
         # Second request made later should have different Cache-Control's max-age
         with mock.patch.object(time, 'time', return_value=1468749601):  # Sun, 17 Jul 2016 10:00:01 GMT
@@ -2182,7 +2183,9 @@ class CacheMiddlewareTest(SimpleTestCase):
             self.assertIn('Expires', response)
             self.assertEqual('Sun, 17 Jul 2016 10:00:02 GMT', response['Expires'])
             self.assertIn('Cache-Control', response)
-            self.assertEqual('max-age=1', response['Cache-Control'])
+            self.assertEqual('max-age=2', response['Cache-Control'])
+            self.assertIn('Age', response)
+            self.assertEqual('1', response['Age'])
 
 
 @override_settings(

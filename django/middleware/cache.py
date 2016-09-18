@@ -49,7 +49,7 @@ from django.conf import settings
 from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.utils.cache import (
     get_cache_key, get_max_age, has_vary_header, learn_cache_key,
-    patch_cache_control, patch_response_headers,
+    patch_response_headers,
 )
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import parse_http_date
@@ -147,12 +147,13 @@ class FetchFromCacheMiddleware(MiddlewareMixin):
             request._cache_update_cache = True
             return None  # No cache information available, need to rebuild.
 
+        # Setting cache Age
         if 'Expires' in response:
-            # Replace 'max-age' value of the 'Cache-Control' by one
-            # calculated from the 'Expires'.
-            expires = parse_http_date(response['Expires'])
-            timeout = expires - int(time.time())
-            patch_cache_control(response, max_age=timeout)
+            max_age = get_max_age(response)
+            if max_age:
+                expires = parse_http_date(response['Expires'])
+                timeout = expires - int(time.time())
+                response['Age'] = max_age - timeout
 
         # hit, return cached response
         request._cache_update_cache = False
