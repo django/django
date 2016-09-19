@@ -248,14 +248,17 @@ class PasswordResetForm(forms.Form):
         email_message.send()
 
     def get_users(self, email):
-        """Given an email, return matching user(s) who should receive a reset.
+        """
+        Given an email , return matching user(s) who should receive a reset.
 
         This allows subclasses to more easily customize the default policies
         that prevent inactive users and users with unusable passwords from
         resetting their password.
         """
-        active_users = get_user_model()._default_manager.filter(
-            email__iexact=email, is_active=True)
+        UserModel = get_user_model()
+        active_users = UserModel._default_manager.filter(**{
+            '%s__iexact' % UserModel.get_email_field_name(): email,
+            'is_active': True, })
         return (u for u in active_users if u.has_usable_password())
 
     def save(self, domain_override=None,
@@ -277,7 +280,7 @@ class PasswordResetForm(forms.Form):
             else:
                 site_name = domain = domain_override
             context = {
-                'email': user.email,
+                'email': email,
                 'domain': domain,
                 'site_name': site_name,
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
@@ -289,7 +292,7 @@ class PasswordResetForm(forms.Form):
                 context.update(extra_email_context)
             self.send_mail(
                 subject_template_name, email_template_name, context, from_email,
-                user.email, html_email_template_name=html_email_template_name,
+                email, html_email_template_name=html_email_template_name,
             )
 
 

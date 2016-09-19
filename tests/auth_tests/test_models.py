@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth import get_user_model
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.hashers import get_hasher
 from django.contrib.auth.models import (
     AbstractUser, Group, Permission, User, UserManager,
@@ -11,6 +12,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.db.models.signals import post_save
 from django.test import TestCase, mock, override_settings
+
+from .models.with_custom_email_field import CustomEmailField
 
 
 class NaturalKeysTestCase(TestCase):
@@ -159,6 +162,14 @@ class AbstractBaseUserTests(TestCase):
                 username = user.get_username()
                 self.assertNotEqual(username, ohm_username)
                 self.assertEqual(username, 'iamtheΩ')  # U+03A9 GREEK CAPITAL LETTER OMEGA
+
+    def test_default_email(self):
+        user = AbstractBaseUser()
+        self.assertEqual(user.get_email_field_name(), 'email')
+
+    def test_custom_email(self):
+        user = CustomEmailField()
+        self.assertEqual(user.get_email_field_name(), 'email_address')
 
 
 class AbstractUserTestCase(TestCase):
