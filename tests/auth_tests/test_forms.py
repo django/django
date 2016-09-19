@@ -26,6 +26,7 @@ from django.utils.translation import ugettext as _
 from .models.custom_user import (
     CustomUser, CustomUserWithoutIsActiveField, ExtensionUser,
 )
+from .models.with_custom_email_field import CustomEmailField
 from .models.with_integer_username import IntegerUsernameUser
 from .settings import AUTH_TEMPLATES
 
@@ -811,6 +812,17 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
             r'^<html><a href="http://example.com/reset/[\w/-]+/">Link</a></html>$',
             message.get_payload(1).get_payload()
         ))
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomEmailField')
+    def test_custom_email_field(self):
+        email = 'test@mail.com'
+        CustomEmailField.objects.create_user('test name', 'test password', email)
+        form = PasswordResetForm({'email': email})
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(form.cleaned_data['email'], email)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, [email])
 
 
 class ReadOnlyPasswordHashTest(SimpleTestCase):

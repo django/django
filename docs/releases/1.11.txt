@@ -120,6 +120,11 @@ Minor features
 * The :func:`~django.contrib.auth.signals.user_login_failed` signal now
   receives a ``request`` argument.
 
+* :class:`~django.contrib.auth.forms.PasswordResetForm` supports custom user
+  models that use an email field named something other than ``'email'``.
+  Set :attr:`CustomUser.EMAIL_FIELD
+  <django.contrib.auth.models.CustomUser.EMAIL_FIELD>` to the name of the field.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

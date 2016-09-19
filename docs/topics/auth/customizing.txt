@@ -544,6 +544,14 @@ password resets. You must then provide some key implementation details:
         value (the :attr:`~django.db.models.Field.primary_key` by default) of an
         existing instance.
 
+    .. attribute:: EMAIL_FIELD
+
+        .. versionadded:: 1.11
+
+        A string describing the name of the email field on the ``User`` model.
+        This value is returned by
+        :meth:`~models.AbstractBaseUser.get_email_field_name`.
+
     .. attribute:: REQUIRED_FIELDS
 
         A list of the field names that will be prompted for when creating a
@@ -622,6 +630,14 @@ The following attributes and methods are available on any subclass of
         Normalizes the username by calling :meth:`normalize_username`. If you
         override this method, be sure to call ``super()`` to retain the
         normalization.
+
+    .. classmethod:: get_email_field_name()
+
+       .. versionadded:: 1.11
+
+       Returns the name of the email field specified by the
+       :attr:`~models.CustomUser.EMAIL_FIELD` attribute. Defaults to
+       ``'email'`` if ``EMAIL_FIELD`` isn't specified.
 
     .. classmethod:: normalize_username(username)
 
@@ -807,9 +823,10 @@ The following forms make assumptions about the user model and can be used as-is
 if those assumptions are met:
 
 * :class:`~django.contrib.auth.forms.PasswordResetForm`: Assumes that the user
-  model has a field named ``email`` that can be used to identify the user and a
-  boolean field named ``is_active`` to prevent password resets for inactive
-  users.
+  model has a field that stores the user's email address with the name returned
+  by :meth:`~models.AbstractBaseUser.get_email_field_name` (``email`` by
+  default) that can be used to identify the user and a boolean field named
+  ``is_active`` to prevent password resets for inactive users.
 
 Finally, the following forms are tied to
 :class:`~django.contrib.auth.models.User` and need to be rewritten or extended
