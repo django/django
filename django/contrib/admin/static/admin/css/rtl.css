@@ -166,6 +166,10 @@ thead th.sorted .text {
     margin-left: 5px;
 }
 
+form .aligned p.help {
+    clear: right;
+}
+
 form ul.inline li {
     float: right;
     padding-right: 0;
@@ -253,4 +257,8 @@ div.colM {
 
 .submit-row input {
     float: left;
+}
+
+.related-widget-wrapper {
+    float: right;
 }
