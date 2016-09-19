@@ -14,3 +14,6 @@ Bugfixes
 
 * Allowed combining ``contrib.postgres.search.SearchQuery`` with more than one
   ``&`` or ``|`` operators (:ticket:`27143`).
+
+* Disabled system check for URL patterns beginning with a '/' when
+  ``APPEND_SLASH=False`` (:ticket:`27238`).
