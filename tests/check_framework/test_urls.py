@@ -55,6 +55,16 @@ class CheckUrlsTest(SimpleTestCase):
 
         self.assertIn(expected_msg, warning.msg)
 
+    @override_settings(
+        ROOT_URLCONF='check_framework.urls.beginning_with_slash',
+        APPEND_SLASH=False,
+    )
+    def test_beginning_with_slash_append_slash(self):
+        # It can be useful to start a URL pattern with a slash when
+        # APPEND_SLASH=False (#27238).
+        result = check_url_config(None)
+        self.assertEqual(result, [])
+
     @override_settings(ROOT_URLCONF='check_framework.urls.name_with_colon')
     def test_name_with_colon(self):
         result = check_url_config(None)
