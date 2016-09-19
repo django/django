@@ -529,10 +529,8 @@ class MigrationAutodetector(object):
                     related_fields[field.name] = field
                 if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
                     related_fields[field.name] = field
-            # Are there any indexes to defer?
-            indexes = model_state.options['indexes']
-            model_state.options['indexes'] = []
-            # Are there unique/index_together to defer?
+            # Are there indexes/unique|index_together to defer?
+            indexes = model_state.options.pop('indexes')
             unique_together = model_state.options.pop('unique_together', None)
             index_together = model_state.options.pop('index_together', None)
             order_with_respect_to = model_state.options.pop('order_with_respect_to', None)
