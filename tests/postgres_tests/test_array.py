@@ -5,6 +5,7 @@ import uuid
 
 from django import forms
 from django.core import exceptions, serializers, validators
+from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
 from django.test import TransactionTestCase, override_settings
@@ -304,6 +305,15 @@ class TestQuerying(PostgreSQLTestCase):
             ),
             [self.objs[3]]
         )
+
+    def test_unsupported_lookup(self):
+        msg = "Unsupported lookup '0_bar' for ArrayField or join on the field not permitted."
+        with self.assertRaisesMessage(FieldError, msg):
+            list(NullableIntegerArrayModel.objects.filter(field__0_bar=[2]))
+
+        msg = "Unsupported lookup '0bar' for ArrayField or join on the field not permitted."
+        with self.assertRaisesMessage(FieldError, msg):
+            list(NullableIntegerArrayModel.objects.filter(field__0bar=[2]))
 
 
 class TestDateTimeExactQuerying(PostgreSQLTestCase):
