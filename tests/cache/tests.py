@@ -2176,7 +2176,7 @@ class CacheMiddlewareTest(SimpleTestCase):
             self.assertEqual('max-age=2', response['Cache-Control'])
             self.assertNotIn('Age', response)
 
-        # Second request made later should have different Cache-Control's max-age
+        # Response for second request made later must have Age header
         with mock.patch.object(time, 'time', return_value=1468749601):  # Sun, 17 Jul 2016 10:00:01 GMT
             response = view(request)
             response.close()
