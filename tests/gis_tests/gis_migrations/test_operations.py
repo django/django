@@ -20,14 +20,21 @@ if connection.features.gis_enabled:
 
 
 @skipUnlessDBFeature('gis_enabled')
-class OperationTests(TransactionTestCase):
+class OperationTestCase(TransactionTestCase):
     available_apps = ['gis_tests.gis_migrations']
 
     def tearDown(self):
         # Delete table after testing
         if hasattr(self, 'current_state'):
             self.apply_operations('gis', self.current_state, [migrations.DeleteModel('Neighborhood')])
-        super(OperationTests, self).tearDown()
+        super(OperationTestCase, self).tearDown()
+
+    @property
+    def has_spatial_indexes(self):
+        if mysql:
+            with connection.cursor() as cursor:
+                return connection.introspection.supports_spatial_index(cursor, 'gis_neighborhood')
+        return True
 
     def get_table_description(self, table):
         with connection.cursor() as cursor:
@@ -54,7 +61,7 @@ class OperationTests(TransactionTestCase):
         if connection.features.supports_raster or force_raster_creation:
             test_fields += [('rast', fields.RasterField(srid=4326))]
         operations = [migrations.CreateModel('Neighborhood', test_fields)]
-        return self.apply_operations('gis', ProjectState(), operations)
+        self.current_state = self.apply_operations('gis', ProjectState(), operations)
 
     def assertGeometryColumnsCount(self, expected_count):
         table_name = 'gis_neighborhood'
@@ -80,18 +87,23 @@ class OperationTests(TransactionTestCase):
             self.assertIn([column], [c['columns'] for c in constraints.values()])
 
     def alter_gis_model(self, migration_class, model_name, field_name,
-                        blank=False, field_class=None):
-        project_state = self.set_up_test_model()
-        self.current_state = project_state
+                        blank=False, field_class=None, field_class_kwargs=None):
         args = [model_name, field_name]
         if field_class:
-            args.append(field_class(srid=4326, blank=blank))
+            field_class_kwargs = field_class_kwargs or {'srid': 4326, 'blank': blank}
+            args.append(field_class(**field_class_kwargs))
         operation = migration_class(*args)
-        new_state = project_state.clone()
-        operation.state_forwards('gis', new_state)
-        self.current_state = new_state
+        old_state = self.current_state.clone()
+        operation.state_forwards('gis', self.current_state)
         with connection.schema_editor() as editor:
-            operation.database_forwards('gis', editor, project_state, new_state)
+            operation.database_forwards('gis', editor, old_state, self.current_state)
+
+
+class OperationTests(OperationTestCase):
+
+    def setUp(self):
+        super(OperationTests, self).setUp()
+        self.set_up_test_model()
 
     def test_add_geom_field(self):
         """
@@ -119,27 +131,6 @@ class OperationTests(TransactionTestCase):
         # Test spatial indices when available
         if self.has_spatial_indexes:
             self.assertSpatialIndexExists('gis_neighborhood', 'heatmap', raster=True)
-
-    @skipIfDBFeature('supports_raster')
-    def test_create_raster_model_on_db_without_raster_support(self):
-        """
-        Test creating a model with a raster field on a db without raster support.
-        """
-        msg = 'Raster fields require backends with raster support.'
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            self.set_up_test_model(True)
-
-    @skipIfDBFeature('supports_raster')
-    def test_add_raster_field_on_db_without_raster_support(self):
-        """
-        Test adding a raster field on a db without raster support.
-        """
-        msg = 'Raster fields require backends with raster support.'
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            self.alter_gis_model(
-                migrations.AddField, 'Neighborhood', 'heatmap',
-                False, fields.RasterField
-            )
 
     def test_add_blank_geom_field(self):
         """
@@ -188,8 +179,6 @@ class OperationTests(TransactionTestCase):
         self.assertColumnNotExists('gis_neighborhood', 'rast')
 
     def test_create_model_spatial_index(self):
-        self.current_state = self.set_up_test_model()
-
         if not self.has_spatial_indexes:
             self.skipTest('No support for Spatial indexes')
 
@@ -198,9 +187,19 @@ class OperationTests(TransactionTestCase):
         if connection.features.supports_raster:
             self.assertSpatialIndexExists('gis_neighborhood', 'rast', raster=True)
 
-    @property
-    def has_spatial_indexes(self):
-        if mysql:
-            with connection.cursor() as cursor:
-                return connection.introspection.supports_spatial_index(cursor, 'gis_neighborhood')
-        return True
+
+@skipIfDBFeature('supports_raster')
+class NoRasterSupportTests(OperationTestCase):
+    def test_create_raster_model_on_db_without_raster_support(self):
+        msg = 'Raster fields require backends with raster support.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.set_up_test_model(force_raster_creation=True)
+
+    def test_add_raster_field_on_db_without_raster_support(self):
+        msg = 'Raster fields require backends with raster support.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.set_up_test_model()
+            self.alter_gis_model(
+                migrations.AddField, 'Neighborhood', 'heatmap',
+                False, fields.RasterField
+            )
