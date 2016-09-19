@@ -141,6 +141,8 @@ Minor features
   ``https://cdnjs.cloudflare.com`` which is more suitable for production use
   than the the old ``http://openlayers.org`` source.
 
+* PostGIS migrations can now change field dimensions.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 
+from unittest import skipIf
+
 from django.contrib.gis.db.models import fields
+from django.contrib.gis.geos import MultiPolygon, Polygon
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, migrations, models
 from django.db.migrations.migration import Migration
@@ -9,7 +12,7 @@ from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
 
-from ..utils import mysql
+from ..utils import mysql, spatialite
 
 if connection.features.gis_enabled:
     try:
@@ -59,7 +62,7 @@ class OperationTestCase(TransactionTestCase):
             ('geom', fields.MultiPolygonField(srid=4326))
         ]
         if connection.features.supports_raster or force_raster_creation:
-            test_fields += [('rast', fields.RasterField(srid=4326))]
+            test_fields += [('rast', fields.RasterField(srid=4326, null=True))]
         operations = [migrations.CreateModel('Neighborhood', test_fields)]
         self.current_state = self.apply_operations('gis', ProjectState(), operations)
 
@@ -186,6 +189,25 @@ class OperationTests(OperationTestCase):
 
         if connection.features.supports_raster:
             self.assertSpatialIndexExists('gis_neighborhood', 'rast', raster=True)
+
+    @skipUnlessDBFeature("supports_3d_storage")
+    @skipIf(spatialite, "Django currently doesn't support altering Spatialite geometry fields")
+    def test_alter_geom_field_dim(self):
+        Neighborhood = self.current_state.apps.get_model('gis', 'Neighborhood')
+        p1 = Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
+        Neighborhood.objects.create(name='TestDim', geom=MultiPolygon(p1, p1))
+        # Add 3rd dimension.
+        self.alter_gis_model(
+            migrations.AlterField, 'Neighborhood', 'geom', False,
+            fields.MultiPolygonField, field_class_kwargs={'srid': 4326, 'dim': 3}
+        )
+        self.assertTrue(Neighborhood.objects.first().geom.hasz)
+        # Rewind to 2 dimensions.
+        self.alter_gis_model(
+            migrations.AlterField, 'Neighborhood', 'geom', False,
+            fields.MultiPolygonField, field_class_kwargs={'srid': 4326, 'dim': 2}
+        )
+        self.assertFalse(Neighborhood.objects.first().geom.hasz)
 
 
 @skipIfDBFeature('supports_raster')
