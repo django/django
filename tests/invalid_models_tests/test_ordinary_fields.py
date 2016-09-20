@@ -440,21 +440,6 @@ class FileFieldTests(SimpleTestCase):
         expected = []
         self.assertEqual(errors, expected)
 
-    def test_unique(self):
-        class Model(models.Model):
-            field = models.FileField(unique=False, upload_to='somewhere')
-
-        field = Model._meta.get_field('field')
-        errors = field.check()
-        expected = [
-            Error(
-                "'unique' is not a valid argument for a FileField.",
-                obj=field,
-                id='fields.E200',
-            )
-        ]
-        self.assertEqual(errors, expected)
-
     def test_primary_key(self):
         class Model(models.Model):
             field = models.FileField(primary_key=False, upload_to='somewhere')
