@@ -2671,6 +2671,18 @@ Templates can override or extend base admin templates as described in
     :attr:`User.is_staff <django.contrib.auth.models.User.is_staff>` to be
     ``True``.
 
+.. method:: AdminSite.register(model_or_iterable, admin_class=None, **options)
+
+    Registers the given model class (or iterable of classes) with the given
+    ``admin_class``. ``admin_class`` defaults to
+    :class:`~django.contrib.admin.ModelAdmin` (the default admin options). If
+    keyword arguments are given -- e.g. ``list_display`` -- they'll be applied
+    as options to the admin class.
+
+    Raises :class:`~django.core.exceptions.ImproperlyConfigured` if a model is
+    abstract. and ``django.contrib.admin.sites.AlreadyRegistered`` if a model
+    is already registered.
+
 Hooking ``AdminSite`` instances into your URLconf
 -------------------------------------------------
 
