@@ -1448,6 +1448,19 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         finally:
             SMTP.send = send
 
+    def test_send_messages_after_open_failed(self):
+        """Test that no messages are sent after open() silently failed."""
+        backend = smtp.EmailBackend()
+
+        def mock_open():
+            return None
+
+        backend.open = mock_open
+
+        email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
+        self.assertEquals(backend.send_messages([email]), None)
+        backend.close()
+
 
 class SMTPBackendStoppedServerTest(SMTPBackendTestsBase):
     """
