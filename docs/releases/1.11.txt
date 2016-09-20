@@ -312,6 +312,9 @@ Models
 * Added support for query expressions on lookups that take multiple arguments,
   such as ``range``.
 
+* You can now use the ``unique=True`` option with
+  :class:`~django.db.models.FileField`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
