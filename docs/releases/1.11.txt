@@ -160,6 +160,10 @@ Minor features
   parameter to specify a custom class to encode data types not supported by the
   standard encoder.
 
+* The ``citext`` extension for case-insensitive lookups is now supported through
+  :class:`~django.contrib.postgres.fields.CITextField` with a corresponding
+  :class:`~django.contrib.postgres.operations.CITextExtension` to enable it.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -35,6 +35,15 @@ the ``django.contrib.postgres.operations`` module.
     Installs the ``hstore`` extension and also sets up the connection to
     interpret hstore data for possible use in subsequent migrations.
 
+``CITextExtension``
+===================
+
+.. class:: CITextExtension()
+
+    .. versionadded:: 1.11
+
+    Install the ``citext`` extension.
+
 ``TrigramExtension``
 ====================
 
