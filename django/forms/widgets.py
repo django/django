@@ -544,7 +544,7 @@ class Select(Widget):
             option_value = ''
         option_value = force_text(option_value)
         if option_value in selected_choices:
-            selected_html = mark_safe(' selected="selected"')
+            selected_html = mark_safe(' selected')
             if not self.allow_multiple_selected:
                 # Only allow for a single selection.
                 selected_choices.remove(option_value)

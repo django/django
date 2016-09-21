@@ -1075,18 +1075,18 @@ class ModelFormBasicTests(TestCase):
 <li>Slug: <input type="text" name="slug" maxlength="50" required /></li>
 <li>Pub date: <input type="text" name="pub_date" required /></li>
 <li>Writer: <select name="writer" required>
-<option value="" selected="selected">---------</option>
+<option value="" selected>---------</option>
 <option value="%s">Bob Woodward</option>
 <option value="%s">Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
 <li>Categories: <select multiple="multiple" name="categories">
-<option value="%s" selected="selected">Entertainment</option>
-<option value="%s" selected="selected">It&#39;s a test</option>
+<option value="%s" selected>Entertainment</option>
+<option value="%s" selected>It&#39;s a test</option>
 <option value="%s">Third test</option>
 </select></li>
 <li>Status: <select name="status">
-<option value="" selected="selected">---------</option>
+<option value="" selected>---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
@@ -1119,7 +1119,7 @@ class ModelFormBasicTests(TestCase):
 <li>Writer: <select name="writer" required>
 <option value="">---------</option>
 <option value="%s">Bob Woodward</option>
-<option value="%s" selected="selected">Mike Royko</option>
+<option value="%s" selected>Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
 <li>Categories: <select multiple="multiple" name="categories">
@@ -1128,7 +1128,7 @@ class ModelFormBasicTests(TestCase):
 <option value="%s">Third test</option>
 </select></li>
 <li>Status: <select name="status">
-<option value="" selected="selected">---------</option>
+<option value="" selected>---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
@@ -1171,8 +1171,8 @@ class ModelFormBasicTests(TestCase):
 <input id="id_headline" type="text" name="headline" maxlength="50" required /></li>
 <li><label for="id_categories">Categories:</label>
 <select multiple="multiple" name="categories" id="id_categories">
-<option value="%d" selected="selected">Entertainment</option>
-<option value="%d" selected="selected">It&39;s a test</option>
+<option value="%d" selected>Entertainment</option>
+<option value="%d" selected>It&39;s a test</option>
 <option value="%d">Third test</option>
 </select></li>"""
             % (self.c1.pk, self.c2.pk, self.c3.pk))
@@ -1233,7 +1233,7 @@ class ModelFormBasicTests(TestCase):
 <tr><th>Slug:</th><td><input type="text" name="slug" maxlength="50" required /></td></tr>
 <tr><th>Pub date:</th><td><input type="text" name="pub_date" required /></td></tr>
 <tr><th>Writer:</th><td><select name="writer" required>
-<option value="" selected="selected">---------</option>
+<option value="" selected>---------</option>
 <option value="%s">Bob Woodward</option>
 <option value="%s">Mike Royko</option>
 </select></td></tr>
@@ -1244,7 +1244,7 @@ class ModelFormBasicTests(TestCase):
 <option value="%s">Third test</option>
 </select></td></tr>
 <tr><th>Status:</th><td><select name="status">
-<option value="" selected="selected">---------</option>
+<option value="" selected>---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
@@ -1265,16 +1265,16 @@ class ModelFormBasicTests(TestCase):
 <li>Writer: <select name="writer" required>
 <option value="">---------</option>
 <option value="%s">Bob Woodward</option>
-<option value="%s" selected="selected">Mike Royko</option>
+<option value="%s" selected>Mike Royko</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
 <li>Categories: <select multiple="multiple" name="categories">
-<option value="%s" selected="selected">Entertainment</option>
+<option value="%s" selected>Entertainment</option>
 <option value="%s">It&#39;s a test</option>
 <option value="%s">Third test</option>
 </select></li>
 <li>Status: <select name="status">
-<option value="" selected="selected">---------</option>
+<option value="" selected>---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
@@ -1409,7 +1409,7 @@ class ModelFormBasicTests(TestCase):
 <li>Slug: <input type="text" name="slug" maxlength="50" required /></li>
 <li>Pub date: <input type="text" name="pub_date" required /></li>
 <li>Writer: <select name="writer" required>
-<option value="" selected="selected">---------</option>
+<option value="" selected>---------</option>
 <option value="%s">Bob Woodward</option>
 <option value="%s">Mike Royko</option>
 </select></li>
@@ -1420,7 +1420,7 @@ class ModelFormBasicTests(TestCase):
 <option value="%s">Third test</option>
 </select> </li>
 <li>Status: <select name="status">
-<option value="" selected="selected">---------</option>
+<option value="" selected>---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
@@ -1434,7 +1434,7 @@ class ModelFormBasicTests(TestCase):
 <li>Slug: <input type="text" name="slug" maxlength="50" required /></li>
 <li>Pub date: <input type="text" name="pub_date" required /></li>
 <li>Writer: <select name="writer" required>
-<option value="" selected="selected">---------</option>
+<option value="" selected>---------</option>
 <option value="%s">Bob Woodward</option>
 <option value="%s">Carl Bernstein</option>
 <option value="%s">Mike Royko</option>
@@ -1447,7 +1447,7 @@ class ModelFormBasicTests(TestCase):
 <option value="%s">Fourth</option>
 </select></li>
 <li>Status: <select name="status">
-<option value="" selected="selected">---------</option>
+<option value="" selected>---------</option>
 <option value="1">Draft</option>
 <option value="2">Pending</option>
 <option value="3">Live</option>
@@ -1911,7 +1911,7 @@ class ModelOneToOneFieldTests(TestCase):
         self.assertHTMLEqual(
             form.as_p(),
             '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer" required>
-<option value="" selected="selected">---------</option>
+<option value="" selected>---------</option>
 <option value="%s">Bob Woodward</option>
 <option value="%s">Mike Royko</option>
 </select></p>
@@ -1933,7 +1933,7 @@ class ModelOneToOneFieldTests(TestCase):
             form.as_p(),
             '''<p><label for="id_writer">Writer:</label> <select name="writer" id="id_writer" required>
 <option value="">---------</option>
-<option value="%s" selected="selected">Bob Woodward</option>
+<option value="%s" selected>Bob Woodward</option>
 <option value="%s">Mike Royko</option>
 </select></p>
 <p><label for="id_age">Age:</label>
@@ -2493,7 +2493,7 @@ class OtherModelFormTests(TestCase):
         form = InventoryForm(instance=core)
         self.assertHTMLEqual(six.text_type(form['parent']), '''<select name="parent" id="id_parent">
 <option value="">---------</option>
-<option value="86" selected="selected">Apple</option>
+<option value="86" selected>Apple</option>
 <option value="87">Core</option>
 <option value="22">Pear</option>
 </select>''')
@@ -2576,13 +2576,13 @@ class OtherModelFormTests(TestCase):
                 <input id="id_date_published" name="date_published" type="text" value="{0}" required />
                 <input id="initial-id_date_published" name="initial-date_published" type="hidden" value="{0}" /></p>
             <p><label for="id_mode">Mode:</label> <select id="id_mode" name="mode" required>
-                <option value="di" selected="selected">direct</option>
+                <option value="di" selected>direct</option>
                 <option value="de">delayed</option></select>
                 <input id="initial-id_mode" name="initial-mode" type="hidden" value="di" /></p>
            <p><label for="id_category">Category:</label> <select id="id_category" name="category" required>
                 <option value="1">Games</option>
                 <option value="2">Comics</option>
-                <option value="3" selected="selected">Novel</option></select>
+                <option value="3" selected>Novel</option></select>
                 <input id="initial-id_category" name="initial-category" type="hidden" value="3" />
             """.format(today_str)
         )
