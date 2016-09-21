@@ -288,3 +288,21 @@ class ParentWithUUIDAlternateKey(models.Model):
 class ChildRelatedViaAK(models.Model):
     name = models.CharField(max_length=255)
     parent = models.ForeignKey(ParentWithUUIDAlternateKey, models.CASCADE, to_field='uuid')
+
+
+class Map(models.Model):
+    name = models.CharField(max_length=128)
+    class Meta:
+        required_db_vendor = 'postgresql'
+
+
+
+class MapSpot(models.Model):
+    map = models.ForeignKey('postgres_tests.Map', models.CASCADE)
+    position = ArrayField(models.IntegerField(), size=2)
+
+    class Meta:
+        unique_together = (('map', 'position'))    
+        required_db_vendor = 'postgresql'
+        
+
