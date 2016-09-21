@@ -68,4 +68,5 @@ Trac instance, and continuous integration infrastructure.
 - Florian Apolloner
 - Aymeric Augustin
 - Tim Graham
+- Markus Holtermann
 - Jannis Leidel
