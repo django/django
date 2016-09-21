@@ -1448,6 +1448,16 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         finally:
             SMTP.send = send
 
+    def test_send_messages_after_open_failed(self):
+        # send_messages() shouldn't try to send messages if open() failed to connect.
+        backend = smtp.EmailBackend()
+
+        # open() returns None if connecting raises an exception.
+        backend.open = lambda: None
+
+        email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
+        self.assertEqual(backend.send_messages([email]), None)
+
 
 class SMTPBackendStoppedServerTest(SMTPBackendTestsBase):
     """
