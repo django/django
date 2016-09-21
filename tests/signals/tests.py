@@ -53,12 +53,12 @@ class SignalTests(BaseSignalTest):
 
         def pre_save_handler(signal, sender, instance, **kwargs):
             data.append(
-                (instance, kwargs.get("raw", False))
+                (instance, sender, kwargs.get("raw", False))
             )
 
         def post_save_handler(signal, sender, instance, **kwargs):
             data.append(
-                (instance, kwargs.get("created"), kwargs.get("raw", False))
+                (instance, sender, kwargs.get("created"), kwargs.get("raw", False))
             )
 
         signals.pre_save.connect(pre_save_handler, weak=False)
@@ -67,24 +67,24 @@ class SignalTests(BaseSignalTest):
             p1 = Person.objects.create(first_name="John", last_name="Smith")
 
             self.assertEqual(data, [
-                (p1, False),
-                (p1, True, False),
+                (p1, Person, False),
+                (p1, Person, True, False),
             ])
             data[:] = []
 
             p1.first_name = "Tom"
             p1.save()
             self.assertEqual(data, [
-                (p1, False),
-                (p1, False, False),
+                (p1, Person, False),
+                (p1, Person, False, False),
             ])
             data[:] = []
 
             # Calling an internal method purely so that we can trigger a "raw" save.
             p1.save_base(raw=True)
             self.assertEqual(data, [
-                (p1, True),
-                (p1, False, True),
+                (p1, Person, True),
+                (p1, Person, False, True),
             ])
             data[:] = []
 
@@ -92,15 +92,25 @@ class SignalTests(BaseSignalTest):
             p2.id = 99999
             p2.save()
             self.assertEqual(data, [
-                (p2, False),
-                (p2, True, False),
+                (p2, Person, False),
+                (p2, Person, True, False),
             ])
             data[:] = []
             p2.id = 99998
             p2.save()
             self.assertEqual(data, [
-                (p2, False),
-                (p2, True, False),
+                (p2, Person, False),
+                (p2, Person, True, False),
+            ])
+
+            # The sender should stay the same when using defer().
+            data[:] = []
+            p3 = Person.objects.defer('first_name').get(pk=p1.pk)
+            p3.last_name = 'Reese'
+            p3.save()
+            self.assertEqual(data, [
+                (p3, Person, False),
+                (p3, Person, False, False),
             ])
         finally:
             signals.pre_save.disconnect(pre_save_handler)
@@ -111,7 +121,7 @@ class SignalTests(BaseSignalTest):
 
         def pre_delete_handler(signal, sender, instance, **kwargs):
             data.append(
-                (instance, instance.id is None)
+                (instance, sender, instance.id is None)
             )
 
         # #8285: signals can be any callable
@@ -121,7 +131,7 @@ class SignalTests(BaseSignalTest):
 
             def __call__(self, signal, sender, instance, **kwargs):
                 self.data.append(
-                    (instance, instance.id is None)
+                    (instance, sender, instance.id is None)
                 )
         post_delete_handler = PostDeleteHandler(data)
 
@@ -131,8 +141,8 @@ class SignalTests(BaseSignalTest):
             p1 = Person.objects.create(first_name="John", last_name="Smith")
             p1.delete()
             self.assertEqual(data, [
-                (p1, False),
-                (p1, False),
+                (p1, Person, False),
+                (p1, Person, False),
             ])
             data[:] = []
 
@@ -143,8 +153,8 @@ class SignalTests(BaseSignalTest):
             p2.save()
             p2.delete()
             self.assertEqual(data, [
-                (p2, False),
-                (p2, False)
+                (p2, Person, False),
+                (p2, Person, False),
             ])
             data[:] = []
 
