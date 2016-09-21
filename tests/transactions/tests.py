@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import os
 import sys
 import threading
 import time
@@ -217,6 +218,18 @@ class AtomicTests(TransactionTestCase):
             transaction.set_rollback(False)
             transaction.savepoint_rollback(sid)
         self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+
+    @skipIf(sys.platform.startswith('win'), "Windows doesn't have signals.")
+    def test_rollback_on_keyboardinterrupt(self):
+        try:
+            with transaction.atomic():
+                Reporter.objects.create(first_name='Tintin')
+                # Send SIGINT (simulate Ctrl-C). One call isn't enough.
+                os.kill(os.getpid(), 2)
+                os.kill(os.getpid(), 2)
+        except KeyboardInterrupt:
+            pass
+        self.assertEqual(Reporter.objects.all().count(), 0)
 
 
 class AtomicInsideTransactionTests(AtomicTests):
