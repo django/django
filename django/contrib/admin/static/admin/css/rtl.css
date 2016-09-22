@@ -230,6 +230,10 @@ form .form-row p.datetime {
     overflow: hidden;
 }
 
+.related-widget-wrapper {
+    float: right;
+}
+
 /* MISC */
 
 .inline-related h2, .inline-group h2 {
@@ -259,6 +263,3 @@ div.colM {
     float: left;
 }
 
-.related-widget-wrapper {
-    float: right;
-}
