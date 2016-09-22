@@ -124,6 +124,7 @@ class TestQuerying(PostgreSQLTestCase):
                 'k': True,
                 'l': False,
             }),
+            JSONModel.objects.create(field={'foo': 'bar'}),
         ]
 
     def test_exact(self):
@@ -236,6 +237,27 @@ class TestQuerying(PostgreSQLTestCase):
             JSONModel.objects.filter(id__in=JSONModel.objects.filter(field__c=1)),
             self.objs[7:9]
         )
+
+    def test_icontains(self):
+        self.assertFalse(JSONModel.objects.filter(field__foo__icontains='"bar"').exists())
+
+    def test_startswith(self):
+        self.assertTrue(JSONModel.objects.filter(field__foo__startswith='b').exists())
+
+    def test_istartswith(self):
+        self.assertTrue(JSONModel.objects.filter(field__foo__istartswith='B').exists())
+
+    def test_endswith(self):
+        self.assertTrue(JSONModel.objects.filter(field__foo__endswith='r').exists())
+
+    def test_iendswith(self):
+        self.assertTrue(JSONModel.objects.filter(field__foo__iendswith='R').exists())
+
+    def test_regex(self):
+        self.assertTrue(JSONModel.objects.filter(field__foo__regex=r'^bar$').exists())
+
+    def test_iregex(self):
+        self.assertTrue(JSONModel.objects.filter(field__foo__iregex=r'^bAr$').exists())
 
 
 @skipUnlessDBFeature('has_jsonb_datatype')
