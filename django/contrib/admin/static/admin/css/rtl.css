@@ -166,7 +166,7 @@ thead th.sorted .text {
     margin-left: 5px;
 }
 
-form .aligned p.help {
+form .aligned p.help, div.help {
     clear: right;
 }
 
