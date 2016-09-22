@@ -7,6 +7,7 @@ import mimetypes
 import os
 import shutil
 import smtpd
+import socket
 import sys
 import tempfile
 import threading
@@ -1448,6 +1449,9 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         finally:
             SMTP.send = send
 
+
+class SMTPNoServerTests(SimpleTestCase):
+
     def test_send_messages_after_open_failed(self):
         """
         send_messages() shouldn't try to send messages if open() raises an
@@ -1460,6 +1464,16 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend.open = lambda: None
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
         self.assertEqual(backend.send_messages([email]), None)
+
+    def test_fail_silently_on_connection_error(self):
+        """
+        A socket connection error is silenced with fail_silently=True.
+        """
+        backend = smtp.EmailBackend(username='', password='')
+        with self.assertRaises(socket.error):
+            backend.open()
+        backend.fail_silently = True
+        backend.open()
 
 
 class SMTPBackendStoppedServerTest(SMTPBackendTestsBase):
