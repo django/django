@@ -139,7 +139,7 @@ docs_transforms = global_transforms + [
     Replacement(r":doc:`getting-started`", r":doc:`/intro/channels`"),
     Replacement(r"<backends>`", r"</ref/channels/backends>`"),
     Replacement(r":doc:`backends`", r":doc:`/ref/channels/backends`"),
-    Replacement(r":doc:`([\w\d\s]+) <asgi>`", r"`\1 <http://channels.readthedocs.org/en/latest/asgi.html>`_"),
+    Replacement(r":doc:`([\w\d\s]+) <asgi>`", r"`\1 <https://channels.readthedocs.io/en/latest/asgi.html>`_"),
     Replacement(r"\n\(.*installation>`\)\n", r""),
     Replacement(r":doc:`installed Channels correctly <installation>`", r"added the channel layer setting"),
     Replacement(r"Channels", r"channels"),

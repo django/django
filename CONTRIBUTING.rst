@@ -10,7 +10,7 @@ Examples of contributions include:
 * Documentation improvements
 * Bug reports and patch reviews
 
-For more information, please see our `contribution guide <http://channels.readthedocs.io/en/latest/contributing.html>`_.
+For more information, please see our `contribution guide <https://channels.readthedocs.io/en/latest/contributing.html>`_.
 
 Quick Setup
 -----------

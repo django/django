@@ -5,7 +5,7 @@ Django Channels
     :target: https://travis-ci.org/django/channels
 
 .. image:: https://readthedocs.org/projects/channels/badge/?version=latest
-    :target: http://channels.readthedocs.org/en/latest/?badge=latest
+    :target: https://channels.readthedocs.io/en/latest/?badge=latest
 
 .. image:: https://img.shields.io/pypi/v/channels.svg
     :target: https://pypi.python.org/pypi/channels
@@ -23,21 +23,21 @@ a bit as things develop. Once we hit ``1.0``, it will be stablized and a
 deprecation policy will come in.
 
 Documentation, installation and getting started instructions are at
-http://channels.readthedocs.org
+https://channels.readthedocs.io
 
 Support can be obtained either here via issues, or in the ``#django-channels``
 channel on Freenode.
 
 You can install channels from PyPI as the ``channels`` package.
 You'll likely also want to ``asgi_redis`` to provide the Redis channel layer.
-See our `installation <http://channels.readthedocs.io/en/latest/installation.html>`_
-and `getting started <http://channels.readthedocs.io/en/latest/getting-started.html>`_ docs for more.
+See our `installation <https://channels.readthedocs.io/en/latest/installation.html>`_
+and `getting started <https://channels.readthedocs.io/en/latest/getting-started.html>`_ docs for more.
 
 
 Contributing
 ------------
 
-To learn more about contributing, please `read our contributing docs <http://channels.readthedocs.io/en/latest/contributing.html>`_.
+To learn more about contributing, please `read our contributing docs <https://channels.readthedocs.io/en/latest/contributing.html>`_.
 
 
 Maintenance and Security
@@ -60,7 +60,7 @@ Maintenance team:
 * Jeremy Spencer
 
 If you are interested in joining the maintenance team, please
-`read more about contributing <http://channels.readthedocs.io/en/latest/contributing.html>`_
+`read more about contributing <https://channels.readthedocs.io/en/latest/contributing.html>`_
 and get in touch!
 
 
