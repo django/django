@@ -153,3 +153,49 @@ class PickleabilityTestCase(TestCase):
         msg = "Pickled queryset instance's Django version 1.0 does not match the current version %s." % get_version()
         with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(qs))
+
+    def test_in_lookup_queryset_evaluation(self):
+        """
+        Pickling a QuerySet.query with an __in=inner_qs lookup,
+        shouldn't evaluate inner_qs.
+        """
+        for i in range(1, 5):
+            Group(name='Group {}'.format(i)).save()
+
+        e1 = Event(title='Event 1', group=Group.objects.all()[0])
+        e1.save()
+
+        groups = Group.objects.all()
+        events = Event.objects.filter(group__in=groups)
+
+        with self.assertNumQueries(0):
+            dumped = pickle.dumps(events.query)
+
+        # Make sure that unpickle doesn't cause evaluation
+        with self.assertNumQueries(0):
+            reloaded = pickle.loads(dumped)
+            reloaded_events = Event.objects.none()
+            reloaded_events.query = reloaded
+
+        self.assertSequenceEqual(reloaded_events, [e1])
+
+    def test_in_lookup_query_evaluation(self):
+        for i in range(1, 5):
+            Group(name='Group {}'.format(i)).save()
+
+        e1 = Event(title='Event 1', group=Group.objects.all()[0])
+        e1.save()
+
+        groups = Group.objects.values('id')
+        events = Event.objects.filter(group__in=groups.query)
+
+        with self.assertNumQueries(0):
+            dumped = pickle.dumps(events.query)
+
+        # Make sure that unpickle doesn't cause evaluation
+        with self.assertNumQueries(0):
+            reloaded = pickle.loads(dumped)
+            reloaded_events = Event.objects.none()
+            reloaded_events.query = reloaded
+
+        self.assertSequenceEqual(reloaded_events, [e1])
