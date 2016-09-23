@@ -63,7 +63,7 @@ class RequestTests(ChannelTestCase):
         self.assertEqual(request.META["REMOTE_HOST"], "10.0.0.1")
         self.assertEqual(request.META["REMOTE_PORT"], 1234)
         self.assertEqual(request.META["SERVER_NAME"], "10.0.0.2")
-        self.assertEqual(request.META["SERVER_PORT"], 80)
+        self.assertEqual(request.META["SERVER_PORT"], "80")
         self.assertEqual(request.GET["x"], "1")
         self.assertEqual(request.GET["y"], "&foo bar+baz")
         self.assertEqual(request.COOKIES["test-time"], "1448995585123")
