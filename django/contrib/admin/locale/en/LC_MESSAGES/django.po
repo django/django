@@ -172,6 +172,7 @@ msgid "and"
 msgstr ""
 
 #: contrib/admin/models.py:119
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr ""
 
