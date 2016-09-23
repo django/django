@@ -18,12 +18,10 @@ from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.deprecation import (
     RemovedInDjango20Warning, warn_about_renamed_method,
 )
-from django.utils.encoding import (
-    force_text, python_2_unicode_compatible, smart_text,
-)
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
-from django.utils.text import camel_case_to_spaces
-from django.utils.translation import override, string_concat
+from django.utils.text import camel_case_to_spaces, format_lazy
+from django.utils.translation import override
 
 NOT_PROVIDED = object()
 
@@ -197,7 +195,7 @@ class Options(object):
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
             if self.verbose_name_plural is None:
-                self.verbose_name_plural = string_concat(self.verbose_name, 's')
+                self.verbose_name_plural = format_lazy('{}s', self.verbose_name)
 
             # order_with_respect_and ordering are mutually exclusive.
             self._ordering_clash = bool(self.ordering and self.order_with_respect_to)
@@ -206,7 +204,7 @@ class Options(object):
             if meta_attrs != {}:
                 raise TypeError("'class Meta' got invalid attribute(s): %s" % ','.join(meta_attrs.keys()))
         else:
-            self.verbose_name_plural = string_concat(self.verbose_name, 's')
+            self.verbose_name_plural = format_lazy('{}s', self.verbose_name)
         del self.meta
 
         # If the db_table wasn't provided, use the app_label + model_name.
@@ -225,7 +223,7 @@ class Options(object):
                     if f.name == query or f.attname == query
                 )
             except StopIteration:
-                raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, query))
+                raise FieldDoesNotExist("%s has no field named '%s'" % (self.object_name, query))
 
             self.ordering = ('_order',)
             if not any(isinstance(field, OrderWrt) for field in model._meta.local_fields):
@@ -313,7 +311,7 @@ class Options(object):
         return '<Options for %s>' % self.object_name
 
     def __str__(self):
-        return "%s.%s" % (smart_text(self.app_label), smart_text(self.model_name))
+        return "%s.%s" % (self.app_label, self.model_name)
 
     def can_migrate(self, connection):
         """
@@ -369,11 +367,16 @@ class Options(object):
     @cached_property
     def managers(self):
         managers = []
+        seen_managers = set()
         bases = (b for b in self.model.mro() if hasattr(b, '_meta'))
         for depth, base in enumerate(bases):
             for manager in base._meta.local_managers:
+                if manager.name in seen_managers:
+                    continue
+
                 manager = copy.copy(manager)
                 manager.model = self.model
+                seen_managers.add(manager.name)
                 managers.append((depth, manager.creation_counter, manager))
 
                 # Used for deprecation of legacy manager inheritance,
@@ -387,7 +390,7 @@ class Options(object):
 
     @cached_property
     def managers_map(self):
-        return {manager.name: manager for manager in reversed(self.managers)}
+        return {manager.name: manager for manager in self.managers}
 
     @cached_property
     def base_manager(self):
@@ -602,7 +605,7 @@ class Options(object):
             # unavailable, therefore we throw a FieldDoesNotExist exception.
             if not self.apps.models_ready:
                 raise FieldDoesNotExist(
-                    "%s has no field named %r. The app cache isn't ready yet, "
+                    "%s has no field named '%s'. The app cache isn't ready yet, "
                     "so if this is an auto-created related field, it won't "
                     "be available yet." % (self.object_name, field_name)
                 )
@@ -612,7 +615,7 @@ class Options(object):
             # field map.
             return self.fields_map[field_name]
         except KeyError:
-            raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
+            raise FieldDoesNotExist("%s has no field named '%s'" % (self.object_name, field_name))
 
     def get_base_chain(self, model):
         """

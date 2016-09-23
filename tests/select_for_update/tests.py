@@ -5,9 +5,11 @@ import time
 
 from multiple_database.routers import TestRouter
 
-from django.db import DatabaseError, connection, router, transaction
+from django.db import (
+    DatabaseError, connection, connections, router, transaction,
+)
 from django.test import (
-    TransactionTestCase, override_settings, skipIfDBFeature,
+    TransactionTestCase, mock, override_settings, skipIfDBFeature,
     skipUnlessDBFeature,
 )
 from django.test.utils import CaptureQueriesContext
@@ -149,6 +151,14 @@ class SelectForUpdateTests(TransactionTestCase):
         with self.assertRaisesMessage(DatabaseError, 'SKIP LOCKED is not supported on this database backend.'):
             with transaction.atomic():
                 Person.objects.select_for_update(skip_locked=True).get()
+
+    @skipUnlessDBFeature('has_select_for_update')
+    def test_for_update_after_from(self):
+        features_class = connections['default'].features.__class__
+        attribute_to_patch = "%s.%s.for_update_after_from" % (features_class.__module__, features_class.__name__)
+        with mock.patch(attribute_to_patch, return_value=True):
+            with transaction.atomic():
+                self.assertIn('FOR UPDATE WHERE', str(Person.objects.filter(name='foo').select_for_update().query))
 
     @skipUnlessDBFeature('has_select_for_update')
     def test_for_update_requires_transaction(self):

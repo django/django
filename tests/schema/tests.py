@@ -21,6 +21,7 @@ from django.db.transaction import atomic
 from django.test import (
     TransactionTestCase, mock, skipIfDBFeature, skipUnlessDBFeature,
 )
+from django.test.utils import CaptureQueriesContext
 from django.utils.timezone import UTC
 
 from .fields import (
@@ -104,12 +105,20 @@ class SchemaTests(TransactionTestCase):
             raise DatabaseError("Table does not exist (empty pragma)")
         return columns
 
+    def get_primary_key(self, table):
+        with connection.cursor() as cursor:
+            return connection.introspection.get_primary_key_column(cursor, table)
+
     def get_indexes(self, table):
         """
         Get the indexes on the table using a new cursor.
         """
         with connection.cursor() as cursor:
-            return connection.introspection.get_indexes(cursor, table)
+            return [
+                c['columns'][0]
+                for c in connection.introspection.get_constraints(cursor, table).values()
+                if c['index'] and len(c['columns']) == 1
+            ]
 
     def get_constraints(self, table):
         """
@@ -347,8 +356,12 @@ class SchemaTests(TransactionTestCase):
         # Add the new field
         new_field = IntegerField(null=True)
         new_field.set_attributes_from_name("age")
-        with connection.schema_editor() as editor:
+        with CaptureQueriesContext(connection) as ctx, connection.schema_editor() as editor:
             editor.add_field(Author, new_field)
+        drop_default_sql = editor.sql_alter_column_no_default % {
+            'column': editor.quote_name(new_field.name),
+        }
+        self.assertFalse(any(drop_default_sql in query['sql'] for query in ctx.captured_queries))
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertEqual(columns['age'][0], "IntegerField")
@@ -1680,9 +1693,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(Tag)
         # Ensure the table is there and has the right PK
-        self.assertTrue(
-            self.get_indexes(Tag._meta.db_table)['id']['primary_key'],
-        )
+        self.assertEqual(self.get_primary_key(Tag._meta.db_table), 'id')
         # Alter to change the PK
         id_field = Tag._meta.get_field("id")
         old_field = Tag._meta.get_field("slug")
@@ -1697,9 +1708,7 @@ class SchemaTests(TransactionTestCase):
             'id',
             self.get_indexes(Tag._meta.db_table),
         )
-        self.assertTrue(
-            self.get_indexes(Tag._meta.db_table)['slug']['primary_key'],
-        )
+        self.assertEqual(self.get_primary_key(Tag._meta.db_table), 'slug')
 
     def test_context_manager_exit(self):
         """

@@ -118,10 +118,7 @@ class ContentTypeManager(models.Manager):
 
     def clear_cache(self):
         """
-        Clear out the content-type cache. This needs to happen during database
-        flushes to prevent caching of "stale" content type IDs (see
-        django.contrib.contenttypes.management.update_contenttypes for where
-        this gets called).
+        Clear out the content-type cache.
         """
         self._cache.clear()
 

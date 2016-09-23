@@ -103,7 +103,15 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
       * ``'django.template.loaders.app_directories.Loader'`` if and only if
         ``app_dirs`` is ``True``.
 
+      If ``debug`` is ``False``, these loaders are wrapped in
+      :class:`django.template.loaders.cached.Loader`.
+
       See :ref:`template-loaders` for details.
+
+      .. versionchanged:: 1.11
+
+          Enabling of the cached template loader when ``debug`` is ``False``
+          was added.
 
     * ``string_if_invalid`` is the output, as a string, that the template
       system should use for invalid (e.g. misspelled) variables.
@@ -569,8 +577,8 @@ against ``dict``::
 
 .. _subclassing-context-requestcontext:
 
-Subclassing ``Context``: ``RequestContext``
--------------------------------------------
+Using ``RequestContext``
+------------------------
 
 .. class:: RequestContext(request, dict_=None, processors=None)
 
@@ -636,17 +644,17 @@ using the optional, third positional argument, ``processors``. In this
 example, the :class:`RequestContext` instance gets a ``ip_address`` variable::
 
     from django.http import HttpResponse
-    from django.template import RequestContext
+    from django.template import RequestContext, Template
 
     def ip_address_processor(request):
         return {'ip_address': request.META['REMOTE_ADDR']}
 
-    def some_view(request):
-        # ...
-        c = RequestContext(request, {
-            'foo': 'bar',
+    def client_ip_view(request):
+        template = Template('{{ title }}: {{ ip_address }}')
+        context = RequestContext(request, {
+            'title': 'Your IP Address',
         }, [ip_address_processor])
-        return HttpResponse(t.render(c))
+        return HttpResponse(template.render(context))
 
 .. _context-processors:
 
@@ -899,18 +907,22 @@ loaders that come with Django:
 
 .. class:: cached.Loader
 
-    By default, the templating system will read and compile your templates every
-    time they need to be rendered. While the Django templating system is quite
-    fast, the overhead from reading and compiling templates can add up.
+    By default (when :setting:`DEBUG` is ``True``), the template system reads
+    and compiles your templates every time they're rendered. While the Django
+    template system is quite fast, the overhead from reading and compiling
+    templates can add up.
 
-    The cached template loader is a class-based loader that you configure with
-    a list of other loaders that it should wrap. The wrapped loaders are used to
-    locate unknown templates when they are first encountered. The cached loader
-    then stores the compiled ``Template`` in memory. The cached ``Template``
-    instance is returned for subsequent requests to load the same template.
+    You configure the cached template loader with a list of other loaders that
+    it should wrap. The wrapped loaders are used to locate unknown templates
+    when they're first encountered. The cached loader then stores the compiled
+    ``Template`` in memory. The cached ``Template`` instance is returned for
+    subsequent requests to load the same template.
 
-    For example, to enable template caching with the ``filesystem`` and
-    ``app_directories`` template loaders you might use the following settings::
+    This loader is automatically enabled if :setting:`DEBUG` is ``False`` and
+    :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't specified.
+
+    You can also enable template caching with some custom template loaders
+    using settings like this::
 
         TEMPLATES = [{
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -920,6 +932,7 @@ loaders that come with Django:
                     ('django.template.loaders.cached.Loader', [
                         'django.template.loaders.filesystem.Loader',
                         'django.template.loaders.app_directories.Loader',
+                        'path.to.custom.Loader',
                     ]),
                 ],
             },
@@ -934,7 +947,10 @@ loaders that come with Django:
         information, see :ref:`template tag thread safety considerations
         <template_tag_thread_safety>`.
 
-    This loader is disabled by default.
+    .. versionchanged:: 1.11
+
+        The automatic enabling of the cached template loader when ``debug`` is
+        ``False`` was added.
 
 ``django.template.loaders.locmem.Loader``
 

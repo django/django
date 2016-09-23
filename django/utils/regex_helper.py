@@ -48,7 +48,7 @@ class NonCapture(list):
 
 
 def normalize(pattern):
-    """
+    r"""
     Given a reg-exp pattern, normalizes it to an iterable of forms that
     suffice for reverse matching. This does the following:
 
@@ -203,7 +203,7 @@ def normalize(pattern):
 
 
 def next_char(input_iter):
-    """
+    r"""
     An iterator that yields the next character from "pattern_iter", respecting
     escape sequences. An escaped character is replaced by a representative of
     its class (e.g. \w -> "x"). If the escaped character is one that is

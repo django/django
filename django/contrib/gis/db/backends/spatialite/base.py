@@ -17,6 +17,11 @@ from .schema import SpatialiteSchemaEditor
 
 class DatabaseWrapper(SQLiteDatabaseWrapper):
     SchemaEditorClass = SpatialiteSchemaEditor
+    # Classes instantiated in __init__().
+    client_class = SpatiaLiteClient
+    features_class = DatabaseFeatures
+    introspection_class = SpatiaLiteIntrospection
+    ops_class = SpatiaLiteOperations
 
     def __init__(self, *args, **kwargs):
         # Before we get too far, make sure pysqlite 2.5+ is installed.
@@ -37,10 +42,6 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
                                        'SPATIALITE_LIBRARY_PATH in your settings.'
                                        )
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
-        self.features = DatabaseFeatures(self)
-        self.ops = SpatiaLiteOperations(self)
-        self.client = SpatiaLiteClient(self)
-        self.introspection = SpatiaLiteIntrospection(self)
 
     def get_new_connection(self, conn_params):
         conn = super(DatabaseWrapper, self).get_new_connection(conn_params)

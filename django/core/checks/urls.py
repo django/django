@@ -78,7 +78,7 @@ def check_include_trailing_dollar(pattern):
     Check that include is not used with a regex ending with a dollar.
     """
     regex_pattern = pattern.regex.pattern
-    if regex_pattern.endswith('$') and not regex_pattern.endswith('\$'):
+    if regex_pattern.endswith('$') and not regex_pattern.endswith(r'\$'):
         warning = Warning(
             "Your URL pattern {} uses include with a regex ending with a '$'. "
             "Remove the dollar from the regex to avoid problems including "
@@ -95,10 +95,17 @@ def check_pattern_startswith_slash(pattern):
     Check that the pattern does not begin with a forward slash.
     """
     regex_pattern = pattern.regex.pattern
+    if not settings.APPEND_SLASH:
+        # Skip check as it can be useful to start a URL pattern with a slash
+        # when APPEND_SLASH=False.
+        return []
     if regex_pattern.startswith('/') or regex_pattern.startswith('^/'):
         warning = Warning(
-            "Your URL pattern {} has a regex beginning with a '/'. "
-            "Remove this slash as it is unnecessary.".format(describe_pattern(pattern)),
+            "Your URL pattern {} has a regex beginning with a '/'. Remove this "
+            "slash as it is unnecessary. If this pattern is targeted in an "
+            "include(), ensure the include() pattern has a trailing '/'.".format(
+                describe_pattern(pattern)
+            ),
             id="urls.W002",
         )
         return [warning]

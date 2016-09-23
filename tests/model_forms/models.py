@@ -120,8 +120,11 @@ class PublicationDefaults(models.Model):
     CATEGORY_CHOICES = ((1, 'Games'), (2, 'Comics'), (3, 'Novel'))
     title = models.CharField(max_length=30)
     date_published = models.DateField(default=datetime.date.today)
+    datetime_published = models.DateTimeField(default=datetime.datetime(2000, 1, 1))
     mode = models.CharField(max_length=2, choices=MODE_CHOICES, default=default_mode)
     category = models.IntegerField(choices=CATEGORY_CHOICES, default=default_category)
+    active = models.BooleanField(default=True)
+    file = models.FileField(default='default.txt')
 
 
 class Author(models.Model):
@@ -130,7 +133,7 @@ class Author(models.Model):
 
 
 class Author1(models.Model):
-    publication = models.OneToOneField(Publication, models.SET_NULL, null=False)
+    publication = models.OneToOneField(Publication, models.CASCADE, null=False)
     full_name = models.CharField(max_length=255)
 
 
@@ -168,7 +171,7 @@ class CustomFF(models.Model):
 
 
 class FilePathModel(models.Model):
-    path = models.FilePathField(path=os.path.dirname(upath(__file__)), match=".*\.py$", blank=True)
+    path = models.FilePathField(path=os.path.dirname(upath(__file__)), match=r".*\.py$", blank=True)
 
 
 try:

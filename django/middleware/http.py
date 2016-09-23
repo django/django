@@ -1,6 +1,6 @@
 from django.utils.cache import get_conditional_response
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.http import http_date, parse_http_date_safe, unquote_etag
+from django.utils.http import http_date, parse_http_date_safe
 
 
 class ConditionalGetMiddleware(MiddlewareMixin):
@@ -24,7 +24,7 @@ class ConditionalGetMiddleware(MiddlewareMixin):
         if etag or last_modified:
             return get_conditional_response(
                 request,
-                etag=unquote_etag(etag),
+                etag=etag,
                 last_modified=last_modified,
                 response=response,
             )

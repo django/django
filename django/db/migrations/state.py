@@ -15,7 +15,7 @@ from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.utils import make_model_tuple
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.version import get_docs_version
@@ -494,7 +494,7 @@ class ModelState(object):
     @classmethod
     def force_text_recursive(cls, value):
         if isinstance(value, six.string_types):
-            return smart_text(value)
+            return force_text(value)
         elif isinstance(value, list):
             return [cls.force_text_recursive(x) for x in value]
         elif isinstance(value, tuple):

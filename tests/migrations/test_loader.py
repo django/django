@@ -4,12 +4,11 @@ from unittest import skipIf
 
 from django.db import connection, connections
 from django.db.migrations.exceptions import (
-    AmbiguityError, InconsistentMigrationHistory, MigrationSchemaMissing,
-    NodeNotFoundError,
+    AmbiguityError, InconsistentMigrationHistory, NodeNotFoundError,
 )
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import TestCase, mock, modify_settings, override_settings
+from django.test import TestCase, modify_settings, override_settings
 from django.utils import six
 
 
@@ -205,6 +204,22 @@ class LoaderTests(TestCase):
         self.assertEqual(migration_loader.migrated_apps, set())
         self.assertEqual(migration_loader.unmigrated_apps, {'migrated_app'})
 
+    @override_settings(
+        INSTALLED_APPS=['migrations.migrations_test_apps.migrated_app'],
+        MIGRATION_MODULES={'migrated_app': 'missing-module'},
+    )
+    def test_explicit_missing_module(self):
+        """
+        If a MIGRATION_MODULES override points to a missing module, the error
+        raised during the importation attempt should be propagated unless
+        `ignore_no_migrations=True`.
+        """
+        with self.assertRaisesMessage(ImportError, 'missing-module'):
+            migration_loader = MigrationLoader(connection)
+        migration_loader = MigrationLoader(connection, ignore_no_migrations=True)
+        self.assertEqual(migration_loader.migrated_apps, set())
+        self.assertEqual(migration_loader.unmigrated_apps, {'migrated_app'})
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_loading_squashed(self):
         "Tests loading a squashed migration"
@@ -378,7 +393,10 @@ class LoaderTests(TestCase):
         loader.check_consistent_history(connection)
         recorder = MigrationRecorder(connection)
         recorder.record_applied('migrations', '0002_second')
-        msg = "Migration migrations.0002_second is applied before its dependency migrations.0001_initial"
+        msg = (
+            "Migration migrations.0002_second is applied before its dependency "
+            "migrations.0001_initial on database 'default'."
+        )
         with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
             loader.check_consistent_history(connection)
 
@@ -409,8 +427,8 @@ class LoaderTests(TestCase):
     ]})
     def test_loading_squashed_ref_squashed(self):
         "Tests loading a squashed migration with a new migration referencing it"
-        """
-        The sample migrations are structred like this:
+        r"""
+        The sample migrations are structured like this:
 
         app_1       1 --> 2 ---------------------*--> 3        *--> 4
                      \                          /             /
@@ -465,12 +483,3 @@ class LoaderTests(TestCase):
             ('app1', '4_auto'),
         }
         self.assertEqual(plan, expected_plan)
-
-    def test_readonly_database(self):
-        """
-        check_consistent_history() ignores read-only databases, possibly
-        without a django_migrations table.
-        """
-        with mock.patch.object(MigrationRecorder, 'ensure_schema', side_effect=MigrationSchemaMissing()):
-            loader = MigrationLoader(connection=None)
-            loader.check_consistent_history(connection)

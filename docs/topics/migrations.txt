@@ -298,6 +298,26 @@ Django checks that all of the respective columns already exist in the database
 and fake-applies the migration if so. Without ``--fake-initial``, initial
 migrations are treated no differently from any other migration.
 
+.. _migration-history-consistency:
+
+History consistency
+-------------------
+
+As previously discussed, you may need to linearize migrations manually when two
+development branches are joined. While editing migration dependencies, you can
+inadvertently create an inconsistent history state where a migration has been
+applied but some of its dependencies haven't. This is a strong indication that
+the dependencies are incorrect, so Django will refuse to run migrations or make
+new migrations until it's fixed. When using multiple databases, you can use the
+:meth:`allow_migrate` method of :ref:`database routers
+<topics-db-multi-db-routing>` to control which databases
+:djadmin:`makemigrations` checks for consistent history.
+
+.. versionchanged:: 1.10
+
+    Migration consistency checks were added. Checks based on database routers
+    were added in 1.10.1.
+
 Adding migrations to apps
 =========================
 
@@ -363,6 +383,9 @@ must always keep base classes around for as long as there is a migration that
 contains a reference to them. On the plus side, methods and managers from these
 base classes inherit normally, so if you absolutely need access to these you
 can opt to move them into a superclass.
+
+To remove old references, you can :ref:`squash migrations <migration-squashing>`
+or, if there aren't many references, copy them into the migration files.
 
 .. _migrations-removing-model-fields:
 

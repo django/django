@@ -4,9 +4,11 @@ Internationalization support.
 from __future__ import unicode_literals
 
 import re
+import warnings
 
 from django.utils import six
 from django.utils.decorators import ContextDecorator
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
 
@@ -224,6 +226,10 @@ def _string_concat(*strings):
     Lazy variant of string concatenation, needed for translations that are
     constructed from multiple parts.
     """
+    warnings.warn(
+        'django.utils.translate.string_concat() is deprecated in '
+        'favor of django.utils.text.format_lazy().',
+        RemovedInDjango21Warning, stacklevel=2)
     return ''.join(force_text(s) for s in strings)
 string_concat = lazy(_string_concat, six.text_type)
 
@@ -249,7 +255,7 @@ def get_language_info(lang_code):
         info['name_translated'] = ugettext_lazy(info['name'])
     return info
 
-trim_whitespace_re = re.compile('\s*\n\s*')
+trim_whitespace_re = re.compile(r'\s*\n\s*')
 
 
 def trim_whitespace(s):

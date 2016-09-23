@@ -149,7 +149,7 @@ when all the tests have been executed.
 You can prevent the test databases from being destroyed by using the
 :option:`test --keepdb` option. This will preserve the test database between
 runs. If the database does not exist, it will first be created. Any migrations
-will also be applied in order to keep it p to date.
+will also be applied in order to keep it up to date.
 
 The default test database names are created by prepending ``test_`` to the
 value of each :setting:`NAME` in :setting:`DATABASES`. When using SQLite, the

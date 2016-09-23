@@ -52,9 +52,9 @@ from .models import (
     CyclicOne, CyclicTwo, DooHickey, Employee, EmptyModel, ExternalSubscriber,
     Fabric, FancyDoodad, FieldOverridePost, FilteredManager, FooAccount,
     FoodDelivery, FunkyTag, Gallery, Grommet, Inquisition, Language, Link,
-    MainPrepopulated, ModelWithStringPrimaryKey, OtherStory, Paper, Parent,
-    ParentWithDependentChildren, ParentWithUUIDPK, Person, Persona, Picture,
-    Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
+    MainPrepopulated, Media, ModelWithStringPrimaryKey, OtherStory, Paper,
+    Parent, ParentWithDependentChildren, ParentWithUUIDPK, Person, Persona,
+    Picture, Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
     PrePopulatedPost, Promo, Question, Recommendation, Recommender,
     RelatedPrepopulated, RelatedWithUUIDPKModel, Report, Restaurant,
     RowLevelChangePermissionModel, SecretHideout, Section, ShortMessage,
@@ -539,7 +539,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             self.assertContentBefore(response, 'The First Item', 'The Middle Item')
             self.assertContentBefore(response, 'The Middle Item', 'The Last Item')
 
-    def test_has_related_field_in_list_display(self):
+    def test_has_related_field_in_list_display_fk(self):
         """Joins shouldn't be performed for <FK>_id fields in list display."""
         state = State.objects.create(name='Karnataka')
         City.objects.create(state=state, name='Bangalore')
@@ -549,6 +549,18 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertIs(response.context['cl'].has_related_field_in_list_display(), True)
 
         response.context['cl'].list_display = ['id', 'name', 'state_id']
+        self.assertIs(response.context['cl'].has_related_field_in_list_display(), False)
+
+    def test_has_related_field_in_list_display_o2o(self):
+        """Joins shouldn't be performed for <O2O>_id fields in list display."""
+        media = Media.objects.create(name='Foo')
+        Vodcast.objects.create(media=media)
+        response = self.client.get(reverse('admin:admin_views_vodcast_changelist'), {})
+
+        response.context['cl'].list_display = ['media']
+        self.assertIs(response.context['cl'].has_related_field_in_list_display(), True)
+
+        response.context['cl'].list_display = ['media_id']
         self.assertIs(response.context['cl'].has_related_field_in_list_display(), False)
 
     def test_limited_filter(self):
@@ -2277,7 +2289,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         cls.p1 = PrePopulatedPost.objects.create(title='A Long Title', published=True, slug='a-long-title')
         cls.pk = (
             "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890 "
-            """-_.!~*'() ;/?:@&=+$, <>#%" {}|\^[]`"""
+            r"""-_.!~*'() ;/?:@&=+$, <>#%" {}|\^[]`"""
         )
         cls.m1 = ModelWithStringPrimaryKey.objects.create(string_pk=cls.pk)
         content_type_pk = ContentType.objects.get_for_model(ModelWithStringPrimaryKey).pk
@@ -3323,7 +3335,7 @@ class AdminActionsTest(TestCase):
         """
         response = self.client.get(reverse('admin:admin_views_externalsubscriber_changelist'))
         self.assertContains(response, '''<label>Action: <select name="action" required>
-<option value="" selected="selected">---------</option>
+<option value="" selected>---------</option>
 <option value="delete_selected">Delete selected external
 subscribers</option>
 <option value="redirect_to">Redirect to (Awesome action)</option>
@@ -4311,7 +4323,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
         self.get_select_option('#id_relatedprepopulated_set-2-1-status', 'option one').click()
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-name').send_keys(
-            'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters'
+            r'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters'
         )
         slug1 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-slug2').get_attribute('value')
@@ -4353,7 +4365,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             slug2='option-two-and-now-tabular-inline',
         )
         RelatedPrepopulated.objects.get(
-            name='a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters',
+            name=r'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters',
             pubdate='1981-08-22',
             status='option one',
             slug1='tabular-inline-ignored-characters-1981-08-22',
@@ -4608,20 +4620,20 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertContains(response, '<div class="form-row field-posted">')
         self.assertContains(response, '<div class="form-row field-value">')
         self.assertContains(response, '<div class="form-row">')
-        self.assertContains(response, '<p class="help">', 3)
+        self.assertContains(response, '<div class="help">', 3)
         self.assertContains(
             response,
-            '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>',
+            '<div class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
         self.assertContains(
             response,
-            '<p class="help">Some help text for the content (with unicode ŠĐĆŽćžšđ)</p>',
+            '<div class="help">Some help text for the content (with unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
         self.assertContains(
             response,
-            '<p class="help">Some help text for the date (with unicode ŠĐĆŽćžšđ)</p>',
+            '<div class="help">Some help text for the date (with unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
 
@@ -4696,6 +4708,14 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         response = self.client.get(reverse('admin:admin_views_topping_add'))
         self.assertEqual(response.status_code, 200)
 
+    def test_readonly_manytomany_forwards_ref(self):
+        topping = Topping.objects.create(name='Salami')
+        pizza = Pizza.objects.create(name='Americano')
+        pizza.toppings.add(topping)
+        response = self.client.get(reverse('admin:admin_views_pizza_change', args=(pizza.pk,)))
+        self.assertContains(response, '<label>Toppings:</label>', html=True)
+        self.assertContains(response, '<p>Salami</p>', html=True)
+
     def test_readonly_onetoone_backwards_ref(self):
         """
         Can reference a reverse OneToOneField in ModelAdmin.readonly_fields.
@@ -4724,7 +4744,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         """
         p = FieldOverridePost.objects.create(title="Test Post", content="Test Content")
         response = self.client.get(reverse('admin:admin_views_fieldoverridepost_change', args=(p.pk,)))
-        self.assertContains(response, '<p class="help">Overridden help text for the date</p>')
+        self.assertContains(response, '<div class="help">Overridden help text for the date</div>')
         self.assertContains(response, '<label for="id_public">Overridden public label:</label>', html=True)
         self.assertNotContains(response, "Some help text for the date (with unicode ŠĐĆŽćžšđ)")
 
@@ -6047,7 +6067,7 @@ class InlineAdminViewOnSiteTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
-class TestEtagWithAdminView(SimpleTestCase):
+class TestETagWithAdminView(SimpleTestCase):
     # See https://code.djangoproject.com/ticket/16003
 
     def test_admin(self):

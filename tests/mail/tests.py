@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import asyncore
+import base64
 import mimetypes
 import os
 import shutil
@@ -11,7 +12,7 @@ import tempfile
 import threading
 from email.header import Header
 from email.mime.text import MIMEText
-from smtplib import SMTP, SMTPException
+from smtplib import SMTP, SMTPAuthenticationError, SMTPException
 from ssl import SSLError
 
 from django.core import mail
@@ -1115,11 +1116,20 @@ class FakeSMTPChannel(smtpd.SMTPChannel):
 
     def collect_incoming_data(self, data):
         try:
-            super(FakeSMTPChannel, self).collect_incoming_data(data)
+            smtpd.SMTPChannel.collect_incoming_data(self, data)
         except UnicodeDecodeError:
             # ignore decode error in SSL/TLS connection tests as we only care
             # whether the connection attempt was made
             pass
+
+    def smtp_AUTH(self, arg):
+        if arg == 'CRAM-MD5':
+            # This is only the first part of the login process. But it's enough
+            # for our tests.
+            challenge = base64.b64encode(b'somerandomstring13579')
+            self.push(str('334 %s' % challenge.decode()))
+        else:
+            self.push(str('502 Error: login "%s" not implemented' % arg))
 
 
 class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
@@ -1139,6 +1149,15 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         self.active = False
         self.active_lock = threading.Lock()
         self.sink_lock = threading.Lock()
+
+    if not PY3:
+        def handle_accept(self):
+            # copy of Python 2.7 smtpd.SMTPServer.handle_accept with hardcoded
+            # SMTPChannel replaced by self.channel_class
+            pair = self.accept()
+            if pair is not None:
+                conn, addr = pair
+                self.channel_class(self, conn, addr)
 
     def process_message(self, peer, mailfrom, rcpttos, data):
         if PY3:
@@ -1185,6 +1204,20 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         if self.active:
             self.active = False
             self.join()
+
+
+class FakeAUTHSMTPConnection(SMTP):
+    """
+    A SMTP connection pretending support for the AUTH command. It does not, but
+    at least this can allow testing the first part of the AUTH process.
+    """
+
+    def ehlo(self, name=''):
+        response = SMTP.ehlo(self, name=name)
+        self.esmtp_features.update({
+            'auth': 'CRAM-MD5 PLAIN LOGIN',
+        })
+        return response
 
 
 class SMTPBackendTestsBase(SimpleTestCase):
@@ -1269,6 +1302,18 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         opened = backend.open()
         backend.close()
         self.assertTrue(opened)
+
+    def test_server_login(self):
+        """
+        Even if the Python SMTP server doesn't support authentication, the
+        login process starts and the appropriate exception is raised.
+        """
+        class CustomEmailBackend(smtp.EmailBackend):
+            connection_class = FakeAUTHSMTPConnection
+
+        backend = CustomEmailBackend(username='username', password='password')
+        with self.assertRaises(SMTPAuthenticationError):
+            backend.open()
 
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_use_settings(self):
@@ -1402,6 +1447,19 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
         finally:
             SMTP.send = send
+
+    def test_send_messages_after_open_failed(self):
+        """
+        send_messages() shouldn't try to send messages if open() raises an
+        exception after initializing the connection.
+        """
+        backend = smtp.EmailBackend()
+        # Simulate connection initialization success and a subsequent
+        # connection exception.
+        backend.connection = True
+        backend.open = lambda: None
+        email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
+        self.assertEqual(backend.send_messages([email]), None)
 
 
 class SMTPBackendStoppedServerTest(SMTPBackendTestsBase):

@@ -97,7 +97,7 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
         self.fail("The token '%s' could not be found in %s, please check the test config" % (token, path))
 
     def assertLocationCommentPresent(self, po_filename, line_number, *comment_parts):
-        """
+        r"""
         self.assertLocationCommentPresent('django.po', 42, 'dirA', 'dirB', 'foo.py')
 
         verifies that the django.po file has a gettext-style location comment of the form
@@ -307,7 +307,7 @@ class BasicExtractorTests(ExtractorTests):
                 self, str(ws[2].message),
                 r"The translator-targeted comment 'Translators: ignored i18n "
                 r"comment #4' \(file templates[/\\]comments.thtml, line 8\) "
-                "was ignored, because it wasn't the last item on the line\."
+                r"was ignored, because it wasn't the last item on the line\."
             )
         # Now test .po file contents
         self.assertTrue(os.path.exists(self.PO_FILE))

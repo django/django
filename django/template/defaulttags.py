@@ -4,12 +4,13 @@ from __future__ import unicode_literals
 import re
 import sys
 import warnings
+from collections import namedtuple
 from datetime import datetime
 from itertools import cycle as itertools_cycle, groupby
 
 from django.conf import settings
 from django.utils import six, timezone
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
 from django.utils.safestring import mark_safe
@@ -86,6 +87,12 @@ class CycleNode(Node):
         if self.silent:
             return ''
         return render_value_in_context(value, context)
+
+    def reset(self, context):
+        """
+        Reset the cycle iteration back to the beginning.
+        """
+        context.render_context[self] = itertools_cycle(self.cyclevars)
 
 
 class DebugNode(Node):
@@ -335,6 +342,9 @@ class LoremNode(Node):
         return '\n\n'.join(paras)
 
 
+GroupedResult = namedtuple('GroupedResult', ['grouper', 'list'])
+
+
 class RegroupNode(Node):
     def __init__(self, target, expression, var_name):
         self.target, self.expression = target, expression
@@ -355,7 +365,7 @@ class RegroupNode(Node):
         # List of dictionaries in the format:
         # {'grouper': 'key', 'list': [list of contents]}.
         context[self.var_name] = [
-            {'grouper': key, 'list': list(val)}
+            GroupedResult(grouper=key, list=list(val))
             for key, val in
             groupby(obj_list, lambda obj: self.resolve_expression(obj, context))
         ]
@@ -381,6 +391,15 @@ class NowNode(Node):
             return ''
         else:
             return formatted
+
+
+class ResetCycleNode(Node):
+    def __init__(self, node):
+        self.node = node
+
+    def render(self, context):
+        self.node.reset(context)
+        return ''
 
 
 class SpacelessNode(Node):
@@ -421,7 +440,7 @@ class URLNode(Node):
         from django.urls import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
         kwargs = {
-            smart_text(k, 'ascii'): v.resolve(context)
+            force_text(k, 'ascii'): v.resolve(context)
             for k, v in self.kwargs.items()
         }
         view_name = self.view_name.resolve(context)
@@ -578,6 +597,9 @@ def cycle(parser, token):
     # that names are only unique within each template (as opposed to using
     # a global variable, which would make cycle names have to be unique across
     # *all* templates.
+    #
+    # It keeps the last node in the parser to be able to reset it with
+    # {% resetcycle %}.
 
     args = token.split_contents()
 
@@ -617,6 +639,7 @@ def cycle(parser, token):
     else:
         values = [parser.compile_filter(arg) for arg in args[1:]]
         node = CycleNode(values)
+    parser._last_cycle_node = node
     return node
 
 
@@ -1148,46 +1171,47 @@ def regroup(parser, token):
     """
     Regroups a list of alike objects by a common attribute.
 
-    This complex tag is best illustrated by use of an example:  say that
-    ``people`` is a list of ``Person`` objects that have ``first_name``,
-    ``last_name``, and ``gender`` attributes, and you'd like to display a list
-    that looks like:
+    This complex tag is best illustrated by use of an example: say that
+    ``musicians`` is a list of ``Musician`` objects that have ``name`` and
+    ``instrument`` attributes, and you'd like to display a list that
+    looks like:
 
-        * Male:
-            * George Bush
-            * Bill Clinton
-        * Female:
-            * Margaret Thatcher
-            * Colendeeza Rice
-        * Unknown:
-            * Pat Smith
+        * Guitar:
+            * Django Reinhardt
+            * Emily Remler
+        * Piano:
+            * Lovie Austin
+            * Bud Powell
+        * Trumpet:
+            * Duke Ellington
 
     The following snippet of template code would accomplish this dubious task::
 
-        {% regroup people by gender as grouped %}
+        {% regroup musicians by instrument as grouped %}
         <ul>
         {% for group in grouped %}
             <li>{{ group.grouper }}
             <ul>
-                {% for item in group.list %}
-                <li>{{ item }}</li>
+                {% for musician in group.list %}
+                <li>{{ musician.name }}</li>
                 {% endfor %}
             </ul>
         {% endfor %}
         </ul>
 
     As you can see, ``{% regroup %}`` populates a variable with a list of
-    objects with ``grouper`` and ``list`` attributes.  ``grouper`` contains the
+    objects with ``grouper`` and ``list`` attributes. ``grouper`` contains the
     item that was grouped by; ``list`` contains the list of objects that share
-    that ``grouper``.  In this case, ``grouper`` would be ``Male``, ``Female``
-    and ``Unknown``, and ``list`` is the list of people with those genders.
+    that ``grouper``. In this case, ``grouper`` would be ``Guitar``, ``Piano``
+    and ``Trumpet``, and ``list`` is the list of musicians who play this
+    instrument.
 
     Note that ``{% regroup %}`` does not work when the list to be grouped is not
-    sorted by the key you are grouping by!  This means that if your list of
-    people was not sorted by gender, you'd need to make sure it is sorted
+    sorted by the key you are grouping by! This means that if your list of
+    musicians was not sorted by instrument, you'd need to make sure it is sorted
     before using it, i.e.::
 
-        {% regroup people|dictsort:"gender" by gender as grouped %}
+        {% regroup musicians|dictsort:"instrument" by instrument as grouped %}
     """
     bits = token.split_contents()
     if len(bits) != 6:
@@ -1209,6 +1233,32 @@ def regroup(parser, token):
                                        VARIABLE_ATTRIBUTE_SEPARATOR +
                                        bits[3])
     return RegroupNode(target, expression, var_name)
+
+
+@register.tag
+def resetcycle(parser, token):
+    """
+    Resets a cycle tag.
+
+    If an argument is given, resets the last rendered cycle tag whose name
+    matches the argument, else resets the last rendered cycle tag (named or
+    unnamed).
+    """
+    args = token.split_contents()
+
+    if len(args) > 2:
+        raise TemplateSyntaxError("%r tag accepts at most one argument." % args[0])
+
+    if len(args) == 2:
+        name = args[1]
+        try:
+            return ResetCycleNode(parser._named_cycle_nodes[name])
+        except (AttributeError, KeyError):
+            raise TemplateSyntaxError("Named cycle '%s' does not exist." % name)
+    try:
+        return ResetCycleNode(parser._last_cycle_node)
+    except AttributeError:
+        raise TemplateSyntaxError("No cycles in template.")
 
 
 @register.tag
@@ -1279,7 +1329,7 @@ def templatetag(parser, token):
 
 @register.tag
 def url(parser, token):
-    """
+    r"""
     Return an absolute URL matching the given view with its parameters.
 
     This is a way to define links that aren't tied to a particular URL

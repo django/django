@@ -58,20 +58,20 @@ def condition(etag_func=None, last_modified_func=None):
 
     The parameters are callables to compute the ETag and last modified time for
     the requested resource, respectively. The callables are passed the same
-    parameters as the view itself. The Etag function should return a string (or
+    parameters as the view itself. The ETag function should return a string (or
     None if the resource doesn't exist), while the last_modified function
     should return a datetime object (or None if the resource doesn't exist).
 
-    If both parameters are provided, all the preconditions must be met before
-    the view is processed.
+    The ETag function should return a complete ETag, including quotes (e.g.
+    '"etag"'), since that's the only way to distinguish between weak and strong
+    ETags. If an unquoted ETag is returned (e.g. 'etag'), it will be converted
+    to a strong ETag by adding quotes.
 
     This decorator will either pass control to the wrapped view function or
-    return an HTTP 304 response (unmodified) or 412 response (preconditions
-    failed), depending upon the request method.
-
-    Any behavior marked as "undefined" in the HTTP spec (e.g. If-none-match
-    plus If-modified-since headers) will result in the view function being
-    called.
+    return an HTTP 304 response (unmodified) or 412 response (precondition
+    failed), depending upon the request method. In either case, it will add the
+    generated ETag and Last-Modified headers to the response if it doesn't
+    already have them.
     """
     def decorator(func):
         @wraps(func, assigned=available_attrs(func))
@@ -83,7 +83,9 @@ def condition(etag_func=None, last_modified_func=None):
                     if dt:
                         return timegm(dt.utctimetuple())
 
+            # The value from etag_func() could be quoted or unquoted.
             res_etag = etag_func(request, *args, **kwargs) if etag_func else None
+            res_etag = quote_etag(res_etag) if res_etag is not None else None
             res_last_modified = get_last_modified()
 
             response = get_conditional_response(
@@ -99,7 +101,7 @@ def condition(etag_func=None, last_modified_func=None):
             if res_last_modified and not response.has_header('Last-Modified'):
                 response['Last-Modified'] = http_date(res_last_modified)
             if res_etag and not response.has_header('ETag'):
-                response['ETag'] = quote_etag(res_etag)
+                response['ETag'] = res_etag
 
             return response
 

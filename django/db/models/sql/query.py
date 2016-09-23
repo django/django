@@ -990,6 +990,20 @@ class Query(object):
             pre_joins = self.alias_refcount.copy()
             value = value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
             used_joins = [k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)]
+        elif isinstance(value, (list, tuple)):
+            # The items of the iterable may be expressions and therefore need
+            # to be resolved independently.
+            processed_values = []
+            used_joins = set()
+            for sub_value in value:
+                if hasattr(sub_value, 'resolve_expression'):
+                    pre_joins = self.alias_refcount.copy()
+                    processed_values.append(
+                        sub_value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
+                    )
+                    # The used_joins for a tuple of expressions is the union of
+                    # the used_joins for the individual expressions.
+                    used_joins |= set(k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0))
         # Subqueries need to use a different set of aliases than the
         # outer query. Call bump_prefix to change aliases of the inner
         # query (the value).
@@ -1325,7 +1339,7 @@ class Query(object):
                 if pos == -1 or fail_on_missing:
                     field_names = list(get_field_names_from_opts(opts))
                     available = sorted(field_names + list(self.annotation_select))
-                    raise FieldError("Cannot resolve keyword %r into field. "
+                    raise FieldError("Cannot resolve keyword '%s' into field. "
                                      "Choices are: %s" % (name, ", ".join(available)))
                 break
             # Check if we need any joins for concrete inheritance cases (the

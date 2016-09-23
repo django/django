@@ -119,6 +119,3 @@ class DjangoJSONEncoder(json.JSONEncoder):
             return six.text_type(o)
         else:
             return super(DjangoJSONEncoder, self).default(o)
-
-# Older, deprecated class name (for backwards compatibility purposes).
-DateTimeAwareJSONEncoder = DjangoJSONEncoder

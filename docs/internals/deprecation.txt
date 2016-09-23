@@ -25,6 +25,22 @@ details on these changes.
 
 * ``django.test.runner.setup_databases()`` will be removed.
 
+* ``django.utils.translation.string_concat()`` will be removed.
+
+* ``django.core.cache.backends.memcached.PyLibMCCache`` will no longer support
+  passing ``pylibmc`` behavior settings as top-level attributes of ``OPTIONS``.
+
+* The ``host`` parameter of ``django.utils.http.is_safe_url()`` will be
+  removed.
+
+* Silencing of exceptions raised while rendering the ``{% include %}`` template
+  tag will be removed.
+
+* ``DatabaseIntrospection.get_indexes()`` will be removed.
+
+* The ``authenticate()`` method of authentication backends will require a
+  ``request`` argument.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

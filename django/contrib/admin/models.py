@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible, smart_text
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.text import get_text_list
 from django.utils.translation import ugettext, ugettext_lazy as _
 
@@ -26,7 +26,7 @@ class LogEntryManager(models.Manager):
         self.model.objects.create(
             user_id=user_id,
             content_type_id=content_type_id,
-            object_id=smart_text(object_id),
+            object_id=force_text(object_id),
             object_repr=object_repr[:200],
             action_flag=action_flag,
             change_message=change_message,
@@ -67,7 +67,7 @@ class LogEntry(models.Model):
         ordering = ('-action_time',)
 
     def __repr__(self):
-        return smart_text(self.action_time)
+        return force_text(self.action_time)
 
     def __str__(self):
         if self.is_addition():

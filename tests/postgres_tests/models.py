@@ -1,9 +1,10 @@
-from django.db import connection, models
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
 
 from .fields import (
-    ArrayField, BigIntegerRangeField, DateRangeField, DateTimeRangeField,
-    FloatRangeField, HStoreField, IntegerRangeField, JSONField,
-    SearchVectorField,
+    ArrayField, BigIntegerRangeField, CITextField, DateRangeField,
+    DateTimeRangeField, FloatRangeField, HStoreField, IntegerRangeField,
+    JSONField, SearchVectorField,
 )
 
 
@@ -40,7 +41,7 @@ class PostgreSQLModel(models.Model):
 
 
 class IntegerArrayModel(PostgreSQLModel):
-    field = ArrayField(models.IntegerField())
+    field = ArrayField(models.IntegerField(), default=[], blank=True)
 
 
 class NullableIntegerArrayModel(PostgreSQLModel):
@@ -100,6 +101,13 @@ class Character(models.Model):
         return self.name
 
 
+class CITextTestModel(PostgreSQLModel):
+    name = CITextField(primary_key=True, max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class Line(PostgreSQLModel):
     scene = models.ForeignKey('Scene', models.CASCADE)
     character = models.ForeignKey('Character', models.CASCADE)
@@ -128,14 +136,12 @@ class RangeLookupsModel(PostgreSQLModel):
     date = models.DateField(blank=True, null=True)
 
 
-# Only create this model for postgres >= 9.4
-if connection.vendor == 'postgresql' and connection.pg_version >= 90400:
-    class JSONModel(models.Model):
-        field = JSONField(blank=True, null=True)
-else:
-    # create an object with this name so we don't have failing imports
-    class JSONModel(object):
-        pass
+class JSONModel(models.Model):
+    field = JSONField(blank=True, null=True)
+    field_custom = JSONField(blank=True, null=True, encoder=DjangoJSONEncoder)
+
+    class Meta:
+        required_db_features = ['has_jsonb_datatype']
 
 
 class ArrayFieldSubclass(ArrayField):

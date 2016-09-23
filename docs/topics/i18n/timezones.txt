@@ -151,10 +151,8 @@ used.
     backwards-compatibility with applications that still rely on local time.
     However, :ref:`as explained above <naive-datetime-objects>`, this isn't
     entirely reliable, and you should always work with aware datetimes in UTC
-    in your own code. For instance, use
-    :meth:`~datetime.datetime.utcfromtimestamp` instead of
-    :meth:`~datetime.datetime.fromtimestamp` -- and don't forget to set
-    ``tzinfo`` to :data:`~django.utils.timezone.utc`.
+    in your own code. For instance, use :meth:`~datetime.datetime.fromtimestamp`
+    and set the ``tz`` parameter to :data:`~django.utils.timezone.utc`.
 
 Selecting the current time zone
 -------------------------------
@@ -212,7 +210,7 @@ Include a form in ``template.html`` that will ``POST`` to this view:
         <label for="timezone">Time zone:</label>
         <select name="timezone">
             {% for tz in timezones %}
-            <option value="{{ tz }}"{% if tz == TIME_ZONE %} selected="selected"{% endif %}>{{ tz }}</option>
+            <option value="{{ tz }}"{% if tz == TIME_ZONE %} selected{% endif %}>{{ tz }}</option>
             {% endfor %}
         </select>
         <input type="submit" value="Set" />

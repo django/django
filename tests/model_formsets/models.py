@@ -166,7 +166,7 @@ class MexicanRestaurant(Restaurant):
 
 
 class ClassyMexicanRestaurant(MexicanRestaurant):
-    restaurant = models.OneToOneField(MexicanRestaurant, models.CASCADE, parent_link=True, primary_key=True)
+    the_restaurant = models.OneToOneField(MexicanRestaurant, models.CASCADE, parent_link=True, primary_key=True)
     tacos_are_yummy = models.BooleanField(default=False)
 
 

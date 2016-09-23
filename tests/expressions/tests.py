@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import unittest
 import uuid
 from copy import deepcopy
 
@@ -17,11 +18,15 @@ from django.db.models.expressions import (
 from django.db.models.functions import (
     Coalesce, Concat, Length, Lower, Substr, Upper,
 )
+from django.db.models.sql import constants
+from django.db.models.sql.datastructures import Join
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils import six
 
-from .models import UUID, Company, Employee, Experiment, Number, Time
+from .models import (
+    UUID, Company, Employee, Experiment, Number, Result, SimulationRun, Time,
+)
 
 
 class BasicExpressionsTests(TestCase):
@@ -74,7 +79,7 @@ class BasicExpressionsTests(TestCase):
         # We can filter on attribute relationships on same model obj, e.g.
         # find companies where the number of employees is greater
         # than the number of chairs.
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.company_query.filter(num_employees__gt=F("num_chairs")), [
                 {
                     "num_chairs": 5,
@@ -87,14 +92,13 @@ class BasicExpressionsTests(TestCase):
                     "num_employees": 32
                 },
             ],
-            lambda o: o
         )
 
     def test_update(self):
         # We can set one field to have the value of another field
         # Make sure we have enough chairs
         self.company_query.update(num_chairs=F("num_employees"))
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.company_query, [
                 {
                     "num_chairs": 2300,
@@ -112,14 +116,13 @@ class BasicExpressionsTests(TestCase):
                     "num_employees": 32
                 }
             ],
-            lambda o: o
         )
 
     def test_arithmetic(self):
         # We can perform arithmetic operations in expressions
         # Make sure we have 2 spare chairs
         self.company_query.update(num_chairs=F("num_employees") + 2)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.company_query, [
                 {
                     'num_chairs': 2302,
@@ -137,7 +140,6 @@ class BasicExpressionsTests(TestCase):
                     'num_employees': 32
                 }
             ],
-            lambda o: o,
         )
 
     def test_order_of_operations(self):
@@ -145,7 +147,7 @@ class BasicExpressionsTests(TestCase):
         self. company_query.update(
             num_chairs=F('num_employees') + 2 * F('num_employees')
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.company_query, [
                 {
                     'num_chairs': 6900,
@@ -163,7 +165,6 @@ class BasicExpressionsTests(TestCase):
                     'num_employees': 32
                 }
             ],
-            lambda o: o,
         )
 
     def test_parenthesis_priority(self):
@@ -171,7 +172,7 @@ class BasicExpressionsTests(TestCase):
         self.company_query.update(
             num_chairs=((F('num_employees') + 2) * F('num_employees'))
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.company_query, [
                 {
                     'num_chairs': 5294600,
@@ -189,7 +190,6 @@ class BasicExpressionsTests(TestCase):
                     'num_employees': 32
                 }
             ],
-            lambda o: o,
         )
 
     def test_update_with_fk(self):
@@ -344,12 +344,9 @@ class BasicExpressionsTests(TestCase):
         Employee.objects.create(firstname="John", lastname="Doe")
         e2 = Employee.objects.create(firstname="Jack", lastname="Jackson")
         e3 = Employee.objects.create(firstname="Jack", lastname="jackson")
-        self.assertQuerysetEqual(
-            Employee.objects.filter(lastname__startswith=F('firstname')),
-            [e2], lambda x: x)
-        self.assertQuerysetEqual(
-            Employee.objects.filter(lastname__istartswith=F('firstname')).order_by('pk'),
-            [e2, e3], lambda x: x)
+        self.assertSequenceEqual(Employee.objects.filter(lastname__startswith=F('firstname')), [e2])
+        qs = Employee.objects.filter(lastname__istartswith=F('firstname')).order_by('pk')
+        self.assertSequenceEqual(qs, [e2, e3])
 
     def test_ticket_18375_join_reuse(self):
         # Test that reverse multijoin F() references and the lookup target
@@ -391,6 +388,144 @@ class BasicExpressionsTests(TestCase):
         self.assertEqual(str(qs.query).count('JOIN'), 2)
 
 
+class IterableLookupInnerExpressionsTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        ceo = Employee.objects.create(firstname='Just', lastname='Doit', salary=30)
+        # MySQL requires that the values calculated for expressions don't pass
+        # outside of the field's range, so it's inconvenient to use the values
+        # in the more general tests.
+        Company.objects.create(name='5020 Ltd', num_employees=50, num_chairs=20, ceo=ceo)
+        Company.objects.create(name='5040 Ltd', num_employees=50, num_chairs=40, ceo=ceo)
+        Company.objects.create(name='5050 Ltd', num_employees=50, num_chairs=50, ceo=ceo)
+        Company.objects.create(name='5060 Ltd', num_employees=50, num_chairs=60, ceo=ceo)
+        Company.objects.create(name='99300 Ltd', num_employees=99, num_chairs=300, ceo=ceo)
+
+    def test_in_lookup_allows_F_expressions_and_expressions_for_integers(self):
+        # __in lookups can use F() expressions for integers.
+        queryset = Company.objects.filter(num_employees__in=([F('num_chairs') - 10]))
+        self.assertQuerysetEqual(queryset, ['<Company: 5060 Ltd>'], ordered=False)
+        self.assertQuerysetEqual(
+            Company.objects.filter(num_employees__in=([F('num_chairs') - 10, F('num_chairs') + 10])),
+            ['<Company: 5040 Ltd>', '<Company: 5060 Ltd>'],
+            ordered=False
+        )
+        self.assertQuerysetEqual(
+            Company.objects.filter(
+                num_employees__in=([F('num_chairs') - 10, F('num_chairs'), F('num_chairs') + 10])
+            ),
+            ['<Company: 5040 Ltd>', '<Company: 5050 Ltd>', '<Company: 5060 Ltd>'],
+            ordered=False
+        )
+
+    def test_expressions_in_lookups_join_choice(self):
+        midpoint = datetime.time(13, 0)
+        t1 = Time.objects.create(time=datetime.time(12, 0))
+        t2 = Time.objects.create(time=datetime.time(14, 0))
+        SimulationRun.objects.create(start=t1, end=t2, midpoint=midpoint)
+        SimulationRun.objects.create(start=t1, end=None, midpoint=midpoint)
+        SimulationRun.objects.create(start=None, end=t2, midpoint=midpoint)
+        SimulationRun.objects.create(start=None, end=None, midpoint=midpoint)
+
+        queryset = SimulationRun.objects.filter(midpoint__range=[F('start__time'), F('end__time')])
+        self.assertQuerysetEqual(
+            queryset,
+            ['<SimulationRun: 13:00:00 (12:00:00 to 14:00:00)>'],
+            ordered=False
+        )
+        for alias in queryset.query.alias_map.values():
+            if isinstance(alias, Join):
+                self.assertEqual(alias.join_type, constants.INNER)
+
+        queryset = SimulationRun.objects.exclude(midpoint__range=[F('start__time'), F('end__time')])
+        self.assertQuerysetEqual(queryset, [], ordered=False)
+        for alias in queryset.query.alias_map.values():
+            if isinstance(alias, Join):
+                self.assertEqual(alias.join_type, constants.LOUTER)
+
+    def test_range_lookup_allows_F_expressions_and_expressions_for_integers(self):
+        # Range lookups can use F() expressions for integers.
+        Company.objects.filter(num_employees__exact=F("num_chairs"))
+        self.assertQuerysetEqual(
+            Company.objects.filter(num_employees__range=(F('num_chairs'), 100)),
+            ['<Company: 5020 Ltd>', '<Company: 5040 Ltd>', '<Company: 5050 Ltd>'],
+            ordered=False
+        )
+        self.assertQuerysetEqual(
+            Company.objects.filter(num_employees__range=(F('num_chairs') - 10, F('num_chairs') + 10)),
+            ['<Company: 5040 Ltd>', '<Company: 5050 Ltd>', '<Company: 5060 Ltd>'],
+            ordered=False
+        )
+        self.assertQuerysetEqual(
+            Company.objects.filter(num_employees__range=(F('num_chairs') - 10, 100)),
+            ['<Company: 5020 Ltd>', '<Company: 5040 Ltd>', '<Company: 5050 Ltd>', '<Company: 5060 Ltd>'],
+            ordered=False
+        )
+        self.assertQuerysetEqual(
+            Company.objects.filter(num_employees__range=(1, 100)),
+            [
+                '<Company: 5020 Ltd>', '<Company: 5040 Ltd>', '<Company: 5050 Ltd>',
+                '<Company: 5060 Ltd>', '<Company: 99300 Ltd>',
+            ],
+            ordered=False
+        )
+
+    @unittest.skipUnless(connection.vendor == 'sqlite',
+                         "This defensive test only works on databases that don't validate parameter types")
+    def test_complex_expressions_do_not_introduce_sql_injection_via_untrusted_string_inclusion(self):
+        """
+        This tests that SQL injection isn't possible using compilation of
+        expressions in iterable filters, as their compilation happens before
+        the main query compilation. It's limited to SQLite, as PostgreSQL,
+        Oracle and other vendors have defense in depth against this by type
+        checking. Testing against SQLite (the most permissive of the built-in
+        databases) demonstrates that the problem doesn't exist while keeping
+        the test simple.
+        """
+        queryset = Company.objects.filter(name__in=[F('num_chairs') + '1)) OR ((1==1'])
+        self.assertQuerysetEqual(queryset, [], ordered=False)
+
+    def test_in_lookup_allows_F_expressions_and_expressions_for_datetimes(self):
+        start = datetime.datetime(2016, 2, 3, 15, 0, 0)
+        end = datetime.datetime(2016, 2, 5, 15, 0, 0)
+        experiment_1 = Experiment.objects.create(
+            name='Integrity testing',
+            assigned=start.date(),
+            start=start,
+            end=end,
+            completed=end.date(),
+            estimated_time=end - start,
+        )
+        experiment_2 = Experiment.objects.create(
+            name='Taste testing',
+            assigned=start.date(),
+            start=start,
+            end=end,
+            completed=end.date(),
+            estimated_time=end - start,
+        )
+        Result.objects.create(
+            experiment=experiment_1,
+            result_time=datetime.datetime(2016, 2, 4, 15, 0, 0),
+        )
+        Result.objects.create(
+            experiment=experiment_1,
+            result_time=datetime.datetime(2016, 3, 10, 2, 0, 0),
+        )
+        Result.objects.create(
+            experiment=experiment_2,
+            result_time=datetime.datetime(2016, 1, 8, 5, 0, 0),
+        )
+
+        within_experiment_time = [F('experiment__start'), F('experiment__end')]
+        queryset = Result.objects.filter(result_time__range=within_experiment_time)
+        self.assertQuerysetEqual(queryset, ["<Result: Result at 2016-02-04 15:00:00>"])
+
+        within_experiment_time = [F('experiment__start'), F('experiment__end')]
+        queryset = Result.objects.filter(result_time__range=within_experiment_time)
+        self.assertQuerysetEqual(queryset, ["<Result: Result at 2016-02-04 15:00:00>"])
+
+
 class ExpressionsTests(TestCase):
 
     def test_F_object_deepcopy(self):
@@ -417,7 +552,7 @@ class ExpressionsTests(TestCase):
         self.assertEqual(c_qs.get(), c)
 
     def test_patterns_escape(self):
-        """
+        r"""
         Test that special characters (e.g. %, _ and \) stored in database are
         properly escaped when using a pattern lookup with an expression
         refs #16731
@@ -449,7 +584,7 @@ class ExpressionsTests(TestCase):
             ordered=False)
 
     def test_insensitive_patterns_escape(self):
-        """
+        r"""
         Test that special characters (e.g. %, _ and \) stored in database are
         properly escaped when using a case insensitive pattern lookup with an
         expression -- refs #16731
@@ -553,7 +688,7 @@ class ExpressionsNumericTests(TestCase):
         self.assertEqual(Number.objects.get(pk=n.pk).float, Approximate(256.900, places=3))
 
     def test_incorrect_field_expression(self):
-        with six.assertRaisesRegex(self, FieldError, "Cannot resolve keyword u?'nope' into field.*"):
+        with self.assertRaisesMessage(FieldError, "Cannot resolve keyword 'nope' into field."):
             list(Employee.objects.filter(firstname=F('nope')))
 
 

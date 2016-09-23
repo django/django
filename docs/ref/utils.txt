@@ -868,6 +868,26 @@ appropriate entities.
 .. module:: django.utils.text
     :synopsis: Text manipulation.
 
+.. function:: format_lazy(format_string, *args, **kwargs)
+
+    .. versionadded:: 1.11
+
+    A version of :meth:`str.format` for when ``format_string``, ``args``,
+    and/or ``kwargs`` contain lazy objects. The first argument is the string to
+    be formatted. For example::
+
+        from django.utils.text import format_lazy
+        from django.utils.translation import pgettext_lazy
+
+        urlpatterns = [
+            url(format_lazy(r'{person}/(?P<pk>\d+)/$', person=pgettext_lazy('URL', 'person')),
+                PersonDetailView.as_view()),
+        ]
+
+    This example allows translators to translate part of the URL. If "person"
+    is translated to "persona", the regular expression will match
+    ``persona/(?P<pk>\d+)/$``, e.g. ``persona/5/``.
+
 .. function:: slugify(allow_unicode=False)
 
     Converts to ASCII if ``allow_unicode`` is ``False`` (default). Converts spaces to
@@ -954,13 +974,31 @@ appropriate entities.
 
     ``override`` is also usable as a function decorator.
 
-.. function:: localtime(value, timezone=None)
+.. function:: localtime(value=None, timezone=None)
 
     Converts an aware :class:`~datetime.datetime` to a different time zone,
     by default the :ref:`current time zone <default-current-time-zone>`.
 
+    When ``value`` is omitted, it defaults to :func:`now`.
+
     This function doesn't work on naive datetimes; use :func:`make_aware`
     instead.
+
+    .. versionchanged:: 1.11
+
+        In older versions, ``value`` is a required argument.
+
+.. function:: localdate(value=None, timezone=None)
+
+    .. versionadded:: 1.11
+
+    Uses :func:`localtime` to convert an aware :class:`~datetime.datetime` to a
+    :meth:`~datetime.datetime.date` in a different time zone, by default the
+    :ref:`current time zone <default-current-time-zone>`.
+
+    When ``value`` is omitted, it defaults to :func:`now`.
+
+    This function doesn't work on naive datetimes.
 
 .. function:: now()
 
@@ -1086,6 +1124,12 @@ For a complete discussion on the usage of the following see the
     See :ref:`lazy translations documentation <lazy-translations>`.
 
 .. function:: string_concat(*strings)
+
+    .. deprecated:: 1.11
+
+        Use :meth:`django.utils.text.format_lazy` instead.
+        ``string_concat(*strings)`` can be replaced by
+        ``format_lazy('{}' * len(strings), *strings)``.
 
     Lazy variant of string concatenation, needed for translations that are
     constructed from multiple parts.

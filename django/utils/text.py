@@ -7,7 +7,9 @@ from io import BytesIO
 
 from django.utils import six
 from django.utils.encoding import force_text
-from django.utils.functional import SimpleLazyObject, keep_lazy, keep_lazy_text
+from django.utils.functional import (
+    SimpleLazyObject, keep_lazy, keep_lazy_text, lazy,
+)
 from django.utils.safestring import SafeText, mark_safe
 from django.utils.six.moves import html_entities
 from django.utils.translation import pgettext, ugettext as _, ugettext_lazy
@@ -421,11 +423,11 @@ def slugify(value, allow_unicode=False):
     value = force_text(value)
     if allow_unicode:
         value = unicodedata.normalize('NFKC', value)
-        value = re.sub('[^\w\s-]', '', value, flags=re.U).strip().lower()
-        return mark_safe(re.sub('[-\s]+', '-', value, flags=re.U))
+        value = re.sub(r'[^\w\s-]', '', value, flags=re.U).strip().lower()
+        return mark_safe(re.sub(r'[-\s]+', '-', value, flags=re.U))
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
-    value = re.sub('[^\w\s-]', '', value).strip().lower()
-    return mark_safe(re.sub('[-\s]+', '-', value))
+    value = re.sub(r'[^\w\s-]', '', value).strip().lower()
+    return mark_safe(re.sub(r'[-\s]+', '-', value))
 
 
 def camel_case_to_spaces(value):
@@ -434,3 +436,12 @@ def camel_case_to_spaces(value):
     trailing whitespace.
     """
     return re_camel_case.sub(r' \1', value).strip().lower()
+
+
+def _format_lazy(format_string, *args, **kwargs):
+    """
+    Apply str.format() on 'format_string' where format_string, args,
+    and/or kwargs might be lazy.
+    """
+    return format_string.format(*args, **kwargs)
+format_lazy = lazy(_format_lazy, six.text_type)

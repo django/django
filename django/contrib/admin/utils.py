@@ -317,7 +317,7 @@ def _get_non_gfk_field(opts, name):
         raise FieldDoesNotExist()
 
     # Avoid coercing <FK>_id fields to FK
-    if field.is_relation and hasattr(field, 'attname') and field.attname == name:
+    if field.is_relation and not field.many_to_many and hasattr(field, 'attname') and field.attname == name:
         raise FieldIsAForeignKeyColumnName()
 
     return field
@@ -435,7 +435,7 @@ def display_for_value(value, empty_value_display, boolean=False):
     elif isinstance(value, (list, tuple)):
         return ', '.join(force_text(v) for v in value)
     else:
-        return smart_text(value)
+        return force_text(value)
 
 
 class NotRelationField(Exception):

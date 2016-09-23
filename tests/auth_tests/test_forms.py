@@ -12,6 +12,7 @@ from django.contrib.auth.forms import (
     SetPasswordForm, UserChangeForm, UserCreationForm,
 )
 from django.contrib.auth.models import User
+from django.contrib.auth.signals import user_login_failed
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
@@ -22,7 +23,9 @@ from django.utils.encoding import force_text
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
-from .models.custom_user import CustomUser, ExtensionUser
+from .models.custom_user import (
+    CustomUser, CustomUserWithoutIsActiveField, ExtensionUser,
+)
 from .models.with_integer_username import IntegerUsernameUser
 from .settings import AUTH_TEMPLATES
 
@@ -209,6 +212,20 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         form = CustomUserCreationForm(data)
         self.assertTrue(form.is_valid())
 
+    def test_custom_form_hidden_username_field(self):
+        class CustomUserCreationForm(UserCreationForm):
+            class Meta(UserCreationForm.Meta):
+                model = CustomUserWithoutIsActiveField
+                fields = ('email',)  # without USERNAME_FIELD
+
+        data = {
+            'email': 'testclient@example.com',
+            'password1': 'testclient',
+            'password2': 'testclient',
+        }
+        form = CustomUserCreationForm(data)
+        self.assertTrue(form.is_valid())
+
     def test_password_whitespace_not_stripped(self):
         data = {
             'username': 'testuser',
@@ -219,6 +236,16 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['password1'], data['password1'])
         self.assertEqual(form.cleaned_data['password2'], data['password2'])
+
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    ])
+    def test_password_help_text(self):
+        form = UserCreationForm()
+        self.assertEqual(
+            form.fields['password1'].help_text,
+            '<ul><li>Your password can&#39;t be too similar to your other personal information.</li></ul>'
+        )
 
 
 # To verify that the login form rejects inactive users, use an authentication
@@ -252,6 +279,24 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         form = AuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.non_field_errors(), [force_text(form.error_messages['inactive'])])
+
+    def test_login_failed(self):
+        signal_calls = []
+
+        def signal_handler(**kwargs):
+            signal_calls.append(kwargs)
+
+        user_login_failed.connect(signal_handler)
+        fake_request = object()
+        try:
+            form = AuthenticationForm(fake_request, {
+                'username': 'testclient',
+                'password': 'incorrect',
+            })
+            self.assertFalse(form.is_valid())
+            self.assertIs(signal_calls[0]['request'], fake_request)
+        finally:
+            user_login_failed.disconnect(signal_handler)
 
     def test_inactive_user_i18n(self):
         with self.settings(USE_I18N=True), translation.override('pt-br', deactivate=True):

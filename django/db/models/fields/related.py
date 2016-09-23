@@ -1438,12 +1438,12 @@ class ManyToManyField(RelatedField):
         return errors
 
     def _check_table_uniqueness(self, **kwargs):
-        if isinstance(self.remote_field.through, six.string_types):
+        if isinstance(self.remote_field.through, six.string_types) or not self.remote_field.through._meta.managed:
             return []
         registered_tables = {
             model._meta.db_table: model
             for model in self.opts.apps.get_models(include_auto_created=True)
-            if model != self.remote_field.through
+            if model != self.remote_field.through and model._meta.managed
         }
         m2m_db_table = self.m2m_db_table()
         if m2m_db_table in registered_tables:

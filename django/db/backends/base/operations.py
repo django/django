@@ -428,7 +428,7 @@ class BaseDatabaseOperations(object):
 
     def prep_for_like_query(self, x):
         """Prepares a value for use in a LIKE query."""
-        return force_text(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
+        return force_text(x).replace("\\", "\\\\").replace("%", r"\%").replace("_", r"\_")
 
     # Same as prep_for_like_query(), but called for "iexact" matches, which
     # need not necessarily be implemented using "LIKE" in the backend.

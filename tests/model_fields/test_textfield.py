@@ -1,4 +1,9 @@
-from django.db import models
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from unittest import skipIf
+
+from django.db import connection, models
 from django.test import TestCase
 
 from .models import Post
@@ -23,3 +28,9 @@ class TextFieldTests(TestCase):
 
     def test_lookup_integer_in_textfield(self):
         self.assertEqual(Post.objects.filter(body=24).count(), 0)
+
+    @skipIf(connection.vendor == 'mysql', 'See https://code.djangoproject.com/ticket/18392')
+    def test_emoji(self):
+        p = Post.objects.create(title='Whatever', body='Smile 😀.')
+        p.refresh_from_db()
+        self.assertEqual(p.body, 'Smile 😀.')

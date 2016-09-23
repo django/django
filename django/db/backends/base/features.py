@@ -163,9 +163,6 @@ class BaseDatabaseFeatures(object):
     # Can the backend introspect the column order (ASC/DESC) for indexes?
     supports_index_column_ordering = True
 
-    # Can the backend introspect the type of index created?
-    can_introspect_index_type = False
-
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
 
@@ -231,6 +228,9 @@ class BaseDatabaseFeatures(object):
     # Does the backend consider quoted identifiers with different casing to
     # be equal?
     ignores_quoted_identifier_case = False
+
+    # Place FOR UPDATE right after FROM clause. Used on MSSQL.
+    for_update_after_from = False
 
     def __init__(self, connection):
         self.connection = connection

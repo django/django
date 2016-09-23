@@ -23,6 +23,18 @@ class CreateExtension(Operation):
         return "Creates extension %s" % self.name
 
 
+class BtreeGinExtension(CreateExtension):
+
+    def __init__(self):
+        self.name = 'btree_gin'
+
+
+class CITextExtension(CreateExtension):
+
+    def __init__(self):
+        self.name = 'citext'
+
+
 class HStoreExtension(CreateExtension):
 
     def __init__(self):
@@ -36,19 +48,13 @@ class HStoreExtension(CreateExtension):
         register_hstore_handler(schema_editor.connection)
 
 
-class UnaccentExtension(CreateExtension):
-
-    def __init__(self):
-        self.name = 'unaccent'
-
-
 class TrigramExtension(CreateExtension):
 
     def __init__(self):
         self.name = 'pg_trgm'
 
 
-class BtreeGinExtension(CreateExtension):
+class UnaccentExtension(CreateExtension):
 
     def __init__(self):
-        self.name = 'btree_gin'
+        self.name = 'unaccent'

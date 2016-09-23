@@ -385,10 +385,10 @@ class UUIDUserPasswordResetTest(CustomUserPasswordResetTest):
 
 class ChangePasswordTest(AuthViewsTestCase):
 
-    def fail_login(self, password='password'):
+    def fail_login(self):
         response = self.client.post('/login/', {
             'username': 'testclient',
-            'password': password,
+            'password': 'password',
         })
         self.assertFormError(response, AuthenticationForm.error_messages['invalid_login'] % {
             'username': User._meta.get_field('username').verbose_name
@@ -505,7 +505,7 @@ class LoginTest(AuthViewsTestCase):
             self.assertIsInstance(response.context['site'], RequestSite)
         self.assertIsInstance(response.context['form'], AuthenticationForm)
 
-    def test_security_check(self, password='password'):
+    def test_security_check(self):
         login_url = reverse('login')
 
         # Those URLs should not pass the security check
@@ -524,7 +524,7 @@ class LoginTest(AuthViewsTestCase):
             }
             response = self.client.post(nasty_url, {
                 'username': 'testclient',
-                'password': password,
+                'password': 'password',
             })
             self.assertEqual(response.status_code, 302)
             self.assertNotIn(bad_url, response.url,
@@ -546,10 +546,27 @@ class LoginTest(AuthViewsTestCase):
             }
             response = self.client.post(safe_url, {
                 'username': 'testclient',
-                'password': password,
+                'password': 'password',
             })
             self.assertEqual(response.status_code, 302)
             self.assertIn(good_url, response.url, "%s should be allowed" % good_url)
+
+    def test_security_check_https(self):
+        login_url = reverse('login')
+        non_https_next_url = 'http://testserver/path'
+        not_secured_url = '%(url)s?%(next)s=%(next_url)s' % {
+            'url': login_url,
+            'next': REDIRECT_FIELD_NAME,
+            'next_url': urlquote(non_https_next_url),
+        }
+        post_data = {
+            'username': 'testclient',
+            'password': 'password',
+        }
+        response = self.client.post(not_secured_url, post_data, secure=True)
+        self.assertEqual(response.status_code, 302)
+        self.assertNotEqual(response.url, non_https_next_url)
+        self.assertEqual(response.url, settings.LOGIN_REDIRECT_URL)
 
     def test_login_form_contains_request(self):
         # 15198
@@ -560,7 +577,7 @@ class LoginTest(AuthViewsTestCase):
         # the custom authentication form used by this login asserts
         # that a request is passed to the form successfully.
 
-    def test_login_csrf_rotate(self, password='password'):
+    def test_login_csrf_rotate(self):
         """
         Makes sure that a login rotates the currently-used CSRF token.
         """
@@ -579,7 +596,7 @@ class LoginTest(AuthViewsTestCase):
         req = HttpRequest()
         req.COOKIES[settings.CSRF_COOKIE_NAME] = token1
         req.method = "POST"
-        req.POST = {'username': 'testclient', 'password': password, 'csrfmiddlewaretoken': token1}
+        req.POST = {'username': 'testclient', 'password': 'password', 'csrfmiddlewaretoken': token1}
 
         # Use POST request to log in
         SessionMiddleware().process_request(req)
@@ -805,6 +822,38 @@ class LoginRedirectAuthenticatedUser(AuthViewsTestCase):
                 self.client.get(url)
 
 
+class LoginSuccessURLAllowedHostsTest(AuthViewsTestCase):
+    def test_success_url_allowed_hosts_same_host(self):
+        response = self.client.post('/login/allowed_hosts/', {
+            'username': 'testclient',
+            'password': 'password',
+            'next': 'https://testserver/home',
+        })
+        self.assertIn(SESSION_KEY, self.client.session)
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, 'https://testserver/home')
+
+    def test_success_url_allowed_hosts_safe_host(self):
+        response = self.client.post('/login/allowed_hosts/', {
+            'username': 'testclient',
+            'password': 'password',
+            'next': 'https://otherserver/home',
+        })
+        self.assertIn(SESSION_KEY, self.client.session)
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, 'https://otherserver/home')
+
+    def test_success_url_allowed_hosts_unsafe_host(self):
+        response = self.client.post('/login/allowed_hosts/', {
+            'username': 'testclient',
+            'password': 'password',
+            'next': 'https://evil/home',
+        })
+        self.assertIn(SESSION_KEY, self.client.session)
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, '/accounts/profile/')
+
+
 class LogoutTest(AuthViewsTestCase):
 
     def confirm_logged_out(self):
@@ -876,7 +925,28 @@ class LogoutTest(AuthViewsTestCase):
         self.assertURLEqual(response.url, '/password_reset/')
         self.confirm_logged_out()
 
-    def test_security_check(self, password='password'):
+    def test_success_url_allowed_hosts_same_host(self):
+        self.login()
+        response = self.client.get('/logout/allowed_hosts/?next=https://testserver/')
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, 'https://testserver/')
+        self.confirm_logged_out()
+
+    def test_success_url_allowed_hosts_safe_host(self):
+        self.login()
+        response = self.client.get('/logout/allowed_hosts/?next=https://otherserver/')
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, 'https://otherserver/')
+        self.confirm_logged_out()
+
+    def test_success_url_allowed_hosts_unsafe_host(self):
+        self.login()
+        response = self.client.get('/logout/allowed_hosts/?next=https://evil/')
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, '/logout/allowed_hosts/')
+        self.confirm_logged_out()
+
+    def test_security_check(self):
         logout_url = reverse('logout')
 
         # Those URLs should not pass the security check
@@ -918,6 +988,21 @@ class LogoutTest(AuthViewsTestCase):
             self.assertEqual(response.status_code, 302)
             self.assertIn(good_url, response.url, "%s should be allowed" % good_url)
             self.confirm_logged_out()
+
+    def test_security_check_https(self):
+        logout_url = reverse('logout')
+        non_https_next_url = 'http://testserver/'
+        url = '%(url)s?%(next)s=%(next_url)s' % {
+            'url': logout_url,
+            'next': REDIRECT_FIELD_NAME,
+            'next_url': urlquote(non_https_next_url),
+        }
+        self.login()
+        response = self.client.get(url, secure=True)
+        self.assertEqual(response.status_code, 302)
+        self.assertNotEqual(response.url, non_https_next_url)
+        self.assertEqual(response.url, logout_url)
+        self.confirm_logged_out()
 
     def test_logout_preserve_language(self):
         """Check that language stored in session is preserved after logout"""

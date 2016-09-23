@@ -53,7 +53,7 @@ class FilePathFieldTest(SimpleTestCase):
     def test_filepathfield_3(self):
         path = upath(forms.__file__)
         path = os.path.dirname(os.path.abspath(path)) + '/'
-        f = FilePathField(path=path, match='^.*?\.py$')
+        f = FilePathField(path=path, match=r'^.*?\.py$')
         f.choices.sort()
         expected = [
             ('/django/forms/__init__.py', '__init__.py'),
@@ -72,7 +72,7 @@ class FilePathFieldTest(SimpleTestCase):
     def test_filepathfield_4(self):
         path = os.path.abspath(upath(forms.__file__))
         path = os.path.dirname(path) + '/'
-        f = FilePathField(path=path, recursive=True, match='^.*?\.py$')
+        f = FilePathField(path=path, recursive=True, match=r'^.*?\.py$')
         f.choices.sort()
         expected = [
             ('/django/forms/__init__.py', '__init__.py'),

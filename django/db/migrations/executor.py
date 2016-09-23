@@ -63,10 +63,25 @@ class MigrationExecutor(object):
                         applied.add(migration)
         return plan
 
-    def _create_project_state(self):
-        return ProjectState(real_apps=list(self.loader.unmigrated_apps))
+    def _create_project_state(self, with_applied_migrations=False):
+        """
+        Create a project state including all the applications without
+        migrations and applied migrations if with_applied_migrations=True.
+        """
+        state = ProjectState(real_apps=list(self.loader.unmigrated_apps))
+        if with_applied_migrations:
+            # Create the forwards plan Django would follow on an empty database
+            full_plan = self.migration_plan(self.loader.graph.leaf_nodes(), clean_start=True)
+            applied_migrations = {
+                self.loader.graph.nodes[key] for key in self.loader.applied_migrations
+                if key in self.loader.graph.nodes
+            }
+            for migration, _ in full_plan:
+                if migration in applied_migrations:
+                    migration.mutate_state(state, preserve=False)
+        return state
 
-    def migrate(self, targets, plan=None, fake=False, fake_initial=False):
+    def migrate(self, targets, plan=None, state=None, fake=False, fake_initial=False):
         """
         Migrates the database up to the given targets.
 
@@ -82,9 +97,9 @@ class MigrationExecutor(object):
         all_backwards = all(backwards for mig, backwards in plan)
 
         if not plan:
-            # Nothing to do for an empty plan, except for building the post
-            # migrate project state
-            state = self._create_project_state()
+            if state is None:
+                # The resulting state should include applied migrations.
+                state = self._create_project_state(with_applied_migrations=True)
         elif all_forwards == all_backwards:
             # This should only happen if there's a mixed plan
             raise InvalidMigrationPlan(
@@ -94,7 +109,10 @@ class MigrationExecutor(object):
                 plan
             )
         elif all_forwards:
-            state = self._migrate_all_forwards(plan, full_plan, fake=fake, fake_initial=fake_initial)
+            if state is None:
+                # The resulting state should still include applied migrations.
+                state = self._create_project_state(with_applied_migrations=True)
+            state = self._migrate_all_forwards(state, plan, full_plan, fake=fake, fake_initial=fake_initial)
         else:
             # No need to check for `elif all_backwards` here, as that condition
             # would always evaluate to true.
@@ -104,19 +122,14 @@ class MigrationExecutor(object):
 
         return state
 
-    def _migrate_all_forwards(self, plan, full_plan, fake, fake_initial):
+    def _migrate_all_forwards(self, state, plan, full_plan, fake, fake_initial):
         """
         Take a list of 2-tuples of the form (migration instance, False) and
         apply them in the order they occur in the full_plan.
         """
         migrations_to_run = {m[0] for m in plan}
-        state = self._create_project_state()
-        applied_migrations = {
-            self.loader.graph.nodes[key] for key in self.loader.applied_migrations
-            if key in self.loader.graph.nodes
-        }
         for migration, _ in full_plan:
-            if not migrations_to_run and not applied_migrations:
+            if not migrations_to_run:
                 # We remove every migration that we applied from these sets so
                 # that we can bail out once the last migration has been applied
                 # and don't always run until the very end of the migration
@@ -131,12 +144,6 @@ class MigrationExecutor(object):
                         self.progress_callback("render_success")
                 state = self.apply_migration(state, migration, fake=fake, fake_initial=fake_initial)
                 migrations_to_run.remove(migration)
-            elif migration in applied_migrations:
-                # Only mutate the state if the migration is actually applied
-                # to make sure the resulting state doesn't include changes
-                # from unrelated migrations.
-                migration.mutate_state(state, preserve=False)
-                applied_migrations.remove(migration)
 
         return state
 

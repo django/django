@@ -106,20 +106,28 @@ class SkippingClassTestCase(SimpleTestCase):
             def test_dummy(self):
                 return
 
+        @skipUnlessDBFeature("missing")
         @skipIfDBFeature("__class__")
         class SkippedTests(unittest.TestCase):
             def test_will_be_skipped(self):
                 self.fail("We should never arrive here.")
 
+        @skipIfDBFeature("__dict__")
+        class SkippedTestsSubclass(SkippedTests):
+            pass
+
         test_suite = unittest.TestSuite()
         test_suite.addTest(NotSkippedTests('test_dummy'))
         try:
             test_suite.addTest(SkippedTests('test_will_be_skipped'))
+            test_suite.addTest(SkippedTestsSubclass('test_will_be_skipped'))
         except unittest.SkipTest:
             self.fail("SkipTest should not be raised at this stage")
         result = unittest.TextTestRunner(stream=six.StringIO()).run(test_suite)
-        self.assertEqual(result.testsRun, 2)
-        self.assertEqual(len(result.skipped), 1)
+        self.assertEqual(result.testsRun, 3)
+        self.assertEqual(len(result.skipped), 2)
+        self.assertEqual(result.skipped[0][1], 'Database has feature(s) __class__')
+        self.assertEqual(result.skipped[1][1], 'Database has feature(s) __class__')
 
 
 @override_settings(ROOT_URLCONF='test_utils.urls')
@@ -591,6 +599,8 @@ class HTMLEqualTests(SimpleTestCase):
         self.assertIn(dom1, dom2)
         dom1 = parse_html('<p>bar</p>')
         self.assertIn(dom1, dom2)
+        dom1 = parse_html('<div><p>foo</p><p>bar</p></div>')
+        self.assertIn(dom2, dom1)
 
     def test_count(self):
         # equal html contains each other one time
@@ -625,6 +635,11 @@ class HTMLEqualTests(SimpleTestCase):
 
         dom2 = parse_html('<p>foo<p>bar</p></p>')
         self.assertEqual(dom2.count(dom1), 0)
+
+        # html with a root element contains the same html with no root element
+        dom1 = parse_html('<p>foo</p><p>bar</p>')
+        dom2 = parse_html('<div><p>foo</p><p>bar</p></div>')
+        self.assertEqual(dom2.count(dom1), 1)
 
     def test_parsing_errors(self):
         with self.assertRaises(AssertionError):

@@ -117,8 +117,8 @@ class UserManagerTestCase(TestCase):
         self.assertEqual(returned, 'normal@domain.com')
 
     def test_create_user_email_domain_normalize_with_whitespace(self):
-        returned = UserManager.normalize_email('email\ with_whitespace@D.COM')
-        self.assertEqual(returned, 'email\ with_whitespace@d.com')
+        returned = UserManager.normalize_email(r'email\ with_whitespace@D.COM')
+        self.assertEqual(returned, r'email\ with_whitespace@d.com')
 
     def test_empty_username(self):
         with self.assertRaisesMessage(ValueError, 'The given username must be set'):

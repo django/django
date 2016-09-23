@@ -1,10 +1,13 @@
+from __future__ import unicode_literals
+
 import datetime
-import unittest
+import uuid
+from decimal import Decimal
 
 from django.core import exceptions, serializers
-from django.db import connection
+from django.core.serializers.json import DjangoJSONEncoder
 from django.forms import CharField, Form, widgets
-from django.test import TestCase
+from django.test import skipUnlessDBFeature
 from django.utils.html import escape
 
 from . import PostgreSQLTestCase
@@ -17,18 +20,8 @@ except ImportError:
     pass
 
 
-def skipUnlessPG94(test):
-    try:
-        PG_VERSION = connection.pg_version
-    except AttributeError:
-        PG_VERSION = 0
-    if PG_VERSION < 90400:
-        return unittest.skip('PostgreSQL >= 9.4 required')(test)
-    return test
-
-
-@skipUnlessPG94
-class TestSaveLoad(TestCase):
+@skipUnlessDBFeature('has_jsonb_datatype')
+class TestSaveLoad(PostgreSQLTestCase):
     def test_null(self):
         instance = JSONModel()
         instance.save()
@@ -79,9 +72,30 @@ class TestSaveLoad(TestCase):
         loaded = JSONModel.objects.get()
         self.assertEqual(loaded.field, obj)
 
+    def test_custom_encoding(self):
+        """
+        JSONModel.field_custom has a custom DjangoJSONEncoder.
+        """
+        some_uuid = uuid.uuid4()
+        obj_before = {
+            'date': datetime.date(2016, 8, 12),
+            'datetime': datetime.datetime(2016, 8, 12, 13, 44, 47, 575981),
+            'decimal': Decimal('10.54'),
+            'uuid': some_uuid,
+        }
+        obj_after = {
+            'date': '2016-08-12',
+            'datetime': '2016-08-12T13:44:47.575',
+            'decimal': '10.54',
+            'uuid': str(some_uuid),
+        }
+        JSONModel.objects.create(field_custom=obj_before)
+        loaded = JSONModel.objects.get()
+        self.assertEqual(loaded.field_custom, obj_after)
 
-@skipUnlessPG94
-class TestQuerying(TestCase):
+
+@skipUnlessDBFeature('has_jsonb_datatype')
+class TestQuerying(PostgreSQLTestCase):
     @classmethod
     def setUpTestData(cls):
         cls.objs = [
@@ -110,6 +124,7 @@ class TestQuerying(TestCase):
                 'k': True,
                 'l': False,
             }),
+            JSONModel.objects.create(field={'foo': 'bar'}),
         ]
 
     def test_exact(self):
@@ -128,6 +143,17 @@ class TestQuerying(TestCase):
         self.assertSequenceEqual(
             JSONModel.objects.filter(field__isnull=True),
             [self.objs[0]]
+        )
+
+    def test_isnull_key(self):
+        # key__isnull works the same as has_key='key'.
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__a__isnull=True),
+            self.objs[:7] + self.objs[9:]
+        )
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__a__isnull=False),
+            [self.objs[7], self.objs[8]]
         )
 
     def test_contains(self):
@@ -212,10 +238,34 @@ class TestQuerying(TestCase):
             self.objs[7:9]
         )
 
+    def test_icontains(self):
+        self.assertFalse(JSONModel.objects.filter(field__foo__icontains='"bar"').exists())
 
-@skipUnlessPG94
-class TestSerialization(TestCase):
-    test_data = '[{"fields": {"field": {"a": "b", "c": null}}, "model": "postgres_tests.jsonmodel", "pk": null}]'
+    def test_startswith(self):
+        self.assertTrue(JSONModel.objects.filter(field__foo__startswith='b').exists())
+
+    def test_istartswith(self):
+        self.assertTrue(JSONModel.objects.filter(field__foo__istartswith='B').exists())
+
+    def test_endswith(self):
+        self.assertTrue(JSONModel.objects.filter(field__foo__endswith='r').exists())
+
+    def test_iendswith(self):
+        self.assertTrue(JSONModel.objects.filter(field__foo__iendswith='R').exists())
+
+    def test_regex(self):
+        self.assertTrue(JSONModel.objects.filter(field__foo__regex=r'^bar$').exists())
+
+    def test_iregex(self):
+        self.assertTrue(JSONModel.objects.filter(field__foo__iregex=r'^bAr$').exists())
+
+
+@skipUnlessDBFeature('has_jsonb_datatype')
+class TestSerialization(PostgreSQLTestCase):
+    test_data = (
+        '[{"fields": {"field": {"a": "b", "c": null}, "field_custom": null}, '
+        '"model": "postgres_tests.jsonmodel", "pk": null}]'
+    )
 
     def test_dumping(self):
         instance = JSONModel(field={'a': 'b', 'c': None})
@@ -235,6 +285,12 @@ class TestValidation(PostgreSQLTestCase):
             field.clean(datetime.timedelta(days=1), None)
         self.assertEqual(cm.exception.code, 'invalid')
         self.assertEqual(cm.exception.message % cm.exception.params, "Value must be valid JSON.")
+
+    def test_custom_encoder(self):
+        with self.assertRaisesMessage(ValueError, "The encoder parameter must be a callable object."):
+            field = JSONField(encoder=DjangoJSONEncoder())
+        field = JSONField(encoder=DjangoJSONEncoder)
+        self.assertEqual(field.clean(datetime.timedelta(days=1), None), datetime.timedelta(days=1))
 
 
 class TestFormField(PostgreSQLTestCase):

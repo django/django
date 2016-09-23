@@ -11,7 +11,7 @@ from django.template.defaultfilters import force_escape, pprint
 from django.urls import Resolver404, resolve
 from django.utils import lru_cache, six, timezone
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_bytes, smart_text
+from django.utils.encoding import force_bytes, force_text
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
 
@@ -280,7 +280,7 @@ class ExceptionReporter(object):
             end = getattr(self.exc_value, 'end', None)
             if start is not None and end is not None:
                 unicode_str = self.exc_value.args[1]
-                unicode_hint = smart_text(
+                unicode_hint = force_text(
                     unicode_str[max(start - 5, 0):min(end + 5, len(unicode_str))],
                     'ascii', errors='replace'
                 )
@@ -290,7 +290,7 @@ class ExceptionReporter(object):
             'unicode_hint': unicode_hint,
             'frames': frames,
             'request': self.request,
-            'filtered_POST': self.filter.get_post_parameters(self.request),
+            'filtered_POST_items': self.filter.get_post_parameters(self.request).items(),
             'settings': get_safe_settings(),
             'sys_executable': sys.executable,
             'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
@@ -301,11 +301,15 @@ class ExceptionReporter(object):
             'template_does_not_exist': self.template_does_not_exist,
             'postmortem': self.postmortem,
         }
+        if self.request is not None:
+            c['request_GET_items'] = self.request.GET.items()
+            c['request_FILES_items'] = self.request.FILES.items()
+            c['request_COOKIES_items'] = self.request.COOKIES.items()
         # Check whether exception info is available
         if self.exc_type:
             c['exception_type'] = self.exc_type.__name__
         if self.exc_value:
-            c['exception_value'] = smart_text(self.exc_value, errors='replace')
+            c['exception_value'] = force_text(self.exc_value, errors='replace')
         if frames:
             c['lastframe'] = frames[-1]
         return c
@@ -533,7 +537,7 @@ TECHNICAL_500_TEMPLATE = ("""
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="robots" content="NONE,NOARCHIVE">
   <title>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}"""
-"""{% if request %} at {{ request.path_info|escape }}{% endif %}</title>
+r"""{% if request %} at {{ request.path_info|escape }}{% endif %}</title>
   <style type="text/css">
     html * { padding:0; margin:0; }
     body * { padding:10px 20px; }
@@ -913,10 +917,10 @@ Exception Value: {{ exception_value|force_escape }}
         </tr>
       </thead>
       <tbody>
-        {% for var in request.GET.items %}
+        {% for k, v in request_GET_items %}
           <tr>
-            <td>{{ var.0 }}</td>
-            <td class="code"><pre>{{ var.1|pprint }}</pre></td>
+            <td>{{ k }}</td>
+            <td class="code"><pre>{{ v|pprint }}</pre></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -926,7 +930,7 @@ Exception Value: {{ exception_value|force_escape }}
   {% endif %}
 
   <h3 id="post-info">POST</h3>
-  {% if filtered_POST %}
+  {% if filtered_POST_items %}
     <table class="req">
       <thead>
         <tr>
@@ -935,10 +939,10 @@ Exception Value: {{ exception_value|force_escape }}
         </tr>
       </thead>
       <tbody>
-        {% for var in filtered_POST.items %}
+        {% for k, v in filtered_POST_items %}
           <tr>
-            <td>{{ var.0 }}</td>
-            <td class="code"><pre>{{ var.1|pprint }}</pre></td>
+            <td>{{ k }}</td>
+            <td class="code"><pre>{{ v|pprint }}</pre></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -956,10 +960,10 @@ Exception Value: {{ exception_value|force_escape }}
             </tr>
         </thead>
         <tbody>
-            {% for var in request.FILES.items %}
+            {% for k, v in request_FILES_items %}
                 <tr>
-                    <td>{{ var.0 }}</td>
-                    <td class="code"><pre>{{ var.1|pprint }}</pre></td>
+                    <td>{{ k }}</td>
+                    <td class="code"><pre>{{ v|pprint }}</pre></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -979,10 +983,10 @@ Exception Value: {{ exception_value|force_escape }}
         </tr>
       </thead>
       <tbody>
-        {% for var in request.COOKIES.items %}
+        {% for k, v in request_COOKIES_items %}
           <tr>
-            <td>{{ var.0 }}</td>
-            <td class="code"><pre>{{ var.1|pprint }}</pre></td>
+            <td>{{ k }}</td>
+            <td class="code"><pre>{{ v|pprint }}</pre></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -1101,16 +1105,16 @@ File "{{ frame.filename }}" in {{ frame.function }}
 {% if request %}Request information:
 {% if request.user %}USER: {{ request.user }}{% endif %}
 
-GET:{% for k, v in request.GET.items %}
+GET:{% for k, v in request_GET_items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No GET data{% endfor %}
 
-POST:{% for k, v in filtered_POST.items %}
+POST:{% for k, v in filtered_POST_items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No POST data{% endfor %}
 
-FILES:{% for k, v in request.FILES.items %}
+FILES:{% for k, v in request_FILES_items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No FILES data{% endfor %}
 
-COOKIES:{% for k, v in request.COOKIES.items %}
+COOKIES:{% for k, v in request_COOKIES_items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No cookie data{% endfor %}
 
 META:{% for k, v in request.META.items|dictsort:0 %}

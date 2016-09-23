@@ -15,7 +15,7 @@ from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -56,12 +56,12 @@ class AdminForm(object):
                 **options
             )
 
-    def _media(self):
+    @property
+    def media(self):
         media = self.form.media
         for fs in self:
             media = media + fs.media
         return media
-    media = property(_media)
 
 
 class Fieldset(object):
@@ -74,7 +74,8 @@ class Fieldset(object):
         self.model_admin = model_admin
         self.readonly_fields = readonly_fields
 
-    def _media(self):
+    @property
+    def media(self):
         if 'collapse' in self.classes:
             extra = '' if settings.DEBUG else '.min'
             js = [
@@ -84,7 +85,6 @@ class Fieldset(object):
             ]
             return forms.Media(js=['admin/js/%s' % url for url in js])
         return forms.Media()
-    media = property(_media)
 
     def __iter__(self):
         for field in self.fields:
@@ -209,12 +209,12 @@ class AdminReadonlyField(object):
                     if hasattr(value, "__html__"):
                         result_repr = value
                     else:
-                        result_repr = smart_text(value)
+                        result_repr = force_text(value)
                         if getattr(attr, "allow_tags", False):
                             warnings.warn(
                                 "Deprecated allow_tags attribute used on %s. "
-                                "Use django.utils.safestring.format_html(), "
-                                "format_html_join(), or mark_safe() instead." % attr,
+                                "Use django.utils.html.format_html(), format_html_join(), "
+                                "or django.utils.safestring.mark_safe() instead." % attr,
                                 RemovedInDjango20Warning
                             )
                             result_repr = mark_safe(value)
@@ -303,12 +303,12 @@ class InlineAdminFormSet(object):
             }
         })
 
-    def _media(self):
+    @property
+    def media(self):
         media = self.opts.media + self.formset.media
         for fs in self:
             media = media + fs.media
         return media
-    media = property(_media)
 
 
 class InlineAdminForm(AdminForm):

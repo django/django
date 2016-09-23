@@ -225,7 +225,7 @@ What happened is this:
 * in ``test_was_published_recently_with_future_question`` it created a ``Question``
   instance whose ``pub_date`` field is 30 days in the future
 
-* ... and using the ``assertEqual()`` method, it discovered that its
+* ... and using the ``assertIs()`` method, it discovered that its
   ``was_published_recently()`` returns ``True``, though we wanted it to return
   ``False``
 
@@ -343,7 +343,9 @@ which will allow us to examine some additional attributes on responses such as
 ``response.context`` that otherwise wouldn't be available. Note that this
 method *does not* setup a test database, so the following will be run against
 the existing database and the output may differ slightly depending on what
-questions you already created.
+questions you already created. You might get unexpected results if your
+``TIME_ZONE`` in ``settings.py`` isn't correct. If you don't remember setting
+it earlier, check it before continuing.
 
 Next we need to import the test client class (later in ``tests.py`` we will use
 the :class:`django.test.TestCase` class, which comes with its own client, so
@@ -367,23 +369,11 @@ With that ready, we can ask the client to do some work for us::
     >>> response.status_code
     200
     >>> response.content
-    b'\n\n\n    <p>No polls are available.</p>\n\n'
-    >>> # note - you might get unexpected results if your ``TIME_ZONE``
-    >>> # in ``settings.py`` is not correct. If you need to change it,
-    >>> # you will also need to restart your shell session
-    >>> from polls.models import Question
-    >>> from django.utils import timezone
-    >>> # create a Question and save it
-    >>> q = Question(question_text="Who is your favorite Beatle?", pub_date=timezone.now())
-    >>> q.save()
-    >>> # check the response once again
-    >>> response = client.get('/polls/')
-    >>> response.content
-    b'\n\n\n    <ul>\n    \n        <li><a href="/polls/1/">Who is your favorite Beatle?</a></li>\n    \n    </ul>\n\n'
+    b'\n    <ul>\n    \n        <li><a href="/polls/1/">What&#39;s up?</a></li>\n    \n    </ul>\n\n'
     >>> # If the following doesn't work, you probably omitted the call to
     >>> # setup_test_environment() described above
     >>> response.context['latest_question_list']
-    <QuerySet [<Question: Who is your favorite Beatle?>]>
+    <QuerySet [<Question: What's up?>]>
 
 Improving our view
 ------------------

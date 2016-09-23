@@ -129,13 +129,14 @@ class ArrayField(Field):
         transform = super(ArrayField, self).get_transform(name)
         if transform:
             return transform
-        try:
-            index = int(name)
-        except ValueError:
-            pass
-        else:
-            index += 1  # postgres uses 1-indexing
-            return IndexTransformFactory(index, self.base_field)
+        if '_' not in name:
+            try:
+                index = int(name)
+            except ValueError:
+                pass
+            else:
+                index += 1  # postgres uses 1-indexing
+                return IndexTransformFactory(index, self.base_field)
         try:
             start, end = name.split('_')
             start = int(start) + 1
@@ -239,7 +240,13 @@ class ArrayInLookup(In):
         values = super(ArrayInLookup, self).get_prep_lookup()
         # In.process_rhs() expects values to be hashable, so convert lists
         # to tuples.
-        return [tuple(value) for value in values]
+        prepared_values = []
+        for value in values:
+            if hasattr(value, 'resolve_expression'):
+                prepared_values.append(value)
+            else:
+                prepared_values.append(tuple(value))
+        return prepared_values
 
 
 class IndexTransform(Transform):

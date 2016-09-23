@@ -270,6 +270,21 @@ foundation for custom widgets.
         customize it and add expensive processing, you should implement some
         caching mechanism yourself.
 
+    .. method:: value_omitted_from_data(data, files, name)
+
+        .. versionadded:: 1.10.2
+
+        Given ``data`` and ``files`` dictionaries and this widget's name,
+        returns whether or not there's data or files for the widget.
+
+        The method's result affects whether or not a field in a model form
+        :ref:`falls back to its default <topics-modelform-save>`.
+
+        A special case is :class:`~django.forms.CheckboxInput`, which always
+        returns ``False`` because an unchecked checkbox doesn't appear in the
+        data of an HTML form submission, so it's unknown whether or not the
+        user actually submitted a value.
+
 ``MultiWidget``
 ---------------
 

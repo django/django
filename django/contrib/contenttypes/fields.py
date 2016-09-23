@@ -13,7 +13,7 @@ from django.db.models.fields.related import (
     lazy_related_operation,
 )
 from django.db.models.query_utils import PathInfo
-from django.utils.encoding import python_2_unicode_compatible, smart_text
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
 
 
@@ -402,7 +402,7 @@ class GenericRelation(ForeignObject):
 
     def value_to_string(self, obj):
         qs = getattr(obj, self.name).all()
-        return smart_text([instance._get_pk_val() for instance in qs])
+        return force_text([instance._get_pk_val() for instance in qs])
 
     def contribute_to_class(self, cls, name, **kwargs):
         kwargs['private_only'] = True

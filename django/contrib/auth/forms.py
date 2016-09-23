@@ -79,6 +79,7 @@ class UserCreationForm(forms.ModelForm):
         label=_("Password"),
         strip=False,
         widget=forms.PasswordInput,
+        help_text=password_validation.password_validators_help_text_html(),
     )
     password2 = forms.CharField(
         label=_("Password confirmation"),
@@ -94,7 +95,8 @@ class UserCreationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(UserCreationForm, self).__init__(*args, **kwargs)
-        self.fields[self._meta.model.USERNAME_FIELD].widget.attrs.update({'autofocus': ''})
+        if self._meta.model.USERNAME_FIELD in self.fields:
+            self.fields[self._meta.model.USERNAME_FIELD].widget.attrs.update({'autofocus': True})
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -151,7 +153,7 @@ class AuthenticationForm(forms.Form):
     """
     username = UsernameField(
         max_length=254,
-        widget=forms.TextInput(attrs={'autofocus': ''}),
+        widget=forms.TextInput(attrs={'autofocus': True}),
     )
     password = forms.CharField(
         label=_("Password"),
@@ -187,7 +189,7 @@ class AuthenticationForm(forms.Form):
         password = self.cleaned_data.get('password')
 
         if username is not None and password:
-            self.user_cache = authenticate(username=username, password=password)
+            self.user_cache = authenticate(self.request, username=username, password=password)
             if self.user_cache is None:
                 raise forms.ValidationError(
                     self.error_messages['invalid_login'],
@@ -346,7 +348,7 @@ class PasswordChangeForm(SetPasswordForm):
     old_password = forms.CharField(
         label=_("Old password"),
         strip=False,
-        widget=forms.PasswordInput(attrs={'autofocus': ''}),
+        widget=forms.PasswordInput(attrs={'autofocus': True}),
     )
 
     field_order = ['old_password', 'new_password1', 'new_password2']
@@ -374,7 +376,7 @@ class AdminPasswordChangeForm(forms.Form):
     required_css_class = 'required'
     password1 = forms.CharField(
         label=_("Password"),
-        widget=forms.PasswordInput(attrs={'autofocus': ''}),
+        widget=forms.PasswordInput(attrs={'autofocus': True}),
         strip=False,
         help_text=password_validation.password_validators_help_text_html(),
     )
@@ -411,10 +413,10 @@ class AdminPasswordChangeForm(forms.Form):
             self.user.save()
         return self.user
 
-    def _get_changed_data(self):
+    @property
+    def changed_data(self):
         data = super(AdminPasswordChangeForm, self).changed_data
         for name in self.fields.keys():
             if name not in data:
                 return []
         return ['password']
-    changed_data = property(_get_changed_data)

@@ -360,7 +360,7 @@ class ModelAdminTests(TestCase):
             str(form["main_band"]),
             '<div class="related-widget-wrapper">'
             '<select name="main_band" id="id_main_band" required>'
-            '<option value="" selected="selected">---------</option>'
+            '<option value="" selected>---------</option>'
             '<option value="%d">The Beatles</option>'
             '<option value="%d">The Doors</option>'
             '</select></div>' % (band2.id, self.band.id)
@@ -381,7 +381,7 @@ class ModelAdminTests(TestCase):
             str(form["main_band"]),
             '<div class="related-widget-wrapper">'
             '<select name="main_band" id="id_main_band" required>'
-            '<option value="" selected="selected">---------</option>'
+            '<option value="" selected>---------</option>'
             '<option value="%d">The Doors</option>'
             '</select></div>' % self.band.id
         )
@@ -925,7 +925,7 @@ class PrepopulatedFieldsCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             ("The value of 'prepopulated_fields' refers to 'users', which must not be "
-             "a DateTimeField, a foreign key, or a many-to-many field."),
+             "a DateTimeField, a ForeignKey, or a ManyToManyField."),
             'admin.E028')
 
     def test_valid_case(self):
@@ -963,7 +963,7 @@ class ListDisplayTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            "The value of 'list_display[0]' must not be a many-to-many field.",
+            "The value of 'list_display[0]' must not be a ManyToManyField.",
             'admin.E109')
 
     def test_valid_case(self):
@@ -1339,7 +1339,7 @@ class InlinesCheckTests(CheckTestCase):
 
         self.assertIsInvalidRegexp(
             ValidationTestModelAdmin, ValidationTestModel,
-            r"'.*\.ValidationTestInline' must inherit from 'BaseModelAdmin'\.",
+            r"'.*\.ValidationTestInline' must inherit from 'InlineModelAdmin'\.",
             'admin.E104')
 
     def test_missing_model_field(self):

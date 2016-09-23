@@ -14,7 +14,7 @@ from django.contrib.admin.utils import (
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.utils import timezone
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -207,7 +207,7 @@ class RelatedFieldListFilter(FieldListFilter):
         }
         for pk_val, val in self.lookup_choices:
             yield {
-                'selected': self.lookup_val == smart_text(pk_val),
+                'selected': self.lookup_val == force_text(pk_val),
                 'query_string': changelist.get_query_string({
                     self.lookup_kwarg: pk_val,
                 }, [self.lookup_kwarg_isnull]),
@@ -292,7 +292,7 @@ class ChoicesFieldListFilter(FieldListFilter):
                 none_title = title
                 continue
             yield {
-                'selected': smart_text(lookup) == self.lookup_val,
+                'selected': force_text(lookup) == self.lookup_val,
                 'query_string': changelist.get_query_string(
                     {self.lookup_kwarg: lookup}, [self.lookup_kwarg_isnull]
                 ),
@@ -417,7 +417,7 @@ class AllValuesFieldListFilter(FieldListFilter):
             if val is None:
                 include_none = True
                 continue
-            val = smart_text(val)
+            val = force_text(val)
             yield {
                 'selected': self.lookup_val == val,
                 'query_string': changelist.get_query_string({

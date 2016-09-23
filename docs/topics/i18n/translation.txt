@@ -489,21 +489,22 @@ directly with the ``number`` argument::
                 raise forms.ValidationError(self.error_message % number)
 
 
-Joining strings: ``string_concat()``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Formatting strings: ``format_lazy()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Standard Python string joins (``''.join([...])``) will not work on lists
-containing lazy translation objects. Instead, you can use
-:func:`django.utils.translation.string_concat()`, which creates a lazy object
-that concatenates its contents *and* converts them to strings only when the
-result is included in a string. For example::
+Python's :meth:`str.format()` method will not work when either the
+``format_string`` or any of the arguments to :meth:`str.format()`
+contains lazy translation objects. Instead, you can use
+:func:`django.utils.text.format_lazy()`, which creates a lazy object
+that runs the ``str.format()`` method only when the result is included
+in a string. For example::
 
-    from django.utils.translation import string_concat
+    from django.utils.text import format_lazy
     from django.utils.translation import ugettext_lazy
     ...
     name = ugettext_lazy('John Lennon')
     instrument = ugettext_lazy('guitar')
-    result = string_concat(name, ': ', instrument)
+    result = format_lazy('{name}: {instrument}', name=name, instrument=instrument)
 
 In this case, the lazy translations in ``result`` will only be converted to
 strings when ``result`` itself is used in a string (usually at template
@@ -1909,7 +1910,7 @@ Here's example HTML template code:
             {% get_available_languages as LANGUAGES %}
             {% get_language_info_list for LANGUAGES as languages %}
             {% for language in languages %}
-                <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}>
+                <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected{% endif %}>
                     {{ language.name_local }} ({{ language.code }})
                 </option>
             {% endfor %}
@@ -1919,6 +1920,8 @@ Here's example HTML template code:
 
 In this example, Django looks up the URL of the page to which the user will be
 redirected in the ``redirect_to`` context variable.
+
+.. _explicitly-setting-the-active-language:
 
 Explicitly setting the active language
 --------------------------------------

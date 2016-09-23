@@ -5,9 +5,7 @@ import datetime
 from django.forms.utils import flatatt, pretty_name
 from django.forms.widgets import Textarea, TextInput
 from django.utils import six
-from django.utils.encoding import (
-    force_text, python_2_unicode_compatible, smart_text,
-)
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
@@ -129,12 +127,9 @@ class BoundField(object):
         Returns the value for this BoundField, using the initial value if
         the form is not bound or the data otherwise.
         """
-        if not self.form.is_bound:
-            data = self.initial
-        else:
-            data = self.field.bound_data(
-                self.data, self.form.initial.get(self.name, self.field.initial)
-            )
+        data = self.initial
+        if self.form.is_bound:
+            data = self.field.bound_data(self.data, data)
         return self.field.prepare_value(data)
 
     def label_tag(self, contents=None, attrs=None, label_suffix=None):
@@ -199,8 +194,8 @@ class BoundField(object):
         associated Form has specified auto_id. Returns an empty string otherwise.
         """
         auto_id = self.form.auto_id
-        if auto_id and '%s' in smart_text(auto_id):
-            return smart_text(auto_id) % self.html_name
+        if auto_id and '%s' in force_text(auto_id):
+            return force_text(auto_id) % self.html_name
         elif auto_id:
             return self.html_name
         return ''
@@ -218,14 +213,12 @@ class BoundField(object):
 
     @cached_property
     def initial(self):
-        data = self.form.initial.get(self.name, self.field.initial)
-        if callable(data):
-            data = data()
-            # If this is an auto-generated default date, nix the microseconds
-            # for standardized handling. See #22502.
-            if (isinstance(data, (datetime.datetime, datetime.time)) and
-                    not self.field.widget.supports_microseconds):
-                data = data.replace(microsecond=0)
+        data = self.form.get_initial_for_field(self.field, self.name)
+        # If this is an auto-generated default date, nix the microseconds for
+        # standardized handling. See #22502.
+        if (isinstance(data, (datetime.datetime, datetime.time)) and
+                not self.field.widget.supports_microseconds):
+            data = data.replace(microsecond=0)
         return data
 
     def build_widget_attrs(self, attrs, widget=None):

@@ -220,7 +220,7 @@ Extra parameters to pass to the cache backend. Available parameters
 vary depending on your cache backend.
 
 Some information on available parameters can be found in the
-:doc:`Cache Backends </topics/cache>` documentation. For more information,
+:ref:`cache arguments <cache_arguments>` documentation. For more information,
 consult your backend module's own documentation.
 
 .. setting:: CACHES-TIMEOUT
@@ -737,6 +737,20 @@ database into an in-memory JSON string before running tests (used to restore
 the database state between tests if you don't have transactions). You can set
 this to ``False`` to speed up creation time if you don't have any test classes
 with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
+
+.. setting:: TEST_TEMPLATE
+
+``TEMPLATE``
+^^^^^^^^^^^^
+
+.. versionadded:: 1.11
+
+This is a PostgreSQL-specific setting.
+
+The name of a `template`_ (e.g. ``'template0'``) from which to create the test
+database.
+
+.. _template: https://www.postgresql.org/docs/current/static/sql-createdatabase.html
 
 .. setting:: TEST_CREATE
 
@@ -2513,10 +2527,10 @@ to ensure your processes are running in the correct environment.
 
 Default: ``False``
 
-A boolean that specifies whether to output the "Etag" header. This saves
-bandwidth but slows down performance. This is used by the ``CommonMiddleware``
-(see :doc:`/topics/http/middleware`) and in the``Cache Framework``
-(see :doc:`/topics/cache`).
+A boolean that specifies whether to output the ``ETag`` header. This saves
+bandwidth but slows down performance. This is used by the
+:class:`~django.middleware.common.CommonMiddleware` and in the :doc:`cache
+framework </topics/cache>`.
 
 .. setting:: USE_I18N
 

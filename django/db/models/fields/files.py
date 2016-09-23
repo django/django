@@ -60,22 +60,22 @@ class FieldFile(File):
 
     file = property(_get_file, _set_file, _del_file)
 
-    def _get_path(self):
+    @property
+    def path(self):
         self._require_file()
         return self.storage.path(self.name)
-    path = property(_get_path)
 
-    def _get_url(self):
+    @property
+    def url(self):
         self._require_file()
         return self.storage.url(self.name)
-    url = property(_get_url)
 
-    def _get_size(self):
+    @property
+    def size(self):
         self._require_file()
         if not self._committed:
             return self.file.size
         return self.storage.size(self.name)
-    size = property(_get_size)
 
     def open(self, mode='rb'):
         self._require_file()
@@ -120,10 +120,10 @@ class FieldFile(File):
             self.instance.save()
     delete.alters_data = True
 
-    def _get_closed(self):
+    @property
+    def closed(self):
         file = getattr(self, '_file', None)
         return file is None or file.closed
-    closed = property(_get_closed)
 
     def close(self):
         file = getattr(self, '_file', None)

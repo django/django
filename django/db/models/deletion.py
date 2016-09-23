@@ -200,10 +200,6 @@ class Collector(object):
             concrete_model = model._meta.concrete_model
             for ptr in six.itervalues(concrete_model._meta.parents):
                 if ptr:
-                    # FIXME: This seems to be buggy and execute a query for each
-                    # parent object fetch. We have the parent data in the obj,
-                    # but we don't have a nice way to turn that data into parent
-                    # object instance.
                     parent_objs = [getattr(obj, ptr.name) for obj in new_objs]
                     self.collect(parent_objs, source=model,
                                  source_attr=ptr.remote_field.related_name,

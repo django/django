@@ -376,7 +376,7 @@ def serializer_factory(value):
         return DecimalSerializer(value)
     if isinstance(value, functools.partial):
         return FunctoolsPartialSerializer(value)
-    if isinstance(value, (types.FunctionType, types.BuiltinFunctionType)):
+    if isinstance(value, (types.FunctionType, types.BuiltinFunctionType, types.MethodType)):
         return FunctionTypeSerializer(value)
     if isinstance(value, collections.Iterable):
         return IterableSerializer(value)
