@@ -202,10 +202,7 @@ fairly simply::
     class SettingsBackend(object):
         ...
         def has_perm(self, user_obj, perm, obj=None):
-            if user_obj.username == settings.ADMIN_LOGIN:
-                return True
-            else:
-                return False
+            return user_obj.username == settings.ADMIN_LOGIN
 
 This gives full permissions to the user granted access in the above example.
 Notice that in addition to the same arguments given to the associated
