@@ -1329,9 +1329,6 @@ class Prefetch(object):
         self.prefetch_through = LOOKUP_SEP.join([prefix, self.prefetch_through])
         self.prefetch_to = LOOKUP_SEP.join([prefix, self.prefetch_to])
 
-    def get_current_prefetch_through(self, level):
-        return LOOKUP_SEP.join(self.prefetch_through.split(LOOKUP_SEP)[:level + 1])
-
     def get_current_prefetch_to(self, level):
         return LOOKUP_SEP.join(self.prefetch_to.split(LOOKUP_SEP)[:level + 1])
 
