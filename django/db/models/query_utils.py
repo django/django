@@ -10,7 +10,6 @@ from __future__ import unicode_literals
 import inspect
 from collections import namedtuple
 
-from django.core.exceptions import FieldDoesNotExist
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
 from django.utils.lru_cache import lru_cache
@@ -108,19 +107,11 @@ class DeferredAttribute(object):
         """
         if instance is None:
             return self
-        opts = instance._meta
         data = instance.__dict__
         if data.get(self.field_name, self) is self:
-            # self.field_name is the attname of the field, but only() takes the
-            # actual name, so we need to translate it here.
-            try:
-                f = opts.get_field(self.field_name)
-            except FieldDoesNotExist:
-                f = [f for f in opts.fields if f.attname == self.field_name][0]
-            name = f.name
             # Let's see if the field is part of the parent chain. If so we
             # might be able to reuse the already loaded value. Refs #18343.
-            val = self._check_parent_chain(instance, name)
+            val = self._check_parent_chain(instance, self.field_name)
             if val is None:
                 instance.refresh_from_db(fields=[self.field_name])
                 val = getattr(instance, self.field_name)
