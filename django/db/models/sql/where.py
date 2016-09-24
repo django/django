@@ -214,11 +214,3 @@ class SubqueryConstraint(object):
 
         query_compiler = query.get_compiler(connection=connection)
         return query_compiler.as_subquery_condition(self.alias, self.columns, compiler)
-
-    def relabel_aliases(self, change_map):
-        self.alias = change_map.get(self.alias, self.alias)
-
-    def clone(self):
-        return self.__class__(
-            self.alias, self.columns, self.targets,
-            self.query_object)
