@@ -335,7 +335,7 @@ class AggregationTests(TestCase):
             ],
         )
 
-    def test_aggrate_annotation(self):
+    def test_aggregate_annotation(self):
         # Aggregates can be composed over annotations.
         # The return type is derived from the composed aggregate
         vals = (
