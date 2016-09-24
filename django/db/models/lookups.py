@@ -171,12 +171,6 @@ class FieldGetDbPrepValueMixin(object):
     """
     get_db_prep_lookup_value_is_iterable = False
 
-    @classmethod
-    def get_prep_lookup_value(cls, value, output_field):
-        if hasattr(value, '_prepare'):
-            return value._prepare(output_field)
-        return output_field.get_prep_value(value)
-
     def get_db_prep_lookup(self, value, connection):
         # For relational fields, use the output_field of the 'field' attribute.
         field = getattr(self.lhs.output_field, 'field', None)
