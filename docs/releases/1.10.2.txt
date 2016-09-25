@@ -22,3 +22,6 @@ Bugfixes
   ``SplitDateTimeWidget``, ``SelectDateWidget``, and ``SplitArrayWidget``
   (:ticket:`27186`). Custom widgets affected by this issue may need to
   implement a :meth:`~django.forms.Widget.value_omitted_from_data` method.
+
+* Fixed a crash in ``runserver`` logging during a "Broken pipe" error
+  (:ticket:`27271`).
