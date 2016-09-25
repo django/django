@@ -8,7 +8,8 @@ from threading import Thread
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, IntegrityError, connection
 from django.test import (
-    SimpleTestCase, TestCase, TransactionTestCase, ignore_warnings, skipUnlessDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, ignore_warnings,
+    skipUnlessDBFeature,
 )
 from django.utils.encoding import DjangoUnicodeDecodeError
 
