@@ -2881,6 +2881,7 @@ The :class:`AdminSite` provides the following named URL patterns:
 Page                       URL name                  Parameters
 =========================  ========================  ==================================
 Index                      ``index``
+Login                      ``login``
 Logout                     ``logout``
 Password change            ``password_change``
 Password change done       ``password_change_done``
