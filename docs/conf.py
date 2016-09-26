@@ -45,6 +45,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "ticket_role",
+    "cve_role",
 ]
 
 # Spelling check needs an additional module that is not installed by default.
@@ -372,5 +373,6 @@ epub_cover = ('', 'epub-cover.html')
 # If false, no index is generated.
 # epub_use_index = True
 
-# -- ticket options ------------------------------------------------------------
+# -- custom extension options --------------------------------------------------
+cve_url = 'https://web.nvd.nist.gov/view/vuln/detail?vulnId=%s'
 ticket_url = 'https://code.djangoproject.com/ticket/%s'

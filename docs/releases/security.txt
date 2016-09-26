@@ -1,5 +1,3 @@
-.. _security-releases:
-
 ==========================
 Archive of security issues
 ==========================
@@ -39,25 +37,27 @@ Some security issues were handled before Django had a formalized
 security process in use. For these, new releases may not have been
 issued at the time and CVEs may not have been assigned.
 
-August 16, 2006 - CVE-2007-0404
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+August 16, 2006 - :cve:`2007-0404`
+----------------------------------
 
-`CVE-2007-0404 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2007-0404&cid=3>`_: Filename validation issue in translation framework. `Full description <https://www.djangoproject.com/weblog/2006/aug/16/compilemessages/>`__
+Filename validation issue in translation framework. `Full description
+<https://www.djangoproject.com/weblog/2006/aug/16/compilemessages/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 0.90 `(patch) <https://github.com/django/django/commit/518d406e53>`__
 * Django 0.91 `(patch) <https://github.com/django/django/commit/518d406e53>`__
 * Django 0.95 `(patch) <https://github.com/django/django/commit/a132d411c6>`__ (released January 21 2007)
 
-January 21, 2007 - CVE-2007-0405
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+January 21, 2007 - :cve:`2007-0405`
+-----------------------------------
 
-`CVE-2007-0405 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2007-0405&cid=3>`_: Apparent "caching" of authenticated user. `Full description <https://www.djangoproject.com/weblog/2007/jan/21/0951/>`__
+Apparent "caching" of authenticated user. `Full description
+<https://www.djangoproject.com/weblog/2007/jan/21/0951/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 0.95 `(patch) <https://github.com/django/django/commit/e89f0a6558>`__
 
@@ -67,650 +67,677 @@ Issues under Django's security process
 All other security issues have been handled under versions of Django's
 security process. These are listed below.
 
-October 26, 2007 - CVE-2007-5712
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+October 26, 2007 - :cve:`2007-5712`
+-----------------------------------
 
-`CVE-2007-5712 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2007-5712&cid=3>`_: Denial-of-service via arbitrarily-large ``Accept-Language`` header. `Full description <https://www.djangoproject.com/weblog/2007/oct/26/security-fix/>`__
+Denial-of-service via arbitrarily-large ``Accept-Language`` header. `Full
+description <https://www.djangoproject.com/weblog/2007/oct/26/security-fix/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 0.91 `(patch) <https://github.com/django/django/commit/8bc36e726c9e8c75c681d3ad232df8e882aaac81>`__
 * Django 0.95 `(patch) <https://github.com/django/django/commit/412ed22502e11c50dbfee854627594f0e7e2c234>`__
 * Django 0.96 `(patch) <https://github.com/django/django/commit/7dd2dd08a79e388732ce00e2b5514f15bd6d0f6f>`__
 
-May 14, 2008 - CVE-2008-2302
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+May 14, 2008 - :cve:`2008-2302`
+-------------------------------
 
-`CVE-2008-2302 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2008-2302&cid=3>`_: XSS via admin login redirect. `Full description <https://www.djangoproject.com/weblog/2008/may/14/security/>`__
+XSS via admin login redirect. `Full description
+<https://www.djangoproject.com/weblog/2008/may/14/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 0.91 `(patch) <https://github.com/django/django/commit/50ce7fb57d>`__
 * Django 0.95 `(patch) <https://github.com/django/django/commit/50ce7fb57d>`__
 * Django 0.96 `(patch) <https://github.com/django/django/commit/7791e5c050>`__
 
-September 2, 2008 - CVE-2008-3909
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+September 2, 2008 - :cve:`2008-3909`
+------------------------------------
 
-`CVE-2008-3909 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2008-3909&cid=3>`_: CSRF via preservation of POST data during admin login. `Full description <https://www.djangoproject.com/weblog/2008/sep/02/security/>`__
+CSRF via preservation of POST data during admin login. `Full description
+<https://www.djangoproject.com/weblog/2008/sep/02/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 0.91 `(patch) <https://github.com/django/django/commit/44debfeaa4473bd28872c735dd3d9afde6886752>`__
 * Django 0.95 `(patch) <https://github.com/django/django/commit/aee48854a164382c655acb9f18b3c06c3d238e81>`__
 * Django 0.96 `(patch) <https://github.com/django/django/commit/7e0972bded362bc4b851c109df2c8a6548481a8e>`__
 
-July 28, 2009 - CVE-2009-2659
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+July 28, 2009 - :cve:`2009-2659`
+--------------------------------
 
-`CVE-2009-2659 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2009-2659&cid=3>`_: Directory-traversal in development server media handler. `Full description <https://www.djangoproject.com/weblog/2009/jul/28/security/>`__
+Directory-traversal in development server media handler. `Full description
+<https://www.djangoproject.com/weblog/2009/jul/28/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 0.96 `(patch) <https://github.com/django/django/commit/da85d76fd6>`__
 * Django 1.0 `(patch) <https://github.com/django/django/commit/df7f917b7f>`__
 
-October 9, 2009 - CVE-2009-3965
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+October 9, 2009 - :cve:`2009-3965`
+----------------------------------
 
-`CVE-2009-3965 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2009-3695&cid=3>`_: Denial-of-service via pathological regular expression performance. `Full description <https://www.djangoproject.com/weblog/2009/oct/09/security/>`__
+Denial-of-service via pathological regular expression performance. `Full
+description <https://www.djangoproject.com/weblog/2009/oct/09/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.0 `(patch) <https://github.com/django/django/commit/594a28a904>`__
 * Django 1.1 `(patch) <https://github.com/django/django/commit/e3e992e18b>`__
 
-September 8, 2010 - CVE-2010-3082
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+September 8, 2010 - :cve:`2010-3082`
+------------------------------------
 
-`CVE-2010-3082 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2010-3082&cid=3>`_: XSS via trusting unsafe cookie value. `Full description <https://www.djangoproject.com/weblog/2010/sep/08/security-release/>`__
+XSS via trusting unsafe cookie value. `Full description
+<https://www.djangoproject.com/weblog/2010/sep/08/security-release/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.2 `(patch) <https://github.com/django/django/commit/7f84657b6b>`__
 
-December 22, 2010 - CVE-2010-4534
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+December 22, 2010 - :cve:`2010-4534`
+------------------------------------
 
-`CVE-2010-4534 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2010-4534&cid=3>`_: Information leakage in administrative interface. `Full description <https://www.djangoproject.com/weblog/2010/dec/22/security/>`__
+Information leakage in administrative interface. `Full description
+<https://www.djangoproject.com/weblog/2010/dec/22/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.1 `(patch) <https://github.com/django/django/commit/17084839fd>`__
 * Django 1.2 `(patch) <https://github.com/django/django/commit/85207a245b>`__
 
-December 22, 2010 - CVE-2010-4535
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+December 22, 2010 - :cve:`2010-4535`
+------------------------------------
 
-`CVE-2010-4535 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2010-4535&cid=2>`_: Denial-of-service in password-reset mechanism. `Full description <https://www.djangoproject.com/weblog/2010/dec/22/security/>`__
+Denial-of-service in password-reset mechanism. `Full description
+<https://www.djangoproject.com/weblog/2010/dec/22/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.1 `(patch) <https://github.com/django/django/commit/7f8dd9cbac>`__
 * Django 1.2 `(patch) <https://github.com/django/django/commit/d5d8942a16>`__
 
-February 8, 2011 - CVE-2011-0696
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+February 8, 2011 - :cve:`2011-0696`
+-----------------------------------
 
-`CVE-2011-0696 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2011-0696&cid=2>`_: CSRF via forged HTTP headers. `Full description <https://www.djangoproject.com/weblog/2011/feb/08/security/>`__
+CSRF via forged HTTP headers. `Full description
+<https://www.djangoproject.com/weblog/2011/feb/08/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.1 `(patch) <https://github.com/django/django/commit/408c5c873c>`__
 * Django 1.2 `(patch) <https://github.com/django/django/commit/818e70344e>`__
 
-February 8, 2011 - CVE-2011-0697
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+February 8, 2011 - :cve:`2011-0697`
+-----------------------------------
 
-`CVE-2011-0697 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2011-0697&cid=2>`_: XSS via unsanitized names of uploaded files. `Full description <https://www.djangoproject.com/weblog/2011/feb/08/security/>`__
+XSS via unsanitized names of uploaded files. `Full description
+<https://www.djangoproject.com/weblog/2011/feb/08/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.1 `(patch) <https://github.com/django/django/commit/1966786d2d>`__
 * Django 1.2 `(patch) <https://github.com/django/django/commit/1f814a9547>`__
 
-February 8, 2011 - CVE-2011-0698
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+February 8, 2011 - :cve:`2011-0698`
+-----------------------------------
 
-`CVE-2011-0698 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2011-0698&cid=2>`_: Directory-traversal on Windows via incorrect path-separator handling. `Full description <https://www.djangoproject.com/weblog/2011/feb/08/security/>`__
+Directory-traversal on Windows via incorrect path-separator handling. `Full
+description <https://www.djangoproject.com/weblog/2011/feb/08/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.1 `(patch) <https://github.com/django/django/commit/570a32a047>`__
 * Django 1.2 `(patch) <https://github.com/django/django/commit/194566480b>`__
 
-September 9, 2011 - CVE-2011-4136
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+September 9, 2011 - :cve:`2011-4136`
+------------------------------------
 
-`CVE-2011-4136 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2011-4136&cid=2>`_: Session manipulation when using memory-cache-backed session. `Full description <https://www.djangoproject.com/weblog/2011/sep/09/security-releases-issued/>`__
+Session manipulation when using memory-cache-backed session. `Full description
+<https://www.djangoproject.com/weblog/2011/sep/09/security-releases-issued/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.2 `(patch) <https://github.com/django/django/commit/ac7c3a110f>`__
 * Django 1.3 `(patch) <https://github.com/django/django/commit/fbe2eead2f>`__
 
-September 9, 2011 - CVE-2011-4137
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+September 9, 2011 - :cve:`2011-4137`
+------------------------------------
 
-`CVE-2011-4137 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2011-4137&cid=2>`_: Denial-of-service via via ``URLField.verify_exists``. `Full description <https://www.djangoproject.com/weblog/2011/sep/09/security-releases-issued/>`__
+Denial-of-service via ``URLField.verify_exists``. `Full description
+<https://www.djangoproject.com/weblog/2011/sep/09/security-releases-issued/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.2 `(patch) <https://github.com/django/django/commit/7268f8af86>`__
 * Django 1.3 `(patch) <https://github.com/django/django/commit/1a76dbefdf>`__
 
-September 9, 2011 - CVE-2011-4138
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+September 9, 2011 - :cve:`2011-4138`
+------------------------------------
 
-`CVE-2011-4138 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2011-4138&cid=2>`_: Information leakage/arbitrary request issuance via ``URLField.verify_exists``. `Full description <https://www.djangoproject.com/weblog/2011/sep/09/security-releases-issued/>`__
+Information leakage/arbitrary request issuance via ``URLField.verify_exists``.
+`Full description
+<https://www.djangoproject.com/weblog/2011/sep/09/security-releases-issued/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.2: `(patch) <https://github.com/django/django/commit/7268f8af86>`__
 * Django 1.3: `(patch) <https://github.com/django/django/commit/1a76dbefdf>`__
 
-September 9, 2011 - CVE-2011-4139
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+September 9, 2011 - :cve:`2011-4139`
+------------------------------------
 
-`CVE-2011-4139 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2011-4139&cid=2>`_: ``Host`` header cache poisoning. `Full description <https://www.djangoproject.com/weblog/2011/sep/09/security-releases-issued/>`__
+``Host`` header cache poisoning. `Full description
+<https://www.djangoproject.com/weblog/2011/sep/09/security-releases-issued/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.2 `(patch) <https://github.com/django/django/commit/c613af4d64>`__
 * Django 1.3 `(patch) <https://github.com/django/django/commit/2f7fadc38e>`__
 
-September 9, 2011 - CVE-2011-4140
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+September 9, 2011 - :cve:`2011-4140`
+------------------------------------
 
-`CVE-2011-4140 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2011-4140&cid=2>`_: Potential CSRF via ``Host`` header.  `Full description <https://www.djangoproject.com/weblog/2011/sep/09/security-releases-issued/>`__
+Potential CSRF via ``Host`` header. `Full description
+<https://www.djangoproject.com/weblog/2011/sep/09/security-releases-issued/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 This notification was an advisory only, so no patches were issued.
 
 * Django 1.2
 * Django 1.3
 
-July 30, 2012 - CVE-2012-3442
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+July 30, 2012 - :cve:`2012-3442`
+--------------------------------
 
-`CVE-2012-3442 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2012-3442&cid=2>`_: XSS via failure to validate redirect scheme. `Full description <https://www.djangoproject.com/weblog/2012/jul/30/security-releases-issued/>`__
+XSS via failure to validate redirect scheme. `Full description
+<https://www.djangoproject.com/weblog/2012/jul/30/security-releases-issued/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.3: `(patch) <https://github.com/django/django/commit/4dea4883e6c50d75f215a6b9bcbd95273f57c72d>`__
 * Django 1.4: `(patch) <https://github.com/django/django/commit/e34685034b60be1112160e76091e5aee60149fa1>`__
 
-July 30, 2012 - CVE-2012-3443
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+July 30, 2012 - :cve:`2012-3443`
+--------------------------------
 
-`CVE-2012-3443 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2012-3443&cid=2>`_: Denial-of-service via compressed image files. `Full description <https://www.djangoproject.com/weblog/2012/jul/30/security-releases-issued/>`__
+Denial-of-service via compressed image files. `Full description
+<https://www.djangoproject.com/weblog/2012/jul/30/security-releases-issued/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.3: `(patch) <https://github.com/django/django/commit/b2eb4787a0fff9c9993b78be5c698e85108f3446>`__
 * Django 1.4: `(patch) <https://github.com/django/django/commit/c14f325c4eef628bc7bfd8873c3a72aeb0219141>`__
 
-July 30, 2012 - CVE-2012-3444
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+July 30, 2012 - :cve:`2012-3444`
+--------------------------------
 
-`CVE-2012-3444 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2012-3444&cid=2>`_: Denial-of-service via large image files. `Full description <https://www.djangoproject.com/weblog/2012/jul/30/security-releases-issued/>`__
+Denial-of-service via large image files. `Full description
+<https://www.djangoproject.com/weblog/2012/jul/30/security-releases-issued/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.3 `(patch) <https://github.com/django/django/commit/9ca0ff6268eeff92d0d0ac2c315d4b6a8e229155>`__
 * Django 1.4 `(patch) <https://github.com/django/django/commit/da33d67181b53fe6cc737ac1220153814a1509f6>`__
 
-October 17, 2012 - CVE-2012-4520
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+October 17, 2012 - :cve:`2012-4520`
+-----------------------------------
 
-`CVE-2012-4520 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2012-4520&cid=2>`_: ``Host`` header poisoning. `Full description <https://www.djangoproject.com/weblog/2012/oct/17/security/>`__
+``Host`` header poisoning. `Full description
+<https://www.djangoproject.com/weblog/2012/oct/17/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.3 `(patch) <https://github.com/django/django/commit/b45c377f8f488955e0c7069cad3f3dd21910b071>`__
 * Django 1.4 `(patch) <https://github.com/django/django/commit/92d3430f12171f16f566c9050c40feefb830a4a3>`__
 
 December 10, 2012 - No CVE 1
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
-Additional hardening of ``Host`` header handling. `Full description <https://www.djangoproject.com/weblog/2012/dec/10/security/>`__
+Additional hardening of ``Host`` header handling. `Full description
+<https://www.djangoproject.com/weblog/2012/dec/10/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.3 `(patch) <https://github.com/django/django/commit/2da4ace0bc1bc1d79bf43b368cb857f6f0cd6b1b>`__
 * Django 1.4 `(patch) <https://github.com/django/django/commit/319627c184e71ae267d6b7f000e293168c7b6e09>`__
 
 December 10, 2012 - No CVE 2
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
-Additional hardening of redirect validation. `Full description <https://www.djangoproject.com/weblog/2012/dec/10/security/>`__
+Additional hardening of redirect validation. `Full description
+<https://www.djangoproject.com/weblog/2012/dec/10/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.3: `(patch) <https://github.com/django/django/commit/1515eb46daa0897ba5ad5f0a2db8969255f1b343>`__
 * Django 1.4: `(patch) <https://github.com/django/django/commit/b2ae0a63aeec741f1e51bac9a95a27fd635f9652>`__
 
 February 19, 2013 - No CVE
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
-Additional hardening of ``Host`` header handling. `Full description <https://www.djangoproject.com/weblog/2013/feb/19/security/>`__
+Additional hardening of ``Host`` header handling. `Full description
+<https://www.djangoproject.com/weblog/2013/feb/19/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.3 `(patch) <https://github.com/django/django/commit/27cd872e6e36a81d0bb6f5b8765a1705fecfc253>`__
 * Django 1.4 `(patch) <https://github.com/django/django/commit/9936fdb11d0bbf0bd242f259bfb97bbf849d16f8>`__
 
-February 19, 2013 - CVE-2013-1664/1665
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+February 19, 2013 - :cve:`2013-1664` / :cve:`2013-1665`
+-------------------------------------------------------
 
-`CVE-2013-1664 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-1664&cid=2>`_ and `CVE-2013-1665 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-1665&cid=2>`_: Entity-based attacks against Python XML libraries. `Full description <https://www.djangoproject.com/weblog/2013/feb/19/security/>`__
+Entity-based attacks against Python XML libraries. `Full description
+<https://www.djangoproject.com/weblog/2013/feb/19/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.3 `(patch) <https://github.com/django/django/commit/d19a27066b2247102e65412aa66917aff0091112>`__
 * Django 1.4 `(patch) <https://github.com/django/django/commit/1c60d07ba23e0350351c278ad28d0bd5aa410b40>`__
 
-February 19, 2013 - CVE-2013-0305
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+February 19, 2013 - :cve:`2013-0305`
+------------------------------------
 
-`CVE-2013-0305 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0305&cid=2>`_: Information leakage via admin history log.  `Full description <https://www.djangoproject.com/weblog/2013/feb/19/security/>`__
+Information leakage via admin history log. `Full description
+<https://www.djangoproject.com/weblog/2013/feb/19/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.3 `(patch) <https://github.com/django/django/commit/d3a45e10c8ac8268899999129daa27652ec0da35>`__
 * Django 1.4 `(patch) <https://github.com/django/django/commit/0e7861aec73702f7933ce2a93056f7983939f0d6>`__
 
-February 19, 2013 - CVE-2013-0306
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+February 19, 2013 - :cve:`2013-0306`
+------------------------------------
 
-`CVE-2013-0306 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-0306&cid=2>`_: Denial-of-service via formset ``max_num`` bypass. `Full description <https://www.djangoproject.com/weblog/2013/feb/19/security/>`__
+Denial-of-service via formset ``max_num`` bypass. `Full description
+<https://www.djangoproject.com/weblog/2013/feb/19/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.3 `(patch) <https://github.com/django/django/commit/d7094bbce8cb838f3b40f504f198c098ff1cf727>`__
 * Django 1.4 `(patch) <https://github.com/django/django/commit/0cc350a896f70ace18280410eb616a9197d862b0>`__
 
-August 13, 2013 - CVE-2013-4249
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+August 13, 2013 - :cve:`2013-4249`
+----------------------------------
 
-`CVE-2013-4249 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-4249&cid=2>`_: XSS via admin trusting ``URLField`` values. `Full description <https://www.djangoproject.com/weblog/2013/aug/13/security-releases-issued/>`__
+XSS via admin trusting ``URLField`` values. `Full description
+<https://www.djangoproject.com/weblog/2013/aug/13/security-releases-issued/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.5 `(patch) <https://github.com/django/django/commit/90363e388c61874add3f3557ee654a996ec75d78>`__
 
-August 13, 2013 - CVE-2013-6044
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+August 13, 2013 - :cve:`2013-6044`
+----------------------------------
 
-`CVE-2013-6044 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-6044&cid=2>`_: Possible XSS via unvalidated URL redirect schemes. `Full description <https://www.djangoproject.com/weblog/2013/aug/13/security-releases-issued/>`__
+Possible XSS via unvalidated URL redirect schemes. `Full description
+<https://www.djangoproject.com/weblog/2013/aug/13/security-releases-issued/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch) <https://github.com/django/django/commit/ec67af0bd609c412b76eaa4cc89968a2a8e5ad6a>`__
 * Django 1.5 `(patch) <https://github.com/django/django/commit/1a274ccd6bc1afbdac80344c9b6e5810c1162b5f>`__
 
-September 10, 2013 - CVE-2013-4315
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+September 10, 2013 - :cve:`2013-4315`
+-------------------------------------
 
-`CVE-2013-4315 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2013-4315&cid=2>`_ Directory-traversal via ``ssi`` template tag. `Full description <https://www.djangoproject.com/weblog/2013/sep/10/security-releases-issued/>`__
+Directory-traversal via ``ssi`` template tag. `Full description
+<https://www.djangoproject.com/weblog/2013/sep/10/security-releases-issued/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch) <https://github.com/django/django/commit/87d2750b39f6f2d54b7047225521a44dcd37e896>`__
 * Django 1.5 `(patch) <https://github.com/django/django/commit/988b61c550d798f9a66d17ee0511fb7a9a7f33ca>`__
 
-September 14, 2013 - CVE-2013-1443
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+September 14, 2013 - :cve:`2013-1443`
+-------------------------------------
 
-CVE-2013-1443: Denial-of-service via large passwords. `Full description <https://www.djangoproject.com/weblog/2013/sep/15/security/>`__
+Denial-of-service via large passwords. `Full description
+<https://www.djangoproject.com/weblog/2013/sep/15/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch <https://github.com/django/django/commit/3f3d887a6844ec2db743fee64c9e53e04d39a368>`__ and `Python compatibility fix) <https://github.com/django/django/commit/6903d1690a92aa040adfb0c8eb37cf62e4206714>`__
 * Django 1.5 `(patch) <https://github.com/django/django/commit/22b74fa09d7ccbc8c52270d648a0da7f3f0fa2bc>`__
 
-April 21, 2014 - CVE-2014-0472
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+April 21, 2014 - :cve:`2014-0472`
+---------------------------------
 
-`CVE-2014-0472 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0472&cid=2>`_: Unexpected code execution using ``reverse()``. `Full description <https://www.djangoproject.com/weblog/2014/apr/21/security/>`__
+Unexpected code execution using ``reverse()``. `Full description
+<https://www.djangoproject.com/weblog/2014/apr/21/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch) <https://github.com/django/django/commit/c1a8c420fe4b27fb2caf5e46d23b5712fc0ac535>`__
 * Django 1.5 `(patch) <https://github.com/django/django/commit/2a5bcb69f42b84464b24b5c835dca6467b6aa7f1>`__
 * Django 1.6 `(patch) <https://github.com/django/django/commit/4352a50871e239ebcdf64eee6f0b88e714015c1b>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/546740544d7f69254a67b06a3fc7fa0c43512958>`__
 
-April 21, 2014 - CVE-2014-0473
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+April 21, 2014 - :cve:`2014-0473`
+---------------------------------
 
-`CVE-2014-0473 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0473&cid=2>`_: Caching of anonymous pages could reveal CSRF token. `Full description <https://www.djangoproject.com/weblog/2014/apr/21/security/>`__
+Caching of anonymous pages could reveal CSRF token. `Full description
+<https://www.djangoproject.com/weblog/2014/apr/21/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch) <https://github.com/django/django/commit/1170f285ddd6a94a65f911a27788ba49ca08c0b0>`__
 * Django 1.5 `(patch) <https://github.com/django/django/commit/6872f42757d7ef6a97e0b6ec5db4d2615d8a2bd8>`__
 * Django 1.6 `(patch) <https://github.com/django/django/commit/d63e20942f3024f24cb8cd85a49461ba8a9b6736>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/380545bf85cbf17fc698d136815b7691f8d023ca>`__
 
-April 21, 2014 - CVE-2014-0474
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+April 21, 2014 - :cve:`2014-0474`
+---------------------------------
 
-`CVE-2014-0474 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0474&cid=2>`_: MySQL typecasting causes unexpected query results. `Full description <https://www.djangoproject.com/weblog/2014/apr/21/security/>`__
+MySQL typecasting causes unexpected query results. `Full description
+<https://www.djangoproject.com/weblog/2014/apr/21/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch) <https://github.com/django/django/commit/aa80f498de6d687e613860933ac58433ab71ea4b>`__
 * Django 1.5 `(patch) <https://github.com/django/django/commit/985434fb1d6bf2335bf96c6ebf91c3674f1f399f>`__
 * Django 1.6 `(patch) <https://github.com/django/django/commit/5f0829a27e85d89ad8c433f5c6a7a7d17c9e9292>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/34526c2f56b863c2103655a0893ac801667e86ea>`__
 
-May 18, 2014 - CVE-2014-1418
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+May 18, 2014 - :cve:`2014-1418`
+-------------------------------
 
-`CVE-2014-1418 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-1418&cid=2>`_: Caches may be allowed to store and serve private data. `Full description <https://www.djangoproject.com/weblog/2014/may/14/security-releases-issued/>`__
+Caches may be allowed to store and serve private data. `Full description
+<https://www.djangoproject.com/weblog/2014/may/14/security-releases-issued/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch) <https://github.com/django/django/commit/28e23306aa53bbbb8fb87db85f99d970b051026c>`__
 * Django 1.5 `(patch) <https://github.com/django/django/commit/4001ec8698f577b973c5a540801d8a0bbea1205b>`__
 * Django 1.6 `(patch) <https://github.com/django/django/commit/1abcf3a808b35abae5d425ed4d44cb6e886dc769>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/7fef18ba9e5a8b47bc24b5bb259c8bf3d3879f2a>`__
 
-May 18, 2014 - CVE-2014-3730
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+May 18, 2014 - :cve:`2014-3730`
+-------------------------------
 
-`CVE-2014-3730 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3730&cid=2>`_: Malformed URLs from user input incorrectly validated. `Full description <https://www.djangoproject.com/weblog/2014/may/14/security-releases-issued/>`__
+Malformed URLs from user input incorrectly validated. `Full description
+<https://www.djangoproject.com/weblog/2014/may/14/security-releases-issued/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch) <https://github.com/django/django/commit/7feb54bbae3f637ab3c4dd4831d4385964f574df>`__
 * Django 1.5 `(patch) <https://github.com/django/django/commit/ad32c218850ad40972dcef57beb460f8c979dd6d>`__
 * Django 1.6 `(patch) <https://github.com/django/django/commit/601107524523bca02376a0ddc1a06c6fdb8f22f3>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/e7b0cace455c2da24492660636bfd48c45a19cdf>`__
 
-August 20, 2014 - CVE-2014-0480
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+August 20, 2014 - :cve:`2014-0480`
+----------------------------------
 
-`CVE-2014-0480 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0480&cid=2>`_: reverse() can generate URLs pointing to other hosts. `Full description <https://www.djangoproject.com/weblog/2014/aug/20/security/>`__
+``reverse()`` can generate URLs pointing to other hosts. `Full description
+<https://www.djangoproject.com/weblog/2014/aug/20/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch) <https://github.com/django/django/commit/c2fe73133b62a1d9e8f7a6b43966570b14618d7e>`__
 * Django 1.5 `(patch) <https://github.com/django/django/commit/45ac9d4fb087d21902469fc22643f5201d41a0cd>`__
 * Django 1.6 `(patch) <https://github.com/django/django/commit/da051da8df5e69944745072611351d4cfc6435d5>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/bf650a2ee78c6d1f4544a875dcc777cf27fe93e9>`__
 
-August 20, 2014 - CVE-2014-0481
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+August 20, 2014 - :cve:`2014-0481`
+----------------------------------
 
-`CVE-2014-0481 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0481&cid=2>`_: File upload denial of service. `Full description <https://www.djangoproject.com/weblog/2014/aug/20/security/>`__
+File upload denial of service. `Full description
+<https://www.djangoproject.com/weblog/2014/aug/20/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch) <https://github.com/django/django/commit/30042d475bf084c6723c6217a21598d9247a9c41>`__
 * Django 1.5 `(patch) <https://github.com/django/django/commit/26cd48e166ac4d84317c8ee6d63ac52a87e8da99>`__
 * Django 1.6 `(patch) <https://github.com/django/django/commit/dd0c3f4ee1a30c1a1e6055061c6ba6e58c6b54d1>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/3123f8452cf49071be9110e277eea60ba0032216>`__
 
-August 20, 2014 - CVE-2014-0482
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+August 20, 2014 - :cve:`2014-0482`
+----------------------------------
 
-`CVE-2014-0482 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0482&cid=2>`_: RemoteUserMiddleware session hijacking. `Full description <https://www.djangoproject.com/weblog/2014/aug/20/security/>`__
+``RemoteUserMiddleware`` session hijacking. `Full description
+<https://www.djangoproject.com/weblog/2014/aug/20/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch) <https://github.com/django/django/commit/c9e3b9949cd55f090591fbdc4a114fcb8368b6d9>`__
 * Django 1.5 `(patch) <https://github.com/django/django/commit/dd68f319b365f6cb38c5a6c106faf4f6142d7d88>`__
 * Django 1.6 `(patch) <https://github.com/django/django/commit/0268b855f9eab3377f2821164ef3e66037789e09>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/1a45d059c70385fcd6f4a3955f3b4e4cc96d0150>`__
 
-August 20, 2014 - CVE-2014-0483
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+August 20, 2014 - :cve:`2014-0483`
+----------------------------------
 
-`CVE-2014-0483 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0483&cid=2>`_: Data leakage via querystring manipulation in admin. `Full description <https://www.djangoproject.com/weblog/2014/aug/20/security/>`__
+Data leakage via querystring manipulation in admin.
+`Full description <https://www.djangoproject.com/weblog/2014/aug/20/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch) <https://github.com/django/django/commit/027bd348642007617518379f8b02546abacaa6e0>`__
 * Django 1.5 `(patch) <https://github.com/django/django/commit/2a446c896e7c814661fb9c4f212b071b2a7fa446>`__
 * Django 1.6 `(patch) <https://github.com/django/django/commit/f7c494f2506250b8cb5923714360a3642ed63e0f>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/2b31342cdf14fc20e07c43d258f1e7334ad664a6>`__
 
-January 13, 2015 - CVE-2015-0219
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+January 13, 2015 - :cve:`2015-0219`
+-----------------------------------
 
-`CVE-2015-0219 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-0219&cid=2>`_:
-WSGI header spoofing via underscore/dash conflation.
-`Full description <https://www.djangoproject.com/weblog/2015/jan/13/security/>`__
+WSGI header spoofing via underscore/dash conflation. `Full description
+<https://www.djangoproject.com/weblog/2015/jan/13/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch) <https://github.com/django/django/commit/4f6fffc1dc429f1ad428ecf8e6620739e8837450>`__
 * Django 1.6 `(patch) <https://github.com/django/django/commit/d7597b31d5c03106eeba4be14a33b32a5e25f4ee>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/41b4bc73ee0da7b2e09f4af47fc1fd21144c710f>`__
 
-January 13, 2015 - CVE-2015-0220
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+January 13, 2015 - :cve:`2015-0220`
+-----------------------------------
 
-`CVE-2015-0220 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-0220&cid=2>`_: Mitigated possible XSS attack via user-supplied redirect URLs. `Full description <https://www.djangoproject.com/weblog/2015/jan/13/security/>`__
+Mitigated possible XSS attack via user-supplied redirect URLs. `Full
+description <https://www.djangoproject.com/weblog/2015/jan/13/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch) <https://github.com/django/django/commit/4c241f1b710da6419d9dca160e80b23b82db7758>`__
 * Django 1.6 `(patch) <https://github.com/django/django/commit/72e0b033662faa11bb7f516f18a132728aa0ae28>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/de67dedc771ad2edec15c1d00c083a1a084e1e89>`__
 
-January 13, 2015 - CVE-2015-0221
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+January 13, 2015 - :cve:`2015-0221`
+-----------------------------------
 
-`CVE-2015-0221 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-0221&cid=2>`_:
-Denial-of-service attack against ``django.views.static.serve()``.
-`Full description <https://www.djangoproject.com/weblog/2015/jan/13/security/>`__
+Denial-of-service attack against ``django.views.static.serve()``. `Full
+description <https://www.djangoproject.com/weblog/2015/jan/13/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch) <https://github.com/django/django/commit/d020da6646c5142bc092247d218a3d1ce3e993f7>`__
 * Django 1.6 `(patch) <https://github.com/django/django/commit/553779c4055e8742cc832ed525b9ee34b174934f>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/818e59a3f0fbadf6c447754d202d88df025f8f2a>`__
 
-January 13, 2015 - CVE-2015-0222
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+January 13, 2015 - :cve:`2015-0222`
+-----------------------------------
 
-`CVE-2015-0222 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-0222&cid=2>`_:
-Database denial-of-service with ``ModelMultipleChoiceField``.
-`Full description <https://www.djangoproject.com/weblog/2015/jan/13/security/>`__
+Database denial-of-service with ``ModelMultipleChoiceField``. `Full description
+<https://www.djangoproject.com/weblog/2015/jan/13/security/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.6 `(patch) <https://github.com/django/django/commit/d7a06ee7e571b6dad07c0f5b519b1db02e2a476c>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/bcfb47780ce7caecb409a9e9c1c314266e41d392>`__
 
-March 9, 2015 - CVE-2015-2241
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+March 9, 2015 - :cve:`2015-2241`
+--------------------------------
 
-`CVE-2015-2241 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-2241&cid=2>`_:
-XSS attack via properties in ``ModelAdmin.readonly_fields``.
-`Full description <https://www.djangoproject.com/weblog/2015/mar/09/security-releases/>`__
+XSS attack via properties in ``ModelAdmin.readonly_fields``. `Full description
+<https://www.djangoproject.com/weblog/2015/mar/09/security-releases/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.7 `(patch) <https://github.com/django/django/commit/d16e4e1d6f95e6f46bff53cc4fd0ab398b8e5059>`__
 * Django 1.8 `(patch) <https://github.com/django/django/commit/2654e1b93923bac55f12b4e66c5e39b16695ace5>`_
 
-March 18, 2015 - CVE-2015-2316
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+March 18, 2015 - :cve:`2015-2316`
+---------------------------------
 
-`CVE-2015-2316 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-2316&cid=2>`_:
-Denial-of-service possibility with ``strip_tags()``.
-`Full description <https://www.djangoproject.com/weblog/2015/mar/18/security-releases/>`__
+Denial-of-service possibility with ``strip_tags()``. `Full description
+<https://www.djangoproject.com/weblog/2015/mar/18/security-releases/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.6 `(patch) <https://github.com/django/django/commit/b6b3cb9899214a23ebb0f4ebf0e0b300b0ee524f>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/e63363f8e075fa8d66326ad6a1cc3391cc95cd97>`__
 * Django 1.8 `(patch) <https://github.com/django/django/commit/5447709a571cd5d95971f1d5d21d4a7edcf85bbd>`__
 
-March 18, 2015 - CVE-2015-2317
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+March 18, 2015 - :cve:`2015-2317`
+---------------------------------
 
-`CVE-2015-2317 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-2317&cid=2>`_:
-Mitigated possible XSS attack via user-supplied redirect URLs.
-`Full description <https://www.djangoproject.com/weblog/2015/mar/18/security-releases/>`__
+Mitigated possible XSS attack via user-supplied redirect URLs. `Full
+description <https://www.djangoproject.com/weblog/2015/mar/18/security-releases/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.4 `(patch) <https://github.com/django/django/commit/2342693b31f740a422abf7267c53b4e7bc487c1b>`__
 * Django 1.6 `(patch) <https://github.com/django/django/commit/5510f070711540aaa8d3707776cd77494e688ef9>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/2a4113dbd532ce952308992633d802dc169a75f1>`__
 * Django 1.8 `(patch) <https://github.com/django/django/commit/770427c2896a078925abfca2317486b284d22f04>`__
 
-May 20, 2015 - CVE-2015-3982
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+May 20, 2015 - :cve:`2015-3982`
+-------------------------------
 
-`CVE-2015-3982 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-3982&cid=2>`_:
-Fixed session flushing in the cached_db backend.
-`Full description <https://www.djangoproject.com/weblog/2015/may/20/security-release/>`__
+Fixed session flushing in the cached_db backend. `Full description
+<https://www.djangoproject.com/weblog/2015/may/20/security-release/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.8 `(patch) <https://github.com/django/django/commit/31cb25adecba930bdeee4556709f5a1c42d88fd6>`__
 
-July 8, 2015 - CVE-2015-5143
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+July 8, 2015 - :cve:`2015-5143`
+-------------------------------
 
-`CVE-2015-5143 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5143&cid=2>`_:
-Denial-of-service possibility by filling session store.
-`Full description <https://www.djangoproject.com/weblog/2015/jul/08/security-releases/>`__
+Denial-of-service possibility by filling session store. `Full
+description <https://www.djangoproject.com/weblog/2015/jul/08/security-releases/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.8 `(patch) <https://github.com/django/django/commit/66d12d1ababa8f062857ee5eb43276493720bf16>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/1828f4341ec53a8684112d24031b767eba557663>`__
 * Django 1.4 `(patch) <https://github.com/django/django/commit/2e47f3e401c29bc2ba5ab794d483cb0820855fb9>`__
 
-July 8, 2015 - CVE-2015-5144
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+July 8, 2015 - :cve:`2015-5144`
+-------------------------------
 
-`CVE-2015-5144 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5144&cid=2>`_:
-Header injection possibility since validators accept newlines in input.
-`Full description <https://www.djangoproject.com/weblog/2015/jul/08/security-releases/>`__
+Header injection possibility since validators accept newlines in input. `Full
+description <https://www.djangoproject.com/weblog/2015/jul/08/security-releases/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.8 `(patch) <https://github.com/django/django/commit/574dd5e0b0fbb877ae5827b1603d298edc9bb2a0>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/ae49b4d994656bc037513dcd064cb9ce5bb85649>`__
 * Django 1.4 `(patch) <https://github.com/django/django/commit/1ba1cdce7d58e6740fe51955d945b56ae51d072a>`__
 
-July 8, 2015 - CVE-2015-5145
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+July 8, 2015 - :cve:`2015-5145`
+-------------------------------
 
-`CVE-2015-5145 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5145&cid=2>`_:
-Denial-of-service possibility in URL validation.
-`Full description <https://www.djangoproject.com/weblog/2015/jul/08/security-releases/>`__
+Denial-of-service possibility in URL validation. `Full description
+<https://www.djangoproject.com/weblog/2015/jul/08/security-releases/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.8 `(patch) <https://github.com/django/django/commit/8f9a4d3a2bc42f14bb437defd30c7315adbff22c>`__
 
-August 18, 2015 - CVE-2015-5963/CVE-2015-5964
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+August 18, 2015 - :cve:`2015-5963` / :cve:`2015-5964`
+-----------------------------------------------------
 
-`CVE-2015-5963 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5963&cid=2>`_
-and
-`CVE-2015-5964 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5964&cid=2>`_:
 Denial-of-service possibility in ``logout()`` view by filling session store.
 `Full description <https://www.djangoproject.com/weblog/2015/aug/18/security-releases/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.8 `(patch) <https://github.com/django/django/commit/2eb86b01d7b59be06076f6179a454d0fd0afaff6>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/2f5485346ee6f84b4e52068c04e043092daf55f7>`__
 * Django 1.4 `(patch) <https://github.com/django/django/commit/575f59f9bc7c59a5e41a081d1f5f55fc859c5012>`__
 
-November 24, 2015 - CVE-2015-8213
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+November 24, 2015 - :cve:`2015-8213`
+------------------------------------
 
-`CVE-2015-8213 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-8213&cid=2>`_:
-Settings leak possibility in ``date`` template filter.
-`Full description <https://www.djangoproject.com/weblog/2015/nov/24/security-releases-issued/>`__
+Settings leak possibility in ``date`` template filter. `Full description
+<https://www.djangoproject.com/weblog/2015/nov/24/security-releases-issued/>`__
 
 Versions affected
------------------
+~~~~~~~~~~~~~~~~~
 
 * Django 1.8 `(patch) <https://github.com/django/django/commit/9f83fc2f66f5a0bac7c291aec55df66050bb6991>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/8a01c6b53169ee079cb21ac5919fdafcc8c5e172>`__
 
-February 1, 2016 - CVE-2016-2048
---------------------------------
+February 1, 2016 - :cve:`2016-2048`
+-----------------------------------
 
-`CVE-2016-2048 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2016-2048&cid=2>`_:
-User with "change" but not "add" permission can create objects for ``ModelAdmin``’s with ``save_as=True``.
-`Full description <https://www.djangoproject.com/weblog/2016/feb/01/releases-192-and-189/>`__
+User with "change" but not "add" permission can create objects for
+``ModelAdmin``’s with ``save_as=True``. `Full description
+<https://www.djangoproject.com/weblog/2016/feb/01/releases-192-and-189/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
 
 * Django 1.9 `(patch) <https://github.com/django/django/commit/adbca5e4db42542575734b8e5d26961c8ada7265>`__
 
-March 1, 2016 - CVE-2016-2512
------------------------------
+March 1, 2016 - :cve:`2016-2512`
+--------------------------------
 
-`CVE-2016-2512 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2016-2512&cid=2>`_:
-Malicious redirect and possible XSS attack via user-supplied redirect URLs containing basic auth.
-`Full description <https://www.djangoproject.com/weblog/2016/mar/01/security-releases/>`__
+Malicious redirect and possible XSS attack via user-supplied redirect URLs
+containing basic auth. `Full description
+<https://www.djangoproject.com/weblog/2016/mar/01/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -718,12 +745,12 @@ Versions affected
 * Django 1.9 `(patch) <https://github.com/django/django/commit/fc6d147a63f89795dbcdecb0559256470fff4380>`__
 * Django 1.8 `(patch) <https://github.com/django/django/commit/382ab137312961ad62feb8109d70a5a581fe8350>`__
 
-March 1, 2016 - CVE-2016-2513
------------------------------
+March 1, 2016 - :cve:`2016-2513`
+--------------------------------
 
-`CVE-2016-2513 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2016-2513&cid=2>`_:
-User enumeration through timing difference on password hasher work factor upgrade.
-`Full description <https://www.djangoproject.com/weblog/2016/mar/01/security-releases/>`__
+User enumeration through timing difference on password hasher work factor
+upgrade. `Full description
+<https://www.djangoproject.com/weblog/2016/mar/01/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
@@ -731,12 +758,11 @@ Versions affected
 * Django 1.9 `(patch) <https://github.com/django/django/commit/af7d09b0c5c6ab68e629fd9baf736f9dd203b18e>`__
 * Django 1.8 `(patch) <https://github.com/django/django/commit/f4e6e02f7713a6924d16540be279909ff4091eb6>`__
 
-July 18, 2016 - CVE-2016-6186
------------------------------
+July 18, 2016 - :cve:`2016-6186`
+--------------------------------
 
-`CVE-2016-6186 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2016-6186&cid=2>`_:
-XSS in admin's add/change related popup.
-`Full description <https://www.djangoproject.com/weblog/2016/jul/18/security-releases/>`__
+XSS in admin's add/change related popup. `Full description
+<https://www.djangoproject.com/weblog/2016/jul/18/security-releases/>`__
 
 Versions affected
 ~~~~~~~~~~~~~~~~~
