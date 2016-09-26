@@ -58,6 +58,15 @@ General-purpose aggregation functions
     Returns ``True`` if at least one input value is true, ``None`` if all
     values are null or if there are no values, otherwise ``False``.
 
+``JsonAgg``
+-----------
+
+.. class:: JsonAgg(expressions, **extra)
+
+    .. versionadded:: 1.11
+
+    Returns the input values as a ``JSON`` array.
+
 ``StringAgg``
 -------------
 

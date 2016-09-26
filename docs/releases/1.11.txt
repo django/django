@@ -172,6 +172,9 @@ Minor features
   operation allow using PostgreSQL's ``citext`` extension for case-insensitive
   lookups.
 
+* The new :class:`~django.contrib.postgres.aggregates.JsonAgg` allows
+  aggregating values as a JSON array.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
