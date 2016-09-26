@@ -45,9 +45,6 @@ from .introspection import DatabaseIntrospection            # isort:skip
 from .operations import DatabaseOperations                  # isort:skip
 from .schema import DatabaseSchemaEditor                    # isort:skip
 
-DatabaseError = Database.DatabaseError
-IntegrityError = Database.IntegrityError
-
 
 def adapt_datetime_warn_on_aware_datetime(value):
     # Remove this function and rely on the default adapter in Django 2.0.

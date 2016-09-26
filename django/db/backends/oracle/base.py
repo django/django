@@ -63,9 +63,6 @@ from .operations import DatabaseOperations                  # NOQA isort:skip
 from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
 from .utils import Oracle_datetime, convert_unicode         # NOQA isort:skip
 
-DatabaseError = Database.DatabaseError
-IntegrityError = Database.IntegrityError
-
 
 class _UninitializedOperatorsDescriptor(object):
 
@@ -241,7 +238,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 cursor.execute("SELECT 1 FROM DUAL WHERE DUMMY %s"
                                % self._standard_operators['contains'],
                                ['X'])
-            except DatabaseError:
+            except Database.DatabaseError:
                 self.operators = self._likec_operators
                 self.pattern_ops = self._likec_pattern_ops
             else:
@@ -479,7 +476,7 @@ class FormatStylePlaceholderCursor(object):
             return self.cursor.execute(query, self._param_generator(params))
         except Database.DatabaseError as e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
-            if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, IntegrityError):
+            if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, Database.IntegrityError):
                 six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
             raise
 
@@ -498,7 +495,7 @@ class FormatStylePlaceholderCursor(object):
             return self.cursor.executemany(query, [self._param_generator(p) for p in formatted])
         except Database.DatabaseError as e:
             # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
-            if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, IntegrityError):
+            if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, Database.IntegrityError):
                 six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
             raise
 

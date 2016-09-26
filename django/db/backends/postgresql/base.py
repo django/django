@@ -44,9 +44,6 @@ from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
 from .utils import utc_tzinfo_factory                       # NOQA isort:skip
 from .version import get_version                            # NOQA isort:skip
 
-DatabaseError = Database.DatabaseError
-IntegrityError = Database.IntegrityError
-
 if six.PY2:
     psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
     psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
@@ -239,7 +236,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         nodb_connection = super(DatabaseWrapper, self)._nodb_connection
         try:
             nodb_connection.ensure_connection()
-        except (DatabaseError, WrappedDatabaseError):
+        except (Database.DatabaseError, WrappedDatabaseError):
             warnings.warn(
                 "Normally Django will use a connection to the 'postgres' database "
                 "to avoid running initialization queries against the production "

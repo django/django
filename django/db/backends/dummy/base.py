@@ -26,14 +26,6 @@ def ignore(*args, **kwargs):
     pass
 
 
-class DatabaseError(Exception):
-    pass
-
-
-class IntegrityError(DatabaseError):
-    pass
-
-
 class DatabaseOperations(BaseDatabaseOperations):
     quote_name = complain
 
