@@ -769,3 +769,15 @@ Versions affected
 
 * Django 1.9 `(patch) <https://github.com/django/django/commit/d03bf6fe4e9bf5b07de62c1a271c4b41a7d3d158>`__
 * Django 1.8 `(patch) <https://github.com/django/django/commit/f68e5a99164867ab0e071a936470958ed867479d>`__
+
+September 26, 2016 - :cve:`2016-7401`
+-------------------------------------
+
+CSRF protection bypass on a site with Google Analytics. `Full description
+<https://www.djangoproject.com/weblog/2016/sep/26/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 1.9 `(patch) <https://github.com/django/django/commit/d1bc980db1c0fffd6d60677e62f70beadb9fe64a>`__
+* Django 1.8 `(patch) <https://github.com/django/django/commit/6118ab7d0676f0d622278e5be215f14fb5410b6a>`__
