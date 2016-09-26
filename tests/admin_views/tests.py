@@ -1474,8 +1474,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.status_code, 302)
         login = self.client.post(login_url, self.no_username_login)
         self.assertEqual(login.status_code, 200)
-        form = login.context[0].get('form')
-        self.assertEqual(form.errors['username'][0], 'This field is required.')
+        self.assertFormError(login, 'form', 'username', ['This field is required.'])
 
     def test_login_redirect_for_direct_get(self):
         """
@@ -4935,9 +4934,8 @@ class UserAdminTest(TestCase):
             'password2': 'mismatch',
         })
         self.assertEqual(response.status_code, 200)
-        adminform = response.context['adminform']
-        self.assertNotIn('password', adminform.form.errors)
-        self.assertEqual(adminform.form.errors['password2'], ["The two password fields didn't match."])
+        self.assertFormError(response, 'adminform', 'password', [])
+        self.assertFormError(response, 'adminform', 'password2', ["The two password fields didn't match."])
 
     def test_user_fk_add_popup(self):
         """User addition through a FK popup should return the appropriate JavaScript response."""
@@ -5922,7 +5920,9 @@ class AdminViewOnSiteTests(TestCase):
         """
         Issue #20522
         Verifying that if the parent form fails validation, the inlines also
-        run validation even if validation is contingent on parent form data
+        run validation even if validation is contingent on parent form data.
+        Also, assertFormError() and assertFormsetError() is usable for admin
+        forms and formsets.
         """
         # The form validation should fail because 'some_required_info' is
         # not included on the parent form, and the family_name of the parent
@@ -5936,15 +5936,17 @@ class AdminViewOnSiteTests(TestCase):
                      "dependentchild_set-0-family_name": "Test2"}
         response = self.client.post(reverse('admin:admin_views_parentwithdependentchildren_add'),
                                     post_data)
-
-        # just verifying the parent form failed validation, as expected --
-        # this isn't the regression test
-        self.assertIn('some_required_info', response.context['adminform'].form.errors)
-
-        # actual regression test
-        for error_set in response.context['inline_admin_formset'].formset.errors:
-            self.assertEqual(['Children must share a family name with their parents in this contrived test case'],
-                             error_set.get('__all__'))
+        self.assertFormError(response, 'adminform', 'some_required_info', ['This field is required.'])
+        msg = "The form 'adminform' in context 0 does not contain the non-field error 'Error'"
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormError(response, 'adminform', None, ['Error'])
+        self.assertFormsetError(
+            response, 'inline_admin_formset', 0, None,
+            ['Children must share a family name with their parents in this contrived test case']
+        )
+        msg = "The formset 'inline_admin_formset' in context 4 does not contain any non-form errors."
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormsetError(response, 'inline_admin_formset', None, None, ['Error'])
 
     def test_change_view_form_and_formsets_run_validation(self):
         """
@@ -5967,15 +5969,11 @@ class AdminViewOnSiteTests(TestCase):
         response = self.client.post(
             reverse('admin:admin_views_parentwithdependentchildren_change', args=(pwdc.id,)), post_data
         )
-
-        # just verifying the parent form failed validation, as expected --
-        # this isn't the regression test
-        self.assertIn('some_required_info', response.context['adminform'].form.errors)
-
-        # actual regression test
-        for error_set in response.context['inline_admin_formset'].formset.errors:
-            self.assertEqual(['Children must share a family name with their parents in this contrived test case'],
-                             error_set.get('__all__'))
+        self.assertFormError(response, 'adminform', 'some_required_info', ['This field is required.'])
+        self.assertFormsetError(
+            response, 'inline_admin_formset', 0, None,
+            ['Children must share a family name with their parents in this contrived test case']
+        )
 
     def test_check(self):
         "Ensure that the view_on_site value is either a boolean or a callable"
