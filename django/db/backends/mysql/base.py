@@ -52,10 +52,6 @@ if (version < (1, 2, 1) or (
     raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
 
-DatabaseError = Database.DatabaseError
-IntegrityError = Database.IntegrityError
-
-
 def adapt_datetime_warn_on_aware_datetime(value, conv):
     # Remove this function and rely on the default adapter in Django 2.0.
     if settings.USE_TZ and timezone.is_aware(value):
