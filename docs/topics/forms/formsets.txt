@@ -296,14 +296,14 @@ The formset ``clean`` method is called after all the ``Form.clean`` methods
 have been called. The errors will be found using the ``non_form_errors()``
 method on the formset.
 
-.. _validate_max:
-
 Validating the number of forms in a formset
 ===========================================
 
 Django provides a couple ways to validate the minimum or maximum number of
 submitted forms. Applications which need more customizable validation of the
 number of forms should use custom formset validation.
+
+.. _validate_max:
 
 ``validate_max``
 ----------------
