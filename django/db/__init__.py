@@ -7,19 +7,16 @@ from django.db.utils import (
 )
 
 __all__ = [
-    'backend', 'connection', 'connections', 'router', 'DatabaseError',
-    'IntegrityError', 'InternalError', 'ProgrammingError', 'DataError',
-    'NotSupportedError', 'Error', 'InterfaceError', 'OperationalError',
-    'DEFAULT_DB_ALIAS', 'DJANGO_VERSION_PICKLE_KEY'
+    'connection', 'connections', 'router', 'DatabaseError', 'IntegrityError',
+    'InternalError', 'ProgrammingError', 'DataError', 'NotSupportedError',
+    'Error', 'InterfaceError', 'OperationalError', 'DEFAULT_DB_ALIAS',
+    'DJANGO_VERSION_PICKLE_KEY',
 ]
 
 connections = ConnectionHandler()
 
 router = ConnectionRouter()
 
-
-# `connection`, `DatabaseError` and `IntegrityError` are convenient aliases
-# for backend bits.
 
 # DatabaseWrapper.__init__() takes a dictionary, not a settings module, so we
 # manually create the dictionary from the settings, passing only the settings
