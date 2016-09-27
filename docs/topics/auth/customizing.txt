@@ -544,6 +544,14 @@ password resets. You must then provide some key implementation details:
         value (the :attr:`~django.db.models.Field.primary_key` by default) of an
         existing instance.
 
+    .. attribute:: EMAIL_FIELD
+
+        .. versionadded:: 1.11
+
+        A string describing the name of the email field on the ``User`` model.
+        This value is returned by
+        :func:`~django.contrib.auth.models.AbstractBaseUser.get_email_field_name()`.
+
     .. attribute:: REQUIRED_FIELDS
 
         A list of the field names that will be prompted for when creating a
@@ -699,6 +707,14 @@ The following attributes and methods are available on any subclass of
         Returns an HMAC of the password field. Used for
         :ref:`session-invalidation-on-password-change`.
 
+    .. classmethod:: get_email_field_name(cls)
+
+       .. versionadded:: 1.11
+
+       Returns the name of the email field specified by the model attribute
+       ``EMAIL_FIELD``. If ``EMAIL_FIELD`` is not specified, ``'email'`` is
+       returned.
+
 :class:`~models.AbstractUser` subclasses :class:`~models.AbstractBaseUser`:
 
 .. class:: models.AbstractUser
@@ -807,9 +823,12 @@ The following forms make assumptions about the user model and can be used as-is
 if those assumptions are met:
 
 * :class:`~django.contrib.auth.forms.PasswordResetForm`: Assumes that the user
-  model has a field named ``email`` that can be used to identify the user and a
-  boolean field named ``is_active`` to prevent password resets for inactive
-  users.
+  model has a field that can be used to identify the user. By default, the
+  expected field name is ``email`` which can be changed by setting the
+  ``User`` model attribute
+  :attr:`~django.contrib.auth.models.CustomUser.EMAIL_FIELD`. Additionally,
+  a boolean field named ``is_active`` is required in order to prevent password
+  resets for inactive users.
 
 Finally, the following forms are tied to
 :class:`~django.contrib.auth.models.User` and need to be rewritten or extended

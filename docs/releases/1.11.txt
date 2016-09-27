@@ -256,6 +256,11 @@ Forms
   <django.forms.Form.get_initial_for_field>` method returns initial data for a
   form field.
 
+* :class:`~django.contrib.auth.forms.PasswordResetForm` supports custom user
+  models that use an email field named something other than ``'email'``.
+  Set :attr:`~django.contrib.auth.models.CustomUser.EMAIL_FIELD` to the name
+  of the field.
+
 Generic Views
 ~~~~~~~~~~~~~
 

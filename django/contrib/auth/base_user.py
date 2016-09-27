@@ -138,5 +138,12 @@ class AbstractBaseUser(models.Model):
         return salted_hmac(key_salt, self.password).hexdigest()
 
     @classmethod
+    def get_email_field_name(cls):
+        try:
+            return cls.EMAIL_FIELD
+        except AttributeError:
+            return 'email'
+
+    @classmethod
     def normalize_username(cls, username):
         return unicodedata.normalize('NFKC', force_text(username))
