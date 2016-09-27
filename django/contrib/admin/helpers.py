@@ -57,6 +57,14 @@ class AdminForm(object):
             )
 
     @property
+    def errors(self):
+        return self.form.errors
+
+    @property
+    def non_field_errors(self):
+        return self.form.non_field_errors
+
+    @property
     def media(self):
         media = self.form.media
         for fs in self:
@@ -302,6 +310,14 @@ class InlineAdminFormSet(object):
                 'deleteText': ugettext('Remove'),
             }
         })
+
+    @property
+    def forms(self):
+        return self.formset.forms
+
+    @property
+    def non_form_errors(self):
+        return self.formset.non_form_errors
 
     @property
     def media(self):
