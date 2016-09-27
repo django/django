@@ -682,3 +682,20 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
     An :class:`~django.apps.AppConfig` for use if you :ref:`aren't using
     <using-auth-without-models>` any of the built-in ``contrib.auth`` models.
+
+Utility functions
+=================
+
+.. function:: get_user(request)
+
+    Returns the user model instance associated with the given ``request``
+    session.
+
+    It uses the authentication backend that ties to the active session, and
+    then checks that if the backend is present in
+    :setting:`AUTHENTICATION_BACKENDS`. If it does, uses the backend's
+    ``get_user()`` method to get the user model instance, and tries to verify
+    the session by calling the user model's ``get_session_auth_hash()`` method.
+
+    If no user is retrieved or the session is not validated, an instance of
+    :class:`~django.contrib.auth.models.AnonymousUser` is returned.
