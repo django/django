@@ -377,6 +377,10 @@ Validators
   :data:`~django.core.validators.validate_image_file_extension` to validate
   image files.
 
+* Added :class:`~django.core.validators.DomainNameValidator` and
+  :data:`~django.core.validators.validate_domain_name` to validate domain
+  names.
+
 .. _backwards-incompatible-1.11:
 
 Backwards incompatible changes in 1.11

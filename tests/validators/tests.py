@@ -11,13 +11,13 @@ from unittest import TestCase, skipUnless
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.validators import (
-    BaseValidator, DecimalValidator, EmailValidator, FileExtensionValidator,
-    MaxLengthValidator, MaxValueValidator, MinLengthValidator,
-    MinValueValidator, RegexValidator, URLValidator, int_list_validator,
-    validate_comma_separated_integer_list, validate_email,
-    validate_image_file_extension, validate_integer, validate_ipv4_address,
-    validate_ipv6_address, validate_ipv46_address, validate_slug,
-    validate_unicode_slug,
+    BaseValidator, DecimalValidator, DomainNameValidator,
+    EmailValidator, FileExtensionValidator, MaxLengthValidator,
+    MaxValueValidator, MinLengthValidator, MinValueValidator, RegexValidator,
+    URLValidator, int_list_validator, validate_comma_separated_integer_list,
+    validate_domain_name, validate_email, validate_image_file_extension,
+    validate_integer, validate_ipv4_address, validate_ipv6_address,
+    validate_ipv46_address, validate_slug, validate_unicode_slug,
 )
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
@@ -262,6 +262,26 @@ TEST_DATA = [
     (validate_image_file_extension, ContentFile('contents', name='file.png'), None),
     (validate_image_file_extension, ContentFile('contents', name='file.txt'), ValidationError),
     (validate_image_file_extension, ContentFile('contents', name='file'), ValidationError),
+
+    (validate_domain_name, '000000.org', None),
+    (validate_domain_name, 'localhost', None),
+    (validate_domain_name, 'python.org', None),
+    (validate_domain_name, 'python.co.uk', None),
+    (validate_domain_name, 'python.tk', None),
+    (validate_domain_name, 'domain.with.idn.tld.उदाहरण.परीक्ष', None),
+    (validate_domain_name, 'ıçğü.com', None),
+    (validate_domain_name, 'xn--7ca6byfyc.com', None),
+    (validate_domain_name, 'hg.python.org', None),
+    (validate_domain_name, 'python.xyz', None),
+    (validate_domain_name, 'djangoproject.com', None),
+    (validate_domain_name, 'DJANGOPROJECT.COM', None),
+    (validate_domain_name, 'localhost', None),
+    (validate_domain_name, 'spam.eggs', None),
+    (validate_domain_name, 'python-python.com', None),
+    (validate_domain_name, 'python..org', ValidationError),
+    (validate_domain_name, 'python-.org', ValidationError),
+    (validate_domain_name, 'python.name.uk', None),
+    (validate_domain_name, 'python.tips', None),
 ]
 
 
@@ -474,4 +494,28 @@ class TestValidatorEquality(TestCase):
         self.assertNotEqual(
             FileExtensionValidator(['txt']),
             FileExtensionValidator(['txt'], message='custom error message')
+        )
+
+    def test_domain_name_equality(self):
+        self.assertEqual(
+            DomainNameValidator(),
+            DomainNameValidator(),
+        )
+        self.assertNotEqual(
+            DomainNameValidator(),
+            EmailValidator(),
+        )
+        self.assertNotEqual(
+            DomainNameValidator(),
+            DomainNameValidator(code='custom_code'),
+        )
+        self.assertEqual(
+            DomainNameValidator(message='custom error message'),
+            DomainNameValidator(message='custom error message'),
+        )
+        self.assertNotEqual(
+            DomainNameValidator(message='custom error message'),
+            DomainNameValidator(
+                message='custom error message', code='custom_code'
+            ),
         )

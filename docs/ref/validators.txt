@@ -167,12 +167,31 @@ to, or in lieu of custom ``field.clean()`` methods.
 
         .. _valid URI schemes: https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
 
+``DomainNameValidator``
+-----------------------
+
+.. class:: DomainNameValidator()
+
+    .. versionadded:: 1.11
+
+    A :class:`RegexValidator` that ensures a value looks like a domain name,
+    and raises an error code of ``'invalid'`` if it doesn't.
+
 ``validate_email``
 ------------------
 
 .. data:: validate_email
 
     An :class:`EmailValidator` instance without any customizations.
+
+``validate_domain_name``
+------------------------
+
+.. data:: validate_domain_name
+
+    .. versionadded:: 1.11
+
+    A :class:`DomainNameValidator` instance.
 
 ``validate_slug``
 -----------------
