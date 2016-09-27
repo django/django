@@ -44,6 +44,7 @@ OLD_LOGGING = {
 
 
 class LoggingFiltersTest(SimpleTestCase):
+
     def test_require_debug_false_filter(self):
         """
         Test the RequireDebugFalse filter class.
@@ -177,6 +178,7 @@ class WarningLoggerTests(SimpleTestCase):
 
 
 class CallbackFilterTest(SimpleTestCase):
+
     def test_sense(self):
         f_false = CallbackFilter(lambda r: False)
         f_true = CallbackFilter(lambda r: True)
@@ -518,12 +520,12 @@ class SchemaLoggerTests(SimpleTestCase):
         )
 
 
-class LogFormattersTests(SetupDefaultLoggingMixin, SimpleTestCase):
+class LogFormattersTests(SimpleTestCase):
+
     def test_server_formatter_styles(self):
         color_style = color.make_style('')
         formatter = ServerFormatter()
         formatter.style = color_style
-
         log_msg = 'log message'
         status_code_styles = [
             (200, 'HTTP_SUCCESS'),
@@ -535,21 +537,14 @@ class LogFormattersTests(SetupDefaultLoggingMixin, SimpleTestCase):
             (500, 'HTTP_SERVER_ERROR'),
         ]
         for status_code, style in status_code_styles:
-            record = logging.makeLogRecord({
-                'msg': log_msg,
-                'status_code': status_code,
-            })
-            self.assertEqual(
-                formatter.format(record),
-                getattr(color_style, style)(log_msg),
-            )
+            record = logging.makeLogRecord({'msg': log_msg, 'status_code': status_code})
+            self.assertEqual(formatter.format(record), getattr(color_style, style)(log_msg))
         record = logging.makeLogRecord({'msg': log_msg})
         self.assertEqual(formatter.format(record), log_msg)
 
     def test_server_formatter_default_format(self):
         server_time = '2016-09-25 10:20:30'
         log_msg = 'log message'
-
         logger = logging.getLogger('django.server')
 
         @contextmanager
@@ -562,14 +557,8 @@ class LogFormattersTests(SetupDefaultLoggingMixin, SimpleTestCase):
 
         with patch_django_server_logger() as logger_output:
             logger.info(log_msg, extra={'server_time': server_time})
-            self.assertEqual(
-                '[%s] %s\n' % (server_time, log_msg),
-                logger_output.getvalue()
-            )
+            self.assertEqual('[%s] %s\n' % (server_time, log_msg), logger_output.getvalue())
 
         with patch_django_server_logger() as logger_output:
             logger.info(log_msg)
-            self.assertRegexpMatches(
-                logger_output.getvalue(),
-                r'^\[[-:,.\s\d]+\] %s' % log_msg
-            )
+            six.assertRegex(self, logger_output.getvalue(), r'^\[[-:,.\s\d]+\] %s' % log_msg)
