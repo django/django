@@ -515,6 +515,9 @@ class LookupTests(TestCase):
         msg = 'Related Field got invalid lookup: editor'
         with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(author__editor__name='James')
+        msg = 'Related Field got invalid lookup: foo'
+        with self.assertRaisesMessage(FieldError, msg):
+            Tag.objects.filter(articles__foo='bar')
 
     def test_regex(self):
         # Create some articles with a bit more interesting headlines for testing field lookups:
