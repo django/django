@@ -159,6 +159,25 @@ to, or in lieu of custom ``field.clean()`` methods.
         validation, so you'd need to add them to the ``allowlist`` as
         necessary.
 
+``DomainNameValidator``
+-----------------------
+
+.. versionadded:: 5.1
+
+.. class:: DomainNameValidator(accept_idna=True, message=None, code=None)
+
+    A :class:`RegexValidator` subclass that ensures a value looks like a domain
+    name. Values longer than 255 characters are always considered invalid. IP
+    addresses are not accepted as valid domain names.
+
+    In addition to the optional arguments of its parent :class:`RegexValidator`
+    class, ``DomainNameValidator`` accepts an extra optional attribute:
+
+    .. attribute:: accept_idna
+
+        Determines whether to accept internationalized domain names, that is,
+        domain names that contain non-ASCII characters. Defaults to ``True``.
+
 ``URLValidator``
 ----------------
 
@@ -200,6 +219,15 @@ to, or in lieu of custom ``field.clean()`` methods.
 .. data:: validate_email
 
     An :class:`EmailValidator` instance without any customizations.
+
+``validate_domain_name``
+------------------------
+
+.. versionadded:: 5.1
+
+.. data:: validate_domain_name
+
+    A :class:`DomainNameValidator` instance without any customizations.
 
 ``validate_slug``
 -----------------

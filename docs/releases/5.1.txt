@@ -363,7 +363,10 @@ Utilities
 Validators
 ~~~~~~~~~~
 
-* ...
+* The new :class:`~django.core.validators.DomainNameValidator` validates domain
+  names, including internationalized domain names. The new
+  :func:`~django.core.validators.validate_domain_name` function returns an
+  instance of :class:`~django.core.validators.DomainNameValidator`.
 
 .. _backwards-incompatible-5.1:
 
