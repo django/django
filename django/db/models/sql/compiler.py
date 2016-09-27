@@ -884,9 +884,6 @@ class SQLCompiler(object):
     def as_subquery_condition(self, alias, columns, compiler):
         qn = compiler.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
-        if len(columns) == 1:
-            sql, params = self.as_sql()
-            return '%s.%s IN (%s)' % (qn(alias), qn2(columns[0]), sql), params
 
         for index, select_col in enumerate(self.query.select):
             lhs_sql, lhs_params = self.compile(select_col)
