@@ -4,11 +4,12 @@ import unittest
 
 from django.db import connection, migrations, models, transaction
 from django.db.migrations.migration import Migration
+from django.db.migrations.operations import CreateModel
 from django.db.migrations.state import ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
 from django.db.utils import IntegrityError
-from django.test import override_settings, skipUnlessDBFeature
+from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 
 from .models import FoodManager, FoodQuerySet, UnicodeModel
 from .test_base import MigrationTestBase
@@ -2414,3 +2415,9 @@ class SwappableOperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_forwards('test_rminigsw', editor, project_state, new_state)
             operation.database_backwards('test_rminigsw', editor, new_state, project_state)
+
+
+class TestCreateModel(SimpleTestCase):
+
+    def test_references_model_mixin(self):
+        CreateModel('name', [], bases=(Mixin, models.Model)).references_model('other_model')
