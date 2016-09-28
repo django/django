@@ -1190,7 +1190,7 @@ Miscellaneous
   Be careful if you upgrade to Django 1.8 and skip Django 1.7. If you run
   ``manage.py migrate --fake``, this migration will be skipped and you'll see
   a ``RuntimeError: Error creating new content types.`` exception because the
-  ``name`` column won't be dropped from the database. Use ``migrate.py migrate
+  ``name`` column won't be dropped from the database. Use ``manage.py migrate
   --fake-initial`` to fake only the initial migration instead.
 
 * The new :option:`migrate --fake-initial` option allows faking initial
