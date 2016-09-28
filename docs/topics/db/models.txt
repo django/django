@@ -1084,6 +1084,8 @@ created directly as a ``Place`` object or was the parent of some other class),
 referring to ``p.restaurant`` would raise a ``Restaurant.DoesNotExist``
 exception.
 
+.. _meta-and-multi-table-inheritance:
+
 ``Meta`` and multi-table inheritance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1211,6 +1213,9 @@ order by the ``last_name`` attribute when you use the proxy. This is easy::
 
 Now normal ``Person`` queries will be unordered
 and ``OrderedPerson`` queries will be ordered by ``last_name``.
+
+Proxy models inherit ``Meta`` attributes :ref:`in the same way as regular
+models <meta-and-multi-table-inheritance>`.
 
 ``QuerySet``\s still return the model that was requested
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
