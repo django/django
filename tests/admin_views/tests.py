@@ -27,8 +27,8 @@ from django.forms.utils import ErrorList
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.test import (
-    TestCase, ignore_warnings, modify_settings, override_settings,
-    skipUnlessDBFeature,
+    SimpleTestCase, TestCase, ignore_warnings, modify_settings,
+    override_settings, skipUnlessDBFeature,
 )
 from django.test.utils import override_script_prefix, patch_logger
 from django.urls import NoReverseMatch, resolve, reverse
@@ -6064,6 +6064,22 @@ class InlineAdminViewOnSiteTest(TestCase):
         "Ensure that the right link is displayed if view_on_site is a callable"
         response = self.client.get(reverse('admin:admin_views_restaurant_change', args=(self.r1.pk,)))
         self.assertContains(response, '"/worker_inline/%s/%s/"' % (self.w1.surname, self.w1.name))
+
+
+@override_settings(ROOT_URLCONF='admin_views.urls')
+class TestETagWithAdminView(SimpleTestCase):
+    # See https://code.djangoproject.com/ticket/16003
+
+    def test_admin(self):
+        with self.settings(USE_ETAGS=False):
+            response = self.client.get(reverse('admin:index'))
+            self.assertEqual(response.status_code, 302)
+            self.assertFalse(response.has_header('ETag'))
+
+        with self.settings(USE_ETAGS=True):
+            response = self.client.get(reverse('admin:index'))
+            self.assertEqual(response.status_code, 302)
+            self.assertTrue(response.has_header('ETag'))
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')

@@ -210,7 +210,12 @@ def patch_response_headers(response, cache_timeout=None):
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
     if cache_timeout < 0:
         cache_timeout = 0  # Can't have max-age negative
-    if 'Expires' not in response:
+    if settings.USE_ETAGS and not response.has_header('ETag'):
+        if hasattr(response, 'render') and callable(response.render):
+            response.add_post_render_callback(set_response_etag)
+        else:
+            response = set_response_etag(response)
+    if not response.has_header('Expires'):
         response['Expires'] = http_date(time.time() + cache_timeout)
     patch_cache_control(response, max_age=cache_timeout)
 

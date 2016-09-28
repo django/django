@@ -39,7 +39,8 @@ from django.test import (
 from django.test.signals import setting_changed
 from django.utils import six, timezone, translation
 from django.utils.cache import (
-    get_cache_key, learn_cache_key, patch_cache_control, patch_vary_headers,
+    get_cache_key, learn_cache_key, patch_cache_control,
+    patch_response_headers, patch_vary_headers,
 )
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
@@ -1896,6 +1897,14 @@ class CacheI18nTest(TestCase):
         # Check that we can recover the cache
         self.assertIsNotNone(get_cache_data)
         self.assertEqual(get_cache_data.content, en_message.encode())
+        # Check that we use etags
+        self.assertTrue(get_cache_data.has_header('ETag'))
+        # Check that we can disable etags
+        with self.settings(USE_ETAGS=False):
+            request._cache_update_cache = True
+            set_cache(request, 'en', en_message)
+            get_cache_data = FetchFromCacheMiddleware().process_request(request)
+            self.assertFalse(get_cache_data.has_header('ETag'))
         # change the session language and set content
         request = self.factory.get(self.path)
         request._cache_update_cache = True
@@ -2238,6 +2247,26 @@ class TestWithTemplateResponse(SimpleTestCase):
             'views.decorators.cache.cache_page.settingsprefix.GET.'
             '0f1c2d56633c943073c4569d9a9502fe.d41d8cd98f00b204e9800998ecf8427e'
         )
+
+    @override_settings(USE_ETAGS=False)
+    def test_without_etag(self):
+        template = engines['django'].from_string("This is a test")
+        response = TemplateResponse(HttpRequest(), template)
+        self.assertFalse(response.has_header('ETag'))
+        patch_response_headers(response)
+        self.assertFalse(response.has_header('ETag'))
+        response = response.render()
+        self.assertFalse(response.has_header('ETag'))
+
+    @override_settings(USE_ETAGS=True)
+    def test_with_etag(self):
+        template = engines['django'].from_string("This is a test")
+        response = TemplateResponse(HttpRequest(), template)
+        self.assertFalse(response.has_header('ETag'))
+        patch_response_headers(response)
+        self.assertFalse(response.has_header('ETag'))
+        response = response.render()
+        self.assertTrue(response.has_header('ETag'))
 
 
 class TestMakeTemplateFragmentKey(SimpleTestCase):
