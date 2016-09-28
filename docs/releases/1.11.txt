@@ -539,6 +539,12 @@ Miscellaneous
   :rfc:`7232` Conditional Requests specification rather than the older
   :rfc:`2616`.
 
+* ``patch_response_headers`` does not generate `Last-Modified` header now.
+  According to the :rfc:`7234` (Section 4.2.2) this header is useless along
+  with other HTTP-caching headers which provide explicit response cache
+  expiration time, e.g. `Expires` or `Cache-Control`. ``UpdateCacheMiddleware``
+  and ``add_never_cache_headers`` also affected by this behavior.
+
 * In the admin templates, ``<p class="help">`` is replaced with a ``<div>`` tag
   to allow including lists inside help text.
 
