@@ -1691,7 +1691,25 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. class:: UserCreationForm
 
-    A form for creating a new user.
+    A ``django.forms.ModelForm`` for creating a new user.
+
+    **Fields:**
+
+    * ``username``:
+
+    * ``password1``:
+
+    * ``password2``:
+
+    The form verifies that the username is unique and the password entered
+    matches in password1 and password2.
+
+    Because ``UserCreationForm`` extends ``django.forms.ModelForm`` it
+    is also possible to use, override and access member properties and methods
+    from the super-class.
+
+    UserCreationForm can also be passed as ``form_class`` for class based views
+    such as the ``django.views.generic.CreateView``
 
 .. currentmodule:: django.contrib.auth
 

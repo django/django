@@ -832,7 +832,11 @@ Finally, the following forms are tied to
 :class:`~django.contrib.auth.models.User` and need to be rewritten or extended
 to work with a custom user model:
 
-* :class:`~django.contrib.auth.forms.UserCreationForm`
+* :class:`~django.contrib.auth.forms.UserCreationForm`:
+
+  See the :class:`full API documentation <django.contrib.auth.forms.UserCreationForm>` for
+  full reference.
+
 * :class:`~django.contrib.auth.forms.UserChangeForm`
 
 If your custom user model is a simple subclass of ``AbstractUser``, then you
