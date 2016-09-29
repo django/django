@@ -257,7 +257,7 @@ Methods
         behind multiple proxies. One solution is to use middleware to rewrite
         the proxy headers, as in the following example::
 
-            from django.django.utils.deprecation import MiddlewareMixin
+            from django.utils.deprecation import MiddlewareMixin
 
             class MultipleProxyMiddleware(MiddlewareMixin):
                 FORWARDED_FOR_FIELDS = [
