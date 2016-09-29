@@ -564,6 +564,11 @@ directory. After making changes to the messages files you need to compile them
 with :djadmin:`compilemessages` for use with the builtin gettext support. See
 the :ref:`i18n documentation <how-to-create-language-files>` for details.
 
+This command doesn't require configured settings. However, when settings aren't
+configured, the command can't ignore the :setting:`MEDIA_ROOT` and
+:setting:`STATIC_ROOT` directories or include :setting:`LOCALE_PATHS`. It will
+also write files in UTF-8 rather than in :setting:`FILE_CHARSET`.
+
 .. django-admin-option:: --all, -a
 
 Updates the message files for all available languages.

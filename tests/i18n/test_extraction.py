@@ -9,6 +9,8 @@ import time
 import warnings
 from unittest import skipUnless
 
+from admin_scripts.tests import AdminScriptTestCase
+
 from django.core import management
 from django.core.management import execute_from_command_line
 from django.core.management.base import CommandError
@@ -713,3 +715,10 @@ class CustomLayoutExtractionTests(ExtractorTests):
             with open(app_de_locale, 'r') as fp:
                 po_contents = force_text(fp.read())
                 self.assertMsgId('This app has a locale directory', po_contents)
+
+
+class NoSettingsExtractionTests(AdminScriptTestCase):
+    def test_makemessages_no_settings(self):
+        out, err = self.run_django_admin(['makemessages', '-l', 'en', '-v', '0'])
+        self.assertNoOutput(err)
+        self.assertNoOutput(out)

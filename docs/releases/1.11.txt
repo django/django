@@ -515,9 +515,6 @@ Miscellaneous
   called a second time before calling
   :func:`~django.test.utils.teardown_test_environment`.
 
-* The :djadmin:`makemessages` command now requires configured settings, like
-  most other commands.
-
 * The undocumented ``DateTimeAwareJSONEncoder`` alias for
   :class:`~django.core.serializers.json.DjangoJSONEncoder` (renamed in Django
   1.0) is removed.

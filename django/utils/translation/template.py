@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import re
 import warnings
 
-from django.conf import settings
 from django.template.base import (
     TOKEN_BLOCK, TOKEN_COMMENT, TOKEN_TEXT, TOKEN_VAR, TRANSLATOR_COMMENT_MARK,
     Lexer,
@@ -40,13 +39,13 @@ plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
 
 
-def templatize(src, origin=None):
+def templatize(src, origin=None, charset='utf-8'):
     """
     Turn a Django template into something that is understood by xgettext. It
     does so by translating the Django translation tags into standard gettext
     function invocations.
     """
-    src = force_text(src, settings.FILE_CHARSET)
+    src = force_text(src, charset)
     out = StringIO('')
     message_context = None
     intrans = False
