@@ -476,8 +476,11 @@ class SQLCompiler(object):
         Used when nesting this query inside another.
         """
         obj = self.query.clone()
-        if obj.low_mark == 0 and obj.high_mark is None and not self.query.distinct_fields:
-            # If there is no slicing in use, then we can safely drop all ordering
+        # It's safe to drop ordering if the queryset isn't using slicing,
+        # distinct(*fields) or select_for_update().
+        if (obj.low_mark == 0 and obj.high_mark is None and
+                not self.query.distinct_fields and
+                not self.query.select_for_update):
             obj.clear_ordering(True)
         nested_sql = obj.get_compiler(connection=self.connection).as_sql(subquery=True)
         if nested_sql == ('', ()):
