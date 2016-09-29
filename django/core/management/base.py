@@ -303,7 +303,12 @@ class BaseCommand(object):
                 self.stderr.write('%s: %s' % (e.__class__.__name__, e))
             sys.exit(1)
         finally:
-            connections.close_all()
+            try:
+                connections.close_all()
+            except ImproperlyConfigured:
+                # Ignore if connections aren't setup at this point (e.g. no
+                # configured settings).
+                pass
 
     def execute(self, *args, **options):
         """
