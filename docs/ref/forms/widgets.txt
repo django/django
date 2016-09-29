@@ -280,10 +280,11 @@ foundation for custom widgets.
         The method's result affects whether or not a field in a model form
         :ref:`falls back to its default <topics-modelform-save>`.
 
-        A special case is :class:`~django.forms.CheckboxInput`, which always
-        returns ``False`` because an unchecked checkbox doesn't appear in the
-        data of an HTML form submission, so it's unknown whether or not the
-        user actually submitted a value.
+        Special cases are :class:`~django.forms.CheckboxInput` and
+        :class:`~django.forms.CheckboxSelectMultiple`, which always return
+        ``False`` because an unchecked checkbox doesn't appear in the data of
+        an HTML form submission, so it's unknown whether or not the user
+        actually submitted a value.
 
 ``MultiWidget``
 ---------------

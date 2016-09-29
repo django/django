@@ -601,6 +601,22 @@ class ModelFormBaseTest(TestCase):
         self.assertIsInstance(mf1.fields['active'].widget, forms.CheckboxInput)
         self.assertIs(m1._meta.get_field('active').get_default(), True)
 
+    def test_default_not_populated_on_checkboxselectmultiple(self):
+        class PubForm(forms.ModelForm):
+            mode = forms.CharField(required=False, widget=forms.CheckboxSelectMultiple)
+
+            class Meta:
+                model = PublicationDefaults
+                fields = ('mode',)
+
+        # Empty data doesn't use the model default because an unchecked
+        # CheckboxSelectMultiple doesn't have a value in HTML form submission.
+        mf1 = PubForm({})
+        self.assertEqual(mf1.errors, {})
+        m1 = mf1.save(commit=False)
+        self.assertEqual(m1.mode, '')
+        self.assertEqual(m1._meta.get_field('mode').get_default(), 'di')
+
     def test_prefixed_form_with_default_field(self):
         class PubForm(forms.ModelForm):
             prefix = 'form-prefix'
@@ -651,7 +667,7 @@ class ModelFormBaseTest(TestCase):
         m2 = mf2.save(commit=False)
         self.assertEqual(m2.file.name, 'name')
 
-    def test_selectdatewidget(self):
+    def test_default_selectdatewidget(self):
         class PubForm(forms.ModelForm):
             date_published = forms.DateField(required=False, widget=forms.SelectDateWidget)
 
