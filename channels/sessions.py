@@ -183,3 +183,27 @@ def http_session(func):
             session.save()
         return result
     return inner
+
+
+def channel_and_http_session(func):
+    """
+    Enables both the channel_session and http_session.
+
+    Stores the http session key in the channel_session on websocket.connect messages.
+    It will then hydrate the http_session from that same key on subsequent messages.
+    """
+    @http_session
+    @channel_session
+    @functools.wraps(func)
+    def inner(message, *args, **kwargs):
+        # Store the session key in channel_session
+        if message.http_session is not None and settings.SESSION_COOKIE_NAME not in message.channel_session:
+            message.channel_session[settings.SESSION_COOKIE_NAME] = message.http_session.session_key
+        # Hydrate the http_session from session_key
+        elif message.http_session is None and settings.SESSION_COOKIE_NAME in message.channel_session:
+            session_engine = import_module(settings.SESSION_ENGINE)
+            session = session_engine.SessionStore(session_key=message.channel_session[settings.SESSION_COOKIE_NAME])
+            message.http_session = session
+        # Run the consumer
+        return func(message, *args, **kwargs)
+    return inner
