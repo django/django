@@ -148,8 +148,8 @@ See :doc:`/howto/static-files/index` for more information.
 ----------------------------------------------
 
 Media files are uploaded by your users. They're untrusted! Make sure your web
-server never attempt to interpret them. For instance, if a user uploads a
-``.php`` file , the web server shouldn't execute it.
+server never attempts to interpret them. For instance, if a user uploads a
+``.php`` file, the web server shouldn't execute it.
 
 Now is a good time to check your backup strategy for these files.
 
