@@ -835,9 +835,9 @@ to work with a custom user model:
 * :class:`~django.contrib.auth.forms.UserCreationForm`: an extension of django.forms.ModelForm
   The primary attributes of the class are:
   
-  * :attr:`~django.contrib.auth.forms.UserCreationForm.username`
-  * :attr:`~django.contrib.auth.forms.UserCreationForm.password1`
-  * :attr:`~django.contrib.auth.forms.UserCreationForm.password2`
+  * `~django.contrib.auth.forms.UserCreationForm.username`
+  * `~django.contrib.auth.forms.UserCreationForm.password1`
+  * `~django.contrib.auth.forms.UserCreationForm.password2`
   
   See the :class:`full API documentation <django.contrib.auth.forms.UserCreationForm>` for
   full reference, the documentation that follows is more task oriented.
