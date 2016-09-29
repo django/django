@@ -327,6 +327,12 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             qs = qs.order_by(*ordering)
         return qs
 
+    def get_exclude(self, request, obj=None):
+        """
+        Hook for specifying exclude.
+        """
+        return self.exclude
+
     def lookup_allowed(self, lookup, value):
         from django.contrib.admin.filters import SimpleListFilter
 
@@ -606,13 +612,15 @@ class ModelAdmin(BaseModelAdmin):
             fields = kwargs.pop('fields')
         else:
             fields = flatten_fieldsets(self.get_fieldsets(request, obj))
-        if self.exclude is None:
+        excluded = self.get_exclude(request, obj)
+        if excluded is None:
             exclude = []
         else:
-            exclude = list(self.exclude)
+            exclude = list(excluded)
         readonly_fields = self.get_readonly_fields(request, obj)
         exclude.extend(readonly_fields)
-        if self.exclude is None and hasattr(self.form, '_meta') and self.form._meta.exclude:
+        if (excluded is None and
+                hasattr(self.form, '_meta') and self.form._meta.exclude):
             # Take the custom ModelForm's Meta.exclude into account only if the
             # ModelAdmin doesn't define its own.
             exclude.extend(self.form._meta.exclude)
@@ -1885,12 +1893,14 @@ class InlineModelAdmin(BaseModelAdmin):
             fields = kwargs.pop('fields')
         else:
             fields = flatten_fieldsets(self.get_fieldsets(request, obj))
-        if self.exclude is None:
+        excluded = self.get_exclude(request, obj)
+        if excluded is None:
             exclude = []
         else:
-            exclude = list(self.exclude)
+            exclude = list(excluded)
         exclude.extend(self.get_readonly_fields(request, obj))
-        if self.exclude is None and hasattr(self.form, '_meta') and self.form._meta.exclude:
+        if (excluded is None and
+                hasattr(self.form, '_meta') and self.form._meta.exclude):
             # Take the custom ModelForm's Meta.exclude into account only if the
             # InlineModelAdmin doesn't define its own.
             exclude.extend(self.form._meta.exclude)

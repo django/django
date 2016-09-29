@@ -50,6 +50,7 @@ class ModelAdminTests(TestCase):
         self.assertEqual(list(ma.get_form(request).base_fields), ['name', 'bio', 'sign_date'])
         self.assertEqual(list(ma.get_fields(request)), ['name', 'bio', 'sign_date'])
         self.assertEqual(list(ma.get_fields(request, self.band)), ['name', 'bio', 'sign_date'])
+        self.assertIsNone(ma.get_exclude(request, self.band))
 
     def test_default_fieldsets(self):
         # fieldsets_add and fieldsets_change should return a special data structure that
@@ -275,6 +276,43 @@ class ModelAdminTests(TestCase):
         self.assertEqual(
             list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ['main_band', 'opening_band', 'day', 'id', 'DELETE']
+        )
+
+    def test_overriding_get_exclude(self):
+        # Using `get_exclude`.
+        class BandAdmin(ModelAdmin):
+            def get_exclude(self, request, obj=None):
+                return ['name']
+
+        self.assertEqual(
+            list(BandAdmin(Band, self.site).get_form(request).base_fields),
+            ['bio', 'sign_date']
+        )
+
+        # Using `exclude` and `get_exclude`.
+        class BandAdmin(ModelAdmin):
+            exclude = ['bio']
+
+            def get_exclude(self, request, obj=None):
+                return ['name']
+
+        self.assertEqual(
+            list(BandAdmin(Band, self.site).get_form(request).base_fields),
+            ['bio', 'sign_date']
+        )
+
+        # Using `exclude` and `get_exclude` with obj.
+        class BandAdmin(ModelAdmin):
+            exclude = ['bio']
+
+            def get_exclude(self, request, obj=None):
+                if obj:
+                    return ['sign_date']
+                return ['name']
+
+        self.assertEqual(
+            list(BandAdmin(Band, self.site).get_form(request, self.band).base_fields),
+            ['name', 'bio']
         )
 
     def test_custom_form_validation(self):
