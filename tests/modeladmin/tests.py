@@ -52,6 +52,7 @@ class ModelAdminTests(TestCase):
         self.assertEqual(list(ma.get_form(request).base_fields), ['name', 'bio', 'sign_date'])
         self.assertEqual(list(ma.get_fields(request)), ['name', 'bio', 'sign_date'])
         self.assertEqual(list(ma.get_fields(request, self.band)), ['name', 'bio', 'sign_date'])
+        self.assertIsNone(ma.get_exclude(request, self.band))
 
     def test_default_fieldsets(self):
         # fieldsets_add and fieldsets_change should return a special data structure that
@@ -279,6 +280,40 @@ class ModelAdminTests(TestCase):
             ['main_band', 'opening_band', 'day', 'id', 'DELETE']
         )
 
+    def test_overriding_get_exclude(self):
+        class BandAdmin(ModelAdmin):
+            def get_exclude(self, request, obj=None):
+                return ['name']
+
+        self.assertEqual(
+            list(BandAdmin(Band, self.site).get_form(request).base_fields),
+            ['bio', 'sign_date']
+        )
+
+    def test_get_exclude_overrides_exclude(self):
+        class BandAdmin(ModelAdmin):
+            exclude = ['bio']
+
+            def get_exclude(self, request, obj=None):
+                return ['name']
+
+        self.assertEqual(
+            list(BandAdmin(Band, self.site).get_form(request).base_fields),
+            ['bio', 'sign_date']
+        )
+
+    def test_get_exclude_takes_obj(self):
+        class BandAdmin(ModelAdmin):
+            def get_exclude(self, request, obj=None):
+                if obj:
+                    return ['sign_date']
+                return ['name']
+
+        self.assertEqual(
+            list(BandAdmin(Band, self.site).get_form(request, self.band).base_fields),
+            ['name', 'bio']
+        )
+
     def test_custom_form_validation(self):
         # If we specify a form, it should use it allowing custom validation to work
         # properly. This won't, however, break any of the admin widgets or media.
@@ -345,6 +380,52 @@ class ModelAdminTests(TestCase):
         self.assertEqual(
             list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ['main_band', 'day', 'transport', 'id', 'DELETE'])
+
+    def test_formset_overriding_get_exclude_with_form_fields(self):
+        class AdminConcertForm(forms.ModelForm):
+            class Meta:
+                model = Concert
+                fields = ['main_band', 'opening_band', 'day', 'transport']
+
+        class ConcertInline(TabularInline):
+            form = AdminConcertForm
+            fk_name = 'main_band'
+            model = Concert
+
+            def get_exclude(self, request, obj=None):
+                return ['opening_band']
+
+        class BandAdmin(ModelAdmin):
+            inlines = [ConcertInline]
+
+        ma = BandAdmin(Band, self.site)
+        self.assertEqual(
+            list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
+            ['main_band', 'day', 'transport', 'id', 'DELETE']
+        )
+
+    def test_formset_overriding_get_exclude_with_form_exclude(self):
+        class AdminConcertForm(forms.ModelForm):
+            class Meta:
+                model = Concert
+                exclude = ['day']
+
+        class ConcertInline(TabularInline):
+            form = AdminConcertForm
+            fk_name = 'main_band'
+            model = Concert
+
+            def get_exclude(self, request, obj=None):
+                return ['opening_band']
+
+        class BandAdmin(ModelAdmin):
+            inlines = [ConcertInline]
+
+        ma = BandAdmin(Band, self.site)
+        self.assertEqual(
+            list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
+            ['main_band', 'day', 'transport', 'id', 'DELETE']
+        )
 
     def test_queryset_override(self):
         # If we need to override the queryset of a ModelChoiceField in our custom form

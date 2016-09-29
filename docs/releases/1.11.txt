@@ -68,6 +68,10 @@ Minor features
 
 * :attr:`.ModelAdmin.date_hierarchy` can now reference fields across relations.
 
+* The new :meth:`ModelAdmin.get_exclude()
+  <django.contrib.admin.ModelAdmin.get_exclude>` hook allows specifying the
+  exclude fields based on the request or model instance.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -1459,6 +1459,14 @@ templates used by the :class:`ModelAdmin` views:
     names on the changelist that will be linked to the change view, as described
     in the :attr:`ModelAdmin.list_display_links` section.
 
+.. method:: ModelAdmin.get_exclude(request, obj=None)
+
+    .. versionadded:: 1.11
+
+    The ``get_exclude`` method is given the ``HttpRequest`` and the ``obj``
+    being edited (or ``None`` on an add form) and is expected to return a list
+    of fields, as described in :attr:`ModelAdmin.exclude`.
+
 .. method:: ModelAdmin.get_fields(request, obj=None)
 
     The ``get_fields`` method is given the ``HttpRequest`` and the ``obj``
