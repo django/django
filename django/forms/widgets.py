@@ -810,6 +810,7 @@ class RadioSelect(RendererMixin, Select):
 
 class CheckboxSelectMultiple(RendererMixin, SelectMultiple):
     renderer = CheckboxFieldRenderer
+    dont_use_model_field_default_for_empty_data = True
     _empty_value = []
 
     def use_required_attribute(self, initial):
