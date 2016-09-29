@@ -78,3 +78,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             cursor.execute('SELECT @@SQL_AUTO_IS_NULL')
             result = cursor.fetchone()
             return result and result[0] == 1
+
+    @cached_property
+    def supports_transactions(self):
+        """
+        All storage engines except MyISAM support transactions.
+        """
+        return self._mysql_storage_engine != 'MyISAM'
