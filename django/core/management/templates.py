@@ -11,6 +11,7 @@ import tempfile
 from os import path
 
 import django
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import handle_extensions
 from django.template import Context, Engine
@@ -119,9 +120,9 @@ class TemplateCommand(BaseCommand):
         }), autoescape=False)
 
         # Setup a stub settings environment for template rendering
-        from django.conf import settings
         if not settings.configured:
             settings.configure()
+            django.setup()
 
         template_dir = self.handle_template(options['template'],
                                             base_subdir)

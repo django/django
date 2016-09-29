@@ -306,19 +306,10 @@ class ManagementUtility(object):
         except CommandError:
             pass  # Ignore any option errors at this point.
 
-        no_settings_commands = [
-            'help', 'version', '--help', '--version', '-h',
-            'startapp', 'startproject', 'compilemessages',
-        ]
-
         try:
             settings.INSTALLED_APPS
         except ImproperlyConfigured as exc:
             self.settings_exception = exc
-            # A handful of built-in management commands work without settings.
-            # Load the default settings -- where INSTALLED_APPS is empty.
-            if subcommand in no_settings_commands:
-                settings.configure()
 
         if settings.configured:
             # Start the auto-reloading dev server even if the code is broken.
