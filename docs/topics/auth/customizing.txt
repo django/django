@@ -832,7 +832,16 @@ Finally, the following forms are tied to
 :class:`~django.contrib.auth.models.User` and need to be rewritten or extended
 to work with a custom user model:
 
-* :class:`~django.contrib.auth.forms.UserCreationForm`
+* :class:`~django.contrib.auth.forms.UserCreationForm`: an extension of django.forms.ModelForm
+  The primary attributes of the class are:
+  
+  * :attr:`~django.contrib.auth.forms.UserCreationForm.username`
+  * :attr:`~django.contrib.auth.forms.UserCreationForm.password1`
+  * :attr:`~django.contrib.auth.forms.UserCreationForm.password2`
+  
+  See the :class:`full API documentation <django.contrib.auth.forms.UserCreationForm>` for
+  full reference, the documentation that follows is more task oriented.
+
 * :class:`~django.contrib.auth.forms.UserChangeForm`
 
 If your custom user model is a simple subclass of ``AbstractUser``, then you
@@ -845,7 +854,7 @@ can extend these forms in this manner::
 
         class Meta(UserCreationForm.Meta):
             model = CustomUser
-            fields = UserCreationForm.Meta.fields + ('custom_field',)
+            fields = UserCreationForm.Meta.fields + ('custom_field',) 
 
 Custom users and :mod:`django.contrib.admin`
 --------------------------------------------
