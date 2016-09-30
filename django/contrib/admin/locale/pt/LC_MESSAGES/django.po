@@ -144,6 +144,7 @@ msgstr "Adicionado."
 msgid "and"
 msgstr "e"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr ""
 

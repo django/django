@@ -4,13 +4,14 @@
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mail6543210 <mail6543210@yahoo.com.tw>, 2013
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-09-03 06:25+0000\n"
-"Last-Translator: Chen Chun-Chia <ccc.larc@gmail.com>\n"
+"PO-Revision-Date: 2016-08-19 08:03+0000\n"
+"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +21,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Sites"
-msgstr "Sites"
+msgstr "網站"
 
 msgid "The domain name cannot contain any spaces or tabs."
 msgstr "網域名稱不能包含空格或定位字元。"

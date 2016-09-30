@@ -3,7 +3,7 @@
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # Carlos E C Leite <caduado@gmail.com>, 2016
-# FilipeCifali <cifali.filipe@gmail.com>, 2016
+# Filipe Cifali <cifali.filipe@gmail.com>, 2016
 # Claudemiro Alves Feitosa Neto <dimiro1@gmail.com>, 2015
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # dudanogueira <dudanogueira@gmail.com>, 2014

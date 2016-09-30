@@ -6,7 +6,7 @@
 # Antoni Aloy <aaloy@apsl.net>, 2011-2014
 # Diego Andres Sanabria Martin <diegueus9@gmail.com>, 2012
 # Diego Schulz <dschulz@gmail.com>, 2012
-# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
+# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015-2016
 # Ernesto Avilés Vázquez <whippiii@gmail.com>, 2014
 # franchukelly <inactive+franchukelly@transifex.com>, 2011
 # Igor Támara <igor@tamarapatino.org>, 2015
@@ -26,8 +26,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-08-03 15:35+0000\n"
+"Last-Translator: Ernesto Avilés Vázquez <whippiii@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -79,7 +79,7 @@ msgid "German"
 msgstr "Alemán"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "Bajo sorbio"
 
 msgid "Greek"
 msgstr "Griego"
@@ -151,7 +151,7 @@ msgid "Croatian"
 msgstr "Croata"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "Alto sorbio"
 
 msgid "Hungarian"
 msgstr "Húngaro"
@@ -214,7 +214,7 @@ msgid "Burmese"
 msgstr "Birmano"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "Bokmål noruego"
 
 msgid "Nepali"
 msgstr "Nepalí"
@@ -615,11 +615,11 @@ msgstr "Relación uno-a-uno"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "relación %(from)s-%(to)s"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "relaciones %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Relación muchos-a-muchos"

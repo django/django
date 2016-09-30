@@ -3,13 +3,14 @@
 # Translators:
 # Lele Long <schemacs@gmail.com>, 2015
 # Liping Wang <lynn.config@gmail.com>, 2016
+# Liping Wang <lynn.config@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 09:52+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-09-20 02:20+0000\n"
+"Last-Translator: Liping Wang <lynn.config@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -45,7 +46,7 @@ msgid "Could not load JSON data."
 msgstr "不能加载JSON数据。"
 
 msgid "Input must be a JSON dictionary."
-msgstr ""
+msgstr "输入必须是JSON字典。"
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."

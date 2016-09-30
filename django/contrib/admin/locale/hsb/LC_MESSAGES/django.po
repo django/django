@@ -141,6 +141,7 @@ msgstr "Přidaty."
 msgid "and"
 msgstr "a"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr "{fields} za {name} „{object}“ su so změnili."
 
