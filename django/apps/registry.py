@@ -77,7 +77,7 @@ class Apps(object):
             if self.app_configs:
                 raise RuntimeError("populate() isn't reentrant")
 
-            # Load app configs and app modules.
+            # Phase 1: initialize app configs and import app modules.
             for entry in installed_apps:
                 if isinstance(entry, AppConfig):
                     app_config = entry
@@ -103,15 +103,15 @@ class Apps(object):
 
             self.apps_ready = True
 
-            # Load models.
+            # Phase 2: import models modules.
             for app_config in self.app_configs.values():
-                all_models = self.all_models[app_config.label]
-                app_config.import_models(all_models)
+                app_config.import_models()
 
             self.clear_cache()
 
             self.models_ready = True
 
+            # Phase 3: run ready() methods of app configs.
             for app_config in self.get_app_configs():
                 app_config.ready()
 
