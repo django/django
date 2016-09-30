@@ -242,9 +242,9 @@ running ``migrate``::
         1005, "Can't create table '\\db_name\\.#sql-4a8_ab' (errno: 150)"
     )
 
-.. _storage engines: https://dev.mysql.com/doc/refman/5.6/en/storage-engines.html
-.. _MyISAM: https://dev.mysql.com/doc/refman/5.6/en/myisam-storage-engine.html
-.. _InnoDB: https://dev.mysql.com/doc/refman/5.6/en/innodb-storage-engine.html
+.. _storage engines: https://dev.mysql.com/doc/refman/en/storage-engines.html
+.. _MyISAM: https://dev.mysql.com/doc/refman/en/myisam-storage-engine.html
+.. _InnoDB: https://dev.mysql.com/doc/refman/en/innodb-storage-engine.html
 
 .. [#] Unless this was changed by the packager of your MySQL package. We've
    had reports that the Windows Community Server installer sets up InnoDB as
@@ -323,7 +323,7 @@ If you plan on using Django's :doc:`timezone support </topics/i18n/timezones>`,
 use `mysql_tzinfo_to_sql`_ to load time zone tables into the MySQL database.
 This needs to be done just once for your MySQL server, not per database.
 
-.. _mysql_tzinfo_to_sql: https://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
+.. _mysql_tzinfo_to_sql: https://dev.mysql.com/doc/refman/en/mysql-tzinfo-to-sql.html
 
 Creating your database
 ----------------------
@@ -334,7 +334,7 @@ You can `create your database`_ using the command-line tools and this SQL::
 
 This ensures all tables and columns will use UTF-8 by default.
 
-.. _create your database: https://dev.mysql.com/doc/refman/5.6/en/create-database.html
+.. _create your database: https://dev.mysql.com/doc/refman/en/create-database.html
 
 .. _mysql-collation:
 
@@ -348,7 +348,7 @@ the MySQL documentation. In all cases, you set the collation by directly
 manipulating the database tables; Django doesn't provide a way to set this on
 the model definition.
 
-.. _documented thoroughly: https://dev.mysql.com/doc/refman/5.6/en/charset.html
+.. _documented thoroughly: https://dev.mysql.com/doc/refman/en/charset.html
 
 By default, with a UTF-8 database, MySQL will use the
 ``utf8_general_ci`` collation. This results in all string equality
@@ -404,7 +404,7 @@ you should use ``utf8_general_ci`` because it is faster. If this is not acceptab
 (for example, if you require German dictionary order), use ``utf8_unicode_ci``
 because it is more accurate.
 
-.. _MySQL Unicode Character Sets: https://dev.mysql.com/doc/refman/5.7/en/charset-unicode-sets.html
+.. _MySQL Unicode Character Sets: https://dev.mysql.com/doc/refman/en/charset-unicode-sets.html
 
 .. warning::
 
@@ -453,7 +453,7 @@ Several other MySQLdb connection options may be useful, such as ``ssl``,
 ``init_command``, and ``sql_mode``. Consult the `MySQLdb documentation`_ for
 more details.
 
-.. _MySQL option file: https://dev.mysql.com/doc/refman/5.6/en/option-files.html
+.. _MySQL option file: https://dev.mysql.com/doc/refman/en/option-files.html
 .. _MySQLdb documentation: http://mysql-python.sourceforge.net/
 
 .. _mysql-sql-mode:
@@ -467,7 +467,7 @@ warnings into errors when data are truncated upon insertion, so Django highly
 recommends activating a `strict mode`_ for MySQL to prevent data loss (either
 ``STRICT_TRANS_TABLES`` or ``STRICT_ALL_TABLES``).
 
-.. _strict mode: https://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sql-mode-strict
+.. _strict mode: https://dev.mysql.com/doc/refman/en/sql-mode.html#sql-mode-strict
 
 If you need to customize the SQL mode, you can set the ``sql_mode`` variable
 like other MySQL options: either in a config file or with the entry
