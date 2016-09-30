@@ -153,13 +153,16 @@ class GISFunctionsTests(TestCase):
 
     @skipUnlessDBFeature("has_BoundingCircle_function")
     def test_bounding_circle(self):
+        # The weak precision in the assertions is because the BoundingCircle
+        # calculation changed on PostGIS 2.3.
         qs = Country.objects.annotate(circle=functions.BoundingCircle('mpoly')).order_by('name')
-        self.assertAlmostEqual(qs[0].circle.area, 168.89, 2)
-        self.assertAlmostEqual(qs[1].circle.area, 135.95, 2)
+        self.assertAlmostEqual(qs[0].circle.area, 169, 0)
+        self.assertAlmostEqual(qs[1].circle.area, 136, 0)
 
         qs = Country.objects.annotate(circle=functions.BoundingCircle('mpoly', num_seg=12)).order_by('name')
-        self.assertAlmostEqual(qs[0].circle.area, 168.44, 2)
-        self.assertAlmostEqual(qs[1].circle.area, 135.59, 2)
+        self.assertGreater(qs[0].circle.area, 168.4, 0)
+        self.assertLess(qs[0].circle.area, 169.5, 0)
+        self.assertAlmostEqual(qs[1].circle.area, 136, 0)
 
     @skipUnlessDBFeature("has_Centroid_function")
     def test_centroid(self):
