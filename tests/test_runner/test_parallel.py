@@ -10,6 +10,18 @@ except ImportError:
     tblib = None
 
 
+class ErrorThatFailsUnpickling(Exception):
+    """
+    This exception class will fail unpickling both on 2.x and 3.x although with
+    slightly different error messages. Both errors relate to incorrect
+    arguments passed to __init__.
+    """
+    def __init__(self, arg1, arg2):
+        self.arg1 = arg1
+        self.arg2 = arg2
+        super(ErrorThatFailsUnpickling, self).__init__('Message with %s and %s')
+
+
 class ParallelTestRunnerTest(SimpleTestCase):
     """
     End-to-end tests of the parallel test runner.
@@ -43,6 +55,16 @@ class SampleFailingSubtest(SimpleTestCase):
 
 
 class RemoteTestResultTest(SimpleTestCase):
+
+    def test_pickle_errors_detection(self):
+        picklable_error = RuntimeError('This is fine')
+        not_unpicklable_error = ErrorThatFailsUnpickling('one arg', 'another arg')
+
+        result = RemoteTestResult()
+        result._raise_when_not_picklable(picklable_error)
+
+        with self.assertRaisesMessage(TypeError, 'argument'):
+            result._raise_when_not_picklable(not_unpicklable_error)
 
     @unittest.skipUnless(six.PY3 and tblib is not None, 'requires tblib to be installed')
     def test_add_failing_subtests(self):
