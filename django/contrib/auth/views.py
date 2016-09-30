@@ -31,6 +31,8 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
+UserModel = get_user_model()
+
 
 def deprecate_current_app(func):
     """
@@ -320,7 +322,6 @@ def password_reset_confirm(request, uidb64=None, token=None,
     warnings.warn("The password_reset_confirm() view is superseded by the "
                   "class-based PasswordResetConfirmView().",
                   RemovedInDjango21Warning, stacklevel=2)
-    UserModel = get_user_model()
     assert uidb64 is not None and token is not None  # checked by URLconf
     if post_reset_redirect is None:
         post_reset_redirect = reverse('password_reset_complete')
@@ -453,7 +454,6 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
         return super(PasswordResetConfirmView, self).dispatch(*args, **kwargs)
 
     def get_user(self, uidb64):
-        UserModel = get_user_model()
         try:
             # urlsafe_base64_decode() decodes to bytestring on Python 3
             uid = force_text(urlsafe_base64_decode(uidb64))

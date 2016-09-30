@@ -125,6 +125,9 @@ Minor features
   Set :attr:`CustomUser.EMAIL_FIELD
   <django.contrib.auth.models.CustomUser.EMAIL_FIELD>` to the name of the field.
 
+* :func:`~django.contrib.auth.get_user_model` can now be called at import time,
+  even in modules that define models.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -487,9 +487,33 @@ different user model.
 
         post_save.connect(post_save_receiver, sender=settings.AUTH_USER_MODEL)
 
-    Generally speaking, you should reference the user model with the
-    :setting:`AUTH_USER_MODEL` setting in code that is executed at import
-    time. ``get_user_model()`` only works once Django has imported all models.
+    Generally speaking, it's easiest to refer to the user model with the
+    :setting:`AUTH_USER_MODEL` setting in code that's executed at import time,
+    however, it's also possible to call ``get_user_model()`` while Django
+    is importing models, so you could use
+    ``models.ForeignKey(get_user_model(), ...)``.
+
+    If your app is tested with multiple user models, using
+    ``@override_settings(AUTH_USER_MODEL=...)`` for example, and you cache the
+    result of ``get_user_model()`` in a module-level variable, you may need to
+    listen to the  :data:`~django.test.signals.setting_changed` signal to clear
+    the cache. For example::
+
+        from django.apps import apps
+        from django.contrib.auth import get_user_model
+        from django.core.signals import setting_changed
+        from django.dispatch import receiver
+
+        @receiver(setting_changed)
+        def user_model_swapped(**kwargs):
+            if kwargs['setting'] == 'AUTH_USER_MODEL':
+                apps.clear_cache()
+                from myapp import some_module
+                some_module.UserModel = get_user_model()
+
+    .. versionchanged:: 1.11
+
+        The ability to call ``get_user_model()`` at import time was added.
 
 .. _specifying-custom-user-model:
 
