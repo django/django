@@ -554,6 +554,31 @@ Miscellaneous
 Features deprecated in 1.11
 ===========================
 
+``models.permalink()`` decorator
+--------------------------------
+
+Use :func:`django.urls.reverse` instead. For example::
+
+    from django.db import models
+
+    class MyModel(models.Model):
+        ...
+
+        @models.permalink
+        def url(self):
+            return ('guitarist_detail', [self.slug])
+
+becomes::
+
+    from django.db import models
+    from django.urls import reverse
+
+    class MyModel(models.Model):
+        ...
+
+        def url(self):
+            return reverse('guitarist_detail', args=[self.slug])
+
 Miscellaneous
 -------------
 

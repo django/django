@@ -41,6 +41,8 @@ details on these changes.
 * The ``authenticate()`` method of authentication backends will require a
   ``request`` argument.
 
+* The ``django.db.models.permalink()`` decorator will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0
