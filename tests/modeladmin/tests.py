@@ -4,11 +4,13 @@ from datetime import date
 
 from django import forms
 from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
+from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import (
     HORIZONTAL, VERTICAL, ModelAdmin, TabularInline,
 )
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
+from django.contrib.auth.models import User
 from django.core.checks import Error
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
@@ -532,6 +534,14 @@ class ModelAdminTests(TestCase):
             list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ['extra', 'transport', 'id', 'DELETE', 'main_band']
         )
+
+    def test_log_actions(self):
+        ma = ModelAdmin(Band, self.site)
+        mock_request = MockRequest()
+        mock_request.user = User.objects.create(username='bill')
+        self.assertEqual(ma.log_addition(mock_request, self.band, 'added'), LogEntry.objects.latest('action_time'))
+        self.assertEqual(ma.log_change(mock_request, self.band, 'changed'), LogEntry.objects.latest('action_time'))
+        self.assertEqual(ma.log_change(mock_request, self.band, 'deleted'), LogEntry.objects.latest('action_time'))
 
 
 class CheckTestCase(SimpleTestCase):
