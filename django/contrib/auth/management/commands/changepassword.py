@@ -10,6 +10,9 @@ from django.db import DEFAULT_DB_ALIAS
 from django.utils.encoding import force_str
 
 
+UserModel = get_user_model()
+
+
 class Command(BaseCommand):
     help = "Change a user's password for django.contrib.auth."
     requires_migrations_checks = True
@@ -37,8 +40,6 @@ class Command(BaseCommand):
             username = options['username']
         else:
             username = getpass.getuser()
-
-        UserModel = get_user_model()
 
         try:
             u = UserModel._default_manager.using(options['database']).get(**{

@@ -98,6 +98,9 @@ Minor features
   ``password_reset_confirm()``, and ``password_reset_complete()`` function-based
   views.
 
+* :func:`~django.contrib.auth.get_user_model` can be called at import time,
+  even in modules that define models.
+
 * The new ``post_reset_login`` attribute for
   :class:`~django.contrib.auth.views.PasswordResetConfirmView` allows
   automatically logging in a user after a successful password reset.
