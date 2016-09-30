@@ -18,10 +18,10 @@ Bugfixes
 * Disabled system check for URL patterns beginning with a '/' when
   ``APPEND_SLASH=False`` (:ticket:`27238`).
 
-* Fixed model form ``default`` fallback for ``MultiWidget``, ``FileInput``,
-  ``SplitDateTimeWidget``, ``SelectDateWidget``, and ``SplitArrayWidget``
-  (:ticket:`27186`). Custom widgets affected by this issue may need to
-  implement a :meth:`~django.forms.Widget.value_omitted_from_data` method.
+* Fixed model form ``default`` fallback for ``CheckboxSelectMultiple``,
+  ``MultiWidget``, ``FileInput``, ``SplitDateTimeWidget``, ``SelectDateWidget``,
+  and ``SplitArrayWidget`` (:ticket:`27186`). Custom widgets affected by this
+  issue should implement :meth:`~django.forms.Widget.value_omitted_from_data`.
 
 * Fixed a crash in ``runserver`` logging during a "Broken pipe" error
   (:ticket:`27271`).
