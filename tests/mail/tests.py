@@ -1449,9 +1449,6 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         finally:
             SMTP.send = send
 
-
-class SMTPNoServerTests(SimpleTestCase):
-
     def test_send_messages_after_open_failed(self):
         """
         send_messages() shouldn't try to send messages if open() raises an
@@ -1465,30 +1462,31 @@ class SMTPNoServerTests(SimpleTestCase):
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
         self.assertEqual(backend.send_messages([email]), None)
 
+
+class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
+    """
+    These tests require a separate class, because the FakeSMTPServer is shut
+    down in setUpClass(), and it cannot be restarted ("RuntimeError: threads
+    can only be started once").
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(SMTPBackendStoppedServerTests, cls).setUpClass()
+        cls.backend = smtp.EmailBackend(username='', password='')
+        cls.server.stop()
+
+    def test_server_stopped(self):
+        """
+        Closing the backend while the SMTP server is stopped doesn't raise an
+        exception.
+        """
+        self.backend.close()
+
     def test_fail_silently_on_connection_error(self):
         """
         A socket connection error is silenced with fail_silently=True.
         """
-        backend = smtp.EmailBackend(username='', password='')
         with self.assertRaises(socket.error):
-            backend.open()
-        backend.fail_silently = True
-        backend.open()
-
-
-class SMTPBackendStoppedServerTest(SMTPBackendTestsBase):
-    """
-    This test requires a separate class, because it shuts down the
-    FakeSMTPServer started in setUpClass(). It cannot be restarted
-    ("RuntimeError: threads can only be started once").
-    """
-
-    def test_server_stopped(self):
-        """
-        Test that closing the backend while the SMTP server is stopped doesn't
-        raise an exception.
-        """
-        backend = smtp.EmailBackend(username='', password='')
-        backend.open()
-        self.server.stop()
-        backend.close()
+            self.backend.open()
+        self.backend.fail_silently = True
+        self.backend.open()
