@@ -239,6 +239,10 @@ class StateApps(Apps):
         app_configs = [AppConfigStub(label) for label in sorted(real_apps + list(app_labels))]
         super(StateApps, self).__init__(app_configs)
 
+        # The lock gets in the way of copying as implemented in clone(), which
+        # is called whenever Django duplicates a StateApps before updating it.
+        self._lock = None
+
         self.render_multiple(list(models.values()) + self.real_models)
 
         # There shouldn't be any operations pending at this point.
@@ -293,6 +297,9 @@ class StateApps(Apps):
         clone = StateApps([], {})
         clone.all_models = copy.deepcopy(self.all_models)
         clone.app_configs = copy.deepcopy(self.app_configs)
+        # Set the pointer to the correct app registry.
+        for app_config in clone.app_configs.values():
+            app_config.apps = clone
         # No need to actually clone them, they'll never change
         clone.real_models = self.real_models
         return clone
@@ -301,6 +308,7 @@ class StateApps(Apps):
         self.all_models[app_label][model._meta.model_name] = model
         if app_label not in self.app_configs:
             self.app_configs[app_label] = AppConfigStub(app_label)
+            self.app_configs[app_label].apps = self
             self.app_configs[app_label].models = OrderedDict()
         self.app_configs[app_label].models[model._meta.model_name] = model
         self.do_pending_operations(model)
