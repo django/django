@@ -214,8 +214,8 @@ class AppConfigStub(AppConfig):
         # the app name, but we need something unique, and the label works fine.
         super(AppConfigStub, self).__init__(label, None)
 
-    def import_models(self, all_models):
-        self.models = all_models
+    def import_models(self):
+        self.models = self.apps.all_models[self.label]
 
 
 class StateApps(Apps):
