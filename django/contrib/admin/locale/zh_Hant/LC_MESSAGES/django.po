@@ -7,6 +7,7 @@
 # mail6543210 <mail6543210@yahoo.com.tw>, 2013-2014
 # ming hsien tzang <tzangms@gmail.com>, 2011
 # tcc <tcchou@tcchou.org>, 2011
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016
 # Yeh-Yung <yyc1217@gmail.com>, 2013
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
@@ -14,8 +15,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-08-19 07:27+0000\n"
+"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -40,7 +41,7 @@ msgid "Delete selected %(verbose_name_plural)s"
 msgstr "刪除所選的 %(verbose_name_plural)s"
 
 msgid "Administration"
-msgstr ""
+msgstr "管理"
 
 msgid "All"
 msgstr "全部"
@@ -70,10 +71,10 @@ msgid "This year"
 msgstr "今年"
 
 msgid "No date"
-msgstr ""
+msgstr "沒有日期"
 
 msgid "Has date"
-msgstr ""
+msgstr "有日期"
 
 #, python-format
 msgid ""
@@ -95,10 +96,10 @@ msgid "action time"
 msgstr "動作時間"
 
 msgid "user"
-msgstr ""
+msgstr "使用者"
 
 msgid "content type"
-msgstr ""
+msgstr "內容類型"
 
 msgid "object id"
 msgstr "物件 id"
@@ -137,30 +138,31 @@ msgstr "紀錄項目"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "{name} \"{object}\" 已新增。"
 
 msgid "Added."
-msgstr ""
+msgstr "已新增。"
 
 msgid "and"
 msgstr "和"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "{name} \"{object}\" 的 {fields} 已變更。"
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "{fields} 已變更。"
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "{name} \"{object}\" 已刪除。"
 
 msgid "No fields changed."
 msgstr "沒有欄位被變更。"
 
 msgid "None"
-msgstr "None"
+msgstr "無"
 
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
@@ -169,32 +171,32 @@ msgstr "按住 \"Control\" 或 \"Command\" (Mac)，可選取多個值"
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
+msgstr "{name} \"{obj}\" 新增成功。你可以在下面再次編輯它。"
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr ""
+msgstr "{name} \"{obj}\" 新增成功。你可以在下方加入其他 {name}。"
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" 已成功新增。"
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
+msgstr "{name} \"{obj}\" 變更成功。你可以在下方再次編輯。"
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
-msgstr ""
+msgstr "{name} \"{obj}\" 變更成功。你可以在下方加入其他 {name}。"
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" 已成功變更。"
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -269,7 +271,7 @@ msgstr "登入"
 
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "%(app)s 管理"
 
 msgid "Page not found"
 msgstr "頁面沒有找到"
@@ -337,7 +339,7 @@ msgid "Welcome,"
 msgstr "歡迎，"
 
 msgid "View site"
-msgstr ""
+msgstr "檢視網站"
 
 msgid "Documentation"
 msgstr "文件"
@@ -453,10 +455,10 @@ msgid "You don't have permission to edit anything."
 msgstr "你沒有編輯任何東西的權限。"
 
 msgid "Recent actions"
-msgstr ""
+msgstr "最近的動作"
 
 msgid "My actions"
-msgstr ""
+msgstr "我的動作"
 
 msgid "None available"
 msgstr "無可用的"
@@ -477,6 +479,7 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"您已認證為 %(username)s，但並沒有瀏覽此頁面的權限。您是否希望以其他帳號登入？"
 
 msgid "Forgotten your password or username?"
 msgstr "忘了你的密碼或是使用者名稱？"
@@ -502,7 +505,7 @@ msgid "Save"
 msgstr "儲存"
 
 msgid "Popup closing..."
-msgstr ""
+msgstr "關閉彈出視窗中⋯⋯"
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -588,6 +591,8 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"若您提交的電子郵件地址存在對應帳號，我們已寄出重設密碼的相關指示。您應該很快"
+"就會收到。"
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "

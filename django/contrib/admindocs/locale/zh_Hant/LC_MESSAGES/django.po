@@ -5,14 +5,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mail6543210 <mail6543210@yahoo.com.tw>, 2013
 # quantum9876 <quantum9876@gmail.com>, 2011
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:51+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-08-30 09:33+0000\n"
+"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -22,7 +23,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "管理文件"
 
 msgid "Home"
 msgstr "首頁"
@@ -41,6 +42,8 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"要安裝 bookmarklet，把連結拖進你的書籤工具列，或右擊該連結後新增到你的書籤"
+"裡。現在你可以從網站的任何頁面來選擇 bookmarklet。"
 
 msgid "Documentation for this page"
 msgstr "本頁面的文件"
@@ -83,7 +86,7 @@ msgid ""
 msgstr ""
 
 msgid "Tools for your browser to quickly access admin functionality."
-msgstr ""
+msgstr "方便使用管理功能的瀏覽器工具。"
 
 msgid "Please install docutils"
 msgstr "請安裝 docutils"
@@ -92,25 +95,25 @@ msgstr "請安裝 docutils"
 msgid ""
 "The admin documentation system requires Python's <a href=\"%(link)s"
 "\">docutils</a> library."
-msgstr ""
+msgstr "管理文件系統需要 Python 的 <a href=\"%(link)s\">docutils</a> 函式庫。"
 
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
-msgstr ""
+msgstr "請要求您的管理員安裝 <a href=\"%(link)s\">docutils</a>。"
 
 #, python-format
 msgid "Model: %(name)s"
 msgstr "模型：%(name)s"
 
 msgid "Fields"
-msgstr ""
+msgstr "欄位"
 
 msgid "Field"
 msgstr "欄位"
 
 msgid "Type"
-msgstr ""
+msgstr "類別"
 
 msgid "Description"
 msgstr "描述"
@@ -119,19 +122,19 @@ msgid "Methods with arguments"
 msgstr ""
 
 msgid "Method"
-msgstr ""
+msgstr "方法"
 
 msgid "Arguments"
-msgstr ""
+msgstr "參數"
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "回到模型文件"
 
 msgid "Model documentation"
 msgstr "模型文件"
 
 msgid "Model groups"
-msgstr ""
+msgstr "模型群組"
 
 msgid "Templates"
 msgstr "模版"
@@ -147,7 +150,7 @@ msgstr "模版：\"%(name)s\""
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
-msgstr ""
+msgstr "搜尋模板「%(name)s」的路徑："
 
 msgid "(does not exist)"
 msgstr "(不存在)"
@@ -196,23 +199,23 @@ msgid "Templates:"
 msgstr "模版："
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "回到視圖文件"
 
 msgid "View documentation"
 msgstr "視圖文件"
 
 msgid "Jump to namespace"
-msgstr ""
+msgstr "跳至名稱空間"
 
 msgid "Empty namespace"
-msgstr ""
+msgstr "空的名稱空間"
 
 #, python-format
 msgid "Views by namespace %(name)s"
-msgstr ""
+msgstr "名稱空間 %(name)s 之視圖"
 
 msgid "Views by empty namespace"
-msgstr ""
+msgstr "空名稱空間之視圖"
 
 #, python-format
 msgid ""

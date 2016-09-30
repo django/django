@@ -149,6 +149,7 @@ msgstr "Lagt till."
 msgid "and"
 msgstr "och"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr "Ändrade {fields} på {name} \"{object}\"."
 

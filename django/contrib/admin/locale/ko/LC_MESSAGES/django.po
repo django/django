@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Jiyoon, Ha <cryptography@konkuk.ac.kr>, 2016
 # Hoseok Lee <ihooi77@gmail.com>, 2016
 # Ian Y. Choi <ianyrchoi@gmail.com>, 2015
 # Jaehong Kim <mixe@korea.com>, 2011
@@ -12,8 +13,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-07-12 18:25+0000\n"
-"Last-Translator: Jeong Seongtae <magno79@gmail.com>\n"
+"PO-Revision-Date: 2016-09-16 06:13+0000\n"
+"Last-Translator: Jiyoon, Ha <cryptography@konkuk.ac.kr>\n"
 "Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -132,18 +133,19 @@ msgid "Deleted \"%(object)s.\""
 msgstr "\"%(object)s.\"를 삭제하였습니다."
 
 msgid "LogEntry Object"
-msgstr "LogEntry 객체"
+msgstr "로그 엔트리 객체"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
 msgstr "{name} \"{object}\"를 추가하였습니다."
 
 msgid "Added."
-msgstr "추가하였습니다."
+msgstr "추가되었습니다."
 
 msgid "and"
 msgstr "또한"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr "{name} \"{object}\"의 {fields}가 변경되었습니다."
 
@@ -240,7 +242,7 @@ msgstr[0] "%(count)s개의 %(name)s이/가 변경되었습니다."
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
-msgstr[0] "모두 %(total_count)s개가 선택되었습니다."
+msgstr[0] "총 %(total_count)s개가 선택되었습니다."
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -281,7 +283,7 @@ msgid "%(app)s administration"
 msgstr "%(app)s 관리"
 
 msgid "Page not found"
-msgstr "해당 페이지가 없습니다."
+msgstr "페이지를 찾을 수 없습니다."
 
 msgid "We're sorry, but the requested page could not be found."
 msgstr "죄송합니다, 요청하신 페이지를 찾을 수 없습니다."
@@ -319,16 +321,17 @@ msgid "Select all %(total_count)s %(module_name)s"
 msgstr "%(total_count)s개의 %(module_name)s 모두를 선택합니다."
 
 msgid "Clear selection"
-msgstr "선택을 해제합니다."
+msgstr "선택 해제"
 
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr ""
-"사용자명와 비밀번호를 입력하세요.더 많은 사용자 옵션을 사용하실 수 있습니다."
+"사용자 이름과 비밀번호를 입력하세요. 더 많은 사용자 옵션을 사용하실 수 있습니"
+"다."
 
 msgid "Enter a username and password."
-msgstr "유저명과 암호를 입력하세요."
+msgstr "사용자 이름과 비밀번호를 입력하세요."
 
 msgid "Change password"
 msgstr "비밀번호 변경"
@@ -337,7 +340,7 @@ msgid "Please correct the error below."
 msgstr "아래의 오류를 수정하십시오."
 
 msgid "Please correct the errors below."
-msgstr "아래의 오류를 수정하십시오."
+msgstr "아래의 오류들을 수정하십시오."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
@@ -477,7 +480,7 @@ msgid "None available"
 msgstr "이용할 수 없습니다."
 
 msgid "Unknown content"
-msgstr "내용 형식이 지정되지 않았습니다."
+msgstr "알 수 없는 형식입니다."
 
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
@@ -492,11 +495,11 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
-"%(username)s 로 인증되어 있지만, 이 페이지를 액세스하기 위한 권한이 없습니"
-"다. 다른 계정으로 로그인하시겠습니까?"
+"%(username)s 로 인증되어 있지만, 이 페이지를 접근하기 위한 권한이 없습니다. "
+"다른 계정으로 로그인하시겠습니까?"
 
 msgid "Forgotten your password or username?"
-msgstr "이름이나 비밀번호를 분실하였습니까?"
+msgstr "사용자 이름이나 비밀번호를 분실하였습니까?"
 
 msgid "Date/time"
 msgstr "날짜/시간"
@@ -511,8 +514,8 @@ msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
-"오브젝트에 변경사항이 없습니다. 이 admin 사이트를 통해 추가된 것이 아닐 수 있"
-"습니다."
+"오브젝트에 변경사항이 없습니다. 이 관리자 사이트를 통해 추가된 것이 아닐 수 "
+"있습니다."
 
 msgid "Show all"
 msgstr "모두 표시"
@@ -591,28 +594,28 @@ msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
-"새로운 비밀번호를 정확히 입력했는지 확인할 수 있도록두 번 입력하시기 바랍니"
+"새로운 비밀번호를 정확히 입력했는지 확인할 수 있도록 두 번 입력하시기 바랍니"
 "다."
 
 msgid "New password:"
 msgstr "새로운 비밀번호:"
 
 msgid "Confirm password:"
-msgstr "새로운 비밀번호(확인):"
+msgstr "새로운 비밀번호 (확인):"
 
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
-"비밀번호 초기화 링크가 이미 사용되어 올바르지 않습니다.비밀번호 초기화을 다"
+"비밀번호 초기화 링크가 이미 사용되어 올바르지 않습니다. 비밀번호 초기화를 다"
 "시 해주세요."
 
 msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
-"계정에 등록된 이메일로 비밀번호를 지정하기 위한 지침을 보냈습니다. 곧 메일을 "
-"받으실 것입니다."
+"계정에 등록된 이메일로 비밀번호를 설정하기 위한 안내 사항을 보냈습니다. 곧 메"
+"일을 받으실 것입니다."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
@@ -625,13 +628,15 @@ msgstr ""
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
-msgstr "%(site_name)s 의 사용자"
+msgstr ""
+"%(site_name)s의 계정 비밀번호를 초기화하기 위한 요청으로 이 이메일이 전송되었"
+"습니다."
 
 msgid "Please go to the following page and choose a new password:"
-msgstr "이어지는 페이지에서 새 비밀번호를 선택하세요."
+msgstr "다음 페이지에서 새 비밀번호를 선택하세요."
 
 msgid "Your username, in case you've forgotten:"
-msgstr "사용자명:"
+msgstr "사용자 이름:"
 
 msgid "Thanks for using our site!"
 msgstr "사이트를 이용해 주셔서 고맙습니다."
@@ -648,7 +653,7 @@ msgstr ""
 "호를 설정하는 이메일을 보내드리겠습니다."
 
 msgid "Email address:"
-msgstr "이메일 주소"
+msgstr "이메일 주소:"
 
 msgid "Reset my password"
 msgstr "비밀번호 초기화"

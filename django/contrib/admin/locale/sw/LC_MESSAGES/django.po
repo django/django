@@ -2,13 +2,14 @@
 #
 # Translators:
 # Machaku <bmachaku@gmail.com>, 2013-2014
+# Machaku <bmachaku@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-08-09 20:22+0000\n"
+"Last-Translator: Machaku <bmachaku@gmail.com>\n"
 "Language-Team: Swahili (http://www.transifex.com/django/django/language/"
 "sw/)\n"
 "MIME-Version: 1.0\n"
@@ -63,10 +64,10 @@ msgid "This year"
 msgstr "Mwaka huu"
 
 msgid "No date"
-msgstr ""
+msgstr "Hakuna tarehe"
 
 msgid "Has date"
-msgstr ""
+msgstr "Kuna tarehe"
 
 #, python-format
 msgid ""
@@ -90,10 +91,10 @@ msgid "action time"
 msgstr "muda wa tendo"
 
 msgid "user"
-msgstr ""
+msgstr "mtumiaji"
 
 msgid "content type"
-msgstr ""
+msgstr "aina ya maudhui"
 
 msgid "object id"
 msgstr "Kitambulisho cha kitu"
@@ -132,24 +133,25 @@ msgstr "Kitu cha Ingizo la Kumbukumbu"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "Kumeongezeka {name} \"{object}\"."
 
 msgid "Added."
-msgstr ""
+msgstr "Imeongezwa"
 
 msgid "and"
 msgstr "na"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "Mabadiliko ya {fields} yamefanyika katika  {name} \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "Mabadiliko yamefanyika katika {fields} "
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "Futa {name} \"{object}\"."
 
 msgid "No fields changed."
 msgstr "Hakuna uga uliobadilishwa."
@@ -165,6 +167,7 @@ msgstr ""
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
+"Ingizo la {name} \"{obj}\" limefanyika kwa mafanikio. Unaweza kuhariri tena"
 
 #, python-brace-format
 msgid ""
@@ -338,7 +341,7 @@ msgid "Welcome,"
 msgstr "Karibu"
 
 msgid "View site"
-msgstr ""
+msgstr "Tazama tovuti"
 
 msgid "Documentation"
 msgstr "Nyaraka"
@@ -399,13 +402,13 @@ msgstr ""
 "Vitu vyote vinavyohuisana kati ya vifuatavyo vitafutwa:"
 
 msgid "Objects"
-msgstr ""
+msgstr "Viumbile"
 
 msgid "Yes, I'm sure"
 msgstr "Ndiyo, Nina uhakika"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Hapana, nirudishe"
 
 msgid "Delete multiple objects"
 msgstr "Futa viumbile mbalimbali"
@@ -447,7 +450,7 @@ msgid " By %(filter_title)s "
 msgstr " Kwa %(filter_title)s"
 
 msgid "Summary"
-msgstr ""
+msgstr "Muhtasari"
 
 #, python-format
 msgid "Models in the %(name)s application"
@@ -460,10 +463,10 @@ msgid "You don't have permission to edit anything."
 msgstr "Huna ruhusa ya kuhariri chochote"
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Matendo ya karibuni"
 
 msgid "My actions"
-msgstr ""
+msgstr "Matendo yangu"
 
 msgid "None available"
 msgstr "Hakuna kilichopatikana"
@@ -512,19 +515,19 @@ msgid "Save"
 msgstr "Hifadhi"
 
 msgid "Popup closing..."
-msgstr ""
+msgstr "Udukizi unafunga"
 
 #, python-format
 msgid "Change selected %(model)s"
-msgstr ""
+msgstr "Badili %(model)s husika"
 
 #, python-format
 msgid "Add another %(model)s"
-msgstr ""
+msgstr "Ongeza %(model)s tena"
 
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr ""
+msgstr "Futa %(model)s husika"
 
 msgid "Search"
 msgstr "Tafuta"

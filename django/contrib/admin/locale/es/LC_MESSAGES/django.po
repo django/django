@@ -4,7 +4,7 @@
 # abraham.martin <abraham.martin@gmail.com>, 2014
 # Antoni Aloy <aaloy@apsl.net>, 2011-2014
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
+# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015-2016
 # franchukelly <inactive+franchukelly@transifex.com>, 2011
 # guillem <serra.guillem@gmail.com>, 2012
 # Igor Támara <igor@tamarapatino.org>, 2013
@@ -20,8 +20,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-08-03 15:38+0000\n"
+"Last-Translator: Ernesto Avilés Vázquez <whippiii@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -76,10 +76,10 @@ msgid "This year"
 msgstr "Este año"
 
 msgid "No date"
-msgstr ""
+msgstr "Sin fecha"
 
 msgid "Has date"
-msgstr ""
+msgstr "Tiene fecha"
 
 #, python-format
 msgid ""
@@ -145,7 +145,7 @@ msgstr "Objeto de registro de Log"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "Añadido {name} \"{object}\"."
 
 msgid "Added."
 msgstr "Añadido."
@@ -153,16 +153,17 @@ msgstr "Añadido."
 msgid "and"
 msgstr "y"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "Modificado {fields} por {name} \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "Modificado {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "Eliminado {name} \"{object}\"."
 
 msgid "No fields changed."
 msgstr "No ha cambiado ningún campo."
@@ -180,16 +181,20 @@ msgstr ""
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
+"Se añadió con éxito el {name} \"{obj}\". Puede editarlo otra vez a "
+"continuación."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
+"Se añadió con éxito el {name} \"{obj}\". Puede añadir otro {name} a "
+"continuación."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgstr "Se añadió con éxito el {name} \"{obj}\"."
 
 #, python-brace-format
 msgid ""
@@ -478,10 +483,10 @@ msgid "You don't have permission to edit anything."
 msgstr "No tiene permiso para editar nada."
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Acciones recientes"
 
 msgid "My actions"
-msgstr ""
+msgstr "Mis acciones"
 
 msgid "None available"
 msgstr "Ninguno disponible"

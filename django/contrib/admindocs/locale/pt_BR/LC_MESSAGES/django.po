@@ -4,7 +4,7 @@
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # andrewsmedina <andrewsmedina@gmail.com>, 2016
 # Carlos E C Leite <caduado@gmail.com>, 2016
-# FilipeCifali <cifali.filipe@gmail.com>, 2016
+# Filipe Cifali <cifali.filipe@gmail.com>, 2016
 # Eduardo Cereto Carvalho, 2016
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Guilherme Gondim, 2012

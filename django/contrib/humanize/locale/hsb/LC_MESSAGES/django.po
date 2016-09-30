@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2016-06-12 13:51+0000\n"
+"PO-Revision-Date: 2016-08-05 08:21+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
@@ -258,62 +258,62 @@ msgstr "nětko"
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "před %(count)s sekundu"
+msgstr[1] "před %(count)s sekundomaj"
+msgstr[2] "před %(count)s sekundami"
+msgstr[3] "před %(count)s sekundami"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "před %(count)s mjeńšinu"
+msgstr[1] "před %(count)s mjeńšinomaj"
+msgstr[2] "před %(count)s mjeńšinami"
+msgstr[3] "před %(count)s mjeńšinami"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "před %(count)s hodźinu"
+msgstr[1] "před %(count)s hodźinomaj"
+msgstr[2] "před %(count)s hodźinami"
+msgstr[3] "před %(count)s hodźinami"
 
 #, python-format
 msgctxt "naturaltime"
 msgid "%(delta)s from now"
-msgstr "%(delta)s wotnětka"
+msgstr "za %(delta)s"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "za %(count)s sekundu"
+msgstr[1] "za %(count)s sekundźe"
+msgstr[2] "za %(count)s sekundy"
+msgstr[3] "za %(count)s sekundow"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "za %(count)s mjeńšinu"
+msgstr[1] "za %(count)s mjeńšinje"
+msgstr[2] "za %(count)s mjeńšiny"
+msgstr[3] "za %(count)s mjeńšin"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "za %(count)s hodźinu"
+msgstr[1] "za %(count)s hodźinje"
+msgstr[2] "za %(count)s hodźiny"
+msgstr[3] "za %(count)s hodźin"

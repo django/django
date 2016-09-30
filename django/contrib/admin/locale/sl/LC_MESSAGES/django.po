@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-09-27 19:24+0000\n"
+"Last-Translator: zejn <zejn@kiberpipa.org>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
@@ -66,10 +66,10 @@ msgid "This year"
 msgstr "Letos"
 
 msgid "No date"
-msgstr ""
+msgstr "Brez datuma"
 
 msgid "Has date"
-msgstr ""
+msgstr "Z datumom"
 
 #, python-format
 msgid ""
@@ -135,7 +135,7 @@ msgstr "Dnevniški vnos"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "Dodan vnos {name} \"{object}\"."
 
 msgid "Added."
 msgstr "Dodano."
@@ -143,16 +143,17 @@ msgstr "Dodano."
 msgid "and"
 msgstr "in"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "Spremenjena polja {fields} za {name} \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "Spremenjena polja {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "Izbrisan vnos {name} \"{object}\"."
 
 msgid "No fields changed."
 msgstr "Nobeno polje ni bilo spremenjeno."
@@ -168,31 +169,37 @@ msgstr "Držite \"Control\" (ali \"Command\" na Mac-u) za izbiro več kot enega.
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
+"Vnos {name} \"{obj}\" je bil uspešno dodan. Lahko ga znova uredite spodaj."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
+"Vnos {name} \"{obj}\" je bil uspešno dodan. Lahko dodate še en {name} spodaj."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgstr "Vnos {name} \"{obj}\" je bil uspešno dodan."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
+"Vnos {name} \"{obj}\" je bil uspešno spremenjen. Lahko ga znova uredite "
+"spodaj."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"Vnos {name} \"{obj}\" je bil uspešno spremenjen. Spodaj lahko dodate nov "
+"vnos {name}."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr "Vnos {name} \"{obj}\" je bil uspešno spremenjen."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -466,10 +473,10 @@ msgid "You don't have permission to edit anything."
 msgstr "Nimate dovoljenja za urejanje."
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Nedavna dejanja"
 
 msgid "My actions"
-msgstr ""
+msgstr "Moja dejanja"
 
 msgid "None available"
 msgstr "Ni na voljo"

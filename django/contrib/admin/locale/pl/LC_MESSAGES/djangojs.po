@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-06 22:01+0000\n"
+"PO-Revision-Date: 2016-08-09 13:22+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -32,7 +32,7 @@ msgid ""
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
 "To jest lista dostępnych %s. Aby wybrać pozycje zaznacz je i kliknij "
-"strzałkę \"Wybierz\" pomiędzy listami."
+"strzałkę „Wybierz” pomiędzy listami."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -42,7 +42,7 @@ msgid "Filter"
 msgstr "Filtr"
 
 msgid "Choose all"
-msgstr "Wybierz wszystko"
+msgstr "Wybierz wszystkie"
 
 #, javascript-format
 msgid "Click to choose all %s at once."
@@ -56,7 +56,7 @@ msgstr "Usuń"
 
 #, javascript-format
 msgid "Chosen %s"
-msgstr "Wybrano %s"
+msgstr "Wybrane %s"
 
 #, javascript-format
 msgid ""
@@ -64,7 +64,7 @@ msgid ""
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
 "To jest lista wybranych %s. Aby usunąć zaznacz pozycje wybrane do usunięcia "
-"i kliknij strzałkę \"Usuń\" pomiędzy listami."
+"i kliknij strzałkę „Usuń” pomiędzy listami."
 
 msgid "Remove all"
 msgstr "Usuń wszystkie"
@@ -100,7 +100,7 @@ msgid ""
 "button."
 msgstr ""
 "Wybrano akcję, lecz nie dokonano żadnych zmian. Prawdopodobnie szukasz "
-"przycisku \"Wykonaj\" (a nie \"Zapisz\")"
+"przycisku „Wykonaj” (a nie „Zapisz”)"
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."

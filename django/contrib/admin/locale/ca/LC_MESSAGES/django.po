@@ -144,6 +144,7 @@ msgstr "Afegit."
 msgid "and"
 msgstr "i"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr ""
 

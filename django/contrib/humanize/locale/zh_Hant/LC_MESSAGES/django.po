@@ -4,14 +4,15 @@
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # tcc <tcchou@tcchou.org>, 2011
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-09-03 02:30+0000\n"
-"Last-Translator: Chen Chun-Chia <ccc.larc@gmail.com>\n"
+"PO-Revision-Date: 2016-08-19 08:14+0000\n"
+"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -21,19 +22,19 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Humanize"
-msgstr ""
+msgstr "人性化"
 
 msgid "th"
-msgstr "th"
+msgstr ""
 
 msgid "st"
-msgstr "st"
+msgstr ""
 
 msgid "nd"
-msgstr "nd"
+msgstr ""
 
 msgid "rd"
-msgstr "rd"
+msgstr ""
 
 #, python-format
 msgid "%(value).1f million"

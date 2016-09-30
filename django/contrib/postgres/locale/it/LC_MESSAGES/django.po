@@ -4,14 +4,14 @@
 # Flavio Curella <flavio.curella@gmail.com>, 2016
 # palmux <palmux@gmail.com>, 2015
 # Mattia Procopio <promat85@gmail.com>, 2015
-# Stefano Brentegani <sbrentegani@gmail.com>, 2015
+# Stefano Brentegani <sbrentegani@gmail.com>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-18 21:08+0000\n"
-"Last-Translator: Flavio Curella <flavio.curella@gmail.com>\n"
+"PO-Revision-Date: 2016-09-28 11:37+0000\n"
+"Last-Translator: Stefano Brentegani <sbrentegani@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -47,7 +47,7 @@ msgid "Could not load JSON data."
 msgstr "Caricamento dati JSON fallito."
 
 msgid "Input must be a JSON dictionary."
-msgstr "L'input deve essere un dizionario JSON"
+msgstr "L'input deve essere un dizionario JSON."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."

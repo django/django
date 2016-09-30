@@ -4,9 +4,9 @@
 # André Hagenbruch, 2012
 # Florian Apolloner <florian@apolloner.eu>, 2011
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Jannis Vajen, 2013
+# Jannis, 2013
 # Jannis Leidel <jannis@leidel.info>, 2013-2016
-# Jannis Vajen, 2016
+# Jannis, 2016
 # Markus Holtermann <inyoka@markusholtermann.eu>, 2013,2015
 msgid ""
 msgstr ""
@@ -145,6 +145,7 @@ msgstr "Hinzugefügt."
 msgid "and"
 msgstr "und"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr "{fields} für {name} „{object}“ geändert."
 

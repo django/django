@@ -145,6 +145,7 @@ msgstr "Нэмэгдсэн."
 msgid "and"
 msgstr "ба"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr ""
 

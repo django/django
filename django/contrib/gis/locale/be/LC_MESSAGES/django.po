@@ -2,13 +2,14 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2014-2015
+# znotdead <zhirafchik@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-09-15 08:51+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -23,11 +24,13 @@ msgid "GIS"
 msgstr "ГІС"
 
 msgid "The base GIS field."
-msgstr ""
+msgstr "Галоўнае поле ГІС."
 
 msgid ""
 "The base Geometry field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
+"Галоўнае геаметрычнае поле - адлюстроўвае геамэтрычныя віды паводле "
+"спэцыфікацыі «OpenGIS»."
 
 msgid "Point"
 msgstr "Пункт"
@@ -51,10 +54,10 @@ msgid "Geometry collection"
 msgstr "Набор ґеамэтрычных аб’ектаў"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "Поле аб'яднанай плошчы"
 
 msgid "Raster Field"
-msgstr ""
+msgstr "Растравае поле"
 
 msgid "No geometry value provided."
 msgstr "Не пазначылі значэньне ґеамэтрыі."

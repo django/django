@@ -2,13 +2,14 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
+# znotdead <zhirafchik@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 09:52+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-09-15 09:30+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -24,33 +25,33 @@ msgstr "Пашырэнні PostgreSQL"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate: "
-msgstr ""
+msgstr "Элемент масіву нумар %(nth)s не прайшоў праверкі:"
 
 msgid "Nested arrays must have the same length."
-msgstr ""
+msgstr "Укладзенныя масівы павінны мець аднолькавую даўжыню."
 
 msgid "Map of strings to strings"
-msgstr ""
+msgstr "Адпаведнасць радкоў у радкі."
 
 #, python-format
 msgid "The value of \"%(key)s\" is not a string."
-msgstr ""
+msgstr "Значэнне \"%(key)s\" не з'яўляецца радком."
 
 msgid "A JSON object"
-msgstr ""
+msgstr "JSON аб’ект"
 
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "Значэнне павінна быць сапраўдным JSON."
 
 msgid "Could not load JSON data."
 msgstr "Не атрымалася загрузіць дадзеныя JSON."
 
 msgid "Input must be a JSON dictionary."
-msgstr ""
+msgstr "Значэнне павінна быць JSON слоўнікам. "
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
-msgstr ""
+msgstr "'%(value)s' значэнне павінна быць сапраўдным JSON."
 
 msgid "Enter two valid values."
 msgstr "Увядзіце два сапраўдных значэнні."
@@ -65,7 +66,7 @@ msgid "Enter two numbers."
 msgstr "Увядзіце два лікі."
 
 msgid "Enter two valid date/times."
-msgstr ""
+msgstr "Увядзіце дзве/два сапраўдных даты/часу."
 
 msgid "Enter two valid dates."
 msgstr "Увядзіце дзве сапраўдных даты."
@@ -78,9 +79,17 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no more than "
 "%(limit_value)d."
 msgstr[0] ""
+"Спіс мае %(show_value)d элемент, ён павінен мець не болей чым "
+"%(limit_value)d."
 msgstr[1] ""
+"Спіс мае %(show_value)d элемента, ён павінен мець не болей чым "
+"%(limit_value)d."
 msgstr[2] ""
+"Спіс мае %(show_value)d элементаў, ён павінен мець не болей чым "
+"%(limit_value)d."
 msgstr[3] ""
+"Спіс мае %(show_value)d элементаў, ён павінен мець не болей чым "
+"%(limit_value)d."
 
 #, python-format
 msgid ""
@@ -90,25 +99,34 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no fewer than "
 "%(limit_value)d."
 msgstr[0] ""
+"Спіс мае %(show_value)d элемент, ён павінен мець не менш чым %(limit_value)d."
 msgstr[1] ""
+"Спіс мае %(show_value)d элемента, ён павінен мець не менш чым "
+"%(limit_value)d."
 msgstr[2] ""
+"Спіс мае %(show_value)d элементаў, ён павінен мець не менш чым "
+"%(limit_value)d."
 msgstr[3] ""
+"Спіс мае %(show_value)d элементаў, ён павінен мець не менш чым "
+"%(limit_value)d."
 
 #, python-format
 msgid "Some keys were missing: %(keys)s"
-msgstr ""
+msgstr "Не хапае нейкіх ключоў: %(keys)s"
 
 #, python-format
 msgid "Some unknown keys were provided: %(keys)s"
-msgstr ""
+msgstr "Дадзены нейкія невядомыя ключы: %(keys)s"
 
 #, python-format
 msgid ""
 "Ensure that this range is completely less than or equal to %(limit_value)s."
 msgstr ""
+"Упэўніцеся, что ўсе элементы гэтага інтэрвалу менш ці раўны %(limit_value)s."
 
 #, python-format
 msgid ""
 "Ensure that this range is completely greater than or equal to "
 "%(limit_value)s."
 msgstr ""
+"Упэўніцеся, что ўсе элементы гэтага інтэрвалу больш ці раўны %(limit_value)s."
