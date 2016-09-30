@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import codecs
 import datetime
 import importlib
+import io
 import os
 import sys
 
@@ -553,7 +553,7 @@ class MakeMigrationsTests(MigrationTestBase):
             initial_file = os.path.join(migration_dir, "0001_initial.py")
             self.assertTrue(os.path.exists(initial_file))
 
-            with codecs.open(initial_file, 'r', encoding='utf-8') as fp:
+            with io.open(initial_file, 'r', encoding='utf-8') as fp:
                 content = fp.read()
                 self.assertIn('# -*- coding: utf-8 -*-', content)
                 self.assertIn('migrations.CreateModel', content)
@@ -696,7 +696,7 @@ class MakeMigrationsTests(MigrationTestBase):
             initial_file = os.path.join(migration_dir, "0001_initial.py")
             self.assertTrue(os.path.exists(initial_file))
 
-            with codecs.open(initial_file, 'r', encoding='utf-8') as fp:
+            with io.open(initial_file, 'r', encoding='utf-8') as fp:
                 content = fp.read()
                 self.assertIn('# -*- coding: utf-8 -*-', content)
 
@@ -788,7 +788,7 @@ class MakeMigrationsTests(MigrationTestBase):
                 call_command("makemigrations", "migrations", name="merge", merge=True, interactive=True, stdout=out)
                 merge_file = os.path.join(migration_dir, '0003_merge.py')
                 self.assertTrue(os.path.exists(merge_file))
-            self.assertIn("Created new merge migration", force_text(out.getvalue()))
+            self.assertIn("Created new merge migration", out.getvalue())
 
     @mock.patch('django.db.migrations.utils.datetime')
     def test_makemigrations_default_merge_name(self, mock_datetime):
@@ -799,7 +799,7 @@ class MakeMigrationsTests(MigrationTestBase):
                 call_command("makemigrations", "migrations", merge=True, interactive=True, stdout=out)
                 merge_file = os.path.join(migration_dir, '0003_merge_20160102_0304.py')
                 self.assertTrue(os.path.exists(merge_file))
-            self.assertIn("Created new merge migration", force_text(out.getvalue()))
+            self.assertIn("Created new merge migration", out.getvalue())
 
     def test_makemigrations_non_interactive_not_null_addition(self):
         """
@@ -832,7 +832,7 @@ class MakeMigrationsTests(MigrationTestBase):
         out = six.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations"):
             call_command("makemigrations", "migrations", interactive=False, stdout=out)
-        self.assertIn("Alter field slug on author", force_text(out.getvalue()))
+        self.assertIn("Alter field slug on author", out.getvalue())
 
     def test_makemigrations_non_interactive_no_model_rename(self):
         """
@@ -847,8 +847,8 @@ class MakeMigrationsTests(MigrationTestBase):
         out = six.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
             call_command("makemigrations", "migrations", interactive=False, stdout=out)
-        self.assertIn("Delete model SillyModel", force_text(out.getvalue()))
-        self.assertIn("Create model RenamedModel", force_text(out.getvalue()))
+        self.assertIn("Delete model SillyModel", out.getvalue())
+        self.assertIn("Create model RenamedModel", out.getvalue())
 
     def test_makemigrations_non_interactive_no_field_rename(self):
         """
@@ -863,8 +863,8 @@ class MakeMigrationsTests(MigrationTestBase):
         out = six.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
             call_command("makemigrations", "migrations", interactive=False, stdout=out)
-        self.assertIn("Remove field silly_field from sillymodel", force_text(out.getvalue()))
-        self.assertIn("Add field silly_rename to sillymodel", force_text(out.getvalue()))
+        self.assertIn("Remove field silly_field from sillymodel", out.getvalue())
+        self.assertIn("Add field silly_rename to sillymodel", out.getvalue())
 
     def test_makemigrations_handle_merge(self):
         """
@@ -875,7 +875,7 @@ class MakeMigrationsTests(MigrationTestBase):
             call_command("makemigrations", "migrations", name="merge", merge=True, interactive=False, stdout=out)
             merge_file = os.path.join(migration_dir, '0003_merge.py')
             self.assertTrue(os.path.exists(merge_file))
-        output = force_text(out.getvalue())
+        output = out.getvalue()
         self.assertIn("Merging migrations", output)
         self.assertIn("Branch 0002_second", output)
         self.assertIn("Branch 0002_conflicting_second", output)
@@ -894,7 +894,7 @@ class MakeMigrationsTests(MigrationTestBase):
             )
             merge_file = os.path.join(migration_dir, '0003_merge.py')
             self.assertFalse(os.path.exists(merge_file))
-        output = force_text(out.getvalue())
+        output = out.getvalue()
         self.assertIn("Merging migrations", output)
         self.assertIn("Branch 0002_second", output)
         self.assertIn("Branch 0002_conflicting_second", output)
@@ -913,7 +913,7 @@ class MakeMigrationsTests(MigrationTestBase):
             )
             merge_file = os.path.join(migration_dir, '0003_merge.py')
             self.assertFalse(os.path.exists(merge_file))
-        output = force_text(out.getvalue())
+        output = out.getvalue()
         self.assertIn("Merging migrations", output)
         self.assertIn("Branch 0002_second", output)
         self.assertIn("Branch 0002_conflicting_second", output)
@@ -921,7 +921,8 @@ class MakeMigrationsTests(MigrationTestBase):
 
         # Additional output caused by verbosity 3
         # The complete merge migration file that would be written
-        self.assertIn("# -*- coding: utf-8 -*-", output)
+        # '\n#' is to verify no bytestring prefix before #
+        self.assertIn("\n# -*- coding: utf-8 -*-", output)
         self.assertIn("class Migration(migrations.Migration):", output)
         self.assertIn("dependencies = [", output)
         self.assertIn("('migrations', '0002_second')", output)
@@ -1092,7 +1093,7 @@ class MakeMigrationsTests(MigrationTestBase):
                 migration_file = os.path.join(migration_dir, "%s_%s.py" % (migration_count, migration_name))
                 # Check for existing migration file in migration folder
                 self.assertTrue(os.path.exists(migration_file))
-                with codecs.open(migration_file, "r", encoding="utf-8") as fp:
+                with io.open(migration_file, "r", encoding="utf-8") as fp:
                     content = fp.read()
                     self.assertIn("# -*- coding: utf-8 -*-", content)
                     content = content.replace(" ", "")
@@ -1182,8 +1183,8 @@ class MakeMigrationsTests(MigrationTestBase):
             out = six.StringIO()
             with self.temporary_migration_module(module='migrations.test_auto_now_add'):
                 call_command('makemigrations', 'migrations', interactive=True, stdout=out)
-            output = force_text(out.getvalue())
-            prompt_output = force_text(prompt_stdout.getvalue())
+            output = out.getvalue()
+            prompt_output = prompt_stdout.getvalue()
             self.assertIn("You can accept the default 'timezone.now' by pressing 'Enter'", prompt_output)
             self.assertIn("Add field creation_date to entry", output)
 
@@ -1208,7 +1209,7 @@ class SquashMigrationsTests(MigrationTestBase):
             call_command("squashmigrations", "migrations", "0002", interactive=False, verbosity=0)
 
             squashed_migration_file = os.path.join(migration_dir, "0001_squashed_0002_second.py")
-            with codecs.open(squashed_migration_file, "r", encoding="utf-8") as fp:
+            with io.open(squashed_migration_file, "r", encoding="utf-8") as fp:
                 content = fp.read()
                 self.assertIn("initial = True", content)
 
@@ -1219,7 +1220,7 @@ class SquashMigrationsTests(MigrationTestBase):
         out = six.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations"):
             call_command("squashmigrations", "migrations", "0002", interactive=False, verbosity=1, stdout=out)
-        self.assertIn("Optimized from 8 operations to 3 operations.", force_text(out.getvalue()))
+        self.assertIn("Optimized from 8 operations to 3 operations.", out.getvalue())
 
     def test_ticket_23799_squashmigrations_no_optimize(self):
         """
@@ -1229,7 +1230,7 @@ class SquashMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module(module="migrations.test_migrations"):
             call_command("squashmigrations", "migrations", "0002",
                          interactive=False, verbosity=1, no_optimize=True, stdout=out)
-        self.assertIn("Skipping optimization", force_text(out.getvalue()))
+        self.assertIn("Skipping optimization", out.getvalue())
 
     def test_squashmigrations_valid_start(self):
         """
@@ -1241,11 +1242,11 @@ class SquashMigrationsTests(MigrationTestBase):
                          interactive=False, verbosity=1, stdout=out)
 
             squashed_migration_file = os.path.join(migration_dir, "0002_second_squashed_0003_third.py")
-            with codecs.open(squashed_migration_file, "r", encoding="utf-8") as fp:
+            with io.open(squashed_migration_file, "r", encoding="utf-8") as fp:
                 content = fp.read()
                 self.assertIn("        ('migrations', '0001_initial')", content)
                 self.assertNotIn("initial = True", content)
-        out = force_text(out.getvalue())
+        out = out.getvalue()
         self.assertNotIn(" - 0001_initial", out)
         self.assertIn(" - 0002_second", out)
         self.assertIn(" - 0003_third", out)

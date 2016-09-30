@@ -1,3 +1,4 @@
+import io
 import os
 import sys
 import warnings
@@ -222,7 +223,7 @@ class Command(BaseCommand):
                         # We just do this once per app
                         directory_created[app_label] = True
                     migration_string = writer.as_string()
-                    with open(writer.path, "wb") as fh:
+                    with io.open(writer.path, "w", encoding='utf-8') as fh:
                         fh.write(migration_string)
                 elif self.verbosity == 3:
                     # Alternatively, makemigrations --dry-run --verbosity 3
@@ -301,7 +302,7 @@ class Command(BaseCommand):
 
                 if not self.dry_run:
                     # Write the merge migrations file to the disk
-                    with open(writer.path, "wb") as fh:
+                    with io.open(writer.path, "w", encoding='utf-8') as fh:
                         fh.write(writer.as_string())
                     if self.verbosity > 0:
                         self.stdout.write("\nCreated new merge migration %s" % writer.path)
