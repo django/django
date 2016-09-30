@@ -25,3 +25,6 @@ Bugfixes
 
 * Fixed a crash in ``runserver`` logging during a "Broken pipe" error
   (:ticket:`27271`).
+
+* Fixed an encoding issue when outputting the content of a migration file to
+  stdout (:ticket:`27300`).

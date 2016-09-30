@@ -18,6 +18,7 @@ from django.db.migrations.state import ProjectState
 from django.db.migrations.utils import get_migration_name_timestamp
 from django.db.migrations.writer import MigrationWriter
 from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.encoding import force_text
 from django.utils.six import iteritems
 from django.utils.six.moves import zip
 
@@ -231,7 +232,7 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.MIGRATE_HEADING(
                         "Full migrations file '%s':" % writer.filename) + "\n"
                     )
-                    self.stdout.write("%s\n" % writer.as_string())
+                    self.stdout.write("%s\n" % force_text(writer.as_string()))
 
     def handle_merge(self, loader, conflicts):
         """

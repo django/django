@@ -969,6 +969,7 @@ class MakeMigrationsTests(MigrationTestBase):
 
         # Additional output caused by verbosity 3
         # The complete migrations file that would be written
+        self.assertNotIn('b"', out.getvalue())
         self.assertIn("# -*- coding: utf-8 -*-", out.getvalue())
         self.assertIn("class Migration(migrations.Migration):", out.getvalue())
         self.assertIn("dependencies = [", out.getvalue())
