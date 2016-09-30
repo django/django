@@ -587,7 +587,7 @@ function in autocommit mode: statements will be executed and committed as soon
 as they're called. If your MySQL setup *does* support transactions, Django
 will handle transactions as explained in this document.
 
-.. _information on MySQL transactions: https://dev.mysql.com/doc/refman/5.6/en/sql-syntax-transactions.html
+.. _information on MySQL transactions: https://dev.mysql.com/doc/refman/en/sql-syntax-transactions.html
 
 Handling exceptions within PostgreSQL transactions
 --------------------------------------------------

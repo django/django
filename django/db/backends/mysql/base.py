@@ -80,9 +80,7 @@ django_conversions.update({
 })
 
 # This should match the numerical portion of the version numbers (we can treat
-# versions like 5.0.24 and 5.0.24a as the same). Based on the list of version
-# at http://dev.mysql.com/doc/refman/4.1/en/news.html and
-# http://dev.mysql.com/doc/refman/5.0/en/news.html .
+# versions like 5.0.24 and 5.0.24a as the same).
 server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 
 
