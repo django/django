@@ -227,11 +227,16 @@ Methods
     Returns an iterable of :class:`~django.db.models.Model` classes for this
     application.
 
+    Requires the app registry to be fully populated.
+
 .. method:: AppConfig.get_model(model_name)
 
     Returns the :class:`~django.db.models.Model` with the given
-    ``model_name``. Raises :exc:`LookupError` if no such model exists in this
-    application. ``model_name`` is case-insensitive.
+    ``model_name``. ``model_name`` is case-insensitive.
+
+    Raises :exc:`LookupError` if no such model exists in this application.
+
+    Requires the app registry to be fully populated.
 
 .. method:: AppConfig.ready()
 

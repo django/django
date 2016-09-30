@@ -89,6 +89,7 @@ class Apps(object):
                         "duplicates: %s" % app_config.label)
 
                 self.app_configs[app_config.label] = app_config
+                app_config.apps = self
 
             # Check for duplicate app names.
             counts = Counter(

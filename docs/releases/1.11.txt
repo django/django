@@ -579,6 +579,13 @@ Miscellaneous
 * ``ConditionalGetMiddleware`` no longer sets the ``Date`` header as Web
   servers set that header.
 
+* :meth:`~django.apps.AppConfig.get_model` and
+  :meth:`~django.apps.AppConfig.get_models` now raise
+  :exc:`~django.core.exceptions.AppRegistryNotReady` if they're called before
+  models of all applications have been loaded. Previously they only required
+  the target application's models to be loaded and thus could return models
+  without all their relations set up.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11

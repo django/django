@@ -1,7 +1,7 @@
 import os
 from importlib import import_module
 
-from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured
 from django.utils._os import upath
 from django.utils.module_loading import module_has_submodule
 
@@ -20,6 +20,10 @@ class AppConfig(object):
         # Root module for the application eg. <module 'django.contrib.admin'
         # from 'django/contrib/admin/__init__.pyc'>.
         self.module = app_module
+
+        # Reference to the Apps registry that holds this AppConfig. Set by the
+        # registry when it registers the AppConfig instance.
+        self.apps = None
 
         # The following attributes could be defined at the class level in a
         # subclass, hence the test-and-set pattern.
@@ -151,21 +155,13 @@ class AppConfig(object):
         # Entry is a path to an app config class.
         return cls(app_name, app_module)
 
-    def check_models_ready(self):
-        """
-        Raises an exception if models haven't been imported yet.
-        """
-        if self.models is None:
-            raise AppRegistryNotReady(
-                "Models for app '%s' haven't been imported yet." % self.label)
-
     def get_model(self, model_name):
         """
         Returns the model with the given case-insensitive model_name.
 
         Raises LookupError if no model exists with this name.
         """
-        self.check_models_ready()
+        self.apps.check_models_ready()
         try:
             return self.models[model_name.lower()]
         except KeyError:
@@ -186,7 +182,7 @@ class AppConfig(object):
         Set the corresponding keyword argument to True to include such models.
         Keyword arguments aren't documented; they're a private API.
         """
-        self.check_models_ready()
+        self.apps.check_models_ready()
         for model in self.models.values():
             if model._meta.auto_created and not include_auto_created:
                 continue
