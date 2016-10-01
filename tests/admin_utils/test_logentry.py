@@ -25,7 +25,7 @@ class LogEntryTests(TestCase):
         self.a1 = Article.objects.create(
             site=self.site,
             title="Title",
-            created=datetime(2008, 3, 18, 11, 54),
+            created=datetime(2008, 3, 12, 11, 54),
         )
         content_type_pk = ContentType.objects.get_for_model(Article).pk
         LogEntry.objects.log_action(
@@ -51,7 +51,7 @@ class LogEntryTests(TestCase):
         """
         post_data = {
             'site': self.site.pk, 'title': 'Changed', 'hist': 'Some content',
-            'created_0': '2008-03-18', 'created_1': '11:54',
+            'created_0': '2008-03-12', 'created_1': '11:54',
         }
         change_url = reverse('admin:admin_utils_article_change', args=[quote(self.a1.pk)])
         response = self.client.post(change_url, post_data)
@@ -69,6 +69,22 @@ class LogEntryTests(TestCase):
         self.assertEqual(logentry.get_change_message(), 'Added.')
         with translation.override('fr'):
             self.assertEqual(logentry.get_change_message(), 'Ajout.')
+
+    @override_settings(USE_L10N=True)
+    def test_logentry_change_message_localized_datetime_input(self):
+        """
+        Localized date/time inputs shouldn't affect changed form data detection.
+        """
+        post_data = {
+            'site': self.site.pk, 'title': 'Changed', 'hist': 'Some content',
+            'created_0': '12/03/2008', 'created_1': '11:54',
+        }
+        with translation.override('fr'):
+            change_url = reverse('admin:admin_utils_article_change', args=[quote(self.a1.pk)])
+            response = self.client.post(change_url, post_data)
+            self.assertRedirects(response, reverse('admin:admin_utils_article_changelist'))
+        logentry = LogEntry.objects.filter(content_type__model__iexact='article').latest('id')
+        self.assertEqual(logentry.get_change_message(), 'Changed title and hist.')
 
     def test_logentry_change_message_formsets(self):
         """
