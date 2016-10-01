@@ -100,15 +100,16 @@ class CarDriver(models.Model):
 class Event(models.Model):
     name = models.CharField(max_length=50, unique=True)
     people = models.ManyToManyField('Person', through='IndividualCompetitor')
-    special_people = models.ManyToManyField('Person', through='ProxiedIndividualCompetitor',
-                                            related_name='special_event_set')
+    special_people = models.ManyToManyField(
+        'Person',
+        through='ProxiedIndividualCompetitor',
+        related_name='special_event_set'
+    )
     teams = models.ManyToManyField('Group', through='CompetingTeam')
 
 
 class Competitor(models.Model):
     event = models.ForeignKey('Event', models.CASCADE)
-    rank = models.IntegerField(blank=True, null=True)
-    disqualified = models.BooleanField()
 
 
 class IndividualCompetitor(Competitor):

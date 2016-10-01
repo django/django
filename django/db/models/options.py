@@ -673,9 +673,9 @@ class Options(object):
 
     def get_path_to_parent(self, parent):
         """
-        Get path from current model to a parent model.
-
-        Returns an empty list if parent is not a parent of the current model.
+        Return a list of PathInfos containing the path from the current
+        model to the parent model, or an empty list if parent is not a
+        parent of the current model.
         """
         if self.model is parent:
             return []
@@ -695,19 +695,23 @@ class Options(object):
 
     def get_path_from_parent(self, parent):
         """
-        Get path from parent model to current model.
-
-        Returns an empty list if parent is not a parent of the current model.
+        Return a list of PathInfos containing the path from the parent
+        model to the current model, or an empty list if parent is not a
+        parent of the current model.
         """
         if self.model is parent:
             return []
         model = self.concrete_model
+        # Get a reversed base chain including both the current and parent
+        # models
         chain = model._meta.get_base_chain(parent)
         chain.reverse()
         chain.append(model)
+        # Construct a list of the PathInfos between models in chain
         path = []
-        for i in range(len(chain) - 1):
-            link = chain[i + 1]._meta.get_ancestor_link(chain[i])
+        for i, ancestor in enumerate(chain[:-1]):
+            child = chain[i + 1]
+            link = child._meta.get_ancestor_link(ancestor)
             path.extend(link.get_reverse_path_info())
         return path
 
