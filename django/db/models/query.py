@@ -1140,6 +1140,7 @@ class QuerySet(object):
             obj = self.values('pk')
             forced_pk = True
         query = obj.query
+        query._db = obj._db
         if forced_pk:
             query._forced_pk = True
         # It's safe to drop ordering if the queryset isn't using slicing,
