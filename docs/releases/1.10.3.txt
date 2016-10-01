@@ -1,0 +1,12 @@
+===========================
+Django 1.10.3 release notes
+===========================
+
+*Under development*
+
+Django 1.10.3 fixes several bugs in 1.10.2.
+
+Bugfixes
+========
+
+* ...
