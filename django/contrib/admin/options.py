@@ -929,7 +929,6 @@ class ModelAdmin(BaseModelAdmin):
                 return urlencode({'_changelist_filters': preserved_filters})
         return ''
 
-    @translation_override(None)
     def construct_change_message(self, request, form, formsets, add=False):
         """
         Construct a JSON structure describing changes from a changed object.
@@ -943,29 +942,30 @@ class ModelAdmin(BaseModelAdmin):
             change_message.append({'changed': {'fields': form.changed_data}})
 
         if formsets:
-            for formset in formsets:
-                for added_object in formset.new_objects:
-                    change_message.append({
-                        'added': {
-                            'name': force_text(added_object._meta.verbose_name),
-                            'object': force_text(added_object),
-                        }
-                    })
-                for changed_object, changed_fields in formset.changed_objects:
-                    change_message.append({
-                        'changed': {
-                            'name': force_text(changed_object._meta.verbose_name),
-                            'object': force_text(changed_object),
-                            'fields': changed_fields,
-                        }
-                    })
-                for deleted_object in formset.deleted_objects:
-                    change_message.append({
-                        'deleted': {
-                            'name': force_text(deleted_object._meta.verbose_name),
-                            'object': force_text(deleted_object),
-                        }
-                    })
+            with translation_override(None):
+                for formset in formsets:
+                    for added_object in formset.new_objects:
+                        change_message.append({
+                            'added': {
+                                'name': force_text(added_object._meta.verbose_name),
+                                'object': force_text(added_object),
+                            }
+                        })
+                    for changed_object, changed_fields in formset.changed_objects:
+                        change_message.append({
+                            'changed': {
+                                'name': force_text(changed_object._meta.verbose_name),
+                                'object': force_text(changed_object),
+                                'fields': changed_fields,
+                            }
+                        })
+                    for deleted_object in formset.deleted_objects:
+                        change_message.append({
+                            'deleted': {
+                                'name': force_text(deleted_object._meta.verbose_name),
+                                'object': force_text(deleted_object),
+                            }
+                        })
         return change_message
 
     def message_user(self, request, message, level=messages.INFO, extra_tags='',
