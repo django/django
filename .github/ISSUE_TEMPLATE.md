@@ -1,27 +1,13 @@
-## Submit a feature request or bug report
+If you're submitting a feature request, please try to include:
 
-### Versions
+- Detailed description of the overall behaviour
+- Reasoning why it should be in Channels rather than a third-party app
+- Examples of usage, if possible (it's easier to discuss concrete code examples)
 
-OS/Version:
+If you're submitting a bug report, please include:
 
-Django:
-
-Channels:
-
-Daphne:
-
-Twisted:
-
-### Connection Information
-
-**Are you connecting to daphne/runserver directly? If not, please describe the connection.**
-
-
-**What is the current behavior? (please include logs/output)**
-
-
-**What is the expected or desired behavior?**
-
-
-**Any other/relevant information:**
-
+- Your OS and runtime environment, and browser if applicable
+- The versions of Channels, Daphne, Django, Twisted, and your ASGI backend (asgi_ipc or asgi_redis normally)
+- What you expected to happen vs. what actually happened
+- How you're running Channels (runserver? daphne/runworker? Nginx/Apache in front?)
+- Console logs and full tracebacks of any errors
