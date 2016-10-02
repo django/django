@@ -35,9 +35,6 @@ class TemplateCommand(BaseCommand):
     :param options: The additional variables passed to project or app templates
     """
     requires_system_checks = False
-    # Can't import settings during this command, because they haven't
-    # necessarily been created.
-    can_import_settings = False
     # The supported URL schemes
     url_schemes = ['http', 'https', 'ftp']
     # Can't perform any active locale changes during this command, because

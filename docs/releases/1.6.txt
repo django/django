@@ -189,7 +189,7 @@ Minor features
 
 * For custom management commands: Verification of the presence of valid
   settings in commands that ask for it by using the
-  :attr:`~django.core.management.BaseCommand.can_import_settings` internal
+  ``BaseCommand.can_import_settings`` internal
   option is now performed independently from handling of the locale that
   should be active during the execution of the command. The latter can now be
   influenced by the new
