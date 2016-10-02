@@ -16,6 +16,7 @@ from django.core.exceptions import (
 )
 from django.core.paginator import InvalidPage
 from django.db import models
+from django.db.models.query_utils import Q
 from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_text
@@ -313,10 +314,21 @@ class ChangeList(object):
 
         # Then, we let every list filter modify the queryset to its liking.
         qs = self.root_queryset
+        q_like_objects = []
         for filter_spec in self.filter_specs:
             new_qs = filter_spec.queryset(request, qs)
             if new_qs is not None:
-                qs = new_qs
+                if isinstance(new_qs, Q):
+                    q_like_objects.append(new_qs)
+                else:
+                    qs = new_qs
+
+        if q_like_objects:
+            q_base = Q()
+            for item in q_like_objects:
+                q_base &= item
+
+            qs = qs.filter(q_base)
 
         try:
             # Finally, we apply the remaining lookup parameters from the query
