@@ -299,3 +299,15 @@ class InspectDBTestCase(TestCase):
         self.assertIn("# Unable to inspect table 'nonexistent'", output)
         # The error message depends on the backend
         self.assertIn("# The error was:", output)
+
+    def test_indexes_inspection(self):
+        out = StringIO()
+        call_command('inspectdb', table_name_filter=lambda tn: tn.startswith('inspectdb_indexes'), stdout=out)
+        output = out.getvalue()
+        self.assertIn('        indexes = [', output, msg='inspectdb should generate indexes.')
+        name = 'inspectdb_from_field_idx'
+        if connection.features.uppercases_column_names:
+            name = name.upper()
+        index = "models.Index(fields=['from_field', 'field'], name='%s'),\n" % name
+        self.assertIn(index, output)
+        self.assertIn('        ]', output)

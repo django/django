@@ -278,6 +278,8 @@ Management Commands
 * The new :option:`loaddata --exclude` option allows excluding models and apps
   while loading data from fixtures.
 
+* The :djadmin:`inspectdb` command now inspects for database indexes as well.
+
 Migrations
 ~~~~~~~~~~
 

@@ -83,3 +83,13 @@ class UniqueTogether(models.Model):
             ('from_field', 'field1'),
             ('non_unique', 'non_unique_0'),
         ]
+
+
+class Indexes(models.Model):
+    from_field = models.CharField(max_length=10, db_column='from')
+    field = models.IntegerField()
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['from_field', 'field'], name='inspectdb_from_field_idx'),
+        ]

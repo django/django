@@ -269,14 +269,22 @@ class Command(BaseCommand):
         to the given database table name.
         """
         unique_together = []
+        indexes = []
         for index, params in constraints.items():
+            if params['index'] or params['unique']:
+                fields = [column_to_field_name[c] for c in params['columns']]
             if params['unique']:
                 columns = params['columns']
                 if len(columns) > 1:
                     # we do not want to include the u"" or u'' prefix
                     # so we build the string rather than interpolate the tuple
-                    tup = '(' + ', '.join("'%s'" % column_to_field_name[c] for c in columns) + ')'
+                    tup = '(' + ', '.join("'%s'" % f for f in fields) + ')'
                     unique_together.append(tup)
+            elif params['index'] and not params['primary_key']:
+                index_fields = ', '.join("'%s'" % f for f in fields)
+                indexes.append("models.Index(fields=[%s], name='%s')," % (index_fields, index))
+                if params['type'] != 'btree':
+                    indexes[-1] += ' # The type of this index is %s' % params['type']
         meta = ["",
                 "    class Meta:",
                 "        managed = False",
@@ -284,4 +292,9 @@ class Command(BaseCommand):
         if unique_together:
             tup = '(' + ', '.join(unique_together) + ',)'
             meta += ["        unique_together = %s" % tup]
+        if indexes:
+            meta.append('        indexes = [')
+            for index in indexes:
+                meta.append('            %s' % index)
+            meta.append('        ]')
         return meta
