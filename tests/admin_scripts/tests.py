@@ -1899,6 +1899,11 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
+        # Ensure line endings are platform-specific
+        manage_path = os.path.join(testproject_dir, 'manage.py')
+        with open(manage_path, 'rb') as manage_file:
+            lines = manage_file.read().splitlines(True)
+        self.assertTrue(lines[0].endswith(b'python' + os.linesep.encode()))
 
         # running again..
         out, err = self.run_django_admin(args)

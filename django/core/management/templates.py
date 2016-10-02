@@ -1,5 +1,6 @@
 import cgi
 import errno
+import io
 import mimetypes
 import os
 import posixpath
@@ -158,15 +159,15 @@ class TemplateCommand(BaseCommand):
 
                 # Only render the Python files, as we don't want to
                 # accidentally render Django templates files
-                with open(old_path, 'rb') as template_file:
-                    content = template_file.read()
                 if new_path.endswith(extensions) or filename in extra_files:
-                    content = content.decode('utf-8')
+                    with io.open(old_path, 'r', encoding='utf-8') as template_file:
+                        content = template_file.read()
                     template = Engine().from_string(content)
                     content = template.render(context)
-                    content = content.encode('utf-8')
-                with open(new_path, 'wb') as new_file:
-                    new_file.write(content)
+                    with io.open(new_path, 'w', encoding='utf-8') as new_file:
+                        new_file.write(content)
+                else:
+                    shutil.copyfile(old_path, new_path)
 
                 if self.verbosity >= 2:
                     self.stdout.write("Creating %s\n" % new_path)
