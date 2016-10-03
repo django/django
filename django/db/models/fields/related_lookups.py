@@ -83,7 +83,14 @@ class RelatedIn(In):
         else:
             if getattr(self.rhs, '_forced_pk', False):
                 self.rhs.clear_select_clause()
-                self.rhs.add_fields([self.lhs.field.target_field.name], True)
+                if getattr(self.lhs.output_field, 'primary_key', False):
+                    # A case like Restaurant.objects.filter(place__in=restaurant_qs),
+                    # where place is a OneToOneField and the primary key of
+                    # Restaurant.
+                    target_field = self.lhs.field.name
+                else:
+                    target_field = self.lhs.field.target_field.name
+                self.rhs.add_fields([target_field], True)
             return super(RelatedIn, self).as_sql(compiler, connection)
 
 
