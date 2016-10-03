@@ -273,6 +273,11 @@ class RenameModel(ModelOperation):
         )
 
     def state_forwards(self, app_label, state):
+        # In cases where state doesn't have rendered apps, prevent subsequent
+        # reload_model() calls from rendering models for performance
+        # reasons. This method should be refactored to avoid relying on
+        # state.apps (#27310).
+        reset_apps = 'apps' not in state.__dict__
         apps = state.apps
         model = apps.get_model(app_label, self.old_name)
         model._meta.apps = apps
@@ -281,6 +286,8 @@ class RenameModel(ModelOperation):
             f for f in model._meta.get_fields(include_hidden=True)
             if f.auto_created and not f.concrete and (not f.hidden or f.many_to_many)
         )
+        if reset_apps:
+            del state.__dict__['apps']
         # Rename the model
         state.models[app_label, self.new_name_lower] = state.models[app_label, self.old_name_lower]
         state.models[app_label, self.new_name_lower].name = self.new_name

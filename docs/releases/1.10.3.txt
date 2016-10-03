@@ -11,3 +11,6 @@ Bugfixes
 
 * Allowed ``User.is_authenticated`` and ``User.is_anonymous`` properties to be
   tested for ``set`` membership (:ticket:`27309`).
+
+* Fixed a performance regression when running ``migrate`` in projects
+  with ``RenameModel`` operations (:ticket:`27279`).

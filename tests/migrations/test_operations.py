@@ -4,7 +4,7 @@ import unittest
 
 from django.db import connection, migrations, models, transaction
 from django.db.migrations.migration import Migration
-from django.db.migrations.state import ProjectState
+from django.db.migrations.state import ModelState, ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
 from django.db.utils import IntegrityError
@@ -578,6 +578,26 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "RenameModel")
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2], {'old_name': "Pony", 'new_name': "Horse"})
+
+    def test_rename_model_state_forwards(self):
+        """
+        RenameModel operations shouldn't trigger the caching of rendered apps
+        on state without prior apps.
+        """
+        state = ProjectState()
+        state.add_model(ModelState('migrations', 'Foo', []))
+        operation = migrations.RenameModel('Foo', 'Bar')
+        operation.state_forwards('migrations', state)
+        self.assertNotIn('apps', state.__dict__)
+        self.assertNotIn(('migrations', 'foo'), state.models)
+        self.assertIn(('migrations', 'bar'), state.models)
+        # Now with apps cached.
+        apps = state.apps
+        operation = migrations.RenameModel('Bar', 'Foo')
+        operation.state_forwards('migrations', state)
+        self.assertIs(state.apps, apps)
+        self.assertNotIn(('migrations', 'bar'), state.models)
+        self.assertIn(('migrations', 'foo'), state.models)
 
     def test_rename_model_with_self_referential_fk(self):
         """
