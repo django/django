@@ -128,9 +128,11 @@ When it gets that message, it takes the ``reply_channel`` attribute from it, whi
 is the unique response channel for that client, and sends the same content
 back to the client using its ``send()`` method.
 
-Let's test it! Run ``runserver``, open a browser and put the following into the
-JavaScript console to open a WebSocket and send some data down it (you might
-need to change the socket address if you're using a development VM or similar)::
+Let's test it! Run ``runserver``, open a browser, navigate to a page on the server
+(you can't use any page's console because of origin restrictions), and put the
+following into the JavaScript console to open a WebSocket and send some data
+down it (you might need to change the socket address if you're using a
+development VM or similar)::
 
     // Note that the path doesn't matter for routing; any WebSocket
     // connection gets bumped over to WebSocket consumers
