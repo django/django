@@ -277,6 +277,21 @@ class ModelAdminTests(TestCase):
             ['main_band', 'opening_band', 'day', 'id', 'DELETE']
         )
 
+    def test_overriding_get_exclude(self):
+        """
+        Ensure that overriding ModelAdmin.get_exclude method works
+        Refs #24941.
+        """
+        class BandAdmin(ModelAdmin):
+            exclude = ['bio']
+
+            def get_exclude(self, *args, **kwargs):
+                return ['name']
+
+        ma = BandAdmin(Band, self.site)
+        self.assertEqual(list(ma.get_form(request).base_fields),
+            ['bio', 'sign_date'])
+
     def test_custom_form_validation(self):
         # If we specify a form, it should use it allowing custom validation to work
         # properly. This won't, however, break any of the admin widgets or media.
