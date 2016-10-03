@@ -377,7 +377,8 @@ Here's what the relevant URLconf lines would look like for the example above::
 
     urlpatterns = [
         url(r'^sitemap\.xml$', views.index, {'sitemaps': sitemaps}),
-        url(r'^sitemap-(?P<section>.+)\.xml$', views.sitemap, {'sitemaps': sitemaps}),
+        url(r'^sitemap-(?P<section>.+)\.xml$', views.sitemap, {'sitemaps': sitemaps},
+            name='django.contrib.sitemaps.views.sitemap'),
     ]
 
 This will automatically generate a :file:`sitemap.xml` file that references
@@ -423,7 +424,7 @@ parameter to the ``sitemap`` and ``index`` views via the URLconf::
         url(r'^custom-sitemap-(?P<section>.+)\.xml$', views.sitemap, {
             'sitemaps': sitemaps,
             'template_name': 'custom_sitemap.html'
-        }),
+        }, name='django.contrib.sitemaps.views.sitemap'),
     ]
 
 
