@@ -704,7 +704,7 @@ Keys:
 
 * ``reply_channel``: Channel name responses would have been sent on. No longer
   valid after this message is sent; all messages to it will be dropped.
-  
+
 * ``path``: Unicode string HTTP path from URL, with percent escapes decoded
   and UTF8 byte sequences decoded into characters.
 
@@ -731,7 +731,21 @@ Connection
 
 Sent when the client initially opens a connection and completes the
 WebSocket handshake. If sending this raises ``ChannelFull``, the interface
-server must close the WebSocket connection with error code 1013.
+server must close the connection with either HTTP status code ``503`` or
+WebSocket close code ``1013``.
+
+This message must be responded to on the ``reply_channel`` with a
+*Connection Reply* message before the socket will pass messages on the
+``receive`` channel. The protocol server should ideally send this message
+during the handshake phase of the WebSocket and not complete the handshake
+until it gets a reply, returning HTTP status code ``403`` if the connection is
+denied. If this is not possible, it must buffer WebSocket frames and not
+send them onto ``websocket.receive`` until a reply is received, and if the
+connection is rejected, return WebSocket close code ``4403``.
+
+Receiving a WebSocket *Send/Close* message while waiting for a
+*Connection Reply* must make the server accept the connection and then send
+the message immediately.
 
 Channel: ``websocket.connect``
 
@@ -766,6 +780,22 @@ Keys:
   Optional, defaults to ``None``.
 
 * ``order``: The integer value ``0``.
+
+
+Connection Reply
+''''''''''''''''
+
+Sent back on the reply channel from an application when a ``connect`` message
+is received to say if the connection should be accepted or dropped.
+
+Behaviour on WebSocket rejection is defined in the Connection section above.
+
+Channel: ``websocket.send!``
+
+Keys:
+
+* ``accept``: If the connection should be accepted (``True``) or rejected and
+  dropped (``False``).
 
 
 Receive
@@ -824,6 +854,9 @@ Send/Close
 
 Sends a data frame to the client and/or closes the connection from the
 server end. If ``ChannelFull`` is raised, wait and try again.
+
+If sent while the connection is waiting for acceptance or rejection,
+will accept the connection before the frame is sent.
 
 Channel: ``websocket.send!``
 

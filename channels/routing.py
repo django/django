@@ -56,8 +56,9 @@ class Router(object):
         # We also add a no-op websocket.connect consumer to the bottom, as the
         # spec requires that this is consumed, but Channels does not. Any user
         # consumer will override this one. Same for websocket.receive.
-        self.add_route(Route("websocket.connect", null_consumer))
+        self.add_route(Route("websocket.connect", connect_consumer))
         self.add_route(Route("websocket.receive", null_consumer))
+        self.add_route(Route("websocket.disconnect", null_consumer))
 
     @classmethod
     def resolve_routing(cls, routing):
@@ -248,6 +249,13 @@ def null_consumer(*args, **kwargs):
     """
     Standard no-op consumer.
     """
+
+
+def connect_consumer(message, *args, **kwargs):
+    """
+    Accept-all-connections websocket.connect consumer
+    """
+    message.reply_channel.send({"accept": True})
 
 
 # Lowercase standard to match urls.py

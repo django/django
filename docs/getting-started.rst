@@ -105,7 +105,7 @@ for ``http.request`` - and make this WebSocket consumer instead::
 
     def ws_message(message):
         # ASGI WebSocket packet-received and send-packet message types
-        # both have a "text" key for their textual data. 
+        # both have a "text" key for their textual data.
         message.reply_channel.send({
             "text": message.content['text'],
         })
@@ -165,6 +165,7 @@ disconnect, like this::
 
     # Connected to websocket.connect
     def ws_add(message):
+        message.reply_channel.send({"accept": True})
         Group("chat").add(message.reply_channel)
 
     # Connected to websocket.disconnect
@@ -203,6 +204,7 @@ get the message. Here's all the code::
 
     # Connected to websocket.connect
     def ws_add(message):
+        message.reply_channel.send({"accept": True})
         Group("chat").add(message.reply_channel)
 
     # Connected to websocket.receive
@@ -363,6 +365,8 @@ name in the path of your WebSocket request (we'll ignore auth for now - that's n
     # Connected to websocket.connect
     @channel_session
     def ws_connect(message):
+        # Accept connection
+        message.reply_channel.send({"accept": True})
         # Work out room name from path (ignore slashes)
         room = message.content['path'].strip("/")
         # Save room in session and add us to the group
@@ -462,6 +466,8 @@ chat to people with the same first letter of their username::
     # Connected to websocket.connect
     @channel_session_user_from_http
     def ws_add(message):
+        # Accept connection
+        message.reply_channel.send({"accept": True})
         # Add them to the right group
         Group("chat-%s" % message.user.username[0]).add(message.reply_channel)
 

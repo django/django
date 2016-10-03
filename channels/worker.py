@@ -13,6 +13,7 @@ from .exceptions import ConsumeLater
 from .message import Message
 from .utils import name_that_thing
 from .signals import worker_ready
+from .consumer_middleware import ConsumerMiddlewareRegistry
 
 logger = logging.getLogger('django.channels')
 
@@ -40,6 +41,7 @@ class Worker(object):
         self.exclude_channels = exclude_channels
         self.termed = False
         self.in_job = False
+        self.middleware_registry = ConsumerMiddlewareRegistry()
 
     def install_signal_handler(self):
         signal.signal(signal.SIGTERM, self.sigterm_handler)
@@ -117,7 +119,8 @@ class Worker(object):
                 # Send consumer started to manage lifecycle stuff
                 consumer_started.send(sender=self.__class__, environ={})
                 # Run consumer
-                consumer(message, **kwargs)
+                chain = self.middleware_registry.make_chain(consumer, kwargs)
+                chain(message)
             except ConsumeLater:
                 # They want to not handle it yet. Re-inject it with a number-of-tries marker.
                 content['__retries__'] = content.get("__retries__", 0) + 1

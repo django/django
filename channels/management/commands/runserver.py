@@ -121,6 +121,10 @@ class Command(RunserverCommand):
             msg += "WebSocket CONNECT %(path)s [%(client)s]\n" % details
         elif protocol == "websocket" and action == "disconnected":
             msg += "WebSocket DISCONNECT %(path)s [%(client)s]\n" % details
+        elif protocol == "websocket" and action == "connecting":
+            msg += "WebSocket HANDSHAKING %(path)s [%(client)s]\n" % details
+        elif protocol == "websocket" and action == "rejected":
+            msg += "WebSocket REJECT %(path)s [%(client)s]\n" % details
 
         sys.stderr.write(msg)
 

@@ -29,3 +29,11 @@ class RequestAborted(Exception):
     reading the body.
     """
     pass
+
+
+class DenyConnection(Exception):
+    """
+    Raise during a websocket.connect (or other supported connection) handler
+    to deny the connection.
+    """
+    pass
