@@ -25,3 +25,7 @@ class TestCallableBool(SimpleTestCase):
         self.assertIs(CallableTrue | False, True)
         self.assertIs(CallableFalse | True, True)
         self.assertFalse(CallableFalse | False, False)
+
+    def test_set_membership(self):
+        self.assertIs(CallableTrue in {True}, True)
+        self.assertIs(CallableFalse not in {True}, True)
