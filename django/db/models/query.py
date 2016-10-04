@@ -532,7 +532,8 @@ class QuerySet(object):
             try:
                 self.model._meta.get_field(param)
             except exceptions.FieldDoesNotExist:
-                invalid_params.append(param)
+                if param != 'pk':  # Allow to use model's pk property
+                    invalid_params.append(param)
         if invalid_params:
             raise exceptions.FieldError(
                 "Invalid field name(s) for model %s: '%s'." % (

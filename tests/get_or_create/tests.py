@@ -71,6 +71,13 @@ class GetOrCreateTests(TestCase):
         with self.assertRaises(IntegrityError):
             Person.objects.get_or_create(first_name="Tom", last_name="Smith")
 
+    def test_get_or_create_with_pk_property(self):
+        """
+        Using the pk property of a model should be allowed, even though pk is
+        not a model field.
+        """
+        Thing.objects.get_or_create(pk=1)
+
     def test_get_or_create_on_related_manager(self):
         p = Publisher.objects.create(name="Acme Publishing")
         # Create a book through the publisher.
@@ -323,6 +330,13 @@ class UpdateOrCreateTests(TestCase):
         with self.assertRaises(IntegrityError):
             ManualPrimaryKeyTest.objects.update_or_create(id=1, data="Different")
         self.assertEqual(ManualPrimaryKeyTest.objects.get(id=1).data, "Original")
+
+    def test_with_pk_property(self):
+        """
+        Using the pk property of a model should be allowed, even though pk is
+        not a model field.
+        """
+        Thing.objects.update_or_create(pk=1)
 
     def test_error_contains_full_traceback(self):
         """
