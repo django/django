@@ -279,7 +279,6 @@ class ModelAdminTests(TestCase):
         )
 
     def test_overriding_get_exclude(self):
-        # Using `get_exclude`.
         class BandAdmin(ModelAdmin):
             def get_exclude(self, request, obj=None):
                 return ['name']
@@ -289,7 +288,7 @@ class ModelAdminTests(TestCase):
             ['bio', 'sign_date']
         )
 
-        # Using `exclude` and `get_exclude`.
+    def test_get_exclude_overrides_exclude(self):
         class BandAdmin(ModelAdmin):
             exclude = ['bio']
 
@@ -301,10 +300,8 @@ class ModelAdminTests(TestCase):
             ['bio', 'sign_date']
         )
 
-        # Using `exclude` and `get_exclude` with obj.
+    def test_get_exclude_takes_obj(self):
         class BandAdmin(ModelAdmin):
-            exclude = ['bio']
-
             def get_exclude(self, request, obj=None):
                 if obj:
                     return ['sign_date']

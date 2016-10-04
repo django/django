@@ -283,6 +283,12 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         except AttributeError:
             return mark_safe(self.admin_site.empty_value_display)
 
+    def get_exclude(self, request, obj=None):
+        """
+        Hook for specifying exclude.
+        """
+        return self.exclude
+
     def get_fields(self, request, obj=None):
         """
         Hook for specifying fields.
@@ -326,12 +332,6 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         if ordering:
             qs = qs.order_by(*ordering)
         return qs
-
-    def get_exclude(self, request, obj=None):
-        """
-        Hook for specifying exclude.
-        """
-        return self.exclude
 
     def lookup_allowed(self, lookup, value):
         from django.contrib.admin.filters import SimpleListFilter
@@ -613,10 +613,7 @@ class ModelAdmin(BaseModelAdmin):
         else:
             fields = flatten_fieldsets(self.get_fieldsets(request, obj))
         excluded = self.get_exclude(request, obj)
-        if excluded is None:
-            exclude = []
-        else:
-            exclude = list(excluded)
+        exclude = [] if excluded is None else list(excluded)
         readonly_fields = self.get_readonly_fields(request, obj)
         exclude.extend(readonly_fields)
         if (excluded is None and
@@ -1894,10 +1891,7 @@ class InlineModelAdmin(BaseModelAdmin):
         else:
             fields = flatten_fieldsets(self.get_fieldsets(request, obj))
         excluded = self.get_exclude(request, obj)
-        if excluded is None:
-            exclude = []
-        else:
-            exclude = list(excluded)
+        exclude = [] if excluded is None else list(excluded)
         exclude.extend(self.get_readonly_fields(request, obj))
         if (excluded is None and
                 hasattr(self.form, '_meta') and self.form._meta.exclude):
