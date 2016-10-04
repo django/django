@@ -31,7 +31,6 @@ In your custom ``change_form.html`` template, extend the
     {% block admin_change_form_document_ready %}
     {{ block.super }}
     <script type="text/javascript" src="{% static 'app/formset_handlers.js' %}></script>
-    </script>
     {% endblock %}
 
 .. snippet:: javascript
