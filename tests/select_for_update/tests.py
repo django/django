@@ -300,3 +300,12 @@ class SelectForUpdateTests(TransactionTestCase):
     def test_nowait_and_skip_locked(self):
         with self.assertRaisesMessage(ValueError, 'The nowait option cannot be used with skip_locked.'):
             Person.objects.select_for_update(nowait=True, skip_locked=True)
+
+    def test_ordered_select_for_update(self):
+        """
+        Subqueries should respect ordering as an ORDER BY clause may be useful
+        to specify a row locking order to prevent deadlocks (#27193).
+        """
+        with transaction.atomic():
+            qs = Person.objects.filter(id__in=Person.objects.order_by('-id').select_for_update())
+            self.assertIn('ORDER BY', str(qs.query))
