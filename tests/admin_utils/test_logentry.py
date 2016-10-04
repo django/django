@@ -179,6 +179,14 @@ class LogEntryTests(TestCase):
         log_entry.action_flag = 4
         self.assertEqual(six.text_type(log_entry), 'LogEntry Object')
 
+    def test_logaction(self):
+        content_type_pk = ContentType.objects.get_for_model(Article).pk
+        log_entry = LogEntry.objects.log_action(
+            self.user.pk, content_type_pk, self.a1.pk, repr(self.a1), CHANGE,
+            change_message='Changed something else'
+        )
+        self.assertEqual(log_entry, LogEntry.objects.latest('action_time'))
+
     def test_recentactions_without_content_type(self):
         """
         If a LogEntry is missing content_type it will not display it in span
