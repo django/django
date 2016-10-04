@@ -1,5 +1,3 @@
-from functools import wraps
-
 from django.core.exceptions import ObjectDoesNotExist  # NOQA
 from django.db.models import signals  # NOQA
 from django.db.models.aggregates import *  # NOQA
@@ -37,7 +35,17 @@ def permalink(func):
         (viewname, viewargs)
         (viewname, viewargs, viewkwargs)
     """
+    import warnings
+    from functools import wraps
+
     from django.urls import reverse
+    from django.utils.deprecation import RemovedInDjango21Warning
+
+    warnings.warn(
+        'permalink() is deprecated in favor of calling django.urls.reverse() '
+        'in the decorated method.',
+        RemovedInDjango21Warning
+    )
 
     @wraps(func)
     def inner(*args, **kwargs):
