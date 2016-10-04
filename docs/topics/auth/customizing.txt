@@ -139,7 +139,7 @@ object the first time a user authenticates::
         """
         Authenticate against the settings ADMIN_LOGIN and ADMIN_PASSWORD.
 
-        Use the login name, and a hash of the password. For example:
+        Use the login name and a hash of the password. For example:
 
         ADMIN_LOGIN = 'admin'
         ADMIN_PASSWORD = 'pbkdf2_sha256$30000$Vo0VlMnkR4Bk$qEvtdyZRWTcOsCnI/oQ7fVOu1XAURIZYoOZ3iq8Dr4M='
@@ -152,10 +152,9 @@ object the first time a user authenticates::
                 try:
                     user = User.objects.get(username=username)
                 except User.DoesNotExist:
-                    # Create a new user. Note that we can set password
-                    # to anything, because it won't be checked; the password
-                    # from settings.py will.
-                    user = User(username=username, password='get from settings.py')
+                    # Create a new user. There's no need to set a password
+                    # because only the password from settings.py is checked.
+                    user = User(username=username)
                     user.is_staff = True
                     user.is_superuser = True
                     user.save()
