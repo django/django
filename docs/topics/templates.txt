@@ -252,6 +252,10 @@ templates, Django provides a shortcut function which automates the process.
         An optional :class:`~django.http.HttpRequest` that will be available
         during the template's rendering process.
 
+    ``using``
+        An optional :setting:`NAME <TEMPLATES-NAME>` of a particular template engine
+        to restrict the search for the template file.
+
     Usage example::
 
         from django.template.loader import render_to_string
