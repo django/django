@@ -52,7 +52,7 @@ you can still do that by passing the ``immediately`` argument::
 
     Channel("thumbnailing-tasks").send({"id": 34245}, immediately=True)
 
-This should be entirely backwards compatible, and may actually fix race
+This should be mostly backwards compatible, and may actually fix race
 conditions in some apps that were pre-existing.
 
 
@@ -60,3 +60,28 @@ Demultiplexer Overhaul
 ~~~~~~~~~~~~~~~~~~~~~~
 
 TBD
+
+
+Backwards Incompatible Changes
+------------------------------
+
+Connect Consumers
+~~~~~~~~~~~~~~~~~
+
+If you have a custom consumer for ``websocket.connect``, you must ensure that
+it either:
+
+* Sends at least one message onto the ``reply_channel`` that generates a
+  WebSocket frame (either ``bytes`` or ``text`` is set), either directly
+  or via a group.
+* Sends a message onto the ``reply_channel`` that is ``{"accept": True}``,
+  to accept a connection without sending data.
+* Sends a message onto the ``reply_channel`` that is ``{"close": True}``,
+  to reject a connection mid-handshake.
+
+Many consumers already do the former, but if your connect consumer does not
+send anything you MUST now send an accept message or the socket will remain
+in the handshaking phase forever and you'll never get any messages.
+
+All built-in Channels consumers (e.g. in the generic consumers) have been
+upgraded to do this.
