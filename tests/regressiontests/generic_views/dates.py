@@ -70,13 +70,13 @@ class ArchiveIndexViewTests(TestCase):
         res = self.client.get('/dates/books/paginated/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['date_list'], Book.objects.dates('pubdate', 'year')[::-1])
-        self.assertEqual(list(res.context['latest']), list(Book.objects.all()[0:10]))
+        self.assertItemsEqual(list(res.context['latest']), list(Book.objects.all()[0:10]))
         self.assertTemplateUsed(res, 'generic_views/book_archive.html')
 
         res = self.client.get('/dates/books/paginated/?page=2')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['page_obj'].number, 2)
-        self.assertEqual(list(res.context['latest']), list(Book.objects.all()[10:20]))
+        self.assertItemsEqual(list(res.context['latest']), list(Book.objects.all()[10:20]))
 
 
 class YearArchiveViewTests(TestCase):

@@ -25,17 +25,15 @@ class TestTransactionClosing(TransactionTestCase):
         def raw_sql():
             "Write a record using raw sql under a commit_on_success decorator"
             cursor = connection.cursor()
-            cursor.execute("INSERT into transactions_regress_mod (id,fld) values (17,18)")
+            cursor.execute("INSERT into transactions_regress_mod (fld) values (18)")
 
         raw_sql()
         # Rollback so that if the decorator didn't commit, the record is unwritten
         transaction.rollback()
-        try:
-            # Check that the record is in the DB
-            obj = Mod.objects.get(pk=17)
-            self.assertEqual(obj.fld, 18)
-        except Mod.DoesNotExist:
-            self.fail("transaction with raw sql not committed")
+        self.assertEqual(Mod.objects.count(), 1)
+        # Check that the record is in the DB
+        obj = Mod.objects.all()[0]
+        self.assertEqual(obj.fld, 18)
 
     def test_commit_manually_enforced(self):
         """
@@ -116,19 +114,16 @@ class TestTransactionClosing(TransactionTestCase):
             be committed.
             """
             cursor = connection.cursor()
-            cursor.execute("INSERT into transactions_regress_mod (id,fld) values (1,2)")
+            cursor.execute("INSERT into transactions_regress_mod (fld) values (2)")
             transaction.rollback()
-            cursor.execute("INSERT into transactions_regress_mod (id,fld) values (1,2)")
+            cursor.execute("INSERT into transactions_regress_mod (fld) values (2)")
 
         reuse_cursor_ref()
         # Rollback so that if the decorator didn't commit, the record is unwritten
         transaction.rollback()
-        try:
-            # Check that the record is in the DB
-            obj = Mod.objects.get(pk=1)
-            self.assertEqual(obj.fld, 2)
-        except Mod.DoesNotExist:
-            self.fail("After ending a transaction, cursor use no longer sets dirty")
+        self.assertEqual(Mod.objects.count(), 1)
+        obj = Mod.objects.all()[0]
+        self.assertEqual(obj.fld, 2)
 
     def test_failing_query_transaction_closed(self):
         """

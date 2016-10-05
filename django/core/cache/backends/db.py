@@ -172,6 +172,11 @@ class DatabaseCache(BaseDatabaseCache):
                     cursor.execute("""SELECT cache_key FROM
 (SELECT ROW_NUMBER() OVER (ORDER BY cache_key) AS counter, cache_key FROM %s)
 WHERE counter > %%s AND COUNTER <= %%s""" % table, [cull_num, cull_num + 1])
+                elif connections[db].vendor == 'microsoft':
+                    # MS doesn't support LIMIT + OFFSET
+                    cursor.execute("""SELECT cache_key FROM
+(SELECT ROW_NUMBER() OVER (ORDER BY cache_key) AS counter, cache_key FROM %s) AS RankedCache
+WHERE counter > %%s AND counter <= %%s""" % table, [cull_num, cull_num + 1])
                 else:
                     # This isn't standard SQL, it's likely to break
                     # with some non officially supported databases

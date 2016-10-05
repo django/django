@@ -19,7 +19,7 @@ from django.utils import unittest
 from django.test import LiveServerTestCase
 
 test_dir = os.path.dirname(os.path.dirname(__file__))
-expected_query_re = re.compile(r'CREATE TABLE [`"]admin_scripts_article[`"]', re.IGNORECASE)
+expected_query_re = re.compile(r'CREATE TABLE [\[`"]admin_scripts_article[\]`"]', re.IGNORECASE)
 
 
 class AdminScriptTestCase(unittest.TestCase):
