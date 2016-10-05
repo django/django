@@ -135,7 +135,6 @@ blockquote {
 
 code, pre {
     font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
-    background: inherit;
     color: #666;
     font-size: 11px;
 }
