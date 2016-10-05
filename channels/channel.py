@@ -38,7 +38,6 @@ class Channel(object):
             raise TypeError("You can only send dicts as content on channels.")
         self.channel_layer.send(self.name, content)
         message_sent.send(sender=self.__class__, channel=self.name, keys=list(content.keys()))
-        print("didsig", self.name)
 
     def __str__(self):
         return self.name

@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import importlib
 import threading
+import warnings
 from django.conf import settings
 
 from .exceptions import DenyConnection
@@ -48,14 +49,18 @@ class ConvenienceMiddleware(object):
         self.consumer = consumer
 
     def __call__(self, message):
-        print("conven", message.channel)
         if message.channel.name == "websocket.connect":
             # Websocket connect acceptance helper
             try:
                 self.consumer(message)
-                print ("messages sent", self.get_messages())
             except DenyConnection:
                 message.reply_channel.send({"accept": False})
+            else:
+                replies_sent = [msg for chan, msg in self.get_messages() if chan == message.reply_channel.name]
+                # If they sent no replies, send implicit acceptance
+                if not replies_sent:
+                    warnings.warn("AAAAAAAAAAA", RuntimeWarning)
+                    message.reply_channel.send({"accept": True})
         else:
             # General path
             return self.consumer(message)
@@ -67,8 +72,8 @@ class ConvenienceMiddleware(object):
         """
         cls.runtime_data.sent_messages = []
 
-    consumer_started.connect(lambda **kwargs: reset_messages())
-    consumer_finished.connect(lambda **kwargs: reset_messages())
+    consumer_started.connect(lambda **kwargs: ConvenienceMiddleware.reset_messages(), weak=False)
+    consumer_finished.connect(lambda **kwargs: ConvenienceMiddleware.reset_messages(), weak=False)
 
     @classmethod
     def sent_message(cls, channel, keys, **kwargs):
@@ -78,9 +83,8 @@ class ConvenienceMiddleware(object):
         all messages.
         """
         cls.runtime_data.sent_messages = getattr(cls.runtime_data, "sent_messages", []) + [(channel, keys)]
-        print ("saved now", cls.runtime_data.sent_messages)
 
-    message_sent.connect(lambda channel, keys, **kwargs: sent_message(channel, keys))
+    message_sent.connect(lambda channel, keys, **kwargs: ConvenienceMiddleware.sent_message(channel, keys), weak=False)
 
     @classmethod
     def get_messages(cls):
