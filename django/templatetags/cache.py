@@ -9,6 +9,14 @@ from django.utils.http import urlquote
 
 register = Library()
 
+def make_key(fragment_name, vary_on):
+    """
+    Build a key for this fragment and all vary-on's.
+    """
+    key = ':'.join(map(urlquote, vary_on))
+    args = hashlib.md5(force_bytes(key))
+    return 'template.cache.%s.%s' % (fragment_name, args.hexdigest())
+
 class CacheNode(Node):
     def __init__(self, nodelist, expire_time_var, fragment_name, vary_on):
         self.nodelist = nodelist
@@ -25,10 +33,8 @@ class CacheNode(Node):
             expire_time = int(expire_time)
         except (ValueError, TypeError):
             raise TemplateSyntaxError('"cache" tag got a non-integer timeout value: %r' % expire_time)
-        # Build a key for this fragment and all vary-on's.
-        key = ':'.join([urlquote(resolve_variable(var, context)) for var in self.vary_on])
-        args = hashlib.md5(force_bytes(key))
-        cache_key = 'template.cache.%s.%s' % (self.fragment_name, args.hexdigest())
+        vary_on = [resolve_variable(var, context) for var in self.vary_on]
+        cache_key = make_key(self.fragment_name, vary_on)
         value = cache.get(cache_key)
         if value is None:
             value = self.nodelist.render(context)

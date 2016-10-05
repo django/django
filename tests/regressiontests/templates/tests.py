@@ -37,6 +37,7 @@ from django.utils import six
 from django.utils.tzinfo import LocalTimezone
 
 from .callables import CallableVariablesTests
+from .cache import TestCache
 from .context import ContextTests
 from .custom import CustomTagTests, CustomFilterTests
 from .parser import ParserTests
