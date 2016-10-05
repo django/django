@@ -14,6 +14,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.html import conditional_escape
 from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode
 from django.utils.safestring import mark_safe
+from django.utils.formats import localize
 
 
 __all__ = ('BaseForm', 'Form')
@@ -341,6 +342,8 @@ class BaseForm(StrAndUnicode):
                     hidden_widget = field.hidden_widget()
                     initial_value = hidden_widget.value_from_datadict(
                         self.data, self.files, initial_prefixed_name)
+                if field.widget.is_localized:
+                    initial_value = localize(initial_value)
                 if field.widget._has_changed(initial_value, data_value):
                     self._changed_data.append(name)
         return self._changed_data
