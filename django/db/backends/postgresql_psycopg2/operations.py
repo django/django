@@ -133,12 +133,13 @@ class DatabaseOperations(BaseDatabaseOperations):
                     break # Only one AutoField is allowed per model, so don't bother continuing.
             for f in model._meta.many_to_many:
                 if not f.rel.through:
+                    pk_column = f.m2m_reverse_name()
                     output.append("%s setval(pg_get_serial_sequence('%s','%s'), coalesce(max(%s), 1), max(%s) %s null) %s %s;" % \
                         (style.SQL_KEYWORD('SELECT'),
                         style.SQL_TABLE(qn(f.m2m_db_table())),
-                        style.SQL_FIELD('id'),
-                        style.SQL_FIELD(qn('id')),
-                        style.SQL_FIELD(qn('id')),
+                        style.SQL_FIELD(pk_column),
+                        style.SQL_FIELD(qn(pk_column)),
+                        style.SQL_FIELD(qn(pk_column)),
                         style.SQL_KEYWORD('IS NOT'),
                         style.SQL_KEYWORD('FROM'),
                         style.SQL_TABLE(qn(f.m2m_db_table()))))
