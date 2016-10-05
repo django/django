@@ -219,7 +219,7 @@ class AppCache(object):
         return model_list
 
     def get_model(self, app_label, model_name,
-                  seed_cache=True, only_installed=True):
+                  seed_cache=True, only_installed=True, module=None):
         """
         Returns the model matching the given app_label and case-insensitive
         model_name.
@@ -230,7 +230,11 @@ class AppCache(object):
             self._populate()
         if only_installed and app_label not in self.app_labels:
             return None
-        return self.app_models.get(app_label, SortedDict()).get(model_name.lower())
+        model_name = full_model_name = model_name.lower()
+        if module is not None:
+            full_model_name = '%s.%s' % (module, model_name)
+        models = self.app_models.get(app_label, SortedDict())
+        return models.get(full_model_name) or models.get(model_name)
 
     def register_models(self, app_label, *models):
         """
@@ -241,6 +245,8 @@ class AppCache(object):
             # in the app_models dictionary
             model_name = model._meta.object_name.lower()
             model_dict = self.app_models.setdefault(app_label, SortedDict())
+            if model._meta.proxy and model_name in model_dict:
+                model_name = '%s.%s' % (model.__module__, model_name)
             if model_name in model_dict:
                 # The same model may be imported via different paths (e.g.
                 # appname.models and project.appname.models). We use the source
