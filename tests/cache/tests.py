@@ -459,7 +459,7 @@ class BaseCacheTests(object):
 
     def test_zero_timeout(self):
         '''
-        Passing in None into timeout results in a value that is cached forever
+        Passing in zero into timeout results in a value that is not cached
         '''
         self.cache.set('key1', 'eggs', 0)
         self.assertEqual(self.cache.get('key1'), None)
