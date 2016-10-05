@@ -744,7 +744,10 @@ class TransactionTestCase(SimpleTestCase):
             cache.set_available_apps(self.available_apps)
             for db_name in self._databases_names(include_mirrors=False):
                 flush.Command.emit_post_syncdb(
-                        verbosity=0, interactive=False, database=db_name)
+                    verbosity=self._utils_verbosity(),
+                    interactive=False,
+                    database=db_name
+                )
         try:
             self._fixture_setup()
         except Exception:
@@ -782,8 +785,13 @@ class TransactionTestCase(SimpleTestCase):
             if hasattr(self, 'fixtures'):
                 # We have to use this slightly awkward syntax due to the fact
                 # that we're using *args and **kwargs together.
-                call_command('loaddata', *self.fixtures,
-                             **{'verbosity': 0, 'database': db_name, 'skip_validation': True})
+                call_command(
+                    'loaddata',
+                    *self.fixtures,
+                    **{'verbosity': self._utils_verbosity(),
+                        'database': db_name,
+                        'skip_validation': True}
+                )
 
     def _post_teardown(self):
         """Performs any post-test things. This includes:
@@ -810,11 +818,24 @@ class TransactionTestCase(SimpleTestCase):
         # Allow TRUNCATE ... CASCADE and don't emit the post_syncdb signal
         # when flushing only a subset of the apps
         for db_name in self._databases_names(include_mirrors=False):
-            call_command('flush', verbosity=0, interactive=False,
-                         database=db_name, skip_validation=True,
-                         reset_sequences=False,
-                         allow_cascade=self.available_apps is not None,
-                         inhibit_post_syncdb=self.available_apps is not None)
+            call_command(
+                'flush',
+                verbosity=self._utils_verbosity(),
+                interactive=False,
+                database=db_name,
+                skip_validation=True,
+                reset_sequences=False,
+                allow_cascade=self.available_apps is not None,
+                inhibit_post_syncdb=self.available_apps is not None)
+
+    def _utils_verbosity(self):
+        """We won't change default output, because someone may relay on it.
+        On the other hand side if someone would like to get verbose output
+        he should get it from all resources."""
+        verbosity = getattr(TestCase, '__utils_verbosity__', 0)
+        if verbosity == 1:
+            verbosity = 0
+        return verbosity
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True):
         items = six.moves.map(transform, qs)
@@ -875,7 +896,7 @@ class TestCase(TransactionTestCase):
                 try:
                     call_command('loaddata', *self.fixtures,
                                  **{
-                                    'verbosity': 0,
+                                    'verbosity': self._utils_verbosity(),
                                     'commit': False,
                                     'database': db_name,
                                     'skip_validation': True,
