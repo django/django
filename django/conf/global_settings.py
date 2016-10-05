@@ -11,6 +11,7 @@ gettext_noop = lambda s: s
 
 DEBUG = False
 TEMPLATE_DEBUG = False
+TECHNICAL_500_RESPONSE_HAS_HTML = False
 
 # Whether the framework should propagate raw exceptions rather than catching
 # them. This is useful under some testing situations and should never be used

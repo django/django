@@ -61,8 +61,9 @@ def technical_500_response(request, exc_type, exc_value, tb):
     Create a technical server error response. The last three arguments are
     the values returned from sys.exc_info() and friends.
     """
+    html_force = getattr(settings, 'TECHNICAL_500_RESPONSE_HAS_HTML', False)
     reporter = ExceptionReporter(request, exc_type, exc_value, tb)
-    if request.is_ajax():
+    if html_force is False and request.is_ajax():
         text = reporter.get_traceback_text()
         return HttpResponseServerError(text, content_type='text/plain')
     else:
