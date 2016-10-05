@@ -29,13 +29,20 @@ class Channel(object):
         else:
             self.channel_layer = channel_layers[alias]
 
-    def send(self, content):
+    def send(self, content, immediately=False):
         """
         Send a message over the channel - messages are always dicts.
+
+        Sends are delayed until consumer completion. To override this, you
+        may pass immediately=True.
         """
         if not isinstance(content, dict):
             raise TypeError("You can only send dicts as content on channels.")
-        self.channel_layer.send(self.name, content)
+        if immediately:
+            self.channel_layer.send(self.name, content)
+        else:
+            from .message import pending_message_store
+            pending_message_store.append(self, content)
 
     def __str__(self):
         return self.name
@@ -66,7 +73,17 @@ class Group(object):
             channel = channel.name
         self.channel_layer.group_discard(self.name, channel)
 
-    def send(self, content):
+    def send(self, content, immediately=False):
+        """
+        Send a message to all channels in the group.
+
+        Sends are delayed until consumer completion. To override this, you
+        may pass immediately=True.
+        """
         if not isinstance(content, dict):
             raise ValueError("You can only send dicts as content on channels.")
-        self.channel_layer.send_group(self.name, content)
+        if immediately:
+            self.channel_layer.send_group(self.name, content)
+        else:
+            from .message import pending_message_store
+            pending_message_store.append(self, content)

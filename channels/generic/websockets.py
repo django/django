@@ -23,7 +23,7 @@ class WebsocketConsumer(BaseConsumer):
     # implies channel_session_user
     http_user = False
 
-    # Set one to True if you want the class to enforce ordering for you
+    # Set to True if you want the class to enforce ordering for you
     slight_ordering = False
     strict_ordering = False
 
@@ -47,7 +47,7 @@ class WebsocketConsumer(BaseConsumer):
         if self.strict_ordering:
             return enforce_ordering(handler, slight=False)
         elif self.slight_ordering:
-            return enforce_ordering(handler, slight=True)
+            raise ValueError("Slight ordering is now always on. Please remove `slight_ordering=True`.")
         else:
             return handler
 

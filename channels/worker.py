@@ -145,7 +145,7 @@ class Worker(object):
                         break
             except:
                 logger.exception("Error processing message with consumer %s:", name_that_thing(consumer))
-            else:
+            finally:
                 # Send consumer finished so DB conns close etc.
                 consumer_finished.send(sender=self.__class__)
 

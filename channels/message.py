@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 import copy
+import threading
 
 from .channel import Channel
+from .signals import consumer_finished
 
 
 class Message(object):
@@ -58,3 +60,25 @@ class Message(object):
             self.channel.name,
             self.channel_layer,
         )
+
+
+class PendingMessageStore(object):
+    """
+    Singleton object used for storing pending messages that should be sent
+    to a channel or group when a consumer finishes.
+    """
+
+    threadlocal = threading.local()
+
+    def append(self, sender, message):
+        if not hasattr(self.threadlocal, "messages"):
+            self.threadlocal.messages = []
+        self.threadlocal.messages.append((sender, message))
+
+    def send_and_flush(self, **kwargs):
+        for sender, message in getattr(self.threadlocal, "messages", []):
+            sender.send(message, immediately=True)
+        self.threadlocal.messages = []
+
+pending_message_store = PendingMessageStore()
+consumer_finished.connect(pending_message_store.send_and_flush)
