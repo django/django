@@ -185,7 +185,7 @@ class LogEntryTests(TestCase):
             self.user.pk, content_type_pk, self.a1.pk, repr(self.a1), CHANGE,
             change_message='Changed something else',
         )
-        self.assertEqual(log_entry, LogEntry.objects.latest('action_time'))
+        self.assertEqual(log_entry, LogEntry.objects.latest('id'))
 
     def test_recentactions_without_content_type(self):
         """
