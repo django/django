@@ -114,9 +114,11 @@ class CursorWrapper(object):
     to the particular underlying representation returned by Connection.cursor().
     """
     codes_for_integrityerror = (1048,)
+    codes_for_goneaway = (2006,)
 
-    def __init__(self, cursor):
+    def __init__(self, cursor, db=None):
         self.cursor = cursor
+        self.db = db
 
     def execute(self, query, args=None):
         try:
@@ -127,6 +129,8 @@ class CursorWrapper(object):
             # misclassified and Django would prefer the more logical place.
             if e.args[0] in self.codes_for_integrityerror:
                 six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+            if e.args[0] in self.codes_for_goneaway:
+                return self._reissue_query(self.execute, query, args)
             raise
 
     def executemany(self, query, args):
@@ -137,7 +141,15 @@ class CursorWrapper(object):
             # misclassified and Django would prefer the more logical place.
             if e.args[0] in self.codes_for_integrityerror:
                 six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+            if e.args[0] in self.codes_for_goneaway:
+                return self._reissue_query(self.executemany, query, args)
             raise
+
+    def _reissue_query(self, method, query, args):
+        self.cursor.close()
+        self.db.connect()
+        self.cursor = self.db.create_cursor()
+        return method(query, args)
 
     def __getattr__(self, attr):
         if attr in self.__dict__:
@@ -448,7 +460,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def create_cursor(self):
         cursor = self.connection.cursor()
-        return CursorWrapper(cursor)
+        return CursorWrapper(cursor, self)
 
     def _rollback(self):
         try:
