@@ -23,6 +23,13 @@ then
     GEOGRAPHY=1
 fi
 
+# For Ubuntu 12.04 LTS / (with PostGIS 2.0)
+if [ -d "/usr/share/postgresql/9.1/contrib/postgis-2.0" ]
+then
+    POSTGIS_SQL_PATH=/usr/share/postgresql/9.1/contrib/postgis-2.0
+    GEOGRAPHY=1
+fi
+
 createdb -E UTF8 template_postgis && \
 ( createlang -d template_postgis -l | grep plpgsql || createlang -d template_postgis plpgsql ) && \
 psql -d postgres -c "UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis';" && \
