@@ -257,7 +257,7 @@ class AppCache(object):
         return model_list
 
     def get_model(self, app_label, model_name,
-                  seed_cache=True, only_installed=True):
+                  seed_cache=True, only_installed=True, module=None):
         """
         Returns the model matching the given app_label and case-insensitive
         model_name.
@@ -274,8 +274,12 @@ class AppCache(object):
         if (self.available_apps is not None and only_installed
                 and app_label not in self.available_apps):
             raise UnavailableApp("App with label %s isn't available." % app_label)
+        model_name = full_model_name = model_name.lower()
+        if module is not None:
+            full_model_name = '%s.%s' % (module, model_name)
         try:
-            return self.app_models[app_label][model_name.lower()]
+            models = self.app_models[app_label]
+            return models.get(full_model_name) or models.get(model_name)
         except KeyError:
             return None
 
@@ -299,6 +303,9 @@ class AppCache(object):
                 # comparing.
                 if os.path.splitext(fname1)[0] == os.path.splitext(fname2)[0]:
                     continue
+                existing_model = model_dict[model_name]
+                full_model_name = '%s.%s' % (existing_model.__module__, model_name)
+                model_dict[full_model_name] = existing_model
             model_dict[model_name] = model
         self._get_models_cache.clear()
 
