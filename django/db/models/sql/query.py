@@ -151,6 +151,8 @@ class Query(object):
         self.extra_tables = ()
         self.extra_order_by = ()
 
+        self.comments = []
+
         # A tuple that is a set of model field names and either True, if these
         # are the fields to defer, or False if these are the only fields to
         # load.
@@ -294,6 +296,9 @@ class Query(object):
             obj._extra_select_cache = self._extra_select_cache.copy()
         obj.extra_tables = self.extra_tables
         obj.extra_order_by = self.extra_order_by
+
+        obj.comments = copy.deepcopy(self.comments)
+
         obj.deferred_loading = copy.deepcopy(self.deferred_loading, memo=memo)
         if self.filter_is_sticky and self.used_aliases:
             obj.used_aliases = self.used_aliases.copy()
@@ -1688,6 +1693,12 @@ class Query(object):
             self.order_by.extend(ordering)
         else:
             self.default_ordering = False
+
+    def add_comment(self, comment_str):
+        """
+        Adds comment to query instance.
+        """
+        self.comments.append(comment_str)
 
     def clear_ordering(self, force_empty=False):
         """

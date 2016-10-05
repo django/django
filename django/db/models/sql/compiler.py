@@ -147,7 +147,15 @@ class SQLCompiler(object):
         # Finally do cleanup - get rid of the joins we created above.
         self.query.reset_refcounts(self.refcounts_before)
 
-        return ' '.join(result), tuple(params)
+        query_str = ' '.join(result)
+
+        # Add all comments to the query.
+        if self.query.comments:
+            for comment_str in self.query.comments:
+                query_str = '%s /* %%s */' % query_str
+                params.append(comment_str)
+
+        return query_str, tuple(params)
 
     def as_nested_sql(self):
         """

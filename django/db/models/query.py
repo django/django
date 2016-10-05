@@ -759,6 +759,17 @@ class QuerySet(object):
         obj.query.add_ordering(*field_names)
         return obj
 
+    def comment(self, comment_str):
+        """
+        Returns a new QuerySet instance with a comment added.
+        """
+        assert (type(comment_str) ==  str), \
+                "Cannot add a non-string as a comment."
+
+        obj = self._clone()
+        obj.query.add_comment(comment_str)
+        return obj
+
     def distinct(self, *field_names):
         """
         Returns a new QuerySet instance that will select only distinct results.
