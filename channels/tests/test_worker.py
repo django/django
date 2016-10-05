@@ -68,7 +68,7 @@ class WorkerTests(ChannelTestCase):
             if _consumer._call_count == 1:
                 raise ConsumeLater()
 
-        Channel('test').send({'test': 'test'})
+        Channel('test').send({'test': 'test'}, immediately=True)
         channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
         channel_layer.router.add_route(route('test', _consumer))
         old_send = channel_layer.send
@@ -83,7 +83,7 @@ class WorkerTests(ChannelTestCase):
 
     def test_normal_run(self):
         consumer = mock.Mock()
-        Channel('test').send({'test': 'test'})
+        Channel('test').send({'test': 'test'}, immediately=True)
         channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
         channel_layer.router.add_route(route('test', consumer))
         old_send = channel_layer.send

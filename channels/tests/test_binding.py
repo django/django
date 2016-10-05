@@ -6,6 +6,7 @@ from channels.binding.base import CREATE, UPDATE, DELETE
 from channels.binding.websockets import WebsocketBinding
 from channels.generic.websockets import WebsocketDemultiplexer
 from channels.tests import ChannelTestCase, apply_routes, HttpClient
+from channels.signals import consumer_finished
 from channels import route, Group
 
 User = get_user_model()
@@ -33,6 +34,7 @@ class TestsBinding(ChannelTestCase):
 
             user = User.objects.create(username='test', email='test@test.com')
 
+            consumer_finished.send(sender=None)
             received = client.receive()
             self.assertTrue('payload' in received)
             self.assertTrue('action' in received['payload'])
@@ -69,7 +71,9 @@ class TestsBinding(ChannelTestCase):
             def has_permission(self, user, action, pk):
                 return True
 
+        # Make model and clear out pending sends
         user = User.objects.create(username='test', email='test@test.com')
+        consumer_finished.send(sender=None)
 
         with apply_routes([route('test', TestBinding.consumer)]):
             client = HttpClient()
@@ -78,6 +82,7 @@ class TestsBinding(ChannelTestCase):
             user.username = 'test_new'
             user.save()
 
+            consumer_finished.send(sender=None)
             received = client.receive()
             self.assertTrue('payload' in received)
             self.assertTrue('action' in received['payload'])
@@ -114,7 +119,9 @@ class TestsBinding(ChannelTestCase):
             def has_permission(self, user, action, pk):
                 return True
 
+        # Make model and clear out pending sends
         user = User.objects.create(username='test', email='test@test.com')
+        consumer_finished.send(sender=None)
 
         with apply_routes([route('test', TestBinding.consumer)]):
             client = HttpClient()
@@ -122,6 +129,7 @@ class TestsBinding(ChannelTestCase):
 
             user.delete()
 
+            consumer_finished.send(sender=None)
             received = client.receive()
             self.assertTrue('payload' in received)
             self.assertTrue('action' in received['payload'])
@@ -151,7 +159,7 @@ class TestsBinding(ChannelTestCase):
             client.send_and_consume('websocket.connect', path='/')
 
             # assert in group
-            Group('inbound').send({'text': json.dumps({'test': 'yes'})})
+            Group('inbound').send({'text': json.dumps({'test': 'yes'})}, immediately=True)
             self.assertEqual(client.receive(), {'test': 'yes'})
 
             # assert that demultiplexer stream message

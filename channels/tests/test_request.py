@@ -22,7 +22,7 @@ class RequestTests(ChannelTestCase):
             "http_version": "1.1",
             "method": "GET",
             "path": "/test/",
-        })
+        }, immediately=True)
         request = AsgiRequest(self.get_next_message("test"))
         self.assertEqual(request.path, "/test/")
         self.assertEqual(request.method, "GET")
@@ -53,7 +53,7 @@ class RequestTests(ChannelTestCase):
             },
             "client": ["10.0.0.1", 1234],
             "server": ["10.0.0.2", 80],
-        })
+        }, immediately=True)
         request = AsgiRequest(self.get_next_message("test"))
         self.assertEqual(request.path, "/test2/")
         self.assertEqual(request.method, "GET")
@@ -86,7 +86,7 @@ class RequestTests(ChannelTestCase):
                 "content-type": b"application/x-www-form-urlencoded",
                 "content-length": b"18",
             },
-        })
+        }, immediately=True)
         request = AsgiRequest(self.get_next_message("test"))
         self.assertEqual(request.path, "/test2/")
         self.assertEqual(request.method, "POST")
@@ -116,14 +116,14 @@ class RequestTests(ChannelTestCase):
                 "content-type": b"application/x-www-form-urlencoded",
                 "content-length": b"21",
             },
-        })
+        }, immediately=True)
         Channel("test-input").send({
             "content": b"re=fou",
             "more_content": True,
-        })
+        }, immediately=True)
         Channel("test-input").send({
             "content": b"r+lights",
-        })
+        }, immediately=True)
         request = AsgiRequest(self.get_next_message("test"))
         self.assertEqual(request.method, "POST")
         self.assertEqual(request.body, b"there_are=four+lights")
@@ -154,14 +154,14 @@ class RequestTests(ChannelTestCase):
                 "content-type": b"multipart/form-data; boundary=BOUNDARY",
                 "content-length": six.text_type(len(body)).encode("ascii"),
             },
-        })
+        }, immediately=True)
         Channel("test-input").send({
             "content": body[:20],
             "more_content": True,
-        })
+        }, immediately=True)
         Channel("test-input").send({
             "content": body[20:],
-        })
+        }, immediately=True)
         request = AsgiRequest(self.get_next_message("test"))
         self.assertEqual(request.method, "POST")
         self.assertEqual(len(request.body), len(body))
@@ -184,7 +184,7 @@ class RequestTests(ChannelTestCase):
                 "host": b"example.com",
                 "content-length": b"11",
             },
-        })
+        }, immediately=True)
         request = AsgiRequest(self.get_next_message("test", require=True))
         self.assertEqual(request.method, "PUT")
         self.assertEqual(request.read(3), b"one")
@@ -206,12 +206,12 @@ class RequestTests(ChannelTestCase):
                 "content-type": b"application/x-www-form-urlencoded",
                 "content-length": b"21",
             },
-        })
+        }, immediately=True)
         # Say there's more content, but never provide it! Muahahaha!
         Channel("test-input").send({
             "content": b"re=fou",
             "more_content": True,
-        })
+        }, immediately=True)
 
         class VeryImpatientRequest(AsgiRequest):
             body_receive_timeout = 0
@@ -235,9 +235,9 @@ class RequestTests(ChannelTestCase):
                 "content-type": b"application/x-www-form-urlencoded",
                 "content-length": b"21",
             },
-        })
+        }, immediately=True)
         Channel("test-input").send({
             "closed": True,
-        })
+        }, immediately=True)
         with self.assertRaises(RequestAborted):
             AsgiRequest(self.get_next_message("test"))
