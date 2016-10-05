@@ -13,6 +13,8 @@ from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError
 from django.utils.six.moves import zip
 
+FORCE = object()
+
 
 class SQLCompiler(object):
     def __init__(self, query, connection, using):
@@ -354,7 +356,7 @@ class SQLCompiler(object):
             sql, params = vendor_impl(self, self.connection)
         else:
             sql, params = node.as_sql(self, self.connection)
-        if select_format and not self.query.subquery:
+        if select_format is FORCE or (select_format and not self.query.subquery):
             return node.output_field.select_format(self, sql, params)
         return sql, params
 
@@ -1198,7 +1200,7 @@ class SQLAggregateCompiler(SQLCompiler):
         """
         sql, params = [], []
         for annotation in self.query.annotation_select.values():
-            ann_sql, ann_params = self.compile(annotation, select_format=True)
+            ann_sql, ann_params = self.compile(annotation, select_format=FORCE)
             sql.append(ann_sql)
             params.extend(ann_params)
         self.col_count = len(self.query.annotation_select)
