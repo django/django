@@ -3,6 +3,7 @@ Testing some internals of the template processing. These are *not* examples to b
 """
 from django.template import (TokenParser, FilterExpression, Parser, Variable,
     TemplateSyntaxError)
+from django.test.utils import override_settings
 from django.utils.unittest import TestCase
 
 
@@ -81,3 +82,21 @@ class ParserTests(TestCase):
         self.assertRaises(TemplateSyntaxError,
             Variable, "article._hidden"
         )
+
+    @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
+    def test_compile_filter_error(self):
+        """
+        Test that exceptions during Parser.compile_filter are handled correctly
+        Refs #19819
+
+        """
+        from django.template import Template, TemplateSyntaxError
+        try:
+            Template("{% if 1 %}{{ foo@bar }}{% endif %}")
+        except TemplateSyntaxError, e:
+            print e
+            self.assertEqual(
+                e.args[0],
+                "Could not parse the remainder: '@bar' from 'foo@bar'")
+
+            self.assertEqual(e.django_template_source[1], (10, 23))
