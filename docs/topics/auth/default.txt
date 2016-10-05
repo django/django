@@ -136,6 +136,11 @@ Authenticating Users
             # the authentication system was unable to verify the username and password
             print("The username and password were incorrect.")
 
+    .. note::
+
+        When calling ``authenticate`` for a custom user model, you should use the ``username``
+        keyword as the first argument, even if ``USERNAME_FIELD`` has been set to some other field.
+
 .. _topic-authorization:
 
 Permissions and Authorization
