@@ -4,7 +4,8 @@ import warnings
 
 from django.db import connection
 from django.forms import EmailField, IntegerField
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
+from django.template.response import TemplateResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
@@ -541,6 +542,85 @@ class HTMLEqualTests(TestCase):
     def test_unicode_handling(self):
         response = HttpResponse('<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>')
         self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True)
+
+
+class AssertContainsTest(SimpleTestCase):
+    longMessage = False  # defaults vary between Python 2 and 3, affects error messages
+
+    def test_string_contained_passes(self):
+        response = HttpResponse('This is some response text.')
+        self.assertContains(response, 'some response text')
+
+    def test_string_not_contained_fails(self):
+        response = HttpResponse('This is some response text.')
+        with self.assertRaises(AssertionError):
+            self.assertContains(response, 'this will not be in the response')
+
+    def test_string_not_contained_failure_message(self):
+        response = HttpResponse('This is some response text.')
+        with self.assertRaises(AssertionError) as mgr:
+            self.assertContains(response, 'foo')
+        self.assertEqual(
+            str(mgr.exception),
+            "Couldn't find 'foo' in response"
+        )
+
+    def test_with_bytestring(self):
+        response = HttpResponse('This is some response text.')
+        self.assertContains(response, b'some response text')
+
+    def test_raw_bytes(self):
+        response = HttpResponse(b'\1\2\3\4')
+        self.assertContains(response, b'\2\3')
+        with self.assertRaises(AssertionError):
+            self.assertContains(response, b'\5')
+
+    def test_raw_bytes_failure_message_has_nice_repr(self):
+        response = HttpResponse(b'\1\2\3\4')
+        self.assertContains(response, b'\2\3')
+        with self.assertRaises(AssertionError) as mgr:
+            self.assertContains(response, b'\5')
+        self.assertIn('\\x05', str(mgr.exception))
+
+    def test_count_correct_passes(self):
+        response = HttpResponse('a thing' * 5)
+        self.assertContains(response, 'thing', count=5)
+
+    def test_count_too_low_fails(self):
+        response = HttpResponse('a thing' * 5)
+        with self.assertRaises(AssertionError):
+            self.assertContains(response, 'thing', count=4)
+
+    def test_count_too_high_fails(self):
+        response = HttpResponse('a thing' * 5)
+        with self.assertRaises(AssertionError):
+            self.assertContains(response, 'thing', count=6)
+
+    def test_streaming_response(self):
+        response = StreamingHttpResponse(['response content'])
+        self.assertContains(response, 'content')
+        with self.assertRaises(AssertionError):
+            self.assertContains(response, 'not this')
+
+    def test_template_response(self):
+        response = TemplateResponse(request=HttpRequest(), template='template.html')
+        self.assertContains(response, 'template content')
+        with self.assertRaises(AssertionError):
+            self.assertContains(response, 'not this')
+
+
+class AssertContainsIntegrationTest(TestCase):
+    """ For the paranoid, test that a "real" response from the test client works """
+    urls = 'test_utils.urls'
+
+    def test_passing_case(self):
+        response = self.client.get("/test_utils/text_response/")
+        self.assertContains(response, 'some response text')
+
+    def test_failure_case(self):
+        response = self.client.get("/test_utils/text_response/")
+        with self.assertRaises(AssertionError):
+            self.assertContains(response, 'this will not be in the response')
 
 
 class XMLEqualTests(TestCase):
