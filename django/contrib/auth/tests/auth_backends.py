@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from datetime import date
 
 from django.conf import settings
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User, Group, Permission, AnonymousUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.auth.tests.custom_user import ExtensionUser, CustomPermissionsUser, CustomUser
