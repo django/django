@@ -57,4 +57,4 @@ Topics
    asgi
    community
    contributing
-   releases
+   releases/index
