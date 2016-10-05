@@ -9,11 +9,10 @@ import multiprocessing
 import threading
 
 from .signals import consumer_started, consumer_finished
-from .exceptions import ConsumeLater
+from .exceptions import ConsumeLater, DenyConnection
 from .message import Message
 from .utils import name_that_thing
 from .signals import worker_ready
-from .consumer_middleware import ConsumerMiddlewareRegistry
 
 logger = logging.getLogger('django.channels')
 
@@ -41,7 +40,6 @@ class Worker(object):
         self.exclude_channels = exclude_channels
         self.termed = False
         self.in_job = False
-        self.middleware_registry = ConsumerMiddlewareRegistry()
 
     def install_signal_handler(self):
         signal.signal(signal.SIGTERM, self.sigterm_handler)
@@ -119,8 +117,12 @@ class Worker(object):
                 # Send consumer started to manage lifecycle stuff
                 consumer_started.send(sender=self.__class__, environ={})
                 # Run consumer
-                chain = self.middleware_registry.make_chain(consumer, kwargs)
-                chain(message)
+                consumer(message, **kwargs)
+            except DenyConnection:
+                # They want to deny a WebSocket connection.
+                if message.channel.name != "websocket.connect":
+                    raise ValueError("You cannot DenyConnection from a non-websocket.connect handler.")
+                message.reply_channel.send({"accept": False})
             except ConsumeLater:
                 # They want to not handle it yet. Re-inject it with a number-of-tries marker.
                 content['__retries__'] = content.get("__retries__", 0) + 1

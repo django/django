@@ -790,6 +790,9 @@ is received to say if the connection should be accepted or dropped.
 
 Behaviour on WebSocket rejection is defined in the Connection section above.
 
+If received while the socket is already accepted, the protocol server should
+log an error, but not do anything.
+
 Channel: ``websocket.send!``
 
 Keys:
