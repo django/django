@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+import mock
 import datetime
 from decimal import Decimal
 
@@ -150,6 +151,53 @@ class DateTimeFieldTests(unittest.TestCase):
                          datetime.time(1, 2, 3, 4))
         self.assertEqual(f.to_python('01:02:03.999999'),
                          datetime.time(1, 2, 3, 999999))
+
+    def test_datefield_to_python_issue_21523(self):
+        """DateField.to_python should handle mock dates. (see #21523)"""
+
+        class FakeDate(datetime.date):
+            """Mock date class."""
+            pass
+
+        with mock.patch('datetime.date', FakeDate):
+            # this will create a mock date
+            today = datetime.date.today()
+            # this will force the creation of a 'real' date (i.e. not the mock)
+            tomorrow = today + datetime.timedelta(days=1)
+            # to_python does an isinstance(value, datetime.date) check -
+            # when we are mocking out datetime.date with our FakeDate class
+            # then this test will FAIL if value is a real date object, which
+            # is the case with issue #21523.
+            # 
+            # NB use of assertTrue and isinstance rather than assertIsInstance
+            # is deliberate, to make it as close as possible to the case we
+            # are testing for. Pls do not revert.
+            self.assertTrue(isinstance(today, datetime.date))
+            self.assertFalse(isinstance(tomorrow, datetime.date))
+            # if #21523 is not fixed, a call to to_python with a real date,
+            # e.g. the 'tomorrow' value, will raise a TypeError.
+            # What we want is for both FakeDate and real datetime.date objects
+            # to pass through unchanged.
+            f = models.DateField()
+            self.assertEqual(f.to_python(today), today)
+            self.assertEqual(f.to_python(tomorrow), tomorrow)
+
+    def test_datetimefield_to_python_issue_21523(self):
+        """DateTimeField.to_python should handle mock dates. (see #21523)"""
+
+        class FakeDateTime(datetime.datetime):
+            """Mock datetime class."""
+            pass
+
+        with mock.patch('datetime.datetime', FakeDateTime):
+            now = datetime.datetime.now()  # this is a mock datetime
+            then = now + datetime.timedelta(hours=-1)  # this is a real datetime
+            self.assertTrue(isinstance(now, datetime.datetime))
+            self.assertFalse(isinstance(then, datetime.datetime))
+            f = models.DateTimeField()
+            self.assertEqual(f.to_python(now), now)
+            self.assertEqual(f.to_python(then), then)
+
 
 class BooleanFieldTests(unittest.TestCase):
     def _test_get_db_prep_lookup(self, f):
