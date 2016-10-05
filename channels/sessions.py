@@ -78,6 +78,7 @@ def enforce_ordering(func=None, slight=False):
     # Slight is deprecated
     if slight:
         raise ValueError("Slight ordering is now always on due to Channels changes. Please remove the decorator.")
+
     # Main decorator
     def decorator(func):
         @channel_session
