@@ -13,6 +13,7 @@ from django.contrib.admin.utils import (
 )
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
+from django.db.models.query_utils import Q
 from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
@@ -45,7 +46,7 @@ class ListFilter(object):
         """
         raise NotImplementedError('subclasses of ListFilter must provide a choices() method')
 
-    def queryset(self, request, queryset):
+    def queryset(self, request, queryset, as_q=False):
         """
         Returns the filtered queryset.
         """
@@ -132,8 +133,10 @@ class FieldListFilter(ListFilter):
     def has_output(self):
         return True
 
-    def queryset(self, request, queryset):
+    def queryset(self, request, queryset, as_q=False):
         try:
+            if as_q:
+                return Q(**self.user_parameters)
             return queryset.filter(**self.used_parameters)
         except ValidationError as e:
             raise IncorrectLookupParameters(e)

@@ -307,28 +307,28 @@ class ChangeList(object):
                 ordering_fields[idx] = 'desc' if pfx == '-' else 'asc'
         return ordering_fields
 
+    def apply_query_objects(self, queryset, qlike_objects):
+        return self.model_admin.apply_query_objects(queryset, qlike_objects)
+
     def get_queryset(self, request):
         # First, we collect all the declared list filters.
         (self.filter_specs, self.has_filters, remaining_lookup_params,
          filters_use_distinct) = self.get_filters(request)
 
-        # Then, we let every list filter modify the queryset to its liking.
+        # Then, we let every list filter modify the queryset to its liking
+        # or return a Q object which will then be applied afterwards
         qs = self.root_queryset
-        q_like_objects = []
+        qlike_objects = []
         for filter_spec in self.filter_specs:
-            new_qs = filter_spec.queryset(request, qs)
+            new_qs = filter_spec.queryset(request, qs, as_q=self.model_admin.opts.filter_q_behavior)
             if new_qs is not None:
                 if isinstance(new_qs, Q):
-                    q_like_objects.append(new_qs)
+                    qlike_objects.append(new_qs)
                 else:
                     qs = new_qs
 
-        if q_like_objects:
-            q_base = Q()
-            for item in q_like_objects:
-                q_base &= item
-
-            qs = qs.filter(q_base)
+        if qlike_objects:
+            qs = self.apply_query_objects(qs, qlike_objects)
 
         try:
             # Finally, we apply the remaining lookup parameters from the query
