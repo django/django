@@ -174,6 +174,7 @@ class RequestsTests(unittest.TestCase):
             'example.com:80/badpath',
             'example.com: recovermypassword.com',
             'other.com', # not in ALLOWED_HOSTS
+            '//var/tmp/persist.sock',
         ]
 
         for host in legit_hosts:
@@ -190,6 +191,21 @@ class RequestsTests(unittest.TestCase):
                     'HTTP_HOST': host,
                 }
                 request.get_host()
+
+        # "Suspicious" host headers are not rejected when they are in SERVER_NAME
+        for host in legit_hosts:
+            request = HttpRequest()
+            request.META = {
+                'SERVER_NAME': host,
+            }
+            request.get_host()
+
+        for host in poisoned_hosts:
+            request = HttpRequest()
+            request.META = {
+                'SERVER_NAME': host,
+            }
+            request.get_host()
 
     @override_settings(USE_X_FORWARDED_HOST=True, ALLOWED_HOSTS=['*'])
     def test_http_get_host_with_x_forwarded_host(self):
