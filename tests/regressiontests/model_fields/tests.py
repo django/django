@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+import mock
 import datetime
 from decimal import Decimal
 
@@ -134,7 +135,14 @@ class ForeignKeyTests(test.TestCase):
         b = Bar.objects.create(b="bcd")
         self.assertEqual(b.a, a)
 
+from datetime import date as real_date # used to test mocking dates.
 class DateTimeFieldTests(unittest.TestCase):
+    
+    class FakeDate(real_date):
+        "An object that is *not* a date, but which could be parsed as such."
+        def __new__(cls, *args, **kwargs):
+            return real_date.__new__(real_date, *args, **kwargs)
+
     def test_datetimefield_to_python_usecs(self):
         """DateTimeField.to_python should support usecs"""
         f = models.DateTimeField()
@@ -150,6 +158,13 @@ class DateTimeFieldTests(unittest.TestCase):
                          datetime.time(1, 2, 3, 4))
         self.assertEqual(f.to_python('01:02:03.999999'),
                          datetime.time(1, 2, 3, 999999))
+
+    @mock.patch('datetime.date', FakeDate)
+    def test_datefield_to_python_can_be_mocked(self):
+        """DateField.to_python should support mock dates."""
+        self.assertEqual(models.DateField().to_python(
+                DateTimeFieldTests.FakeDate.today()),
+            datetime.date.today())
 
 class BooleanFieldTests(unittest.TestCase):
     def _test_get_db_prep_lookup(self, f):

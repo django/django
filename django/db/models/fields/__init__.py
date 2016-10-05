@@ -693,6 +693,10 @@ class DateField(Field):
         if isinstance(value, datetime.date):
             return value
 
+        # handle objects that are neither dates nor strings, but which
+        # return a parseable date string, e.g. a mock date class.
+        value = smart_text(value)
+
         try:
             parsed = parse_date(value)
             if parsed is not None:
@@ -783,6 +787,11 @@ class DateTimeField(DateField):
                 default_timezone = timezone.get_default_timezone()
                 value = timezone.make_aware(value, default_timezone)
             return value
+
+
+        # handle objects that are neither dates nor strings, but which
+        # return a parseable date string, e.g. a mock date class.
+        value = smart_text(value)
 
         try:
             parsed = parse_datetime(value)
