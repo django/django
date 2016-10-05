@@ -113,6 +113,13 @@ For example::
             'mymodel': MyModel.objects.get(slug=slug)
         }, context_instance=RequestContext(request))
 
+.. versionchanged:: 1.5
+
+Access to :setting:`INSTALLED_APPS` is limited according to: 
+
+.. method:: User.has_module_perms(package_name)
+
+This means that a regular user will not see any of the module documentation unless given permission.
 
 Template tags and filters reference
 ===================================
