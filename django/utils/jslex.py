@@ -203,7 +203,7 @@ def prepare_js_for_gettext(js):
         if name == 'regex':
             # C doesn't grok regexes, and they aren't needed for gettext,
             # so just output a string instead.
-            tok = '"REGEX"';
+            tok = '"REGEX"'
         elif name == 'string':
             # C doesn't have single-quoted strings, so make all strings
             # double-quoted.
@@ -214,6 +214,6 @@ def prepare_js_for_gettext(js):
             # C can't deal with Unicode escapes in identifiers.  We don't
             # need them for gettext anyway, so replace them with something
             # innocuous
-            tok = tok.replace("\\", "U");
+            tok = tok.replace("\\", "U")
         c.append(tok)
     return ''.join(c)
