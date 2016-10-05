@@ -8,7 +8,7 @@ class Command(NoArgsCommand):
             help='Tells Django to use plain Python, not IPython.'),
     )
     help = "Runs a Python interactive interpreter. Tries to use IPython, if it's available."
-    shells = ['ipython', 'bpython']
+    shells = ['ipython', 'bpython', 'pycrust']
     requires_model_validation = False
 
     def ipython(self):
@@ -30,6 +30,17 @@ class Command(NoArgsCommand):
     def bpython(self):
         import bpython
         bpython.embed()
+
+    def pycrust(self):
+        import wx.py.crust
+        app = wx.App(0)
+        frame = wx.py.crust.CrustFrame(parent=None, title='PyCrust Debug Window')
+        frame.Show()
+
+        from django.conf import settings
+        frame.shell.interp.locals['settings'] =  settings
+
+        app.MainLoop()
 
     def run_shell(self):
         for shell in self.shells:
