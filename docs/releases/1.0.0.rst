@@ -1,0 +1,62 @@
+1.0.0 Release Notes
+===================
+
+.. note::
+    These release notes are in development. Channels 1.0.0 is not yet released.
+
+
+Major Features
+--------------
+
+Channels 1.0 introduces a couple of new major features.
+
+
+WebSocket accept/reject flow
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rather than be immediately accepted, WebSockets now pause during the handshake
+while they send over a message on ``websocket.connect``, and your application
+must either accept or reject the connection before the handshake is completed
+and messages can be received.
+
+This has several advantages:
+
+* You can now reject WebSockets before they even finish connecting, giving
+  appropriate error codes to browsers and not letting the browser-side socket
+  ever get into a connected state and send messages.
+
+* Combined with Consumer Atomicity (below), it means there is no longer any need
+  for the old "slight ordering" mode, as the connect consumer must run to
+  completion and accept the socket before any messages can be received and
+  forwarded onto ``websocket.receive``.
+
+* Any ``send`` message sent to the WebSocket will implicitly accept the connection,
+  meaning only a limited set of ``connect`` consumers need changes (see
+  Backwards Incompatible Changes below)
+
+
+Consumer Atomicity
+~~~~~~~~~~~~~~~~~~
+
+Consumers will now buffer messages you try to send until the consumer completes
+and then send them once it exits and the outbound part of any decorators have
+been run (even if an exception is raised).
+
+This makes the flow of messages much easier to reason about - consumers can now
+be reasoned about as atomic blocks that run and then send messages, meaning that
+if you send a message to start another consumer you're guaranteed that the
+sending consumer has finished running by the time it's acted upon.
+
+If you want to send messages immediately rather than at the end of the consumer,
+you can still do that by passing the ``immediately`` argument::
+
+    Channel("thumbnailing-tasks").send({"id": 34245}, immediately=True)
+
+This should be entirely backwards compatible, and may actually fix race
+conditions in some apps that were pre-existing.
+
+
+Demultiplexer Overhaul
+~~~~~~~~~~~~~~~~~~~~~~
+
+TBD
