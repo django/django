@@ -58,7 +58,7 @@ class MultipleObjectMixin(ContextMixin):
                                 'message': str(e)
             })
 
-    def get_paginate_by(self, queryset):
+    def get_paginate_by(self):
         """
         Get the number of items to paginate by, or ``None`` for no pagination.
         """
@@ -93,7 +93,7 @@ class MultipleObjectMixin(ContextMixin):
         Get the context for this view.
         """
         queryset = kwargs.pop('object_list')
-        page_size = self.get_paginate_by(queryset)
+        page_size = self.get_paginate_by()
         context_object_name = self.get_context_object_name(queryset)
         if page_size:
             paginator, page, queryset, is_paginated = self.paginate_queryset(queryset, page_size)
