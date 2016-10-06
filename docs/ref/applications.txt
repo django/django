@@ -347,6 +347,8 @@ Application registry
     :exc:`ValueError` when called with a single argument that doesn't contain
     exactly one dot.
 
+.. _app-loading-process:
+
 Initialization process
 ======================
 
@@ -425,9 +427,9 @@ Troubleshooting
 
 Here are some common problems that you may encounter during initialization:
 
-* ``AppRegistryNotReady`` This happens when importing an application
-  configuration or a models module triggers code that depends on the app
-  registry.
+* :class:`~django.core.exceptions.AppRegistryNotReady`: This happens when
+  importing an application configuration or a models module triggers code that
+  depends on the app registry.
 
   For example, :func:`~django.utils.translation.ugettext()` uses the app
   registry to look up translation catalogs in applications. To translate at
