@@ -89,6 +89,14 @@ class RemoteTestResult(object):
     def test_index(self):
         return self.testsRun - 1
 
+    def _confirm_picklable(self, obj):
+        """
+        Confirm that obj can be pickled and unpickled as multiprocessing will
+        need to pickle the exception in the child process and unpickle it in
+        the parent process. Let the exception rise, if not.
+        """
+        pickle.loads(pickle.dumps(obj))
+
     def _print_unpicklable_subtest(self, test, subtest, pickle_exc):
         print("""
 Subtest failed:
@@ -113,7 +121,7 @@ with a cleaner failure message.
         # with the multiprocessing module. Since we're in a forked process,
         # our best chance to communicate with them is to print to stdout.
         try:
-            pickle.dumps(err)
+            self._confirm_picklable(err)
         except Exception as exc:
             original_exc_txt = repr(err[1])
             original_exc_txt = textwrap.fill(original_exc_txt, 75, initial_indent='    ', subsequent_indent='    ')
@@ -154,7 +162,7 @@ failure and get a correct traceback.
 
     def check_subtest_picklable(self, test, subtest):
         try:
-            pickle.dumps(subtest)
+            self._confirm_picklable(subtest)
         except Exception as exc:
             self._print_unpicklable_subtest(test, subtest, exc)
             raise
