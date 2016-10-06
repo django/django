@@ -26,6 +26,7 @@ class ListFilter(object):
     def __init__(self, request, params, model, model_admin):
         # This dictionary will eventually contain the request's query string
         # parameters actually used by this filter.
+        self.filter_q_behavior = model_admin.filter_q_behavior
         self.used_parameters = {}
         if self.title is None:
             raise ImproperlyConfigured(
@@ -67,7 +68,6 @@ class SimpleListFilter(ListFilter):
     def __init__(self, request, params, model, model_admin):
         super(SimpleListFilter, self).__init__(
             request, params, model, model_admin)
-        self.filter_q_behavior = model_admin.filter_q_behavior
         if self.parameter_name is None:
             raise ImproperlyConfigured(
                 "The list filter '%s' does not specify "
