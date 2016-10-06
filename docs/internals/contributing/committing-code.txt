@@ -109,9 +109,9 @@ Committing guidelines
 In addition, please follow the following guidelines when committing code to
 Django's Git repository:
 
-* Never change the published history of django/django branches! **Never force-
-  push your changes to django/django.** If you absolutely must (for security
-  reasons for example) first discuss the situation with the core team.
+* Never change the published history of django/django branches! **Never
+  force-push your changes to django/django.** If you absolutely must (for
+  security reasons for example) first discuss the situation with the core team.
 
 * For any medium-to-big changes, where "medium-to-big" is according to
   your judgment, please bring things up on the |django-developers|
