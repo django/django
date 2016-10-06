@@ -104,16 +104,18 @@ class BaseDatabaseWrapper(local):
         over to the surrounding block, as a commit will commit all changes, even
         those from outside. (Commits are on connection level.)
         """
-        self._leave_transaction_management(self.is_managed())
         if self.transaction_state:
             del self.transaction_state[-1]
         else:
-            raise TransactionManagementError("This code isn't under transaction "
-                "management")
+            raise TransactionManagementError(
+                "This code isn't under transaction management")
+        # We will pass the next status (after leaving the previous state
+        # behind) to subclass hook.
+        self._leave_transaction_management(self.is_managed())
         if self._dirty:
             self.rollback()
-            raise TransactionManagementError("Transaction managed block ended with "
-                "pending COMMIT/ROLLBACK")
+            raise TransactionManagementError(
+                "Transaction managed block ended with pending COMMIT/ROLLBACK")
         self._dirty = False
 
     def is_dirty(self):
@@ -156,6 +158,8 @@ class BaseDatabaseWrapper(local):
         """
         if self.transaction_state:
             return self.transaction_state[-1]
+        # Note that this setting isn't documented, and is only used here, and
+        # in enter_transaction_management()
         return settings.TRANSACTIONS_MANAGED
 
     def managed(self, flag=True):
@@ -352,15 +356,24 @@ class BaseDatabaseFeatures(object):
 
     def _supports_transactions(self):
         "Confirm support for transactions"
-        cursor = self.connection.cursor()
-        cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
-        self.connection._commit()
-        cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
-        self.connection._rollback()
-        cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
-        count, = cursor.fetchone()
-        cursor.execute('DROP TABLE ROLLBACK_TEST')
-        self.connection._commit()
+        try:
+            # Make sure to run inside a managed transaction block,
+            # otherwise autocommit will cause the confimation to
+            # fail.
+            self.connection.enter_transaction_management()
+            self.connection.managed(True)
+            cursor = self.connection.cursor()
+            cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
+            self.connection._commit()
+            cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
+            self.connection._rollback()
+            cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
+            count, = cursor.fetchone()
+            cursor.execute('DROP TABLE ROLLBACK_TEST')
+            self.connection._commit()
+            self.connection._dirty = False
+        finally:
+            self.connection.leave_transaction_management()
         return count == 0
 
     def _supports_stddev(self):
