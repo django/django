@@ -320,7 +320,7 @@ class ChangeList(object):
         qs = self.root_queryset
         qlike_objects = []
         for filter_spec in self.filter_specs:
-            new_qs = filter_spec.queryset(request, qs, as_q=self.model_admin.opts.filter_q_behavior)
+            new_qs = filter_spec.queryset(request, qs)
             if new_qs is not None:
                 if isinstance(new_qs, Q):
                     qlike_objects.append(new_qs)

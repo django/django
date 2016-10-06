@@ -46,7 +46,7 @@ class ListFilter(object):
         """
         raise NotImplementedError('subclasses of ListFilter must provide a choices() method')
 
-    def queryset(self, request, queryset, as_q=False):
+    def queryset(self, request, queryset):
         """
         Returns the filtered queryset.
         """
@@ -67,6 +67,7 @@ class SimpleListFilter(ListFilter):
     def __init__(self, request, params, model, model_admin):
         super(SimpleListFilter, self).__init__(
             request, params, model, model_admin)
+        self.filter_q_behavior = model_admin.filter_q_behavior
         if self.parameter_name is None:
             raise ImproperlyConfigured(
                 "The list filter '%s' does not specify "
@@ -133,9 +134,9 @@ class FieldListFilter(ListFilter):
     def has_output(self):
         return True
 
-    def queryset(self, request, queryset, as_q=False):
+    def queryset(self, request, queryset):
         try:
-            if as_q:
+            if self.filter_q_behavior:
                 return Q(**self.user_parameters)
             return queryset.filter(**self.used_parameters)
         except ValidationError as e:
