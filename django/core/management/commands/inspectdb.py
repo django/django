@@ -6,6 +6,7 @@ from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.db.models.constants import LOOKUP_SEP
 from django.utils.encoding import force_text
 
 
@@ -189,10 +190,10 @@ class Command(BaseCommand):
         if num_repl > 0:
             field_notes.append('Field renamed to remove unsuitable characters.')
 
-        if new_name.find('__') >= 0:
-            while new_name.find('__') >= 0:
-                new_name = new_name.replace('__', '_')
-            if col_name.lower().find('__') >= 0:
+        if new_name.find(LOOKUP_SEP) >= 0:
+            while new_name.find(LOOKUP_SEP) >= 0:
+                new_name = new_name.replace(LOOKUP_SEP, '_')
+            if col_name.lower().find(LOOKUP_SEP) >= 0:
                 # Only add the comment if the double underscore was in the original name
                 field_notes.append("Field renamed because it contained more than one '_' in a row.")
 
