@@ -37,13 +37,11 @@ The current security team members are:
 
 - Florian Apolloner
 - James Bennett
-- Jeremy Dunck
+- Tim Graham
 - Adrian Holovaty
-- Jacob Kaplan-Moss
-- Russell Keith-Magee
+- Markus Holtermann
 - Paul McMillan
 - Carl Meyer
-- Donald Stufft
 
 .. _releasers-list:
 
