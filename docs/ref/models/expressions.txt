@@ -259,6 +259,12 @@ The ``Func`` API is as follows:
         generated for this function. Defaults to
         ``'%(function)s(%(expressions)s)'``.
 
+        If you're constructing SQL like ``strftime('%W', 'date')`` and need a
+        literal ``%`` character in the query, quadruple it (``%%%%``) in the
+        ``template`` attribute because the string is interpolated twice: once
+        during the template interpolation in ``as_sql()`` and once in the SQL
+        interpolation with the query parameters in the database cursor.
+
     .. attribute:: arg_joiner
 
         A class attribute that denotes the character used to join the list of
