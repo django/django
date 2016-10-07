@@ -171,31 +171,41 @@ msgstr ""
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
+"{name} \"{obj}\" se ha añadido correctamente. Puede seguir editando "
+"a continuación."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
+"{name} \"{obj}\" se ha añadido correctamente. Puede seguir agregando "
+"a continuación."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
+"{name} \"{obj}\" se ha añadido correctamente."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
+"{name} \"{obj}\" se ha modificado correctamente. Puede seguir editando "
+"a continuación."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"{name} \"{obj}\" se ha modificado correctamente. Puede seguir agregando "
+"a continuación."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
 msgstr ""
+"{name} \"{obj}\" se ha modificado correctamente."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
