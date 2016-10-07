@@ -42,9 +42,7 @@ Shared:
 # Multiple Template Engines
 
 from .engine import Engine
-from .utils import EngineHandler
-
-engines = EngineHandler()
+from .utils import engines
 
 __all__ = ('Engine', 'engines')
 

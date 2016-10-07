@@ -1,8 +1,8 @@
 from template_tests.test_response import test_processor_name
 
-from django.template import EngineHandler
 from django.template.backends.django import DjangoTemplates
 from django.template.library import InvalidTemplateLibrary
+from django.template.utils import EngineHandler
 from django.test import RequestFactory, override_settings
 
 from .test_dummy import TemplateStringsTests

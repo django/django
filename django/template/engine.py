@@ -7,6 +7,7 @@ from .base import Context, Template
 from .context import _builtin_context_processors
 from .exceptions import TemplateDoesNotExist
 from .library import import_library
+from .utils import engines
 
 
 class Engine(object):
@@ -68,16 +69,11 @@ class Engine(object):
         >>> template.render(context)
         'Hello world!'
         """
-        # Since Engine is imported in django.template and since
-        # DjangoTemplates is a wrapper around this Engine class,
-        # local imports are required to avoid import loops.
-        from django.template import engines
-        from django.template.backends.django import DjangoTemplates
-        django_engines = [engine for engine in engines.all()
-                          if isinstance(engine, DjangoTemplates)]
+        django_engines = [engine for engine in engines.templates.values()
+                          if engine['BACKEND'] == 'django.template.backends.django.DjangoTemplates']
         if len(django_engines) == 1:
             # Unwrap the Engine instance inside DjangoTemplates
-            return django_engines[0].engine
+            return engines[django_engines[0]['NAME']].engine
         elif len(django_engines) == 0:
             raise ImproperlyConfigured(
                 "No DjangoTemplates backend is configured.")
