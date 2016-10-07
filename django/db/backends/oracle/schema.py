@@ -40,8 +40,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             DECLARE
                 i INTEGER;
             BEGIN
-                SELECT COUNT(*) INTO i FROM USER_CATALOG
-                    WHERE TABLE_NAME = '%(sq_name)s' AND TABLE_TYPE = 'SEQUENCE';
+                SELECT COUNT(1) INTO i FROM USER_SEQUENCES
+                    WHERE SEQUENCE_NAME = '%(sq_name)s';
                 IF i = 1 THEN
                     EXECUTE IMMEDIATE 'DROP SEQUENCE "%(sq_name)s"';
                 END IF;
