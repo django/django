@@ -11,6 +11,8 @@ import decimal
 import re
 import warnings
 
+import pytz
+
 from django.conf import settings
 from django.db import utils
 from django.db.backends import utils as backend_utils
@@ -22,11 +24,6 @@ from django.utils.dateparse import (
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.safestring import SafeBytes
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 try:
     try:

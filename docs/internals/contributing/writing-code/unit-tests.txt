@@ -232,7 +232,7 @@ dependencies:
 *  numpy_
 *  Pillow_
 *  PyYAML_
-*  pytz_
+*  pytz_ (required)
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
 *  mock_ (for Python 2)

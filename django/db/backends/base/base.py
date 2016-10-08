@@ -4,6 +4,8 @@ import warnings
 from collections import deque
 from contextlib import contextmanager
 
+import pytz
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS
@@ -15,11 +17,6 @@ from django.db.utils import DatabaseError, DatabaseErrorWrapper
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.six.moves import _thread as thread
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 NO_DB_ALIAS = '__no_db__'
 
@@ -128,7 +125,6 @@ class BaseDatabaseWrapper(object):
         elif self.settings_dict['TIME_ZONE'] is None:
             return timezone.utc
         else:
-            # Only this branch requires pytz.
             return pytz.timezone(self.settings_dict['TIME_ZONE'])
 
     @cached_property
@@ -207,10 +203,6 @@ class BaseDatabaseWrapper(object):
                 raise ImproperlyConfigured(
                     "Connection '%s' cannot set TIME_ZONE because its engine "
                     "handles time zones conversions natively." % self.alias)
-            elif pytz is None:
-                raise ImproperlyConfigured(
-                    "Connection '%s' cannot set TIME_ZONE because pytz isn't "
-                    "installed." % self.alias)
 
     def ensure_connection(self):
         """

@@ -468,6 +468,27 @@ To prevent typos from passing silently,
 arguments are model fields. This should be backwards-incompatible only in the
 fact that it might expose a bug in your project.
 
+``pytz`` is a required dependency and support for ``settings.TIME_ZONE = None`` is removed
+------------------------------------------------------------------------------------------
+
+To simplify Django's timezone handling, ``pytz`` is now a required dependency.
+It's automatically installed along with Django.
+
+Support for ``settings.TIME_ZONE = None`` is removed as the behavior isn't
+commonly used and is questionably useful. If you want to automatically detect
+the timezone based on the system timezone, you can use `tzlocal
+<https://pypi.python.org/pypi/tzlocal>`_::
+
+    from tzlocal import get_localzone
+
+    TIME_ZONE = get_localzone().zone
+
+This works similar to ``settings.TIME_ZONE = None`` except that it also sets
+``os.environ['TZ']``. `Let us know
+<https://groups.google.com/d/topic/django-developers/OAV3FChfuPM/discussion>`__
+if there's a use case where you find you can't adapt your code to set a
+``TIME_ZONE``.
+
 Miscellaneous
 -------------
 

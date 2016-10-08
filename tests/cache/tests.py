@@ -1832,17 +1832,16 @@ class CacheI18nTest(TestCase):
 
     @override_settings(USE_I18N=False, USE_L10N=False, USE_TZ=True)
     def test_cache_key_with_non_ascii_tzname(self):
-        # Regression test for #17476
-        class CustomTzName(timezone.UTC):
-            name = ''
-
-            def tzname(self, dt):
-                return self.name
+        # Timezone-dependent cache keys should use ASCII characters only
+        # (#17476). The implementation here is a bit odd (timezone.utc is an
+        # instance, not a class), but it simulates the correct conditions.
+        class CustomTzName(timezone.utc):
+            pass
 
         request = self.factory.get(self.path)
         response = HttpResponse()
-        with timezone.override(CustomTzName()):
-            CustomTzName.name = 'Hora estándar de Argentina'.encode('UTF-8')  # UTF-8 string
+        with timezone.override(CustomTzName):
+            CustomTzName.zone = 'Hora estándar de Argentina'.encode('UTF-8')  # UTF-8 string
             sanitized_name = 'Hora_estndar_de_Argentina'
             self.assertIn(
                 sanitized_name, learn_cache_key(request, response),

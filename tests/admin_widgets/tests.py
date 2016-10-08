@@ -5,7 +5,8 @@ import gettext
 import os
 from datetime import datetime, timedelta
 from importlib import import_module
-from unittest import skipIf
+
+import pytz
 
 from django import forms
 from django.conf import settings
@@ -22,11 +23,6 @@ from django.utils import six, translation
 
 from . import models
 from .widgetadmin import site as widget_admin_site
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 
 class TestDataMixin(object):
@@ -794,7 +790,6 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
                 self.wait_for_text('#calendarin0 caption', expected_caption)
 
 
-@skipIf(pytz is None, "this test requires pytz")
 @override_settings(TIME_ZONE='Asia/Singapore')
 class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
 

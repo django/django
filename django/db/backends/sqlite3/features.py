@@ -7,11 +7,6 @@ from django.utils.functional import cached_property
 
 from .base import Database
 
-try:
-    import pytz
-except ImportError:
-    pytz = None
-
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     # SQLite cannot handle us only partially reading from a cursor's result set
@@ -78,7 +73,3 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 has_support = False
             cursor.execute('DROP TABLE STDDEV_TEST')
         return has_support
-
-    @cached_property
-    def has_zoneinfo_database(self):
-        return pytz is not None

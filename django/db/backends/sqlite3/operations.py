@@ -4,7 +4,7 @@ import datetime
 import uuid
 
 from django.conf import settings
-from django.core.exceptions import FieldError, ImproperlyConfigured
+from django.core.exceptions import FieldError
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.operations import BaseDatabaseOperations
@@ -12,11 +12,6 @@ from django.db.models import aggregates, fields
 from django.utils import six, timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.duration import duration_string
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -77,27 +72,19 @@ class DatabaseOperations(BaseDatabaseOperations):
         # cause a collision with a field name).
         return "django_time_trunc('%s', %s)" % (lookup_type.lower(), field_name)
 
-    def _require_pytz(self):
-        if settings.USE_TZ and pytz is None:
-            raise ImproperlyConfigured("This query requires pytz, but it isn't installed.")
-
     def datetime_cast_date_sql(self, field_name, tzname):
-        self._require_pytz()
         return "django_datetime_cast_date(%s, %%s)" % field_name, [tzname]
 
     def datetime_cast_time_sql(self, field_name, tzname):
-        self._require_pytz()
         return "django_datetime_cast_time(%s, %%s)" % field_name, [tzname]
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         # Same comment as in date_extract_sql.
-        self._require_pytz()
         return "django_datetime_extract('%s', %s, %%s)" % (
             lookup_type.lower(), field_name), [tzname]
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         # Same comment as in date_trunc_sql.
-        self._require_pytz()
         return "django_datetime_trunc('%s', %s, %%s)" % (
             lookup_type.lower(), field_name), [tzname]
 

@@ -1,23 +1,15 @@
 """
 Timezone-related classes and functions.
-
-This module uses pytz when it's available and fallbacks when it isn't.
 """
 
-import sys
-import time as _time
 from datetime import datetime, timedelta, tzinfo
 from threading import local
+
+import pytz
 
 from django.conf import settings
 from django.utils import lru_cache, six
 from django.utils.decorators import ContextDecorator
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
-
 
 __all__ = [
     'utc', 'get_fixed_timezone',
@@ -32,26 +24,6 @@ __all__ = [
 # UTC and local time zones
 
 ZERO = timedelta(0)
-
-
-class UTC(tzinfo):
-    """
-    UTC implementation taken from Python's docs.
-
-    Used only when pytz isn't available.
-    """
-
-    def __repr__(self):
-        return "<UTC>"
-
-    def utcoffset(self, dt):
-        return ZERO
-
-    def tzname(self, dt):
-        return "UTC"
-
-    def dst(self, dt):
-        return ZERO
 
 
 class FixedOffset(tzinfo):
@@ -78,79 +50,7 @@ class FixedOffset(tzinfo):
     def dst(self, dt):
         return ZERO
 
-
-class ReferenceLocalTimezone(tzinfo):
-    """
-    Local time. Taken from Python's docs.
-
-    Used only when pytz isn't available, and most likely inaccurate. If you're
-    having trouble with this class, don't waste your time, just install pytz.
-
-    Kept as close as possible to the reference version. __init__ was added to
-    delay the computation of STDOFFSET, DSTOFFSET and DSTDIFF which is
-    performed at import time in the example.
-
-    Subclasses contain further improvements.
-    """
-
-    def __init__(self):
-        self.STDOFFSET = timedelta(seconds=-_time.timezone)
-        if _time.daylight:
-            self.DSTOFFSET = timedelta(seconds=-_time.altzone)
-        else:
-            self.DSTOFFSET = self.STDOFFSET
-        self.DSTDIFF = self.DSTOFFSET - self.STDOFFSET
-        tzinfo.__init__(self)
-
-    def utcoffset(self, dt):
-        if self._isdst(dt):
-            return self.DSTOFFSET
-        else:
-            return self.STDOFFSET
-
-    def dst(self, dt):
-        if self._isdst(dt):
-            return self.DSTDIFF
-        else:
-            return ZERO
-
-    def tzname(self, dt):
-        return _time.tzname[self._isdst(dt)]
-
-    def _isdst(self, dt):
-        tt = (dt.year, dt.month, dt.day,
-              dt.hour, dt.minute, dt.second,
-              dt.weekday(), 0, 0)
-        stamp = _time.mktime(tt)
-        tt = _time.localtime(stamp)
-        return tt.tm_isdst > 0
-
-
-class LocalTimezone(ReferenceLocalTimezone):
-    """
-    Slightly improved local time implementation focusing on correctness.
-
-    It still crashes on dates before 1970 or after 2038, but at least the
-    error message is helpful.
-    """
-
-    def tzname(self, dt):
-        is_dst = False if dt is None else self._isdst(dt)
-        return _time.tzname[is_dst]
-
-    def _isdst(self, dt):
-        try:
-            return super(LocalTimezone, self)._isdst(dt)
-        except (OverflowError, ValueError) as exc:
-            exc_type = type(exc)
-            exc_value = exc_type(
-                "Unsupported value: %r. You should install pytz." % dt)
-            exc_value.__cause__ = exc
-            if not hasattr(exc, '__traceback__'):
-                exc.__traceback__ = sys.exc_info()[2]
-            six.reraise(exc_type, exc_value, sys.exc_info()[2])
-
-utc = pytz.utc if pytz else UTC()
+utc = pytz.utc
 """UTC time zone as a tzinfo instance."""
 
 
@@ -175,11 +75,7 @@ def get_default_timezone():
 
     This is the time zone defined by settings.TIME_ZONE.
     """
-    if isinstance(settings.TIME_ZONE, six.string_types) and pytz is not None:
-        return pytz.timezone(settings.TIME_ZONE)
-    else:
-        # This relies on os.environ['TZ'] being set to settings.TIME_ZONE.
-        return LocalTimezone()
+    return pytz.timezone(settings.TIME_ZONE)
 
 
 # This function exists for consistency with get_current_timezone_name
@@ -228,11 +124,11 @@ def activate(timezone):
     Sets the time zone for the current thread.
 
     The ``timezone`` argument must be an instance of a tzinfo subclass or a
-    time zone name. If it is a time zone name, pytz is required.
+    time zone name.
     """
     if isinstance(timezone, tzinfo):
         _active.value = timezone
-    elif isinstance(timezone, six.string_types) and pytz is not None:
+    elif isinstance(timezone, six.string_types):
         _active.value = pytz.timezone(timezone)
     else:
         raise ValueError("Invalid timezone: %r" % timezone)
@@ -257,8 +153,8 @@ class override(ContextDecorator):
     on exit.
 
     The ``timezone`` argument must be an instance of a ``tzinfo`` subclass, a
-    time zone name, or ``None``. If is it a time zone name, pytz is required.
-    If it is ``None``, Django enables the default time zone.
+    time zone name, or ``None``. If it is ``None``, Django enables the default
+    time zone.
     """
     def __init__(self, timezone):
         self.timezone = timezone

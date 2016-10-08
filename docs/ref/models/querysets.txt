@@ -758,11 +758,11 @@ object. If it's ``None``, Django uses the :ref:`current time zone
     As a consequence, your database must be able to interpret the value of
     ``tzinfo.tzname(None)``. This translates into the following requirements:
 
-    - SQLite: install pytz_ — conversions are actually performed in Python.
+    - SQLite: no requirements. Conversions are performed in Python with pytz_
+      (installed when you install Django).
     - PostgreSQL: no requirements (see `Time Zones`_).
     - Oracle: no requirements (see `Choosing a Time Zone File`_).
-    - MySQL: install pytz_ and load the time zone tables with
-      `mysql_tzinfo_to_sql`_.
+    - MySQL: load the time zone tables with `mysql_tzinfo_to_sql`_.
 
     .. _pytz: http://pytz.sourceforge.net/
     .. _Time Zones: https://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-TIMEZONES

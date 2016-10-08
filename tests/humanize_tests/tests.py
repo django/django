@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import datetime
 from decimal import Decimal
-from unittest import skipIf
 
 from django.contrib.humanize.templatetags import humanize
 from django.template import Context, Template, defaultfilters
@@ -11,12 +10,6 @@ from django.utils import translation
 from django.utils.html import escape
 from django.utils.timezone import get_fixed_timezone, utc
 from django.utils.translation import ugettext as _
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
-
 
 # Mock out datetime in some tests so they don't fail occasionally when they
 # run too slow. Use a fixed datetime for datetime.now(). DST change in
@@ -174,7 +167,6 @@ class HumanizeTests(SimpleTestCase):
         # As 24h of difference they will never be the same
         self.assertNotEqual(naturalday_one, naturalday_two)
 
-    @skipIf(pytz is None, "this test requires pytz")
     def test_naturalday_uses_localtime(self):
         # Regression for #18504
         # This is 2012-03-08HT19:30:00-06:00 in America/Chicago

@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
-from unittest import skipIf
+
+import pytz
 
 from django.conf import settings
 from django.db import connection
@@ -15,11 +16,6 @@ from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from .models import DTModel
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 
 def microsecond_support(value):
@@ -659,7 +655,6 @@ class DateFunctionTests(TestCase):
             list(DTModel.objects.annotate(truncated=TruncSecond('start_date', output_field=DateField())))
 
 
-@skipIf(pytz is None, "this test requires pytz")
 @override_settings(USE_TZ=True, TIME_ZONE='UTC')
 class DateFunctionWithTimeZoneTests(DateFunctionTests):
 
