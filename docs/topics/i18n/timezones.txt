@@ -251,6 +251,8 @@ output for computers rather than for humans. The following filters and tags,
 provided by the ``tz`` template tag library, allow you to control the time zone
 conversions.
 
+.. highlight:: html+django
+
 Template tags
 -------------
 
@@ -365,6 +367,8 @@ For example::
     {% load tz %}
 
     {{ value|timezone:"Europe/Paris" }}
+
+.. highlight:: python
 
 .. _time-zones-migration-guide:
 
