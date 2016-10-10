@@ -2171,21 +2171,21 @@ class CacheMiddlewareTest(SimpleTestCase):
             response = view(request)
             response.close()
             self.assertIn('Expires', response)
-            self.assertEqual('Sun, 17 Jul 2016 10:00:02 GMT', response['Expires'])
+            self.assertEqual(response['Expires'], 'Sun, 17 Jul 2016 10:00:02 GMT')
             self.assertIn('Cache-Control', response)
-            self.assertEqual('max-age=2', response['Cache-Control'])
+            self.assertEqual(response['Cache-Control'], 'max-age=2')
             self.assertNotIn('Age', response)
 
-        # Response for second request made later must have Age header
+        # Response for second request made 1 second later must have 'Age: 1' header
         with mock.patch.object(time, 'time', return_value=1468749601):  # Sun, 17 Jul 2016 10:00:01 GMT
             response = view(request)
             response.close()
             self.assertIn('Expires', response)
-            self.assertEqual('Sun, 17 Jul 2016 10:00:02 GMT', response['Expires'])
+            self.assertEqual(response['Expires'], 'Sun, 17 Jul 2016 10:00:02 GMT')
             self.assertIn('Cache-Control', response)
-            self.assertEqual('max-age=2', response['Cache-Control'])
+            self.assertEqual(response['Cache-Control'], 'max-age=2')
             self.assertIn('Age', response)
-            self.assertEqual('1', response['Age'])
+            self.assertEqual(response['Age'], '1')
 
 
 @override_settings(
