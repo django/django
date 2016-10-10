@@ -554,7 +554,7 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaises(UnreadablePostError):
             request.body
 
-    def test_set_encoding_clears_POST(self):
+    def test_set_encoding_clears(self):
         payload = FakePayload('name=Hello Günter')
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
@@ -565,6 +565,17 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request.POST, {'name': ['Hello Günter']})
         request.encoding = 'iso-8859-16'
         self.assertEqual(request.POST, {'name': ['Hello GĂŒnter']})
+
+        payload = FakePayload('name=Hello Günter')
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'GET',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+            'QUERY_STRING': 'name=Hello Günter'
+        })
+        request.encoding = 'iso-8859-16'
+        self.assertEqual(request.GET, {'name': ['Hello Günter']})
 
     def test_FILES_connection_error(self):
         """
