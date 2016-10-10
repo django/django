@@ -181,6 +181,8 @@ class NestedObjects(Collector):
             return super().collect(objs, source_attr=source_attr, **kwargs)
         except models.ProtectedError as e:
             self.protected.update(e.protected_objects)
+        except models.RestrictedError as e:
+            self.protected.update(e.restricted_objects)
 
     def related_objects(self, related_model, related_fields, objs):
         qs = super().related_objects(related_model, related_fields, objs)

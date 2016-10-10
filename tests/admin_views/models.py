@@ -604,6 +604,14 @@ class Album(models.Model):
     title = models.CharField(max_length=30)
 
 
+class Song(models.Model):
+    name = models.CharField(max_length=20)
+    album = models.ForeignKey(Album, on_delete=models.RESTRICT)
+
+    def __str__(self):
+        return self.name
+
+
 class Employee(Person):
     code = models.CharField(max_length=20)
 

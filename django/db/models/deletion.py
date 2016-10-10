@@ -14,9 +14,17 @@ class ProtectedError(IntegrityError):
         super().__init__(msg, protected_objects)
 
 
+class RestrictedError(IntegrityError):
+    def __init__(self, msg, restricted_objects):
+        self.restricted_objects = restricted_objects
+        super().__init__(msg, restricted_objects)
+
+
 def CASCADE(collector, field, sub_objs, using):
-    collector.collect(sub_objs, source=field.remote_field.model,
-                      source_attr=field.name, nullable=field.null)
+    collector.collect(
+        sub_objs, source=field.remote_field.model, source_attr=field.name,
+        nullable=field.null, fail_on_restricted=False,
+    )
     if field.null and not connections[using].features.can_defer_constraint_checks:
         collector.add_field_update(field, None, sub_objs)
 
@@ -29,6 +37,11 @@ def PROTECT(collector, field, sub_objs, using):
         ),
         sub_objs
     )
+
+
+def RESTRICT(collector, field, sub_objs, using):
+    collector.add_restricted_objects(field, sub_objs)
+    collector.add_dependency(field.remote_field.model, field.model)
 
 
 def SET(value):
@@ -70,6 +83,8 @@ class Collector:
         self.data = defaultdict(set)
         # {model: {(field, value): {instances}}}
         self.field_updates = defaultdict(partial(defaultdict, set))
+        # {model: {field: {instances}}}
+        self.restricted_objects = defaultdict(partial(defaultdict, set))
         # fast_deletes is a list of queryset-likes that can be deleted without
         # fetching the objects into memory.
         self.fast_deletes = []
@@ -120,6 +135,26 @@ class Collector:
             return
         model = objs[0].__class__
         self.field_updates[model][field, value].update(objs)
+
+    def add_restricted_objects(self, field, objs):
+        if objs:
+            model = objs[0].__class__
+            self.restricted_objects[model][field].update(objs)
+
+    def clear_restricted_objects_from_set(self, model, objs):
+        if model in self.restricted_objects:
+            self.restricted_objects[model] = {
+                field: items - objs
+                for field, items in self.restricted_objects[model].items()
+            }
+
+    def clear_restricted_objects_from_queryset(self, model, qs):
+        if model in self.restricted_objects:
+            objs = set(qs.filter(pk__in=[
+                obj.pk
+                for objs in self.restricted_objects[model].values() for obj in objs
+            ]))
+            self.clear_restricted_objects_from_set(model, objs)
 
     def _has_signal_listeners(self, model):
         return (
@@ -177,7 +212,8 @@ class Collector:
             return [objs]
 
     def collect(self, objs, source=None, nullable=False, collect_related=True,
-                source_attr=None, reverse_dependency=False, keep_parents=False):
+                source_attr=None, reverse_dependency=False, keep_parents=False,
+                fail_on_restricted=True):
         """
         Add 'objs' to the collection of objects to be deleted as well as all
         parent instances.  'objs' must be a homogeneous iterable collection of
@@ -194,6 +230,12 @@ class Collector:
         direction of an FK rather than the reverse direction.)
 
         If 'keep_parents' is True, data of parent model's will be not deleted.
+
+        If 'fail_on_restricted' is False, error won't be raised even if it's
+        prohibited to delete such objects due to RESTRICT, that defers
+        restricted object checking in recursive calls where the top-level call
+        may need to collect more objects to determine whether restricted ones
+        can be deleted.
         """
         if self.can_fast_delete(objs):
             self.fast_deletes.append(objs)
@@ -215,7 +257,8 @@ class Collector:
                     self.collect(parent_objs, source=model,
                                  source_attr=ptr.remote_field.related_name,
                                  collect_related=False,
-                                 reverse_dependency=True)
+                                 reverse_dependency=True,
+                                 fail_on_restricted=False)
         if not collect_related:
             return
 
@@ -259,7 +302,28 @@ class Collector:
             if hasattr(field, 'bulk_related_objects'):
                 # It's something like generic foreign key.
                 sub_objs = field.bulk_related_objects(new_objs, self.using)
-                self.collect(sub_objs, source=model, nullable=True)
+                self.collect(sub_objs, source=model, nullable=True, fail_on_restricted=False)
+
+        if fail_on_restricted:
+            # Raise an error if collected restricted objects (RESTRICT) aren't
+            # candidates for deletion also collected via CASCADE.
+            for model, instances in self.data.items():
+                self.clear_restricted_objects_from_set(model, instances)
+            for qs in self.fast_deletes:
+                self.clear_restricted_objects_from_queryset(qs.model, qs)
+            for model, fields in self.restricted_objects.items():
+                for field, objs in fields.items():
+                    for obj in objs:
+                        raise RestrictedError(
+                            "Cannot delete some instances of model '%s' "
+                            "because they are referenced through a restricted "
+                            "foreign key: '%s.%s'." % (
+                                field.remote_field.model.__name__,
+                                obj.__class__.__name__,
+                                field.name,
+                            ),
+                            objs,
+                        )
 
     def related_objects(self, related_model, related_fields, objs):
         """

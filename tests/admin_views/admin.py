@@ -41,8 +41,8 @@ from .models import (
     ReferencedByGenRel, ReferencedByInline, ReferencedByParent,
     RelatedPrepopulated, RelatedWithUUIDPKModel, Report, Reservation,
     Restaurant, RowLevelChangePermissionModel, Section, ShortMessage, Simple,
-    Sketch, State, Story, StumpJoke, Subscriber, SuperVillain, Telegram, Thing,
-    Topping, UnchangeableObject, UndeletableObject, UnorderedObject,
+    Sketch, Song, State, Story, StumpJoke, Subscriber, SuperVillain, Telegram,
+    Thing, Topping, UnchangeableObject, UndeletableObject, UnorderedObject,
     UserMessenger, UserProxy, Villain, Vodcast, Whatsit, Widget, Worker,
     WorkHour,
 )
@@ -1069,6 +1069,7 @@ site.register(ReadOnlyPizza, ReadOnlyPizzaAdmin)
 site.register(ReadablePizza)
 site.register(Topping, ToppingAdmin)
 site.register(Album, AlbumAdmin)
+site.register(Song)
 site.register(Question, QuestionAdmin)
 site.register(Answer, AnswerAdmin, date_hierarchy='question__posted')
 site.register(Answer2, date_hierarchy='question__expires')

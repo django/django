@@ -1,13 +1,14 @@
 from math import ceil
 
 from django.db import IntegrityError, connection, models
-from django.db.models.deletion import Collector
+from django.db.models.deletion import Collector, RestrictedError
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
-    MR, A, Avatar, Base, Child, HiddenUser, HiddenUserProfile, M, M2MFrom,
-    M2MTo, MRNull, Origin, Parent, R, RChild, RChildChild, Referrer, S, T,
+    B1, B2, MR, A, Avatar, Base, Child, DeleteBottom, DeleteTop, GenericB1,
+    GenericB2, GenericDeleteBottom, HiddenUser, HiddenUserProfile, M, M2MFrom,
+    M2MTo, MRNull, Origin, P, Parent, R, RChild, RChildChild, Referrer, S, T,
     User, create_a, get_default_r,
 )
 
@@ -145,6 +146,87 @@ class OnDeleteTests(TestCase):
         a.o2o_setnull.delete()
         a = A.objects.get(pk=a.pk)
         self.assertIsNone(a.o2o_setnull)
+
+    def test_restrict(self):
+        a = create_a('restrict')
+        msg = (
+            "Cannot delete some instances of model 'R' because they are "
+            "referenced through a restricted foreign key: 'A.restrict'."
+        )
+        with self.assertRaisesMessage(RestrictedError, msg):
+            a.restrict.delete()
+
+    def test_restrict_path_cascade_indirect(self):
+        a = create_a('restrict')
+        a.restrict.p = P.objects.create()
+        a.restrict.save()
+        msg = (
+            "Cannot delete some instances of model 'R' because they are "
+            "referenced through a restricted foreign key: 'A.restrict'."
+        )
+        with self.assertRaisesMessage(RestrictedError, msg):
+            a.restrict.p.delete()
+        # Object referenced also with CASCADE relationship can be deleted.
+        a.cascade.p = a.restrict.p
+        a.cascade.save()
+        a.restrict.p.delete()
+        self.assertFalse(A.objects.filter(name='restrict').exists())
+        self.assertFalse(R.objects.filter(pk=a.restrict_id).exists())
+
+    def test_restrict_path_cascade_direct(self):
+        a = create_a('restrict')
+        a.restrict.p = P.objects.create()
+        a.restrict.save()
+        a.cascade_p = a.restrict.p
+        a.save()
+        a.restrict.p.delete()
+        self.assertFalse(A.objects.filter(name='restrict').exists())
+        self.assertFalse(R.objects.filter(pk=a.restrict_id).exists())
+
+    def test_restrict_path_cascade_indirect_diamond(self):
+        delete_top = DeleteTop.objects.create()
+        b1 = B1.objects.create(delete_top=delete_top)
+        b2 = B2.objects.create(delete_top=delete_top)
+        DeleteBottom.objects.create(b1=b1, b2=b2)
+        msg = (
+            "Cannot delete some instances of model 'B1' because they are "
+            "referenced through a restricted foreign key: 'DeleteBottom.b1'."
+        )
+        with self.assertRaisesMessage(RestrictedError, msg):
+            b1.delete()
+        self.assertTrue(DeleteTop.objects.exists())
+        self.assertTrue(B1.objects.exists())
+        self.assertTrue(B2.objects.exists())
+        self.assertTrue(DeleteBottom.objects.exists())
+        # Object referenced also with CASCADE relationship can be deleted.
+        delete_top.delete()
+        self.assertFalse(DeleteTop.objects.exists())
+        self.assertFalse(B1.objects.exists())
+        self.assertFalse(B2.objects.exists())
+        self.assertFalse(DeleteBottom.objects.exists())
+
+    def test_restrict_gfk_no_fast_delete(self):
+        delete_top = DeleteTop.objects.create()
+        generic_b1 = GenericB1.objects.create(generic_delete_top=delete_top)
+        generic_b2 = GenericB2.objects.create(generic_delete_top=delete_top)
+        GenericDeleteBottom.objects.create(generic_b1=generic_b1, generic_b2=generic_b2)
+        msg = (
+            "Cannot delete some instances of model 'GenericB1' because they "
+            "are referenced through a restricted foreign key: "
+            "'GenericDeleteBottom.generic_b1'."
+        )
+        with self.assertRaisesMessage(RestrictedError, msg):
+            generic_b1.delete()
+        self.assertTrue(DeleteTop.objects.exists())
+        self.assertTrue(GenericB1.objects.exists())
+        self.assertTrue(GenericB2.objects.exists())
+        self.assertTrue(GenericDeleteBottom.objects.exists())
+        # Object referenced also with CASCADE relationship can be deleted.
+        delete_top.delete()
+        self.assertFalse(DeleteTop.objects.exists())
+        self.assertFalse(GenericB1.objects.exists())
+        self.assertFalse(GenericB2.objects.exists())
+        self.assertFalse(GenericDeleteBottom.objects.exists())
 
 
 class DeletionTests(TestCase):

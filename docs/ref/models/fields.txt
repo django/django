@@ -1470,6 +1470,46 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     :exc:`~django.db.models.ProtectedError`, a subclass of
     :exc:`django.db.IntegrityError`.
 
+* .. attribute:: RESTRICT
+
+    .. versionadded:: 3.1
+
+    Prevent deletion of the referenced object by raising
+    :exc:`~django.db.models.RestrictedError` (a subclass of
+    :exc:`django.db.IntegrityError`). Unlike :attr:`PROTECT`, deletion of the
+    referenced object is allowed if it also references a different object
+    that is being deleted in the same operation, but via a :attr:`CASCADE`
+    relationship.
+
+    Consider this set of models::
+
+        class Artist(models.Model):
+            name = models.CharField(max_length=10)
+
+        class Album(models.Model):
+            artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
+
+        class Song(models.Model):
+            artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
+            album = models.ForeignKey(Album, on_delete=models.RESTRICT)
+
+    ``Artist`` can be deleted even if that implies deleting an ``Album``
+    which is referenced by a ``Song``, because ``Song`` also references
+    ``Artist`` itself through a cascading relationship. For example::
+
+        >>> artist_one = Artist.objects.create(name='artist one')
+        >>> artist_two = Artist.objects.create(name='artist two')
+        >>> album_one = Album.objects.create(artist=artist_one)
+        >>> album_two = Album.objects.create(artist=artist_two)
+        >>> song_one = Song.objects.create(artist=artist_one, album=album_one)
+        >>> song_two = Song.objects.create(artist=artist_one, album=album_two)
+        >>> album_one.delete()
+        # Raises RestrictedError.
+        >>> artist_two.delete()
+        # Raises RestrictedError.
+        >>> artist_one.delete()
+        (4, {'Song': 2, 'Album': 1, 'Artist': 1})
+
 * .. attribute:: SET_NULL
 
     Set the :class:`ForeignKey` null; this is only possible if

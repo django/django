@@ -199,6 +199,11 @@ Models
   values under a certain (database-dependent) limit. Values from ``0`` to
   ``9223372036854775807`` are safe in all databases supported by Django.
 
+* The new :class:`~django.db.models.RESTRICT` option for
+  :attr:`~django.db.models.ForeignKey.on_delete` argument of ``ForeignKey`` and
+  ``OneToOneField`` emulates the behavior of the SQL constraint ``ON DELETE
+  RESTRICT``.
+
 Pagination
 ~~~~~~~~~~
 

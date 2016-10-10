@@ -38,7 +38,7 @@ from . import customadmin
 from .admin import CityAdmin, site, site2
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
-    AdminOrderedModelMethod, Answer, Answer2, Article, BarAccount, Book,
+    AdminOrderedModelMethod, Album, Answer, Answer2, Article, BarAccount, Book,
     Bookmark, Category, Chapter, ChapterXtra1, ChapterXtra2, Character, Child,
     Choice, City, Collector, Color, ComplexSortedPerson, CoverLetter,
     CustomArticle, CyclicOne, CyclicTwo, DooHickey, Employee, EmptyModel,
@@ -50,7 +50,7 @@ from .models import (
     PrePopulatedPost, Promo, Question, ReadablePizza, ReadOnlyPizza,
     Recommendation, Recommender, RelatedPrepopulated, RelatedWithUUIDPKModel,
     Report, Restaurant, RowLevelChangePermissionModel, SecretHideout, Section,
-    ShortMessage, Simple, State, Story, SuperSecretHideout, SuperVillain,
+    ShortMessage, Simple, Song, State, Story, SuperSecretHideout, SuperVillain,
     Telegram, TitleTranslation, Topping, UnchangeableObject, UndeletableObject,
     UnorderedObject, UserProxy, Villain, Vodcast, Whatsit, Widget, Worker,
     WorkHour,
@@ -2602,6 +2602,33 @@ class AdminViewDeletedObjectsTest(TestCase):
         response = self.client.post(reverse('admin:admin_views_question_delete', args=(q.pk,)), {'post': 'yes'})
         self.assertEqual(Question.objects.count(), 1)
         self.assertContains(response, "would require deleting the following protected related objects")
+
+    def test_restricted(self):
+        album = Album.objects.create(title='Amaryllis')
+        song = Song.objects.create(album=album, name='Unity')
+        response = self.client.get(reverse('admin:admin_views_album_delete', args=(album.pk,)))
+        self.assertContains(
+            response,
+            'would require deleting the following protected related objects',
+        )
+        self.assertContains(
+            response,
+            '<li>Song: <a href="%s">Unity</a></li>'
+            % reverse('admin:admin_views_song_change', args=(song.pk,))
+        )
+
+    def test_post_delete_restricted(self):
+        album = Album.objects.create(title='Amaryllis')
+        Song.objects.create(album=album, name='Unity')
+        response = self.client.post(
+            reverse('admin:admin_views_album_delete', args=(album.pk,)),
+            {'post': 'yes'},
+        )
+        self.assertEqual(Album.objects.count(), 1)
+        self.assertContains(
+            response,
+            'would require deleting the following protected related objects',
+        )
 
     def test_not_registered(self):
         should_contain = """<li>Secret hideout: underground bunker"""
