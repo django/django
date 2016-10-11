@@ -572,6 +572,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
         s = msg.message().as_bytes()
         self.assertIn(b'Content-Transfer-Encoding: 8bit', s)
+        s = msg.message().as_string()
+        self.assertIn(str('Content-Transfer-Encoding: 8bit'), s)
 
         msg = EmailMessage(
             'Subject', 'Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.', 'bounce@example.com',
@@ -579,6 +581,8 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
         s = msg.message().as_bytes()
         self.assertIn(b'Content-Transfer-Encoding: 8bit', s)
+        s = msg.message().as_string()
+        self.assertIn(str('Content-Transfer-Encoding: 8bit'), s)
 
     def test_dont_base64_encode_message_rfc822(self):
         # Ticket #18967

@@ -211,30 +211,19 @@ class SafeMIMEText(MIMEMixin, MIMEText):
 
     def __init__(self, _text, _subtype='plain', _charset=None):
         self.encoding = _charset
-        if _charset == 'utf-8':
-            # Unfortunately, Python doesn't yet pass a Charset instance as
-            # MIMEText init parameter to set_payload().
-            # http://bugs.python.org/issue27445
-            # We do it manually and trigger re-encoding of the payload.
-            if six.PY3 and isinstance(_text, bytes):
-                # Sniffing encoding would fail with bytes content in MIMEText.__init__.
-                _text = _text.decode('utf-8')
-            MIMEText.__init__(self, _text, _subtype, None)
-            del self['Content-Transfer-Encoding']
-            has_long_lines = any(len(l) > RFC5322_EMAIL_LINE_LENGTH_LIMIT for l in _text.splitlines())
-            # Quoted-Printable encoding has the side effect of shortening long
-            # lines, if any (#22561).
-            self.set_payload(_text, utf8_charset_qp if has_long_lines else utf8_charset)
-            self.replace_header('Content-Type', 'text/%s; charset="%s"' % (_subtype, _charset))
-        elif _charset is None:
-            # the default value of '_charset' is 'us-ascii' on Python 2
-            MIMEText.__init__(self, _text, _subtype)
-        else:
-            MIMEText.__init__(self, _text, _subtype, _charset)
+        MIMEText.__init__(self, _text, _subtype=_subtype, _charset=_charset)
 
     def __setitem__(self, name, val):
         name, val = forbid_multi_line_headers(name, val, self.encoding)
         MIMEText.__setitem__(self, name, val)
+
+    def set_payload(self, payload, charset=None):
+        if charset == 'utf-8':
+            has_long_lines = any(len(l) > RFC5322_EMAIL_LINE_LENGTH_LIMIT for l in payload.splitlines())
+            # Quoted-Printable encoding has the side effect of shortening long
+            # lines, if any (#22561).
+            charset = utf8_charset_qp if has_long_lines else utf8_charset
+        MIMEText.set_payload(self, payload, charset=charset)
 
 
 class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
