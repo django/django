@@ -770,6 +770,12 @@ class GZipMiddlewareTest(SimpleTestCase):
         with gzip.GzipFile(mode='rb', fileobj=BytesIO(gzipped_string)) as f:
             return f.read()
 
+    @staticmethod
+    def get_mtime(gzipped_string):
+        with gzip.GzipFile(mode='rb', fileobj=BytesIO(gzipped_string)) as f:
+            f.read()  # must read the data before accessing the header
+            return f.mtime
+
     def test_compress_response(self):
         """
         Compression is performed on responses with compressible content.
@@ -849,6 +855,20 @@ class GZipMiddlewareTest(SimpleTestCase):
         r = GZipMiddleware().process_response(self.req, self.resp)
         self.assertEqual(r.content, self.incompressible_string)
         self.assertIsNone(r.get('Content-Encoding'))
+
+    def test_compress_deterministic(self):
+        """
+        Compression results are the same for the same content and don't
+        include a modification time (since that would make the results
+        of compression non-deterministic and prevent
+        ConditionalGetMiddleware from recognizing conditional matches
+        on gzipped content).
+        """
+        r1 = GZipMiddleware().process_response(self.req, self.resp)
+        r2 = GZipMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(r1.content, r2.content)
+        self.assertEqual(self.get_mtime(r1.content), 0)
+        self.assertEqual(self.get_mtime(r2.content), 0)
 
 
 @ignore_warnings(category=RemovedInDjango21Warning)
