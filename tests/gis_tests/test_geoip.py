@@ -32,8 +32,8 @@ if HAS_GEOIP:
 )
 @ignore_warnings(category=RemovedInDjango20Warning)
 class GeoIPTest(unittest.TestCase):
-    addr = '128.249.1.1'
-    fqdn = 'tmc.edu'
+    addr = '162.242.220.127'
+    fqdn = 'www.djangoproject.com'
 
     def _is_dns_available(self, domain):
         # Naive check to see if there is DNS available to use.
@@ -127,12 +127,12 @@ class GeoIPTest(unittest.TestCase):
             # City information dictionary.
             d = g.city(query)
             self.assertEqual('USA', d['country_code3'])
-            self.assertEqual('Houston', d['city'])
+            self.assertEqual('San Antonio', d['city'])
             self.assertEqual('TX', d['region'])
-            self.assertEqual(713, d['area_code'])
+            self.assertEqual(210, d['area_code'])
             geom = g.geos(query)
             self.assertIsInstance(geom, GEOSGeometry)
-            lon, lat = (-95.4010, 29.7079)
+            lon, lat = (-98, 29)
             lat_lon = g.lat_lon(query)
             lat_lon = (lat_lon[1], lat_lon[0])
             for tup in (geom.tuple, g.coords(query), g.lon_lat(query), lat_lon):
