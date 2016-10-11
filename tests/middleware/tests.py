@@ -614,6 +614,29 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
         self.assertEqual(self.resp.status_code, 400)
 
+    def test_not_modified_headers(self):
+        """
+        The 304 Not Modified response should include all and only those headers
+        that we want to preserve: the headers required by section 4.1 of
+        RFC 7232; Last-Modified; and the cookies.
+        """
+        self.req.META['HTTP_IF_NONE_MATCH'] = self.resp['ETag'] = '"spam"'
+        self.resp['Date'] = 'Sat, 12 Feb 2011 17:35:44 GMT'
+        self.resp['Last-Modified'] = 'Sat, 12 Feb 2011 17:35:44 GMT'
+        self.resp['Expires'] = 'Sun, 13 Feb 2011 17:35:44 GMT'
+        self.resp['Vary'] = 'Cookie'
+        self.resp['Cache-Control'] = 'public'
+        self.resp['Content-Location'] = '/alt'
+        self.resp['Content-Language'] = 'en'  # should not be preserved
+        self.resp.set_cookie("key", "value")
+
+        new_response = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(new_response.status_code, 304)
+        for header in ('Cache-Control', 'Content-Location', 'Date', 'ETag', 'Expires', 'Last-Modified', 'Vary'):
+            self.assertEqual(new_response[header], self.resp[header])
+        self.assertEqual(new_response.cookies, self.resp.cookies)
+        self.assertNotIn('Content-Language', new_response)
+
 
 class XFrameOptionsMiddlewareTest(SimpleTestCase):
     """

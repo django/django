@@ -122,14 +122,20 @@ def _precondition_failed(request):
 
 
 def _not_modified(request, response=None):
+    new_response = HttpResponseNotModified()
+
     if response:
-        # We need to keep the cookies, see ticket #4994.
-        cookies = response.cookies
-        response = HttpResponseNotModified()
-        response.cookies = cookies
-        return response
-    else:
-        return HttpResponseNotModified()
+        # The headers to preserve in 304 Not Modified responses. This comprises
+        # the headers required by Section 4.1 of RFC 7232, plus Last-Modified.
+        for header in ('Cache-Control', 'Content-Location', 'Date', 'ETag', 'Expires', 'Last-Modified', 'Vary'):
+            if header in response:
+                new_response[header] = response[header]
+
+        # We also preserve the cookies. See ticket #4994 and
+        # https://bz.apache.org/bugzilla/show_bug.cgi?id=18388.
+        new_response.cookies = response.cookies
+
+    return new_response
 
 
 def get_conditional_response(request, etag=None, last_modified=None, response=None):
