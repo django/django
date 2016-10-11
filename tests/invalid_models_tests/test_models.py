@@ -689,6 +689,45 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertFalse(Child.check())
 
+    def test_name_beginning_with_underscore(self):
+        class _Model(models.Model):
+            pass
+
+        self.assertEqual(_Model.check(), [
+            Error(
+                "The model name '_Model' cannot start or end with an underscore "
+                "as it collides with the query lookup syntax.",
+                obj=_Model,
+                id='models.E023',
+            )
+        ])
+
+    def test_name_ending_with_underscore(self):
+        class Model_(models.Model):
+            pass
+
+        self.assertEqual(Model_.check(), [
+            Error(
+                "The model name 'Model_' cannot start or end with an underscore "
+                "as it collides with the query lookup syntax.",
+                obj=Model_,
+                id='models.E023',
+            )
+        ])
+
+    def test_name_contains_double_underscores(self):
+        class Test__Model(models.Model):
+            pass
+
+        self.assertEqual(Test__Model.check(), [
+            Error(
+                "The model name 'Test__Model' cannot contain double underscores "
+                "as it collides with the query lookup syntax.",
+                obj=Test__Model,
+                id='models.E024',
+            )
+        ])
+
     @override_settings(TEST_SWAPPED_MODEL_BAD_VALUE='not-a-model')
     def test_swappable_missing_app_name(self):
         class Model(models.Model):

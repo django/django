@@ -141,6 +141,10 @@ Models
 * **models.E022**: ``<function>`` contains a lazy reference to
   ``<app label>.<model>``, but app ``<app label>`` isn't installed or
   doesn't provide model ``<model>``.
+* **models.E023**: The model name ``<model>`` cannot start or end with an
+  underscore as it collides with the query lookup syntax.
+* **models.E024**: The model name ``<model>`` cannot contain double underscores
+  as it collides with the query lookup syntax.
 
 Fields
 ~~~~~~
