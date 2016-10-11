@@ -502,15 +502,6 @@ def get_fields_from_path(model, path):
     return fields
 
 
-def remove_trailing_data_field(fields):
-    """ Discard trailing non-relation field if extant. """
-    try:
-        get_model_from_relation(fields[-1])
-    except NotRelationField:
-        fields = fields[:-1]
-    return fields
-
-
 def construct_change_message(form, formsets, add):
     """
     Construct a JSON structure describing changes from a changed object.
