@@ -139,7 +139,7 @@ Models
 * **models.E021**: ``ordering`` and ``order_with_respect_to`` cannot be used
   together.
 * **models.E022**: ``<function>`` contains a lazy reference to
-  ``<app label>>.<model>``, but app ``<app label>`` isn't installed or
+  ``<app label>.<model>``, but app ``<app label>`` isn't installed or
   doesn't provide model ``<model>``.
 
 Fields
