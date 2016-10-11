@@ -855,27 +855,44 @@ class GZipMiddlewareTest(SimpleTestCase):
 @override_settings(USE_ETAGS=True)
 class ETagGZipMiddlewareTest(SimpleTestCase):
     """
-    Tests if the ETagMiddleware behaves correctly with GZipMiddleware.
+    Tests that ETags are handled properly by GZipMiddleware.
     """
     rf = RequestFactory()
     compressible_string = b'a' * 500
 
-    def test_compress_response(self):
+    def test_strong_etag_modified(self):
         """
-        ETag is changed after gzip compression is performed.
+        GZipMiddleware makes a strong ETag weak.
+        """
+        request = self.rf.get('/', HTTP_ACCEPT_ENCODING='gzip, deflate')
+        response = HttpResponse(self.compressible_string)
+        response['ETag'] = '"eggs"'
+        gzip_response = GZipMiddleware().process_response(request, response)
+        self.assertEqual(gzip_response['ETag'], 'W/"eggs"')
+
+    def test_weak_etag_not_modified(self):
+        """
+        GZipMiddleware doesn't modify a weak ETag.
+        """
+        request = self.rf.get('/', HTTP_ACCEPT_ENCODING='gzip, deflate')
+        response = HttpResponse(self.compressible_string)
+        response['ETag'] = 'W/"eggs"'
+        gzip_response = GZipMiddleware().process_response(request, response)
+        self.assertEqual(gzip_response['ETag'], 'W/"eggs"')
+
+    def test_etag_match(self):
+        """
+        GZipMiddleware allows 304 Not Modified responses.
         """
         request = self.rf.get('/', HTTP_ACCEPT_ENCODING='gzip, deflate')
         response = GZipMiddleware().process_response(
             request,
-            CommonMiddleware().process_response(request, HttpResponse(self.compressible_string))
+            ConditionalGetMiddleware().process_response(request, HttpResponse(self.compressible_string))
         )
-        gzip_etag = response.get('ETag')
-
-        request = self.rf.get('/', HTTP_ACCEPT_ENCODING='')
-        response = GZipMiddleware().process_response(
-            request,
-            CommonMiddleware().process_response(request, HttpResponse(self.compressible_string))
+        gzip_etag = response['ETag']
+        next_request = self.rf.get('/', HTTP_ACCEPT_ENCODING='gzip, deflate', HTTP_IF_NONE_MATCH=gzip_etag)
+        next_response = ConditionalGetMiddleware().process_response(
+            next_request,
+            HttpResponse(self.compressible_string)
         )
-        nogzip_etag = response.get('ETag')
-
-        self.assertNotEqual(gzip_etag, nogzip_etag)
+        self.assertEqual(next_response.status_code, 304)

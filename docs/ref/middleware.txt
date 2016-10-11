@@ -155,6 +155,9 @@ It will NOT compress content if any of the following are true:
 * The request (the browser) hasn't sent an ``Accept-Encoding`` header
   containing ``gzip``.
 
+If the response has an ``ETag`` header, the header will be changed to a weak
+``ETag`` to comply with :rfc:`7232`.
+
 You can apply GZip compression to individual views using the
 :func:`~django.views.decorators.gzip.gzip_page()` decorator.
 
@@ -163,6 +166,7 @@ You can apply GZip compression to individual views using the
     In older versions, Django's CSRF protection mechanism was vulnerable to
     BREACH attacks when compression was used. This is no longer the case, but
     you should still take care not to compromise your own secrets this way.
+
 
 Conditional GET middleware
 --------------------------
