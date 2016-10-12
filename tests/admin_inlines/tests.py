@@ -12,8 +12,8 @@ from .admin import InnerInline, site as admin_site
 from .models import (
     Author, BinaryTree, Book, Chapter, Child, ChildModel1, ChildModel2,
     Fashionista, FootNote, Holder, Holder2, Holder3, Holder4, Inner, Inner2,
-    Inner3, Inner4Stacked, Inner4Tabular, Novel, OutfitItem, Parent,
-    ParentModelWithCustomPk, Person, Poll, Profile, ProfileCollection,
+    Inner3, Inner4Stacked, Inner4Tabular, NonAutoPKBookSubclass, Novel, OutfitItem,
+    Parent, ParentModelWithCustomPk, Person, Poll, Profile, ProfileCollection,
     Question, Sighting, SomeChildModel, SomeParentModel, Teacher,
 )
 
@@ -358,6 +358,22 @@ class TestInline(TestDataMixin, TestCase):
             response,
             '<input id="id_nonautopkbook_set-2-0-rand_pk" '
             'name="nonautopkbook_set-2-0-rand_pk" type="hidden" />',
+            html=True
+        )
+
+    def test_non_autofield_primary_key(self):
+        """
+        The inline form must contain a hidden field holding the primary key in
+        case the primary key is not editable because it is a pointer to the
+        model's parent's class.
+        """
+        author = Author.objects.create(name='Foo')
+        book1 = NonAutoPKBookSubclass.objects.create(title='Bar', author=author)
+        response = self.client.get(reverse('admin:admin_inlines_author_change', args=(author.id,)))
+        self.assertContains(
+            response,
+            '<input id="id_nonautopkbooksubclass_set-0-nonautopkbook_ptr" value="{}" '
+            'name="nonautopkbooksubclass_set-0-nonautopkbook_ptr" type="hidden" />'.format(book1.pk),
             html=True
         )
 
