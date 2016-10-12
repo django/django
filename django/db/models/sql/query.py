@@ -966,6 +966,9 @@ class Query(object):
         self.append_annotation_mask([alias])
         self.annotations[alias] = annotation
 
+    def _prepare_as_filter_value(self):
+        return self.clone()
+
     def prepare_lookup_value(self, value, lookups, can_reuse, allow_joins=True):
         # Default lookup if none given is exact.
         used_joins = []
@@ -1000,9 +1003,6 @@ class Query(object):
         # query (the value).
         if hasattr(value, '_prepare_as_filter_value'):
             value = value._prepare_as_filter_value()
-            value.bump_prefix(self)
-        elif hasattr(value, 'bump_prefix'):
-            value = value.clone()
             value.bump_prefix(self)
         # For Oracle '' is equivalent to null. The check needs to be done
         # at this stage because join promotion can't be done at compiler
