@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed a performance regression when running ``migrate`` in projects
   with ``RenameModel`` operations (:ticket:`27279`).
+
+* Added ``model_name`` to the ``allow_migrate()`` calls in ``makemigrations``
+  (:ticket:`27200`).

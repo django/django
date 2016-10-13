@@ -638,7 +638,7 @@ class MakeMigrationsTests(MigrationTestBase):
                 with self.settings(DATABASE_ROUTERS=['migrations.routers.TestRouter']):
                     with mock.patch.object(TestRouter, 'allow_migrate', return_value=False) as allow_migrate:
                         call_command('makemigrations', 'migrations', verbosity=0)
-                allow_migrate.assert_called_with('other', 'migrations')
+                allow_migrate.assert_called_with('other', 'migrations', model_name='UnicodeModel')
                 self.assertEqual(ensure_schema.call_count, 4)
 
     def test_failing_migration(self):
