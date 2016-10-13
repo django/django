@@ -450,7 +450,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         """
         opts = self.opts
         codename = get_permission_codename('change', opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
 
     def has_delete_permission(self, request, obj=None):
         """
@@ -465,7 +465,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         """
         opts = self.opts
         codename = get_permission_codename('delete', opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+        return request.user.has_perm("%s.%s" % (opts.app_label, codename), obj)
 
     def has_module_permission(self, request):
         """
