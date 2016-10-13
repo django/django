@@ -285,6 +285,8 @@ class WriterTests(TestCase):
         # Just make sure it runs for now, and that things look alright.
         result = self.safe_exec(output)
         self.assertIn("Migration", result)
+        self.assertIn("migrations", result)
+        self.assertIn("models", result)
         # In order to preserve compatibility with Python 3.2 unicode literals
         # prefix shouldn't be added to strings.
         tokens = tokenize.generate_tokens(six.StringIO(str(output)).readline)
@@ -296,6 +298,25 @@ class WriterTests(TestCase):
                         srow, scol, line.strip()
                     )
                 )
+
+    def test_migrations_import_only(self):
+        """
+        Tests that migrations import shows up without models import
+        """
+        options = {
+            'verbose_name': 'My model',
+            'verbose_name_plural': 'My Models',
+        }
+        migration = type(str("Migration"), (migrations.Migration,), {
+            "operations": [
+                migrations.AlterModelOptions('My model', options),
+            ],
+        })
+        writer = MigrationWriter(migration)
+        output = writer.as_string()
+        result = self.safe_exec(output)
+        self.assertIn("migrations", result)
+        self.assertNotIn("models", result)
 
     def test_migration_path(self):
         test_apps = [
