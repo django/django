@@ -1795,21 +1795,25 @@ the given ``kwargs``. If a match is found, it updates the fields passed in the
 
 This is meant as a shortcut to boilerplatish code. For example::
 
+    defaults = {'first_name': 'Bob'}
     try:
         obj = Person.objects.get(first_name='John', last_name='Lennon')
-        for key, value in updated_values.iteritems():
+        for key, value in defaults.items():
             setattr(obj, key, value)
         obj.save()
     except Person.DoesNotExist:
-        updated_values.update({'first_name': 'John', 'last_name': 'Lennon'})
-        obj = Person(**updated_values)
+        new_values = {'first_name': 'John', 'last_name': 'Lennon'}
+        new_values.update(defaults)
+        obj = Person(**new_values)
         obj.save()
 
 This pattern gets quite unwieldy as the number of fields in a model goes up.
 The above example can be rewritten using ``update_or_create()`` like so::
 
     obj, created = Person.objects.update_or_create(
-        first_name='John', last_name='Lennon', defaults=updated_values)
+        first_name='John', last_name='Lennon',
+        defaults={'first_name': 'Bob'},
+    )
 
 For detailed description how names passed in ``kwargs`` are resolved see
 :meth:`get_or_create`.
