@@ -41,8 +41,12 @@ class GZipMiddleware(MiddlewareMixin):
             response.content = compressed_content
             response['Content-Length'] = str(len(response.content))
 
-        if response.has_header('ETag'):
-            response['ETag'] = re.sub('"$', ';gzip"', response['ETag'])
+        # If there is a strong ETag, make it weak. That fulfills the
+        # requirements of RFC 7232 while still allowing conditional
+        # request matches on ETags.
+        etag = response.get('ETag')
+        if etag and etag.startswith('"'):
+            response['ETag'] = 'W/' + etag
         response['Content-Encoding'] = 'gzip'
 
         return response
