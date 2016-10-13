@@ -1338,8 +1338,11 @@ class CountrySpecificLanguageTests(TestCase):
         self.assertTrue(check_for_language('en'))
         self.assertTrue(check_for_language('en-us'))
         self.assertTrue(check_for_language('en-US'))
+        self.assertTrue(check_for_language('be'))
+        self.assertTrue(check_for_language('be@latin'))
         self.assertFalse(check_for_language('en-ü'))
         self.assertFalse(check_for_language('en\x00'))
+        self.assertFalse(check_for_language('be@ '))
 
     def test_get_language_from_request(self):
         # issue 19919
