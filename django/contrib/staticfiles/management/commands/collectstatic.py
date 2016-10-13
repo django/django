@@ -199,6 +199,8 @@ class Command(NoArgsCommand):
         """
         Deletes the given relative path using the destination storage backend.
         """
+        if not os.path.isdir(self.storage.location):
+            return
         dirs, files = self.storage.listdir(path)
         for f in files:
             fpath = os.path.join(path, f)
