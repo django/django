@@ -1324,10 +1324,7 @@ class Query(object):
                         "querying. If it is a GenericForeignKey, consider "
                         "adding a GenericRelation." % name
                     )
-                try:
-                    model = field.model._meta.concrete_model
-                except AttributeError:
-                    model = None
+                model = field.model._meta.concrete_model
             else:
                 # We didn't find the current field, so move position back
                 # one step.
