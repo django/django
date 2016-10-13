@@ -9,7 +9,7 @@ from django.http import HttpResponseNotModified
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.http import http_date
-from django.views.static import was_modified_since
+from django.views.static import was_modified_since, STREAM_CHUNK_SIZE
 
 from .. import urls
 from ..urls import media_dir
@@ -33,6 +33,14 @@ class StaticTests(TestCase):
                 self.assertEqual(fp.read(), response_content)
             self.assertEqual(len(response_content), int(response['Content-Length']))
             self.assertEqual(mimetypes.guess_type(file_path)[1], response.get('Content-Encoding', None))
+
+    def test_chunked(self):
+        "The static view should stream files in chunks to avoid large memory usage"
+        response = self.client.get('/views/%s/%s' % (self.prefix, 'long-line.txt'))
+        first_chunk = next(response.streaming_content)
+        self.assertEqual(len(first_chunk), STREAM_CHUNK_SIZE)
+        second_chunk = next(response.streaming_content)
+        self.assertEqual(len(second_chunk), 1451)
 
     def test_unknown_mime_type(self):
         response = self.client.get('/views/%s/file.unknown' % self.prefix)
