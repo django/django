@@ -176,13 +176,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 (SELECT fkc.relname || '.' || fka.attname
                 FROM pg_attribute AS fka
                 JOIN pg_class AS fkc ON fka.attrelid = fkc.oid
-                WHERE fka.attrelid = c.confrelid AND fka.attnum = c.confkey[1])
+                WHERE fka.attrelid = c.confrelid AND fka.attnum = c.confkey[1]),
+                cl.reloptions
             FROM pg_constraint AS c
             JOIN pg_class AS cl ON c.conrelid = cl.oid
             JOIN pg_namespace AS ns ON cl.relnamespace = ns.oid
             WHERE ns.nspname = %s AND cl.relname = %s
         """, ["public", table_name])
-        for constraint, columns, kind, used_cols in cursor.fetchall():
+        for constraint, columns, kind, used_cols, options in cursor.fetchall():
             constraints[constraint] = {
                 "columns": columns,
                 "primary_key": kind == "p",
@@ -191,12 +192,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 "check": kind == "c",
                 "index": False,
                 "definition": None,
+                "options": options,
             }
         # Now get indexes
         cursor.execute("""
             SELECT
                 indexname, array_agg(attname), indisunique, indisprimary,
-                array_agg(ordering), amname, exprdef
+                array_agg(ordering), amname, exprdef, s2.attoptions
             FROM (
                 SELECT
                     c2.relname as indexname, idx.*, attr.attname, am.amname,
@@ -209,7 +211,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                             CASE (option & 1)
                                 WHEN 1 THEN 'DESC' ELSE 'ASC'
                             END
-                    END as ordering
+                    END as ordering,
+                    c2.reloptions as attoptions
                 FROM (
                     SELECT
                         *, unnest(i.indkey) as key, unnest(i.indoption) as option
@@ -221,9 +224,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 LEFT JOIN pg_attribute attr ON attr.attrelid = c.oid AND attr.attnum = idx.key
                 WHERE c.relname = %s
             ) s2
-            GROUP BY indexname, indisunique, indisprimary, amname, exprdef;
+            GROUP BY indexname, indisunique, indisprimary, amname, exprdef, attoptions;
         """, [table_name])
-        for index, columns, unique, primary, orders, type_, definition in cursor.fetchall():
+        for index, columns, unique, primary, orders, type_, definition, options in cursor.fetchall():
             if index not in constraints:
                 constraints[index] = {
                     "columns": columns if columns != [None] else [],
@@ -235,5 +238,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "index": True,
                     "type": type_,
                     "definition": definition,
+                    "options": options,
                 }
         return constraints

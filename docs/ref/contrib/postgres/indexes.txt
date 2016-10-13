@@ -9,6 +9,16 @@ PostgreSQL specific model indexes
 The following are PostgreSQL specific :doc:`indexes </ref/models/indexes>`
 available from the ``django.contrib.postgres.indexes`` module.
 
+``BrinIndex``
+=============
+
+.. class:: BrinIndex(pages_per_range=None)
+
+    Creates a `BRIN index
+    <https://www.postgresql.org/docs/current/static/brin-intro.html>`_. For
+    performance considerations and use cases of the index, please consult the
+    documentation.
+
 ``GinIndex``
 ============
 

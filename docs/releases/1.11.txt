@@ -212,8 +212,9 @@ Minor features
   :class:`~django.contrib.postgres.aggregates.StringAgg` determines if
   concatenated values will be distinct.
 
-* The new :class:`~django.contrib.postgres.indexes.GinIndex` class allows
-  creating gin indexes in the database.
+* The new :class:`~django.contrib.postgres.indexes.GinIndex` and
+  :class:`~django.contrib.postgres.indexes.BrinIndex` classes allow
+  creating ``GIN`` and ``BRIN`` indexes in the database.
 
 * :class:`~django.contrib.postgres.fields.JSONField` accepts a new ``encoder``
   parameter to specify a custom class to encode data types not supported by the

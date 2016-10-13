@@ -38,6 +38,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.connection.pg_version >= 90500
 
     @cached_property
+    def has_brin_index_support(self):
+        return self.connection.pg_version >= 90500
+
+    @cached_property
     def has_jsonb_datatype(self):
         return self.connection.pg_version >= 90400
 
