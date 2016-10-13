@@ -182,15 +182,6 @@ class InsertQuery(Query):
         self.fields = []
         self.objs = []
 
-    def clone(self, klass=None, **kwargs):
-        extras = {
-            'fields': self.fields[:],
-            'objs': self.objs[:],
-            'raw': self.raw,
-        }
-        extras.update(kwargs)
-        return super(InsertQuery, self).clone(klass, **extras)
-
     def insert_values(self, fields, objs, raw=False):
         """
         Set up the insert query from the 'insert_values' dictionary. The
