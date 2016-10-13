@@ -216,6 +216,15 @@ class AuthenticationForm(forms.Form):
 class PasswordResetForm(forms.Form):
     email = forms.EmailField(label=_("Email"), max_length=254)
 
+    def send_mail(self, subject_template_name, email_template_name,
+                  context, from_email, to_email):
+        from django.core.mail import send_mail
+        subject = loader.render_to_string(subject_template_name, context)
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+        email = loader.render_to_string(email_template_name, context)
+        send_mail(subject, email, from_email, [to_email])
+
     def save(self, domain_override=None,
              subject_template_name='registration/password_reset_subject.txt',
              email_template_name='registration/password_reset_email.html',
@@ -225,7 +234,6 @@ class PasswordResetForm(forms.Form):
         Generates a one-use only link for resetting password and sends to the
         user.
         """
-        from django.core.mail import send_mail
         UserModel = get_user_model()
         email = self.cleaned_data["email"]
         active_users = UserModel._default_manager.filter(
@@ -250,11 +258,8 @@ class PasswordResetForm(forms.Form):
                 'token': token_generator.make_token(user),
                 'protocol': 'https' if use_https else 'http',
             }
-            subject = loader.render_to_string(subject_template_name, c)
-            # Email subject *must not* contain newlines
-            subject = ''.join(subject.splitlines())
-            email = loader.render_to_string(email_template_name, c)
-            send_mail(subject, email, from_email, [user.email])
+            self.send_mail(subject_template_name, email_template_name,
+                           context, from_email, user.email)
 
 
 class SetPasswordForm(forms.Form):
