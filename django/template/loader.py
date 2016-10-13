@@ -26,10 +26,11 @@
 # installed, because pkg_resources is necessary to read eggs.
 
 from django.core.exceptions import ImproperlyConfigured
-from django.template.base import Origin, Template, Context, TemplateDoesNotExist
+from django.template.base import Origin, Template, Context, TemplateDoesNotExist, TemplateSyntaxError
 from django.conf import settings
 from django.utils.module_loading import import_string
 from django.utils import six
+import sys
 
 template_source_loaders = None
 
@@ -55,6 +56,10 @@ class BaseLoader(object):
             # This allows for correct identification (later) of the actual template that does
             # not exist.
             return source, display_name
+        except TemplateSyntaxError:
+            excp_class, excp_inst, stack_trace = sys.exc_info()
+            error = "Error in file: %s\n%s" % (display_name, excp_inst.message)
+            six.reraise(excp_class, excp_class(error), stack_trace)
 
     def load_template_source(self, template_name, template_dirs=None):
         """
