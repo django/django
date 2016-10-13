@@ -317,6 +317,15 @@ hashing algorithm.
 .. _`url()`: http://www.w3.org/TR/CSS2/syndata.html#uri
 .. _`Cascading Style Sheets`: http://www.w3.org/Style/CSS/
 
+.. warning::
+
+    Using ``ManifestStaticFilesStorage`` requires you to run the :djadmin:`collectstatic` 
+    management command to create the hashed names mapping in the file ``staticfiles.json``. 
+
+    Therefore, ``ManifestStaticFilesStorage`` should not be used when running tests. During testing,
+    make sure that the :setting:`STATICFILES_STORAGE` setting does not refer to
+    ``ManifestStaticFilesStorage``.
+
 CachedStaticFilesStorage
 ------------------------
 
