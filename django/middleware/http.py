@@ -18,6 +18,12 @@ class ConditionalGetMiddleware(MiddlewareMixin):
         if not response.streaming and not response.has_header('Content-Length'):
             response['Content-Length'] = str(len(response.content))
 
+        # It's too late to prevent an unsafe request with a 412 response, and
+        # for a HEAD request, the response body is always empty so computing
+        # an accurate ETag isn't possible.
+        if request.method != 'GET':
+            return response
+
         if self.needs_etag(response) and not response.has_header('ETag'):
             set_response_etag(response)
 
