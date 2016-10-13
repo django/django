@@ -149,6 +149,10 @@ class TranslationTests(TransRealMixin, TestCase):
             with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
                 complex_context_deferred % {'name': 'Jim'}
 
+    def test_ungettext_lazy_long(self):
+        plural_with_long = ungettext_lazy('Hi %(name)s, %(num)d good result', 'Hi %(name)s, %(num)d good results', 4L)
+        self.assertEqual(plural_with_long % {'num': 4L, 'name': 'Jim'}, 'Hi Jim, 4 good results')
+
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_pgettext(self):
         trans_real._active = local()
