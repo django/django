@@ -1135,8 +1135,6 @@ class SQLUpdateCompiler(SQLCompiler):
                 update_params.append(val)
             else:
                 values.append('%s = NULL' % qn(name))
-        if not values:
-            return '', ()
         table = self.query.tables[0]
         result = [
             'UPDATE %s SET' % qn(table),
