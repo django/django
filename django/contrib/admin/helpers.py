@@ -58,14 +58,14 @@ class AdminForm(object):
 
 class Fieldset(object):
     def __init__(self, form, name=None, readonly_fields=(), fields=(), classes=(),
-      description=None, model_admin=None):
+      description=None, model_admin=None, style=None):
         self.form = form
         self.name, self.fields = name, fields
         self.classes = ' '.join(classes)
         self.description = description
         self.model_admin = model_admin
         self.readonly_fields = readonly_fields
-
+        self.style=style
     def _media(self):
         if 'collapse' in self.classes:
             extra = '' if settings.DEBUG else '.min'
