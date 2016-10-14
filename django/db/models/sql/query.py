@@ -1059,7 +1059,7 @@ class Query(object):
                 if not value.is_compatible_query_object_type(opts, field):
                     raise ValueError(
                         'Cannot use QuerySet for "%s": Use a QuerySet for "%s".' %
-                        (value.model._meta.model_name, opts.object_name)
+                        (value.model._meta.object_name, opts.object_name)
                     )
             elif hasattr(value, '_meta'):
                 self.check_query_object_type(value, opts, field)
