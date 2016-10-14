@@ -440,22 +440,18 @@ class QuerySet(object):
         objs = list(objs)
         self._populate_pk_values(objs)
         with transaction.atomic(using=self.db, savepoint=False):
-            if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk and
-                    self.model._meta.has_auto_field):
-                self._batched_insert(objs, fields, batch_size)
-            else:
-                objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
-                if objs_with_pk:
-                    self._batched_insert(objs_with_pk, fields, batch_size)
-                if objs_without_pk:
-                    fields = [f for f in fields if not isinstance(f, AutoField)]
-                    ids = self._batched_insert(objs_without_pk, fields, batch_size)
-                    if connection.features.can_return_ids_from_bulk_insert:
-                        assert len(ids) == len(objs_without_pk)
-                    for obj_without_pk, pk in zip(objs_without_pk, ids):
-                        obj_without_pk.pk = pk
-                        obj_without_pk._state.adding = False
-                        obj_without_pk._state.db = self.db
+            objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
+            if objs_with_pk:
+                self._batched_insert(objs_with_pk, fields, batch_size)
+            if objs_without_pk:
+                fields = [f for f in fields if not isinstance(f, AutoField)]
+                ids = self._batched_insert(objs_without_pk, fields, batch_size)
+                if connection.features.can_return_ids_from_bulk_insert:
+                    assert len(ids) == len(objs_without_pk)
+                for obj_without_pk, pk in zip(objs_without_pk, ids):
+                    obj_without_pk.pk = pk
+                    obj_without_pk._state.adding = False
+                    obj_without_pk._state.db = self.db
 
         return objs
 

@@ -25,7 +25,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_1000_query_parameters = False
     supports_mixed_date_datetime_comparisons = False
     has_bulk_insert = True
-    can_combine_inserts_with_and_without_auto_increment_pk = False
     supports_foreign_keys = False
     supports_column_check_constraints = False
     autocommits_when_autocommit_is_off = True
