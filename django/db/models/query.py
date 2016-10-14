@@ -1151,10 +1151,6 @@ class QuerySet(object):
             return clone.query.get_compiler(connection=connection).as_nested_sql()
         raise ValueError("Can't do subqueries with queries on different DBs.")
 
-    # When used as part of a nested query, a queryset will never be an "always
-    # empty" result.
-    value_annotation = True
-
     def _add_hints(self, **hints):
         """
         Update hinting information for later use by Routers
