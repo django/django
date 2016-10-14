@@ -161,3 +161,8 @@ The :func:`~django.views.defaults.bad_request` view is overridden by
 :data:`~django.conf.urls.handler400`::
 
     handler400 = 'mysite.views.my_custom_bad_request_view'
+
+.. seealso::
+
+    Use the :setting:`CSRF_FAILURE_VIEW` setting to override the CSRF error
+    view.
