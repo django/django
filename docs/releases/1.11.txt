@@ -559,6 +559,9 @@ Miscellaneous
 * In the admin templates, ``<p class="help">`` is replaced with a ``<div>`` tag
   to allow including lists inside help text.
 
+* ``ConditionalGetMiddleware`` no longer sets the ``Date`` header as Web
+  servers set that header.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11

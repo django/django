@@ -2,7 +2,7 @@ from django.utils.cache import (
     cc_delim_re, get_conditional_response, set_response_etag,
 )
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.http import http_date, parse_http_date_safe
+from django.utils.http import parse_http_date_safe
 
 
 class ConditionalGetMiddleware(MiddlewareMixin):
@@ -12,10 +12,9 @@ class ConditionalGetMiddleware(MiddlewareMixin):
     If-Modified-Since, the response is replaced by an HttpNotModified. An ETag
     header is added if needed.
 
-    Also sets the Date and Content-Length response-headers.
+    Also sets the Content-Length response-header.
     """
     def process_response(self, request, response):
-        response['Date'] = http_date()
         if not response.streaming and not response.has_header('Content-Length'):
             response['Content-Length'] = str(len(response.content))
 

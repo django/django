@@ -478,13 +478,6 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         self.req = RequestFactory().get('/')
         self.resp = self.client.get(self.req.path_info)
 
-    # Tests for the Date header
-
-    def test_date_header_added(self):
-        self.assertNotIn('Date', self.resp)
-        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
-        self.assertIn('Date', self.resp)
-
     # Tests for the Content-Length header
 
     def test_content_length_header_added(self):
