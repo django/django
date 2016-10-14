@@ -34,7 +34,7 @@ class SessionMiddleware(MiddlewareMixin):
         else:
             # First check if we need to delete this cookie.
             # The session should be deleted only if the session is entirely empty
-            if settings.SESSION_COOKIE_NAME in request.COOKIES and empty:
+            if request.COOKIES.get(settings.SESSION_COOKIE_NAME) and empty:
                 response.delete_cookie(
                     settings.SESSION_COOKIE_NAME,
                     path=settings.SESSION_COOKIE_PATH,
