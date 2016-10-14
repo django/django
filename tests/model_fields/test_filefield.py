@@ -1,4 +1,10 @@
-from django.test import TestCase
+import os
+import sys
+import unittest
+
+from django.core.files import temp
+from django.core.files.uploadedfile import TemporaryUploadedFile
+from django.test import TestCase, override_settings
 
 from .models import Document
 
@@ -54,3 +60,18 @@ class FileFieldTests(TestCase):
     def test_defer(self):
         Document.objects.create(myfile='something.txt')
         self.assertEqual(Document.objects.defer('myfile')[0].myfile, 'something.txt')
+
+    @unittest.skipIf(sys.platform.startswith('win'), "Windows doesn't support moving open files.")
+    # Ensure that source and destination of move are on same filesystem,
+    # and prevent writing to tests directory
+    @override_settings(MEDIA_ROOT=temp.gettempdir())
+    def test_move_temporary_file(self):
+        """
+        Check that a temporary uploaded file is moved
+        to upload destination rather than copied (#27334)
+        """
+        with TemporaryUploadedFile('something.txt', 'text/plain', 0, 'UTF-8') as tmp_file:
+            tmp_file_path = tmp_file.temporary_file_path()
+            Document.objects.create(myfile=tmp_file)
+            still_exists = os.path.exists(tmp_file_path)
+            self.assertFalse(still_exists, 'Temporary file still exists')
