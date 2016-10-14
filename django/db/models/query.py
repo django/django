@@ -19,9 +19,7 @@ from django.db.models.deletion import Collector
 from django.db.models.expressions import F
 from django.db.models.fields import AutoField
 from django.db.models.functions import Trunc
-from django.db.models.query_utils import (
-    InvalidQuery, Q, check_rel_lookup_compatibility,
-)
+from django.db.models.query_utils import InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR
 from django.utils import six, timezone
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -1151,21 +1149,6 @@ class QuerySet(object):
         for example qs[1:]._has_filters() -> False.
         """
         return self.query.has_filters()
-
-    def is_compatible_query_object_type(self, opts, field):
-        """
-        Check that using this queryset as the rhs value for a lookup is
-        allowed. The opts are the options of the relation's target we are
-        querying against. For example in .filter(author__in=Author.objects.all())
-        the opts would be Author's (from the author field) and self.model would
-        be Author.objects.all() queryset's .model (Author also). The field is
-        the related field on the lhs side.
-        """
-        # We trust that users of values() know what they are doing.
-        if self._fields is not None:
-            return True
-        return check_rel_lookup_compatibility(self.model, opts, field)
-    is_compatible_query_object_type.queryset_only = True
 
 
 class InstanceCheckMeta(type):

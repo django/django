@@ -1050,14 +1050,20 @@ class Query(object):
         Checks the type of object passed to query relations.
         """
         if field.is_relation:
-            # QuerySets implement is_compatible_query_object_type() to
-            # determine compatibility with the given field.
-            if hasattr(value, 'is_compatible_query_object_type'):
-                if not value.is_compatible_query_object_type(opts, field):
-                    raise ValueError(
-                        'Cannot use QuerySet for "%s": Use a QuerySet for "%s".' %
-                        (value.model._meta.object_name, opts.object_name)
-                    )
+            # Check that the field and the queryset use the same model in a
+            # query like .filter(author=Author.objects.all()). For example, the
+            # opts would be Author's (from the author field) and value.model
+            # would be Author.objects.all() queryset's .model (Author also).
+            # The field is the related field on the lhs side.
+            # If _forced_pk isn't set, this isn't a queryset query or values()
+            # or values_list() was specified by the developer in which case
+            # that choice is trusted.
+            if (getattr(value, '_forced_pk', False) and
+                    not check_rel_lookup_compatibility(value.model, opts, field)):
+                raise ValueError(
+                    'Cannot use QuerySet for "%s": Use a QuerySet for "%s".' %
+                    (value.model._meta.object_name, opts.object_name)
+                )
             elif hasattr(value, '_meta'):
                 self.check_query_object_type(value, opts, field)
             elif hasattr(value, '__iter__'):
