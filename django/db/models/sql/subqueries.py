@@ -28,7 +28,7 @@ class DeleteQuery(Query):
         cursor = self.get_compiler(using).execute_sql(CURSOR)
         return cursor.rowcount if cursor else 0
 
-    def delete_batch(self, pk_list, using, field=None):
+    def delete_batch(self, pk_list, using):
         """
         Set up and execute delete queries for all the objects in pk_list.
 
@@ -37,8 +37,7 @@ class DeleteQuery(Query):
         """
         # number of objects deleted
         num_deleted = 0
-        if not field:
-            field = self.get_meta().pk
+        field = self.get_meta().pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
             self.add_q(Q(
