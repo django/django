@@ -999,6 +999,15 @@ implementation details see :ref:`using-the-views`.
       authenticated users accessing the login page will be redirected as if
       they had just successfully logged in. Defaults to ``False``.
 
+      .. warning::
+
+        If you enable ``redirect_authenticated_user``, other websites will be
+        able to determine if their visitors are authenticated on your site by
+        requesting redirect URLs to image files on your website. To avoid
+        this "`social media fingerprinting
+        <https://robinlinus.github.io/socialmedia-leak/>`_" information
+        leakage, host all images and your favicon on a separate domain.
+
     .. deprecated:: 1.9
 
         The ``current_app`` parameter is deprecated and will be removed in
