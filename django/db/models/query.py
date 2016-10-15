@@ -54,8 +54,6 @@ class ModelIterable(BaseIterable):
         results = compiler.execute_sql()
         select, klass_info, annotation_col_map = (compiler.select, compiler.klass_info,
                                                   compiler.annotation_col_map)
-        if klass_info is None:
-            return
         model_cls = klass_info['model']
         select_fields = klass_info['select_fields']
         model_fields_start, model_fields_end = select_fields[0], select_fields[-1] + 1
