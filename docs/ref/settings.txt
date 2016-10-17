@@ -90,8 +90,10 @@ If the ``Host`` header (or ``X-Forwarded-Host`` if
 list, the :meth:`django.http.HttpRequest.get_host()` method will raise
 :exc:`~django.core.exceptions.SuspiciousOperation`.
 
-When :setting:`DEBUG` is ``True``, host validation is disabled; any host will
-be accepted. ``ALLOWED_HOSTS`` is :ref:`checked when running tests
+When :setting:`DEBUG` is ``True`` and ``ALLOWED_HOSTS`` is empty, the host
+is validated against ``['localhost', '127.0.0.1', '[::1]']``.
+
+``ALLOWED_HOSTS`` is also :ref:`checked when running tests
 <topics-testing-advanced-multiple-hosts>`.
 
 This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
@@ -101,6 +103,10 @@ are bypassing this security protection.
 .. versionchanged:: 1.11
 
     In older versions, ``ALLOWED_HOSTS`` wasn't checked when running tests.
+
+    In older versions, ``ALLOWED_HOSTS`` wasn't checked if ``DEBUG=True``.
+    This was also changed in Django 1.10.3, 1.9.11, and 1.8.16 to prevent a
+    DNS rebinding attack.
 
 .. setting:: APPEND_SLASH
 
