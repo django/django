@@ -92,12 +92,13 @@ class HttpRequest(object):
         """Return the HTTP host using the environment or request headers."""
         host = self._get_raw_host()
 
-        # There is no hostname validation when DEBUG=True
-        if settings.DEBUG:
-            return host
+        # Allow variants of localhost if ALLOWED_HOSTS is empty and DEBUG=True.
+        allowed_hosts = settings.ALLOWED_HOSTS
+        if settings.DEBUG and not allowed_hosts:
+            allowed_hosts = ['localhost', '127.0.0.1', '[::1]']
 
         domain, port = split_domain_port(host)
-        if domain and validate_host(domain, settings.ALLOWED_HOSTS):
+        if domain and validate_host(domain, allowed_hosts):
             return host
         else:
             msg = "Invalid HTTP_HOST header: %r." % host
