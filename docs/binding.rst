@@ -81,7 +81,8 @@ always provide:
 
 * ``fields`` is a whitelist of fields to return in the serialized request.
   Channels does not default to all fields for security concerns; if you want
-  this, set it to the value ``["__all__"]``.
+  this, set it to the value ``["__all__"]``. As an alternative, ``exclude``
+  acts as a blacklist of fields.
 
 * ``group_names`` returns a list of groups to send outbound updates to based
   on the model and action. For example, you could dispatch posts on different
