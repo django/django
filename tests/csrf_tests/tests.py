@@ -377,7 +377,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         self.assertEqual(len(csrf_cookie.value), CSRF_TOKEN_LENGTH)
         self._check_token_present(resp, csrf_id=csrf_cookie.value)
 
-    @override_settings(DEBUG=True)
+    @override_settings(DEBUG=True, ALLOWED_HOSTS=['www.example.com'])
     def test_https_bad_referer(self):
         """
         Test that a POST HTTPS request with a bad referer is rejected
