@@ -2211,7 +2211,7 @@ The ``InlineModelAdmin`` class adds:
 
             def get_max_num(self, request, obj=None, **kwargs):
                 max_num = 10
-                if obj.parent:
+                if obj and obj.parent:
                     return max_num - 5
                 return max_num
 
