@@ -11,21 +11,22 @@ from .models import Article, Author, Reference
 
 class OrderingTests(TestCase):
 
-    def setUp(self):
-        self.a1 = Article.objects.create(
+    @classmethod
+    def setUpTestData(cls):
+        cls.a1 = Article.objects.create(
             headline="Article 1", pub_date=datetime(2005, 7, 26)
         )
-        self.a2 = Article.objects.create(
+        cls.a2 = Article.objects.create(
             headline="Article 2", pub_date=datetime(2005, 7, 27)
         )
-        self.a3 = Article.objects.create(
+        cls.a3 = Article.objects.create(
             headline="Article 3", pub_date=datetime(2005, 7, 27)
         )
-        self.a4 = Article.objects.create(
+        cls.a4 = Article.objects.create(
             headline="Article 4", pub_date=datetime(2005, 7, 28)
         )
-        self.author_1 = Author.objects.create()
-        self.author_2 = Author.objects.create()
+        cls.author_1 = Author.objects.create()
+        cls.author_2 = Author.objects.create()
         for i in range(3):
             Author.objects.create()
 
