@@ -56,7 +56,7 @@ class WebsocketBinding(Binding):
         Serializes model data into JSON-compatible types.
         """
         if self.fields is not None:
-            if list(self.fields) == ['__all__']:
+            if self.fields == '__all__' or list(self.fields) == ['__all__']:
                 fields = None
             else:
                 fields = self.fields
