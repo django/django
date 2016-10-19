@@ -666,23 +666,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
    users because :attr:`~RemoteUserBackend.user_can_authenticate` always
    returns ``True``.
 
-``AppConfig`` classes
-=====================
-
-.. module:: django.contrib.auth.apps
-   :synopsis: AppConfigs for contrib.auth.
-
-.. class:: AuthConfig
-
-    The default :class:`~django.apps.AppConfig`.
-
-.. class:: BaseAuthConfig
-
-    .. versionadded:: 1.11
-
-    An :class:`~django.apps.AppConfig` for use if you :ref:`aren't using
-    <using-auth-without-models>` any of the built-in ``contrib.auth`` models.
-
 Utility functions
 =================
 

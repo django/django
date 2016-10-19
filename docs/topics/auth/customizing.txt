@@ -1156,28 +1156,3 @@ Finally, specify the custom model as the default user model for your project
 using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
 
     AUTH_USER_MODEL = 'customauth.MyUser'
-
-.. _using-auth-without-models:
-
-Using ``contrib.auth`` without the built-in models
-==================================================
-
-The models shipped with ``contrib.auth`` may not be required. For example, if
-you :ref:`customize the user model <auth-custom-user>` and don't use the
-:class:`~django.contrib.auth.models.Permission` and
-:class:`~django.contrib.auth.models.Group` models, then the ``auth`` tables
-may be unused. To avoid creating these tables, modify the
-:setting:`MIGRATION_MODULES` setting and disable the migrations for the
-``auth`` app::
-
-    MIGRATION_MODULES = {'auth': None}
-
-To prevent creation of the default permissions, change ``'django.contrib.auth'``
-in :setting:`INSTALLED_APPS` to
-:class:`django.contrib.auth.apps.BaseAuthConfig`::
-
-    INSTALLED_APPS = [
-        ...
-        'django.contrib.auth.apps.BaseAuthConfig',
-        ...
-    ]
