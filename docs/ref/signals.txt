@@ -429,13 +429,13 @@ Arguments sent with this signal:
 .. data:: django.db.models.signals.post_migrate
    :module:
 
-Sent by the :djadmin:`migrate` command after it installs an application, and the
-:djadmin:`flush` command. It's not emitted for applications that lack a
+Sent at the end of the :djadmin:`migrate` (even if no migrations are run) and
+:djadmin:`flush` commands. It's not emitted for applications that lack a
 ``models`` module.
 
-It is important that handlers of this signal perform idempotent changes (e.g.
-no database alterations) as this may cause the :djadmin:`flush` management
-command to fail if it also ran during the :djadmin:`migrate` command.
+Handlers of this signal must not perform database schema alterations as doing
+so may cause the :djadmin:`flush` command to fail if it runs during the
+:djadmin:`migrate` command.
 
 Arguments sent with this signal:
 
