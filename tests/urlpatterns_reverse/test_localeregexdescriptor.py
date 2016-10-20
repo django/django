@@ -3,15 +3,14 @@ from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, override_settings
-from django.urls import LocaleRegexProvider
-from django.urls.resolvers import LocaleRegexDescriptor
+from django.urls.resolvers import LocaleRegexDescriptor, RegexPattern
 from django.utils import translation
 
 here = os.path.dirname(os.path.abspath(__file__))
 
 
 @override_settings(LOCALE_PATHS=[os.path.join(here, 'translations', 'locale')])
-class LocaleRegexProviderTests(SimpleTestCase):
+class LocaleRegexDescriptorTests(SimpleTestCase):
     def setUp(self):
         translation.trans_real._translations = {}
 
@@ -19,7 +18,7 @@ class LocaleRegexProviderTests(SimpleTestCase):
         translation.trans_real._translations = {}
 
     def test_translated_regex_compiled_per_language(self):
-        provider = LocaleRegexProvider(translation.gettext_lazy('^foo/$'))
+        provider = RegexPattern(translation.gettext_lazy('^foo/$'))
         with translation.override('de'):
             de_compiled = provider.regex
             # compiled only once per language
@@ -33,7 +32,7 @@ class LocaleRegexProviderTests(SimpleTestCase):
         self.assertEqual(de_compiled, de_compiled_2)
 
     def test_nontranslated_regex_compiled_once(self):
-        provider = LocaleRegexProvider('^foo/$')
+        provider = RegexPattern('^foo/$')
         with translation.override('de'):
             de_compiled = provider.regex
         with translation.override('fr'):
@@ -46,10 +45,10 @@ class LocaleRegexProviderTests(SimpleTestCase):
 
     def test_regex_compile_error(self):
         """Regex errors are re-raised as ImproperlyConfigured."""
-        provider = LocaleRegexProvider('*')
+        provider = RegexPattern('*')
         msg = '"*" is not a valid regular expression: nothing to repeat'
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             provider.regex
 
     def test_access_locale_regex_descriptor(self):
-        self.assertIsInstance(LocaleRegexProvider.regex, LocaleRegexDescriptor)
+        self.assertIsInstance(RegexPattern.regex, LocaleRegexDescriptor)

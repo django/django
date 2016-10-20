@@ -502,7 +502,7 @@ The ``login_required`` decorator
 
         from django.contrib.auth import views as auth_views
 
-        url(r'^accounts/login/$', auth_views.LoginView.as_view()),
+        path('accounts/login/', auth_views.LoginView.as_view()),
 
     The :setting:`settings.LOGIN_URL <LOGIN_URL>` also accepts view function
     names and :ref:`named URL patterns <naming-url-patterns>`. This allows you
@@ -896,7 +896,7 @@ easiest way is to include the provided URLconf in ``django.contrib.auth.urls``
 in your own URLconf, for example::
 
     urlpatterns = [
-        url('^', include('django.contrib.auth.urls')),
+        path('', include('django.contrib.auth.urls')),
     ]
 
 This will include the following URL patterns::
@@ -919,7 +919,7 @@ your URLconf::
     from django.contrib.auth import views as auth_views
 
     urlpatterns = [
-        url('^change-password/$', auth_views.PasswordChangeView.as_view()),
+        path('change-password/', auth_views.PasswordChangeView.as_view()),
     ]
 
 The views have optional arguments you can use to alter the behavior of the
@@ -928,8 +928,8 @@ provide the ``template_name`` argument. A way to do this is to provide keyword
 arguments in the URLconf, these will be passed on to the view. For example::
 
     urlpatterns = [
-        url(
-            '^change-password/$',
+        path(
+            'change-password/',
             auth_views.PasswordChangeView.as_view(template_name='change-password.html'),
         ),
     ]
@@ -1035,7 +1035,7 @@ implementation details see :ref:`using-the-views`.
     the ``as_view`` method in your URLconf. For example, this URLconf line would
     use :file:`myapp/login.html` instead::
 
-        url(r'^accounts/login/$', auth_views.LoginView.as_view(template_name='myapp/login.html')),
+        path('accounts/login/', auth_views.LoginView.as_view(template_name='myapp/login.html')),
 
     You can also specify the name of the ``GET`` field which contains the URL
     to redirect to after login using ``redirect_field_name``. By default, the

@@ -196,11 +196,11 @@ class AdminSite:
             class MyAdminSite(AdminSite):
 
                 def get_urls(self):
-                    from django.conf.urls import url
+                    from django.urls import path
 
                     urls = super().get_urls()
                     urls += [
-                        url(r'^my_view/$', self.admin_view(some_view))
+                        path('my_view/', self.admin_view(some_view))
                     ]
                     return urls
 
@@ -230,7 +230,7 @@ class AdminSite:
         return update_wrapper(inner, view)
 
     def get_urls(self):
-        from django.conf.urls import url, include
+        from django.urls import include, path, re_path
         # Since this module gets imported in the application's root package,
         # it cannot import models from other applications at the module level,
         # and django.contrib.contenttypes.views imports ContentType.
@@ -244,15 +244,21 @@ class AdminSite:
 
         # Admin-site-wide views.
         urlpatterns = [
-            url(r'^$', wrap(self.index), name='index'),
-            url(r'^login/$', self.login, name='login'),
-            url(r'^logout/$', wrap(self.logout), name='logout'),
-            url(r'^password_change/$', wrap(self.password_change, cacheable=True), name='password_change'),
-            url(r'^password_change/done/$', wrap(self.password_change_done, cacheable=True),
-                name='password_change_done'),
-            url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
-            url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$', wrap(contenttype_views.shortcut),
-                name='view_on_site'),
+            path('', wrap(self.index), name='index'),
+            path('login/', self.login, name='login'),
+            path('logout/', wrap(self.logout), name='logout'),
+            path('password_change/', wrap(self.password_change, cacheable=True), name='password_change'),
+            path(
+                'password_change/done/',
+                wrap(self.password_change_done, cacheable=True),
+                name='password_change_done',
+            ),
+            path('jsi18n/', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
+            path(
+                'r/<int:content_type_id>/<path:object_id>/',
+                wrap(contenttype_views.shortcut),
+                name='view_on_site',
+            ),
         ]
 
         # Add in each model's views, and create a list of valid URLS for the
@@ -260,7 +266,7 @@ class AdminSite:
         valid_app_labels = []
         for model, model_admin in self._registry.items():
             urlpatterns += [
-                url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
+                path('%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
             ]
             if model._meta.app_label not in valid_app_labels:
                 valid_app_labels.append(model._meta.app_label)
@@ -270,7 +276,7 @@ class AdminSite:
         if valid_app_labels:
             regex = r'^(?P<app_label>' + '|'.join(valid_app_labels) + ')/$'
             urlpatterns += [
-                url(regex, wrap(self.app_index), name='app_list'),
+                re_path(regex, wrap(self.app_index), name='app_list'),
             ]
         return urlpatterns
 

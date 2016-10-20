@@ -17,7 +17,7 @@ callable view object. For example, given the following ``url``::
 
     from news import views
 
-    url(r'^archive/$', views.archive, name='news-archive')
+    path('archive/', views.archive, name='news-archive')
 
 you can use any of the following to reverse the URL::
 

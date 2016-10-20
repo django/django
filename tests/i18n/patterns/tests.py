@@ -155,6 +155,8 @@ class URLTranslationTests(URLTestCaseBase):
             self.assertEqual(translate_url('/en/users/', 'nl'), '/nl/gebruikers/')
             # Namespaced URL
             self.assertEqual(translate_url('/en/account/register/', 'nl'), '/nl/profiel/registreren/')
+            # path() URL pattern
+            self.assertEqual(translate_url('/en/account/register-as-path/', 'nl'), '/nl/profiel/registreren-als-pad/')
             self.assertEqual(translation.get_language(), 'en')
 
         with translation.override('nl'):
@@ -169,9 +171,11 @@ class URLNamespaceTests(URLTestCaseBase):
     def test_account_register(self):
         with translation.override('en'):
             self.assertEqual(reverse('account:register'), '/en/account/register/')
+            self.assertEqual(reverse('account:register-as-path'), '/en/account/register-as-path/')
 
         with translation.override('nl'):
             self.assertEqual(reverse('account:register'), '/nl/profiel/registreren/')
+            self.assertEqual(reverse('account:register-as-path'), '/nl/profiel/registreren-als-pad/')
 
 
 class URLRedirectTests(URLTestCaseBase):
@@ -321,6 +325,18 @@ class URLResponseTests(URLTestCaseBase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['content-language'], 'pt-br')
         self.assertEqual(response.context['LANGUAGE_CODE'], 'pt-br')
+
+    def test_en_path(self):
+        response = self.client.get('/en/account/register-as-path/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['content-language'], 'en')
+        self.assertEqual(response.context['LANGUAGE_CODE'], 'en')
+
+    def test_nl_path(self):
+        response = self.client.get('/nl/profiel/registreren-als-pad/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['content-language'], 'nl')
+        self.assertEqual(response.context['LANGUAGE_CODE'], 'nl')
 
 
 class URLRedirectWithScriptAliasTests(URLTestCaseBase):

@@ -1,9 +1,12 @@
 """Functions for use in URLsconfs."""
+from functools import partial
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
 
-from .resolvers import LocaleRegexURLResolver
+from .resolvers import (
+    LocalePrefixPattern, RegexPattern, RoutePattern, URLPattern, URLResolver,
+)
 
 
 def include(arg, namespace=None):
@@ -43,8 +46,32 @@ def include(arg, namespace=None):
     # testcases will break).
     if isinstance(patterns, (list, tuple)):
         for url_pattern in patterns:
-            if isinstance(url_pattern, LocaleRegexURLResolver):
+            pattern = getattr(url_pattern, 'pattern', None)
+            if isinstance(pattern, LocalePrefixPattern):
                 raise ImproperlyConfigured(
                     'Using i18n_patterns in an included URLconf is not allowed.'
                 )
     return (urlconf_module, app_name, namespace)
+
+
+def _path(route, view, kwargs=None, name=None, Pattern=None):
+    if isinstance(view, (list, tuple)):
+        # For include(...) processing.
+        pattern = Pattern(route, is_endpoint=False)
+        urlconf_module, app_name, namespace = view
+        return URLResolver(
+            pattern,
+            urlconf_module,
+            kwargs,
+            app_name=app_name,
+            namespace=namespace,
+        )
+    elif callable(view):
+        pattern = Pattern(route, name=name, is_endpoint=True)
+        return URLPattern(pattern, view, kwargs, name)
+    else:
+        raise TypeError('view must be a callable or a list/tuple in the case of include().')
+
+
+path = partial(_path, Pattern=RoutePattern)
+re_path = partial(_path, Pattern=RegexPattern)

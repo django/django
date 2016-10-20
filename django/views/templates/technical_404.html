@@ -52,7 +52,7 @@
         {% for pattern in urlpatterns %}
           <li>
             {% for pat in pattern %}
-                {{ pat.regex.pattern }}
+                {{ pat.pattern }}
                 {% if forloop.last and pat.name %}[name='{{ pat.name }}']{% endif %}
             {% endfor %}
           </li>

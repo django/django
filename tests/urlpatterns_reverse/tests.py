@@ -17,9 +17,10 @@ from django.shortcuts import redirect
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import override_script_prefix
 from django.urls import (
-    NoReverseMatch, RegexURLPattern, RegexURLResolver, Resolver404,
-    ResolverMatch, get_callable, get_resolver, resolve, reverse, reverse_lazy,
+    NoReverseMatch, Resolver404, ResolverMatch, URLPattern, URLResolver,
+    get_callable, get_resolver, resolve, reverse, reverse_lazy,
 )
+from django.urls.resolvers import RegexPattern
 
 from . import middleware, urlconf_outer, views
 from .utils import URLObject
@@ -259,9 +260,9 @@ class NoURLPatternsTests(SimpleTestCase):
 
     def test_no_urls_exception(self):
         """
-        RegexURLResolver should raise an exception when no urlpatterns exist.
+        URLResolver should raise an exception when no urlpatterns exist.
         """
-        resolver = RegexURLResolver(r'^$', settings.ROOT_URLCONF)
+        resolver = URLResolver(RegexPattern(r'^$'), settings.ROOT_URLCONF)
 
         with self.assertRaisesMessage(
             ImproperlyConfigured,
@@ -368,13 +369,13 @@ class URLPatternReverse(SimpleTestCase):
 class ResolverTests(SimpleTestCase):
     def test_resolver_repr(self):
         """
-        Test repr of RegexURLResolver, especially when urlconf_name is a list
+        Test repr of URLResolver, especially when urlconf_name is a list
         (#17892).
         """
         # Pick a resolver from a namespaced URLconf
         resolver = get_resolver('urlpatterns_reverse.namespace_urls')
         sub_resolver = resolver.namespace_dict['test-ns1'][1]
-        self.assertIn('<RegexURLPattern list>', repr(sub_resolver))
+        self.assertIn('<URLPattern list>', repr(sub_resolver))
 
     def test_reverse_lazy_object_coercion_by_resolve(self):
         """
@@ -445,13 +446,13 @@ class ResolverTests(SimpleTestCase):
         # you try to resolve a nonexistent URL in the first level of included
         # URLs in named_urls.py (e.g., '/included/nonexistent-url')
         url_types_names = [
-            [{'type': RegexURLPattern, 'name': 'named-url1'}],
-            [{'type': RegexURLPattern, 'name': 'named-url2'}],
-            [{'type': RegexURLPattern, 'name': None}],
-            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': 'named-url3'}],
-            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': 'named-url4'}],
-            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': None}],
-            [{'type': RegexURLResolver}, {'type': RegexURLResolver}],
+            [{'type': URLPattern, 'name': 'named-url1'}],
+            [{'type': URLPattern, 'name': 'named-url2'}],
+            [{'type': URLPattern, 'name': None}],
+            [{'type': URLResolver}, {'type': URLPattern, 'name': 'named-url3'}],
+            [{'type': URLResolver}, {'type': URLPattern, 'name': 'named-url4'}],
+            [{'type': URLResolver}, {'type': URLPattern, 'name': None}],
+            [{'type': URLResolver}, {'type': URLResolver}],
         ]
         with self.assertRaisesMessage(Resolver404, 'tried') as cm:
             resolve('/included/nonexistent-url', urlconf=urls)
@@ -494,10 +495,10 @@ class ResolverTests(SimpleTestCase):
 
     def test_populate_concurrency(self):
         """
-        RegexURLResolver._populate() can be called concurrently, but not more
+        URLResolver._populate() can be called concurrently, but not more
         than once per thread (#26888).
         """
-        resolver = RegexURLResolver(r'^/', 'urlpatterns_reverse.urls')
+        resolver = URLResolver(RegexPattern(r'^/'), 'urlpatterns_reverse.urls')
         resolver._local.populating = True
         thread = threading.Thread(target=resolver._populate)
         thread.start()
@@ -1039,8 +1040,8 @@ class ErrorHandlerResolutionTests(SimpleTestCase):
     def setUp(self):
         urlconf = 'urlpatterns_reverse.urls_error_handlers'
         urlconf_callables = 'urlpatterns_reverse.urls_error_handlers_callables'
-        self.resolver = RegexURLResolver(r'^$', urlconf)
-        self.callable_resolver = RegexURLResolver(r'^$', urlconf_callables)
+        self.resolver = URLResolver(RegexPattern(r'^$'), urlconf)
+        self.callable_resolver = URLResolver(RegexPattern(r'^$'), urlconf_callables)
 
     def test_named_handlers(self):
         handler = (empty_view, {})

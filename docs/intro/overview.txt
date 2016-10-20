@@ -191,31 +191,30 @@ example above:
 .. snippet::
     :filename: mysite/news/urls.py
 
-    from django.conf.urls import url
+    from django.urls import path
 
     from . import views
 
     urlpatterns = [
-        url(r'^articles/([0-9]{4})/$', views.year_archive),
-        url(r'^articles/([0-9]{4})/([0-9]{2})/$', views.month_archive),
-        url(r'^articles/([0-9]{4})/([0-9]{2})/([0-9]+)/$', views.article_detail),
+        path('articles/<int:year>/', views.year_archive),
+        path('articles/<int:year>/<int:month>/', views.month_archive),
+        path('articles/<int:year>/<int:month>/<int:pk>/', views.article_detail),
     ]
 
-The code above maps URLs, as simple :ref:`regular expressions <regex-howto>`,
-to the location of Python callback functions ("views"). The regular expressions
-use parenthesis to "capture" values from the URLs. When a user requests a page,
-Django runs through each pattern, in order, and stops at the first one that
-matches the requested URL. (If none of them matches, Django calls a
-special-case 404 view.) This is blazingly fast, because the regular expressions
-are compiled at load time.
+The code above maps URL paths to Python callback functions ("views"). The path
+strings use parameter tags to "capture" values from the URLs. When a user
+requests a page, Django runs through each path, in order, and stops at the
+first one that matches the requested URL. (If none of them matches, Django
+calls a special-case 404 view.) This is blazingly fast, because the paths are
+compiled into regular expressions at load time.
 
-Once one of the regexes matches, Django calls the given view, which is a Python
-function. Each view gets passed a request object -- which contains request
-metadata -- and the values captured in the regex.
+Once one of the URL patterns matches, Django calls the given view, which is a
+Python function. Each view gets passed a request object -- which contains
+request metadata -- and the values captured in the pattern.
 
 For example, if a user requested the URL "/articles/2005/05/39323/", Django
 would call the function ``news.views.article_detail(request,
-'2005', '05', '39323')``.
+year=2005, month=5, pk=39323)``.
 
 Write your views
 ================

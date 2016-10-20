@@ -591,7 +591,7 @@ multiple URLs point at the same view, each URL will be cached separately.
 Continuing the ``my_view`` example, if your URLconf looks like this::
 
     urlpatterns = [
-        url(r'^foo/([0-9]{1,2})/$', my_view),
+        path('foo/<int:code>/', my_view),
     ]
 
 then requests to ``/foo/1/`` and ``/foo/23/`` will be cached separately, as
@@ -637,7 +637,7 @@ Doing so is easy: simply wrap the view function with ``cache_page`` when you
 refer to it in the URLconf. Here's the old URLconf from earlier::
 
     urlpatterns = [
-        url(r'^foo/([0-9]{1,2})/$', my_view),
+        path('foo/<int:code>/', my_view),
     ]
 
 Here's the same thing, with ``my_view`` wrapped in ``cache_page``::
@@ -645,7 +645,7 @@ Here's the same thing, with ``my_view`` wrapped in ``cache_page``::
     from django.views.decorators.cache import cache_page
 
     urlpatterns = [
-        url(r'^foo/([0-9]{1,2})/$', cache_page(60 * 15)(my_view)),
+        path('foo/<int:code>/', cache_page(60 * 15)(my_view)),
     ]
 
 .. templatetag:: cache

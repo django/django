@@ -444,18 +444,18 @@ URLs
 The following checks are performed on your URL configuration:
 
 * **urls.W001**: Your URL pattern ``<pattern>`` uses
-  :func:`~django.conf.urls.include` with a ``regex`` ending with a
-  ``$``. Remove the dollar from the ``regex`` to avoid problems
-  including URLs.
-* **urls.W002**: Your URL pattern ``<pattern>`` has a ``regex``
-  beginning with a ``/``. Remove this slash as it is unnecessary.
-  If this pattern is targeted in an :func:`~django.conf.urls.include`, ensure
-  the :func:`~django.conf.urls.include` pattern has a trailing ``/``.
+  :func:`~django.urls.include` with a ``route`` ending with a ``$``. Remove the
+  dollar from the ``route`` to avoid problems including URLs.
+* **urls.W002**: Your URL pattern ``<pattern>`` has a ``route`` beginning with
+  a ``/``. Remove this slash as it is unnecessary. If this pattern is targeted
+  in an :func:`~django.urls.include`, ensure the :func:`~django.urls.include`
+  pattern has a trailing ``/``.
 * **urls.W003**: Your URL pattern ``<pattern>`` has a ``name``
   including a ``:``. Remove the colon, to avoid ambiguous namespace
   references.
 * **urls.E004**: Your URL pattern ``<pattern>`` is invalid. Ensure that
-  ``urlpatterns`` is a list of :func:`~django.conf.urls.url()` instances.
+  ``urlpatterns`` is a list of :func:`~django.urls.path` and/or
+  :func:`~django.urls.re_path` instances.
 * **urls.W005**: URL namespace ``<namespace>`` isn't unique. You may not be
   able to reverse all URLs in this namespace.
 * **urls.E006**: The :setting:`MEDIA_URL`/ :setting:`STATIC_URL` setting must

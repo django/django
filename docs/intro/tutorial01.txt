@@ -274,54 +274,44 @@ In the ``polls/urls.py`` file include the following code:
 .. snippet::
     :filename: polls/urls.py
 
-    from django.conf.urls import url
+    from django.urls import path
 
     from . import views
 
     urlpatterns = [
-        url(r'^$', views.index, name='index'),
+        path('', views.index, name='index'),
     ]
 
 The next step is to point the root URLconf at the ``polls.urls`` module. In
-``mysite/urls.py``, add an import for ``django.conf.urls.include`` and insert
-an :func:`~django.conf.urls.include` in the ``urlpatterns`` list, so you have:
+``mysite/urls.py``, add an import for ``django.urls.include`` and insert an
+:func:`~django.urls.include` in the ``urlpatterns`` list, so you have:
 
 .. snippet::
     :filename: mysite/urls.py
 
-    from django.conf.urls import include, url
+    from django.urls import include, path
     from django.contrib import admin
 
     urlpatterns = [
-        url(r'^polls/', include('polls.urls')),
-        url(r'^admin/', admin.site.urls),
+        path('polls/', include('polls.urls')),
+        path('admin/', admin.site.urls),
     ]
 
-The :func:`~django.conf.urls.include` function allows referencing other
-URLconfs. Note that the regular expressions for the
-:func:`~django.conf.urls.include` function doesn't have a ``$`` (end-of-string
-match character) but rather a trailing slash. Whenever Django encounters
-:func:`~django.conf.urls.include`, it chops off whatever part of the URL
-matched up to that point and sends the remaining string to the included URLconf
-for further processing.
+The :func:`~django.urls.include` function allows referencing other URLconfs.
+Whenever Django encounters :func:`~django.urls.include`, it chops off whatever
+part of the URL matched up to that point and sends the remaining string to the
+included URLconf for further processing.
 
-The idea behind :func:`~django.conf.urls.include` is to make it easy to
+The idea behind :func:`~django.urls.include` is to make it easy to
 plug-and-play URLs. Since polls are in their own URLconf
 (``polls/urls.py``), they can be placed under "/polls/", or under
 "/fun_polls/", or under "/content/polls/", or any other path root, and the
 app will still work.
 
-.. admonition:: When to use :func:`~django.conf.urls.include()`
+.. admonition:: When to use :func:`~django.urls.include()`
 
     You should always use ``include()`` when you include other URL patterns.
     ``admin.site.urls`` is the only exception to this.
-
-.. admonition:: Doesn't match what you see?
-
-    If you're seeing ``include(admin.site.urls)`` instead of just
-    ``admin.site.urls``, you're probably using a version of Django that
-    doesn't match this tutorial version.  You'll want to either switch to the
-    older tutorial or the newer Django version.
 
 You have now wired an ``index`` view into the URLconf. Lets verify it's
 working, run the following command:
@@ -334,56 +324,39 @@ Go to http://localhost:8000/polls/ in your browser, and you should see the
 text "*Hello, world. You're at the polls index.*", which you defined in the
 ``index`` view.
 
-The :func:`~django.conf.urls.url` function is passed four arguments, two
-required: ``regex`` and ``view``, and two optional: ``kwargs``, and ``name``.
+The :func:`~django.urls.path` function is passed four arguments, two required:
+``route`` and ``view``, and two optional: ``kwargs``, and ``name``.
 At this point, it's worth reviewing what these arguments are for.
 
-:func:`~django.conf.urls.url` argument: regex
+:func:`~django.urls.path` argument: ``route``
 ---------------------------------------------
 
-The term "regex" is a commonly used short form meaning "regular expression",
-which is a syntax for matching patterns in strings, or in this case, url
-patterns. Django starts at the first regular expression and makes its way down
-the list,  comparing the requested URL against each regular expression until it
-finds one that matches.
+``route`` is a string that contains a URL pattern. When processing a request,
+Django starts at the first pattern in ``urlpatterns`` and makes its way down
+the list, comparing the requested URL against each pattern until it finds one
+that matches.
 
-Note that these regular expressions do not search GET and POST parameters, or
-the domain name. For example, in a request to
-``https://www.example.com/myapp/``, the URLconf will look for ``myapp/``. In a
-request to ``https://www.example.com/myapp/?page=3``, the URLconf will also
-look for ``myapp/``.
+Patterns don't search GET and POST parameters, or the domain name. For example,
+in a request to ``https://www.example.com/myapp/``, the URLconf will look for
+``myapp/``. In a request to ``https://www.example.com/myapp/?page=3``, the
+URLconf will also look for ``myapp/``.
 
-If you need help with regular expressions, see `Wikipedia's entry`_ and the
-documentation of the :mod:`re` module. Also, the O'Reilly book "Mastering
-Regular Expressions" by Jeffrey Friedl is fantastic. In practice, however,
-you don't need to be an expert on regular expressions, as you really only need
-to know how to capture simple patterns. In fact, complex regexes can have poor
-lookup performance, so you probably shouldn't rely on the full power of regexes.
-
-Finally, a performance note: these regular expressions are compiled the first
-time the URLconf module is loaded. They're super fast (as long as the lookups
-aren't too complex as noted above).
-
-.. _Wikipedia's entry: https://en.wikipedia.org/wiki/Regular_expression
-
-:func:`~django.conf.urls.url` argument: view
+:func:`~django.urls.path` argument: ``view``
 --------------------------------------------
 
-When Django finds a regular expression match, Django calls the specified view
-function, with an :class:`~django.http.HttpRequest` object as the first
-argument and any “captured” values from the regular expression as other
-arguments. If the regex uses simple captures, values are passed as positional
-arguments; if it uses named captures, values are passed as keyword arguments.
-We'll give an example of this in a bit.
+When Django finds a matching pattern, it calls the specified view function with
+an :class:`~django.http.HttpRequest` object as the first argument and any
+"captured" values from the route as keyword arguments. We'll give an example
+of this in a bit.
 
-:func:`~django.conf.urls.url` argument: kwargs
+:func:`~django.urls.path` argument: ``kwargs``
 ----------------------------------------------
 
 Arbitrary keyword arguments can be passed in a dictionary to the target view. We
 aren't going to use this feature of Django in the tutorial.
 
-:func:`~django.conf.urls.url` argument: name
----------------------------------------------
+:func:`~django.urls.path` argument: ``name``
+--------------------------------------------
 
 Naming your URL lets you refer to it unambiguously from elsewhere in Django,
 especially from within templates. This powerful feature allows you to make

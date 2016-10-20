@@ -1329,7 +1329,7 @@ def url(parser, token):
 
         {% url "url_name" name1=value1 name2=value2 %}
 
-    The first argument is a django.conf.urls.url() name. Other arguments are
+    The first argument is a URL pattern name. Other arguments are
     space-separated values that will be filled in place of positional and
     keyword arguments in the URL. Don't mix positional and keyword arguments.
     All arguments for the URL must be present.
@@ -1337,12 +1337,12 @@ def url(parser, token):
     For example, if you have a view ``app_name.views.client_details`` taking
     the client's id and the corresponding line in a URLconf looks like this::
 
-        url('^client/(\d+)/$', views.client_details, name='client-detail-view')
+        path('client/<int:id>/', views.client_details, name='client-detail-view')
 
     and this app's URLconf is included into the project's URLconf under some
     path::
 
-        url('^clients/', include('app_name.urls'))
+        path('clients/', include('app_name.urls'))
 
     then in a template you can create a link for a certain client like this::
 
@@ -1359,7 +1359,7 @@ def url(parser, token):
     """
     bits = token.split_contents()
     if len(bits) < 2:
-        raise TemplateSyntaxError("'%s' takes at least one argument, the name of a url()." % bits[0])
+        raise TemplateSyntaxError("'%s' takes at least one argument, a URL pattern name." % bits[0])
     viewname = parser.compile_filter(bits[1])
     args = []
     kwargs = {}
