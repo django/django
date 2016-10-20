@@ -94,6 +94,8 @@ class Field(object):
         widget = widget or self.widget
         if isinstance(widget, type):
             widget = widget()
+        else:
+            widget = copy.deepcopy(widget)
 
         # Trigger the localization machinery if needed.
         self.localize = localize
