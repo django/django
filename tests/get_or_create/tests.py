@@ -441,6 +441,17 @@ class UpdateOrCreateTests(TestCase):
         self.assertIs(created, False)
         self.assertEqual(obj.last_name, 'NotHarrison')
 
+    def test_save_not_called_when_no_changes(self):
+        before_count = Person.save_count_called
+        Person.objects.update_or_create(
+            first_name='George', last_name='Harrison', birthday=date(1942, 2, 25),
+        )
+        Person.objects.update_or_create(
+            first_name='George'
+        )
+        after_count = Person.save_count_called
+        self.assertEqual(after_count - before_count, 1)
+
 
 class UpdateOrCreateTransactionTests(TransactionTestCase):
     available_apps = ['get_or_create']
