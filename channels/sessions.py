@@ -99,6 +99,7 @@ def enforce_ordering(func=None, slight=False):
                 # Mark next message order as available for running
                 message.channel_session["__channels_next_order"] = order + 1
                 message.channel_session.save()
+                message.channel_session.modified = False
                 # Requeue any pending wait channel messages for this socket connection back onto it's original channel
                 while True:
                     wait_channel = "__wait__.%s" % message.reply_channel.name
