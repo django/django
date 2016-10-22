@@ -858,7 +858,10 @@ Miscellaneous
 * Required form fields now have the ``required`` HTML attribute. Set the
   :attr:`Form.use_required_attribute <django.forms.Form.use_required_attribute>`
   attribute to ``False`` to disable it. You could also add the ``novalidate``
-  attribute to ``<form>`` if you don't want browser validation.
+  attribute to ``<form>`` if you don't want browser validation. To disable
+  the ``required`` attribute on custom widgets, override the
+  :meth:`Widget.use_required_attribute() <django.forms.Widget.use_required_attribute>`
+  method.
 
 * The WSGI handler no longer removes content of responses from ``HEAD``
   requests or responses with a ``status_code`` of 100-199, 204, or 304. Most
