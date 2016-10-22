@@ -17,3 +17,6 @@ Bugfixes
 
 * Added ``model_name`` to the ``allow_migrate()`` calls in ``makemigrations``
   (:ticket:`27200`).
+
+* Made the ``JavaScriptCatalog`` view respect the ``packages`` argument;
+  previously it was ignored (:ticket:`27374`).
