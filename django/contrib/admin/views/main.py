@@ -125,12 +125,15 @@ class ChangeList(object):
                     if not isinstance(field, models.Field):
                         field_path = field
                         field = get_fields_from_path(self.model, field_path)[-1]
+
+                    lookup_params_count = len(lookup_params)
                     spec = field_list_filter_class(
                         field, request, lookup_params,
                         self.model, self.model_admin, field_path=field_path
                     )
-                    # Check if we need to use distinct()
-                    use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, field_path)
+                    # Check if we need to use distinct() in case lookup params include one of list_filter items
+                    if lookup_params_count > len(lookup_params):
+                        use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, field_path)
                 if spec and spec.has_output():
                     filter_specs.append(spec)
 
