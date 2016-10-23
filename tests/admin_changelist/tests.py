@@ -445,6 +445,22 @@ class ChangeListTests(TestCase):
         # There's only one Concert instance
         self.assertEqual(cl.queryset.count(), 1)
 
+    def test_no_distinct_for_m2m_in_list_filter_without_params(self):
+        """
+        If a ManyToManyField is in list_filter but isn't in any lookup params,
+        the changelist's query shouldn't have distinct.
+        """
+        m = BandAdmin(Band, custom_site)
+        for lookup_params in ({}, {'name': 'test'}):
+            request = self.factory.get('/band/', lookup_params)
+            cl = ChangeList(request, Band, *get_changelist_args(m))
+            self.assertFalse(cl.queryset.query.distinct)
+
+        # A ManyToManyField in params does have distinct applied.
+        request = self.factory.get('/band/', {'genres': '0'})
+        cl = ChangeList(request, Band, *get_changelist_args(m))
+        self.assertTrue(cl.queryset.query.distinct)
+
     def test_pagination(self):
         """
         Regression tests for #12893: Pagination in admins changelist doesn't
