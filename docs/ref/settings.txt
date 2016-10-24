@@ -773,7 +773,11 @@ Default: ``None``
 This is an Oracle-specific setting.
 
 The password to use when connecting to the Oracle database that will be used
-when running tests. If not provided, Django will use a hardcoded default value.
+when running tests. If not provided, Django will generate a random password.
+
+.. versionchanged:: 1.8.16
+
+    Older versions used a hardcoded default password.
 
 .. setting:: TEST_TBLSPACE
 
