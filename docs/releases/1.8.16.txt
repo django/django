@@ -1,0 +1,7 @@
+===========================
+Django 1.8.16 release notes
+===========================
+
+*November 1, 2016*
+
+Django 1.8.16 fixes two security issues in 1.8.15.
