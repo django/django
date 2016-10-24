@@ -6,6 +6,20 @@ Django 1.10.3 release notes
 
 Django 1.10.3 fixes two security issues and several bugs in 1.10.2.
 
+User with hardcoded password created when running tests on Oracle
+=================================================================
+
+When running tests with an Oracle database, Django creates a temporary database
+user. In older versions, if a password isn't manually specified in the database
+settings ``TEST`` dictionary, a hardcoded password is used. This could allow
+an attacker with network access to the database server to connect.
+
+This user is usually dropped after the test suite completes, but not when using
+the ``manage.py test --keepdb`` option or if the user has an active session
+(such as an attacker's connection).
+
+A randomly generated password is now used for each test run.
+
 Bugfixes
 ========
 
