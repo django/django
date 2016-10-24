@@ -44,6 +44,13 @@ the ``django.contrib.postgres.operations`` module.
     Installs the ``hstore`` extension and also sets up the connection to
     interpret hstore data for possible use in subsequent migrations.
 
+``PrewarmExtension``
+===================
+
+.. class:: PrewarmExtension()
+
+    Installs the ``pg_prewarm`` extension.
+
 ``TrigramExtension``
 ====================
 
