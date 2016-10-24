@@ -462,10 +462,10 @@ Daniele Procida
     realized it was possible to enjoy web development.
 
     He spends a lot of time helping people on the #django IRC channel, and has
-    authored and released a number of `smaller django apps`_.
+    authored and released a number of `smaller Django apps`_.
 
     .. _Curtis Maloney: http://musings.tinbrain.net/blog/
-    .. _smaller django apps: https://github.com/funkybob/
+    .. _smaller Django apps: https://github.com/funkybob/
 
 `Markus Holtermann`_
     Markus is a senior backend developer at `LaterPay`_ in Munich. He studied

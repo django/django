@@ -977,7 +977,7 @@ subclass::
         class FilterWithCustomTemplate(admin.SimpleListFilter):
             template = "custom_template.html"
 
-    See the default template provided by django (``admin/filter.html``) for
+    See the default template provided by Django (``admin/filter.html``) for
     a concrete example.
 
 .. attribute:: ModelAdmin.list_max_show_all
