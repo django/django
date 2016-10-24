@@ -809,10 +809,6 @@ class Query(object):
                 if alias == old_alias:
                     table_aliases[pos] = new_alias
                     break
-            for pos, alias in enumerate(self.tables):
-                if alias == old_alias:
-                    self.tables[pos] = new_alias
-                    break
         self.external_aliases = {change_map.get(alias, alias)
                                  for alias in self.external_aliases}
 
