@@ -2,9 +2,9 @@
 Django 1.10.3 release notes
 ===========================
 
-*Under development*
+*November 1, 2016*
 
-Django 1.10.3 fixes several bugs in 1.10.2.
+Django 1.10.3 fixes two security issues and several bugs in 1.10.2.
 
 Bugfixes
 ========
