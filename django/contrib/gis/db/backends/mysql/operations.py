@@ -15,6 +15,10 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     Adapter = WKTAdapter
 
     @cached_property
+    def geom_func_prefix(self):
+        return '' if self.is_mysql_5_5 else 'ST_'
+
+    @cached_property
     def is_mysql_5_5(self):
         return self.connection.mysql_version < (5, 6, 1)
 
@@ -28,21 +32,15 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def select(self):
-        if self.is_mysql_5_5:
-            return 'AsText(%s)'
-        return 'ST_AsText(%s)'
+        return self.geom_func_prefix + 'AsText(%s)'
 
     @cached_property
     def from_wkb(self):
-        if self.is_mysql_5_5:
-            return 'GeomFromWKB'
-        return 'ST_GeomFromWKB'
+        return self.geom_func_prefix + 'GeomFromWKB'
 
     @cached_property
     def from_text(self):
-        if self.is_mysql_5_5:
-            return 'GeomFromText'
-        return 'ST_GeomFromText'
+        return self.geom_func_prefix + 'GeomFromText'
 
     @cached_property
     def gis_operators(self):
@@ -64,19 +62,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def function_names(self):
-        return {
-            'Area': 'Area' if self.is_mysql_5_5 else 'ST_Area',
-            'Centroid': 'Centroid' if self.is_mysql_5_5 else 'ST_Centroid',
-            'Difference': 'ST_Difference',
-            'Distance': 'ST_Distance',
-            'Envelope': 'Envelope' if self.is_mysql_5_5 else 'ST_Envelope',
-            'Intersection': 'ST_Intersection',
-            'Length': 'GLength' if self.is_mysql_5_5 else 'ST_Length',
-            'NumGeometries': 'NumGeometries' if self.is_mysql_5_5 else 'ST_NumGeometries',
-            'NumPoints': 'NumPoints' if self.is_mysql_5_5 else 'ST_NumPoints',
-            'SymDifference': 'ST_SymDifference',
-            'Union': 'ST_Union',
-        }
+        return {'Length': 'GLength'} if self.is_mysql_5_5 else {}
 
     disallowed_aggregates = (
         aggregates.Collect, aggregates.Extent, aggregates.Extent3D,
