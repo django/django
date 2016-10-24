@@ -242,6 +242,7 @@ class FileField(Field):
         errors = super(FileField, self).check(**kwargs)
         errors.extend(self._check_unique())
         errors.extend(self._check_primary_key())
+        errors.extend(self._check_upload_to())
         return errors
 
     def _check_unique(self):
@@ -263,6 +264,20 @@ class FileField(Field):
                     "'primary_key' is not a valid argument for a %s." % self.__class__.__name__,
                     obj=self,
                     id='fields.E201',
+                )
+            ]
+        else:
+            return []
+
+    def _check_upload_to(self):
+        # Added system check based on #27358
+        if self.upload_to and self.upload_to[0] == '/':
+            return [
+                checks.Error(
+                    "'upload_to' should be a relative path, not an absolute path (remove leading slash) in %s." %
+                    self.__class__.__name__,
+                    obj=self,
+                    id='fields.E202',
                 )
             ]
         else:

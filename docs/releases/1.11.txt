@@ -558,6 +558,9 @@ Miscellaneous
 * ``ConditionalGetMiddleware`` no longer sets the ``Date`` header as Web
   servers set that header.
 
+* ``FileField`` now has system check checking upload_to doesn't have a leading
+  slash.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11

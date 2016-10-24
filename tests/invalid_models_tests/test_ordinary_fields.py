@@ -470,6 +470,22 @@ class FileFieldTests(SimpleTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_upload_to(self):
+        # System check added based on #27358
+        class Model(models.Model):
+            field = models.FileField(upload_to='/somewhere')
+
+        field = Model._meta.get_field('field')
+        errors = field.check()
+        expected = [
+            Error(
+                "'upload_to' should be a relative path, not an absolute path (remove leading slash) in FileField.",
+                obj=field,
+                id='fields.E202',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
 
 @isolate_apps('invalid_models_tests')
 class FilePathFieldTests(SimpleTestCase):
