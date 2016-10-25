@@ -25,7 +25,7 @@ from django.contrib.sessions.serializers import (
 from django.core import management
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.http import HttpResponse
 from django.test import (
     RequestFactory, TestCase, ignore_warnings, override_settings,
@@ -704,14 +704,15 @@ class SessionMiddlewareTests(TestCase):
         request.session.save(must_create=True)
         request.session.delete()
 
-        # Handle the response through the middleware. It will try to save the
-        # deleted session which will cause an UpdateError that's caught and
-        # results in a redirect to the original page.
-        response = middleware.process_response(request, response)
-
-        # Check that the response is a redirect.
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['Location'], path)
+        msg = (
+            "The request's session was deleted before the request completed. "
+            "The user may have logged out in a concurrent request, for example."
+        )
+        with self.assertRaisesMessage(SuspiciousOperation, msg):
+            # Handle the response through the middleware. It will try to save
+            # the deleted session which will cause an UpdateError that's caught
+            # and raised as a SuspiciousOperation.
+            middleware.process_response(request, response)
 
     def test_session_delete_on_end(self):
         request = RequestFactory().get('/')
