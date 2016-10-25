@@ -33,7 +33,7 @@ also need a database engine. PostgreSQL_ is recommended, because we're
 PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 
 .. _Python: https://www.python.org/
-.. _PostgreSQL: http://www.postgresql.org/
+.. _PostgreSQL: https://www.postgresql.org/
 .. _MySQL: https://www.mysql.com/
 .. _`SQLite 3`: https://www.sqlite.org/
 .. _Oracle: http://www.oracle.com/
