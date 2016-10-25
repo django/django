@@ -146,14 +146,15 @@ Further resources
 
 * PDFlib_ is another PDF-generation library that has Python bindings. To
   use it with Django, just use the same concepts explained in this article.
-* `XHTML2PDF`_ is yet another PDF-generation library. It ships with an example
-  of how to integrate it with Django.
+* `WeasyPrint`_ is a visual rendering engine for HTML and CSS that can
+  export to PDF. It aims to support web standards for printing and is written
+  in Python.
 * HTMLdoc_ is a command-line script that can convert HTML to PDF. It
   doesn't have a Python interface, but you can escape out to the shell
   using ``system`` or ``popen`` and retrieve the output in Python.
 
 .. _PDFlib: http://www.pdflib.org/
-.. _XHTML2PDF: https://github.com/xhtml2pdf/xhtml2pdf
+.. _WeasyPrint: http://weasyprint.org/
 .. _HTMLdoc: https://www.msweet.org/projects.php?Z1
 
 Other formats
