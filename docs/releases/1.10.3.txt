@@ -26,3 +26,7 @@ Bugfixes
 
 * Prevented ``i18n_patterns()`` from using too much of the URL as the language
   to fix a use case for ``prefix_default_language=False`` (:ticket:`27063`).
+
+* Replaced a possibly incorrect redirect from ``SessionMiddleware`` when a
+  session is destroyed in a concurrent request with a ``SuspiciousOperation``
+  to indicate that the request can't be completed (:ticket:`27363`).
