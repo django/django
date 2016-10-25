@@ -12,7 +12,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if internal_type in ("GenericIPAddressField", "IPAddressField", "TimeField", "UUIDField"):
             # PostgreSQL will resolve a union as type 'text' if input types are
             # 'unknown'.
-            # http://www.postgresql.org/docs/9.4/static/typeconv-union-case.html
+            # https://www.postgresql.org/docs/current/static/typeconv-union-case.html
             # These fields cannot be implicitly cast back in the default
             # PostgreSQL configuration so we need to explicitly cast them.
             # We must also remove components of the type within brackets:
@@ -21,7 +21,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return '%s'
 
     def date_extract_sql(self, lookup_type, field_name):
-        # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
+        # https://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
         if lookup_type == 'week_day':
             # For consistency across backends, we return Sunday=1, Saturday=7.
             return "EXTRACT('dow' FROM %s) + 1" % field_name
@@ -29,7 +29,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
 
     def date_trunc_sql(self, lookup_type, field_name):
-        # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+        # https://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
     def _convert_field_to_tz(self, field_name, tzname):
@@ -52,7 +52,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         field_name, params = self._convert_field_to_tz(field_name, tzname)
-        # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+        # https://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         sql = "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
         return sql, params
 
