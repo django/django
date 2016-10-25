@@ -20,3 +20,6 @@ Bugfixes
 
 * Made the ``JavaScriptCatalog`` view respect the ``packages`` argument;
   previously it was ignored (:ticket:`27374`).
+
+* Fixed ``bulk_create`` when ``objs`` length is a multiple plus one of
+  ``batch_size`` (:ticket:`27385`).
