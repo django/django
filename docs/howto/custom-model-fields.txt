@@ -19,7 +19,7 @@ only the common types, such as ``VARCHAR`` and ``INTEGER``. For more obscure
 column types, such as geographic polygons or even user-created types such as
 `PostgreSQL custom types`_, you can define your own Django ``Field`` subclasses.
 
-.. _PostgreSQL custom types: http://www.postgresql.org/docs/current/interactive/sql-createtype.html
+.. _PostgreSQL custom types: https://www.postgresql.org/docs/current/static/sql-createtype.html
 
 Alternatively, you may have a complex Python object that can somehow be
 serialized to fit into a standard database column type. This is another case

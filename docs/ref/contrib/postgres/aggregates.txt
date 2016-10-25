@@ -6,7 +6,7 @@ PostgreSQL specific aggregation functions
    :synopsis: PostgreSQL specific aggregation functions
 
 These functions are described in more detail in the `PostgreSQL docs
-<http://www.postgresql.org/docs/current/static/functions-aggregate.html>`_.
+<https://www.postgresql.org/docs/current/static/functions-aggregate.html>`_.
 
 .. note::
 
