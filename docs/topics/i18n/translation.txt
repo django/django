@@ -418,17 +418,34 @@ Working with lazy translation objects
 -------------------------------------
 
 The result of a ``ugettext_lazy()`` call can be used wherever you would use a
-unicode string (an object with type ``unicode``) in Python. If you try to use
-it where a bytestring (a ``str`` object) is expected, things will not work as
-expected, since a ``ugettext_lazy()`` object doesn't know how to convert
-itself to a bytestring. You can't use a unicode string inside a bytestring,
-either, so this is consistent with normal Python behavior. For example::
+unicode string (a :class:`str` object) in other Django code, but it may not
+work with arbitrary Python code. For example, the following won't work because
+the `requests <https://pypi.python.org/pypi/requests/>`_ library doesn't handle
+``ugettext_lazy`` objects::
 
-    # This is fine: putting a unicode proxy into a unicode string.
+    body = ugettext_lazy("I \u2764 Django")  # (unicode :heart:)
+    requests.post('https://example.com/send', data={'body': body})
+
+You can avoid such problems by casting ``ugettext_lazy()`` objects to text
+strings before passing them to non-Django code::
+
+    requests.post('https://example.com/send', data={'body': str(body)})
+
+Use ``unicode`` in place of ``str`` on Python 2, or :data:`six.text_type` to
+support Python 2 and 3.
+
+If you try to use a ``ugettext_lazy()`` result where a bytestring (a
+:class:`bytes` object) is expected, things won't work as expected since a
+``ugettext_lazy()`` object doesn't know how to convert itself to a bytestring.
+You can't use a unicode string inside a bytestring, either, so this is
+consistent with normal Python behavior. For example, putting a unicode proxy
+into a unicode string is fine::
+
     "Hello %s" % ugettext_lazy("people")
 
-    # This will not work, since you cannot insert a unicode object
-    # into a bytestring (nor can you insert our unicode proxy there)
+But you can't insert a unicode object into a bytestring and nor can you insert
+a unicode proxy there::
+
     b"Hello %s" % ugettext_lazy("people")
 
 If you ever see output that looks like ``"hello
