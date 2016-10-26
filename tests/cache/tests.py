@@ -1155,6 +1155,12 @@ PyLibMCCache_params = configured_caches.get('django.core.cache.backends.memcache
 # The memcached backends don't support cull-related options like `MAX_ENTRIES`.
 memcached_excluded_caches = {'cull', 'zero_cull'}
 
+memcached_never_expiring_params = memcached_params.copy()
+memcached_never_expiring_params['TIMEOUT'] = None
+
+memcached_far_future_params = memcached_params.copy()
+memcached_far_future_params['TIMEOUT'] = 31536000  # 60*60*24*365, 1 year
+
 
 class BaseMemcachedTests(BaseCacheTests):
 
@@ -1210,6 +1216,18 @@ class BaseMemcachedTests(BaseCacheTests):
                 TIMEOUT=31536000)):
             cache.set('future_foo', 'bar')
             self.assertEqual(cache.get('future_foo'), 'bar')
+
+    @override_settings(CACHES=caches_setting_for_tests(base=memcached_never_expiring_params))
+    def test_default_never_expiring_timeout(self):
+        # Regression test for #22845
+        cache.set('infinite_foo', 'bar')
+        self.assertEqual(cache.get('infinite_foo'), 'bar')
+
+    @override_settings(CACHES=caches_setting_for_tests(base=memcached_far_future_params))
+    def test_default_far_future_timeout(self):
+        # Regression test for #22845
+        cache.set('future_foo', 'bar')
+        self.assertEqual(cache.get('future_foo'), 'bar')
 
     def test_cull(self):
         # culling isn't implemented, memcached deals with it.
