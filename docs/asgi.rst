@@ -561,10 +561,10 @@ Keys:
   Header names must be lowercased.
 
 * ``body``: Body of the request, as a byte string. Optional, defaults to ``""``.
-  If ``more_body`` is set, treat as start of body and concatenate
+  If ``body_channel`` is set, treat as start of body and concatenate
   on further chunks.
 
-* ``more_body``: Name of a single-reader channel (containing ``?``) that contains
+* ``body_channel``: Name of a single-reader channel (containing ``?``) that contains
   Request Body Chunk messages representing a large request body.
   Optional, defaults to ``None``. Chunks append to ``body`` if set. Presence of
   a channel indicates at least one Request Body Chunk message needs to be read,
