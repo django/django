@@ -198,7 +198,9 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* :class:`~django.test.SimpleTestCase` now implements the ``debug()`` method to
+  allow running a test without collecting the result and catching exceptions.
+  This can be used to support running tests under a debugger.
 
 URLs
 ~~~~
