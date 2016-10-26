@@ -1192,10 +1192,12 @@ class Query:
             return self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]),
                                       can_reuse, e.names_with_path)
 
-        if can_reuse is not None:
-            can_reuse.update(join_list)
+        # Update used_joins before trimming since they are reused to determine
+        # which joins could be later promoted to INNER.
         used_joins = set(used_joins).union(set(join_list))
         targets, alias, join_list = self.trim_joins(sources, join_list, path)
+        if can_reuse is not None:
+            can_reuse.update(join_list)
 
         if field.is_relation:
             # No support for transforms for relational fields
