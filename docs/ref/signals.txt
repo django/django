@@ -431,10 +431,11 @@ Arguments sent with this signal:
 
 Sent by the :djadmin:`migrate` command after it installs an application, and the
 :djadmin:`flush` command. It's not emitted for applications that lack a
-``models`` module.
+``models`` module. It is called everytime `manage.py migrate` gets called, even
+if no migrations were executed.
 
 It is important that handlers of this signal perform idempotent changes (e.g.
-no database alterations) as this may cause the :djadmin:`flush` management
+no database schema alterations) as this may cause the :djadmin:`flush` management
 command to fail if it also ran during the :djadmin:`migrate` command.
 
 Arguments sent with this signal:
