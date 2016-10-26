@@ -648,8 +648,6 @@ class Employment(models.Model):
     title = models.CharField(max_length=128)
 
 
-# Bug #22429
-
 class School(models.Model):
     pass
 
@@ -659,6 +657,8 @@ class Student(models.Model):
 
 
 class Classroom(models.Model):
+    name = models.CharField(max_length=20)
+    has_blackboard = models.NullBooleanField()
     school = models.ForeignKey(School, models.CASCADE)
     students = models.ManyToManyField(Student, related_name='classroom')
 

@@ -3148,6 +3148,33 @@ class JoinReuseTest(TestCase):
         self.assertEqual(str(qs.query).count('JOIN'), 2)
 
 
+class InvertedQAcrossRelationsTest(TestCase):
+    def test_inverted_q_across_relations(self):
+        """
+        When a trimmable join is specified in the query (here school__), the ORM
+        detects it and removes unnecessary joins. The set of reusable joins
+        should be updated after trimming the query, so that other lookups
+        doesn't consider that outer query's filters are in effect for the
+        subquery (#26551).
+
+        See #26551 for more details.
+        """
+        springfield_elementary = School.objects.create()
+        hogward = School.objects.create()
+        Student.objects.create(school=springfield_elementary)
+        hp = Student.objects.create(school=hogward)
+        Classroom.objects.create(school=hogward, name='Potion')
+        Classroom.objects.create(school=springfield_elementary, name='Main')
+
+        qs = Student.objects.filter(
+            # school is trimmable, do not add it to reusable set
+            ~(Q(school__classroom__name='Main') &
+              Q(school__classroom__has_blackboard=None))
+        )
+
+        self.assertSequenceEqual(qs, [hp])
+
+
 class DisjunctionPromotionTests(TestCase):
     def test_disjunction_promotion_select_related(self):
         fk1 = FK1.objects.create(f1='f1', f2='f2')
