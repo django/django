@@ -11,6 +11,7 @@ from django.contrib.admindocs import utils
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.db import models
 from django.http import Http404
+from django.template import engines
 from django.template.engine import Engine
 from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
 from django.utils import six
@@ -353,8 +354,11 @@ class TemplateDetailView(BaseAdminDocsView):
             # Non-trivial TEMPLATES settings aren't supported (#24125).
             pass
         else:
-            # This doesn't account for template loaders (#24128).
-            for index, directory in enumerate(default_engine.dirs):
+            directories = set(default_engine.dirs)
+            for engine in engines.all():
+                for loader in engine.engine.template_loaders:
+                    directories.update(loader.get_dirs())
+            for index, directory in enumerate(directories):
                 template_file = os.path.join(directory, template)
                 if os.path.exists(template_file):
                     with open(template_file) as f:
