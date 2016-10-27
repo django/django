@@ -356,6 +356,8 @@ def _sqlite_date_trunc(lookup_type, dt):
         dt = backend_utils.typecast_timestamp(dt)
     except (ValueError, TypeError):
         return None
+    if dt is None:
+        return None
     if lookup_type == 'year':
         return "%i-01-01" % dt.year
     elif lookup_type == 'month':
@@ -368,6 +370,8 @@ def _sqlite_time_trunc(lookup_type, dt):
     try:
         dt = backend_utils.typecast_time(dt)
     except (ValueError, TypeError):
+        return None
+    if dt is None:
         return None
     if lookup_type == 'hour':
         return "%02i:00:00" % dt.hour
@@ -382,6 +386,7 @@ def _sqlite_datetime_parse(dt, tzname):
         return None
     try:
         dt = backend_utils.typecast_timestamp(dt)
+        # Typecast_timestamp is returning time rather than datetime
     except (ValueError, TypeError):
         return None
     if tzname is not None:
@@ -391,6 +396,8 @@ def _sqlite_datetime_parse(dt, tzname):
 
 def _sqlite_datetime_cast_date(dt, tzname):
     dt = _sqlite_datetime_parse(dt, tzname)
+    if type(dt) is datetime.date:
+        return dt.isoformat()
     if dt is None:
         return None
     return dt.date().isoformat()
@@ -398,6 +405,8 @@ def _sqlite_datetime_cast_date(dt, tzname):
 
 def _sqlite_datetime_cast_time(dt, tzname):
     dt = _sqlite_datetime_parse(dt, tzname)
+    if isinstance(dt, datetime.time):
+        return dt.isoformat()
     if dt is None:
         return None
     return dt.time().isoformat()
