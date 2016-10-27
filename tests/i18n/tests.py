@@ -1472,11 +1472,26 @@ class MiscTests(SimpleTestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
         self.assertEqual(g(r), 'zh-hans')
 
+    @override_settings(
+        LANGUAGES=[
+            ('en', 'English'),
+            ('de', 'German'),
+            ('de-at', 'Austrian German'),
+            ('pl', 'Polish'),
+        ]
+    )
     def test_get_language_from_path_real(self):
         g = trans_real.get_language_from_path
         self.assertEqual(g('/pl/'), 'pl')
         self.assertEqual(g('/pl'), 'pl')
         self.assertIsNone(g('/xyz/'))
+
+        self.assertEqual(g('/en/'), 'en')
+        self.assertEqual(g('/en-gb/'), 'en')
+
+        self.assertEqual(g('/de/'), 'de')
+        self.assertEqual(g('/de-at/'), 'de-at')
+        self.assertEqual(g('/de-ch/'), 'de')
 
     def test_get_language_from_path_null(self):
         from django.utils.translation.trans_null import get_language_from_path as g
