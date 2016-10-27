@@ -3576,17 +3576,3 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         f = DataForm({'data': 'xyzzy'})
         self.assertTrue(f.is_valid())
         self.assertEqual(f.cleaned_data, {'data': 'xyzzy'})
-
-    def test_choicefield_uses_separate_widget_instances(self):
-        class CustomChoiceField(ChoiceField):
-            widget = Select(attrs={'class': 'my-custom-class'})
-
-        class TestForm(Form):
-            field1 = CustomChoiceField(choices=[])
-            field2 = CustomChoiceField(choices=[])
-
-        f = TestForm()
-        f.fields['field1'].choices = [("1", "1")]
-        f.fields['field2'].choices = [("2", "2")]
-        self.assertEqual(f.fields['field1'].widget.choices, [("1", "1")])
-        self.assertEqual(f.fields['field2'].widget.choices, [("2", "2")])
