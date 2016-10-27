@@ -282,9 +282,6 @@ class CsrfViewMiddleware(MiddlewareMixin):
             if getattr(response, 'csrf_cookie_set', False):
                 return response
 
-        if not request.META.get("CSRF_COOKIE_USED", False):
-            return response
-
         # Set the CSRF cookie even if it's already set, so we renew
         # the expiry timer.
         response.set_cookie(settings.CSRF_COOKIE_NAME,
@@ -295,6 +292,10 @@ class CsrfViewMiddleware(MiddlewareMixin):
                             secure=settings.CSRF_COOKIE_SECURE,
                             httponly=settings.CSRF_COOKIE_HTTPONLY
                             )
+
+        if not request.META.get("CSRF_COOKIE_USED", False):
+            return response
+
         # Content varies with the CSRF cookie, so set the Vary header.
         patch_vary_headers(response, ('Cookie',))
         response.csrf_cookie_set = True
