@@ -46,6 +46,13 @@ class TestSaveLoad(TestCase):
         with self.assertRaisesMessage(TypeError, 'is not a valid UUID'):
             PrimaryKeyUUIDModel.objects.get(pk=[])
 
+    def test_pk_validated(self):
+        with self.assertRaisesMessage(TypeError, 'is not a valid UUID'):
+            PrimaryKeyUUIDModel.objects.get(pk={})
+
+        with self.assertRaisesMessage(TypeError, 'is not a valid UUID'):
+            PrimaryKeyUUIDModel.objects.get(pk=[])
+
     def test_wrong_value(self):
         with self.assertRaisesMessage(ValueError, 'badly formed hexadecimal UUID string'):
             UUIDModel.objects.get(field='not-a-uuid')
