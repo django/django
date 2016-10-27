@@ -1391,6 +1391,22 @@ your test suite.
     ``errors`` is an error string, or a list of error strings, that are
     expected as a result of form validation.
 
+.. method:: SimpleTestCase.assertFormValid(form, msg=None)
+
+    Asserts that a form is valid. if form is not valid. Displays clean output with
+    form errors
+
+    ``form`` is the form to be validated
+
+.. method:: SimpleTestCase.assertFormNotValid(form, expected_errors=None, msg=None)
+
+   Asserts that a form is not valid and errors are the ``expected_errors``
+
+   ``form`` is the form to be validated
+
+   ``expected_errors`` is a list of (field, code) errors that are expected on the form
+
+
 .. method:: SimpleTestCase.assertFormsetError(response, formset, form_index, field, errors, msg_prefix='')
 
     Asserts that the ``formset`` raises the provided list of errors when

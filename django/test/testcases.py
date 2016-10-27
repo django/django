@@ -802,6 +802,36 @@ class SimpleTestCase(unittest.TestCase):
                 standardMsg = '%s == %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
                 self.fail(self._formatMessage(msg, standardMsg))
 
+    def assertFormValid(self, form, msg=None):
+        """
+        Asserts that a form is valid
+        """
+        if not form.is_valid():
+            standardMsg = "Form validation failed. The following field(s) had errors:\n"
+            for field, field_errors in form.errors.items():
+                standardMsg += "- %s:\n" % field
+                for error in field_errors:
+                    standardMsg += "    - %s\n" % error
+            self.fail(self._formatMessage(msg, standardMsg))
+
+    def assertFormNotValid(self, form, expected_errors=None, msg=None):
+        """
+        Asserts that a form is not valid
+        """
+        to_report = []
+        if form.is_valid():
+            to_report.append("Form was valid")
+        else:
+            for error in expected_errors:
+                if not form.has_error(*error):
+                    to_report.append('Missing %s' % error)
+
+        if to_report:
+            standardMsg = "\n"
+            for error in to_report:
+                standardMsg += "- %s\n" % error
+            self.fail(self._formatMessage(msg, standardMsg))
+
 
 class TransactionTestCase(SimpleTestCase):
 
