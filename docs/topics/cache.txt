@@ -803,11 +803,12 @@ The basic interface is ``set(key, value, timeout)`` and ``get(key)``::
     >>> cache.get('my_key')
     'hello, world!'
 
-The ``timeout`` argument is optional and defaults to the ``timeout`` argument
-of the appropriate backend in the :setting:`CACHES` setting (explained above).
-It's the number of seconds the value should be stored in the cache. Passing in
-``None`` for ``timeout`` will cache the value forever. A ``timeout`` of ``0``
-won't cache the value.
+``key`` should be a ``str`` (or ``unicode`` on Python 2), and ``value`` can be
+any Python object that can be pickled safely. The ``timeout`` argument is
+optional and defaults to the ``timeout`` argument of the appropriate backend in
+the :setting:`CACHES` setting (explained above). It's the number of seconds the
+value should be stored in the cache. Passing in ``None`` for ``timeout`` will
+cache the value forever. A ``timeout`` of ``0`` won't cache the value.
 
 If the object doesn't exist in the cache, ``cache.get()`` returns ``None``::
 
