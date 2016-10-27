@@ -123,12 +123,12 @@ class SerializersTestBase(object):
         self.a2.categories.set([music, op_ed])
 
     def test_serialize(self):
-        """Tests that basic serialization works."""
+        """Basic serialization works."""
         serial_str = serializers.serialize(self.serializer_name, Article.objects.all())
         self.assertTrue(self._validate_output(serial_str))
 
     def test_serializer_roundtrip(self):
-        """Tests that serialized content can be deserialized."""
+        """Serialized content can be deserialized."""
         serial_str = serializers.serialize(self.serializer_name, Article.objects.all())
         models = list(serializers.deserialize(self.serializer_name, serial_str))
         self.assertEqual(len(models), 2)
@@ -144,7 +144,7 @@ class SerializersTestBase(object):
             # Serialize normally for a comparison
             string_data = serializers.serialize(self.serializer_name, [obj], indent=2)
 
-            # Check that the two are the same
+            # The two are the same
             if isinstance(stream, StringIO):
                 self.assertEqual(string_data, stream.getvalue())
             else:
@@ -160,15 +160,14 @@ class SerializersTestBase(object):
         )
         result = next(serializers.deserialize(self.serializer_name, serialized_data))
 
-        # Check that the deserialized object contains data in only the serialized fields.
+        # The deserialized object contains data in only the serialized fields.
         self.assertEqual(result.object.field1, 'first')
         self.assertEqual(result.object.field2, '')
         self.assertEqual(result.object.field3, 'third')
 
     def test_altering_serialized_output(self):
         """
-        Tests the ability to create new objects by
-        modifying serialized content.
+        The ability to create new objects by modifying serialized content.
         """
         old_headline = "Poker has no place on ESPN"
         new_headline = "Poker has no place on television"
@@ -189,9 +188,9 @@ class SerializersTestBase(object):
 
     def test_one_to_one_as_pk(self):
         """
-        Tests that if you use your own primary key field
-        (such as a OneToOneField), it doesn't appear in the
-        serialized field list - it replaces the pk identifier.
+        If you use your own primary key field (such as a OneToOneField), it
+        doesn't appear in the serialized field list - it replaces the pk
+        identifier.
         """
         AuthorProfile.objects.create(author=self.joe, date_of_birth=datetime(1970, 1, 1))
         serial_str = serializers.serialize(self.serializer_name, AuthorProfile.objects.all())
@@ -201,7 +200,7 @@ class SerializersTestBase(object):
             self.assertEqual(obj.object.pk, self._comparison_value(self.joe.pk))
 
     def test_serialize_field_subset(self):
-        """Tests that output can be restricted to a subset of fields"""
+        """Output can be restricted to a subset of fields"""
         valid_fields = ('headline', 'pub_date')
         invalid_fields = ("author", "categories")
         serial_str = serializers.serialize(self.serializer_name, Article.objects.all(), fields=valid_fields)
@@ -212,7 +211,7 @@ class SerializersTestBase(object):
             self.assertTrue(self._get_field_values(serial_str, field_name))
 
     def test_serialize_unicode(self):
-        """Tests that unicode makes the roundtrip intact"""
+        """Unicode makes the roundtrip intact"""
         actor_name = "Za\u017c\u00f3\u0142\u0107"
         movie_title = 'G\u0119\u015bl\u0105 ja\u017a\u0144'
         ac = Actor(name=actor_name)
@@ -253,7 +252,7 @@ class SerializersTestBase(object):
 
     def test_serialize_with_null_pk(self):
         """
-        Tests that serialized data with no primary key results
+        Serialized data with no primary key results
         in a model instance with no id
         """
         category = Category(name="Reference")
@@ -265,7 +264,7 @@ class SerializersTestBase(object):
         self.assertIsNone(cat_obj.id)
 
     def test_float_serialization(self):
-        """Tests that float values serialize and deserialize intact"""
+        """Float values serialize and deserialize intact"""
         sc = Score(score=3.4)
         sc.save()
         serial_str = serializers.serialize(self.serializer_name, [sc])
@@ -282,7 +281,7 @@ class SerializersTestBase(object):
         self.assertEqual(deserial_objs[0].object.__class__, Author)
 
     def test_custom_field_serialization(self):
-        """Tests that custom fields serialize and deserialize intact"""
+        """Custom fields serialize and deserialize intact"""
         team_str = "Spartak Moskva"
         player = Player()
         player.name = "Soslan Djanaev"
@@ -298,7 +297,7 @@ class SerializersTestBase(object):
         self.assertEqual(deserial_objs[0].object.team.to_string(), player.team.to_string())
 
     def test_pre_1000ad_date(self):
-        """Tests that year values before 1000AD are properly formatted"""
+        """Year values before 1000AD are properly formatted"""
         # Regression for #12524 -- dates before 1000AD get prefixed
         # 0's on the year
         a = Article.objects.create(
@@ -312,8 +311,7 @@ class SerializersTestBase(object):
 
     def test_pkless_serialized_strings(self):
         """
-        Tests that serialized strings without PKs
-        can be turned into models
+        Serialized strings without PKs can be turned into models
         """
         deserial_objs = list(serializers.deserialize(self.serializer_name, self.pkless_str))
         for obj in deserial_objs:
@@ -333,7 +331,7 @@ class SerializersTestBase(object):
         })
 
     def test_deserialize_force_insert(self):
-        """Tests that deserialized content can be saved with force_insert as a parameter."""
+        """Deserialized content can be saved with force_insert as a parameter."""
         serial_str = serializers.serialize(self.serializer_name, [self.a1])
         deserial_obj = list(serializers.deserialize(self.serializer_name, serial_str))[0]
         with mock.patch('django.db.models.Model') as mock_model:
@@ -383,7 +381,7 @@ class SerializersTransactionTestBase(object):
     @skipUnlessDBFeature('supports_forward_references')
     def test_forward_refs(self):
         """
-        Tests that objects ids can be referenced before they are
+        Objects ids can be referenced before they are
         defined in the serialization data.
         """
         # The deserialization process needs to run in a transaction in order

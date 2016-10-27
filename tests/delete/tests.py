@@ -83,7 +83,7 @@ class OnDeleteTests(TestCase):
 
     def test_do_nothing_qscount(self):
         """
-        Test that a models.DO_NOTHING relation doesn't trigger a query.
+        A models.DO_NOTHING relation doesn't trigger a query.
         """
         b = Base.objects.create()
         with self.assertNumQueries(1):

@@ -65,9 +65,8 @@ class DecoratorFromMiddlewareTests(SimpleTestCase):
 
     def test_full_dec_normal(self):
         """
-        Test that all methods of middleware are called for normal HttpResponses
+        All methods of middleware are called for normal HttpResponses
         """
-
         @full_dec
         def normal_view(request):
             template = engines['django'].from_string("Hello world")
@@ -83,10 +82,9 @@ class DecoratorFromMiddlewareTests(SimpleTestCase):
 
     def test_full_dec_templateresponse(self):
         """
-        Test that all methods of middleware are called for TemplateResponses in
+        All methods of middleware are called for TemplateResponses in
         the right sequence.
         """
-
         @full_dec
         def template_response_view(request):
             template = engines['django'].from_string("Hello world")
@@ -105,7 +103,7 @@ class DecoratorFromMiddlewareTests(SimpleTestCase):
         self.assertFalse(getattr(request, 'process_response_reached', False))
         response.render()
         self.assertTrue(getattr(request, 'process_response_reached', False))
-        # Check that process_response saw the rendered content
+        # process_response saw the rendered content
         self.assertEqual(request.process_response_content, b"Hello world")
 
 

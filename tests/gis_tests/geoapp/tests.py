@@ -877,7 +877,7 @@ class GeoQuerySetTest(TestCase):
 
     def test_within_subquery(self):
         """
-        Test that using a queryset inside a geo lookup is working (using a subquery)
+        Using a queryset inside a geo lookup is working (using a subquery)
         (#14483).
         """
         tex_cities = City.objects.filter(

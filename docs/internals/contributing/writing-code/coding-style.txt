@@ -53,6 +53,19 @@ Python style
   (``six.assertRaisesRegex()`` as long as we support Python 2) only if you need
   to use regular expression matching.
 
+* In test docstrings, state the expected behavior that each test demonstrates.
+  Don't include preambles such as "Tests that" or "Ensures that".
+
+  Reserve ticket references for obscure issues where the ticket has additional
+  details that can't be easily described in docstrings or comments. Include the
+  ticket number at the end of a sentence like this::
+
+    def test_foo():
+        """
+        A test docstring looks like this (#123456).
+        """
+        ...
+
 .. _coding-style-imports:
 
 Imports

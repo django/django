@@ -195,12 +195,12 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertContains(response, "The password reset link was invalid")
 
     def test_confirm_invalid_user(self):
-        # Ensure that we get a 200 response for a non-existent user, not a 404
+        # We get a 200 response for a non-existent user, not a 404
         response = self.client.get('/reset/123456/1-1/')
         self.assertContains(response, "The password reset link was invalid")
 
     def test_confirm_overflow_user(self):
-        # Ensure that we get a 200 response for a base36 user id that overflows int
+        # We get a 200 response for a base36 user id that overflows int
         response = self.client.get('/reset/zzzzzzzzzzzzz/1-1/')
         self.assertContains(response, "The password reset link was invalid")
 

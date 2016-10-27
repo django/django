@@ -233,18 +233,17 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertContains(response, "The password reset link was invalid")
 
     def test_confirm_invalid_user(self):
-        # Ensure that we get a 200 response for a non-existent user, not a 404
+        # A non-existent user returns a 200 response, not a 404.
         response = self.client.get('/reset/123456/1-1/')
         self.assertContains(response, "The password reset link was invalid")
 
     def test_confirm_overflow_user(self):
-        # Ensure that we get a 200 response for a base36 user id that overflows int
+        # A base36 user id that overflows int returns a 200 response.
         response = self.client.get('/reset/zzzzzzzzzzzzz/1-1/')
         self.assertContains(response, "The password reset link was invalid")
 
     def test_confirm_invalid_post(self):
-        # Same as test_confirm_invalid, but trying
-        # to do a POST instead.
+        # Same as test_confirm_invalid, but trying to do a POST instead.
         url, path = self._test_confirm_start()
         path = path[:-5] + ("0" * 4) + path[-1]
 
@@ -311,14 +310,12 @@ class PasswordResetTest(AuthViewsTestCase):
     def test_confirm_display_user_from_form(self):
         url, path = self._test_confirm_start()
         response = self.client.get(path)
-
-        # #16919 -- The ``password_reset_confirm`` view should pass the user
-        # object to the ``SetPasswordForm``, even on GET requests.
-        # For this test, we render ``{{ form.user }}`` in the template
-        # ``registration/password_reset_confirm.html`` so that we can test this.
+        # The password_reset_confirm() view passes the user object to the
+        # SetPasswordForm``, even on GET requests (#16919). For this test,
+        # {{ form.user }}`` is rendered in the template
+        # registration/password_reset_confirm.html.
         username = User.objects.get(email='staffmember@example.com').username
         self.assertContains(response, "Hello, %s." % username)
-
         # However, the view should NOT pass any user object on a form if the
         # password reset link was invalid.
         response = self.client.get('/reset/zzzzzzzzzzzzz/1-1/')
@@ -978,7 +975,7 @@ class LogoutTest(AuthViewsTestCase):
         self.confirm_logged_out()
 
     def test_logout_preserve_language(self):
-        """Check that language stored in session is preserved after logout"""
+        """Language stored in session is preserved after logout"""
         # Create a new session with language
         engine = import_module(settings.SESSION_ENGINE)
         session = engine.SessionStore()

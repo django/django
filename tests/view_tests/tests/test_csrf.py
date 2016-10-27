@@ -25,7 +25,7 @@ class CsrfViewTests(SimpleTestCase):
     )
     def test_translation(self):
         """
-        Test that an invalid request is rejected with a localized error message.
+        An invalid request is rejected with a localized error message.
         """
         response = self.client.post('/')
         self.assertContains(response, "Forbidden", status_code=403)
@@ -52,7 +52,7 @@ class CsrfViewTests(SimpleTestCase):
     )
     def test_translation_middleware_classes(self):
         """
-        Test that an invalid request is rejected with a localized error message.
+        An invalid request is rejected with a localized error message.
         """
         response = self.client.post('/')
         self.assertContains(response, "Forbidden", status_code=403)

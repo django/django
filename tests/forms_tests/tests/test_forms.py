@@ -8,7 +8,7 @@ import uuid
 
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.validators import RegexValidator
+from django.core.validators import MaxValueValidator, RegexValidator
 from django.forms import (
     BooleanField, CharField, CheckboxSelectMultiple, ChoiceField, DateField,
     DateTimeField, EmailField, FileField, FloatField, Form, HiddenInput,
@@ -1134,7 +1134,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
                 except ValidationError as e:
                     self._errors = e.update_error_dict(self._errors)
 
-                # Ensure that the newly added list of errors is an instance of ErrorList.
+                # The newly added list of errors is an instance of ErrorList.
                 for field, error_list in self._errors.items():
                     if not isinstance(error_list, self.error_class):
                         self._errors[field] = self.error_class(error_list)
@@ -1143,7 +1143,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
         # Trigger validation.
         self.assertFalse(form.is_valid())
 
-        # Check that update_error_dict didn't lose track of the ErrorDict type.
+        # update_error_dict didn't lose track of the ErrorDict type.
         self.assertIsInstance(form._errors, forms.ErrorDict)
 
         self.assertEqual(dict(form.errors), {
@@ -1325,10 +1325,10 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
         self.assertEqual(f['gender'].field.choices, [('f', 'Female'), ('m', 'Male')])
 
     def test_validators_independence(self):
-        """ Test that we are able to modify a form field validators list without polluting
-            other forms """
-        from django.core.validators import MaxValueValidator
-
+        """
+        The list of form field validators can be modified without polluting
+        other forms.
+        """
         class MyForm(Form):
             myfield = CharField(max_length=25)
 
@@ -1931,7 +1931,7 @@ Password: <input type="password" name="password" required /></li>
         self.assertIn('last_name', p.changed_data)
         self.assertNotIn('birthday', p.changed_data)
 
-        # Test that field raising ValidationError is always in changed_data
+        # A field raising ValidationError is always in changed_data
         class PedanticField(forms.Field):
             def to_python(self, value):
                 raise ValidationError('Whatever')
@@ -1990,7 +1990,7 @@ Password: <input type="password" name="password" required /></li>
 
     def test_boundfield_rendering(self):
         """
-        Python 2 issue: Test that rendering a BoundField with bytestring content
+        Python 2 issue: Rendering a BoundField with bytestring content
         doesn't lose it's safe string status (#22950).
         """
         class CustomWidget(TextInput):
@@ -2937,7 +2937,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
 
     def test_custom_empty_values(self):
         """
-        Test that form fields can customize what is considered as an empty value
+        Form fields can customize what is considered as an empty value
         for themselves (#19997).
         """
         class CustomJSONField(CharField):

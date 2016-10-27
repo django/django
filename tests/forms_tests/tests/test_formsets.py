@@ -128,7 +128,7 @@ class FormsFormsetTestCase(SimpleTestCase):
 
     def test_form_kwargs_formset(self):
         """
-        Test that custom kwargs set on the formset instance are passed to the
+        Custom kwargs set on the formset instance are passed to the
         underlying forms.
         """
         FormSet = formset_factory(CustomKwargForm, extra=2)
@@ -139,7 +139,7 @@ class FormsFormsetTestCase(SimpleTestCase):
 
     def test_form_kwargs_formset_dynamic(self):
         """
-        Test that form kwargs can be passed dynamically in a formset.
+        Form kwargs can be passed dynamically in a formset.
         """
         class DynamicBaseFormSet(BaseFormSet):
             def get_form_kwargs(self, index):
@@ -856,8 +856,7 @@ class FormsFormsetTestCase(SimpleTestCase):
 <td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>"""
         )
 
-        # Ensure that max_num has no effect when extra is less than max_num.
-
+        # max_num has no effect when extra is less than max_num.
         LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, extra=1, max_num=2)
         formset = LimitedFavoriteDrinkFormSet()
         form_output = []
@@ -1342,7 +1341,7 @@ class TestIsBoundBehavior(SimpleTestCase):
 
 class TestEmptyFormSet(SimpleTestCase):
     def test_empty_formset_is_valid(self):
-        """Test that an empty formset still calls clean()"""
+        """An empty formset still calls clean()"""
         EmptyFsetWontValidateFormset = formset_factory(FavoriteDrinkForm, extra=0, formset=EmptyFsetWontValidate)
         formset = EmptyFsetWontValidateFormset(
             data={'form-INITIAL_FORMS': '0', 'form-TOTAL_FORMS': '0'},

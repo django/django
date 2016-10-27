@@ -107,8 +107,8 @@ class TranslationTests(SimpleTestCase):
 
     def test_override_exit(self):
         """
-        Test that the language restored is the one used when the function was
-        called, not the one used when the decorator was initialized. refs #23381
+        The language restored is the one used when the function was
+        called, not the one used when the decorator was initialized (#23381).
         """
         activate('fr')
 
@@ -267,9 +267,8 @@ class TranslationTests(SimpleTestCase):
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_template_tags_pgettext(self):
         """
-        Ensure that message contexts are taken into account the {% trans %} and
-        {% blocktrans %} template tags.
-        Refs #14806.
+        Message contexts are taken into account the {% trans %} and
+        {% blocktrans %} template tags (#14806).
         """
         trans_real._active = local()
         trans_real._translations = {}
@@ -726,10 +725,9 @@ class FormattingTests(SimpleTestCase):
 
     def test_false_like_locale_formats(self):
         """
-        Ensure that the active locale's formats take precedence over the
-        default settings even if they would be interpreted as False in a
-        conditional test (e.g. 0 or empty string).
-        Refs #16938.
+        The active locale's formats take precedence over the default settings
+        even if they would be interpreted as False in a conditional test
+        (e.g. 0 or empty string) (#16938).
         """
         with patch_formats('fr', THOUSAND_SEPARATOR='', FIRST_DAY_OF_WEEK=0):
             with translation.override('fr'):
@@ -1152,7 +1150,7 @@ class FormattingTests(SimpleTestCase):
 
         with translation.override('ru', deactivate=True):
             # Russian locale has non-breaking space (\xa0) as thousand separator
-            # Check that usual space is accepted too when sanitizing inputs
+            # Usual space is accepted too when sanitizing inputs
             with self.settings(USE_THOUSAND_SEPARATOR=True):
                 self.assertEqual(sanitize_separators('1\xa0234\xa0567'), '1234567')
                 self.assertEqual(sanitize_separators('77\xa0777,777'), '77777.777')
@@ -1514,8 +1512,8 @@ class MiscTests(SimpleTestCase):
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_percent_formatting_in_blocktrans(self):
         """
-        Test that using Python's %-formatting is properly escaped in blocktrans,
-        singular or plural
+        Python's %-formatting is properly escaped in blocktrans, singular or
+        plural.
         """
         t_sing = Template("{% load i18n %}{% blocktrans %}There are %(num_comments)s comments{% endblocktrans %}")
         t_plur = Template(
@@ -1531,8 +1529,8 @@ class MiscTests(SimpleTestCase):
 
     def test_cache_resetting(self):
         """
-        #14170 after setting LANGUAGE, cache should be cleared and languages
-        previously valid should not be used.
+        After setting LANGUAGE, the cache should be cleared and languages
+        previously valid should not be used (#14170).
         """
         g = get_language_from_request
         r = self.rf.get('/')
@@ -1812,9 +1810,10 @@ class LocaleMiddlewareTests(TestCase):
         ],
     )
     def test_language_not_saved_to_session(self):
-        """Checks that current language is not automatically saved to
-        session on every request."""
-        # Regression test for #21473
+        """
+        The Current language isno' automatically saved to the session on every
+        request (#21473).
+        """
         self.client.get('/fr/simple/')
         self.assertNotIn(LANGUAGE_SESSION_KEY, self.client.session)
 

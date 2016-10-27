@@ -363,12 +363,10 @@ class ResolverTests(SimpleTestCase):
 
     def test_non_regex(self):
         """
-        Verifies that we raise a Resolver404 if what we are resolving doesn't
-        meet the basic requirements of a path to match - i.e., at the very
-        least, it matches the root pattern '^/'. We must never return None
-        from resolve, or we will get a TypeError further down the line.
-
-        Regression for #10834.
+        A Resolver404 is raised if resolving doesn't meet the basic
+        requirements of a path to match - i.e., at the very least, it matches
+        the root pattern '^/'. Never return None from resolve() to prevent a
+        TypeError from occuring later (#10834).
         """
         with self.assertRaises(Resolver404):
             resolve('')
@@ -381,9 +379,9 @@ class ResolverTests(SimpleTestCase):
 
     def test_404_tried_urls_have_names(self):
         """
-        Verifies that the list of URLs that come back from a Resolver404
-        exception contains a list in the right format for printing out in
-        the DEBUG 404 page with both the patterns and URL names, if available.
+        The list of URLs that come back from a Resolver404 exception contains
+        a list in the right format for printing out in the DEBUG 404 page with
+        both the patterns and URL names, if available.
         """
         urls = 'urlpatterns_reverse.named_urls'
         # this list matches the expected URL types and names returned when
@@ -480,7 +478,7 @@ class ReverseLazyTest(TestCase):
 
 class ReverseLazySettingsTest(AdminScriptTestCase):
     """
-    Test that reverse_lazy can be used in settings without causing a circular
+    reverse_lazy can be used in settings without causing a circular
     import error.
     """
     def setUp(self):

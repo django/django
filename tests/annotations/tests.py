@@ -343,7 +343,7 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_null_annotation(self):
         """
-        Test that annotating None onto a model round-trips
+        Annotating None onto a model round-trips
         """
         book = Book.objects.annotate(no_value=Value(None, output_field=IntegerField())).first()
         self.assertIsNone(book.no_value)
@@ -372,9 +372,9 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_column_field_ordering(self):
         """
-        Test that columns are aligned in the correct order for
-        resolve_columns. This test will fail on mysql if column
-        ordering is out. Column fields should be aligned as:
+        Columns are aligned in the correct order for resolve_columns. This test
+        will fail on MySQL if column ordering is out. Column fields should be
+        aligned as:
         1. extra_select
         2. model_fields
         3. annotation_fields

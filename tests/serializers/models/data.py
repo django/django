@@ -275,8 +275,8 @@ class ModifyingSaveData(models.Model):
     def save(self, *args, **kwargs):
         """
         A save method that modifies the data in the object.
-        Verifies that a user-defined save() method isn't called when objects
-        are deserialized (#4459).
+        A user-defined save() method isn't called when objects are deserialized
+        (#4459).
         """
         self.data = 666
         super(ModifyingSaveData, self).save(*args, **kwargs)

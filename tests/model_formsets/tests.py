@@ -485,8 +485,9 @@ class ModelFormsetTest(TestCase):
         self.assertEqual(poet2.name, 'Vladimir Mayakovsky')
 
     def test_custom_form(self):
-        """ Test that model_formset respects fields and exclude parameters of
-            custom form
+        """
+        model_formset_factory() respects fields and exclude parameters of a
+        custom form.
         """
         class PostForm1(forms.ModelForm):
             class Meta:
@@ -508,8 +509,7 @@ class ModelFormsetTest(TestCase):
 
     def test_custom_queryset_init(self):
         """
-        Test that a queryset can be overridden in the __init__ method.
-        https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#changing-the-queryset
+        A queryset can be overridden in the formset's __init__() method.
         """
         Author.objects.create(name='Charles Baudelaire')
         Author.objects.create(name='Paul Verlaine')

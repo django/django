@@ -189,9 +189,7 @@ class AbstractUserTestCase(TestCase):
             from_email="from@domain.com",
             **kwargs
         )
-        # Test that one message has been sent.
         self.assertEqual(len(mail.outbox), 1)
-        # Verify that test email contains the correct attributes:
         message = mail.outbox[0]
         self.assertEqual(message.subject, "Subject here")
         self.assertEqual(message.body, "This is a message")

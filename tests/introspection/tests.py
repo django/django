@@ -182,8 +182,7 @@ class IntrospectionTests(TransactionTestCase):
     @ignore_warnings(category=RemovedInDjango21Warning)
     def test_get_indexes_multicol(self):
         """
-        Test that multicolumn indexes are not included in the introspection
-        results.
+        Multicolumn indexes are not included in the introspection results.
         """
         with connection.cursor() as cursor:
             indexes = connection.introspection.get_indexes(cursor, Reporter._meta.db_table)

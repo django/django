@@ -91,7 +91,10 @@ class M2MThroughTestCase(TestCase):
         )
 
     def test_join_trimming_forwards(self):
-        "Check that we don't involve too many copies of the intermediate table when doing a join. Refs #8046, #8254"
+        """
+        Too many copies of the intermediate table aren't involved when doing a
+        join (#8046, #8254).
+        """
         self.assertQuerysetEqual(
             self.rock.members.filter(membership__price=50), [
                 "<Person: Jim>",

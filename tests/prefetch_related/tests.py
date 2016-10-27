@@ -118,18 +118,13 @@ class PrefetchRelatedTests(TestCase):
         self.assertIn(qs[0], qs)
 
     def test_clear(self):
-        """
-        Test that we can clear the behavior by calling prefetch_related()
-        """
         with self.assertNumQueries(5):
             with_prefetch = Author.objects.prefetch_related('books')
             without_prefetch = with_prefetch.prefetch_related(None)
             [list(a.books.all()) for a in without_prefetch]
 
     def test_m2m_then_m2m(self):
-        """
-        Test we can follow a m2m and another m2m
-        """
+        """A m2m can be followed through another m2m."""
         with self.assertNumQueries(3):
             qs = Author.objects.prefetch_related('books__read_by')
             lists = [[[six.text_type(r) for r in b.read_by.all()]
@@ -168,7 +163,7 @@ class PrefetchRelatedTests(TestCase):
 
     def test_get(self):
         """
-        Test that objects retrieved with .get() get the prefetch behavior.
+        Objects retrieved with .get() get the prefetch behavior.
         """
         # Need a double
         with self.assertNumQueries(3):
@@ -178,8 +173,8 @@ class PrefetchRelatedTests(TestCase):
 
     def test_foreign_key_then_m2m(self):
         """
-        Test we can follow an m2m relation after a relation like ForeignKey
-        that doesn't have many objects
+        A m2m relation can be followed after a relation like ForeignKey that
+        doesn't have many objects.
         """
         with self.assertNumQueries(2):
             qs = Author.objects.select_related('first_book').prefetch_related('first_book__read_by')
@@ -189,8 +184,8 @@ class PrefetchRelatedTests(TestCase):
 
     def test_reverse_one_to_one_then_m2m(self):
         """
-        Test that we can follow a m2m relation after going through
-        the select_related reverse of an o2o.
+        A m2m relation can be followed afterr going through the select_related
+        reverse of an o2o.
         """
         qs = Author.objects.prefetch_related('bio__books').select_related('bio')
 
@@ -832,7 +827,7 @@ class GenericRelationTests(TestCase):
 
     def test_traverse_GFK(self):
         """
-        Test that we can traverse a 'content_object' with prefetch_related() and
+        A 'content_object' can be traversed with prefetch_related() and
         get to related objects on the other side (assuming it is suitably
         filtered)
         """
@@ -1093,7 +1088,7 @@ class NullableTest(TestCase):
         boss1 = Employee.objects.create(name="Peter")
         boss2 = Employee.objects.create(name="Jack")
         with self.assertNumQueries(2):
-            # Check that prefetch is done and it does not cause any errors.
+            # Prefetch is done and it does not cause any errors.
             bulk = Employee.objects.prefetch_related('serfs').in_bulk([boss1.pk, boss2.pk])
             for b in bulk.values():
                 list(b.serfs.all())

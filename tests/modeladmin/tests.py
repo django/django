@@ -67,9 +67,7 @@ class ModelAdminTests(TestCase):
         self.assertEqual(ma.get_fieldsets(request, self.band), [(None, {'fields': ['name', 'bio', 'sign_date']})])
 
     def test_get_fieldsets(self):
-        # Test that get_fieldsets is called when figuring out form fields.
-        # Refs #18681.
-
+        # get_fieldsets() is called when figuring out form fields (#18681).
         class BandAdmin(ModelAdmin):
             def get_fieldsets(self, request, obj=None):
                 return [(None, {'fields': ['name', 'bio']})]
@@ -92,9 +90,8 @@ class ModelAdminTests(TestCase):
 
     def test_lookup_allowed_allows_nonexistent_lookup(self):
         """
-        Ensure that a lookup_allowed allows a parameter
-        whose field lookup doesn't exist.
-        Refs #21129.
+        A lookup_allowed allows a parameter whose field lookup doesn't exist.
+        (#21129).
         """
         class BandAdmin(ModelAdmin):
             fields = ['name']
@@ -162,13 +159,11 @@ class ModelAdminTests(TestCase):
 
     def test_custom_form_meta_exclude_with_readonly(self):
         """
-        Ensure that the custom ModelForm's `Meta.exclude` is respected when
-        used in conjunction with `ModelAdmin.readonly_fields` and when no
-        `ModelAdmin.exclude` is defined.
-        Refs #14496.
+        The custom ModelForm's `Meta.exclude` is respected when used in
+        conjunction with `ModelAdmin.readonly_fields` and when no
+        `ModelAdmin.exclude` is defined (#14496).
         """
         # First, with `ModelAdmin` -----------------------
-
         class AdminBandForm(forms.ModelForm):
             class Meta:
                 model = Band
@@ -182,7 +177,6 @@ class ModelAdminTests(TestCase):
         self.assertEqual(list(ma.get_form(request).base_fields), ['sign_date'])
 
         # Then, with `InlineModelAdmin`  -----------------
-
         class AdminConcertForm(forms.ModelForm):
             class Meta:
                 model = Concert
@@ -237,12 +231,10 @@ class ModelAdminTests(TestCase):
 
     def test_custom_form_meta_exclude(self):
         """
-        Ensure that the custom ModelForm's `Meta.exclude` is overridden if
-        `ModelAdmin.exclude` or `InlineModelAdmin.exclude` are defined.
-        Refs #14496.
+        The custom ModelForm's `Meta.exclude` is overridden if
+        `ModelAdmin.exclude` or `InlineModelAdmin.exclude` are defined (#14496).
         """
         # First, with `ModelAdmin` -----------------------
-
         class AdminBandForm(forms.ModelForm):
             class Meta:
                 model = Band
@@ -256,7 +248,6 @@ class ModelAdminTests(TestCase):
         self.assertEqual(list(ma.get_form(request).base_fields), ['bio', 'sign_date'])
 
         # Then, with `InlineModelAdmin`  -----------------
-
         class AdminConcertForm(forms.ModelForm):
 
             class Meta:
@@ -330,8 +321,8 @@ class ModelAdminTests(TestCase):
 
     def test_form_exclude_kwarg_override(self):
         """
-        Ensure that the `exclude` kwarg passed to `ModelAdmin.get_form()`
-        overrides all other declarations. Refs #8999.
+        The `exclude` kwarg passed to `ModelAdmin.get_form()` overrides all
+        other declarations (#8999).
         """
 
         class AdminBandForm(forms.ModelForm):
@@ -352,8 +343,8 @@ class ModelAdminTests(TestCase):
 
     def test_formset_exclude_kwarg_override(self):
         """
-        Ensure that the `exclude` kwarg passed to `InlineModelAdmin.get_formset()`
-        overrides all other declarations. Refs #8999.
+        The `exclude` kwarg passed to `InlineModelAdmin.get_formset()`
+        overrides all other declarations (#8999).
         """
 
         class AdminConcertForm(forms.ModelForm):
@@ -471,7 +462,7 @@ class ModelAdminTests(TestCase):
 
     def test_regression_for_ticket_15820(self):
         """
-        Ensure that `obj` is passed from `InlineModelAdmin.get_fieldsets()` to
+        `obj` is passed from `InlineModelAdmin.get_fieldsets()` to
         `InlineModelAdmin.get_formset()`.
         """
         class CustomConcertForm(forms.ModelForm):
@@ -1709,8 +1700,8 @@ class ModelAdminPermissionTests(SimpleTestCase):
 
     def test_has_add_permission(self):
         """
-        Ensure that has_add_permission returns True for users who can add
-        objects and False for users who can't.
+        has_add_permission returns True for users who can add objects and
+        False for users who can't.
         """
         ma = ModelAdmin(Band, AdminSite())
         request = MockRequest()
@@ -1723,8 +1714,8 @@ class ModelAdminPermissionTests(SimpleTestCase):
 
     def test_has_change_permission(self):
         """
-        Ensure that has_change_permission returns True for users who can edit
-        objects and False for users who can't.
+        has_change_permission returns True for users who can edit objects and
+        False for users who can't.
         """
         ma = ModelAdmin(Band, AdminSite())
         request = MockRequest()
@@ -1737,8 +1728,8 @@ class ModelAdminPermissionTests(SimpleTestCase):
 
     def test_has_delete_permission(self):
         """
-        Ensure that has_delete_permission returns True for users who can delete
-        objects and False for users who can't.
+        has_delete_permission returns True for users who can delete objects and
+        False for users who can't.
         """
         ma = ModelAdmin(Band, AdminSite())
         request = MockRequest()
@@ -1751,8 +1742,8 @@ class ModelAdminPermissionTests(SimpleTestCase):
 
     def test_has_module_permission(self):
         """
-        Ensure that has_module_permission returns True for users who have any
-        permission for the module and False for users who don't.
+        as_module_permission returns True for users who have any permission
+        for the module and False for users who don't.
         """
         ma = ModelAdmin(Band, AdminSite())
         request = MockRequest()

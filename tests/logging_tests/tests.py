@@ -170,7 +170,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
     logger = logging.getLogger('django')
 
     def get_admin_email_handler(self, logger):
-        # Ensure that AdminEmailHandler does not get filtered out
+        # AdminEmailHandler does not get filtered out
         # even with DEBUG=True.
         admin_email_handler = [
             h for h in logger.handlers
@@ -188,9 +188,8 @@ class AdminEmailHandlerTest(SimpleTestCase):
     )
     def test_accepts_args(self):
         """
-        Ensure that user-supplied arguments and the EMAIL_SUBJECT_PREFIX
-        setting are used to compose the email subject.
-        Refs #16736.
+        User-supplied arguments and the EMAIL_SUBJECT_PREFIX setting are used
+        to compose the email subject (#16736).
         """
         message = "Custom message that says '%s' and '%s'"
         token1 = 'ping'
@@ -219,8 +218,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
     )
     def test_accepts_args_and_request(self):
         """
-        Ensure that the subject is also handled if being
-        passed a request object.
+        The subject is also handled if being passed a request object.
         """
         message = "Custom message that says '%s' and '%s'"
         token1 = 'ping'
@@ -255,9 +253,8 @@ class AdminEmailHandlerTest(SimpleTestCase):
     )
     def test_subject_accepts_newlines(self):
         """
-        Ensure that newlines in email reports' subjects are escaped to avoid
-        AdminErrorHandler to fail.
-        Refs #17281.
+        Newlines in email reports' subjects are escaped to prevent
+        AdminErrorHandler from failing (#17281).
         """
         message = 'Message \r\n with newlines'
         expected_subject = 'ERROR: Message \\r\\n with newlines'
@@ -361,7 +358,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
 
 class SettingsConfigTest(AdminScriptTestCase):
     """
-    Test that accessing settings in a custom logging handler does not trigger
+    Accessing settings in a custom logging handler does not trigger
     a circular import error.
     """
     def setUp(self):
@@ -393,7 +390,7 @@ dictConfig.called = False
 
 class SetupConfigureLogging(SimpleTestCase):
     """
-    Test that calling django.setup() initializes the logging configuration.
+    Calling django.setup() initializes the logging configuration.
     """
     @override_settings(LOGGING_CONFIG='logging_tests.tests.dictConfig',
                        LOGGING=OLD_LOGGING)
@@ -430,7 +427,7 @@ class SecurityLoggerTest(SimpleTestCase):
 
 class SettingsCustomLoggingTest(AdminScriptTestCase):
     """
-    Test that using a logging defaults are still applied when using a custom
+    Using a logging defaults are still applied when using a custom
     callable in LOGGING_CONFIG (i.e., logging.config.fileConfig).
     """
     def setUp(self):

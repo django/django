@@ -369,5 +369,4 @@ class CustomGeometryWidgetTest(SimpleTestCase):
 
         form = PointForm(data={'p': point.json})
         self.assertTrue(form.is_valid())
-        # Ensure that resulting geometry has srid set
         self.assertEqual(form.cleaned_data['p'].srid, 4326)

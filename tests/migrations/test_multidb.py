@@ -49,7 +49,7 @@ class MultiDBOperationTests(OperationTestBase):
 
     def _test_create_model(self, app_label, should_run):
         """
-        Tests that CreateModel honours multi-db settings.
+        CreateModel honors multi-db settings.
         """
         operation = migrations.CreateModel(
             "Pony",

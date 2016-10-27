@@ -7,8 +7,7 @@ from unittest import TestCase
 from wsgiref import simple_server
 
 # If data is too large, socket will choke, so write chunks no larger than 32MB
-# at a time. The rationale behind the 32MB can be found on Django's Trac:
-# https://code.djangoproject.com/ticket/5596#comment:4
+# at a time. The rationale behind the 32MB can be found in #5596#comment:4.
 MAX_SOCKET_CHUNK_SIZE = 32 * 1024 * 1024  # 32 MB
 
 
@@ -80,7 +79,7 @@ def wsgi_app_file_wrapper(environ, start_response):
 
 class WSGIFileWrapperTests(TestCase):
     """
-    Test that the wsgi.file_wrapper works for the builting server.
+    The wsgi.file_wrapper works for the builting server.
 
     Tests for #9659: wsgi.file_wrapper in the builtin server.
     We need to mock a couple of handlers and keep track of what
@@ -134,7 +133,7 @@ def send_big_data_app(environ, start_response):
 
 class ServerHandlerChunksProperly(TestCase):
     """
-    Test that the ServerHandler chunks data properly.
+    The ServerHandler chunks data properly.
 
     Tests for #18972: The logic that performs the math to break data into
     32MB (MAX_SOCKET_CHUNK_SIZE) chunks was flawed, BUT it didn't actually

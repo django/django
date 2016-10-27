@@ -45,11 +45,11 @@ class HeadersCheckMixin(object):
 
     def assertMessageHasHeaders(self, message, headers):
         """
-        Check that :param message: has all :param headers: headers.
+        Asserts that the `message` has all `headers`.
 
-        :param message: can be an instance of an email.Message subclass or a
-        string with the contents of an email message.
-        :param headers: should be a set of (header-name, header-value) tuples.
+        message: can be an instance of an email.Message subclass or a string
+                 with the contents of an email message.
+        headers: should be a set of (header-name, header-value) tuples.
         """
         if isinstance(message, binary_type):
             message = message_from_bytes(message)
@@ -432,7 +432,6 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
     def test_attach_text_as_bytes(self):
         msg = EmailMessage('subject', 'body', 'from@example.com', ['to@example.com'])
         msg.attach('file.txt', b'file content')
-        # Check that the message would be sent at all.
         sent_num = msg.send()
         self.assertEqual(sent_num, 1)
         filename, content, mimetype = self.get_decoded_attachments(msg)[0]
@@ -620,7 +619,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         parent_msg.attach(content=child_s, mimetype='message/rfc822')
         parent_s = parent_msg.message().as_string()
 
-        # Verify that the child message header is not base64 encoded
+        # The child message header is not base64 encoded
         self.assertIn(str('Child Subject'), parent_s)
 
         # Feature test: try attaching email.Message object directly to the mail.
@@ -631,7 +630,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         parent_msg.attach(content=child_msg.message(), mimetype='message/rfc822')
         parent_s = parent_msg.message().as_string()
 
-        # Verify that the child message header is not base64 encoded
+        # The child message header is not base64 encoded
         self.assertIn(str('Child Subject'), parent_s)
 
         # Feature test: try attaching Django's EmailMessage object directly to the mail.
@@ -642,7 +641,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         parent_msg.attach(content=child_msg, mimetype='message/rfc822')
         parent_s = parent_msg.message().as_string()
 
-        # Verify that the child message header is not base64 encoded
+        # The child message header is not base64 encoded
         self.assertIn(str('Child Subject'), parent_s)
 
     def test_sanitize_address(self):
@@ -890,7 +889,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
     @override_settings(ADMINS=[], MANAGERS=[])
     def test_empty_admins(self):
         """
-        Test that mail_admins/mail_managers doesn't connect to the mail server
+        mail_admins/mail_managers doesn't connect to the mail server
         if there are no recipients (#9383)
         """
         mail_admins('hi', 'there')
@@ -971,14 +970,14 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
 
     def test_close_connection(self):
         """
-        Test that connection can be closed (even when not explicitly opened)
+        Connection can be closed (even when not explicitly opened)
         """
         conn = mail.get_connection(username='', password='')
         conn.close()
 
     def test_use_as_contextmanager(self):
         """
-        Test that the connection can be used as a contextmanager.
+        The connection can be used as a contextmanager.
         """
         opened = [False]
         closed = [False]
@@ -1114,7 +1113,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
     def test_console_stream_kwarg(self):
         """
-        Test that the console backend can be pointed at an arbitrary stream.
+        The console backend can be pointed at an arbitrary stream.
         """
         s = StringIO()
         connection = mail.get_connection('django.core.mail.backends.console.EmailBackend', stream=s)
@@ -1300,7 +1299,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
     def test_auth_attempted(self):
         """
-        Test that opening the backend with non empty username/password tries
+        Opening the backend with non empty username/password tries
         to authenticate against the SMTP server.
         """
         backend = smtp.EmailBackend(
@@ -1311,7 +1310,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
     def test_server_open(self):
         """
-        Test that open() tells us whether it opened a connection.
+        open() returns whether it opened a connection.
         """
         backend = smtp.EmailBackend(username='', password='')
         self.assertFalse(backend.connection)
@@ -1405,12 +1404,12 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
                 pass
 
     def test_connection_timeout_default(self):
-        """Test that the connection's timeout value is None by default."""
+        """The connection's timeout value is None by default."""
         connection = mail.get_connection('django.core.mail.backends.smtp.EmailBackend')
         self.assertIsNone(connection.timeout)
 
     def test_connection_timeout_custom(self):
-        """Test that the timeout parameter can be customized."""
+        """The timeout parameter can be customized."""
         class MyEmailBackend(smtp.EmailBackend):
             def __init__(self, *args, **kwargs):
                 kwargs.setdefault('timeout', 42)
@@ -1428,7 +1427,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(backend.timeout, 10)
 
     def test_email_msg_uses_crlf(self):
-        """#23063 -- Test that RFC-compliant messages are sent over SMTP."""
+        """#23063 -- RFC-compliant messages are sent over SMTP."""
         send = SMTP.send
         try:
             smtp_messages = []
@@ -1453,7 +1452,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
             if PY3:
                 msg = msg.decode('utf-8')
-            # Ensure that the message only contains CRLF and not combinations of CRLF, LF, and CR.
+            # The message only contains CRLF and not combinations of CRLF, LF, and CR.
             msg = msg.replace('\r\n', '')
             self.assertNotIn('\r', msg)
             self.assertNotIn('\n', msg)

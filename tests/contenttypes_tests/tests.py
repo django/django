@@ -466,8 +466,8 @@ class ContentTypesMultidbTestCase(TestCase):
 
     def test_multidb(self):
         """
-        Test that, when using multiple databases, we use the db_for_read (see
-        #20401).
+        When using multiple databases, ContentType.objects.get_for_model() uses
+        db_for_read().
         """
         ContentType.objects.clear_cache()
 

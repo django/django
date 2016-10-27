@@ -180,7 +180,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_process_response_get_token_not_used(self):
         """
-        Check that if get_token() is not called, the view middleware does not
+        If get_token() is not called, the view middleware does not
         add a cookie.
         """
         # This is important to make pages cacheable.  Pages which do call
@@ -201,8 +201,8 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
     # Check the request processing
     def test_process_request_no_csrf_cookie(self):
         """
-        Check that if no CSRF cookies is present, the middleware rejects the
-        incoming request.  This will stop login CSRF.
+        If no CSRF cookies is present, the middleware rejects the incoming
+        request. This will stop login CSRF.
         """
         with patch_logger('django.security.csrf', 'warning') as logger_calls:
             req = self._get_POST_no_csrf_cookie_request()
@@ -212,8 +212,8 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_process_request_csrf_cookie_no_token(self):
         """
-        Check that if a CSRF cookie is present but no token, the middleware
-        rejects the incoming request.
+        If a CSRF cookie is present but no token, the middleware rejects
+        the incoming request.
         """
         with patch_logger('django.security.csrf', 'warning') as logger_calls:
             req = self._get_POST_csrf_cookie_request()
@@ -223,7 +223,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_process_request_csrf_cookie_and_token(self):
         """
-        Check that if both a cookie and a token is present, the middleware lets it through.
+        If both a cookie and a token is present, the middleware lets it through.
         """
         req = self._get_POST_request_with_token()
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
@@ -231,8 +231,8 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_process_request_csrf_cookie_no_token_exempt_view(self):
         """
-        Check that if a CSRF cookie is present and no token, but the csrf_exempt
-        decorator has been applied to the view, the middleware lets it through
+        If a CSRF cookie is present and no token, but the csrf_exempt decorator
+        has been applied to the view, the middleware lets it through
         """
         req = self._get_POST_csrf_cookie_request()
         req2 = CsrfViewMiddleware().process_view(req, csrf_exempt(post_form_view), (), {})
@@ -240,7 +240,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_csrf_token_in_header(self):
         """
-        Check that we can pass in the token in a header instead of in the form
+        The token may be passed in a header instead of in the form.
         """
         req = self._get_POST_csrf_cookie_request()
         req.META['HTTP_X_CSRFTOKEN'] = self._csrf_id
@@ -259,7 +259,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_put_and_delete_rejected(self):
         """
-        Tests that HTTP PUT and DELETE methods have protection
+        HTTP PUT and DELETE methods have protection
         """
         req = TestingHttpRequest()
         req.method = 'PUT'
@@ -277,8 +277,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_put_and_delete_allowed(self):
         """
-        Tests that HTTP PUT and DELETE methods can get through with
-        X-CSRFToken and a cookie
+        HTTP PUT and DELETE can get through with X-CSRFToken and a cookie.
         """
         req = self._get_GET_csrf_cookie_request()
         req.method = 'PUT'
@@ -295,7 +294,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
     # Tests for the template tag method
     def test_token_node_no_csrf_cookie(self):
         """
-        Check that CsrfTokenNode works when no CSRF cookie is set
+        CsrfTokenNode works when no CSRF cookie is set.
         """
         req = self._get_GET_no_csrf_cookie_request()
         resp = token_view(req)
@@ -306,7 +305,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_token_node_empty_csrf_cookie(self):
         """
-        Check that we get a new token if the csrf_cookie is the empty string
+        A new token is sent if the csrf_cookie is the empty string.
         """
         req = self._get_GET_no_csrf_cookie_request()
         req.COOKIES[settings.CSRF_COOKIE_NAME] = b""
@@ -319,7 +318,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_token_node_with_csrf_cookie(self):
         """
-        Check that CsrfTokenNode works when a CSRF cookie is set
+        CsrfTokenNode works when a CSRF cookie is set.
         """
         req = self._get_GET_csrf_cookie_request()
         CsrfViewMiddleware().process_view(req, token_view, (), {})
@@ -328,7 +327,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_get_token_for_exempt_view(self):
         """
-        Check that get_token still works for a view decorated with 'csrf_exempt'.
+        get_token still works for a view decorated with 'csrf_exempt'.
         """
         req = self._get_GET_csrf_cookie_request()
         CsrfViewMiddleware().process_view(req, csrf_exempt(token_view), (), {})
@@ -337,7 +336,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_get_token_for_requires_csrf_token_view(self):
         """
-        Check that get_token works for a view decorated solely with requires_csrf_token
+        get_token() works for a view decorated solely with requires_csrf_token.
         """
         req = self._get_GET_csrf_cookie_request()
         resp = requires_csrf_token(token_view)(req)
@@ -345,7 +344,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_token_node_with_new_csrf_cookie(self):
         """
-        Check that CsrfTokenNode works when a CSRF cookie is created by
+        CsrfTokenNode works when a CSRF cookie is created by
         the middleware (when one was not already present)
         """
         req = self._get_GET_no_csrf_cookie_request()
@@ -389,7 +388,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
     @override_settings(DEBUG=True, ALLOWED_HOSTS=['www.example.com'])
     def test_https_bad_referer(self):
         """
-        Test that a POST HTTPS request with a bad referer is rejected
+        A POST HTTPS request with a bad referer is rejected
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True

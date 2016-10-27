@@ -395,7 +395,7 @@ class ExtraRegressTests(TestCase):
 
     def test_regression_17877(self):
         """
-        Ensure that extra WHERE clauses get correctly ANDed, even when they
+        Extra WHERE clauses get correctly ANDed, even when they
         contain OR operations.
         """
         # Test Case 1: should appear in queryset.

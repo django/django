@@ -98,7 +98,7 @@ class CommonMiddlewareTest(SimpleTestCase):
     @override_settings(APPEND_SLASH=True, DEBUG=True)
     def test_append_slash_no_redirect_on_POST_in_DEBUG(self):
         """
-        Tests that while in debug mode, an exception is raised with a warning
+        While in debug mode, an exception is raised with a warning
         when a failed attempt is made to POST, PUT, or PATCH to an URL which
         would normally be redirected to a slashed version.
         """
@@ -210,7 +210,7 @@ class CommonMiddlewareTest(SimpleTestCase):
     @override_settings(APPEND_SLASH=True, DEBUG=True)
     def test_append_slash_no_redirect_on_POST_in_DEBUG_custom_urlconf(self):
         """
-        Tests that while in debug mode, an exception is raised with a warning
+        While in debug mode, an exception is raised with a warning
         when a failed attempt is made to POST to an URL which would normally be
         redirected to a slashed version.
         """

@@ -349,7 +349,7 @@ for validator, value, expected in TEST_DATA:
 
 class TestValidatorEquality(TestCase):
     """
-    Tests that validators have valid equality operators (#21638)
+    Validators have valid equality operators (#21638)
     """
 
     def test_regex_equality(self):

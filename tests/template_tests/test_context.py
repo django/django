@@ -116,7 +116,7 @@ class ContextTests(SimpleTestCase):
     def test_render_context(self):
         test_context = RenderContext({'fruit': 'papaya'})
 
-        # Test that push() limits access to the topmost dict
+        # push() limits access to the topmost dict
         test_context.push()
 
         test_context['vegetable'] = 'artichoke'

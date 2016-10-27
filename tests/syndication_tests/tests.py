@@ -283,7 +283,7 @@ class SyndicationFeedTest(FeedTestCase):
 
     def test_atom_feed_published_and_updated_elements(self):
         """
-        Test that the published and updated elements are not
+        The published and updated elements are not
         the same and now adhere to RFC 4287.
         """
         response = self.client.get('/syndication/atom/')
@@ -315,7 +315,7 @@ class SyndicationFeedTest(FeedTestCase):
 
     def test_latest_post_date(self):
         """
-        Test that both the published and updated dates are
+        Both the published and updated dates are
         considered when determining the latest post date.
         """
         # this feed has a `published` element with the latest date
@@ -370,7 +370,7 @@ class SyndicationFeedTest(FeedTestCase):
 
     def test_title_escaping(self):
         """
-        Tests that titles are escaped correctly in RSS feeds.
+        Titles are escaped correctly in RSS feeds.
         """
         response = self.client.get('/syndication/rss2/')
         doc = minidom.parseString(response.content)
@@ -382,7 +382,7 @@ class SyndicationFeedTest(FeedTestCase):
 
     def test_naive_datetime_conversion(self):
         """
-        Test that datetimes are correctly converted to the local time zone.
+        Datetimes are correctly converted to the local time zone.
         """
         # Naive date times passed in get converted to the local time zone, so
         # check the received zone offset against the local offset.
@@ -397,7 +397,7 @@ class SyndicationFeedTest(FeedTestCase):
 
     def test_aware_datetime_conversion(self):
         """
-        Test that datetimes with timezones don't get trodden on.
+        Datetimes with timezones don't get trodden on.
         """
         response = self.client.get('/syndication/aware-dates/')
         doc = minidom.parseString(response.content)
@@ -425,7 +425,7 @@ class SyndicationFeedTest(FeedTestCase):
 
     def test_feed_url(self):
         """
-        Test that the feed_url can be overridden.
+        The feed_url can be overridden.
         """
         response = self.client.get('/syndication/feedurl/')
         doc = minidom.parseString(response.content)
@@ -454,16 +454,15 @@ class SyndicationFeedTest(FeedTestCase):
 
     def test_item_link_error(self):
         """
-        Test that an ImproperlyConfigured is raised if no link could be found
-        for the item(s).
+        An ImproperlyConfigured is raised if no link could be found for the
+        item(s).
         """
         with self.assertRaises(ImproperlyConfigured):
             self.client.get('/syndication/articles/')
 
     def test_template_feed(self):
         """
-        Test that the item title and description can be overridden with
-        templates.
+        The item title and description can be overridden with templates.
         """
         response = self.client.get('/syndication/template/')
         doc = minidom.parseString(response.content)
@@ -479,7 +478,7 @@ class SyndicationFeedTest(FeedTestCase):
 
     def test_template_context_feed(self):
         """
-        Test that custom context data can be passed to templates for title
+        Custom context data can be passed to templates for title
         and description.
         """
         response = self.client.get('/syndication/template_context/')
@@ -495,7 +494,7 @@ class SyndicationFeedTest(FeedTestCase):
 
     def test_add_domain(self):
         """
-        Test add_domain() prefixes domains onto the correct URLs.
+        add_domain() prefixes domains onto the correct URLs.
         """
         self.assertEqual(
             views.add_domain('example.com', '/foo/?arg=value'),

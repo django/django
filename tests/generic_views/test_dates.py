@@ -670,9 +670,8 @@ class DateDetailViewTests(TestDataMixin, TestCase):
 
     def test_get_object_custom_queryset(self):
         """
-        Ensure that custom querysets are used when provided to
-        BaseDateDetailView.get_object()
-        Refs #16918.
+        Custom querysets are used when provided to
+        BaseDateDetailView.get_object().
         """
         res = self.client.get(
             '/dates/books/get_object_custom_queryset/2006/may/01/%s/' % self.book2.pk)

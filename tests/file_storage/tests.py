@@ -161,7 +161,7 @@ class FileStorageTests(SimpleTestCase):
             self.assertTrue(timezone.is_aware(dt))
             self.assertEqual(now.tzname(), dt.tzname())
 
-            # Check that the three timezones are indeed distinct.
+            # The three timezones are indeed distinct.
             naive_now = datetime.now()
             algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
             django_offset = timezone.get_current_timezone().utcoffset(naive_now)
@@ -192,7 +192,7 @@ class FileStorageTests(SimpleTestCase):
             # dt should be naive, in system (+1) TZ
             self.assertTrue(timezone.is_naive(dt))
 
-            # Check that the three timezones are indeed distinct.
+            # The three timezones are indeed distinct.
             naive_now = datetime.now()
             algiers_offset = now_in_algiers.tzinfo.utcoffset(naive_now)
             django_offset = timezone.get_current_timezone().utcoffset(naive_now)
@@ -484,7 +484,7 @@ class FileStorageTests(SimpleTestCase):
             with self.storage.open('raced/test.file') as f:
                 self.assertEqual(f.read(), b'saved with race')
 
-            # Check that OSErrors aside from EEXIST are still raised.
+            # OSErrors aside from EEXIST are still raised.
             with self.assertRaises(OSError):
                 self.storage.save('error/test.file', ContentFile('not saved'))
         finally:
@@ -520,7 +520,7 @@ class FileStorageTests(SimpleTestCase):
             self.storage.delete('raced.file')
             self.assertFalse(self.storage.exists('normal.file'))
 
-            # Check that OSErrors aside from ENOENT are still raised.
+            # OSErrors aside from ENOENT are still raised.
             self.storage.save('error.file', ContentFile('delete with error'))
             with self.assertRaises(OSError):
                 self.storage.delete('error.file')
@@ -988,8 +988,9 @@ class ContentFileStorageTestCase(unittest.TestCase):
 
     def test_content_saving(self):
         """
-        Test that ContentFile can be saved correctly with the filesystem storage,
-        both if it was initialized with string or unicode content"""
+        ContentFile can be saved correctly with the filesystem storage,
+        if it was initialized with either bytes or unicode content.
+        """
         self.storage.save('bytes.txt', ContentFile(b"content"))
         self.storage.save('unicode.txt', ContentFile("español"))
 

@@ -210,8 +210,7 @@ class OrderingTests(TestCase):
 
     def test_order_by_pk(self):
         """
-        Ensure that 'pk' works as an ordering option in Meta.
-        Refs #8291.
+        'pk' works as an ordering option in Meta.
         """
         Author.objects.create(pk=1)
         Author.objects.create(pk=2)
@@ -227,9 +226,8 @@ class OrderingTests(TestCase):
 
     def test_order_by_fk_attname(self):
         """
-        Ensure that ordering by a foreign key by its attribute name prevents
-        the query from inheriting its related model ordering option.
-        Refs #19195.
+        ordering by a foreign key by its attribute name prevents the query
+        from inheriting its related model ordering option (#19195).
         """
         for i in range(1, 5):
             author = Author.objects.create(pk=i)

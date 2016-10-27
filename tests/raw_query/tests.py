@@ -63,7 +63,7 @@ class RawQueryTests(TestCase):
                 setattr(orig_item, *annotation)
 
             for field in model._meta.fields:
-                # Check that all values on the model are equal
+                # All values on the model are equal
                 self.assertEqual(
                     getattr(item, field.attname),
                     getattr(orig_item, field.attname)
@@ -76,14 +76,13 @@ class RawQueryTests(TestCase):
 
     def assertNoAnnotations(self, results):
         """
-        Check that the results of a raw query contain no annotations
+        The results of a raw query contain no annotations
         """
         self.assertAnnotations(results, ())
 
     def assertAnnotations(self, results, expected_annotations):
         """
-        Check that the passed raw query results contain the expected
-        annotations
+        The passed raw query results contain the expected annotations
         """
         if expected_annotations:
             for index, result in enumerate(results):

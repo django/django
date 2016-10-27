@@ -26,7 +26,7 @@ class TestCharField(TestCase):
     def test_lookup_integer_in_charfield(self):
         self.assertEqual(Post.objects.filter(title=9).count(), 0)
 
-    @skipIf(connection.vendor == 'mysql', 'See https://code.djangoproject.com/ticket/18392')
+    @skipIf(connection.vendor == 'mysql', 'Running on MySQL requires utf8mb4 encoding (#18392)')
     def test_emoji(self):
         p = Post.objects.create(title='Smile 😀', body='Whatever.')
         p.refresh_from_db()

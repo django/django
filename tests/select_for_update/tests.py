@@ -63,7 +63,7 @@ class SelectForUpdateTests(TransactionTestCase):
     @skipUnlessDBFeature('has_select_for_update')
     def test_for_update_sql_generated(self):
         """
-        Test that the backend's FOR UPDATE variant appears in
+        The backend's FOR UPDATE variant appears in
         generated SQL when select_for_update is invoked.
         """
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
@@ -73,7 +73,7 @@ class SelectForUpdateTests(TransactionTestCase):
     @skipUnlessDBFeature('has_select_for_update_nowait')
     def test_for_update_sql_generated_nowait(self):
         """
-        Test that the backend's FOR UPDATE NOWAIT variant appears in
+        The backend's FOR UPDATE NOWAIT variant appears in
         generated SQL when select_for_update is invoked.
         """
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
@@ -83,7 +83,7 @@ class SelectForUpdateTests(TransactionTestCase):
     @skipUnlessDBFeature('has_select_for_update_skip_locked')
     def test_for_update_sql_generated_skip_locked(self):
         """
-        Test that the backend's FOR UPDATE SKIP LOCKED variant appears in
+        The backend's FOR UPDATE SKIP LOCKED variant appears in
         generated SQL when select_for_update is invoked.
         """
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
@@ -163,7 +163,7 @@ class SelectForUpdateTests(TransactionTestCase):
     @skipUnlessDBFeature('has_select_for_update')
     def test_for_update_requires_transaction(self):
         """
-        Test that a TransactionManagementError is raised
+        A TransactionManagementError is raised
         when a select_for_update query is executed outside of a transaction.
         """
         with self.assertRaises(transaction.TransactionManagementError):
@@ -172,7 +172,7 @@ class SelectForUpdateTests(TransactionTestCase):
     @skipUnlessDBFeature('has_select_for_update')
     def test_for_update_requires_transaction_only_in_execution(self):
         """
-        Test that no TransactionManagementError is raised
+        No TransactionManagementError is raised
         when select_for_update is invoked outside of a transaction -
         only when the query is executed.
         """
@@ -207,9 +207,8 @@ class SelectForUpdateTests(TransactionTestCase):
     @skipUnlessDBFeature('supports_transactions')
     def test_block(self):
         """
-        Check that a thread running a select_for_update that
-        accesses rows being touched by a similar operation
-        on another connection blocks correctly.
+        A thread running a select_for_update that accesses rows being touched
+        by a similar operation on another connection blocks correctly.
         """
         # First, let's start the transaction in our thread.
         self.start_blocking_transaction()
@@ -255,8 +254,8 @@ class SelectForUpdateTests(TransactionTestCase):
     @skipUnlessDBFeature('has_select_for_update')
     def test_raw_lock_not_available(self):
         """
-        Check that running a raw query which can't obtain a FOR UPDATE lock
-        raises the correct exception
+        Running a raw query which can't obtain a FOR UPDATE lock raises
+        the correct exception
         """
         self.start_blocking_transaction()
 

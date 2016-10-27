@@ -47,9 +47,9 @@ if HAS_POSTGRES:
 
 
 @unittest.skipUnless(HAS_POSTGRES, "The psycopg2 driver is needed for these tests")
-class TestPostgisVersionCheck(unittest.TestCase):
+class TestPostGISVersionCheck(unittest.TestCase):
     """
-    Tests that the postgis version check parses correctly the version numbers
+    The PostGIS version check parses correctly the version numbers
     """
 
     def test_get_version(self):

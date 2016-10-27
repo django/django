@@ -655,29 +655,28 @@ class LookupTests(TestCase):
 
     def test_regex_null(self):
         """
-        Ensure that a regex lookup does not fail on null/None values
+        A regex lookup does not fail on null/None values
         """
         Season.objects.create(year=2012, gt=None)
         self.assertQuerysetEqual(Season.objects.filter(gt__regex=r'^$'), [])
 
     def test_regex_non_string(self):
         """
-        Ensure that a regex lookup does not fail on non-string fields
+        A regex lookup does not fail on non-string fields
         """
         Season.objects.create(year=2013, gt=444)
         self.assertQuerysetEqual(Season.objects.filter(gt__regex=r'^444$'), ['<Season: 2013>'])
 
     def test_regex_non_ascii(self):
         """
-        Ensure that a regex lookup does not trip on non-ASCII characters.
+        A regex lookup does not trip on non-ASCII characters.
         """
         Player.objects.create(name='\u2660')
         Player.objects.get(name__regex='\u2660')
 
     def test_nonfield_lookups(self):
         """
-        Ensure that a lookup query containing non-fields raises the proper
-        exception.
+        A lookup query containing non-fields raises the proper exception.
         """
         with self.assertRaises(FieldError):
             Article.objects.filter(headline__blahblah=99)
@@ -688,12 +687,10 @@ class LookupTests(TestCase):
 
     def test_lookup_collision(self):
         """
-        Ensure that genuine field names don't collide with built-in lookup
-        types ('year', 'gt', 'range', 'in' etc.).
-        Refs #11670.
+        Genuine field names don't collide with built-in lookup types
+        ('year', 'gt', 'range', 'in' etc.) (#11670).
         """
-
-        # Here we're using 'gt' as a code number for the year, e.g. 111=>2009.
+        # 'gt' is used as a code number for the year, e.g. 111=>2009.
         season_2009 = Season.objects.create(year=2009, gt=111)
         season_2009.games.create(home="Houston Astros", away="St. Louis Cardinals")
         season_2010 = Season.objects.create(year=2010, gt=222)

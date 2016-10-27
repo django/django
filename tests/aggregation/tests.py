@@ -816,7 +816,7 @@ class AggregateTestCase(TestCase):
 
     def test_dates_with_aggregation(self):
         """
-        Test that .dates() returns a distinct set of dates when applied to a
+        .dates() returns a distinct set of dates when applied to a
         QuerySet with aggregation.
 
         Refs #18056. Previously, .dates() would return distinct (date_kind,
@@ -847,8 +847,7 @@ class AggregateTestCase(TestCase):
 
     def test_ticket17424(self):
         """
-        Check that doing exclude() on a foreign model after annotate()
-        doesn't crash.
+        Doing exclude() on a foreign model after annotate() doesn't crash.
         """
         all_books = list(Book.objects.values_list('pk', flat=True).order_by('pk'))
         annotated_books = Book.objects.order_by('pk').annotate(one=Count("id"))
@@ -868,7 +867,7 @@ class AggregateTestCase(TestCase):
 
     def test_ticket12886(self):
         """
-        Check that aggregation over sliced queryset works correctly.
+        Aggregation over sliced queryset works correctly.
         """
         qs = Book.objects.all().order_by('-rating')[0:3]
         vals = qs.aggregate(average_top3_rating=Avg('rating'))['average_top3_rating']
@@ -876,8 +875,8 @@ class AggregateTestCase(TestCase):
 
     def test_ticket11881(self):
         """
-        Check that subqueries do not needlessly contain ORDER BY, SELECT FOR UPDATE
-        or select_related() stuff.
+        Subqueries do not needlessly contain ORDER BY, SELECT FOR UPDATE or
+        select_related() stuff.
         """
         qs = Book.objects.all().select_for_update().order_by(
             'pk').select_related('publisher').annotate(max_pk=Max('pk'))

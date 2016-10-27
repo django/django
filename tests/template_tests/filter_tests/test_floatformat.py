@@ -56,14 +56,10 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(floatformat(None), '')
 
     def test_zero_values(self):
-        """
-        Check that we're not converting to scientific notation.
-        """
         self.assertEqual(floatformat(0, 6), '0.000000')
         self.assertEqual(floatformat(0, 7), '0.0000000')
         self.assertEqual(floatformat(0, 10), '0.0000000000')
-        self.assertEqual(floatformat(0.000000000000000000015, 20),
-                         '0.00000000000000000002')
+        self.assertEqual(floatformat(0.000000000000000000015, 20), '0.00000000000000000002')
 
     def test_infinity(self):
         pos_inf = float(1e30000)

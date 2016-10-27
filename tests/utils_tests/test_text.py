@@ -56,14 +56,11 @@ class TestUtilsText(SimpleTestCase):
             self.assertEqual(list(text.smart_split(test)), expected)
 
     def test_truncate_chars(self):
-        truncator = text.Truncator(
-            'The quick brown fox jumped over the lazy dog.'
-        )
+        truncator = text.Truncator('The quick brown fox jumped over the lazy dog.')
         self.assertEqual('The quick brown fox jumped over the lazy dog.', truncator.chars(100)),
         self.assertEqual('The quick brown fox ...', truncator.chars(23)),
         self.assertEqual('The quick brown fo.....', truncator.chars(23, '.....')),
 
-        # Ensure that we normalize our unicode data first
         nfc = text.Truncator('o\xfco\xfco\xfco\xfc')
         nfd = text.Truncator('ou\u0308ou\u0308ou\u0308ou\u0308')
         self.assertEqual('oüoüoüoü', nfc.chars(8))
@@ -88,7 +85,7 @@ class TestUtilsText(SimpleTestCase):
         # Make a best effort to shorten to the desired length, but requesting
         # a length shorter than the ellipsis shouldn't break
         self.assertEqual('...', text.Truncator('asdf').chars(1))
-        # Ensure that lazy strings are handled correctly
+        # lazy strings are handled correctly
         self.assertEqual(text.Truncator(lazystr('The quick brown fox')).chars(12), 'The quick...')
 
     def test_truncate_words(self):
@@ -96,7 +93,7 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual('The quick brown fox jumped over the lazy dog.', truncator.words(10))
         self.assertEqual('The quick brown fox...', truncator.words(4))
         self.assertEqual('The quick brown fox[snip]', truncator.words(4, '[snip]'))
-        # Ensure that lazy strings are handled correctly
+        # lazy strings are handled correctly
         truncator = text.Truncator(lazystr('The quick brown fox jumped over the lazy dog.'))
         self.assertEqual('The quick brown fox...', truncator.words(4))
 

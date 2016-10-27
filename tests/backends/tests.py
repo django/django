@@ -61,7 +61,7 @@ class DummyBackendTest(SimpleTestCase):
 
     def test_no_databases(self):
         """
-        Test that empty DATABASES setting default to the dummy backend.
+        Empty DATABASES setting default to the dummy backend.
         """
         DATABASES = {}
         conns = ConnectionHandler(DATABASES)
@@ -74,7 +74,7 @@ class DummyBackendTest(SimpleTestCase):
 class OracleTests(unittest.TestCase):
 
     def test_quote_name(self):
-        # Check that '%' chars are escaped for query execution.
+        # '%' chars are escaped for query execution.
         name = '"SOME%NAME"'
         quoted_name = connection.ops.quote_name(name)
         self.assertEqual(quoted_name % (), name)
@@ -122,7 +122,7 @@ class OracleTests(unittest.TestCase):
         # NLS parameters as per #18465.
         with connection.cursor() as cursor:
             query = "select 1 from dual where '1936-12-29 00:00' < sysdate"
-            # Test that the query succeeds without errors - pre #18465 this
+            # The query succeeds without errors - pre #18465 this
             # wasn't the case.
             cursor.execute(query)
             self.assertEqual(cursor.fetchone()[0], 1)
@@ -135,8 +135,8 @@ class SQLiteTests(TestCase):
 
     def test_autoincrement(self):
         """
-        Check that auto_increment fields are created with the AUTOINCREMENT
-        keyword in order to be monotonically increasing. Refs #10164.
+        auto_increment fields are created with the AUTOINCREMENT keyword
+        in order to be monotonically increasing. Refs #10164.
         """
         with connection.schema_editor(collect_sql=True) as editor:
             editor.create_model(models.Square)
@@ -211,7 +211,7 @@ class PostgreSQLTests(TestCase):
 
     def test_nodb_connection(self):
         """
-        Test that the _nodb_connection property fallbacks to the default connection
+        The _nodb_connection property fallbacks to the default connection
         database when access to the 'postgres' database is not granted.
         """
         def mocked_connect(self):
@@ -378,10 +378,7 @@ class DateQuotingTest(TestCase):
     def test_django_date_trunc(self):
         """
         Test the custom ``django_date_trunc method``, in particular against
-        fields which clash with strings passed to it (e.g. 'year') - see
-        #12818__.
-
-        __: http://code.djangoproject.com/ticket/12818
+        fields which clash with strings passed to it (e.g. 'year') (#12818).
         """
         updated = datetime.datetime(2010, 2, 20)
         models.SchoolClass.objects.create(year=2009, last_updated=updated)
@@ -391,9 +388,7 @@ class DateQuotingTest(TestCase):
     def test_django_date_extract(self):
         """
         Test the custom ``django_date_extract method``, in particular against fields
-        which clash with strings passed to it (e.g. 'day') - see #12818__.
-
-        __: http://code.djangoproject.com/ticket/12818
+        which clash with strings passed to it (e.g. 'day') (#12818).
         """
         updated = datetime.datetime(2010, 2, 20)
         models.SchoolClass.objects.create(year=2009, last_updated=updated)
@@ -420,7 +415,7 @@ class LastExecutedQueryTest(TestCase):
 
     def test_query_encoding(self):
         """
-        Test that last_executed_query() returns an Unicode string
+        last_executed_query() returns an Unicode string
         """
         data = models.RawData.objects.filter(raw_data=b'\x00\x46  \xFE').extra(select={'föö': 1})
         sql, params = data.query.sql_with_params()
@@ -431,8 +426,7 @@ class LastExecutedQueryTest(TestCase):
     @unittest.skipUnless(connection.vendor == 'sqlite',
                          "This test is specific to SQLite.")
     def test_no_interpolation_on_sqlite(self):
-        # Regression for #17158
-        # This shouldn't raise an exception
+        # This shouldn't raise an exception (##17158)
         query = "SELECT strftime('%Y', 'now');"
         connection.cursor().execute(query)
         self.assertEqual(connection.queries[-1]['sql'], query)
@@ -729,7 +723,7 @@ class BackendTestCase(TransactionTestCase):
 
     def test_database_operations_init(self):
         """
-        Test that DatabaseOperations initialization doesn't query the database.
+        DatabaseOperations initialization doesn't query the database.
         See #17656.
         """
         with self.assertNumQueries(0):
@@ -741,7 +735,7 @@ class BackendTestCase(TransactionTestCase):
         self.assertIn(connection.features.can_introspect_foreign_keys, (True, False))
 
     def test_duplicate_table_error(self):
-        """ Test that creating an existing table returns a DatabaseError """
+        """ Creating an existing table returns a DatabaseError """
         cursor = connection.cursor()
         query = 'CREATE TABLE %s (id INTEGER);' % models.Article._meta.db_table
         with self.assertRaises(DatabaseError):
@@ -749,7 +743,7 @@ class BackendTestCase(TransactionTestCase):
 
     def test_cursor_contextmanager(self):
         """
-        Test that cursors can be used as a context manager
+        Cursors can be used as a context manager
         """
         with connection.cursor() as cursor:
             self.assertIsInstance(cursor, CursorWrapper)
@@ -774,9 +768,7 @@ class BackendTestCase(TransactionTestCase):
     @skipUnlessDBFeature('test_db_allows_multiple_connections')
     def test_is_usable_after_database_disconnects(self):
         """
-        Test that is_usable() doesn't crash when the database disconnects.
-
-        Regression for #21553.
+        is_usable() doesn't crash when the database disconnects (#21553).
         """
         # Open a connection to the database.
         with connection.cursor():
@@ -816,9 +808,7 @@ class BackendTestCase(TransactionTestCase):
     @override_settings(DEBUG=True)
     def test_queries_limit(self):
         """
-        Test that the backend doesn't store an unlimited number of queries.
-
-        Regression for #12581.
+        The backend doesn't store an unlimited number of queries (#12581).
         """
         old_queries_limit = BaseDatabaseWrapper.queries_limit
         BaseDatabaseWrapper.queries_limit = 3
@@ -995,9 +985,8 @@ class ThreadTests(TransactionTestCase):
 
     def test_default_connection_thread_local(self):
         """
-        Ensure that the default connection (i.e. django.db.connection) is
-        different for each thread.
-        Refs #17258.
+        The default connection (i.e. django.db.connection) is different for
+        each thread (#17258).
         """
         # Map connections by id because connections with identical aliases
         # have the same hash.
@@ -1019,7 +1008,7 @@ class ThreadTests(TransactionTestCase):
             t = threading.Thread(target=runner)
             t.start()
             t.join()
-        # Check that each created connection got different inner connection.
+        # Each created connection got different inner connection.
         self.assertEqual(
             len(set(conn.connection for conn in connections_dict.values())),
             3)
@@ -1032,8 +1021,7 @@ class ThreadTests(TransactionTestCase):
 
     def test_connections_thread_local(self):
         """
-        Ensure that the connections are different for each thread.
-        Refs #17258.
+        The connections are different for each thread (#17258).
         """
         # Map connections by id because connections with identical aliases
         # have the same hash.
@@ -1062,8 +1050,7 @@ class ThreadTests(TransactionTestCase):
 
     def test_pass_connection_between_threads(self):
         """
-        Ensure that a connection can be passed from one thread to the other.
-        Refs #17258.
+        A connection can be passed from one thread to the other (#17258).
         """
         models.Person.objects.create(first_name="John", last_name="Doe")
 
@@ -1101,9 +1088,8 @@ class ThreadTests(TransactionTestCase):
 
     def test_closing_non_shared_connections(self):
         """
-        Ensure that a connection that is not explicitly shareable cannot be
-        closed by another thread.
-        Refs #17258.
+        A connection that is not explicitly shareable cannot be closed by
+        another thread (#17258).
         """
         # First, without explicitly enabling the connection for sharing.
         exceptions = set()

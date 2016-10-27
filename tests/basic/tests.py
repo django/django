@@ -331,7 +331,7 @@ class ModelTest(TestCase):
 
     def test_create_relation_with_ugettext_lazy(self):
         """
-        Test that ugettext_lazy objects work when saving model instances
+        ugettext_lazy objects work when saving model instances
         through various methods. Refs #10498.
         """
         notlazy = 'test'
@@ -640,9 +640,8 @@ class SelectOnSaveTests(TestCase):
 
     def test_select_on_save_lying_update(self):
         """
-        Test that select_on_save works correctly if the database
-        doesn't return correct information about matched rows from
-        UPDATE.
+        select_on_save works correctly if the database doesn't return correct
+        information about matched rows from UPDATE.
         """
         # Change the manager to not return "row matched" for update().
         # We are going to change the Article's _base_manager class

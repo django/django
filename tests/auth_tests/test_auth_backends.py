@@ -295,7 +295,7 @@ class CustomPermissionsUserModelBackendTest(BaseModelBackendTest, TestCase):
 @override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
 class CustomUserModelBackendAuthenticateTest(TestCase):
     """
-    Tests that the model backend can accept a credentials kwarg labeled with
+    The model backend can accept a credentials kwarg labeled with
     custom user model's USERNAME_FIELD.
     """
 
@@ -440,7 +440,7 @@ class AnonymousUserBackendTest(SimpleTestCase):
 @override_settings(AUTHENTICATION_BACKENDS=[])
 class NoBackendsTest(TestCase):
     """
-    Tests that an appropriate error is raised if no auth backends are provided.
+    An appropriate error is raised if no auth backends are provided.
     """
     def setUp(self):
         self.user = User.objects.create_user('test', 'test@example.com', 'test')
@@ -487,7 +487,7 @@ class PermissionDeniedBackend(object):
 
 class PermissionDeniedBackendTest(TestCase):
     """
-    Tests that other backends are not checked once a backend raises PermissionDenied
+    Other backends are not checked once a backend raises PermissionDenied
     """
     backend = 'auth_tests.test_auth_backends.PermissionDeniedBackend'
 
@@ -547,27 +547,22 @@ class ChangedBackendSettingsTest(TestCase):
     TEST_EMAIL = 'test@example.com'
 
     def setUp(self):
-        User.objects.create_user(self.TEST_USERNAME,
-                                 self.TEST_EMAIL,
-                                 self.TEST_PASSWORD)
+        User.objects.create_user(self.TEST_USERNAME, self.TEST_EMAIL, self.TEST_PASSWORD)
 
     @override_settings(AUTHENTICATION_BACKENDS=[backend])
     def test_changed_backend_settings(self):
         """
-        Tests that removing a backend configured in AUTHENTICATION_BACKENDS
-        make already logged-in users disconnect.
+        Removing a backend configured in AUTHENTICATION_BACKENDS makes already
+        logged-in users disconnect.
         """
-
         # Get a session for the test user
         self.assertTrue(self.client.login(
             username=self.TEST_USERNAME,
             password=self.TEST_PASSWORD)
         )
-
         # Prepare a request object
         request = HttpRequest()
         request.session = self.client.session
-
         # Remove NewModelBackend
         with self.settings(AUTHENTICATION_BACKENDS=[
                 'django.contrib.auth.backends.ModelBackend']):
@@ -591,9 +586,7 @@ class TypeErrorBackend(object):
 
 class TypeErrorBackendTest(TestCase):
     """
-    Tests that a TypeError within a backend is propagated properly.
-
-    Regression test for ticket #18171
+    A TypeError within a backend is propagated properly (#18171).
     """
     backend = 'auth_tests.test_auth_backends.TypeErrorBackend'
 
@@ -608,17 +601,12 @@ class TypeErrorBackendTest(TestCase):
 
 class ImproperlyConfiguredUserModelTest(TestCase):
     """
-    Tests that an exception from within get_user_model is propagated and doesn't
-    raise an UnboundLocalError.
-
-    Regression test for ticket #21439
+    An exception from within get_user_model() is propagated and doesn't
+    raise an UnboundLocalError (#21439).
     """
     def setUp(self):
         self.user1 = User.objects.create_user('test', 'test@example.com', 'test')
-        self.client.login(
-            username='test',
-            password='test'
-        )
+        self.client.login(username='test', password='test')
 
     @override_settings(AUTH_USER_MODEL='thismodel.doesntexist')
     def test_does_not_shadow_exception(self):

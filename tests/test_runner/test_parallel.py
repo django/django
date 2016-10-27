@@ -31,7 +31,7 @@ class ParallelTestRunnerTest(SimpleTestCase):
     @unittest.skipUnless(six.PY3, 'subtests were added in Python 3.4')
     def test_subtest(self):
         """
-        Check that passing subtests work.
+        Passing subtests work.
         """
         for i in range(2):
             with self.subTest(index=i):

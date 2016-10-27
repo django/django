@@ -134,7 +134,7 @@ class ChangeListTests(TestCase):
 
     def test_result_list_set_empty_value_display_on_admin_site(self):
         """
-        Test that empty value display can be set on AdminSite
+        Empty value display can be set on AdminSite.
         """
         new_child = Child.objects.create(name='name', parent=None)
         request = self.factory.get('/child/')
@@ -155,7 +155,7 @@ class ChangeListTests(TestCase):
 
     def test_result_list_set_empty_value_display_in_model_admin(self):
         """
-        Test that empty value display can be set in ModelAdmin or individual fields.
+        Empty value display can be set in ModelAdmin or individual fields.
         """
         new_child = Child.objects.create(name='name', parent=None)
         request = self.factory.get('/child/')
@@ -174,8 +174,8 @@ class ChangeListTests(TestCase):
 
     def test_result_list_html(self):
         """
-        Verifies that inclusion tag result_list generates a table when with
-        default ModelAdmin settings.
+        Inclusion tag result_list generates a table when with default
+        ModelAdmin settings.
         """
         new_parent = Parent.objects.create(name='parent')
         new_child = Child.objects.create(name='name', parent=new_parent)
@@ -672,10 +672,9 @@ class ChangeListTests(TestCase):
 
     def test_deterministic_order_for_unordered_model(self):
         """
-        Ensure that the primary key is systematically used in the ordering of
-        the changelist's results to guarantee a deterministic order, even
-        when the Model doesn't have any default ordering defined.
-        Refs #17198.
+        The primary key is used in the ordering of the changelist's results to
+        guarantee a deterministic order, even when the model doesn't have any
+        default ordering defined (#17198).
         """
         superuser = self._create_superuser('superuser')
 
@@ -717,10 +716,9 @@ class ChangeListTests(TestCase):
 
     def test_deterministic_order_for_model_ordered_by_its_manager(self):
         """
-        Ensure that the primary key is systematically used in the ordering of
-        the changelist's results to guarantee a deterministic order, even
-        when the Model has a manager that defines a default ordering.
-        Refs #17198.
+        The primary key is used in the ordering of the changelist's results to
+        guarantee a deterministic order, even when the model has a manager that
+        defines a default ordering (#17198).
         """
         superuser = self._create_superuser('superuser')
 
@@ -887,7 +885,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
     def test_add_row_selection(self):
         """
-        Ensure that the status line for selected rows gets updated correctly (#22038)
+        The status line for selected rows gets updated correctly (#22038).
         """
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:auth_user_changelist'))

@@ -176,7 +176,7 @@ def form_view_with_template(request):
 
 class BaseTestFormSet(BaseFormSet):
     def clean(self):
-        """Checks that no two email addresses are the same."""
+        """No two email addresses are the same."""
         if any(self.errors):
             # Don't bother validating the formset unless each form is valid
             return

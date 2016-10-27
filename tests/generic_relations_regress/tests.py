@@ -15,10 +15,8 @@ class GenericRelationTests(TestCase):
 
     def test_inherited_models_content_type(self):
         """
-        Test that GenericRelations on inherited classes use the correct content
-        type.
+        GenericRelations on inherited classes use the correct content type.
         """
-
         p = Place.objects.create(name="South Park")
         r = Restaurant.objects.create(name="Chubby's")
         l1 = Link.objects.create(content_object=p)
@@ -28,7 +26,7 @@ class GenericRelationTests(TestCase):
 
     def test_reverse_relation_pk(self):
         """
-        Test that the correct column name is used for the primary key on the
+        The correct column name is used for the primary key on the
         originating model of a query.  See #12664.
         """
         p = Person.objects.create(account=23, name='Chef')
@@ -52,10 +50,8 @@ class GenericRelationTests(TestCase):
 
     def test_q_object_or(self):
         """
-        Tests that SQL query parameters for generic relations are properly
-        grouped when OR is used.
-
-        Test for bug http://code.djangoproject.com/ticket/11535
+        SQL query parameters for generic relations are properly
+        grouped when OR is used (#11535).
 
         In this bug the first query (below) works while the second, with the
         query parameters the same but in reverse order, does not.
@@ -88,7 +84,7 @@ class GenericRelationTests(TestCase):
 
     def test_generic_relation_ordering(self):
         """
-        Test that ordering over a generic relation does not include extraneous
+        Ordering over a generic relation does not include extraneous
         duplicate results, nor excludes rows not participating in the relation.
         """
         p1 = Place.objects.create(name="South Park")

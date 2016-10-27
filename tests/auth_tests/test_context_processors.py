@@ -41,7 +41,7 @@ class PermWrapperTests(SimpleTestCase):
 
     def test_permwrapper_in(self):
         """
-        Test that 'something' in PermWrapper works as expected.
+        'something' in PermWrapper works as expected.
         """
         perms = PermWrapper(MockUser())
         # Works for modules and full permissions.
@@ -72,7 +72,7 @@ class AuthContextProcessorTests(TestCase):
     @override_settings(MIDDLEWARE=AUTH_MIDDLEWARE)
     def test_session_not_accessed(self):
         """
-        Tests that the session is not accessed simply by including
+        The session is not accessed simply by including
         the auth context processor
         """
         response = self.client.get('/auth_processor_no_attr_access/')
@@ -87,7 +87,7 @@ class AuthContextProcessorTests(TestCase):
     @override_settings(MIDDLEWARE=AUTH_MIDDLEWARE)
     def test_session_is_accessed(self):
         """
-        Tests that the session is accessed if the auth context processor
+        The session is accessed if the auth context processor
         is used and relevant attributes accessed.
         """
         response = self.client.get('/auth_processor_attr_access/')
@@ -130,7 +130,7 @@ class AuthContextProcessorTests(TestCase):
 
     def test_user_attrs(self):
         """
-        Test that the lazy objects returned behave just like the wrapped objects.
+        The lazy objects returned behave just like the wrapped objects.
         """
         # These are 'functional' level tests for common use cases.  Direct
         # testing of the implementation (SimpleLazyObject) is in the 'utils'

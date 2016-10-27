@@ -184,7 +184,7 @@ class LiveWidgetTests(AdminSeleniumTestCase):
 
     def test_textarea_trailing_newlines(self):
         """
-        Test that a roundtrip on a ModelForm doesn't alter the TextField value
+        A roundtrip on a ModelForm doesn't alter the TextField value
         """
         article = Article.objects.create(content="\nTst\n")
         self.selenium.get(self.live_server_url + reverse('article_form', args=[article.pk]))

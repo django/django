@@ -108,7 +108,6 @@ class ArticleAdmin(admin.ModelAdmin):
     )
 
     def changelist_view(self, request):
-        "Test that extra_context works"
         return super(ArticleAdmin, self).changelist_view(
             request, extra_context={
                 'extra_var': 'Hello!'
@@ -163,7 +162,6 @@ class CustomArticleAdmin(admin.ModelAdmin):
     delete_selected_confirmation_template = 'custom_admin/delete_selected_confirmation.html'
 
     def changelist_view(self, request):
-        "Test that extra_context works"
         return super(CustomArticleAdmin, self).changelist_view(
             request, extra_context={
                 'extra_var': 'Hello!'

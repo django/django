@@ -42,7 +42,7 @@ class TestFilenameGenerator(SimpleTestCase):
 
     def test_django_locales(self):
         """
-        Test that gen_filenames() yields the built-in Django locale files.
+        gen_filenames() yields the built-in Django locale files.
         """
         django_dir = os.path.join(os.path.dirname(conf.__file__), 'locale')
         django_mo = os.path.join(django_dir, 'nl', 'LC_MESSAGES', 'django.mo')
@@ -51,7 +51,7 @@ class TestFilenameGenerator(SimpleTestCase):
     @override_settings(LOCALE_PATHS=[LOCALE_PATH])
     def test_locale_paths_setting(self):
         """
-        Test that gen_filenames also yields from LOCALE_PATHS locales.
+        gen_filenames also yields from LOCALE_PATHS locales.
         """
         locale_paths_mo = os.path.join(LOCALE_PATH, 'nl', 'LC_MESSAGES', 'django.mo')
         self.assertFileFound(locale_paths_mo)
@@ -59,8 +59,7 @@ class TestFilenameGenerator(SimpleTestCase):
     @override_settings(INSTALLED_APPS=[])
     def test_project_root_locale(self):
         """
-        Test that gen_filenames also yields from the current directory (project
-        root).
+        gen_filenames() also yields from the current directory (project root).
         """
         old_cwd = os.getcwd()
         os.chdir(os.path.dirname(__file__))
@@ -74,7 +73,7 @@ class TestFilenameGenerator(SimpleTestCase):
     @override_settings(INSTALLED_APPS=['django.contrib.admin'])
     def test_app_locales(self):
         """
-        Test that gen_filenames also yields from locale dirs in installed apps.
+        gen_filenames() also yields from locale dirs in installed apps.
         """
         admin_dir = os.path.join(os.path.dirname(admin.__file__), 'locale')
         admin_mo = os.path.join(admin_dir, 'nl', 'LC_MESSAGES', 'django.mo')

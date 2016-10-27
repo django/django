@@ -202,7 +202,7 @@ class AssertQuerysetEqualTests(TestCase):
 
     def test_repeated_values(self):
         """
-        Test that assertQuerysetEqual checks the number of appearance of each item
+        assertQuerysetEqual checks the number of appearance of each item
         when used with option ordered=False.
         """
         batmobile = Car.objects.create(name='Batmobile')

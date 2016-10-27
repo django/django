@@ -27,11 +27,11 @@ class DjangoTemplatesTests(TemplateStringsTests):
         template = engine.from_string('{{ processors }}')
         request = RequestFactory().get('/')
 
-        # Check that context processors run
+        # Context processors run
         content = template.render({}, request)
         self.assertEqual(content, 'yes')
 
-        # Check that context overrides context processors
+        # Context overrides context processors
         content = template.render({'processors': 'no'}, request)
         self.assertEqual(content, 'no')
 

@@ -165,10 +165,8 @@ class OneToOneTests(TestCase):
 
     def test_create_models_m2m(self):
         """
-        Regression test for #1064 and #1506
-
-        Check that we create models via the m2m relation if the remote model
-        has a OneToOneField.
+        Modles are created via the m2m relation if the remote model has a
+        OneToOneField (#1064, #1506).
         """
         f = Favorites(name='Fred')
         f.save()
@@ -180,9 +178,7 @@ class OneToOneTests(TestCase):
 
     def test_reverse_object_cache(self):
         """
-        Regression test for #7173
-
-        Check that the name of the cache for the reverse object is correct.
+        The name of the cache for the reverse object is correct (#7173).
         """
         self.assertEqual(self.p1.restaurant, self.r1)
         self.assertEqual(self.p1.bar, self.b1)
@@ -516,11 +512,11 @@ class OneToOneTests(TestCase):
     def test_rel_pk_subquery(self):
         r = Restaurant.objects.first()
         q1 = Restaurant.objects.filter(place_id=r.pk)
-        # Test that subquery using primary key and a query against the
+        # Subquery using primary key and a query against the
         # same model works correctly.
         q2 = Restaurant.objects.filter(place_id__in=q1)
         self.assertSequenceEqual(q2, [r])
-        # Test that subquery using 'pk__in' instead of 'place_id__in' work, too.
+        # Subquery using 'pk__in' instead of 'place_id__in' work, too.
         q2 = Restaurant.objects.filter(
             pk__in=Restaurant.objects.filter(place__id=r.place.pk)
         )

@@ -236,7 +236,7 @@ class InspectDBTestCase(TestCase):
         self.assertIn("class InspectdbSpecialTableName(models.Model):", output)
 
     def test_managed_models(self):
-        """Test that by default the command generates models with `Meta.managed = False` (#14305)"""
+        """By default the command generates models with `Meta.managed = False` (#14305)"""
         out = StringIO()
         call_command('inspectdb',
                      table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'),

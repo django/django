@@ -498,14 +498,13 @@ class HttpResponseSubclassesTests(SimpleTestCase):
     def test_redirect(self):
         response = HttpResponseRedirect('/redirected/')
         self.assertEqual(response.status_code, 302)
-        # Test that standard HttpResponse init args can be used
+        # Standard HttpResponse init args can be used
         response = HttpResponseRedirect(
             '/redirected/',
             content='The resource has temporarily moved',
             content_type='text/html',
         )
         self.assertContains(response, 'The resource has temporarily moved', status_code=302)
-        # Test that url attribute is right
         self.assertEqual(response.url, response['Location'])
 
     def test_redirect_lazy(self):
@@ -529,7 +528,7 @@ class HttpResponseSubclassesTests(SimpleTestCase):
     def test_not_allowed(self):
         response = HttpResponseNotAllowed(['GET'])
         self.assertEqual(response.status_code, 405)
-        # Test that standard HttpResponse init args can be used
+        # Standard HttpResponse init args can be used
         response = HttpResponseNotAllowed(['GET'], content='Only the GET method is allowed', content_type='text/html')
         self.assertContains(response, 'Only the GET method is allowed', status_code=405)
 
@@ -697,18 +696,14 @@ class FileCloseTests(SimpleTestCase):
 
 class CookieTests(unittest.TestCase):
     def test_encode(self):
-        """
-        Test that we don't output tricky characters in encoded value
-        """
+        """Semicolons and commas are encoded."""
         c = SimpleCookie()
         c['test'] = "An,awkward;value"
         self.assertNotIn(";", c.output().rstrip(';'))  # IE compat
         self.assertNotIn(",", c.output().rstrip(';'))  # Safari compat
 
     def test_decode(self):
-        """
-        Test that we can still preserve semi-colons and commas
-        """
+        """Semicolons and commas are decoded."""
         c = SimpleCookie()
         c['test'] = "An,awkward;value"
         c2 = SimpleCookie()
@@ -718,9 +713,6 @@ class CookieTests(unittest.TestCase):
         self.assertEqual(c['test'].value, c3['test'])
 
     def test_decode_2(self):
-        """
-        Test that we haven't broken normal encoding
-        """
         c = SimpleCookie()
         c['test'] = b"\xf0"
         c2 = SimpleCookie()
@@ -731,13 +723,13 @@ class CookieTests(unittest.TestCase):
 
     def test_nonstandard_keys(self):
         """
-        Test that a single non-standard cookie name doesn't affect all cookies. Ticket #13007.
+        A single non-standard cookie name doesn't affect all cookies (#13007).
         """
         self.assertIn('good_cookie', parse_cookie('good_cookie=yes;bad:cookie=yes').keys())
 
     def test_repeated_nonstandard_keys(self):
         """
-        Test that a repeated non-standard name doesn't affect all cookies. Ticket #15852
+        A repeated non-standard name doesn't affect all cookies (#15852).
         """
         self.assertIn('good_cookie', parse_cookie('a:=b; a:=c; good_cookie=yes').keys())
 
@@ -788,9 +780,6 @@ class CookieTests(unittest.TestCase):
         self.assertEqual(parse_cookie('  =  b  ;  ;  =  ;   c  =  ;  '), {'': 'b', 'c': ''})
 
     def test_httponly_after_load(self):
-        """
-        Test that we can use httponly attribute on cookies that we load
-        """
         c = SimpleCookie()
         c.load("name=val")
         c['name']['httponly'] = True

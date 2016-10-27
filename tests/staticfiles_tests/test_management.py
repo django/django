@@ -45,7 +45,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
 
     def test_all_files(self):
         """
-        Test that findstatic returns all candidate files if run without --first and -v1.
+        findstatic returns all candidate files if run without --first and -v1.
         """
         result = call_command('findstatic', 'test/file.txt', verbosity=1, stdout=six.StringIO())
         lines = [l.strip() for l in result.split('\n')]
@@ -55,7 +55,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
 
     def test_all_files_less_verbose(self):
         """
-        Test that findstatic returns all candidate files if run without --first and -v0.
+        findstatic returns all candidate files if run without --first and -v0.
         """
         result = call_command('findstatic', 'test/file.txt', verbosity=0, stdout=six.StringIO())
         lines = [l.strip() for l in result.split('\n')]
@@ -65,7 +65,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
 
     def test_all_files_more_verbose(self):
         """
-        Test that findstatic returns all candidate files if run without --first and -v2.
+        findstatic returns all candidate files if run without --first and -v2.
         Also, test that findstatic returns the searched locations with -v2.
         """
         result = call_command('findstatic', 'test/file.txt', verbosity=2, stdout=six.StringIO())
@@ -140,7 +140,7 @@ class TestCollection(TestDefaults, CollectionTestCase):
     """
     def test_ignore(self):
         """
-        Test that -i patterns are ignored.
+        -i patterns are ignored.
         """
         self.assertFileNotFound('test/test.ignoreme')
 

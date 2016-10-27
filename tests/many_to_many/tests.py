@@ -475,9 +475,9 @@ class ManyToManyTests(TestCase):
         self.assertQuerysetEqual(self.a4.publications.all(), ['<Publication: Science Weekly>'])
 
     def test_forward_assign_with_queryset(self):
-        # Ensure that querysets used in m2m assignments are pre-evaluated
-        # so their value isn't affected by the clearing operation in
-        # ManyRelatedManager.set() (#19816).
+        # Querysets used in m2m assignments are pre-evaluated so their value
+        # isn't affected by the clearing operation in ManyRelatedManager.set()
+        # (#19816).
         self.a1.publications.set([self.p1, self.p2])
 
         qs = self.a1.publications.filter(title='The Python Journal')
@@ -487,9 +487,9 @@ class ManyToManyTests(TestCase):
         self.assertEqual(1, qs.count())
 
     def test_reverse_assign_with_queryset(self):
-        # Ensure that querysets used in M2M assignments are pre-evaluated
-        # so their value isn't affected by the clearing operation in
-        # ManyRelatedManager.set() (#19816).
+        # Querysets used in M2M assignments are pre-evaluated so their value
+        # isn't affected by the clearing operation in ManyRelatedManager.set()
+        # (#19816).
         self.p1.article_set.set([self.a1, self.a2])
 
         qs = self.p1.article_set.filter(headline='Django lets you build Web apps easily')

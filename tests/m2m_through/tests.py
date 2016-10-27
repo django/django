@@ -341,7 +341,7 @@ class M2mThroughTests(TestCase):
 
     def test_through_fields(self):
         """
-        Tests that relations with intermediary tables with multiple FKs
+        Relations with intermediary tables with multiple FKs
         to the M2M's ``to`` model are possible.
         """
         event = Event.objects.create(title='Rockwhale 2014')

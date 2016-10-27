@@ -214,7 +214,7 @@ class BasicExtractorTests(ExtractorTests):
         )
         with self.assertRaisesMessage(SyntaxError, msg):
             management.call_command('makemessages', locale=[LOCALE], extensions=['tpl'], verbosity=0)
-        # Check that the temporary file was cleaned up
+        # The temporary file was cleaned up
         self.assertFalse(os.path.exists('./templates/template_with_error.tpl.py'))
 
     def test_unicode_decode_error(self):
@@ -237,9 +237,8 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_template_message_context_extractor(self):
         """
-        Ensure that message contexts are correctly extracted for the
-        {% trans %} and {% blocktrans %} template tags.
-        Refs #14806.
+        Message contexts are correctly extracted for the {% trans %} and
+        {% blocktrans %} template tags (#14806).
         """
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
@@ -350,7 +349,7 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_makemessages_find_files(self):
         """
-        Test that find_files only discover files having the proper extensions.
+        find_files only discover files having the proper extensions.
         """
         cmd = MakeMessagesCommand()
         cmd.ignore_patterns = ['CVS', '.*', '*~', '*.pyc']
@@ -695,9 +694,8 @@ class CustomLayoutExtractionTests(ExtractorTests):
 
     def test_project_locale_paths(self):
         """
-        Test that:
-          * translations for an app containing a locale folder are stored in that folder
-          * translations outside of that app are in LOCALE_PATHS[0]
+        * translations for an app containing a locale folder are stored in that folder
+        * translations outside of that app are in LOCALE_PATHS[0]
         """
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'project_locale')]):
             management.call_command('makemessages', locale=[LOCALE], verbosity=0)

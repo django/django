@@ -1829,8 +1829,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
     def test_model_multiple_choice_number_of_queries(self):
         """
-        Test that ModelMultipleChoiceField does O(1) queries instead of
-        O(n) (#10156).
+        ModelMultipleChoiceField does O(1) queries instead of O(n) (#10156).
         """
         persons = [Writer.objects.create(name="Person %s" % i) for i in range(30)]
 
@@ -1839,7 +1838,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
     def test_model_multiple_choice_run_validators(self):
         """
-        Test that ModelMultipleChoiceField run given validators (#14144).
+        ModelMultipleChoiceField run given validators (#14144).
         """
         for i in range(30):
             Writer.objects.create(name="Person %s" % i)
@@ -2779,8 +2778,10 @@ class ModelFormInheritanceTests(SimpleTestCase):
         self.assertEqual(list(type(str('NewForm'), (ModelForm, Form), {'age': None})().fields.keys()), ['name'])
 
     def test_field_removal_name_clashes(self):
-        """Regression test for https://code.djangoproject.com/ticket/22510."""
-
+        """
+        Form fields can be removed in subclasses by setting them to None
+        (#22510).
+        """
         class MyForm(forms.ModelForm):
             media = forms.CharField()
 
@@ -2898,8 +2899,7 @@ class FormFieldCallbackTests(SimpleTestCase):
         self.assertEqual(list(form.base_fields), ["name"])
 
     def test_custom_callback(self):
-        """Test that a custom formfield_callback is used if provided"""
-
+        """A custom formfield_callback is used if provided"""
         callback_args = []
 
         def callback(db_field, **kwargs):
@@ -2917,8 +2917,7 @@ class FormFieldCallbackTests(SimpleTestCase):
         modelform_factory(Person, form=BaseForm, formfield_callback=callback)
         id_field, name_field = Person._meta.fields
 
-        self.assertEqual(callback_args,
-                         [(id_field, {}), (name_field, {'widget': widget})])
+        self.assertEqual(callback_args, [(id_field, {}), (name_field, {'widget': widget})])
 
     def test_bad_callback(self):
         # A bad callback provided by user still gives an error

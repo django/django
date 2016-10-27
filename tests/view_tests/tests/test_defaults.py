@@ -86,8 +86,7 @@ class DefaultsTests(TestCase):
     }])
     def test_custom_templates(self):
         """
-        Test that 404.html and 500.html templates are picked by their respective
-        handler.
+        404.html and 500.html templates are picked by their respective handler.
         """
         response = self.client.get('/server_error/')
         self.assertContains(response, "test template for a 500 error", status_code=500)

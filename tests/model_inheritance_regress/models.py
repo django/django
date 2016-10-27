@@ -167,7 +167,7 @@ class InternalCertificationAudit(CertificationAudit):
     auditing_dept = models.CharField(max_length=20)
 
 
-# Check that abstract classes don't get m2m tables autocreated.
+# Abstract classes don't get m2m tables autocreated.
 @python_2_unicode_compatible
 class Person(models.Model):
     name = models.CharField(max_length=100)

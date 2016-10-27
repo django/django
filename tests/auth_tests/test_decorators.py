@@ -17,7 +17,7 @@ class LoginRequiredTestCase(AuthViewsTestCase):
 
     def testCallable(self):
         """
-        Check that login_required is assignable to callable objects.
+        login_required is assignable to callable objects.
         """
         class CallableView(object):
             def __call__(self, *args, **kwargs):
@@ -26,7 +26,7 @@ class LoginRequiredTestCase(AuthViewsTestCase):
 
     def testView(self):
         """
-        Check that login_required is assignable to normal views.
+        login_required is assignable to normal views.
         """
         def normal_view(request):
             pass
@@ -34,8 +34,8 @@ class LoginRequiredTestCase(AuthViewsTestCase):
 
     def testLoginRequired(self, view_url='/login_required/', login_url=None):
         """
-        Check that login_required works on a simple view wrapped in a
-        login_required decorator.
+        login_required works on a simple view wrapped in a login_required
+        decorator.
         """
         if login_url is None:
             login_url = settings.LOGIN_URL
@@ -48,8 +48,8 @@ class LoginRequiredTestCase(AuthViewsTestCase):
 
     def testLoginRequiredNextUrl(self):
         """
-        Check that login_required works on a simple view wrapped in a
-        login_required decorator with a login_url set.
+        login_required works on a simple view wrapped in a login_required
+        decorator with a login_url set.
         """
         self.testLoginRequired(view_url='/login_required_login_url/', login_url='/somewhere/')
 

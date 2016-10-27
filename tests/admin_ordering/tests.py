@@ -156,7 +156,7 @@ class TestRelatedFieldsAdminOrdering(TestCase):
         self.check_ordering_of_field_choices([self.b1, self.b2])
 
     def test_custom_queryset_still_wins(self):
-        """Test that custom queryset has still precedence (#21405)"""
+        """Custom queryset has still precedence (#21405)"""
         class SongAdmin(admin.ModelAdmin):
             # Exclude one of the two Bands from the querysets
             def formfield_for_foreignkey(self, db_field, request, **kwargs):

@@ -39,7 +39,7 @@ class OptimizerTests(SimpleTestCase):
 
     def test_single(self):
         """
-        Tests that the optimizer does nothing on a single operation,
+        The optimizer does nothing on a single operation,
         and that it does it in just one pass.
         """
         self.assertOptimizesTo(
@@ -655,9 +655,9 @@ class OptimizerTests(SimpleTestCase):
 
     def test_optimize_through_fields(self):
         """
-        Checks that field-level through checking is working.
-        This should manage to collapse model Foo to nonexistence,
-        and model Bar to a single IntegerField called "width".
+        field-level through checking is working. This should manage to collapse
+        model Foo to nonexistence, and model Bar to a single IntegerField
+        called "width".
         """
         self.assertOptimizesTo(
             [

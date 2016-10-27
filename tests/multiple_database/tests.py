@@ -21,7 +21,7 @@ class QueryTestCase(TestCase):
     multi_db = True
 
     def test_db_selection(self):
-        "Check that querysets will use the default database by default"
+        "Querysets will use the default database by default"
         self.assertEqual(Book.objects.db, DEFAULT_DB_ALIAS)
         self.assertEqual(Book.objects.all().db, DEFAULT_DB_ALIAS)
 
@@ -41,7 +41,7 @@ class QueryTestCase(TestCase):
         dive.published = datetime.date(2009, 5, 4)
         dive.save()
 
-        # Check that book exists on the default database, but not on other database
+        # Book exists on the default database, but not on other database
         try:
             Book.objects.get(title="Pro Django")
             Book.objects.using('default').get(title="Pro Django")
@@ -72,7 +72,7 @@ class QueryTestCase(TestCase):
         dive.published = datetime.date(2009, 5, 4)
         dive.save(using='other')
 
-        # Check that book exists on the default database, but not on other database
+        # Book exists on the default database, but not on other database
         try:
             Book.objects.using('other').get(title="Pro Django")
         except Book.DoesNotExist:
@@ -162,7 +162,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(Book.authors.through.objects.using('default').count(), 1)
         self.assertEqual(Book.authors.through.objects.using('other').count(), 1)
 
-        # Check that queries work across m2m joins
+        # Queries work across m2m joins
         self.assertEqual(
             list(Book.objects.using('default').filter(authors__name='Marty Alchin').values_list('title', flat=True)),
             ['Pro Django']
@@ -428,7 +428,7 @@ class QueryTestCase(TestCase):
         dive = Book.objects.using('other').get(title="Dive into Python")
         self.assertEqual(dive.editor.name, "Chris Mills")
 
-        # Check that queries work across foreign key joins
+        # Queries work across foreign key joins
         self.assertEqual(
             list(Person.objects.using('default').filter(edited__title='Pro Django').values_list('name', flat=True)),
             ['George Vilches']
@@ -608,7 +608,7 @@ class QueryTestCase(TestCase):
         bob = User.objects.using('other').get(username="bob")
         self.assertEqual(bob.userprofile.flavor, "crunchy frog")
 
-        # Check that queries work across joins
+        # Queries work across joins
         self.assertEqual(
             list(
                 User.objects.using('default')
@@ -962,7 +962,7 @@ class RouterTestCase(TestCase):
     multi_db = True
 
     def test_db_selection(self):
-        "Check that querysets obey the router for db suggestions"
+        "Querysets obey the router for db suggestions"
         self.assertEqual(Book.objects.db, 'other')
         self.assertEqual(Book.objects.all().db, 'other')
 
@@ -1047,7 +1047,7 @@ class RouterTestCase(TestCase):
         # But the same query issued explicitly at a database will work.
         pro = Book.objects.using('default').get(title='Pro Django')
 
-        # Check that the update worked.
+        # The update worked.
         self.assertEqual(pro.pages, 200)
 
         # An update query with an explicit using clause will be routed
@@ -1230,7 +1230,7 @@ class RouterTestCase(TestCase):
         dive.save(using='other')
         mark.save(using='other')
 
-        # Check that we have 2 of both types of object on both databases
+        # We have 2 of both types of object on both databases
         self.assertEqual(Book.objects.using('default').count(), 2)
         self.assertEqual(Book.objects.using('other').count(), 2)
         self.assertEqual(Person.objects.using('default').count(), 2)
@@ -1513,18 +1513,18 @@ class AuthTestCase(TestCase):
         self.assertEqual(User.objects.using('other').count(), 1)
 
     def test_dumpdata(self):
-        "Check that dumpdata honors allow_migrate restrictions on the router"
+        "dumpdata honors allow_migrate restrictions on the router"
         User.objects.create_user('alice', 'alice@example.com')
         User.objects.db_manager('default').create_user('bob', 'bob@example.com')
 
-        # Check that dumping the default database doesn't try to include auth
-        # because allow_migrate prohibits auth on default
+        # dumping the default database doesn't try to include auth because
+        # allow_migrate prohibits auth on default
         new_io = StringIO()
         management.call_command('dumpdata', 'auth', format='json', database='default', stdout=new_io)
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, '[]')
 
-        # Check that dumping the other database does include auth
+        # dumping the other database does include auth
         new_io = StringIO()
         management.call_command('dumpdata', 'auth', format='json', database='other', stdout=new_io)
         command_output = new_io.getvalue().strip()
@@ -1549,14 +1549,14 @@ class FixtureTestCase(TestCase):
     @override_settings(DATABASE_ROUTERS=[AntiPetRouter()])
     def test_fixture_loading(self):
         "Multi-db fixtures are loaded correctly"
-        # Check that "Pro Django" exists on the default database, but not on other database
+        # "Pro Django" exists on the default database, but not on other database
         Book.objects.get(title="Pro Django")
         Book.objects.using('default').get(title="Pro Django")
 
         with self.assertRaises(Book.DoesNotExist):
             Book.objects.using('other').get(title="Pro Django")
 
-        # Check that "Dive into Python" exists on the default database, but not on other database
+        # "Dive into Python" exists on the default database, but not on other database
         Book.objects.using('other').get(title="Dive into Python")
 
         with self.assertRaises(Book.DoesNotExist):
@@ -1564,7 +1564,7 @@ class FixtureTestCase(TestCase):
         with self.assertRaises(Book.DoesNotExist):
             Book.objects.using('default').get(title="Dive into Python")
 
-        # Check that "Definitive Guide" exists on the both databases
+        # "Definitive Guide" exists on the both databases
         Book.objects.get(title="The Definitive Guide to Django")
         Book.objects.using('default').get(title="The Definitive Guide to Django")
         Book.objects.using('other').get(title="The Definitive Guide to Django")
@@ -1616,8 +1616,7 @@ class SignalTests(TestCase):
 
     def test_database_arg_save_and_delete(self):
         """
-        Tests that the pre/post_save signal contains the correct database.
-        (#13552)
+        The pre/post_save signal contains the correct database.
         """
         # Make some signal receivers
         pre_save_receiver = DatabaseReceiver()
@@ -1654,7 +1653,7 @@ class SignalTests(TestCase):
 
     def test_database_arg_m2m(self):
         """
-        Test that the m2m_changed signal has a correct database arg (#13552)
+        The m2m_changed signal has a correct database arg.
         """
         # Make a receiver
         receiver = DatabaseReceiver()
@@ -1717,7 +1716,7 @@ class RouterAttributeErrorTestCase(TestCase):
         return override_settings(DATABASE_ROUTERS=[AttributeErrorRouter()])
 
     def test_attribute_error_read(self):
-        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        "The AttributeError from AttributeErrorRouter bubbles up"
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
         with self.override_router():
@@ -1725,7 +1724,7 @@ class RouterAttributeErrorTestCase(TestCase):
                 Book.objects.get(pk=b.pk)
 
     def test_attribute_error_save(self):
-        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        "The AttributeError from AttributeErrorRouter bubbles up"
         dive = Book()
         dive.title = "Dive into Python"
         dive.published = datetime.date(2009, 5, 4)
@@ -1734,7 +1733,7 @@ class RouterAttributeErrorTestCase(TestCase):
                 dive.save()
 
     def test_attribute_error_delete(self):
-        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        "The AttributeError from AttributeErrorRouter bubbles up"
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
         p = Person.objects.create(name="Marty Alchin")
@@ -1745,7 +1744,7 @@ class RouterAttributeErrorTestCase(TestCase):
                 b.delete()
 
     def test_attribute_error_m2m(self):
-        "Check that the AttributeError from AttributeErrorRouter bubbles up"
+        "The AttributeError from AttributeErrorRouter bubbles up"
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
         p = Person.objects.create(name="Marty Alchin")

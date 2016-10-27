@@ -402,7 +402,7 @@ class OperationTests(OperationTestBase):
 
     def test_create_proxy_model(self):
         """
-        Tests that CreateModel ignores proxy models.
+        CreateModel ignores proxy models.
         """
         project_state = self.set_up_test_model("test_crprmo")
         # Test the state alteration
@@ -436,7 +436,7 @@ class OperationTests(OperationTestBase):
 
     def test_create_unmanaged_model(self):
         """
-        Tests that CreateModel ignores unmanaged models.
+        CreateModel ignores unmanaged models.
         """
         project_state = self.set_up_test_model("test_crummo")
         # Test the state alteration
@@ -465,7 +465,7 @@ class OperationTests(OperationTestBase):
 
     def test_create_model_managers(self):
         """
-        Tests that the managers on a model are set.
+        The managers on a model are set.
         """
         project_state = self.set_up_test_model("test_cmoma")
         # Test the state alteration
@@ -1502,7 +1502,7 @@ class OperationTests(OperationTestBase):
         self.assertColumnNotNull("test_alflin_pony", "pink")
         with connection.schema_editor() as editor:
             operation.database_forwards("test_alflin", editor, project_state, new_state)
-        # Ensure that index hasn't been dropped
+        # Index hasn't been dropped
         self.assertIndexExists("test_alflin_pony", ["pink"])
         # And test reversal
         with connection.schema_editor() as editor:
@@ -1563,7 +1563,7 @@ class OperationTests(OperationTestBase):
 
     def test_alter_model_options_emptying(self):
         """
-        Tests that the AlterModelOptions operation removes keys from the dict (#23121)
+        The AlterModelOptions operation removes keys from the dict (#23121)
         """
         project_state = self.set_up_test_model("test_almoop", options=True)
         # Test the state alteration (no DB alteration to test)
@@ -1623,7 +1623,7 @@ class OperationTests(OperationTestBase):
 
     def test_alter_model_managers(self):
         """
-        Tests that the managers on a model are set.
+        The managers on a model are set.
         """
         project_state = self.set_up_test_model("test_almoma")
         # Test the state alteration
@@ -1659,7 +1659,7 @@ class OperationTests(OperationTestBase):
 
     def test_alter_model_managers_emptying(self):
         """
-        Tests that the managers on a model are set.
+        The managers on a model are set.
         """
         project_state = self.set_up_test_model("test_almomae", manager_model=True)
         # Test the state alteration
@@ -1683,7 +1683,7 @@ class OperationTests(OperationTestBase):
 
     def test_alter_fk(self):
         """
-        Tests that creating and then altering an FK works correctly
+        Creating and then altering an FK works correctly
         and deals with the pending SQL (#23091)
         """
         project_state = self.set_up_test_model("test_alfk")
@@ -1710,7 +1710,7 @@ class OperationTests(OperationTestBase):
 
     def test_alter_fk_non_fk(self):
         """
-        Tests that altering an FK to a non-FK works (#23244)
+        Altering an FK to a non-FK works (#23244)
         """
         # Test the state alteration
         operation = migrations.AlterField(
@@ -2013,7 +2013,7 @@ class OperationTests(OperationTestBase):
 
     def test_run_python_related_assignment(self):
         """
-        #24282 - Tests that model changes to a FK reverse side update the model
+        #24282 - Model changes to a FK reverse side update the model
         on the FK side as well.
         """
 
@@ -2307,7 +2307,7 @@ class OperationTests(OperationTestBase):
         operation.state_forwards(app_label, new_state)
 
         def assertModelsAndTables(after_db):
-            # Check that tables and models exist, or don't, as they should:
+            # Tables and models exist, or don't, as they should:
             self.assertNotIn((app_label, "somethingelse"), new_state.models)
             self.assertEqual(len(new_state.models[app_label, "somethingcompletelydifferent"].fields), 1)
             self.assertNotIn((app_label, "iloveponiesonies"), new_state.models)
@@ -2337,7 +2337,7 @@ class OperationTests(OperationTestBase):
 
 class SwappableOperationTests(OperationTestBase):
     """
-    Tests that key operations ignore swappable models
+    Key operations ignore swappable models
     (we don't want to replicate all of them here, as the functionality
     is in a common base class anyway)
     """
@@ -2351,7 +2351,7 @@ class SwappableOperationTests(OperationTestBase):
     @override_settings(TEST_SWAP_MODEL="migrations.SomeFakeModel")
     def test_create_ignore_swapped(self):
         """
-        Tests that the CreateTable operation ignores swapped models.
+        The CreateTable operation ignores swapped models.
         """
         operation = migrations.CreateModel(
             "Pony",

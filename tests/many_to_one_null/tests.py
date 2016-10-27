@@ -102,7 +102,7 @@ class ManyToOneNullTests(TestCase):
         )
 
     def test_assign_with_queryset(self):
-        # Ensure that querysets used in reverse FK assignments are pre-evaluated
+        # Querysets used in reverse FK assignments are pre-evaluated
         # so their value isn't affected by the clearing operation in
         # RelatedManager.set() (#19816).
         self.r2.article_set.set([self.a2, self.a3])

@@ -15,8 +15,8 @@ class TestUtilsHtml(SimpleTestCase):
 
     def check_output(self, function, value, output=None):
         """
-        Check that function(value) equals output.  If output is None,
-        check that function(value) equals value.
+        function(value) equals output. If output is None, function(value)
+        equals value.
         """
         if output is None:
             output = value
@@ -149,10 +149,10 @@ class TestUtilsHtml(SimpleTestCase):
 
     def test_smart_urlquote(self):
         quote = html.smart_urlquote
-        # Ensure that IDNs are properly quoted
+        # IDNs are properly quoted
         self.assertEqual(quote('http://öäü.com/'), 'http://xn--4ca9at.com/')
         self.assertEqual(quote('http://öäü.com/öäü/'), 'http://xn--4ca9at.com/%C3%B6%C3%A4%C3%BC/')
-        # Ensure that everything unsafe is quoted, !*'();:@&=+$,/?#[]~ is considered safe as per RFC
+        # Everything unsafe is quoted, !*'();:@&=+$,/?#[]~ is considered safe as per RFC
         self.assertEqual(quote('http://example.com/path/öäü/'), 'http://example.com/path/%C3%B6%C3%A4%C3%BC/')
         self.assertEqual(quote('http://example.com/%C3%B6/ä/'), 'http://example.com/%C3%B6/%C3%A4/')
         self.assertEqual(quote('http://example.com/?x=1&y=2+3&z='), 'http://example.com/?x=1&y=2+3&z=')

@@ -80,7 +80,7 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         self.assertNotContains(response, 'haha', status_code=500)
 
     def test_400(self):
-        # Ensure that when DEBUG=True, technical_500_template() is called.
+        # When DEBUG=True, technical_500_template() is called.
         response = self.client.get('/raises400/')
         self.assertContains(response, '<div class="context" id="', status_code=400)
 
@@ -325,7 +325,7 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn('<p>Request data not supplied</p>', html)
 
     def test_eol_support(self):
-        """Test that the ExceptionReporter supports Unix, Windows and Macintosh EOL markers"""
+        """The ExceptionReporter supports Unix, Windows and Macintosh EOL markers"""
         LINES = list('print %d' % i for i in range(1, 6))
         reporter = ExceptionReporter(None, None, None, None)
 
@@ -789,14 +789,13 @@ class ExceptionReportTestMixin(object):
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin, SimpleTestCase):
     """
-    Ensure that sensitive information can be filtered out of error reports.
-    Refs #14614.
+    Sensitive information can be filtered out of error reports (#14614).
     """
     rf = RequestFactory()
 
     def test_non_sensitive_request(self):
         """
-        Ensure that everything (request info and frame variables) can bee seen
+        Everything (request info and frame variables) can bee seen
         in the default error reports for non-sensitive requests.
         """
         with self.settings(DEBUG=True):
@@ -809,7 +808,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
     def test_sensitive_request(self):
         """
-        Ensure that sensitive POST parameters and frame variables cannot be
+        Sensitive POST parameters and frame variables cannot be
         seen in the default error reports for sensitive requests.
         """
         with self.settings(DEBUG=True):
@@ -822,7 +821,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
     def test_paranoid_request(self):
         """
-        Ensure that no POST parameters and frame variables can be seen in the
+        No POST parameters and frame variables can be seen in the
         default error reports for "paranoid" requests.
         """
         with self.settings(DEBUG=True):
@@ -835,7 +834,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
     def test_multivalue_dict_key_error(self):
         """
-        #21098 -- Ensure that sensitive POST parameters cannot be seen in the
+        #21098 -- Sensitive POST parameters cannot be seen in the
         error reports for if request.POST['nonexistent_key'] throws an error.
         """
         with self.settings(DEBUG=True):
@@ -848,7 +847,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
     def test_custom_exception_reporter_filter(self):
         """
-        Ensure that it's possible to assign an exception reporter filter to
+        It's possible to assign an exception reporter filter to
         the request to bypass the one set in DEFAULT_EXCEPTION_REPORTER_FILTER.
         """
         with self.settings(DEBUG=True):
@@ -861,28 +860,21 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
     def test_sensitive_method(self):
         """
-        Ensure that the sensitive_variables decorator works with object
-        methods.
-        Refs #18379.
+        The sensitive_variables decorator works with object methods.
         """
         with self.settings(DEBUG=True):
-            self.verify_unsafe_response(sensitive_method_view,
-                                        check_for_POST_params=False)
-            self.verify_unsafe_email(sensitive_method_view,
-                                     check_for_POST_params=False)
+            self.verify_unsafe_response(sensitive_method_view, check_for_POST_params=False)
+            self.verify_unsafe_email(sensitive_method_view, check_for_POST_params=False)
 
         with self.settings(DEBUG=False):
-            self.verify_safe_response(sensitive_method_view,
-                                      check_for_POST_params=False)
-            self.verify_safe_email(sensitive_method_view,
-                                   check_for_POST_params=False)
+            self.verify_safe_response(sensitive_method_view, check_for_POST_params=False)
+            self.verify_safe_email(sensitive_method_view, check_for_POST_params=False)
 
     def test_sensitive_function_arguments(self):
         """
-        Ensure that sensitive variables don't leak in the sensitive_variables
-        decorator's frame, when those variables are passed as arguments to the
-        decorated function.
-        Refs #19453.
+        Sensitive variables don't leak in the sensitive_variables decorator's
+        frame, when those variables are passed as arguments to the decorated
+        function.
         """
         with self.settings(DEBUG=True):
             self.verify_unsafe_response(sensitive_args_function_caller)
@@ -894,10 +886,9 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
     def test_sensitive_function_keyword_arguments(self):
         """
-        Ensure that sensitive variables don't leak in the sensitive_variables
-        decorator's frame, when those variables are passed as keyword arguments
-        to the decorated function.
-        Refs #19453.
+        Sensitive variables don't leak in the sensitive_variables decorator's
+        frame, when those variables are passed as keyword arguments to the
+        decorated function.
         """
         with self.settings(DEBUG=True):
             self.verify_unsafe_response(sensitive_kwargs_function_caller)
@@ -980,7 +971,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
 class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptureMixin, SimpleTestCase):
     """
-    Ensure that sensitive information can be filtered out of error reports.
+    Sensitive information can be filtered out of error reports.
 
     Here we specifically test the plain text 500 debug-only error page served
     when it has been detected the request was sent by JS code. We don't check
@@ -992,7 +983,7 @@ class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptu
 
     def test_non_sensitive_request(self):
         """
-        Ensure that request info can bee seen in the default error reports for
+        Request info can bee seen in the default error reports for
         non-sensitive requests.
         """
         with self.settings(DEBUG=True):
@@ -1003,7 +994,7 @@ class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptu
 
     def test_sensitive_request(self):
         """
-        Ensure that sensitive POST parameters cannot be seen in the default
+        Sensitive POST parameters cannot be seen in the default
         error reports for sensitive requests.
         """
         with self.settings(DEBUG=True):
@@ -1014,7 +1005,7 @@ class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptu
 
     def test_paranoid_request(self):
         """
-        Ensure that no POST parameters can be seen in the default error reports
+        No POST parameters can be seen in the default error reports
         for "paranoid" requests.
         """
         with self.settings(DEBUG=True):
@@ -1025,7 +1016,7 @@ class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptu
 
     def test_custom_exception_reporter_filter(self):
         """
-        Ensure that it's possible to assign an exception reporter filter to
+        It's possible to assign an exception reporter filter to
         the request to bypass the one set in DEFAULT_EXCEPTION_REPORTER_FILTER.
         """
         with self.settings(DEBUG=True):

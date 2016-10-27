@@ -17,7 +17,7 @@ class SimpleTest(TestCase):
 
     def test_nonempty_update(self):
         """
-        Test that update changes the right number of rows for a nonempty queryset
+        Update changes the right number of rows for a nonempty queryset
         """
         num_updated = self.a1.b_set.update(y=100)
         self.assertEqual(num_updated, 20)
@@ -26,7 +26,7 @@ class SimpleTest(TestCase):
 
     def test_empty_update(self):
         """
-        Test that update changes the right number of rows for an empty queryset
+        Update changes the right number of rows for an empty queryset
         """
         num_updated = self.a2.b_set.update(y=100)
         self.assertEqual(num_updated, 0)
@@ -35,7 +35,7 @@ class SimpleTest(TestCase):
 
     def test_nonempty_update_with_inheritance(self):
         """
-        Test that update changes the right number of rows for an empty queryset
+        Update changes the right number of rows for an empty queryset
         when the update affects only a base table
         """
         num_updated = self.a1.d_set.update(y=100)
@@ -45,7 +45,7 @@ class SimpleTest(TestCase):
 
     def test_empty_update_with_inheritance(self):
         """
-        Test that update changes the right number of rows for an empty queryset
+        Update changes the right number of rows for an empty queryset
         when the update affects only a base table
         """
         num_updated = self.a2.d_set.update(y=100)
@@ -55,7 +55,7 @@ class SimpleTest(TestCase):
 
     def test_foreign_key_update_with_id(self):
         """
-        Test that update works using <field>_id for foreign keys
+        Update works using <field>_id for foreign keys
         """
         num_updated = self.a1.d_set.update(a_id=self.a2)
         self.assertEqual(num_updated, 20)

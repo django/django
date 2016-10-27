@@ -70,9 +70,7 @@ class PrefetchRelatedObjectsTests(TestCase):
             [list(book.first_time_authors.all()) for book in books]
 
     def test_m2m_then_m2m(self):
-        """
-        We can follow a m2m and another m2m.
-        """
+        """A m2m can be followed through another m2m."""
         authors = list(Author.objects.all())
         with self.assertNumQueries(2):
             prefetch_related_objects(authors, 'books__read_by')

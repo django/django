@@ -87,8 +87,7 @@ class DecoratorsTest(TestCase):
 
     def test_attributes(self):
         """
-        Tests that django decorators set certain attributes of the wrapped
-        function.
+        Built-in decorators set certain attributes of the wrapped function.
         """
         self.assertEqual(fully_decorated.__name__, 'fully_decorated')
         self.assertEqual(fully_decorated.__doc__, 'Expected __doc__')
@@ -96,8 +95,7 @@ class DecoratorsTest(TestCase):
 
     def test_user_passes_test_composition(self):
         """
-        Test that the user_passes_test decorator can be applied multiple times
-        (#9474).
+        The user_passes_test decorator can be applied multiple times (#9474).
         """
         def test1(user):
             user.decorators_applied.append('test1')
@@ -126,10 +124,7 @@ class DecoratorsTest(TestCase):
 
         self.assertEqual(response, ['test2', 'test1'])
 
-    def test_cache_page_new_style(self):
-        """
-        Test that we can call cache_page the new way
-        """
+    def test_cache_page(self):
         def my_view(request):
             return "response"
         my_view_cached = cache_page(123)(my_view)

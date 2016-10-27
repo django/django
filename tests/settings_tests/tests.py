@@ -115,7 +115,7 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
         self.assertEqual(settings.TEST, 'override')
 
     def test_setupclass_override(self):
-        """Test that settings are overridden within setUpClass -- refs #21281"""
+        """Settings are overridden within setUpClass (#21281)."""
         self.assertEqual(self.foo, 'override')
 
     @override_settings(TEST='override2')
@@ -260,7 +260,7 @@ class SettingsTests(SimpleTestCase):
 
     def test_override_settings_nested(self):
         """
-        Test that override_settings uses the actual _wrapped attribute at
+        override_settings uses the actual _wrapped attribute at
         runtime, not when it was instantiated.
         """
 

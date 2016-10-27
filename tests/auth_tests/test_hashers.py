@@ -161,7 +161,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password('lètmeinz', encoded))
         self.assertEqual(identify_hasher(encoded).algorithm, "bcrypt_sha256")
 
-        # Verify that password truncation no longer works
+        # password truncation no longer works
         password = (
             'VSK0UYV6FFQVZ0KG88DYN9WADAADZO1CTSIVDJUNZSUML6IBX7LN7ZS3R5'
             'JGB3RGZ7VI7G7DJQ9NI8BQFSRPTG6UWTTVESA5ZPUN'
@@ -210,7 +210,7 @@ class TestUtilsHashPass(SimpleTestCase):
             def setter(password):
                 state['upgraded'] = True
 
-            # Check that no upgrade is triggered.
+            # No upgrade is triggered.
             self.assertTrue(check_password('letmein', encoded, setter, 'bcrypt'))
             self.assertFalse(state['upgraded'])
 
@@ -353,7 +353,7 @@ class TestUtilsHashPass(SimpleTestCase):
             def setter(password):
                 state['upgraded'] = True
 
-            # Check that no upgrade is triggered
+            # No upgrade is triggered
             self.assertTrue(check_password('letmein', encoded, setter))
             self.assertFalse(state['upgraded'])
 
@@ -401,7 +401,7 @@ class TestUtilsHashPass(SimpleTestCase):
             algo, iterations, salt, hash = encoded.split('$', 3)
             self.assertEqual(iterations, '1')
 
-            # Check that no upgrade is triggered
+            # No upgrade is triggered
             self.assertTrue(check_password('letmein', encoded, setter))
             self.assertFalse(state['upgraded'])
 
@@ -513,7 +513,7 @@ class TestUtilsHashPassArgon2(SimpleTestCase):
             def setter(password):
                 state['upgraded'] = True
 
-            # Check that no upgrade is triggered.
+            # No upgrade is triggered.
             self.assertTrue(check_password('letmein', encoded, setter, 'argon2'))
             self.assertFalse(state['upgraded'])
 

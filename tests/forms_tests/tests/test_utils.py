@@ -38,7 +38,7 @@ class FormsUtilsTestCase(SimpleTestCase):
 
     def test_flatatt_no_side_effects(self):
         """
-        Fixes #23883 -- Check that flatatt does not modify the dict passed in
+        flatatt() does not modify the dict passed in.
         """
         attrs = {'foo': 'bar', 'true': True, 'false': False}
         attrs_copy = copy.copy(attrs)

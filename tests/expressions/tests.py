@@ -349,9 +349,9 @@ class BasicExpressionsTests(TestCase):
         self.assertSequenceEqual(qs, [e2, e3])
 
     def test_ticket_18375_join_reuse(self):
-        # Test that reverse multijoin F() references and the lookup target
-        # the same join. Pre #18375 the F() join was generated first, and the
-        # lookup couldn't reuse that join.
+        # Reverse multijoin F() references and the lookup target the same join.
+        # Pre #18375 the F() join was generated first and the lookup couldn't
+        # reuse that join.
         qs = Employee.objects.filter(
             company_ceo_set__num_chairs=F('company_ceo_set__num_employees'))
         self.assertEqual(str(qs.query).count('JOIN'), 1)
@@ -379,7 +379,7 @@ class BasicExpressionsTests(TestCase):
         self.assertEqual(str(qs.query).count('JOIN'), 1)
 
     def test_ticket_18375_chained_filters(self):
-        # Test that F() expressions do not reuse joins from previous filter.
+        # F() expressions do not reuse joins from previous filter.
         qs = Employee.objects.filter(
             company_ceo_set__num_employees=F('pk')
         ).filter(
@@ -553,7 +553,7 @@ class ExpressionsTests(TestCase):
 
     def test_patterns_escape(self):
         r"""
-        Test that special characters (e.g. %, _ and \) stored in database are
+        Special characters (e.g. %, _ and \) stored in database are
         properly escaped when using a pattern lookup with an expression
         refs #16731
         """
@@ -585,7 +585,7 @@ class ExpressionsTests(TestCase):
 
     def test_insensitive_patterns_escape(self):
         r"""
-        Test that special characters (e.g. %, _ and \) stored in database are
+        Special characters (e.g. %, _ and \) stored in database are
         properly escaped when using a case insensitive pattern lookup with an
         expression -- refs #16731
         """

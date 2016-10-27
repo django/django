@@ -186,8 +186,8 @@ class LoginRequiredMixinTests(TestCase):
 
     def test_login_required(self):
         """
-        Check that login_required works on a simple view wrapped in a
-        login_required decorator.
+        login_required works on a simple view wrapped in a login_required
+        decorator.
         """
         class AView(LoginRequiredMixin, EmptyResponseView):
             pass

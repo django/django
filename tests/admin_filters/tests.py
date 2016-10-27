@@ -891,7 +891,7 @@ class ListFiltersTests(TestCase):
 
     def test_filter_with_failing_queryset(self):
         """
-        Ensure that when a filter's queryset method fails, it fails loudly and
+        When a filter's queryset method fails, it fails loudly and
         the corresponding exception doesn't get swallowed (#17828).
         """
         modeladmin = DecadeFilterBookAdminWithFailingQueryset(Book, site)
@@ -941,8 +941,8 @@ class ListFiltersTests(TestCase):
 
     def test_parameter_ends_with__in__or__isnull(self):
         """
-        Ensure that a SimpleListFilter's parameter name is not mistaken for a
-        model field if it ends with '__isnull' or '__in' (#17091).
+        A SimpleListFilter's parameter name is not mistaken for a model field
+        if it ends with '__isnull' or '__in' (#17091).
         """
         # When it ends with '__in' -----------------------------------------
         modeladmin = DecadeFilterBookAdminParameterEndsWith__In(Book, site)

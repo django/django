@@ -22,10 +22,10 @@ from .models import (
 class ModelInheritanceTest(TestCase):
     def test_model_inheritance(self):
         # Regression for #7350, #7202
-        # Check that when you create a Parent object with a specific reference
-        # to an existent child instance, saving the Parent doesn't duplicate
-        # the child. This behavior is only activated during a raw save - it
-        # is mostly relevant to deserialization, but any sort of CORBA style
+        # When you create a Parent object with a specific reference to an
+        # existent child instance, saving the Parent doesn't duplicate the
+        # child. This behavior is only activated during a raw save - it is
+        # mostly relevant to deserialization, but any sort of CORBA style
         # 'narrow()' API would require a similar approach.
 
         # Create a child-parent-grandparent chain
@@ -49,7 +49,7 @@ class ModelInheritanceTest(TestCase):
         park = ParkingLot(parent=place2, capacity=100)
         park.save_base(raw=True)
 
-        # Check that no extra parent objects have been created.
+        # No extra parent objects have been created.
         places = list(Place.objects.all())
         self.assertEqual(places, [place1, place2])
 
@@ -325,8 +325,8 @@ class ModelInheritanceTest(TestCase):
             assignee="adrian")
 
     def test_abstract_base_class_m2m_relation_inheritance(self):
-        # Check that many-to-many relations defined on an abstract base class
-        # are correctly inherited (and created) on the child class.
+        # many-to-many relations defined on an abstract base class are
+        # correctly inherited (and created) on the child class.
         p1 = Person.objects.create(name='Alice')
         p2 = Person.objects.create(name='Bob')
         p3 = Person.objects.create(name='Carol')
@@ -348,8 +348,8 @@ class ModelInheritanceTest(TestCase):
         parties = list(p2.bachelorparty_set.all())
         self.assertEqual(parties, [bachelor])
 
-        # Check that a subclass of a subclass of an abstract model doesn't get
-        # its own accessor.
+        # A subclass of a subclass of an abstract model doesn't get its own
+        # accessor.
         self.assertFalse(hasattr(p2, 'messybachelorparty_set'))
 
         # ... but it does inherit the m2m from its parent
@@ -410,8 +410,8 @@ class ModelInheritanceTest(TestCase):
 
     def test_inherited_unique_field_with_form(self):
         """
-        Test that a model which has different primary key for the parent model
-        passes unique field checking correctly. Refs #17615.
+        A model which has different primary key for the parent model passes
+        unique field checking correctly (#17615).
         """
         class ProfileForm(forms.ModelForm):
             class Meta:
@@ -420,8 +420,7 @@ class ModelInheritanceTest(TestCase):
 
         User.objects.create(username="user_only")
         p = Profile.objects.create(username="user_with_profile")
-        form = ProfileForm({'username': "user_with_profile", 'extra': "hello"},
-                           instance=p)
+        form = ProfileForm({'username': "user_with_profile", 'extra': "hello"}, instance=p)
         self.assertTrue(form.is_valid())
 
     def test_inheritance_joins(self):
@@ -441,10 +440,7 @@ class ModelInheritanceTest(TestCase):
         self.assertEqual(str(qs.query).count('JOIN'), 1)
 
     def test_issue_21554(self):
-        senator = Senator.objects.create(
-            name='John Doe', title='X', state='Y'
-        )
-
+        senator = Senator.objects.create(name='John Doe', title='X', state='Y')
         senator = Senator.objects.get(pk=senator.pk)
         self.assertEqual(senator.name, 'John Doe')
         self.assertEqual(senator.title, 'X')
