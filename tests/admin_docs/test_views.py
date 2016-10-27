@@ -105,6 +105,10 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         response = self.client.get(reverse('django-admindocs-templates', args=['admin_doc/template_detail.html']))
         self.assertContains(response, '<h1>Template: "admin_doc/template_detail.html"</h1>', html=True)
 
+    def test_template_detail_loader(self):
+        response = self.client.get(reverse('django-admindocs-templates', args=['view_for_loader_test.html']))
+        self.assertContains(response, 'view_for_loader_test.html</code></li>', html=True)
+
     def test_missing_docutils(self):
         utils.docutils_is_available = False
         try:
