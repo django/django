@@ -612,14 +612,6 @@ tickets is useful, however, since we are using git - adopting a more :doc:`git
 oriented workflow </internals/contributing/writing-code/working-with-git>` is
 recommended.
 
-Since we never committed our changes locally, perform the following to get your
-git branch back to a good starting point:
-
-.. code-block:: console
-
-    $ git reset --hard HEAD
-    $ git checkout master
-
 More information for new contributors
 -------------------------------------
 
