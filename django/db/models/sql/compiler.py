@@ -484,6 +484,13 @@ class SQLCompiler(object):
             obj.clear_ordering(True)
         return obj.get_compiler(connection=self.connection).as_sql(subquery=True)
 
+    def as_quoted_sql(self):
+        """
+        Returns SQL for this query with adapted parameters to use in string representation.
+        """
+        sql, params = self.as_sql()
+        return sql, tuple(self.connection.ops.adapt_param(param) for param in params)
+
     def get_default_columns(self, start_alias=None, opts=None, from_parent=None):
         """
         Computes the default columns for selecting every field in the base

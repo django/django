@@ -318,6 +318,12 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a quote_name() method')
 
+    def adapt_param(self, param):
+        """
+        Returns adapted version of parameter.
+        """
+        return param
+
     def random_function_sql(self):
         """
         Returns an SQL expression that returns a random value.
