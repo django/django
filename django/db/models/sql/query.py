@@ -2012,6 +2012,17 @@ class Query(object):
         else:
             return field.null
 
+    def as_subquery_filter(self, db):
+        self._db = db
+        self.subquery = True
+        # It's safe to drop ordering if the queryset isn't using slicing,
+        # distinct(*fields) or select_for_update().
+        if (self.low_mark == 0 and self.high_mark is None and
+                not self.distinct_fields and
+                not self.select_for_update):
+            self.clear_ordering(True)
+        return self
+
 
 def get_order_dir(field, default='ASC'):
     """

@@ -1114,24 +1114,15 @@ class QuerySet(object):
 
     def _prepare_as_filter_value(self):
         if self._fields is None:
-            obj = self.values('pk')
-            obj.query._forced_pk = True
+            queryset = self.values('pk')
+            queryset.query._forced_pk = True
         else:
             # values() queryset can only be used as nested queries
             # if they are set up to select only a single field.
             if len(self._fields) > 1:
                 raise TypeError('Cannot use multi-field values as a filter value.')
-            obj = self._clone()
-        query = obj.query
-        query._db = obj._db
-        query.subquery = True
-        # It's safe to drop ordering if the queryset isn't using slicing,
-        # distinct(*fields) or select_for_update().
-        if (query.low_mark == 0 and query.high_mark is None and
-                not query.distinct_fields and
-                not query.select_for_update):
-            query.clear_ordering(True)
-        return query
+            queryset = self._clone()
+        return queryset.query.as_subquery_filter(queryset._db)
 
     def _add_hints(self, **hints):
         """
