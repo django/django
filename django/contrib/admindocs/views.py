@@ -13,6 +13,8 @@ from django.db import models
 from django.http import Http404
 from django.template import engines
 from django.template.engine import Engine
+from django.template.loaders.filesystem import Loader
+from django.template.loaders.cached import Loader as Cached_Loader
 from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
 from django.utils import six
 from django.utils.decorators import method_decorator
@@ -357,7 +359,11 @@ class TemplateDetailView(BaseAdminDocsView):
             directories = set(default_engine.dirs)
             for engine in engines.all():
                 for loader in engine.engine.template_loaders:
-                    directories.update(loader.get_dirs())
+                    if isinstance(loader, Loader):
+                        directories.update(loader.get_dirs())
+                    elif isinstance(loader, Cached_Loader):
+                        for cached_loader in loader.loaders:
+                            directories.update(cached_loader.get_dirs())
             for index, directory in enumerate(directories):
                 template_file = os.path.join(directory, template)
                 if os.path.exists(template_file):
