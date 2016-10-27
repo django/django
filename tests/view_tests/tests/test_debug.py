@@ -11,6 +11,7 @@ import sys
 import tempfile
 from unittest import skipIf
 
+from django.conf.urls import url
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import DatabaseError, connection
@@ -28,9 +29,10 @@ from django.views.debug import (
 
 from .. import BrokenException, except_args
 from ..views import (
-    custom_exception_reporter_filter_view, multivalue_dict_key_error,
-    non_sensitive_view, paranoid_view, sensitive_args_function_caller,
-    sensitive_kwargs_function_caller, sensitive_method_view, sensitive_view,
+    custom_exception_reporter_filter_view, index_page,
+    multivalue_dict_key_error, non_sensitive_view, paranoid_view,
+    sensitive_args_function_caller, sensitive_kwargs_function_caller,
+    sensitive_method_view, sensitive_view,
 )
 
 if six.PY3:
@@ -42,6 +44,10 @@ PY36 = sys.version_info >= (3, 6)
 class User(object):
     def __str__(self):
         return 'jacob'
+
+
+class WithoutEmptyPathUrls:
+    urlpatterns = [url(r'url/$', index_page, name='url')]
 
 
 class CallableSettingWrapperTests(SimpleTestCase):
@@ -114,6 +120,11 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         response = self.client.get('/not-in-urls')
         self.assertNotContains(response, "Raised by:", status_code=404)
         self.assertContains(response, "<code>not-in-urls</code>, didn't match", status_code=404)
+
+    @override_settings(ROOT_URLCONF=WithoutEmptyPathUrls)
+    def test_404_empty_path_not_in_urls(self):
+        response = self.client.get('/')
+        self.assertContains(response, "The empty path didn't match any of these.", status_code=404)
 
     def test_technical_404(self):
         response = self.client.get('/views/technical404/')
