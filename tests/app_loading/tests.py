@@ -4,7 +4,7 @@ import os
 
 from django.apps import apps
 from django.test import SimpleTestCase
-from django.test.utils import extend_sys_path
+from django.test.utils import extend_sys_path, override_settings
 from django.utils._os import upath
 
 
@@ -74,3 +74,13 @@ class GetModelsTest(SimpleTestCase):
         self.assertNotIn(
             "NotInstalledModel",
             [m.__name__ for m in apps.get_models()])
+
+
+@override_settings(INSTALLED_APPS=[
+    'app_loading.dependent_app2',
+    'app_loading.dependent_app1',
+])
+class DependentModelLoadingTest(SimpleTestCase):
+    def test_dependent_loading(self):
+        # If we get at this point, the test succeeded!
+        pass
