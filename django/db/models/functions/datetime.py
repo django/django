@@ -87,6 +87,14 @@ class ExtractDay(Extract):
     lookup_name = 'day'
 
 
+class ExtractWeek(Extract):
+    """
+    Return 1-52 or 53, based on ISO-8601, i.e., Monday is the first of the
+    week.
+    """
+    lookup_name = 'week'
+
+
 class ExtractWeekDay(Extract):
     """
     Return Sunday=1 through Saturday=7.
@@ -112,6 +120,7 @@ DateField.register_lookup(ExtractYear)
 DateField.register_lookup(ExtractMonth)
 DateField.register_lookup(ExtractDay)
 DateField.register_lookup(ExtractWeekDay)
+DateField.register_lookup(ExtractWeek)
 
 TimeField.register_lookup(ExtractHour)
 TimeField.register_lookup(ExtractMinute)

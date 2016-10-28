@@ -344,6 +344,8 @@ def _sqlite_date_extract(lookup_type, dt):
         return None
     if lookup_type == 'week_day':
         return (dt.isoweekday() % 7) + 1
+    elif lookup_type == 'week':
+        return dt.isocalendar()[1]
     else:
         return getattr(dt, lookup_type)
 
@@ -406,6 +408,8 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname):
         return None
     if lookup_type == 'week_day':
         return (dt.isoweekday() % 7) + 1
+    elif lookup_type == 'week':
+        return dt.isocalendar()[1]
     else:
         return getattr(dt, lookup_type)
 

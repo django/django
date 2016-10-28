@@ -2703,6 +2703,28 @@ When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
 current time zone before filtering. This requires :ref:`time zone definitions
 in the database <database-time-zone-definitions>`.
 
+.. fieldlookup:: week
+
+``week``
+~~~~~~~~
+
+.. versionadded:: 1.11
+
+For date and datetime fields, return the week number (1-52 or 53) according
+to `ISO-8601 <https://en.wikipedia.org/wiki/ISO-8601>`_, i.e., weeks start
+on a Monday and the first week starts on or before Thursday.
+
+Example::
+
+    Entry.objects.filter(pub_date__week=52)
+    Entry.objects.filter(pub_date__week__gte=32, pub_date__week__lte=38)
+
+(No equivalent SQL code fragment is included for this lookup because
+implementation of the relevant query varies among different database engines.)
+
+When :setting:`USE_TZ` is ``True``, fields are converted to the current time
+zone before filtering.
+
 .. fieldlookup:: week_day
 
 ``week_day``
