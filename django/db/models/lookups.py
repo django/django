@@ -26,9 +26,8 @@ class Lookup(object):
         if bilateral_transforms:
             # Warn the user as soon as possible if they are trying to apply
             # a bilateral transformation on a nested QuerySet: that won't work.
-            # We need to import QuerySet here so as to avoid circular
-            from django.db.models.query import QuerySet
-            if isinstance(rhs, QuerySet):
+            from django.db.models.sql.query import Query  # avoid circular import
+            if isinstance(rhs, Query):
                 raise NotImplementedError("Bilateral transformations on nested querysets are not supported.")
         self.bilateral_transforms = bilateral_transforms
 
@@ -79,16 +78,12 @@ class Lookup(object):
             value = value.resolve_expression(compiler.query)
         # Due to historical reasons there are a couple of different
         # ways to produce sql here. get_compiler is likely a Query
-        # instance, _as_sql QuerySet and as_sql just something with
-        # as_sql. Finally the value can of course be just plain
-        # Python value.
+        # instance and as_sql just something with as_sql. Finally the value
+        # can of course be just plain Python value.
         if hasattr(value, 'get_compiler'):
             value = value.get_compiler(connection=connection)
         if hasattr(value, 'as_sql'):
             sql, params = compiler.compile(value)
-            return '(' + sql + ')', params
-        if hasattr(value, '_as_sql'):
-            sql, params = value._as_sql(connection=connection)
             return '(' + sql + ')', params
         else:
             return self.get_db_prep_lookup(value, connection)
@@ -96,7 +91,6 @@ class Lookup(object):
     def rhs_is_direct_value(self):
         return not(
             hasattr(self.rhs, 'as_sql') or
-            hasattr(self.rhs, '_as_sql') or
             hasattr(self.rhs, 'get_compiler'))
 
     def relabeled_clone(self, relabels):
@@ -371,8 +365,7 @@ class PatternLookup(BuiltinLookup):
         # So, for Python values we don't need any special pattern, but for
         # SQL reference values or SQL transformations we need the correct
         # pattern added.
-        if (hasattr(self.rhs, 'get_compiler') or hasattr(self.rhs, 'as_sql') or
-                hasattr(self.rhs, '_as_sql') or self.bilateral_transforms):
+        if hasattr(self.rhs, 'get_compiler') or hasattr(self.rhs, 'as_sql') or self.bilateral_transforms:
             pattern = connection.pattern_ops[self.lookup_name].format(connection.pattern_esc)
             return pattern.format(rhs)
         else:

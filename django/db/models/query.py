@@ -19,9 +19,7 @@ from django.db.models.deletion import Collector
 from django.db.models.expressions import F
 from django.db.models.fields import AutoField
 from django.db.models.functions import Trunc
-from django.db.models.query_utils import (
-    InvalidQuery, Q, check_rel_lookup_compatibility,
-)
+from django.db.models.query_utils import InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR
 from django.utils import six, timezone
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -1114,36 +1112,17 @@ class QuerySet(object):
         for field, objects in other._known_related_objects.items():
             self._known_related_objects.setdefault(field, {}).update(objects)
 
-    def _prepare(self, field):
-        if self._fields is not None:
-            # values() queryset can only be used as nested queries
-            # if they are set up to select only a single field.
-            if len(self._fields or self.model._meta.concrete_fields) > 1:
-                raise TypeError('Cannot use multi-field values as a filter value.')
-        elif self.model != field.model:
-            # If the query is used as a subquery for a ForeignKey with non-pk
-            # target field, make sure to select the target field in the subquery.
-            foreign_fields = getattr(field, 'foreign_related_fields', ())
-            if len(foreign_fields) == 1 and not foreign_fields[0].primary_key:
-                return self.values(foreign_fields[0].name)
-        return self
-
-    def _as_sql(self, connection):
-        """
-        Returns the internal query's SQL and parameters (as a tuple).
-        """
-        if self._fields is not None:
-            # values() queryset can only be used as nested queries
-            # if they are set up to select only a single field.
-            if len(self._fields or self.model._meta.concrete_fields) > 1:
-                raise TypeError('Cannot use multi-field values as a filter value.')
-            clone = self._clone()
+    def _prepare_as_filter_value(self):
+        if self._fields is None:
+            queryset = self.values('pk')
+            queryset.query._forced_pk = True
         else:
-            clone = self.values('pk')
-
-        if clone._db is None or connection == connections[clone._db]:
-            return clone.query.get_compiler(connection=connection).as_nested_sql()
-        raise ValueError("Can't do subqueries with queries on different DBs.")
+            # values() queryset can only be used as nested queries
+            # if they are set up to select only a single field.
+            if len(self._fields) > 1:
+                raise TypeError('Cannot use multi-field values as a filter value.')
+            queryset = self._clone()
+        return queryset.query.as_subquery_filter(queryset._db)
 
     def _add_hints(self, **hints):
         """
@@ -1160,21 +1139,6 @@ class QuerySet(object):
         for example qs[1:]._has_filters() -> False.
         """
         return self.query.has_filters()
-
-    def is_compatible_query_object_type(self, opts, field):
-        """
-        Check that using this queryset as the rhs value for a lookup is
-        allowed. The opts are the options of the relation's target we are
-        querying against. For example in .filter(author__in=Author.objects.all())
-        the opts would be Author's (from the author field) and self.model would
-        be Author.objects.all() queryset's .model (Author also). The field is
-        the related field on the lhs side.
-        """
-        # We trust that users of values() know what they are doing.
-        if self._fields is not None:
-            return True
-        return check_rel_lookup_compatibility(self.model, opts, field)
-    is_compatible_query_object_type.queryset_only = True
 
 
 class InstanceCheckMeta(type):

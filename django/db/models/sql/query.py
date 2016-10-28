@@ -143,6 +143,7 @@ class Query(object):
         self.standard_ordering = True
         self.used_aliases = set()
         self.filter_is_sticky = False
+        self.subquery = False
 
         # SQL-related attributes
         # Select and related select clauses are expressions to use in the
@@ -319,6 +320,7 @@ class Query(object):
         else:
             obj.used_aliases = set()
         obj.filter_is_sticky = False
+        obj.subquery = self.subquery
         if 'alias_prefix' in self.__dict__:
             obj.alias_prefix = self.alias_prefix
         if 'subq_aliases' in self.__dict__:
@@ -964,6 +966,9 @@ class Query(object):
         self.append_annotation_mask([alias])
         self.annotations[alias] = annotation
 
+    def _prepare_as_filter_value(self):
+        return self.clone()
+
     def prepare_lookup_value(self, value, lookups, can_reuse, allow_joins=True):
         # Default lookup if none given is exact.
         used_joins = []
@@ -974,8 +979,7 @@ class Query(object):
         if value is None:
             if lookups[-1] not in ('exact', 'iexact'):
                 raise ValueError("Cannot use None as a query value")
-            lookups[-1] = 'isnull'
-            value = True
+            return True, ['isnull'], used_joins
         elif hasattr(value, 'resolve_expression'):
             pre_joins = self.alias_refcount.copy()
             value = value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
@@ -997,11 +1001,8 @@ class Query(object):
         # Subqueries need to use a different set of aliases than the
         # outer query. Call bump_prefix to change aliases of the inner
         # query (the value).
-        if hasattr(value, 'query') and hasattr(value.query, 'bump_prefix'):
-            value = value._clone()
-            value.query.bump_prefix(self)
-        if hasattr(value, 'bump_prefix'):
-            value = value.clone()
+        if hasattr(value, '_prepare_as_filter_value'):
+            value = value._prepare_as_filter_value()
             value.bump_prefix(self)
         # For Oracle '' is equivalent to null. The check needs to be done
         # at this stage because join promotion can't be done at compiler
@@ -1049,14 +1050,20 @@ class Query(object):
         Checks the type of object passed to query relations.
         """
         if field.is_relation:
-            # QuerySets implement is_compatible_query_object_type() to
-            # determine compatibility with the given field.
-            if hasattr(value, 'is_compatible_query_object_type'):
-                if not value.is_compatible_query_object_type(opts, field):
-                    raise ValueError(
-                        'Cannot use QuerySet for "%s": Use a QuerySet for "%s".' %
-                        (value.model._meta.object_name, opts.object_name)
-                    )
+            # Check that the field and the queryset use the same model in a
+            # query like .filter(author=Author.objects.all()). For example, the
+            # opts would be Author's (from the author field) and value.model
+            # would be Author.objects.all() queryset's .model (Author also).
+            # The field is the related field on the lhs side.
+            # If _forced_pk isn't set, this isn't a queryset query or values()
+            # or values_list() was specified by the developer in which case
+            # that choice is trusted.
+            if (getattr(value, '_forced_pk', False) and
+                    not check_rel_lookup_compatibility(value.model, opts, field)):
+                raise ValueError(
+                    'Cannot use QuerySet for "%s": Use a QuerySet for "%s".' %
+                    (value.model._meta.object_name, opts.object_name)
+                )
             elif hasattr(value, '_meta'):
                 self.check_query_object_type(value, opts, field)
             elif hasattr(value, '__iter__'):
@@ -2004,6 +2011,17 @@ class Query(object):
             return True
         else:
             return field.null
+
+    def as_subquery_filter(self, db):
+        self._db = db
+        self.subquery = True
+        # It's safe to drop ordering if the queryset isn't using slicing,
+        # distinct(*fields) or select_for_update().
+        if (self.low_mark == 0 and self.high_mark is None and
+                not self.distinct_fields and
+                not self.select_for_update):
+            self.clear_ordering(True)
+        return self
 
 
 def get_order_dir(field, default='ASC'):

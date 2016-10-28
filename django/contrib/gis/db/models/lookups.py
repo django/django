@@ -6,6 +6,7 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Expression
 from django.db.models.lookups import BuiltinLookup, Lookup, Transform
+from django.db.models.sql.query import Query
 from django.utils import six
 
 gis_lookups = {}
@@ -100,8 +101,8 @@ class GISLookup(Lookup):
         return ('%s', params)
 
     def process_rhs(self, compiler, connection):
-        if hasattr(self.rhs, '_as_sql'):
-            # If rhs is some QuerySet, don't touch it
+        if isinstance(self.rhs, Query):
+            # If rhs is some Query, don't touch it.
             return super(GISLookup, self).process_rhs(compiler, connection)
 
         geom = self.rhs

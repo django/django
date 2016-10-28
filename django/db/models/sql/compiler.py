@@ -13,6 +13,8 @@ from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError
 from django.utils.six.moves import zip
 
+FORCE = object()
+
 
 class SQLCompiler(object):
     def __init__(self, query, connection, using):
@@ -28,7 +30,6 @@ class SQLCompiler(object):
         self.annotation_col_map = None
         self.klass_info = None
         self.ordering_parts = re.compile(r'(.*)\s(ASC|DESC)(.*)')
-        self.subquery = False
 
     def setup_query(self):
         if all(self.query.alias_refcount[a] == 0 for a in self.query.tables):
@@ -355,11 +356,11 @@ class SQLCompiler(object):
             sql, params = vendor_impl(self, self.connection)
         else:
             sql, params = node.as_sql(self, self.connection)
-        if select_format and not self.subquery:
+        if select_format is FORCE or (select_format and not self.query.subquery):
             return node.output_field.select_format(self, sql, params)
         return sql, params
 
-    def as_sql(self, with_limits=True, with_col_aliases=False, subquery=False):
+    def as_sql(self, with_limits=True, with_col_aliases=False):
         """
         Creates the SQL for this query. Returns the SQL string and list of
         parameters.
@@ -367,7 +368,6 @@ class SQLCompiler(object):
         If 'with_limits' is False, any limit/offset information is not included
         in the query.
         """
-        self.subquery = subquery
         refcounts_before = self.query.alias_refcount.copy()
         try:
             extra_select, order_by, group_by = self.pre_sql_setup()
@@ -465,24 +465,6 @@ class SQLCompiler(object):
         finally:
             # Finally do cleanup - get rid of the joins we created above.
             self.query.reset_refcounts(refcounts_before)
-
-    def as_nested_sql(self):
-        """
-        Perform the same functionality as the as_sql() method, returning an
-        SQL string and parameters. However, the alias prefixes are bumped
-        beforehand (in a copy -- the current query isn't changed), and any
-        ordering is removed if the query is unsliced.
-
-        Used when nesting this query inside another.
-        """
-        obj = self.query.clone()
-        # It's safe to drop ordering if the queryset isn't using slicing,
-        # distinct(*fields) or select_for_update().
-        if (obj.low_mark == 0 and obj.high_mark is None and
-                not self.query.distinct_fields and
-                not self.query.select_for_update):
-            obj.clear_ordering(True)
-        return obj.get_compiler(connection=self.connection).as_sql(subquery=True)
 
     def get_default_columns(self, start_alias=None, opts=None, from_parent=None):
         """
@@ -1218,7 +1200,7 @@ class SQLAggregateCompiler(SQLCompiler):
         """
         sql, params = [], []
         for annotation in self.query.annotation_select.values():
-            ann_sql, ann_params = self.compile(annotation, select_format=True)
+            ann_sql, ann_params = self.compile(annotation, select_format=FORCE)
             sql.append(ann_sql)
             params.extend(ann_params)
         self.col_count = len(self.query.annotation_select)
