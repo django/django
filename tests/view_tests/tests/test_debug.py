@@ -17,7 +17,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import DatabaseError, connection
 from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.utils import LoggingCaptureMixin
+from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_bytes, force_text
@@ -260,9 +260,10 @@ class DebugViewQueriesAllowedTests(SimpleTestCase):
 class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
 
     def test_400(self):
-        # Ensure that when DEBUG=True, technical_500_template() is called.
-        response = self.client.get('/raises400/')
-        self.assertContains(response, '<div class="context" id="', status_code=400)
+        # When DEBUG=True, technical_500_template() is called.
+        with patch_logger('django.security.SuspiciousOperation', 'error'):
+            response = self.client.get('/raises400/')
+            self.assertContains(response, '<div class="context" id="', status_code=400)
 
     def test_403(self):
         response = self.client.get('/raises403/')
