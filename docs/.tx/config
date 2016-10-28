@@ -1,0 +1,57 @@
+[main]
+host = https://www.transifex.com
+
+[django-docs.internals]
+file_filter = locale/<lang>/LC_MESSAGES/internals.po
+source_file = _build/locale/internals.pot
+source_lang = en
+
+[django-docs.releases]
+file_filter = locale/<lang>/LC_MESSAGES/releases.po
+source_file = _build/locale/releases.pot
+source_lang = en
+
+[django-docs.faq]
+file_filter = locale/<lang>/LC_MESSAGES/faq.po
+source_file = _build/locale/faq.pot
+source_lang = en
+
+[django-docs.misc]
+file_filter = locale/<lang>/LC_MESSAGES/misc.po
+source_file = _build/locale/misc.pot
+source_lang = en
+
+[django-docs.topics]
+file_filter = locale/<lang>/LC_MESSAGES/topics.po
+source_file = _build/locale/topics.pot
+source_lang = en
+
+[django-docs.intro]
+file_filter = locale/<lang>/LC_MESSAGES/intro.po
+source_file = _build/locale/intro.pot
+source_lang = en
+
+[django-docs.howto]
+file_filter = locale/<lang>/LC_MESSAGES/howto.po
+source_file = _build/locale/howto.pot
+source_lang = en
+
+[django-docs.index]
+file_filter = locale/<lang>/LC_MESSAGES/index.po
+source_file = _build/locale/index.pot
+source_lang = en
+
+[django-docs.glossary-1]
+file_filter = locale/<lang>/LC_MESSAGES/glossary.po
+source_file = _build/locale/glossary.pot
+source_lang = en
+
+[django-docs.reference]
+file_filter = locale/<lang>/LC_MESSAGES/ref.po
+source_file = _build/locale/reference.pot
+source_lang = en
+
+[django-docs.contents]
+file_filter = locale/<lang>/LC_MESSAGES/contents.po
+source_file = _build/locale/contents.pot
+source_lang = en
