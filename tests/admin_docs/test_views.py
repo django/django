@@ -160,6 +160,12 @@ class AdminDocViewWithMultipleEngines(AdminDocViewTests):
         response = self.client.get(reverse('django-admindocs-tags'))
         self.assertContains(response, '<title>Template tags</title>', html=True)
 
+    def test_template_detail_loader(self):
+        # Overridden because non-trivial TEMPLATES settings aren't supported
+        # but the page shouldn't crash (#24125).
+        response = self.client.get(reverse('django-admindocs-templates', args=['view_for_loader_test.html']))
+        self.assertContains(response, '<h1>Template: "view_for_loader_test.html"</h1>', html=True)
+
 
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
 class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
