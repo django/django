@@ -822,6 +822,13 @@ class CheckboxSelectMultiple(RendererMixin, SelectMultiple):
         # never known if the value is actually omitted.
         return False
 
+    def id_for_label(self, id_):
+        """"
+        Don't include for="field_0" in <label> because clicking such a label
+        would toggle the first checkbox.
+        """
+        return ''
+
 
 class MultiWidget(Widget):
     """
