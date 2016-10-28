@@ -1490,6 +1490,7 @@ class MiscTests(SimpleTestCase):
         self.assertEqual(g('/de/'), 'de')
         self.assertEqual(g('/de-at/'), 'de-at')
         self.assertEqual(g('/de-ch/'), 'de')
+        self.assertIsNone(g('/de-simple-page/'))
 
     def test_get_language_from_path_null(self):
         from django.utils.translation.trans_null import get_language_from_path as g
@@ -1822,6 +1823,7 @@ class LocaleMiddlewareTests(TestCase):
     USE_I18N=True,
     LANGUAGES=[
         ('en', 'English'),
+        ('de', 'German'),
         ('fr', 'French'),
     ],
     MIDDLEWARE=[
@@ -1851,6 +1853,11 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
     def test_unexpected_kwarg_to_i18n_patterns(self):
         with self.assertRaisesMessage(AssertionError, "Unexpected kwargs for i18n_patterns(): {'foo':"):
             i18n_patterns(object(), foo='bar')
+
+    def test_page_with_dash(self):
+        # A page starting with /de* shouldn't match the 'de' langauge code.
+        response = self.client.get('/de-simple-page/')
+        self.assertEqual(response.content, b'Yes')
 
 
 @override_settings(
