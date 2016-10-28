@@ -7,10 +7,10 @@ during the development of Django applications.
 
 .. _troubleshooting-django-admin:
 
-Problems running django-admin
-=============================
+Problems running ``django-admin``
+=================================
 
-"command not found: django-admin"
+"command not found: `django-admin`"
 ------------------------------------
 
 :doc:`django-admin </ref/django-admin>` should be on your system path if you

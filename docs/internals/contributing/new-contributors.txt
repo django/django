@@ -145,8 +145,8 @@ FAQ
    First off, it's not personal. Django is entirely developed by volunteers
    (even the core team), and sometimes folks just don't have time. The best
    thing to do is to send a gentle reminder to the |django-developers| mailing
-   list asking for review on the ticket, or to bring it up in the #django-dev
-   IRC channel.
+   list asking for review on the ticket, or to bring it up in the
+   `#django-dev` IRC channel.
 
 2. **I'm sure my ticket is absolutely 100% perfect, can I mark it as RFC
    myself?**

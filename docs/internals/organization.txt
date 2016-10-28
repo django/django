@@ -145,7 +145,7 @@ The technical board holds two prerogatives:
 - Making major technical decisions when no consensus is found otherwise. This
   happens on the |django-developers| mailing-list.
 - Veto a grant of commit access or remove commit access. This happens on the
-  django-core mailing-list.
+  ``django-core`` mailing-list.
 
 In both cases, the technical board is a last resort. In these matters, it
 fulfills a similar function to the former Benevolent Dictators For Life.
