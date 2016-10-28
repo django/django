@@ -259,6 +259,7 @@ class SignalTests(BaseSignalTest):
                 self._run = True
                 signal.disconnect(receiver=self, sender=sender)
 
+        receivers_before = list(signals.post_save.receivers)
         a, b = Handler(1), Handler(2)
         signals.post_save.connect(a, sender=Person, weak=False)
         signals.post_save.connect(b, sender=Person, weak=False)
@@ -266,7 +267,7 @@ class SignalTests(BaseSignalTest):
 
         self.assertTrue(a._run)
         self.assertTrue(b._run)
-        self.assertEqual(signals.post_save.receivers, [])
+        self.assertEqual(signals.post_save.receivers, receivers_before)
 
     @mock.patch('weakref.ref')
     def test_lazy_model_signal(self, ref):
