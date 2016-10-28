@@ -45,7 +45,7 @@ language_code_re = re.compile(
     re.IGNORECASE
 )
 
-language_code_prefix_re = re.compile(r'^/([\w@-]+)(/|$)')
+language_code_prefix_re = re.compile(r'^/(\w+([@-]\w+)?)(/|$)')
 
 
 @receiver(setting_changed)
