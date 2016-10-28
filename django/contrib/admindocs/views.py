@@ -11,7 +11,6 @@ from django.contrib.admindocs import utils
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.db import models
 from django.http import Http404
-from django.template import engines
 from django.template.engine import Engine
 from django.template.loaders.cached import Loader as Cached_Loader
 from django.template.loaders.filesystem import Loader
