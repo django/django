@@ -23,3 +23,6 @@ Bugfixes
 
 * Fixed ``QuerySet.bulk_create()`` on PostgreSQL when the number of objects is
   a multiple plus one of ``batch_size`` (:ticket:`27385`).
+
+* Prevented ``i18n_patterns()`` from using too much of the URL as the language
+  to fix a use case for ``prefix_default_language=False`` (:ticket:`27063`).
