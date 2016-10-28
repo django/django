@@ -357,13 +357,12 @@ class TemplateDetailView(BaseAdminDocsView):
             pass
         else:
             directories = set(default_engine.dirs)
-            for engine in engines.all():
-                for loader in engine.engine.template_loaders:
-                    if isinstance(loader, Loader):
-                        directories.update(loader.get_dirs())
-                    elif isinstance(loader, Cached_Loader):
-                        for cached_loader in loader.loaders:
-                            directories.update(cached_loader.get_dirs())
+            for loader in default_engine.template_loaders:
+                if isinstance(loader, Loader):
+                    directories.update(loader.get_dirs())
+                elif isinstance(loader, Cached_Loader):
+                    for cached_loader in loader.loaders:
+                        directories.update(cached_loader.get_dirs())
             for index, directory in enumerate(directories):
                 template_file = os.path.join(directory, template)
                 if os.path.exists(template_file):
