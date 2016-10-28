@@ -98,6 +98,9 @@ Minor features
   ``password_reset_confirm()``, and ``password_reset_complete()`` function-based
   views.
 
+* :func:`~django.contrib.auth.get_user_model` can be called at import time,
+  even in modules that define models.
+
 * The new ``post_reset_login`` attribute for
   :class:`~django.contrib.auth.views.PasswordResetConfirmView` allows
   automatically logging in a user after a successful password reset.
@@ -578,6 +581,16 @@ Miscellaneous
 
 * ``ConditionalGetMiddleware`` no longer sets the ``Date`` header as Web
   servers set that header.
+
+* :meth:`~django.apps.AppConfig.get_model` raises
+  :exc:`~django.core.exceptions.AppRegistryNotReady` if it's called before
+  models of all applications have been loaded. Previously it only required
+  the target application's models to be loaded and thus could return models
+  without all their relations set up. If you need the old behavior, you can
+  set the ``require_ready`` argument to ``False``.
+
+  :meth:`~django.apps.AppConfig.get_models` changed similarly, but
+  doesn't have a ``require_ready`` argument.
 
 .. _deprecated-features-1.11:
 

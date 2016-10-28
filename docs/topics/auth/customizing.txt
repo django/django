@@ -450,33 +450,10 @@ different User model.
     currently active User model -- the custom User model if one is specified, or
     :class:`~django.contrib.auth.models.User` otherwise.
 
-    When you define a foreign key or many-to-many relations to the User model,
-    you should specify the custom model using the :setting:`AUTH_USER_MODEL`
-    setting. For example::
+    .. versionchanged:: 1.11
 
-        from django.conf import settings
-        from django.db import models
-
-        class Article(models.Model):
-            author = models.ForeignKey(
-                settings.AUTH_USER_MODEL,
-                on_delete=models.CASCADE,
-            )
-
-    When connecting to signals sent by the ``User`` model, you should specify
-    the custom model using the :setting:`AUTH_USER_MODEL` setting. For example::
-
-        from django.conf import settings
-        from django.db.models.signals import post_save
-
-        def post_save_receiver(sender, instance, created, **kwargs):
-            pass
-
-        post_save.connect(post_save_receiver, sender=settings.AUTH_USER_MODEL)
-
-    Generally speaking, you should reference the User model with the
-    :setting:`AUTH_USER_MODEL` setting in code that is executed at import
-    time. ``get_user_model()`` only works once Django has imported all models.
+        It is now possible to call ``get_user_model()`` while Django is
+        importing models.
 
 .. _specifying-custom-user-model:
 
