@@ -24,7 +24,7 @@ they should be clarified in any way, please take 30 seconds to fill out a
 ticket here: https://code.djangoproject.com/newticket
 
 To get more help:
-
+test by alex
 * Join the #django channel on irc.freenode.net. Lots of helpful people hang out
   there. Read the archives at http://django-irc-logs.com/.
 
