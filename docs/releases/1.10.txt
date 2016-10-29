@@ -910,6 +910,15 @@ Miscellaneous
 * Private API ``django.forms.models.model_to_dict()`` returns a queryset rather
   than a list of primary keys for ``ManyToManyField``\s .
 
+* If ``django.contrib.staticfiles`` is
+  installed, the :ttag:`static`  template tag uses the ``staticfiles`` storage
+  to construct the URL rather than simply joining the value with
+  ``STATIC_ROOT``. The new approach encodes the URL, which could be
+  backwards-incompatible in cases such as including a fragment in a path, e.g.
+  ``{% static 'img.svg#fragment' %}``, since the ``#`` is encoded as ``%23``.
+  To adapt, move the fragment outside the template tag:
+  ``{% static 'img.svg' %}#fragment``.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
