@@ -418,8 +418,27 @@ Working with lazy translation objects
 -------------------------------------
 
 The result of a ``ugettext_lazy()`` call can be used wherever you would use a
-unicode string (an object with type ``unicode``) in Python. If you try to use
-it where a bytestring (a ``str`` object) is expected, things will not work as
+unicode text string (an object with type :class:`str`) in other Django code.
+It may also work with other arbitrary Python code, but there are some
+exceptions. For example:
+
+.. code-block:: python
+
+    # This will not work as expected, because the third-party `requests`
+    # package does not handle Django's ugettext_lazy objects:
+    body = ugettext_lazy("I \u2764 Django")  # (unicode :heart:)
+    requests.post('https://example.com/send', data={'body': body})
+
+    # Solution: cast ugettext_lazy results to text:
+    requests.post('https://example.com/send', data={'body': str(body)})
+
+In general, you can avoid such problems by casting ``ugettext_lazy()`` objects
+to text strings just before passing them to non-Django code. In Python 3,
+convert to :class:`str` as shown above. In Python 2, convert to ``unicode``. Or
+for portable code, use :data:`six.text_type`.
+
+If you try to use a ``ugettext_lazy()`` result where a bytestring (a
+:class:`bytes` object) is expected, things will not work as
 expected, since a ``ugettext_lazy()`` object doesn't know how to convert
 itself to a bytestring. You can't use a unicode string inside a bytestring,
 either, so this is consistent with normal Python behavior. For example::
