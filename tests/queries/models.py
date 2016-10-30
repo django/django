@@ -526,8 +526,8 @@ class Job(models.Model):
 
 
 class JobResponsibilities(models.Model):
-    job = models.ForeignKey(Job, models.SET_NULL, to_field='name')
-    responsibility = models.ForeignKey('Responsibility', models.SET_NULL, to_field='description')
+    job = models.ForeignKey(Job, models.CASCADE, to_field='name')
+    responsibility = models.ForeignKey('Responsibility', models.CASCADE, to_field='description')
 
 
 @python_2_unicode_compatible
@@ -620,7 +620,7 @@ class Order(models.Model):
 
 @python_2_unicode_compatible
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, models.SET_NULL, related_name='items')
+    order = models.ForeignKey(Order, models.CASCADE, related_name='items')
     status = models.IntegerField()
 
     class Meta:
@@ -637,8 +637,8 @@ class BaseUser(models.Model):
 @python_2_unicode_compatible
 class Task(models.Model):
     title = models.CharField(max_length=10)
-    owner = models.ForeignKey(BaseUser, models.SET_NULL, related_name='owner')
-    creator = models.ForeignKey(BaseUser, models.SET_NULL, related_name='creator')
+    owner = models.ForeignKey(BaseUser, models.CASCADE, related_name='owner')
+    creator = models.ForeignKey(BaseUser, models.CASCADE, related_name='creator')
 
     def __str__(self):
         return self.title
@@ -654,7 +654,7 @@ class Staff(models.Model):
 
 @python_2_unicode_compatible
 class StaffUser(BaseUser):
-    staff = models.OneToOneField(Staff, models.SET_NULL, related_name='user')
+    staff = models.OneToOneField(Staff, models.CASCADE, related_name='user')
 
     def __str__(self):
         return self.staff

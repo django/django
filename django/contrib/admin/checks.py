@@ -11,6 +11,7 @@ from django.contrib.admin.utils import (
 from django.core import checks
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
+from django.db.models.constants import LOOKUP_SEP
 from django.forms.models import (
     BaseModelForm, BaseModelFormSet, _get_foreign_key,
 )
@@ -458,7 +459,7 @@ class BaseModelAdminChecks(object):
             ]
         elif field_name == '?':
             return []
-        elif '__' in field_name:
+        elif LOOKUP_SEP in field_name:
             # Skip ordering in the format field1__field2 (FIXME: checking
             # this format would be nice, but it's a little fiddly).
             return []

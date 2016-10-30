@@ -191,7 +191,7 @@ class TruncBase(TimezoneMixin, Transform):
                 if value is None:
                     raise ValueError(
                         "Database returned an invalid datetime value. "
-                        "Are time zone definitions for your database and pytz installed?"
+                        "Are time zone definitions for your database installed?"
                     )
                 value = value.replace(tzinfo=None)
                 value = timezone.make_aware(value, self.tzinfo)

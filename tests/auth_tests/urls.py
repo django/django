@@ -67,6 +67,7 @@ urlpatterns = auth_urlpatterns + [
     url(r'^logout/custom_query/$', views.LogoutView.as_view(redirect_field_name='follow')),
     url(r'^logout/next_page/$', views.LogoutView.as_view(next_page='/somewhere/')),
     url(r'^logout/next_page/named/$', views.LogoutView.as_view(next_page='password_reset')),
+    url(r'^logout/allowed_hosts/$', views.LogoutView.as_view(success_url_allowed_hosts={'otherserver'})),
     url(r'^remote_user/$', remote_user_auth_view),
 
     url(r'^password_reset_from_email/$',
@@ -106,6 +107,8 @@ urlpatterns = auth_urlpatterns + [
     url(r'^login/redirect_authenticated_user_default/$', views.LoginView.as_view()),
     url(r'^login/redirect_authenticated_user/$',
         views.LoginView.as_view(redirect_authenticated_user=True)),
+    url(r'^login/allowed_hosts/$',
+        views.LoginView.as_view(success_url_allowed_hosts={'otherserver'})),
 
     # This line is only required to render the password reset with is_admin=True
     url(r'^admin/', admin.site.urls),

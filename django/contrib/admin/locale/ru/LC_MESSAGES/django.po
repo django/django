@@ -4,6 +4,7 @@
 # Ivan Ivaschenko <defuz.net@gmail.com>, 2013
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
+# Eugene MechanisM <eugene@mechanism.pro>, 2016
 # inoks <inoks@mail.ru>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Алексей Борискин <sun.void@gmail.com>, 2012-2015
@@ -12,8 +13,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-03 13:13+0000\n"
-"Last-Translator: inoks <inoks@mail.ru>\n"
+"PO-Revision-Date: 2016-09-01 05:25+0000\n"
+"Last-Translator: Eugene MechanisM <eugene@mechanism.pro>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -147,6 +148,7 @@ msgstr "Добавлено."
 msgid "and"
 msgstr "и"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr "Изменено {fields} у {name} \"{object}\"."
 
@@ -478,7 +480,7 @@ msgid "You don't have permission to edit anything."
 msgstr "У вас недостаточно прав для редактирования."
 
 msgid "Recent actions"
-msgstr "Крайние действия"
+msgstr "Последние действия"
 
 msgid "My actions"
 msgstr "Мои действия"

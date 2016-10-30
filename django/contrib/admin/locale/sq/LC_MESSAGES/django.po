@@ -142,6 +142,7 @@ msgstr "U shtua."
 msgid "and"
 msgstr " dhe "
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr ""
 

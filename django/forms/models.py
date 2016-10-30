@@ -19,7 +19,7 @@ from django.forms.widgets import (
     HiddenInput, MultipleHiddenInput, SelectMultiple,
 )
 from django.utils import six
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_text
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext, ugettext_lazy as _
 
@@ -54,8 +54,8 @@ def construct_instance(form, instance, fields=None, exclude=None):
             continue
         # Leave defaults for fields that aren't in POST data, except for
         # checkbox inputs because they don't appear in POST data if not checked.
-        if (f.has_default() and f.name not in form.data and
-                not getattr(form[f.name].field.widget, 'dont_use_model_field_default_for_empty_data', False)):
+        if (f.has_default() and
+                form[f.name].field.widget.value_omitted_from_data(form.data, form.files, form.add_prefix(f.name))):
             continue
         # Defer saving file-type fields until after the other fields, so a
         # callable upload_to can use the values from other fields.
@@ -1186,7 +1186,7 @@ class ModelChoiceField(ChoiceField):
         generate the labels for the choices presented by this object. Subclasses
         can override this method to customize the display of the choices.
         """
-        return smart_text(obj)
+        return force_text(obj)
 
     def _get_choices(self):
         # If self._choices is set, then somebody must have manually set

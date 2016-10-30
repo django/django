@@ -117,9 +117,9 @@ Imports
 
       # try/except
       try:
-          import pytz
+          import yaml
       except ImportError:
-          pytz = None
+          yaml = None
 
       CONSTANT = 'foo'
 

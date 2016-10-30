@@ -212,9 +212,9 @@ def get_language_from_path(path):
     return _trans.get_language_from_path(path)
 
 
-def templatize(src, origin=None):
+def templatize(src, **kwargs):
     from .template import templatize
-    return templatize(src, origin)
+    return templatize(src, **kwargs)
 
 
 def deactivate_all():
@@ -255,7 +255,7 @@ def get_language_info(lang_code):
         info['name_translated'] = ugettext_lazy(info['name'])
     return info
 
-trim_whitespace_re = re.compile('\s*\n\s*')
+trim_whitespace_re = re.compile(r'\s*\n\s*')
 
 
 def trim_whitespace(s):

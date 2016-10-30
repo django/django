@@ -80,9 +80,9 @@ In a class-based view, this would become::
 
 Because Django's URL resolver expects to send the request and associated
 arguments to a callable function, not a class, class-based views have an
-:meth:`~django.views.generic.base.View.as_view` class method which serves as
-the callable entry point to your class. The ``as_view`` entry point creates an
-instance of your class and calls its
+:meth:`~django.views.generic.base.View.as_view` class method which returns a
+function that can be called when a request arrives for a URL matching the
+associated pattern. The function creates an instance of the class and calls its
 :meth:`~django.views.generic.base.View.dispatch` method. ``dispatch`` looks at
 the request to determine whether it is a ``GET``, ``POST``, etc, and relays the
 request to a matching method if one is defined, or raises

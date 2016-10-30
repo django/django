@@ -4,11 +4,13 @@ from datetime import date
 
 from django import forms
 from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
+from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import (
     HORIZONTAL, VERTICAL, ModelAdmin, TabularInline,
 )
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
+from django.contrib.auth.models import User
 from django.core.checks import Error
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
@@ -50,6 +52,7 @@ class ModelAdminTests(TestCase):
         self.assertEqual(list(ma.get_form(request).base_fields), ['name', 'bio', 'sign_date'])
         self.assertEqual(list(ma.get_fields(request)), ['name', 'bio', 'sign_date'])
         self.assertEqual(list(ma.get_fields(request, self.band)), ['name', 'bio', 'sign_date'])
+        self.assertIsNone(ma.get_exclude(request, self.band))
 
     def test_default_fieldsets(self):
         # fieldsets_add and fieldsets_change should return a special data structure that
@@ -277,6 +280,40 @@ class ModelAdminTests(TestCase):
             ['main_band', 'opening_band', 'day', 'id', 'DELETE']
         )
 
+    def test_overriding_get_exclude(self):
+        class BandAdmin(ModelAdmin):
+            def get_exclude(self, request, obj=None):
+                return ['name']
+
+        self.assertEqual(
+            list(BandAdmin(Band, self.site).get_form(request).base_fields),
+            ['bio', 'sign_date']
+        )
+
+    def test_get_exclude_overrides_exclude(self):
+        class BandAdmin(ModelAdmin):
+            exclude = ['bio']
+
+            def get_exclude(self, request, obj=None):
+                return ['name']
+
+        self.assertEqual(
+            list(BandAdmin(Band, self.site).get_form(request).base_fields),
+            ['bio', 'sign_date']
+        )
+
+    def test_get_exclude_takes_obj(self):
+        class BandAdmin(ModelAdmin):
+            def get_exclude(self, request, obj=None):
+                if obj:
+                    return ['sign_date']
+                return ['name']
+
+        self.assertEqual(
+            list(BandAdmin(Band, self.site).get_form(request, self.band).base_fields),
+            ['name', 'bio']
+        )
+
     def test_custom_form_validation(self):
         # If we specify a form, it should use it allowing custom validation to work
         # properly. This won't, however, break any of the admin widgets or media.
@@ -344,6 +381,52 @@ class ModelAdminTests(TestCase):
             list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ['main_band', 'day', 'transport', 'id', 'DELETE'])
 
+    def test_formset_overriding_get_exclude_with_form_fields(self):
+        class AdminConcertForm(forms.ModelForm):
+            class Meta:
+                model = Concert
+                fields = ['main_band', 'opening_band', 'day', 'transport']
+
+        class ConcertInline(TabularInline):
+            form = AdminConcertForm
+            fk_name = 'main_band'
+            model = Concert
+
+            def get_exclude(self, request, obj=None):
+                return ['opening_band']
+
+        class BandAdmin(ModelAdmin):
+            inlines = [ConcertInline]
+
+        ma = BandAdmin(Band, self.site)
+        self.assertEqual(
+            list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
+            ['main_band', 'day', 'transport', 'id', 'DELETE']
+        )
+
+    def test_formset_overriding_get_exclude_with_form_exclude(self):
+        class AdminConcertForm(forms.ModelForm):
+            class Meta:
+                model = Concert
+                exclude = ['day']
+
+        class ConcertInline(TabularInline):
+            form = AdminConcertForm
+            fk_name = 'main_band'
+            model = Concert
+
+            def get_exclude(self, request, obj=None):
+                return ['opening_band']
+
+        class BandAdmin(ModelAdmin):
+            inlines = [ConcertInline]
+
+        ma = BandAdmin(Band, self.site)
+        self.assertEqual(
+            list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
+            ['main_band', 'day', 'transport', 'id', 'DELETE']
+        )
+
     def test_queryset_override(self):
         # If we need to override the queryset of a ModelChoiceField in our custom form
         # make sure that RelatedFieldWidgetWrapper doesn't mess that up.
@@ -360,7 +443,7 @@ class ModelAdminTests(TestCase):
             str(form["main_band"]),
             '<div class="related-widget-wrapper">'
             '<select name="main_band" id="id_main_band" required>'
-            '<option value="" selected="selected">---------</option>'
+            '<option value="" selected>---------</option>'
             '<option value="%d">The Beatles</option>'
             '<option value="%d">The Doors</option>'
             '</select></div>' % (band2.id, self.band.id)
@@ -381,7 +464,7 @@ class ModelAdminTests(TestCase):
             str(form["main_band"]),
             '<div class="related-widget-wrapper">'
             '<select name="main_band" id="id_main_band" required>'
-            '<option value="" selected="selected">---------</option>'
+            '<option value="" selected>---------</option>'
             '<option value="%d">The Doors</option>'
             '</select></div>' % self.band.id
         )
@@ -532,6 +615,14 @@ class ModelAdminTests(TestCase):
             list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ['extra', 'transport', 'id', 'DELETE', 'main_band']
         )
+
+    def test_log_actions(self):
+        ma = ModelAdmin(Band, self.site)
+        mock_request = MockRequest()
+        mock_request.user = User.objects.create(username='bill')
+        self.assertEqual(ma.log_addition(mock_request, self.band, 'added'), LogEntry.objects.latest('id'))
+        self.assertEqual(ma.log_change(mock_request, self.band, 'changed'), LogEntry.objects.latest('id'))
+        self.assertEqual(ma.log_change(mock_request, self.band, 'deleted'), LogEntry.objects.latest('id'))
 
 
 class CheckTestCase(SimpleTestCase):

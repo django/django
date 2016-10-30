@@ -29,8 +29,8 @@ able to store certain characters in the database, and information will be lost.
 * SQLite users, there is nothing you need to do. SQLite always uses UTF-8
   for internal encoding.
 
-.. _MySQL manual: https://dev.mysql.com/doc/refman/5.6/en/charset-database.html
-.. _PostgreSQL manual: http://www.postgresql.org/docs/current/static/multibyte.html
+.. _MySQL manual: https://dev.mysql.com/doc/refman/en/charset-database.html
+.. _PostgreSQL manual: https://www.postgresql.org/docs/current/static/multibyte.html
 .. _Oracle manual: https://docs.oracle.com/cd/E11882_01/server.112/e10729/toc.htm
 .. _section 2: https://docs.oracle.com/cd/E11882_01/server.112/e10729/ch2charset.htm#NLSPG002
 .. _section 11: https://docs.oracle.com/cd/E11882_01/server.112/e10729/ch11charsetmig.htm#NLSPG011
@@ -163,7 +163,7 @@ for converting back and forth between Unicode and bytestrings.
   slightly different semantics from Python's builtin ``str()`` function,
   but the difference is needed in a few places within Django's internals.
 
-Normally, you'll only need to use ``smart_text()``. Call it as early as
+Normally, you'll only need to use ``force_text()``. Call it as early as
 possible on any input data that might be either Unicode or a bytestring, and
 from then on, you can treat the result as always being Unicode.
 

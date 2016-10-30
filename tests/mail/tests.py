@@ -2,16 +2,18 @@
 from __future__ import unicode_literals
 
 import asyncore
+import base64
 import mimetypes
 import os
 import shutil
 import smtpd
+import socket
 import sys
 import tempfile
 import threading
 from email.header import Header
 from email.mime.text import MIMEText
-from smtplib import SMTP, SMTPException
+from smtplib import SMTP, SMTPAuthenticationError, SMTPException
 from ssl import SSLError
 
 from django.core import mail
@@ -552,7 +554,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             'Subject', 'UTF-8 encoded body', 'bounce@example.com', ['to@example.com'],
             headers={'From': 'from@example.com'},
         )
-        self.assertNotIn(b'Content-Transfer-Encoding: base64', msg.message().as_bytes())
+        self.assertIn(b'Content-Transfer-Encoding: 7bit', msg.message().as_bytes())
 
         # Ticket #11212
         # Shouldn't use quoted printable, should detect it can represent content with 7 bit data
@@ -561,7 +563,6 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             headers={'From': 'from@example.com'},
         )
         s = msg.message().as_bytes()
-        self.assertNotIn(b'Content-Transfer-Encoding: quoted-printable', s)
         self.assertIn(b'Content-Transfer-Encoding: 7bit', s)
 
         # Shouldn't use quoted printable, should detect it can represent content with 8 bit data
@@ -570,16 +571,18 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             headers={'From': 'from@example.com'},
         )
         s = msg.message().as_bytes()
-        self.assertNotIn(b'Content-Transfer-Encoding: quoted-printable', s)
         self.assertIn(b'Content-Transfer-Encoding: 8bit', s)
+        s = msg.message().as_string()
+        self.assertIn(str('Content-Transfer-Encoding: 8bit'), s)
 
         msg = EmailMessage(
             'Subject', 'Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.', 'bounce@example.com',
             ['to@example.com'], headers={'From': 'from@example.com'},
         )
         s = msg.message().as_bytes()
-        self.assertNotIn(b'Content-Transfer-Encoding: quoted-printable', s)
         self.assertIn(b'Content-Transfer-Encoding: 8bit', s)
+        s = msg.message().as_string()
+        self.assertIn(str('Content-Transfer-Encoding: 8bit'), s)
 
     def test_dont_base64_encode_message_rfc822(self):
         # Ticket #18967
@@ -1115,11 +1118,20 @@ class FakeSMTPChannel(smtpd.SMTPChannel):
 
     def collect_incoming_data(self, data):
         try:
-            super(FakeSMTPChannel, self).collect_incoming_data(data)
+            smtpd.SMTPChannel.collect_incoming_data(self, data)
         except UnicodeDecodeError:
             # ignore decode error in SSL/TLS connection tests as we only care
             # whether the connection attempt was made
             pass
+
+    def smtp_AUTH(self, arg):
+        if arg == 'CRAM-MD5':
+            # This is only the first part of the login process. But it's enough
+            # for our tests.
+            challenge = base64.b64encode(b'somerandomstring13579')
+            self.push(str('334 %s' % challenge.decode()))
+        else:
+            self.push(str('502 Error: login "%s" not implemented' % arg))
 
 
 class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
@@ -1139,6 +1151,15 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         self.active = False
         self.active_lock = threading.Lock()
         self.sink_lock = threading.Lock()
+
+    if not PY3:
+        def handle_accept(self):
+            # copy of Python 2.7 smtpd.SMTPServer.handle_accept with hardcoded
+            # SMTPChannel replaced by self.channel_class
+            pair = self.accept()
+            if pair is not None:
+                conn, addr = pair
+                self.channel_class(self, conn, addr)
 
     def process_message(self, peer, mailfrom, rcpttos, data):
         if PY3:
@@ -1185,6 +1206,20 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         if self.active:
             self.active = False
             self.join()
+
+
+class FakeAUTHSMTPConnection(SMTP):
+    """
+    A SMTP connection pretending support for the AUTH command. It does not, but
+    at least this can allow testing the first part of the AUTH process.
+    """
+
+    def ehlo(self, name=''):
+        response = SMTP.ehlo(self, name=name)
+        self.esmtp_features.update({
+            'auth': 'CRAM-MD5 PLAIN LOGIN',
+        })
+        return response
 
 
 class SMTPBackendTestsBase(SimpleTestCase):
@@ -1254,11 +1289,9 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         """
         backend = smtp.EmailBackend(
             username='not empty username', password='not empty password')
-        try:
-            with self.assertRaisesMessage(SMTPException, 'SMTP AUTH extension not supported by server.'):
-                backend.open()
-        finally:
-            backend.close()
+        with self.assertRaisesMessage(SMTPException, 'SMTP AUTH extension not supported by server.'):
+            with backend:
+                pass
 
     def test_server_open(self):
         """
@@ -1269,6 +1302,19 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         opened = backend.open()
         backend.close()
         self.assertTrue(opened)
+
+    def test_server_login(self):
+        """
+        Even if the Python SMTP server doesn't support authentication, the
+        login process starts and the appropriate exception is raised.
+        """
+        class CustomEmailBackend(smtp.EmailBackend):
+            connection_class = FakeAUTHSMTPConnection
+
+        backend = CustomEmailBackend(username='username', password='password')
+        with self.assertRaises(SMTPAuthenticationError):
+            with backend:
+                pass
 
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_use_settings(self):
@@ -1330,21 +1376,17 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     def test_email_tls_attempts_starttls(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_tls)
-        try:
-            with self.assertRaisesMessage(SMTPException, 'STARTTLS extension not supported by server.'):
-                backend.open()
-        finally:
-            backend.close()
+        with self.assertRaisesMessage(SMTPException, 'STARTTLS extension not supported by server.'):
+            with backend:
+                pass
 
     @override_settings(EMAIL_USE_SSL=True)
     def test_email_ssl_attempts_ssl_connection(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_ssl)
-        try:
-            with self.assertRaises(SSLError):
-                backend.open()
-        finally:
-            backend.close()
+        with self.assertRaises(SSLError):
+            with backend:
+                pass
 
     def test_connection_timeout_default(self):
         """Test that the connection's timeout value is None by default."""
@@ -1403,20 +1445,44 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         finally:
             SMTP.send = send
 
+    def test_send_messages_after_open_failed(self):
+        """
+        send_messages() shouldn't try to send messages if open() raises an
+        exception after initializing the connection.
+        """
+        backend = smtp.EmailBackend()
+        # Simulate connection initialization success and a subsequent
+        # connection exception.
+        backend.connection = True
+        backend.open = lambda: None
+        email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
+        self.assertEqual(backend.send_messages([email]), None)
 
-class SMTPBackendStoppedServerTest(SMTPBackendTestsBase):
+
+class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
     """
-    This test requires a separate class, because it shuts down the
-    FakeSMTPServer started in setUpClass(). It cannot be restarted
-    ("RuntimeError: threads can only be started once").
+    These tests require a separate class, because the FakeSMTPServer is shut
+    down in setUpClass(), and it cannot be restarted ("RuntimeError: threads
+    can only be started once").
     """
+    @classmethod
+    def setUpClass(cls):
+        super(SMTPBackendStoppedServerTests, cls).setUpClass()
+        cls.backend = smtp.EmailBackend(username='', password='')
+        cls.server.stop()
 
     def test_server_stopped(self):
         """
-        Test that closing the backend while the SMTP server is stopped doesn't
-        raise an exception.
+        Closing the backend while the SMTP server is stopped doesn't raise an
+        exception.
         """
-        backend = smtp.EmailBackend(username='', password='')
-        backend.open()
-        self.server.stop()
-        backend.close()
+        self.backend.close()
+
+    def test_fail_silently_on_connection_error(self):
+        """
+        A socket connection error is silenced with fail_silently=True.
+        """
+        with self.assertRaises(socket.error):
+            self.backend.open()
+        self.backend.fail_silently = True
+        self.backend.open()

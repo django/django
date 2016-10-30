@@ -12,6 +12,15 @@ Django Core Exceptions
 
 Django core exception classes are defined in ``django.core.exceptions``.
 
+``AppRegistryNotReady``
+-----------------------
+
+.. exception:: AppRegistryNotReady
+
+    This exception is raised when attempting to use models before the :ref:`app
+    loading process <app-loading-process>`, which initializes the ORM, is
+    complete.
+
 ``ObjectDoesNotExist``
 ----------------------
 

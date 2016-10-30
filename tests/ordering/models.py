@@ -25,7 +25,7 @@ class Author(models.Model):
 @python_2_unicode_compatible
 class Article(models.Model):
     author = models.ForeignKey(Author, models.SET_NULL, null=True)
-    second_author = models.ForeignKey(Author, models.SET_NULL, null=True)
+    second_author = models.ForeignKey(Author, models.SET_NULL, null=True, related_name='+')
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
 

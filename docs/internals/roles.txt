@@ -37,13 +37,11 @@ The current security team members are:
 
 - Florian Apolloner
 - James Bennett
-- Jeremy Dunck
+- Tim Graham
 - Adrian Holovaty
-- Jacob Kaplan-Moss
-- Russell Keith-Magee
+- Markus Holtermann
 - Paul McMillan
 - Carl Meyer
-- Donald Stufft
 
 .. _releasers-list:
 
@@ -68,4 +66,5 @@ Trac instance, and continuous integration infrastructure.
 - Florian Apolloner
 - Aymeric Augustin
 - Tim Graham
+- Markus Holtermann
 - Jannis Leidel

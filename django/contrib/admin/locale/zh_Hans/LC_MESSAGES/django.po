@@ -5,6 +5,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
+# Liping Wang <lynn.config@gmail.com>, 2016
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Ronald White <ouyanghongyu@gmail.com>, 2013-2014
 # Sean Lee <iseansay@gmail.com>, 2013
@@ -19,8 +20,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-09-20 02:14+0000\n"
+"Last-Translator: Liping Wang <lynn.config@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -75,10 +76,10 @@ msgid "This year"
 msgstr "今年"
 
 msgid "No date"
-msgstr ""
+msgstr "没有日期"
 
 msgid "Has date"
-msgstr ""
+msgstr "具有日期"
 
 #, python-format
 msgid ""
@@ -142,7 +143,7 @@ msgstr "LogEntry对象"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "以添加{name}\"{object}\"。"
 
 msgid "Added."
 msgstr "已添加。"
@@ -150,16 +151,17 @@ msgstr "已添加。"
 msgid "and"
 msgstr "和"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "已修改{name} \"{object}\"的{fields}。"
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "已修改{fields}。"
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "已删除{name}\"{object}\"。"
 
 msgid "No fields changed."
 msgstr "没有字段被修改。"
@@ -174,32 +176,32 @@ msgstr "按住 ”Control“，或者Mac上的 “Command”，可以选择多�
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
+msgstr "{name} \"{obj}\" 已经添加成功。你可以在下面再次编辑它。"
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr ""
+msgstr "{name} \"{obj}\" 已经添加成功。你可以在下面添加其它的{name}。"
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgstr "{name}\"{obj}\"添加成功。"
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
+msgstr "{name} \"{obj}\" 添加成功。你可以在下面再次编辑它。"
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
-msgstr ""
+msgstr "{name} \"{obj}\" 已经成功进行变更。你可以在下面添加其它的{name}。"
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr "{name}\"{obj}\"修改成功。"
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -459,10 +461,10 @@ msgid "You don't have permission to edit anything."
 msgstr "你无权修改任何东西。"
 
 msgid "Recent actions"
-msgstr ""
+msgstr "最近动作"
 
 msgid "My actions"
-msgstr ""
+msgstr "我的动作"
 
 msgid "None available"
 msgstr "无可用的"

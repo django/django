@@ -1,21 +1,12 @@
-import copy
 import datetime
-import pickle
 import sys
-import unittest
 
-from django.test import SimpleTestCase, override_settings
+import pytz
+
+from django.test import SimpleTestCase, mock, override_settings
 from django.utils import timezone
 
-try:
-    import pytz
-except ImportError:
-    pytz = None
-
-requires_pytz = unittest.skipIf(pytz is None, "this test requires pytz")
-
-if pytz is not None:
-    CET = pytz.timezone("Europe/Paris")
+CET = pytz.timezone("Europe/Paris")
 EAT = timezone.get_fixed_timezone(180)      # Africa/Nairobi
 ICT = timezone.get_fixed_timezone(420)      # Asia/Bangkok
 
@@ -24,35 +15,32 @@ PY36 = sys.version_info >= (3, 6)
 
 class TimezoneTests(SimpleTestCase):
 
-    def test_localtime(self):
-        now = datetime.datetime.utcnow().replace(tzinfo=timezone.utc)
-        local_tz = timezone.LocalTimezone()
-        local_now = timezone.localtime(now, local_tz)
-        self.assertEqual(local_now.tzinfo, local_tz)
-
-    def test_localtime_naive(self):
-        now = datetime.datetime.now()
-        if PY36:
-            self.assertEqual(timezone.localtime(now), now.replace(tzinfo=timezone.LocalTimezone()))
-        else:
-            with self.assertRaisesMessage(ValueError, 'astimezone() cannot be applied to a naive datetime'):
-                timezone.localtime(now)
-
-    def test_localtime_out_of_range(self):
-        local_tz = timezone.LocalTimezone()
-        long_ago = datetime.datetime(1900, 1, 1, tzinfo=timezone.utc)
-        try:
-            timezone.localtime(long_ago, local_tz)
-        except (OverflowError, ValueError) as exc:
-            self.assertIn("install pytz", exc.args[0])
-        else:
-            self.skipTest("Failed to trigger an OverflowError or ValueError")
-
     def test_now(self):
         with override_settings(USE_TZ=True):
             self.assertTrue(timezone.is_aware(timezone.now()))
         with override_settings(USE_TZ=False):
             self.assertTrue(timezone.is_naive(timezone.now()))
+
+    def test_localdate(self):
+        naive = datetime.datetime(2015, 1, 1, 0, 0, 1)
+        if PY36:
+            self.assertEqual(timezone.localdate(naive), datetime.date(2015, 1, 1))
+            self.assertEqual(timezone.localdate(naive, timezone=EAT), datetime.date(2015, 1, 1))
+        else:
+            with self.assertRaisesMessage(ValueError, 'astimezone() cannot be applied to a naive datetime'):
+                timezone.localdate(naive)
+            with self.assertRaisesMessage(ValueError, 'astimezone() cannot be applied to a naive datetime'):
+                timezone.localdate(naive, timezone=EAT)
+
+        aware = datetime.datetime(2015, 1, 1, 0, 0, 1, tzinfo=ICT)
+        self.assertEqual(timezone.localdate(aware, timezone=EAT), datetime.date(2014, 12, 31))
+        with timezone.override(EAT):
+            self.assertEqual(timezone.localdate(aware), datetime.date(2014, 12, 31))
+
+        with mock.patch('django.utils.timezone.now', return_value=aware):
+            self.assertEqual(timezone.localdate(timezone=EAT), datetime.date(2014, 12, 31))
+            with timezone.override(EAT):
+                self.assertEqual(timezone.localdate(), datetime.date(2014, 12, 31))
 
     def test_override(self):
         default = timezone.get_default_timezone()
@@ -109,18 +97,6 @@ class TimezoneTests(SimpleTestCase):
         finally:
             timezone.deactivate()
 
-    def test_copy(self):
-        self.assertIsInstance(copy.copy(timezone.UTC()), timezone.UTC)
-        self.assertIsInstance(copy.copy(timezone.LocalTimezone()), timezone.LocalTimezone)
-
-    def test_deepcopy(self):
-        self.assertIsInstance(copy.deepcopy(timezone.UTC()), timezone.UTC)
-        self.assertIsInstance(copy.deepcopy(timezone.LocalTimezone()), timezone.LocalTimezone)
-
-    def test_pickling_unpickling(self):
-        self.assertIsInstance(pickle.loads(pickle.dumps(timezone.UTC())), timezone.UTC)
-        self.assertIsInstance(pickle.loads(pickle.dumps(timezone.LocalTimezone())), timezone.LocalTimezone)
-
     def test_is_aware(self):
         self.assertTrue(timezone.is_aware(datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)))
         self.assertFalse(timezone.is_aware(datetime.datetime(2011, 9, 1, 13, 20, 30)))
@@ -151,7 +127,6 @@ class TimezoneTests(SimpleTestCase):
             with self.assertRaisesMessage(ValueError, 'astimezone() cannot be applied to a naive datetime'):
                 timezone.make_naive(*args)
 
-    @requires_pytz
     def test_make_aware2(self):
         self.assertEqual(
             timezone.make_aware(datetime.datetime(2011, 9, 1, 12, 20, 30), CET),
@@ -159,7 +134,6 @@ class TimezoneTests(SimpleTestCase):
         with self.assertRaises(ValueError):
             timezone.make_aware(CET.localize(datetime.datetime(2011, 9, 1, 12, 20, 30)), CET)
 
-    @requires_pytz
     def test_make_aware_pytz(self):
         self.assertEqual(
             timezone.make_naive(CET.localize(datetime.datetime(2011, 9, 1, 12, 20, 30)), CET),
@@ -169,10 +143,15 @@ class TimezoneTests(SimpleTestCase):
                 pytz.timezone("Asia/Bangkok").localize(datetime.datetime(2011, 9, 1, 17, 20, 30)), CET
             ),
             datetime.datetime(2011, 9, 1, 12, 20, 30))
-        with self.assertRaises(ValueError):
-            timezone.make_naive(datetime.datetime(2011, 9, 1, 12, 20, 30), CET)
+        if PY36:
+            self.assertEqual(
+                timezone.make_naive(datetime.datetime(2011, 9, 1, 12, 20, 30), CET),
+                datetime.datetime(2011, 9, 1, 19, 20, 30)
+            )
+        else:
+            with self.assertRaises(ValueError):
+                timezone.make_naive(datetime.datetime(2011, 9, 1, 12, 20, 30), CET)
 
-    @requires_pytz
     def test_make_aware_pytz_ambiguous(self):
         # 2:30 happens twice, once before DST ends and once after
         ambiguous = datetime.datetime(2015, 10, 25, 2, 30)
@@ -186,7 +165,6 @@ class TimezoneTests(SimpleTestCase):
         self.assertEqual(std.tzinfo.utcoffset(std), datetime.timedelta(hours=1))
         self.assertEqual(dst.tzinfo.utcoffset(dst), datetime.timedelta(hours=2))
 
-    @requires_pytz
     def test_make_aware_pytz_non_existent(self):
         # 2:30 never happened due to DST
         non_existent = datetime.datetime(2015, 3, 29, 2, 30)
@@ -199,9 +177,3 @@ class TimezoneTests(SimpleTestCase):
         self.assertEqual(std - dst, datetime.timedelta(hours=1))
         self.assertEqual(std.tzinfo.utcoffset(std), datetime.timedelta(hours=1))
         self.assertEqual(dst.tzinfo.utcoffset(dst), datetime.timedelta(hours=2))
-
-        # round trip to UTC then back to CET
-        std = timezone.localtime(timezone.localtime(std, timezone.UTC()), CET)
-        dst = timezone.localtime(timezone.localtime(dst, timezone.UTC()), CET)
-        self.assertEqual((std.hour, std.minute), (3, 30))
-        self.assertEqual((dst.hour, dst.minute), (1, 30))

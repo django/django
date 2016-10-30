@@ -40,7 +40,11 @@ class BaseEmailBackend(object):
         pass
 
     def __enter__(self):
-        self.open()
+        try:
+            self.open()
+        except Exception:
+            self.close()
+            raise
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):

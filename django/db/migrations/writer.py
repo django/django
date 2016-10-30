@@ -181,7 +181,7 @@ class MigrationWriter(object):
         # for comments
         migration_imports = set()
         for line in list(imports):
-            if re.match("^import (.*)\.\d+[^\s]*$", line):
+            if re.match(r"^import (.*)\.\d+[^\s]*$", line):
                 migration_imports.add(line.split("import")[1].strip())
                 imports.remove(line)
                 self.needs_manual_porting = True
@@ -217,11 +217,11 @@ class MigrationWriter(object):
         if self.migration.initial:
             items['initial_str'] = "\n    initial = True\n"
 
-        return (MIGRATION_TEMPLATE % items).encode("utf8")
+        return MIGRATION_TEMPLATE % items
 
     @property
     def basedir(self):
-        migrations_package_name = MigrationLoader.migrations_module(self.migration.app_label)
+        migrations_package_name, _ = MigrationLoader.migrations_module(self.migration.app_label)
 
         if migrations_package_name is None:
             raise ValueError(

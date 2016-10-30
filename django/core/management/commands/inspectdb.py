@@ -6,6 +6,7 @@ from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.db.models.constants import LOOKUP_SEP
 from django.utils.encoding import force_text
 
 
@@ -71,13 +72,14 @@ class Command(BaseCommand):
                     except NotImplementedError:
                         relations = {}
                     try:
-                        indexes = connection.introspection.get_indexes(cursor, table_name)
-                    except NotImplementedError:
-                        indexes = {}
-                    try:
                         constraints = connection.introspection.get_constraints(cursor, table_name)
                     except NotImplementedError:
                         constraints = {}
+                    primary_key_column = connection.introspection.get_primary_key_column(cursor, table_name)
+                    unique_columns = [
+                        c['columns'][0] for c in constraints.values()
+                        if c['unique'] and len(c['columns']) == 1
+                    ]
                     table_description = connection.introspection.get_table_description(cursor, table_name)
                 except Exception as e:
                     yield "# Unable to inspect table '%s'" % table_name
@@ -105,11 +107,10 @@ class Command(BaseCommand):
                     column_to_field_name[column_name] = att_name
 
                     # Add primary_key and unique, if necessary.
-                    if column_name in indexes:
-                        if indexes[column_name]['primary_key']:
-                            extra_params['primary_key'] = True
-                        elif indexes[column_name]['unique']:
-                            extra_params['unique'] = True
+                    if column_name == primary_key_column:
+                        extra_params['primary_key'] = True
+                    elif column_name in unique_columns:
+                        extra_params['unique'] = True
 
                     if is_relation:
                         rel_to = (
@@ -189,10 +190,10 @@ class Command(BaseCommand):
         if num_repl > 0:
             field_notes.append('Field renamed to remove unsuitable characters.')
 
-        if new_name.find('__') >= 0:
-            while new_name.find('__') >= 0:
-                new_name = new_name.replace('__', '_')
-            if col_name.lower().find('__') >= 0:
+        if new_name.find(LOOKUP_SEP) >= 0:
+            while new_name.find(LOOKUP_SEP) >= 0:
+                new_name = new_name.replace(LOOKUP_SEP, '_')
+            if col_name.lower().find(LOOKUP_SEP) >= 0:
                 # Only add the comment if the double underscore was in the original name
                 field_notes.append("Field renamed because it contained more than one '_' in a row.")
 

@@ -250,6 +250,26 @@ At present using :attr:`~django.db.models.Field.db_index` will create a
 A more useful index is a ``GIN`` index, which you should create using a
 :class:`~django.db.migrations.operations.RunSQL` operation.
 
+``CITextField``
+===============
+
+.. class:: CITextField(**options)
+
+    .. versionadded:: 1.11
+
+    This field is a subclass of :class:`~django.db.models.CharField` backed by
+    the citext_ type, a case-insensitive character string type. Read about `the
+    performance considerations`_ prior to using this field.
+
+    To use this field, setup the ``citext`` extension in PostgreSQL before the
+    first ``CreateModel`` migration operation using the
+    :class:`~django.contrib.postgres.operations.CITextExtension` operation. The
+    code to setup the extension is similar to the example for
+    :class:`~django.contrib.postgres.fields.HStoreField`.
+
+    .. _citext: https://www.postgresql.org/docs/current/static/citext.html
+    .. _the performance considerations: https://www.postgresql.org/docs/current/static/citext.html#AEN169274
+
 ``HStoreField``
 ===============
 

@@ -293,7 +293,7 @@ def phone2numeric(phone):
 # Used with permission.
 def compress_string(s):
     zbuf = BytesIO()
-    with GzipFile(mode='wb', compresslevel=6, fileobj=zbuf) as zfile:
+    with GzipFile(mode='wb', compresslevel=6, fileobj=zbuf, mtime=0) as zfile:
         zfile.write(s)
     return zbuf.getvalue()
 
@@ -322,7 +322,7 @@ class StreamingBuffer(object):
 # Like compress_string, but for iterators of strings.
 def compress_sequence(sequence):
     buf = StreamingBuffer()
-    with GzipFile(mode='wb', compresslevel=6, fileobj=buf) as zfile:
+    with GzipFile(mode='wb', compresslevel=6, fileobj=buf, mtime=0) as zfile:
         # Output headers...
         yield buf.read()
         for item in sequence:
@@ -423,11 +423,11 @@ def slugify(value, allow_unicode=False):
     value = force_text(value)
     if allow_unicode:
         value = unicodedata.normalize('NFKC', value)
-        value = re.sub('[^\w\s-]', '', value, flags=re.U).strip().lower()
-        return mark_safe(re.sub('[-\s]+', '-', value, flags=re.U))
+        value = re.sub(r'[^\w\s-]', '', value, flags=re.U).strip().lower()
+        return mark_safe(re.sub(r'[-\s]+', '-', value, flags=re.U))
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
-    value = re.sub('[^\w\s-]', '', value).strip().lower()
-    return mark_safe(re.sub('[-\s]+', '-', value))
+    value = re.sub(r'[^\w\s-]', '', value).strip().lower()
+    return mark_safe(re.sub(r'[-\s]+', '-', value))
 
 
 def camel_case_to_spaces(value):

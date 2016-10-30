@@ -2,7 +2,7 @@
 Django 1.10.1 release notes
 ===========================
 
-*Under development*
+*September 1, 2016*
 
 Django 1.10.1 fixes several bugs in 1.10.
 
@@ -13,7 +13,7 @@ Bugfixes
   doesn't return a result (:ticket:`26991`).
 
 * Allowed ``User.is_authenticated`` and ``User.is_anonymous`` properties to be
-  compared using ``==`` and ``!=`` (:ticket:`26988`).
+  compared using ``==``, ``!=``, and ``|`` (:ticket:`26988`, :ticket:`27154`).
 
 * Removed the broken ``BaseCommand.usage()`` method which was for
   ``optparse`` support (:ticket:`27000`).
@@ -55,7 +55,9 @@ Bugfixes
 
 * Reallowed the ``{% for %}`` tag to unpack any iterable (:ticket:`27058`).
 
-* Fixed ``makemigrations`` crash if a database is read-only (:ticket:`27054`).
+* Made ``makemigrations`` skip inconsistent history checks on non-default
+  databases if database routers aren't in use or if no apps can be migrated
+  to the database (:ticket:`27054`, :ticket:`27110`, :ticket:`27142`).
 
 * Removed duplicated managers in ``Model._meta.managers`` (:ticket:`27073`).
 

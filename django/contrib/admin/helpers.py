@@ -15,7 +15,7 @@ from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -55,6 +55,14 @@ class AdminForm(object):
                 model_admin=self.model_admin,
                 **options
             )
+
+    @property
+    def errors(self):
+        return self.form.errors
+
+    @property
+    def non_field_errors(self):
+        return self.form.non_field_errors
 
     @property
     def media(self):
@@ -209,12 +217,12 @@ class AdminReadonlyField(object):
                     if hasattr(value, "__html__"):
                         result_repr = value
                     else:
-                        result_repr = smart_text(value)
+                        result_repr = force_text(value)
                         if getattr(attr, "allow_tags", False):
                             warnings.warn(
                                 "Deprecated allow_tags attribute used on %s. "
-                                "Use django.utils.safestring.format_html(), "
-                                "format_html_join(), or mark_safe() instead." % attr,
+                                "Use django.utils.html.format_html(), format_html_join(), "
+                                "or django.utils.safestring.mark_safe() instead." % attr,
                                 RemovedInDjango20Warning
                             )
                             result_repr = mark_safe(value)
@@ -302,6 +310,14 @@ class InlineAdminFormSet(object):
                 'deleteText': ugettext('Remove'),
             }
         })
+
+    @property
+    def forms(self):
+        return self.formset.forms
+
+    @property
+    def non_form_errors(self):
+        return self.formset.non_form_errors
 
     @property
     def media(self):

@@ -5,7 +5,7 @@ from .models import CustomUser
 
 class CustomUserBackend(ModelBackend):
 
-    def authenticate(self, username=None, password=None):
+    def authenticate(self, request, username=None, password=None):
         try:
             user = CustomUser.custom_objects.get_by_natural_key(username)
             if user.check_password(password):

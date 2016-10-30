@@ -430,7 +430,7 @@ non_named_group_matcher = re.compile(r'\(.*?\)')
 
 
 def simplify_regex(pattern):
-    """
+    r"""
     Clean up urlpattern regexes into something more readable by humans. For
     example, turn "^(?P<sport_slug>\w+)/athletes/(?P<athlete_slug>\w+)/$"
     into "/<sport_slug>/athletes/<athlete_slug>/".

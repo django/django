@@ -189,7 +189,7 @@ Minor features
 
 * For custom management commands: Verification of the presence of valid
   settings in commands that ask for it by using the
-  :attr:`~django.core.management.BaseCommand.can_import_settings` internal
+  ``BaseCommand.can_import_settings`` internal
   option is now performed independently from handling of the locale that
   should be active during the execution of the command. The latter can now be
   influenced by the new
@@ -484,7 +484,7 @@ pytz_. If you're using MySQL, you must install pytz_ and load the time zone
 tables with `mysql_tzinfo_to_sql`_.
 
 .. _pytz: http://pytz.sourceforge.net/
-.. _mysql_tzinfo_to_sql: https://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
+.. _mysql_tzinfo_to_sql: https://dev.mysql.com/doc/refman/en/mysql-tzinfo-to-sql.html
 
 Addition of ``QuerySet.datetimes()``
 ------------------------------------

@@ -139,7 +139,7 @@ Models
 * **models.E021**: ``ordering`` and ``order_with_respect_to`` cannot be used
   together.
 * **models.E022**: ``<function>`` contains a lazy reference to
-  ``<app label>>.<model>``, but app ``<app label>`` isn't installed or
+  ``<app label>.<model>``, but app ``<app label>`` isn't installed or
   doesn't provide model ``<model>``.
 
 Fields
@@ -183,6 +183,7 @@ File Fields
 ~~~~~~~~~~~
 
 * **fields.E200**: ``unique`` is not a valid argument for a ``FileField``.
+  *This check is removed in Django 1.11*.
 * **fields.E201**: ``primary_key`` is not a valid argument for a ``FileField``.
 * **fields.E210**: Cannot use ``ImageField`` because Pillow is not installed.
 
@@ -657,6 +658,8 @@ The following checks are performed on your URL configuration:
   including URLs.
 * **urls.W002**: Your URL pattern ``<pattern>`` has a ``regex``
   beginning with a ``/``. Remove this slash as it is unnecessary.
+  If this pattern is targeted in an :func:`~django.conf.urls.include`, ensure
+  the :func:`~django.conf.urls.include` pattern has a trailing ``/``.
 * **urls.W003**: Your URL pattern ``<pattern>`` has a ``name``
   including a ``:``. Remove the colon, to avoid ambiguous namespace
   references.

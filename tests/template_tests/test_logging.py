@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 import logging
 
 from django.template import Context, Engine, Variable, VariableDoesNotExist
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango21Warning
 
 
 class TestHandler(logging.Handler):
@@ -104,7 +105,8 @@ class IncludeNodeLoggingTests(BaseTemplateLoggingTestCase):
     def test_logs_exceptions_during_rendering_with_debug_disabled(self):
         template = self.engine.from_string('{% include "child" %}')
         template.name = 'template_name'
-        self.assertEqual(template.render(self.ctx), '')
+        with ignore_warnings(category=RemovedInDjango21Warning):
+            self.assertEqual(template.render(self.ctx), '')
         self.assertEqual(
             self.test_handler.log_record.getMessage(),
             "Exception raised while rendering {% include %} for template "
@@ -115,7 +117,8 @@ class IncludeNodeLoggingTests(BaseTemplateLoggingTestCase):
 
     def test_logs_exceptions_during_rendering_with_no_template_name(self):
         template = self.engine.from_string('{% include "child" %}')
-        self.assertEqual(template.render(self.ctx), '')
+        with ignore_warnings(category=RemovedInDjango21Warning):
+            self.assertEqual(template.render(self.ctx), '')
         self.assertEqual(
             self.test_handler.log_record.getMessage(),
             "Exception raised while rendering {% include %} for template "

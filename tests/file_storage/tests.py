@@ -32,12 +32,6 @@ from django.utils.six.moves.urllib.request import urlopen
 
 from .models import Storage, temp_storage, temp_storage_location
 
-try:
-    import pytz
-except ImportError:
-    pytz = None
-
-
 FILE_SUFFIX_REGEX = '[A-Za-z0-9]{7}'
 
 
@@ -99,10 +93,6 @@ class FileSystemStorageTests(unittest.TestCase):
             storage.url(storage.base_url)
 
 
-# Tests for TZ-aware time methods need pytz.
-requires_pytz = unittest.skipIf(pytz is None, "this test requires pytz")
-
-
 class FileStorageTests(SimpleTestCase):
     storage_class = FileSystemStorage
 
@@ -157,7 +147,6 @@ class FileStorageTests(SimpleTestCase):
         # different.
         now_in_algiers = timezone.make_aware(datetime.now())
 
-        # Use a fixed offset timezone so we don't need pytz.
         with timezone.override(timezone.get_fixed_timezone(-300)):
             # At this point the system TZ is +1 and the Django TZ
             # is -5. The following will be aware in UTC.
@@ -191,7 +180,6 @@ class FileStorageTests(SimpleTestCase):
         # different.
         now_in_algiers = timezone.make_aware(datetime.now())
 
-        # Use a fixed offset timezone so we don't need pytz.
         with timezone.override(timezone.get_fixed_timezone(-300)):
             # At this point the system TZ is +1 and the Django TZ
             # is -5.
@@ -220,7 +208,6 @@ class FileStorageTests(SimpleTestCase):
             _dt = timezone.make_aware(dt, now_in_algiers.tzinfo)
             self.assertLess(abs(_dt - now_in_algiers), timedelta(seconds=2))
 
-    @requires_pytz
     def test_file_get_accessed_time(self):
         """
         File storage returns a Datetime object for the last accessed time of
@@ -236,7 +223,6 @@ class FileStorageTests(SimpleTestCase):
         self.assertEqual(atime, datetime.fromtimestamp(os.path.getatime(self.storage.path(f_name))))
         self.assertLess(timezone.now() - self.storage.get_accessed_time(f_name), timedelta(seconds=2))
 
-    @requires_pytz
     @requires_tz_support
     def test_file_get_accessed_time_timezone(self):
         self._test_file_time_getter(self.storage.get_accessed_time)
@@ -256,7 +242,6 @@ class FileStorageTests(SimpleTestCase):
         self.assertEqual(atime, datetime.fromtimestamp(os.path.getatime(self.storage.path(f_name))))
         self.assertLess(datetime.now() - self.storage.accessed_time(f_name), timedelta(seconds=2))
 
-    @requires_pytz
     def test_file_get_created_time(self):
         """
         File storage returns a datetime for the creation time of a file.
@@ -271,7 +256,6 @@ class FileStorageTests(SimpleTestCase):
         self.assertEqual(ctime, datetime.fromtimestamp(os.path.getctime(self.storage.path(f_name))))
         self.assertLess(timezone.now() - self.storage.get_created_time(f_name), timedelta(seconds=2))
 
-    @requires_pytz
     @requires_tz_support
     def test_file_get_created_time_timezone(self):
         self._test_file_time_getter(self.storage.get_created_time)
@@ -291,7 +275,6 @@ class FileStorageTests(SimpleTestCase):
         self.assertEqual(ctime, datetime.fromtimestamp(os.path.getctime(self.storage.path(f_name))))
         self.assertLess(datetime.now() - self.storage.created_time(f_name), timedelta(seconds=2))
 
-    @requires_pytz
     def test_file_get_modified_time(self):
         """
         File storage returns a datetime for the last modified time of a file.
@@ -306,7 +289,6 @@ class FileStorageTests(SimpleTestCase):
         self.assertEqual(mtime, datetime.fromtimestamp(os.path.getmtime(self.storage.path(f_name))))
         self.assertLess(timezone.now() - self.storage.get_modified_time(f_name), timedelta(seconds=2))
 
-    @requires_pytz
     @requires_tz_support
     def test_file_get_modified_time_timezone(self):
         self._test_file_time_getter(self.storage.get_modified_time)

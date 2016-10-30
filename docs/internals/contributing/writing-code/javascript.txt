@@ -24,6 +24,12 @@ Code style
   JSHint will be run when you run the JavaScript tests. We also recommended
   installing a JSHint plugin in your text editor.
 
+* Where possible, write code that will work even if the page structure is later
+  changed with JavaScript. For instance, when binding a click handler, use
+  ``$('body').on('click', selector, func)`` instead of
+  ``$(selector).click(func)``. This makes it easier for projects to extend
+  Django's default behavior with JavaScript.
+
 .. _javascript-patches:
 
 JavaScript patches

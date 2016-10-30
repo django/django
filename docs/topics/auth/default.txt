@@ -115,7 +115,7 @@ Changing a user's password will log out all their sessions. See
 Authenticating users
 --------------------
 
-.. function:: authenticate(\**credentials)
+.. function:: authenticate(request=None, \**credentials)
 
     Use :func:`~django.contrib.auth.authenticate()` to verify a set of
     credentials. It takes credentials as keyword arguments, ``username`` and
@@ -132,6 +132,13 @@ Authenticating users
             # A backend authenticated the credentials
         else:
             # No backend authenticated the credentials
+
+    ``request`` is an optional :class:`~django.http.HttpRequest` which is
+    passed on the ``authenticate()`` method of the authentication backends.
+
+    .. versionchanged:: 1.11
+
+        The optional ``request`` argument was added.
 
     .. note::
 
@@ -342,7 +349,7 @@ If you have an authenticated user you want to attach to the current session
         def my_view(request):
             username = request.POST['username']
             password = request.POST['password']
-            user = authenticate(username=username, password=password)
+            user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
                 # Redirect to a success page.
@@ -999,6 +1006,19 @@ implementation details see :ref:`using-the-views`.
       authenticated users accessing the login page will be redirected as if
       they had just successfully logged in. Defaults to ``False``.
 
+      .. warning::
+
+        If you enable ``redirect_authenticated_user``, other websites will be
+        able to determine if their visitors are authenticated on your site by
+        requesting redirect URLs to image files on your website. To avoid
+        this "`social media fingerprinting
+        <https://robinlinus.github.io/socialmedia-leak/>`_" information
+        leakage, host all images and your favicon on a separate domain.
+
+    * ``success_url_allowed_hosts``: A :class:`set` of hosts, in addition to
+      :meth:`request.get_host() <django.http.HttpRequest.get_host>`, that are
+      safe for redirecting after login. Defaults to an empty :class:`set`.
+
     Here's what ``LoginView`` does:
 
     * If called via ``GET``, it displays a login form that POSTs to the
@@ -1137,6 +1157,10 @@ implementation details see :ref:`using-the-views`.
 
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
+
+    * ``success_url_allowed_hosts``: A :class:`set` of hosts, in addition to
+      :meth:`request.get_host() <django.http.HttpRequest.get_host>`, that are
+      safe for redirecting after logout. Defaults to an empty :class:`set`.
 
     **Template context:**
 
@@ -1355,8 +1379,8 @@ implementation details see :ref:`using-the-views`.
       for generating a ``text/html`` multipart email with the password reset
       link. By default, HTML email is not sent.
 
-    * ``extra_email_context``: A dictionary of context data that will available
-      in the email template.
+    * ``extra_email_context``: A dictionary of context data that will be
+      available in the email template.
 
     **Template context:**
 
@@ -1676,7 +1700,14 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. class:: UserCreationForm
 
-    A form for creating a new user.
+    A :class:`~django.forms.ModelForm` for creating a new user.
+
+    It has three fields: ``username`` (from the user model), ``password1``,
+    and ``password2``. It verifies that ``password1`` and ``password2`` match,
+    validates the password using
+    :func:`~django.contrib.auth.password_validation.validate_password`, and
+    sets the user's password using
+    :meth:`~django.contrib.auth.models.User.set_password()`.
 
 .. currentmodule:: django.contrib.auth
 

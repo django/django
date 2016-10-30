@@ -12,7 +12,7 @@ from django.urls import translate_url
 from django.utils import six
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import smart_text
+from django.utils.encoding import force_text
 from django.utils.formats import get_format
 from django.utils.http import is_safe_url, urlunquote
 from django.utils.translation import (
@@ -38,11 +38,11 @@ def set_language(request):
     """
     next = request.POST.get('next', request.GET.get('next'))
     if ((next or not request.is_ajax()) and
-            not is_safe_url(url=next, host=request.get_host(), require_https=request.is_secure())):
+            not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure())):
         next = request.META.get('HTTP_REFERER')
         if next:
             next = urlunquote(next)  # HTTP_REFERER may be encoded.
-        if not is_safe_url(url=next, host=request.get_host(), require_https=request.is_secure()):
+        if not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
             next = '/'
     response = http.HttpResponseRedirect(next) if next else http.HttpResponse(status=204)
     if request.method == 'POST':
@@ -81,9 +81,9 @@ def get_formats():
     formats = {}
     for k, v in result.items():
         if isinstance(v, (six.string_types, int)):
-            formats[k] = smart_text(v)
+            formats[k] = force_text(v)
         elif isinstance(v, (tuple, list)):
-            formats[k] = [smart_text(value) for value in v]
+            formats[k] = [force_text(value) for value in v]
     return formats
 
 
@@ -356,7 +356,8 @@ class JavaScriptCatalog(View):
         domain = kwargs.get('domain', self.domain)
         # If packages are not provided, default to all installed packages, as
         # DjangoTranslation without localedirs harvests them all.
-        packages = kwargs.get('packages', '').split('+') or self.packages
+        packages = kwargs.get('packages', '')
+        packages = packages.split('+') if packages else self.packages
         paths = self.get_paths(packages) if packages else None
         self.translation = DjangoTranslation(locale, domain=domain, localedirs=paths)
         context = self.get_context_data(**kwargs)

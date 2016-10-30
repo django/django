@@ -220,7 +220,7 @@ Extra parameters to pass to the cache backend. Available parameters
 vary depending on your cache backend.
 
 Some information on available parameters can be found in the
-:doc:`Cache Backends </topics/cache>` documentation. For more information,
+:ref:`cache arguments <cache_arguments>` documentation. For more information,
 consult your backend module's own documentation.
 
 .. setting:: CACHES-TIMEOUT
@@ -607,8 +607,6 @@ This allows interacting with third-party databases that store datetimes in
 local time rather than UTC. To avoid issues around DST changes, you shouldn't
 set this option for databases managed by Django.
 
-Setting this option requires installing pytz_.
-
 When :setting:`USE_TZ` is ``True`` and the database doesn't support time zones
 (e.g. SQLite, MySQL, Oracle), Django reads and writes datetimes in local time
 according to this option if it is set and in UTC if it isn't.
@@ -617,8 +615,6 @@ When :setting:`USE_TZ` is ``True`` and the database supports time zones (e.g.
 PostgreSQL), it is an error to set this option.
 
 When :setting:`USE_TZ` is ``False``, it is an error to set this option.
-
-.. _pytz: http://pytz.sourceforge.net/
 
 .. setting:: USER
 
@@ -667,8 +663,8 @@ backend-specific.
 
 Supported by the PostgreSQL_ (``postgresql``) and MySQL_ (``mysql``) backends.
 
-.. _PostgreSQL: http://www.postgresql.org/docs/current/static/multibyte.html
-.. _MySQL: https://dev.mysql.com/doc/refman/5.6/en/charset-database.html
+.. _PostgreSQL: https://www.postgresql.org/docs/current/static/multibyte.html
+.. _MySQL: https://dev.mysql.com/doc/refman/en/charset-database.html
 
 .. setting:: TEST_COLLATION
 
@@ -2478,8 +2474,8 @@ See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
 Default: ``'America/Chicago'``
 
-A string representing the time zone for this installation, or ``None``. See
-the `list of time zones`_.
+A string representing the time zone for this installation. See the `list of
+time zones`_.
 
 .. note::
     Since Django was first released with the :setting:`TIME_ZONE` set to
@@ -2496,22 +2492,15 @@ will store all datetimes. When :setting:`USE_TZ` is ``True``, this is the
 default time zone that Django will use to display datetimes in templates and
 to interpret datetimes entered in forms.
 
-Django sets the ``os.environ['TZ']`` variable to the time zone you specify in
-the :setting:`TIME_ZONE` setting. Thus, all your views and models will
+On Unix environments (where :func:`time.tzset` is implemented), Django sets the
+``os.environ['TZ']`` variable to the time zone you specify in the
+:setting:`TIME_ZONE` setting. Thus, all your views and models will
 automatically operate in this time zone. However, Django won't set the ``TZ``
-environment variable under the following conditions:
-
-* If you're using the manual configuration option as described in
-  :ref:`manually configuring settings
-  <settings-without-django-settings-module>`, or
-
-* If you specify ``TIME_ZONE = None``. This will cause Django to fall back to
-  using the system timezone. However, this is discouraged when :setting:`USE_TZ
-  = True <USE_TZ>`, because it makes conversions between local time and UTC
-  less reliable.
-
-If Django doesn't set the ``TZ`` environment variable, it's up to you
-to ensure your processes are running in the correct environment.
+environment variable if you're using the manual configuration option as
+described in :ref:`manually configuring settings
+<settings-without-django-settings-module>`. If Django doesn't set the ``TZ``
+environment variable, it's up to you to ensure your processes are running in
+the correct environment.
 
 .. note::
     Django cannot reliably use alternate time zones in a Windows environment.
@@ -2527,10 +2516,15 @@ to ensure your processes are running in the correct environment.
 
 Default: ``False``
 
-A boolean that specifies whether to output the "Etag" header. This saves
-bandwidth but slows down performance. This is used by the ``CommonMiddleware``
-(see :doc:`/topics/http/middleware`) and in the``Cache Framework``
-(see :doc:`/topics/cache`).
+A boolean that specifies whether to output the ``ETag`` header. This saves
+bandwidth but slows down performance. This is used by the
+:class:`~django.middleware.common.CommonMiddleware` and in the :doc:`cache
+framework </topics/cache>`.
+
+.. deprecated:: 1.11
+
+    This setting is deprecated in favor of using ``ConditionalGetMiddleware``,
+    which sets an ETag regardless of this setting.
 
 .. setting:: USE_I18N
 

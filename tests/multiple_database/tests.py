@@ -94,13 +94,7 @@ class QueryTestCase(TestCase):
             Book.objects.using('default').get(title="Dive into Python")
 
     def test_refresh(self):
-        dive = Book()
-        dive.title = "Dive into Python"
-        dive = Book()
-        dive.title = "Dive into Python"
-        dive.published = datetime.date(2009, 5, 4)
-        dive.save(using='other')
-        dive.published = datetime.date(2009, 5, 4)
+        dive = Book(title="Dive into Python", published=datetime.date(2009, 5, 4))
         dive.save(using='other')
         dive2 = Book.objects.using('other').get()
         dive2.title = "Dive into Python (on default)"

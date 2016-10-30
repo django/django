@@ -2,7 +2,7 @@ from django.db.models.sql import compiler
 
 
 class SQLCompiler(compiler.SQLCompiler):
-    def as_sql(self, with_limits=True, with_col_aliases=False, subquery=False):
+    def as_sql(self, with_limits=True, with_col_aliases=False):
         """
         Creates the SQL for this query. Returns the SQL string and list
         of parameters.  This is overridden from the original Query class
@@ -19,13 +19,11 @@ class SQLCompiler(compiler.SQLCompiler):
             sql, params = super(SQLCompiler, self).as_sql(
                 with_limits=False,
                 with_col_aliases=with_col_aliases,
-                subquery=subquery,
             )
         else:
             sql, params = super(SQLCompiler, self).as_sql(
                 with_limits=False,
                 with_col_aliases=True,
-                subquery=subquery,
             )
             # Wrap the base query in an outer SELECT * with boundaries on
             # the "_RN" column.  This is the canonical way to emulate LIMIT

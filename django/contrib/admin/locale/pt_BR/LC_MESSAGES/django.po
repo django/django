@@ -3,7 +3,7 @@
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
-# FilipeCifali <cifali.filipe@gmail.com>, 2016
+# Filipe Cifali <cifali.filipe@gmail.com>, 2016
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
@@ -153,6 +153,7 @@ msgstr "Adicionado."
 msgid "and"
 msgstr "e"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr "Alterado {fields} para {name} \"{object}\"."
 

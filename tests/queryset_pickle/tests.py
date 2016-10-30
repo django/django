@@ -109,11 +109,11 @@ class PickleabilityTestCase(TestCase):
 
         # First pickling
         groups = pickle.loads(pickle.dumps(groups))
-        self.assertQuerysetEqual(groups, [g], lambda x: x)
+        self.assertSequenceEqual(groups, [g])
 
         # Second pickling
         groups = pickle.loads(pickle.dumps(groups))
-        self.assertQuerysetEqual(groups, [g], lambda x: x)
+        self.assertSequenceEqual(groups, [g])
 
     def test_pickle_prefetch_related_with_m2m_and_objects_deletion(self):
         """
@@ -127,7 +127,7 @@ class PickleabilityTestCase(TestCase):
 
         m2ms = M2MModel.objects.prefetch_related('groups')
         m2ms = pickle.loads(pickle.dumps(m2ms))
-        self.assertQuerysetEqual(m2ms, [m2m], lambda x: x)
+        self.assertSequenceEqual(m2ms, [m2m])
 
     def test_annotation_with_callable_default(self):
         # Happening.when has a callable default of datetime.datetime.now.
@@ -153,3 +153,42 @@ class PickleabilityTestCase(TestCase):
         msg = "Pickled queryset instance's Django version 1.0 does not match the current version %s." % get_version()
         with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(qs))
+
+
+class InLookupTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        for i in range(1, 3):
+            group = Group.objects.create(name='Group {}'.format(i))
+        cls.e1 = Event.objects.create(title='Event 1', group=group)
+
+    def test_in_lookup_queryset_evaluation(self):
+        """
+        Neither pickling nor unpickling a QuerySet.query with an __in=inner_qs
+        lookup should evaluate inner_qs.
+        """
+        events = Event.objects.filter(group__in=Group.objects.all())
+
+        with self.assertNumQueries(0):
+            dumped = pickle.dumps(events.query)
+
+        with self.assertNumQueries(0):
+            reloaded = pickle.loads(dumped)
+            reloaded_events = Event.objects.none()
+            reloaded_events.query = reloaded
+
+        self.assertSequenceEqual(reloaded_events, [self.e1])
+
+    def test_in_lookup_query_evaluation(self):
+        events = Event.objects.filter(group__in=Group.objects.values('id').query)
+
+        with self.assertNumQueries(0):
+            dumped = pickle.dumps(events.query)
+
+        with self.assertNumQueries(0):
+            reloaded = pickle.loads(dumped)
+            reloaded_events = Event.objects.none()
+            reloaded_events.query = reloaded
+
+        self.assertSequenceEqual(reloaded_events, [self.e1])

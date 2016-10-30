@@ -146,6 +146,7 @@ msgstr "Προστέθηκε"
 msgid "and"
 msgstr "και"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr "Αλλαγή του {fields} για {name} \"{object}\"."
 

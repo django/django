@@ -194,7 +194,7 @@ features to include in the next version. This should include a good deal of
 preliminary work on those features -- working code trumps grand design.
 
 Major features for an upcoming release will be added to the wiki roadmap page,
-e.g. https://code.djangoproject.com/wiki/Version1.9Roadmap.
+e.g. https://code.djangoproject.com/wiki/Version1.11Roadmap.
 
 Phase two: development
 ~~~~~~~~~~~~~~~~~~~~~~

@@ -35,7 +35,9 @@ from django.urls import NoReverseMatch, resolve, reverse
 from django.utils import formats, six, translation
 from django.utils._os import upath
 from django.utils.cache import get_max_age
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
 from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -52,9 +54,9 @@ from .models import (
     CyclicOne, CyclicTwo, DooHickey, Employee, EmptyModel, ExternalSubscriber,
     Fabric, FancyDoodad, FieldOverridePost, FilteredManager, FooAccount,
     FoodDelivery, FunkyTag, Gallery, Grommet, Inquisition, Language, Link,
-    MainPrepopulated, ModelWithStringPrimaryKey, OtherStory, Paper, Parent,
-    ParentWithDependentChildren, ParentWithUUIDPK, Person, Persona, Picture,
-    Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
+    MainPrepopulated, Media, ModelWithStringPrimaryKey, OtherStory, Paper,
+    Parent, ParentWithDependentChildren, ParentWithUUIDPK, Person, Persona,
+    Picture, Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
     PrePopulatedPost, Promo, Question, Recommendation, Recommender,
     RelatedPrepopulated, RelatedWithUUIDPKModel, Report, Restaurant,
     RowLevelChangePermissionModel, SecretHideout, Section, ShortMessage,
@@ -539,7 +541,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             self.assertContentBefore(response, 'The First Item', 'The Middle Item')
             self.assertContentBefore(response, 'The Middle Item', 'The Last Item')
 
-    def test_has_related_field_in_list_display(self):
+    def test_has_related_field_in_list_display_fk(self):
         """Joins shouldn't be performed for <FK>_id fields in list display."""
         state = State.objects.create(name='Karnataka')
         City.objects.create(state=state, name='Bangalore')
@@ -549,6 +551,18 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertIs(response.context['cl'].has_related_field_in_list_display(), True)
 
         response.context['cl'].list_display = ['id', 'name', 'state_id']
+        self.assertIs(response.context['cl'].has_related_field_in_list_display(), False)
+
+    def test_has_related_field_in_list_display_o2o(self):
+        """Joins shouldn't be performed for <O2O>_id fields in list display."""
+        media = Media.objects.create(name='Foo')
+        Vodcast.objects.create(media=media)
+        response = self.client.get(reverse('admin:admin_views_vodcast_changelist'), {})
+
+        response.context['cl'].list_display = ['media']
+        self.assertIs(response.context['cl'].has_related_field_in_list_display(), True)
+
+        response.context['cl'].list_display = ['media_id']
         self.assertIs(response.context['cl'].has_related_field_in_list_display(), False)
 
     def test_limited_filter(self):
@@ -1462,8 +1476,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.status_code, 302)
         login = self.client.post(login_url, self.no_username_login)
         self.assertEqual(login.status_code, 200)
-        form = login.context[0].get('form')
-        self.assertEqual(form.errors['username'][0], 'This field is required.')
+        self.assertFormError(login, 'form', 'username', ['This field is required.'])
 
     def test_login_redirect_for_direct_get(self):
         """
@@ -1913,10 +1926,9 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get(reverse('secure_view'), follow=True)
         self.assertContains(response, 'id="login-form"')
 
-    def test_app_index_fail_early(self):
+    def test_app_list_permissions(self):
         """
-        If a user has no module perms, avoid iterating over all the modeladmins
-        in the registry.
+        If a user has no module perms, the app list returns a 404.
         """
         opts = Article._meta
         change_user = User.objects.get(username='changeuser')
@@ -1924,10 +1936,10 @@ class AdminViewPermissionsTest(TestCase):
 
         self.client.force_login(self.changeuser)
 
-        # the user has no module permissions, because this module doesn't exist
+        # the user has no module permissions
         change_user.user_permissions.remove(permission)
         response = self.client.get(reverse('admin:app_list', args=('admin_views',)))
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
 
         # the user now has module permissions
         change_user.user_permissions.add(permission)
@@ -1989,30 +2001,38 @@ class AdminViewPermissionsTest(TestCase):
         In this case, it always returns False, so the module should not be
         displayed on the admin index page for any users.
         """
+        articles = Article._meta.verbose_name_plural.title()
+        sections = Section._meta.verbose_name_plural.title()
         index_url = reverse('admin7:index')
 
         self.client.force_login(self.superuser)
         response = self.client.get(index_url)
-        self.assertNotContains(response, 'admin_views')
-        self.assertNotContains(response, 'Articles')
+        self.assertContains(response, sections)
+        self.assertNotContains(response, articles)
         self.client.logout()
 
         self.client.force_login(self.adduser)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
-        self.assertNotContains(response, 'Articles')
+        self.assertNotContains(response, articles)
         self.client.logout()
 
         self.client.force_login(self.changeuser)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
-        self.assertNotContains(response, 'Articles')
+        self.assertNotContains(response, articles)
         self.client.logout()
 
         self.client.force_login(self.deleteuser)
         response = self.client.get(index_url)
-        self.assertNotContains(response, 'admin_views')
-        self.assertNotContains(response, 'Articles')
+        self.assertNotContains(response, articles)
+
+        # The app list displays Sections but not Articles as the latter has
+        # ModelAdmin.has_module_permission() = False.
+        self.client.force_login(self.superuser)
+        response = self.client.get(reverse('admin7:app_list', args=('admin_views',)))
+        self.assertContains(response, sections)
+        self.assertNotContains(response, articles)
 
     def test_post_save_message_no_forbidden_links_visible(self):
         """
@@ -2277,7 +2297,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         cls.p1 = PrePopulatedPost.objects.create(title='A Long Title', published=True, slug='a-long-title')
         cls.pk = (
             "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890 "
-            """-_.!~*'() ;/?:@&=+$, <>#%" {}|\^[]`"""
+            r"""-_.!~*'() ;/?:@&=+$, <>#%" {}|\^[]`"""
         )
         cls.m1 = ModelWithStringPrimaryKey.objects.create(string_pk=cls.pk)
         content_type_pk = ContentType.objects.get_for_model(ModelWithStringPrimaryKey).pk
@@ -3323,7 +3343,7 @@ class AdminActionsTest(TestCase):
         """
         response = self.client.get(reverse('admin:admin_views_externalsubscriber_changelist'))
         self.assertContains(response, '''<label>Action: <select name="action" required>
-<option value="" selected="selected">---------</option>
+<option value="" selected>---------</option>
 <option value="delete_selected">Delete selected external
 subscribers</option>
 <option value="redirect_to">Redirect to (Awesome action)</option>
@@ -4311,7 +4331,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
         self.get_select_option('#id_relatedprepopulated_set-2-1-status', 'option one').click()
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-name').send_keys(
-            'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters'
+            r'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters'
         )
         slug1 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-slug2').get_attribute('value')
@@ -4353,7 +4373,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             slug2='option-two-and-now-tabular-inline',
         )
         RelatedPrepopulated.objects.get(
-            name='a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters',
+            name=r'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters',
             pubdate='1981-08-22',
             status='option one',
             slug1='tabular-inline-ignored-characters-1981-08-22',
@@ -4608,20 +4628,20 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertContains(response, '<div class="form-row field-posted">')
         self.assertContains(response, '<div class="form-row field-value">')
         self.assertContains(response, '<div class="form-row">')
-        self.assertContains(response, '<p class="help">', 3)
+        self.assertContains(response, '<div class="help">', 3)
         self.assertContains(
             response,
-            '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>',
+            '<div class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
         self.assertContains(
             response,
-            '<p class="help">Some help text for the content (with unicode ŠĐĆŽćžšđ)</p>',
+            '<div class="help">Some help text for the content (with unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
         self.assertContains(
             response,
-            '<p class="help">Some help text for the date (with unicode ŠĐĆŽćžšđ)</p>',
+            '<div class="help">Some help text for the date (with unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
 
@@ -4696,6 +4716,14 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         response = self.client.get(reverse('admin:admin_views_topping_add'))
         self.assertEqual(response.status_code, 200)
 
+    def test_readonly_manytomany_forwards_ref(self):
+        topping = Topping.objects.create(name='Salami')
+        pizza = Pizza.objects.create(name='Americano')
+        pizza.toppings.add(topping)
+        response = self.client.get(reverse('admin:admin_views_pizza_change', args=(pizza.pk,)))
+        self.assertContains(response, '<label>Toppings:</label>', html=True)
+        self.assertContains(response, '<p>Salami</p>', html=True)
+
     def test_readonly_onetoone_backwards_ref(self):
         """
         Can reference a reverse OneToOneField in ModelAdmin.readonly_fields.
@@ -4724,7 +4752,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         """
         p = FieldOverridePost.objects.create(title="Test Post", content="Test Content")
         response = self.client.get(reverse('admin:admin_views_fieldoverridepost_change', args=(p.pk,)))
-        self.assertContains(response, '<p class="help">Overridden help text for the date</p>')
+        self.assertContains(response, '<div class="help">Overridden help text for the date</div>')
         self.assertContains(response, '<label for="id_public">Overridden public label:</label>', html=True)
         self.assertNotContains(response, "Some help text for the date (with unicode ŠĐĆŽćžšđ)")
 
@@ -4915,9 +4943,8 @@ class UserAdminTest(TestCase):
             'password2': 'mismatch',
         })
         self.assertEqual(response.status_code, 200)
-        adminform = response.context['adminform']
-        self.assertNotIn('password', adminform.form.errors)
-        self.assertEqual(adminform.form.errors['password2'], ["The two password fields didn't match."])
+        self.assertFormError(response, 'adminform', 'password', [])
+        self.assertFormError(response, 'adminform', 'password2', ["The two password fields didn't match."])
 
     def test_user_fk_add_popup(self):
         """User addition through a FK popup should return the appropriate JavaScript response."""
@@ -5902,7 +5929,9 @@ class AdminViewOnSiteTests(TestCase):
         """
         Issue #20522
         Verifying that if the parent form fails validation, the inlines also
-        run validation even if validation is contingent on parent form data
+        run validation even if validation is contingent on parent form data.
+        Also, assertFormError() and assertFormsetError() is usable for admin
+        forms and formsets.
         """
         # The form validation should fail because 'some_required_info' is
         # not included on the parent form, and the family_name of the parent
@@ -5916,15 +5945,17 @@ class AdminViewOnSiteTests(TestCase):
                      "dependentchild_set-0-family_name": "Test2"}
         response = self.client.post(reverse('admin:admin_views_parentwithdependentchildren_add'),
                                     post_data)
-
-        # just verifying the parent form failed validation, as expected --
-        # this isn't the regression test
-        self.assertIn('some_required_info', response.context['adminform'].form.errors)
-
-        # actual regression test
-        for error_set in response.context['inline_admin_formset'].formset.errors:
-            self.assertEqual(['Children must share a family name with their parents in this contrived test case'],
-                             error_set.get('__all__'))
+        self.assertFormError(response, 'adminform', 'some_required_info', ['This field is required.'])
+        msg = "The form 'adminform' in context 0 does not contain the non-field error 'Error'"
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormError(response, 'adminform', None, ['Error'])
+        self.assertFormsetError(
+            response, 'inline_admin_formset', 0, None,
+            ['Children must share a family name with their parents in this contrived test case']
+        )
+        msg = "The formset 'inline_admin_formset' in context 4 does not contain any non-form errors."
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertFormsetError(response, 'inline_admin_formset', None, None, ['Error'])
 
     def test_change_view_form_and_formsets_run_validation(self):
         """
@@ -5947,15 +5978,11 @@ class AdminViewOnSiteTests(TestCase):
         response = self.client.post(
             reverse('admin:admin_views_parentwithdependentchildren_change', args=(pwdc.id,)), post_data
         )
-
-        # just verifying the parent form failed validation, as expected --
-        # this isn't the regression test
-        self.assertIn('some_required_info', response.context['adminform'].form.errors)
-
-        # actual regression test
-        for error_set in response.context['inline_admin_formset'].formset.errors:
-            self.assertEqual(['Children must share a family name with their parents in this contrived test case'],
-                             error_set.get('__all__'))
+        self.assertFormError(response, 'adminform', 'some_required_info', ['This field is required.'])
+        self.assertFormsetError(
+            response, 'inline_admin_formset', 0, None,
+            ['Children must share a family name with their parents in this contrived test case']
+        )
 
     def test_check(self):
         "Ensure that the view_on_site value is either a boolean or a callable"
@@ -6047,7 +6074,7 @@ class InlineAdminViewOnSiteTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
-class TestEtagWithAdminView(SimpleTestCase):
+class TestETagWithAdminView(SimpleTestCase):
     # See https://code.djangoproject.com/ticket/16003
 
     def test_admin(self):
@@ -6056,7 +6083,7 @@ class TestEtagWithAdminView(SimpleTestCase):
             self.assertEqual(response.status_code, 302)
             self.assertFalse(response.has_header('ETag'))
 
-        with self.settings(USE_ETAGS=True):
+        with self.settings(USE_ETAGS=True), ignore_warnings(category=RemovedInDjango21Warning):
             response = self.client.get(reverse('admin:index'))
             self.assertEqual(response.status_code, 302)
             self.assertTrue(response.has_header('ETag'))

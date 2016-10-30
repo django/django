@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-08-23 04:48+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +66,7 @@ msgid "German"
 msgstr "Jerman"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "Lower Sorbian"
 
 msgid "Greek"
 msgstr "Yunani"
@@ -123,7 +123,7 @@ msgid "Irish"
 msgstr "Irlandia"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "Gaelik Skotlandia"
 
 msgid "Galician"
 msgstr "Galicia"
@@ -138,7 +138,7 @@ msgid "Croatian"
 msgstr "Kroasia"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "Upper Sorbian"
 
 msgid "Hungarian"
 msgstr "Hungaria"
@@ -150,7 +150,7 @@ msgid "Indonesian"
 msgstr "Indonesia"
 
 msgid "Ido"
-msgstr ""
+msgstr "ido"
 
 msgid "Icelandic"
 msgstr "Islandia"
@@ -195,13 +195,13 @@ msgid "Mongolian"
 msgstr "Mongolia"
 
 msgid "Marathi"
-msgstr ""
+msgstr "Marathi"
 
 msgid "Burmese"
 msgstr "Burma"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "Bokmål Norwegian"
 
 msgid "Nepali"
 msgstr "Nepal"
@@ -470,12 +470,16 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"Nilai '%(value)s' mempunyai bentuk tidak sah. Itu harus dalam bentuk YYYY-MM-"
+"DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"Nilai '%(value)s mempunyai bentuk benar (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
+"tetapi itu adalah sebuah tanggal/waktu tidak sah."
 
 msgid "Date (with time)"
 msgstr "Tanggal (dengan waktu)"
@@ -587,11 +591,11 @@ msgstr "Hubungan satu-ke-satu"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "Hubungan %(from)s-%(to)s"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "Hubungan %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Hubungan banyak-ke-banyak"
@@ -676,7 +680,7 @@ msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Bidang tersembunyi %(name)s) %(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "Data ManagementForm hilang atau telah dirusak "
 
 #, python-format
 msgid "Please submit %d or fewer forms."

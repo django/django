@@ -10,7 +10,7 @@ from itertools import cycle as itertools_cycle, groupby
 
 from django.conf import settings
 from django.utils import six, timezone
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
 from django.utils.safestring import mark_safe
@@ -87,6 +87,12 @@ class CycleNode(Node):
         if self.silent:
             return ''
         return render_value_in_context(value, context)
+
+    def reset(self, context):
+        """
+        Reset the cycle iteration back to the beginning.
+        """
+        context.render_context[self] = itertools_cycle(self.cyclevars)
 
 
 class DebugNode(Node):
@@ -387,6 +393,15 @@ class NowNode(Node):
             return formatted
 
 
+class ResetCycleNode(Node):
+    def __init__(self, node):
+        self.node = node
+
+    def render(self, context):
+        self.node.reset(context)
+        return ''
+
+
 class SpacelessNode(Node):
     def __init__(self, nodelist):
         self.nodelist = nodelist
@@ -425,7 +440,7 @@ class URLNode(Node):
         from django.urls import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
         kwargs = {
-            smart_text(k, 'ascii'): v.resolve(context)
+            force_text(k, 'ascii'): v.resolve(context)
             for k, v in self.kwargs.items()
         }
         view_name = self.view_name.resolve(context)
@@ -582,6 +597,9 @@ def cycle(parser, token):
     # that names are only unique within each template (as opposed to using
     # a global variable, which would make cycle names have to be unique across
     # *all* templates.
+    #
+    # It keeps the last node in the parser to be able to reset it with
+    # {% resetcycle %}.
 
     args = token.split_contents()
 
@@ -621,6 +639,7 @@ def cycle(parser, token):
     else:
         values = [parser.compile_filter(arg) for arg in args[1:]]
         node = CycleNode(values)
+    parser._last_cycle_node = node
     return node
 
 
@@ -1217,6 +1236,32 @@ def regroup(parser, token):
 
 
 @register.tag
+def resetcycle(parser, token):
+    """
+    Resets a cycle tag.
+
+    If an argument is given, resets the last rendered cycle tag whose name
+    matches the argument, else resets the last rendered cycle tag (named or
+    unnamed).
+    """
+    args = token.split_contents()
+
+    if len(args) > 2:
+        raise TemplateSyntaxError("%r tag accepts at most one argument." % args[0])
+
+    if len(args) == 2:
+        name = args[1]
+        try:
+            return ResetCycleNode(parser._named_cycle_nodes[name])
+        except (AttributeError, KeyError):
+            raise TemplateSyntaxError("Named cycle '%s' does not exist." % name)
+    try:
+        return ResetCycleNode(parser._last_cycle_node)
+    except AttributeError:
+        raise TemplateSyntaxError("No cycles in template.")
+
+
+@register.tag
 def spaceless(parser, token):
     """
     Removes whitespace between HTML tags, including tab and newline characters.
@@ -1284,7 +1329,7 @@ def templatetag(parser, token):
 
 @register.tag
 def url(parser, token):
-    """
+    r"""
     Return an absolute URL matching the given view with its parameters.
 
     This is a way to define links that aren't tied to a particular URL

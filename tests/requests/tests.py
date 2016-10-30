@@ -554,6 +554,18 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaises(UnreadablePostError):
             request.body
 
+    def test_set_encoding_clears_POST(self):
+        payload = FakePayload('name=Hello Günter')
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
+        self.assertEqual(request.POST, {'name': ['Hello Günter']})
+        request.encoding = 'iso-8859-16'
+        self.assertEqual(request.POST, {'name': ['Hello GĂŒnter']})
+
     def test_FILES_connection_error(self):
         """
         If wsgi.input.read() raises an exception while trying to read() the

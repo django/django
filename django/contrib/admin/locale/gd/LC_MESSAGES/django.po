@@ -144,6 +144,7 @@ msgstr "Chaidh a chur ris."
 msgid "and"
 msgstr "agus"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr "Chaidh {fields} atharrachadh airson {name} “{object}”."
 

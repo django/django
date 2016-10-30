@@ -79,6 +79,7 @@ class UserCreationForm(forms.ModelForm):
         label=_("Password"),
         strip=False,
         widget=forms.PasswordInput,
+        help_text=password_validation.password_validators_help_text_html(),
     )
     password2 = forms.CharField(
         label=_("Password confirmation"),
@@ -188,7 +189,7 @@ class AuthenticationForm(forms.Form):
         password = self.cleaned_data.get('password')
 
         if username is not None and password:
-            self.user_cache = authenticate(username=username, password=password)
+            self.user_cache = authenticate(self.request, username=username, password=password)
             if self.user_cache is None:
                 raise forms.ValidationError(
                     self.error_messages['invalid_login'],
@@ -253,8 +254,11 @@ class PasswordResetForm(forms.Form):
         that prevent inactive users and users with unusable passwords from
         resetting their password.
         """
-        active_users = get_user_model()._default_manager.filter(
-            email__iexact=email, is_active=True)
+        UserModel = get_user_model()
+        active_users = UserModel._default_manager.filter(**{
+            '%s__iexact' % UserModel.get_email_field_name(): email,
+            'is_active': True,
+        })
         return (u for u in active_users if u.has_usable_password())
 
     def save(self, domain_override=None,
@@ -276,7 +280,7 @@ class PasswordResetForm(forms.Form):
             else:
                 site_name = domain = domain_override
             context = {
-                'email': user.email,
+                'email': email,
                 'domain': domain,
                 'site_name': site_name,
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
@@ -288,7 +292,7 @@ class PasswordResetForm(forms.Form):
                 context.update(extra_email_context)
             self.send_mail(
                 subject_template_name, email_template_name, context, from_email,
-                user.email, html_email_template_name=html_email_template_name,
+                email, html_email_template_name=html_email_template_name,
             )
 
 

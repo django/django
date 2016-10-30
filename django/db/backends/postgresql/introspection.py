@@ -1,10 +1,12 @@
 from __future__ import unicode_literals
 
+import warnings
 from collections import namedtuple
 
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 
 FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('default',))
@@ -36,15 +38,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     ignored_tables = []
 
     _get_indexes_query = """
-        SELECT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary,
-            am.amname
+        SELECT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
         FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
-            pg_catalog.pg_index idx, pg_catalog.pg_attribute attr, pg_catalog.pg_am am
+            pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
         WHERE c.oid = idx.indrelid
             AND idx.indexrelid = c2.oid
             AND attr.attrelid = c.oid
             AND attr.attnum = idx.indkey[0]
-            AND c2.relam = am.oid
             AND c.relname = %s"""
 
     def get_field_type(self, data_type, description):
@@ -126,6 +126,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return key_columns
 
     def get_indexes(self, cursor, table_name):
+        warnings.warn(
+            "get_indexes() is deprecated in favor of get_constraints().",
+            RemovedInDjango21Warning, stacklevel=2
+        )
         # This query retrieves each index on the given table, including the
         # first associated field name
         cursor.execute(self._get_indexes_query, [table_name])
@@ -134,7 +138,6 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # row[1] (idx.indkey) is stored in the DB as an array. It comes out as
             # a string of space-separated integers. This designates the field
             # indexes (1-based) of the fields that have indexes on the table.
-            # row[4] is the type of index, e.g. btree, hash, etc.
             # Here, we skip any indexes across multiple fields.
             if ' ' in row[1]:
                 continue
@@ -145,83 +148,67 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 indexes[row[0]]['primary_key'] = True
             if row[2]:
                 indexes[row[0]]['unique'] = True
-            indexes[row[0]]['type'] = row[4]
         return indexes
 
     def get_constraints(self, cursor, table_name):
         """
-        Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
+        Retrieve any constraints or keys (unique, pk, fk, check, index) across
+        one or more columns. Also retrieve the definition of expression-based
+        indexes.
         """
         constraints = {}
-        # Loop over the key table, collecting things as constraints
-        # This will get PKs, FKs, and uniques, but not CHECK
+        # Loop over the key table, collecting things as constraints. The column
+        # array must return column names in the same order in which they were
+        # created.
+        # The subquery containing generate_series can be replaced with
+        # "WITH ORDINALITY" when support for PostgreSQL 9.3 is dropped.
         cursor.execute("""
             SELECT
-                kc.constraint_name,
-                kc.column_name,
-                c.constraint_type,
-                array(SELECT table_name::text || '.' || column_name::text
-                      FROM information_schema.constraint_column_usage
-                      WHERE constraint_name = kc.constraint_name)
-            FROM information_schema.key_column_usage AS kc
-            JOIN information_schema.table_constraints AS c ON
-                kc.table_schema = c.table_schema AND
-                kc.table_name = c.table_name AND
-                kc.constraint_name = c.constraint_name
-            WHERE
-                kc.table_schema = %s AND
-                kc.table_name = %s
-            ORDER BY kc.ordinal_position ASC
+                c.conname,
+                array(
+                    SELECT attname
+                    FROM (
+                        SELECT unnest(c.conkey) AS colid,
+                               generate_series(1, array_length(c.conkey, 1)) AS arridx
+                    ) AS cols
+                    JOIN pg_attribute AS ca ON cols.colid = ca.attnum
+                    WHERE ca.attrelid = c.conrelid
+                    ORDER BY cols.arridx
+                ),
+                c.contype,
+                (SELECT fkc.relname || '.' || fka.attname
+                FROM pg_attribute AS fka
+                JOIN pg_class AS fkc ON fka.attrelid = fkc.oid
+                WHERE fka.attrelid = c.confrelid AND fka.attnum = c.confkey[1])
+            FROM pg_constraint AS c
+            JOIN pg_class AS cl ON c.conrelid = cl.oid
+            JOIN pg_namespace AS ns ON cl.relnamespace = ns.oid
+            WHERE ns.nspname = %s AND cl.relname = %s
         """, ["public", table_name])
-        for constraint, column, kind, used_cols in cursor.fetchall():
-            # If we're the first column, make the record
-            if constraint not in constraints:
-                constraints[constraint] = {
-                    "columns": [],
-                    "primary_key": kind.lower() == "primary key",
-                    "unique": kind.lower() in ["primary key", "unique"],
-                    "foreign_key": tuple(used_cols[0].split(".", 1)) if kind.lower() == "foreign key" else None,
-                    "check": False,
-                    "index": False,
-                }
-            # Record the details
-            constraints[constraint]['columns'].append(column)
-        # Now get CHECK constraint columns
-        cursor.execute("""
-            SELECT kc.constraint_name, kc.column_name
-            FROM information_schema.constraint_column_usage AS kc
-            JOIN information_schema.table_constraints AS c ON
-                kc.table_schema = c.table_schema AND
-                kc.table_name = c.table_name AND
-                kc.constraint_name = c.constraint_name
-            WHERE
-                c.constraint_type = 'CHECK' AND
-                kc.table_schema = %s AND
-                kc.table_name = %s
-        """, ["public", table_name])
-        for constraint, column in cursor.fetchall():
-            # If we're the first column, make the record
-            if constraint not in constraints:
-                constraints[constraint] = {
-                    "columns": [],
-                    "primary_key": False,
-                    "unique": False,
-                    "foreign_key": None,
-                    "check": True,
-                    "index": False,
-                }
-            # Record the details
-            constraints[constraint]['columns'].append(column)
+        for constraint, columns, kind, used_cols in cursor.fetchall():
+            constraints[constraint] = {
+                "columns": columns,
+                "primary_key": kind == "p",
+                "unique": kind in ["p", "u"],
+                "foreign_key": tuple(used_cols.split(".", 1)) if kind == "f" else None,
+                "check": kind == "c",
+                "index": False,
+                "definition": None,
+            }
         # Now get indexes
         cursor.execute("""
             SELECT
                 indexname, array_agg(attname), indisunique, indisprimary,
-                array_agg(ordering)
+                array_agg(ordering), amname, exprdef
             FROM (
                 SELECT
-                    c2.relname as indexname, idx.*, attr.attname,
+                    c2.relname as indexname, idx.*, attr.attname, am.amname,
                     CASE
-                        WHEN am.amcanorder THEN
+                        WHEN idx.indexprs IS NOT NULL THEN
+                            pg_get_indexdef(idx.indexrelid)
+                    END AS exprdef,
+                    CASE am.amname
+                        WHEN 'btree' THEN
                             CASE (option & 1)
                                 WHEN 1 THEN 'DESC' ELSE 'ASC'
                             END
@@ -230,25 +217,26 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     SELECT
                         *, unnest(i.indkey) as key, unnest(i.indoption) as option
                     FROM pg_index i
-                ) idx, pg_class c, pg_class c2, pg_am am, pg_attribute attr
-                WHERE c.oid=idx.indrelid
-                    AND idx.indexrelid=c2.oid
-                    AND attr.attrelid=c.oid
-                    AND attr.attnum=idx.key
-                    AND c2.relam=am.oid
-                    AND c.relname = %s
+                ) idx
+                LEFT JOIN pg_class c ON idx.indrelid = c.oid
+                LEFT JOIN pg_class c2 ON idx.indexrelid = c2.oid
+                LEFT JOIN pg_am am ON c2.relam = am.oid
+                LEFT JOIN pg_attribute attr ON attr.attrelid = c.oid AND attr.attnum = idx.key
+                WHERE c.relname = %s
             ) s2
-            GROUP BY indexname, indisunique, indisprimary;
+            GROUP BY indexname, indisunique, indisprimary, amname, exprdef;
         """, [table_name])
-        for index, columns, unique, primary, orders in cursor.fetchall():
+        for index, columns, unique, primary, orders, type_, definition in cursor.fetchall():
             if index not in constraints:
                 constraints[index] = {
-                    "columns": columns,
-                    "orders": orders,
+                    "columns": columns if columns != [None] else [],
+                    "orders": orders if orders != [None] else [],
                     "primary_key": primary,
                     "unique": unique,
                     "foreign_key": None,
                     "check": False,
                     "index": True,
+                    "type": type_,
+                    "definition": definition,
                 }
         return constraints

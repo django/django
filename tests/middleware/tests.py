@@ -20,8 +20,11 @@ from django.middleware.common import (
 )
 from django.middleware.gzip import GZipMiddleware
 from django.middleware.http import ConditionalGetMiddleware
-from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.test import (
+    RequestFactory, SimpleTestCase, ignore_warnings, override_settings,
+)
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_str
 from django.utils.six.moves import range
 from django.utils.six.moves.urllib.parse import quote
@@ -256,12 +259,14 @@ class CommonMiddlewareTest(SimpleTestCase):
 
     # ETag + If-Not-Modified support tests
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     @override_settings(USE_ETAGS=True)
     def test_etag(self):
         req = HttpRequest()
         res = HttpResponse('content')
         self.assertTrue(CommonMiddleware().process_response(req, res).has_header('ETag'))
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     @override_settings(USE_ETAGS=True)
     def test_etag_streaming_response(self):
         req = HttpRequest()
@@ -269,12 +274,14 @@ class CommonMiddlewareTest(SimpleTestCase):
         res['ETag'] = 'tomatoes'
         self.assertEqual(CommonMiddleware().process_response(req, res).get('ETag'), 'tomatoes')
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     @override_settings(USE_ETAGS=True)
     def test_no_etag_streaming_response(self):
         req = HttpRequest()
         res = StreamingHttpResponse(['content'])
         self.assertFalse(CommonMiddleware().process_response(req, res).has_header('ETag'))
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     @override_settings(USE_ETAGS=True)
     def test_no_etag_no_store_cache(self):
         req = HttpRequest()
@@ -282,6 +289,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         res['Cache-Control'] = 'No-Cache, No-Store, Max-age=0'
         self.assertFalse(CommonMiddleware().process_response(req, res).has_header('ETag'))
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     @override_settings(USE_ETAGS=True)
     def test_etag_extended_cache_control(self):
         req = HttpRequest()
@@ -289,6 +297,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         res['Cache-Control'] = 'my-directive="my-no-store"'
         self.assertTrue(CommonMiddleware().process_response(req, res).has_header('ETag'))
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     @override_settings(USE_ETAGS=True)
     def test_if_none_match(self):
         first_req = HttpRequest()
@@ -469,13 +478,6 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         self.req = RequestFactory().get('/')
         self.resp = self.client.get(self.req.path_info)
 
-    # Tests for the Date header
-
-    def test_date_header_added(self):
-        self.assertNotIn('Date', self.resp)
-        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
-        self.assertIn('Date', self.resp)
-
     # Tests for the Content-Length header
 
     def test_content_length_header_added(self):
@@ -502,6 +504,30 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
 
     # Tests for the ETag header
 
+    def test_middleware_calculates_etag(self):
+        self.assertNotIn('ETag', self.resp)
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.resp.status_code, 200)
+        self.assertNotEqual('', self.resp['ETag'])
+
+    def test_middleware_wont_overwrite_etag(self):
+        self.resp['ETag'] = 'eggs'
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.resp.status_code, 200)
+        self.assertEqual('eggs', self.resp['ETag'])
+
+    def test_no_etag_streaming_response(self):
+        res = StreamingHttpResponse(['content'])
+        self.assertFalse(ConditionalGetMiddleware().process_response(self.req, res).has_header('ETag'))
+
+    def test_no_etag_no_store_cache(self):
+        self.resp['Cache-Control'] = 'No-Cache, No-Store, Max-age=0'
+        self.assertFalse(ConditionalGetMiddleware().process_response(self.req, self.resp).has_header('ETag'))
+
+    def test_etag_extended_cache_control(self):
+        self.resp['Cache-Control'] = 'my-directive="my-no-store"'
+        self.assertTrue(ConditionalGetMiddleware().process_response(self.req, self.resp).has_header('ETag'))
+
     def test_if_none_match_and_no_etag(self):
         self.req.META['HTTP_IF_NONE_MATCH'] = 'spam'
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
@@ -513,11 +539,6 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         self.assertEqual(self.resp.status_code, 200)
 
     def test_if_none_match_and_same_etag(self):
-        self.req.META['HTTP_IF_NONE_MATCH'] = self.resp['ETag'] = 'spam'
-        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
-        self.assertEqual(self.resp.status_code, 304)
-
-    def test_if_none_match_and_same_etag_with_quotes(self):
         self.req.META['HTTP_IF_NONE_MATCH'] = self.resp['ETag'] = '"spam"'
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
         self.assertEqual(self.resp.status_code, 304)
@@ -585,6 +606,53 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         self.resp.status_code = 400
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
         self.assertEqual(self.resp.status_code, 400)
+
+    def test_not_modified_headers(self):
+        """
+        The 304 Not Modified response should include only the headers required
+        by section 4.1 of RFC 7232, Last-Modified, and the cookies.
+        """
+        self.req.META['HTTP_IF_NONE_MATCH'] = self.resp['ETag'] = '"spam"'
+        self.resp['Date'] = 'Sat, 12 Feb 2011 17:35:44 GMT'
+        self.resp['Last-Modified'] = 'Sat, 12 Feb 2011 17:35:44 GMT'
+        self.resp['Expires'] = 'Sun, 13 Feb 2011 17:35:44 GMT'
+        self.resp['Vary'] = 'Cookie'
+        self.resp['Cache-Control'] = 'public'
+        self.resp['Content-Location'] = '/alt'
+        self.resp['Content-Language'] = 'en'  # shouldn't be preserved
+        self.resp.set_cookie('key', 'value')
+
+        new_response = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(new_response.status_code, 304)
+        for header in ('Cache-Control', 'Content-Location', 'Date', 'ETag', 'Expires', 'Last-Modified', 'Vary'):
+            self.assertEqual(new_response[header], self.resp[header])
+        self.assertEqual(new_response.cookies, self.resp.cookies)
+        self.assertNotIn('Content-Language', new_response)
+
+    def test_no_unsafe(self):
+        """
+        ConditionalGetMiddleware shouldn't return a conditional response on an
+        unsafe request. A response has already been generated by the time
+        ConditionalGetMiddleware is called, so it's too late to return a 412
+        Precondition Failed.
+        """
+        get_response = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        etag = get_response['ETag']
+        put_request = RequestFactory().put('/', HTTP_IF_MATCH=etag)
+        put_response = HttpResponse(status=200)
+        conditional_get_response = ConditionalGetMiddleware().process_response(put_request, put_response)
+        self.assertEqual(conditional_get_response.status_code, 200)  # should never be a 412
+
+    def test_no_head(self):
+        """
+        ConditionalGetMiddleware shouldn't compute and return an ETag on a
+        HEAD request since it can't do so accurately without access to the
+        response body of the corresponding GET.
+        """
+        request = RequestFactory().head('/')
+        response = HttpResponse(status=200)
+        conditional_get_response = ConditionalGetMiddleware().process_response(request, response)
+        self.assertNotIn('ETag', conditional_get_response)
 
 
 class XFrameOptionsMiddlewareTest(SimpleTestCase):
@@ -720,6 +788,12 @@ class GZipMiddlewareTest(SimpleTestCase):
         with gzip.GzipFile(mode='rb', fileobj=BytesIO(gzipped_string)) as f:
             return f.read()
 
+    @staticmethod
+    def get_mtime(gzipped_string):
+        with gzip.GzipFile(mode='rb', fileobj=BytesIO(gzipped_string)) as f:
+            f.read()  # must read the data before accessing the header
+            return f.mtime
+
     def test_compress_response(self):
         """
         Compression is performed on responses with compressible content.
@@ -800,31 +874,63 @@ class GZipMiddlewareTest(SimpleTestCase):
         self.assertEqual(r.content, self.incompressible_string)
         self.assertIsNone(r.get('Content-Encoding'))
 
+    def test_compress_deterministic(self):
+        """
+        Compression results are the same for the same content and don't
+        include a modification time (since that would make the results
+        of compression non-deterministic and prevent
+        ConditionalGetMiddleware from recognizing conditional matches
+        on gzipped content).
+        """
+        r1 = GZipMiddleware().process_response(self.req, self.resp)
+        r2 = GZipMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(r1.content, r2.content)
+        self.assertEqual(self.get_mtime(r1.content), 0)
+        self.assertEqual(self.get_mtime(r2.content), 0)
 
+
+@ignore_warnings(category=RemovedInDjango21Warning)
 @override_settings(USE_ETAGS=True)
 class ETagGZipMiddlewareTest(SimpleTestCase):
     """
-    Tests if the ETagMiddleware behaves correctly with GZipMiddleware.
+    ETags are handled properly by GZipMiddleware.
     """
     rf = RequestFactory()
     compressible_string = b'a' * 500
 
-    def test_compress_response(self):
+    def test_strong_etag_modified(self):
         """
-        ETag is changed after gzip compression is performed.
+        GZipMiddleware makes a strong ETag weak.
+        """
+        request = self.rf.get('/', HTTP_ACCEPT_ENCODING='gzip, deflate')
+        response = HttpResponse(self.compressible_string)
+        response['ETag'] = '"eggs"'
+        gzip_response = GZipMiddleware().process_response(request, response)
+        self.assertEqual(gzip_response['ETag'], 'W/"eggs"')
+
+    def test_weak_etag_not_modified(self):
+        """
+        GZipMiddleware doesn't modify a weak ETag.
+        """
+        request = self.rf.get('/', HTTP_ACCEPT_ENCODING='gzip, deflate')
+        response = HttpResponse(self.compressible_string)
+        response['ETag'] = 'W/"eggs"'
+        gzip_response = GZipMiddleware().process_response(request, response)
+        self.assertEqual(gzip_response['ETag'], 'W/"eggs"')
+
+    def test_etag_match(self):
+        """
+        GZipMiddleware allows 304 Not Modified responses.
         """
         request = self.rf.get('/', HTTP_ACCEPT_ENCODING='gzip, deflate')
         response = GZipMiddleware().process_response(
             request,
-            CommonMiddleware().process_response(request, HttpResponse(self.compressible_string))
+            ConditionalGetMiddleware().process_response(request, HttpResponse(self.compressible_string))
         )
-        gzip_etag = response.get('ETag')
-
-        request = self.rf.get('/', HTTP_ACCEPT_ENCODING='')
-        response = GZipMiddleware().process_response(
-            request,
-            CommonMiddleware().process_response(request, HttpResponse(self.compressible_string))
+        gzip_etag = response['ETag']
+        next_request = self.rf.get('/', HTTP_ACCEPT_ENCODING='gzip, deflate', HTTP_IF_NONE_MATCH=gzip_etag)
+        next_response = ConditionalGetMiddleware().process_response(
+            next_request,
+            HttpResponse(self.compressible_string)
         )
-        nogzip_etag = response.get('ETag')
-
-        self.assertNotEqual(gzip_etag, nogzip_etag)
+        self.assertEqual(next_response.status_code, 304)

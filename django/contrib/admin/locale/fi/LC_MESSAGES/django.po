@@ -143,6 +143,7 @@ msgstr "Lisätty."
 msgid "and"
 msgstr "ja"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr ""
 

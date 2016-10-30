@@ -1,9 +1,7 @@
 from django.apps import apps as global_apps
 from django.db import DEFAULT_DB_ALIAS, migrations, router, transaction
-from django.db.models.deletion import Collector
 from django.db.utils import IntegrityError
 from django.utils import six
-from django.utils.six.moves import input
 
 
 class RenameContentType(migrations.RunPython):
@@ -30,8 +28,8 @@ class RenameContentType(migrations.RunPython):
                     content_type.save(update_fields={'model'})
             except IntegrityError:
                 # Gracefully fallback if a stale content type causes a
-                # conflict as update_contenttypes will take care of asking the
-                # user what should be done next.
+                # conflict as remove_stale_contenttypes will take care of
+                # asking the user what should be done next.
                 content_type.model = old_model
             else:
                 # Clear the cache as the `get_by_natual_key()` call will cache
@@ -87,10 +85,26 @@ def inject_rename_contenttypes_operations(plan=None, apps=global_apps, using=DEF
             migration.operations.insert(inserted + index, operation)
 
 
-def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, apps=global_apps, **kwargs):
+def get_contenttypes_and_models(app_config, using, ContentType):
+    if not router.allow_migrate_model(using, ContentType):
+        return None, None
+
+    ContentType.objects.clear_cache()
+
+    content_types = {
+        ct.model: ct
+        for ct in ContentType.objects.using(using).filter(app_label=app_config.label)
+    }
+    app_models = {
+        model._meta.model_name: model
+        for model in app_config.get_models()
+    }
+    return content_types, app_models
+
+
+def create_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, apps=global_apps, **kwargs):
     """
-    Creates content types for models in the given app, removing any model
-    entries that no longer have a matching model class.
+    Creates content types for models in the given app.
     """
     if not app_config.models_module:
         return
@@ -102,31 +116,10 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
     except LookupError:
         return
 
-    if not router.allow_migrate_model(using, ContentType):
-        return
-
-    ContentType.objects.clear_cache()
-    # Always clear the global content types cache.
-    if apps is not global_apps:
-        global_apps.get_model('contenttypes', 'ContentType').objects.clear_cache()
-
-    app_models = {
-        model._meta.model_name: model
-        for model in app_config.get_models()}
+    content_types, app_models = get_contenttypes_and_models(app_config, using, ContentType)
 
     if not app_models:
         return
-
-    # Get all the content types
-    content_types = {
-        ct.model: ct
-        for ct in ContentType.objects.using(using).filter(app_label=app_label)
-    }
-    to_remove = [
-        ct
-        for (model_name, ct) in six.iteritems(content_types)
-        if model_name not in app_models
-    ]
 
     cts = [
         ContentType(
@@ -140,55 +133,3 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
     if verbosity >= 2:
         for ct in cts:
             print("Adding content type '%s | %s'" % (ct.app_label, ct.model))
-
-    # Confirm that the content type is stale before deletion.
-    using = router.db_for_write(ContentType)
-    if to_remove:
-        if interactive:
-            ct_info = []
-            for ct in to_remove:
-                ct_info.append('    - Content type for %s.%s' % (ct.app_label, ct.model))
-                collector = NoFastDeleteCollector(using=using)
-                collector.collect([ct])
-
-                for obj_type, objs in collector.data.items():
-                    if objs == {ct}:
-                        continue
-                    ct_info.append('    - %s %s object(s)' % (
-                        len(objs),
-                        obj_type._meta.label,
-                    ))
-
-            content_type_display = '\n'.join(ct_info)
-            print("""Some content types in your database are stale and can be deleted.
-Any objects that depend on these content types will also be deleted.
-The content types and dependent objects that would be deleted are:
-
-%s
-
-This list doesn't include any cascade deletions to data outside of Django's
-models (uncommon).
-
-Are you sure you want to delete these content types?
-If you're unsure, answer 'no'.
-    """ % content_type_display)
-            ok_to_delete = input("Type 'yes' to continue, or 'no' to cancel: ")
-        else:
-            ok_to_delete = False
-
-        if ok_to_delete == 'yes':
-            for ct in to_remove:
-                if verbosity >= 2:
-                    print("Deleting stale content type '%s | %s'" % (ct.app_label, ct.model))
-                ct.delete()
-        else:
-            if verbosity >= 2:
-                print("Stale content types remain.")
-
-
-class NoFastDeleteCollector(Collector):
-    def can_fast_delete(self, *args, **kwargs):
-        """
-        Always load related objects to display them when showing confirmation.
-        """
-        return False

@@ -8,7 +8,7 @@ import os
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpResponse, HttpResponseServerError
 from django.utils import six
-from django.utils.encoding import force_bytes, smart_str
+from django.utils.encoding import force_bytes, force_str
 
 from .models import FileModel
 from .tests import UNICODE_FILENAME, UPLOAD_TO
@@ -158,7 +158,7 @@ def file_upload_content_type_extra(request):
     params = {}
     for file_name, uploadedfile in request.FILES.items():
         params[file_name] = {
-            k: smart_str(v) for k, v in uploadedfile.content_type_extra.items()
+            k: force_str(v) for k, v in uploadedfile.content_type_extra.items()
         }
     return HttpResponse(json.dumps(params))
 

@@ -2,7 +2,7 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2012-2013
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2015
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2016
 # batisteo <bapdarth@yahoo·fr>, 2011
 # Dinu Gherman <gherman@darwin.in-berlin.de>, 2011
 # kristjan <kristjan.schmidt@googlemail.com>, 2011
@@ -12,8 +12,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-09-29 18:22+0000\n"
+"Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
@@ -65,7 +65,7 @@ msgid "German"
 msgstr "Germana"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "Malsuprasaroba"
 
 msgid "Greek"
 msgstr "Greka"
@@ -137,7 +137,7 @@ msgid "Croatian"
 msgstr "Kroata"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "Suprasoraba"
 
 msgid "Hungarian"
 msgstr "Hungara"
@@ -200,7 +200,7 @@ msgid "Burmese"
 msgstr "Birma"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "Norvega Bbokmål"
 
 msgid "Nepali"
 msgstr "Nepala"
@@ -597,11 +597,11 @@ msgstr "Unu-al-unu rilato"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "%(from)s-%(to)s rilato"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "%(from)s-%(to)s rilatoj"
 
 msgid "Many-to-many relationship"
 msgstr "Mult-al-multa rilato"

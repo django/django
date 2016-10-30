@@ -638,9 +638,10 @@ with :func:`~django.utils.encoding.python_2_unicode_compatible` as shown above.
 .. method:: Model.__eq__()
 
 The equality method is defined such that instances with the same primary
-key value and the same concrete class are considered equal. For proxy
-models, concrete class is defined as the model's first non-proxy parent;
-for all other models it is simply the model's class.
+key value and the same concrete class are considered equal, except that
+instances with a primary key value of ``None`` aren't equal to anything except
+themselves. For proxy models, concrete class is defined as the model's first
+non-proxy parent; for all other models it's simply the model's class.
 
 For example::
 
@@ -656,10 +657,18 @@ For example::
     class MultitableInherited(MyModel):
         pass
 
+    # Primary keys compared
     MyModel(id=1) == MyModel(id=1)
-    MyModel(id=1) == MyProxyModel(id=1)
-    MyModel(id=1) != MultitableInherited(id=1)
     MyModel(id=1) != MyModel(id=2)
+    # Primay keys are None
+    MyModel(id=None) != MyModel(id=None)
+    # Same instance
+    instance = MyModel(id=None)
+    instance == instance
+    # Proxy model
+    MyModel(id=1) == MyProxyModel(id=1)
+    # Multi-table inheritance
+    MyModel(id=1) != MultitableInherited(id=1)
 
 ``__hash__()``
 --------------

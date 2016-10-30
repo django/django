@@ -969,6 +969,9 @@ subclass::
         The ``FieldListFilter`` API is considered internal and might be
         changed.
 
+    List filter's typically appear only if the filter has more than one choice.
+    A filter's ``has_output()`` method controls whether or not it appears.
+
     It is possible to specify a custom template for rendering a list filter::
 
         class FilterWithCustomTemplate(admin.SimpleListFilter):
@@ -1455,6 +1458,14 @@ templates used by the :class:`ModelAdmin` views:
     It is expected to return either ``None`` or a ``list`` or ``tuple`` of field
     names on the changelist that will be linked to the change view, as described
     in the :attr:`ModelAdmin.list_display_links` section.
+
+.. method:: ModelAdmin.get_exclude(request, obj=None)
+
+    .. versionadded:: 1.11
+
+    The ``get_exclude`` method is given the ``HttpRequest`` and the ``obj``
+    being edited (or ``None`` on an add form) and is expected to return a list
+    of fields, as described in :attr:`ModelAdmin.exclude`.
 
 .. method:: ModelAdmin.get_fields(request, obj=None)
 
@@ -2201,7 +2212,7 @@ The ``InlineModelAdmin`` class adds:
 
             def get_max_num(self, request, obj=None, **kwargs):
                 max_num = 10
-                if obj.parent:
+                if obj and obj.parent:
                     return max_num - 5
                 return max_num
 
@@ -2655,6 +2666,18 @@ Templates can override or extend base admin templates as described in
     :attr:`User.is_staff <django.contrib.auth.models.User.is_staff>` to be
     ``True``.
 
+.. method:: AdminSite.register(model_or_iterable, admin_class=None, **options)
+
+    Registers the given model class (or iterable of classes) with the given
+    ``admin_class``. ``admin_class`` defaults to
+    :class:`~django.contrib.admin.ModelAdmin` (the default admin options). If
+    keyword arguments are given -- e.g. ``list_display`` -- they'll be applied
+    as options to the admin class.
+
+    Raises :class:`~django.core.exceptions.ImproperlyConfigured` if a model is
+    abstract. and ``django.contrib.admin.sites.AlreadyRegistered`` if a model
+    is already registered.
+
 Hooking ``AdminSite`` instances into your URLconf
 -------------------------------------------------
 
@@ -2878,6 +2901,7 @@ The :class:`AdminSite` provides the following named URL patterns:
 Page                       URL name                  Parameters
 =========================  ========================  ==================================
 Index                      ``index``
+Login                      ``login``
 Logout                     ``logout``
 Password change            ``password_change``
 Password change done       ``password_change_done``

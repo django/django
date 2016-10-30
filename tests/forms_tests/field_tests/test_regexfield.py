@@ -48,8 +48,8 @@ class RegexFieldTest(SimpleTestCase):
             f.clean('123')
         six.assertRaisesRegex(
             self, ValidationError,
-            "'Ensure this value has at least 5 characters \(it has 3\)\.',"
-            " u?'Enter a valid value\.'",
+            r"'Ensure this value has at least 5 characters \(it has 3\)\.',"
+            r" u?'Enter a valid value\.'",
             f.clean, 'abc'
         )
         self.assertEqual('12345', f.clean('12345'))
@@ -60,7 +60,7 @@ class RegexFieldTest(SimpleTestCase):
             f.clean('12345a')
 
     def test_regexfield_unicode_characters(self):
-        f = RegexField('^\w+$')
+        f = RegexField(r'^\w+$')
         self.assertEqual('éèøçÎÎ你好', f.clean('éèøçÎÎ你好'))
 
     def test_change_regex_after_init(self):

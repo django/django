@@ -1,8 +1,10 @@
 import logging
 import posixpath
+import warnings
 from collections import defaultdict
 
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.safestring import mark_safe
 
 from .base import (
@@ -208,10 +210,17 @@ class IncludeNode(Node):
                 return template.render(context.new(values))
             with context.push(**values):
                 return template.render(context)
-        except Exception:
+        except Exception as e:
             if context.template.engine.debug:
                 raise
             template_name = getattr(context, 'template_name', None) or 'unknown'
+            warnings.warn(
+                "Rendering {%% include '%s' %%} raised %s. In Django 2.1, "
+                "this exception will be raised rather than silenced and "
+                "rendered as an empty string." %
+                (template_name, e.__class__.__name__),
+                RemovedInDjango21Warning,
+            )
             logger.warning(
                 "Exception raised while rendering {%% include %%} for "
                 "template '%s'. Empty string rendered instead.",

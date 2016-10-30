@@ -1,8 +1,11 @@
+import warnings
+
 import cx_Oracle
 
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 
 
@@ -117,6 +120,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 for row in cursor.fetchall()]
 
     def get_indexes(self, cursor, table_name):
+        warnings.warn(
+            "get_indexes() is deprecated in favor of get_constraints().",
+            RemovedInDjango21Warning, stacklevel=2
+        )
         sql = """
     SELECT LOWER(uic1.column_name) AS column_name,
            CASE user_constraints.constraint_type
@@ -151,7 +158,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
         """
         constraints = {}
-        # Loop over the constraints, getting PKs and uniques
+        # Loop over the constraints, getting PKs, uniques, and checks
         cursor.execute("""
             SELECT
                 user_constraints.constraint_name,
@@ -160,29 +167,34 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     WHEN 'P' THEN 1
                     ELSE 0
                 END AS is_primary_key,
-                CASE user_indexes.uniqueness
-                    WHEN 'UNIQUE' THEN 1
+                CASE
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM user_indexes
+                        WHERE user_indexes.index_name = user_constraints.index_name
+                        AND user_indexes.uniqueness = 'UNIQUE'
+                    )
+                    THEN 1
                     ELSE 0
                 END AS is_unique,
                 CASE user_constraints.constraint_type
                     WHEN 'C' THEN 1
                     ELSE 0
-                END AS is_check_constraint
+                END AS is_check_constraint,
+                CASE
+                    WHEN user_constraints.constraint_type IN ('P', 'U') THEN 1
+                    ELSE 0
+                END AS has_index
             FROM
                 user_constraints
-            INNER JOIN
-                user_indexes ON user_indexes.index_name = user_constraints.index_name
             LEFT OUTER JOIN
                 user_cons_columns cols ON user_constraints.constraint_name = cols.constraint_name
             WHERE
-                (
-                    user_constraints.constraint_type = 'P' OR
-                    user_constraints.constraint_type = 'U'
-                )
+                user_constraints.constraint_type = ANY('P', 'U', 'C')
                 AND user_constraints.table_name = UPPER(%s)
             ORDER BY cols.position
         """, [table_name])
-        for constraint, column, pk, unique, check in cursor.fetchall():
+        for constraint, column, pk, unique, check, index in cursor.fetchall():
             # If we're the first column, make the record
             if constraint not in constraints:
                 constraints[constraint] = {
@@ -191,34 +203,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "unique": unique,
                     "foreign_key": None,
                     "check": check,
-                    "index": True,  # All P and U come with index, see inner join above
-                }
-            # Record the details
-            constraints[constraint]['columns'].append(column)
-        # Check constraints
-        cursor.execute("""
-            SELECT
-                cons.constraint_name,
-                LOWER(cols.column_name) AS column_name
-            FROM
-                user_constraints cons
-            LEFT OUTER JOIN
-                user_cons_columns cols ON cons.constraint_name = cols.constraint_name
-            WHERE
-                cons.constraint_type = 'C' AND
-                cons.table_name = UPPER(%s)
-            ORDER BY cols.position
-        """, [table_name])
-        for constraint, column in cursor.fetchall():
-            # If we're the first column, make the record
-            if constraint not in constraints:
-                constraints[constraint] = {
-                    "columns": [],
-                    "primary_key": False,
-                    "unique": False,
-                    "foreign_key": None,
-                    "check": True,
-                    "index": False,
+                    "index": index,  # All P and U come with index
                 }
             # Record the details
             constraints[constraint]['columns'].append(column)
@@ -258,20 +243,20 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Now get indexes
         cursor.execute("""
             SELECT
-                index_name,
-                LOWER(column_name), descend
+                cols.index_name, LOWER(cols.column_name), cols.descend,
+                LOWER(ind.index_type)
             FROM
-                user_ind_columns cols
+                user_ind_columns cols, user_indexes ind
             WHERE
-                table_name = UPPER(%s) AND
+                cols.table_name = UPPER(%s) AND
                 NOT EXISTS (
                     SELECT 1
                     FROM user_constraints cons
                     WHERE cols.index_name = cons.index_name
-                )
+                ) AND cols.index_name = ind.index_name
             ORDER BY cols.column_position
         """, [table_name])
-        for constraint, column, order in cursor.fetchall():
+        for constraint, column, order, type_ in cursor.fetchall():
             # If we're the first column, make the record
             if constraint not in constraints:
                 constraints[constraint] = {
@@ -282,6 +267,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "foreign_key": None,
                     "check": False,
                     "index": True,
+                    "type": 'btree' if type_ == 'normal' else type_,
                 }
             # Record the details
             constraints[constraint]['columns'].append(column)

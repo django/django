@@ -19,7 +19,7 @@ test_srs = ({
     # From proj's "cs2cs -le" and Wikipedia (semi-minor only)
     'ellipsoid': (6378137.0, 6356752.3, 298.257223563),
     'eprec': (1, 1, 9),
-    'wkt': re.sub('[\s+]', '', """
+    'wkt': re.sub(r'[\s+]', '', """
         GEOGCS["WGS 84",
     DATUM["WGS_1984",
         SPHEROID["WGS 84",6378137,298.257223563,

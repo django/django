@@ -303,14 +303,8 @@ class ProxyModelTests(TestCase):
         issue = Issue.objects.create(assignee=tu)
         self.assertEqual(tu.issues.get(), issue)
         self.assertEqual(ptu.issues.get(), issue)
-        self.assertQuerysetEqual(
-            TrackerUser.objects.filter(issues=issue),
-            [tu], lambda x: x
-        )
-        self.assertQuerysetEqual(
-            ProxyTrackerUser.objects.filter(issues=issue),
-            [ptu], lambda x: x
-        )
+        self.assertSequenceEqual(TrackerUser.objects.filter(issues=issue), [tu])
+        self.assertSequenceEqual(ProxyTrackerUser.objects.filter(issues=issue), [ptu])
 
     def test_proxy_bug(self):
         contributor = ProxyTrackerUser.objects.create(name='Contributor', status='contrib')

@@ -129,13 +129,14 @@ class ArrayField(Field):
         transform = super(ArrayField, self).get_transform(name)
         if transform:
             return transform
-        try:
-            index = int(name)
-        except ValueError:
-            pass
-        else:
-            index += 1  # postgres uses 1-indexing
-            return IndexTransformFactory(index, self.base_field)
+        if '_' not in name:
+            try:
+                index = int(name)
+            except ValueError:
+                pass
+            else:
+                index += 1  # postgres uses 1-indexing
+                return IndexTransformFactory(index, self.base_field)
         try:
             start, end = name.split('_')
             start = int(start) + 1

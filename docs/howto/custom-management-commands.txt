@@ -148,7 +148,6 @@ support code::
 
     class Command(BaseCommand):
         ...
-        can_import_settings = True
 
         def handle(self, *args, **options):
 
@@ -208,13 +207,6 @@ Attributes
 All attributes can be set in your derived class and can be used in
 :class:`BaseCommand`’s :ref:`subclasses<ref-basecommand-subclasses>`.
 
-.. attribute:: BaseCommand.can_import_settings
-
-    A boolean indicating whether the command needs to be able to
-    import Django settings; if ``True``, ``execute()`` will verify
-    that this is possible before proceeding. Default value is
-    ``True``.
-
 .. attribute:: BaseCommand.help
 
     A short description of the command, which will be printed in the
@@ -260,11 +252,6 @@ All attributes can be set in your derived class and can be used in
     locale differ from the de facto default 'en-us' might cause unintended
     effects. Seethe `Management commands and locales`_ section above for
     further details.
-
-    This option can't be ``False`` when the
-    :data:`~BaseCommand.can_import_settings` option is set to ``False`` too
-    because attempting to set the locale needs access to settings. This
-    condition will generate a :exc:`CommandError`.
 
 .. attribute:: BaseCommand.style
 

@@ -179,8 +179,8 @@ commit, for example to fix a typo in a docstring::
     # The second and third commits should be applied.
 
 If your topic branch is already published at GitHub, for example if you're
-making minor changes to take into account a review, you will need to force-
-push the changes::
+making minor changes to take into account a review, you will need to force-push
+the changes::
 
     git push -f origin ticket_xxxxx
 

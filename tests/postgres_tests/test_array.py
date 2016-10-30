@@ -5,6 +5,7 @@ import uuid
 
 from django import forms
 from django.core import exceptions, serializers, validators
+from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
 from django.test import TransactionTestCase, override_settings
@@ -20,7 +21,9 @@ from .models import (
 
 try:
     from django.contrib.postgres.fields import ArrayField
-    from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
+    from django.contrib.postgres.forms import (
+        SimpleArrayField, SplitArrayField, SplitArrayWidget,
+    )
 except ImportError:
     pass
 
@@ -305,6 +308,15 @@ class TestQuerying(PostgreSQLTestCase):
             [self.objs[3]]
         )
 
+    def test_unsupported_lookup(self):
+        msg = "Unsupported lookup '0_bar' for ArrayField or join on the field not permitted."
+        with self.assertRaisesMessage(FieldError, msg):
+            list(NullableIntegerArrayModel.objects.filter(field__0_bar=[2]))
+
+        msg = "Unsupported lookup '0bar' for ArrayField or join on the field not permitted."
+        with self.assertRaisesMessage(FieldError, msg):
+            list(NullableIntegerArrayModel.objects.filter(field__0bar=[2]))
+
 
 class TestDateTimeExactQuerying(PostgreSQLTestCase):
 
@@ -483,9 +495,13 @@ class TestMigrations(TransactionTestCase):
             ]
         # Only the CharField should have a LIKE index.
         self.assertEqual(like_constraint_columns_list, [['char2']])
-        with connection.cursor() as cursor:
-            indexes = connection.introspection.get_indexes(cursor, table_name)
         # All fields should have regular indexes.
+        with connection.cursor() as cursor:
+            indexes = [
+                c['columns'][0]
+                for c in connection.introspection.get_constraints(cursor, table_name).values()
+                if c['index'] and len(c['columns']) == 1
+            ]
         self.assertIn('char', indexes)
         self.assertIn('char2', indexes)
         self.assertIn('text', indexes)
@@ -742,3 +758,26 @@ class TestSplitFormField(PostgreSQLTestCase):
             'Item 0 in the array did not validate: Ensure this value has at most 2 characters (it has 3).',
             'Item 2 in the array did not validate: Ensure this value has at most 2 characters (it has 4).',
         ])
+
+    def test_splitarraywidget_value_omitted_from_data(self):
+        class Form(forms.ModelForm):
+            field = SplitArrayField(forms.IntegerField(), required=False, size=2)
+
+            class Meta:
+                model = IntegerArrayModel
+                fields = ('field',)
+
+        form = Form({'field_0': '1', 'field_1': '2'})
+        self.assertEqual(form.errors, {})
+        obj = form.save(commit=False)
+        self.assertEqual(obj.field, [1, 2])
+
+
+class TestSplitFormWidget(PostgreSQLTestCase):
+
+    def test_value_omitted_from_data(self):
+        widget = SplitArrayWidget(forms.TextInput(), size=2)
+        self.assertIs(widget.value_omitted_from_data({}, {}, 'field'), True)
+        self.assertIs(widget.value_omitted_from_data({'field_0': 'value'}, {}, 'field'), False)
+        self.assertIs(widget.value_omitted_from_data({'field_1': 'value'}, {}, 'field'), False)
+        self.assertIs(widget.value_omitted_from_data({'field_0': 'value', 'field_1': 'value'}, {}, 'field'), False)

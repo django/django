@@ -239,7 +239,6 @@ environ
 escapejs
 esque
 Ess
-Etag
 ETag
 ETags
 exe
@@ -254,6 +253,7 @@ fallback
 fallbacks
 faq
 FastCGI
+favicon
 fieldset
 fieldsets
 filename
@@ -333,6 +333,7 @@ hoc
 Hoerner
 Holovaty
 Holscher
+Holtermann
 Homebrew
 honeypot
 Honza
@@ -621,7 +622,6 @@ Pygments
 pysqlite
 pythonic
 Pythonista
-pytz
 qs
 Québec
 queryset
@@ -949,13 +949,7 @@ virtualenv
 virtualenvs
 virtualized
 Votizen
-webapps
-webkit
-WebKit
 Weblog
-webpages
-webserver
-webservers
 whatsnext
 whitelist
 whitelisted

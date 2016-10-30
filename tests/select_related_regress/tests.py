@@ -187,7 +187,7 @@ class SelectRelatedRegressTests(TestCase):
                              c_a=a, c_b=b)
         results = C.objects.all().only('name', 'lots_of_text', 'c_a', 'c_b', 'c_b__lots_of_text',
                                        'c_a__name', 'c_b__name').select_related()
-        self.assertQuerysetEqual(results, [c], lambda x: x)
+        self.assertSequenceEqual(results, [c])
         with self.assertNumQueries(0):
             qs_c = results[0]
             self.assertEqual(qs_c.name, 'c')

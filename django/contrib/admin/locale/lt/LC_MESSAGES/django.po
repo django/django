@@ -146,6 +146,7 @@ msgstr "Pridėta."
 msgid "and"
 msgstr "ir"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr "Pakeisti {fields} arba {name} \"{object}\"."
 

@@ -5,9 +5,11 @@ import traceback
 from datetime import date, datetime, timedelta
 from threading import Thread
 
+from django.core.exceptions import FieldError
 from django.db import DatabaseError, IntegrityError, connection
 from django.test import (
-    TestCase, TransactionTestCase, ignore_warnings, skipUnlessDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, ignore_warnings,
+    skipUnlessDBFeature,
 )
 from django.utils.encoding import DjangoUnicodeDecodeError
 
@@ -68,6 +70,12 @@ class GetOrCreateTests(TestCase):
         """
         with self.assertRaises(IntegrityError):
             Person.objects.get_or_create(first_name="Tom", last_name="Smith")
+
+    def test_get_or_create_with_pk_property(self):
+        """
+        Using the pk property of a model is allowed.
+        """
+        Thing.objects.get_or_create(pk=1)
 
     def test_get_or_create_on_related_manager(self):
         p = Publisher.objects.create(name="Acme Publishing")
@@ -322,6 +330,12 @@ class UpdateOrCreateTests(TestCase):
             ManualPrimaryKeyTest.objects.update_or_create(id=1, data="Different")
         self.assertEqual(ManualPrimaryKeyTest.objects.get(id=1).data, "Original")
 
+    def test_with_pk_property(self):
+        """
+        Using the pk property of a model is allowed.
+        """
+        Thing.objects.update_or_create(pk=1)
+
     def test_error_contains_full_traceback(self):
         """
         update_or_create should raise IntegrityErrors with the full traceback.
@@ -484,3 +498,27 @@ class UpdateOrCreateTransactionTests(TransactionTestCase):
         updated_person = Person.objects.get(first_name='John')
         self.assertGreater(after_update - before_start, timedelta(seconds=0.5))
         self.assertEqual(updated_person.last_name, 'NotLennon')
+
+
+class InvalidCreateArgumentsTests(SimpleTestCase):
+    msg = "Invalid field name(s) for model Thing: 'nonexistent'."
+
+    def test_get_or_create_with_invalid_defaults(self):
+        with self.assertRaisesMessage(FieldError, self.msg):
+            Thing.objects.get_or_create(name='a', defaults={'nonexistent': 'b'})
+
+    def test_get_or_create_with_invalid_kwargs(self):
+        with self.assertRaisesMessage(FieldError, self.msg):
+            Thing.objects.get_or_create(name='a', nonexistent='b')
+
+    def test_update_or_create_with_invalid_defaults(self):
+        with self.assertRaisesMessage(FieldError, self.msg):
+            Thing.objects.update_or_create(name='a', defaults={'nonexistent': 'b'})
+
+    def test_update_or_create_with_invalid_kwargs(self):
+        with self.assertRaisesMessage(FieldError, self.msg):
+            Thing.objects.update_or_create(name='a', nonexistent='b')
+
+    def test_multiple_invalid_fields(self):
+        with self.assertRaisesMessage(FieldError, "Invalid field name(s) for model Thing: 'invalid', 'nonexistent'"):
+            Thing.objects.update_or_create(name='a', nonexistent='b', defaults={'invalid': 'c'})
