@@ -33,6 +33,7 @@ The three default routing objects are:
 * ``include``: Takes either a list or string import path to a routing list,
   and optional filter keyword arguments.
 
+.. _filters:
 
 Filters
 -------
