@@ -267,14 +267,14 @@ Paul McMillan
     .. _l10n.gnome.org: https://l10n.gnome.org
 
 Anssi Kääriäinen
-    Anssi works as a developer at Finnish National Institute for Health and
-    Welfare. He is also a computer science student at Aalto University. In his
-    work he uses Django for developing internal business applications and sees
-    Django as a great match for that use case.
+    Anssi works as a Senior Backend Developer at Holvi, a Finnish fintech
+    company building digital banking solutions for the use of freelancers
+    and small businesses. What makes Holvi an exciting challenge for Anssi
+    is using technology to create something real people care for and actually
+    want to use. In his daily work he is building a full stack bank with Django.
 
-    Anssi is interested in developing the object relational mapper (ORM) and
-    all related features. He's also a fan of benchmarking and he tries keep
-    Django as fast as possible.
+    Anssi is working mostly on ORM related issues, and enjoys making the ORM
+    solve complex query problems.
 
 Florian Apolloner
     Florian is currently studying Physics at the `Graz University of Technology`_.
