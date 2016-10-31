@@ -763,16 +763,16 @@ For example, repeatedly getting a certain index in a queryset object will query
 the database each time::
 
     >>> queryset = Entry.objects.all()
-    >>> print queryset[5] # Queries the database
-    >>> print queryset[5] # Queries the database again
+    >>> print(queryset[5]) # Queries the database
+    >>> print(queryset[5]) # Queries the database again
 
 However, if the entire queryset has already been evaluated, the cache will be
 checked instead::
 
     >>> queryset = Entry.objects.all()
     >>> [entry for entry in queryset] # Queries the database
-    >>> print queryset[5] # Uses cache
-    >>> print queryset[5] # Uses cache
+    >>> print(queryset[5]) # Uses cache
+    >>> print(queryset[5]) # Uses cache
 
 Here are some examples of other actions that will result in the entire queryset
 being evaluated and therefore populate the cache::
