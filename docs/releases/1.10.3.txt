@@ -23,3 +23,6 @@ Bugfixes
 
 * Fixed ``QuerySet.bulk_create()`` on PostgreSQL when the number of objects is
   a multiple plus one of ``batch_size`` (:ticket:`27385`).
+
+* Fixed issue where pages starting with /<language_code>-* are matched to language_code.
+    (:ticket:`27063`)
