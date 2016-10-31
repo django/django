@@ -3117,9 +3117,10 @@ static files for deployment.
 Example: ``"/var/www/example.com/static/"``
 
 If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
-(default) the :djadmin:`collectstatic` management command will collect static
-files into this directory. See the howto on :doc:`managing static
-files</howto/static-files/index>` for more details about usage.
+(as in the default project template), the :djadmin:`collectstatic` management
+command will collect static files into this directory. See the how-to on
+:doc:`managing static files</howto/static-files/index>` for more details about
+usage.
 
 .. warning::
 
