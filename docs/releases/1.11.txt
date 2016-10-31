@@ -286,7 +286,7 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* Added support for serialization of ``uuid.UUID`` objects.
 
 Models
 ~~~~~~

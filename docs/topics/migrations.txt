@@ -669,6 +669,7 @@ Django can serialize the following:
   (include those that are timezone-aware)
 - ``decimal.Decimal`` instances
 - ``enum.Enum`` instances
+- ``uuid.UUID`` instances
 - ``functools.partial`` instances which have serializable ``func``, ``args``,
   and ``keywords`` values.
 - ``LazyObject`` instances which wrap a serializable value.
@@ -680,6 +681,10 @@ Django can serialize the following:
 .. versionchanged:: 1.10
 
     Serialization support for ``enum.Enum`` was added.
+
+.. versionchanged:: 1.11
+
+    Serialization support for ``uuid.UUID`` was added.
 
 Django can serialize the following on Python 3 only:
 
