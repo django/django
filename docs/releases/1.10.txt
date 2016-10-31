@@ -910,6 +910,14 @@ Miscellaneous
 * Private API ``django.forms.models.model_to_dict()`` returns a queryset rather
   than a list of primary keys for ``ManyToManyField``\s .
 
+* If ``django.contrib.staticfiles`` is installed, the :ttag:`static` 
+  template tag will call the ``url`` function from 
+  ``django.contrib.staticfiles.storage`` instead of the ``urljoin`` 
+  function from ``django.utils.six.moves.urllib.parse``.
+  The ``url`` function encodes the URL, causing ``#`` to become  ``%23``. 
+  If you don't want the URL encoded, remove ``django.contrib.staticfiles``
+  from ``INSTALLED_APPS``.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
