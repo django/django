@@ -23,3 +23,6 @@ Bugfixes
 
 * Fixed ``QuerySet.bulk_create()`` on PostgreSQL when the number of objects is
   a multiple plus one of ``batch_size`` (:ticket:`27385`).
+
+* Fixed redirecting issue when session destroyed during request processing
+  (:ticket:`27363`)
