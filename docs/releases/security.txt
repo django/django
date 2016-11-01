@@ -781,3 +781,29 @@ Versions affected
 
 * Django 1.9 `(patch) <https://github.com/django/django/commit/d1bc980db1c0fffd6d60677e62f70beadb9fe64a>`__
 * Django 1.8 `(patch) <https://github.com/django/django/commit/6118ab7d0676f0d622278e5be215f14fb5410b6a>`__
+
+November 1, 2016 - :cve:`2016-9013`
+-----------------------------------
+
+User with hardcoded password created when running tests on Oracle. `Full
+description <https://www.djangoproject.com/weblog/2016/nov/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 1.10 `(patch) <https://github.com/django/django/commit/34e10720d81b8d407aa14d763b6a7fe8f13b4f2e>`__
+* Django 1.9 `(patch) <https://github.com/django/django/commit/4844d86c7728c1a5a3bbce4ad336a8d32304072b>`__
+* Django 1.8 `(patch) <https://github.com/django/django/commit/70f99952965a430daf69eeb9947079aae535d2d0>`__
+
+November 1, 2016 - :cve:`2016-9014`
+-----------------------------------
+
+DNS rebinding vulnerability when ``DEBUG=True``. `Full description
+<https://www.djangoproject.com/weblog/2016/nov/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 1.10 `(patch) <https://github.com/django/django/commit/884e113838e5a72b4b0ec9e5e87aa480f6aa4472>`__
+* Django 1.9 `(patch) <https://github.com/django/django/commit/45acd6d836895a4c36575f48b3fb36a3dae98d19>`__
+* Django 1.8 `(patch) <https://github.com/django/django/commit/c401ae9a7dfb1a94a8a61927ed541d6f93089587>`__
