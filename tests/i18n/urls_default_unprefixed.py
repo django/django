@@ -6,5 +6,6 @@ from django.utils.translation import ugettext_lazy as _
 urlpatterns = i18n_patterns(
     url(r'^(?P<arg>[\w-]+)-page', lambda request, **arg: HttpResponse(_("Yes"))),
     url(r'^simple/$', lambda r: HttpResponse(_("Yes"))),
+    url(r'^(?P<group1>.+)/(?P<group2>.+)/$', lambda r: HttpResponse(_("Group1-Group2"))),
     prefix_default_language=False,
 )

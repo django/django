@@ -1859,6 +1859,10 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
         response = self.client.get('/de-simple-page/')
         self.assertEqual(response.content, b'Yes')
 
+    def test_404_page_no_default_language_redirect(self):
+        response = self.client.get('/non-existent-no-slash', follow=False)
+        self.assertEqual(response.status_code, 404)
+
 
 @override_settings(
     USE_I18N=True,
