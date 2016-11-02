@@ -757,12 +757,13 @@ class BaseModelFormSet(BaseFormSet):
         forms_to_delete = self.deleted_forms
         for form in self.initial_forms:
             obj = form.instance
+            # If the pk is None, it means either:
+            # 1. The object is an unexpected empty model, created by invalid
+            #    POST data such as an object outside the formset's queryset.
+            # 2. The object was already deleted from the database.
+            if obj.pk is None:
+                continue
             if form in forms_to_delete:
-                # If the pk is None, it means that the object can't be
-                # deleted again. Possible reason for this is that the
-                # object was already deleted from the DB. Refs #14877.
-                if obj.pk is None:
-                    continue
                 self.deleted_objects.append(obj)
                 self.delete_existing(obj, commit=commit)
             elif form.has_changed():
