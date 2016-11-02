@@ -61,4 +61,4 @@ class Command(BaseCommand):
         failures = test_runner.run_tests(test_labels)
 
         if failures:
-            sys.exit(bool(failures))
+            sys.exit(1)
