@@ -67,6 +67,9 @@ class AsgiRequest(http.HttpRequest):
         if self.message.get('server', None):
             self.META['SERVER_NAME'] = self.message['server'][0]
             self.META['SERVER_PORT'] = six.text_type(self.message['server'][1])
+        else:
+            self.META['SERVER_NAME'] = "unknown"
+            self.META['SERVER_PORT'] = "0"
         # Handle old style-headers for a transition period
         if "headers" in self.message and isinstance(self.message['headers'], dict):
             self.message['headers'] = [
