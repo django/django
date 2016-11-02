@@ -174,7 +174,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             print("_create_test_user(): username = %s" % parameters['user'])
         statements = [
             """CREATE USER %(user)s
-               IDENTIFIED BY %(password)s
+               IDENTIFIED BY "%(password)s"
                DEFAULT TABLESPACE %(tblspace)s
                TEMPORARY TABLESPACE %(tblspace_temp)s
                QUOTA UNLIMITED ON %(tblspace)s
@@ -191,7 +191,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         success = self._execute_allow_fail_statements(cursor, statements, parameters, verbosity, acceptable_ora_err)
         # If the password was randomly generated, change the user accordingly.
         if not success and self._test_settings_get('PASSWORD') is None:
-            set_password = "ALTER USER %(user)s IDENTIFIED BY %(password)s"
+            set_password = 'ALTER USER %(user)s IDENTIFIED BY "%(password)s"'
             self._execute_statements(cursor, [set_password], parameters, verbosity)
         # Most test-suites can be run without the create-view privilege. But some need it.
         extra = "GRANT CREATE VIEW TO %(user)s"

@@ -729,6 +729,7 @@ To run a project's test suite, the user usually needs these *additional*
 privileges:
 
 * CREATE USER
+* ALTER USER
 * DROP USER
 * CREATE TABLESPACE
 * DROP TABLESPACE
