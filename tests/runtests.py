@@ -483,4 +483,4 @@ if __name__ == "__main__":
             options.exclude_tags,
         )
         if failures:
-            sys.exit(bool(failures))
+            sys.exit(1)
