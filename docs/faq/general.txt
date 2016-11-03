@@ -178,18 +178,6 @@ information than the docs that come with the latest Django release.
 
 .. _stored in revision control: https://github.com/django/django/tree/master/docs/
 
-Where can I find Django developers for hire?
-============================================
-
-Consult our `developers for hire page`_ for a list of Django developers who
-would be happy to help you.
-
-You might also be interested in posting a job to https://djangogigs.com/ .
-If you want to find Django-capable people in your local area, try
-https://people.djangoproject.com/ .
-
-.. _developers for hire page: https://code.djangoproject.com/wiki/DevelopersForHire
-
 How do I cite Django?
 =====================
 
