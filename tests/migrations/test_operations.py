@@ -624,9 +624,11 @@ class OperationTests(OperationTestBase):
         self.assertIn(("test_rmwsrf", "horserider"), new_state.models)
         # Remember, RenameModel also repoints all incoming FKs and M2Ms
         self.assertEqual(
-            "test_rmwsrf.HorseRider",
+            'self',
             new_state.models["test_rmwsrf", "horserider"].fields[2][1].remote_field.model
         )
+        HorseRider = new_state.apps.get_model('test_rmwsrf', 'horserider')
+        self.assertIs(HorseRider._meta.get_field('horserider').remote_field.model, HorseRider)
         # Test the database alteration
         self.assertTableExists("test_rmwsrf_rider")
         self.assertTableNotExists("test_rmwsrf_horserider")

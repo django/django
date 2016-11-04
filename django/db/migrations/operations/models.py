@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.state import ModelState
+from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.options import normalize_together
 from django.utils import six
 from django.utils.functional import cached_property
@@ -277,70 +278,50 @@ class RenameModel(ModelOperation):
             kwargs
         )
 
+    def _get_model_tuple(self, remote_model, app_label, model_name):
+        if remote_model == RECURSIVE_RELATIONSHIP_CONSTANT:
+            return app_label, model_name.lower()
+        elif '.' in remote_model:
+            return tuple(remote_model.lower().split('.'))
+        else:
+            return app_label, remote_model.lower()
+
     def state_forwards(self, app_label, state):
-        # In cases where state doesn't have rendered apps, prevent subsequent
-        # reload_model() calls from rendering models for performance
-        # reasons. This method should be refactored to avoid relying on
-        # state.apps (#27310).
-        reset_apps = 'apps' not in state.__dict__
-        apps = state.apps
-        model = apps.get_model(app_label, self.old_name)
-        model._meta.apps = apps
-        # Get all of the related objects we need to repoint
-        all_related_objects = (
-            f for f in model._meta.get_fields(include_hidden=True)
-            if f.auto_created and not f.concrete and (not f.hidden or f.many_to_many)
-        )
-        if reset_apps:
-            del state.__dict__['apps']
-        # Rename the model
-        state.models[app_label, self.new_name_lower] = state.models[app_label, self.old_name_lower]
-        state.models[app_label, self.new_name_lower].name = self.new_name
+        # Add a new model.
+        renamed_model = state.models[app_label, self.old_name_lower].clone()
+        renamed_model.name = self.new_name
+        state.models[app_label, self.new_name_lower] = renamed_model
+        # Repoint all fields pointing to the old model to the new one.
+        old_model_tuple = app_label, self.old_name_lower
+        new_remote_model = '%s.%s' % (app_label, self.new_name)
+        for (model_app_label, model_name), model_state in state.models.items():
+            model_changed = False
+            for index, (name, field) in enumerate(model_state.fields):
+                changed_field = None
+                remote_field = field.remote_field
+                if remote_field:
+                    remote_model_tuple = self._get_model_tuple(
+                        remote_field.model, model_app_label, model_name
+                    )
+                    if remote_model_tuple == old_model_tuple:
+                        changed_field = field.clone()
+                        changed_field.remote_field.model = new_remote_model
+                    through_model = getattr(remote_field, 'through', None)
+                    if through_model:
+                        through_model_tuple = self._get_model_tuple(
+                            through_model, model_app_label, model_name
+                        )
+                        if through_model_tuple == old_model_tuple:
+                            if changed_field is None:
+                                changed_field = field.clone()
+                            changed_field.remote_field.through = new_remote_model
+                if changed_field:
+                    model_state.fields[index] = name, changed_field
+                    model_changed = True
+            if model_changed:
+                state.reload_model(model_app_label, model_name)
+        # Remove the old model.
         state.remove_model(app_label, self.old_name_lower)
-        # Repoint the FKs and M2Ms pointing to us
-        for related_object in all_related_objects:
-            if related_object.model is not model:
-                # The model being renamed does not participate in this relation
-                # directly. Rather, a superclass does.
-                continue
-            # Use the new related key for self referential related objects.
-            if related_object.related_model == model:
-                related_key = (app_label, self.new_name_lower)
-            else:
-                related_key = (
-                    related_object.related_model._meta.app_label,
-                    related_object.related_model._meta.model_name,
-                )
-            new_fields = []
-            for name, field in state.models[related_key].fields:
-                if name == related_object.field.name:
-                    field = field.clone()
-                    field.remote_field.model = "%s.%s" % (app_label, self.new_name)
-                new_fields.append((name, field))
-            state.models[related_key].fields = new_fields
-            state.reload_model(*related_key)
-        # Repoint M2Ms with through pointing to us
-        related_models = {
-            f.remote_field.model for f in model._meta.fields
-            if getattr(f.remote_field, 'model', None)
-        }
-        model_name = '%s.%s' % (app_label, self.old_name)
-        for related_model in related_models:
-            if related_model == model:
-                related_key = (app_label, self.new_name_lower)
-            else:
-                related_key = (related_model._meta.app_label, related_model._meta.model_name)
-            new_fields = []
-            changed = False
-            for name, field in state.models[related_key].fields:
-                if field.is_relation and field.many_to_many and field.remote_field.through == model_name:
-                    field = field.clone()
-                    field.remote_field.through = '%s.%s' % (app_label, self.new_name)
-                    changed = True
-                new_fields.append((name, field))
-            if changed:
-                state.models[related_key].fields = new_fields
-                state.reload_model(*related_key)
         state.reload_model(app_label, self.new_name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
