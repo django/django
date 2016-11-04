@@ -111,9 +111,9 @@ Getting a copy of Django's development version
 ==============================================
 
 The first step to contributing to Django is to get a copy of the source code.
-First, `fork Django on GitHub <https://github.com/django/django#fork-destination-box>`__.
-Then, from the command line, use the ``cd`` command to navigate to the
-directory where you'll want your local copy of Django to live.
+First, `fork Django on GitHub <https://github.com/django/django/fork>`__. Then,
+from the command line, use the ``cd`` command to navigate to the directory
+where you'll want your local copy of Django to live.
 
 Download the Django source code repository using the following command:
 

@@ -21,8 +21,7 @@ Running the unit tests
 Quickstart
 ----------
 
-First, `fork Django on GitHub
-<https://github.com/django/django#fork-destination-box>`__.
+First, `fork Django on GitHub <https://github.com/django/django/fork>`__.
 
 Second, create and activate a virtual environment. If you're not familiar with
 how to do that, read our :doc:`contributing tutorial </intro/contributing>`.
