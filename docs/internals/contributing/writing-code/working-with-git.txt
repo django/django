@@ -42,7 +42,8 @@ Setting up local repository
 ===========================
 
 When you have created your GitHub account, with the nick "GitHub_nick", and
-forked Django's repository, create a local copy of your fork::
+`forked Django's repository <https://github.com/django/django/fork>`__,
+create a local copy of your fork::
 
     git clone git@github.com:GitHub_nick/django.git
 
