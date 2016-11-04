@@ -83,6 +83,18 @@ class CommonMiddlewareTest(SimpleTestCase):
         r = CommonMiddleware().process_response(request, response)
         self.assertEqual(r.url, '/slash/?test=1')
 
+    @override_settings(APPEND_SLASH=True)
+    def test_append_slash_redirect_querystring_have_slash(self):
+        """
+        APPEND_SLASH should append slash to path when redirecting a request
+        with a querystring ending with slash.
+        """
+        request = self.rf.get('/slash?test=slash/')
+        response = HttpResponseNotFound()
+        r = CommonMiddleware().process_response(request, response)
+        self.assertIsInstance(r, HttpResponsePermanentRedirect)
+        self.assertEqual(r.url, '/slash/?test=slash/')
+
     @override_settings(APPEND_SLASH=True, DEBUG=True)
     def test_append_slash_no_redirect_on_POST_in_DEBUG(self):
         """
