@@ -208,7 +208,10 @@ class Command(BaseCommand):
                 if self.verbosity >= 1:
                     # Display a relative path if it's below the current working
                     # directory, or an absolute path otherwise.
-                    migration_string = os.path.relpath(writer.path)
+                    try:
+                        migration_string = os.path.relpath(writer.path)
+                    except ValueError:
+                        migration_string = writer.path
                     if migration_string.startswith('..'):
                         migration_string = writer.path
                     self.stdout.write("  %s:\n" % (self.style.MIGRATE_LABEL(migration_string),))
