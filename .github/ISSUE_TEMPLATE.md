@@ -1,3 +1,5 @@
+Please submit **questions** about usage to django-users@googlegroups.com (https://groups.google.com/forum/#!forum/django-users) and about development to django-developers@googlegroups.com (https://groups.google.com/forum/#!forum/django-developers).
+
 If you're submitting a feature request, please try to include:
 
 - Detailed description of the overall behaviour
