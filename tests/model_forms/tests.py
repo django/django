@@ -2643,11 +2643,11 @@ class OtherModelFormTests(TestCase):
             <p><label for="id_date_published">Date published:</label>
                 <input id="id_date_published" name="date_published" type="text" value="{0}" required />
                 <input id="initial-id_date_published" name="initial-date_published" type="hidden" value="{0}" /></p>
-            <p><label for="id_mode">Mode:</label> <select id="id_mode" name="mode" required>
+            <p><label for="id_mode">Mode:</label> <select id="id_mode" name="mode">
                 <option value="di" selected>direct</option>
                 <option value="de">delayed</option></select>
                 <input id="initial-id_mode" name="initial-mode" type="hidden" value="di" /></p>
-           <p><label for="id_category">Category:</label> <select id="id_category" name="category" required>
+           <p><label for="id_category">Category:</label> <select id="id_category" name="category">
                 <option value="1">Games</option>
                 <option value="2">Comics</option>
                 <option value="3" selected>Novel</option></select>

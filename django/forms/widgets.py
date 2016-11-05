@@ -573,6 +573,30 @@ class Select(Widget):
                 output.append(self.render_option(selected_choices, option_value, option_label))
         return '\n'.join(output)
 
+    def choice_has_empty_value(self, choice):
+        """
+        Checks whenever choice value is empty string or None.
+        """
+        choice_value = choice[0]
+        if isinstance(choice_value, six.string_types):
+            return len(choice_value) == 0
+        return choice_value is None
+
+    def use_required_attribute(self, initial):
+        """
+        If first choice has a value, rendering required attribute causes HTML
+        validation error.
+        """
+        super_result = super(Select, self).use_required_attribute(initial)
+
+        # Further checks are needed only when HTML element select is used and
+        # only one choice can be selected.
+        if self.allow_multiple_selected or hasattr(self, 'renderer'):
+            return super_result
+
+        first_choice = next(iter(self.choices), None)
+        return super_result and first_choice is not None and self.choice_has_empty_value(first_choice)
+
 
 class NullBooleanSelect(Select):
     """
