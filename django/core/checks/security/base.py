@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.core.signing import force_bytes, force_text
+from django.core.signing import force_text
 
 from .. import Tags, Warning, register
 from ..utils import patch_middleware_message
