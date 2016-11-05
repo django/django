@@ -89,13 +89,13 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None,
         if ns_pattern:
             resolver = get_ns_resolver(ns_pattern, resolver)
 
-    url = force_text(iri_to_uri(resolver._reverse_with_prefix(
+    uri = force_text(iri_to_uri(resolver._reverse_with_prefix(
         view, prefix, *args, **kwargs)))
 
     if request:
-        url = request.build_absolute_uri(url)
+        uri = request.build_absolute_uri(uri)
 
-    return url
+    return uri
 
 
 reverse_lazy = lazy(reverse, six.text_type)
