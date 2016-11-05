@@ -206,8 +206,8 @@ The extensions defined here are:
 * ``groups``: Allows grouping of channels to allow broadcast; see below for more.
 * ``flush``: Allows easier testing and development with channel layers.
 * ``statistics``: Allows channel layers to provide global and per-channel statistics.
-* ``twisted``: Async compatability with the Twisted framework.
-* ``asyncio``: Async compatability with Python 3's asyncio.
+* ``twisted``: Async compatibility with the Twisted framework.
+* ``asyncio``: Async compatibility with Python 3's asyncio.
 
 There is potential to add further extensions; these may be defined by
 a separate specification, or a new version of this specification.
@@ -457,7 +457,7 @@ after the most recent ``group_add`` call for that membership, the default being
 ``group_expiry`` property on the channel layer.
 
 Protocol servers must have a configurable timeout value for every connection-based
-prtocol they serve that closes the connection after the timeout, and should
+protocol they serve that closes the connection after the timeout, and should
 default this value to the value of ``group_expiry``, if the channel
 layer provides it. This allows old group memberships to be cleaned up safely,
 knowing that after the group expiry the original connection must have closed,
