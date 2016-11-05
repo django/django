@@ -768,6 +768,9 @@ class QuerySet(object):
     # PUBLIC METHODS THAT ALTER ATTRIBUTES AND RETURN A NEW QUERYSET #
     ##################################################################
 
+    def unsafe(self):
+        return self
+
     def all(self):
         """
         Returns a new QuerySet that is a copy of the current one. This allows a
