@@ -75,6 +75,10 @@ construct a fully qualified URL when using the method. For example::
     >>> reverse('admin:app_list', kwargs={'app_label': 'auth'}, request=request)
     'htttp://example.com/admin/auth/'
 
+.. versionchanged:: 1.11
+
+    The ``request``argument was added.
+
 .. note::
 
     The string returned by ``reverse()`` is already
