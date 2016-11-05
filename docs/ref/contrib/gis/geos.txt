@@ -160,7 +160,7 @@ Geometries support set-like operators::
     The :class:`~GEOSGeometry` equality operator uses
     :meth:`~GEOSGeometry.equals_exact`, not :meth:`~GEOSGeometry.equals`, i.e.
     it requires the compared geometries to have the same coordinates in the
-    same positions (and additionally, have the same srids)::
+    same positions (and additionally, have the same SRIDs)::
 
         >>> from django.contrib.gis.geos import LineString
         >>> ls1 = LineString((0, 0), (1, 1))
@@ -170,7 +170,7 @@ Geometries support set-like operators::
         True
         >>> ls1 == ls2
         False
-        >>> ls3 == ls2  # different srids
+        >>> ls3 == ls2  # different SRIDs
         False
 
 Geometry Objects
