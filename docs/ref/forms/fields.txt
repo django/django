@@ -92,6 +92,11 @@ then ``clean()`` will return a *normalized* empty value rather than raising
 For other ``Field`` classes, it might be ``None``. (This varies from field to
 field.)
 
+.. versionadded:: 1.10
+
+Required form fields now have the ``required`` HTML attribute. See the
+:ref:`Django 1.10 release notes <required-html-attribute>` for more details.
+
 ``label``
 ---------
 
