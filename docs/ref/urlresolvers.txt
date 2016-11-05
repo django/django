@@ -69,7 +69,7 @@ The ``urlconf`` argument is the URLconf module containing the URL patterns to
 use for reversing. By default, the root URLconf for the current thread is used.
 
 The ``request`` argument must be an instance of
-:class:`django.core.handlers.wsgi.WSGIRequest`  and it provides you a way to
+``django.core.handlers.wsgi.WSGIRequest``  and it provides you a way to
 construct a fully qualified URL when using the method. For example::
 
     >>> reverse('admin:app_list', kwargs={'app_label': 'auth'}, request=request)
