@@ -77,7 +77,7 @@ construct a fully qualified URL when using the method. For example::
 
 .. versionchanged:: 1.11
 
-    The ``request``argument was added.
+    The ``request`` argument was added.
 
 .. note::
 
