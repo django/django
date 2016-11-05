@@ -63,8 +63,8 @@ the ``django.contrib.postgres.operations`` module.
 ``Create extension using migrations``
 =====================================
 
-You can create a PostgreSQL Extension in your database through the generated
-migration file. Following example will cover creating of hstore extension,
+You can create a PostgreSQL Extension in your database using a migration file.
+The following example will cover creating of hstore extension,
 but same usage principles apply for all other extensions, mentioned above.
 
 1. Add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
@@ -88,5 +88,6 @@ but same usage principles apply for all other extensions, mentioned above.
    privileges, you'll have to create the extension outside of Django
    migrations with a user that has the appropriate privileges.
 
-   For hstore extension, connect to your Django database and run the query:
+   For example, doing this manually with the hstore extension,
+   you would connect to your Django database and run the following query:
    ``CREATE EXTENSION IF NOT EXISTS hstore;``
