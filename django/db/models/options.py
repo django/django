@@ -115,6 +115,7 @@ class Options(object):
         self.pk = None
         self.has_auto_field = False
         self.auto_field = None
+        self.has_readonly_fields = False
         self.abstract = False
         self.managed = True
         self.proxy = False
