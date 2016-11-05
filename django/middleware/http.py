@@ -11,13 +11,8 @@ class ConditionalGetMiddleware(MiddlewareMixin):
     Last-Modified header, and the request has If-None-Match or
     If-Modified-Since, the response is replaced by an HttpNotModified. An ETag
     header is added if needed.
-
-    Also sets the Content-Length response-header.
     """
     def process_response(self, request, response):
-        if not response.streaming and not response.has_header('Content-Length'):
-            response['Content-Length'] = str(len(response.content))
-
         # It's too late to prevent an unsafe request with a 412 response, and
         # for a HEAD request, the response body is always empty so computing
         # an accurate ETag isn't possible.

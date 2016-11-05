@@ -181,12 +181,10 @@ header, the middleware adds one if needed. If the response has a ``ETag`` or
 ``If-Modified-Since``, the response is replaced by an
 :class:`~django.http.HttpResponseNotModified`.
 
-Also sets ``Content-Length`` response-header.
-
 .. versionchanged:: 1.11
 
-    In older versions, the middleware set the ``Date`` header and didn't set
-    the ``ETag`` header.
+    In older versions, the middleware set the ``Content-Length`` and ``Date``
+    headers and didn't set the ``ETag`` header.
 
 Locale middleware
 -----------------
