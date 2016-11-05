@@ -478,30 +478,6 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         self.req = RequestFactory().get('/')
         self.resp = self.client.get(self.req.path_info)
 
-    # Tests for the Content-Length header
-
-    def test_content_length_header_added(self):
-        content_length = len(self.resp.content)
-        # Already set by CommonMiddleware, remove it to check that
-        # ConditionalGetMiddleware readds it.
-        del self.resp['Content-Length']
-        self.assertNotIn('Content-Length', self.resp)
-        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
-        self.assertIn('Content-Length', self.resp)
-        self.assertEqual(int(self.resp['Content-Length']), content_length)
-
-    def test_content_length_header_not_added(self):
-        resp = StreamingHttpResponse('content')
-        self.assertNotIn('Content-Length', resp)
-        resp = ConditionalGetMiddleware().process_response(self.req, resp)
-        self.assertNotIn('Content-Length', resp)
-
-    def test_content_length_header_not_changed(self):
-        bad_content_length = len(self.resp.content) + 10
-        self.resp['Content-Length'] = bad_content_length
-        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
-        self.assertEqual(int(self.resp['Content-Length']), bad_content_length)
-
     # Tests for the ETag header
 
     def test_middleware_calculates_etag(self):
