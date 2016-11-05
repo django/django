@@ -51,8 +51,7 @@ class MigrationLoader(object):
         if load:
             self.build_graph()
 
-    @classmethod
-    def migrations_module(cls, app_label):
+    def migrations_module(self, app_label):
         """
         Return the path to the migrations module for the specified app_label
         and a boolean indicating if the module is specified in
@@ -61,7 +60,7 @@ class MigrationLoader(object):
         if (self.connection is not None and
                 getattr(self.connection, '_run_in_test_case', False) and
                 not self.connection.settings_dict.get('TEST', {}).get('MIGRATE', True)):
-            return None
+            return None, True
         if app_label in settings.MIGRATION_MODULES:
             return settings.MIGRATION_MODULES[app_label], True
         else:
