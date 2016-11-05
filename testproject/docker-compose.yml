@@ -13,6 +13,6 @@ services:
     worker:
         image: channels-test
         build: .
-        command: python manage.py runworker
+        command: python manage.py runworker --settings=testproject.settings.channels_redis
         depends_on:
           - redis

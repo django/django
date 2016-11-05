@@ -12,13 +12,13 @@ RUN apt-get update && \
 
 # Install asgi_redis driver and most recent Daphne
 RUN pip install \
-    asgi_redis==0.8.3 \
+    asgi_redis==1.0.0 \
     git+https://github.com/django/daphne.git@#egg=daphne
 
 # Clone Channels and install it
 RUN git clone https://github.com/django/channels.git /srv/channels/ && \
     cd /srv/channels && \
-    git reset --hard caa589ae708a1a66ba1bdcd24f5fd473040772bd && \
+    git reset --hard origin/master && \
     python setup.py install
 
 WORKDIR /srv/channels/testproject/
