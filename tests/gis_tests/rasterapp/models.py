@@ -1,6 +1,5 @@
+from django.contrib.gis.db import models
 from django.contrib.gis.gdal import HAS_GDAL
-
-from ..models import models
 
 if HAS_GDAL:
     class RasterModel(models.Model):
