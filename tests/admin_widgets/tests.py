@@ -436,7 +436,7 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         response = self.client.get(reverse('admin:admin_widgets_album_change', args=(self.album.id,)))
         self.assertContains(
             response,
-            '<div class=\"readonly-field\"><a href="%(STORAGE_URL)salbums/hybrid_theory.jpg">'
+            '<div class="readonly-field"><a href="%(STORAGE_URL)salbums/hybrid_theory.jpg">'
             r'albums\hybrid_theory.jpg</a></div>' % {'STORAGE_URL': default_storage.url('')},
             html=True,
         )
@@ -448,7 +448,7 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         response = self.client.get(reverse('admin:admin_widgets_album_add'))
         self.assertContains(
             response,
-            '<div class=\"readonly-field\"></div>',
+            '<div class="readonly-field"></div>',
             html=True,
         )
 

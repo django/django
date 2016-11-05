@@ -4615,11 +4615,13 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertContains(response, "foo")
 
         # Checks that multiline text in a readonly field gets <br /> tags
-        self.assertContains(response, "Multiline<br />test<br />string")
-        self.assertContains(response, "<div class=\"readonly-field\">Multiline<br />html<br />content</div>", html=True)
-        self.assertContains(response, "InlineMultiline<br />test<br />string")
+        self.assertContains(response, 'Multiline<br />test<br />string')
+        self.assertContains(response, '<div class="readonly-field">Multiline<br />html<br />content</div>',
+                            html=True)
+        self.assertContains(response, 'InlineMultiline<br />test<br />string')
         # Remove only this last line when the deprecation completes.
-        self.assertContains(response, "<div class=\"readonly-field\">Multiline<br />html<br />content<br />with allow tags</div>", html=True)
+        self.assertContains(response, '<div class="readonly-field">Multiline<br />html<br />content<br />'
+                            'with allow tags</div>', html=True)
 
         self.assertContains(response, formats.localize(datetime.date.today() - datetime.timedelta(days=7)))
 
