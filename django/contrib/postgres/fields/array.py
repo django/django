@@ -63,8 +63,8 @@ class ArrayField(Field):
 
     flatchoices = property(_get_flatchoices)
 
-    def contribute_to_class(self, cls, name, virtual_only=False):
-        super(ArrayField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
+    def contribute_to_class(self, cls, name, private_only=False):
+        super(ArrayField, self).contribute_to_class(cls, name, private_only=private_only)
         self.base_field.model = cls
 
         if self.choices:
