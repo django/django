@@ -1,6 +1,5 @@
 import datetime
 import pickle
-import sys
 
 import pytz
 
@@ -10,8 +9,6 @@ from django.utils import timezone
 CET = pytz.timezone("Europe/Paris")
 EAT = timezone.get_fixed_timezone(180)      # Africa/Nairobi
 ICT = timezone.get_fixed_timezone(420)      # Asia/Bangkok
-
-PY36 = sys.version_info >= (3, 6)
 
 
 class TimezoneTests(SimpleTestCase):
@@ -24,14 +21,10 @@ class TimezoneTests(SimpleTestCase):
 
     def test_localdate(self):
         naive = datetime.datetime(2015, 1, 1, 0, 0, 1)
-        if PY36:
-            self.assertEqual(timezone.localdate(naive), datetime.date(2015, 1, 1))
-            self.assertEqual(timezone.localdate(naive, timezone=EAT), datetime.date(2015, 1, 1))
-        else:
-            with self.assertRaisesMessage(ValueError, 'astimezone() cannot be applied to a naive datetime'):
-                timezone.localdate(naive)
-            with self.assertRaisesMessage(ValueError, 'astimezone() cannot be applied to a naive datetime'):
-                timezone.localdate(naive, timezone=EAT)
+        with self.assertRaisesMessage(ValueError, 'localtime() cannot be applied to a naive datetime'):
+            timezone.localdate(naive)
+        with self.assertRaisesMessage(ValueError, 'localtime() cannot be applied to a naive datetime'):
+            timezone.localdate(naive, timezone=EAT)
 
         aware = datetime.datetime(2015, 1, 1, 0, 0, 1, tzinfo=ICT)
         self.assertEqual(timezone.localdate(aware, timezone=EAT), datetime.date(2014, 12, 31))
@@ -133,12 +126,8 @@ class TimezoneTests(SimpleTestCase):
             timezone.make_naive(datetime.datetime(2011, 9, 1, 17, 20, 30, tzinfo=ICT), EAT),
             datetime.datetime(2011, 9, 1, 13, 20, 30))
 
-        args = (datetime.datetime(2011, 9, 1, 13, 20, 30), EAT)
-        if PY36:
-            self.assertEqual(timezone.make_naive(*args), datetime.datetime(2011, 9, 1, 21, 20, 30))
-        else:
-            with self.assertRaisesMessage(ValueError, 'astimezone() cannot be applied to a naive datetime'):
-                timezone.make_naive(*args)
+        with self.assertRaisesMessage(ValueError, 'make_naive() cannot be applied to a naive datetime'):
+            timezone.make_naive(datetime.datetime(2011, 9, 1, 13, 20, 30), EAT)
 
     def test_make_naive_no_tz(self):
         self.assertEqual(
@@ -168,14 +157,8 @@ class TimezoneTests(SimpleTestCase):
                 pytz.timezone("Asia/Bangkok").localize(datetime.datetime(2011, 9, 1, 17, 20, 30)), CET
             ),
             datetime.datetime(2011, 9, 1, 12, 20, 30))
-        if PY36:
-            self.assertEqual(
-                timezone.make_naive(datetime.datetime(2011, 9, 1, 12, 20, 30), CET),
-                datetime.datetime(2011, 9, 1, 19, 20, 30)
-            )
-        else:
-            with self.assertRaises(ValueError):
-                timezone.make_naive(datetime.datetime(2011, 9, 1, 12, 20, 30), CET)
+        with self.assertRaisesMessage(ValueError, 'make_naive() cannot be applied to a naive datetime'):
+            timezone.make_naive(datetime.datetime(2011, 9, 1, 12, 20, 30), CET)
 
     def test_make_aware_pytz_ambiguous(self):
         # 2:30 happens twice, once before DST ends and once after
