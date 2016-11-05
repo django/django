@@ -59,6 +59,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # literals containing hexadecimal data and preceded by a single "X"
             # character:
             # value = b'\x01\x02' => value_hex = b'0102' => return X'0102'
+            if hasattr(value, 'tobytes'):
+                value = value.tobytes()
+            else:
+                value = bytes(value)
             value = bytes(value)
             hex_encoder = codecs.getencoder('hex_codec')
             value_hex, _length = hex_encoder(value)

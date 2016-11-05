@@ -152,8 +152,11 @@ class _WKBReader(IOBase):
 
     def read(self, wkb):
         "Returns a _pointer_ to C GEOS Geometry object from the given WKB."
-        if isinstance(wkb, six.memoryview):
-            wkb_s = bytes(wkb)
+        if isinstance(wkb, six.buffer_types):
+            if hasattr(wkb, 'tobytes'):
+                wkb_s = wkb.tobytes()
+            else:
+                wkb_s = bytes(wkb)
             return wkb_reader_read(self.ptr, wkb_s, len(wkb_s))
         elif isinstance(wkb, (bytes, six.string_types)):
             return wkb_reader_read_hex(self.ptr, wkb, len(wkb))

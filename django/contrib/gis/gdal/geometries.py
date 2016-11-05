@@ -96,7 +96,10 @@ class OGRGeometry(GDALBase):
                 OGRGeomType(geom_input)
                 g = capi.create_geom(OGRGeomType(geom_input).num)
         elif isinstance(geom_input, six.buffer_types):
-            geom_input_bytes = bytes(geom_input)
+            if hasattr(geom_input, 'tobytes'):
+                geom_input_bytes = geom_input.tobytes()
+            else:
+                geom_input_bytes = bytes(geom_input)
             # WKB was passed in
             g = capi.from_wkb(geom_input_bytes, None, byref(c_void_p()), len(geom_input_bytes))
         elif isinstance(geom_input, OGRGeomType):
