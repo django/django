@@ -245,12 +245,16 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_basic_edit_GET_string_PK(self):
         """
-        Ensure GET on the change_view works (returns an HTTP 404 error, see
-        #11191) when passing a string as the PK argument for a model with an
-        integer PK field.
+        GET on the change_view (when passing a string as the PK argument for a
+        model with an integer PK field) redirects to the index page with a
+        message saying the object doesn't exist.
         """
-        response = self.client.get(reverse('admin:admin_views_section_change', args=('abc',)))
-        self.assertEqual(response.status_code, 404)
+        response = self.client.get(reverse('admin:admin_views_section_change', args=('abc',)), follow=True)
+        self.assertRedirects(response, reverse('admin:index'))
+        self.assertEqual(
+            [m.message for m in response.context['messages']],
+            ["section with ID abc doesn't exist. Perhaps it was deleted?"]
+        )
 
     def test_basic_edit_GET_old_url_redirect(self):
         """
@@ -263,12 +267,15 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_basic_inheritance_GET_string_PK(self):
         """
-        Ensure GET on the change_view works on inherited models (returns an
-        HTTP 404 error, see #19951) when passing a string as the PK argument
-        for a model with an integer PK field.
+        GET on the change_view (for inherited models) redirects to the index
+        page with a message saying the object doesn't exist.
         """
-        response = self.client.get(reverse('admin:admin_views_supervillain_change', args=('abc',)))
-        self.assertEqual(response.status_code, 404)
+        response = self.client.get(reverse('admin:admin_views_supervillain_change', args=('abc',)), follow=True)
+        self.assertRedirects(response, reverse('admin:index'))
+        self.assertEqual(
+            [m.message for m in response.context['messages']],
+            ["super villain with ID abc doesn't exist. Perhaps it was deleted?"]
+        )
 
     def test_basic_add_POST(self):
         """
@@ -1787,6 +1794,16 @@ class AdminViewPermissionsTest(TestCase):
         logged = LogEntry.objects.get(content_type=article_ct, action_flag=DELETION)
         self.assertEqual(logged.object_id, str(self.a1.pk))
 
+    def test_delete_view_nonexistent_obj(self):
+        self.client.force_login(self.deleteuser)
+        url = reverse('admin:admin_views_article_delete', args=('nonexistent',))
+        response = self.client.get(url, follow=True)
+        self.assertRedirects(response, reverse('admin:index'))
+        self.assertEqual(
+            [m.message for m in response.context['messages']],
+            ["article with ID nonexistent doesn't exist. Perhaps it was deleted?"]
+        )
+
     def test_history_view(self):
         """History view should restrict access."""
         # add user should not be able to view the list of article or change any of them
@@ -1828,8 +1845,12 @@ class AdminViewPermissionsTest(TestCase):
 
     def test_history_view_bad_url(self):
         self.client.force_login(self.changeuser)
-        response = self.client.get(reverse('admin:admin_views_article_history', args=('foo',)))
-        self.assertEqual(response.status_code, 404)
+        response = self.client.get(reverse('admin:admin_views_article_history', args=('foo',)), follow=True)
+        self.assertRedirects(response, reverse('admin:index'))
+        self.assertEqual(
+            [m.message for m in response.context['messages']],
+            ["article with ID foo doesn't exist. Perhaps it was deleted?"]
+        )
 
     def test_conditionally_show_add_section_link(self):
         """
@@ -3609,11 +3630,16 @@ class AdminCustomQuerysetTest(TestCase):
 
     def test_change_view(self):
         for i in self.pks:
-            response = self.client.get(reverse('admin:admin_views_emptymodel_change', args=(i,)))
+            url = reverse('admin:admin_views_emptymodel_change', args=(i,))
+            response = self.client.get(url, follow=True)
             if i > 1:
                 self.assertEqual(response.status_code, 200)
             else:
-                self.assertEqual(response.status_code, 404)
+                self.assertRedirects(response, reverse('admin:index'))
+                self.assertEqual(
+                    [m.message for m in response.context['messages']],
+                    ["empty model with ID 1 doesn't exist. Perhaps it was deleted?"]
+                )
 
     def test_add_model_modeladmin_defer_qs(self):
         # Test for #14529. defer() is used in ModelAdmin.get_queryset()

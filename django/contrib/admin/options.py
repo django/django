@@ -34,7 +34,7 @@ from django.forms.models import (
     modelform_factory, modelformset_factory,
 )
 from django.forms.widgets import CheckboxSelectMultiple, SelectMultiple
-from django.http import Http404, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import reverse
@@ -1389,6 +1389,19 @@ class ModelAdmin(BaseModelAdmin):
                 initial[k] = initial[k].split(",")
         return initial
 
+    def _get_obj_does_not_exist_redirect(self, request, opts, object_id):
+        """
+        Create a message informing the user that the object doesn't exist
+        and return a redirect to the admin index page.
+        """
+        msg = _("%(name)s with ID %(key)s doesn't exist. Perhaps it was deleted?") % {
+            'name': force_text(opts.verbose_name),
+            'key': escape(object_id),
+        }
+        self.message_user(request, msg, messages.WARNING)
+        url = reverse('admin:index', current_app=self.admin_site.name)
+        return HttpResponseRedirect(url)
+
     @csrf_protect_m
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         with transaction.atomic(using=router.db_for_write(self.model)):
@@ -1419,8 +1432,7 @@ class ModelAdmin(BaseModelAdmin):
                 raise PermissionDenied
 
             if obj is None:
-                raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
-                    'name': force_text(opts.verbose_name), 'key': escape(object_id)})
+                return self._get_obj_does_not_exist_redirect(request, opts, object_id)
 
         ModelForm = self.get_form(request, obj)
         if request.method == 'POST':
@@ -1692,10 +1704,7 @@ class ModelAdmin(BaseModelAdmin):
             raise PermissionDenied
 
         if obj is None:
-            raise Http404(
-                _('%(name)s object with primary key %(key)r does not exist.') %
-                {'name': force_text(opts.verbose_name), 'key': escape(object_id)}
-            )
+            return self._get_obj_does_not_exist_redirect(request, opts, object_id)
 
         using = router.db_for_write(self.model)
 
@@ -1749,10 +1758,7 @@ class ModelAdmin(BaseModelAdmin):
         model = self.model
         obj = self.get_object(request, unquote(object_id))
         if obj is None:
-            raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
-                'name': force_text(model._meta.verbose_name),
-                'key': escape(object_id),
-            })
+            return self._get_obj_does_not_exist_redirect(request, model._meta, object_id)
 
         if not self.has_change_permission(request, obj):
             raise PermissionDenied
