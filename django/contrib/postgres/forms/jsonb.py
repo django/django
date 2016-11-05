@@ -11,7 +11,7 @@ class InvalidJSONInput(six.text_type):
     pass
 
 
-class JsonStr(six.text_type):
+class JSONString(six.text_type):
     pass
 
 
@@ -26,7 +26,7 @@ class JSONField(forms.CharField):
             return value
         if value in self.empty_values:
             return None
-        elif isinstance(value, (list, dict, int, float, bool, JsonStr)):
+        elif isinstance(value, (list, dict, int, float, bool, JSONString)):
             return value
 
         try:
@@ -39,7 +39,7 @@ class JSONField(forms.CharField):
             )
 
         if isinstance(converted, six.text_type):
-            return JsonStr(converted)
+            return JSONString(converted)
         else:
             return converted
 
