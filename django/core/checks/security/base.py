@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.signing import force_bytes, force_text
 
 from .. import Tags, Warning, register
 from ..utils import patch_middleware_message
@@ -107,6 +108,12 @@ W021 = Warning(
     id='security.W021',
 )
 
+W022 = Warning(
+    "Your SECRET_KEY contains invalid Unicode. Please ensure you have a "
+    "valid Unicode string.",
+    id='security.W022',
+)
+
 
 def _security_middleware():
     return ("django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE_CLASSES or
@@ -184,13 +191,27 @@ def check_ssl_redirect(app_configs, **kwargs):
 
 
 @register(Tags.security, deploy=True)
-def check_secret_key(app_configs, **kwargs):
+def check_secret_key_length(app_configs, **kwargs):
     passed_check = (
         getattr(settings, 'SECRET_KEY', None) and
         len(set(settings.SECRET_KEY)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
         len(settings.SECRET_KEY) >= SECRET_KEY_MIN_LENGTH
     )
     return [] if passed_check else [W009]
+
+
+@register(Tags.security, deploy=True)
+def check_secret_key_valid_unicode(app_configs, **kwargs):
+    valid_unicode = True
+    try:
+        # To maintain backwards compatibility, instead of checking that
+        # SECRET_KEY is a valid unicode string, simply check if it goes through
+        # `force_bytes` and `force_text` without throwing an exception.
+        force_bytes(settings.SECRET_KEY)
+        force_text(settings.SECRET_KEY)
+    except UnicodeDecodeError:
+        valid_unicode = False
+    return [] if valid_unicode else [W022]
 
 
 @register(Tags.security, deploy=True)
