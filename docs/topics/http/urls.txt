@@ -597,15 +597,28 @@ In order to perform URL reversing, you'll need to use **named URL patterns**
 as done in the examples above. The string used for the URL name can contain any
 characters you like. You are not restricted to valid Python names.
 
-When you name your URL patterns, make sure you use names that are unlikely
-to clash with any other application's choice of names. If you call your URL
-pattern ``comment``, and another application does the same thing, there's
-no guarantee which URL will be inserted into your template when you use
-this name.
+When naming URL patterns, choose names that are unlikely to clash with other
+applications' choice of names. If you call your URL pattern ``comment``
+and another application does the same thing, the URL that
+:func:`~django.urls.reverse()` finds depends on whichever pattern is last in
+your project's ``urlpatterns`` list.
 
 Putting a prefix on your URL names, perhaps derived from the application
-name, will decrease the chances of collision. We recommend something like
-``myapp-comment`` instead of ``comment``.
+name (such as ``myapp-comment`` instead of ``comment``), decreases the chance
+of collision.
+
+You can deliberately choose the *same URL name* as another application if you
+want to override a view. For example, a common use case is to override the
+:class:`~django.contrib.auth.views.LoginView`. Parts of Django and most
+third-party apps assume that this view has a URL pattern with the name
+``login``. If you have a custom login view and give its URL the name ``login``,
+:func:`~django.urls.reverse()` will find your custom view as long as it's in
+``urlpatterns`` after ``django.contrib.auth.urls`` is included (if that's
+included at all).
+
+You may also use the same name for multiple URL patterns if they differ in
+their arguments. In addition to the URL name, :func:`~django.urls.reverse()`
+matches the number of arguments and the names of the keyword arguments.
 
 .. _topics-http-defining-url-namespaces:
 

@@ -386,6 +386,23 @@ class ResolverTests(SimpleTestCase):
         self.assertEqual(resolver.reverse('named-url2', 'arg'), 'extra/arg/')
         self.assertEqual(resolver.reverse('named-url2', extra='arg'), 'extra/arg/')
 
+    def test_resolver_reverse_conflict(self):
+        """
+        url() name arguments don't need to be unique. The last registered
+        pattern takes precedence for conflicting names.
+        """
+        resolver = get_resolver('urlpatterns_reverse.named_urls_conflict')
+        # Without arguments, the last URL in urlpatterns has precedence.
+        self.assertEqual(resolver.reverse('name-conflict'), 'conflict/')
+        # With an arg, the last URL in urlpatterns has precedence.
+        self.assertEqual(resolver.reverse('name-conflict', 'arg'), 'conflict-last/arg/')
+        # With a kwarg, other url()s can be reversed.
+        self.assertEqual(resolver.reverse('name-conflict', first='arg'), 'conflict-first/arg/')
+        self.assertEqual(resolver.reverse('name-conflict', middle='arg'), 'conflict-middle/arg/')
+        self.assertEqual(resolver.reverse('name-conflict', last='arg'), 'conflict-last/arg/')
+        # The number and order of the arguments don't interfere with reversing.
+        self.assertEqual(resolver.reverse('name-conflict', 'arg', 'arg'), 'conflict/arg/arg/')
+
     def test_non_regex(self):
         """
         A Resolver404 is raised if resolving doesn't meet the basic
