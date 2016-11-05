@@ -281,6 +281,9 @@ Management Commands
 * The new :option:`loaddata --exclude` option allows excluding models and apps
   while loading data from fixtures.
 
+* The new :option:`diffsettings --default` option allows specifying a settings
+  module other than Django's default settings to compare against.
+
 Migrations
 ~~~~~~~~~~
 

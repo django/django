@@ -223,7 +223,7 @@ Specifies the database onto which to open a shell. Defaults to ``default``.
 .. django-admin:: diffsettings
 
 Displays differences between the current settings file and Django's default
-settings.
+settings (or another settings file specified by :option:`--default`).
 
 Settings that don't appear in the defaults are followed by ``"###"``. For
 example, the default settings don't define :setting:`ROOT_URLCONF`, so
@@ -234,6 +234,13 @@ example, the default settings don't define :setting:`ROOT_URLCONF`, so
 
 Displays all settings, even if they have Django's default value. Such settings
 are prefixed by ``"###"``.
+
+.. django-admin-option:: --default MODULE
+
+.. versionadded:: 1.11
+
+The settings module to compare the current settings against. Leave empty to
+compare against Django's default settings.
 
 ``dumpdata``
 ------------
