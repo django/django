@@ -334,6 +334,9 @@ Also note that Django expects the ``"%s"`` placeholder, *not* the ``"?"``
 placeholder, which is used by the SQLite Python bindings. This is for the sake
 of consistency and sanity.
 
+Any argument given to the cursor will pass through to the underlying database
+adapter.
+
 Using a cursor as a context manager::
 
     with connection.cursor() as c:

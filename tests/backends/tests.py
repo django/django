@@ -29,7 +29,7 @@ from django.test import (
 from django.utils import six
 from django.utils.six.moves import range
 
-from . import models
+from . import cursors, models
 
 
 class DatabaseWrapperTests(SimpleTestCase):
@@ -1257,3 +1257,38 @@ class TestSqliteThreadSharing(TransactionTestCase):
         thread.join()
 
         self.assertEqual(models.Object.objects.count(), 2)
+
+
+@unittest.skipUnless(connection.vendor == 'postgresql',
+                     "This test applies only to PostgreSQL")
+class PostgreSQLCursorOptionsTestCase(TestCase):
+
+    def test_cursor_options(self):
+        cursor_factory = cursors.postgres.LoggingCursorFactory()
+        with connection.cursor(cursor_factory=cursor_factory.create) as cursor:
+            cursor.execute("SELECT 1;")
+        self.assertIn(b"SELECT 1;", cursor_factory.bucket)
+
+
+@unittest.skipUnless(
+    connection.vendor == 'sqlite',
+    "This test applies only to SQLite")
+class SQLiteCursorOptionsTestCase(TestCase):
+
+    def test_cursor_options(self):
+        cursor_factory = cursors.sqlite.LoggingCursorFactory()
+        with connection.cursor(factory=cursor_factory.create) as cursor:
+            cursor.execute("SELECT 1;")
+            self.assertIn("SELECT 1;", cursor_factory.bucket)
+
+
+@unittest.skipUnless(
+    connection.vendor == 'mysql',
+    "This test applies only to SQLite")
+class MySQLCursorOptionsTestCase(TestCase):
+
+    def test_cursor_options(self):
+        cursor_factory = cursors.mysql.LoggingCursorFactory()
+        with connection.cursor(cursorclass=cursor_factory.create) as cursor:
+            cursor.execute("SELECT 1;")
+            self.assertIn("SELECT 1;", cursor_factory.bucket)
