@@ -841,14 +841,15 @@ message:
 
 * If ``bytes`` or ``text`` is present, accept the connection and send the data.
 * If ``accept`` is ``True``, accept the connection and do nothing else.
-* If ``close`` is ``True``, reject the connection. If ``bytes`` or ``text`` is
-  also set, it should accept the connection, send the frame, then immediately
-  close the connection.
+* If ``close`` is ``True`` or a positive integer, reject the connection. If
+  ``bytes`` or ``text`` is also set, it should accept the connection, send the
+  frame, then immediately close the connection.
 
 If received while the connection is established:
 
 * If ``bytes`` or ``text`` is present, send the data.
-* If ``close`` is ``True``, close the connection after any send.
+* If ``close`` is ``True`` or a positive integer, close the connection after
+  any send.
 * ``accept`` is ignored.
 
 Channel: ``websocket.send!``
@@ -859,8 +860,10 @@ Keys:
 
 * ``text``: Unicode string of frame content, if in text mode, or ``None``.
 
-* ``close``: Boolean saying if the connection should be closed after data
-  is sent, if any. Optional, default ``False``.
+* ``close``: Boolean indicating if the connection should be closed after
+  data is sent, if any. Alternatively, a positive integer specifying the
+  response code. The response code will be 1000 if you pass ``True``.
+  Optional, default ``False``.
 
 * ``accept``: Boolean saying if the connection should be accepted without
   sending a frame if it is in the handshake phase.

@@ -172,8 +172,8 @@ Note that this subclass still can't intercept ``Group.send()`` calls to make
 them into JSON automatically, but it does provide ``self.group_send(name, content)``
 that will do this for you if you call it explicitly.
 
-``self.close()`` is also provided to easily close the WebSocket from the server
-end once you are done with it.
+``self.close()`` is also provided to easily close the WebSocket from the
+server end with an optional status code once you are done with it.
 
 .. _multiplexing:
 

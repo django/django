@@ -95,7 +95,7 @@ class WebsocketConsumer(BaseConsumer):
         """
         message = {}
         if close:
-            message["close"] = True
+            message["close"] = close
         if text is not None:
             message["text"] = text
         elif bytes is not None:
@@ -108,7 +108,7 @@ class WebsocketConsumer(BaseConsumer):
     def group_send(cls, name, text=None, bytes=None, close=False):
         message = {}
         if close:
-            message["close"] = True
+            message["close"] = close
         if text is not None:
             message["text"] = text
         elif bytes is not None:
@@ -117,11 +117,11 @@ class WebsocketConsumer(BaseConsumer):
             raise ValueError("You must pass text or bytes")
         Group(name).send(message)
 
-    def close(self):
+    def close(self, status=True):
         """
         Closes the WebSocket from the server end
         """
-        self.message.reply_channel.send({"close": True})
+        self.message.reply_channel.send({"close": status})
 
     def raw_disconnect(self, message, **kwargs):
         """
@@ -134,7 +134,7 @@ class WebsocketConsumer(BaseConsumer):
 
     def disconnect(self, message, **kwargs):
         """
-        Called when a WebSocket connection is opened.
+        Called when a WebSocket connection is closed.
         """
         pass
 
