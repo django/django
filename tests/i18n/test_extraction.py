@@ -17,7 +17,6 @@ from django.core.management.utils import find_command
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils._os import symlinks_supported
-from django.utils.translation import TranslatorCommentWarning
 
 from .utils import POFileAssertionMixin, RunInTmpDirMixin, copytree
 
@@ -271,33 +270,9 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_template_comments(self):
         """Template comment tags on the same line of other constructs (#19552)"""
-        # Test detection/end user reporting of old, incorrect templates
-        # translator comments syntax
-        with warnings.catch_warnings(record=True) as ws:
-            warnings.simplefilter('always')
-            management.call_command('makemessages', locale=[LOCALE], extensions=['thtml'], verbosity=0)
-            self.assertEqual(len(ws), 3)
-            for w in ws:
-                self.assertTrue(issubclass(w.category, TranslatorCommentWarning))
-            self.assertRegex(
-                str(ws[0].message),
-                r"The translator-targeted comment 'Translators: ignored i18n "
-                r"comment #1' \(file templates[/\\]comments.thtml, line 4\) "
-                r"was ignored, because it wasn't the last item on the line\."
-            )
-            self.assertRegex(
-                str(ws[1].message),
-                r"The translator-targeted comment 'Translators: ignored i18n "
-                r"comment #3' \(file templates[/\\]comments.thtml, line 6\) "
-                r"was ignored, because it wasn't the last item on the line\."
-            )
-            self.assertRegex(
-                str(ws[2].message),
-                r"The translator-targeted comment 'Translators: ignored i18n "
-                r"comment #4' \(file templates[/\\]comments.thtml, line 8\) "
-                r"was ignored, because it wasn't the last item on the line\."
-            )
-        # Now test .po file contents
+
+        management.call_command('makemessages', locale=[LOCALE], extensions=['thtml'], verbosity=0)
+
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
@@ -305,24 +280,24 @@ class BasicExtractorTests(ExtractorTests):
             self.assertMsgId('Translatable literal #9a', po_contents)
             self.assertNotIn('ignored comment #1', po_contents)
 
-            self.assertNotIn('Translators: ignored i18n comment #1', po_contents)
+            self.assertIn('Translators: i18n comment #1', po_contents)
             self.assertMsgId("Translatable literal #9b", po_contents)
 
-            self.assertNotIn('ignored i18n comment #2', po_contents)
+            self.assertIn('i18n comment #2', po_contents)
             self.assertNotIn('ignored comment #2', po_contents)
             self.assertMsgId('Translatable literal #9c', po_contents)
 
             self.assertNotIn('ignored comment #3', po_contents)
-            self.assertNotIn('ignored i18n comment #3', po_contents)
+            self.assertIn('i18n comment #3', po_contents)
             self.assertMsgId('Translatable literal #9d', po_contents)
 
             self.assertNotIn('ignored comment #4', po_contents)
             self.assertMsgId('Translatable literal #9e', po_contents)
             self.assertNotIn('ignored comment #5', po_contents)
 
-            self.assertNotIn('ignored i18n comment #4', po_contents)
+            self.assertIn('i18n comment #4', po_contents)
+            self.assertIn('valid i18n comment #5', po_contents)
             self.assertMsgId('Translatable literal #9f', po_contents)
-            self.assertIn('#. Translators: valid i18n comment #5', po_contents)
 
             self.assertMsgId('Translatable literal #9g', po_contents)
             self.assertIn('#. Translators: valid i18n comment #6', po_contents)
@@ -333,6 +308,70 @@ class BasicExtractorTests(ExtractorTests):
             self.assertRegex(po_contents, r'#\..+Translators: valid i18n comment #8')
             self.assertRegex(po_contents, r'#\..+Translators: valid i18n comment #9')
             self.assertMsgId("Translatable literal #9j", po_contents)
+
+            self.assertRegex(po_contents, r'#\..+Translators: i18n comment #9w')
+            self.assertMsgId("Translatable literal #9w", po_contents)
+
+            self.assertRegex(po_contents, r'#\..+Translators: i18n comment #9z')
+            self.assertMsgId("Translatable literal #9z", po_contents)
+
+            self.assertRegex(po_contents, r'#\..+Translators: i18n comment #9x')
+            self.assertMsgId("Translatable literal #9x", po_contents)
+
+    def test_inline_translators_template_comments(self):
+        """Test translations along with inline translators comments (#21963)"""
+
+        # No warnings expected, TranslatorCommentWarning has been removed from Django
+        with warnings.catch_warnings(record=True) as ws:
+            warnings.simplefilter('always')
+            management.call_command('makemessages', locale=[LOCALE], extensions=['thtml'], verbosity=0)
+            self.assertEqual(len(ws), 0)
+
+        # Test .po file contents and ensure that all translations are in correct
+        # locations with correct inline comments
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = fp.read()
+
+            self.assertMsgId('Jan', po_contents)
+            self.assertIn("#. Translators: Abbreviated month name 'Jan'", po_contents)
+            self.assertLocationCommentPresent(self.PO_FILE, 4, 'templates', 'translators.thtml')
+
+            self.assertMsgId('Feb', po_contents)
+            self.assertIn("Translators: Abbreviated month name 'Feb'", po_contents)
+            self.assertLocationCommentPresent(self.PO_FILE, 6, 'templates', 'translators.thtml')
+
+            self.assertMsgId('Mar', po_contents)
+            self.assertIn("Translators: Abbreviated month name 'Mar'", po_contents)
+            self.assertLocationCommentPresent(self.PO_FILE, 8, 'templates', 'translators.thtml')
+
+            self.assertMsgId('Apr', po_contents)
+            self.assertIn("Translators: Abbreviated month name 'Apr'", po_contents)
+            self.assertLocationCommentPresent(self.PO_FILE, 10, 'templates', 'translators.thtml')
+
+            self.assertMsgId('May', po_contents)
+            self.assertIn("Translators: Abbreviated month name 'May'", po_contents)
+            self.assertLocationCommentPresent(self.PO_FILE, 12, 'templates', 'translators.thtml')
+
+            self.assertMsgId('Jun', po_contents)
+            self.assertIn("Translators: Abbreviated month name 'Jun'", po_contents)
+            self.assertLocationCommentPresent(self.PO_FILE, 15, 'templates', 'translators.thtml')
+
+            self.assertMsgId('Jul', po_contents)
+            self.assertIn("Translators: Abbreviated month name 'Jul'", po_contents)
+            self.assertLocationCommentPresent(self.PO_FILE, 19, 'templates', 'translators.thtml')
+
+            self.assertMsgId('Aug', po_contents)
+            self.assertIn("Translators: Abbreviated month name 'Aug'", po_contents)
+            self.assertLocationCommentPresent(self.PO_FILE, 23, 'templates', 'translators.thtml')
+
+            self.assertMsgId('Sep', po_contents)
+            self.assertIn("Translators: Abbreviated month name 'Sep'", po_contents)
+            self.assertLocationCommentPresent(self.PO_FILE, 25, 'templates', 'translators.thtml')
+
+            self.assertMsgId('Oct', po_contents)
+            self.assertIn("Translators: Abbreviated month name 'Oct'", po_contents)
+            self.assertLocationCommentPresent(self.PO_FILE, 27, 'templates', 'translators.thtml')
 
     def test_makemessages_find_files(self):
         """

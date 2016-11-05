@@ -1,5 +1,4 @@
 import re
-import warnings
 from io import StringIO
 
 from django.template.base import (
@@ -7,7 +6,7 @@ from django.template.base import (
     Lexer,
 )
 
-from . import TranslatorCommentWarning, trim_whitespace
+from . import trim_whitespace
 
 dot_re = re.compile(r'\S')
 
@@ -50,8 +49,6 @@ def templatize(src, origin=None):
     plural = []
     incomment = False
     comment = []
-    lineno_comment_map = {}
-    comment_lineno_cache = None
     # Adding the u prefix allows gettext to recognize the string (#26093).
     raw_prefix = 'u'
 
@@ -70,8 +67,18 @@ def templatize(src, origin=None):
                     if line.lstrip().startswith(TRANSLATOR_COMMENT_MARK):
                         translators_comment_start = lineno
                 for lineno, line in enumerate(content.splitlines(True)):
+                    multiline_comment_block = len(content.splitlines(True)) > 1
                     if translators_comment_start is not None and lineno >= translators_comment_start:
-                        out.write(' # %s' % line)
+                        if not multiline_comment_block:
+                            # move comment into last new line at the end of line
+                            new_line_pos = out.getvalue().rindex('\n')
+                            out.seek(new_line_pos + 1)
+                            temp_buffer = out.read()
+                            out.seek(new_line_pos)
+                            comment_block_content = ' # %s \n%s' % (line, temp_buffer)
+                        else:
+                            comment_block_content = ' # %s ' % line
+                        out.write(comment_block_content)
                     else:
                         out.write(' #\n')
                 incomment = False
@@ -142,27 +149,6 @@ def templatize(src, origin=None):
                 else:
                     singular.append(contents)
         else:
-            # Handle comment tokens (`{# ... #}`) plus other constructs on
-            # the same line:
-            if comment_lineno_cache is not None:
-                cur_lineno = t.lineno + t.contents.count('\n')
-                if comment_lineno_cache == cur_lineno:
-                    if t.token_type != TOKEN_COMMENT:
-                        for c in lineno_comment_map[comment_lineno_cache]:
-                            filemsg = ''
-                            if origin:
-                                filemsg = 'file %s, ' % origin
-                            warn_msg = (
-                                "The translator-targeted comment '%s' "
-                                "(%sline %d) was ignored, because it wasn't "
-                                "the last item on the line."
-                            ) % (c, filemsg, comment_lineno_cache)
-                            warnings.warn(warn_msg, TranslatorCommentWarning)
-                        lineno_comment_map[comment_lineno_cache] = []
-                else:
-                    out.write('# %s' % ' | '.join(lineno_comment_map[comment_lineno_cache]))
-                comment_lineno_cache = None
-
             if t.token_type == TOKEN_BLOCK:
                 imatch = inline_re.match(t.contents)
                 bmatch = block_re.match(t.contents)
@@ -223,8 +209,13 @@ def templatize(src, origin=None):
                         out.write(blankout(p, 'F'))
             elif t.token_type == TOKEN_COMMENT:
                 if t.contents.lstrip().startswith(TRANSLATOR_COMMENT_MARK):
-                    lineno_comment_map.setdefault(t.lineno, []).append(t.contents)
-                    comment_lineno_cache = t.lineno
+                    new_line_pos = out.getvalue().rindex('\n')
+                    out.seek(new_line_pos + 1)
+                    temp_buffer = out.read()
+                    out.seek(new_line_pos)
+                    comment_block_content = '# %s ' % t.contents
+                    out.write(comment_block_content + '\n' + temp_buffer)
+
             else:
                 out.write(blankout(t.contents, 'X'))
     return out.getvalue()

@@ -26,10 +26,6 @@ __all__ = [
 LANGUAGE_SESSION_KEY = '_language'
 
 
-class TranslatorCommentWarning(SyntaxWarning):
-    pass
-
-
 # Here be dragons, so a short explanation of the logic won't hurt:
 # We are trying to solve two problems: (1) access settings, in particular
 # settings.USE_I18N, as late as possible, so that modules can be imported
