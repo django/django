@@ -6,6 +6,7 @@ from django.db.backends import utils as backend_utils
 from django.db.models import fields
 from django.db.models.query_utils import Q
 from django.utils import six
+from django.utils.deconstruct import deconstructible
 from django.utils.functional import cached_property
 
 
@@ -116,6 +117,7 @@ class Combinable(object):
         )
 
 
+@deconstructible
 class BaseExpression(object):
     """
     Base class for all query expressions.
@@ -339,6 +341,24 @@ class BaseExpression(object):
                 for inner_expr in expr.flatten():
                     yield inner_expr
 
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return False
+
+        path, args, kwargs = self.deconstruct()
+        other_path, other_args, other_kwargs = other.deconstruct()
+
+        if (path, args) == (other_path, other_args):
+            kwargs = kwargs.copy()
+            other_kwargs = other_kwargs.copy()
+            output_field = type(kwargs.pop('output_field', None))
+            other_output_field = type(other_kwargs.pop('output_field', None))
+
+            if output_field == other_output_field:
+                return kwargs == other_kwargs
+
+        return False
+
 
 class Expression(BaseExpression, Combinable):
     """
@@ -445,6 +465,7 @@ class TemporalSubtraction(CombinedExpression):
         return connection.ops.subtract_temporals(self.lhs.output_field.get_internal_type(), lhs, rhs)
 
 
+@deconstructible
 class F(Combinable):
     """
     An object capable of resolving references to existing query objects.
@@ -467,6 +488,9 @@ class F(Combinable):
 
     def desc(self):
         return OrderBy(self, descending=True)
+
+    def __eq__(self, other):
+        return self.__class__ == other.__class__ and self.name == other.name
 
 
 class Func(Expression):
