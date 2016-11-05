@@ -35,7 +35,7 @@ class BaseStaticFilesMixin(object):
     def render_template(self, template, **kwargs):
         if isinstance(template, six.string_types):
             template = Template(template)
-        return template.render(Context(kwargs)).strip()
+        return template.render(Context(**kwargs)).strip()
 
     def static_template_snippet(self, path, asvar=False):
         if asvar:
