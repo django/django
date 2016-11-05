@@ -205,11 +205,10 @@ def check_secret_key_valid_unicode(app_configs, **kwargs):
     valid_unicode = True
     try:
         # To maintain backwards compatibility, instead of checking that
-        # SECRET_KEY is a valid unicode string, simply check if it goes through
-        # `force_bytes` and `force_text` without throwing an exception.
-        force_bytes(settings.SECRET_KEY)
+        # SECRET_KEY is a valid Unicode string, simply check if it goes through
+        # `force_text` without throwing an exception.
         force_text(settings.SECRET_KEY)
-    except UnicodeDecodeError:
+    except UnicodeError:
         valid_unicode = False
     return [] if valid_unicode else [W022]
 
