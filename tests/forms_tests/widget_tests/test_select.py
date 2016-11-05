@@ -294,3 +294,23 @@ class SelectTest(WidgetTest):
         self.assertIsNot(widget.choices, obj.choices)
         self.assertEqual(widget.attrs, obj.attrs)
         self.assertIsNot(widget.attrs, obj.attrs)
+
+    def test_doesnt_render_required_when_impossible_to_select_empty_field(self):
+        widget = self.widget(choices=[('J', 'John'), ('P', 'Paul')])
+        self.assertIs(widget.use_required_attribute(initial=None), False)
+
+    def test_renders_required_when_possible_to_select_empty_field_str(self):
+        widget = self.widget(choices=[('', 'select please'), ('P', 'Paul')])
+        self.assertIs(widget.use_required_attribute(initial=None), True)
+
+    def test_renders_required_when_possible_to_select_empty_field_list(self):
+        widget = self.widget(choices=[['', 'select please'], ['P', 'Paul']])
+        self.assertIs(widget.use_required_attribute(initial=None), True)
+
+    def test_renders_required_when_possible_to_select_empty_field_none(self):
+        widget = self.widget(choices=[(None, 'select please'), ('P', 'Paul')])
+        self.assertIs(widget.use_required_attribute(initial=None), True)
+
+    def test_doesnt_render_required_when_no_choices_are_available(self):
+        widget = self.widget(choices=[])
+        self.assertIs(widget.use_required_attribute(initial=None), False)

@@ -502,12 +502,12 @@ class FormsTestCase(SimpleTestCase):
             language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')])
 
         f = FrameworkForm(auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<select name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
         f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<select name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select name="language">
 <option value="P" selected>Python</option>
 <option value="J">Java</option>
 </select>""")
@@ -531,12 +531,12 @@ class FormsTestCase(SimpleTestCase):
             language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')], widget=Select(attrs={'class': 'foo'}))
 
         f = FrameworkForm(auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
         f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language">
 <option value="P" selected>Python</option>
 <option value="J">Java</option>
 </select>""")
@@ -552,12 +552,12 @@ class FormsTestCase(SimpleTestCase):
             )
 
         f = FrameworkForm(auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
         f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language">
 <option value="P" selected>Python</option>
 <option value="J">Java</option>
 </select>""")
@@ -568,10 +568,10 @@ class FormsTestCase(SimpleTestCase):
             language = ChoiceField()
 
         f = FrameworkForm(auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<select name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select name="language">
 </select>""")
         f.fields['language'].choices = [('P', 'Python'), ('J', 'Java')]
-        self.assertHTMLEqual(str(f['language']), """<select name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
@@ -2363,37 +2363,37 @@ Password: <input type="password" name="password" required />
             is_cool = NullBooleanField()
 
         p = Person({'name': 'Joe'}, auto_id=False)
-        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': '1'}, auto_id=False)
-        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': '2'}, auto_id=False)
-        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2" selected>Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': '3'}, auto_id=False)
-        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2">Yes</option>
 <option value="3" selected>No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': True}, auto_id=False)
-        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2" selected>Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': False}, auto_id=False)
-        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2">Yes</option>
 <option value="3" selected>No</option>
@@ -2759,7 +2759,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             """<li class="required error"><ul class="errorlist"><li>This field is required.</li></ul>
 <label class="required" for="id_name">Name:</label> <input type="text" name="name" id="id_name" required /></li>
 <li class="required"><label class="required" for="id_is_cool">Is cool:</label>
-<select name="is_cool" id="id_is_cool" required>
+<select name="is_cool" id="id_is_cool">
 <option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
@@ -2775,7 +2775,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
 <p class="required error"><label class="required" for="id_name">Name:</label>
 <input type="text" name="name" id="id_name" required /></p>
 <p class="required"><label class="required" for="id_is_cool">Is cool:</label>
-<select name="is_cool" id="id_is_cool" required>
+<select name="is_cool" id="id_is_cool">
 <option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
@@ -2793,7 +2793,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
 <td><ul class="errorlist"><li>This field is required.</li></ul>
 <input type="text" name="name" id="id_name" required /></td></tr>
 <tr class="required"><th><label class="required" for="id_is_cool">Is cool:</label></th>
-<td><select name="is_cool" id="id_is_cool" required>
+<td><select name="is_cool" id="id_is_cool">
 <option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
@@ -3516,7 +3516,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             '<p><label for="id_f2">F2:</label> <input id="id_f2" maxlength="30" name="f2" type="text" /></p>'
             '<p><label for="id_f3">F3:</label> <textarea cols="40" id="id_f3" name="f3" rows="10" required>'
             '</textarea></p>'
-            '<p><label for="id_f4">F4:</label> <select id="id_f4" name="f4" required>'
+            '<p><label for="id_f4">F4:</label> <select id="id_f4" name="f4">'
             '<option value="P">Python</option>'
             '<option value="J">Java</option>'
             '</select></p>',
@@ -3528,7 +3528,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             '<li><label for="id_f2">F2:</label> <input id="id_f2" maxlength="30" name="f2" type="text" /></li>'
             '<li><label for="id_f3">F3:</label> <textarea cols="40" id="id_f3" name="f3" rows="10" required>'
             '</textarea></li>'
-            '<li><label for="id_f4">F4:</label> <select id="id_f4" name="f4" required>'
+            '<li><label for="id_f4">F4:</label> <select id="id_f4" name="f4">'
             '<option value="P">Python</option>'
             '<option value="J">Java</option>'
             '</select></li>',
@@ -3542,7 +3542,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             '<tr><th><label for="id_f3">F3:</label></th>'
             '<td><textarea cols="40" id="id_f3" name="f3" rows="10" required>'
             '</textarea></td></tr>'
-            '<tr><th><label for="id_f4">F4:</label></th><td><select id="id_f4" name="f4" required>'
+            '<tr><th><label for="id_f4">F4:</label></th><td><select id="id_f4" name="f4">'
             '<option value="P">Python</option>'
             '<option value="J">Java</option>'
             '</select></td></tr>',
