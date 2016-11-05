@@ -214,6 +214,15 @@ directly support ``output_field`` you will need to wrap the expression with
         expires=ExpressionWrapper(
             F('active_at') + F('duration'), output_field=DateTimeField()))
 
+When referencing relational fields such as ``ForeignKey``, ``F()`` returns the
+primary key value rather than a model instance::
+
+    >> car = Company.objects.annotate(built_by=F('manufacturer'))[0]
+    >> car.manufacturer
+    <Manufacturer: Toyota>
+    >> car.built_by
+    3
+
 .. _func-expressions:
 
 ``Func()`` expressions
