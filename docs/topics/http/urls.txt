@@ -597,15 +597,32 @@ In order to perform URL reversing, you'll need to use **named URL patterns**
 as done in the examples above. The string used for the URL name can contain any
 characters you like. You are not restricted to valid Python names.
 
-When you name your URL patterns, make sure you use names that are unlikely
-to clash with any other application's choice of names. If you call your URL
-pattern ``comment``, and another application does the same thing, there's
-no guarantee which URL will be inserted into your template when you use
-this name.
+First, when you name your own URL patterns, make sure you use names that are
+unlikely to clash with any other Django app's choice of names. If you call
+your URL pattern ``comment``, and another app does the same thing,
+the URL inserted into your template when you use this name will depend on
+whichever was last in your project's ``urlpatterns`` stack.
 
 Putting a prefix on your URL names, perhaps derived from the application
 name, will decrease the chances of collision. We recommend something like
 ``myapp-comment`` instead of ``comment``.
+
+Second, you can deliberately use the *same name* as used in contrib app. A
+common usage is to override the built-in login view
+(:class:`~django.contrib.auth.views.LoginView`). This view has a URL
+pattern with the name ``login``. If you have a custom login view and give its
+URL the name ``login``, login actions from third-party apps tend to use this
+same name and, provided that your view has been registered after the contrib
+auth url, it will take precedence.
+
+Third, you can use the same name for multiple URL patterns if they differ
+regarding arguments. When reversing URL patterns by name, Django ensures the
+number of arguments and the names of the keyword arguments match.
+
+A note on order. ``url()`` patterns are matched from the top down: the first pattern
+to match is used. ``url()`` pattern names are looked up in reverse order: from the
+bottom to the top. So a named url further down in your URLconf wins from one
+defined earlier.
 
 .. _topics-http-defining-url-namespaces:
 

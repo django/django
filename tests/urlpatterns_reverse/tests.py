@@ -361,6 +361,32 @@ class ResolverTests(SimpleTestCase):
         self.assertEqual(resolver.reverse('named-url2', 'arg'), 'extra/arg/')
         self.assertEqual(resolver.reverse('named-url2', extra='arg'), 'extra/arg/')
 
+    def test_resolver_reverse_conflict(self):
+        """
+        url() name arguments can indeed conflict: they need not be unique.
+
+        Behavior is that the last registered pattern will take precedence
+        for direct conflict of patterns.
+
+        Clarification tests for #27367
+        """
+        resolver = get_resolver('urlpatterns_reverse.named_urls_conflict')
+
+        # Without arguments, the last registered route has precedence
+        self.assertNotEqual(resolver.reverse('name-conflict'), 'conflict/cannot-go-here/')
+        self.assertEqual(resolver.reverse('name-conflict'), 'conflict/')
+        # If you pass as an arg, the last registered route (again) has precedence
+        self.assertEqual(resolver.reverse('name-conflict', 'arg'), 'conflict-last/arg/')
+        # If you pass as a kwarg, you can actually get to other routes
+        self.assertEqual(resolver.reverse('name-conflict', first='arg'), 'conflict-first/arg/')
+        self.assertEqual(resolver.reverse('name-conflict', middle='arg'), 'conflict-middle/arg/')
+        self.assertEqual(resolver.reverse('name-conflict', last='arg'), 'conflict-last/arg/')
+        # But if something matches that route's kwarg as well, the last registered route has precedence
+        self.assertNotEqual(resolver.reverse('name-conflict', middle='arg'), 'conflict-cannot-go-here/arg/')
+        # Unsurprisingly, the number and order of the arguments don't interfere with the resolution
+        self.assertNotEqual(resolver.reverse('name-conflict', 'arg', 'arg'), 'conflict/arg/arg/cannot-go-here/')
+        self.assertEqual(resolver.reverse('name-conflict', 'arg', 'arg'), 'conflict/arg/arg/')
+
     def test_non_regex(self):
         """
         Verifies that we raise a Resolver404 if what we are resolving doesn't
