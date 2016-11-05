@@ -579,8 +579,10 @@ Miscellaneous
 * In the admin templates, ``<p class="help">`` is replaced with a ``<div>`` tag
   to allow including lists inside help text.
 
-* ``ConditionalGetMiddleware`` no longer sets the ``Date`` header as Web
-  servers set that header.
+* :class:`~django.middleware.http.ConditionalGetMiddleware` no longer sets the
+  ``Date`` header as Web servers set that header, also no longer sets the
+  ``Content-Length`` response header for non-streaming responses as this is
+  now done in :class:`~django.middleware.common.CommonMiddleware`.
 
 * :meth:`~django.apps.AppConfig.get_model` and
   :meth:`~django.apps.AppConfig.get_models` now raise
