@@ -95,9 +95,10 @@ class OGRGeometry(GDALBase):
                 # (e.g., 'Point', 'POLYGON').
                 OGRGeomType(geom_input)
                 g = capi.create_geom(OGRGeomType(geom_input).num)
-        elif isinstance(geom_input, six.memoryview):
+        elif isinstance(geom_input, six.buffer_types):
+            geom_input_bytes = bytes(geom_input)
             # WKB was passed in
-            g = capi.from_wkb(bytes(geom_input), None, byref(c_void_p()), len(geom_input))
+            g = capi.from_wkb(geom_input_bytes, None, byref(c_void_p()), len(geom_input_bytes))
         elif isinstance(geom_input, OGRGeomType):
             # OGRGeomType was passed in, an empty geometry will be created.
             g = capi.create_geom(geom_input.num)
