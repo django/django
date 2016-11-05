@@ -132,7 +132,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
             if field_desc.startswith("FOREIGN KEY"):
                 # Find name of the target FK field
-                m = re.match(r'FOREIGN KEY\(([^\)]*)\).*', field_desc, re.I)
+                m = re.match(r'FOREIGN KEY ?\(([^\)]*)\).*', field_desc, re.I)
                 field_name = m.groups()[0].strip('"')
             else:
                 field_name = field_desc.split()[0].strip('"')
