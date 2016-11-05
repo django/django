@@ -387,3 +387,26 @@ class UUIDChild(PrimaryKeyUUIDModel):
 
 class UUIDGrandchild(UUIDChild):
     pass
+
+###############################################################################
+# This model is used for Readonly test cases
+
+
+class ModelWithReadonlyField(models.Model):
+    """
+    This model is quite linked with the ReadonlyTestsMixin and its
+    SQL will be modified by ReadonlyTestsMixin subclasses.
+    Make sure it's not used in any other test otherwise there will be
+    isolation problems.
+    """
+    not_readonly = models.CharField(max_length=60)
+    readonly_int1 = models.IntegerField(readonly=True)
+    readonly_int2 = models.IntegerField(readonly=True)
+
+
+class ModelReferencingReadonly(models.Model):
+    """
+    This model solely exists so that there's a relation in
+    ModelWithReadonlyField
+    """
+    fk = models.ForeignKey(ModelWithReadonlyField, models.CASCADE)

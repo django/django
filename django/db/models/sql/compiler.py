@@ -987,8 +987,12 @@ class SQLInsertCompiler(SQLCompiler):
         opts = self.query.get_meta()
         result = ['INSERT INTO %s' % qn(opts.db_table)]
 
-        has_fields = bool(self.query.fields)
-        fields = self.query.fields if has_fields else [opts.pk]
+        # Filter out readonly fields
+        fields = [field for field in self.query.fields if not field.readonly]
+
+        has_fields = bool(fields)
+        fields = fields if has_fields else [opts.pk]
+
         result.append('(%s)' % ', '.join(qn(f.column) for f in fields))
 
         if has_fields:
@@ -1077,12 +1081,18 @@ class SQLUpdateCompiler(SQLCompiler):
         Creates the SQL for this query. Returns the SQL string and list of
         parameters.
         """
+
+        writable_values = [
+            (field, model, val)
+            for field, model, val in self.query.values
+            if not field.readonly]
+
         self.pre_sql_setup()
-        if not self.query.values:
+        if not writable_values:
             return '', ()
         qn = self.quote_name_unless_alias
         values, update_params = [], []
-        for field, model, val in self.query.values:
+        for field, model, val in writable_values:
             if hasattr(val, 'resolve_expression'):
                 val = val.resolve_expression(self.query, allow_joins=False, for_save=True)
                 if val.contains_aggregate:
