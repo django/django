@@ -19,8 +19,8 @@ from django.http import (
 )
 from django.shortcuts import redirect
 from django.test import (
-    SimpleTestCase, TestCase, ignore_warnings, override_settings,
-    RequestFactory,
+    RequestFactory, SimpleTestCase, TestCase, ignore_warnings,
+    override_settings,
 )
 from django.test.utils import override_script_prefix
 from django.urls import (
