@@ -8,9 +8,10 @@ from django.db.migrations.operations import (
 from django.db.migrations.state import (
     ModelState, ProjectState, get_related_models_recursive,
 )
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.test.utils import isolate_apps
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango21Warning
 
 from .models import (
     FoodManager, FoodQuerySet, ModelWithCustomBase, NoMigrationFoodManager,
@@ -23,6 +24,7 @@ class StateTests(SimpleTestCase):
     Tests state construction, rendering and modification by operations.
     """
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_create(self):
         """
         Tests making a ProjectState from an Apps

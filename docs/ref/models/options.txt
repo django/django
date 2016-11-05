@@ -443,6 +443,10 @@ Django quotes column and table names behind the scenes.
 ``index_together``
 ------------------
 
+.. deprecated:: 1.11
+
+    Use :attr:`~django.db.models.Options.indexes` instead.
+
 .. attribute:: Options.index_together
 
     Sets of field names that, taken together, are indexed::

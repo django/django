@@ -17,7 +17,8 @@ from django.db.models.fields.related import OneToOneField
 from django.utils import six
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.deprecation import (
-    RemovedInDjango20Warning, warn_about_renamed_method,
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+    warn_about_renamed_method,
 )
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
@@ -192,7 +193,11 @@ class Options(object):
 
             self.unique_together = normalize_together(self.unique_together)
             self.index_together = normalize_together(self.index_together)
-
+            if self.index_together:
+                warnings.warn(
+                    "'index_together' is deprecated in favor of 'indexes'",
+                    RemovedInDjango21Warning
+                )
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
             if self.verbose_name_plural is None:

@@ -139,7 +139,7 @@ class TagIndexed(models.Model):
 
     class Meta:
         apps = new_apps
-        index_together = [["slug", "title"]]
+        indexes = [models.Index(fields=['slug', 'title'])]
 
 
 class TagM2MTest(models.Model):

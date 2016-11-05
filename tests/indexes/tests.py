@@ -54,9 +54,9 @@ class SchemaIndexesTests(TestCase):
         # Ensure the index name is properly quoted
         self.assertIn(
             connection.ops.quote_name(
-                editor._create_index_name(Article, ['headline', 'pub_date'], suffix='_idx')
+                Article._meta.indexes[0].create_sql(Article, editor)
             ),
-            index_sql[0]
+            connection.ops.quote_name(index_sql[0])
         )
 
     def test_index_together_single_list(self):

@@ -52,9 +52,7 @@ class Article(models.Model):
 
     class Meta:
         ordering = ('headline',)
-        index_together = [
-            ["headline", "pub_date"],
-        ]
+        indexes = [models.Index(fields=['headline', 'pub_date'])]
 
 
 class ArticleReporter(models.Model):

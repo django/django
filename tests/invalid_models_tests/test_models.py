@@ -10,7 +10,8 @@ from django.core.checks.model_checks import _check_lazy_references
 from django.db import connections, models
 from django.db.models.signals import post_init
 from django.test import SimpleTestCase
-from django.test.utils import isolate_apps, override_settings
+from django.test.utils import ignore_warnings, isolate_apps, override_settings
+from django.utils.deprecation import RemovedInDjango21Warning
 
 
 def get_max_column_name_length():
@@ -34,9 +35,11 @@ def get_max_column_name_length():
 
 
 @isolate_apps('invalid_models_tests')
+@ignore_warnings(category=RemovedInDjango21Warning)
 class IndexTogetherTests(SimpleTestCase):
 
     def test_non_iterable(self):
+
         class Model(models.Model):
             class Meta:
                 index_together = 42
@@ -67,6 +70,7 @@ class IndexTogetherTests(SimpleTestCase):
         self.assertEqual(errors, expected)
 
     def test_list_containing_non_iterable(self):
+
         class Model(models.Model):
             class Meta:
                 index_together = [('a', 'b'), 42]
@@ -82,6 +86,7 @@ class IndexTogetherTests(SimpleTestCase):
         self.assertEqual(errors, expected)
 
     def test_pointing_to_missing_field(self):
+
         class Model(models.Model):
             class Meta:
                 index_together = [
@@ -99,6 +104,7 @@ class IndexTogetherTests(SimpleTestCase):
         self.assertEqual(errors, expected)
 
     def test_pointing_to_non_local_field(self):
+
         class Foo(models.Model):
             field1 = models.IntegerField()
 
@@ -123,6 +129,7 @@ class IndexTogetherTests(SimpleTestCase):
         self.assertEqual(errors, expected)
 
     def test_pointing_to_m2m_field(self):
+
         class Model(models.Model):
             m2m = models.ManyToManyField('self')
 
