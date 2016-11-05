@@ -380,6 +380,11 @@ Tests
 * Added support for :meth:`python:unittest.TestCase.subTest`’s when using the
   :option:`test --parallel` option.
 
+* The new test assertions
+  :meth:`~django.test.SimpleTestCase.assertSignalSent` and
+  :meth:`~django.test.SimpleTestCase.assertSignalNotSent` make it
+  easier to test code that uses signals.
+
 URLs
 ~~~~
 

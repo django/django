@@ -1566,6 +1566,41 @@ your test suite.
 
     Output in case of error can be customized with the ``msg`` argument.
 
+.. method:: SimpleTestCase.assertSignalSent(signal, required_kwargs=None)
+
+    .. versionadded:: 1.11
+
+Asserts that a signal was sent. This assertion **must** be used as
+    a context manager::
+
+        with self.assertSignalSent(signals.post_save):
+            m = MyModel()
+            m.save()
+
+    If ``required_kwargs`` is provided, also asserts that the signal
+    was sent with keyword arguments of those names::
+
+        with self.assertSignalSent(my_signal, required_kwargs=['my_kwarg']):
+            trigger_signal_send()
+
+    To access detailed information about the arguments sent with the
+    signal, inspect the ``received_kwargs`` and ``sender`` attributes
+    of the context manager::
+
+        with self.assertSignalSent(my_signal) as cm:
+            trigger_signal_send()
+            self.assertEqual(cm.received_kwargs['num'], 2)
+
+.. method:: SimpleTestCase.assertSignalNotSent(signal)
+
+    .. versionadded:: 1.11
+
+    Asserts that a signal was not sent. This assertion **must** be used as
+    a context manager::
+
+        with self.assertSignalNotSent(signals.post_save):
+            m = MyModelInstance()
+
 .. method:: SimpleTestCase.assertJSONNotEqual(raw, expected_data, msg=None)
 
     Asserts that the JSON fragments ``raw`` and ``expected_data`` are *not* equal.

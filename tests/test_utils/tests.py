@@ -10,6 +10,7 @@ from django.contrib.staticfiles.finders import get_finder, get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import default_storage
 from django.db import connection, models, router
+from django.dispatch import Signal
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -870,6 +871,50 @@ class AssertFieldOutputTests(SimpleTestCase):
                 'required': 'This is really required.',
             }
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
+
+
+class AssertSignalSentTests(SimpleTestCase):
+    test_signal = Signal(providing_args=['test_kwarg'])
+
+    def send_signal(self):
+        self.test_signal.send(sender=self.__class__, test_kwarg=1)
+
+    def test_signal_sent(self):
+        with self.assertSignalSent(self.test_signal):
+            self.send_signal()
+
+    def test_signal_sent_arguments(self):
+        with self.assertSignalSent(self.test_signal, required_kwargs=['test_kwarg']):
+            self.send_signal()
+
+    def test_signal_sent_missing_arguments(self):
+        with self.assertRaisesMessage(
+            AssertionError,
+            'Signal missing required arguments: test_kwarg'
+        ):
+            with self.assertSignalSent(self.test_signal, required_kwargs=['test_kwarg']):
+                self.test_signal.send(sender=self.__class__)
+
+    def test_signal_sent_inspect(self):
+        with self.assertSignalSent(self.test_signal) as cm:
+            self.send_signal()
+            self.assertEqual(cm.sender, self.__class__)
+            self.assertEqual(cm.received_kwargs['test_kwarg'], 1)
+
+    def test_signal_sent_fail(self):
+        with self.assertRaisesMessage(AssertionError, 'Signal was not sent.'):
+            with self.assertSignalSent(self.test_signal) as cm:
+                self.assertEqual(cm.received_kwargs, {})
+                self.assertFalse(cm.signal_sent)
+
+    def test_signal_not_sent(self):
+        with self.assertSignalNotSent(self.test_signal):
+            pass
+
+    def test_signal_not_sent_fail(self):
+        with self.assertRaisesMessage(AssertionError, 'Signal was unexpectedly sent.'):
+            with self.assertSignalNotSent(self.test_signal):
+                self.send_signal()
 
 
 class FirstUrls:

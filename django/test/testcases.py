@@ -150,6 +150,48 @@ class _CursorFailure(object):
         )
 
 
+class _AssertSignalSentContext(object):
+    def __init__(self, test_case, signal, required_kwargs=None):
+        self.test_case = test_case
+        self.signal = signal
+        self.required_kwargs = required_kwargs
+
+    def _listener(self, sender, **kwargs):
+        self.signal_sent = True
+        self.received_kwargs = kwargs
+        self.sender = sender
+
+    def __enter__(self):
+        self.signal_sent = False
+        self.received_kwargs = {}
+        self.sender = None
+        self.signal.connect(self._listener)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.signal.disconnect(self._listener)
+        if not self.signal_sent:
+            self.test_case.fail('Signal was not sent.')
+            return
+        if self.required_kwargs is not None:
+            missing_kwargs = []
+            for k in self.required_kwargs:
+                if k not in self.received_kwargs:
+                    missing_kwargs.append(k)
+            if missing_kwargs:
+                self.test_case.fail(
+                    "Signal missing required arguments: "
+                    "%s" % ','.join(missing_kwargs)
+                )
+
+
+class _AssertSignalNotSentContext(_AssertSignalSentContext):
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.signal.disconnect(self._listener)
+        if self.signal_sent:
+            self.test_case.fail('Signal was unexpectedly sent.')
+
+
 class SimpleTestCase(unittest.TestCase):
 
     # The class we'll use for the test client self.client.
@@ -641,6 +683,33 @@ class SimpleTestCase(unittest.TestCase):
         # Assertion was passed a callable.
         with cm:
             callable_obj(*args, **kwargs)
+
+    @contextmanager
+    def assertSignalSent(self, signal, required_kwargs=None):
+        """
+        Asserts that a signal was sent, and checks presence of required arguments.
+
+        This assertion must be used as a context manager.
+
+        Args:
+            signal: the signal which must be sent.
+            required_kwargs: a list of names of arguments which must be sent with the signal.
+        """
+        with _AssertSignalSentContext(self, signal, required_kwargs) as cm:
+            yield cm
+
+    @contextmanager
+    def assertSignalNotSent(self, signal):
+        """
+        Asserts that a signal was not sent.
+
+        This assertion must be used as a context manager.
+
+        Args:
+            signal: the signal which must not be sent.
+        """
+        with _AssertSignalNotSentContext(self, signal) as cm:
+            yield cm
 
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=None,
                           field_kwargs=None, empty_value=''):
