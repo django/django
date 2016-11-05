@@ -822,3 +822,72 @@ class RemoveIndex(IndexOperation):
 
     def describe(self):
         return 'Remove index %s from %s' % (self.name, self.model_name)
+
+
+class AddConstraint(IndexOperation):
+    option_name = 'constraints'
+
+    def __init__(self, model_name, constraint):
+        self.model_name = model_name
+        self.constraint = constraint
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.model_name_lower]
+        constraints = list(model_state.options[self.option_name])
+        constraints.append(self.constraint)
+        model_state.options[self.option_name] = constraints
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        model = to_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            schema_editor.add_constraint(model, self.constraint)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        model = to_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            schema_editor.remove_constraint(model, self.constraint)
+
+    def deconstruct(self):
+        return self.__class__.__name__, [], {
+            'model_name': self.model_name,
+            'constraint': self.constraint,
+        }
+
+    def describe(self):
+        return 'Create constraint %s on model %s' % (self.constraint.name, self.model_name)
+
+
+class RemoveConstraint(IndexOperation):
+    option_name = 'constraints'
+
+    def __init__(self, model_name, name):
+        self.model_name = model_name
+        self.name = name
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.model_name_lower]
+        constraints = model_state.options[self.option_name]
+        model_state.options[self.option_name] = [c for c in constraints if c.name != self.name]
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        model = from_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            from_model_state = from_state.models[app_label, self.model_name_lower]
+            constraint = from_model_state.get_constraint_by_name(self.name)
+            schema_editor.remove_constraint(model, constraint)
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        model = to_state.apps.get_model(app_label, self.model_name)
+        if self.allow_migrate_model(schema_editor.connection.alias, model):
+            to_model_state = to_state.models[app_label, self.model_name_lower]
+            constraint = to_model_state.get_constraint_by_name(self.name)
+            schema_editor.add_constraint(model, constraint)
+
+    def deconstruct(self):
+        return self.__class__.__name__, [], {
+            'model_name': self.model_name,
+            'name': self.name,
+        }
+
+    def describe(self):
+        return 'Remove constraint %s from model %s' % (self.name, self.model_name)

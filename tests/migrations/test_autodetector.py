@@ -61,6 +61,12 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default='Ada Lovelace')),
     ])
+    author_name_check_constraint = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200)),
+    ],
+        {'constraints': [models.CheckConstraint(models.Q(name__contains='Bob'), 'name_contains_bob')]},
+    )
     author_dates_of_birth_auto_now = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("date_of_birth", models.DateField(auto_now=True)),
@@ -1389,6 +1395,40 @@ class AutodetectorTests(TestCase):
         added_index = models.Index(fields=['title', 'author'], name='book_author_title_idx')
         self.assertOperationAttributes(changes, 'otherapp', 0, 1, model_name='book', index=added_index)
 
+    def test_create_model_with_check_constraint(self):
+        """Test creation of new model with constraints already defined."""
+        author = ModelState('otherapp', 'Author', [
+            ('id', models.AutoField(primary_key=True)),
+            ('name', models.CharField(max_length=200)),
+        ], {'constraints': [models.CheckConstraint(models.Q(name__contains='Bob'), 'name_contains_bob')]})
+        changes = self.get_changes([], [author])
+        added_constraint = models.CheckConstraint(models.Q(name__contains='Bob'), 'name_contains_bob')
+        # Right number of migrations?
+        self.assertEqual(len(changes['otherapp']), 1)
+        # Right number of actions?
+        migration = changes['otherapp'][0]
+        self.assertEqual(len(migration.operations), 2)
+        # Right actions order?
+        self.assertOperationTypes(changes, 'otherapp', 0, ['CreateModel', 'AddConstraint'])
+        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name='Author')
+        self.assertOperationAttributes(changes, 'otherapp', 0, 1, model_name='author', constraint=added_constraint)
+
+    def test_add_constraints(self):
+        """Test change detection of new constraints."""
+        changes = self.get_changes([self.author_name], [self.author_name_check_constraint])
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['AddConstraint'])
+        added_constraint = models.CheckConstraint(models.Q(name__contains='Bob'), 'name_contains_bob')
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, model_name='author', constraint=added_constraint)
+
+    def test_remove_constraints(self):
+        """Test change detection of removed constraints."""
+        changes = self.get_changes([self.author_name_check_constraint], [self.author_name])
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['RemoveConstraint'])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, model_name='author', name='name_contains_bob')
+
     def test_add_foo_together(self):
         """Tests index/unique_together detection."""
         changes = self.get_changes([self.author_empty, self.book], [self.author_empty, self.book_foo_together])
@@ -1520,7 +1560,7 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["CreateModel"])
         self.assertOperationAttributes(
-            changes, "testapp", 0, 0, name="AuthorProxy", options={"proxy": True, "indexes": []}
+            changes, "testapp", 0, 0, name="AuthorProxy", options={"proxy": True, "indexes": [], "constraints": []}
         )
         # Now, we test turning a proxy model into a non-proxy model
         # It should delete the proxy then make the real one

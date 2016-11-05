@@ -26,6 +26,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_release_savepoints = True
     atomic_transactions = False
     supports_column_check_constraints = False
+    supports_table_check_constraints = False
     can_clone_databases = True
     supports_temporal_subtraction = True
     supports_select_intersection = False

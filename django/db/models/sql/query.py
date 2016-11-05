@@ -18,7 +18,7 @@ from django.core.exceptions import (
 from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import Col, Ref
+from django.db.models.expressions import Col, F, Ref, SimpleCol
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.lookups import Lookup
@@ -60,6 +60,12 @@ JoinInfo = namedtuple(
     'JoinInfo',
     ('final_field', 'targets', 'opts', 'joins', 'path', 'transform_function')
 )
+
+
+def _get_col(target, field, alias, simple_col):
+    if simple_col:
+        return SimpleCol(target, field)
+    return target.get_col(alias, field)
 
 
 class RawQuery:
@@ -1011,15 +1017,24 @@ class Query:
     def as_sql(self, compiler, connection):
         return self.get_compiler(connection=connection).as_sql()
 
-    def resolve_lookup_value(self, value, can_reuse, allow_joins):
+    def resolve_lookup_value(self, value, can_reuse, allow_joins, simple_col):
         if hasattr(value, 'resolve_expression'):
-            value = value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
+            kwargs = {'reuse': can_reuse, 'allow_joins': allow_joins}
+            if isinstance(value, F):
+                kwargs['simple_col'] = simple_col
+            value = value.resolve_expression(self, **kwargs)
         elif isinstance(value, (list, tuple)):
             # The items of the iterable may be expressions and therefore need
             # to be resolved independently.
             for sub_value in value:
                 if hasattr(sub_value, 'resolve_expression'):
-                    sub_value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
+                    if isinstance(sub_value, F):
+                        sub_value.resolve_expression(
+                            self, reuse=can_reuse, allow_joins=allow_joins,
+                            simple_col=simple_col,
+                        )
+                    else:
+                        sub_value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
         return value
 
     def solve_lookup_type(self, lookup):
@@ -1133,7 +1148,7 @@ class Query:
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
                      can_reuse=None, allow_joins=True, split_subq=True,
-                     reuse_with_filtered_relation=False):
+                     reuse_with_filtered_relation=False, simple_col=False):
         """
         Build a WhereNode for a single filter clause but don't add it
         to this Query. Query.add_q() will then add this filter to the where
@@ -1179,7 +1194,7 @@ class Query:
             raise FieldError("Joined field references are not permitted in this query")
 
         pre_joins = self.alias_refcount.copy()
-        value = self.resolve_lookup_value(value, can_reuse, allow_joins)
+        value = self.resolve_lookup_value(value, can_reuse, allow_joins, simple_col)
         used_joins = {k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)}
 
         clause = self.where_class()
@@ -1222,11 +1237,11 @@ class Query:
             if num_lookups > 1:
                 raise FieldError('Related Field got invalid lookup: {}'.format(lookups[0]))
             if len(targets) == 1:
-                col = targets[0].get_col(alias, join_info.final_field)
+                col = _get_col(targets[0], join_info.final_field, alias, simple_col)
             else:
                 col = MultiColSource(alias, targets, join_info.targets, join_info.final_field)
         else:
-            col = targets[0].get_col(alias, join_info.final_field)
+            col = _get_col(targets[0], join_info.final_field, alias, simple_col)
 
         condition = self.build_lookup(lookups, col, value)
         lookup_type = condition.lookup_name
@@ -1248,7 +1263,8 @@ class Query:
                 #   <=>
                 # NOT (col IS NOT NULL AND col = someval).
                 lookup_class = targets[0].get_lookup('isnull')
-                clause.add(lookup_class(targets[0].get_col(alias, join_info.targets[0]), False), AND)
+                col = _get_col(targets[0], join_info.targets[0], alias, simple_col)
+                clause.add(lookup_class(col, False), AND)
         return clause, used_joins if not require_outer else ()
 
     def add_filter(self, filter_clause):
@@ -1271,8 +1287,12 @@ class Query:
             self.where.add(clause, AND)
         self.demote_joins(existing_inner)
 
+    def build_where(self, q_object):
+        return self._add_q(q_object, used_aliases=set(), allow_joins=False, simple_col=True)[0]
+
     def _add_q(self, q_object, used_aliases, branch_negated=False,
-               current_negated=False, allow_joins=True, split_subq=True):
+               current_negated=False, allow_joins=True, split_subq=True,
+               simple_col=False):
         """Add a Q-object to the current filter."""
         connector = q_object.connector
         current_negated = current_negated ^ q_object.negated
@@ -1290,7 +1310,7 @@ class Query:
                 child_clause, needed_inner = self.build_filter(
                     child, can_reuse=used_aliases, branch_negated=branch_negated,
                     current_negated=current_negated, allow_joins=allow_joins,
-                    split_subq=split_subq,
+                    split_subq=split_subq, simple_col=simple_col,
                 )
                 joinpromoter.add_votes(needed_inner)
             if child_clause:
@@ -1559,7 +1579,7 @@ class Query:
             self.unref_alias(joins.pop())
         return targets, joins[-1], joins
 
-    def resolve_ref(self, name, allow_joins=True, reuse=None, summarize=False):
+    def resolve_ref(self, name, allow_joins=True, reuse=None, summarize=False, simple_col=False):
         if not allow_joins and LOOKUP_SEP in name:
             raise FieldError("Joined field references are not permitted in this query")
         if name in self.annotations:
@@ -1580,7 +1600,7 @@ class Query:
                                  "isn't supported")
             if reuse is not None:
                 reuse.update(join_list)
-            col = targets[0].get_col(join_list[-1], join_info.targets[0])
+            col = _get_col(targets[0], join_info.targets[0], join_list[-1], simple_col)
             return col
 
     def split_exclude(self, filter_expr, can_reuse, names_with_path):

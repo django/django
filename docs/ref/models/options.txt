@@ -451,6 +451,26 @@ Django quotes column and table names behind the scenes.
 
         index_together = ["pub_date", "deadline"]
 
+``constraints``
+---------------
+
+.. attribute:: Options.constraints
+
+    .. versionadded:: 2.2
+
+    A list of :doc:`constraints </ref/models/check-constraints>` that you want
+    to define on the model::
+
+        from django.db import models
+
+        class Customer(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                constraints = [
+                    models.CheckConstraint(models.Q(age__gte=18), 'age_gte_18'),
+                ]
+
 ``verbose_name``
 ----------------
 

@@ -30,6 +30,13 @@ officially support the latest release of each series.
 What's new in Django 2.2
 ========================
 
+Check Constraints
+-----------------
+
+The new :class:`~django.db.models.CheckConstraint` class enables adding custom
+database constraints. Constraints are added to models using the
+:attr:`Meta.constraints <django.db.models.Options.constraints>` option.
+
 Minor features
 --------------
 
@@ -213,7 +220,9 @@ Backwards incompatible changes in 2.2
 Database backend API
 --------------------
 
-* ...
+* Third-party database backends must implement support for table check
+  constraints or set ``DatabaseFeatures.supports_table_check_constraints`` to
+  ``False``.
 
 :mod:`django.contrib.gis`
 -------------------------

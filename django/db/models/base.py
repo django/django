@@ -16,6 +16,7 @@ from django.db import (
     connections, router, transaction,
 )
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.constraints import CheckConstraint
 from django.db.models.deletion import CASCADE, Collector
 from django.db.models.fields.related import (
     ForeignObjectRel, OneToOneField, lazy_related_operation, resolve_relation,
@@ -1201,6 +1202,7 @@ class Model(metaclass=ModelBase):
                 *cls._check_unique_together(),
                 *cls._check_indexes(),
                 *cls._check_ordering(),
+                *cls._check_constraints(),
             ]
 
         return errors
@@ -1697,6 +1699,29 @@ class Model(metaclass=ModelBase):
                         )
                     )
 
+        return errors
+
+    @classmethod
+    def _check_constraints(cls):
+        errors = []
+        for db in settings.DATABASES:
+            if not router.allow_migrate_model(db, cls):
+                continue
+            connection = connections[db]
+            if connection.features.supports_table_check_constraints:
+                continue
+            if any(isinstance(constraint, CheckConstraint) for constraint in cls._meta.constraints):
+                errors.append(
+                    checks.Warning(
+                        '%s does not support check constraints.' % connection.display_name,
+                        hint=(
+                            "A constraint won't be created. Silence this "
+                            "warning if you don't care about it."
+                        ),
+                        obj=cls,
+                        id='models.W027',
+                    )
+                )
         return errors
 
 

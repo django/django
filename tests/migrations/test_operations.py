@@ -53,7 +53,7 @@ class OperationTestBase(MigrationTestBase):
     def set_up_test_model(
             self, app_label, second_model=False, third_model=False, index=False, multicol_index=False,
             related_model=False, mti_model=False, proxy_model=False, manager_model=False,
-            unique_together=False, options=False, db_table=None, index_together=False):
+            unique_together=False, options=False, db_table=None, index_together=False, check_constraint=False):
         """
         Creates a test model state and database table.
         """
@@ -105,6 +105,11 @@ class OperationTestBase(MigrationTestBase):
             operations.append(migrations.AddIndex(
                 "Pony",
                 models.Index(fields=["pink", "weight"], name="pony_test_idx")
+            ))
+        if check_constraint:
+            operations.append(migrations.AddConstraint(
+                "Pony",
+                models.CheckConstraint(models.Q(pink__gt=2), name="pony_test_constraint")
             ))
         if second_model:
             operations.append(migrations.CreateModel(
@@ -461,6 +466,45 @@ class OperationTests(OperationTestBase):
             operation.database_backwards("test_crummo", editor, new_state, project_state)
         self.assertTableNotExists("test_crummo_unmanagedpony")
         self.assertTableExists("test_crummo_pony")
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_create_model_with_constraint(self):
+        where = models.Q(pink__gt=2)
+        check_constraint = models.CheckConstraint(where, name='test_constraint_pony_pink_gt_2')
+        operation = migrations.CreateModel(
+            "Pony",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("pink", models.IntegerField(default=3)),
+            ],
+            options={'constraints': [check_constraint]},
+        )
+
+        # Test the state alteration
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        operation.state_forwards("test_crmo", new_state)
+        self.assertEqual(len(new_state.models['test_crmo', 'pony'].options['constraints']), 1)
+
+        # Test database alteration
+        self.assertTableNotExists("test_crmo_pony")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_crmo", editor, project_state, new_state)
+        self.assertTableExists("test_crmo_pony")
+        with connection.cursor() as cursor:
+            with self.assertRaises(IntegrityError):
+                cursor.execute("INSERT INTO test_crmo_pony (id, pink) VALUES (1, 1)")
+
+        # Test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_crmo", editor, new_state, project_state)
+        self.assertTableNotExists("test_crmo_pony")
+
+        # Test deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "CreateModel")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2]['options']['constraints'], [check_constraint])
 
     def test_create_model_managers(self):
         """
@@ -1707,6 +1751,87 @@ class OperationTests(OperationTestBase):
     def test_alter_index_together_remove(self):
         operation = migrations.AlterIndexTogether("Pony", None)
         self.assertEqual(operation.describe(), "Alter index_together for Pony (0 constraint(s))")
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_add_constraint(self):
+        """Test the AddConstraint operation."""
+        project_state = self.set_up_test_model('test_addconstraint')
+
+        where = models.Q(pink__gt=2)
+        check_constraint = models.CheckConstraint(where, name='test_constraint_pony_pink_gt_2')
+        operation = migrations.AddConstraint('Pony', check_constraint)
+        self.assertEqual(operation.describe(), 'Create constraint test_constraint_pony_pink_gt_2 on model Pony')
+
+        new_state = project_state.clone()
+        operation.state_forwards('test_addconstraint', new_state)
+        self.assertEqual(len(new_state.models['test_addconstraint', 'pony'].options['constraints']), 1)
+
+        # Test database alteration
+        with connection.cursor() as cursor:
+            with atomic():
+                cursor.execute("INSERT INTO test_addconstraint_pony (id, pink, weight) VALUES (1, 1, 1.0)")
+            cursor.execute("DELETE FROM test_addconstraint_pony")
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_addconstraint", editor, project_state, new_state)
+
+        with connection.cursor() as cursor:
+            with self.assertRaises(IntegrityError):
+                cursor.execute("INSERT INTO test_addconstraint_pony (id, pink, weight) VALUES (1, 1, 1.0)")
+
+        # Test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_addconstraint", editor, new_state, project_state)
+
+        with connection.cursor() as cursor:
+            with atomic():
+                cursor.execute("INSERT INTO test_addconstraint_pony (id, pink, weight) VALUES (1, 1, 1.0)")
+            cursor.execute("DELETE FROM test_addconstraint_pony")
+
+        # Test deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "AddConstraint")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'model_name': "Pony", 'constraint': check_constraint})
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_remove_constraint(self):
+        """Test the RemoveConstraint operation."""
+        project_state = self.set_up_test_model("test_removeconstraint", check_constraint=True)
+        self.assertTableExists("test_removeconstraint_pony")
+        operation = migrations.RemoveConstraint("Pony", "pony_test_constraint")
+        self.assertEqual(operation.describe(), "Remove constraint pony_test_constraint from model Pony")
+        new_state = project_state.clone()
+        operation.state_forwards("test_removeconstraint", new_state)
+        # Test state alteration
+        self.assertEqual(len(new_state.models["test_removeconstraint", "pony"].options['constraints']), 0)
+
+        with connection.cursor() as cursor:
+            with self.assertRaises(IntegrityError):
+                cursor.execute("INSERT INTO test_removeconstraint_pony (id, pink, weight) VALUES (1, 1, 1.0)")
+
+        # Test database alteration
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_removeconstraint", editor, project_state, new_state)
+
+        with connection.cursor() as cursor:
+            with atomic():
+                cursor.execute("INSERT INTO test_removeconstraint_pony (id, pink, weight) VALUES (1, 1, 1.0)")
+            cursor.execute("DELETE FROM test_removeconstraint_pony")
+
+        # Test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_removeconstraint", editor, new_state, project_state)
+
+        with connection.cursor() as cursor:
+            with self.assertRaises(IntegrityError):
+                cursor.execute("INSERT INTO test_removeconstraint_pony (id, pink, weight) VALUES (1, 1, 1.0)")
+
+        # Test deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "RemoveConstraint")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'model_name': "Pony", 'name': "pony_test_constraint"})
 
     def test_alter_model_options(self):
         """

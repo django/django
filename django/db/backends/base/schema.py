@@ -63,7 +63,8 @@ class BaseDatabaseSchemaEditor:
     sql_rename_column = "ALTER TABLE %(table)s RENAME COLUMN %(old_column)s TO %(new_column)s"
     sql_update_with_default = "UPDATE %(table)s SET %(column)s = %(default)s WHERE %(column)s IS NULL"
 
-    sql_create_check = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s CHECK (%(check)s)"
+    sql_check = "CONSTRAINT %(name)s CHECK (%(check)s)"
+    sql_create_check = "ALTER TABLE %(table)s ADD %(check)s"
     sql_delete_check = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
     sql_create_unique = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s UNIQUE (%(columns)s)"
@@ -299,10 +300,11 @@ class BaseDatabaseSchemaEditor:
         for fields in model._meta.unique_together:
             columns = [model._meta.get_field(field).column for field in fields]
             self.deferred_sql.append(self._create_unique_sql(model, columns))
+        constraints = [check.constraint_sql(model, self) for check in model._meta.constraints]
         # Make the table
         sql = self.sql_create_table % {
             "table": self.quote_name(model._meta.db_table),
-            "definition": ", ".join(column_sqls)
+            "definition": ", ".join((*column_sqls, *constraints)),
         }
         if model._meta.db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(model._meta.db_tablespace)
@@ -342,6 +344,14 @@ class BaseDatabaseSchemaEditor:
     def remove_index(self, model, index):
         """Remove an index from a model."""
         self.execute(index.remove_sql(model, self))
+
+    def add_constraint(self, model, constraint):
+        """Add a check constraint to a model."""
+        self.execute(constraint.create_sql(model, self))
+
+    def remove_constraint(self, model, constraint):
+        """Remove a check constraint from a model."""
+        self.execute(constraint.remove_sql(model, self))
 
     def alter_unique_together(self, model, old_unique_together, new_unique_together):
         """
@@ -752,11 +762,12 @@ class BaseDatabaseSchemaEditor:
             self.execute(
                 self.sql_create_check % {
                     "table": self.quote_name(model._meta.db_table),
-                    "name": self.quote_name(
-                        self._create_index_name(model._meta.db_table, [new_field.column], suffix="_check")
-                    ),
-                    "column": self.quote_name(new_field.column),
-                    "check": new_db_params['check'],
+                    "check": self.sql_check % {
+                        'name': self.quote_name(
+                            self._create_index_name(model._meta.db_table, [new_field.column], suffix='_check'),
+                        ),
+                        'check': new_db_params['check'],
+                    },
                 }
             )
         # Drop the default if we need to
