@@ -5,6 +5,7 @@ from django.core.exceptions import EmptyResultSet, FieldError
 from django.db.backends import utils as backend_utils
 from django.db.models import fields
 from django.db.models.query_utils import Q
+from django.utils.deconstruct import deconstructible
 from django.utils.functional import cached_property
 
 
@@ -117,6 +118,7 @@ class Combinable:
         )
 
 
+@deconstructible
 class BaseExpression:
     """
     Base class for all query expressions.
@@ -339,6 +341,27 @@ class BaseExpression:
             if expr:
                 yield from expr.flatten()
 
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return False
+        path, args, kwargs = self.deconstruct()
+        other_path, other_args, other_kwargs = other.deconstruct()
+        if (path, args) == (other_path, other_args):
+            kwargs = kwargs.copy()
+            other_kwargs = other_kwargs.copy()
+            output_field = type(kwargs.pop('output_field', None))
+            other_output_field = type(other_kwargs.pop('output_field', None))
+            if output_field == other_output_field:
+                return kwargs == other_kwargs
+        return False
+
+    def __hash__(self):
+        path, args, kwargs = self.deconstruct()
+        h = hash(path) ^ hash(args)
+        for kwarg in kwargs.items():
+            h ^= hash(kwarg)
+        return h
+
 
 class Expression(BaseExpression, Combinable):
     """
@@ -445,6 +468,7 @@ class TemporalSubtraction(CombinedExpression):
         return connection.ops.subtract_temporals(self.lhs.output_field.get_internal_type(), lhs, rhs)
 
 
+@deconstructible
 class F(Combinable):
     """
     An object capable of resolving references to existing query objects.
@@ -467,6 +491,12 @@ class F(Combinable):
 
     def desc(self, **kwargs):
         return OrderBy(self, descending=True, **kwargs)
+
+    def __eq__(self, other):
+        return self.__class__ == other.__class__ and self.name == other.name
+
+    def __hash__(self):
+        return hash(self.name)
 
 
 class ResolvedOuterRef(F):
@@ -646,6 +676,12 @@ class RawSQL(Expression):
 
     def get_group_by_cols(self):
         return [self]
+
+    def __hash__(self):
+        h = hash(self.sql) ^ hash(self._output_field)
+        for param in self.params:
+            h ^= hash(param)
+        return h
 
 
 class Star(Expression):

@@ -5,7 +5,7 @@ from copy import deepcopy
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, connection, models, transaction
-from django.db.models import TimeField, UUIDField
+from django.db.models import CharField, TimeField, UUIDField
 from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
@@ -18,7 +18,9 @@ from django.db.models.functions import (
 )
 from django.db.models.sql import constants
 from django.db.models.sql.datastructures import Join
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.test import (
+    SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature,
+)
 from django.test.utils import Approximate
 
 from .models import (
@@ -653,17 +655,42 @@ class IterableLookupInnerExpressionsTests(TestCase):
         self.assertQuerysetEqual(queryset, ["<Result: Result at 2016-02-04 15:00:00>"])
 
 
-class ExpressionsTests(TestCase):
+class FTests(SimpleTestCase):
 
-    def test_F_object_deepcopy(self):
-        """
-        Make sure F objects can be deepcopied (#23492)
-        """
+    def test_deepcopy(self):
         f = F("foo")
         g = deepcopy(f)
         self.assertEqual(f.name, g.name)
 
-    def test_f_reuse(self):
+    def test_deconstruct(self):
+        f = F('name')
+        path, args, kwargs = f.deconstruct()
+        self.assertEqual(path, 'django.db.models.expressions.F')
+        self.assertEqual(args, (f.name,))
+        self.assertEqual(kwargs, {})
+
+    def test_equal(self):
+        f = F('name')
+        same_f = F('name')
+        other_f = F('username')
+        self.assertEqual(f, same_f)
+        self.assertNotEqual(f, other_f)
+
+    def test_hash(self):
+        d = {F('name'): 'Bob'}
+        self.assertIn(F('name'), d)
+        self.assertEqual(d[F('name')], 'Bob')
+
+    def test_not_equal_Value(self):
+        f = F('name')
+        value = Value('name')
+        self.assertNotEqual(f, value)
+        self.assertNotEqual(value, f)
+
+
+class ExpressionsTests(TestCase):
+
+    def test_F_reuse(self):
         f = F('id')
         n = Number.objects.create(integer=-1)
         c = Company.objects.create(
@@ -1237,6 +1264,42 @@ class ValueTests(TestCase):
         UUID.objects.create()
         UUID.objects.update(uuid=Value(uuid.UUID('12345678901234567890123456789012'), output_field=UUIDField()))
         self.assertEqual(UUID.objects.get().uuid, uuid.UUID('12345678901234567890123456789012'))
+
+    def test_deconstruct(self):
+        value = Value('name')
+        path, args, kwargs = value.deconstruct()
+        self.assertEqual(path, 'django.db.models.expressions.Value')
+        self.assertEqual(args, (value.value,))
+        self.assertEqual(kwargs, {})
+
+    def test_deconstruct_output_field(self):
+        value = Value('name', output_field=CharField())
+        path, args, kwargs = value.deconstruct()
+        self.assertEqual(path, 'django.db.models.expressions.Value')
+        self.assertEqual(args, (value.value,))
+        self.assertEqual(len(kwargs), 1)
+        self.assertEqual(kwargs['output_field'].deconstruct(), CharField().deconstruct())
+
+    def test_equal(self):
+        value = Value('name')
+        same_value = Value('name')
+        other_value = Value('username')
+        self.assertEqual(value, same_value)
+        self.assertNotEqual(value, other_value)
+
+    def test_hash(self):
+        d = {Value('name'): 'Bob'}
+        self.assertIn(Value('name'), d)
+        self.assertEqual(d[Value('name')], 'Bob')
+
+    def test_equal_output_field(self):
+        value = Value('name', output_field=CharField())
+        same_value = Value('name', output_field=CharField())
+        other_value = Value('name', output_field=TimeField())
+        no_output_field = Value('name')
+        self.assertEqual(value, same_value)
+        self.assertNotEqual(value, other_value)
+        self.assertNotEqual(value, no_output_field)
 
 
 class ReprTests(TestCase):
