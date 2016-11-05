@@ -871,14 +871,24 @@ sys.meta_path.append(_importer)
 ### Additional customizations for Django ###
 
 if PY3:
-    memoryview = memoryview
     buffer_types = (bytes, bytearray, memoryview)
 else:
-    # memoryview and buffer are not strictly equivalent, but should be fine for
-    # django core usage (mainly BinaryField). However, Jython doesn't support
-    # buffer (see http://bugs.jython.org/issue1521), so we have to be careful.
-    if sys.platform.startswith('java'):
-        memoryview = memoryview
-    else:
-        memoryview = buffer
-    buffer_types = (bytearray, memoryview)
+    buffer_types = (bytearray,)
+
+    # if memoryview is available we should add it.
+    try:
+        buffer_types += (memoryview,)
+    except NameError:
+        pass
+
+    # Jython doesn't support buffer (see http://bugs.jython.org/issue1521), so we have to be careful.
+    try:
+        buffer_types += (buffer,)
+    except NameError:
+        pass
+
+# memoryview and buffer are not strictly equivalent, but should be fine for
+# django core usage (mainly BinaryField). We can't just use memoryview with python 2.7.
+# libs heavy relay on it for instance sqlite3 http://bugs.python.org/issue7723.
+# So if buffer is available we should use it.
+memoryview = buffer_types[-1]
