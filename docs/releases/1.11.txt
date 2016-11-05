@@ -501,6 +501,15 @@ This works similar to ``settings.TIME_ZONE = None`` except that it also sets
 if there's a use case where you find you can't adapt your code to set a
 ``TIME_ZONE``.
 
+HTML changes in admin templates
+-------------------------------
+
+``<p class="help">`` is replaced with a ``<div>`` tag to allow including lists
+inside help text.
+
+Read-only fields are wrapped in ``<div class="readonly">...</div>`` instead of
+``<p>...</p>`` to allow any kind of HTML as the field's content.
+
 Miscellaneous
 -------------
 
