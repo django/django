@@ -1,4 +1,7 @@
+import warnings
+
 from django.db import models
+from django.utils.deprecation import RemovedInDjango21Warning
 
 
 def set_attr(name, value):
@@ -8,17 +11,20 @@ def set_attr(name, value):
     return wrapper
 
 
-class Guitarist(models.Model):
-    name = models.CharField(max_length=50)
-    slug = models.CharField(max_length=50)
+with warnings.catch_warnings():
+    warnings.simplefilter('ignore', category=RemovedInDjango21Warning)
 
-    @models.permalink
-    def url(self):
-        "Returns the URL for this guitarist."
-        return ('guitarist_detail', [self.slug])
+    class Guitarist(models.Model):
+        name = models.CharField(max_length=50)
+        slug = models.CharField(max_length=50)
 
-    @models.permalink
-    @set_attr('attribute', 'value')
-    def url_with_attribute(self):
-        "Returns the URL for this guitarist and holds an attribute"
-        return ('guitarist_detail', [self.slug])
+        @models.permalink
+        def url(self):
+            "Returns the URL for this guitarist."
+            return ('guitarist_detail', [self.slug])
+
+        @models.permalink
+        @set_attr('attribute', 'value')
+        def url_with_attribute(self):
+            "Returns the URL for this guitarist and holds an attribute"
+            return ('guitarist_detail', [self.slug])

@@ -3,6 +3,7 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lele Long <schemacs@gmail.com>, 2015
+# Liping Wang <lynn.config@gmail.com>, 2016
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Ronald White <ouyanghongyu@gmail.com>, 2014
 # Kevin Sze <leiarix@gmail.com>, 2012
@@ -11,8 +12,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:51+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-09-20 02:21+0000\n"
+"Last-Translator: Liping Wang <lynn.config@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -131,7 +132,7 @@ msgid "Arguments"
 msgstr "参数"
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "返回到模型文档"
 
 msgid "Model documentation"
 msgstr "模型文档"
@@ -204,7 +205,7 @@ msgid "Templates:"
 msgstr "模板:"
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "回到视图文档"
 
 msgid "View documentation"
 msgstr "视图文档"

@@ -16,10 +16,12 @@ from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.template import Context, Template, TemplateSyntaxError
 from django.test import (
-    RequestFactory, SimpleTestCase, TestCase, override_settings,
+    RequestFactory, SimpleTestCase, TestCase, ignore_warnings,
+    override_settings,
 )
 from django.utils import six, translation
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.formats import (
     date_format, get_format, get_format_modules, iter_format_modules, localize,
     localize_input, reset_format_cache, sanitize_separators, time_format,
@@ -417,6 +419,7 @@ class TranslationTests(SimpleTestCase):
                     ' super results{% endblocktrans %}'
                 )
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_string_concat(self):
         """
         six.text_type(string_concat(...)) should not raise a TypeError - #4796
@@ -661,7 +664,7 @@ class FormattingTests(SimpleTestCase):
                 '<option value="9">setembre</option>'
                 '<option value="10">octubre</option>'
                 '<option value="11">novembre</option>'
-                '<option value="12" selected="selected">desembre</option>'
+                '<option value="12" selected>desembre</option>'
                 '</select>'
                 '<select name="mydate_day" id="id_mydate_day">'
                 '<option value="0">---</option>'
@@ -695,11 +698,11 @@ class FormattingTests(SimpleTestCase):
                 '<option value="28">28</option>'
                 '<option value="29">29</option>'
                 '<option value="30">30</option>'
-                '<option value="31" selected="selected">31</option>'
+                '<option value="31" selected>31</option>'
                 '</select>'
                 '<select name="mydate_year" id="id_mydate_year">'
                 '<option value="0">---</option>'
-                '<option value="2009" selected="selected">2009</option>'
+                '<option value="2009" selected>2009</option>'
                 '<option value="2010">2010</option>'
                 '<option value="2011">2011</option>'
                 '<option value="2012">2012</option>'
@@ -744,7 +747,7 @@ class FormattingTests(SimpleTestCase):
         self.maxDiff = 3000
         # Catalan locale
         with translation.override('ca', deactivate=True):
-            self.assertEqual('j \d\e F \d\e Y', get_format('DATE_FORMAT'))
+            self.assertEqual(r'j \d\e F \d\e Y', get_format('DATE_FORMAT'))
             self.assertEqual(1, get_format('FIRST_DAY_OF_WEEK'))
             self.assertEqual(',', get_format('DECIMAL_SEPARATOR'))
             self.assertEqual('10:15', time_format(self.t))
@@ -861,7 +864,7 @@ class FormattingTests(SimpleTestCase):
                 '<option value="28">28</option>'
                 '<option value="29">29</option>'
                 '<option value="30">30</option>'
-                '<option value="31" selected="selected">31</option>'
+                '<option value="31" selected>31</option>'
                 '</select>'
                 '<select name="mydate_month" id="id_mydate_month">'
                 '<option value="0">---</option>'
@@ -876,11 +879,11 @@ class FormattingTests(SimpleTestCase):
                 '<option value="9">setembre</option>'
                 '<option value="10">octubre</option>'
                 '<option value="11">novembre</option>'
-                '<option value="12" selected="selected">desembre</option>'
+                '<option value="12" selected>desembre</option>'
                 '</select>'
                 '<select name="mydate_year" id="id_mydate_year">'
                 '<option value="0">---</option>'
-                '<option value="2009" selected="selected">2009</option>'
+                '<option value="2009" selected>2009</option>'
                 '<option value="2010">2010</option>'
                 '<option value="2011">2011</option>'
                 '<option value="2012">2012</option>'
@@ -929,7 +932,7 @@ class FormattingTests(SimpleTestCase):
                 '<option value="28">28</option>'
                 '<option value="29">29</option>'
                 '<option value="30">30</option>'
-                '<option value="31" selected="selected">31</option>'
+                '<option value="31" selected>31</option>'
                 '</select>'
                 '<select name="mydate_month" id="id_mydate_month">'
                 '<option value="0">---</option>'
@@ -944,11 +947,11 @@ class FormattingTests(SimpleTestCase):
                 '<option value="9">\u0421\u0435\u043d\u0442\u044f\u0431\u0440\u044c</option>'
                 '<option value="10">\u041e\u043a\u0442\u044f\u0431\u0440\u044c</option>'
                 '<option value="11">\u041d\u043e\u044f\u0431\u0440\u044c</option>'
-                '<option value="12" selected="selected">\u0414\u0435\u043a\u0430\u0431\u0440\u044c</option>'
+                '<option value="12" selected>\u0414\u0435\u043a\u0430\u0431\u0440\u044c</option>'
                 '</select>'
                 '<select name="mydate_year" id="id_mydate_year">'
                 '<option value="0">---</option>'
-                '<option value="2009" selected="selected">2009</option>'
+                '<option value="2009" selected>2009</option>'
                 '<option value="2010">2010</option>'
                 '<option value="2011">2011</option>'
                 '<option value="2012">2012</option>'
@@ -1039,7 +1042,7 @@ class FormattingTests(SimpleTestCase):
                 '<option value="9">September</option>'
                 '<option value="10">October</option>'
                 '<option value="11">November</option>'
-                '<option value="12" selected="selected">December</option>'
+                '<option value="12" selected>December</option>'
                 '</select>'
                 '<select name="mydate_day" id="id_mydate_day">'
                 '<option value="0">---</option>'
@@ -1073,11 +1076,11 @@ class FormattingTests(SimpleTestCase):
                 '<option value="28">28</option>'
                 '<option value="29">29</option>'
                 '<option value="30">30</option>'
-                '<option value="31" selected="selected">31</option>'
+                '<option value="31" selected>31</option>'
                 '</select>'
                 '<select name="mydate_year" id="id_mydate_year">'
                 '<option value="0">---</option>'
-                '<option value="2009" selected="selected">2009</option>'
+                '<option value="2009" selected>2009</option>'
                 '<option value="2010">2010</option>'
                 '<option value="2011">2011</option>'
                 '<option value="2012">2012</option>'
@@ -1469,11 +1472,25 @@ class MiscTests(SimpleTestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
         self.assertEqual(g(r), 'zh-hans')
 
+    @override_settings(
+        LANGUAGES=[
+            ('en', 'English'),
+            ('de', 'German'),
+            ('de-at', 'Austrian German'),
+            ('pl', 'Polish'),
+        ],
+    )
     def test_get_language_from_path_real(self):
         g = trans_real.get_language_from_path
         self.assertEqual(g('/pl/'), 'pl')
         self.assertEqual(g('/pl'), 'pl')
         self.assertIsNone(g('/xyz/'))
+        self.assertEqual(g('/en/'), 'en')
+        self.assertEqual(g('/en-gb/'), 'en')
+        self.assertEqual(g('/de/'), 'de')
+        self.assertEqual(g('/de-at/'), 'de-at')
+        self.assertEqual(g('/de-ch/'), 'de')
+        self.assertIsNone(g('/de-simple-page/'))
 
     def test_get_language_from_path_null(self):
         from django.utils.translation.trans_null import get_language_from_path as g
@@ -1806,6 +1823,7 @@ class LocaleMiddlewareTests(TestCase):
     USE_I18N=True,
     LANGUAGES=[
         ('en', 'English'),
+        ('de', 'German'),
         ('fr', 'French'),
     ],
     MIDDLEWARE=[
@@ -1835,6 +1853,11 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
     def test_unexpected_kwarg_to_i18n_patterns(self):
         with self.assertRaisesMessage(AssertionError, "Unexpected kwargs for i18n_patterns(): {'foo':"):
             i18n_patterns(object(), foo='bar')
+
+    def test_page_with_dash(self):
+        # A page starting with /de* shouldn't match the 'de' langauge code.
+        response = self.client.get('/de-simple-page/')
+        self.assertEqual(response.content, b'Yes')
 
 
 @override_settings(

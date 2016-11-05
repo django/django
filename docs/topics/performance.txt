@@ -262,7 +262,8 @@ that can help optimize your site's performance. They include:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Adds support for modern browsers to conditionally GET responses based on the
-``ETag`` and ``Last-Modified`` headers.
+``ETag`` and ``Last-Modified`` headers. It also calculates and sets an ETag if
+needed.
 
 :class:`~django.middleware.gzip.GZipMiddleware`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

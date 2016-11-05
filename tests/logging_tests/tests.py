@@ -3,19 +3,22 @@ from __future__ import unicode_literals
 
 import logging
 import warnings
+from contextlib import contextmanager
 
 from admin_scripts.tests import AdminScriptTestCase
 
 from django.conf import settings
 from django.core import mail
 from django.core.files.temp import NamedTemporaryFile
+from django.core.management import color
 from django.db import connection
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
+from django.utils import six
 from django.utils.deprecation import RemovedInNextVersionWarning
 from django.utils.log import (
     DEFAULT_LOGGING, AdminEmailHandler, CallbackFilter, RequireDebugFalse,
-    RequireDebugTrue,
+    RequireDebugTrue, ServerFormatter,
 )
 
 from .logconfig import MyEmailBackend
@@ -513,3 +516,47 @@ class SchemaLoggerTests(SimpleTestCase):
                 }},
             )]
         )
+
+
+class LogFormattersTests(SimpleTestCase):
+
+    def test_server_formatter_styles(self):
+        color_style = color.make_style('')
+        formatter = ServerFormatter()
+        formatter.style = color_style
+        log_msg = 'log message'
+        status_code_styles = [
+            (200, 'HTTP_SUCCESS'),
+            (100, 'HTTP_INFO'),
+            (304, 'HTTP_NOT_MODIFIED'),
+            (300, 'HTTP_REDIRECT'),
+            (404, 'HTTP_NOT_FOUND'),
+            (400, 'HTTP_BAD_REQUEST'),
+            (500, 'HTTP_SERVER_ERROR'),
+        ]
+        for status_code, style in status_code_styles:
+            record = logging.makeLogRecord({'msg': log_msg, 'status_code': status_code})
+            self.assertEqual(formatter.format(record), getattr(color_style, style)(log_msg))
+        record = logging.makeLogRecord({'msg': log_msg})
+        self.assertEqual(formatter.format(record), log_msg)
+
+    def test_server_formatter_default_format(self):
+        server_time = '2016-09-25 10:20:30'
+        log_msg = 'log message'
+        logger = logging.getLogger('django.server')
+
+        @contextmanager
+        def patch_django_server_logger():
+            old_stream = logger.handlers[0].stream
+            new_stream = six.StringIO()
+            logger.handlers[0].stream = new_stream
+            yield new_stream
+            logger.handlers[0].stream = old_stream
+
+        with patch_django_server_logger() as logger_output:
+            logger.info(log_msg, extra={'server_time': server_time})
+            self.assertEqual('[%s] %s\n' % (server_time, log_msg), logger_output.getvalue())
+
+        with patch_django_server_logger() as logger_output:
+            logger.info(log_msg)
+            six.assertRegex(self, logger_output.getvalue(), r'^\[[-:,.\s\d]+\] %s' % log_msg)

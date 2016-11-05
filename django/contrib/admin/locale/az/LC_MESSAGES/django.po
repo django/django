@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Emin Mastizada <emin@mastizada.com>, 2016
+# Emin Mastizada <emin@linux.com>, 2016
+# Konul Allahverdiyeva <english.koni@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-08-31 10:37+0000\n"
+"Last-Translator: Konul Allahverdiyeva <english.koni@gmail.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -63,18 +64,18 @@ msgid "This year"
 msgstr "Bu il"
 
 msgid "No date"
-msgstr ""
+msgstr "Tarixi yoxdur"
 
 msgid "Has date"
-msgstr ""
+msgstr "Tarixi mövcuddur"
 
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"Lütfən, əməkdaş hesabı üçün doğru %(username)s və parol daxil olun. Nəzərə "
-"alın ki, hər iki bölüm böyük/kiçik hərflərə həssasdırlar."
+"Lütfən, istifadəçi hesabı üçün doğru %(username)s və parol daxil olun. "
+"Nəzərə alın ki, hər iki sahə böyük/kiçik hərflərə həssasdırlar."
 
 msgid "Action:"
 msgstr "Əməliyyat:"
@@ -132,7 +133,7 @@ msgstr "LogEntry obyekti"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "{name} \"{object}\" əlavə edildi."
 
 msgid "Added."
 msgstr "Əlavə edildi."
@@ -140,16 +141,17 @@ msgstr "Əlavə edildi."
 msgid "and"
 msgstr "və"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "{name} \"{object}\" üçün {fields} dəyişdirildi."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "{fields} dəyişdirildi."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "{name} \"{object}\" silindi."
 
 msgid "No fields changed."
 msgstr "Heç bir sahə dəyişmədi."
@@ -167,31 +169,38 @@ msgstr ""
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
+"{name} \"{obj}\" uğurla əlavə edildi. Bunu təkrar aşağıdan dəyişdirə "
+"bilərsiz."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
+"{name} \"{obj}\" uğurla əlavə edildi. Aşağıdan başqa bir {name} əlavə edə "
+"bilərsiz."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" uğurla əlavə edildi."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
+"{name} \"{obj}\" uğurla dəyişdirildi. Təkrar aşağıdan dəyişdirə bilərsiz."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
 msgstr ""
+"{name} \"{obj}\" uğurla dəyişdirildi. Aşağıdan başqa bir {name} əlavə edə "
+"bilərsiz."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" uğurla dəyişdirildi."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -464,10 +473,10 @@ msgid "You don't have permission to edit anything."
 msgstr "Üzrlər, amma sizin nəyisə dəyişməyə səlahiyyətiniz çatmır."
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Son əməliyyatlar"
 
 msgid "My actions"
-msgstr ""
+msgstr "Mənim əməliyyatlarım"
 
 msgid "None available"
 msgstr "Heç nə yoxdur"

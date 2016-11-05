@@ -5,9 +5,11 @@ import time
 
 from multiple_database.routers import TestRouter
 
-from django.db import DatabaseError, connection, router, transaction
+from django.db import (
+    DatabaseError, connection, connections, router, transaction,
+)
 from django.test import (
-    TransactionTestCase, override_settings, skipIfDBFeature,
+    TransactionTestCase, mock, override_settings, skipIfDBFeature,
     skipUnlessDBFeature,
 )
 from django.test.utils import CaptureQueriesContext
@@ -151,6 +153,14 @@ class SelectForUpdateTests(TransactionTestCase):
                 Person.objects.select_for_update(skip_locked=True).get()
 
     @skipUnlessDBFeature('has_select_for_update')
+    def test_for_update_after_from(self):
+        features_class = connections['default'].features.__class__
+        attribute_to_patch = "%s.%s.for_update_after_from" % (features_class.__module__, features_class.__name__)
+        with mock.patch(attribute_to_patch, return_value=True):
+            with transaction.atomic():
+                self.assertIn('FOR UPDATE WHERE', str(Person.objects.filter(name='foo').select_for_update().query))
+
+    @skipUnlessDBFeature('has_select_for_update')
     def test_for_update_requires_transaction(self):
         """
         Test that a TransactionManagementError is raised
@@ -290,3 +300,12 @@ class SelectForUpdateTests(TransactionTestCase):
     def test_nowait_and_skip_locked(self):
         with self.assertRaisesMessage(ValueError, 'The nowait option cannot be used with skip_locked.'):
             Person.objects.select_for_update(nowait=True, skip_locked=True)
+
+    def test_ordered_select_for_update(self):
+        """
+        Subqueries should respect ordering as an ORDER BY clause may be useful
+        to specify a row locking order to prevent deadlocks (#27193).
+        """
+        with transaction.atomic():
+            qs = Person.objects.filter(id__in=Person.objects.order_by('-id').select_for_update())
+            self.assertIn('ORDER BY', str(qs.query))

@@ -396,11 +396,11 @@ When the ``Form`` is valid, ``cleaned_data`` will include a key and value for
 fields. In this example, the data dictionary doesn't include a value for the
 ``nick_name`` field, but ``cleaned_data`` includes it, with an empty value::
 
-    >>> from django.forms import Form
-    >>> class OptionalPersonForm(Form):
-    ...     first_name = CharField()
-    ...     last_name = CharField()
-    ...     nick_name = CharField(required=False)
+    >>> from django import forms
+    >>> class OptionalPersonForm(forms.Form):
+    ...     first_name = forms.CharField()
+    ...     last_name = forms.CharField()
+    ...     nick_name = forms.CharField(required=False)
     >>> data = {'first_name': 'John', 'last_name': 'Lennon'}
     >>> f = OptionalPersonForm(data)
     >>> f.is_valid()
@@ -540,7 +540,7 @@ it calls its ``as_table()`` method behind the scenes::
     >>> f = ContactForm()
     >>> f.as_table()
     '<tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" required /></td></tr>\n<tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" required /></td></tr>\n<tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" required /></td></tr>\n<tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>'
-    >>> print(f.as_table())
+    >>> print(f)
     <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" required /></td></tr>
     <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" required /></td></tr>
     <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" required /></td></tr>
@@ -563,9 +563,9 @@ attributes to required rows or to rows with errors: simply set the
 :attr:`Form.error_css_class` and/or :attr:`Form.required_css_class`
 attributes::
 
-    from django.forms import Form
+    from django import forms
 
-    class ContactForm(Form):
+    class ContactForm(forms.Form):
         error_css_class = 'error'
         required_css_class = 'required'
 
@@ -1158,14 +1158,14 @@ example, ``BeatleForm`` subclasses both ``PersonForm`` and ``InstrumentForm``
 (in that order), and its field list includes the fields from the parent
 classes::
 
-    >>> from django.forms import Form
-    >>> class PersonForm(Form):
-    ...     first_name = CharField()
-    ...     last_name = CharField()
-    >>> class InstrumentForm(Form):
-    ...     instrument = CharField()
-    >>> class BeatleForm(PersonForm, InstrumentForm):
-    ...     haircut_type = CharField()
+    >>> from django import forms
+    >>> class PersonForm(forms.Form):
+    ...     first_name = forms.CharField()
+    ...     last_name = forms.CharField()
+    >>> class InstrumentForm(forms.Form):
+    ...     instrument = forms.CharField()
+    >>> class BeatleForm(InstrumentForm, PersonForm):
+    ...     haircut_type = forms.CharField()
     >>> b = BeatleForm(auto_id=False)
     >>> print(b.as_ul())
     <li>First name: <input type="text" name="first_name" required /></li>

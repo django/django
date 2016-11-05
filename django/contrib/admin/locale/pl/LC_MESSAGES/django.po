@@ -18,7 +18,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-06-06 21:56+0000\n"
+"PO-Revision-Date: 2016-08-14 22:58+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -84,7 +84,7 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"Wprowadź poprawne dane w polach \"%(username)s\" i \"hasło\" dla konta "
+"Wprowadź poprawne dane w polach „%(username)s” i „hasło” dla konta "
 "należącego do zespołu. Uwaga: wielkość liter może mieć znaczenie."
 
 msgid "Action:"
@@ -128,15 +128,15 @@ msgstr "logi"
 
 #, python-format
 msgid "Added \"%(object)s\"."
-msgstr "Dodano \" %(object)s \"."
+msgstr "Dodano „%(object)s”."
 
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "Zmieniono \" %(object)s \" - %(changes)s "
+msgstr "Zmieniono „%(object)s” – %(changes)s "
 
 #, python-format
 msgid "Deleted \"%(object)s.\""
-msgstr "Usunięto \" %(object)s \"."
+msgstr "Usunięto „%(object)s”."
 
 msgid "LogEntry Object"
 msgstr "Obiekt typu LogEntry"
@@ -151,6 +151,7 @@ msgstr "Dodany."
 msgid "and"
 msgstr "i"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr "Zmieniono {fields} w {name} „{object}”."
 
@@ -171,8 +172,8 @@ msgstr "brak"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-"Przytrzymaj wciśnięty klawisz \"Ctrl\" lub \"Command\" na Mac'u aby "
-"zaznaczyć więcej niż jeden wybór."
+"Przytrzymaj wciśnięty klawisz „Ctrl” lub „Command” na Macu, aby zaznaczyć "
+"więcej niż jeden wybór."
 
 #, python-brace-format
 msgid ""
@@ -221,7 +222,7 @@ msgstr "Nie wybrano akcji."
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" usunięty pomyślnie."
+msgstr "%(name)s „%(obj)s” usunięty pomyślnie."
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
@@ -288,7 +289,7 @@ msgstr "Zaloguj się"
 
 #, python-format
 msgid "%(app)s administration"
-msgstr "%(app)s - administracja"
+msgstr "%(app)s – administracja"
 
 msgid "Page not found"
 msgstr "Strona nie znaleziona"
@@ -416,7 +417,7 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Czy chcesz skasować %(object_name)s \"%(escaped_object)s\"? Następujące "
+"Czy chcesz skasować %(object_name)s „%(escaped_object)s”? Następujące "
 "zależne obiekty zostaną skasowane:"
 
 msgid "Objects"
@@ -681,7 +682,7 @@ msgstr "Zaznacz %s"
 
 #, python-format
 msgid "Select %s to change"
-msgstr "Zaznacz %s aby zmienić"
+msgstr "Zaznacz %s do zmiany"
 
 msgid "Date:"
 msgstr "Data:"

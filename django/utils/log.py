@@ -164,28 +164,32 @@ class ServerFormatter(logging.Formatter):
         super(ServerFormatter, self).__init__(*args, **kwargs)
 
     def format(self, record):
-        args = record.args
         msg = record.msg
+        status_code = getattr(record, 'status_code', None)
 
-        if len(args) == 0:
-            msg = self.style.HTTP_BAD_REQUEST(msg)
-        else:
-            if args[1][0] == '2':
+        if status_code:
+            if 200 <= status_code < 300:
                 # Put 2XX first, since it should be the common case
                 msg = self.style.HTTP_SUCCESS(msg)
-            elif args[1][0] == '1':
+            elif 100 <= status_code < 200:
                 msg = self.style.HTTP_INFO(msg)
-            elif args[1] == '304':
+            elif status_code == 304:
                 msg = self.style.HTTP_NOT_MODIFIED(msg)
-            elif args[1][0] == '3':
+            elif 300 <= status_code < 400:
                 msg = self.style.HTTP_REDIRECT(msg)
-            elif args[1] == '404':
+            elif status_code == 404:
                 msg = self.style.HTTP_NOT_FOUND(msg)
-            elif args[1][0] == '4':
+            elif 400 <= status_code < 500:
                 msg = self.style.HTTP_BAD_REQUEST(msg)
             else:
-                # Any 5XX, or any other response
+                # Any 5XX, or any other status code
                 msg = self.style.HTTP_SERVER_ERROR(msg)
+
+        if self.uses_server_time() and not hasattr(record, 'server_time'):
+            record.server_time = self.formatTime(record, self.datefmt)
 
         record.msg = msg
         return super(ServerFormatter, self).format(record)
+
+    def uses_server_time(self):
+        return self._fmt.find('%(server_time)') >= 0

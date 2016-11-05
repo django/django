@@ -142,7 +142,7 @@ class Field(RegisterLookupMixin):
                  db_index=False, rel=None, default=NOT_PROVIDED, editable=True,
                  serialize=True, unique_for_date=None, unique_for_month=None,
                  unique_for_year=None, choices=None, help_text='', db_column=None,
-                 db_tablespace=None, auto_created=False, validators=[],
+                 db_tablespace=None, auto_created=False, validators=(),
                  error_messages=None):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
@@ -175,7 +175,7 @@ class Field(RegisterLookupMixin):
             self.creation_counter = Field.creation_counter
             Field.creation_counter += 1
 
-        self._validators = validators  # Store for deconstruction later
+        self._validators = list(validators)  # Store for deconstruction later
 
         messages = {}
         for c in reversed(self.__class__.__mro__):
@@ -817,7 +817,7 @@ class Field(RegisterLookupMixin):
         Returns a string value of this field from the passed obj.
         This is used by the serialization framework.
         """
-        return smart_text(self.value_from_object(obj))
+        return force_text(self.value_from_object(obj))
 
     def _get_flatchoices(self):
         """Flattened version of choices tuple."""
@@ -1075,7 +1075,7 @@ class CharField(Field):
     def to_python(self, value):
         if isinstance(value, six.string_types) or value is None:
             return value
-        return smart_text(value)
+        return force_text(value)
 
     def get_prep_value(self, value):
         value = super(CharField, self).get_prep_value(value)
@@ -2129,7 +2129,7 @@ class TextField(Field):
     def to_python(self, value):
         if isinstance(value, six.string_types) or value is None:
             return value
-        return smart_text(value)
+        return force_text(value)
 
     def get_prep_value(self, value):
         value = super(TextField, self).get_prep_value(value)
@@ -2371,20 +2371,17 @@ class UUIDField(Field):
         if value is None:
             return None
         if not isinstance(value, uuid.UUID):
-            try:
-                value = uuid.UUID(value)
-            except AttributeError:
-                raise TypeError(self.error_messages['invalid'] % {'value': value})
+            value = self.to_python(value)
 
         if connection.features.has_native_uuid_field:
             return value
         return value.hex
 
     def to_python(self, value):
-        if value and not isinstance(value, uuid.UUID):
+        if not isinstance(value, uuid.UUID):
             try:
                 return uuid.UUID(value)
-            except ValueError:
+            except (AttributeError, ValueError):
                 raise exceptions.ValidationError(
                     self.error_messages['invalid'],
                     code='invalid',

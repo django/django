@@ -16,7 +16,7 @@ By default, the configuration uses SQLite. If you're new to databases, or
 you're just interested in trying Django, this is the easiest choice. SQLite is
 included in Python, so you won't need to install anything else to support your
 database. When starting your first real project, however, you may want to use a
-more robust database like PostgreSQL, to avoid database-switching headaches
+more scalable database like PostgreSQL, to avoid database-switching headaches
 down the road.
 
 If you wish to use another database, install the appropriate :ref:`database
@@ -204,9 +204,12 @@ But first we need to tell our project that the ``polls`` app is installed.
     you can distribute apps, because they don't have to be tied to a given
     Django installation.
 
-Edit the :file:`mysite/settings.py` file again, and change the
-:setting:`INSTALLED_APPS` setting to include the string
-``'polls.apps.PollsConfig'``. It'll look like this:
+To include the app in our project, we need to add a reference to its
+configuration class in the :setting:`INSTALLED_APPS` setting. The
+``PollsConfig`` class is in the :file:`polls/apps.py` file, so its dotted path
+is ``'polls.apps.PollsConfig'``. Edit the :file:`mysite/settings.py` file and
+add that dotted path to the :setting:`INSTALLED_APPS` setting. It'll look like
+this:
 
 .. snippet::
     :filename: mysite/settings.py

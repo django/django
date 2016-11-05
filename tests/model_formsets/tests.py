@@ -1134,7 +1134,7 @@ class ModelFormsetTest(TestCase):
             formset.forms[0].as_p(),
             '<p><label for="id_form-0-owner">Owner:</label>'
             '<select name="form-0-owner" id="id_form-0-owner">'
-            '<option value="" selected="selected">---------</option>'
+            '<option value="" selected>---------</option>'
             '<option value="%d">Joe Perry at Giordanos</option>'
             '<option value="%d">Jack Berry at Giordanos</option>'
             '</select></p>'
@@ -1461,7 +1461,7 @@ class ModelFormsetTest(TestCase):
         # a formset for a Model that has a custom primary key that still needs to be
         # added to the formset automatically
         FormSet = modelformset_factory(ClassyMexicanRestaurant, fields=["tacos_are_yummy"])
-        self.assertEqual(sorted(FormSet().forms[0].fields.keys()), ['restaurant', 'tacos_are_yummy'])
+        self.assertEqual(sorted(FormSet().forms[0].fields.keys()), ['tacos_are_yummy', 'the_restaurant'])
 
     def test_model_formset_with_initial_model_instance(self):
         # has_changed should compare model instance and primary key

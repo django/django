@@ -21,8 +21,8 @@ handling date/times. When enabled, this Django will store date/times in UTC,
 use timezone-aware objects internally, and translate them to users' local
 timezones for display.
 
-If you're upgrading an existing project to Django 1.4, switching to the time-
-zone aware mode may take some care: the new mode disallows some rather sloppy
+If you're upgrading an existing project to Django 1.4, switching to the timezone
+aware mode may take some care: the new mode disallows some rather sloppy
 behavior that used to be accepted. We encourage anyone who's upgrading to check
 out the :ref:`timezone migration guide <time-zones-migration-guide>` and the
 :ref:`timezone FAQ <time-zones-faq>` for useful pointers.

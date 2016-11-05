@@ -143,8 +143,9 @@ msgstr "追加されました。"
 msgid "and"
 msgstr "と"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "{name} \"{object}\" の {list} を変更しました。"
+msgstr "{name} \"{object}\" の {fields} を変更しました。"
 
 #, python-brace-format
 msgid "Changed {fields}."

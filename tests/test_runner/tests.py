@@ -281,7 +281,7 @@ class SetupDatabasesTests(unittest.TestCase):
             }
         })
 
-        with mock.patch('django.db.backends.dummy.base.DatabaseCreation') as mocked_db_creation:
+        with mock.patch('django.db.backends.dummy.base.DatabaseWrapper.creation_class') as mocked_db_creation:
             with mock.patch('django.test.utils.connections', new=tested_connections):
                 old_config = self.runner_instance.setup_databases()
                 self.runner_instance.teardown_databases(old_config)
@@ -306,7 +306,7 @@ class SetupDatabasesTests(unittest.TestCase):
                 'ENGINE': 'django.db.backends.dummy',
             },
         })
-        with mock.patch('django.db.backends.dummy.base.DatabaseCreation') as mocked_db_creation:
+        with mock.patch('django.db.backends.dummy.base.DatabaseWrapper.creation_class') as mocked_db_creation:
             with mock.patch('django.test.utils.connections', new=tested_connections):
                 self.runner_instance.setup_databases()
         mocked_db_creation.return_value.create_test_db.assert_called_once_with(
@@ -320,7 +320,7 @@ class SetupDatabasesTests(unittest.TestCase):
                 'TEST': {'SERIALIZE': False},
             },
         })
-        with mock.patch('django.db.backends.dummy.base.DatabaseCreation') as mocked_db_creation:
+        with mock.patch('django.db.backends.dummy.base.DatabaseWrapper.creation_class') as mocked_db_creation:
             with mock.patch('django.test.utils.connections', new=tested_connections):
                 self.runner_instance.setup_databases()
         mocked_db_creation.return_value.create_test_db.assert_called_once_with(

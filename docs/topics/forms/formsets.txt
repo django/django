@@ -80,6 +80,11 @@ There are now a total of three forms showing above. One for the initial data
 that was passed in and two extra forms. Also note that we are passing in a
 list of dictionaries as the initial data.
 
+If you use an ``initial`` for displaying a formset, you should pass the same
+``initial`` when processing that formset's submission so that the formset can
+detect which forms were changed by the user. For example, you might have
+something like: ``ArticleFormSet(request.POST, initial=[...])``.
+
 .. seealso::
 
     :ref:`Creating formsets from models with model formsets <model-formsets>`.
@@ -164,10 +169,10 @@ As we can see, ``formset.errors`` is a list whose entries correspond to the
 forms in the formset. Validation was performed for each of the two forms, and
 the expected error message appears for the second item.
 
-Just like when using a normal ``Form``, each form in the formset may include
-HTML attributes such as ``maxlength`` for browser validation. However, forms of
-formsets won't include the ``required`` attribute as that validation may be
-incorrect when adding and deleting forms.
+Just like when using a normal ``Form``, each field in a formset's forms may
+include HTML attributes such as ``maxlength`` for browser validation. However,
+form fields of formsets won't include the ``required`` attribute as that
+validation may be incorrect when adding and deleting forms.
 
 .. method:: BaseFormSet.total_error_count()
 
@@ -296,14 +301,14 @@ The formset ``clean`` method is called after all the ``Form.clean`` methods
 have been called. The errors will be found using the ``non_form_errors()``
 method on the formset.
 
-.. _validate_max:
-
 Validating the number of forms in a formset
 ===========================================
 
 Django provides a couple ways to validate the minimum or maximum number of
 submitted forms. Applications which need more customizable validation of the
 number of forms should use custom formset validation.
+
+.. _validate_max:
 
 ``validate_max``
 ----------------

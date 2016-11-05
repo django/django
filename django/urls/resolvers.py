@@ -13,6 +13,8 @@ import threading
 from importlib import import_module
 
 from django.conf import settings
+from django.core.checks import Warning
+from django.core.checks.urls import check_resolver
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import lru_cache, six
 from django.utils.datastructures import MultiValueDict
@@ -107,6 +109,37 @@ class LocaleRegexProvider(object):
             self._regex_dict[language_code] = compiled_regex
         return self._regex_dict[language_code]
 
+    def describe(self):
+        """
+        Format the URL pattern for display in warning messages.
+        """
+        description = "'{}'".format(self.regex.pattern)
+        if getattr(self, 'name', False):
+            description += " [name='{}']".format(self.name)
+        return description
+
+    def _check_pattern_startswith_slash(self):
+        """
+        Check that the pattern does not begin with a forward slash.
+        """
+        regex_pattern = self.regex.pattern
+        if not settings.APPEND_SLASH:
+            # Skip check as it can be useful to start a URL pattern with a slash
+            # when APPEND_SLASH=False.
+            return []
+        if (regex_pattern.startswith('/') or regex_pattern.startswith('^/')) and not regex_pattern.endswith('/'):
+            warning = Warning(
+                "Your URL pattern {} has a regex beginning with a '/'. Remove this "
+                "slash as it is unnecessary. If this pattern is targeted in an "
+                "include(), ensure the include() pattern has a trailing '/'.".format(
+                    self.describe()
+                ),
+                id="urls.W002",
+            )
+            return [warning]
+        else:
+            return []
+
 
 class RegexURLPattern(LocaleRegexProvider):
     def __init__(self, regex, callback, default_args=None, name=None):
@@ -117,6 +150,26 @@ class RegexURLPattern(LocaleRegexProvider):
 
     def __repr__(self):
         return force_str('<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
+
+    def check(self):
+        warnings = self._check_pattern_name()
+        if not warnings:
+            warnings = self._check_pattern_startswith_slash()
+        return warnings
+
+    def _check_pattern_name(self):
+        """
+        Check that the pattern name does not contain a colon.
+        """
+        if self.name is not None and ":" in self.name:
+            warning = Warning(
+                "Your URL pattern {} has a name including a ':'. Remove the colon, to "
+                "avoid ambiguous namespace references.".format(self.describe()),
+                id="urls.W003",
+            )
+            return [warning]
+        else:
+            return []
 
     def resolve(self, path):
         match = self.regex.search(path)
@@ -180,6 +233,30 @@ class RegexURLResolver(LocaleRegexProvider):
             self.__class__.__name__, urlconf_repr, self.app_name,
             self.namespace, self.regex.pattern,
         )
+
+    def check(self):
+        warnings = self._check_include_trailing_dollar()
+        for pattern in self.url_patterns:
+            warnings.extend(check_resolver(pattern))
+        if not warnings:
+            warnings = self._check_pattern_startswith_slash()
+        return warnings
+
+    def _check_include_trailing_dollar(self):
+        """
+        Check that include is not used with a regex ending with a dollar.
+        """
+        regex_pattern = self.regex.pattern
+        if regex_pattern.endswith('$') and not regex_pattern.endswith(r'\$'):
+            warning = Warning(
+                "Your URL pattern {} uses include with a regex ending with a '$'. "
+                "Remove the dollar from the regex to avoid problems including "
+                "URLs.".format(self.describe()),
+                id="urls.W001",
+            )
+            return [warning]
+        else:
+            return []
 
     def _populate(self):
         # Short-circuit if called recursively in this thread to prevent

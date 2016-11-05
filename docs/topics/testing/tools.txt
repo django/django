@@ -570,6 +570,44 @@ can access these properties as part of a test condition.
             session['somekey'] = 'test'
             session.save()
 
+Setting the language
+--------------------
+
+When testing applications that support internationalization and localization,
+you might want to set the language for a test client request. The method for
+doing so depends on whether or not the
+:class:`~django.middleware.locale.LocaleMiddleware` is enabled.
+
+If the middleware is enabled, the language can be set by creating a cookie with
+a name of :setting:`LANGUAGE_COOKIE_NAME` and a value of the language code::
+
+    from django.conf import settings
+
+    def test_language_using_cookie(self):
+        self.client.cookies.load({settings.LANGUAGE_COOKIE_NAME: 'fr'})
+        response = self.client.get('/')
+        self.assertEqual(response.content, b"Bienvenue sur mon site.")
+
+or by including the ``Accept-Language`` HTTP header in the request::
+
+    def test_language_using_header(self):
+        response = self.client.get('/', HTTP_ACCEPT_LANGUAGE='fr')
+        self.assertEqual(response.content, b"Bienvenue sur mon site.")
+
+More details are in :ref:`how-django-discovers-language-preference`.
+
+If the middleware isn't enabled, the active language may be set using
+:func:`.translation.override`::
+
+    from django.utils import translation
+
+    def test_language_using_override(self):
+        with translation.override('fr'):
+            response = self.client.get('/')
+        self.assertEqual(response.content, b"Bienvenue sur mon site.")
+
+More details are in :ref:`explicitly-setting-the-active-language`.
+
 Example
 -------
 
@@ -1433,7 +1471,7 @@ your test suite.
     point of the redirect chain.
 
     If ``fetch_redirect_response`` is ``False``, the final page won't be
-    loaded. Since the test client can't fetch externals URLs, this is
+    loaded. Since the test client can't fetch external URLs, this is
     particularly useful if ``expected_url`` isn't part of your Django app.
 
     Scheme is handled correctly when making comparisons between two URLs. If

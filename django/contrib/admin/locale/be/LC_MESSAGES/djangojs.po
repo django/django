@@ -2,13 +2,14 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
+# znotdead <zhirafchik@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 10:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-09-15 03:59+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -120,7 +121,7 @@ msgid "Now"
 msgstr "Цяпер"
 
 msgid "Choose a Time"
-msgstr ""
+msgstr "Абярыце час"
 
 msgid "Choose a time"
 msgstr "Абярыце час"
@@ -135,7 +136,7 @@ msgid "Noon"
 msgstr "Поўдзень"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "6 папаўдні"
 
 msgid "Cancel"
 msgstr "Скасаваць"
@@ -144,7 +145,7 @@ msgid "Today"
 msgstr "Сёньня"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "Абярыце дату"
 
 msgid "Yesterday"
 msgstr "Учора"
@@ -153,68 +154,68 @@ msgid "Tomorrow"
 msgstr "Заўтра"
 
 msgid "January"
-msgstr ""
+msgstr "Студзень"
 
 msgid "February"
-msgstr ""
+msgstr "Люты"
 
 msgid "March"
-msgstr ""
+msgstr "Сакавік"
 
 msgid "April"
-msgstr ""
+msgstr "Красавік"
 
 msgid "May"
-msgstr ""
+msgstr "Травень"
 
 msgid "June"
-msgstr ""
+msgstr "Чэрвень"
 
 msgid "July"
-msgstr ""
+msgstr "Ліпень"
 
 msgid "August"
-msgstr ""
+msgstr "Жнівень"
 
 msgid "September"
-msgstr ""
+msgstr "Верасень"
 
 msgid "October"
-msgstr ""
+msgstr "Кастрычнік"
 
 msgid "November"
-msgstr ""
+msgstr "Лістапад"
 
 msgid "December"
-msgstr ""
+msgstr "Снежань"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "Н"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "П"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "А"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "С"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "Ч"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "П"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "С"
 
 msgid "Show"
 msgstr "Паказаць"

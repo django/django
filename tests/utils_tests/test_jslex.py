@@ -67,7 +67,7 @@ class JsTokensTest(SimpleTestCase):
         (r"""/a[\]]b/""", [r"""regex /a[\]]b/"""]),
         (r"""/[\]/]/gi""", [r"""regex /[\]/]/gi"""]),
         (r"""/\[[^\]]+\]/gi""", [r"""regex /\[[^\]]+\]/gi"""]),
-        ("""
+        (r"""
             rexl.re = {
             NAME: /^(?![0-9])(?:\w)+|^"(?:[^"]|"")+"/,
             UNQUOTED_LITERAL: /^@(?:(?![0-9])(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/,
@@ -86,7 +86,7 @@ class JsTokensTest(SimpleTestCase):
          "punct }", "punct ;"
          ]),
 
-        ("""
+        (r"""
             rexl.re = {
             NAME: /^(?![0-9])(?:\w)+|^"(?:[^"]|"")+"/,
             UNQUOTED_LITERAL: /^@(?:(?![0-9])(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/,

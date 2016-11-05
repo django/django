@@ -145,6 +145,7 @@ msgstr "Adăugat."
 msgid "and"
 msgstr "și"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr ""
 

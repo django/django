@@ -322,3 +322,12 @@ Also consider what you want to happen when the migration is unapplied. You
 could either do nothing (as in the example above) or remove some or all of the
 data from the new application. Adjust the second argument of the
 :mod:`~django.db.migrations.operations.RunPython` operation accordingly.
+
+Changing an unmanaged model to managed
+======================================
+
+If you want to change an unmanaged model (:attr:`managed=False
+<django.db.models.Options.managed>`) to managed, you must remove
+``managed=False`` and generate a migration before making other schema-related
+changes to the model, since schema changes that appear in the migration that
+contains the operation to change ``Meta.managed`` may not be applied.

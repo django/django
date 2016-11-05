@@ -4,21 +4,19 @@ import warnings
 from collections import deque
 from contextlib import contextmanager
 
+import pytz
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends import utils
+from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.signals import connection_created
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.six.moves import _thread as thread
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 NO_DB_ALIAS = '__no_db__'
 
@@ -36,6 +34,13 @@ class BaseDatabaseWrapper(object):
     ops = None
     vendor = 'unknown'
     SchemaEditorClass = None
+    # Classes instantiated in __init__().
+    client_class = None
+    creation_class = None
+    features_class = None
+    introspection_class = None
+    ops_class = None
+    validation_class = BaseDatabaseValidation
 
     queries_limit = 9000
 
@@ -88,8 +93,12 @@ class BaseDatabaseWrapper(object):
         # is called?
         self.run_commit_hooks_on_set_autocommit_on = False
 
-        # This will be used by BaseDatabaseCreation.create_test_db().
-        self._run_in_test_case = None
+        self.client = self.client_class(self)
+        self.creation = self.creation_class(self)
+        self.features = self.features_class(self)
+        self.introspection = self.introspection_class(self)
+        self.ops = self.ops_class(self)
+        self.validation = self.validation_class(self)
 
     def ensure_timezone(self):
         """
@@ -116,7 +125,6 @@ class BaseDatabaseWrapper(object):
         elif self.settings_dict['TIME_ZONE'] is None:
             return timezone.utc
         else:
-            # Only this branch requires pytz.
             return pytz.timezone(self.settings_dict['TIME_ZONE'])
 
     @cached_property
@@ -195,10 +203,6 @@ class BaseDatabaseWrapper(object):
                 raise ImproperlyConfigured(
                     "Connection '%s' cannot set TIME_ZONE because its engine "
                     "handles time zones conversions natively." % self.alias)
-            elif pytz is None:
-                raise ImproperlyConfigured(
-                    "Connection '%s' cannot set TIME_ZONE because pytz isn't "
-                    "installed." % self.alias)
 
     def ensure_connection(self):
         """

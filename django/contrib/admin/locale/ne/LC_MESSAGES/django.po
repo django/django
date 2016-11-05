@@ -139,6 +139,7 @@ msgstr "थपिएको छ ।"
 msgid "and"
 msgstr "र"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr ""
 

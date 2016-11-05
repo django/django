@@ -9,7 +9,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
-from django.utils.encoding import smart_text
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.six.moves import input
 
@@ -173,22 +173,28 @@ class Command(BaseCommand):
         if self.is_local_storage() and self.storage.location:
             destination_path = self.storage.location
             message.append(':\n\n    %s\n\n' % destination_path)
+            should_warn_user = (
+                self.storage.exists(destination_path) and
+                any(self.storage.listdir(destination_path))
+            )
         else:
             destination_path = None
             message.append('.\n\n')
+            # Destination files existence not checked; play it safe and warn.
+            should_warn_user = True
 
-        if self.clear:
-            message.append('This will DELETE ALL FILES in this location!\n')
-        else:
-            message.append('This will overwrite existing files!\n')
+        if self.interactive and should_warn_user:
+            if self.clear:
+                message.append('This will DELETE ALL FILES in this location!\n')
+            else:
+                message.append('This will overwrite existing files!\n')
 
-        message.append(
-            'Are you sure you want to do this?\n\n'
-            "Type 'yes' to continue, or 'no' to cancel: "
-        )
-
-        if self.interactive and input(''.join(message)) != 'yes':
-            raise CommandError("Collecting static files cancelled.")
+            message.append(
+                'Are you sure you want to do this?\n\n'
+                "Type 'yes' to continue, or 'no' to cancel: "
+            )
+            if input(''.join(message)) != 'yes':
+                raise CommandError("Collecting static files cancelled.")
 
         collected = self.collect()
         modified_count = len(collected['modified'])
@@ -231,10 +237,9 @@ class Command(BaseCommand):
         for f in files:
             fpath = os.path.join(path, f)
             if self.dry_run:
-                self.log("Pretending to delete '%s'" %
-                         smart_text(fpath), level=1)
+                self.log("Pretending to delete '%s'" % force_text(fpath), level=1)
             else:
-                self.log("Deleting '%s'" % smart_text(fpath), level=1)
+                self.log("Deleting '%s'" % force_text(fpath), level=1)
                 try:
                     full_path = self.storage.path(fpath)
                 except NotImplementedError:

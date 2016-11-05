@@ -89,31 +89,36 @@ Writing an authentication backend
 ---------------------------------
 
 An authentication backend is a class that implements two required methods:
-``get_user(user_id)`` and ``authenticate(**credentials)``, as well as a set of
-optional permission related :ref:`authorization methods <authorization_methods>`.
+``get_user(user_id)`` and ``authenticate(request, **credentials)``, as well as
+a set of optional permission related :ref:`authorization methods
+<authorization_methods>`.
 
 The ``get_user`` method takes a ``user_id`` -- which could be a username,
 database ID or whatever, but has to be the primary key of your ``User`` object
 -- and returns a ``User`` object.
 
-The ``authenticate`` method takes credentials as keyword arguments. Most of
-the time, it'll just look like this::
+The ``authenticate`` method takes a ``request`` argument and credentials as
+keyword arguments. Most of the time, it'll just look like this::
 
     class MyBackend(object):
-        def authenticate(self, username=None, password=None):
+        def authenticate(self, request, username=None, password=None):
             # Check the username/password and return a User.
             ...
 
 But it could also authenticate a token, like so::
 
     class MyBackend(object):
-        def authenticate(self, token=None):
+        def authenticate(self, request, token=None):
             # Check the token and return a User.
             ...
 
 Either way, ``authenticate`` should check the credentials it gets, and it
 should return a ``User`` object that matches those credentials, if the
 credentials are valid. If they're not valid, it should return ``None``.
+
+``request`` is an :class:`~django.http.HttpRequest` and may be ``None`` if it
+wasn't provided to :func:`~django.contrib.auth.authenticate` (which passes it
+on to the backend).
 
 The Django admin is tightly coupled to the Django :ref:`User object
 <user-objects>`. The best way to deal with this is to create a Django ``User``
@@ -134,23 +139,22 @@ object the first time a user authenticates::
         """
         Authenticate against the settings ADMIN_LOGIN and ADMIN_PASSWORD.
 
-        Use the login name, and a hash of the password. For example:
+        Use the login name and a hash of the password. For example:
 
         ADMIN_LOGIN = 'admin'
         ADMIN_PASSWORD = 'pbkdf2_sha256$30000$Vo0VlMnkR4Bk$qEvtdyZRWTcOsCnI/oQ7fVOu1XAURIZYoOZ3iq8Dr4M='
         """
 
-        def authenticate(self, username=None, password=None):
+        def authenticate(self, request, username=None, password=None):
             login_valid = (settings.ADMIN_LOGIN == username)
             pwd_valid = check_password(password, settings.ADMIN_PASSWORD)
             if login_valid and pwd_valid:
                 try:
                     user = User.objects.get(username=username)
                 except User.DoesNotExist:
-                    # Create a new user. Note that we can set password
-                    # to anything, because it won't be checked; the password
-                    # from settings.py will.
-                    user = User(username=username, password='get from settings.py')
+                    # Create a new user. There's no need to set a password
+                    # because only the password from settings.py is checked.
+                    user = User(username=username)
                     user.is_staff = True
                     user.is_superuser = True
                     user.save()
@@ -162,6 +166,11 @@ object the first time a user authenticates::
                 return User.objects.get(pk=user_id)
             except User.DoesNotExist:
                 return None
+
+.. versionchanged:: 1.11
+
+    The ``request`` parameter was added to ``authenticate()`` and support for
+    backends that don't accept it will be removed in Django 2.1.
 
 .. _authorization_methods:
 
@@ -192,10 +201,7 @@ fairly simply::
     class SettingsBackend(object):
         ...
         def has_perm(self, user_obj, perm, obj=None):
-            if user_obj.username == settings.ADMIN_LOGIN:
-                return True
-            else:
-                return False
+            return user_obj.username == settings.ADMIN_LOGIN
 
 This gives full permissions to the user granted access in the above example.
 Notice that in addition to the same arguments given to the associated
@@ -537,6 +543,14 @@ password resets. You must then provide some key implementation details:
         value (the :attr:`~django.db.models.Field.primary_key` by default) of an
         existing instance.
 
+    .. attribute:: EMAIL_FIELD
+
+        .. versionadded:: 1.11
+
+        A string describing the name of the email field on the ``User`` model.
+        This value is returned by
+        :meth:`~models.AbstractBaseUser.get_email_field_name`.
+
     .. attribute:: REQUIRED_FIELDS
 
         A list of the field names that will be prompted for when creating a
@@ -615,6 +629,14 @@ The following attributes and methods are available on any subclass of
         Normalizes the username by calling :meth:`normalize_username`. If you
         override this method, be sure to call ``super()`` to retain the
         normalization.
+
+    .. classmethod:: get_email_field_name()
+
+       .. versionadded:: 1.11
+
+       Returns the name of the email field specified by the
+       :attr:`~models.CustomUser.EMAIL_FIELD` attribute. Defaults to
+       ``'email'`` if ``EMAIL_FIELD`` isn't specified.
 
     .. classmethod:: normalize_username(username)
 
@@ -800,9 +822,10 @@ The following forms make assumptions about the user model and can be used as-is
 if those assumptions are met:
 
 * :class:`~django.contrib.auth.forms.PasswordResetForm`: Assumes that the user
-  model has a field named ``email`` that can be used to identify the user and a
-  boolean field named ``is_active`` to prevent password resets for inactive
-  users.
+  model has a field that stores the user's email address with the name returned
+  by :meth:`~models.AbstractBaseUser.get_email_field_name` (``email`` by
+  default) that can be used to identify the user and a boolean field named
+  ``is_active`` to prevent password resets for inactive users.
 
 Finally, the following forms are tied to
 :class:`~django.contrib.auth.models.User` and need to be rewritten or extended

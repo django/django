@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011,2013
@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 08:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-08-24 05:00+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -73,6 +73,9 @@ msgid ""
 "password, but you can change the password using <a href=\"../password/"
 "\">this form</a>."
 msgstr ""
+"Sandi mentah tidak disimpan, jadi tidak ada jalan untuk melihat sandi "
+"pengguna ini, tetapi anda dapat merubah sandi menggunakan <a href=\"../"
+"password/\">formulir ini</a>. "
 
 #, python-format
 msgid ""
@@ -116,19 +119,19 @@ msgid "hash"
 msgstr "hash"
 
 msgid "variety"
-msgstr ""
+msgstr "keanekaragaman"
 
 msgid "version"
-msgstr ""
+msgstr "versi"
 
 msgid "memory cost"
-msgstr ""
+msgstr "biaya memori"
 
 msgid "time cost"
-msgstr ""
+msgstr "biaya waktu"
 
 msgid "parallelism"
-msgstr ""
+msgstr "sifat paralel"
 
 msgid "work factor"
 msgstr "faktor kerja"
@@ -185,6 +188,7 @@ msgstr "nama pengguna"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Dibutuhkan. 150 karakter atau sedikit. Hanya huruf, angka dan @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Seorang pengguna dengan nama pengguna tersebut sudah ada."
@@ -266,11 +270,15 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
+"Masukkan nama pengguna sah. Nilai ini mungkin mengandung hanya huruf "
+"Enggris, angka dan karakter @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
+"Masukkan nama pengguna sah. Nilai ini hanya boleh mengandung huruf, angka "
+"dan karakter @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Keluar"

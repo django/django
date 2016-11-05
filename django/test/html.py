@@ -10,7 +10,7 @@ from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html_parser import HTMLParseError, HTMLParser
 
-WHITESPACE = re.compile('\s+')
+WHITESPACE = re.compile(r'\s+')
 
 
 def normalize_whitespace(string):
@@ -93,6 +93,9 @@ class Element(object):
     def _count(self, element, count=True):
         if not isinstance(element, six.string_types):
             if self == element:
+                return 1
+        if isinstance(element, RootElement):
+            if self.children == element.children:
                 return 1
         i = 0
         for child in self.children:

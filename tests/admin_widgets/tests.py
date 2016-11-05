@@ -5,7 +5,8 @@ import gettext
 import os
 from datetime import datetime, timedelta
 from importlib import import_module
-from unittest import skipIf
+
+import pytz
 
 from django import forms
 from django.conf import settings
@@ -22,11 +23,6 @@ from django.utils import six, translation
 
 from . import models
 from .widgetadmin import site as widget_admin_site
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 
 class TestDataMixin(object):
@@ -419,7 +415,7 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         self.assertHTMLEqual(
             w.render('test', self.album.cover_art),
             '<p class="file-upload">Currently: <a href="%(STORAGE_URL)salbums/'
-            'hybrid_theory.jpg">albums\hybrid_theory.jpg</a> '
+            r'hybrid_theory.jpg">albums\hybrid_theory.jpg</a> '
             '<span class="clearable-file-input">'
             '<input type="checkbox" name="test-clear" id="test-clear_id" /> '
             '<label for="test-clear_id">Clear</label></span><br />'
@@ -441,7 +437,7 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
         self.assertContains(
             response,
             '<p><a href="%(STORAGE_URL)salbums/hybrid_theory.jpg">'
-            'albums\hybrid_theory.jpg</a></p>' % {'STORAGE_URL': default_storage.url('')},
+            r'albums\hybrid_theory.jpg</a></p>' % {'STORAGE_URL': default_storage.url('')},
             html=True,
         )
         self.assertNotContains(
@@ -794,7 +790,6 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
                 self.wait_for_text('#calendarin0 caption', expected_caption)
 
 
-@skipIf(pytz is None, "this test requires pytz")
 @override_settings(TIME_ZONE='Asia/Singapore')
 class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
 
@@ -1222,7 +1217,7 @@ class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Help text for the field is displayed
         self.assertEqual(
-            self.selenium.find_element_by_css_selector('.field-supporting_bands p.help').text,
+            self.selenium.find_element_by_css_selector('.field-supporting_bands div.help').text,
             'Supporting Bands.'
         )
 

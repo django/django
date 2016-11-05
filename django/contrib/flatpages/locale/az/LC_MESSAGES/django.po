@@ -3,7 +3,7 @@
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Emin Mastizada <emin@mastizada.com>, 2015
+# Emin Mastizada <emin@linux.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"

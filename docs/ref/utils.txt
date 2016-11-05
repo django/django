@@ -53,7 +53,6 @@ need to distinguish caches by the ``Accept-language`` header.
     Adds some useful headers to the given ``HttpResponse`` object:
 
     * ``ETag``
-    * ``Last-Modified``
     * ``Expires``
     * ``Cache-Control``
 
@@ -61,6 +60,15 @@ need to distinguish caches by the ``Accept-language`` header.
 
     ``cache_timeout`` is in seconds. The :setting:`CACHE_MIDDLEWARE_SECONDS`
     setting is used by default.
+
+    .. versionchanged:: 1.11
+
+        In older versions, the ``Last-Modified`` header was also set.
+
+    .. deprecated:: 1.11
+
+        Since the ``USE_ETAGS`` setting is deprecated, this function won't set
+        the ``ETag`` header when the deprecation ends in Django 2.1.
 
 .. function:: add_never_cache_headers(response)
 
@@ -868,6 +876,26 @@ appropriate entities.
 .. module:: django.utils.text
     :synopsis: Text manipulation.
 
+.. function:: format_lazy(format_string, *args, **kwargs)
+
+    .. versionadded:: 1.11
+
+    A version of :meth:`str.format` for when ``format_string``, ``args``,
+    and/or ``kwargs`` contain lazy objects. The first argument is the string to
+    be formatted. For example::
+
+        from django.utils.text import format_lazy
+        from django.utils.translation import pgettext_lazy
+
+        urlpatterns = [
+            url(format_lazy(r'{person}/(?P<pk>\d+)/$', person=pgettext_lazy('URL', 'person')),
+                PersonDetailView.as_view()),
+        ]
+
+    This example allows translators to translate part of the URL. If "person"
+    is translated to "persona", the regular expression will match
+    ``persona/(?P<pk>\d+)/$``, e.g. ``persona/5/``.
+
 .. function:: slugify(allow_unicode=False)
 
     Converts to ASCII if ``allow_unicode`` is ``False`` (default). Converts spaces to
@@ -938,7 +966,7 @@ appropriate entities.
 
     Sets the :ref:`current time zone <default-current-time-zone>`. The
     ``timezone`` argument must be an instance of a :class:`~datetime.tzinfo`
-    subclass or, if pytz_ is available, a time zone name.
+    subclass or a time zone name.
 
 .. function:: deactivate()
 
@@ -954,13 +982,31 @@ appropriate entities.
 
     ``override`` is also usable as a function decorator.
 
-.. function:: localtime(value, timezone=None)
+.. function:: localtime(value=None, timezone=None)
 
     Converts an aware :class:`~datetime.datetime` to a different time zone,
     by default the :ref:`current time zone <default-current-time-zone>`.
 
+    When ``value`` is omitted, it defaults to :func:`now`.
+
     This function doesn't work on naive datetimes; use :func:`make_aware`
     instead.
+
+    .. versionchanged:: 1.11
+
+        In older versions, ``value`` is a required argument.
+
+.. function:: localdate(value=None, timezone=None)
+
+    .. versionadded:: 1.11
+
+    Uses :func:`localtime` to convert an aware :class:`~datetime.datetime` to a
+    :meth:`~datetime.datetime.date` in a different time zone, by default the
+    :ref:`current time zone <default-current-time-zone>`.
+
+    When ``value`` is omitted, it defaults to :func:`now`.
+
+    This function doesn't work on naive datetimes.
 
 .. function:: now()
 
@@ -997,21 +1043,18 @@ appropriate entities.
     :class:`~datetime.datetime`. If ``timezone`` is set to ``None``, it
     defaults to the :ref:`current time zone <default-current-time-zone>`.
 
-    When pytz_ is installed, the exception ``pytz.AmbiguousTimeError``
-    will be raised if you try to make ``value`` aware during a DST transition
-    where the same time occurs twice (when reverting from DST). Setting
-    ``is_dst`` to ``True`` or ``False`` will avoid the exception by choosing if
-    the time is pre-transition or post-transition respectively.
+    The ``pytz.AmbiguousTimeError`` exception is raised if you try to make
+    ``value`` aware during a DST transition where the same time occurs twice
+    (when reverting from DST). Setting ``is_dst`` to ``True`` or ``False`` will
+    avoid the exception by choosing if the time is pre-transition or
+    post-transition respectively.
 
-    When pytz_ is installed, the exception ``pytz.NonExistentTimeError``
-    will be raised if you try to make ``value`` aware during a DST transition
-    such that the time never occurred (when entering into DST). Setting
-    ``is_dst`` to ``True`` or ``False`` will avoid the exception by moving the
-    hour backwards or forwards by 1 respectively. For example, ``is_dst=True``
-    would change a non-existent time of 2:30 to 1:30 and ``is_dst=False``
-    would change the time to 3:30.
-
-    ``is_dst`` has no effect when ``pytz`` is not installed.
+    The ``pytz.NonExistentTimeError`` exception is raised if you try to make
+    ``value`` aware during a DST transition such that the time never occurred
+    (when entering into DST). Setting ``is_dst`` to ``True`` or ``False`` will
+    avoid the exception by moving the hour backwards or forwards by 1
+    respectively. For example, ``is_dst=True`` would change a non-existent
+    time of 2:30 to 1:30 and ``is_dst=False`` would change the time to 3:30.
 
 .. function:: make_naive(value, timezone=None)
 
@@ -1019,8 +1062,6 @@ appropriate entities.
     ``timezone``  the same point in time as ``value``, ``value`` being an
     aware :class:`~datetime.datetime`. If ``timezone`` is set to ``None``, it
     defaults to the :ref:`current time zone <default-current-time-zone>`.
-
-.. _pytz: http://pytz.sourceforge.net/
 
 ``django.utils.translation``
 ============================
@@ -1086,6 +1127,12 @@ For a complete discussion on the usage of the following see the
     See :ref:`lazy translations documentation <lazy-translations>`.
 
 .. function:: string_concat(*strings)
+
+    .. deprecated:: 1.11
+
+        Use :meth:`django.utils.text.format_lazy` instead.
+        ``string_concat(*strings)`` can be replaced by
+        ``format_lazy('{}' * len(strings), *strings)``.
 
     Lazy variant of string concatenation, needed for translations that are
     constructed from multiple parts.

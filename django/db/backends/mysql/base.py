@@ -52,10 +52,6 @@ if (version < (1, 2, 1) or (
     raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
 
-DatabaseError = Database.DatabaseError
-IntegrityError = Database.IntegrityError
-
-
 def adapt_datetime_warn_on_aware_datetime(value, conv):
     # Remove this function and rely on the default adapter in Django 2.0.
     if settings.USE_TZ and timezone.is_aware(value):
@@ -83,9 +79,7 @@ django_conversions.update({
 })
 
 # This should match the numerical portion of the version numbers (we can treat
-# versions like 5.0.24 and 5.0.24a as the same). Based on the list of version
-# at http://dev.mysql.com/doc/refman/4.1/en/news.html and
-# http://dev.mysql.com/doc/refman/5.0/en/news.html .
+# versions like 5.0.24 and 5.0.24a as the same).
 server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 
 
@@ -227,16 +221,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     Database = Database
     SchemaEditorClass = DatabaseSchemaEditor
-
-    def __init__(self, *args, **kwargs):
-        super(DatabaseWrapper, self).__init__(*args, **kwargs)
-
-        self.features = DatabaseFeatures(self)
-        self.ops = DatabaseOperations(self)
-        self.client = DatabaseClient(self)
-        self.creation = DatabaseCreation(self)
-        self.introspection = DatabaseIntrospection(self)
-        self.validation = DatabaseValidation(self)
+    # Classes instantiated in __init__().
+    client_class = DatabaseClient
+    creation_class = DatabaseCreation
+    features_class = DatabaseFeatures
+    introspection_class = DatabaseIntrospection
+    ops_class = DatabaseOperations
+    validation_class = DatabaseValidation
 
     def get_connection_params(self):
         kwargs = {

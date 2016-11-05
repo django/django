@@ -94,8 +94,8 @@ Django's components.
 ``django-announce``
 ===================
 
-A (very) low-traffic list for announcing new releases of Django and important
-bugfixes.
+A (very) low-traffic list for announcing :ref:`upcoming security releases
+<security-disclosure>`, new releases of Django, and security advisories.
 
 * `django-announce mailing archive`_
 * `django-announce subscription email address`_

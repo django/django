@@ -85,3 +85,7 @@ class CheckboxInputTest(WidgetTest):
     def test_value_from_datadict_string_int(self):
         value = self.widget.value_from_datadict({'testing': '0'}, {}, 'testing')
         self.assertIs(value, True)
+
+    def test_value_omitted_from_data(self):
+        self.assertIs(self.widget.value_omitted_from_data({'field': 'value'}, {}, 'field'), False)
+        self.assertIs(self.widget.value_omitted_from_data({}, {}, 'field'), False)

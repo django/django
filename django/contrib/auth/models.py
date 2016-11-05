@@ -333,6 +333,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
+    EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
@@ -412,13 +413,13 @@ class AnonymousUser(object):
     def check_password(self, raw_password):
         raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
 
-    def _get_groups(self):
+    @property
+    def groups(self):
         return self._groups
-    groups = property(_get_groups)
 
-    def _get_user_permissions(self):
+    @property
+    def user_permissions(self):
         return self._user_permissions
-    user_permissions = property(_get_user_permissions)
 
     def get_group_permissions(self, obj=None):
         return set()

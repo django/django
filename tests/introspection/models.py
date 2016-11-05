@@ -45,7 +45,7 @@ class Article(models.Model):
     body = models.TextField(default='')
     reporter = models.ForeignKey(Reporter, models.CASCADE)
     response_to = models.ForeignKey('self', models.SET_NULL, null=True)
-    unmanaged_reporters = models.ManyToManyField(Reporter, through='ArticleReporter')
+    unmanaged_reporters = models.ManyToManyField(Reporter, through='ArticleReporter', related_name='+')
 
     def __str__(self):
         return self.headline

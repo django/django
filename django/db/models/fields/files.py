@@ -60,22 +60,22 @@ class FieldFile(File):
 
     file = property(_get_file, _set_file, _del_file)
 
-    def _get_path(self):
+    @property
+    def path(self):
         self._require_file()
         return self.storage.path(self.name)
-    path = property(_get_path)
 
-    def _get_url(self):
+    @property
+    def url(self):
         self._require_file()
         return self.storage.url(self.name)
-    url = property(_get_url)
 
-    def _get_size(self):
+    @property
+    def size(self):
         self._require_file()
         if not self._committed:
             return self.file.size
         return self.storage.size(self.name)
-    size = property(_get_size)
 
     def open(self, mode='rb'):
         self._require_file()
@@ -120,10 +120,10 @@ class FieldFile(File):
             self.instance.save()
     delete.alters_data = True
 
-    def _get_closed(self):
+    @property
+    def closed(self):
         file = getattr(self, '_file', None)
         return file is None or file.closed
-    closed = property(_get_closed)
 
     def close(self):
         file = getattr(self, '_file', None)
@@ -230,7 +230,6 @@ class FileField(Field):
 
     def __init__(self, verbose_name=None, name=None, upload_to='', storage=None, **kwargs):
         self._primary_key_set_explicitly = 'primary_key' in kwargs
-        self._unique_set_explicitly = 'unique' in kwargs
 
         self.storage = storage or default_storage
         self.upload_to = upload_to
@@ -240,21 +239,8 @@ class FileField(Field):
 
     def check(self, **kwargs):
         errors = super(FileField, self).check(**kwargs)
-        errors.extend(self._check_unique())
         errors.extend(self._check_primary_key())
         return errors
-
-    def _check_unique(self):
-        if self._unique_set_explicitly:
-            return [
-                checks.Error(
-                    "'unique' is not a valid argument for a %s." % self.__class__.__name__,
-                    obj=self,
-                    id='fields.E200',
-                )
-            ]
-        else:
-            return []
 
     def _check_primary_key(self):
         if self._primary_key_set_explicitly:
@@ -293,7 +279,7 @@ class FileField(Field):
         file = super(FileField, self).pre_save(model_instance, add)
         if file and not file._committed:
             # Commit the file to storage prior to saving the model
-            file.save(file.name, file, save=False)
+            file.save(file.name, file.file, save=False)
         return file
 
     def contribute_to_class(self, cls, name, **kwargs):

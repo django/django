@@ -158,7 +158,7 @@ class TestInline(TestDataMixin, TestCase):
         Ref #8190.
         """
         response = self.client.get(reverse('admin:admin_inlines_holder4_add'))
-        self.assertContains(response, '<p class="help">Awesome stacked help text is awesome.</p>', 4)
+        self.assertContains(response, '<div class="help">Awesome stacked help text is awesome.</div>', 4)
         self.assertContains(
             response,
             '<img src="/static/admin/img/icon-unknown.svg" '
@@ -366,13 +366,13 @@ class TestInline(TestDataMixin, TestCase):
         self.assertContains(
             response,
             '<input class="vIntegerField" id="id_editablepkbook_set-0-manual_pk" '
-            'name="editablepkbook_set-0-manual_pk" type="text" />',
+            'name="editablepkbook_set-0-manual_pk" type="number" />',
             html=True, count=1
         )
         self.assertContains(
             response,
             '<input class="vIntegerField" id="id_editablepkbook_set-2-0-manual_pk" '
-            'name="editablepkbook_set-2-0-manual_pk" type="text" />',
+            'name="editablepkbook_set-2-0-manual_pk" type="number" />',
             html=True, count=1
         )
 

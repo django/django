@@ -197,28 +197,6 @@ class SubqueryConstraint(object):
 
     def as_sql(self, compiler, connection):
         query = self.query_object
-
-        # QuerySet was sent
-        if hasattr(query, 'values'):
-            if query._db and connection.alias != query._db:
-                raise ValueError("Can't do subqueries with queries on different DBs.")
-            # Do not override already existing values.
-            if query._fields is None:
-                query = query.values(*self.targets)
-            else:
-                query = query._clone()
-            query = query.query
-            if query.can_filter():
-                # If there is no slicing in use, then we can safely drop all ordering
-                query.clear_ordering(True)
-
+        query.set_values(self.targets)
         query_compiler = query.get_compiler(connection=connection)
         return query_compiler.as_subquery_condition(self.alias, self.columns, compiler)
-
-    def relabel_aliases(self, change_map):
-        self.alias = change_map.get(self.alias, self.alias)
-
-    def clone(self):
-        return self.__class__(
-            self.alias, self.columns, self.targets,
-            self.query_object)

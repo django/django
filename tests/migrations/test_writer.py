@@ -7,6 +7,7 @@ import functools
 import math
 import os
 import re
+import sys
 import tokenize
 import unittest
 
@@ -24,6 +25,7 @@ from django.test import SimpleTestCase, ignore_warnings, mock
 from django.utils import datetime_safe, six
 from django.utils._os import upath
 from django.utils.deconstruct import deconstructible
+from django.utils.encoding import force_str
 from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import FixedOffset, get_default_timezone, utc
 from django.utils.translation import ugettext_lazy as _
@@ -34,6 +36,8 @@ try:
     import enum
 except ImportError:
     enum = None
+
+PY36 = sys.version_info >= (3, 6)
 
 
 class Money(decimal.Decimal):
@@ -178,7 +182,7 @@ class WriterTests(SimpleTestCase):
     def safe_exec(self, string, value=None):
         l = {}
         try:
-            exec(string, globals(), l)
+            exec(force_str(string), globals(), l)
         except Exception as e:
             if value:
                 self.fail("Could not exec %r (from value %r): %s" % (string.strip(), value, e))
@@ -412,7 +416,10 @@ class WriterTests(SimpleTestCase):
         # Test a string regex with flag
         validator = RegexValidator(r'^[0-9]+$', flags=re.U)
         string = MigrationWriter.serialize(validator)[0]
-        self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=32)")
+        if PY36:
+            self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=re.RegexFlag(32))")
+        else:
+            self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=32)")
         self.serialize_round_trip(validator)
 
         # Test message and code
@@ -540,8 +547,6 @@ class WriterTests(SimpleTestCase):
         })
         writer = MigrationWriter(migration)
         output = writer.as_string()
-        # It should NOT be unicode.
-        self.assertIsInstance(output, six.binary_type, "Migration as_string returned unicode")
         # We don't test the output formatting - that's too fragile.
         # Just make sure it runs for now, and that things look alright.
         result = self.safe_exec(output)
@@ -609,7 +614,7 @@ class WriterTests(SimpleTestCase):
             ]
         })
         writer = MigrationWriter(migration)
-        output = writer.as_string().decode('utf-8')
+        output = writer.as_string()
         self.assertIn(
             "import datetime\n"
             "from django.db import migrations, models\n"
@@ -627,7 +632,7 @@ class WriterTests(SimpleTestCase):
         dt = datetime.datetime(2015, 7, 31, 4, 40, 0, 0, tzinfo=utc)
         with mock.patch('django.db.migrations.writer.now', lambda: dt):
             writer = MigrationWriter(migration)
-            output = writer.as_string().decode('utf-8')
+            output = writer.as_string()
 
         self.assertTrue(
             output.startswith(
@@ -651,7 +656,7 @@ class WriterTests(SimpleTestCase):
             ]
         })
         writer = MigrationWriter(migration)
-        output = writer.as_string().decode('utf-8')
+        output = writer.as_string()
         self.assertIn("from django.db import migrations\n", output)
 
     def test_deconstruct_class_arguments(self):

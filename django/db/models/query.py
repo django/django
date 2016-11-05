@@ -19,9 +19,7 @@ from django.db.models.deletion import Collector
 from django.db.models.expressions import F
 from django.db.models.fields import AutoField
 from django.db.models.functions import Trunc
-from django.db.models.query_utils import (
-    InvalidQuery, Q, check_rel_lookup_compatibility,
-)
+from django.db.models.query_utils import InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR
 from django.utils import six, timezone
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -54,8 +52,6 @@ class ModelIterable(BaseIterable):
         results = compiler.execute_sql()
         select, klass_info, annotation_col_map = (compiler.select, compiler.klass_info,
                                                   compiler.annotation_col_map)
-        if klass_info is None:
-            return
         model_cls = klass_info['model']
         select_fields = klass_info['select_fields']
         model_fields_start, model_fields_end = select_fields[0], select_fields[-1] + 1
@@ -440,22 +436,18 @@ class QuerySet(object):
         objs = list(objs)
         self._populate_pk_values(objs)
         with transaction.atomic(using=self.db, savepoint=False):
-            if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk and
-                    self.model._meta.has_auto_field):
-                self._batched_insert(objs, fields, batch_size)
-            else:
-                objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
-                if objs_with_pk:
-                    self._batched_insert(objs_with_pk, fields, batch_size)
-                if objs_without_pk:
-                    fields = [f for f in fields if not isinstance(f, AutoField)]
-                    ids = self._batched_insert(objs_without_pk, fields, batch_size)
-                    if connection.features.can_return_ids_from_bulk_insert:
-                        assert len(ids) == len(objs_without_pk)
-                    for obj_without_pk, pk in zip(objs_without_pk, ids):
-                        obj_without_pk.pk = pk
-                        obj_without_pk._state.adding = False
-                        obj_without_pk._state.db = self.db
+            objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
+            if objs_with_pk:
+                self._batched_insert(objs_with_pk, fields, batch_size)
+            if objs_without_pk:
+                fields = [f for f in fields if not isinstance(f, AutoField)]
+                ids = self._batched_insert(objs_without_pk, fields, batch_size)
+                if connection.features.can_return_ids_from_bulk_insert:
+                    assert len(ids) == len(objs_without_pk)
+                for obj_without_pk, pk in zip(objs_without_pk, ids):
+                    obj_without_pk.pk = pk
+                    obj_without_pk._state.adding = False
+                    obj_without_pk._state.db = self.db
 
         return objs
 
@@ -527,6 +519,19 @@ class QuerySet(object):
                 lookup[f.name] = lookup.pop(f.attname)
         params = {k: v for k, v in kwargs.items() if LOOKUP_SEP not in k}
         params.update(defaults)
+        invalid_params = []
+        for param in params:
+            try:
+                self.model._meta.get_field(param)
+            except exceptions.FieldDoesNotExist:
+                if param != 'pk':  # It's okay to use a model's pk property.
+                    invalid_params.append(param)
+        if invalid_params:
+            raise exceptions.FieldError(
+                "Invalid field name(s) for model %s: '%s'." % (
+                    self.model._meta.object_name,
+                    "', '".join(sorted(invalid_params)),
+                ))
         return lookup, params
 
     def _earliest_or_latest(self, field_name=None, direction="-"):
@@ -993,6 +998,7 @@ class QuerySet(object):
     # PUBLIC INTROSPECTION ATTRIBUTES #
     ###################################
 
+    @property
     def ordered(self):
         """
         Returns True if the QuerySet is ordered -- i.e. has an order_by()
@@ -1004,7 +1010,6 @@ class QuerySet(object):
             return True
         else:
             return False
-    ordered = property(ordered)
 
     @property
     def db(self):
@@ -1045,9 +1050,9 @@ class QuerySet(object):
         for item in [objs[i:i + batch_size] for i in range(0, len(objs), batch_size)]:
             if connections[self.db].features.can_return_ids_from_bulk_insert:
                 inserted_id = self._insert(item, fields=fields, using=self.db, return_id=True)
-                if len(objs) > 1:
+                if isinstance(inserted_id, list):
                     inserted_ids.extend(inserted_id)
-                if len(objs) == 1:
+                else:
                     inserted_ids.append(inserted_id)
             else:
                 self._insert(item, fields=fields, using=self.db)
@@ -1107,40 +1112,17 @@ class QuerySet(object):
         for field, objects in other._known_related_objects.items():
             self._known_related_objects.setdefault(field, {}).update(objects)
 
-    def _prepare(self, field):
-        if self._fields is not None:
-            # values() queryset can only be used as nested queries
-            # if they are set up to select only a single field.
-            if len(self._fields or self.model._meta.concrete_fields) > 1:
-                raise TypeError('Cannot use multi-field values as a filter value.')
-        elif self.model != field.model:
-            # If the query is used as a subquery for a ForeignKey with non-pk
-            # target field, make sure to select the target field in the subquery.
-            foreign_fields = getattr(field, 'foreign_related_fields', ())
-            if len(foreign_fields) == 1 and not foreign_fields[0].primary_key:
-                return self.values(foreign_fields[0].name)
-        return self
-
-    def _as_sql(self, connection):
-        """
-        Returns the internal query's SQL and parameters (as a tuple).
-        """
-        if self._fields is not None:
-            # values() queryset can only be used as nested queries
-            # if they are set up to select only a single field.
-            if len(self._fields or self.model._meta.concrete_fields) > 1:
-                raise TypeError('Cannot use multi-field values as a filter value.')
-            clone = self._clone()
+    def _prepare_as_filter_value(self):
+        if self._fields is None:
+            queryset = self.values('pk')
+            queryset.query._forced_pk = True
         else:
-            clone = self.values('pk')
-
-        if clone._db is None or connection == connections[clone._db]:
-            return clone.query.get_compiler(connection=connection).as_nested_sql()
-        raise ValueError("Can't do subqueries with queries on different DBs.")
-
-    # When used as part of a nested query, a queryset will never be an "always
-    # empty" result.
-    value_annotation = True
+            # values() queryset can only be used as nested queries
+            # if they are set up to select only a single field.
+            if len(self._fields) > 1:
+                raise TypeError('Cannot use multi-field values as a filter value.')
+            queryset = self._clone()
+        return queryset.query.as_subquery_filter(queryset._db)
 
     def _add_hints(self, **hints):
         """
@@ -1157,21 +1139,6 @@ class QuerySet(object):
         for example qs[1:]._has_filters() -> False.
         """
         return self.query.has_filters()
-
-    def is_compatible_query_object_type(self, opts, field):
-        """
-        Check that using this queryset as the rhs value for a lookup is
-        allowed. The opts are the options of the relation's target we are
-        querying against. For example in .filter(author__in=Author.objects.all())
-        the opts would be Author's (from the author field) and self.model would
-        be Author.objects.all() queryset's .model (Author also). The field is
-        the related field on the lhs side.
-        """
-        # We trust that users of values() know what they are doing.
-        if self._fields is not None:
-            return True
-        return check_rel_lookup_compatibility(self.model, opts, field)
-    is_compatible_query_object_type.queryset_only = True
 
 
 class InstanceCheckMeta(type):
@@ -1328,9 +1295,6 @@ class Prefetch(object):
     def add_prefix(self, prefix):
         self.prefetch_through = LOOKUP_SEP.join([prefix, self.prefetch_through])
         self.prefetch_to = LOOKUP_SEP.join([prefix, self.prefetch_to])
-
-    def get_current_prefetch_through(self, level):
-        return LOOKUP_SEP.join(self.prefetch_through.split(LOOKUP_SEP)[:level + 1])
 
     def get_current_prefetch_to(self, level):
         return LOOKUP_SEP.join(self.prefetch_to.split(LOOKUP_SEP)[:level + 1])

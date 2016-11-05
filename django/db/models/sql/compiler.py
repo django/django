@@ -13,6 +13,8 @@ from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError
 from django.utils.six.moves import zip
 
+FORCE = object()
+
 
 class SQLCompiler(object):
     def __init__(self, query, connection, using):
@@ -28,7 +30,6 @@ class SQLCompiler(object):
         self.annotation_col_map = None
         self.klass_info = None
         self.ordering_parts = re.compile(r'(.*)\s(ASC|DESC)(.*)')
-        self.subquery = False
 
     def setup_query(self):
         if all(self.query.alias_refcount[a] == 0 for a in self.query.tables):
@@ -355,11 +356,11 @@ class SQLCompiler(object):
             sql, params = vendor_impl(self, self.connection)
         else:
             sql, params = node.as_sql(self, self.connection)
-        if select_format and not self.subquery:
+        if select_format is FORCE or (select_format and not self.query.subquery):
             return node.output_field.select_format(self, sql, params)
         return sql, params
 
-    def as_sql(self, with_limits=True, with_col_aliases=False, subquery=False):
+    def as_sql(self, with_limits=True, with_col_aliases=False):
         """
         Creates the SQL for this query. Returns the SQL string and list of
         parameters.
@@ -367,7 +368,6 @@ class SQLCompiler(object):
         If 'with_limits' is False, any limit/offset information is not included
         in the query.
         """
-        self.subquery = subquery
         refcounts_before = self.query.alias_refcount.copy()
         try:
             extra_select, order_by, group_by = self.pre_sql_setup()
@@ -401,6 +401,25 @@ class SQLCompiler(object):
             result.append('FROM')
             result.extend(from_)
             params.extend(f_params)
+
+            for_update_part = None
+            if self.query.select_for_update and self.connection.features.has_select_for_update:
+                if self.connection.get_autocommit():
+                    raise TransactionManagementError("select_for_update cannot be used outside of a transaction.")
+
+                nowait = self.query.select_for_update_nowait
+                skip_locked = self.query.select_for_update_skip_locked
+                # If it's a NOWAIT/SKIP LOCKED query but the backend doesn't
+                # support it, raise a DatabaseError to prevent a possible
+                # deadlock.
+                if nowait and not self.connection.features.has_select_for_update_nowait:
+                    raise DatabaseError('NOWAIT is not supported on this database backend.')
+                elif skip_locked and not self.connection.features.has_select_for_update_skip_locked:
+                    raise DatabaseError('SKIP LOCKED is not supported on this database backend.')
+                for_update_part = self.connection.ops.for_update_sql(nowait=nowait, skip_locked=skip_locked)
+
+            if for_update_part and self.connection.features.for_update_after_from:
+                result.append(for_update_part)
 
             if where:
                 result.append('WHERE %s' % where)
@@ -439,45 +458,13 @@ class SQLCompiler(object):
                             result.append('LIMIT %d' % val)
                     result.append('OFFSET %d' % self.query.low_mark)
 
-            if self.query.select_for_update and self.connection.features.has_select_for_update:
-                if self.connection.get_autocommit():
-                    raise TransactionManagementError(
-                        "select_for_update cannot be used outside of a transaction."
-                    )
-
-                nowait = self.query.select_for_update_nowait
-                skip_locked = self.query.select_for_update_skip_locked
-                # If we've been asked for a NOWAIT/SKIP LOCKED query but the
-                # backend does not support it, raise a DatabaseError otherwise
-                # we could get an unexpected deadlock.
-                if nowait and not self.connection.features.has_select_for_update_nowait:
-                    raise DatabaseError('NOWAIT is not supported on this database backend.')
-                elif skip_locked and not self.connection.features.has_select_for_update_skip_locked:
-                    raise DatabaseError('SKIP LOCKED is not supported on this database backend.')
-                result.append(self.connection.ops.for_update_sql(nowait=nowait, skip_locked=skip_locked))
+            if for_update_part and not self.connection.features.for_update_after_from:
+                result.append(for_update_part)
 
             return ' '.join(result), tuple(params)
         finally:
             # Finally do cleanup - get rid of the joins we created above.
             self.query.reset_refcounts(refcounts_before)
-
-    def as_nested_sql(self):
-        """
-        Perform the same functionality as the as_sql() method, returning an
-        SQL string and parameters. However, the alias prefixes are bumped
-        beforehand (in a copy -- the current query isn't changed), and any
-        ordering is removed if the query is unsliced.
-
-        Used when nesting this query inside another.
-        """
-        obj = self.query.clone()
-        if obj.low_mark == 0 and obj.high_mark is None and not self.query.distinct_fields:
-            # If there is no slicing in use, then we can safely drop all ordering
-            obj.clear_ordering(True)
-        nested_sql = obj.get_compiler(connection=self.connection).as_sql(subquery=True)
-        if nested_sql == ('', ()):
-            raise EmptyResultSet
-        return nested_sql
 
     def get_default_columns(self, start_alias=None, opts=None, from_parent=None):
         """
@@ -879,9 +866,6 @@ class SQLCompiler(object):
     def as_subquery_condition(self, alias, columns, compiler):
         qn = compiler.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
-        if len(columns) == 1:
-            sql, params = self.as_sql()
-            return '%s.%s IN (%s)' % (qn(alias), qn2(columns[0]), sql), params
 
         for index, select_col in enumerate(self.query.select):
             lhs_sql, lhs_params = self.compile(select_col)
@@ -1133,8 +1117,6 @@ class SQLUpdateCompiler(SQLCompiler):
                 update_params.append(val)
             else:
                 values.append('%s = NULL' % qn(name))
-        if not values:
-            return '', ()
         table = self.query.tables[0]
         result = [
             'UPDATE %s SET' % qn(table),
@@ -1216,14 +1198,9 @@ class SQLAggregateCompiler(SQLCompiler):
         Creates the SQL for this query. Returns the SQL string and list of
         parameters.
         """
-        # Empty SQL for the inner query is a marker that the inner query
-        # isn't going to produce any results. This can happen when doing
-        # LIMIT 0 queries (generated by qs[:0]) for example.
-        if not self.query.subquery:
-            raise EmptyResultSet
         sql, params = [], []
         for annotation in self.query.annotation_select.values():
-            ann_sql, ann_params = self.compile(annotation, select_format=True)
+            ann_sql, ann_params = self.compile(annotation, select_format=FORCE)
             sql.append(ann_sql)
             params.extend(ann_params)
         self.col_count = len(self.query.annotation_select)

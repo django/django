@@ -385,7 +385,7 @@ class AdminURLFieldWidget(forms.URLInput):
         return html
 
 
-class AdminIntegerFieldWidget(forms.TextInput):
+class AdminIntegerFieldWidget(forms.NumberInput):
     class_name = 'vIntegerField'
 
     def __init__(self, attrs=None):

@@ -92,13 +92,42 @@ class CombinedSearchVector(SearchVectorCombinable, CombinedExpression):
         super(CombinedSearchVector, self).__init__(lhs, connector, rhs, output_field)
 
 
-class SearchQuery(Value):
+class SearchQueryCombinable(object):
+    BITAND = '&&'
+    BITOR = '||'
+
+    def _combine(self, other, connector, reversed, node=None):
+        if not isinstance(other, SearchQueryCombinable):
+            raise TypeError(
+                'SearchQuery can only be combined with other SearchQuerys, '
+                'got {}.'.format(type(other))
+            )
+        if not self.config == other.config:
+            raise TypeError("SearchQuery configs don't match.")
+        if reversed:
+            return CombinedSearchQuery(other, connector, self, self.config)
+        return CombinedSearchQuery(self, connector, other, self.config)
+
+    # On Combinable, these are not implemented to reduce confusion with Q. In
+    # this case we are actually (ab)using them to do logical combination so
+    # it's consistent with other usage in Django.
+    def __or__(self, other):
+        return self._combine(other, self.BITOR, False)
+
+    def __ror__(self, other):
+        return self._combine(other, self.BITOR, True)
+
+    def __and__(self, other):
+        return self._combine(other, self.BITAND, False)
+
+    def __rand__(self, other):
+        return self._combine(other, self.BITAND, True)
+
+
+class SearchQuery(SearchQueryCombinable, Value):
     invert = False
     _output_field = SearchQueryField()
     config = None
-
-    BITAND = '&&'
-    BITOR = '||'
 
     def __init__(self, value, output_field=None, **extra):
         self.config = extra.pop('config', self.config)
@@ -131,27 +160,18 @@ class SearchQuery(Value):
         combined.output_field = SearchQueryField()
         return combined
 
-    # On Combinable, these are not implemented to reduce confusion with Q. In
-    # this case we are actually (ab)using them to do logical combination so
-    # it's consistent with other usage in Django.
-    def __or__(self, other):
-        return self._combine(other, self.BITOR, False)
-
-    def __ror__(self, other):
-        return self._combine(other, self.BITOR, True)
-
-    def __and__(self, other):
-        return self._combine(other, self.BITAND, False)
-
-    def __rand__(self, other):
-        return self._combine(other, self.BITAND, True)
-
     def __invert__(self):
         extra = {
             'invert': not self.invert,
             'config': self.config,
         }
         return type(self)(self.value, **extra)
+
+
+class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):
+    def __init__(self, lhs, connector, rhs, config, output_field=None):
+        self.config = config
+        super(CombinedSearchQuery, self).__init__(lhs, connector, rhs, output_field)
 
 
 class SearchRank(Func):

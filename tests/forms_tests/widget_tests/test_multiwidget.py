@@ -118,6 +118,13 @@ class MultiWidgetTest(WidgetTest):
             '<input id="bar_1" type="text" class="small" value="lennon" name="name_1" />'
         ))
 
+    def test_value_omitted_from_data(self):
+        widget = MyMultiWidget(widgets=(TextInput(), TextInput()))
+        self.assertIs(widget.value_omitted_from_data({}, {}, 'field'), True)
+        self.assertIs(widget.value_omitted_from_data({'field_0': 'x'}, {}, 'field'), False)
+        self.assertIs(widget.value_omitted_from_data({'field_1': 'y'}, {}, 'field'), False)
+        self.assertIs(widget.value_omitted_from_data({'field_0': 'x', 'field_1': 'y'}, {}, 'field'), False)
+
     def test_needs_multipart_true(self):
         """
         needs_multipart_form should be True if any widgets need it.
@@ -141,8 +148,8 @@ class MultiWidgetTest(WidgetTest):
             """
             <input type="text" name="name_0" value="some text" />
             <select multiple="multiple" name="name_1">
-                <option value="J" selected="selected">John</option>
-                <option value="P" selected="selected">Paul</option>
+                <option value="J" selected>John</option>
+                <option value="P" selected>Paul</option>
                 <option value="G">George</option>
                 <option value="R">Ringo</option>
             </select>

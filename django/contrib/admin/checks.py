@@ -11,6 +11,7 @@ from django.contrib.admin.utils import (
 from django.core import checks
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
+from django.db.models.constants import LOOKUP_SEP
 from django.forms.models import (
     BaseModelForm, BaseModelFormSet, _get_foreign_key,
 )
@@ -217,10 +218,11 @@ class BaseModelAdminChecks(object):
                 # be an extra field on the form.
                 return []
             else:
-                if field.many_to_many and not field.remote_field.through._meta.auto_created:
+                if (isinstance(field, models.ManyToManyField) and
+                        not field.remote_field.through._meta.auto_created):
                     return [
                         checks.Error(
-                            "The value of '%s' cannot include the many-to-many field '%s' "
+                            "The value of '%s' cannot include the ManyToManyField '%s', "
                             "because that field manually specifies a relationship model."
                             % (label, field_name),
                             obj=obj.__class__,
@@ -393,11 +395,11 @@ class BaseModelAdminChecks(object):
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=obj, id='admin.E027')
         else:
-            if field.many_to_many or isinstance(field, (models.DateTimeField, models.ForeignKey)):
+            if isinstance(field, (models.DateTimeField, models.ForeignKey, models.ManyToManyField)):
                 return [
                     checks.Error(
                         "The value of '%s' refers to '%s', which must not be a DateTimeField, "
-                        "a foreign key, or a many-to-many field." % (label, field_name),
+                        "a ForeignKey, or a ManyToManyField." % (label, field_name),
                         obj=obj.__class__,
                         id='admin.E028',
                     )
@@ -457,7 +459,7 @@ class BaseModelAdminChecks(object):
             ]
         elif field_name == '?':
             return []
-        elif '__' in field_name:
+        elif LOOKUP_SEP in field_name:
             # Skip ordering in the format field1__field2 (FIXME: checking
             # this format would be nice, but it's a little fiddly).
             return []
@@ -560,12 +562,12 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check one inline model admin. """
         inline_label = '.'.join([inline.__module__, inline.__name__])
 
-        from django.contrib.admin.options import BaseModelAdmin
+        from django.contrib.admin.options import InlineModelAdmin
 
-        if not issubclass(inline, BaseModelAdmin):
+        if not issubclass(inline, InlineModelAdmin):
             return [
                 checks.Error(
-                    "'%s' must inherit from 'BaseModelAdmin'." % inline_label,
+                    "'%s' must inherit from 'InlineModelAdmin'." % inline_label,
                     obj=obj.__class__,
                     id='admin.E104',
                 )
@@ -621,10 +623,10 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         id='admin.E108',
                     )
                 ]
-            elif getattr(field, 'many_to_many', False):
+            elif isinstance(field, models.ManyToManyField):
                 return [
                     checks.Error(
-                        "The value of '%s' must not be a many-to-many field." % label,
+                        "The value of '%s' must not be a ManyToManyField." % label,
                         obj=obj.__class__,
                         id='admin.E109',
                     )

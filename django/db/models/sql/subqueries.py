@@ -28,7 +28,7 @@ class DeleteQuery(Query):
         cursor = self.get_compiler(using).execute_sql(CURSOR)
         return cursor.rowcount if cursor else 0
 
-    def delete_batch(self, pk_list, using, field=None):
+    def delete_batch(self, pk_list, using):
         """
         Set up and execute delete queries for all the objects in pk_list.
 
@@ -37,8 +37,7 @@ class DeleteQuery(Query):
         """
         # number of objects deleted
         num_deleted = 0
-        if not field:
-            field = self.get_meta().pk
+        field = self.get_meta().pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
             self.add_q(Q(
@@ -182,15 +181,6 @@ class InsertQuery(Query):
         self.fields = []
         self.objs = []
 
-    def clone(self, klass=None, **kwargs):
-        extras = {
-            'fields': self.fields[:],
-            'objs': self.objs[:],
-            'raw': self.raw,
-        }
-        extras.update(kwargs)
-        return super(InsertQuery, self).clone(klass, **extras)
-
     def insert_values(self, fields, objs, raw=False):
         """
         Set up the insert query from the 'insert_values' dictionary. The
@@ -215,7 +205,5 @@ class AggregateQuery(Query):
     compiler = 'SQLAggregateCompiler'
 
     def add_subquery(self, query, using):
-        self.subquery, self.sub_params = query.get_compiler(using).as_sql(
-            with_col_aliases=True,
-            subquery=True,
-        )
+        query.subquery = True
+        self.subquery, self.sub_params = query.get_compiler(using).as_sql(with_col_aliases=True)

@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-09-27 19:12+0000\n"
+"Last-Translator: zejn <zejn@kiberpipa.org>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
@@ -65,7 +65,7 @@ msgid "German"
 msgstr "Nemščina"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "Dolnjelužiška srbščina"
 
 msgid "Greek"
 msgstr "Grščina"
@@ -137,7 +137,7 @@ msgid "Croatian"
 msgstr "Hrvaščina"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "Gornjelužiška srbščina"
 
 msgid "Hungarian"
 msgstr "Madžarščina"
@@ -200,7 +200,7 @@ msgid "Burmese"
 msgstr "Burmanski jezik"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "Norveški jezik"
 
 msgid "Nepali"
 msgstr "Nepalščina"
@@ -621,11 +621,11 @@ msgstr "Relacija ena-na-ena"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "Relacija %(from)s-%(to)s"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "Relacija %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Relacija več-na-več"

@@ -1,11 +1,6 @@
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.utils import InterfaceError
 
-try:
-    import pytz
-except ImportError:
-    pytz = None
-
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
@@ -19,7 +14,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_subqueries_in_group_by = False
     supports_transactions = True
     supports_timezones = False
-    has_zoneinfo_database = pytz is not None
     supports_bitwise_or = False
     has_native_duration_field = True
     can_defer_constraint_checks = True

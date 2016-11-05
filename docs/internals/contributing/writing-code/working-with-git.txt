@@ -42,7 +42,8 @@ Setting up local repository
 ===========================
 
 When you have created your GitHub account, with the nick "GitHub_nick", and
-forked Django's repository, create a local copy of your fork::
+`forked Django's repository <https://github.com/django/django/fork>`__,
+create a local copy of your fork::
 
     git clone git@github.com:GitHub_nick/django.git
 
@@ -179,8 +180,8 @@ commit, for example to fix a typo in a docstring::
     # The second and third commits should be applied.
 
 If your topic branch is already published at GitHub, for example if you're
-making minor changes to take into account a review, you will need to force-
-push the changes::
+making minor changes to take into account a review, you will need to force-push
+the changes::
 
     git push -f origin ticket_xxxxx
 

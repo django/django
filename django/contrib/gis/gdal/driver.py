@@ -76,10 +76,11 @@ class Driver(GDALBase):
         """
         Attempts to register all the data source drivers.
         """
-        # Only register all if the driver count is 0 (or else all drivers
+        # Only register all if the driver counts are 0 (or else all drivers
         # will be registered over and over again)
-        if not cls.driver_count():
+        if not vcapi.get_driver_count():
             vcapi.register_all()
+        if not rcapi.get_driver_count():
             rcapi.register_all()
 
     @classmethod

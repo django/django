@@ -145,6 +145,7 @@ msgstr "Được thêm."
 msgid "and"
 msgstr "và"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr ""
 

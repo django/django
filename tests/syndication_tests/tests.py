@@ -16,11 +16,6 @@ from django.utils.feedgenerator import (
 
 from .models import Article, Entry
 
-try:
-    import pytz
-except ImportError:
-    pytz = None
-
 TZ = timezone.get_default_timezone()
 
 

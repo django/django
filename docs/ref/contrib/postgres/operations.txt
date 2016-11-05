@@ -27,6 +27,15 @@ the ``django.contrib.postgres.operations`` module.
 
     Install the ``btree_gin`` extension.
 
+``CITextExtension``
+===================
+
+.. class:: CITextExtension()
+
+    .. versionadded:: 1.11
+
+    Installs the ``citext`` extension.
+
 ``HStoreExtension``
 ===================
 

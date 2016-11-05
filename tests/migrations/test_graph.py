@@ -68,7 +68,7 @@ class GraphTests(SimpleTestCase):
         )
 
     def test_complex_graph(self):
-        """
+        r"""
         Tests a complex dependency graph:
 
         app_a:  0001 <-- 0002 <--- 0003 <-- 0004

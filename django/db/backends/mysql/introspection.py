@@ -1,3 +1,4 @@
+import warnings
 from collections import namedtuple
 
 from MySQLdb.constants import FIELD_TYPE
@@ -6,6 +7,7 @@ from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
 from django.utils.datastructures import OrderedSet
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 
 FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('extra', 'default'))
@@ -122,6 +124,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return key_columns
 
     def get_indexes(self, cursor, table_name):
+        warnings.warn(
+            "get_indexes() is deprecated in favor of get_constraints().",
+            RemovedInDjango21Warning, stacklevel=2
+        )
         cursor.execute("SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name))
         # Do a two-pass search for indexes: on first pass check which indexes
         # are multicolumn, on second pass check which single-column indexes
@@ -201,17 +207,17 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 constraints[constraint]['unique'] = True
         # Now add in the indexes
         cursor.execute("SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name))
-        for table, non_unique, index, colseq, column in [x[:5] for x in cursor.fetchall()]:
+        for table, non_unique, index, colseq, column, type_ in [x[:5] + (x[10],) for x in cursor.fetchall()]:
             if index not in constraints:
                 constraints[index] = {
                     'columns': OrderedSet(),
                     'primary_key': False,
                     'unique': False,
-                    'index': True,
                     'check': False,
                     'foreign_key': None,
                 }
             constraints[index]['index'] = True
+            constraints[index]['type'] = type_.lower()
             constraints[index]['columns'].add(column)
         # Convert the sorted sets to lists
         for constraint in constraints.values():

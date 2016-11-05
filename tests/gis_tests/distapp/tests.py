@@ -10,7 +10,7 @@ from django.db.models import F, Q
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from ..utils import no_oracle, oracle, postgis
+from ..utils import no_oracle, oracle, postgis, spatialite
 from .models import (
     AustraliaCity, CensusZipcode, Interstate, SouthTexasCity, SouthTexasCityFt,
     SouthTexasInterstate, SouthTexasZipcode,
@@ -82,9 +82,11 @@ class DistanceTest(TestCase):
                 type_error = False
 
             if isinstance(dist, tuple):
-                if oracle:
+                if oracle or spatialite:
+                    # Result in meters
                     dist = dist[1]
                 else:
+                    # Result in units of the field
                     dist = dist[0]
 
             # Creating the query set.
@@ -426,7 +428,7 @@ class DistanceTest(TestCase):
         qs = SouthTexasCity.objects.distance(Point(3, 3)).order_by(
             'distance'
         ).values_list('name', flat=True).filter(name__in=('San Antonio', 'Pearland'))
-        self.assertQuerysetEqual(qs, ['San Antonio', 'Pearland'], lambda x: x)
+        self.assertSequenceEqual(qs, ['San Antonio', 'Pearland'])
 
 
 '''
@@ -641,7 +643,7 @@ class DistanceFunctionsTests(TestCase):
         qs = SouthTexasCity.objects.annotate(distance=Distance('point', Point(3, 3, srid=32140))).order_by(
             'distance'
         ).values_list('name', flat=True).filter(name__in=('San Antonio', 'Pearland'))
-        self.assertQuerysetEqual(qs, ['San Antonio', 'Pearland'], lambda x: x)
+        self.assertSequenceEqual(qs, ['San Antonio', 'Pearland'])
 
     @skipUnlessDBFeature("has_Length_function")
     def test_length(self):

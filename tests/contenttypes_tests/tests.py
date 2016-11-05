@@ -12,6 +12,7 @@ from django.contrib.contenttypes.fields import (
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core import checks, management
+from django.core.management import call_command
 from django.db import connections, migrations, models
 from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, mock, override_settings,
@@ -388,16 +389,19 @@ class UpdateContentTypesTests(TestCase):
 
     def test_interactive_true_with_dependent_objects(self):
         """
-        interactive mode of update_contenttypes() (the default) should delete
-        stale contenttypes and warn of dependent objects.
+        interactive mode of remove_stale_contenttypes (the default) should
+        delete stale contenttypes and warn of dependent objects.
         """
         post = Post.objects.create(title='post', content_type=self.content_type)
         # A related object is needed to show that a custom collector with
         # can_fast_delete=False is needed.
         ModelWithNullFKToSite.objects.create(post=post)
-        contenttypes_management.input = lambda x: force_str("yes")
-        with captured_stdout() as stdout:
-            contenttypes_management.update_contenttypes(self.app_config)
+        with mock.patch(
+            'django.contrib.contenttypes.management.commands.remove_stale_contenttypes.input',
+            return_value='yes'
+        ):
+            with captured_stdout() as stdout:
+                call_command('remove_stale_contenttypes', verbosity=2, stdout=stdout)
         self.assertEqual(Post.objects.count(), 0)
         output = stdout.getvalue()
         self.assertIn('- Content type for contenttypes_tests.Fake', output)
@@ -408,33 +412,35 @@ class UpdateContentTypesTests(TestCase):
 
     def test_interactive_true_without_dependent_objects(self):
         """
-        interactive mode of update_contenttypes() (the default) should delete
-        stale contenttypes even if there aren't any dependent objects.
+        interactive mode of remove_stale_contenttypes (the default) should
+        delete stale contenttypes even if there aren't any dependent objects.
         """
-        contenttypes_management.input = lambda x: force_str("yes")
-        with captured_stdout() as stdout:
-            contenttypes_management.update_contenttypes(self.app_config)
+        with mock.patch(
+            'django.contrib.contenttypes.management.commands.remove_stale_contenttypes.input',
+            return_value='yes'
+        ):
+            with captured_stdout() as stdout:
+                call_command('remove_stale_contenttypes', verbosity=2)
         self.assertIn("Deleting stale content type", stdout.getvalue())
         self.assertEqual(ContentType.objects.count(), self.before_count)
 
     def test_interactive_false(self):
         """
-        non-interactive mode of update_contenttypes() shouldn't delete stale
-        content types.
+        non-interactive mode of remove_stale_contenttypes shouldn't delete
+        stale content types.
         """
         with captured_stdout() as stdout:
-            contenttypes_management.update_contenttypes(self.app_config, interactive=False)
+            call_command('remove_stale_contenttypes', interactive=False, verbosity=2)
         self.assertIn("Stale content types remain.", stdout.getvalue())
         self.assertEqual(ContentType.objects.count(), self.before_count + 1)
 
     def test_unavailable_content_type_model(self):
         """
-        #24075 - A ContentType shouldn't be created or deleted if the model
-        isn't available.
+        A ContentType shouldn't be created if the model isn't available.
         """
         apps = Apps()
         with self.assertNumQueries(0):
-            contenttypes_management.update_contenttypes(self.app_config, interactive=False, verbosity=0, apps=apps)
+            contenttypes_management.create_contenttypes(self.app_config, interactive=False, verbosity=0, apps=apps)
         self.assertEqual(ContentType.objects.count(), self.before_count + 1)
 
 

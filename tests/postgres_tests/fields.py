@@ -6,8 +6,9 @@ from django.db import models
 
 try:
     from django.contrib.postgres.fields import (
-        ArrayField, BigIntegerRangeField, DateRangeField, DateTimeRangeField,
-        FloatRangeField, HStoreField, IntegerRangeField, JSONField,
+        ArrayField, BigIntegerRangeField, CITextField, DateRangeField,
+        DateTimeRangeField, FloatRangeField, HStoreField, IntegerRangeField,
+        JSONField,
     )
     from django.contrib.postgres.search import SearchVectorField
 except ImportError:
@@ -23,12 +24,17 @@ except ImportError:
             })
             return name, path, args, kwargs
 
+    class DummyJSONField(models.Field):
+        def __init__(self, encoder=None, **kwargs):
+            super(DummyJSONField, self).__init__(**kwargs)
+
     ArrayField = DummyArrayField
     BigIntegerRangeField = models.Field
+    CITextField = models.Field
     DateRangeField = models.Field
     DateTimeRangeField = models.Field
     FloatRangeField = models.Field
     HStoreField = models.Field
     IntegerRangeField = models.Field
-    JSONField = models.Field
+    JSONField = DummyJSONField
     SearchVectorField = models.Field

@@ -1617,7 +1617,7 @@ class Model(six.with_metaclass(ModelBase)):
 
         # Skip ordering in the format field1__field2 (FIXME: checking
         # this format would be nice, but it's a little fiddly).
-        fields = (f for f in fields if '__' not in f)
+        fields = (f for f in fields if LOOKUP_SEP not in f)
 
         # Skip ordering on pk. This is always a valid order_by field
         # but is an alias and therefore won't be found by opts.get_field.

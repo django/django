@@ -250,6 +250,26 @@ At present using :attr:`~django.db.models.Field.db_index` will create a
 A more useful index is a ``GIN`` index, which you should create using a
 :class:`~django.db.migrations.operations.RunSQL` operation.
 
+``CITextField``
+===============
+
+.. class:: CITextField(**options)
+
+    .. versionadded:: 1.11
+
+    This field is a subclass of :class:`~django.db.models.CharField` backed by
+    the citext_ type, a case-insensitive character string type. Read about `the
+    performance considerations`_ prior to using this field.
+
+    To use this field, setup the ``citext`` extension in PostgreSQL before the
+    first ``CreateModel`` migration operation using the
+    :class:`~django.contrib.postgres.operations.CITextExtension` operation. The
+    code to setup the extension is similar to the example for
+    :class:`~django.contrib.postgres.fields.HStoreField`.
+
+    .. _citext: https://www.postgresql.org/docs/current/static/citext.html
+    .. _the performance considerations: https://www.postgresql.org/docs/current/static/citext.html#AEN169274
+
 ``HStoreField``
 ===============
 
@@ -458,17 +478,32 @@ using in conjunction with lookups on
 ``JSONField``
 =============
 
-.. class:: JSONField(**options)
+.. class:: JSONField(encoder=None, **options)
 
     A field for storing JSON encoded data. In Python the data is represented in
     its Python native format: dictionaries, lists, strings, numbers, booleans
     and ``None``.
 
-    If you want to store other data types, you'll need to serialize them first.
-    For example, you might cast a ``datetime`` to a string. You might also want
-    to convert the string back to a ``datetime`` when you retrieve the data
-    from the database. There are some third-party ``JSONField`` implementations
-    which do this sort of thing automatically.
+    .. attribute:: encoder
+
+        .. versionadded:: 1.11
+
+        An optional JSON-encoding class to serialize data types not supported
+        by the standard JSON serializer (``datetime``, ``uuid``, etc.). For
+        example, you can use the
+        :class:`~django.core.serializers.json.DjangoJSONEncoder` class or any
+        other :py:class:`json.JSONEncoder` subclass.
+
+        When the value is retrieved from the database, it will be in the format
+        chosen by the custom encoder (most often a string), so you'll need to
+        take extra steps to convert the value back to the initial data type
+        (:meth:`Model.from_db() <django.db.models.Model.from_db>` and
+        :meth:`Field.from_db_value() <django.db.models.Field.from_db_value>`
+        are two possible hooks for that purpose). Your deserialization may need
+        to account for the fact that you can't be certain of the input type.
+        For example, you run the risk of returning a ``datetime`` that was
+        actually a string that just happened to be in the same format chosen
+        for ``datetime``\s.
 
     If you give the field a :attr:`~django.db.models.Field.default`, ensure
     it's a callable such as ``dict`` (for an empty default) or a callable that

@@ -279,7 +279,7 @@ class FileSystemLoaderTests(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.engine = Engine(dirs=[TEMPLATE_DIR])
+        cls.engine = Engine(dirs=[TEMPLATE_DIR], loaders=['django.template.loaders.filesystem.Loader'])
         super(FileSystemLoaderTests, cls).setUpClass()
 
     @contextmanager

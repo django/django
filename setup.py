@@ -35,7 +35,7 @@ version = __import__('django').get_version()
 setup(
     name='Django',
     version=version,
-    url='http://www.djangoproject.com/',
+    url='https://www.djangoproject.com/',
     author='Django Software Foundation',
     author_email='foundation@djangoproject.com',
     description=('A high-level Python Web framework that encourages '
@@ -47,6 +47,7 @@ setup(
     entry_points={'console_scripts': [
         'django-admin = django.core.management:execute_from_command_line',
     ]},
+    install_requires=['pytz'],
     extras_require={
         "bcrypt": ["bcrypt"],
         "argon2": ["argon2-cffi >= 16.1.0"],

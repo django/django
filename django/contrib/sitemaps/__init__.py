@@ -68,9 +68,9 @@ class Sitemap(object):
     def location(self, obj):
         return obj.get_absolute_url()
 
-    def _get_paginator(self):
+    @property
+    def paginator(self):
         return paginator.Paginator(self.items(), self.limit)
-    paginator = property(_get_paginator)
 
     def get_urls(self, page=1, site=None, protocol=None):
         # Determine protocol

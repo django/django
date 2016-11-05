@@ -3,7 +3,7 @@ from importlib import import_module
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import UpdateError
-from django.shortcuts import redirect
+from django.core.exceptions import SuspiciousOperation
 from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import cookie_date
@@ -57,10 +57,11 @@ class SessionMiddleware(MiddlewareMixin):
                         try:
                             request.session.save()
                         except UpdateError:
-                            # The user is now logged out; redirecting to same
-                            # page will result in a redirect to the login page
-                            # if required.
-                            return redirect(request.path)
+                            raise SuspiciousOperation(
+                                "The request's session was deleted before the "
+                                "request completed. The user may have logged "
+                                "out in a concurrent request, for example."
+                            )
                         response.set_cookie(
                             settings.SESSION_COOKIE_NAME,
                             request.session.session_key, max_age=max_age,

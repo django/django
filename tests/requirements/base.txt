@@ -6,7 +6,9 @@ jinja2 >= 2.7
 numpy
 Pillow
 PyYAML
-pytz > dev
+# pylibmc/libmemcached can't be built on Windows.
+pylibmc; sys.platform != 'win32'
+pytz
 selenium
 sqlparse
 tblib

@@ -259,7 +259,7 @@ def stringformat(value, arg):
 def title(value):
     """Converts a string into titlecase."""
     t = re.sub("([a-z])'([A-Z])", lambda m: m.group(0).lower(), value.title())
-    return re.sub("\d([A-Z])", lambda m: m.group(0).lower(), t)
+    return re.sub(r"\d([A-Z])", lambda m: m.group(0).lower(), t)
 
 
 @register.filter(is_safe=True)

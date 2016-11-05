@@ -583,7 +583,7 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = BookAdmin(Book, AdminSite()).check()
         expected = [
             checks.Error(
-                "The value of 'fields' cannot include the many-to-many field 'authors' "
+                "The value of 'fields' cannot include the ManyToManyField 'authors', "
                 "because that field manually specifies a relationship model.",
                 obj=BookAdmin,
                 id='admin.E013',
@@ -601,8 +601,8 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = FieldsetBookAdmin(Book, AdminSite()).check()
         expected = [
             checks.Error(
-                "The value of 'fieldsets[1][1][\"fields\"]' cannot include the many-to-many field "
-                "'authors' because that field manually specifies a relationship model.",
+                "The value of 'fieldsets[1][1][\"fields\"]' cannot include the ManyToManyField "
+                "'authors', because that field manually specifies a relationship model.",
                 obj=FieldsetBookAdmin,
                 id='admin.E013',
             )

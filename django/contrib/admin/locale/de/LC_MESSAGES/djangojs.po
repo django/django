@@ -3,7 +3,7 @@
 # Translators:
 # André Hagenbruch, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011,2013-2016
-# Jannis Vajen, 2016
+# Jannis, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"

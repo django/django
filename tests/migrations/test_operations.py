@@ -4,11 +4,12 @@ import unittest
 
 from django.db import connection, migrations, models, transaction
 from django.db.migrations.migration import Migration
-from django.db.migrations.state import ProjectState
+from django.db.migrations.operations import CreateModel
+from django.db.migrations.state import ModelState, ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
 from django.db.utils import IntegrityError
-from django.test import override_settings, skipUnlessDBFeature
+from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 
 from .models import FoodManager, FoodQuerySet, UnicodeModel
 from .test_base import MigrationTestBase
@@ -588,6 +589,26 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[0], "RenameModel")
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2], {'old_name': "Pony", 'new_name': "Horse"})
+
+    def test_rename_model_state_forwards(self):
+        """
+        RenameModel operations shouldn't trigger the caching of rendered apps
+        on state without prior apps.
+        """
+        state = ProjectState()
+        state.add_model(ModelState('migrations', 'Foo', []))
+        operation = migrations.RenameModel('Foo', 'Bar')
+        operation.state_forwards('migrations', state)
+        self.assertNotIn('apps', state.__dict__)
+        self.assertNotIn(('migrations', 'foo'), state.models)
+        self.assertIn(('migrations', 'bar'), state.models)
+        # Now with apps cached.
+        apps = state.apps
+        operation = migrations.RenameModel('Bar', 'Foo')
+        operation.state_forwards('migrations', state)
+        self.assertIs(state.apps, apps)
+        self.assertNotIn(('migrations', 'bar'), state.models)
+        self.assertIn(('migrations', 'foo'), state.models)
 
     def test_rename_model_with_self_referential_fk(self):
         """
@@ -2414,3 +2435,9 @@ class SwappableOperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_forwards('test_rminigsw', editor, project_state, new_state)
             operation.database_backwards('test_rminigsw', editor, new_state, project_state)
+
+
+class TestCreateModel(SimpleTestCase):
+
+    def test_references_model_mixin(self):
+        CreateModel('name', [], bases=(Mixin, models.Model)).references_model('other_model')

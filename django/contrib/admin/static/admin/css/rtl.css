@@ -166,6 +166,10 @@ thead th.sorted .text {
     margin-left: 5px;
 }
 
+form .aligned p.help, form .aligned div.help {
+    clear: right;
+}
+
 form ul.inline li {
     float: right;
     padding-right: 0;
@@ -224,6 +228,10 @@ fieldset .field-box {
 
 form .form-row p.datetime {
     overflow: hidden;
+}
+
+.related-widget-wrapper {
+    float: right;
 }
 
 /* MISC */

@@ -1,5 +1,6 @@
 import cgi
 import errno
+import io
 import mimetypes
 import os
 import posixpath
@@ -11,6 +12,7 @@ import tempfile
 from os import path
 
 import django
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import handle_extensions
 from django.template import Context, Engine
@@ -34,9 +36,6 @@ class TemplateCommand(BaseCommand):
     :param options: The additional variables passed to project or app templates
     """
     requires_system_checks = False
-    # Can't import settings during this command, because they haven't
-    # necessarily been created.
-    can_import_settings = False
     # The supported URL schemes
     url_schemes = ['http', 'https', 'ftp']
     # Can't perform any active locale changes during this command, because
@@ -114,13 +113,14 @@ class TemplateCommand(BaseCommand):
             camel_case_name: camel_case_value,
             'docs_version': get_docs_version(),
             'django_version': django.__version__,
-            'unicode_literals': '' if six.PY3 else 'from __future__ import unicode_literals\n\n',
+            'unicode_literals': '' if six.PY3 else '# -*- coding: utf-8 -*-\n'
+                                                   'from __future__ import unicode_literals\n\n',
         }), autoescape=False)
 
         # Setup a stub settings environment for template rendering
-        from django.conf import settings
         if not settings.configured:
             settings.configure()
+            django.setup()
 
         template_dir = self.handle_template(options['template'],
                                             base_subdir)
@@ -159,15 +159,15 @@ class TemplateCommand(BaseCommand):
 
                 # Only render the Python files, as we don't want to
                 # accidentally render Django templates files
-                with open(old_path, 'rb') as template_file:
-                    content = template_file.read()
                 if new_path.endswith(extensions) or filename in extra_files:
-                    content = content.decode('utf-8')
+                    with io.open(old_path, 'r', encoding='utf-8') as template_file:
+                        content = template_file.read()
                     template = Engine().from_string(content)
                     content = template.render(context)
-                    content = content.encode('utf-8')
-                with open(new_path, 'wb') as new_file:
-                    new_file.write(content)
+                    with io.open(new_path, 'w', encoding='utf-8') as new_file:
+                        new_file.write(content)
+                else:
+                    shutil.copyfile(old_path, new_path)
 
                 if self.verbosity >= 2:
                     self.stdout.write("Creating %s\n" % new_path)

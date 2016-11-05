@@ -6,7 +6,7 @@ Full text search
 
 The database functions in the ``django.contrib.postgres.search`` module ease
 the use of PostgreSQL's `full text search engine
-<http://www.postgresql.org/docs/current/static/textsearch.html>`_.
+<https://www.postgresql.org/docs/current/static/textsearch.html>`_.
 
 For the examples in this document, we'll use the models defined in
 :doc:`/topics/db/queries`.
@@ -167,7 +167,7 @@ In the event that all the fields you're querying on are contained within one
 particular model, you can create a functional index which matches the search
 vector you wish to use. The PostgreSQL documentation has details on
 `creating indexes for full text search
-<http://www.postgresql.org/docs/current/static/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX>`_.
+<https://www.postgresql.org/docs/current/static/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX>`_.
 
 ``SearchVectorField``
 ---------------------
@@ -183,7 +183,7 @@ if it were an annotated ``SearchVector``::
     >>> Entry.objects.filter(search_vector='cheese')
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]
 
-.. _PostgreSQL documentation: http://www.postgresql.org/docs/current/static/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
+.. _PostgreSQL documentation: https://www.postgresql.org/docs/current/static/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
 
 Trigram similarity
 ==================
@@ -193,7 +193,7 @@ three consecutive characters. In addition to the :lookup:`trigram_similar`
 lookup, you can use a couple of other expressions.
 
 To use them, you need to activate the `pg_trgm extension
-<http://www.postgresql.org/docs/current/interactive/pgtrgm.html>`_ on
+<https://www.postgresql.org/docs/current/static/pgtrgm.html>`_ on
 PostgreSQL. You can install it using the
 :class:`~django.contrib.postgres.operations.TrigramExtension` migration
 operation.

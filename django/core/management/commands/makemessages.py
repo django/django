@@ -11,6 +11,7 @@ from itertools import dropwhile
 
 import django
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.files.temp import NamedTemporaryFile
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import (
@@ -103,13 +104,14 @@ class BuildFile(object):
         if not self.is_templatized:
             return
 
-        with io.open(self.path, 'r', encoding=settings.FILE_CHARSET) as fp:
+        encoding = settings.FILE_CHARSET if self.command.settings_available else 'utf-8'
+        with io.open(self.path, 'r', encoding=encoding) as fp:
             src_data = fp.read()
 
         if self.domain == 'djangojs':
             content = prepare_js_for_gettext(src_data)
         elif self.domain == 'django':
-            content = templatize(src_data, self.path[2:])
+            content = templatize(src_data, origin=self.path[2:], charset=encoding)
 
         with io.open(self.work_path, 'w', encoding='utf-8') as fp:
             fp.write(content)
@@ -325,7 +327,8 @@ class Command(BaseCommand):
             self.default_locale_path = self.locale_paths[0]
             self.invoked_for_django = True
         else:
-            self.locale_paths.extend(settings.LOCALE_PATHS)
+            if self.settings_available:
+                self.locale_paths.extend(settings.LOCALE_PATHS)
             # Allow to run makemessages inside an app dir
             if os.path.isdir('locale'):
                 self.locale_paths.append(os.path.abspath('locale'))
@@ -376,6 +379,16 @@ class Command(BaseCommand):
             return tuple(int(d) for d in m.groups() if d is not None)
         else:
             raise CommandError("Unable to get gettext version. Is it installed?")
+
+    @cached_property
+    def settings_available(self):
+        try:
+            settings.LOCALE_PATHS
+        except ImproperlyConfigured:
+            if self.verbosity > 1:
+                self.stderr.write("Running without configured settings.")
+            return False
+        return True
 
     def build_potfiles(self):
         """
@@ -438,7 +451,9 @@ class Command(BaseCommand):
                 norm_patterns.append(p)
 
         all_files = []
-        ignored_roots = [os.path.normpath(p) for p in (settings.MEDIA_ROOT, settings.STATIC_ROOT) if p]
+        ignored_roots = []
+        if self.settings_available:
+            ignored_roots = [os.path.normpath(p) for p in (settings.MEDIA_ROOT, settings.STATIC_ROOT) if p]
         for dirpath, dirnames, filenames in os.walk(root, topdown=True, followlinks=self.symlinks):
             for dirname in dirnames[:]:
                 if (is_ignored(os.path.normpath(os.path.join(dirpath, dirname)), norm_patterns) or

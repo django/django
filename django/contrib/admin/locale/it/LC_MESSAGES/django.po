@@ -148,6 +148,7 @@ msgstr "Aggiunto."
 msgid "and"
 msgstr "e"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr "Modificati {fields} per {name} \"{object}\"."
 

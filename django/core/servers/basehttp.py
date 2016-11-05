@@ -15,10 +15,8 @@ import sys
 from wsgiref import simple_server
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.handlers.wsgi import ISO_8859_1, UTF_8
 from django.core.wsgi import get_wsgi_application
 from django.utils import six
-from django.utils.encoding import uri_to_iri
 from django.utils.module_loading import import_string
 from django.utils.six.moves import socketserver
 
@@ -139,19 +137,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
             if '_' in k:
                 del self.headers[k]
 
-        env = super(WSGIRequestHandler, self).get_environ()
-
-        path = self.path
-        if '?' in path:
-            path = path.partition('?')[0]
-
-        path = uri_to_iri(path).encode(UTF_8)
-        # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
-        # decoded with ISO-8859-1. We replicate this behavior here.
-        # Refs comment in `get_bytes_from_wsgi()`.
-        env['PATH_INFO'] = path.decode(ISO_8859_1) if six.PY3 else path
-
-        return env
+        return super(WSGIRequestHandler, self).get_environ()
 
     def handle(self):
         """Copy of WSGIRequestHandler, but with different ServerHandler"""
