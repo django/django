@@ -876,9 +876,6 @@ If the :doc:`staticfiles</ref/contrib/staticfiles>` contrib app is enabled
 (default in new projects) the :djadmin:`runserver` command will be overridden
 with its own :ref:`runserver<staticfiles-runserver>` command.
 
-If :djadmin:`migrate` was not previously executed, the table that stores the
-history of migrations is created at first run of ``runserver``.
-
 Logging of each request and response of the server is sent to the
 :ref:`django-server-logger` logger.
 
