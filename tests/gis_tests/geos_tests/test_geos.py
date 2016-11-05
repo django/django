@@ -237,11 +237,13 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertNotEqual(p1, p2)
         # EWKT
         self.assertNotEqual(p0, p1.ewkt)
+        self.assertNotEqual(p1, p0.ewkt)
         self.assertNotEqual(p1, p2.ewkt)
-        # Equivalence with matching srids
+        # Equivalence with matching SRIDs
         self.assertEqual(p2, p2)
-        self.assertEqual(p2, p2.wkt)
         self.assertEqual(p2, p2.ewkt)
+        # WKT contains no SRID so will not equal
+        self.assertNotEqual(p2, p2.wkt)
 
     def test_points(self):
         "Testing Point objects."

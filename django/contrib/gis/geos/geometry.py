@@ -177,9 +177,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         or a WKT or EWKT representation.
         """
         if isinstance(other, six.string_types):
-            if other.startswith('SRID'):
-                return self.ewkt == other
-            return self.wkt == other
+            return self.ewkt == other
         elif isinstance(other, GEOSGeometry):
             return self.srid == other.srid and self.equals_exact(other)
         else:
