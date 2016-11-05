@@ -1,17 +1,18 @@
 from __future__ import unicode_literals
 
+import threading
+
+from channels import DEFAULT_CHANNEL_LAYER, Channel, route
+from channels.asgi import channel_layers
+from channels.exceptions import ConsumeLater
+from channels.signals import worker_ready
+from channels.tests import ChannelTestCase
+from channels.worker import Worker, WorkerGroup
+
 try:
     from unittest import mock
 except ImportError:
     import mock
-import threading
-
-from channels import Channel, route, DEFAULT_CHANNEL_LAYER
-from channels.asgi import channel_layers
-from channels.tests import ChannelTestCase
-from channels.worker import Worker, WorkerGroup
-from channels.exceptions import ConsumeLater
-from channels.signals import worker_ready
 
 
 class PatchedWorker(Worker):

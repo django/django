@@ -2,11 +2,13 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.test import override_settings
-from channels.message import Message
-from channels.sessions import channel_session, channel_and_http_session, http_session, enforce_ordering, \
-    session_for_reply_channel
-from channels.tests import ChannelTestCase
+
 from channels import DEFAULT_CHANNEL_LAYER, channel_layers
+from channels.message import Message
+from channels.sessions import (
+    channel_and_http_session, channel_session, enforce_ordering, http_session, session_for_reply_channel,
+)
+from channels.tests import ChannelTestCase
 
 
 @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.cache")

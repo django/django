@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
 from django.test import override_settings
+
 from channels import route_class
 from channels.generic import BaseConsumer, websockets
-from channels.tests import ChannelTestCase
-from channels.tests import apply_routes, Client
+from channels.tests import ChannelTestCase, Client, apply_routes
 
 
 @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.cache")

@@ -4,11 +4,11 @@ import logging
 
 from asgiref.inmemory import ChannelLayer
 from django.core.management import CommandError, call_command
-from channels.staticfiles import StaticFilesConsumer
 from django.test import TestCase, mock
 from six import StringIO
 
 from channels.management.commands import runserver
+from channels.staticfiles import StaticFilesConsumer
 
 
 class FakeChannelLayer(ChannelLayer):

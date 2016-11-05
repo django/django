@@ -1,8 +1,7 @@
-import json
 import copy
+import json
 
 import six
-
 from django.apps import apps
 from django.conf import settings
 

@@ -1,13 +1,11 @@
 from __future__ import unicode_literals
 
 import six
-
 from django.apps import apps
-from django.db.models.signals import post_save, post_delete, pre_save, pre_delete
+from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
 
-from ..channel import Group
 from ..auth import channel_session, channel_session_user
-
+from ..channel import Group
 
 CREATE = 'create'
 UPDATE = 'update'

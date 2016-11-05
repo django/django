@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
+
+from ..auth import channel_session_user
 from ..routing import route_class
 from ..sessions import channel_session
-from ..auth import channel_session_user
 
 
 class BaseConsumer(object):

@@ -5,14 +5,15 @@ import random
 import string
 from functools import wraps
 
-from django.test.testcases import TestCase, TransactionTestCase
-from .. import DEFAULT_CHANNEL_LAYER
-from ..channel import Group
-from ..routing import Router, include
-from ..asgi import channel_layers, ChannelLayerWrapper
-from ..message import Message
-from ..signals import consumer_finished, consumer_started
 from asgiref.inmemory import ChannelLayer as InMemoryChannelLayer
+from django.test.testcases import TestCase, TransactionTestCase
+
+from .. import DEFAULT_CHANNEL_LAYER
+from ..asgi import ChannelLayerWrapper, channel_layers
+from ..channel import Group
+from ..message import Message
+from ..routing import Router, include
+from ..signals import consumer_finished, consumer_started
 
 
 class ChannelTestCaseMixin(object):

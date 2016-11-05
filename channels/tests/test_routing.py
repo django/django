@@ -1,10 +1,11 @@
 from __future__ import unicode_literals
+
 from django.test import SimpleTestCase
 
-from channels.routing import Router, route, route_class, include
-from channels.message import Message
-from channels.utils import name_that_thing
 from channels.generic import BaseConsumer
+from channels.message import Message
+from channels.routing import Router, include, route, route_class
+from channels.utils import name_that_thing
 
 
 # Fake consumers and routing sets that can be imported by string

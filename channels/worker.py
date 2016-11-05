@@ -2,17 +2,16 @@ from __future__ import unicode_literals
 
 import fnmatch
 import logging
+import multiprocessing
 import signal
 import sys
-import time
-import multiprocessing
 import threading
+import time
 
-from .signals import consumer_started, consumer_finished
 from .exceptions import ConsumeLater, DenyConnection
 from .message import Message
+from .signals import consumer_finished, consumer_started, worker_ready
 from .utils import name_that_thing
-from .signals import worker_ready
 
 logger = logging.getLogger('django.channels')
 

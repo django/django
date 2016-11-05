@@ -5,9 +5,9 @@ from django.core.management import BaseCommand, CommandError
 
 from channels import DEFAULT_CHANNEL_LAYER, channel_layers
 from channels.log import setup_logger
+from channels.signals import worker_process_ready
 from channels.staticfiles import StaticFilesConsumer
 from channels.worker import Worker, WorkerGroup
-from channels.signals import worker_process_ready
 
 
 class Command(BaseCommand):

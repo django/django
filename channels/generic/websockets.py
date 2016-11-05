@@ -1,7 +1,7 @@
-from django.core.serializers.json import json, DjangoJSONEncoder
+from django.core.serializers.json import DjangoJSONEncoder, json
 
-from ..channel import Group, Channel
 from ..auth import channel_session_user_from_http
+from ..channel import Channel, Group
 from ..sessions import enforce_ordering
 from .base import BaseConsumer
 

@@ -3,9 +3,9 @@ import json
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 
-from .base import Binding
 from ..generic.websockets import WebsocketDemultiplexer
 from ..sessions import enforce_ordering
+from .base import Binding
 
 
 class WebsocketBinding(Binding):

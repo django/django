@@ -1,13 +1,15 @@
 from __future__ import unicode_literals
+
 import json
 
 from django.contrib.auth import get_user_model
-from channels.binding.base import CREATE, UPDATE, DELETE
+
+from channels import Group, route
+from channels.binding.base import CREATE, DELETE, UPDATE
 from channels.binding.websockets import WebsocketBinding
 from channels.generic.websockets import WebsocketDemultiplexer
-from channels.tests import ChannelTestCase, apply_routes, HttpClient
 from channels.signals import consumer_finished
-from channels import route, Group
+from channels.tests import ChannelTestCase, HttpClient, apply_routes
 
 User = get_user_model()
 

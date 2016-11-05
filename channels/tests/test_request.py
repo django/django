@@ -1,10 +1,11 @@
 from __future__ import unicode_literals
+
 from django.utils import six
 
 from channels import Channel
-from channels.tests import ChannelTestCase
+from channels.exceptions import RequestAborted, RequestTimeout
 from channels.handler import AsgiRequest
-from channels.exceptions import RequestTimeout, RequestAborted
+from channels.tests import ChannelTestCase
 
 
 class RequestTests(ChannelTestCase):

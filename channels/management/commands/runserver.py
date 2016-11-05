@@ -4,8 +4,7 @@ import threading
 
 from daphne.server import Server
 from django.conf import settings
-from django.core.management.commands.runserver import \
-    Command as RunserverCommand
+from django.core.management.commands.runserver import Command as RunserverCommand
 from django.utils import six
 from django.utils.encoding import get_system_encoding
 
