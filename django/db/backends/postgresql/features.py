@@ -13,6 +13,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_native_uuid_field = True
     has_native_duration_field = True
     has_native_json_field = True
+    has_native_serial_field = True
     can_defer_constraint_checks = True
     has_select_for_update = True
     has_select_for_update_nowait = True

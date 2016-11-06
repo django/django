@@ -202,6 +202,13 @@ Minor features
   :class:`~django.contrib.postgres.fields.ArrayField` and
   :class:`~django.contrib.postgres.fields.RangeField`.
 
+* :class:`~django.contrib.postgres.fields.SerialField`,
+  :class:`~django.contrib.postgres.fields.BigSerialField`, and
+  :class:`~django.contrib.postgres.fields.SmallSerialField` have been added
+  corresponding to their respective PostgreSQL database types. They behave much
+  like :class:`~django.db.models.AutoField`, except that they do not need to be
+  a primary key.
+
 * The new :lookup:`rangefield.lower_inc`, :lookup:`rangefield.lower_inf`,
   :lookup:`rangefield.upper_inc`, and :lookup:`rangefield.upper_inf` lookups
   allow querying :class:`~django.contrib.postgres.fields.RangeField` by a bound

@@ -937,3 +937,37 @@ used with a custom range functions that expected boundaries, for example to
 define :class:`~django.contrib.postgres.constraints.ExclusionConstraint`. See
 `the PostgreSQL documentation for the full details <https://www.postgresql.org/
 docs/current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_.
+
+``Serial`` fields
+=================
+
+.. versionadded:: 3.1
+
+.. class:: SerialField(unique=True, editable=False, **options)
+
+    A field similar to :class:`AutoField <django.db.models.AutoField>`
+    except it does not need to be a primary key. It uses a separate postgres
+    sequence to automatically increment the integer value. It stores a 4-byte
+    integer that fits numbers from ``1`` to ``2147483647``.
+
+    .. attribute:: unique
+
+        The field is unique, other attribute values will be overridden.
+
+    .. attribute:: editable
+
+        This is an optional argument.
+
+        The field is not editable by default, similar to
+        :class:`AutoField <django.db.models.AutoField>`, since its value is set
+        by the database. However, it can be changed back, to be editable.
+
+.. class:: BigSerialField(unique=True, editable=False, **options)
+
+    A 8-byte integer, much like an :class:`SerialField` except that it is
+    guaranteed to fit numbers from ``1`` to ``9223372036854775807``.
+
+.. class:: SmallSerialField(unique=True, editable=False, **options)
+
+    A 2-byte integer, much like an :class:`SerialField` except that it is
+    guaranteed to fit numbers from ``1`` to ``32767``.

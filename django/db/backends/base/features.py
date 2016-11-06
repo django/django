@@ -68,6 +68,9 @@ class BaseDatabaseFeatures:
     # Is there a true datatype for timedeltas?
     has_native_duration_field = False
 
+    # Is there a true datatype for serial?
+    has_native_serial_field = False
+
     # Does the database driver supports same type temporal data subtraction
     # by returning the type used to store duration field?
     supports_temporal_subtraction = False

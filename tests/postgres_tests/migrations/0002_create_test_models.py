@@ -1,9 +1,10 @@
 from django.db import migrations, models
 
 from ..fields import (
-    ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,
-    DateRangeField, DateTimeRangeField, DecimalRangeField, EnumField,
-    HStoreField, IntegerRangeField, SearchVectorField,
+    ArrayField, BigIntegerRangeField, BigSerialField, CICharField,
+    CIEmailField, CITextField, DateRangeField, DateTimeRangeField,
+    DecimalRangeField, EnumField, HStoreField, IntegerRangeField,
+    SearchVectorField, SerialField, SmallSerialField,
 )
 from ..models import TagField
 
@@ -281,6 +282,19 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('array_of_enums', ArrayField(EnumField(max_length=20), null=True, blank=True)),
+            ],
+            options={
+                'required_db_vendor': 'postgresql',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='SerialModel',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('small', SmallSerialField()),
+                ('regular', SerialField()),
+                ('big', BigSerialField()),
             ],
             options={
                 'required_db_vendor': 'postgresql',
