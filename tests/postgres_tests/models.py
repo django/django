@@ -2,9 +2,10 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 from .fields import (
-    ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,
-    DateRangeField, DateTimeRangeField, DecimalRangeField, EnumField,
-    HStoreField, IntegerRangeField, JSONField, SearchVectorField,
+    ArrayField, BigIntegerRangeField, BigSerialField, CICharField,
+    CIEmailField, CITextField, DateRangeField, DateTimeRangeField,
+    DecimalRangeField, EnumField, HStoreField, IntegerRangeField, JSONField,
+    SearchVectorField, SerialField, SmallSerialField,
 )
 
 
@@ -196,3 +197,9 @@ class HotelReservation(PostgreSQLModel):
     start = models.DateTimeField()
     end = models.DateTimeField()
     cancelled = models.BooleanField(default=False)
+
+
+class SerialModel(PostgreSQLModel):
+    small = SmallSerialField()
+    regular = SerialField()
+    big = BigSerialField()

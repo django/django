@@ -11,8 +11,9 @@ from django.db.models.deletion import (
 from django.db.models.enums import *  # NOQA
 from django.db.models.enums import __all__ as enums_all
 from django.db.models.expressions import (
-    Case, Exists, Expression, ExpressionList, ExpressionWrapper, F, Func,
-    OuterRef, RowRange, Subquery, Value, ValueRange, When, Window, WindowFrame,
+    Case, Default, Exists, Expression, ExpressionList, ExpressionWrapper, F,
+    Func, OuterRef, RowRange, Subquery, Value, ValueRange, When, Window,
+    WindowFrame,
 )
 from django.db.models.fields import *  # NOQA
 from django.db.models.fields import __all__ as fields_all
@@ -40,7 +41,7 @@ __all__ += [
     'ObjectDoesNotExist', 'signals',
     'CASCADE', 'DO_NOTHING', 'PROTECT', 'RESTRICT', 'SET', 'SET_DEFAULT',
     'SET_NULL', 'ProtectedError', 'RestrictedError',
-    'Case', 'Exists', 'Expression', 'ExpressionList', 'ExpressionWrapper', 'F',
+    'Case', 'Default', 'Exists', 'Expression', 'ExpressionList', 'ExpressionWrapper', 'F',
     'Func', 'OuterRef', 'RowRange', 'Subquery', 'Value', 'ValueRange', 'When',
     'Window', 'WindowFrame',
     'FileField', 'ImageField', 'OrderWrt', 'Lookup', 'Transform', 'Manager',
