@@ -55,7 +55,8 @@ class GeometryFieldTest(SimpleTestCase):
         pnt_fld = forms.GeometryField(geom_type='POINT')
         self.assertEqual(GEOSGeometry('POINT(5 23)', srid=pnt_fld.widget.map_srid), pnt_fld.clean('POINT(5 23)'))
         # a WKT for any other geom_type will be properly transformed by `to_python`
-        self.assertEqual(GEOSGeometry('LINESTRING(0 0, 1 1)', srid=pnt_fld.widget.map_srid), pnt_fld.to_python('LINESTRING(0 0, 1 1)'))
+        self.assertEqual(GEOSGeometry('LINESTRING(0 0, 1 1)', srid=pnt_fld.widget.map_srid),
+                         pnt_fld.to_python('LINESTRING(0 0, 1 1)'))
         # but rejected by `clean`
         with self.assertRaises(forms.ValidationError):
             pnt_fld.clean('LINESTRING(0 0, 1 1)')
