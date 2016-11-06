@@ -389,13 +389,12 @@ class UUIDGrandchild(UUIDChild):
     pass
 
 ###############################################################################
-# This model is used for Readonly test cases
 
 
 class ModelWithReadonlyField(models.Model):
     """
-    This model is quite linked with the ReadonlyTestsMixin and its
-    SQL will be modified by ReadonlyTestsMixin subclasses.
+    This model is quite linked with ReadonlyTests and its
+    SQL will be modified by ReadonlyTests.
     Make sure it's not used in any other test otherwise there will be
     isolation problems.
     """

@@ -66,17 +66,28 @@ class BasicFieldTests(TestCase):
         self.assertEqual(force_str(f), 'model_fields.Foo.a')
 
 
-class ReadonlyTestsMixin(object):
-
-    @classmethod
-    def populate_database_fields(cls):
-        raise NotImplementedError
+class ReadonlyTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(ReadonlyTestsMixin, cls).setUpClass()
+        super(ReadonlyTests, cls).setUpClass()
 
-        cls.populate_database_fields()
+        if connection.vendor == 'sqlite':
+            connection.cursor().execute(
+                '''DROP TABLE model_fields_modelwithreadonlyfield''')
+            connection.cursor().execute(
+                '''CREATE TABLE model_fields_modelwithreadonlyfield
+                (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    not_readonly TEXT,
+                    readonly_int1 INTEGER DEFAULT 1,
+                    readonly_int2 INTEGER DEFAULT 2
+                )''')
+        else:
+            connection.cursor().execute(
+                '''ALTER TABLE model_fields_modelwithreadonlyfield ALTER COLUMN readonly_int1 SET DEFAULT 1''')
+            connection.cursor().execute(
+                '''ALTER TABLE model_fields_modelwithreadonlyfield ALTER COLUMN readonly_int2 SET DEFAULT 2''')
 
     def test_readonly_option(self):
         # Default value
@@ -237,34 +248,6 @@ class ReadonlyTestsMixin(object):
         self.assertIn('not_readonly', query_2)
         self.assertNotIn('readonly_int1', query_2)
         self.assertNotIn('readonly_int2', query_2)
-
-
-@unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL-specific tests")
-class PostgreSQLReadonlyTests(ReadonlyTestsMixin, TestCase):
-
-    @classmethod
-    def populate_database_fields(cls):
-        connection.cursor().execute(
-            '''ALTER TABLE "model_fields_modelwithreadonlyfield" '''
-            '''ALTER COLUMN "readonly_int1" SET DEFAULT 1 ''')
-        connection.cursor().execute(
-            '''ALTER TABLE "model_fields_modelwithreadonlyfield" '''
-            '''ALTER COLUMN "readonly_int2" SET DEFAULT 2;''')
-
-
-@unittest.skipUnless(connection.vendor == 'sqlite', "Sqlite-specific tests")
-class SQLiteReadonlyTests(ReadonlyTestsMixin, TestCase):
-
-    @classmethod
-    def populate_database_fields(cls):
-        connection.cursor().execute(
-            '''DROP TABLE "model_fields_modelwithreadonlyfield"''')
-        connection.cursor().execute(
-            '''CREATE TABLE "model_fields_modelwithreadonlyfield" '''
-            '''(id INTEGER PRIMARY KEY AUTOINCREMENT, '''
-            ''' not_readonly TEXT, '''
-            ''' readonly_int1 INTEGER DEFAULT 1, '''
-            ''' readonly_int2 INTEGER DEFAULT 2);''')
 
 
 class ChoicesTests(SimpleTestCase):

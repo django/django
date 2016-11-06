@@ -77,7 +77,7 @@ class Options(object):
     FORWARD_PROPERTIES = {
         'fields', 'many_to_many', 'concrete_fields', 'local_concrete_fields',
         '_forward_fields_map', 'managers', 'managers_map', 'base_manager',
-        'default_manager',
+        'default_manager', 'readonly_fields',
     }
     REVERSE_PROPERTIES = {'related_objects', 'fields_map', '_relation_tree'}
 
@@ -115,7 +115,6 @@ class Options(object):
         self.pk = None
         self.has_auto_field = False
         self.auto_field = None
-        self.has_readonly_fields = False
         self.abstract = False
         self.managed = True
         self.proxy = False
@@ -597,6 +596,13 @@ class Options(object):
             except AttributeError:
                 pass
         return res
+
+    @cached_property
+    def readonly_fields(self):
+        return make_immutable_fields_list(
+            "readonly_fields",
+            (field for field in self.fields if field.readonly)
+        )
 
     def get_field(self, field_name):
         """

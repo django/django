@@ -835,11 +835,9 @@ class Model(six.with_metaclass(ModelBase)):
         self._state.adding = False
 
         # Readonly fields are computed by the Database. If there are any,
-        # we should fetch their value.
-        if self._meta.has_readonly_fields:
-            self.refresh_from_db(fields=[
-                field.name for field in self._meta.get_fields()
-                if getattr(field, 'readonly', False)])
+        # we should fetch their value. (refresh_from_db does nothing if the
+        # field list is empty)
+        self.refresh_from_db(fields=self._meta.readonly_fields)
 
         # Signal that the save is complete
         if not meta.auto_created:
