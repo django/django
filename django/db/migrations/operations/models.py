@@ -306,6 +306,7 @@ class RenameModel(ModelOperation):
         # Repoint all fields pointing to the old model to the new one.
         old_model_tuple = app_label, self.old_name_lower
         new_remote_model = '%s.%s' % (app_label, self.new_name)
+        to_reload = []
         for (model_app_label, model_name), model_state in state.models.items():
             model_changed = False
             for index, (name, field) in enumerate(model_state.fields):
@@ -331,7 +332,9 @@ class RenameModel(ModelOperation):
                     model_state.fields[index] = name, changed_field
                     model_changed = True
             if model_changed:
-                state.reload_model(model_app_label, model_name, delay=True)
+                to_reload.append((model_app_label, model_name))
+        # Reload models related to old model before removing the old model.
+        state.reload_models(to_reload, delay=True)
         # Remove the old model.
         state.remove_model(app_label, self.old_name_lower)
         state.reload_model(app_label, self.new_name_lower, delay=True)
