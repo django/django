@@ -51,7 +51,6 @@ Topics
    binding
    backends
    testing
-   cross-compat
    reference
    faqs
    asgi

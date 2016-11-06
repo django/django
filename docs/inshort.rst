@@ -94,9 +94,16 @@ affect the overall deployed site.
 What version of Django does it work with?
 -----------------------------------------
 
-You can install Channels as a library for Django 1.8 and 1.9, and it (should be)
-part of Django 1.10. It has a few extra dependencies, but these will all
-be installed if you use ``pip``.
+You can install Channels as a library for Django >= 1.8. It has a few
+extra dependencies, but these will all be installed if you use ``pip``.
+
+Official project
+----------------
+
+Channels is not in the Django core as it was initially planned, but it's
+an official Django project since september 2016. More informations about Channels
+as an official project are available on the
+`Django blog <https://www.djangoproject.com/weblog/2016/sep/09/channels-adopted-official-django-project/>`_.
 
 
 What do I read next?
