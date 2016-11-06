@@ -790,7 +790,7 @@ class RendererMixin(object):
     def id_for_label(self, id_):
         # Widgets using this RendererMixin are made of a collection of
         # subwidgets, each with their own <label>, and distinct ID.
-        # The IDs are made distinct by y "_X" suffix, where X is the zero-based
+        # The IDs are made distinct by a "_X" suffix, where X is the zero-based
         # index of the choice field. Thus, the label for the main widget should
         # reference the first subwidget, hence the "_0" suffix.
         if id_:
