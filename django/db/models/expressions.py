@@ -803,6 +803,22 @@ class RawSQL(Expression):
         return super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
 
 
+class Default(BaseExpression):
+    """Expression for ``DEFAULT`` clause in ``INSERT`` or ``UPDATE`` query."""
+
+    def __repr__(self):
+        return 'DEFAULT'
+
+    def as_sql(self, compiler, connection):
+        return 'DEFAULT', []
+
+    def as_sqlite(self, compiler, connection):
+        return 'NULL', []
+
+    def as_oracle(self, compiler, connection):
+        return 'NULL', []
+
+
 class Star(Expression):
     def __repr__(self):
         return "'*'"

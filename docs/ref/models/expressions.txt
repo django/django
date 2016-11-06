@@ -708,6 +708,21 @@ should avoid them if possible.
     You can read more about how Django's :ref:`SQL injection protection
     <sql-injection-protection>` works.
 
+Default expression
+------------------
+
+.. currentmodule:: django.db.models.expressions
+
+.. class:: Default()
+
+The default expression is used on ``INSERT`` or ``UPDATE`` statements and lets
+the database decide what value to insert or set. The default clause usually
+requires a default constraint for a column to be defined in the database
+schema.
+
+The default expression is usually used to set the primary key, if the primary
+key is an :class:`~django.db.models.AutoField`.
+
 Window functions
 ----------------
 

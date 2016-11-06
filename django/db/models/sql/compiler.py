@@ -6,7 +6,9 @@ from itertools import chain
 from django.core.exceptions import EmptyResultSet, FieldError
 from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import F, OrderBy, RawSQL, Ref, Value
+from django.db.models.expressions import (
+    Default, F, OrderBy, RawSQL, Ref, Value,
+)
 from django.db.models.functions import Cast, Random
 from django.db.models.query_utils import Q, select_related_descend
 from django.db.models.sql.constants import (
@@ -1346,8 +1348,7 @@ class SQLInsertCompiler(SQLCompiler):
             ]
         else:
             # An empty object.
-            value_rows = [[self.connection.ops.pk_default_value()] for _ in self.query.objs]
-            fields = [None]
+            value_rows = [[Default()] for _ in self.query.objs]
 
         # Currently the backends just accept values when generating bulk
         # queries and generate their own placeholders. Doing that isn't

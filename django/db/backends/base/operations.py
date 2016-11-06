@@ -287,13 +287,6 @@ class BaseDatabaseOperations:
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a no_limit_value() method')
 
-    def pk_default_value(self):
-        """
-        Return the value to use during an INSERT statement to specify that
-        the field should use its default value.
-        """
-        return 'DEFAULT'
-
     def prepare_sql_script(self, sql):
         """
         Take an SQL script that may contain multiple lines and return a list

@@ -45,9 +45,6 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
         with self.assertRaisesMessage(NotImplementedError, msg):
             self.ops.sql_flush(None, None)
 
-    def test_pk_default_value(self):
-        self.assertEqual(self.ops.pk_default_value(), 'DEFAULT')
-
     def test_tablespace_sql(self):
         self.assertEqual(self.ops.tablespace_sql(None), '')
 
