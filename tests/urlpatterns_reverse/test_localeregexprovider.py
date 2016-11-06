@@ -5,6 +5,7 @@ import os
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, mock, override_settings
 from django.urls import LocaleRegexProvider
+from django.urls.resolvers import LocaleRegexDescriptor
 from django.utils import translation
 from django.utils._os import upath
 
@@ -33,9 +34,24 @@ class LocaleRegexProviderTests(SimpleTestCase):
         self.assertEqual(de_compiled.pattern, '^foo-de/$')
         self.assertEqual(de_compiled, de_compiled_2)
 
+    def test_nontranslated_regex_compiled_once(self):
+        provider = LocaleRegexProvider('^foo/$')
+        with translation.override('de'):
+            de_compiled = provider.regex
+        with translation.override('fr'):
+            # compiled only once, regardless of language
+            error = AssertionError('tried to compile non-translated url regex twice')
+            with mock.patch('django.urls.resolvers.re.compile', side_effect=error):
+                fr_compiled = provider.regex
+        self.assertEqual(de_compiled.pattern, '^foo/$')
+        self.assertEqual(fr_compiled.pattern, '^foo/$')
+
     def test_regex_compile_error(self):
         """Regex errors are re-raised as ImproperlyConfigured."""
         provider = LocaleRegexProvider('*')
         msg = '"*" is not a valid regular expression: nothing to repeat'
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             provider.regex
+
+    def test_access_locale_regex_descriptor(self):
+        self.assertIsInstance(LocaleRegexProvider.regex, LocaleRegexDescriptor)

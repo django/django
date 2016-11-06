@@ -79,6 +79,37 @@ def get_ns_resolver(ns_pattern, resolver):
     return RegexURLResolver(r'^/', [ns_resolver])
 
 
+class LocaleRegexDescriptor(object):
+    def __get__(self, instance, cls=None):
+        """
+        Return a compiled regular expression based on the active language.
+        """
+        if instance is None:
+            return self
+        # As a performance optimization, if the given regex string is a regular
+        # string (not a lazily-translated string proxy), compile it once and
+        # avoid per-language compilation.
+        if isinstance(instance._regex, six.string_types):
+            instance.__dict__['regex'] = self._compile(instance._regex)
+            return instance.__dict__['regex']
+        language_code = get_language()
+        if language_code not in instance._regex_dict:
+            instance._regex_dict[language_code] = self._compile(force_text(instance._regex))
+        return instance._regex_dict[language_code]
+
+    def _compile(self, regex):
+        """
+        Compile and return the given regular expression.
+        """
+        try:
+            return re.compile(regex, re.UNICODE)
+        except re.error as e:
+            raise ImproperlyConfigured(
+                '"%s" is not a valid regular expression: %s' %
+                (regex, six.text_type(e))
+            )
+
+
 class LocaleRegexProvider(object):
     """
     A mixin to provide a default regex property which can vary by active
@@ -91,23 +122,7 @@ class LocaleRegexProvider(object):
         self._regex = regex
         self._regex_dict = {}
 
-    @property
-    def regex(self):
-        """
-        Return a compiled regular expression based on the activate language.
-        """
-        language_code = get_language()
-        if language_code not in self._regex_dict:
-            regex = self._regex if isinstance(self._regex, six.string_types) else force_text(self._regex)
-            try:
-                compiled_regex = re.compile(regex, re.UNICODE)
-            except re.error as e:
-                raise ImproperlyConfigured(
-                    '"%s" is not a valid regular expression: %s' %
-                    (regex, six.text_type(e))
-                )
-            self._regex_dict[language_code] = compiled_regex
-        return self._regex_dict[language_code]
+    regex = LocaleRegexDescriptor()
 
     def describe(self):
         """
