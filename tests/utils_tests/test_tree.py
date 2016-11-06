@@ -55,3 +55,19 @@ class NodeTests(unittest.TestCase):
         node5 = copy.deepcopy(self.node1)
         self.assertIs(self.node1.children, node4.children)
         self.assertIsNot(self.node1.children, node5.children)
+
+    def test_eq_children(self):
+        node = Node(self.node1_children)
+        self.assertEqual(node, self.node1)
+        self.assertNotEqual(node, self.node2)
+
+    def test_eq_connector(self):
+        new_node = Node(connector='NEW')
+        default_node = Node(connector='DEFAULT')
+        self.assertEqual(default_node, self.node2)
+        self.assertNotEqual(default_node, new_node)
+
+    def test_eq_negated(self):
+        node = Node(negated=False)
+        negated = Node(negated=True)
+        self.assertNotEqual(negated, node)

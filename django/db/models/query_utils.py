@@ -56,7 +56,9 @@ class Q(tree.Node):
     default = AND
 
     def __init__(self, *args, **kwargs):
-        super().__init__(children=list(args) + list(kwargs.items()))
+        connector = kwargs.pop('_connector', None)
+        negated = kwargs.pop('_negated', False)
+        super().__init__(children=list(args) + list(kwargs.items()), connector=connector, negated=negated)
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):
@@ -85,6 +87,19 @@ class Q(tree.Node):
         clause, joins = query._add_q(self, reuse, allow_joins=allow_joins, split_subq=False)
         query.promote_joins(joins)
         return clause
+
+    def deconstruct(self):
+        path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
+        args, kwargs = (), {}
+        if len(self.children) == 1 and not isinstance(self.children[0], Q):
+            child = self.children[0]
+            kwargs = {child[0]: child[1]}
+        else:
+            args = tuple(self.children)
+            kwargs = {'_connector': self.connector}
+        if self.negated:
+            kwargs['_negated'] = True
+        return path, args, kwargs
 
 
 class DeferredAttribute:
