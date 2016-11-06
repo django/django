@@ -77,6 +77,11 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* The new :class:`~django.contrib.postgres.fields.SerialField` and
+  :class:`~django.contrib.postgres.fields.BigSerialField`. Much like the
+  :class:`~django.db.models.AutoField`, except that they do not need to
+  be a primary key.
+
 * The new ``ordering`` argument for
   :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
   :class:`~django.contrib.postgres.aggregates.StringAgg` determines the

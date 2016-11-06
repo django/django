@@ -19,6 +19,43 @@ may be a good choice for the :ref:`range fields <range-fields>` and
 :class:`HStoreField`, and GIN may be helpful for :class:`ArrayField` and
 :class:`JSONField`.
 
+``SerialField``
+===============
+
+.. versionadded:: 2.2
+
+.. class:: SerialField(unique=True)
+
+    A field similar to the :class:`AutoField <django.db.models.AutoField>` except it does not need to be
+    a primary key. It uses a separate postgres sequence to automatically
+    increment the integer value. It stores a 4-byte integer that fits numbers from ``1`` to ``2147483647``.
+
+    .. attribute:: base_field
+
+        This is an optional argument.
+
+        The field is unique by default, however a serial does not need to be unique.
+
+``BigSerialField``
+==================
+
+.. versionadded:: 2.2
+
+.. class:: BigSerialField(unique=True)
+
+    A 8-byte integer, much like an :class:`SerialField` except that it is
+    guaranteed to fit numbers from ``1`` to ``9223372036854775807``.
+
+``SmallSerialField``
+====================
+
+.. versionadded:: 2.2
+
+.. class:: SmallSerialField(unique=True)
+
+    A 2-byte integer, much like an :class:`SerialField` except that it is
+    guaranteed to fit numbers from ``1`` to ``32767``.
+
 ``ArrayField``
 ==============
 

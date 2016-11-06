@@ -1,3 +1,6 @@
+from django.contrib.postgres.fields.serial import (
+    BigSerialField, SerialField, SmallSerialField,
+)
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import migrations, models
 
@@ -243,6 +246,19 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('field', JSONField(null=True, blank=True)),
                 ('field_custom', JSONField(null=True, blank=True, encoder=DjangoJSONEncoder)),
+            ],
+            options={
+                'required_db_vendor': 'postgresql',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='SerialModel',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('small', SmallSerialField(unique=True, editable=False)),
+                ('regular', SerialField(unique=True, editable=False)),
+                ('big', BigSerialField(unique=False, editable=False)),
             ],
             options={
                 'required_db_vendor': 'postgresql',

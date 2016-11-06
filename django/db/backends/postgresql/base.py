@@ -91,6 +91,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'TextField': 'text',
         'TimeField': 'time',
         'UUIDField': 'uuid',
+        'SerialField': 'serial',
+        'SmallSerialField': 'smallserial',
+        'BigSerialField': 'bigserial',
     }
     data_type_check_constraints = {
         'PositiveIntegerField': '"%(column)s" >= 0',

@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields.serial import SerialField, SmallSerialField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
@@ -177,3 +178,9 @@ class NowTestModel(models.Model):
 
 class UUIDTestModel(models.Model):
     uuid = models.UUIDField(default=None, null=True)
+
+
+class SerialModel(models.Model):
+    small = SmallSerialField()
+    regular = SerialField()
+    big = SerialField(unique=False)
