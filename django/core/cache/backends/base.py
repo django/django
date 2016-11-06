@@ -206,9 +206,13 @@ class BaseCache:
 
         If timeout is given, use that timeout for the key; otherwise use the
         default cache timeout.
+
+        On backends that support it, return a list of keys that failed
+        insertion, or an empty list if all keys were inserted successfully.
         """
         for key, value in data.items():
             self.set(key, value, timeout=timeout, version=version)
+        return []
 
     def delete_many(self, keys, version=None):
         """

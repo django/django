@@ -470,6 +470,11 @@ class BaseCacheTests:
         self.assertEqual(cache.get("key1"), "spam")
         self.assertEqual(cache.get("key2"), "eggs")
 
+    def test_set_many_returns_empty_list_on_success(self):
+        """set_many() returns an empty list when all keys are inserted."""
+        failing_keys = cache.set_many({'key1': 'spam', 'key2': 'eggs'})
+        self.assertEqual(failing_keys, [])
+
     def test_set_many_expiration(self):
         # set_many takes a second ``timeout`` parameter
         cache.set_many({"key1": "spam", "key2": "eggs"}, 1)
@@ -1239,6 +1244,13 @@ class BaseMemcachedTests(BaseCacheTests):
         finally:
             signals.request_finished.connect(close_old_connections)
 
+    def test_set_many_returns_failing_keys(self):
+        def fail_set_multi(mapping, *args, **kwargs):
+            return mapping.keys()
+        with mock.patch('%s.Client.set_multi' % self.client_library_name, side_effect=fail_set_multi):
+            failing_keys = cache.set_many({'key': 'value'})
+            self.assertEqual(failing_keys, ['key'])
+
 
 @unittest.skipUnless(MemcachedCache_params, "MemcachedCache backend not configured")
 @override_settings(CACHES=caches_setting_for_tests(
@@ -1247,6 +1259,7 @@ class BaseMemcachedTests(BaseCacheTests):
 ))
 class MemcachedCacheTests(BaseMemcachedTests, TestCase):
     base_params = MemcachedCache_params
+    client_library_name = 'memcache'
 
     def test_memcached_uses_highest_pickle_version(self):
         # Regression test for #19810
@@ -1270,6 +1283,7 @@ class MemcachedCacheTests(BaseMemcachedTests, TestCase):
 ))
 class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
     base_params = PyLibMCCache_params
+    client_library_name = 'pylibmc'
     # libmemcached manages its own connections.
     should_disconnect_on_close = False
 

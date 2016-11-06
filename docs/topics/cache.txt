@@ -881,6 +881,13 @@ of key-value pairs::
 
 Like ``cache.set()``, ``set_many()`` takes an optional ``timeout`` parameter.
 
+On supported backends (memcached), ``set_many()`` returns a list of keys that
+failed to be inserted.
+
+.. versionchanged:: 2.0
+
+    The return value containing list of failing keys was added.
+
 You can delete keys explicitly with ``delete()``. This is an easy way of
 clearing the cache for a particular object::
 

@@ -134,11 +134,14 @@ class BaseMemcachedCache(BaseCache):
         return val
 
     def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
-        safe_data = {
-            self.make_key(key, version=version): value
-            for key, value in data.items()
-        }
-        self._cache.set_multi(safe_data, self.get_backend_timeout(timeout))
+        safe_data = {}
+        original_keys = {}
+        for key, value in data.items():
+            safe_key = self.make_key(key, version=version)
+            safe_data[safe_key] = value
+            original_keys[safe_key] = key
+        failed_keys = self._cache.set_multi(safe_data, self.get_backend_timeout(timeout))
+        return [original_keys[k] for k in failed_keys]
 
     def delete_many(self, keys, version=None):
         self._cache.delete_multi(self.make_key(key, version=version) for key in keys)
