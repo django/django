@@ -325,6 +325,9 @@ Management Commands
 * The new :option:`diffsettings --default` option allows specifying a settings
   module other than Django's default settings to compare against.
 
+* ``app_label``\s arguments now limit the :option:`showmigrations --plan`
+  output.
+
 Migrations
 ~~~~~~~~~~
 

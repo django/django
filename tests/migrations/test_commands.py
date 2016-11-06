@@ -339,6 +339,97 @@ class MigrateTests(MigrationTestBase):
             out.getvalue().lower()
         )
 
+    @override_settings(INSTALLED_APPS=[
+        'migrations.migrations_test_apps.mutate_state_b',
+        'migrations.migrations_test_apps.alter_fk.author_app',
+        'migrations.migrations_test_apps.alter_fk.book_app',
+    ])
+    def test_showmigrations_plan_single_app_label(self):
+        """
+        `showmigrations --plan app_label` output with a single app_label.
+        """
+        # Single app with no dependencies on other apps.
+        out = six.StringIO()
+        call_command('showmigrations', 'mutate_state_b', format='plan', stdout=out)
+        self.assertEqual(
+            '[ ]  mutate_state_b.0001_initial\n'
+            '[ ]  mutate_state_b.0002_add_field\n',
+            out.getvalue()
+        )
+        # Single app with dependencies.
+        out = six.StringIO()
+        call_command('showmigrations', 'author_app', format='plan', stdout=out)
+        self.assertEqual(
+            '[ ]  author_app.0001_initial\n'
+            '[ ]  book_app.0001_initial\n'
+            '[ ]  author_app.0002_alter_id\n',
+            out.getvalue()
+        )
+        # Some migrations already applied.
+        call_command('migrate', 'author_app', '0001', verbosity=0)
+        out = six.StringIO()
+        call_command('showmigrations', 'author_app', format='plan', stdout=out)
+        self.assertEqual(
+            '[X]  author_app.0001_initial\n'
+            '[ ]  book_app.0001_initial\n'
+            '[ ]  author_app.0002_alter_id\n',
+            out.getvalue()
+        )
+        # Cleanup by unmigrating author_app.
+        call_command('migrate', 'author_app', 'zero', verbosity=0)
+
+    @override_settings(INSTALLED_APPS=[
+        'migrations.migrations_test_apps.mutate_state_b',
+        'migrations.migrations_test_apps.alter_fk.author_app',
+        'migrations.migrations_test_apps.alter_fk.book_app',
+    ])
+    def test_showmigrations_plan_multiple_app_labels(self):
+        """
+        `showmigrations --plan app_label` output with multiple app_labels.
+        """
+        # Multiple apps: author_app depends on book_app; mutate_state_b doesn't
+        # depend on other apps.
+        out = six.StringIO()
+        call_command('showmigrations', 'mutate_state_b', 'author_app', format='plan', stdout=out)
+        self.assertEqual(
+            '[ ]  author_app.0001_initial\n'
+            '[ ]  book_app.0001_initial\n'
+            '[ ]  author_app.0002_alter_id\n'
+            '[ ]  mutate_state_b.0001_initial\n'
+            '[ ]  mutate_state_b.0002_add_field\n',
+            out.getvalue()
+        )
+        # Multiple apps: args order shouldn't matter (the same result is
+        # expected as above).
+        out = six.StringIO()
+        call_command('showmigrations', 'author_app', 'mutate_state_b', format='plan', stdout=out)
+        self.assertEqual(
+            '[ ]  author_app.0001_initial\n'
+            '[ ]  book_app.0001_initial\n'
+            '[ ]  author_app.0002_alter_id\n'
+            '[ ]  mutate_state_b.0001_initial\n'
+            '[ ]  mutate_state_b.0002_add_field\n',
+            out.getvalue()
+        )
+
+    @override_settings(INSTALLED_APPS=['migrations.migrations_test_apps.unmigrated_app'])
+    def test_showmigrations_plan_app_label_error(self):
+        """
+        `showmigrations --plan app_label` raises an error when no app or
+        no migrations are present in provided app labels.
+        """
+        # App with no migrations.
+        with self.assertRaisesMessage(CommandError, 'No migrations present for: unmigrated_app'):
+            call_command('showmigrations', 'unmigrated_app', format='plan')
+        # Nonexistent app (wrong app label).
+        with self.assertRaisesMessage(CommandError, 'No migrations present for: nonexistent_app'):
+            call_command('showmigrations', 'nonexistent_app', format='plan')
+        # Multiple nonexistent apps; input order shouldn't matter.
+        with self.assertRaisesMessage(CommandError, 'No migrations present for: nonexistent_app1, nonexistent_app2'):
+            call_command('showmigrations', 'nonexistent_app1', 'nonexistent_app2', format='plan')
+        with self.assertRaisesMessage(CommandError, 'No migrations present for: nonexistent_app1, nonexistent_app2'):
+            call_command('showmigrations', 'nonexistent_app2', 'nonexistent_app1', format='plan')
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_sqlmigrate_forwards(self):
         """

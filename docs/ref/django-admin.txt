@@ -1015,10 +1015,16 @@ This is the default output format.
 
 .. django-admin-option:: --plan, -p
 
-Shows the migration plan Django will follow to apply migrations. Any supplied
-app labels are ignored because the plan might go beyond those apps. Like
+Shows the migration plan Django will follow to apply migrations. Like
 ``--list``, applied migrations are marked by an ``[X]``. For a ``--verbosity``
 of 2 and above, all dependencies of a migration will also be shown.
+
+``app_label``\s arguments limit the output, however, dependencies of provided
+apps may also be included.
+
+.. versionchanged:: 1.11
+
+    In older versions, ``showmigrations --plan`` ignores app labels.
 
 .. django-admin-option:: --database DATABASE
 
