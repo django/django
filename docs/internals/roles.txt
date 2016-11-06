@@ -67,3 +67,4 @@ Trac instance, and continuous integration infrastructure.
 - Tim Graham
 - Markus Holtermann
 - Jannis Leidel
+- Tobias McNulty
