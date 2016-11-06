@@ -52,6 +52,17 @@ def _get_related_models(m):
     return related_models
 
 
+def get_related_models_tuples(model):
+    """
+    Return a list of typical (app_label, model_name) tuples for all related
+    models for the given model.
+    """
+    return {
+        (rel_mod._meta.app_label, rel_mod._meta.model_name)
+        for rel_mod in _get_related_models(model)
+    }
+
+
 def get_related_models_recursive(model):
     """
     Return all models that have a direct or indirect relationship
@@ -85,6 +96,7 @@ class ProjectState(object):
         self.models = models or {}
         # Apps to include from main registry, usually unmigrated ones
         self.real_apps = real_apps or []
+        self.is_delayed = False
 
     def add_model(self, model_state):
         app_label, model_name = model_state.app_label, model_state.name_lower
@@ -100,7 +112,10 @@ class ProjectState(object):
             # the cache automatically (#24513)
             self.apps.clear_cache()
 
-    def reload_model(self, app_label, model_name):
+    def reload_model(self, app_label, model_name, delay=False):
+        if delay:
+            self.is_delayed = True
+
         if 'apps' in self.__dict__:  # hasattr would cache the property
             try:
                 old_model = self.apps.get_model(app_label, model_name)
@@ -109,7 +124,10 @@ class ProjectState(object):
             else:
                 # Get all relations to and from the old model before reloading,
                 # as _meta.apps may change
-                related_models = get_related_models_recursive(old_model)
+                if delay:
+                    related_models = get_related_models_tuples(old_model)
+                else:
+                    related_models = get_related_models_recursive(old_model)
 
             # Get all outgoing references from the model to be rendered
             model_state = self.models[(app_label, model_name)]
@@ -131,7 +149,10 @@ class ProjectState(object):
                 except LookupError:
                     pass
                 else:
-                    related_models.update(get_related_models_recursive(rel_model))
+                    if delay:
+                        related_models.update(get_related_models_tuples(rel_model))
+                    else:
+                        related_models.update(get_related_models_recursive(rel_model))
 
             # Include the model itself
             related_models.add((app_label, model_name))
@@ -169,7 +190,12 @@ class ProjectState(object):
         )
         if 'apps' in self.__dict__:
             new_state.apps = self.apps.clone()
+        new_state.is_delayed = self.is_delayed
         return new_state
+
+    def clear_delayed_apps_cache(self):
+        if self.is_delayed and 'apps' in self.__dict__:
+            del self.__dict__['apps']
 
     @cached_property
     def apps(self):
