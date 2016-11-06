@@ -74,7 +74,7 @@ class CommonMiddleware(MiddlewareMixin):
         Return True if settings.APPEND_SLASH is True and appending a slash to
         the request path turns an invalid path into a valid one.
         """
-        if settings.APPEND_SLASH and not request.get_full_path().endswith('/'):
+        if settings.APPEND_SLASH and not request.path_info.endswith('/'):
             urlconf = getattr(request, 'urlconf', None)
             return (
                 not is_valid_path(request.path_info, urlconf) and
