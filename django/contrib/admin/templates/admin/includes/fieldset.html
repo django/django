@@ -14,7 +14,7 @@
                     {% else %}
                         {{ field.label_tag }}
                         {% if field.is_readonly %}
-                            <div class="readonly-field">{{ field.contents }}</div>
+                            <div class="readonly">{{ field.contents }}</div>
                         {% else %}
                             {{ field.field }}
                         {% endif %}

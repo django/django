@@ -4616,11 +4616,11 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
 
         # Checks that multiline text in a readonly field gets <br /> tags
         self.assertContains(response, 'Multiline<br />test<br />string')
-        self.assertContains(response, '<div class="readonly-field">Multiline<br />html<br />content</div>',
+        self.assertContains(response, '<div class="readonly">Multiline<br />html<br />content</div>',
                             html=True)
         self.assertContains(response, 'InlineMultiline<br />test<br />string')
         # Remove only this last line when the deprecation completes.
-        self.assertContains(response, '<div class="readonly-field">Multiline<br />html<br />content<br />'
+        self.assertContains(response, '<div class="readonly">Multiline<br />html<br />content<br />'
                             'with allow tags</div>', html=True)
 
         self.assertContains(response, formats.localize(datetime.date.today() - datetime.timedelta(days=7)))
@@ -4704,8 +4704,8 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         """
         choice = Choice.objects.create(choice=None)
         response = self.client.get(reverse('admin:admin_views_choice_change', args=(choice.pk,)))
-        self.assertContains(response, '<div class=\"readonly-field\">No opinion</div>', html=True)
-        self.assertNotContains(response, '<div class=\"readonly-field\">(None)</div>')
+        self.assertContains(response, '<div class="readonly">No opinion</div>', html=True)
+        self.assertNotContains(response, '<div class="readonly">(None)</div>')
 
     def test_readonly_manytomany_backwards_ref(self):
         """
@@ -4724,7 +4724,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         pizza.toppings.add(topping)
         response = self.client.get(reverse('admin:admin_views_pizza_change', args=(pizza.pk,)))
         self.assertContains(response, '<label>Toppings:</label>', html=True)
-        self.assertContains(response, '<div class=\"readonly-field\">Salami</div>', html=True)
+        self.assertContains(response, '<div class="readonly">Salami</div>', html=True)
 
     def test_readonly_onetoone_backwards_ref(self):
         """
