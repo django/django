@@ -97,12 +97,13 @@ What version of Django does it work with?
 You can install Channels as a library for Django >= 1.8. It has a few
 extra dependencies, but these will all be installed if you use ``pip``.
 
+
 Official project
 ----------------
 
-Channels is not in the Django core as it was initially planned, but it's
-an official Django project since september 2016. More informations about Channels
-as an official project are available on the
+Channels is not in the Django core as initially planned, but it's
+an official Django project since September 2016. More information about Channels
+being adopted as an official project are available on the
 `Django blog <https://www.djangoproject.com/weblog/2016/sep/09/channels-adopted-official-django-project/>`_.
 
 
