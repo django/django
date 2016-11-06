@@ -187,6 +187,10 @@ class Field(object):
         """
         Return True if data differs from initial.
         """
+        # Always return False if the field is disabled since self.bound_data
+        # always uses the initial value in this case.
+        if self.disabled:
+            return False
         try:
             data = self.to_python(data)
             if hasattr(self, '_coerce'):

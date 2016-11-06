@@ -34,3 +34,9 @@ class BasicFieldsTests(SimpleTestCase):
         f.fields['field2'].choices = [('2', '2')]
         self.assertEqual(f.fields['field1'].widget.choices, [('1', '1')])
         self.assertEqual(f.fields['field2'].widget.choices, [('2', '2')])
+
+
+class DisabledFieldTests(SimpleTestCase):
+    def test_disabled_field_has_changed_always_false(self):
+        disabled_field = Field(disabled=True)
+        self.assertFalse(disabled_field.has_changed('x', 'y'))
