@@ -409,3 +409,13 @@ class ModelReferencingReadonly(models.Model):
     ModelWithReadonlyField
     """
     fk = models.ForeignKey(ModelWithReadonlyField, models.CASCADE)
+
+
+class ModelWithReadonlyPk(models.Model):
+    """
+    This model is quite linked with ReadonlyTests and its
+    SQL will be modified by ReadonlyTests.
+    Make sure it's not used in any other test otherwise there will be
+    isolation problems.
+    """
+    id = models.AutoField(primary_key=True, readonly=True)

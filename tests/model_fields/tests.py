@@ -1,16 +1,16 @@
 import json
-import unittest
 
 from django import forms
 from django.core import serializers
 from django.db import connection, models
+from django.db.utils import DatabaseError
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext
 from django.utils.encoding import force_str
 
 from .models import (
-    Foo, ModelWithReadonlyField, RenamedField, VerboseNameField, Whiz,
-    WhizIter, WhizIterEmpty,
+    Foo, ModelWithReadonlyField, ModelWithReadonlyPk, RenamedField,
+    VerboseNameField, Whiz, WhizIter, WhizIterEmpty,
 )
 
 
@@ -248,6 +248,25 @@ class ReadonlyTests(TestCase):
         self.assertIn('not_readonly', query_2)
         self.assertNotIn('readonly_int1', query_2)
         self.assertNotIn('readonly_int2', query_2)
+
+    def test_all_readonly_fields(self):
+        inst = ModelWithReadonlyField.objects.create(
+            not_readonly="not_readonly",
+            readonly_int1=5,
+        )
+
+        with self.assertRaises(DatabaseError) as error:
+            inst.save(update_fields=['readonly_int1', 'readonly_int2'])
+
+        self.assertEqual(str(error.exception), 'Save with update_fields did not affect any rows.')
+
+    def test_pk_readonly(self):
+        a = ModelWithReadonlyPk.objects.create()
+        pk = a.id
+        ModelWithReadonlyPk.objects.filter(id=pk).update(id=-1)
+
+        # This is the actual assertion : it will fail if readonly doens't work
+        ModelWithReadonlyPk.objects.get(id=pk)
 
 
 class ChoicesTests(SimpleTestCase):
