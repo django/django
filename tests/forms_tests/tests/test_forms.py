@@ -17,6 +17,7 @@ from django.forms import (
     SplitDateTimeField, SplitHiddenDateTimeWidget, Textarea, TextInput,
     TimeField, ValidationError, forms,
 )
+from django.forms.widgets import NullBooleanRadioSelect
 from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
@@ -2316,6 +2317,7 @@ Password: <input type="password" name="password" required />
         class Person(Form):
             name = CharField()
             is_cool = NullBooleanField()
+            is_friendly = NullBooleanField(widget=NullBooleanRadioSelect)
 
         p = Person({'name': 'Joe'}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
@@ -2353,6 +2355,11 @@ Password: <input type="password" name="password" required />
 <option value="2">Yes</option>
 <option value="3" selected>No</option>
 </select>""")
+        # since we reuse the functionality of NullBooleanSelect, only check for correct rendering
+        self.assertHTMLEqual(str(p['is_friendly']), """<ul>
+<li><label><input name="is_friendly" type="radio" value="1" required /> Unknown</label></li>
+<li><label><input name="is_friendly" type="radio" value="2" required /> Yes</label></li>
+<li><label><input name="is_friendly" type="radio" value="3" required /> No</label></li></ul>""")
 
     def test_forms_with_file_fields(self):
         # FileFields are a special case because they take their data from the request.FILES,

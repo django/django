@@ -808,6 +808,11 @@ class RadioSelect(RendererMixin, Select):
     _empty_value = ''
 
 
+class NullBooleanRadioSelect(RendererMixin, NullBooleanSelect):
+    renderer = RadioFieldRenderer
+    _empty_value = ''
+
+
 class CheckboxSelectMultiple(RendererMixin, SelectMultiple):
     renderer = CheckboxFieldRenderer
     _empty_value = []
