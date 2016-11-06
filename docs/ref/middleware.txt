@@ -68,7 +68,7 @@ Adds a few conveniences for perfectionists:
 
 * Sets the ``Content-Length`` header for non-streaming responses.
 
-.. versionchanged: 1.11
+.. versionchanged:: 1.11
 
     Older versions didn't set the ``Content-Length`` header.
 
