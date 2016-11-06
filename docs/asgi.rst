@@ -53,7 +53,7 @@ servers and applications.
 
 A channel layer provides a protocol server or an application server
 with a ``send`` callable, which takes a channel name and message
-``dict``, and a ``receive_many`` callable, which takes a list of
+``dict``, and a ``receive`` callable, which takes a list of
 channel names and returns the next message available on any named channel.
 
 Thus, rather than under WSGI, where you point the protocol server to the
@@ -64,10 +64,10 @@ via the channel layer.
 
 Despite the name of the proposal, ASGI does not specify or design to any
 specific in-process async solution, such as ``asyncio``, ``twisted``, or
-``gevent``. Instead, the ``receive_many`` function can be switched between
+``gevent``. Instead, the ``receive`` function can be switched between
 nonblocking or synchronous. This approach allows applications to choose what's
 best for their current runtime environment; further improvements may provide
-extensions where cooperative versions of receive_many are provided.
+extensions where cooperative versions of receive are provided.
 
 The distinction between protocol servers and applications in this document
 is mostly to distinguish their roles and to make illustrating concepts easier.
@@ -120,7 +120,7 @@ tied to a client socket).
 the backend wishes; in particular, they do not have to appear globally
 consistent, and backends may shard their contents out to different servers
 so that a querying client only sees some portion of the messages. Calling
-``receive_many`` on these channels does not guarantee that you will get the
+``receive`` on these channels does not guarantee that you will get the
 messages in order or that you will get anything if the channel is non-empty.
 
 *Single-reader channel* names contain an question mark
@@ -312,7 +312,7 @@ A *channel layer* must provide an object with these attributes
   channel to send on, as a unicode string, and the message
   to send, as a serializable ``dict``.
 
-* ``receive_many(channels, block=False)``, a callable that takes a list of channel
+* ``receive(channels, block=False)``, a callable that takes a list of channel
   names as unicode strings, and returns with either ``(None, None)``
   or ``(channel, message)`` if a message is available. If ``block`` is True, then
   it will not return until after a built-in timeout or a message arrives; if
@@ -328,7 +328,7 @@ A *channel layer* must provide an object with these attributes
   MUST end with ``!`` or ``?`` or this function must error. If the character
   is ``!``, making it a process-specific channel, ``new_channel`` must be
   called on the same channel layer that intends to read the channel with
-  ``receive_many``; any other channel layer instance may not receive
+  ``receive``; any other channel layer instance may not receive
   messages on this channel due to client-routing portions of the appended string.
 
 * ``MessageTooLarge``, the exception raised when a send operation fails
@@ -388,15 +388,15 @@ A channel layer implementing the ``flush`` extension must also provide:
 
 A channel layer implementing the ``twisted`` extension must also provide:
 
-* ``receive_many_twisted(channels)``, a function that behaves
-  like ``receive_many`` but that returns a Twisted Deferred that eventually
+* ``receive_twisted(channels)``, a function that behaves
+  like ``receive`` but that returns a Twisted Deferred that eventually
   returns either ``(channel, message)`` or ``(None, None)``. It is not possible
-  to run it in nonblocking mode; use the normal ``receive_many`` for that.
+  to run it in nonblocking mode; use the normal ``receive`` for that.
 
 A channel layer implementing the ``asyncio`` extension must also provide:
 
-* ``receive_many_asyncio(channels)``, a function that behaves
-  like ``receive_many`` but that fulfills the asyncio coroutine contract to
+* ``receive_asyncio(channels)``, a function that behaves
+  like ``receive`` but that fulfills the asyncio coroutine contract to
   block until either a result is available or an internal timeout is reached
   and ``(None, None)`` is returned.
 
@@ -910,7 +910,7 @@ to prevent busy channels from overpowering quiet channels.
 
 For example, imagine two channels, ``busy``, which spikes to 1000 messages a
 second, and ``quiet``, which gets one message a second. There's a single
-consumer running ``receive_many(['busy', 'quiet'])`` which can handle
+consumer running ``receive(['busy', 'quiet'])`` which can handle
 around 200 messages a second.
 
 In a simplistic for-loop implementation, the channel layer might always check
@@ -1024,9 +1024,9 @@ TODOs
 
 * Maybe remove ``http_version`` and replace with ``supports_server_push``?
 
-* ``receive_many`` can't easily be implemented with async/cooperative code
+* ``receive`` can't easily be implemented with async/cooperative code
   behind it as it's nonblocking - possible alternative call type?
-  Asyncio extension that provides ``receive_many_yield``?
+  Asyncio extension that provides ``receive_yield``?
 
 * Possible extension to allow detection of channel layer flush/restart and
   prompt protocol servers to restart?
