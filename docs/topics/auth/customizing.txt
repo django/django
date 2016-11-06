@@ -395,42 +395,55 @@ This dotted pair describes the name of the Django app (which must be in your
 :setting:`INSTALLED_APPS`), and the name of the Django model that you wish to
 use as your User model.
 
-.. warning::
+Using a custom user model when starting a project
+-------------------------------------------------
 
-   Changing :setting:`AUTH_USER_MODEL` has a big effect on your database
-   structure. It changes the tables that are available, and it will affect the
-   construction of foreign keys and many-to-many relationships. If you intend
-   to set :setting:`AUTH_USER_MODEL`, you should set it before creating
-   any migrations or running ``manage.py migrate`` for the first time.
+If you're starting a new project, it's highly recommended to set up a custom
+user model, even if the default :class:`~django.contrib.auth.models.User` model
+is sufficient for you. This model behaves identically to the default user
+model, but you'll be able to customize it in the future if the need arises::
 
-   Changing this setting after you have tables created is not supported
-   by :djadmin:`makemigrations` and will result in you having to manually
-   fix your schema, port your data from the old user table, and possibly
-   manually reapply some migrations.
+    from django.conf.auth.models import AbstractUser
 
-.. warning::
+    class User(AbstractUser):
+        pass
 
-   Due to limitations of Django's dynamic dependency feature for swappable
-   models, you must ensure that the model referenced by :setting:`AUTH_USER_MODEL`
-   is created in the first migration of its app (usually called ``0001_initial``);
-   otherwise, you will have dependency issues.
+Don't forget to point :setting:`AUTH_USER_MODEL` to it. Do this before creating
+any migrations or running ``manage.py migrate`` for the first time.
 
-   In addition, you may run into a CircularDependencyError when running your
-   migrations as Django won't be able to automatically break the dependency
-   loop due to the dynamic dependency. If you see this error, you should
-   break the loop by moving the models depended on by your User model
-   into a second migration (you can try making two normal models that
-   have a ForeignKey to each other and seeing how ``makemigrations`` resolves that
-   circular dependency if you want to see how it's usually done)
+Changing to a custom user model mid-project
+-------------------------------------------
 
-.. admonition:: Reusable apps and ``AUTH_USER_MODEL``
+Changing :setting:`AUTH_USER_MODEL` after you've created database tables is
+significantly more difficult since it affects foreign keys and many-to-many
+relationships, for example.
 
-   Reusable apps shouldn't implement a custom user model. A project may use
-   many apps, and two reusable apps that implemented a custom user model
-   couldn't be used together. If you need to store per user information in your
-   app, use a :class:`~django.db.models.ForeignKey` or
-   :class:`~django.db.models.OneToOneField` to ``settings.AUTH_USER_MODEL``
-   as described below.
+This change can't be done automatically and requires manually fixing your
+schema, moving your data from the old user table, and possibly manually
+reapplying some migrations. See :ticket:`25313` for an outline of the steps.
+
+Due to limitations of Django's dynamic dependency feature for swappable
+models, the model referenced by :setting:`AUTH_USER_MODEL` must be created in
+the first migration of its app (usually called ``0001_initial``); otherwise,
+you'll have dependency issues.
+
+In addition, you may run into a ``CircularDependencyError`` when running your
+migrations as Django won't be able to automatically break the dependency loop
+due to the dynamic dependency. If you see this error, you should break the loop
+by moving the models depended on by your user model into a second migration.
+(You can try making two normal models that have a ``ForeignKey`` to each other
+and seeing how ``makemigrations`` resolves that circular dependency if you want
+to see how it's usually done.)
+
+Reusable apps and ``AUTH_USER_MODEL``
+-------------------------------------
+
+Reusable apps shouldn't implement a custom user model. A project may use many
+apps, and two reusable apps that implemented a custom user model couldn't be
+used together. If you need to store per user information in your app, use
+a :class:`~django.db.models.ForeignKey` or
+:class:`~django.db.models.OneToOneField` to ``settings.AUTH_USER_MODEL``
+as described below.
 
 Referencing the ``User`` model
 ------------------------------
