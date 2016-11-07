@@ -169,6 +169,8 @@ class ServerFormatter(logging.Formatter):
 
         if len(args) == 0:
             msg = self.style.HTTP_BAD_REQUEST(msg)
+        elif len(args) == 1:
+            msg = self.style.ERROR(msg)
         else:
             if args[1][0] == '2':
                 # Put 2XX first, since it should be the common case
