@@ -223,3 +223,31 @@ class DiscoverRunnerTest(TestCase):
         with captured_stdout() as stdout:
             runner.build_suite(['test_runner_apps.tagged.tests'])
             self.assertIn('Excluding test tag(s): bar, foo.\n', stdout.getvalue())
+
+    def test_transaction_test_case_before_simple_test_case(self):
+        runner = DiscoverRunner()
+        suite = runner.build_suite(['test_discovery_sample3.tests_transaction_test_case_ordering'])
+        suite = tuple(suite)
+        # TransactionTestCase is second after TestCase.
+        self.assertIn('TestTransactionTestCase', suite[1].id())
+
+    def test_transaction_test_case_next_serialized_rollback_option(self):
+        runner = DiscoverRunner()
+        suite = runner.build_suite(['test_discovery_sample3.tests_transaction_test_case_mixed'])
+        django_test_case, first_transaction_test_case, middle_transaction_test_case, \
+            last_transaction_test_case, vanilla_test_case = suite
+        # TransactionTestCase1._next_serialized_rollback is
+        # TransactionTestCase2.serialize_rollback.
+        self.assertEqual(
+            first_transaction_test_case._next_serialized_rollback,
+            middle_transaction_test_case.serialized_rollback
+        )
+        # TransactionTestCase2._next_serialized_rollback is
+        # TransactionTestCase3.serialize_rollback.
+        self.assertEqual(
+            middle_transaction_test_case._next_serialized_rollback,
+            last_transaction_test_case.serialized_rollback
+        )
+        # The last TransactionTestCase of the suite has
+        # _next_serialized_rollback to = True.
+        self.assertIs(last_transaction_test_case._next_serialized_rollback, True)

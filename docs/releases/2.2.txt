@@ -298,6 +298,17 @@ Database backend API
 
 * Support for GDAL 1.9 and 1.10 is dropped.
 
+``TransactionTestCase`` serialized data loading
+-----------------------------------------------
+
+Initial data migrations are now loaded in
+:class:`~django.test.TransactionTestCase` at the end of the test, after the
+database flush. In older versions, this data was loaded at the beginning of the
+test, but this prevents the :option:`test --keepdb` option from working
+properly (the database was empty at the end of the whole test suite). This
+change shouldn't have an impact on your tests unless you've customized
+:class:`~django.test.TransactionTestCase`'s internals.
+
 Miscellaneous
 -------------
 

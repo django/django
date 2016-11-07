@@ -827,6 +827,15 @@ class TransactionTestCase(SimpleTestCase):
     # This can be slow; this flag allows enabling on a per-case basis.
     serialized_rollback = False
 
+    # This attribute is strongly linked to serialized_rollback parameter and
+    # allows the data restoration after the database flush, at the end of the
+    # test, if the next test needs the initial data. This attribute is updated
+    # by the test runner when the test suite is built. Being initialized to
+    # True is crucial: the last TransactionTestCase, which doesn't have any
+    # test classes with the serialized_rollback attribute, will always have
+    # this value set to True.
+    _next_serialized_rollback = True
+
     # Since tests will be wrapped in a transaction, or serialized if they
     # are not available, we allow queries to be run.
     allow_database_queries = True
@@ -897,17 +906,6 @@ class TransactionTestCase(SimpleTestCase):
             if self.reset_sequences:
                 self._reset_sequences(db_name)
 
-            # If we need to provide replica initial data from migrated apps,
-            # then do so.
-            if self.serialized_rollback and hasattr(connections[db_name], "_test_serialized_contents"):
-                if self.available_apps is not None:
-                    apps.unset_available_apps()
-                connections[db_name].creation.deserialize_db_from_string(
-                    connections[db_name]._test_serialized_contents
-                )
-                if self.available_apps is not None:
-                    apps.set_available_apps(self.available_apps)
-
             if self.fixtures:
                 # We have to use this slightly awkward syntax due to the fact
                 # that we're using *args and **kwargs together.
@@ -961,6 +959,15 @@ class TransactionTestCase(SimpleTestCase):
                          database=db_name, reset_sequences=False,
                          allow_cascade=self.available_apps is not None,
                          inhibit_post_migrate=inhibit_post_migrate)
+            # Provide replica initial data from migrated apps, if needed.
+            if self._next_serialized_rollback and hasattr(connections[db_name], '_test_serialized_contents'):
+                if self.available_apps is not None:
+                    apps.unset_available_apps()
+                connections[db_name].creation.deserialize_db_from_string(
+                    connections[db_name]._test_serialized_contents
+                )
+                if self.available_apps is not None:
+                    apps.set_available_apps(self.available_apps)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
         items = map(transform, qs)
