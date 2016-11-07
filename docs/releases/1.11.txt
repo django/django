@@ -281,8 +281,6 @@ Management Commands
 * The new :option:`loaddata --exclude` option allows excluding models and apps
   while loading data from fixtures.
 
-* The unused ``BaseCommand.can_import_settings`` attribute is removed.
-
 Migrations
 ~~~~~~~~~~
 
@@ -591,6 +589,8 @@ Miscellaneous
   the target application's models to be loaded and thus could return models
   without all their relations set up. If you need the old behavior of
   ``get_model()``, set the ``require_ready`` argument to ``False``.
+
+* The unused ``BaseCommand.can_import_settings`` attribute is removed.
 
 .. _deprecated-features-1.11:
 
