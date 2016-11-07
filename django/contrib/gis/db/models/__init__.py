@@ -7,11 +7,10 @@ from django.contrib.gis.db.models.fields import (
     MultiLineStringField, MultiPointField, MultiPolygonField, PointField,
     PolygonField, RasterField,
 )
-from django.contrib.gis.db.models.manager import GeoManager
 
 __all__ = models_all + aggregates_all
 __all__ += [
     'GeometryCollectionField', 'GeometryField', 'LineStringField',
     'MultiLineStringField', 'MultiPointField', 'MultiPolygonField', 'PointField',
-    'PolygonField', 'RasterField', 'GeoManager',
+    'PolygonField', 'RasterField',
 ]

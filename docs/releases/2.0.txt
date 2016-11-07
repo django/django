@@ -261,3 +261,5 @@ these features.
   ORM, e.g. with ``cursor.execute()``.
 
 * ``django.contrib.auth.tests.utils.skipIfCustomUser()`` is removed.
+
+* The ``GeoManager`` and ``GeoQuerySet`` classes are removed.

@@ -17,7 +17,7 @@ class GeoRegressionTests(TestCase):
     fixtures = ['initial']
 
     def test_update(self):
-        "Testing GeoQuerySet.update(). See #10411."
+        "Testing QuerySet.update() (#10411)."
         pnt = City.objects.get(name='Pueblo').point
         bak = pnt.clone()
         pnt.y += 0.005

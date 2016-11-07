@@ -346,27 +346,6 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
             defaults['widget'] = forms.Textarea
         return super(GeometryField, self).formfield(**defaults)
 
-    def _get_db_prep_lookup(self, lookup_type, value, connection):
-        """
-        Prepare for the database lookup, and return any spatial parameters
-        necessary for the query.  This includes wrapping any geometry
-        parameters with a backend-specific adapter and formatting any distance
-        parameters into the correct units for the coordinate system of the
-        field.
-
-        Only used by the deprecated GeoQuerySet and to be
-        RemovedInDjango20Warning.
-        """
-        # Populating the parameters list, and wrapping the Geometry
-        # with the Adapter of the spatial backend.
-        if isinstance(value, (tuple, list)):
-            params = [connection.ops.Adapter(value[0])]
-            # Getting the distance parameter in the units of the field.
-            params += self.get_distance(value[1:], lookup_type, connection)
-        else:
-            params = [connection.ops.Adapter(value)]
-        return params
-
 
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):

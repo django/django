@@ -305,19 +305,6 @@ class TestManagerInheritance(TestCase):
 
 @isolate_apps('managers_regress')
 class TestManagerDeprecations(TestCase):
-    def test_use_for_related_fields_on_geomanager(self):
-        from django.contrib.gis.db.models import GeoManager
-
-        class MyModel(models.Model):
-            objects = GeoManager()
-
-        # Shouldn't issue any warnings, since GeoManager itself will be
-        # deprecated at the same time as use_for_related_fields, there
-        # is no point annoying users with this deprecation.
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always', RemovedInDjango20Warning)
-            MyModel._base_manager
-        self.assertEqual(len(warns), 0)
 
     def test_use_for_related_fields_for_base_manager(self):
         class MyManager(models.Manager):

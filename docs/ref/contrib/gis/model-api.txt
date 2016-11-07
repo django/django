@@ -244,22 +244,6 @@ For more information, the PostGIS documentation contains a helpful section on
 determining `when to use geography data type over geometry data type
 <http://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`_.
 
-``GeoManager``
-==============
-
-.. currentmodule:: django.contrib.gis.db.models
-.. class:: GeoManager
-
-The ``GeoManager`` is required in order to use the legacy
-:ref:`geoqueryset-methods`.
-
-.. deprecated:: 1.9
-
-    All ``GeoQuerySet`` methods have been deprecated and replaced by
-    :doc:`equivalent database functions </ref/contrib/gis/functions>`. As soon
-    as the legacy methods have been replaced in your code, you should be able
-    to remove the special ``GeoManager`` from your GIS-enabled classes.
-
 .. rubric:: Footnotes
 .. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <http://www.opengeospatial.org/standards/sfs>`_.
 .. [#fnogcsrid] *See id.* at Ch. 2.3.8, p. 39 (Geometry Values and Spatial Reference Systems).

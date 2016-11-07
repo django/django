@@ -3,9 +3,6 @@ from django.utils.encoding import python_2_unicode_compatible
 
 
 class SimpleModel(models.Model):
-
-    objects = models.GeoManager()
-
     class Meta:
         abstract = True
         required_db_features = ['gis_enabled']

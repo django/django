@@ -168,12 +168,6 @@ def setup(verbosity, test_labels, parallel):
         'fields.W901',  # CommaSeparatedIntegerField deprecated
     ]
 
-    warnings.filterwarnings(
-        'ignore',
-        'The GeoManager class is deprecated.',
-        RemovedInDjango20Warning
-    )
-
     # Load all the ALWAYS_INSTALLED_APPS.
     django.setup()
 

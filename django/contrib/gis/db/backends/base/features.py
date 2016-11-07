@@ -1,5 +1,4 @@
 import re
-from functools import partial
 
 from django.contrib.gis.db.models import aggregates
 
@@ -71,17 +70,6 @@ class BaseSpatialFeatures(object):
     def supports_isvalid_lookup(self):
         return 'isvalid' in self.connection.ops.gis_operators
 
-    # For each of those methods, the class will have a property named
-    # `has_<name>_method` (defined in __init__) which accesses connection.ops
-    # to determine GIS method availability.
-    geoqueryset_methods = (
-        'area', 'bounding_circle', 'centroid', 'difference', 'distance',
-        'distance_spheroid', 'envelope', 'force_rhr', 'geohash', 'gml',
-        'intersection', 'kml', 'length', 'mem_size', 'num_geom', 'num_points',
-        'perimeter', 'point_on_surface', 'reverse', 'scale', 'snap_to_grid',
-        'svg', 'sym_difference', 'transform', 'translate', 'union', 'unionagg',
-    )
-
     # Is the aggregate supported by the database?
     @property
     def supports_collect_aggr(self):
@@ -99,19 +87,9 @@ class BaseSpatialFeatures(object):
     def supports_union_aggr(self):
         return aggregates.Union not in self.connection.ops.disallowed_aggregates
 
-    def __init__(self, *args):
-        super(BaseSpatialFeatures, self).__init__(*args)
-        for method in self.geoqueryset_methods:
-            # Add dynamically properties for each GQS method, e.g. has_force_rhr_method, etc.
-            setattr(self.__class__, 'has_%s_method' % method,
-                    property(partial(BaseSpatialFeatures.has_ops_method, method=method)))
-
     def __getattr__(self, name):
         m = re.match(r'has_(\w*)_function$', name)
         if m:
             func_name = m.group(1)
             return func_name not in self.connection.ops.unsupported_functions
         raise AttributeError
-
-    def has_ops_method(self, method):
-        return getattr(self.connection.ops, method, False)

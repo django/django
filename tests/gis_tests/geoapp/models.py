@@ -8,8 +8,6 @@ from ..utils import gisfield_may_be_null
 class NamedModel(models.Model):
     name = models.CharField(max_length=30)
 
-    objects = models.GeoManager()
-
     class Meta:
         abstract = True
         required_db_features = ['gis_enabled']

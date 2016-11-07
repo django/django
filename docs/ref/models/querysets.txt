@@ -149,11 +149,10 @@ Here's the formal declaration of a ``QuerySet``:
     .. note::
 
         The ``query`` parameter to :class:`QuerySet` exists so that specialized
-        query subclasses such as
-        :class:`~django.contrib.gis.db.models.GeoQuerySet` can reconstruct
-        internal query state. The value of the parameter is an opaque
-        representation of that query state and is not part of a public API.
-        To put it simply: if you need to ask, you don't need to use it.
+        query subclasses can reconstruct internal query state. The value of the
+        parameter is an opaque representation of that query state and is not
+        part of a public API. To put it simply: if you need to ask, you don't
+        need to use it.
 
 .. currentmodule:: django.db.models.query.QuerySet
 
