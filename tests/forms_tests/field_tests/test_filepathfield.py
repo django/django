@@ -79,8 +79,6 @@ class FilePathFieldTest(SimpleTestCase):
         expected = [
             ('/django/forms/__init__.py', '__init__.py'),
             ('/django/forms/boundfield.py', 'boundfield.py'),
-            ('/django/forms/extras/__init__.py', 'extras/__init__.py'),
-            ('/django/forms/extras/widgets.py', 'extras/widgets.py'),
             ('/django/forms/fields.py', 'fields.py'),
             ('/django/forms/forms.py', 'forms.py'),
             ('/django/forms/formsets.py', 'formsets.py'),

@@ -239,3 +239,5 @@ these features.
 
 * ``django.db.backends.base.BaseDatabaseOperations.check_aggregate_support()``
   is removed.
+
+* The ``django.forms.extras`` package is removed.

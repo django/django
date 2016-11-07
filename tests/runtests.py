@@ -173,11 +173,6 @@ def setup(verbosity, test_labels, parallel):
         'The GeoManager class is deprecated.',
         RemovedInDjango20Warning
     )
-    warnings.filterwarnings(
-        'ignore',
-        'django.forms.extras is deprecated.',
-        RemovedInDjango20Warning
-    )
 
     # Load all the ALWAYS_INSTALLED_APPS.
     django.setup()
