@@ -1,10 +1,8 @@
-import warnings
 from functools import partial
 
 from django.db.models.utils import make_model_tuple
 from django.dispatch import Signal
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 
 
 class_prepared = Signal(providing_args=["class"])
@@ -32,9 +30,7 @@ class ModelSignal(Signal):
             weak=weak, dispatch_uid=dispatch_uid,
         )
 
-    def disconnect(self, receiver=None, sender=None, weak=None, dispatch_uid=None, apps=None):
-        if weak is not None:
-            warnings.warn("Passing `weak` to disconnect has no effect.", RemovedInDjango20Warning, stacklevel=2)
+    def disconnect(self, receiver=None, sender=None, dispatch_uid=None, apps=None):
         return self._lazy_method(
             super(ModelSignal, self).disconnect, apps, receiver, sender, dispatch_uid=dispatch_uid
         )
