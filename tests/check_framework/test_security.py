@@ -541,6 +541,12 @@ class CheckSecretKeyValidUnicodeTest(SimpleTestCase):
         from django.core.checks.security.base import check_secret_key_valid_unicode
         return check_secret_key_valid_unicode
 
+    @override_settings(SECRET_KEY=(b'abcdefghijklmnopqrstuvwx' * 2) + b'ab')
+    def test_valid_unicode_secret_key(self):
+        self.assertEqual(len(settings.SECRET_KEY), base.SECRET_KEY_MIN_LENGTH)
+        self.assertGreater(len(set(settings.SECRET_KEY)), base.SECRET_KEY_MIN_UNIQUE_CHARACTERS)
+        self.assertEqual(self.func(None), [])
+
     @override_settings(SECRET_KEY=(b'\xffabcdefghijklmnopqrstuvwxyz' * 2))
     def test_invalid_unicode_secret_key(self):
         self.assertGreater(len(settings.SECRET_KEY), base.SECRET_KEY_MIN_LENGTH)

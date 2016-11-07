@@ -109,8 +109,8 @@ W021 = Warning(
 )
 
 W022 = Warning(
-    "Your SECRET_KEY contains invalid Unicode. Please ensure you have a "
-    "valid Unicode string.",
+    "Your SECRET_KEY contains an invalid string or UTF-8 bytes. "
+    "Please ensure you have a valid string or UTF-8 bytes.",
     id='security.W022',
 )
 
@@ -205,8 +205,8 @@ def check_secret_key_valid_unicode(app_configs, **kwargs):
     valid_unicode = True
     try:
         # To maintain backwards compatibility, instead of checking that
-        # SECRET_KEY is a valid Unicode string, simply check if it goes through
-        # `force_text` without throwing an exception.
+        # SECRET_KEY is a valid string or UTF-8 bytes, simply check
+        # if it goes through `force_text` without throwing an exception.
         force_text(settings.SECRET_KEY)
     except UnicodeError:
         valid_unicode = False
