@@ -629,35 +629,6 @@ positional arguments. For example:
 
     {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
 
-Assignment tags
----------------
-
-.. method:: django.template.Library.assignment_tag()
-
-.. deprecated:: 1.9
-
-    ``simple_tag`` can now store results in a template variable and should
-    be used instead.
-
-To ease the creation of tags setting a variable in the context, Django provides
-a helper function, ``assignment_tag``. This function works the same way as
-:meth:`~django.template.Library.simple_tag` except that it stores the tag's
-result in a specified context variable instead of directly outputting it.
-
-Our earlier ``current_time`` function could thus be written like this::
-
-    @register.assignment_tag
-    def get_current_time(format_string):
-        return datetime.datetime.now().strftime(format_string)
-
-You may then store the result in a template variable using the ``as`` argument
-followed by the variable name, and output it yourself where you see fit:
-
-.. code-block:: html+django
-
-    {% get_current_time "%Y-%m-%d %I:%M %p" as the_time %}
-    <p>The time is {{ the_time }}.</p>
-
 Advanced custom template tags
 -----------------------------
 

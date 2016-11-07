@@ -306,29 +306,6 @@ class InclusionTagTests(TagTestCase):
         self.assertEqual(template.render(Context({})).strip(), 'one\ntwo')
 
 
-class AssignmentTagTests(TagTestCase):
-
-    def test_assignment_tags(self):
-        c = Context({'value': 42})
-
-        t = self.engine.from_string('{% load custom %}{% assignment_no_params as var %}The result is: {{ var }}')
-        self.assertEqual(t.render(c), 'The result is: assignment_no_params - Expected result')
-
-    def test_assignment_tag_registration(self):
-        # The decorators preserve the decorated function's docstring, name,
-        # and attributes.
-        self.verify_tag(custom.assignment_no_params, 'assignment_no_params')
-
-    def test_assignment_tag_missing_context(self):
-        # The 'context' parameter must be present when takes_context is True
-        msg = (
-            "'assignment_tag_without_context_parameter' is decorated with "
-            "takes_context=True so it must have a first argument of 'context'"
-        )
-        with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            self.engine.from_string('{% load custom %}{% assignment_tag_without_context_parameter 123 as var %}')
-
-
 class TemplateTagLoadingTests(SimpleTestCase):
 
     @classmethod

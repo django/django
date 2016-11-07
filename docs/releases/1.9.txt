@@ -938,9 +938,8 @@ define built-in libraries via the ``'builtins'`` key of :setting:`OPTIONS
 In general, template tags do not autoescape their contents, and this behavior is
 :ref:`documented <tags-auto-escaping>`. For tags like
 :class:`~django.template.Library.inclusion_tag`, this is not a problem because
-the included template will perform autoescaping. For
-:class:`~django.template.Library.assignment_tag`, the output will be escaped
-when it is used as a variable in the template.
+the included template will perform autoescaping. For ``assignment_tag()``,
+the output will be escaped when it is used as a variable in the template.
 
 For the intended use cases of :class:`~django.template.Library.simple_tag`,
 however, it is very easy to end up with incorrect HTML and possibly an XSS

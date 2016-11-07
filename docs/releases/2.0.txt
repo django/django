@@ -241,3 +241,5 @@ these features.
   is removed.
 
 * The ``django.forms.extras`` package is removed.
+
+* The ``assignment_tag`` helper is removed.

@@ -1,5 +1,4 @@
 import operator
-import warnings
 
 from django import template
 from django.template.defaultfilters import stringfilter
@@ -168,19 +167,3 @@ def minustwo_overridden_name(value):
 
 
 register.simple_tag(lambda x: x - 1, name='minusone')
-
-
-with warnings.catch_warnings():
-    warnings.simplefilter('ignore')
-
-    @register.assignment_tag
-    def assignment_no_params():
-        """Expected assignment_no_params __doc__"""
-        return "assignment_no_params - Expected result"
-    assignment_no_params.anything = "Expected assignment_no_params __dict__"
-
-    @register.assignment_tag(takes_context=True)
-    def assignment_tag_without_context_parameter(arg):
-        """Expected assignment_tag_without_context_parameter __doc__"""
-        return "Expected result"
-    assignment_tag_without_context_parameter.anything = "Expected assignment_tag_without_context_parameter __dict__"

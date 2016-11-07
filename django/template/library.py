@@ -1,9 +1,7 @@
 import functools
-import warnings
 from importlib import import_module
 
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.html import conditional_escape
 from django.utils.inspect import getargspec
 from django.utils.itercompat import is_iterable
@@ -135,14 +133,6 @@ class Library(object):
             return dec(func)
         else:
             raise ValueError("Invalid arguments provided to simple_tag")
-
-    def assignment_tag(self, func=None, takes_context=None, name=None):
-        warnings.warn(
-            "assignment_tag() is deprecated. Use simple_tag() instead",
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        return self.simple_tag(func, takes_context, name)
 
     def inclusion_tag(self, filename, func=None, takes_context=None, name=None):
         """
