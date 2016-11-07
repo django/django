@@ -173,8 +173,9 @@ class DjangoTranslation(gettext_module.GNUTranslations):
                 "gettext calls at import time.")
         for app_config in app_configs:
             localedir = os.path.join(app_config.path, 'locale')
-            translation = self._new_gnu_trans(localedir)
-            self.merge(translation)
+            if os.path.exists(localedir):
+                translation = self._new_gnu_trans(localedir)
+                self.merge(translation)
 
     def _add_local_translations(self):
         """Merges translations defined in LOCALE_PATHS."""
