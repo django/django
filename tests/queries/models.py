@@ -741,4 +741,3 @@ class RelatedIndividual(models.Model):
 class Ticket27397(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=10)
-    
