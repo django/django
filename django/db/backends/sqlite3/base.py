@@ -325,8 +325,10 @@ class SQLiteCursorWrapper(Database.Cursor):
         if params is None:
             return Database.Cursor.execute(self, query)
         query = self.convert_query(query)
-        return Database.Cursor.execute(self, query, params)
-
+        try:
+            return Database.Cursor.execute(self, query, params)
+        except OverflowError:
+            return None
     def executemany(self, query, param_list):
         query = self.convert_query(query)
         return Database.Cursor.executemany(self, query, param_list)

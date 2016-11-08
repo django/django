@@ -29,7 +29,7 @@ from .models import (
     RelatedIndividual, RelatedObject, Report, ReservedName, Responsibility,
     School, SharedConnection, SimpleCategory, SingleObject, SpecialCategory,
     Staff, StaffUser, Student, Tag, Task, Ticket21203Child, Ticket21203Parent,
-    Ticket23605A, Ticket23605B, Ticket23605C, TvChef, Valid, X,
+    Ticket23605A, Ticket23605B, Ticket23605C, TvChef, Valid, X,Ticket27397,
 )
 
 
@@ -3798,3 +3798,7 @@ class Ticket23622Tests(TestCase):
             set(Ticket23605A.objects.filter(qy).values_list('pk', flat=True))
         )
         self.assertSequenceEqual(Ticket23605A.objects.filter(qx), [a2])
+        
+class Ticket27397Tests(TestCase):
+    def test_ticket27397(self):
+        self.assertEqual(len(Ticket27397.objects.filter(id=11111111111111111111111111111111111111111111111)),0)
