@@ -3798,7 +3798,7 @@ class Ticket23622Tests(TestCase):
             set(Ticket23605A.objects.filter(qy).values_list('pk', flat=True))
         )
         self.assertSequenceEqual(Ticket23605A.objects.filter(qx), [a2])
-      
+
 
 class Ticket27397Tests(TestCase):
     def test_ticket27397(self):
