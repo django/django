@@ -77,9 +77,6 @@ class DatabaseCreation(BaseDatabaseCreation):
             try:
                 self._create_test_user(cursor, parameters, verbosity, keepdb)
             except Exception as e:
-                # If we want to keep the db, then we want to also keep the user.
-                if keepdb:
-                    return
                 sys.stderr.write("Got an error creating the test user: %s\n" % e)
                 if not autoclobber:
                     confirm = input(
