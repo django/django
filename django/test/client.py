@@ -226,7 +226,16 @@ def encode_multipart(boundary, data):
 def encode_file(boundary, key, file):
     def to_bytes(s):
         return force_bytes(s, settings.DEFAULT_CHARSET)
-    filename = os.path.basename(file.name) if hasattr(file, 'name') else ''
+
+    filename = getattr(file, 'name', None)
+    # file.name is an int when the file is created with
+    # tempfile.TemporaryFile(), so we have to check the
+    # type.
+    if isinstance(filename, str):
+        filename = os.path.basename(filename)
+    else:
+        filename = ''
+
     if hasattr(file, 'content_type'):
         content_type = file.content_type
     elif filename:
