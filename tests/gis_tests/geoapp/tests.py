@@ -63,8 +63,7 @@ class GeoModelTest(TestCase):
         nullcity.point.x = 23
         nullcity.point.y = 5
         # Checking assignments pre & post-save.
-        self.assertNotEqual(Point(23, 5, srid=4326),
-                            City.objects.get(name='NullCity').point)
+        self.assertNotEqual(Point(23, 5, srid=4326), City.objects.get(name='NullCity').point)
         nullcity.save()
         self.assertEqual(Point(23, 5, srid=4326),
                          City.objects.get(name='NullCity').point)
