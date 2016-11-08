@@ -123,7 +123,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         try:
             return cursor.execute(sql, params).fetchone()
         except OverflowError:
-            return None    
+            return None
         finally:
             cursor.close()
 
