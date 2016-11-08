@@ -717,6 +717,7 @@ class CustomLayoutExtractionTests(ExtractorTests):
                 self.assertMsgId('This app has a locale directory', po_contents)
 
 
+@skipUnless(has_xgettext, 'xgettext is mandatory for extraction tests')
 class NoSettingsExtractionTests(AdminScriptTestCase):
     def test_makemessages_no_settings(self):
         out, err = self.run_django_admin(['makemessages', '-l', 'en', '-v', '0'])
