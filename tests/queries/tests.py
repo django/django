@@ -29,7 +29,7 @@ from .models import (
     RelatedIndividual, RelatedObject, Report, ReservedName, Responsibility,
     School, SharedConnection, SimpleCategory, SingleObject, SpecialCategory,
     Staff, StaffUser, Student, Tag, Task, Ticket21203Child, Ticket21203Parent,
-    Ticket23605A, Ticket23605B, Ticket23605C, Ticket27397, TvChef, Valid, X,
+    Ticket23605A, Ticket23605B, Ticket23605C, TvChef, Valid, X,
 )
 
 
@@ -3801,8 +3801,13 @@ class Ticket23622Tests(TestCase):
 
 
 class Ticket27397Tests(TestCase):
-    def test_ticket27397(self):
+    @classmethod
+    def setUpTestData(cls):
+        # Create a few Orders.
+        cls.o1 = Order.objects.create(pk=1)
+
+    def test_query_params_overflow(self):
         self.assertEqual(
-            len(Ticket27397.objects.filter(id=11111111111111111111111111111111111111111111111)),
+            len(Order.objects.filter(pk=11111111111111111111111111111111111111111111111)),
             0
         )
