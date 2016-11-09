@@ -123,14 +123,11 @@ know about it - it is dealt with entirely by the database. All Python does,
 through Django's ``F()`` class, is create the SQL syntax to refer to the field
 and describe the operation.
 
-.. note::
+To access the new value saved this way, the object must be reloaded::
 
-   In order to access the new value that has been saved in this way, the object
-   will need to be reloaded::
-
-       reporter = Reporters.objects.get(pk=reporter.pk)
-       # Or, more succinctly:
-       reporter.refresh_from_db()
+   reporter = Reporters.objects.get(pk=reporter.pk)
+   # Or, more succinctly:
+   reporter.refresh_from_db()
 
 As well as being used in operations on single instances as above, ``F()`` can
 be used on ``QuerySets`` of object instances, with ``update()``. This reduces
