@@ -214,6 +214,22 @@ directly support ``output_field`` you will need to wrap the expression with
         expires=ExpressionWrapper(
             F('active_at') + F('duration'), output_field=DateTimeField()))
 
+.. note::
+
+   When using ``F()`` to alias a ForeignKey field the pk value of the field 
+   will be returned instead of the model instance as would be the case for 
+   the aliased ForeignKey field::
+
+        car = Car.objects.annotate(
+            build_by=F('manufacturer')
+        )
+
+       >> print(car.manufacturer)
+       <Manufacturer: Toyota>
+       >> print(car.build_by)
+       3
+       
+
 .. _func-expressions:
 
 ``Func()`` expressions
