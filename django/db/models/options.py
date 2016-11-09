@@ -883,3 +883,14 @@ class Options(object):
     @has_auto_field.setter
     def has_auto_field(self, value):
         pass
+
+    @cached_property
+    def _property_names(self):
+        """
+        Return a set of the names of the properties defined on the model.
+        Internal helper for model initialization.
+        """
+        return frozenset({
+            attr for attr in
+            dir(self.model) if isinstance(getattr(self.model, attr), property)
+        })
