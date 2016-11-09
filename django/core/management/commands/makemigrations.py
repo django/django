@@ -104,7 +104,7 @@ class Command(BaseCommand):
                     # At least one model must be migrated to the database.
                     router.allow_migrate(connection.alias, app_label, model_name=model._meta.object_name)
                     for app_label in consistency_check_labels
-                    for model in apps.get_models(app_label)
+                    for model in apps.get_app_config(app_label).get_models()
             )):
                 loader.check_consistent_history(connection)
 
