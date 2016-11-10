@@ -147,7 +147,7 @@ class UserAttributeSimilarityValidator(object):
                 continue
             value_parts = re.split(r'\W+', value) + [value]
             for value_part in value_parts:
-                if SequenceMatcher(a=password.lower(), b=value_part.lower()).quick_ratio() > self.max_similarity:
+                if SequenceMatcher(a=password.lower(), b=value_part.lower()).quick_ratio() >= self.max_similarity:
                     try:
                         verbose_name = force_text(user._meta.get_field(attribute_name).verbose_name)
                     except FieldDoesNotExist:

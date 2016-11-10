@@ -124,7 +124,22 @@ class UserAttributeSimilarityValidatorTest(TestCase):
                 max_similarity=0.3,
             ).validate('testclient', user=user)
         self.assertEqual(cm.exception.messages, [expected_error % "first name"])
-
+        # max_similarity=1 doesn't allow passwords that are identical to the
+        # attribute's value.
+        with self.assertRaises(ValidationError) as cm:
+            UserAttributeSimilarityValidator(
+                user_attributes=['first_name'],
+                max_similarity=1,
+            ).validate(user.first_name, user=user)
+        self.assertEqual(cm.exception.messages, [expected_error % "first name"])
+        # max_similarity=0 rejects all passwords.
+        with self.assertRaises(ValidationError) as cm:
+            UserAttributeSimilarityValidator(
+                user_attributes=['first_name'],
+                max_similarity=0,
+            ).validate('XXX', user=user)
+        self.assertEqual(cm.exception.messages, [expected_error % "first name"])
+        # Passes validation.
         self.assertIsNone(
             UserAttributeSimilarityValidator(user_attributes=['first_name']).validate('testclient', user=user)
         )
