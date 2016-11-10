@@ -102,9 +102,8 @@ class ServerHandler(simple_server.ServerHandler, object):
             self.headers['Content-Length'] = len(result.content)
             self.has_length = True
 
+            
 class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
-    
-    
     protocol_version = "HTTP/1.1"
 
     def address_string(self):
