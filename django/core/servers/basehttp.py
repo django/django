@@ -89,7 +89,7 @@ class WSGIServer(simple_server.WSGIServer, object):
 # Inheriting from object required on Python 2.
 class ServerHandler(simple_server.ServerHandler, object):
     http_version = "1.1"
-    
+
     def handle_error(self):
         # Ignore broken pipe errors, otherwise pass on
         if not is_broken_pipe_error():
@@ -103,8 +103,10 @@ class ServerHandler(simple_server.ServerHandler, object):
             self.has_length = True
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
-    protocol_version = "HTTP/1.1"
     
+    
+    protocol_version = "HTTP/1.1"
+
     def address_string(self):
         # Short-circuit parent method to not call socket.getfqdn
         return self.client_address[0]
@@ -155,7 +157,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         self.close_connection = 1
 
         # max keep-alive request times
-        for i in xrange(100):
+        for i in range(100):
             self.handle_one_request()
             if self.close_connection:
                 break
