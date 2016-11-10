@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 import logging
-import warnings
 from contextlib import contextmanager
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -15,7 +14,6 @@ from django.db import connection
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.utils import six
-from django.utils.deprecation import RemovedInNextVersionWarning
 from django.utils.log import (
     DEFAULT_LOGGING, AdminEmailHandler, CallbackFilter, RequireDebugFalse,
     RequireDebugTrue, ServerFormatter,
@@ -145,35 +143,6 @@ class I18nLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleTest
         self.client.get('/this_does_not/')
         self.client.get('/en/nor_this/')
         self.assertEqual(self.logger_output.getvalue(), 'Not Found: /this_does_not/\nNot Found: /en/nor_this/\n')
-
-
-class WarningLoggerTests(SimpleTestCase):
-    """
-    Tests that warnings output for RemovedInDjangoXXWarning (XX being the next
-    Django version) is enabled and captured to the logging system
-    """
-    def setUp(self):
-        # If tests are invoke with "-Wall" (or any -W flag actually) then
-        # warning logging gets disabled (see configure_logging in django/utils/log.py).
-        # However, these tests expect warnings to be logged, so manually force warnings
-        # to the logs. Use getattr() here because the logging capture state is
-        # undocumented and (I assume) brittle.
-        self._old_capture_state = bool(getattr(logging, '_warnings_showwarning', False))
-        logging.captureWarnings(True)
-
-    def tearDown(self):
-        # Reset warnings state.
-        logging.captureWarnings(self._old_capture_state)
-
-    @override_settings(DEBUG=True)
-    def test_error_filter_still_raises(self):
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                'error',
-                category=RemovedInNextVersionWarning
-            )
-            with self.assertRaises(RemovedInNextVersionWarning):
-                warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
 
 
 class CallbackFilterTest(SimpleTestCase):
