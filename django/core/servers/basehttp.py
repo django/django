@@ -65,6 +65,7 @@ def is_broken_pipe_error():
 class WSGIServer(simple_server.WSGIServer, object):
     """BaseHTTPServer that implements the Python WSGI protocol"""
 
+    protocol_version = "HTTP/1.1"
     request_queue_size = 10
 
     def __init__(self, *args, **kwargs):
@@ -87,13 +88,23 @@ class WSGIServer(simple_server.WSGIServer, object):
 
 # Inheriting from object required on Python 2.
 class ServerHandler(simple_server.ServerHandler, object):
+    http_version = "1.1"
+    
     def handle_error(self):
         # Ignore broken pipe errors, otherwise pass on
         if not is_broken_pipe_error():
             super(ServerHandler, self).handle_error()
 
+    def set_content_length(self):
+        result = self.result
+        self.has_length = False
+        if hasattr(result, 'content'):
+            self.headers['Content-Length'] = len(result.content)
+            self.has_length = True
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
+    protocol_version = "HTTP/1.1"
+    
     def address_string(self):
         # Short-circuit parent method to not call socket.getfqdn
         return self.client_address[0]
@@ -140,7 +151,17 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         return super(WSGIRequestHandler, self).get_environ()
 
     def handle(self):
-        """Copy of WSGIRequestHandler, but with different ServerHandler"""
+        """Handle multiple requests if necessary."""
+        self.close_connection = 1
+
+        # max keep-alive request times
+        for i in xrange(100):
+            self.handle_one_request()
+            if self.close_connection:
+                break
+
+    def handle_one_request(self):
+        """Copy of WSGIRequestHandler.handle(), but with different ServerHandler"""
 
         self.raw_requestline = self.rfile.readline(65537)
         if len(self.raw_requestline) > 65536:
@@ -158,6 +179,8 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         )
         handler.request_handler = self      # backpointer for logging
         handler.run(self.server.get_app())
+        if not handler.has_length:
+            self.close_connection = 1
 
 
 def run(addr, port, wsgi_handler, ipv6=False, threading=False):
