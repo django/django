@@ -1,8 +1,34 @@
 {% load i18n %}
-<h3>{% blocktrans with filter_title=title %} By {{ filter_title }} {% endblocktrans %}</h3>
+<a href="#" class="filter_collapse_{{ title.split|join:"_" }}">
+    <h3>
+        <div id="expanded_{{ title.split|join:"_" }}" style="display: inline;">-</div>
+        <div id="collapsed_{{ title.split|join:"_" }}" style="display: inline;">+</div>
+        {% blocktrans with filter_title=title %} By {{ filter_title }} {% endblocktrans %}
+    </h3>
+</a>
 <ul>
-{% for choice in choices %}
-    <li{% if choice.selected %} class="selected"{% endif %}>
-    <a href="{{ choice.query_string|iriencode }}" title="{{ choice.display }}">{{ choice.display }}</a></li>
-{% endfor %}
+
+<div id="collapse_{{ title.split|join:"_" }}">
+    {% for choice in choices %}
+        <li{% if choice.selected %} class="selected"{% endif %}>
+        <a href="{{ choice.query_string|iriencode }}" title="{{ choice.display }}">{{ choice.display }}</a></li>
+    {% endfor %}
+    </div>
 </ul>
+<script>
+    var jQuery = django.jQuery;
+    (function($){
+        {% if choices|length > 10 %}
+            $('#expanded_{{ title.split|join:"_" }}').toggle();
+            $('#collapse_{{ title.split|join:"_" }}').slideToggle();
+        {% else %}
+            $('#collapsed_{{ title.split|join:"_" }}').toggle();
+        {% endif %}
+            $('.filter_collapse_{{ title.split|join:"_" }}').click(function(){
+                $('#collapse_{{ title.split|join:"_" }}').slideToggle('slow');
+                $('#collapsed_{{ title.split|join:"_" }}').toggle();
+                $('#expanded_{{ title.split|join:"_" }}').toggle();
+            });
+    })(django.jQuery);
+</script>
+
