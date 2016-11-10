@@ -1792,6 +1792,31 @@ That's it. Your translations are ready for use.
    (Byte Order Mark) so if your text editor adds such marks to the beginning of
    files by default then you will need to reconfigure it.
 
+Troubleshooting: ``ugettext()`` incorrectly detects ``python-format`` in strings with percent signs
+---------------------------------------------------------------------------------------------------
+
+In some cases, such as strings with a percent sign followed by a space and a
+:ref:`string conversion type <old-string-formatting>` (e.g.
+``_("10% interest")``), :func:`~django.utils.translation.ugettext` incorrectly
+flags strings with ``python-format``.
+
+If you try to compile message files with incorrectly flagged strings, you'll
+get an error message like ``number of format specifications in 'msgid' and
+'msgstr' does not match`` or ``'msgstr' is not a valid Python format string,
+unlike 'msgid'``.
+
+To workaround this, you can escape percent signs by adding a second percent
+sign::
+
+    from django.utils.translation import ugettext as _
+    output = _("10%% interest)
+
+Or you can use ``no-python-format`` so that all percent signs are treated as
+literals::
+
+    # xgettext:no-python-format
+    output = _("10% interest)
+
 .. _creating-message-files-from-js-code:
 
 Creating message files from JavaScript source code
