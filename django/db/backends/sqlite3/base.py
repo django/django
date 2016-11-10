@@ -326,7 +326,8 @@ class SQLiteCursorWrapper(Database.Cursor):
             return Database.Cursor.execute(self, query)
         if isinstance(params, (tuple)):
             if params:
-                if isinstance(params[0], (int, long)):
+                if isinstance(params[0], six.integer_types):
+                    # Filter values wider than 64 bits
                     if params[0].bit_length() > 63:
                         lst = list(params)
                         lst[0] = ''
