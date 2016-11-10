@@ -8,7 +8,7 @@ from django.core.signals import setting_changed
 from django.db import connections, router
 from django.db.utils import ConnectionRouter
 from django.dispatch import Signal, receiver
-from django.utils import timezone
+from django.utils import six, timezone
 from django.utils.functional import empty
 
 template_rendered = Signal(providing_args=["template", "context"])
@@ -127,9 +127,9 @@ def file_storage_changed(**kwargs):
 def complex_setting_changed(**kwargs):
     if kwargs['enter'] and kwargs['setting'] in COMPLEX_OVERRIDE_SETTINGS:
         # Considering the current implementation of the signals framework,
-        # stacklevel=5 shows the line containing the override_settings call.
+        # this stacklevel shows the line containing the override_settings call.
         warnings.warn("Overriding setting %s can lead to unexpected behavior."
-                      % kwargs['setting'], stacklevel=5)
+                      % kwargs['setting'], stacklevel=5 if six.PY2 else 6)
 
 
 @receiver(setting_changed)
