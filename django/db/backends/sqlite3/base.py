@@ -324,11 +324,17 @@ class SQLiteCursorWrapper(Database.Cursor):
     def execute(self, query, params=None):
         if params is None:
             return Database.Cursor.execute(self, query)
+        if isinstance(params, (tuple)):
+            if params:
+                if isinstance(params[0], (int, long)):
+                    if params[0].bit_length() > 63:
+                        lst = list(params)
+                        lst[0] = ''
+                        params = tuple(lst)
+                        query = self.convert_query(query)
+                        return Database.Cursor.execute(self, query, params)
         query = self.convert_query(query)
-        try:
-            return Database.Cursor.execute(self, query, params)
-        except OverflowError:
-            return None
+        return Database.Cursor.execute(self, query, params)
 
     def executemany(self, query, param_list):
         query = self.convert_query(query)

@@ -3811,3 +3811,7 @@ class Ticket27397Tests(TestCase):
             len(Order.objects.filter(pk=11111111111111111111111111111111111111111111111)),
             0
         )
+        self.assertEqual(
+            len(Order.objects.exclude(pk=11111111111111111111111111111111111111111111111)),
+            1
+        )
