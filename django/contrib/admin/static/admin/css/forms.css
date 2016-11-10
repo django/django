@@ -83,7 +83,7 @@ form ul.inline li {
     height: 26px;
 }
 
-.aligned label + p, .aligned label + div.help {
+.aligned label + p, .aligned label + div.readonly {
     padding: 6px 0;
     margin-top: 0;
     margin-bottom: 0;
