@@ -2939,7 +2939,7 @@ session cookie.
 HTTPOnly_ is a flag included in a Set-Cookie HTTP response header. It
 is not part of the :rfc:`2109` standard for cookies, and it isn't honored
 consistently by all browsers. However, when it is honored, it can be a
-useful way to mitigate the risk of client side script accessing the
+useful way to mitigate the risk of a client side script accessing the
 protected cookie data.
 
 Turning it on makes it less trivial for an attacker to escalate a cross-site
