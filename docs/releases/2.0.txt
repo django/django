@@ -444,6 +444,10 @@ Miscellaneous
 * A model instance's primary key now appears in the default ``Model.__str__()``
   method, e.g. ``Question object (1)``.
 
+* ``makemigrations`` now detects changes to the model field ``limit_choices_to``
+  option. Add this to your existing migrations or accept an auto-generated
+  migration for fields that use it.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0

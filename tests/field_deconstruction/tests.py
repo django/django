@@ -214,6 +214,15 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.Permission", "related_name": "foobar", "on_delete": models.CASCADE})
+        # Test limit_choices_to
+        field = models.ForeignKey("auth.Permission", models.CASCADE, limit_choices_to={'foo': 'bar'})
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.ForeignKey")
+        self.assertEqual(args, [])
+        self.assertEqual(
+            kwargs,
+            {"to": "auth.Permission", "limit_choices_to": {'foo': 'bar'}, "on_delete": models.CASCADE}
+        )
 
     @override_settings(AUTH_USER_MODEL="auth.Permission")
     def test_foreign_key_swapped(self):
@@ -227,6 +236,17 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.Permission", "on_delete": models.CASCADE})
         self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
+
+    def test_one_to_one(self):
+        # Test limit_choices_to
+        field = models.OneToOneField("auth.Permission", models.CASCADE, limit_choices_to={'foo': 'bar'})
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.OneToOneField")
+        self.assertEqual(args, [])
+        self.assertEqual(
+            kwargs,
+            {"to": "auth.Permission", "limit_choices_to": {'foo': 'bar'}, "on_delete": models.CASCADE}
+        )
 
     def test_image_field(self):
         field = models.ImageField(upload_to="foo/barness", width_field="width", height_field="height")
@@ -294,6 +314,12 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(path, "django.db.models.ManyToManyField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.Permission", "related_name": "custom_table"})
+        # Test limit_choices_to
+        field = models.ManyToManyField("auth.Permission", limit_choices_to={'foo': 'bar'})
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.ManyToManyField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"to": "auth.Permission", "limit_choices_to": {'foo': 'bar'}})
 
     @override_settings(AUTH_USER_MODEL="auth.Permission")
     def test_many_to_many_field_swapped(self):
