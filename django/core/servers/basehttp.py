@@ -96,14 +96,24 @@ class ServerHandler(simple_server.ServerHandler, object):
             super(ServerHandler, self).handle_error()
 
     def set_content_length(self):
-        result = self.result
-        if hasattr(result, 'content'):
-            self.headers['Content-Length'] = len(result.content)
-            self.has_length = True
+        """Compute Content-Length or switch to chunked encoding if possible"""
+        try:
+            blocks = len(self.result)
+        except (TypeError,AttributeError,NotImplementedError):
+            result = self.result
+            if hasattr(result, 'content'):
+                result.content = result.content.rstrip()
+                self.headers['Content-Length'] = str(len(result.content))
+                self.has_length = True
+        else:
+            if blocks==1:
+                self.headers['Content-Length'] = str(self.bytes_sent)
+                return
 
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
     protocol_version = "HTTP/1.1"
+    max_keepalive_requests = 100
 
     def address_string(self):
         # Short-circuit parent method to not call socket.getfqdn
@@ -155,7 +165,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         self.close_connection = 1
 
         # max keep-alive request times
-        for i in range(100):
+        for i in range(self.max_keepalive_requests):
             self.handle_one_request()
             if self.close_connection:
                 break
@@ -163,7 +173,12 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
     def handle_one_request(self):
         """Copy of WSGIRequestHandler.handle(), but with different ServerHandler"""
 
-        self.raw_requestline = self.rfile.readline(65537)
+        try:
+            self.raw_requestline = self.rfile.readline(65537)
+        except socket.error:
+            self.close_connection = 1
+            return
+
         if len(self.raw_requestline) > 65536:
             self.requestline = ''
             self.request_version = ''
