@@ -148,6 +148,9 @@ Minor features
 
 * PostGIS migrations can now change field dimensions.
 
+* Added the ability to pass the `size`, `shape`, and `offset` parameter when
+  creating :class:`~django.contrib.gis.gdal.GDALRaster` objects.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

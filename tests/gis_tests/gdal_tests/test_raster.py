@@ -190,6 +190,64 @@ class GDALRasterTests(unittest.TestCase):
         else:
             self.assertEqual(restored_raster.bands[0].data(), self.rs.bands[0].data())
 
+    def test_offset_size_and_shape_on_raster_creation(self):
+        rast = GDALRaster({
+            'datatype': 1,
+            'width': 4,
+            'height': 4,
+            'srid': 4326,
+            'bands': [{
+                'data': (1,),
+                'offset': (1, 1),
+                'size': (2, 2),
+                'shape': (1, 1),
+                'nodata_value': 2,
+            }],
+        })
+        # Get array from raster.
+        result = rast.bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+        # Band data is equal to nodata value except on input block of ones.
+        self.assertEqual(
+            result,
+            [2, 2, 2, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 2, 2, 2]
+        )
+
+    def test_set_nodata_value_on_raster_creation(self):
+        # Create raster filled with nodata values.
+        rast = GDALRaster({
+            'datatype': 1,
+            'width': 2,
+            'height': 2,
+            'srid': 4326,
+            'bands': [{'nodata_value': 23}],
+        })
+        # Get array from raster.
+        result = rast.bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+        # All band data is equal to nodata value.
+        self.assertEqual(result, [23, ] * 4)
+
+    def test_set_nodata_none_on_raster_creation(self):
+        if GDAL_VERSION < (2, 1):
+            self.skipTest("GDAL >= 2.1 is required for this test.")
+        # Create raster without data and without nodata value.
+        rast = GDALRaster({
+            'datatype': 1,
+            'width': 2,
+            'height': 2,
+            'srid': 4326,
+            'bands': [{'nodata_value': None}],
+        })
+        # Get array from raster.
+        result = rast.bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+        # Band data is equal to zero becaues no nodata value has been specified.
+        self.assertEqual(result, [0] * 4)
+
     def test_raster_warp(self):
         # Create in memory raster
         source = GDALRaster({
@@ -245,6 +303,29 @@ class GDALRasterTests(unittest.TestCase):
              8.0, 9.0, 10.0, 11.0,
              12.0, 13.0, 14.0, 15.0]
         )
+
+    def test_raster_warp_nodata_zone(self):
+        # Create in memory raster.
+        source = GDALRaster({
+            'datatype': 1,
+            'driver': 'MEM',
+            'width': 4,
+            'height': 4,
+            'srid': 3086,
+            'origin': (500000, 400000),
+            'scale': (100, -100),
+            'skew': (0, 0),
+            'bands': [{
+                'data': range(16),
+                'nodata_value': 23,
+            }],
+        })
+        # Warp raster onto a location that does not cover any pixels of the original.
+        result = source.warp({'origin': (200000, 200000)}).bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+        # The result is an empty raster filled with the correct nodata value.
+        self.assertEqual(result, [23] * 16)
 
     def test_raster_transform(self):
         if GDAL_VERSION < (1, 8, 1):
