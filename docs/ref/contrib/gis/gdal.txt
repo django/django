@@ -1117,16 +1117,39 @@ blue.
         >>> rst = GDALRaster('/path/to/your/raster.tif', write=False)
         >>> rst.name
         '/path/to/your/raster.tif'
-        >>> rst.width, rst.height            # This file has 163 x 174 pixels
+        >>> rst.width, rst.height  # This file has 163 x 174 pixels
         (163, 174)
-        >>> rst = GDALRaster({'srid': 4326, 'width': 1, 'height': 2, 'datatype': 1
-        ...                   'bands': [{'data': [0, 1]}]}) # Creates in-memory raster
+        >>> rst = GDALRaster({  # Creates an in-memory raster
+        ...     'srid': 4326,
+        ...     'width': 4,
+        ...     'height': 4,
+        ...     'datatype': 1,
+        ...     'bands': [{
+        ...         'data': (2, 3),
+        ...         'offset': (1, 1),
+        ...         'size': (2, 2),
+        ...         'shape': (2, 1),
+        ...         'nodata_value': 5,
+        ...     }]
+        ... })
         >>> rst.srs.srid
         4326
         >>> rst.width, rst.height
-        (1, 2)
+        (4, 4)
         >>> rst.bands[0].data()
-        array([[0, 1]], dtype=int8)
+        array([[5, 5, 5, 5],
+               [5, 2, 3, 5],
+               [5, 2, 3, 5],
+               [5, 5, 5, 5]], dtype=uint8)
+
+    .. versionchanged:: 1.11
+
+        Added the ability to pass the ``size``, ``shape``, and ``offset``
+        parameters when creating :class:`GDALRaster` objects. The parameters
+        can be passed through the ``ds_input`` dictionary. This allows to
+        finely control initial pixel values. The functionality is similar to
+        the :meth:`GDALBand.data()<django.contrib.gis.gdal.GDALBand.data>`
+        method.
 
     .. attribute:: name
 
