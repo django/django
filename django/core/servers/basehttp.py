@@ -99,14 +99,14 @@ class ServerHandler(simple_server.ServerHandler, object):
         """Compute Content-Length or switch to chunked encoding if possible"""
         try:
             blocks = len(self.result)
-        except (TypeError,AttributeError,NotImplementedError):
+        except (TypeError, AttributeError, NotImplementedError):
             result = self.result
             if hasattr(result, 'content'):
                 result.content = result.content.rstrip()
                 self.headers['Content-Length'] = str(len(result.content))
                 self.has_length = True
         else:
-            if blocks==1:
+            if blocks == 1:
                 self.headers['Content-Length'] = str(self.bytes_sent)
                 return
 
