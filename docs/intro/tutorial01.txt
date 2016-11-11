@@ -272,12 +272,12 @@ In the ``polls/urls.py`` file include the following code:
 .. snippet::
     :filename: polls/urls.py
 
-    from django.conf.urls import url
+    from django.urls import path
 
     from . import views
 
     urlpatterns = [
-        url(r'^$', views.index, name='index'),
+        path('', views.index, name='index'),
     ]
 
 The next step is to point the root URLconf at the ``polls.urls`` module. In
@@ -287,12 +287,12 @@ an :func:`~django.conf.urls.include` in the ``urlpatterns`` list, so you have:
 .. snippet::
     :filename: mysite/urls.py
 
-    from django.conf.urls import include, url
+    from django.urls import include, path
     from django.contrib import admin
 
     urlpatterns = [
-        url(r'^polls/', include('polls.urls')),
-        url(r'^admin/', admin.site.urls),
+        path('polls/', include('polls.urls')),
+        path('admin/', admin.site.urls),
     ]
 
 The :func:`~django.conf.urls.include` function allows referencing other
@@ -332,11 +332,11 @@ Go to http://localhost:8000/polls/ in your browser, and you should see the
 text "*Hello, world. You're at the polls index.*", which you defined in the
 ``index`` view.
 
-The :func:`~django.conf.urls.url` function is passed four arguments, two
-required: ``regex`` and ``view``, and two optional: ``kwargs``, and ``name``.
+The :func:`~django.urls.path` function is passed four arguments, two required:
+``path_string`` and ``view``, and two optional: ``kwargs``, and ``name``.
 At this point, it's worth reviewing what these arguments are for.
 
-:func:`~django.conf.urls.url` argument: regex
+:func:`~django.urls.path` argument: regex
 ---------------------------------------------
 
 The term "regex" is a commonly used short form meaning "regular expression",

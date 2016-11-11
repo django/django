@@ -32,7 +32,7 @@ built-in handling for user-uploaded files, but you can have Django serve your
 
     if settings.DEBUG:
         urlpatterns += [
-            url(r'^media/(?P<path>.*)$', serve, {
+            path('media/<path:path>', serve, {
                 'document_root': settings.MEDIA_ROOT,
             }),
         ]

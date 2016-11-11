@@ -23,13 +23,13 @@ Helper function to return a URL pattern for serving files in debug mode::
 
 .. function:: url(regex, view, kwargs=None, name=None)
 
-``urlpatterns`` should be a list of ``url()`` instances. For example::
+``urlpatterns`` should be a list of ``path()`` instances. For example::
 
-    from django.conf.urls import include, url
+    from django.urls import include, path
 
     urlpatterns = [
-        url(r'^index/$', index_view, name='main-view'),
-        url(r'^weblog/', include('blog.urls')),
+        path('index/', index_view, name='main-view'),
+        path('weblog/', include('blog.urls')),
         ...
     ]
 

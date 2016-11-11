@@ -888,7 +888,7 @@ appropriate entities.
         from django.utils.translation import pgettext_lazy
 
         urlpatterns = [
-            url(format_lazy(r'{person}/(?P<pk>\d+)/$', person=pgettext_lazy('URL', 'person')),
+            path(format_lazy('{person}/<int:pk>/', person=pgettext_lazy('URL', 'person')),
                 PersonDetailView.as_view()),
         ]
 
