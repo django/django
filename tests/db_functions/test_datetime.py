@@ -801,7 +801,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
 
         melb = pytz.timezone('Australia/Melbourne')
 
-        def test_datetime_kind(kind, tzinfo=melb):
+        def test_datetime_kind(kind):
             self.assertQuerysetEqual(
                 DTModel.objects.annotate(
                     truncated=Trunc('start_datetime', kind, output_field=DateTimeField(), tzinfo=melb)
@@ -813,7 +813,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                 lambda m: (m.start_datetime, m.truncated)
             )
 
-        def test_date_kind(kind, tzinfo=melb):
+        def test_date_kind(kind):
             self.assertQuerysetEqual(
                 DTModel.objects.annotate(
                     truncated=Trunc('start_date', kind, output_field=DateField(), tzinfo=melb)
@@ -825,7 +825,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                 lambda m: (m.start_datetime, m.truncated)
             )
 
-        def test_time_kind(kind, tzinfo=melb):
+        def test_time_kind(kind):
             self.assertQuerysetEqual(
                 DTModel.objects.annotate(
                     truncated=Trunc('start_time', kind, output_field=TimeField(), tzinfo=melb)
