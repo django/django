@@ -306,6 +306,11 @@ Models
 * Added support for time truncation to
   :class:`~django.db.models.functions.datetime.Trunc` functions.
 
+* Added the :class:`~django.db.models.functions.datetime.ExtractWeek` function
+  to extract the week from :class:`~django.db.models.DateField` and
+  :class:`~django.db.models.DateTimeField` and exposed it through the
+  :lookup:`week` lookup.
+
 * Added the :class:`~django.db.models.functions.datetime.TruncTime` function
   to truncate :class:`~django.db.models.DateTimeField` to its time component
   and exposed it through the :lookup:`time` lookup.
