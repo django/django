@@ -97,7 +97,6 @@ class ServerHandler(simple_server.ServerHandler, object):
 
     def set_content_length(self):
         result = self.result
-        self.has_length = False
         if hasattr(result, 'content'):
             self.headers['Content-Length'] = len(result.content)
             self.has_length = True
@@ -180,7 +179,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         )
         handler.request_handler = self      # backpointer for logging
         handler.run(self.server.get_app())
-        if not handler.has_length:
+        if not hasattr(handler, 'has_length'):
             self.close_connection = 1
 
 
