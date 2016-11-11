@@ -106,7 +106,7 @@ An exception to this rule is the :djadmin:`makemigrations` command. It
 validates the migration history in the databases to catch problems with the
 existing migration files (which could be caused by editing them) before
 creating new migrations. By default, it checks only the ``default`` database,
-but it consults the the :meth:`allow_migrate` method of :ref:`routers
+but it consults the :meth:`allow_migrate` method of :ref:`routers
 <topics-db-multi-db-routing>` if any are installed.
 
 .. versionchanged:: 1.10
