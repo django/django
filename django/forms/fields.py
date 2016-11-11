@@ -185,8 +185,11 @@ class Field(object):
 
     def has_changed(self, initial, data):
         """
-        Return True if data differs from initial.
+        Return True if data differs from initial. Return False when field is
+        disabled.
         """
+        if self.disabled:
+            return False
         try:
             data = self.to_python(data)
             if hasattr(self, '_coerce'):
