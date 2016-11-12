@@ -151,6 +151,8 @@ Minor features
 * Added the ability to pass the `size`, `shape`, and `offset` parameter when
   creating :class:`~django.contrib.gis.gdal.GDALRaster` objects.
 
+* Support for GDAL 1.7 and 1.8 has been dropped.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
