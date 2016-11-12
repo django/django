@@ -173,10 +173,10 @@ Geometries support set-like operators::
         >>> ls3 == ls2  # different SRIDs
         False
 
-        .. versionchanged:: 1.11
+    .. versionchanged:: 1.11
 
-            Added a check on the ``srid`` property when comparing
-            ``GEOSGeometry`` objects using the equality operator.
+        Added a check on the ``srid`` property when comparing
+        ``GEOSGeometry`` objects using the equality operator.
 
 Geometry Objects
 ================
