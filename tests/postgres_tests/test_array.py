@@ -677,6 +677,11 @@ class TestSimpleFormField(PostgreSQLTestCase):
         self.assertIsInstance(form_field, SimpleArrayField)
         self.assertEqual(form_field.max_length, 4)
 
+    def test_already_converted_value(self):
+        field = SimpleArrayField(forms.CharField())
+        vals = ['a', 'b', 'c']
+        self.assertEqual(field.clean(vals), vals)
+
 
 class TestSplitFormField(PostgreSQLTestCase):
 
