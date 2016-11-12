@@ -175,7 +175,7 @@ Geometries support set-like operators::
 
     .. versionchanged:: 1.11
 
-        Added a check on the ``srid`` property when comparing
+        Older versions didn't check the ``srid`` when comparing
         ``GEOSGeometry`` objects using the equality operator.
 
 Geometry Objects

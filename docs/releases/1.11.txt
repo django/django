@@ -409,7 +409,7 @@ Backwards incompatible changes in 1.11
   the Google Maps API and seems to be unmaintained. If you're using it, `let
   us know <https://code.djangoproject.com/ticket/14284>`_.
 
-* The ``GEOSGeometry`` equality operator now also checks on SRID.
+* The ``GEOSGeometry`` equality operator now also compares SRID.
 
 Database backend API
 --------------------
