@@ -48,7 +48,7 @@ class GeometryFieldTest(SimpleTestCase):
         # By default, all geometry types are allowed.
         fld = forms.GeometryField()
         for wkt in ('POINT(5 23)', 'MULTIPOLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'LINESTRING(0 0, 1 1)'):
-            # to_python() uses the SRID of OpenLayersWidget if the converted
+            # `to_python` uses the SRID of OpenLayersWidget if the converted
             # value doesn't have an SRID itself.
             self.assertEqual(GEOSGeometry(wkt, srid=fld.widget.map_srid), fld.clean(wkt))
 
