@@ -181,15 +181,15 @@ class WriterTests(SimpleTestCase):
     """
 
     def safe_exec(self, string, value=None):
-        l = {}
+        d = {}
         try:
-            exec(force_str(string), globals(), l)
+            exec(force_str(string), globals(), d)
         except Exception as e:
             if value:
                 self.fail("Could not exec %r (from value %r): %s" % (string.strip(), value, e))
             else:
                 self.fail("Could not exec %r: %s" % (string.strip(), e))
-        return l
+        return d
 
     def serialize_round_trip(self, value):
         string, imports = MigrationWriter.serialize(value)

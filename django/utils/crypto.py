@@ -164,8 +164,8 @@ else:
             dklen = hlen
         if dklen > (2 ** 32 - 1) * hlen:
             raise OverflowError('dklen too big')
-        l = -(-dklen // hlen)
-        r = dklen - (l - 1) * hlen
+        L = -(-dklen // hlen)
+        r = dklen - (L - 1) * hlen
 
         hex_format_string = "%%0%ix" % (hlen * 2)
 
@@ -187,5 +187,5 @@ else:
                 result ^= _bin_to_long(u)
             return _long_to_bin(result, hex_format_string)
 
-        T = [F(x) for x in range(1, l)]
-        return b''.join(T) + F(l)[:r]
+        T = [F(x) for x in range(1, L)]
+        return b''.join(T) + F(L)[:r]

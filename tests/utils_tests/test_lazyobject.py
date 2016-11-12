@@ -199,10 +199,10 @@ class LazyObjectTestCase(TestCase):
 
     def test_copy_list(self):
         # Copying a list works and returns the correct objects.
-        l = [1, 2, 3]
+        lst = [1, 2, 3]
 
-        obj = self.lazy_wrap(l)
-        len(l)  # forces evaluation
+        obj = self.lazy_wrap(lst)
+        len(lst)  # forces evaluation
         obj2 = copy.copy(obj)
 
         self.assertIsNot(obj, obj2)
@@ -211,9 +211,9 @@ class LazyObjectTestCase(TestCase):
 
     def test_copy_list_no_evaluation(self):
         # Copying a list doesn't force evaluation.
-        l = [1, 2, 3]
+        lst = [1, 2, 3]
 
-        obj = self.lazy_wrap(l)
+        obj = self.lazy_wrap(lst)
         obj2 = copy.copy(obj)
 
         self.assertIsNot(obj, obj2)
@@ -245,10 +245,10 @@ class LazyObjectTestCase(TestCase):
 
     def test_deepcopy_list(self):
         # Deep copying a list works and returns the correct objects.
-        l = [1, 2, 3]
+        lst = [1, 2, 3]
 
-        obj = self.lazy_wrap(l)
-        len(l)  # forces evaluation
+        obj = self.lazy_wrap(lst)
+        len(lst)  # forces evaluation
         obj2 = copy.deepcopy(obj)
 
         self.assertIsNot(obj, obj2)
@@ -257,9 +257,9 @@ class LazyObjectTestCase(TestCase):
 
     def test_deepcopy_list_no_evaluation(self):
         # Deep copying doesn't force evaluation.
-        l = [1, 2, 3]
+        lst = [1, 2, 3]
 
-        obj = self.lazy_wrap(l)
+        obj = self.lazy_wrap(lst)
         obj2 = copy.deepcopy(obj)
 
         self.assertIsNot(obj, obj2)

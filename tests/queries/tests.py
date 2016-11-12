@@ -564,14 +564,14 @@ class Queries1Tests(TestCase):
         self.assertEqual(d, {'a': 'one', 'b': 'two'})
 
         # Order by the number of tags attached to an item.
-        l = (
+        qs = (
             Item.objects
             .extra(select={
                 'count': 'select count(*) from queries_item_tags where queries_item_tags.item_id = queries_item.id'
             })
             .order_by('-count')
         )
-        self.assertEqual([o.count for o in l], [2, 2, 1, 0])
+        self.assertEqual([o.count for o in qs], [2, 2, 1, 0])
 
     def test_ticket6154(self):
         # Multiple filter statements are joined using "AND" all the time.
