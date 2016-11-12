@@ -35,7 +35,9 @@ class SimpleArrayField(forms.CharField):
         return value
 
     def to_python(self, value):
-        if value:
+        if isinstance(value, list):
+            items = value
+        elif value:
             items = value.split(self.delimiter)
         else:
             items = []
