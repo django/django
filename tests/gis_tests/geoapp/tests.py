@@ -479,8 +479,11 @@ class GeoQuerySetTest(TestCase):
                 # SpatiaLite).
                 pass
             else:
-                self.assertEqual(c.mpoly.difference(geom), c.difference)
-                if not spatialite:
+                if spatialite:
+                    # Spatialite `difference` doesn't have an SRID
+                    self.assertEqual(c.mpoly.difference(geom).wkt, c.difference.wkt)
+                else:
+                    self.assertEqual(c.mpoly.difference(geom), c.difference)
                     self.assertEqual(c.mpoly.intersection(geom), c.intersection)
                 # Ordering might differ in collections
                 self.assertSetEqual(set(g.wkt for g in c.mpoly.sym_difference(geom)),
