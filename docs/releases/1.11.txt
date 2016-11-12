@@ -72,6 +72,10 @@ Minor features
   <django.contrib.admin.ModelAdmin.get_exclude>` hook allows specifying the
   exclude fields based on the request or model instance.
 
+* The ``popup_response.html`` template can now be overridden per app, per
+  model, or by setting the :attr:`.ModelAdmin.popup_response_template`
+  attribute.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

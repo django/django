@@ -162,6 +162,7 @@ class CustomArticleAdmin(admin.ModelAdmin):
     object_history_template = 'custom_admin/object_history.html'
     delete_confirmation_template = 'custom_admin/delete_confirmation.html'
     delete_selected_confirmation_template = 'custom_admin/delete_selected_confirmation.html'
+    popup_response_template = 'custom_admin/popup_response.html'
 
     def changelist_view(self, request):
         return super(CustomArticleAdmin, self).changelist_view(
