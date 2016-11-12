@@ -385,6 +385,8 @@ class SettingsConfigTest(AdminScriptTestCase):
 
 def dictConfig(config):
     dictConfig.called = True
+
+
 dictConfig.called = False
 
 

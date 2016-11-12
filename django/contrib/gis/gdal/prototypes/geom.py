@@ -29,6 +29,7 @@ def topology_func(f):
     f.errcheck = lambda result, func, cargs: bool(result)
     return f
 
+
 # ### OGR_G ctypes function prototypes ###
 
 # GeoJSON routines.

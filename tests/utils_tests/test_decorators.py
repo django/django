@@ -9,6 +9,7 @@ class ProcessViewMiddleware(object):
     def process_view(self, request, view_func, view_args, view_kwargs):
         pass
 
+
 process_view_dec = decorator_from_middleware(ProcessViewMiddleware)
 
 
@@ -20,6 +21,7 @@ def process_view(request):
 class ClassProcessView(object):
     def __call__(self, request):
         return HttpResponse()
+
 
 class_process_view = process_view_dec(ClassProcessView())
 
@@ -40,6 +42,7 @@ class FullMiddleware(object):
         request.process_response_content = response.content
         request.process_response_reached = True
         return response
+
 
 full_dec = decorator_from_middleware(FullMiddleware)
 

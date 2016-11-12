@@ -19,6 +19,8 @@ from .utils import TEMPLATE_DIR
 
 def test_processor(request):
     return {'processors': 'yes'}
+
+
 test_processor_name = 'template_tests.test_response.test_processor'
 
 

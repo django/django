@@ -182,6 +182,7 @@ def inherited_compare(testcase, pk, klass, data):
     for key, value in data.items():
         testcase.assertEqual(value, getattr(instance, key))
 
+
 # Define some data types. Each data type is
 # actually a pair of functions; one to create
 # and one to compare objects of that type

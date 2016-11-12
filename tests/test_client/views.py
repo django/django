@@ -116,6 +116,7 @@ def bad_view(request):
     "A view that returns a 404 with some error content"
     return HttpResponseNotFound('Not found!. This page contains some MAGIC content')
 
+
 TestChoices = (
     ('a', 'First Choice'),
     ('b', 'Second Choice'),
@@ -191,6 +192,7 @@ class BaseTestFormSet(BaseFormSet):
                 )
             emails.append(email)
 
+
 TestFormSet = formset_factory(TestForm, BaseTestFormSet)
 
 
@@ -238,6 +240,8 @@ def _permission_protected_view(request):
                  name='Permissions Template')
     c = Context({'user': request.user})
     return HttpResponse(t.render(c))
+
+
 permission_protected_view = permission_required('permission_not_granted')(_permission_protected_view)
 permission_protected_view_exception = (
     permission_required('permission_not_granted', raise_exception=True)(_permission_protected_view)
@@ -261,6 +265,7 @@ class _ViewManager(object):
                      name='Permissions Template')
         c = Context({'user': request.user})
         return HttpResponse(t.render(c))
+
 
 _view_manager = _ViewManager()
 login_protected_method_view = _view_manager.login_protected_view

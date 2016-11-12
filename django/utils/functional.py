@@ -228,6 +228,7 @@ def keep_lazy_text(func):
     """
     return keep_lazy(six.text_type)(func)
 
+
 empty = object()
 
 

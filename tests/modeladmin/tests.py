@@ -30,6 +30,7 @@ class MockSuperUser(object):
     def has_perm(self, perm):
         return True
 
+
 request = MockRequest()
 request.user = MockSuperUser()
 

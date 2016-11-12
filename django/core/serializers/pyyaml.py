@@ -33,6 +33,7 @@ class DjangoSafeDumper(SafeDumper):
     def represent_ordered_dict(self, data):
         return self.represent_mapping('tag:yaml.org,2002:map', data.items())
 
+
 DjangoSafeDumper.add_representer(decimal.Decimal, DjangoSafeDumper.represent_decimal)
 DjangoSafeDumper.add_representer(collections.OrderedDict, DjangoSafeDumper.represent_ordered_dict)
 

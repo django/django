@@ -15,6 +15,7 @@ class CustomUserAdmin(UserAdmin):
         super(CustomUserAdmin, self).log_change(request, object, message)
         request.user.pk = original_pk
 
+
 site.register(get_user_model(), CustomUserAdmin)
 
 urlpatterns = [

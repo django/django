@@ -60,6 +60,7 @@ class TestW3CGeo3(TestGeoRSS1):
         from django.contrib.gis.geos import Polygon
         return Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
 
+
 # The feed dictionary to use for URLs.
 feed_dict = {
     'rss1': TestGeoRSS1,

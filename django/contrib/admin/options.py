@@ -70,6 +70,7 @@ def get_ul_class(radio_style):
 class IncorrectLookupParameters(Exception):
     pass
 
+
 # Defaults for formfield_overrides. ModelAdmin subclasses can change this
 # by adding to ModelAdmin.formfield_overrides.
 

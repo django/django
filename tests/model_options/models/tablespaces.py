@@ -40,6 +40,7 @@ class Article(models.Model):
         db_tablespace = 'tbl_tbsp'
         managed = False
 
+
 # Also set the tables for automatically created models
 
 Authors = Article._meta.get_field('authors').remote_field.through

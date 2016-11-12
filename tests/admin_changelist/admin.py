@@ -24,6 +24,7 @@ class EventAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
 
+
 site.register(Event, EventAdmin)
 
 
@@ -98,11 +99,13 @@ class DynamicListDisplayLinksChildAdmin(admin.ModelAdmin):
     def get_list_display_links(self, request, list_display):
         return ['age']
 
+
 site.register(Child, DynamicListDisplayChildAdmin)
 
 
 class NoListDisplayLinksParentAdmin(admin.ModelAdmin):
     list_display_links = None
+
 
 site.register(Parent, NoListDisplayLinksParentAdmin)
 
@@ -112,6 +115,7 @@ class SwallowAdmin(admin.ModelAdmin):
     list_display = ('origin', 'load', 'speed', 'swallowonetoone')
     list_editable = ['load', 'speed']
     list_per_page = 3
+
 
 site.register(Swallow, SwallowAdmin)
 

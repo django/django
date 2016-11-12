@@ -269,6 +269,7 @@ TEST_DATA = [
 def create_path(filename):
     return os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), filename))
 
+
 # Add valid and invalid URL tests.
 # This only tests the validator without extended schemes.
 with io.open(create_path('valid_urls.txt'), encoding='utf8') as f:
@@ -339,6 +340,7 @@ class TestSimpleValidators(SimpleTestCase):
         v = MaxLengthValidator(16, message='"%(value)s" has more than %(limit_value)d characters.')
         with self.assertRaisesMessage(ValidationError, '"djangoproject.com" has more than 16 characters.'):
             v('djangoproject.com')
+
 
 test_counter = 0
 for validator, value, expected in TEST_DATA:

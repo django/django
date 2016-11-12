@@ -30,6 +30,8 @@ from django.views.decorators.vary import vary_on_cookie, vary_on_headers
 def fully_decorated(request):
     """Expected __doc__"""
     return HttpResponse('<html><body>dummy</body></html>')
+
+
 fully_decorated.anything = "Expected __dict__"
 
 
@@ -170,6 +172,7 @@ def simple_dec(func):
         return func("test:" + arg)
     return wraps(func)(wrapper)
 
+
 simple_dec_m = method_decorator(simple_dec)
 
 
@@ -180,6 +183,7 @@ def myattr_dec(func):
     wrapper.myattr = True
     return wraps(func)(wrapper)
 
+
 myattr_dec_m = method_decorator(myattr_dec)
 
 
@@ -188,6 +192,7 @@ def myattr2_dec(func):
         return func(*args, **kwargs)
     wrapper.myattr2 = True
     return wraps(func)(wrapper)
+
 
 myattr2_dec_m = method_decorator(myattr2_dec)
 

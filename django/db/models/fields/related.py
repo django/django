@@ -756,6 +756,7 @@ class ForeignObject(RelatedField):
             if self.remote_field.limit_choices_to:
                 cls._meta.related_fkey_lookups.append(self.remote_field.limit_choices_to)
 
+
 ForeignObject.register_lookup(RelatedIn)
 ForeignObject.register_lookup(RelatedExact)
 ForeignObject.register_lookup(RelatedLessThan)

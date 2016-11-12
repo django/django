@@ -123,6 +123,7 @@ def make_function(input, toks):
         self.assertListEqual(result, toks)
     return test_func
 
+
 for i, (input, toks) in enumerate(JsTokensTest.LEX_CASES):
     setattr(JsTokensTest, "test_case_%d" % i, make_function(input, toks))
 
@@ -223,6 +224,7 @@ def make_function(js, c):
     def test_func(self):
         self.assertMultiLineEqual(prepare_js_for_gettext(js), c)
     return test_func
+
 
 for i, pair in enumerate(GETTEXT_CASES):
     setattr(JsToCForGettextTest, "test_case_%d" % i, make_function(*pair))

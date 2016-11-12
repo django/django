@@ -35,6 +35,7 @@ class Callable(object):
     def a(self, val, **kwargs):
         return val
 
+
 a_signal = Signal(providing_args=["val"])
 b_signal = Signal(providing_args=["val"])
 c_signal = Signal(providing_args=["val"])

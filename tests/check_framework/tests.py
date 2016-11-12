@@ -137,12 +137,16 @@ def simple_system_check(**kwargs):
 def tagged_system_check(**kwargs):
     tagged_system_check.kwargs = kwargs
     return [checks.Warning('System Check')]
+
+
 tagged_system_check.tags = ['simpletag']
 
 
 def deployment_system_check(**kwargs):
     deployment_system_check.kwargs = kwargs
     return [checks.Warning('Deployment Check')]
+
+
 deployment_system_check.tags = ['deploymenttag']
 
 

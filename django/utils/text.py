@@ -385,6 +385,7 @@ def _replace_entity(match):
         except (ValueError, KeyError):
             return match.group(0)
 
+
 _entity_re = re.compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
 
 
@@ -445,4 +446,6 @@ def _format_lazy(format_string, *args, **kwargs):
     and/or kwargs might be lazy.
     """
     return format_string.format(*args, **kwargs)
+
+
 format_lazy = lazy(_format_lazy, six.text_type)

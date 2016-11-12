@@ -692,6 +692,7 @@ class MultiLineString(GeometryCollection):
 class MultiPolygon(GeometryCollection):
     pass
 
+
 # Class mapping dictionary (using the OGRwkbGeometryType as the key)
 GEO_CLASSES = {1: Point,
                2: LineString,

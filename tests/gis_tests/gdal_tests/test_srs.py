@@ -16,6 +16,7 @@ class TestSRS:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+
 WGS84_proj = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
 
 # Some Spatial Reference examples

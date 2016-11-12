@@ -33,6 +33,7 @@ class SchoolAdmin(admin.ModelAdmin):
     filter_vertical = ('students',)
     filter_horizontal = ('alumni',)
 
+
 site = WidgetAdmin(name='widget-admin')
 
 site.register(models.User)

@@ -158,6 +158,8 @@ class OverlapsLeftLookup(GISLookup):
     left of B's bounding box.
     """
     lookup_name = 'overlaps_left'
+
+
 gis_lookups['overlaps_left'] = OverlapsLeftLookup
 
 
@@ -167,6 +169,8 @@ class OverlapsRightLookup(GISLookup):
     right of B's bounding box.
     """
     lookup_name = 'overlaps_right'
+
+
 gis_lookups['overlaps_right'] = OverlapsRightLookup
 
 
@@ -176,6 +180,8 @@ class OverlapsBelowLookup(GISLookup):
     B's bounding box.
     """
     lookup_name = 'overlaps_below'
+
+
 gis_lookups['overlaps_below'] = OverlapsBelowLookup
 
 
@@ -185,6 +191,8 @@ class OverlapsAboveLookup(GISLookup):
     B's bounding box.
     """
     lookup_name = 'overlaps_above'
+
+
 gis_lookups['overlaps_above'] = OverlapsAboveLookup
 
 
@@ -194,6 +202,8 @@ class LeftLookup(GISLookup):
     of B's bounding box.
     """
     lookup_name = 'left'
+
+
 gis_lookups['left'] = LeftLookup
 
 
@@ -203,6 +213,8 @@ class RightLookup(GISLookup):
     of B's bounding box.
     """
     lookup_name = 'right'
+
+
 gis_lookups['right'] = RightLookup
 
 
@@ -212,6 +224,8 @@ class StrictlyBelowLookup(GISLookup):
     bounding box.
     """
     lookup_name = 'strictly_below'
+
+
 gis_lookups['strictly_below'] = StrictlyBelowLookup
 
 
@@ -221,6 +235,8 @@ class StrictlyAboveLookup(GISLookup):
     bounding box.
     """
     lookup_name = 'strictly_above'
+
+
 gis_lookups['strictly_above'] = StrictlyAboveLookup
 
 
@@ -231,12 +247,16 @@ class SameAsLookup(GISLookup):
     vertex-by-vertex, the operator returns true.
     """
     lookup_name = 'same_as'
+
+
 gis_lookups['same_as'] = SameAsLookup
 
 
 class ExactLookup(SameAsLookup):
     # Alias of same_as
     lookup_name = 'exact'
+
+
 gis_lookups['exact'] = ExactLookup
 
 
@@ -246,6 +266,8 @@ class BBContainsLookup(GISLookup):
     by B's bounding box.
     """
     lookup_name = 'bbcontains'
+
+
 gis_lookups['bbcontains'] = BBContainsLookup
 
 
@@ -254,6 +276,8 @@ class BBOverlapsLookup(GISLookup):
     The 'bboverlaps' operator returns true if A's bounding box overlaps B's bounding box.
     """
     lookup_name = 'bboverlaps'
+
+
 gis_lookups['bboverlaps'] = BBOverlapsLookup
 
 
@@ -263,6 +287,8 @@ class ContainedLookup(GISLookup):
     by B's bounding box.
     """
     lookup_name = 'contained'
+
+
 gis_lookups['contained'] = ContainedLookup
 
 
@@ -272,41 +298,57 @@ gis_lookups['contained'] = ContainedLookup
 
 class ContainsLookup(GISLookup):
     lookup_name = 'contains'
+
+
 gis_lookups['contains'] = ContainsLookup
 
 
 class ContainsProperlyLookup(GISLookup):
     lookup_name = 'contains_properly'
+
+
 gis_lookups['contains_properly'] = ContainsProperlyLookup
 
 
 class CoveredByLookup(GISLookup):
     lookup_name = 'coveredby'
+
+
 gis_lookups['coveredby'] = CoveredByLookup
 
 
 class CoversLookup(GISLookup):
     lookup_name = 'covers'
+
+
 gis_lookups['covers'] = CoversLookup
 
 
 class CrossesLookup(GISLookup):
     lookup_name = 'crosses'
+
+
 gis_lookups['crosses'] = CrossesLookup
 
 
 class DisjointLookup(GISLookup):
     lookup_name = 'disjoint'
+
+
 gis_lookups['disjoint'] = DisjointLookup
 
 
 class EqualsLookup(GISLookup):
     lookup_name = 'equals'
+
+
 gis_lookups['equals'] = EqualsLookup
 
 
 class IntersectsLookup(GISLookup):
     lookup_name = 'intersects'
+
+
 gis_lookups['intersects'] = IntersectsLookup
 
 
@@ -322,11 +364,15 @@ class IsValidLookup(BuiltinLookup):
         if not self.rhs:
             sql = 'NOT ' + sql
         return sql, params
+
+
 gis_lookups['isvalid'] = IsValidLookup
 
 
 class OverlapsLookup(GISLookup):
     lookup_name = 'overlaps'
+
+
 gis_lookups['overlaps'] = OverlapsLookup
 
 
@@ -347,16 +393,22 @@ class RelateLookup(GISLookup):
             if not isinstance(pattern, six.string_types) or not self.pattern_regex.match(pattern):
                 raise ValueError('Invalid intersection matrix pattern "%s".' % pattern)
         return super(RelateLookup, self).get_db_prep_lookup(value, connection)
+
+
 gis_lookups['relate'] = RelateLookup
 
 
 class TouchesLookup(GISLookup):
     lookup_name = 'touches'
+
+
 gis_lookups['touches'] = TouchesLookup
 
 
 class WithinLookup(GISLookup):
     lookup_name = 'within'
+
+
 gis_lookups['within'] = WithinLookup
 
 
@@ -395,24 +447,34 @@ class DistanceLookupBase(GISLookup):
 class DWithinLookup(DistanceLookupBase):
     lookup_name = 'dwithin'
     sql_template = '%(func)s(%(lhs)s, %(rhs)s, %%s)'
+
+
 gis_lookups['dwithin'] = DWithinLookup
 
 
 class DistanceGTLookup(DistanceLookupBase):
     lookup_name = 'distance_gt'
+
+
 gis_lookups['distance_gt'] = DistanceGTLookup
 
 
 class DistanceGTELookup(DistanceLookupBase):
     lookup_name = 'distance_gte'
+
+
 gis_lookups['distance_gte'] = DistanceGTELookup
 
 
 class DistanceLTLookup(DistanceLookupBase):
     lookup_name = 'distance_lt'
+
+
 gis_lookups['distance_lt'] = DistanceLTLookup
 
 
 class DistanceLTELookup(DistanceLookupBase):
     lookup_name = 'distance_lte'
+
+
 gis_lookups['distance_lte'] = DistanceLTELookup

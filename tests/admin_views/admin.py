@@ -54,6 +54,8 @@ def callable_year(dt_value):
         return dt_value.year
     except AttributeError:
         return None
+
+
 callable_year.admin_order_field = 'date'
 
 
@@ -252,24 +254,32 @@ def external_mail(modeladmin, request, selected):
         'from@example.com',
         ['to@example.com']
     ).send()
+
+
 external_mail.short_description = 'External mail (Another awesome action)'
 
 
 def redirect_to(modeladmin, request, selected):
     from django.http import HttpResponseRedirect
     return HttpResponseRedirect('/some-where-else/')
+
+
 redirect_to.short_description = 'Redirect to (Awesome action)'
 
 
 def download(modeladmin, request, selected):
     buf = StringIO('This is the content of the file')
     return StreamingHttpResponse(FileWrapper(buf))
+
+
 download.short_description = 'Download subscription'
 
 
 def no_perm(modeladmin, request, selected):
     return HttpResponse(content='No permission to perform this action',
                         status=403)
+
+
 no_perm.short_description = 'No permission to run'
 
 
@@ -631,6 +641,8 @@ class AdminOrderedAdminMethodAdmin(admin.ModelAdmin):
 
 def admin_ordered_callable(obj):
     return obj.order
+
+
 admin_ordered_callable.admin_order_field = 'order'
 
 

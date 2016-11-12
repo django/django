@@ -53,6 +53,7 @@ FavoriteDrinksFormSet = formset_factory(FavoriteDrinkForm, formset=BaseFavoriteD
 class SplitDateTimeForm(Form):
     when = SplitDateTimeField(initial=datetime.datetime.now)
 
+
 SplitDateTimeFormSet = formset_factory(SplitDateTimeForm)
 
 
@@ -1280,6 +1281,7 @@ class FormsetAsFooTests(SimpleTestCase):
 class ArticleForm(Form):
     title = CharField()
     pub_date = DateField()
+
 
 ArticleFormSet = formset_factory(ArticleForm)
 

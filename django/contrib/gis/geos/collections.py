@@ -137,6 +137,7 @@ class MultiPolygon(GeometryCollection):
         )
         return GEOSGeometry(capi.geos_cascaded_union(self.ptr), self.srid)
 
+
 # Setting the allowed types here since GeometryCollection is defined before
 # its subclasses.
 GeometryCollection._allowed = (Point, LineString, LinearRing, Polygon, MultiPoint, MultiLineString, MultiPolygon)

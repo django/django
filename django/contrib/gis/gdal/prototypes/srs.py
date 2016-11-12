@@ -23,6 +23,7 @@ def units_func(f):
     """
     return double_output(f, [c_void_p, POINTER(c_char_p)], strarg=True)
 
+
 # Creation & destruction.
 clone_srs = srs_output(std_call('OSRClone'), [c_void_p])
 new_srs = srs_output(std_call('OSRNewSpatialReference'), [c_char_p])

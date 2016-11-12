@@ -135,6 +135,7 @@ class MockTestRunner(object):
     def __init__(self, *args, **kwargs):
         pass
 
+
 MockTestRunner.run_tests = mock.Mock(return_value=[])
 
 
