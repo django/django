@@ -328,8 +328,6 @@ class GDALRasterTests(unittest.TestCase):
         self.assertEqual(result, [23] * 16)
 
     def test_raster_transform(self):
-        if GDAL_VERSION < (1, 8, 1):
-            self.skipTest("GDAL >= 1.8.1 is required for this test")
         # Prepare tempfile and nodata value
         rstfile = tempfile.NamedTemporaryFile(suffix='.tif')
         ndv = 99
