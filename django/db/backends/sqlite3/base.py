@@ -64,6 +64,7 @@ def decoder(conv_func):
     """
     return lambda s: conv_func(s.decode('utf-8'))
 
+
 Database.register_converter(str("bool"), decoder(lambda s: s == '1'))
 Database.register_converter(str("time"), decoder(parse_time))
 Database.register_converter(str("date"), decoder(parse_date))

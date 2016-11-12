@@ -92,6 +92,7 @@ class BaseConverter(object):
                 x = int(x // len(to_digits))
         return neg, res
 
+
 base2 = BaseConverter(BASE2_ALPHABET)
 base16 = BaseConverter(BASE16_ALPHABET)
 base36 = BaseConverter(BASE36_ALPHABET)

@@ -92,6 +92,8 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
 #
 # reST roles
 #
+
+
 ROLES = {
     'model': '%s/models/%s/',
     'view': '%s/views/%s/',
@@ -136,6 +138,7 @@ def default_reference_role(name, rawtext, text, lineno, inliner, options=None, c
         **options
     )
     return [node], []
+
 
 if docutils_is_available:
     docutils.parsers.rst.roles.register_canonical_role('cmsreference', default_reference_role)

@@ -471,4 +471,5 @@ class DefaultStorage(LazyObject):
     def _setup(self):
         self._wrapped = get_storage_class()()
 
+
 default_storage = DefaultStorage()

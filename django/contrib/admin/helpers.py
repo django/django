@@ -32,6 +32,7 @@ class ActionForm(forms.Form):
         widget=forms.HiddenInput({'class': 'select-across'}),
     )
 
+
 checkbox = forms.CheckboxInput({'class': 'action-select'}, lambda value: False)
 
 

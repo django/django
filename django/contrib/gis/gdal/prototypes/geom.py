@@ -32,6 +32,8 @@ def topology_func(f):
 # ### OGR_G ctypes function prototypes ###
 
 # GeoJSON routines.
+
+
 from_json = geom_output(lgdal.OGR_G_CreateGeometryFromJson, [c_char_p])
 to_json = string_output(lgdal.OGR_G_ExportToJson, [c_void_p], str_result=True, decoding='ascii')
 to_kml = string_output(lgdal.OGR_G_ExportToKML, [c_void_p, c_char_p], str_result=True, decoding='ascii')

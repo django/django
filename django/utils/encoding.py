@@ -145,6 +145,7 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     else:
         return s.encode(encoding, errors)
 
+
 if six.PY3:
     smart_str = smart_text
     force_str = force_text
@@ -277,5 +278,6 @@ def get_system_encoding():
     except Exception:
         encoding = 'ascii'
     return encoding
+
 
 DEFAULT_LOCALE_ENCODING = get_system_encoding()

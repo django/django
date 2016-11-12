@@ -50,6 +50,7 @@ def escape(text):
         .replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
     )
 
+
 _js_escapes = {
     ord('\\'): '\\u005C',
     ord('\''): '\\u0027',

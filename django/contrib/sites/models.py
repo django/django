@@ -121,5 +121,7 @@ def clear_site_cache(sender, **kwargs):
         del SITE_CACHE[Site.objects.using(using).get(pk=instance.pk).domain]
     except (KeyError, Site.DoesNotExist):
         pass
+
+
 pre_save.connect(clear_site_cache, sender=Site)
 pre_delete.connect(clear_site_cache, sender=Site)

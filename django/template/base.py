@@ -1048,6 +1048,7 @@ class VariableNode(Node):
             return ''
         return render_value_in_context(output, context)
 
+
 # Regex for token keyword arguments
 kwarg_re = re.compile(r"(?:(\w+)=)?(.+)")
 
