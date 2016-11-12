@@ -222,6 +222,7 @@ class RelatedFieldListFilter(FieldListFilter):
                 'display': self.empty_value_display,
             }
 
+
 FieldListFilter.register(lambda f: f.remote_field, RelatedFieldListFilter)
 
 
@@ -259,6 +260,7 @@ class BooleanFieldListFilter(FieldListFilter):
                 }, [self.lookup_kwarg]),
                 'display': _('Unknown'),
             }
+
 
 FieldListFilter.register(
     lambda f: isinstance(f, (models.BooleanField, models.NullBooleanField)),
@@ -306,6 +308,7 @@ class ChoicesFieldListFilter(FieldListFilter):
                 }, [self.lookup_kwarg]),
                 'display': none_title,
             }
+
 
 FieldListFilter.register(lambda f: bool(f.choices), ChoicesFieldListFilter)
 
@@ -376,6 +379,7 @@ class DateFieldListFilter(FieldListFilter):
                 'display': title,
             }
 
+
 FieldListFilter.register(
     lambda f: isinstance(f, models.DateField), DateFieldListFilter)
 
@@ -433,6 +437,7 @@ class AllValuesFieldListFilter(FieldListFilter):
                 }, [self.lookup_kwarg]),
                 'display': self.empty_value_display,
             }
+
 
 FieldListFilter.register(lambda f: True, AllValuesFieldListFilter)
 

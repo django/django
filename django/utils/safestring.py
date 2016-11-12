@@ -28,6 +28,7 @@ class EscapeText(six.text_type, EscapeData):
     """
     pass
 
+
 if six.PY3:
     EscapeString = EscapeText
 else:
@@ -108,6 +109,7 @@ class SafeText(six.text_type, SafeData):
             return SafeText(data)
 
     encode = curry(_proxy_method, method=six.text_type.encode)
+
 
 if six.PY3:
     SafeString = SafeText

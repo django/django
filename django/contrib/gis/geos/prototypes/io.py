@@ -27,6 +27,7 @@ class WKBReader_st(Structure):
 class WKBWriter_st(Structure):
     pass
 
+
 WKT_READ_PTR = POINTER(WKTReader_st)
 WKT_WRITE_PTR = POINTER(WKTWriter_st)
 WKB_READ_PTR = POINTER(WKBReader_st)
@@ -100,6 +101,7 @@ class WKBWriterGet(GEOSFuncFactory):
 
 class WKBWriterSet(GEOSFuncFactory):
     argtypes = [WKB_WRITE_PTR, c_int]
+
 
 wkb_writer_get_byteorder = WKBWriterGet('GEOSWKBWriter_getByteOrder')
 wkb_writer_set_byteorder = WKBWriterSet('GEOSWKBWriter_setByteOrder')
@@ -280,6 +282,7 @@ class ThreadLocalIO(threading.local):
     wkb_r = None
     wkb_w = None
     ewkb_w = None
+
 
 thread_context = ThreadLocalIO()
 

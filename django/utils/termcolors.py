@@ -69,6 +69,7 @@ def make_style(opts=(), **kwargs):
     """
     return lambda text: colorize(text, opts, **kwargs)
 
+
 NOCOLOR_PALETTE = 'nocolor'
 DARK_PALETTE = 'dark'
 LIGHT_PALETTE = 'light'

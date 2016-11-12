@@ -73,6 +73,7 @@ class IncorrectLookupParameters(Exception):
 # Defaults for formfield_overrides. ModelAdmin subclasses can change this
 # by adding to ModelAdmin.formfield_overrides.
 
+
 FORMFIELD_FOR_DBFIELD_DEFAULTS = {
     models.DateTimeField: {
         'form_class': forms.SplitDateTimeField,
@@ -339,11 +340,11 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         # Check FKey lookups that are allowed, so that popups produced by
         # ForeignKeyRawIdWidget, on the basis of ForeignKey.limit_choices_to,
         # are allowed to work.
-        for l in model._meta.related_fkey_lookups:
+        for L in model._meta.related_fkey_lookups:
             # As ``limit_choices_to`` can be a callable, invoke it here.
-            if callable(l):
-                l = l()
-            for k, v in widgets.url_params_from_lookup_dict(l).items():
+            if callable(L):
+                L = L()
+            for k, v in widgets.url_params_from_lookup_dict(L).items():
                 if k == lookup and v == value:
                     return True
 

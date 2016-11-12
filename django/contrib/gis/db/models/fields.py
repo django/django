@@ -249,6 +249,7 @@ class BaseSpatialField(Field):
         else:
             return obj
 
+
 for klass in gis_lookups.values():
     BaseSpatialField.register_lookup(klass)
 

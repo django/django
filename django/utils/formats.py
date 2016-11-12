@@ -139,6 +139,7 @@ def get_format(format_type, lang=None, use_l10n=None):
     # Return the general setting by default
     return getattr(settings, format_type)
 
+
 get_format_lazy = lazy(get_format, six.text_type, list, tuple)
 
 

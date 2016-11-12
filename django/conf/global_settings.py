@@ -15,6 +15,7 @@ def gettext_noop(s):
 # CORE             #
 ####################
 
+
 DEBUG = False
 
 # Whether the framework should propagate raw exceptions rather than catching

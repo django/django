@@ -425,6 +425,7 @@ def extract_views_from_urlpatterns(urlpatterns, base='', namespace=None):
             raise TypeError(_("%s does not appear to be a urlpattern object") % p)
     return views
 
+
 named_group_matcher = re.compile(r'\(\?P(<\w+>).+?\)')
 non_named_group_matcher = re.compile(r'\(.*?\)')
 
