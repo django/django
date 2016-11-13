@@ -2,6 +2,7 @@ import subprocess
 import sys
 
 from django.db.backends.base.creation import BaseDatabaseCreation
+from django.db.migrations.loader import has_unapplied_migrations
 
 from .client import DatabaseClient
 
@@ -26,7 +27,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             try:
                 cursor.execute("CREATE DATABASE %s" % qn(target_database_name))
             except Exception as e:
-                if keepdb:
+                if keepdb and not has_unapplied_migrations(self.connection):
                     return
                 try:
                     if verbosity >= 1:

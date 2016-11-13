@@ -4,6 +4,7 @@ import sys
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.base.creation import BaseDatabaseCreation
+from django.db.migrations.loader import has_unapplied_migrations
 from django.utils.encoding import force_text
 from django.utils.six.moves import input
 
@@ -76,7 +77,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         if not self.is_in_memory_db(source_database_name):
             # Erase the old test database
             if os.access(target_database_name, os.F_OK):
-                if keepdb:
+                if keepdb and not has_unapplied_migrations(self.connection):
                     return
                 if verbosity >= 1:
                     print("Destroying old test database for alias %s..." % (

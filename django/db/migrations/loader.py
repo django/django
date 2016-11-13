@@ -321,3 +321,20 @@ class MigrationLoader(object):
         See graph.make_state for the meaning of "nodes" and "at_end"
         """
         return self.graph.make_state(nodes=nodes, at_end=at_end, real_apps=list(self.unmigrated_apps))
+
+
+def has_unapplied_migrations(connection):
+    # Load migrations from disk/DB
+    loader = MigrationLoader(connection)
+    graph = loader.graph
+    targets = graph.leaf_nodes()
+    seen = set()
+
+    # Generate the plan
+    for target in targets:
+        for migration in graph.forwards_plan(target):
+            if migration not in seen:
+                node = graph.node_map[migration]
+                if node.key not in loader.applied_migrations:
+                    return True
+    return False
