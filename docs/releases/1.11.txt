@@ -151,6 +151,11 @@ Minor features
 * Added the ability to pass the `size`, `shape`, and `offset` parameter when
   creating :class:`~django.contrib.gis.gdal.GDALRaster` objects.
 
+* Added SpatiaLite support for the
+  :class:`~django.contrib.gis.db.models.functions.IsValid` function, and
+  :class:`~django.contrib.gis.db.models.functions.MakeValid` function, and
+  :lookup:`isvalid` lookup on SpatiaLite.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
