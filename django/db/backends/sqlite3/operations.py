@@ -209,6 +209,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_decimalfield_value)
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
+        elif internal_type in ('NullBooleanField', 'BooleanField'):
+            converters.append(self.convert_booleanfield_value)
         return converters
 
     def convert_datetimefield_value(self, value, expression, connection, context):
@@ -241,6 +243,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         if value is not None:
             value = uuid.UUID(value)
         return value
+
+    def convert_booleanfield_value(self, value, expression, connection, context):
+        return bool(value) if value in (1, 0) else value
 
     def bulk_insert_sql(self, fields, placeholder_rows):
         return " UNION ALL ".join(
