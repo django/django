@@ -246,7 +246,7 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
         path('', views.IndexView.as_view(), name='index'),
         path('<int:pk>/', views.DetailView.as_view(), name='detail'),
         path('<int:pk>/results/', views.ResultsView.as_view(), name='results'),
-        path('<int:question_id>/vote/$', views.vote, name='vote'),
+        path('<int:question_id>/vote/', views.vote, name='vote'),
     ]
 
 Note that the name of the matched pattern in the regexes of the second and third

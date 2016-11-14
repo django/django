@@ -546,7 +546,7 @@ views for displaying drilldown pages for date-based data.
         from myapp.views import ArticleTodayArchiveView
 
         urlpatterns = [
-            pth('today/',
+            path('today/',
                 ArticleTodayArchiveView.as_view(),
                 name="archive_today"),
         ]

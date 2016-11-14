@@ -84,7 +84,7 @@ Here's a sample URLconf::
 
 Notes:
 
-* To capture a value from the URL, use the ``<name>>`` syntax.
+* To capture a value from the URL, use the ``<name>`` syntax.
 
 * Captured values can optionally include a convertor type, for example to
   capture an integer parameter use ``<int:name>``.
