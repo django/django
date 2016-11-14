@@ -544,14 +544,14 @@ class FormattingTests(SimpleTestCase):
         self.d = datetime.date(2009, 12, 31)
         self.dt = datetime.datetime(2009, 12, 31, 20, 50)
         self.t = datetime.time(10, 15, 48)
-        self.l = 10000 if PY3 else long(10000)  # NOQA: long undefined on PY3
+        self.long = 10000 if PY3 else long(10000)  # NOQA: long undefined on PY3
         self.ctxt = Context({
             'n': self.n,
             't': self.t,
             'd': self.d,
             'dt': self.dt,
             'f': self.f,
-            'l': self.l,
+            'l': self.long,
         })
 
     def test_locale_independent(self):
@@ -574,7 +574,7 @@ class FormattingTests(SimpleTestCase):
             )
             self.assertEqual('-66666.6', nformat(-66666.666, decimal_sep='.', decimal_pos=1))
             self.assertEqual('-66666.0', nformat(int('-66666'), decimal_sep='.', decimal_pos=1))
-            self.assertEqual('10000.0', nformat(self.l, decimal_sep='.', decimal_pos=1))
+            self.assertEqual('10000.0', nformat(self.long, decimal_sep='.', decimal_pos=1))
             self.assertEqual(
                 '10,00,00,000.00',
                 nformat(100000000.00, decimal_sep='.', decimal_pos=2, grouping=(3, 2, 0), thousand_sep=',')
@@ -588,8 +588,10 @@ class FormattingTests(SimpleTestCase):
                 nformat(1000000000.00, decimal_sep='.', decimal_pos=2, grouping=(3, 2, -1), thousand_sep=',')
             )
             # This unusual grouping/force_grouping combination may be triggered by the intcomma filter (#17414)
-            self.assertEqual('10000', nformat(self.l, decimal_sep='.', decimal_pos=0, grouping=0, force_grouping=True))
-
+            self.assertEqual(
+                '10000',
+                nformat(self.long, decimal_sep='.', decimal_pos=0, grouping=0, force_grouping=True)
+            )
             # date filter
             self.assertEqual('31.12.2009 в 20:50', Template('{{ dt|date:"d.m.Y в H:i" }}').render(self.ctxt))
             self.assertEqual('⌚ 10:15', Template('{{ t|time:"⌚ H:i" }}').render(self.ctxt))
@@ -612,7 +614,7 @@ class FormattingTests(SimpleTestCase):
             self.assertEqual('No localizable', localize('No localizable'))
             self.assertEqual('66666.666', localize(self.n))
             self.assertEqual('99999.999', localize(self.f))
-            self.assertEqual('10000', localize(self.l))
+            self.assertEqual('10000', localize(self.long))
             self.assertEqual('des. 31, 2009', localize(self.d))
             self.assertEqual('des. 31, 2009, 8:50 p.m.', localize(self.dt))
             self.assertEqual('66666.666', Template('{{ n }}').render(self.ctxt))
@@ -757,13 +759,13 @@ class FormattingTests(SimpleTestCase):
             with self.settings(USE_THOUSAND_SEPARATOR=True):
                 self.assertEqual('66.666,666', localize(self.n))
                 self.assertEqual('99.999,999', localize(self.f))
-                self.assertEqual('10.000', localize(self.l))
+                self.assertEqual('10.000', localize(self.long))
                 self.assertEqual('True', localize(True))
 
             with self.settings(USE_THOUSAND_SEPARATOR=False):
                 self.assertEqual('66666,666', localize(self.n))
                 self.assertEqual('99999,999', localize(self.f))
-                self.assertEqual('10000', localize(self.l))
+                self.assertEqual('10000', localize(self.long))
                 self.assertEqual('31 de desembre de 2009', localize(self.d))
                 self.assertEqual('31 de desembre de 2009 a les 20:50', localize(self.dt))
 
@@ -976,12 +978,12 @@ class FormattingTests(SimpleTestCase):
             with self.settings(USE_THOUSAND_SEPARATOR=True):
                 self.assertEqual('66,666.666', localize(self.n))
                 self.assertEqual('99,999.999', localize(self.f))
-                self.assertEqual('10,000', localize(self.l))
+                self.assertEqual('10,000', localize(self.long))
 
             with self.settings(USE_THOUSAND_SEPARATOR=False):
                 self.assertEqual('66666.666', localize(self.n))
                 self.assertEqual('99999.999', localize(self.f))
-                self.assertEqual('10000', localize(self.l))
+                self.assertEqual('10000', localize(self.long))
                 self.assertEqual('Dec. 31, 2009', localize(self.d))
                 self.assertEqual('Dec. 31, 2009, 8:50 p.m.', localize(self.dt))
 

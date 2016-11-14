@@ -956,10 +956,10 @@ class ContextTests(TestDataMixin, TestCase):
         c2.update({'goodbye': 'world', 'python': 'rocks'})
         c2.update({'goodbye': 'dolly'})
 
-        l = ContextList([c1, c2])
+        k = ContextList([c1, c2])
         # None, True and False are builtins of BaseContext, and present
         # in every Context without needing to be added.
-        self.assertEqual({'None', 'True', 'False', 'hello', 'goodbye', 'python', 'dolly'}, l.keys())
+        self.assertEqual({'None', 'True', 'False', 'hello', 'goodbye', 'python', 'dolly'}, k.keys())
 
     def test_15368(self):
         # Need to insert a context processor that assumes certain things about

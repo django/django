@@ -194,15 +194,15 @@ class GenericRelationTests(TestCase):
         HasLinkThing.objects.create()
         b = Board.objects.create(name=str(hs1.pk))
         Link.objects.create(content_object=hs2)
-        l = Link.objects.create(content_object=hs1)
+        link = Link.objects.create(content_object=hs1)
         Link.objects.create(content_object=b)
         qs = HasLinkThing.objects.annotate(Sum('links')).filter(pk=hs1.pk)
         # If content_type restriction isn't in the query's join condition,
         # then wrong results are produced here as the link to b will also match
         # (b and hs1 have equal pks).
         self.assertEqual(qs.count(), 1)
-        self.assertEqual(qs[0].links__sum, l.id)
-        l.delete()
+        self.assertEqual(qs[0].links__sum, link.id)
+        link.delete()
         # Now if we don't have proper left join, we will not produce any
         # results at all here.
         # clear cached results
@@ -217,9 +217,9 @@ class GenericRelationTests(TestCase):
     def test_filter_targets_related_pk(self):
         HasLinkThing.objects.create()
         hs2 = HasLinkThing.objects.create()
-        l = Link.objects.create(content_object=hs2)
-        self.assertNotEqual(l.object_id, l.pk)
-        self.assertSequenceEqual(HasLinkThing.objects.filter(links=l.pk), [hs2])
+        link = Link.objects.create(content_object=hs2)
+        self.assertNotEqual(link.object_id, link.pk)
+        self.assertSequenceEqual(HasLinkThing.objects.filter(links=link.pk), [hs2])
 
     def test_editable_generic_rel(self):
         GenericRelationForm = modelform_factory(HasLinkThing, fields='__all__')

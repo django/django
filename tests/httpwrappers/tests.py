@@ -347,18 +347,18 @@ class HttpResponseTests(unittest.TestCase):
         r = HttpResponse()
         del r['Content-Type']
         r['foo'] = 'bar'
-        l = list(r.items())
-        self.assertEqual(len(l), 1)
-        self.assertEqual(l[0], ('foo', 'bar'))
-        self.assertIsInstance(l[0][0], str)
+        headers = list(r.items())
+        self.assertEqual(len(headers), 1)
+        self.assertEqual(headers[0], ('foo', 'bar'))
+        self.assertIsInstance(headers[0][0], str)
 
         r = HttpResponse()
         del r['Content-Type']
         r[b'foo'] = 'bar'
-        l = list(r.items())
-        self.assertEqual(len(l), 1)
-        self.assertEqual(l[0], ('foo', 'bar'))
-        self.assertIsInstance(l[0][0], str)
+        headers = list(r.items())
+        self.assertEqual(len(headers), 1)
+        self.assertEqual(headers[0], ('foo', 'bar'))
+        self.assertIsInstance(headers[0][0], str)
 
         r = HttpResponse()
         with self.assertRaises(UnicodeError):
