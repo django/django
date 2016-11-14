@@ -28,10 +28,10 @@ def staff_only_view(request):
         raise CustomTestException()
 
 
+@login_required
 def get_view(request):
     "A simple login protected view"
     return HttpResponse("Hello world")
-get_view = login_required(get_view)
 
 
 def request_data(request, template='base.html', data='sausage'):
@@ -67,10 +67,10 @@ def nested_view(request):
     return render(request, 'base.html', {'nested': 'yes'})
 
 
+@login_required
 def login_protected_redirect_view(request):
     "A view that redirects all requests to the GET view"
     return HttpResponseRedirect('/get_view/')
-login_protected_redirect_view = login_required(login_protected_redirect_view)
 
 
 def redirect_to_self_with_changing_query_view(request):

@@ -20,10 +20,11 @@ if six.PY2:
     from django.utils.encoding import force_unicode  # NOQA
 
 
-# Capitalizes the first letter of a string.
+@keep_lazy_text
 def capfirst(x):
+    """Capitalize the first letter of a string."""
     return x and force_text(x)[0].upper() + force_text(x)[1:]
-capfirst = keep_lazy_text(capfirst)
+
 
 # Set up regular expressions
 re_words = re.compile(r'<.*?>|((?:\w[-\w]*|&.*?;)+)', re.U | re.S)

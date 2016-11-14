@@ -213,24 +213,21 @@ def formset_view(request):
     return HttpResponse(t.render(c))
 
 
+@login_required
 def login_protected_view(request):
     "A simple view that is login protected."
     t = Template('This is a login protected test. Username is {{ user.username }}.', name='Login Template')
     c = Context({'user': request.user})
 
     return HttpResponse(t.render(c))
-login_protected_view = login_required(login_protected_view)
 
 
+@login_required(redirect_field_name='redirect_to')
 def login_protected_view_changed_redirect(request):
     "A simple view that is login protected with a custom redirect field set"
     t = Template('This is a login protected test. Username is {{ user.username }}.', name='Login Template')
     c = Context({'user': request.user})
-
     return HttpResponse(t.render(c))
-login_protected_view_changed_redirect = (
-    login_required(redirect_field_name="redirect_to")(login_protected_view_changed_redirect)
-)
 
 
 def _permission_protected_view(request):
