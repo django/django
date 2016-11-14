@@ -44,6 +44,7 @@ class DefaultConnectionProxy(object):
     def __ne__(self, other):
         return connections[DEFAULT_DB_ALIAS] != other
 
+
 connection = DefaultConnectionProxy()
 
 
@@ -51,6 +52,8 @@ connection = DefaultConnectionProxy()
 def reset_queries(**kwargs):
     for conn in connections.all():
         conn.queries_log.clear()
+
+
 signals.request_started.connect(reset_queries)
 
 
@@ -59,5 +62,7 @@ signals.request_started.connect(reset_queries)
 def close_old_connections(**kwargs):
     for conn in connections.all():
         conn.close_if_unusable_or_obsolete()
+
+
 signals.request_started.connect(close_old_connections)
 signals.request_finished.connect(close_old_connections)

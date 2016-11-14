@@ -525,6 +525,7 @@ def default_urlconf(request):
 
     return HttpResponse(t.render(c), content_type='text/html')
 
+
 #
 # Templates are embedded in the file so that we know the error handler will
 # always work even if the template loader is broken.

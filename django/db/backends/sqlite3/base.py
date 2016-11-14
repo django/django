@@ -64,6 +64,7 @@ def decoder(conv_func):
     """
     return lambda s: conv_func(s.decode('utf-8'))
 
+
 Database.register_converter(str("bool"), decoder(lambda s: s == '1'))
 Database.register_converter(str("time"), decoder(parse_time))
 Database.register_converter(str("date"), decoder(parse_date))
@@ -324,6 +325,16 @@ class SQLiteCursorWrapper(Database.Cursor):
     def execute(self, query, params=None):
         if params is None:
             return Database.Cursor.execute(self, query)
+        if isinstance(params, (tuple)):
+            if params:
+                if isinstance(params[0], six.integer_types):
+                    # Filter values wider than 64 bits
+                    if params[0].bit_length() > 63:
+                        lst = list(params)
+                        lst[0] = ''
+                        params = tuple(lst)
+                        query = self.convert_query(query)
+                        return Database.Cursor.execute(self, query, params)
         query = self.convert_query(query)
         return Database.Cursor.execute(self, query, params)
 

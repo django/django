@@ -164,8 +164,8 @@ else:
             dklen = hlen
         if dklen > (2 ** 32 - 1) * hlen:
             raise OverflowError('dklen too big')
-        l = -(-dklen // hlen)
-        r = dklen - (l - 1) * hlen
+        L = -(-dklen // hlen)
+        r = dklen - (L - 1) * hlen
 
         hex_format_string = "%%0%ix" % (hlen * 2)
 

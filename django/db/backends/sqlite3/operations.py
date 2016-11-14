@@ -122,6 +122,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Native sqlite3 cursors cannot be used as context managers.
         try:
             return cursor.execute(sql, params).fetchone()
+        except OverflowError:
+            return None
         finally:
             cursor.close()
 

@@ -48,6 +48,7 @@ class Deferred(object):
     def __str__(self):
         return str('<Deferred field>')
 
+
 DEFERRED = Deferred()
 
 
@@ -1772,6 +1773,8 @@ def model_unpickle(model_id):
         # Backwards compat - the model was cached directly in earlier versions.
         model = model_id
     return model.__new__(model)
+
+
 model_unpickle.__safe_for_unpickle__ = True
 
 

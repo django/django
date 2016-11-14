@@ -24,6 +24,7 @@ class GEOSContextHandle(object):
 class GEOSContext(threading.local):
     handle = None
 
+
 thread_context = GEOSContext()
 
 

@@ -155,6 +155,7 @@ class URLValidator(RegexValidator):
         if len(urlsplit(value).netloc) > 253:
             raise ValidationError(self.message, code=self.code)
 
+
 integer_validator = RegexValidator(
     _lazy_re_compile(r'^-?\d+\Z'),
     message=_('Enter a valid integer.'),
@@ -236,6 +237,7 @@ class EmailValidator(object):
             (self.code == other.code)
         )
 
+
 validate_email = EmailValidator()
 
 slug_re = _lazy_re_compile(r'^[-a-zA-Z0-9_]+\Z')
@@ -269,6 +271,7 @@ def validate_ipv46_address(value):
             validate_ipv6_address(value)
         except ValidationError:
             raise ValidationError(_('Enter a valid IPv4 or IPv6 address.'), code='invalid')
+
 
 ip_address_validator_map = {
     'both': ([validate_ipv46_address], _('Enter a valid IPv4 or IPv6 address.')),
@@ -499,6 +502,7 @@ def get_available_image_extensions():
     else:
         Image.init()
         return [ext.lower()[1:] for ext in Image.EXTENSION.keys()]
+
 
 validate_image_file_extension = FileExtensionValidator(
     allowed_extensions=get_available_image_extensions(),

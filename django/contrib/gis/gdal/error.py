@@ -30,6 +30,8 @@ class OGRIndexError(GDALException, KeyError):
 # #### GDAL/OGR error checking codes and routine ####
 
 # OGR Error Codes
+
+
 OGRERR_DICT = {
     1: (GDALException, 'Not enough data.'),
     2: (GDALException, 'Not enough memory.'),

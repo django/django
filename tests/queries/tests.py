@@ -3797,3 +3797,20 @@ class Ticket23622Tests(TestCase):
             set(Ticket23605A.objects.filter(qy).values_list('pk', flat=True))
         )
         self.assertSequenceEqual(Ticket23605A.objects.filter(qx), [a2])
+
+
+class Ticket27397Tests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # Create a few Orders.
+        cls.o1 = Order.objects.create(pk=1)
+
+    def test_query_params_overflow(self):
+        self.assertEqual(
+            len(Order.objects.filter(pk=11111111111111111111111111111111111111111111111)),
+            0
+        )
+        self.assertEqual(
+            len(Order.objects.exclude(pk=11111111111111111111111111111111111111111111111)),
+            1
+        )
