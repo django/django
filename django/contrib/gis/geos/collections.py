@@ -139,4 +139,6 @@ class MultiPolygon(GeometryCollection):
 
 # Setting the allowed types here since GeometryCollection is defined before
 # its subclasses.
+
+
 GeometryCollection._allowed = (Point, LineString, LinearRing, Polygon, MultiPoint, MultiLineString, MultiPolygon)

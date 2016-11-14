@@ -78,4 +78,5 @@ class PasswordResetTokenGenerator(object):
         # Used for mocking in tests
         return date.today()
 
+
 default_token_generator = PasswordResetTokenGenerator()

@@ -122,6 +122,7 @@ class CallableBool:
     def __hash__(self):
         return hash(self.value)
 
+
 CallableFalse = CallableBool(False)
 CallableTrue = CallableBool(True)
 

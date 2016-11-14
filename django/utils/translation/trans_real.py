@@ -337,6 +337,7 @@ def gettext(message):
     """
     return do_translate(message, 'gettext')
 
+
 if six.PY3:
     ugettext = gettext
 else:
@@ -383,6 +384,7 @@ def ngettext(singular, plural, number):
     Returns a string on Python 3 and an UTF-8-encoded bytestring on Python 2.
     """
     return do_ntranslate(singular, plural, number, 'ngettext')
+
 
 if six.PY3:
     ungettext = ngettext

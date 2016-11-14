@@ -41,6 +41,8 @@ def require_http_methods(request_method_list):
         return inner
     return decorator
 
+
+
 require_GET = require_http_methods(["GET"])
 require_GET.__doc__ = "Decorator to require that a view only accepts the GET method."
 

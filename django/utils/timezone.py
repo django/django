@@ -50,6 +50,7 @@ class FixedOffset(tzinfo):
     def dst(self, dt):
         return ZERO
 
+
 utc = pytz.utc
 """UTC time zone as a tzinfo instance."""
 
@@ -84,6 +85,7 @@ def get_default_timezone_name():
     Returns the name of the default time zone.
     """
     return _get_timezone_name(get_default_timezone())
+
 
 _active = local()
 

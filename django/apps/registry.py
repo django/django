@@ -422,4 +422,5 @@ class Apps(object):
         for function in self._pending_operations.pop(key, []):
             function(model)
 
+
 apps = Apps(installed_apps=None)

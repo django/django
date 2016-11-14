@@ -39,6 +39,7 @@ def _setup_environment(environ):
     else:
         os.environ.update(environ)
 
+
 _setup_environment([
     # Oracle takes client-side character set encoding from the environment.
     ('NLS_LANG', '.AL32UTF8'),

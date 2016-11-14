@@ -202,6 +202,7 @@ class ZipArchive(BaseArchive):
     def close(self):
         self._archive.close()
 
+
 extension_map = {
     '.tar': TarArchive,
     '.tar.bz2': TarArchive,

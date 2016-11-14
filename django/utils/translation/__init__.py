@@ -63,6 +63,7 @@ class Trans(object):
         setattr(self, real_name, getattr(trans, real_name))
         return getattr(trans, real_name)
 
+
 _trans = Trans()
 
 # The Trans class is no more needed, so remove it from the namespace.
@@ -71,6 +72,7 @@ del Trans
 
 def gettext_noop(message):
     return _trans.gettext_noop(message)
+
 
 ugettext_noop = gettext_noop
 
@@ -97,6 +99,7 @@ def pgettext(context, message):
 
 def npgettext(context, singular, plural, number):
     return _trans.npgettext(context, singular, plural, number)
+
 
 gettext_lazy = lazy(gettext, str)
 ugettext_lazy = lazy(ugettext, six.text_type)
@@ -231,6 +234,8 @@ def _string_concat(*strings):
         'favor of django.utils.text.format_lazy().',
         RemovedInDjango21Warning, stacklevel=2)
     return ''.join(force_text(s) for s in strings)
+
+
 string_concat = lazy(_string_concat, six.text_type)
 
 
@@ -254,6 +259,7 @@ def get_language_info(lang_code):
     if info:
         info['name_translated'] = ugettext_lazy(info['name'])
     return info
+
 
 trim_whitespace_re = re.compile(r'\s*\n\s*')
 

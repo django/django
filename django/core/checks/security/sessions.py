@@ -10,6 +10,7 @@ def add_session_cookie_message(message):
         "network traffic sniffers to hijack user sessions."
     )
 
+
 W010 = Warning(
     add_session_cookie_message(
         "You have 'django.contrib.sessions' in your INSTALLED_APPS, "

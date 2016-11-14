@@ -384,6 +384,7 @@ def _replace_entity(match):
         except (ValueError, KeyError):
             return match.group(0)
 
+
 _entity_re = re.compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
 
 

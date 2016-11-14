@@ -234,6 +234,8 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
 
 class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'exact'
+
+
 Field.register_lookup(Exact)
 
 
@@ -253,21 +255,29 @@ Field.register_lookup(IExact)
 
 class GreaterThan(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'gt'
+
+
 Field.register_lookup(GreaterThan)
 
 
 class GreaterThanOrEqual(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'gte'
+
+
 Field.register_lookup(GreaterThanOrEqual)
 
 
 class LessThan(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'lt'
+
+
 Field.register_lookup(LessThan)
 
 
 class LessThanOrEqual(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'lte'
+
+
 Field.register_lookup(LessThanOrEqual)
 
 
@@ -284,11 +294,15 @@ class IntegerFieldFloatRounding(object):
 
 class IntegerGreaterThanOrEqual(IntegerFieldFloatRounding, GreaterThanOrEqual):
     pass
+
+
 IntegerField.register_lookup(IntegerGreaterThanOrEqual)
 
 
 class IntegerLessThan(IntegerFieldFloatRounding, LessThan):
     pass
+
+
 IntegerField.register_lookup(IntegerLessThan)
 
 
@@ -350,6 +364,8 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             params.extend(sqls_params)
         in_clause_elements.append(')')
         return ''.join(in_clause_elements), params
+
+
 Field.register_lookup(In)
 
 
@@ -381,12 +397,16 @@ class Contains(PatternLookup):
         if params and not self.bilateral_transforms:
             params[0] = "%%%s%%" % connection.ops.prep_for_like_query(params[0])
         return rhs, params
+
+
 Field.register_lookup(Contains)
 
 
 class IContains(Contains):
     lookup_name = 'icontains'
     prepare_rhs = False
+
+
 Field.register_lookup(IContains)
 
 
@@ -399,6 +419,8 @@ class StartsWith(PatternLookup):
         if params and not self.bilateral_transforms:
             params[0] = "%s%%" % connection.ops.prep_for_like_query(params[0])
         return rhs, params
+
+
 Field.register_lookup(StartsWith)
 
 
@@ -411,6 +433,8 @@ class IStartsWith(PatternLookup):
         if params and not self.bilateral_transforms:
             params[0] = "%s%%" % connection.ops.prep_for_like_query(params[0])
         return rhs, params
+
+
 Field.register_lookup(IStartsWith)
 
 
@@ -423,6 +447,8 @@ class EndsWith(PatternLookup):
         if params and not self.bilateral_transforms:
             params[0] = "%%%s" % connection.ops.prep_for_like_query(params[0])
         return rhs, params
+
+
 Field.register_lookup(EndsWith)
 
 
@@ -435,6 +461,8 @@ class IEndsWith(PatternLookup):
         if params and not self.bilateral_transforms:
             params[0] = "%%%s" % connection.ops.prep_for_like_query(params[0])
         return rhs, params
+
+
 Field.register_lookup(IEndsWith)
 
 
@@ -443,6 +471,7 @@ class Range(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
 
     def get_rhs_op(self, connection, rhs):
         return "BETWEEN %s AND %s" % (rhs[0], rhs[1])
+
 
 Field.register_lookup(Range)
 
@@ -457,6 +486,8 @@ class IsNull(BuiltinLookup):
             return "%s IS NULL" % sql, params
         else:
             return "%s IS NOT NULL" % sql, params
+
+
 Field.register_lookup(IsNull)
 
 
@@ -473,6 +504,8 @@ class Search(BuiltinLookup):
         rhs, rhs_params = self.process_rhs(compiler, connection)
         sql_template = connection.ops.fulltext_search_sql(field_name=lhs)
         return sql_template, lhs_params + rhs_params
+
+
 Field.register_lookup(Search)
 
 
@@ -488,11 +521,15 @@ class Regex(BuiltinLookup):
             rhs, rhs_params = self.process_rhs(compiler, connection)
             sql_template = connection.ops.regex_lookup(self.lookup_name)
             return sql_template % (lhs, rhs), lhs_params + rhs_params
+
+
 Field.register_lookup(Regex)
 
 
 class IRegex(Regex):
     lookup_name = 'iregex'
+
+
 Field.register_lookup(IRegex)
 
 

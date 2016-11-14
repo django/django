@@ -56,6 +56,8 @@ def intcomma(value, use_l10n=True):
         return intcomma(new, use_l10n)
 
 # A tuple of standard large number to their converters
+
+
 intword_converters = (
     (6, lambda number: (
         ungettext('%(value).1f million', '%(value).1f million', number),

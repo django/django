@@ -129,9 +129,9 @@ class MigrationLoader(object):
         "Returns the migration(s) which match the given app label and name _prefix_"
         # Do the search
         results = []
-        for l, n in self.disk_migrations:
-            if l == app_label and n.startswith(name_prefix):
-                results.append((l, n))
+        for L, n in self.disk_migrations:
+            if L == app_label and n.startswith(name_prefix):
+                results.append((L, n))
         if len(results) > 1:
             raise AmbiguityError(
                 "There is more than one migration for '%s' with the prefix '%s'" % (app_label, name_prefix)
