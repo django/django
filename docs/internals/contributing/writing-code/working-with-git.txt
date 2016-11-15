@@ -55,8 +55,8 @@ cloned directory, so switch to it now::
 
 Your GitHub repository will be called "origin" in Git.
 
-You should also setup django/django as an "upstream" remote (that is, tell git
-that the reference Django repository was the source of your fork of it)::
+You should also setup ``django/django`` as an "upstream" remote (that is, tell
+git that the reference Django repository was the source of your fork of it)::
 
     git remote add upstream git@github.com:django/django.git
     git fetch upstream
@@ -116,7 +116,7 @@ their clone would become corrupt when you edit commits.
 There are also "public branches". These are branches other people are supposed
 to fork, so the history of these branches should never change. Good examples
 of public branches are the ``master`` and ``stable/A.B.x`` branches in the
-django/django repository.
+``django/django`` repository.
 
 When you think your work is ready to be pulled into Django, you should create
 a pull request at GitHub. A good pull request means:
@@ -193,14 +193,14 @@ a topic branch, and nobody should be basing their work on it.
 After upstream has changed
 --------------------------
 
-When upstream (django/django) has changed, you should rebase your work. To
+When upstream (``django/django``) has changed, you should rebase your work. To
 do this, use::
 
   git fetch upstream
   git rebase
 
 The work is automatically rebased using the branch you forked on, in the
-example case using upstream/master.
+example case using ``upstream/master``.
 
 The rebase command removes all your local commits temporarily, applies the
 upstream commits, and then applies your local commits again on the work.

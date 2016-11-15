@@ -67,8 +67,8 @@ The ``ContentType`` model
         The name of the application the model is part of. This is taken from
         the :attr:`app_label` attribute of the model, and includes only the
         *last* part of the application's Python import path;
-        "django.contrib.contenttypes", for example, becomes an
-        :attr:`app_label` of "contenttypes".
+        ``django.contrib.contenttypes``, for example, becomes an
+        :attr:`app_label` of ``contenttypes``.
 
     .. attribute:: model
 
@@ -93,7 +93,7 @@ created with the following values:
 
 * :attr:`~django.contrib.contenttypes.models.ContentType.app_label`
   will be set to ``'sites'`` (the last part of the Python
-  path "django.contrib.sites").
+  path ``django.contrib.sites``).
 
 * :attr:`~django.contrib.contenttypes.models.ContentType.model`
   will be set to ``'site'``.
