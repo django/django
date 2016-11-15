@@ -597,7 +597,7 @@ may not be the same as the entries in the first filter. We are filtering the
     that were published in 2008, you need to make two queries::
 
         Blog.objects.exclude(
-            entry=Entry.objects.filter(
+            entry__in=Entry.objects.filter(
                 headline__contains='Lennon',
                 pub_date__year=2008,
             ),
