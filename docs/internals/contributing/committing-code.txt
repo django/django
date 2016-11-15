@@ -106,9 +106,9 @@ Committing guidelines
 In addition, please follow the following guidelines when committing code to
 Django's Git repository:
 
-* Never change the published history of django/django branches! **Never
-  force-push your changes to django/django.** If you absolutely must (for
-  security reasons for example) first discuss the situation with the core team.
+* Never change the published history of ``django/django`` branches by force
+  pushing. If you absolutely must (for security reasons for example), first
+  discuss the situation with the team.
 
 * For any medium-to-big changes, where "medium-to-big" is according to
   your judgment, please bring things up on the |django-developers|
@@ -239,7 +239,7 @@ When a mistaken commit is discovered, please follow these guidelines:
 * The release branch maintainer may back out commits to the release
   branch without permission if the commit breaks the release branch.
 
-* If you mistakenly push a topic branch to django/django, just delete it.
+* If you mistakenly push a topic branch to ``django/django``, just delete it.
   For instance, if you did: ``git push upstream feature_antigravity``,
   just do a reverse push: ``git push upstream :feature_antigravity``.
 

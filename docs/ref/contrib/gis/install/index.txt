@@ -325,7 +325,7 @@ Fink
 
 `Kurt Schwehr`__ has been gracious enough to create GeoDjango packages for users
 of the `Fink`__ package system. `Different packages are available`__ (starting
-with "django-gis"), depending on which version of Python you want to use.
+with ``django-gis``), depending on which version of Python you want to use.
 
 __ https://schwehr.blogspot.com/
 __ http://www.finkproject.org/

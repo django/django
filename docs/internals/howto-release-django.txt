@@ -340,7 +340,7 @@ Now you're ready to actually put the release out there. To do this:
    announcement blog post. If this is a security release, also include
    oss-security@lists.openwall.com.
 
-#. Add a link to the blog post in the topic of the #django IRC channel:
+#. Add a link to the blog post in the topic of the `#django` IRC channel:
    ``/msg chanserv TOPIC #django new topic goes here``.
 
 Post-release
