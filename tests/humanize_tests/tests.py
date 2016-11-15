@@ -125,7 +125,7 @@ class HumanizeTests(SimpleTestCase):
             '6000000000000',
         )
         result_list = (
-            '100', '1,0 Million', '1,2 Millionen', '1,3 Millionen',
+            '100', '1,0 Million', '1,2 Million', '1,3 Million',
             '1,0 Milliarde', '2,0 Milliarden', '6,0 Billionen',
         )
         with self.settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True):
