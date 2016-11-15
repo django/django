@@ -54,6 +54,10 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(floatformat('foo', 'bar'), '')
         self.assertEqual(floatformat('¿Cómo esta usted?'), '')
         self.assertEqual(floatformat(None), '')
+        self.assertEqual(floatformat(-1.323297138040798e+35, 2), '-132329713804079800000000000000000000.00')
+        self.assertEqual(floatformat(-1.323297138040798e+35, -2), '-132329713804079800000000000000000000')
+        self.assertEqual(floatformat(1.5e-15, 20), '0.00000000000000150000')
+        self.assertEqual(floatformat(1.5e-15, -20), '0.00000000000000150000')
 
     def test_zero_values(self):
         self.assertEqual(floatformat(0, 6), '0.000000')
