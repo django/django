@@ -320,6 +320,9 @@ Models
 
 * Added support for query expressions on lookups that take multiple arguments,
   such as ``range``.
+* Added the ``nulls_last`` and ``nulls_first`` parameters to
+  :class:`django.db.models.F` ``asc`` and ``desc`` methods
+
 
 * You can now use the ``unique=True`` option with
   :class:`~django.db.models.FileField`.

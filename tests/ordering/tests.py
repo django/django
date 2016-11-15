@@ -10,19 +10,25 @@ from .models import Article, Author, Reference
 
 
 class OrderingTests(TestCase):
-    def setUp(self):
-        self.a1 = Article.objects.create(
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.a1 = Article.objects.create(
             headline="Article 1", pub_date=datetime(2005, 7, 26)
         )
-        self.a2 = Article.objects.create(
+        cls.a2 = Article.objects.create(
             headline="Article 2", pub_date=datetime(2005, 7, 27)
         )
-        self.a3 = Article.objects.create(
+        cls.a3 = Article.objects.create(
             headline="Article 3", pub_date=datetime(2005, 7, 27)
         )
-        self.a4 = Article.objects.create(
+        cls.a4 = Article.objects.create(
             headline="Article 4", pub_date=datetime(2005, 7, 28)
         )
+        cls.author_1 = Author.objects.create()
+        cls.author_2 = Author.objects.create()
+        for i in range(3):
+            Author.objects.create()
 
     def test_default_ordering(self):
         """
@@ -88,6 +94,53 @@ class OrderingTests(TestCase):
                 "Article 1",
             ],
             attrgetter("headline")
+        )
+
+    def test_order_by_nulls_first_and_last(self):
+        with self.assertRaisesMessage(ValueError,
+                                      "nulls_first and nulls_last are mutually exclusive"):
+            Article.objects.order_by(F("author").desc(nulls_last=True, nulls_first=True))
+
+    def test_order_by_nulls_last(self):
+        Article.objects.filter(headline="Article 3").update(author=self.author_1)
+        Article.objects.filter(headline="Article 4").update(author=self.author_2)
+
+        # check that asc and desc are chainable with nulls_last
+
+        self.assertSequenceEqual(
+            Article.objects.order_by(F("author").desc(nulls_last=True)), [
+                self.a4,
+                self.a3,
+                self.a1,
+                self.a2
+            ])
+
+        self.assertSequenceEqual(
+            Article.objects.order_by(F("author").asc(nulls_last=True)), [
+                self.a3,
+                self.a4,
+                self.a1,
+                self.a2
+            ]
+        )
+
+    def test_order_by_nulls_first(self):
+        self.assertSequenceEqual(
+            Article.objects.order_by(F("author").asc(nulls_first=True)), [
+                self.a1,
+                self.a2,
+                self.a3,
+                self.a4
+            ]
+        )
+
+        self.assertSequenceEqual(
+            Article.objects.order_by(F("author").desc(nulls_first=True)), [
+                self.a1,
+                self.a2,
+                self.a3,
+                self.a4
+            ]
         )
 
     def test_stop_slicing(self):
@@ -212,14 +265,10 @@ class OrderingTests(TestCase):
         """
         'pk' works as an ordering option in Meta.
         """
-        Author.objects.create(pk=1)
-        Author.objects.create(pk=2)
-        Author.objects.create(pk=3)
-        Author.objects.create(pk=4)
 
         self.assertQuerysetEqual(
             Author.objects.all(), [
-                4, 3, 2, 1
+                5, 4, 3, 2, 1
             ],
             attrgetter("pk")
         )
@@ -230,7 +279,7 @@ class OrderingTests(TestCase):
         from inheriting its related model ordering option (#19195).
         """
         for i in range(1, 5):
-            author = Author.objects.create(pk=i)
+            author = Author.objects.get(pk=i)
             article = getattr(self, "a%d" % (5 - i))
             article.author = author
             article.save(update_fields={'author'})

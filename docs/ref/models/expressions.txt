@@ -560,13 +560,25 @@ calling the appropriate methods on the wrapped expression.
         nested expressions. ``F()`` objects, in particular, hold a reference
         to a column.
 
-    .. method:: asc()
+    .. method:: asc(**kwargs)
 
         Returns the expression ready to be sorted in ascending order.
+        ``nulls_last`` and ``nulls_first`` define how null values
+        should be managed.
 
-    .. method:: desc()
+        .. versionchanged:: 1.11
+
+            ``nulls_last`` and ``nulls_first`` were added
+
+    .. method:: desc(**kwargs)
 
         Returns the expression ready to be sorted in descending order.
+        ``nulls_last`` and ``nulls_first`` define how null values
+        should be managed.
+
+        .. versionchanged:: 1.11
+
+            ``nulls_last`` and ``nulls_first`` parameters were added
 
     .. method:: reverse_ordering()
 
