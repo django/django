@@ -1022,8 +1022,8 @@ The reverse name of the ``common.ChildB.m2m`` field will be
 ``common_childb_related`` and the reverse query name will be
 ``common_childbs``. Finally, the reverse name of the ``rare.ChildB.m2m`` field
 will be ``rare_childb_related`` and the reverse query name will be
-``rare_childbs``. It's up to you how you use the `'%(class)s'`` and
-``'%(app_label)s`` portion to construct your related name or related query name
+``rare_childbs``. It's up to you how you use the ``'%(class)s'`` and
+``'%(app_label)s'`` portion to construct your related name or related query name
 but if you forget to use it, Django will raise errors when you perform system
 checks (or run :djadmin:`migrate`).
 
