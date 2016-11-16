@@ -149,6 +149,10 @@ Minor features
 
 * Added support for the :lookup:`dwithin` lookup on SpatiaLite.
 
+* The :class:`~django.contrib.gis.db.models.functions.Area` function,
+  :class:`~django.contrib.gis.db.models.functions.Distance` function, and
+  distance lookups now work with geodetic coordinates on SpatiaLite.
+
 * The OpenLayers-based form widgets now use ``OpenLayers.js`` from
   ``https://cdnjs.cloudflare.com`` which is more suitable for production use
   than the the old ``http://openlayers.org`` source.

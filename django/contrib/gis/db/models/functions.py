@@ -38,6 +38,10 @@ class GeoFunc(Func):
         except (AttributeError, FieldError):
             return None
 
+    @property
+    def geo_field(self):
+        return GeometryField(srid=self.srid) if self.srid else None
+
     def as_sql(self, compiler, connection, **extra_context):
         if self.function is None:
             self.function = connection.ops.spatial_function_name(self.name)
@@ -122,25 +126,33 @@ class Area(OracleToleranceMixin, GeoFunc):
     output_field_class = AreaField
     arity = 1
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **extra_context):
         if connection.ops.geography:
             self.output_field.area_att = 'sq_m'
         else:
             # Getting the area units of the geographic field.
-            source_fields = self.get_source_fields()
-            if len(source_fields):
-                source_field = source_fields[0]
-                if source_field.geodetic(connection):
+            geo_field = self.geo_field
+            if geo_field.geodetic(connection):
+                if connection.features.supports_area_geodetic:
+                    self.output_field.area_att = 'sq_m'
+                else:
                     # TODO: Do we want to support raw number areas for geodetic fields?
                     raise NotImplementedError('Area on geodetic coordinate systems not supported.')
-                units_name = source_field.units_name(connection)
+            else:
+                units_name = geo_field.units_name(connection)
                 if units_name:
                     self.output_field.area_att = AreaMeasure.unit_attname(units_name)
-        return super(Area, self).as_sql(compiler, connection)
+        return super(Area, self).as_sql(compiler, connection, **extra_context)
 
     def as_oracle(self, compiler, connection):
         self.output_field = AreaField('sq_m')  # Oracle returns area in units of meters.
         return super(Area, self).as_oracle(compiler, connection)
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        if self.geo_field.geodetic(connection):
+            extra_context['template'] = '%(function)s(%(expressions)s, %(spheroid)d)'
+            extra_context['spheroid'] = True
+        return self.as_sql(compiler, connection, **extra_context)
 
 
 class AsGeoJSON(GeoFunc):
@@ -226,7 +238,7 @@ class DistanceResultMixin(object):
     def convert_value(self, value, expression, connection, context):
         if value is None:
             return None
-        geo_field = GeometryField(srid=self.srid)  # Fake field to get SRID info
+        geo_field = self.geo_field
         if geo_field.geodetic(connection):
             dist_att = 'm'
         else:
@@ -274,6 +286,15 @@ class Distance(DistanceResultMixin, OracleToleranceMixin, GeoFuncWithGeoParam):
         if self.spheroid:
             self.source_expressions.pop(2)
         return super(Distance, self).as_oracle(compiler, connection)
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        if self.spheroid:
+            self.source_expressions.pop(2)
+        if self.geo_field.geodetic(connection):
+            # SpatiaLite returns NULL instead of zero on geodetic coordinates
+            extra_context['template'] = 'COALESCE(%(function)s(%(expressions)s, %(spheroid)s), 0)'
+            extra_context['spheroid'] = int(bool(self.spheroid))
+        return super(Distance, self).as_sql(compiler, connection, **extra_context)
 
 
 class Envelope(GeoFunc):

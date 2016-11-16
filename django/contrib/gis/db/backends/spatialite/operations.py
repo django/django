@@ -19,6 +19,20 @@ from django.utils import six
 from django.utils.functional import cached_property
 
 
+class SpatiaLiteDistanceOperator(SpatialOperator):
+    def as_sql(self, connection, lookup, template_params, sql_params):
+        if lookup.lhs.output_field.geodetic(connection):
+            # SpatiaLite returns NULL instead of zero on geodetic coordinates
+            sql_template = 'COALESCE(%(func)s(%(lhs)s, %(rhs)s, %%s), 0) %(op)s %(value)s'
+            template_params.update({
+                'op': self.op,
+                'func': connection.ops.spatial_function_name('Distance'),
+            })
+            sql_params.insert(1, len(lookup.rhs) == 3 and lookup.rhs[-1] == 'spheroid')
+            return sql_template % template_params, sql_params
+        return super(SpatiaLiteDistanceOperator, self).as_sql(connection, lookup, template_params, sql_params)
+
+
 class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     name = 'spatialite'
     spatialite = True
@@ -79,10 +93,10 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         'exact': SpatialOperator(func='Equals'),
         # Distance predicates
         'dwithin': SpatialOperator(func='PtDistWithin'),
-        'distance_gt': SpatialOperator(func='Distance', op='>'),
-        'distance_gte': SpatialOperator(func='Distance', op='>='),
-        'distance_lt': SpatialOperator(func='Distance', op='<'),
-        'distance_lte': SpatialOperator(func='Distance', op='<='),
+        'distance_gt': SpatiaLiteDistanceOperator(func='Distance', op='>'),
+        'distance_gte': SpatiaLiteDistanceOperator(func='Distance', op='>='),
+        'distance_lt': SpatiaLiteDistanceOperator(func='Distance', op='<'),
+        'distance_lte': SpatiaLiteDistanceOperator(func='Distance', op='<='),
     }
 
     disallowed_aggregates = (aggregates.Extent3D,)
@@ -140,19 +154,19 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     def get_distance(self, f, value, lookup_type, **kwargs):
         """
         Returns the distance parameters for the given geometry field,
-        lookup value, and lookup type.  SpatiaLite only supports regular
-        cartesian-based queries (no spheroid/sphere calculations for point
-        geometries like PostGIS).
+        lookup value, and lookup type.
         """
         if not value:
             return []
         value = value[0]
         if isinstance(value, Distance):
             if f.geodetic(self.connection):
-                raise ValueError('SpatiaLite does not support distance queries on '
-                                 'geometry fields with a geodetic coordinate system. '
-                                 'Distance objects; use a numeric value of your '
-                                 'distance in degrees instead.')
+                if lookup_type == 'dwithin':
+                    raise ValueError(
+                        'Only numeric values of degree units are allowed on '
+                        'geographic DWithin queries.'
+                    )
+                dist_param = value.m
             else:
                 dist_param = getattr(value, Distance.unit_attname(f.units_name(self.connection)))
         else:

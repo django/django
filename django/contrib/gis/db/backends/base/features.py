@@ -32,6 +32,7 @@ class BaseSpatialFeatures(object):
     supports_distance_geodetic = True
     supports_length_geodetic = True
     supports_perimeter_geodetic = False
+    supports_area_geodetic = True
     # Is the database able to count vertices on polygons (with `num_points`)?
     supports_num_points_poly = True
 

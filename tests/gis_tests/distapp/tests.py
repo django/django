@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+from unittest import skipIf
+
 from django.contrib.gis.db.models.functions import (
     Area, Distance, Length, Perimeter, Transform,
 )
@@ -143,6 +145,7 @@ class DistanceTest(TestCase):
                 self.assertAlmostEqual(m_distances[i], c.distance.m, tol)
                 self.assertAlmostEqual(ft_distances[i], c.distance.survey_ft, tol)
 
+    @skipIf(spatialite, "distance method doesn't support geodetic coordinates on SpatiaLite.")
     @skipUnlessDBFeature("has_distance_method", "supports_distance_geodetic")
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_distance_geodetic(self):
@@ -270,12 +273,15 @@ class DistanceTest(TestCase):
         # a 100km of that line (which should exclude only Hobart & Adelaide).
         line = GEOSGeometry('LINESTRING(144.9630 -37.8143,151.2607 -33.8870)', 4326)
         dist_qs = AustraliaCity.objects.filter(point__distance_lte=(line, D(km=100)))
-
-        self.assertEqual(9, dist_qs.count())
-        self.assertEqual(['Batemans Bay', 'Canberra', 'Hillsdale',
-                          'Melbourne', 'Mittagong', 'Shellharbour',
-                          'Sydney', 'Thirroul', 'Wollongong'],
-                         self.get_names(dist_qs))
+        expected_cities = [
+            'Batemans Bay', 'Canberra', 'Hillsdale',
+            'Melbourne', 'Mittagong', 'Shellharbour',
+            'Sydney', 'Thirroul', 'Wollongong',
+        ]
+        if spatialite:
+            # SpatiaLite is less accurate and returns 102.8km for Batemans Bay.
+            expected_cities.pop(0)
+        self.assertEqual(expected_cities, self.get_names(dist_qs))
 
         # Too many params (4 in this case) should raise a ValueError.
         queryset = AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)', D(km=100), 'spheroid', '4'))
@@ -355,6 +361,7 @@ class DistanceTest(TestCase):
         for i, z in enumerate(SouthTexasZipcode.objects.order_by('name').area()):
             self.assertAlmostEqual(area_sq_m[i], z.area.sq_m, tol)
 
+    @skipIf(spatialite, "length method doesn't support geodetic coordinates on SpatiaLite.")
     @skipUnlessDBFeature("has_length_method")
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_length(self):
@@ -544,8 +551,9 @@ class DistanceFunctionsTests(TestCase):
                      40435.4335201384, 0, 68272.3896586844, 12375.0643697706, 0]
         qs = AustraliaCity.objects.annotate(distance=Distance('point', ls)).order_by('name')
         for city, distance in zip(qs, distances):
-            # Testing equivalence to within a meter.
-            self.assertAlmostEqual(distance, city.distance.m, 0)
+            # Testing equivalence to within a meter (kilometer on SpatiaLite).
+            tol = -3 if spatialite else 0
+            self.assertAlmostEqual(distance, city.distance.m, tol)
 
     @skipUnlessDBFeature("has_Distance_function", "supports_distance_geodetic")
     def test_distance_geodetic_spheroid(self):
@@ -575,7 +583,7 @@ class DistanceFunctionsTests(TestCase):
         ).order_by('id')
         for i, c in enumerate(qs):
             self.assertAlmostEqual(spheroid_distances[i], c.distance.m, tol)
-        if postgis:
+        if postgis or spatialite:
             # PostGIS uses sphere-only distances by default, testing these as well.
             qs = AustraliaCity.objects.exclude(id=hillsdale.id).annotate(
                 distance=Distance('point', hillsdale.point)
