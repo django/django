@@ -56,9 +56,11 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     select = 'AsText(%s)'
 
     gis_operators = {
+        # Unary predicates
+        'isvalid': SpatialOperator(func='IsValid'),
+        # Binary predicates
         'equals': SpatialOperator(func='Equals'),
         'disjoint': SpatialOperator(func='Disjoint'),
-        'dwithin': SpatialOperator(func='PtDistWithin'),
         'touches': SpatialOperator(func='Touches'),
         'crosses': SpatialOperator(func='Crosses'),
         'within': SpatialOperator(func='Within'),
@@ -75,7 +77,8 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         # These are implemented here as synonyms for Equals
         'same_as': SpatialOperator(func='Equals'),
         'exact': SpatialOperator(func='Equals'),
-
+        # Distance predicates
+        'dwithin': SpatialOperator(func='PtDistWithin'),
         'distance_gt': SpatialOperator(func='Distance', op='>'),
         'distance_gte': SpatialOperator(func='Distance', op='>='),
         'distance_lt': SpatialOperator(func='Distance', op='<'),
@@ -96,9 +99,9 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def unsupported_functions(self):
-        unsupported = {'BoundingCircle', 'ForceRHR', 'IsValid', 'MakeValid', 'MemSize'}
+        unsupported = {'BoundingCircle', 'ForceRHR', 'MemSize'}
         if not self.lwgeom_version():
-            unsupported.add('GeoHash')
+            unsupported |= {'GeoHash', 'IsValid', 'MakeValid'}
         return unsupported
 
     @cached_property
