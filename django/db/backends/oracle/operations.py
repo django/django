@@ -93,16 +93,9 @@ WHEN (new.%(col_name)s IS NULL)
 
     def date_interval_sql(self, timedelta):
         """
-        Implements the interval functionality for expressions
-        format for Oracle:
-        INTERVAL '3 00:03:20.000000' DAY(1) TO SECOND(6)
+        NUMTODSINTERVAL converts number to INTERVAL DAY TO SECOND literal.
         """
-        minutes, seconds = divmod(timedelta.seconds, 60)
-        hours, minutes = divmod(minutes, 60)
-        days = str(timedelta.days)
-        day_precision = len(days)
-        fmt = "INTERVAL '%s %02d:%02d:%02d.%06d' DAY(%d) TO SECOND(6)"
-        return fmt % (days, hours, minutes, seconds, timedelta.microseconds, day_precision), []
+        return "NUMTODSINTERVAL(%06f, 'SECOND')" % (timedelta.total_seconds()), []
 
     def date_trunc_sql(self, lookup_type, field_name):
         # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
