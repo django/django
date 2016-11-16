@@ -225,8 +225,8 @@ class HttpRequest(object):
         next access (so that it is decoded correctly).
         """
         self._encoding = val
-        if hasattr(self, '_get'):
-            del self._get
+        if hasattr(self, 'GET'):
+            del self.GET
         if hasattr(self, '_post'):
             del self._post
 
