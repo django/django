@@ -634,6 +634,10 @@ Miscellaneous
 
 * The undocumented ``django.utils.functional.lazy_property`` is removed.
 
+* For consistency with non-multipart requests, ``MultiPartParser.parse()`` now
+  leaves ``request.POST`` immutable. If you're modifying that ``QueryDict``,
+  you must now first copy it, e.g. ``request.POST.copy()``.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11

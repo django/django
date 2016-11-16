@@ -205,6 +205,7 @@ class UserAdmin(admin.ModelAdmin):
         # * The user has pressed the 'Save and add another' button
         # * We are adding a user in a popup
         if '_addanother' not in request.POST and IS_POPUP_VAR not in request.POST:
+            request.POST = request.POST.copy()
             request.POST['_continue'] = 1
         return super(UserAdmin, self).response_add(request, obj,
                                                    post_url_continue)

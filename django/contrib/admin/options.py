@@ -1785,7 +1785,7 @@ class ModelAdmin(BaseModelAdmin):
             }
             if request.method == 'POST':
                 formset_params.update({
-                    'data': request.POST,
+                    'data': request.POST.copy(),
                     'files': request.FILES,
                     'save_as_new': '_saveasnew' in request.POST
                 })

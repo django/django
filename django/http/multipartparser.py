@@ -289,6 +289,7 @@ class MultiPartParser(object):
             if retval:
                 break
 
+        self._post._mutable = False
         return self._post, self._files
 
     def handle_file_complete(self, old_field_name, counters):
