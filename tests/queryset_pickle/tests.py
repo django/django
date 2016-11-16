@@ -134,6 +134,15 @@ class PickleabilityTestCase(TestCase):
         groups2 = pickle.loads(pickle.dumps(groups))
         self.assertSequenceEqual(groups2.filter(id__gte=0), [g])
 
+    def test_pickle_prefetch_queryset_not_evaluated(self):
+        Group.objects.create(name='foo')
+        groups = Group.objects.prefetch_related(
+            models.Prefetch('event_set', queryset=Event.objects.order_by('id'))
+        )
+        list(groups)  # evaluate QuerySet
+        with self.assertNumQueries(0):
+            pickle.loads(pickle.dumps(groups))
+
     def test_pickle_prefetch_related_with_m2m_and_objects_deletion(self):
         """
         #24831 -- Cached properties on ManyToOneRel created in QuerySet.delete()
