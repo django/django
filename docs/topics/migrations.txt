@@ -87,7 +87,7 @@ add or remove columns. On slower hardware this can be worse than a minute per
 million rows - adding a few columns to a table with just a few million rows
 could lock your site up for over ten minutes.
 
-Finally, MySQL has reasonably small limits on name lengths for columns, tables
+Finally, MySQL has relatively small limits on name lengths for columns, tables
 and indexes, as well as a limit on the combined size of all columns an index
 covers. This means that indexes that are possible on other backends will
 fail to be created under MySQL.
