@@ -197,9 +197,6 @@ class QuerySet(object):
         return obj
 
     def __getstate__(self):
-        """
-        Allows the QuerySet to be pickled.
-        """
         # Force the cache to be fully populated.
         self._fetch_all()
         obj_dict = self.__dict__.copy()
@@ -1291,6 +1288,16 @@ class Prefetch(object):
 
         self.queryset = queryset
         self.to_attr = to_attr
+
+    def __getstate__(self):
+        obj_dict = self.__dict__.copy()
+        if self.queryset is not None:
+            # Prevent the QuerySet from being evaluated
+            obj_dict['queryset'] = self.queryset._clone(
+                _result_cache=[],
+                _prefetch_done=True,
+            )
+        return obj_dict
 
     def add_prefix(self, prefix):
         self.prefetch_through = LOOKUP_SEP.join([prefix, self.prefetch_through])
