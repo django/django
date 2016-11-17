@@ -562,6 +562,16 @@ class RequestsTests(SimpleTestCase):
         request.encoding = 'iso-8859-16'
         self.assertEqual(request.POST, {'name': ['Hello GĂŒnter']})
 
+    def test_set_encoding_clears_GET(self):
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'GET',
+            'wsgi.input': '',
+            'QUERY_STRING': b'name=Hello%20G%C3%BCnter' if six.PY2 else 'name=Hello%20G%C3%BCnter'
+        })
+        self.assertEqual(request.GET, {'name': ['Hello Günter']})
+        request.encoding = 'iso-8859-16'
+        self.assertEqual(request.GET, {'name': ['Hello G\u0102\u0152nter']})
+
     def test_FILES_connection_error(self):
         """
         If wsgi.input.read() raises an exception while trying to read() the
