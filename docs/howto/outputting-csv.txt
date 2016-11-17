@@ -120,28 +120,32 @@ adding column names for the first row::
     import csv
     import datetime
 
-    from StringIO import StringIO
     from django.db import connection
     from django.http import StreamingHttpResponse
+
+    class Echo(object):
+        """An object that implements just the write method of the file-like
+        interface for csv.writer.
+        """
+        def write(self, value):
+            """Write the value by returning it, instead of storing in a buffer."""
+            return value
 
     def export_csv(request):
         """Export raw sql as a csv with column headers"""
         def stream():
             """Generator function to yield cursor rows with a header."""
-            buffer = StringIO()
-            writer = csv.writer(buffer)
+            pseudo_buffer = Echo()
+            writer = csv.writer(pseudo_buffer)
             columns = True
             for row in cursor.fetchall():
+                data = ''
                 if columns:
-                    # Write header columns
+                    # Write the columns if this is the first row
                     columns = [col[0] for col in cursor.description]
-                    writer.writerow(columns)
+                    data = writer.writerow(columns)
                     columns = False
-                writer.writerow(row)
-                buffer.seek(0)
-                data = buffer.read()
-                buffer.seek(0)
-                buffer.truncate()
+                data = data + writer.writerow(row)
                 yield data
 
         # Create a unique file name for the download
