@@ -36,7 +36,7 @@ msgstr "重要日期"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "具有主键 %(key)r 的对象 %(name)s 不存在。"
+msgstr "主键为 %(key)r 的对象 %(name)s 不存在。"
 
 msgid "Password changed successfully."
 msgstr "密码修改成功。"
@@ -58,7 +58,7 @@ msgid "No password set."
 msgstr "密码未设置。"
 
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr "不可用的密码格式或未知的哈希算法。"
+msgstr "无效的密码格式或未知的哈希算法。"
 
 msgid "The two password fields didn't match."
 msgstr "两个密码字段不一致。"
@@ -84,7 +84,7 @@ msgstr ""
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
-msgstr "请输入一个正确的 %(username)s 和密码. 注意他们都是大区分大小写的."
+msgstr "请输入一个正确的 %(username)s 和密码. 注意它们都是区分大小写的."
 
 msgid "This account is inactive."
 msgstr "该帐号未激活。"
@@ -184,7 +184,7 @@ msgid "username"
 msgstr "用户名"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "必填。150个字符或者更少。包含字母，数字和仅有的@/./+/-/_符号。"
+msgstr "必填。少于或等于150个字符。仅包含字母，数字和@/./+/-/_符号。"
 
 msgid "A user with that username already exists."
 msgstr "已存在一位使用该名字的用户。"
@@ -205,12 +205,12 @@ msgid "Designates whether the user can log into this admin site."
 msgstr "指明用户是否可以登录到这个管理站点。"
 
 msgid "active"
-msgstr "有效"
+msgstr "激活的"
 
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr "指明用户是否被认为活跃的。以反选代替删除帐号。"
+msgstr "指明该用户是否是激活的。用反选代替删除帐号。"
 
 msgid "date joined"
 msgstr "加入日期"
