@@ -277,9 +277,7 @@ class SerializersTestBase(object):
         author = Author.objects.defer('name').get(pk=author.pk)
         serial_str = serializers.serialize(self.serializer_name, [author])
         deserial_objs = list(serializers.deserialize(self.serializer_name, serial_str))
-        # Check the class instead of using isinstance() because model instances
-        # with deferred fields (e.g. Author_Deferred_name) will pass isinstance.
-        self.assertEqual(deserial_objs[0].object.__class__, Author)
+        self.assertIsInstance(deserial_objs[0].object, Author)
 
     def test_custom_field_serialization(self):
         """Tests that custom fields serialize and deserialize intact"""
