@@ -360,8 +360,10 @@ class GDALRasterTests(unittest.TestCase):
         self.assertEqual(target.width, 7)
         self.assertEqual(target.height, 7)
         self.assertEqual(target.bands[0].datatype(), source.bands[0].datatype())
-        self.assertEqual(target.origin, [9124842.791079799, 1589911.6476407414])
-        self.assertEqual(target.scale, [223824.82664250192, -223824.82664250192])
+        self.assertAlmostEqual(target.origin[0], 9124842.791079799)
+        self.assertAlmostEqual(target.origin[1], 1589911.6476407414)
+        self.assertAlmostEqual(target.scale[0], 223824.82664250192)
+        self.assertAlmostEqual(target.scale[1], -223824.82664250192)
         self.assertEqual(target.skew, [0, 0])
 
         result = target.bands[0].data()
