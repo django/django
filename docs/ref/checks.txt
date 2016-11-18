@@ -1,3 +1,4 @@
+
 ======================
 System check framework
 ======================
@@ -600,8 +601,8 @@ The following checks are run if you use the :option:`check --deploy` option:
 * **security.W021**: You have not set the
   :setting:`SECURE_HSTS_PRELOAD` setting to ``True``. Without this, your site
   cannot be submitted to the browser preload list.
-* **security.W022**: Your :setting:`SECRET_KEY` is invalid Unicode.
-  Please generate a valid Unicode string.
+* **security.W022**: Your :setting:`SECRET_KEY` contains an invalid string or UTF-8 bytes.
+  :setting:`SECRET_KEY` must be a Unicode string
 
 Sites
 -----

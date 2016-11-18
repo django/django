@@ -110,7 +110,7 @@ W021 = Warning(
 
 W022 = Warning(
     "Your SECRET_KEY contains an invalid string or UTF-8 bytes. "
-    "Please ensure you have a valid string or UTF-8 bytes.",
+    "SECRET_KEY must be a Unicode string",
     id='security.W022',
 )
 
