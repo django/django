@@ -12,6 +12,7 @@ from django.core.management import CommandError, call_command
 from django.db import (
     ConnectionHandler, DatabaseError, connection, connections, models,
 )
+from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.migrations.exceptions import (
     InconsistentMigrationHistory, MigrationSchemaMissing,
 )
@@ -460,6 +461,20 @@ class MigrateTests(MigrationTestBase):
         # registry never sees it and the reference is left dangling. Remove it
         # to avoid problems in subsequent tests.
         del apps._pending_operations[('migrations', 'tribble')]
+
+    @override_settings(INSTALLED_APPS=[
+        'migrations.migrations_test_apps.unmigrated_app_syncdb',
+    ])
+    def test_migrate_syncdb_deferred_sql_executed_with_schemaeditor(self):
+        """
+        For an app without migrations, editor.execute() is used for executing
+        the syncdb deferred SQL.
+        """
+        with mock.patch.object(BaseDatabaseSchemaEditor, 'execute') as execute:
+            call_command('migrate', run_syncdb=True, verbosity=0)
+            self.assertGreater(len(execute.mock_calls), 0)
+            # The CREATE INDEX SQL is deferred.
+            self.assertTrue(any('CREATE INDEX' in str(call) for call in execute.mock_calls))
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_migrate_record_replaced(self):
