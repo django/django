@@ -84,6 +84,7 @@ class Command(RunserverCommand):
                 action_logger=self.log_action,
                 http_timeout=self.http_timeout,
                 ws_protocols=getattr(settings, 'CHANNELS_WS_PROTOCOLS', None),
+                root_path=getattr(settings, 'FORCE_SCRIPT_NAME', ''),
             ).run()
             self.logger.debug("Daphne exited")
         except KeyboardInterrupt:

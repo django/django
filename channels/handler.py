@@ -44,7 +44,7 @@ class AsgiRequest(http.HttpRequest):
         # Path info
         self.path = self.message['path']
         self.script_name = self.message.get('root_path', '')
-        if self.script_name:
+        if self.script_name and self.path.startswith(self.script_name):
             # TODO: Better is-prefix checking, slash handling?
             self.path_info = self.path[len(self.script_name):]
         else:

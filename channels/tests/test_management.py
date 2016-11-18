@@ -87,7 +87,7 @@ class RunServerTests(TestCase):
         call_command('runserver', '--noreload')
         mocked_server.assert_called_with(port=8000, signal_handlers=True, http_timeout=60,
                                          host='127.0.0.1', action_logger=mock.ANY, channel_layer=mock.ANY,
-                                         ws_protocols=None)
+                                         ws_protocols=None, root_path=None)
 
     @mock.patch('channels.management.commands.runserver.sys.stdout', new_callable=StringIO)
     @mock.patch('channels.management.commands.runserver.Server')
@@ -101,12 +101,12 @@ class RunServerTests(TestCase):
             call_command('runserver', '--noreload')
             mocked_server.assert_called_with(port=8000, signal_handlers=True, http_timeout=60,
                                              host='127.0.0.1', action_logger=mock.ANY, channel_layer=mock.ANY,
-                                             ws_protocols=None)
+                                             ws_protocols=None, root_path=None)
 
             call_command('runserver', '--noreload', 'localhost:8001')
             mocked_server.assert_called_with(port=8001, signal_handlers=True, http_timeout=60,
                                              host='localhost', action_logger=mock.ANY, channel_layer=mock.ANY,
-                                             ws_protocols=None)
+                                             ws_protocols=None, root_path=None)
 
         self.assertFalse(mocked_worker.called,
                          "The worker should not be called with '--noworker'")
@@ -121,7 +121,7 @@ class RunServerTests(TestCase):
         call_command('runserver', '--noreload', '--noworker')
         mocked_server.assert_called_with(port=8000, signal_handlers=True, http_timeout=60,
                                          host='127.0.0.1', action_logger=mock.ANY, channel_layer=mock.ANY,
-                                         ws_protocols=None)
+                                         ws_protocols=None, root_path=None)
         self.assertFalse(mocked_worker.called,
                          "The worker should not be called with '--noworker'")
 
