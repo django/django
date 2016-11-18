@@ -11,7 +11,7 @@ patterns and caveats.
 First Consumers
 ---------------
 
-When you run Django out of the box, it will be set up in the default layout -
+When you first run Django with Channels installed, it will be set up in the default layout -
 where all HTTP requests (on the ``http.request`` channel) are routed to the
 Django view layer - nothing will be different to how things worked in the past
 with a WSGI-based Django, and your views and static file serving (from
