@@ -9,6 +9,7 @@ from django.core.paginator import (
 )
 from django.test import TestCase
 from django.utils import six
+from django.utils.translation import ugettext_lazy as _
 
 from .custom import ValidAdjacentNumsPaginator
 from .models import Article
@@ -116,12 +117,18 @@ class PaginationTests(unittest.TestCase):
         Invalid page numbers result in the correct exception being raised.
         """
         paginator = Paginator([1, 2, 3], 2)
-        with self.assertRaises(InvalidPage):
+        with self.assertRaises(InvalidPage) as e:
             paginator.page(3)
-        with self.assertRaises(PageNotAnInteger):
+        self.assertEqual(e.exception.message, _('That page contains no results'))
+        with self.assertRaises(PageNotAnInteger) as e:
             paginator.validate_number(None)
-        with self.assertRaises(PageNotAnInteger):
+        self.assertEqual(e.exception.message, _('That page number is not an integer'))
+        with self.assertRaises(PageNotAnInteger) as e:
             paginator.validate_number('x')
+        self.assertEqual(e.exception.message, _('That page number is not an integer'))
+        with self.assertRaises(EmptyPage) as e:
+            paginator.validate_number(0)
+        self.assertEqual(e.exception.message, _('That page number is less than 1'))
         # With no content and allow_empty_first_page=True, 1 is a valid page number
         paginator = Paginator([], 2)
         self.assertEqual(paginator.validate_number(1), 1)
