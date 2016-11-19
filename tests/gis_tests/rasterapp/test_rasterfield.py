@@ -99,11 +99,10 @@ class RasterFieldTest(TransactionTestCase):
         # Confirm raster has been transformed to the default srid
         self.assertEqual(r.rast.srs.srid, 4326)
         # Confirm geotransform is in lat/lon
-        self.assertEqual(
-            r.rast.geotransform,
-            [-87.9298551266551, 9.459646421449934e-06, 0.0,
-             23.94249275457565, 0.0, -9.459646421449934e-06]
-        )
+        expected = [-87.9298551266551, 9.459646421449934e-06, 0.0, 23.94249275457565,
+                    0.0, -9.459646421449934e-06]
+        for val, exp in zip(r.rast.geotransform, expected):
+            self.assertAlmostEqual(exp, val)
 
     def test_verbose_name_arg(self):
         """
