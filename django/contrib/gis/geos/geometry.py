@@ -178,7 +178,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         if isinstance(other, six.string_types):
             if other.startswith('SRID=0;'):
-                return self.wkt == other[7:]  # Test only WKT part of other
+                return self.ewkt == other[7:]  # Test only WKT part of other
             return self.ewkt == other
         elif isinstance(other, GEOSGeometry):
             return self.srid == other.srid and self.equals_exact(other)
