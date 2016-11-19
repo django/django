@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Unit tests for reverse URL lookups.
 """
-from __future__ import unicode_literals
-
 import sys
 import threading
 import unittest

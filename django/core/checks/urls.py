@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from collections import Counter
 
 from django.conf import settings

@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 """
 LANG_INFO is a dictionary structure to provide meta information about languages.
 

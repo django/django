@@ -1,6 +1,3 @@
-# Since this package contains a "django" module, this is required on Python 2.
-from __future__ import absolute_import
-
 import sys
 from importlib import import_module
 from pkgutil import walk_packages

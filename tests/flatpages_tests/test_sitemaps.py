@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.apps import apps
 from django.contrib.sites.models import Site
 from django.test import TestCase

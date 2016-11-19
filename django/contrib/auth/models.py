@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib import auth
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.signals import user_logged_in

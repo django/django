@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import warnings
 
 from django.db.backends.base.introspection import (

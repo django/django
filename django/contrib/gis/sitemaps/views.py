@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.apps import apps
 from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.models.functions import AsKML, Transform

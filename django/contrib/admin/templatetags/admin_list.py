@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters

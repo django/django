@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from math import ceil
 
 from django.db import IntegrityError, connection, models

@@ -1,8 +1,6 @@
 """
 Form Widget classes specific to the Django admin site.
 """
-from __future__ import unicode_literals
-
 import copy
 
 from django import forms

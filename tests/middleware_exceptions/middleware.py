@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.http import Http404, HttpResponse
 from django.template import engines
 from django.template.response import TemplateResponse

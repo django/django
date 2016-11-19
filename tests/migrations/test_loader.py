@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from unittest import skipIf
 
 from django.db import connection, connections

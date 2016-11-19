@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.forms import Widget
 from django.forms.widgets import Input
 

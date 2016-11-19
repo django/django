@@ -1,8 +1,6 @@
 """
 Regression tests for Model inheritance behavior.
 """
-from __future__ import unicode_literals
-
 import datetime
 from operator import attrgetter
 from unittest import expectedFailure

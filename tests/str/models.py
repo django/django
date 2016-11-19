@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Adding __str__() or __unicode__() to models
 

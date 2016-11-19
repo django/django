@@ -16,8 +16,6 @@ cache keys to prevent delivery of wrong content.
 An example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
-from __future__ import unicode_literals
-
 import hashlib
 import logging
 import re

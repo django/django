@@ -1,6 +1,3 @@
-from __future__ import unicode_literals
-
-
 class MigrationOptimizer(object):
     """
     Powers the optimization process, where you provide a list of Operations

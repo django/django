@@ -21,8 +21,6 @@ Sample usage:
 For definitions of the different versions of RSS, see:
 http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 """
-from __future__ import unicode_literals
-
 import datetime
 
 from django.utils import datetime_safe, six

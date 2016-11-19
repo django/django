@@ -3,8 +3,6 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
-from __future__ import unicode_literals
-
 from collections import OrderedDict
 from itertools import chain
 

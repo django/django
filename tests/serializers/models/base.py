@@ -4,8 +4,6 @@ Serialization
 ``django.core.serializers`` provides interfaces to converting Django
 ``QuerySet`` objects to and from "flat" data (i.e. strings).
 """
-from __future__ import unicode_literals
-
 from decimal import Decimal
 
 from django.db import models

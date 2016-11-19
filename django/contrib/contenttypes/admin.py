@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from functools import partial
 
 from django.contrib.admin.checks import InlineModelAdminChecks

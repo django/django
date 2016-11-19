@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import sys
 import unittest
 from contextlib import contextmanager

@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import models
 from django.db.models.fields.related import ForeignObject

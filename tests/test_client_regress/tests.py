@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 Regression tests for the Test Client, especially the customized assertions.
 """
-from __future__ import unicode_literals
-
 import itertools
 import os
 

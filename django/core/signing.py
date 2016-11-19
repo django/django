@@ -33,8 +33,6 @@ There are 65 url-safe characters: the 64 used by url-safe base64 and the ':'.
 These functions make use of all of them.
 """
 
-from __future__ import unicode_literals
-
 import base64
 import datetime
 import json

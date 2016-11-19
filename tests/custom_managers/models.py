@@ -9,8 +9,6 @@ There are two reasons you might want to customize a ``Manager``: to add extra
 returns.
 """
 
-from __future__ import unicode_literals
-
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )

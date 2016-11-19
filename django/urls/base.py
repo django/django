@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from threading import local
 
 from django.utils import six

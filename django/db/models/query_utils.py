@@ -5,8 +5,6 @@ Factored out from django.db.models.query to avoid making the main module very
 large and/or so that they can be used by other modules without getting into
 circular import difficulties.
 """
-from __future__ import unicode_literals
-
 import inspect
 from collections import namedtuple
 

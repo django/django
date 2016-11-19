@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib.auth.checks import (
     check_models_permissions, check_user_model,
 )

@@ -1,8 +1,6 @@
 """
 A custom AdminSite for AdminViewPermissionsTest.test_login_has_permission().
 """
-from __future__ import unicode_literals
-
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename
 from django.contrib.auth.forms import AuthenticationForm

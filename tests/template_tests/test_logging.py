@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 
 from django.template import Context, Engine, Variable, VariableDoesNotExist

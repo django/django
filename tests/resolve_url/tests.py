@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.shortcuts import resolve_url
 from django.test import SimpleTestCase, override_settings
 from django.urls import NoReverseMatch, reverse_lazy

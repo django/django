@@ -2,8 +2,6 @@
  This module contains the 'base' GEOSGeometry object -- all GEOS Geometries
  inherit from this object.
 """
-from __future__ import unicode_literals
-
 import json
 from ctypes import addressof, byref, c_double
 

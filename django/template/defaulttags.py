@@ -1,6 +1,4 @@
 """Default tags used by the template system, available to all templates."""
-from __future__ import unicode_literals
-
 import re
 import sys
 import warnings

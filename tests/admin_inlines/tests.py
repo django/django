@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib.admin import ModelAdmin, TabularInline
 from django.contrib.admin.helpers import InlineAdminForm
 from django.contrib.admin.tests import AdminSeleniumTestCase

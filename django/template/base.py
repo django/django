@@ -49,8 +49,6 @@ times with multiple contexts)
 '<html></html>'
 """
 
-from __future__ import unicode_literals
-
 import inspect
 import logging
 import re

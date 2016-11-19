@@ -2,8 +2,6 @@
 HTML Widget classes
 """
 
-from __future__ import unicode_literals
-
 import copy
 import datetime
 import re

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db.models.fields import NOT_PROVIDED
 from django.utils.functional import cached_property
 

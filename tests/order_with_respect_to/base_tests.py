@@ -2,8 +2,6 @@
 The tests are shared with contenttypes_tests and so shouldn't import or
 reference any models directly. Subclasses should inherit django.test.TestCase.
 """
-from __future__ import unicode_literals
-
 from operator import attrgetter
 
 

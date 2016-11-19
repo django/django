@@ -10,8 +10,6 @@ Usage:
 7th October 2003 11:39
 >>>
 """
-from __future__ import unicode_literals
-
 import calendar
 import datetime
 import re

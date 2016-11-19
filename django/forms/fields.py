@@ -2,8 +2,6 @@
 Field classes.
 """
 
-from __future__ import unicode_literals
-
 import copy
 import datetime
 import itertools

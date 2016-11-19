@@ -6,8 +6,6 @@ test case that is capable of testing the capabilities of
 the serializers. This includes all valid data values, plus
 forward, backwards and self references.
 """
-from __future__ import unicode_literals
-
 import datetime
 import decimal
 import uuid

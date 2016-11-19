@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.forms.models import ModelForm, inlineformset_factory
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six

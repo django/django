@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Django documentation build configuration file, created by
 # sphinx-quickstart on Thu Mar 27 09:06:53 2008.
 #
@@ -10,8 +8,6 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
-
-from __future__ import unicode_literals
 
 import sys
 from os.path import abspath, dirname, join

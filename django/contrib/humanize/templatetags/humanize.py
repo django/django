@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 import re
 from datetime import date, datetime
 from decimal import Decimal

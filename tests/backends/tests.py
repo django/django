@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
 # Unit and doctests for specific database backends.
-from __future__ import unicode_literals
-
 import datetime
 import re
 import threading

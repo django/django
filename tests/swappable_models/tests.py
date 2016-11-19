@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from swappable_models.models import Article
 
 from django.contrib.auth.models import Permission

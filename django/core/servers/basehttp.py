@@ -7,8 +7,6 @@ This is a simple server for use in testing or debugging Django apps. It hasn't
 been reviewed for security issues. DON'T USE IT FOR PRODUCTION USE!
 """
 
-from __future__ import unicode_literals
-
 import logging
 import socket
 import sys

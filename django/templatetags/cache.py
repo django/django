@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.core.cache import InvalidCacheBackendError, caches
 from django.core.cache.utils import make_template_fragment_key
 from django.template import (

@@ -9,8 +9,6 @@ The canonical example is tags (although this example implementation is *far*
 from complete).
 """
 
-from __future__ import unicode_literals
-
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )

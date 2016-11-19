@@ -1,8 +1,6 @@
 """
 Django's standard crypto functions and utilities.
 """
-from __future__ import unicode_literals
-
 import binascii
 import hashlib
 import hmac

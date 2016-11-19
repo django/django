@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import time
 from collections import OrderedDict
 from importlib import import_module

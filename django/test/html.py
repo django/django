@@ -2,8 +2,6 @@
 Comparing two html documents.
 """
 
-from __future__ import unicode_literals
-
 import re
 
 from django.utils import six

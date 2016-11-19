@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db.models import F, IntegerField, Value
 from django.db.utils import DatabaseError
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature

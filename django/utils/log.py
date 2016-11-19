@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 import logging.config  # needed when logging_config doesn't start with logging.config
 from copy import copy

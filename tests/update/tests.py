@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import FieldError
 from django.db.models import Count, F, Max
 from django.test import TestCase

@@ -3,8 +3,6 @@ Oracle database backend for Django.
 
 Requires cx_Oracle: http://cx-oracle.sourceforge.net/
 """
-from __future__ import unicode_literals
-
 import datetime
 import decimal
 import os

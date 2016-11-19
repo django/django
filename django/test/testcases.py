@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import difflib
 import json
 import posixpath

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.utils.version import get_version
 
 VERSION = (2, 0, 0, 'alpha', 0)

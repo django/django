@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 """
 Default Django settings. Override these with settings in the module pointed to
 by the DJANGO_SETTINGS_MODULE environment variable.
 """
-from __future__ import unicode_literals
 
 
 # This is defined here as a do-nothing function because we can't import

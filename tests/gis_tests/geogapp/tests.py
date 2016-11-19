@@ -1,8 +1,6 @@
 """
 Tests for geography support in PostGIS
 """
-from __future__ import unicode_literals
-
 import os
 from unittest import skipIf, skipUnless
 

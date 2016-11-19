@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django import forms
 from django.forms.formsets import DELETION_FIELD_NAME, BaseFormSet
 from django.forms.models import (

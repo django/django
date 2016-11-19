@@ -113,8 +113,6 @@ class TemplateCommand(BaseCommand):
             camel_case_name: camel_case_value,
             'docs_version': get_docs_version(),
             'django_version': django.__version__,
-            'unicode_literals': '' if six.PY3 else '# -*- coding: utf-8 -*-\n'
-                                                   'from __future__ import unicode_literals\n\n',
         }), autoescape=False)
 
         # Setup a stub settings environment for template rendering

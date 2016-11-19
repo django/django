@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.core.checks import Error
 from django.db import connections, models
 from django.test import SimpleTestCase, mock

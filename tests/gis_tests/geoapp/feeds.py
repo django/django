@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib.gis import feeds
 
 from .models import City

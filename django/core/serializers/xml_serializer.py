@@ -2,8 +2,6 @@
 XML serializer.
 """
 
-from __future__ import unicode_literals
-
 from collections import OrderedDict
 from xml.dom import pulldom
 from xml.sax import handler

@@ -1,7 +1,5 @@
 """HTML utilities suitable for global use."""
 
-from __future__ import unicode_literals
-
 import re
 
 from django.utils import six

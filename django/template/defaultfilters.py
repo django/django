@@ -1,6 +1,4 @@
 """Default variable filters."""
-from __future__ import unicode_literals
-
 import random as random_module
 import re
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation

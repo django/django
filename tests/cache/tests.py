@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
-from __future__ import unicode_literals
-
 import copy
 import io
 import os

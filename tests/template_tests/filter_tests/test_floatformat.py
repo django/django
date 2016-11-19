@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from decimal import Decimal, localcontext
 
 from django.template.defaultfilters import floatformat

@@ -9,8 +9,6 @@ They also act as reverse fields for the purposes of the Meta API because
 they're the closest concept currently available.
 """
 
-from __future__ import unicode_literals
-
 from django.core import exceptions
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property

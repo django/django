@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.http import HttpRequest
 from django.template import (
     Context, Engine, RequestContext, Template, Variable, VariableDoesNotExist,

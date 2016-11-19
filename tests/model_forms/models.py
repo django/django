@@ -6,8 +6,6 @@ tests to use ``ModelForm``. As such, the text may not make sense in all cases,
 and the examples are probably a poor fit for the ``ModelForm`` syntax. In other
 words, most of these tests should be rewritten.
 """
-from __future__ import unicode_literals
-
 import datetime
 import os
 import tempfile

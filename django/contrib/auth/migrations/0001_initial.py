@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import django.contrib.auth.models
 from django.contrib.auth import validators
 from django.db import migrations, models

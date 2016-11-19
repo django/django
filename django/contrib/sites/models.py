@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import string
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError

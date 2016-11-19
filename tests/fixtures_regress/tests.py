@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
 # Unittests for fixtures.
-from __future__ import unicode_literals
-
 import json
 import os
 import re

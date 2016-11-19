@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import ValidationError
 from django.utils.functional import SimpleLazyObject
 from django.utils.text import format_lazy

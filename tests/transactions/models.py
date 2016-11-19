@@ -6,8 +6,6 @@ each transaction upon a write, but you can decorate a function to get
 commit-on-success behavior. Alternatively, you can manage the transaction
 manually.
 """
-from __future__ import unicode_literals
-
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 

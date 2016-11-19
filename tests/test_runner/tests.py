@@ -1,8 +1,6 @@
 """
 Tests for django test runner
 """
-from __future__ import unicode_literals
-
 import unittest
 
 from admin_scripts.tests import AdminScriptTestCase

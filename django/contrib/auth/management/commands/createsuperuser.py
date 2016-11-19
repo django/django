@@ -1,8 +1,6 @@
 """
 Management utility to create superusers.
 """
-from __future__ import unicode_literals
-
 import getpass
 import sys
 

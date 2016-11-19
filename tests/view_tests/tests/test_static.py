@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import mimetypes
 import unittest
 from os import path

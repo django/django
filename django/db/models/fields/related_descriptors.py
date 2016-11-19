@@ -63,8 +63,6 @@ and two directions (forward and reverse) for a total of six combinations.
    ``ReverseManyToManyDescriptor``, use ``ManyToManyDescriptor`` instead.
 """
 
-from __future__ import unicode_literals
-
 from operator import attrgetter
 
 from django.db import connections, router, transaction

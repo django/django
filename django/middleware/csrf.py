@@ -4,8 +4,6 @@ Cross Site Request Forgery Middleware.
 This module provides a middleware that implements protection
 against request forgeries from other sites.
 """
-from __future__ import unicode_literals
-
 import logging
 import re
 import string

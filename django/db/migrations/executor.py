@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.apps.registry import apps as global_apps
 from django.db import migrations, router
 

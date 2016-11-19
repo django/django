@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import sys
 from importlib import import_module
 

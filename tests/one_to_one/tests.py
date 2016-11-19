@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db import IntegrityError, connection, transaction
 from django.test import TestCase
 

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 import importlib
 import io
@@ -661,7 +658,6 @@ class MakeMigrationsTests(MigrationTestBase):
 
             with io.open(initial_file, 'r', encoding='utf-8') as fp:
                 content = fp.read()
-                self.assertIn('# -*- coding: utf-8 -*-', content)
                 self.assertIn('migrations.CreateModel', content)
                 self.assertIn('initial = True', content)
 
@@ -813,7 +809,6 @@ class MakeMigrationsTests(MigrationTestBase):
 
             with io.open(initial_file, 'r', encoding='utf-8') as fp:
                 content = fp.read()
-                self.assertIn('# -*- coding: utf-8 -*-', content)
 
                 # Remove all whitespace to check for empty dependencies and operations
                 content = content.replace(' ', '')
@@ -1040,8 +1035,6 @@ class MakeMigrationsTests(MigrationTestBase):
 
         # Additional output caused by verbosity 3
         # The complete merge migration file that would be written
-        # '\n#' is to verify no bytestring prefix before #
-        self.assertIn("\n# -*- coding: utf-8 -*-", output)
         self.assertIn("class Migration(migrations.Migration):", output)
         self.assertIn("dependencies = [", output)
         self.assertIn("('migrations', '0002_second')", output)
@@ -1087,7 +1080,6 @@ class MakeMigrationsTests(MigrationTestBase):
 
         # Additional output caused by verbosity 3
         # The complete migrations file that would be written
-        self.assertIn("# -*- coding: utf-8 -*-", out.getvalue())
         self.assertIn("class Migration(migrations.Migration):", out.getvalue())
         self.assertIn("dependencies = [", out.getvalue())
         self.assertIn("('migrations', '0001_initial'),", out.getvalue())
@@ -1211,7 +1203,6 @@ class MakeMigrationsTests(MigrationTestBase):
                 self.assertTrue(os.path.exists(migration_file))
                 with io.open(migration_file, "r", encoding="utf-8") as fp:
                     content = fp.read()
-                    self.assertIn("# -*- coding: utf-8 -*-", content)
                     content = content.replace(" ", "")
                 return content
 

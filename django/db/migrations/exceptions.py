@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db.utils import DatabaseError
 from django.utils.encoding import python_2_unicode_compatible
 

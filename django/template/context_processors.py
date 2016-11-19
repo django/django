@@ -7,8 +7,6 @@ These are referenced from the 'context_processors' option of the configuration
 of a DjangoTemplates backend and used by RequestContext.
 """
 
-from __future__ import unicode_literals
-
 import itertools
 
 from django.conf import settings

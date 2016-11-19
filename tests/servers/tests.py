@@ -1,9 +1,6 @@
-# -*- encoding: utf-8 -*-
 """
 Tests for django.core.servers.
 """
-from __future__ import unicode_literals
-
 import contextlib
 import errno
 import os

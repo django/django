@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 """Tests for jslex."""
 # originally from https://bitbucket.org/ned/jslex
-from __future__ import unicode_literals
 
 from django.test import SimpleTestCase
 from django.utils.jslex import JsLexer, prepare_js_for_gettext

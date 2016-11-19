@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db import models
 from django.template import Context, Template
 from django.test import TestCase, override_settings

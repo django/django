@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from . import ValidationTestCase
 from .models import ModelToValidate
 

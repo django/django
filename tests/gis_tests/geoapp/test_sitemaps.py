@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import zipfile
 from io import BytesIO
 from xml.dom import minidom

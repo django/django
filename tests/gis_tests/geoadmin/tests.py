@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib.gis import admin
 from django.contrib.gis.geos import Point
 from django.test import TestCase, override_settings, skipUnlessDBFeature

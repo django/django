@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import sys
 import traceback
 from io import BytesIO

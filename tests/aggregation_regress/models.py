@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )

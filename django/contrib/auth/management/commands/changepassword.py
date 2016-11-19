@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import getpass
 
 from django.contrib.auth import get_user_model

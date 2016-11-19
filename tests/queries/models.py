@@ -1,8 +1,6 @@
 """
 Various complex queries that have been problematic in the past.
 """
-from __future__ import unicode_literals
-
 import threading
 
 from django.db import models

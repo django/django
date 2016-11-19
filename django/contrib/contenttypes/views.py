@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django import http
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType

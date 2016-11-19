@@ -1,8 +1,6 @@
 """
 Testing some internals of the template processing. These are *not* examples to be copied in user code.
 """
-from __future__ import unicode_literals
-
 from django.template import Library, TemplateSyntaxError
 from django.template.base import (
     TOKEN_BLOCK, FilterExpression, Parser, Token, Variable,
