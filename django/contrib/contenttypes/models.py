@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from django.apps import apps
 from django.db import models
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -133,7 +133,6 @@ class ContentTypeManager(models.Manager):
         self._cache.setdefault(using, {})[ct.id] = ct
 
 
-@python_2_unicode_compatible
 class ContentType(models.Model):
     app_label = models.CharField(max_length=100)
     model = models.CharField(_('python model class name'), max_length=100)

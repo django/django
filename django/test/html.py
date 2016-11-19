@@ -5,7 +5,7 @@ Comparing two html documents.
 import re
 
 from django.utils import six
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.html_parser import HTMLParseError, HTMLParser
 
 WHITESPACE = re.compile(r'\s+')
@@ -15,7 +15,6 @@ def normalize_whitespace(string):
     return WHITESPACE.sub(' ', string)
 
 
-@python_2_unicode_compatible
 class Element(object):
     def __init__(self, name, attributes):
         self.name = name
@@ -139,7 +138,6 @@ class Element(object):
         return six.text_type(self)
 
 
-@python_2_unicode_compatible
 class RootElement(Element):
     def __init__(self):
         super(RootElement, self).__init__(None, ())

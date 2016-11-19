@@ -11,9 +11,7 @@ from django.contrib.gis.gdal.raster.const import GDAL_RESAMPLE_ALGORITHMS
 from django.contrib.gis.gdal.srs import SpatialReference, SRSException
 from django.contrib.gis.geometry.regex import json_regex
 from django.utils import six
-from django.utils.encoding import (
-    force_bytes, force_text, python_2_unicode_compatible,
-)
+from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
 
 
@@ -52,7 +50,6 @@ class TransformPoint(list):
         self._raster.geotransform = gtf
 
 
-@python_2_unicode_compatible
 class GDALRaster(GDALBase):
     """
     Wraps a raster GDAL Data Source object.

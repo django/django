@@ -3,7 +3,6 @@ Tests for defer() and only().
 """
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class Secondary(models.Model):
@@ -11,7 +10,6 @@ class Secondary(models.Model):
     second = models.CharField(max_length=50)
 
 
-@python_2_unicode_compatible
 class Primary(models.Model):
     name = models.CharField(max_length=50)
     value = models.CharField(max_length=50)

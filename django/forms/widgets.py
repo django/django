@@ -13,9 +13,7 @@ from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
 from django.utils import datetime_safe, formats, six
 from django.utils.dates import MONTHS
-from django.utils.encoding import (
-    force_str, force_text, python_2_unicode_compatible,
-)
+from django.utils.encoding import force_str, force_text
 from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
 from django.utils.safestring import mark_safe
@@ -38,7 +36,6 @@ MEDIA_TYPES = ('css', 'js')
 
 
 @html_safe
-@python_2_unicode_compatible
 class Media(object):
     def __init__(self, media=None, **kwargs):
         if media:

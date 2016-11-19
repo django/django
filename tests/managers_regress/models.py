@@ -7,7 +7,7 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 
 
 class OnlyFred(models.Manager):
@@ -55,7 +55,6 @@ class AbstractBase3(models.Model):
         abstract = True
 
 
-@python_2_unicode_compatible
 class Parent(models.Model):
     name = models.CharField(max_length=50)
 
@@ -68,7 +67,6 @@ class Parent(models.Model):
 # Managers from base classes are inherited and, if no manager is specified
 # *and* the parent has a manager specified, the first one (in the MRO) will
 # become the default.
-@python_2_unicode_compatible
 class Child1(AbstractBase1):
     data = models.CharField(max_length=25)
 
@@ -76,7 +74,6 @@ class Child1(AbstractBase1):
         return self.data
 
 
-@python_2_unicode_compatible
 class Child2(AbstractBase1, AbstractBase2):
     data = models.CharField(max_length=25)
 
@@ -84,7 +81,6 @@ class Child2(AbstractBase1, AbstractBase2):
         return self.data
 
 
-@python_2_unicode_compatible
 class Child3(AbstractBase1, AbstractBase3):
     data = models.CharField(max_length=25)
 
@@ -92,7 +88,6 @@ class Child3(AbstractBase1, AbstractBase3):
         return self.data
 
 
-@python_2_unicode_compatible
 class Child4(AbstractBase1):
     data = models.CharField(max_length=25)
 
@@ -104,7 +99,6 @@ class Child4(AbstractBase1):
         return self.data
 
 
-@python_2_unicode_compatible
 class Child5(AbstractBase3):
     name = models.CharField(max_length=25)
 
@@ -124,7 +118,6 @@ class Child7(Parent):
 
 
 # RelatedManagers
-@python_2_unicode_compatible
 class RelatedModel(models.Model):
     test_gfk = GenericRelation('RelationModel', content_type_field='gfk_ctype', object_id_field='gfk_id')
     exact = models.NullBooleanField()
@@ -133,7 +126,6 @@ class RelatedModel(models.Model):
         return force_text(self.pk)
 
 
-@python_2_unicode_compatible
 class RelationModel(models.Model):
     fk = models.ForeignKey(RelatedModel, models.CASCADE, related_name='test_fk')
 

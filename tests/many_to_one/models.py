@@ -4,10 +4,8 @@ Many-to-one relationships
 To define a many-to-one relationship, use ``ForeignKey()``.
 """
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Reporter(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -17,7 +15,6 @@ class Reporter(models.Model):
         return "%s %s" % (self.first_name, self.last_name)
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateField()
@@ -30,7 +27,6 @@ class Article(models.Model):
         ordering = ('headline',)
 
 
-@python_2_unicode_compatible
 class City(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=50)
@@ -39,7 +35,6 @@ class City(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class District(models.Model):
     city = models.ForeignKey(City, models.CASCADE, related_name='districts', null=True)
     name = models.CharField(max_length=50)
@@ -80,7 +75,6 @@ class ToFieldChild(models.Model):
 
 
 # Multiple paths to the same model (#7110, #7125)
-@python_2_unicode_compatible
 class Category(models.Model):
     name = models.CharField(max_length=20)
 
@@ -92,7 +86,6 @@ class Record(models.Model):
     category = models.ForeignKey(Category, models.CASCADE)
 
 
-@python_2_unicode_compatible
 class Relation(models.Model):
     left = models.ForeignKey(Record, models.CASCADE, related_name='left_set')
     right = models.ForeignKey(Record, models.CASCADE, related_name='right_set')

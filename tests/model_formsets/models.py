@@ -3,10 +3,8 @@ import uuid
 
 from django.db import models
 from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=100)
 
@@ -21,7 +19,6 @@ class BetterAuthor(Author):
     write_speed = models.IntegerField()
 
 
-@python_2_unicode_compatible
 class Book(models.Model):
     author = models.ForeignKey(Author, models.CASCADE)
     title = models.CharField(max_length=100)
@@ -40,7 +37,6 @@ class Book(models.Model):
         assert self.author.name is not None
 
 
-@python_2_unicode_compatible
 class BookWithCustomPK(models.Model):
     my_pk = models.DecimalField(max_digits=5, decimal_places=0, primary_key=True)
     author = models.ForeignKey(Author, models.CASCADE)
@@ -54,7 +50,6 @@ class Editor(models.Model):
     name = models.CharField(max_length=100)
 
 
-@python_2_unicode_compatible
 class BookWithOptionalAltEditor(models.Model):
     author = models.ForeignKey(Author, models.CASCADE)
     # Optional secondary author
@@ -70,7 +65,6 @@ class BookWithOptionalAltEditor(models.Model):
         return self.title
 
 
-@python_2_unicode_compatible
 class AlternateBook(Book):
     notes = models.CharField(max_length=100)
 
@@ -78,7 +72,6 @@ class AlternateBook(Book):
         return '%s - %s' % (self.title, self.notes)
 
 
-@python_2_unicode_compatible
 class AuthorMeeting(models.Model):
     name = models.CharField(max_length=100)
     authors = models.ManyToManyField(Author)
@@ -96,7 +89,6 @@ class CustomPrimaryKey(models.Model):
 # models for inheritance tests.
 
 
-@python_2_unicode_compatible
 class Place(models.Model):
     name = models.CharField(max_length=50)
     city = models.CharField(max_length=50)
@@ -105,7 +97,6 @@ class Place(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Owner(models.Model):
     auto_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
@@ -122,7 +113,6 @@ class Location(models.Model):
     lon = models.CharField(max_length=100)
 
 
-@python_2_unicode_compatible
 class OwnerProfile(models.Model):
     owner = models.OneToOneField(Owner, models.CASCADE, primary_key=True)
     age = models.PositiveIntegerField()
@@ -131,7 +121,6 @@ class OwnerProfile(models.Model):
         return "%s is %d" % (self.owner.name, self.age)
 
 
-@python_2_unicode_compatible
 class Restaurant(Place):
     serves_pizza = models.BooleanField(default=False)
 
@@ -139,7 +128,6 @@ class Restaurant(Place):
         return self.name
 
 
-@python_2_unicode_compatible
 class Product(models.Model):
     slug = models.SlugField(unique=True)
 
@@ -147,7 +135,6 @@ class Product(models.Model):
         return self.slug
 
 
-@python_2_unicode_compatible
 class Price(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField()
@@ -170,7 +157,6 @@ class ClassyMexicanRestaurant(MexicanRestaurant):
 
 # models for testing unique_together validation when a fk is involved and
 # using inlineformset_factory.
-@python_2_unicode_compatible
 class Repository(models.Model):
     name = models.CharField(max_length=25)
 
@@ -178,7 +164,6 @@ class Repository(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Revision(models.Model):
     repository = models.ForeignKey(Repository, models.CASCADE)
     revision = models.CharField(max_length=40)
@@ -208,7 +193,6 @@ class Team(models.Model):
     name = models.CharField(max_length=100)
 
 
-@python_2_unicode_compatible
 class Player(models.Model):
     team = models.ForeignKey(Team, models.SET_NULL, null=True)
     name = models.CharField(max_length=100)
@@ -218,7 +202,6 @@ class Player(models.Model):
 
 
 # Models for testing custom ModelForm save methods in formsets and inline formsets
-@python_2_unicode_compatible
 class Poet(models.Model):
     name = models.CharField(max_length=100)
 
@@ -226,7 +209,6 @@ class Poet(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Poem(models.Model):
     poet = models.ForeignKey(Poet, models.CASCADE)
     name = models.CharField(max_length=100)
@@ -235,7 +217,6 @@ class Poem(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Post(models.Model):
     title = models.CharField(max_length=50, unique_for_date='posted', blank=True)
     slug = models.CharField(max_length=50, unique_for_year='posted', blank=True)

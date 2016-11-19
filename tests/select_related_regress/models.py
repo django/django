@@ -1,8 +1,6 @@
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Building(models.Model):
     name = models.CharField(max_length=10)
 
@@ -10,7 +8,6 @@ class Building(models.Model):
         return "Building: %s" % self.name
 
 
-@python_2_unicode_compatible
 class Device(models.Model):
     building = models.ForeignKey('Building', models.CASCADE)
     name = models.CharField(max_length=10)
@@ -19,7 +16,6 @@ class Device(models.Model):
         return "device '%s' in building %s" % (self.name, self.building)
 
 
-@python_2_unicode_compatible
 class Port(models.Model):
     device = models.ForeignKey('Device', models.CASCADE)
     port_number = models.CharField(max_length=10)
@@ -28,7 +24,6 @@ class Port(models.Model):
         return "%s/%s" % (self.device.name, self.port_number)
 
 
-@python_2_unicode_compatible
 class Connection(models.Model):
     start = models.ForeignKey(
         Port,
@@ -102,7 +97,6 @@ class SpecialClient(Client):
 # Some model inheritance exercises
 
 
-@python_2_unicode_compatible
 class Parent(models.Model):
     name = models.CharField(max_length=10)
 
@@ -114,7 +108,6 @@ class Child(Parent):
     value = models.IntegerField()
 
 
-@python_2_unicode_compatible
 class Item(models.Model):
     name = models.CharField(max_length=10)
     child = models.ForeignKey(Child, models.SET_NULL, null=True)
@@ -125,7 +118,6 @@ class Item(models.Model):
 # Models for testing bug #19870.
 
 
-@python_2_unicode_compatible
 class Fowl(models.Model):
     name = models.CharField(max_length=10)
 

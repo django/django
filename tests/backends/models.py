@@ -3,10 +3,8 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Square(models.Model):
     root = models.IntegerField()
     square = models.PositiveIntegerField()
@@ -15,7 +13,6 @@ class Square(models.Model):
         return "%s ** 2 == %s" % (self.root, self.square)
 
 
-@python_2_unicode_compatible
 class Person(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
@@ -52,7 +49,6 @@ class Post(models.Model):
         db_table = 'CaseSensitive_Post'
 
 
-@python_2_unicode_compatible
 class Reporter(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -66,7 +62,6 @@ class ReporterProxy(Reporter):
         proxy = True
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateField()
@@ -82,7 +77,6 @@ class Article(models.Model):
         return self.headline
 
 
-@python_2_unicode_compatible
 class Item(models.Model):
     name = models.CharField(max_length=30)
     date = models.DateField()
@@ -93,7 +87,6 @@ class Item(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Object(models.Model):
     related_objects = models.ManyToManyField("self", db_constraint=False, symmetrical=False)
 
@@ -101,7 +94,6 @@ class Object(models.Model):
         return str(self.id)
 
 
-@python_2_unicode_compatible
 class ObjectReference(models.Model):
     obj = models.ForeignKey(Object, models.CASCADE, db_constraint=False)
 

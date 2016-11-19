@@ -4,7 +4,6 @@ from django.db.models.fields.related import (
 )
 from django.db.models.lookups import StartsWith
 from django.db.models.query_utils import PathInfo
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class CustomForeignObjectRel(ForeignObjectRel):
@@ -78,7 +77,6 @@ class BrokenContainsRelation(StartsWithRelation):
         return None
 
 
-@python_2_unicode_compatible
 class SlugPage(models.Model):
     slug = models.CharField(max_length=20, unique=True)
     descendants = StartsWithRelation(

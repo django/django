@@ -4,7 +4,6 @@ import os
 from django.template.engine import Engine
 from django.test.utils import override_settings
 from django.utils._os import upath
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 
 ROOT = os.path.dirname(os.path.abspath(upath(__file__)))
@@ -165,7 +164,6 @@ class SilentAttrClass(object):
     b = property(b)
 
 
-@python_2_unicode_compatible
 class UTF8Class:
     "Class whose __str__ returns non-ASCII data on Python 2"
     def __str__(self):
@@ -173,13 +171,11 @@ class UTF8Class:
 
 
 # These two classes are used to test auto-escaping of unicode output.
-@python_2_unicode_compatible
 class UnsafeClass:
     def __str__(self):
         return 'you & me'
 
 
-@python_2_unicode_compatible
 class SafeClass:
     def __str__(self):
         return mark_safe('you &gt; me')

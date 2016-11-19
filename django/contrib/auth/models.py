@@ -7,7 +7,6 @@ from django.core.mail import send_mail
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.utils import six, timezone
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from .validators import ASCIIUsernameValidator, UnicodeUsernameValidator
@@ -35,7 +34,6 @@ class PermissionManager(models.Manager):
         )
 
 
-@python_2_unicode_compatible
 class Permission(models.Model):
     """
     The permissions system provides a way to assign permissions to specific
@@ -96,7 +94,6 @@ class GroupManager(models.Manager):
         return self.get(name=name)
 
 
-@python_2_unicode_compatible
 class Group(models.Model):
     """
     Groups are a generic way of categorizing users to apply permissions, or
@@ -374,7 +371,6 @@ class User(AbstractUser):
         swappable = 'AUTH_USER_MODEL'
 
 
-@python_2_unicode_compatible
 class AnonymousUser(object):
     id = None
     pk = None

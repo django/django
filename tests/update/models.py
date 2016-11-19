@@ -5,10 +5,8 @@ updates.
 
 from django.db import models
 from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class DataPoint(models.Model):
     name = models.CharField(max_length=20)
     value = models.CharField(max_length=20)
@@ -18,7 +16,6 @@ class DataPoint(models.Model):
         return six.text_type(self.name)
 
 
-@python_2_unicode_compatible
 class RelatedPoint(models.Model):
     name = models.CharField(max_length=20)
     data = models.ForeignKey(DataPoint, models.CASCADE)

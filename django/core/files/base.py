@@ -3,12 +3,9 @@ from io import BytesIO, StringIO, UnsupportedOperation
 
 from django.core.files.utils import FileProxyMixin
 from django.utils import six
-from django.utils.encoding import (
-    force_bytes, force_str, force_text, python_2_unicode_compatible,
-)
+from django.utils.encoding import force_bytes, force_str, force_text
 
 
-@python_2_unicode_compatible
 class File(FileProxyMixin):
     DEFAULT_CHUNK_SIZE = 64 * 2 ** 10
 
@@ -138,7 +135,6 @@ class File(FileProxyMixin):
         self.file.close()
 
 
-@python_2_unicode_compatible
 class ContentFile(File):
     """
     A File-like object that takes just raw content, rather than an actual file.

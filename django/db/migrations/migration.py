@@ -1,10 +1,8 @@
 from django.db.transaction import atomic
-from django.utils.encoding import python_2_unicode_compatible
 
 from .exceptions import IrreversibleError
 
 
-@python_2_unicode_compatible
 class Migration(object):
     """
     The base class for all migrations.

@@ -4,7 +4,6 @@ from django.forms.fields import BooleanField, IntegerField
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.html import html_safe
 from django.utils.safestring import mark_safe
@@ -46,7 +45,6 @@ class ManagementForm(Form):
 
 
 @html_safe
-@python_2_unicode_compatible
 class BaseFormSet(object):
     """
     A collection of instances of the same Form class.

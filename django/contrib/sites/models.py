@@ -4,7 +4,6 @@ from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.db.models.signals import pre_delete, pre_save
 from django.http.request import split_domain_port
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 SITE_CACHE = {}
@@ -78,7 +77,6 @@ class SiteManager(models.Manager):
         return self.get(domain=domain)
 
 
-@python_2_unicode_compatible
 class Site(models.Model):
 
     domain = models.CharField(

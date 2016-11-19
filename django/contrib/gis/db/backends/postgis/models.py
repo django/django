@@ -3,10 +3,8 @@
 """
 from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class PostGISGeometryColumns(models.Model):
     """
     The 'geometry_columns' view from PostGIS. See the PostGIS

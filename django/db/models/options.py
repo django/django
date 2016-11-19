@@ -16,7 +16,7 @@ from django.db.models.query_utils import PathInfo
 from django.utils import six
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.text import camel_case_to_spaces, format_lazy
 from django.utils.translation import override
@@ -67,7 +67,6 @@ def make_immutable_fields_list(name, data):
     return ImmutableList(data, warning=IMMUTABLE_WARNING % name)
 
 
-@python_2_unicode_compatible
 class Options(object):
     FORWARD_PROPERTIES = {
         'fields', 'many_to_many', 'concrete_fields', 'local_concrete_fields',

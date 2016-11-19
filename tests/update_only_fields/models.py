@@ -1,6 +1,5 @@
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 GENDER_CHOICES = (
     ('M', 'Male'),
@@ -12,7 +11,6 @@ class Account(models.Model):
     num = models.IntegerField()
 
 
-@python_2_unicode_compatible
 class Person(models.Model):
     name = models.CharField(max_length=20)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
@@ -28,7 +26,6 @@ class Employee(Person):
     accounts = models.ManyToManyField('Account', related_name='employees', blank=True)
 
 
-@python_2_unicode_compatible
 class Profile(models.Model):
     name = models.CharField(max_length=200)
     salary = models.FloatField(default=1000.0)

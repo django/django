@@ -4,14 +4,12 @@ from django.contrib.contenttypes.fields import (
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models.deletion import ProtectedError
-from django.utils.encoding import python_2_unicode_compatible
 
 __all__ = ('Link', 'Place', 'Restaurant', 'Person', 'Address',
            'CharLink', 'TextLink', 'OddRelation1', 'OddRelation2',
            'Contact', 'Organization', 'Note', 'Company')
 
 
-@python_2_unicode_compatible
 class Link(models.Model):
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
@@ -21,7 +19,6 @@ class Link(models.Model):
         return "Link to %s id=%s" % (self.content_type, self.object_id)
 
 
-@python_2_unicode_compatible
 class Place(models.Model):
     name = models.CharField(max_length=100)
     links = GenericRelation(Link)
@@ -30,13 +27,11 @@ class Place(models.Model):
         return "Place: %s" % self.name
 
 
-@python_2_unicode_compatible
 class Restaurant(Place):
     def __str__(self):
         return "Restaurant: %s" % self.name
 
 
-@python_2_unicode_compatible
 class Address(models.Model):
     street = models.CharField(max_length=80)
     city = models.CharField(max_length=50)
@@ -50,7 +45,6 @@ class Address(models.Model):
         return '%s %s, %s %s' % (self.street, self.city, self.state, self.zipcode)
 
 
-@python_2_unicode_compatible
 class Person(models.Model):
     account = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=128)
@@ -99,7 +93,6 @@ class Organization(models.Model):
     contacts = models.ManyToManyField(Contact, related_name='organizations')
 
 
-@python_2_unicode_compatible
 class Company(models.Model):
     name = models.CharField(max_length=100)
     links = GenericRelation(Link)
@@ -113,7 +106,6 @@ class Developer(models.Model):
     name = models.CharField(max_length=15)
 
 
-@python_2_unicode_compatible
 class Team(models.Model):
     name = models.CharField(max_length=15)
     members = models.ManyToManyField(Developer)

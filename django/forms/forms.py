@@ -13,7 +13,7 @@ from django.forms.fields import Field, FileField
 from django.forms.utils import ErrorDict, ErrorList, pretty_name  # NOQA
 from django.forms.widgets import Media, MediaDefiningClass
 from django.utils import six
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, html_safe
 from django.utils.safestring import mark_safe
@@ -59,7 +59,6 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
 
 
 @html_safe
-@python_2_unicode_compatible
 class BaseForm(object):
     # This is the main implementation of all the Form logic. Note that this
     # class is different than Form. See the comments by the Form class for more

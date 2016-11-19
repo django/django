@@ -14,10 +14,8 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Category(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -29,7 +27,6 @@ class Category(models.Model):
         ordering = ('title',)
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
     pub_date = models.DateTimeField()
@@ -41,7 +38,6 @@ class Article(models.Model):
         ordering = ('-pub_date', 'headline')
 
 
-@python_2_unicode_compatible
 class Blog(models.Model):
     name = models.CharField(max_length=100)
     featured = models.ForeignKey(Article, models.CASCADE, related_name='fixtures_featured_set')
@@ -52,7 +48,6 @@ class Blog(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Tag(models.Model):
     name = models.CharField(max_length=100)
     tagged_type = models.ForeignKey(ContentType, models.CASCADE, related_name="fixtures_tag_set")
@@ -69,7 +64,6 @@ class PersonManager(models.Manager):
         return self.get(name=name)
 
 
-@python_2_unicode_compatible
 class Person(models.Model):
     objects = PersonManager()
     name = models.CharField(max_length=100)
@@ -99,7 +93,6 @@ class ProxySpy(Spy):
         proxy = True
 
 
-@python_2_unicode_compatible
 class Visa(models.Model):
     person = models.ForeignKey(Person, models.CASCADE)
     permissions = models.ManyToManyField(Permission, blank=True)
@@ -109,7 +102,6 @@ class Visa(models.Model):
                           ', '.join(p.name for p in self.permissions.all()))
 
 
-@python_2_unicode_compatible
 class Book(models.Model):
     name = models.CharField(max_length=100)
     authors = models.ManyToManyField(Person)

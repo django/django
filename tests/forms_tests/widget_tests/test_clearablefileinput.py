@@ -1,11 +1,9 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import ClearableFileInput
-from django.utils.encoding import python_2_unicode_compatible
 
 from .base import WidgetTest
 
 
-@python_2_unicode_compatible
 class FakeFieldFile(object):
     """
     Quacks like a FieldFile (has a .url and unicode representation), but
@@ -39,7 +37,6 @@ class ClearableFileInputTest(WidgetTest):
         A ClearableFileInput should escape name, filename, and URL
         when rendering HTML (#15182).
         """
-        @python_2_unicode_compatible
         class StrangeFieldFile(object):
             url = "something?chapter=1&sect=2&copy=3&lang=en"
 
@@ -110,7 +107,6 @@ class ClearableFileInputTest(WidgetTest):
         A ClearableFileInput should not mask exceptions produced while
         checking that it has a value.
         """
-        @python_2_unicode_compatible
         class FailingURLFieldFile(object):
             @property
             def url(self):
@@ -123,7 +119,6 @@ class ClearableFileInputTest(WidgetTest):
             self.widget.render('myfile', FailingURLFieldFile())
 
     def test_url_as_property(self):
-        @python_2_unicode_compatible
         class URLFieldFile(object):
             @property
             def url(self):
@@ -136,7 +131,6 @@ class ClearableFileInputTest(WidgetTest):
         self.assertInHTML('<a href="https://www.python.org/">value</a>', html)
 
     def test_return_false_if_url_does_not_exists(self):
-        @python_2_unicode_compatible
         class NoURLFieldFile(object):
             def __str__(self):
                 return 'value'

@@ -3,7 +3,6 @@ from django.contrib.auth.models import (
     PermissionsMixin, UserManager,
 )
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 # The custom user uses email as the unique identifier, and requires
@@ -33,7 +32,6 @@ class CustomUserManager(BaseUserManager):
         return u
 
 
-@python_2_unicode_compatible
 class CustomUser(AbstractBaseUser):
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
     is_active = models.BooleanField(default=True)

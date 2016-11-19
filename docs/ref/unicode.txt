@@ -258,33 +258,6 @@ is *always* the case, even if the data could fit into an ASCII bytestring.
 You can pass in bytestrings when creating a model or populating a field, and
 Django will convert it to Unicode when it needs to.
 
-Choosing between ``__str__()`` and ``__unicode__()``
-----------------------------------------------------
-
-.. note::
-
-    If you are on Python 3, you can skip this section because you'll always
-    create ``__str__()`` rather than ``__unicode__()``. If you'd like
-    compatibility with Python 2, you can decorate your model class with
-    :func:`~django.utils.encoding.python_2_unicode_compatible`.
-
-One consequence of using Unicode by default is that you have to take some care
-when printing data from the model.
-
-In particular, rather than giving your model a ``__str__()`` method, we
-recommended you implement a ``__unicode__()`` method. In the ``__unicode__()``
-method, you can quite safely return the values of all your fields without
-having to worry about whether they fit into a bytestring or not. (The way
-Python works, the result of ``__str__()`` is *always* a bytestring, even if you
-accidentally try to return a Unicode object).
-
-You can still create a ``__str__()`` method on your models if you want, of
-course, but you shouldn't need to do this unless you have a good reason.
-Django's ``Model`` base class automatically provides a ``__str__()``
-implementation that calls ``__unicode__()`` and encodes the result into UTF-8.
-This means you'll normally only need to implement a ``__unicode__()`` method
-and let Django handle the coercion to a bytestring when required.
-
 Taking care in ``get_absolute_url()``
 -------------------------------------
 

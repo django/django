@@ -148,27 +148,6 @@ In Python 3, there's simply :meth:`~object.__str__`, which must return ``str``
 (It is also possible to define :meth:`~object.__bytes__`, but Django applications
 have little use for that method, because they hardly ever deal with ``bytes``.)
 
-Django provides a simple way to define :meth:`~object.__str__` and
-` __unicode__()`_ methods that work on Python 2 and 3: you must
-define a :meth:`~object.__str__` method returning text and to apply the
-:func:`~django.utils.encoding.python_2_unicode_compatible` decorator.
-
-On Python 3, the decorator is a no-op. On Python 2, it defines appropriate
-` __unicode__()`_ and :meth:`~object.__str__` methods (replacing the
-original :meth:`~object.__str__` method in the process). Here's an example::
-
-    from __future__ import unicode_literals
-    from django.utils.encoding import python_2_unicode_compatible
-
-    @python_2_unicode_compatible
-    class MyClass(object):
-        def __str__(self):
-            return "Instance of my class"
-
-This technique is the best match for Django's porting philosophy.
-
-For forwards compatibility, this decorator is available as of Django 1.4.2.
-
 Finally, note that :meth:`~object.__repr__` must return a ``str`` on all
 versions of Python.
 

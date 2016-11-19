@@ -6,10 +6,8 @@ To define a one-to-one relationship, use ``OneToOneField()``.
 In this example, a ``Place`` optionally can be a ``Restaurant``.
 """
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Place(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=80)
@@ -18,7 +16,6 @@ class Place(models.Model):
         return "%s the place" % self.name
 
 
-@python_2_unicode_compatible
 class Restaurant(models.Model):
     place = models.OneToOneField(Place, models.CASCADE, primary_key=True)
     serves_hot_dogs = models.BooleanField(default=False)
@@ -28,7 +25,6 @@ class Restaurant(models.Model):
         return "%s the restaurant" % self.place.name
 
 
-@python_2_unicode_compatible
 class Bar(models.Model):
     place = models.OneToOneField(Place, models.CASCADE)
     serves_cocktails = models.BooleanField(default=True)
@@ -42,7 +38,6 @@ class UndergroundBar(models.Model):
     serves_cocktails = models.BooleanField(default=True)
 
 
-@python_2_unicode_compatible
 class Waiter(models.Model):
     restaurant = models.ForeignKey(Restaurant, models.CASCADE)
     name = models.CharField(max_length=50)
@@ -51,7 +46,6 @@ class Waiter(models.Model):
         return "%s the waiter at %s" % (self.name, self.restaurant)
 
 
-@python_2_unicode_compatible
 class Favorites(models.Model):
     name = models.CharField(max_length=50)
     restaurants = models.ManyToManyField(Restaurant)
@@ -70,7 +64,6 @@ class RelatedModel(models.Model):
     name = models.CharField(max_length=50)
 
 
-@python_2_unicode_compatible
 class MultiModel(models.Model):
     link1 = models.OneToOneField(Place, models.CASCADE)
     link2 = models.OneToOneField(ManualPrimaryKey, models.CASCADE)

@@ -4,10 +4,8 @@ from django.contrib import admin
 from django.db import models
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Action(models.Model):
     name = models.CharField(max_length=50, primary_key=True)
     description = models.CharField(max_length=70)

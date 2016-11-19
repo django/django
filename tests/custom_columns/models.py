@@ -16,10 +16,8 @@ from the default generated name, use the ``db_table`` parameter on the
 """
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Author(models.Model):
     Author_ID = models.AutoField(primary_key=True, db_column='Author ID')
     first_name = models.CharField(max_length=30, db_column='firstname')
@@ -33,7 +31,6 @@ class Author(models.Model):
         ordering = ('last_name', 'first_name')
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     Article_ID = models.AutoField(primary_key=True, db_column='Article ID')
     headline = models.CharField(max_length=100)

@@ -5,7 +5,7 @@ from django.forms.utils import flatatt, pretty_name
 from django.forms.widgets import Textarea, TextInput
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.inspect import func_supports_parameter
@@ -16,7 +16,6 @@ __all__ = ('BoundField',)
 
 
 @html_safe
-@python_2_unicode_compatible
 class BoundField(object):
     "A Field plus data"
     def __init__(self, form, field, name):
@@ -253,7 +252,6 @@ class BoundField(object):
 
 
 @html_safe
-@python_2_unicode_compatible
 class BoundWidget(object):
     """
     A container class used for iterating over widgets. This is useful for

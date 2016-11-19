@@ -2,7 +2,6 @@ from datetime import datetime
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 def validate_answer_to_universe(value):
@@ -89,7 +88,6 @@ class Article(models.Model):
             self.pub_date = datetime.now()
 
 
-@python_2_unicode_compatible
 class Post(models.Model):
     title = models.CharField(max_length=50, unique_for_date='posted', blank=True)
     slug = models.CharField(max_length=50, unique_for_year='posted', blank=True)

@@ -11,11 +11,10 @@ from django.db.models.fields.related import (
     lazy_related_operation,
 )
 from django.db.models.query_utils import PathInfo
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 
 
-@python_2_unicode_compatible
 class GenericForeignKey(object):
     """
     Provide a generic many-to-one relation through the ``content_type`` and

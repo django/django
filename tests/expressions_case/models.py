@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 try:
     from PIL import Image
@@ -7,7 +6,6 @@ except ImportError:
     Image = None
 
 
-@python_2_unicode_compatible
 class CaseTestModel(models.Model):
     integer = models.IntegerField()
     integer2 = models.IntegerField(null=True)
@@ -42,7 +40,6 @@ class CaseTestModel(models.Model):
         return "%i, %s" % (self.integer, self.string)
 
 
-@python_2_unicode_compatible
 class O2OCaseTestModel(models.Model):
     o2o = models.OneToOneField(CaseTestModel, models.CASCADE, related_name='o2o_rel')
     integer = models.IntegerField()
@@ -51,7 +48,6 @@ class O2OCaseTestModel(models.Model):
         return "%i, %s" % (self.id, self.o2o)
 
 
-@python_2_unicode_compatible
 class FKCaseTestModel(models.Model):
     fk = models.ForeignKey(CaseTestModel, models.CASCADE, related_name='fk_rel')
     integer = models.IntegerField()
@@ -60,7 +56,6 @@ class FKCaseTestModel(models.Model):
         return "%i, %s" % (self.id, self.fk)
 
 
-@python_2_unicode_compatible
 class Client(models.Model):
     REGULAR = 'R'
     GOLD = 'G'

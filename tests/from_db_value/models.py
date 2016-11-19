@@ -1,7 +1,6 @@
 import decimal
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class Cash(decimal.Decimal):
@@ -24,7 +23,6 @@ class CashField(models.DecimalField):
         return cash
 
 
-@python_2_unicode_compatible
 class CashModel(models.Model):
     cash = CashField()
 

@@ -1,7 +1,6 @@
 from django.apps.registry import Apps
 from django.db import models
 from django.db.utils import DatabaseError
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 
 from .exceptions import MigrationSchemaMissing
@@ -20,7 +19,6 @@ class MigrationRecorder(object):
     a row in the table always means a migration is applied.
     """
 
-    @python_2_unicode_compatible
     class Migration(models.Model):
         app = models.CharField(max_length=255)
         name = models.CharField(max_length=255)

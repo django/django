@@ -27,9 +27,7 @@ from django.db.models.signals import (
 )
 from django.db.models.utils import make_model_tuple
 from django.utils import six
-from django.utils.encoding import (
-    force_str, force_text, python_2_unicode_compatible,
-)
+from django.utils.encoding import force_str, force_text
 from django.utils.functional import curry
 from django.utils.six.moves import zip
 from django.utils.text import capfirst, get_text_list
@@ -37,7 +35,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.version import get_version
 
 
-@python_2_unicode_compatible
 class Deferred(object):
     def __repr__(self):
         return str('<Deferred field>')

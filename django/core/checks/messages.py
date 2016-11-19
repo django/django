@@ -1,4 +1,4 @@
-from django.utils.encoding import force_str, python_2_unicode_compatible
+from django.utils.encoding import force_str
 
 # Levels
 DEBUG = 10
@@ -8,7 +8,6 @@ ERROR = 40
 CRITICAL = 50
 
 
-@python_2_unicode_compatible
 class CheckMessage(object):
 
     def __init__(self, level, msg, hint=None, obj=None, id=None):

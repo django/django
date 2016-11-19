@@ -13,7 +13,6 @@ from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class PersonManager(models.Manager):
@@ -86,7 +85,6 @@ class BoringPeopleManager(models.Manager):
         return super(BoringPeopleManager, self).get_queryset().filter(fun=False)
 
 
-@python_2_unicode_compatible
 class Person(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -109,7 +107,6 @@ class Person(models.Model):
         return "%s %s" % (self.first_name, self.last_name)
 
 
-@python_2_unicode_compatible
 class FunPerson(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -130,7 +127,6 @@ class FunPerson(models.Model):
         return "%s %s" % (self.first_name, self.last_name)
 
 
-@python_2_unicode_compatible
 class Book(models.Model):
     title = models.CharField(max_length=50)
     author = models.CharField(max_length=30)
@@ -158,7 +154,6 @@ class FastCarManager(models.Manager):
         return super(FastCarManager, self).get_queryset().filter(top_speed__gt=150)
 
 
-@python_2_unicode_compatible
 class Car(models.Model):
     name = models.CharField(max_length=10)
     mileage = models.IntegerField()
@@ -187,7 +182,6 @@ class RestrictedManager(models.Manager):
         return super(RestrictedManager, self).get_queryset().filter(is_public=True)
 
 
-@python_2_unicode_compatible
 class RelatedModel(models.Model):
     name = models.CharField(max_length=50)
 
@@ -195,7 +189,6 @@ class RelatedModel(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class RestrictedModel(models.Model):
     name = models.CharField(max_length=50)
     is_public = models.BooleanField(default=False)
@@ -208,7 +201,6 @@ class RestrictedModel(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class OneToOneRestrictedModel(models.Model):
     name = models.CharField(max_length=50)
     is_public = models.BooleanField(default=False)

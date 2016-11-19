@@ -9,10 +9,8 @@
 """
 from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class OracleGeometryColumns(models.Model):
     "Maps to the Oracle USER_SDO_GEOM_METADATA table."
     table_name = models.CharField(max_length=32)

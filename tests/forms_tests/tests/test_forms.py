@@ -21,7 +21,7 @@ from django.template import Context, Template
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.safestring import SafeData, mark_safe
 
@@ -3375,7 +3375,6 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         )
 
     def test_errorlist_override(self):
-        @python_2_unicode_compatible
         class DivErrorList(ErrorList):
             def __str__(self):
                 return self.as_divs()

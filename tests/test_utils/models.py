@@ -1,8 +1,6 @@
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Car(models.Model):
     name = models.CharField(max_length=100)
 
@@ -10,7 +8,6 @@ class Car(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Person(models.Model):
     name = models.CharField(max_length=100)
     cars = models.ManyToManyField(Car, through='PossessedCar')
@@ -19,7 +16,6 @@ class Person(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class PossessedCar(models.Model):
     car = models.ForeignKey(Car, models.CASCADE)
     belongs_to = models.ForeignKey(Person, models.CASCADE)
