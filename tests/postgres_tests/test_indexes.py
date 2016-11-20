@@ -1,8 +1,9 @@
 from django.contrib.postgres.indexes import GinIndex
-from django.db import connection
+from django.contrib.postgres.operations import CITextArrayGinOperatorClass
+from django.db import ProgrammingError, connection
 
 from . import PostgreSQLTestCase
-from .models import IntegerArrayModel
+from .models import CITextArrayTestModel, IntegerArrayModel
 
 
 class GinIndexTests(PostgreSQLTestCase):
@@ -55,3 +56,18 @@ class SchemaTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.remove_index(IntegerArrayModel, index)
         self.assertNotIn(index_name, self.get_constraints(IntegerArrayModel._meta.db_table))
+
+    def test_gin_array_citext(self):
+        with self.assertRaises(ProgrammingError):
+            with connection.schema_editor() as editor:
+                editor.add_index(CITextArrayTestModel, GinIndex(fields=['citext_array']))
+        with connection.schema_editor() as editor:
+            operation = CITextArrayGinOperatorClass()
+            operation.database_forwards(app_label="postgres_tests", schema_editor=editor,
+                                        from_state=None, to_state=None)
+            editor.add_index(CITextArrayTestModel, GinIndex(name='citext_array_gin_idx', fields=['citext_array']))
+        instance = CITextArrayTestModel.objects.create(citext_array=['joHn', 'RiChard', 'Carl'])
+        self.assertSequenceEqual(
+            CITextArrayTestModel.objects.filter(citext_array__contains=['john']),
+            [instance]
+        )

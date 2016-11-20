@@ -108,6 +108,10 @@ class CITextTestModel(PostgreSQLModel):
         return self.name
 
 
+class CITextArrayTestModel(PostgreSQLModel):
+    citext_array = ArrayField(CITextField())
+
+
 class Line(PostgreSQLModel):
     scene = models.ForeignKey('Scene', models.CASCADE)
     character = models.ForeignKey('Character', models.CASCADE)

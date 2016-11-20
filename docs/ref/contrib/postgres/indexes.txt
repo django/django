@@ -24,3 +24,10 @@ available from the ``django.contrib.postgres.indexes`` module.
     PostgreSQL. You can install it using the
     :class:`~django.contrib.postgres.operations.BtreeGinExtension` migration
     operation.
+
+    Some data types are not natively supported by PostgreSQL for use in a
+    ``gin`` index. This is the case for
+    :class:`~django.contrib.postgres.fields.CITextField` which can be supported
+    through an operation
+    :class:`~django.contrib.postgres.operations.CITextArrayGinOperatorClass`
+    which adds the missing operators.
