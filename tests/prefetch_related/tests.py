@@ -44,6 +44,13 @@ class PrefetchRelatedTests(TestCase):
         cls.reader1.books_read.add(cls.book1, cls.book4)
         cls.reader2.books_read.add(cls.book2, cls.book4)
 
+    def assertWhereContains(self, sql, needle):
+        where_idx = sql.index('WHERE')
+        self.assertEqual(
+            sql.count(str(needle), where_idx), 1,
+            msg="WHERE clause doesn't contain %s, actual SQL: %s" % (needle, sql[where_idx:])
+        )
+
     def test_m2m_forward(self):
         with self.assertNumQueries(2):
             lists = [list(b.authors.all()) for b in Book.objects.prefetch_related('authors')]
@@ -238,21 +245,21 @@ class PrefetchRelatedTests(TestCase):
             list(Book.objects.prefetch_related('authors__addresses'))
 
         sql = queries[-1]['sql']
-        self.assertEqual(sql.count(self.author1.name), 1)
+        self.assertWhereContains(sql, self.author1.name)
 
     def test_m2m_then_m2m_object_ids(self):
         with CaptureQueriesContext(connection) as queries:
             list(Book.objects.prefetch_related('authors__favorite_authors'))
 
         sql = queries[-1]['sql']
-        self.assertEqual(sql.count(self.author1.name), 1)
+        self.assertWhereContains(sql, self.author1.name)
 
     def test_m2m_then_reverse_one_to_one_object_ids(self):
         with CaptureQueriesContext(connection) as queries:
             list(Book.objects.prefetch_related('authors__authorwithage'))
 
         sql = queries[-1]['sql']
-        self.assertEqual(sql.count(str(self.author1.id)), 1, sql)
+        self.assertWhereContains(sql, self.author1.id)
 
 
 class CustomPrefetchTests(TestCase):
