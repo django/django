@@ -1209,6 +1209,10 @@ class RequestMethodStringDataTests(SimpleTestCase):
         response = self.client.get('/json_response/')
         self.assertEqual(response.json(), {'key': 'value'})
 
+    def test_json_multiple_access(self):
+        response = self.client.get('/json_response/')
+        self.assertIs(response.json(), response.json())
+
     def test_json_wrong_header(self):
         response = self.client.get('/body/')
         msg = 'Content-Type header is "text/html; charset=utf-8", not "application/json"'

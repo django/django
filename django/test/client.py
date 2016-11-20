@@ -683,12 +683,14 @@ class Client(RequestFactory):
         self.cookies = SimpleCookie()
 
     def _parse_json(self, response, **extra):
-        if 'application/json' not in response.get('Content-Type'):
-            raise ValueError(
-                'Content-Type header is "{0}", not "application/json"'
-                .format(response.get('Content-Type'))
-            )
-        return json.loads(response.content.decode(), **extra)
+        if not hasattr(response, '_json'):
+            if 'application/json' not in response.get('Content-Type'):
+                raise ValueError(
+                    'Content-Type header is "{0}", not "application/json"'
+                    .format(response.get('Content-Type'))
+                )
+            response._json = json.loads(response.content.decode(), **extra)
+        return response._json
 
     def _handle_redirects(self, response, **extra):
         "Follows any redirects by requesting responses from the server using GET."
