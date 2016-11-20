@@ -5,8 +5,8 @@ from django.db import migrations
 
 try:
     from django.contrib.postgres.operations import (
-        BtreeGinExtension, CITextExtension, CreateExtension,
-        HStoreExtension, TrigramExtension, UnaccentExtension,
+        BtreeGinExtension, CITextExtension, CreateExtension, HStoreExtension,
+        TrigramExtension, UnaccentExtension,
     )
 except ImportError:
     from django.test import mock
