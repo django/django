@@ -605,12 +605,6 @@ class Model(six.with_metaclass(ModelBase)):
         return hash(self._get_pk_val())
 
     def __reduce__(self):
-        """
-        Provides pickling support. Normally, this just dispatches to Python's
-        standard handling. However, for models with deferred field loading, we
-        need to do things manually, as they're dynamically created classes and
-        only module-level classes can be pickled by the default path.
-        """
         data = self.__dict__
         data[DJANGO_VERSION_PICKLE_KEY] = get_version()
         class_id = self._meta.app_label, self._meta.object_name

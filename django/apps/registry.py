@@ -165,7 +165,6 @@ class Apps(object):
 
         - auto-created models for many-to-many relations without
           an explicit intermediate table,
-        - models created to satisfy deferred attribute queries,
         - models that have been swapped out.
 
         Set the corresponding keyword argument to True to include such models.
