@@ -472,8 +472,7 @@ class Model(six.with_metaclass(ModelBase)):
         # overrides it. It should be one or the other; don't duplicate the work
         # The reason for the kwargs check is that standard iterator passes in by
         # args, and instantiation for iteration is 33% faster.
-        args_len = len(args)
-        if args_len > len(self._meta.concrete_fields):
+        if len(args) > len(self._meta.concrete_fields):
             # Daft, but matches old exception sans the err msg.
             raise IndexError("Number of args exceeds number of fields")
 
