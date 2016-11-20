@@ -17,6 +17,11 @@ from .models import (
 
 
 class ModelTests(TestCase):
+    def test_model_init_too_many_args(self):
+        msg = "Number of args exceeds number of fields"
+        with self.assertRaisesMessage(IndexError, msg):
+            Worker(1, 2, 3, 4)
+
     # The bug is that the following queries would raise:
     # "TypeError: Related Field has invalid lookup: gte"
     def test_related_gte_lookup(self):
