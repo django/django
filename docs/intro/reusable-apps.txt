@@ -321,6 +321,6 @@ disadvantages:
 
 Typically, these situations only arise once you're maintaining several Django
 projects. When they do, the best solution is to use `virtualenv
-<http://www.virtualenv.org/>`_. This tool allows you to maintain multiple
+<https://virtualenv.pypa.io/>`_. This tool allows you to maintain multiple
 isolated Python environments, each with its own copy of the libraries and
 package namespace.
