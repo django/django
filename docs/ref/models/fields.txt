@@ -2015,6 +2015,5 @@ have boolean values (rather than ``None``) if the field is a relation type
 .. attribute:: Field.related_model
 
     Points to the model the field relates to. For example, ``Author`` in
-    ``ForeignKey(Author, on_delete=models.CASCADE)``. If a field has a generic
-    relation (such as a ``GenericForeignKey`` or a ``GenericRelation``) then
-    ``related_model`` will be ``None``.
+    ``ForeignKey(Author, on_delete=models.CASCADE)``. The ``related_model`` for
+    a ``GenericForeignKey`` is always ``None``.
