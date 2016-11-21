@@ -21,8 +21,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, Collector
 from django.db.models.fields import AutoField
 from django.db.models.fields.related import (
-    ForeignObjectRel, ManyToOneRel, OneToOneField, lazy_related_operation,
-    resolve_relation,
+    ForeignObjectRel, OneToOneField, lazy_related_operation, resolve_relation,
 )
 from django.db.models.manager import Manager
 from django.db.models.options import Options
@@ -494,9 +493,6 @@ class Model(six.with_metaclass(ModelBase)):
                     continue
                 setattr(self, field.attname, val)
                 kwargs.pop(field.name, None)
-                # Maintain compatibility with existing calls.
-                if isinstance(field.remote_field, ManyToOneRel):
-                    kwargs.pop(field.attname, None)
 
         # Now we're left with the unprocessed fields that *must* come from
         # keywords, or default.
