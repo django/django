@@ -460,7 +460,7 @@ find a revision where your test passes, mark it as "good"::
 Now we're ready for the fun part: using ``git bisect run`` to automate the rest
 of the process::
 
-    $ git bisect run python runtests.py migrations.test_regression
+    $ git bisect run tests/runtests.py migrations.test_regression
 
 You should see ``git bisect`` use a binary search to automatically checkout
 revisions between the good and bad commits until it finds the first "bad"
