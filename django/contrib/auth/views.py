@@ -441,6 +441,15 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
     @method_decorator(never_cache)
     def dispatch(self, *args, **kwargs):
         assert 'uidb64' in kwargs and 'token' in kwargs
+
+        self.validlink = False
+        self.user = self.get_user(kwargs['uidb64'])
+
+        if self.user is not None and self.token_generator.check_token(self.user, kwargs['token']):
+            self.validlink = True
+        else:
+            return self.render_to_response(self.get_context_data())
+
         return super(PasswordResetConfirmView, self).dispatch(*args, **kwargs)
 
     def get_user(self, uidb64):
@@ -455,7 +464,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super(PasswordResetConfirmView, self).get_form_kwargs()
-        kwargs['user'] = self.get_user(self.kwargs['uidb64'])
+        kwargs['user'] = self.user
         return kwargs
 
     def form_valid(self, form):
@@ -466,8 +475,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(PasswordResetConfirmView, self).get_context_data(**kwargs)
-        user = context['form'].user
-        if user is not None and self.token_generator.check_token(user, self.kwargs['token']):
+        if self.validlink:
             context['validlink'] = True
         else:
             context.update({
