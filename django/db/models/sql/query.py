@@ -201,6 +201,7 @@ class Query:
         self.deferred_loading = (frozenset(), True)
 
         self.context = {}
+        self._filtered_relations = {}
 
     @property
     def extra(self):
@@ -326,6 +327,7 @@ class Query:
         if hasattr(obj, '_setup_query'):
             obj._setup_query()
         obj.context = self.context.copy()
+        obj._filtered_relations = self._filtered_relations.copy()
         return obj
 
     def add_context(self, key, value):
@@ -1277,6 +1279,15 @@ class Query:
         needed_inner = joinpromoter.update_join_types(self)
         return target_clause, needed_inner
 
+    def add_filtered_relation(self, filtered_relation):
+        for lookup in chain((filtered_relation.relation_name,),
+                            dict(filtered_relation.condition.children).keys()):
+            lookups, parts, _ = self.solve_lookup_type(lookup)
+            if len(parts) > (1 + len(lookups)):
+                raise FieldError("Filtered relation %r can not operate on foreign keys %s." % (
+                    filtered_relation.alias, lookup))
+        self._filtered_relations[filtered_relation.alias] = filtered_relation
+
     def names_to_path(self, names, opts, allow_many=True, fail_on_missing=False):
         """
         Walk the list of names and turns them into PathInfo tuples. A single
@@ -1304,7 +1315,22 @@ class Query:
             except FieldDoesNotExist:
                 if name in self.annotation_select:
                     field = self.annotation_select[name].output_field
-
+                elif name in self._filtered_relations:
+                    filtered_relation = self._filtered_relations[name]
+                    field = opts.get_field(filtered_relation.relation_name)
+                elif pos == 0:
+                    for rel in opts.related_objects:
+                        if (name == rel.related_model._meta.model_name and
+                                rel.related_name == rel.related_model._meta.default_related_name):
+                            related_name = rel.related_name
+                            field = opts.get_field(related_name)
+                            warnings.warn(
+                                "Query lookup '%s' is deprecated in favor of "
+                                "Meta.default_related_name '%s'."
+                                % (name, related_name),
+                                RemovedInDjango20Warning, 2
+                            )
+                            break
             if field is not None:
                 # Fields that contain one-to-many relations with a generic
                 # model (like a GenericForeignKey) cannot generate reverse
@@ -1328,7 +1354,8 @@ class Query:
                 pos -= 1
                 if pos == -1 or fail_on_missing:
                     field_names = list(get_field_names_from_opts(opts))
-                    available = sorted(field_names + list(self.annotation_select))
+                    available = sorted(field_names + list(self.annotation_select) +
+                                       list(self._filtered_relations))
                     raise FieldError("Cannot resolve keyword '%s' into field. "
                                      "Choices are: %s" % (name, ", ".join(available)))
                 break
@@ -1400,13 +1427,30 @@ class Query:
         # Then, add the path to the query's joins. Note that we can't trim
         # joins at this stage - we will need the information about join type
         # of the trimmed joins.
-        for join in path:
+        for pos, join in enumerate(path):
             opts = join.to_opts
             if join.direct:
                 nullable = self.is_nullable(join.join_field)
             else:
                 nullable = True
-            connection = Join(opts.db_table, alias, None, INNER, join.join_field, nullable)
+
+            try:
+                filtered_relation = self._filtered_relations[names[pos]]
+            except (KeyError, IndexError):
+                connection = Join(opts.db_table, alias, None, INNER, join.join_field, nullable)
+            else:
+                table_alias = filtered_relation.alias
+                if table_alias not in self.tables:
+                    self.table_map[opts.db_table] = [table_alias]
+                    self.alias_refcount[table_alias] = 1
+                    self.tables.append(table_alias)
+                    connection = Join(opts.db_table, alias, table_alias, INNER, join.join_field, nullable,
+                                      filtered_relation=filtered_relation)
+                    self.alias_map[table_alias] = connection
+                    filtered_relation.pre_compile(self)
+                else:
+                    connection = self.alias_map[table_alias]
+                can_reuse.add(table_alias)
             reuse = can_reuse if join.m2m else None
             alias = self.join(connection, reuse=reuse)
             joins.append(alias)

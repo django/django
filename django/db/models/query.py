@@ -977,6 +977,14 @@ class QuerySet:
         clone._db = alias
         return clone
 
+    def filtered_relation(self, relation_name, alias=None, condition=None):
+        """
+        Allows to add extra filter on relations.
+        """
+        clone = self._clone()
+        clone.query.add_filtered_relation(FilteredRelation(relation_name, alias, condition))
+        return clone
+
     ###################################
     # PUBLIC INTROSPECTION ATTRIBUTES #
     ###################################
@@ -1674,3 +1682,33 @@ def get_related_populators(klass_info, select, db):
         rel_cls = RelatedPopulator(rel_klass_info, select, db)
         iterators.append(rel_cls)
     return iterators
+
+
+class FilteredRelation(object):
+    def __init__(self, relation_name, alias, condition):
+        if not relation_name:
+            raise exceptions.FieldError("FilterRelation expects a non empty relation_name")
+        if not alias:
+            raise exceptions.FieldError("FilterRelation expects a non empty alias")
+        if relation_name == alias:
+            raise exceptions.FieldError("FilterRelation must be used with an alias %r"
+                                        " different as relation_name %r" % (alias, relation_name))
+        self.relation_name = relation_name
+        self.alias = alias
+        self.condition = condition
+        self.query = None
+
+    def pre_compile(self, query):
+        self.query = query
+
+    def resolve(self, alias_map):
+        query = self.query.clone()
+        query.alias_map.update(alias_map)
+        return self.condition.resolve_expression(query=query)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return (self.relation_name == other.relation_name and
+                    self.alias == other.alias and
+                    self.condition == other.condition)
+        return False
