@@ -95,7 +95,7 @@ If you use some other installation process, you might have to manually
 should look at the complete installation instructions.
 
 .. _pip: https://pip.pypa.io/
-.. _virtualenv: http://www.virtualenv.org/
+.. _virtualenv: https://virtualenv.pypa.io/
 
 Testing
 =======

@@ -108,7 +108,7 @@ string to ``WSGIPythonPath`` must be quoted:
 Make sure you give the correct path to your virtualenv, and replace
 ``python3.X`` with the correct Python version (e.g. ``python3.4``).
 
-.. _virtualenv: http://www.virtualenv.org
+.. _virtualenv: https://virtualenv.pypa.io
 
 .. _daemon-mode:
 
