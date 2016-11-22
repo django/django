@@ -41,7 +41,7 @@ class Join:
         - relabeled_clone()
     """
     def __init__(self, table_name, parent_alias, table_alias, join_type,
-                 join_field, nullable):
+                 join_field, nullable, filtered_relation=None):
         # Join table
         self.table_name = table_name
         self.parent_alias = parent_alias
@@ -56,6 +56,7 @@ class Join:
         self.join_field = join_field
         # Is this join nullabled?
         self.nullable = nullable
+        self.filtered_relation = filtered_relation
 
     def as_sql(self, compiler, connection):
         """
@@ -85,6 +86,17 @@ class Join:
             extra_sql, extra_params = compiler.compile(extra_cond)
             join_conditions.append('(%s)' % extra_sql)
             params.extend(extra_params)
+        elif self.filtered_relation:
+            # prepare a new join to force the query_builder to reuse the existing
+            # join based on alias.
+            join = self.filtered_relation.query.alias_map[self.filtered_relation.alias].relabeled_clone({})
+            join.table_alias = self.filtered_relation.alias
+            join.filtered_relation = None
+
+            alias_map = {self.filtered_relation.alias: join}
+            extra_sql, extra_params = compiler.compile(self.filtered_relation.resolve(alias_map))
+            join_conditions.append('(%s)' % extra_sql)
+            params.extend(extra_params)
 
         if not join_conditions:
             # This might be a rel on the other end of an actual declared field.
@@ -103,14 +115,15 @@ class Join:
         new_table_alias = change_map.get(self.table_alias, self.table_alias)
         return self.__class__(
             self.table_name, new_parent_alias, new_table_alias, self.join_type,
-            self.join_field, self.nullable)
+            self.join_field, self.nullable, filtered_relation=self.filtered_relation)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return (
                 self.table_name == other.table_name and
                 self.parent_alias == other.parent_alias and
-                self.join_field == other.join_field
+                self.join_field == other.join_field and
+                self.filtered_relation == other.filtered_relation
             )
         return False
 

@@ -1242,6 +1242,19 @@ where prefetching with a custom ``QuerySet`` is useful:
     specific order to avoid creating extra queries; therefore it's recommended
     to always carefully order ``prefetch_related`` arguments.
 
+``filtered_relation()``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. method:: filtered_relation(relation_name, alias=None, condition=None)
+
+It supports additional filtering when establishing a relationship.
+``alias`` and ``condition`` are required named argument.
+
+Example::
+    Restaurant.objects.filtered_relation('pizzas', alias='pizzas_vegetarian',
+        condition=Q(pizzas__vegetarian=True)).filter(pizzas_vegetarian__name__icontains='Mozzarella')
+
+
 ``extra()``
 ~~~~~~~~~~~
 
