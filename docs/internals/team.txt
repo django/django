@@ -151,7 +151,7 @@ Karen Tracey
 
     .. _Jannis Leidel: https://jezdez.com/
     .. _Bauhaus-University Weimar: http://www.uni-weimar.de/
-    .. _virtualenv: https://virtualenv.pypa.io//
+    .. _virtualenv: https://virtualenv.pypa.io/
     .. _pip: https://pip.pypa.io/
     .. _Mozilla: https://www.mozilla.org/
 
