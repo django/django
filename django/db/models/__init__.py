@@ -20,6 +20,7 @@ from django.db.models.manager import Manager
 from django.db.models.query import (
     Prefetch, Q, QuerySet, prefetch_related_objects,
 )
+from django.db.models.query_utils import FilteredRelation
 
 # Imports that would create circular imports if sorted
 from django.db.models.base import DEFERRED, Model  # isort:skip
@@ -69,6 +70,7 @@ __all__ += [
     'Window', 'WindowFrame',
     'FileField', 'ImageField', 'OrderWrt', 'Lookup', 'Transform', 'Manager',
     'Prefetch', 'Q', 'QuerySet', 'prefetch_related_objects', 'DEFERRED', 'Model',
+    'FilteredRelation',
     'ForeignKey', 'ForeignObject', 'OneToOneField', 'ManyToManyField',
     'ManyToOneRel', 'ManyToManyRel', 'OneToOneRel', 'permalink',
 ]

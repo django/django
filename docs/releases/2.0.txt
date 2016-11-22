@@ -354,6 +354,9 @@ Models
 * The new ``named`` parameter of :meth:`.QuerySet.values_list` allows fetching
   results as named tuples.
 
+* The new :class:`.FilteredRelation` class allows adding an ``ON`` clause to
+  querysets.
+
 Pagination
 ~~~~~~~~~~
 
