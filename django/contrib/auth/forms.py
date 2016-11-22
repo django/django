@@ -181,9 +181,8 @@ class AuthenticationForm(forms.Form):
         # Set the label and username length for the "username" field.
         UserModel = get_user_model()
         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
-        self.fields['username'].widget.attrs['maxlength'] = UserModel._meta.get_field(
-            UserModel.USERNAME_FIELD
-        ).max_length
+        if self.username_field.max_length is not None:
+            self.fields['username'].widget.attrs['maxlength'] = self.username_field.max_length
         if self.fields['username'].label is None:
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
 
