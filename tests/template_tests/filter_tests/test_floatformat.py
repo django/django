@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from decimal import Decimal, localcontext
-from unittest import expectedFailure
 
 from django.template.defaultfilters import floatformat
 from django.test import SimpleTestCase
@@ -58,6 +57,7 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(floatformat(-1.323297138040798e+35, -2), '-132329713804079800000000000000000000')
         self.assertEqual(floatformat(1.5e-15, 20), '0.00000000000000150000')
         self.assertEqual(floatformat(1.5e-15, -20), '0.00000000000000150000')
+        self.assertEqual(floatformat(1.00000000000000015, 16), '1.0000000000000002')
 
     def test_zero_values(self):
         self.assertEqual(floatformat(0, 6), '0.000000')
@@ -97,12 +97,3 @@ class FunctionTests(SimpleTestCase):
             self.assertEqual(floatformat(15.2042, '-3'), '15.204')
             self.assertEqual(floatformat(Decimal('1.2345'), 2), '1.23')
             self.assertEqual(floatformat(Decimal('15.2042'), -3), '15.204')
-
-    def test_many_zeroes(self):
-        self.assertEqual(floatformat(1.00000000000000015, 16), '1.0000000000000002')
-
-    if six.PY2:
-        # The above test fails because of Python 2's float handling. Floats
-        # with many zeroes after the decimal point should be passed in as
-        # another type such as unicode or Decimal.
-        test_many_zeroes = expectedFailure(test_many_zeroes)
