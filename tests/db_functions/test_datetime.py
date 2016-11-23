@@ -11,7 +11,9 @@ from django.db.models.functions import (
     Trunc, TruncDate, TruncDay, TruncHour, TruncMinute, TruncMonth,
     TruncQuarter, TruncSecond, TruncTime, TruncYear,
 )
-from django.test import TestCase, override_settings
+from django.test import (
+    TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature,
+)
 from django.utils import timezone
 
 from .models import DTModel
@@ -147,7 +149,7 @@ class DateFunctionTests(TestCase):
         with self.assertRaisesMessage(ValueError, 'lookup_name must be provided'):
             Extract('start_datetime')
 
-        msg = 'Extract input expression must be DateField, DateTimeField, or TimeField.'
+        msg = 'Extract input expression must be DateField, DateTimeField, TimeField, or DurationField.'
         with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(extracted=Extract('name', 'hour')))
 
@@ -207,6 +209,36 @@ class DateFunctionTests(TestCase):
         self.assertEqual(DTModel.objects.filter(start_datetime__hour=Extract('start_datetime', 'hour')).count(), 2)
         self.assertEqual(DTModel.objects.filter(start_date__month=Extract('start_date', 'month')).count(), 2)
         self.assertEqual(DTModel.objects.filter(start_time__hour=Extract('start_time', 'hour')).count(), 2)
+
+    @skipUnlessDBFeature('has_native_duration_field')
+    def test_extract_duration(self):
+        start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
+        end_datetime = microsecond_support(datetime(2016, 6, 15, 14, 10, 50, 123))
+        if settings.USE_TZ:
+            start_datetime = timezone.make_aware(start_datetime, is_dst=False)
+            end_datetime = timezone.make_aware(end_datetime, is_dst=False)
+        self.create_model(start_datetime, end_datetime)
+        self.create_model(end_datetime, start_datetime)
+        self.assertQuerysetEqual(
+            DTModel.objects.annotate(extracted=Extract('duration', 'second')).order_by('start_datetime'),
+            [
+                (start_datetime, (end_datetime - start_datetime).seconds % 60),
+                (end_datetime, (start_datetime - end_datetime).seconds % 60)
+            ],
+            lambda m: (m.start_datetime, m.extracted)
+        )
+        self.assertEqual(
+            DTModel.objects.annotate(
+                duration_days=Extract('duration', 'day'),
+            ).filter(duration_days__gt=200).count(),
+            1
+        )
+
+    @skipIfDBFeature('has_native_duration_field')
+    def test_extract_duration_without_native_duration_field(self):
+        msg = 'Extract requires native DurationField database support.'
+        with self.assertRaisesMessage(ValueError, msg):
+            list(DTModel.objects.annotate(extracted=Extract('duration', 'second')))
 
     def test_extract_year_func(self):
         start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))

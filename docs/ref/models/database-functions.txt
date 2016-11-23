@@ -331,12 +331,16 @@ We'll be using the following model in examples of each function::
 
 Extracts a component of a date as a number.
 
-Takes an ``expression`` representing a ``DateField`` or ``DateTimeField`` and a
-``lookup_name``, and returns the part of the date referenced by ``lookup_name``
-as an ``IntegerField``. Django usually uses the databases' extract function, so
-you may use any ``lookup_name`` that your database supports. A ``tzinfo``
-subclass, usually provided by ``pytz``, can be passed to extract a value in a
-specific timezone.
+Takes an ``expression`` representing a ``DateField``, ``DateTimeField``,
+``TimeField``, or ``DurationField`` and a ``lookup_name``, and returns the part
+of the date referenced by ``lookup_name`` as an ``IntegerField``.
+Django usually uses the databases' extract function, so you may use any
+``lookup_name`` that your database supports. A ``tzinfo`` subclass, usually
+provided by ``pytz``, can be passed to extract a value in a specific timezone.
+
+.. versionchanged:: 2.0
+
+    Support for ``DurationField`` was added.
 
 Given the datetime ``2015-06-15 23:30:01.000321+00:00``, the built-in
 ``lookup_name``\s return:

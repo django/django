@@ -2,7 +2,8 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db.models import (
-    DateField, DateTimeField, IntegerField, TimeField, Transform,
+    DateField, DateTimeField, DurationField, IntegerField, TimeField,
+    Transform,
 )
 from django.db.models.lookups import (
     YearExact, YearGt, YearGte, YearLt, YearLte,
@@ -49,6 +50,10 @@ class Extract(TimezoneMixin, Transform):
             sql = connection.ops.date_extract_sql(self.lookup_name, sql)
         elif isinstance(lhs_output_field, TimeField):
             sql = connection.ops.time_extract_sql(self.lookup_name, sql)
+        elif isinstance(lhs_output_field, DurationField):
+            if not connection.features.has_native_duration_field:
+                raise ValueError('Extract requires native DurationField database support.')
+            sql = connection.ops.time_extract_sql(self.lookup_name, sql)
         else:
             # resolve_expression has already validated the output_field so this
             # assert should never be hit.
@@ -58,8 +63,11 @@ class Extract(TimezoneMixin, Transform):
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         copy = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
         field = copy.lhs.output_field
-        if not isinstance(field, (DateField, DateTimeField, TimeField)):
-            raise ValueError('Extract input expression must be DateField, DateTimeField, or TimeField.')
+        if not isinstance(field, (DateField, DateTimeField, TimeField, DurationField)):
+            raise ValueError(
+                'Extract input expression must be DateField, DateTimeField, '
+                'TimeField, or DurationField.'
+            )
         # Passing dates to functions expecting datetimes is most likely a mistake.
         if type(field) == DateField and copy.lookup_name in ('hour', 'minute', 'second'):
             raise ValueError(
