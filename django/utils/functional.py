@@ -300,11 +300,12 @@ class LazyObject(object):
             self._setup()
         return (unpickle_lazyobject, (self._wrapped,))
 
-    # We have to explicitly override __getstate__ so that older versions of
-    # pickle don't try to pickle the __dict__ (which in the case of a
-    # SimpleLazyObject may contain a lambda). The value will end up being
-    # ignored by our __reduce__ and custom unpickler.
     def __getstate__(self):
+        """
+        Prevent older versions of pickle from trying to pickle the __dict__
+        (which in the case of a SimpleLazyObject may contain a lambda). The
+        value will be ignored by __reduce__() and the custom unpickler.
+        """
         return {}
 
     def __copy__(self):

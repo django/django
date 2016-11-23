@@ -197,9 +197,6 @@ class QuerySet(object):
         return obj
 
     def __getstate__(self):
-        """
-        Allows the QuerySet to be pickled.
-        """
         # Force the cache to be fully populated.
         self._fetch_all()
         obj_dict = self.__dict__.copy()

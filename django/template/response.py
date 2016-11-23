@@ -44,11 +44,9 @@ class SimpleTemplateResponse(HttpResponse):
         self._is_rendered = False
 
     def __getstate__(self):
-        """Pickling support function.
-
-        Ensures that the object can't be pickled before it has been
-        rendered, and that the pickled state only includes rendered
-        data, not the data used to construct the response.
+        """
+        Raise an exception if trying to pickle an unrendered response. Pickle
+        only rendered data, not the data used to construct the response.
         """
         obj_dict = self.__dict__.copy()
         if not self._is_rendered:
