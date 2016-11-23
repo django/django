@@ -202,6 +202,7 @@ class AuthenticationForm(forms.Form):
                     )
                 else:
                     self.confirm_login_allowed(self.user_cache)
+                return self.cleaned_data
             error_messages = {
                 'invalid_maxlength': _(
                     "The maximum length for an username is 150 characters."
@@ -211,8 +212,6 @@ class AuthenticationForm(forms.Form):
                 error_messages['invalid_maxlength'],
                 code='invalid_maxlength',
             )
-
-        return self.cleaned_data
 
     def confirm_login_allowed(self, user):
         """
