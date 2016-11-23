@@ -283,8 +283,9 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
 
     def test_invalid_length_username(self):
         # The user submits an invalid maxlength ex:(200 length) username.
+        invalid_maxlength_username = "A" * 200
         data = {
-            'username': 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            'username': invalid_maxlength_username,
             'password': '123456',
         }
         form = AuthenticationForm(None, data)
