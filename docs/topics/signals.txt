@@ -186,7 +186,7 @@ Preventing duplicate signals
 
 In some circumstances, the code connecting receivers to signals may run
 multiple times. This can cause your receiver function to be registered more
-than once, and thus called multiples times for a single signal event.
+than once, and thus called multiple times for a single signal event.
 
 If this behavior is problematic (such as when using signals to
 send an email whenever a model is saved), pass a unique identifier as
