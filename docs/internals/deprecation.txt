@@ -46,6 +46,8 @@ details on these changes.
 * The ``USE_ETAGS`` setting will be removed. ``CommonMiddleware`` and
   ``django.utils.cache.patch_response_headers()`` will no longer set ETags.
 
+* The ``Model._meta.has_auto_field`` attribute will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

@@ -900,7 +900,7 @@ class Model(six.with_metaclass(ModelBase)):
             if not pk_set:
                 fields = [f for f in fields if f is not meta.auto_field]
 
-            update_pk = bool(meta.has_auto_field and not pk_set)
+            update_pk = meta.auto_field and not pk_set
             result = self._do_insert(cls._base_manager, using, fields, update_pk, raw)
             if update_pk:
                 setattr(self, meta.pk.attname, result)
