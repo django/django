@@ -281,6 +281,20 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form.non_field_errors(), [force_text(form.error_messages['inactive'])])
 
+    def test_invalid_length_username(self):
+        # The user submits an invalid maxlength ex:(200 length) username.
+        data = {
+            'username': 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            'password': '123456',
+        }
+        form = AuthenticationForm(None, data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.non_field_errors(), [
+                force_text(forms.error_messages['invalid_maxlength'])
+            ]
+        )
+
     def test_login_failed(self):
         signal_calls = []
 

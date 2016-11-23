@@ -182,6 +182,7 @@ class AuthenticationForm(forms.Form):
         UserModel = get_user_model()
         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
         if self.username_field.max_length is not None:
+            self.fields['username'].max_length = self.username_field.max_length
             self.fields['username'].widget.attrs['maxlength'] = self.username_field.max_length
         if self.fields['username'].label is None:
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
@@ -191,15 +192,25 @@ class AuthenticationForm(forms.Form):
         password = self.cleaned_data.get('password')
 
         if username is not None and password:
-            self.user_cache = authenticate(self.request, username=username, password=password)
-            if self.user_cache is None:
-                raise forms.ValidationError(
-                    self.error_messages['invalid_login'],
-                    code='invalid_login',
-                    params={'username': self.username_field.verbose_name},
+            if len(username) <= self.username_field.max_length:
+                self.user_cache = authenticate(self.request, username=username, password=password)
+                if self.user_cache is None:
+                    raise forms.ValidationError(
+                        self.error_messages['invalid_login'],
+                        code='invalid_login',
+                        params={'username': self.username_field.verbose_name},
+                    )
+                else:
+                    self.confirm_login_allowed(self.user_cache)
+            error_messages = {
+                'invalid_maxlength': _(
+                    "The maximum length for an username is 150 characters."
                 )
-            else:
-                self.confirm_login_allowed(self.user_cache)
+            }
+            raise forms.ValidationError(
+                error_messages['invalid_maxlength'],
+                code='invalid_maxlength',
+            )
 
         return self.cleaned_data
 
