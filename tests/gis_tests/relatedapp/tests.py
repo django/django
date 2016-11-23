@@ -36,7 +36,7 @@ class RelatedGeoModelTest(TestCase):
                 nm, st, lon, lat = ref
                 self.assertEqual(nm, c.name)
                 self.assertEqual(st, c.state)
-                self.assertEqual(Point(lon, lat), c.location.point)
+                self.assertEqual(Point(lon, lat, srid=c.location.point.srid), c.location.point)
 
     @skipUnlessDBFeature("has_transform_method")
     def test03_transform_related(self):

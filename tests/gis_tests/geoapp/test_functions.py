@@ -266,7 +266,7 @@ class GISFunctionsTests(TestCase):
         State.objects.create(name='invalid', poly=invalid_geom)
         invalid = State.objects.filter(name='invalid').annotate(repaired=functions.MakeValid('poly')).first()
         self.assertIs(invalid.repaired.valid, True)
-        self.assertEqual(invalid.repaired, fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))'))
+        self.assertEqual(invalid.repaired, fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))', srid=invalid.poly.srid))
 
     @skipUnlessDBFeature("has_MemSize_function")
     def test_memsize(self):

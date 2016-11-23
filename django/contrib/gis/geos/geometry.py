@@ -174,12 +174,14 @@ class GEOSGeometry(GEOSBase, ListMixin):
     def __eq__(self, other):
         """
         Equivalence testing, a Geometry may be compared with another Geometry
-        or a WKT representation.
+        or an EWKT representation.
         """
         if isinstance(other, six.string_types):
-            return self.wkt == other
+            if other.startswith('SRID=0;'):
+                return self.ewkt == other[7:]  # Test only WKT part of other
+            return self.ewkt == other
         elif isinstance(other, GEOSGeometry):
-            return self.equals_exact(other)
+            return self.srid == other.srid and self.equals_exact(other)
         else:
             return False
 

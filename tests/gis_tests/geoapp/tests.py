@@ -63,9 +63,9 @@ class GeoModelTest(TestCase):
         nullcity.point.x = 23
         nullcity.point.y = 5
         # Checking assignments pre & post-save.
-        self.assertNotEqual(Point(23, 5), City.objects.get(name='NullCity').point)
+        self.assertNotEqual(Point(23, 5, srid=4326), City.objects.get(name='NullCity').point)
         nullcity.save()
-        self.assertEqual(Point(23, 5), City.objects.get(name='NullCity').point)
+        self.assertEqual(Point(23, 5, srid=4326), City.objects.get(name='NullCity').point)
         nullcity.delete()
 
         # Testing on a Polygon
@@ -479,8 +479,11 @@ class GeoQuerySetTest(TestCase):
                 # SpatiaLite).
                 pass
             else:
-                self.assertEqual(c.mpoly.difference(geom), c.difference)
-                if not spatialite:
+                if spatialite:
+                    # Spatialite `difference` doesn't have an SRID
+                    self.assertEqual(c.mpoly.difference(geom).wkt, c.difference.wkt)
+                else:
+                    self.assertEqual(c.mpoly.difference(geom), c.difference)
                     self.assertEqual(c.mpoly.intersection(geom), c.intersection)
                 # Ordering might differ in collections
                 self.assertSetEqual(set(g.wkt for g in c.mpoly.sym_difference(geom)),
