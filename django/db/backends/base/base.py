@@ -267,7 +267,7 @@ class BaseDatabaseWrapper(object):
         self._rollback()
         # A successful rollback means that the database connection works.
         self.errors_occurred = False
-
+        self.needs_rollback = False
         self.run_on_commit = []
 
     def close(self):
