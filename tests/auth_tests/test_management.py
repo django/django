@@ -263,7 +263,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
     @override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
     def test_swappable_user(self):
-        "A superuser can be created when a custom User model is in use"
+        "A superuser can be created when a custom user model is in use"
         # We can use the management command to create a superuser
         # We skip validation because the temporary substitution of the
         # swappable User model messes with validation.

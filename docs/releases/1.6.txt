@@ -448,7 +448,7 @@ removed and the standalone GeoDjango tests execution setup it implemented isn't
 supported anymore. To run the GeoDjango tests simply use the new
 ``DiscoverRunner`` and specify the ``django.contrib.gis`` app.
 
-Custom User models in tests
+Custom user models in tests
 ---------------------------
 
 The introduction of the new test runner has also slightly changed the way that
