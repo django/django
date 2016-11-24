@@ -50,6 +50,7 @@ Topics
    routing
    binding
    backends
+   delay
    testing
    reference
    faqs
