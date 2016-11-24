@@ -1616,7 +1616,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. class:: AuthenticationForm
 
-    A form for logging a user in.
+    The form read the user submitted data, validate the form and take the final step of logging the user in.
 
     Takes ``request`` as its first positional argument, which is stored on the
     form instance for use by sub-classes.

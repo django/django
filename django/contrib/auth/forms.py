@@ -187,31 +187,28 @@ class AuthenticationForm(forms.Form):
         if self.fields['username'].label is None:
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
 
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if len(username) > self.username_field.max_length:
+            raise forms.ValidationError(
+                "The maximum length for an username is 150 characters."
+            )
+        return username
+
     def clean(self):
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
-
         if username is not None and password:
-            if len(username) <= self.username_field.max_length:
-                self.user_cache = authenticate(self.request, username=username, password=password)
-                if self.user_cache is None:
-                    raise forms.ValidationError(
-                        self.error_messages['invalid_login'],
-                        code='invalid_login',
-                        params={'username': self.username_field.verbose_name},
-                    )
-                else:
-                    self.confirm_login_allowed(self.user_cache)
-                return self.cleaned_data
-            error_messages = {
-                'invalid_maxlength': _(
-                    "The maximum length for an username is 150 characters."
+            self.user_cache = authenticate(self.request, username=username, password=password)
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                    params={'username': self.username_field.verbose_name},
                 )
-            }
-            raise forms.ValidationError(
-                error_messages['invalid_maxlength'],
-                code='invalid_maxlength',
-            )
+            else:
+                self.confirm_login_allowed(self.user_cache)
+            return self.cleaned_data
 
     def confirm_login_allowed(self, user):
         """

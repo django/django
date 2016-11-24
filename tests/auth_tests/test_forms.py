@@ -292,7 +292,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.non_field_errors(), [
-                force_text(forms.error_messages['invalid_maxlength'])
+                force_text(form.errors['username'][0])
             ]
         )
 
