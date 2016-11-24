@@ -34,7 +34,7 @@ class SimpleTemplateResponse(HttpResponse):
         # content argument doesn't make sense here because it will be replaced
         # with rendered template so we always pass empty string in order to
         # prevent errors and provide shorter signature.
-        super(SimpleTemplateResponse, self).__init__('', content_type, status, charset)
+        super(SimpleTemplateResponse, self).__init__('', content_type, status, charset=charset)
 
         # _is_rendered tracks whether the template and context has been baked
         # into a final response.
