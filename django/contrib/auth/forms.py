@@ -160,7 +160,9 @@ class AuthenticationForm(forms.Form):
         strip=False,
         widget=forms.PasswordInput,
     )
-
+    username = forms.CharField(
+        max_length=150
+    )
     error_messages = {
         'invalid_login': _(
             "Please enter a correct %(username)s and password. Note that both "
@@ -178,16 +180,18 @@ class AuthenticationForm(forms.Form):
         self.user_cache = None
         super(AuthenticationForm, self).__init__(*args, **kwargs)
 
-        # Set the label for the "username" field.
+        # Set the label and maxlength for the "username" field.
         UserModel = get_user_model()
         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
+        if self.username_field.max_length is not None:
+            self.fields['username'].max_length = self.username_field.max_length
+            self.fields['username'].widget.attrs['maxlength'] = self.username_field.max_length
         if self.fields['username'].label is None:
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
 
     def clean(self):
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
-
         if username is not None and password:
             self.user_cache = authenticate(self.request, username=username, password=password)
             if self.user_cache is None:
@@ -198,8 +202,7 @@ class AuthenticationForm(forms.Form):
                 )
             else:
                 self.confirm_login_allowed(self.user_cache)
-
-        return self.cleaned_data
+            return self.cleaned_data
 
     def confirm_login_allowed(self, user):
         """
