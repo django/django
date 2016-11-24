@@ -19,7 +19,6 @@ from django.db import (
 from django.db.models import signals
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, Collector
-from django.db.models.fields import AutoField
 from django.db.models.fields.related import (
     ForeignObjectRel, OneToOneField, lazy_related_operation, resolve_relation,
 )
@@ -899,7 +898,7 @@ class Model(six.with_metaclass(ModelBase)):
 
             fields = meta.local_concrete_fields
             if not pk_set:
-                fields = [f for f in fields if not isinstance(f, AutoField)]
+                fields = [f for f in fields if f is not meta.auto_field]
 
             update_pk = bool(meta.has_auto_field and not pk_set)
             result = self._do_insert(cls._base_manager, using, fields, update_pk, raw)
