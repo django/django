@@ -160,7 +160,9 @@ class AuthenticationForm(forms.Form):
         strip=False,
         widget=forms.PasswordInput,
     )
-
+    username = forms.CharField(
+        max_length=150
+    )
     error_messages = {
         'invalid_login': _(
             "Please enter a correct %(username)s and password. Note that both "
@@ -186,14 +188,6 @@ class AuthenticationForm(forms.Form):
             self.fields['username'].widget.attrs['maxlength'] = self.username_field.max_length
         if self.fields['username'].label is None:
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
-
-    def clean_username(self):
-        username = self.cleaned_data.get('username')
-        if len(username) > self.username_field.max_length:
-            raise forms.ValidationError(
-                "The maximum length for an username is 150 characters."
-            )
-        return username
 
     def clean(self):
         username = self.cleaned_data.get('username')
