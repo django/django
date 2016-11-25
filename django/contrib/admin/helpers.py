@@ -349,8 +349,12 @@ class InlineAdminForm(AdminForm):
             )
 
     def needs_explicit_pk_field(self):
-        # Auto fields are editable (oddly), so need to check for auto or non-editable pk
-        if self.form._meta.model._meta.has_auto_field or not self.form._meta.model._meta.pk.editable:
+        # If the primary key is not editable, the form must provide a pk field
+        # explicitly. AutoField and One-to-one fields (used for child models)
+        # have the editable property set to true, even if they do not appear
+        # in the form, so these two cases must be checked specifically.
+        if (not self.form._meta.model._meta.pk.editable or self.form._meta.model._meta.has_auto_field or
+                self.form._meta.model._meta.pk.one_to_one):
             return True
         # Also search any parents for an auto field. (The pk info is propagated to child
         # models so that does not need to be checked in parents.)
