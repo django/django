@@ -238,7 +238,7 @@ class TranslationTests(SimpleTestCase):
         # Now with a long
         result = ungettext_lazy(
             '%(name)s has %(num)d good result', '%(name)s has %(num)d good results',
-            long(4)   # NOQA: long undefined on PY3
+            long(4)  # NOQA: long undefined on PY3
         )
         self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
 
@@ -1859,6 +1859,25 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
         # A page starting with /de* shouldn't match the 'de' langauge code.
         response = self.client.get('/de-simple-page/')
         self.assertEqual(response.content, b'Yes')
+
+    def test_404_page_no_default_language_redirect(self):
+        response = self.client.get('/non-existent-no-slash', follow=False)
+        self.assertEqual(response.status_code, 404)
+
+    def test_404_page_no_default_language_redirect_2_groups(self):
+        # trying to redirect to /en/group1/group2/
+        response = self.client.get('/group1/group2/', follow=False)
+        self.assertEqual(response.status_code, 404)
+
+    def test_404_page_no_default_language_redirect_prefixed_2_groups(self):
+        # trying to redirect to /en/prefix/group1/group2/
+        response = self.client.get('/prefix/group1/group2/', follow=False)
+        self.assertEqual(response.status_code, 404)
+
+    def test_404_page_no_default_language_redirect_prefixed_2_groups_fr(self):
+        # trying to redirect to /en/prefix/group1/group2/
+        response = self.client.get('/fr/prefix/group1/group2/', follow=False)
+        self.assertEqual(response.status_code, 404)
 
 
 @override_settings(

@@ -37,6 +37,8 @@ class LocaleMiddleware(MiddlewareMixin):
 
         if response.status_code == 404 and not language_from_path and i18n_patterns_used:
             language_path = '/%s%s' % (language, request.path_info)
+            if i18n_patterns_used and not prefixed_default_language and str(language) == str(settings.LANGUAGE_CODE):
+                language_path = '/%s' % (request.path_info)
             path_valid = is_valid_path(language_path, urlconf)
             path_needs_slash = (
                 not path_valid and (
@@ -49,12 +51,18 @@ class LocaleMiddleware(MiddlewareMixin):
                 script_prefix = get_script_prefix()
                 # Insert language after the script prefix and before the
                 # rest of the URL
-                language_url = request.get_full_path(force_append_slash=path_needs_slash).replace(
+                if prefixed_default_language:
+                    language_url_replacement = '%s%s/' % (script_prefix, language)
+                else:
+                    language_url_replacement = '%s/' % script_prefix
+                language_url = request.get_full_path(force_append_slash=path_needs_slash)
+                language_url.replace(
                     script_prefix,
-                    '%s%s/' % (script_prefix, language),
+                    language_url_replacement,
                     1
                 )
-                return self.response_redirect_class(language_url)
+                if language_url != request.path_info:
+                    return self.response_redirect_class(language_url)
 
         if not (i18n_patterns_used and language_from_path):
             patch_vary_headers(response, ('Accept-Language',))
