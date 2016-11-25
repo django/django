@@ -20,8 +20,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         SQLite has a compile-time default (SQLITE_LIMIT_VARIABLE_NUMBER) of
         999 variables per query.
 
-        If there is just single field to insert, then we can hit another
-        limit, SQLITE_MAX_COMPOUND_SELECT which defaults to 500.
+        If there is only a single field to be inserted we can hit another
+        limit (SQLITE_MAX_COMPOUND_SELECT), which defaults to 500.
         """
         limit = 999 if len(fields) > 1 else 500
         return (limit // len(fields)) if len(fields) > 0 else len(objs)
