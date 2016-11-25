@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import os
+import signal
 import sys
 import threading
 import time
@@ -225,8 +226,8 @@ class AtomicTests(TransactionTestCase):
             with transaction.atomic():
                 Reporter.objects.create(first_name='Tintin')
                 # Send SIGINT (simulate Ctrl-C). One call isn't enough.
-                os.kill(os.getpid(), 2)
-                os.kill(os.getpid(), 2)
+                os.kill(os.getpid(), signal.SIGINT)
+                os.kill(os.getpid(), signal.SIGINT)
         except KeyboardInterrupt:
             pass
         self.assertEqual(Reporter.objects.all().count(), 0)

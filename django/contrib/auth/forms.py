@@ -22,6 +22,8 @@ from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext, ugettext_lazy as _
 
+UserModel = get_user_model()
+
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
     def render(self, name, value, attrs):
@@ -179,7 +181,6 @@ class AuthenticationForm(forms.Form):
         super(AuthenticationForm, self).__init__(*args, **kwargs)
 
         # Set the label for the "username" field.
-        UserModel = get_user_model()
         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
         if self.fields['username'].label is None:
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
@@ -254,7 +255,6 @@ class PasswordResetForm(forms.Form):
         that prevent inactive users and users with unusable passwords from
         resetting their password.
         """
-        UserModel = get_user_model()
         active_users = UserModel._default_manager.filter(**{
             '%s__iexact' % UserModel.get_email_field_name(): email,
             'is_active': True,

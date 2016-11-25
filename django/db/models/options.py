@@ -17,7 +17,8 @@ from django.db.models.fields.related import OneToOneField
 from django.utils import six
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.deprecation import (
-    RemovedInDjango20Warning, warn_about_renamed_method,
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+    warn_about_renamed_method,
 )
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
@@ -113,7 +114,6 @@ class Options(object):
         self.required_db_vendor = None
         self.meta = meta
         self.pk = None
-        self.has_auto_field = False
         self.auto_field = None
         self.abstract = False
         self.managed = True
@@ -825,3 +825,16 @@ class Options(object):
         # Store result into cache for later access
         self._get_fields_cache[cache_key] = fields
         return fields
+
+    @property
+    def has_auto_field(self):
+        warnings.warn(
+            'Model._meta.has_auto_field is deprecated in favor of checking if '
+            'Model._meta.auto_field is not None.',
+            RemovedInDjango21Warning, stacklevel=2
+        )
+        return self.auto_field is not None
+
+    @has_auto_field.setter
+    def has_auto_field(self, value):
+        pass

@@ -115,6 +115,34 @@ class PickleabilityTestCase(TestCase):
         groups = pickle.loads(pickle.dumps(groups))
         self.assertSequenceEqual(groups, [g])
 
+    def test_pickle_prefetch_queryset_usable_outside_of_prefetch(self):
+        # Prefetch shouldn't affect the fetch-on-pickle behavior of the
+        # queryset passed to it.
+        Group.objects.create(name='foo')
+        events = Event.objects.order_by('id')
+        Group.objects.prefetch_related(models.Prefetch('event_set', queryset=events))
+        with self.assertNumQueries(1):
+            events2 = pickle.loads(pickle.dumps(events))
+        with self.assertNumQueries(0):
+            list(events2)
+
+    def test_pickle_prefetch_queryset_still_usable(self):
+        g = Group.objects.create(name='foo')
+        groups = Group.objects.prefetch_related(
+            models.Prefetch('event_set', queryset=Event.objects.order_by('id'))
+        )
+        groups2 = pickle.loads(pickle.dumps(groups))
+        self.assertSequenceEqual(groups2.filter(id__gte=0), [g])
+
+    def test_pickle_prefetch_queryset_not_evaluated(self):
+        Group.objects.create(name='foo')
+        groups = Group.objects.prefetch_related(
+            models.Prefetch('event_set', queryset=Event.objects.order_by('id'))
+        )
+        list(groups)  # evaluate QuerySet
+        with self.assertNumQueries(0):
+            pickle.loads(pickle.dumps(groups))
+
     def test_pickle_prefetch_related_with_m2m_and_objects_deletion(self):
         """
         #24831 -- Cached properties on ManyToOneRel created in QuerySet.delete()

@@ -125,6 +125,9 @@ Minor features
   Set :attr:`CustomUser.EMAIL_FIELD
   <django.contrib.auth.models.CustomUser.EMAIL_FIELD>` to the name of the field.
 
+* :func:`~django.contrib.auth.get_user_model` can now be called at import time,
+  even in modules that define models.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -704,3 +707,6 @@ Miscellaneous
   ``ETag`` header to responses regardless of the setting. ``CommonMiddleware``
   and ``django.utils.cache.patch_response_headers()`` will no longer set ETags
   when the deprecation ends.
+
+* ``Model._meta.has_auto_field`` is deprecated in favor of checking if
+  ``Model._meta.auto_field is not None``.

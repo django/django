@@ -15,7 +15,7 @@ version >= 2.2 and mod_wsgi >= 2.0. For example, you could:
 * Allow certain users to connect to a WebDAV share created with mod_dav_.
 
 .. note::
-    If you have installed a :ref:`custom User model <auth-custom-user>` and
+    If you have installed a :ref:`custom user model <auth-custom-user>` and
     want to use this default auth handler, it must support an ``is_active``
     attribute. If you want to use group based authorization, your custom user
     must have a relation named 'groups', referring to a related object that has
