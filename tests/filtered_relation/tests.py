@@ -64,7 +64,7 @@ class FilteredRelationTests(TestCase):
                         'book', alias='book_alice',
                         condition=Q(book__title__iexact='poem by alice'))
                     .filter(book_alice__isnull=False))
-        self.assertIn('INNER JOIN "filtered_relation_book" book_alice ON', str(queryset.query))
+        self.assertIn('INNER JOIN "filtered_relation_book" ON', str(queryset.query))
 
     @unittest.skipUnless(connection.vendor == 'mysql', 'MySQL specific test.')
     def test_filtered_relation_alias_mapping_mysql(self):
@@ -105,12 +105,28 @@ class FilteredRelationTests(TestCase):
             ["<Author: Jane>"])
 
     def test_filtered_relation_with_m2m(self):
+        qs = Author.objects.filtered_relation(
+            'favourite_books', alias='favourite_books_written_by_jane',
+            condition=Q(favourite_books__in=[self.book2])
+        ).filter(favourite_books_written_by_jane__isnull=False)
         self.assertQuerysetEqual(
-            Author.objects
-            .filtered_relation('favourite_books', alias='favourite_books_written_by_jane',
-                               condition=Q(favourite_books__in=[self.book2]))
-            .filter(favourite_books_written_by_jane__isnull=False),
-            ["<Author: Alice>"])
+            qs, ["<Author: Alice>"])
+
+    def test_filtered_relation_with_m2m_deep(self):
+        qs = Author.objects.filtered_relation(
+            'favourite_books', alias='favourite_books_written_by_jane',
+            condition=Q(favourite_books__author=self.author2)
+        ).filter(favourite_books_written_by_jane__title='The book by Jane B')
+        self.assertQuerysetEqual(
+            qs, ["<Author: Alice>"])
+
+    def test_filtered_relation_with_m2m_multijoin(self):
+        qs = Author.objects.filtered_relation(
+            'favourite_books', alias='favourite_books_written_by_jane',
+            condition=Q(favourite_books__author=self.author2)
+        ).filter(favourite_books_written_by_jane__editor__name='b').distinct()
+        self.assertQuerysetEqual(
+            qs, ["<Author: Alice>"])
 
     def test_filtered_relation_with_foreign_key_error(self):
         with self.assertRaises(FieldError):

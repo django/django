@@ -86,18 +86,11 @@ class Join:
             extra_sql, extra_params = compiler.compile(extra_cond)
             join_conditions.append('(%s)' % extra_sql)
             params.extend(extra_params)
-        elif self.filtered_relation:
-            # prepare a new join to force the query_builder to reuse the existing
-            # join based on alias.
-            join = self.filtered_relation.query.alias_map[self.filtered_relation.alias].relabeled_clone({})
-            join.table_alias = self.filtered_relation.alias
-            join.filtered_relation = None
-
-            alias_map = {self.filtered_relation.alias: join}
-            extra_sql, extra_params = compiler.compile(self.filtered_relation.resolve(alias_map))
+        if self.filtered_relation:
+            compilable = self.filtered_relation.get_compilable(self)
+            extra_sql, extra_params = compiler.compile(compilable)
             join_conditions.append('(%s)' % extra_sql)
             params.extend(extra_params)
-
         if not join_conditions:
             # This might be a rel on the other end of an actual declared field.
             declared_field = getattr(self.join_field, 'field', self.join_field)
@@ -117,15 +110,18 @@ class Join:
             self.table_name, new_parent_alias, new_table_alias, self.join_type,
             self.join_field, self.nullable, filtered_relation=self.filtered_relation)
 
-    def __eq__(self, other):
+    def equals(self, other, with_filtered_relation):
         if isinstance(other, self.__class__):
             return (
                 self.table_name == other.table_name and
                 self.parent_alias == other.parent_alias and
                 self.join_field == other.join_field and
-                self.filtered_relation == other.filtered_relation
+                (not with_filtered_relation or self.filtered_relation == other.filtered_relation)
             )
         return False
+
+    def __eq__(self, other):
+        return self.equals(other, with_filtered_relation=True)
 
     def demote(self):
         new = self.relabeled_clone({})
@@ -159,3 +155,6 @@ class BaseTable:
 
     def relabeled_clone(self, change_map):
         return self.__class__(self.table_name, change_map.get(self.table_alias, self.table_alias))
+
+    def equals(self, other, with_filtered_relation):
+        return self is other

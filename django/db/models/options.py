@@ -632,7 +632,7 @@ class Options:
                 final_field = opts.parents[int_model]
                 targets = (final_field.remote_field.get_related_field(),)
                 opts = int_model._meta
-                path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
+                path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True, None))
         return path
 
     def get_path_from_parent(self, parent):
