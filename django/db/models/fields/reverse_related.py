@@ -166,8 +166,8 @@ class ForeignObjectRel:
     def get_cache_name(self):
         return "_%s_cache" % self.get_accessor_name()
 
-    def get_path_info(self):
-        return self.field.get_reverse_path_info()
+    def get_path_info(self, filtered_relation=None):
+        return self.field.get_reverse_path_info(filtered_relation)
 
 
 class ManyToOneRel(ForeignObjectRel):

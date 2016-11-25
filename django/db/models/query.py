@@ -1696,15 +1696,7 @@ class FilteredRelation(object):
         self.relation_name = relation_name
         self.alias = alias
         self.condition = condition
-        self.query = None
-
-    def pre_compile(self, query):
-        self.query = query
-
-    def resolve(self, alias_map):
-        query = self.query.clone()
-        query.alias_map.update(alias_map)
-        return self.condition.resolve_expression(query=query)
+        self.path = []
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -1712,3 +1704,18 @@ class FilteredRelation(object):
                     self.alias == other.alias and
                     self.condition == other.condition)
         return False
+
+    def clone(self):
+        clone = FilteredRelation(self.relation_name, self.alias, self.condition)
+        clone.path = self.path[:]
+        return clone
+
+    def get_compilable(self, join):
+        return self
+
+    def as_sql(self, compiler, connection):
+        # The condition in self.filtered_relation needs to be
+        # resolved.
+        query = compiler.query
+        where = query.build_filtered_relation_q(self.condition, force_reuse=set(self.path))
+        return compiler.compile(where)
