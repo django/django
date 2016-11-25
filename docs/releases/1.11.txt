@@ -707,3 +707,6 @@ Miscellaneous
   ``ETag`` header to responses regardless of the setting. ``CommonMiddleware``
   and ``django.utils.cache.patch_response_headers()`` will no longer set ETags
   when the deprecation ends.
+
+* ``Model._meta.has_auto_field`` is deprecated in favor of checking if
+  ``Model._meta.auto_field`` is not None.
