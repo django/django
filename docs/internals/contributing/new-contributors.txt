@@ -86,9 +86,9 @@ some advice to make your work on Django more useful and rewarding.
   When reading Trac, you need to take into account who says things, and when
   they were said. Support for an idea two years ago doesn't necessarily mean
   that the idea will still have support. You also need to pay attention to who
-  *hasn't* spoken -- for example, if a core team member hasn't been recently
-  involved in a discussion, then a ticket may not have the support required to
-  get into trunk.
+  *hasn't* spoken -- for example, if an experienced contributor hasn't been
+  recently involved in a discussion, then a ticket may not have the support
+  required to get into Django.
 
 * **Start small**
 
@@ -99,15 +99,15 @@ some advice to make your work on Django more useful and rewarding.
   support first**
 
   This means getting someone else to confirm that a bug is real before you fix
-  the issue, and ensuring that the core team supports a proposed feature
-  before you go implementing it.
+  the issue, and ensuring that there's consensus on a proposed feature before
+  you go implementing it.
 
 * **Be bold! Leave feedback!**
 
   Sometimes it can be scary to put your opinion out to the world and say "this
   ticket is correct" or "this patch needs work", but it's the only way the
   project moves forward. The contributions of the broad Django community
-  ultimately have a much greater impact than that of the core team. We can't
+  ultimately have a much greater impact than that of any one person. We can't
   do it without **you**!
 
 * **Err on the side of caution when marking things Ready For Check-in**
@@ -143,9 +143,9 @@ FAQ
    I do to get it committed?**
 
    First off, it's not personal. Django is entirely developed by volunteers
-   (even the core team), and sometimes folks just don't have time. The best
-   thing to do is to send a gentle reminder to the |django-developers| mailing
-   list asking for review on the ticket, or to bring it up in the
+   (except the Django fellow), and sometimes folks just don't have time. The
+   best thing to do is to send a gentle reminder to the |django-developers|
+   mailing list asking for review on the ticket, or to bring it up in the
    `#django-dev` IRC channel.
 
 2. **I'm sure my ticket is absolutely 100% perfect, can I mark it as RFC
