@@ -13,6 +13,15 @@ In order to control for variances, several measures were taken:
 - several tests were run for each setup and test type
 
 
+Setups
+~~~~~~~~~~~~
+
+3 setups were used for this set of tests:
+
+1) Normal Django with Gunicorn (19.6.0)
+2) Django Channels with local Redis (0.14.0) and Daphne (0.14.3)
+3) Django Channels with IPC (1.1.0) and Daphne (0.14.3)
+
 
 Latency
 ~~~~~~~~~~~~
@@ -22,7 +31,8 @@ All target and sources machines were identical ec2 instances m3.2xlarge running 
 In order to ensure that the same number of requests were sent, the rps flag was set to 300.
 
 
-.. image:: channels-latency.PNG
+.. image:: channels-latency.png
+
 
 Throughput
 ~~~~~~~~~~~~
@@ -34,13 +44,16 @@ For the following tests, loadtest was permitted to autothrottle so as to limit e
 
 Gunicorn had a latency of 6 ms; daphne and Redis, 12 ms; daphne and IPC,  35 ms.
 
-.. image:: channels-throughput.PNG
+
+.. image:: channels-throughput.png
 
 
 Supervisor Configs
 ~~~~~~~~~~~~
 
 **Gunicorn (19.6.0)**
+
+This is the non-channels config. It's a standard Django environment on one machine, using gunicorn to handle requests.
 
 .. code-block:: bash
 
@@ -55,6 +68,10 @@ Supervisor Configs
 
 
 **Redis (0.14.0) and Daphne (0.14.3)**
+
+This is the channels config using redis as the backend. It's on one machine, so a local redis confog.
+
+Also, it's a single worker, not multiple, as that's the default config.
 
 .. code-block:: bash
 
@@ -75,6 +92,9 @@ Supervisor Configs
 
 
 **IPC (1.1.0) and Daphne (0.14.3)**
+
+This is the channels config using IPC (Inter Process Communication). It's only possible to have this work on one machine.
+
 
 .. code-block:: bash
 
