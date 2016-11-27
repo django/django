@@ -60,13 +60,11 @@
     {% endif %}
 
     {% block messages %}
-        <ul class="messagelist">
         {% if messages %}
-            {% for message in messages %}
-              <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
-            {% endfor %}
+        <ul class="messagelist">{% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+        {% endfor %}</ul>
         {% endif %}
-        </ul>
     {% endblock messages %}
 
     <!-- Content -->

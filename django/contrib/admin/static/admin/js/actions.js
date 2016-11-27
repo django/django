@@ -115,19 +115,28 @@
         $('form#changelist-form button[name="index"]').click(function(event) {
             var actionSelected = $('select[name="action"]').val(),
                 itemSelected = $('table#result_list td.action-checkbox input:checked').length > 0,
-                messageList = $('ul.messagelist'),  // admin base.html's message list
+                messageList = $('div#container ul.messagelist'),  // admin base.html's message list
+                getMessageList = function () {
+                    return (messageList.length) ? messageList : function() {
+                        // insert in the original django admin position
+                        $('<ul class="messagelist"></ul>').insertBefore('div#content');
+                        messageList = $('div#container ul.messagelist');
+                        return messageList // return the list (<ul><>) instance
+                    }();
+                },
                 skipChangeListFormSubmit = function (msg, type, replace) {
                     event.preventDefault();  // skip submit
                     if (replace) {
                         // replace the message list with the new item error
-                        messageList.html('<li class="' + type + '">' + msg + '</li>');
+                        getMessageList().html('<li class="' + type + '">' + msg + '</li>');
                     }
                     else {
                         // add new item error to the message list
-                        $('<li class="' + type + '">' + msg + '</li>').appendTo(messageList);
+                        $('<li class="' + type + '">' + msg + '</li>').appendTo(getMessageList());
                     }
                     return;
                 };
+
             if (!actionSelected) skipChangeListFormSubmit(
                 gettext("No action selected."),
                 'warning',
