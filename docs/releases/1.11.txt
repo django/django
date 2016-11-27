@@ -116,6 +116,14 @@ Minor features
   :class:`~django.contrib.auth.views.PasswordResetConfirmView` allows
   automatically logging in a user after a successful password reset.
 
+* To avoid the possibility of leaking a password reset token via the HTTP
+  Referer header (for example, if the reset page includes a reference to CSS or
+  JavaScript hosted on another domain), the
+  :class:`~django.contrib.auth.views.PasswordResetConfirmView` (but not the
+  deprecated ``password_reset_confirm()`` function-based view) stores the token
+  in a session and redirects to itself to present the password change form to
+  the user without the token in the URL.
+
 * :func:`~django.contrib.auth.update_session_auth_hash` now rotates the session
   key to allow a password change to invalidate stolen session cookies.
 

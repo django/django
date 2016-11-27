@@ -425,6 +425,10 @@ class PasswordResetView(PasswordContextMixin, FormView):
         return super(PasswordResetView, self).form_valid(form)
 
 
+INTERNAL_RESET_URL_TOKEN = 'set-password'
+INTERNAL_RESET_SESSION_TOKEN = '_password_reset_token'
+
+
 class PasswordResetDoneView(PasswordContextMixin, TemplateView):
     template_name = 'registration/password_reset_done.html'
     title = _('Password reset sent')
@@ -446,12 +450,26 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
         self.validlink = False
         self.user = self.get_user(kwargs['uidb64'])
 
-        if self.user is not None and self.token_generator.check_token(self.user, kwargs['token']):
-            self.validlink = True
-        else:
-            return self.render_to_response(self.get_context_data())
+        if self.user is not None:
+            token = kwargs['token']
+            if token == INTERNAL_RESET_URL_TOKEN:
+                session_token = self.request.session.get(INTERNAL_RESET_SESSION_TOKEN)
+                if self.token_generator.check_token(self.user, session_token):
+                    # If the token is valid, display the password reset form.
+                    self.validlink = True
+                    return super(PasswordResetConfirmView, self).dispatch(*args, **kwargs)
+            else:
+                if self.token_generator.check_token(self.user, token):
+                    # Store the token in the session and redirect to the
+                    # password reset form at a URL without the token. That
+                    # avoids the possibility of leaking the token in the
+                    # HTTP Referer header.
+                    self.request.session[INTERNAL_RESET_SESSION_TOKEN] = token
+                    redirect_url = self.request.path.replace(token, INTERNAL_RESET_URL_TOKEN)
+                    return HttpResponseRedirect(redirect_url)
 
-        return super(PasswordResetConfirmView, self).dispatch(*args, **kwargs)
+        # Display the "Password reset unsuccessful" page.
+        return self.render_to_response(self.get_context_data())
 
     def get_user(self, uidb64):
         try:
@@ -471,6 +489,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
         user = form.save()
         if self.post_reset_login:
             auth_login(self.request, user)
+        del self.request.session[INTERNAL_RESET_SESSION_TOKEN]
         return super(PasswordResetConfirmView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):

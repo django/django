@@ -24,6 +24,8 @@ class PasswordResetTokenGenerator(object):
         """
         Check that a password reset token is correct for a given user.
         """
+        if not (user and token):
+            return False
         # Parse the token
         try:
             ts_b36, hash = token.split("-")
