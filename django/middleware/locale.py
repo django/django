@@ -35,7 +35,8 @@ class LocaleMiddleware(MiddlewareMixin):
         urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
         i18n_patterns_used, prefixed_default_language = is_language_prefix_patterns_used(urlconf)
 
-        if response.status_code == 404 and not language_from_path and i18n_patterns_used:
+        if (response.status_code == 404 and not language_from_path and i18n_patterns_used and
+                (prefixed_default_language or language != settings.LANGUAGE_CODE)):
             language_path = '/%s%s' % (language, request.path_info)
             path_valid = is_valid_path(language_path, urlconf)
             path_needs_slash = (

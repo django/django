@@ -1860,6 +1860,16 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
         response = self.client.get('/de-simple-page/')
         self.assertEqual(response.content, b'Yes')
 
+    def test_no_redirect_on_404(self):
+        """
+        Regression test for #27402.
+        Request for url not defined can cause an unneeded redirect to
+        /<defaut_language>/<request_url> when prefix_default_language is
+        False and /<default_language>/<request_url> has a url match.
+        """
+        response = self.client.get('/non-existent/', follow=False)
+        self.assertEqual(response.status_code, 404)
+
 
 @override_settings(
     USE_I18N=True,
