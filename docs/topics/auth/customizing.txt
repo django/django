@@ -241,7 +241,7 @@ for example, to control anonymous access.
 Authorization for inactive users
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-An inactive user is a one that has its
+An inactive user is one that has its
 :attr:`~django.contrib.auth.models.User.is_active` field set to ``False``. The
 :class:`~django.contrib.auth.backends.ModelBackend` and
 :class:`~django.contrib.auth.backends.RemoteUserBackend` authentication
