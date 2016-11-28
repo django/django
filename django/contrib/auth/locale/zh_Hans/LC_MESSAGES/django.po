@@ -84,7 +84,7 @@ msgstr ""
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
-msgstr "请输入一个正确的 %(username)s 和密码. 注意他们都是大区分大小写的."
+msgstr "请输入一个正确的 %(username)s 和密码. 注意他们都是区分大小写的."
 
 msgid "This account is inactive."
 msgstr "该帐号未激活。"
