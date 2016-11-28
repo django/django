@@ -224,9 +224,9 @@ class BaseDatabaseFeatures(object):
     # Defaults to False to allow third-party backends to opt-in.
     can_clone_databases = False
 
-    # Does the backend consider quoted identifiers with different casing to
+    # Does the backend consider table names with different casing to
     # be equal?
-    ignores_quoted_identifier_case = False
+    ignores_table_name_case = False
 
     # Place FOR UPDATE right after FROM clause. Used on MSSQL.
     for_update_after_from = False

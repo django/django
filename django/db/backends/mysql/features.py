@@ -72,3 +72,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         All storage engines except MyISAM support transactions.
         """
         return self._mysql_storage_engine != 'MyISAM'
+
+    @cached_property
+    def ignores_table_name_case(self):
+        with self.connection.cursor() as cursor:
+            cursor.execute('SELECT @@LOWER_CASE_TABLE_NAMES')
+            result = cursor.fetchone()
+            return result and result[0] != 0
