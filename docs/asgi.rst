@@ -123,7 +123,7 @@ so that a querying client only sees some portion of the messages. Calling
 ``receive`` on these channels does not guarantee that you will get the
 messages in order or that you will get anything if the channel is non-empty.
 
-*Single-reader channel* names contain an question mark
+*Single-reader channel* names contain a question mark
 (``?``) character in order to indicate to the channel layer that it must make
 these channels appear globally consistent. The ``?`` is always preceded by
 the main channel name (e.g. ``http.response.body``) and followed by a

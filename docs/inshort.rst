@@ -66,7 +66,7 @@ and WebSockets) and *worker servers* (ones that run your Django code) to
 fit your use case.
 
 The ASGI spec allows a number of different *channel layers* to be plugged in
-between these two components, with difference performance characteristics, and
+between these two components, with different performance characteristics, and
 it's designed to allow both easy sharding as well as the ability to run
 separate clusters with their own protocol and worker servers.
 
