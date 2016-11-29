@@ -11,6 +11,7 @@ from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import (
     HttpRequest, HttpResponse, RawPostDataException, UnreadablePostError,
 )
+from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
 from django.test.utils import freeze_time, str_prefix
@@ -841,6 +842,11 @@ class HostValidationTests(SimpleTestCase):
         request.META = {'HTTP_HOST': "invalid_hostname.com"}
         with self.assertRaisesMessage(SuspiciousOperation, msg_suggestion2 % "invalid_hostname.com"):
             request.get_host()
+
+    def test_split_domain_port_removes_trailing_dot(self):
+        domain, port = split_domain_port('example.com.:8080')
+        self.assertEqual(domain, 'example.com')
+        self.assertEqual(port, '8080')
 
 
 class BuildAbsoluteURITestCase(SimpleTestCase):

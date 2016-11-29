@@ -46,8 +46,6 @@ class SiteManager(models.Manager):
         except Site.DoesNotExist:
             # Fallback to looking up site after stripping port from the host.
             domain, port = split_domain_port(host)
-            if not port:
-                raise
             if domain not in SITE_CACHE:
                 SITE_CACHE[domain] = self.get(domain__iexact=domain)
             return SITE_CACHE[domain]
