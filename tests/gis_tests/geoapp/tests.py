@@ -858,8 +858,7 @@ class GeoQuerySetTest(TestCase):
         """
         tx = Country.objects.get(name='Texas').mpoly
         # Houston, Dallas -- Ordering may differ depending on backend or GEOS version.
-        union1 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
-        union2 = fromstr('MULTIPOINT(-95.363151 29.763374,-96.801611 32.782057)')
+        union = GEOSGeometry('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
         qs = City.objects.filter(point__within=tx)
         with self.assertRaises(ValueError):
             qs.aggregate(Union('name'))
@@ -868,9 +867,8 @@ class GeoQuerySetTest(TestCase):
         # an aggregate method on a spatial column)
         u1 = qs.aggregate(Union('point'))['point__union']
         u2 = qs.order_by('name').aggregate(Union('point'))['point__union']
-        tol = 0.00001
-        self.assertTrue(union1.equals_exact(u1, tol) or union2.equals_exact(u1, tol))
-        self.assertTrue(union1.equals_exact(u2, tol) or union2.equals_exact(u2, tol))
+        self.assertTrue(union.equals(u1))
+        self.assertTrue(union.equals(u2))
         qs = City.objects.filter(name='NotACity')
         self.assertIsNone(qs.aggregate(Union('point'))['point__union'])
 

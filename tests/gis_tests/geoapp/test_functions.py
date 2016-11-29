@@ -485,8 +485,5 @@ class GISFunctionsTests(TestCase):
     def test_union(self):
         geom = Point(-95.363151, 29.763374, srid=4326)
         ptown = City.objects.annotate(union=functions.Union('point', geom)).get(name='Dallas')
-        tol = 0.00001
-        # Undefined ordering
-        expected1 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)', srid=4326)
-        expected2 = fromstr('MULTIPOINT(-95.363151 29.763374,-96.801611 32.782057)', srid=4326)
-        self.assertTrue(expected1.equals_exact(ptown.union, tol) or expected2.equals_exact(ptown.union, tol))
+        expected = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)', srid=4326)
+        self.assertTrue(expected.equals(ptown.union))
