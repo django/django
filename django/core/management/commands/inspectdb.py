@@ -286,7 +286,7 @@ class Command(BaseCommand):
 
         if has_unsupported_constraint_columns:
             unsupported_warning_comments = ["    # " + table_name + " contains unsupported constraints. ",
-                                            "    # Please modify the model class to match database constraint"]
+                                            "    # You may need to add the constraints' logic to application layer"]
             meta += unsupported_warning_comments
 
         meta += ["    class Meta:",
