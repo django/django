@@ -472,9 +472,10 @@ class MigrateTests(MigrationTestBase):
         """
         with mock.patch.object(BaseDatabaseSchemaEditor, 'execute') as execute:
             call_command('migrate', run_syncdb=True, verbosity=0)
-            self.assertGreater(len(execute.mock_calls), 0)
-            # The CREATE INDEX SQL is deferred.
-            self.assertTrue(any('CREATE INDEX' in str(call) for call in execute.mock_calls))
+            table_creates = len([call for call in execute.mock_calls if 'CREATE TABLE' in str(call)])
+            self.assertEqual(table_creates, 2)
+            # there should be more queries than the table creates (usually the deferred ones)
+            self.assertGreater(len(execute.mock_calls), 2)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_migrate_record_replaced(self):
