@@ -15,7 +15,7 @@ from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from ..utils import no_oracle, oracle, postgis, skipUnlessGISLookup, spatialite
+from ..utils import oracle, postgis, skipUnlessGISLookup, spatialite
 from .models import (
     City, Country, Feature, MinusOneSRID, NonConcreteModel, PennsylvaniaCity,
     State, Track,
@@ -851,11 +851,7 @@ class GeoQuerySetTest(TestCase):
                         self.assertAlmostEqual(c1[0] + xfac, c2[0], 5)
                         self.assertAlmostEqual(c1[1] + yfac, c2[1], 5)
 
-    # TODO: Oracle can be made to pass if
-    # union1 = union2 = fromstr('POINT (-97.5211570000000023 34.4646419999999978)')
-    # but this seems unexpected and should be investigated to determine the cause.
     @skipUnlessDBFeature("has_unionagg_method")
-    @no_oracle
     def test_unionagg(self):
         """
         Testing the `Union` aggregate.
