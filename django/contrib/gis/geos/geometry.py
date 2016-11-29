@@ -259,7 +259,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
 
     def normalize(self):
         "Converts this Geometry to normal form (or canonical form)."
-        return capi.geos_normalize(self.ptr)
+        capi.geos_normalize(self.ptr)
 
     # #### Unary predicates ####
     @property
