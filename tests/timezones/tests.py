@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, connections
-from django.db.models import Max, Min
+from django.db.models import F, Max, Min
 from django.http import HttpRequest
 from django.template import (
     Context, RequestContext, Template, TemplateSyntaxError, context_processors,
@@ -24,6 +24,7 @@ from django.test import (
 from django.test.utils import requires_tz_support
 from django.urls import reverse
 from django.utils import six, timezone
+from django.utils.timezone import timedelta
 
 from .forms import (
     EventForm, EventLocalizedForm, EventLocalizedModelForm, EventModelForm,
@@ -589,6 +590,13 @@ class NewDatabaseTests(TestCase):
         # Regression test for #17294
         e = MaybeEvent.objects.create()
         self.assertIsNone(e.dt)
+
+    def test_update_with_timedelta(self):
+        initial_dt = timezone.now().replace(microsecond=0)
+        event = Event.objects.create(dt=initial_dt)
+        Event.objects.update(dt=F('dt') + timedelta(hours=2))
+        event.refresh_from_db()
+        self.assertEqual(event.dt, initial_dt + timedelta(hours=2))
 
 
 @override_settings(TIME_ZONE='Africa/Nairobi', USE_TZ=True)
