@@ -1,7 +1,35 @@
 Django Channels Load Testing Results for (2016-09-06)
 ===============
 
-The goal of these tests is to see how channels performs with normal HTTP traffic under heavy load with a control.
+The goal of these load tests is to see how Channels performs with normal HTTP traffic under heavy load.
+
+In order to handle WebSockets, Channels introduced ASGI, a new interface spec for asynchronous request handling. Also,
+Channels implemented this spec with Daphne--an HTTP, HTTP2, and WebSocket protocol server.
+
+The load testing completed has been to compare how well Daphne using 1 worker performs with normal HTTP traffic in
+comparison to a WSGI HTTP server. Gunincorn was chosen as its configuration was simple and well-understood.
+
+
+Summary of Results
+~~~~~~~~~~~~
+
+Daphne is not as efficient as its WSGI counterpart. When considering only latency, Daphne can have 10 times the latency
+when under the same traffic load as gunincorn. When considering only throughput, Daphne can have 40-50% of the total
+throughput of gunicorn while still being at 2 times latency.
+
+The results should not be surprising considering the overhead involved. However, these results represent the simplest
+case to test and should be represented as saying that Daphne is always slower than an WSGI server. These results are
+a starting point, not a final conclusion.
+
+Some additional things that should be tested:
+
+- More than 1 worker
+- A separate server for redis
+- Comparison to other WebSocket servers, such as Node's socket.io or Rails' Action cable
+
+
+Methodology
+~~~~~~~~~~~~
 
 In order to control for variances, several measures were taken:
 
