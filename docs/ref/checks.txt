@@ -189,6 +189,8 @@ File Fields
 * **fields.E200**: ``unique`` is not a valid argument for a ``FileField``.
   *This check is removed in Django 1.11*.
 * **fields.E201**: ``primary_key`` is not a valid argument for a ``FileField``.
+* **fields.E202**: ``upload_to`` should be a relative path, not an absolute path
+                   (remove leading slash) in ``FileField``.
 * **fields.E210**: Cannot use ``ImageField`` because Pillow is not installed.
 
 Related Fields

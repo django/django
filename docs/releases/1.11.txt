@@ -627,6 +627,9 @@ Miscellaneous
 
 * The unused ``BaseCommand.can_import_settings`` attribute is removed.
 
+* ``FileField`` now has system check checking upload_to doesn't have a leading
+  slash.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
