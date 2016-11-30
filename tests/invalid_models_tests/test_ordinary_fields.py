@@ -431,6 +431,12 @@ class DecimalFieldTests(SimpleTestCase):
 @isolate_apps('invalid_models_tests')
 class FileFieldTests(SimpleTestCase):
 
+    def test_valid_default_case(self):
+        class Model(models.Model):
+            field = models.FileField()
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
     def test_valid_case(self):
         class Model(models.Model):
             field = models.FileField(upload_to='somewhere')

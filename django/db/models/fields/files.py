@@ -256,7 +256,7 @@ class FileField(Field):
             return []
 
     def _check_upload_to(self):
-        if isinstance(self.upload_to, six.string_types) and self.upload_to[0] == '/':
+        if isinstance(self.upload_to, six.string_types) and self.upload_to.startswith('/'):
             return [
                 checks.Error(
                     "%s's 'upload_to' argument must be a relative path, not an "
