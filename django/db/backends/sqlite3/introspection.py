@@ -1,6 +1,5 @@
 import re
 import warnings
-from collections import namedtuple
 
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
@@ -8,7 +7,6 @@ from django.db.backends.base.introspection import (
 from django.utils.deprecation import RemovedInDjango21Warning
 
 field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
-FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('default',))
 
 
 def get_field_size(name):

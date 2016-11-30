@@ -95,24 +95,26 @@ class GEOSGeometry(GEOSBase, ListMixin):
             self.srid = srid
 
         # Setting the class type (e.g., Point, Polygon, etc.)
-        if GEOSGeometry._GEOS_CLASSES is None:
-            # Lazy-loaded variable to avoid import conflicts with GEOSGeometry.
-            from .linestring import LineString, LinearRing
-            from .point import Point
-            from .polygon import Polygon
-            from .collections import (
-                GeometryCollection, MultiPoint, MultiLineString, MultiPolygon)
-            GEOSGeometry._GEOS_CLASSES = {
-                0: Point,
-                1: LineString,
-                2: LinearRing,
-                3: Polygon,
-                4: MultiPoint,
-                5: MultiLineString,
-                6: MultiPolygon,
-                7: GeometryCollection,
-            }
-        self.__class__ = GEOSGeometry._GEOS_CLASSES[self.geom_typeid]
+        if type(self) == GEOSGeometry:
+            if GEOSGeometry._GEOS_CLASSES is None:
+                # Lazy-loaded variable to avoid import conflicts with GEOSGeometry.
+                from .linestring import LineString, LinearRing
+                from .point import Point
+                from .polygon import Polygon
+                from .collections import (
+                    GeometryCollection, MultiPoint, MultiLineString, MultiPolygon,
+                )
+                GEOSGeometry._GEOS_CLASSES = {
+                    0: Point,
+                    1: LineString,
+                    2: LinearRing,
+                    3: Polygon,
+                    4: MultiPoint,
+                    5: MultiLineString,
+                    6: MultiPolygon,
+                    7: GeometryCollection,
+                }
+            self.__class__ = GEOSGeometry._GEOS_CLASSES[self.geom_typeid]
 
         # Setting the coordinate sequence for the geometry (will be None on
         # geometries that do not have coordinate sequences)
@@ -259,7 +261,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
 
     def normalize(self):
         "Converts this Geometry to normal form (or canonical form)."
-        return capi.geos_normalize(self.ptr)
+        capi.geos_normalize(self.ptr)
 
     # #### Unary predicates ####
     @property

@@ -9,7 +9,7 @@ from .models import AggregateTestModel, StatTestModel
 
 try:
     from django.contrib.postgres.aggregates import (
-        ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, Corr, CovarPop, JsonAgg,
+        ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, Corr, CovarPop, JSONBAgg,
         RegrAvgX, RegrAvgY, RegrCount, RegrIntercept, RegrR2, RegrSlope,
         RegrSXX, RegrSXY, RegrSYY, StatAggregate, StringAgg,
     )
@@ -117,14 +117,14 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         values = AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter=';'))
         self.assertEqual(values, {'stringagg': ''})
 
-    @skipUnlessDBFeature('has_jsonb_datatype')
+    @skipUnlessDBFeature('has_jsonb_agg')
     def test_json_agg(self):
-        values = AggregateTestModel.objects.aggregate(jsonagg=JsonAgg('char_field'))
+        values = AggregateTestModel.objects.aggregate(jsonagg=JSONBAgg('char_field'))
         self.assertEqual(values, {'jsonagg': ['Foo1', 'Foo2', 'Foo3', 'Foo4']})
 
-    @skipUnlessDBFeature('has_jsonb_datatype')
+    @skipUnlessDBFeature('has_jsonb_agg')
     def test_json_agg_empty(self):
-        values = AggregateTestModel.objects.none().aggregate(jsonagg=JsonAgg('integer_field'))
+        values = AggregateTestModel.objects.none().aggregate(jsonagg=JSONBAgg('integer_field'))
         self.assertEqual(values, json.loads('{"jsonagg": []}'))
 
 

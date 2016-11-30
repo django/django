@@ -15,7 +15,7 @@ from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from ..utils import no_oracle, oracle, postgis, skipUnlessGISLookup, spatialite
+from ..utils import oracle, postgis, skipUnlessGISLookup, spatialite
 from .models import (
     City, Country, Feature, MinusOneSRID, NonConcreteModel, PennsylvaniaCity,
     State, Track,
@@ -295,8 +295,14 @@ class GeoLookupTest(TestCase):
     def test_isvalid_lookup(self):
         invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')
         State.objects.create(name='invalid', poly=invalid_geom)
-        self.assertEqual(State.objects.filter(poly__isvalid=False).count(), 1)
-        self.assertEqual(State.objects.filter(poly__isvalid=True).count(), State.objects.count() - 1)
+        qs = State.objects.all()
+        if oracle:
+            # Kansas has adjacent vertices with distance 6.99244813842e-12
+            # which is smaller than the default Oracle tolerance.
+            qs = qs.exclude(name='Kansas')
+            self.assertEqual(State.objects.filter(name='Kansas', poly__isvalid=False).count(), 1)
+        self.assertEqual(qs.filter(poly__isvalid=False).count(), 1)
+        self.assertEqual(qs.filter(poly__isvalid=True).count(), qs.count() - 1)
 
     @skipUnlessDBFeature("supports_left_right_lookups")
     def test_left_right_lookups(self):
@@ -851,19 +857,14 @@ class GeoQuerySetTest(TestCase):
                         self.assertAlmostEqual(c1[0] + xfac, c2[0], 5)
                         self.assertAlmostEqual(c1[1] + yfac, c2[1], 5)
 
-    # TODO: Oracle can be made to pass if
-    # union1 = union2 = fromstr('POINT (-97.5211570000000023 34.4646419999999978)')
-    # but this seems unexpected and should be investigated to determine the cause.
     @skipUnlessDBFeature("has_unionagg_method")
-    @no_oracle
     def test_unionagg(self):
         """
         Testing the `Union` aggregate.
         """
         tx = Country.objects.get(name='Texas').mpoly
         # Houston, Dallas -- Ordering may differ depending on backend or GEOS version.
-        union1 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
-        union2 = fromstr('MULTIPOINT(-95.363151 29.763374,-96.801611 32.782057)')
+        union = GEOSGeometry('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
         qs = City.objects.filter(point__within=tx)
         with self.assertRaises(ValueError):
             qs.aggregate(Union('name'))
@@ -872,9 +873,8 @@ class GeoQuerySetTest(TestCase):
         # an aggregate method on a spatial column)
         u1 = qs.aggregate(Union('point'))['point__union']
         u2 = qs.order_by('name').aggregate(Union('point'))['point__union']
-        tol = 0.00001
-        self.assertTrue(union1.equals_exact(u1, tol) or union2.equals_exact(u1, tol))
-        self.assertTrue(union1.equals_exact(u2, tol) or union2.equals_exact(u2, tol))
+        self.assertTrue(union.equals(u1))
+        self.assertTrue(union.equals(u2))
         qs = City.objects.filter(name='NotACity')
         self.assertIsNone(qs.aggregate(Union('point'))['point__union'])
 

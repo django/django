@@ -2,7 +2,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db.models.aggregates import Aggregate
 
 __all__ = [
-    'ArrayAgg', 'BitAnd', 'BitOr', 'BoolAnd', 'BoolOr', 'JsonAgg', 'StringAgg',
+    'ArrayAgg', 'BitAnd', 'BitOr', 'BoolAnd', 'BoolOr', 'JSONBAgg', 'StringAgg',
 ]
 
 
@@ -31,7 +31,7 @@ class BoolOr(Aggregate):
     function = 'BOOL_OR'
 
 
-class JsonAgg(Aggregate):
+class JSONBAgg(Aggregate):
     function = 'JSONB_AGG'
     _output_field = JSONField()
 

@@ -10,7 +10,7 @@ from django.utils.datastructures import OrderedSet
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 
-FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('extra', 'default'))
+FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('extra',))
 InfoLine = namedtuple('InfoLine', 'col_name data_type max_len num_prec num_scale extra column_default')
 
 
@@ -89,8 +89,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                         to_int(field_info[col_name].num_prec) or line[4],
                         to_int(field_info[col_name].num_scale) or line[5],
                         line[6],
-                        field_info[col_name].extra,
                         field_info[col_name].column_default,
+                        field_info[col_name].extra,
                     )
                 ))
             )

@@ -130,15 +130,6 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         xmax, ymax = shell[2][:2]
         return (xmin, ymin, xmax, ymax)
 
-    def convert_geom(self, wkt, geo_field):
-        """
-        Converts geometry WKT returned from a SpatiaLite aggregate.
-        """
-        if wkt:
-            return Geometry(wkt, geo_field.srid)
-        else:
-            return None
-
     def geo_db_type(self, f):
         """
         Returns None because geometry columns are added via the

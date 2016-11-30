@@ -312,8 +312,9 @@ class Command(BaseCommand):
 
                 if self.verbosity >= 1:
                     self.stdout.write("    Running deferred SQL...\n")
-                for statement in deferred_sql:
-                    cursor.execute(statement)
+                with connection.schema_editor() as editor:
+                    for statement in deferred_sql:
+                        editor.execute(statement)
         finally:
             cursor.close()
 

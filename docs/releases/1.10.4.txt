@@ -19,3 +19,10 @@ Bugfixes
 
 * Made ``Model.delete(keep_parents=True)`` preserve parent reverse
   relationships in multi-table inheritance (:ticket:`27407`).
+
+* Fixed a ``QuerySet.update()`` crash on SQLite when updating a
+  ``DateTimeField`` with an ``F()`` expression and a ``timedelta``
+  (:ticket:`27544`).
+
+* Prevented ``LocaleMiddleware`` from redirecting on URLs that should return
+  404 when using ``prefix_default_language=False`` (:ticket:`27402`).

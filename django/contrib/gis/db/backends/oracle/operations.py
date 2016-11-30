@@ -16,7 +16,6 @@ from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
-from django.db.backends.oracle.base import Database
 from django.db.backends.oracle.operations import DatabaseOperations
 from django.utils import six
 
@@ -53,6 +52,10 @@ class SDORelate(SpatialOperator):
         return super(SDORelate, self).as_sql(connection, lookup, template_params, sql_params)
 
 
+class SDOIsValid(SpatialOperator):
+    sql_template = "%%(func)s(%%(lhs)s, %s) = 'TRUE'" % DEFAULT_TOLERANCE
+
+
 class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     name = 'oracle'
@@ -86,6 +89,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         'Difference': 'SDO_GEOM.SDO_DIFFERENCE',
         'Distance': 'SDO_GEOM.SDO_DISTANCE',
         'Intersection': 'SDO_GEOM.SDO_INTERSECTION',
+        'IsValid': 'SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT',
         'Length': 'SDO_GEOM.SDO_LENGTH',
         'NumGeometries': 'SDO_UTIL.GETNUMELEM',
         'NumPoints': 'SDO_UTIL.GETNUMVERTICES',
@@ -110,6 +114,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         'covers': SDOOperator(func='SDO_COVERS'),
         'disjoint': SDODisjoint(),
         'intersects': SDOOperator(func='SDO_OVERLAPBDYINTERSECT'),  # TODO: Is this really the same as ST_Intersects()?
+        'isvalid': SDOIsValid(func='SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT'),
         'equals': SDOOperator(func='SDO_EQUAL'),
         'exact': SDOOperator(func='SDO_EQUAL'),
         'overlaps': SDOOperator(func='SDO_OVERLAPS'),
@@ -129,7 +134,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     unsupported_functions = {
         'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG',
         'BoundingCircle', 'Envelope',
-        'ForceRHR', 'GeoHash', 'IsValid', 'MakeValid', 'MemSize', 'Scale',
+        'ForceRHR', 'GeoHash', 'MakeValid', 'MemSize', 'Scale',
         'SnapToGrid', 'Translate',
     }
 
@@ -177,14 +182,6 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
             xmin, ymin = ll
             xmax, ymax = ur
             return (xmin, ymin, xmax, ymax)
-        else:
-            return None
-
-    def convert_geom(self, value, geo_field):
-        if value:
-            if isinstance(value, Database.LOB):
-                value = value.read()
-            return Geometry(value, geo_field.srid)
         else:
             return None
 

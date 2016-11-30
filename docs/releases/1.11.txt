@@ -159,6 +159,10 @@ Minor features
   :class:`~django.contrib.gis.db.models.functions.MakeValid` function, and
   :lookup:`isvalid` lookup.
 
+* Added Oracle support for the
+  :class:`~django.contrib.gis.db.models.functions.IsValid` function and
+  :lookup:`isvalid` lookup.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -183,7 +187,7 @@ Minor features
   operation allow using PostgreSQL's ``citext`` extension for case-insensitive
   lookups.
 
-* The new :class:`~django.contrib.postgres.aggregates.JsonAgg` allows
+* The new :class:`~django.contrib.postgres.aggregates.JSONBAgg` allows
   aggregating values as a JSON array.
 
 :mod:`django.contrib.redirects`
@@ -231,7 +235,8 @@ Cache
 CSRF
 ~~~~
 
-* ...
+* Added the :setting:`CSRF_USE_SESSIONS` setting to allow storing the CSRF
+  token in the user's session rather than in a cookie.
 
 Database backends
 ~~~~~~~~~~~~~~~~~
@@ -456,6 +461,9 @@ Database backend API
   which is deprecated. Custom database backends should ensure all types of
   indexes are returned by ``DatabaseIntrospection.get_constraints()``.
 
+* Renamed the ``ignores_quoted_identifier_case`` feature to
+  ``ignores_table_name_case`` to more accurately reflect how it is used.
+
 Dropped support for PostgreSQL 9.2 and PostGIS 2.0
 --------------------------------------------------
 
@@ -623,6 +631,8 @@ Miscellaneous
   ``get_model()``, set the ``require_ready`` argument to ``False``.
 
 * The unused ``BaseCommand.can_import_settings`` attribute is removed.
+
+* The undocumented ``django.utils.functional.lazy_property`` is removed.
 
 .. _deprecated-features-1.11:
 

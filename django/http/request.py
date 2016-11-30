@@ -554,9 +554,10 @@ def split_domain_port(host):
         # It's an IPv6 address without a port.
         return host, ''
     bits = host.rsplit(':', 1)
-    if len(bits) == 2:
-        return tuple(bits)
-    return bits[0], ''
+    domain, port = bits if len(bits) == 2 else (bits[0], '')
+    # Remove a trailing dot (if present) from the domain.
+    domain = domain[:-1] if domain.endswith('.') else domain
+    return domain, port
 
 
 def validate_host(host, allowed_hosts):
@@ -574,8 +575,6 @@ def validate_host(host, allowed_hosts):
 
     Return ``True`` for a valid host, ``False`` otherwise.
     """
-    host = host[:-1] if host.endswith('.') else host
-
     for pattern in allowed_hosts:
         if pattern == '*' or is_same_domain(host, pattern):
             return True

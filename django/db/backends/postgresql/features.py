@@ -40,3 +40,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def has_jsonb_datatype(self):
         return self.connection.pg_version >= 90400
+
+    @cached_property
+    def has_jsonb_agg(self):
+        return self.connection.pg_version >= 90500

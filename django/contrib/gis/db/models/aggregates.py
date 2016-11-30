@@ -30,9 +30,6 @@ class GeoAggregate(Aggregate):
                 raise ValueError('Geospatial aggregates only allowed on geometry fields.')
         return c
 
-    def convert_value(self, value, expression, connection, context):
-        return connection.ops.convert_geom(value, self.output_field)
-
 
 class Collect(GeoAggregate):
     name = 'Collect'

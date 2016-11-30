@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import unittest
 
 from django.utils import six
-from django.utils.functional import cached_property, lazy, lazy_property
+from django.utils.functional import cached_property, lazy
 
 
 class FunctionalTestCase(unittest.TestCase):
@@ -37,25 +37,6 @@ class FunctionalTestCase(unittest.TestCase):
 
         t = lazy(lambda: Klazz(), Base)()
         self.assertEqual(t.method(), 'Klazz')
-
-    def test_lazy_property(self):
-
-        class A(object):
-
-            def _get_do(self):
-                raise NotImplementedError
-
-            def _set_do(self, value):
-                raise NotImplementedError
-            do = lazy_property(_get_do, _set_do)
-
-        class B(A):
-            def _get_do(self):
-                return "DO IT"
-
-        with self.assertRaises(NotImplementedError):
-            A().do
-        self.assertEqual(B().do, 'DO IT')
 
     def test_lazy_object_to_string(self):
 

@@ -570,6 +570,30 @@ Daniele Procida
     .. _Coding is for Girls: https://www.youtube.com/channel/UC0hNd2uW8jTR5K3KBzRuG2A
     .. _Potato: https://p.ota.to
 
+`Adam Johnson`_
+    Adam started working with Django in 2012 on his first non-PHP website and
+    has never looked back. He has since been pushing for it to be more friendly
+    with MySQL / MariaDB, and now helps organize the London Django Meetup.
+
+    Adam hails from Cheltenham, UK and currently resides in London where he
+    works for `Time Out`_.
+
+    .. _Adam Johnson: https://adamj.eu/
+    .. _Time Out: https://www.timeout.com/
+
+`Lucie Daeye`_
+    Lucie studied Geography and Korean Studies at university. She discovered
+    Django during the very first `Django Girls`_ in 2014: she coded her first
+    first web app for her PhD research, loved it, and decided to switch career
+    to programming.
+
+    Since then, she's organized two `Django Girls workshops in Paris`_ and
+    coached at numerous events. She started working for Django Girls in
+    September 2015 and is now their `Awesomeness Ambassador`_.
+
+    .. _Lucie Daeye: https://justhiding.org/
+    .. _Django Girls workshops in Paris: https://djangogirls.org/paris/
+    .. _Awesomeness Ambassador: https://github.com/DjangoGirls/wiki/blob/master/general/ambassador.md
 
 Past team members
 =================
