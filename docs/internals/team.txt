@@ -583,16 +583,16 @@ Daniele Procida
 
 `Lucie Daeye`_
     Lucie studied Geography and Korean Studies at the university. She discovered
-    Django during the first `Django Girls`_ workshop in 2014: she coded her first
+    Django during the very first `Django Girls`_ in 2014: she coded her first
     web app for her PhD research, loved it and decided to switch career to
     programming.
 
-    Since then, she organized two `Django Girls workshops in Paris`_ and coached
+    Since then, she's organized two `Django Girls workshops in Paris`_ and coached
     at numerous events. She started working for Django Girls in September 2015
     and is now their `Awesomeness Ambassador`_.
 
     .. _Lucie Daeye: https://justhiding.org/
-    .. _Django Girls: https://djangogirls.org/
+    .. _Django Girls: https://djangogirls.org
     .. _Django Girls workshops in Paris: https://djangogirls.org/paris/
     .. _Awesomeness Ambassador: https://github.com/DjangoGirls/wiki/blob/master/general/ambassador.md
 
