@@ -16,7 +16,6 @@ from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
-from django.db.backends.oracle.base import Database
 from django.db.backends.oracle.operations import DatabaseOperations
 from django.utils import six
 
@@ -177,14 +176,6 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
             xmin, ymin = ll
             xmax, ymax = ur
             return (xmin, ymin, xmax, ymax)
-        else:
-            return None
-
-    def convert_geom(self, value, geo_field):
-        if value:
-            if isinstance(value, Database.LOB):
-                value = value.read()
-            return Geometry(value, geo_field.srid)
         else:
             return None
 

@@ -5,7 +5,6 @@ from django.contrib.gis.db.backends.base.operations import \
     BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.gdal import GDALRaster
-from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql.operations import DatabaseOperations
@@ -265,15 +264,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         xmin, ymin, zmin = map(float, ll.split())
         xmax, ymax, zmax = map(float, ur.split())
         return (xmin, ymin, zmin, xmax, ymax, zmax)
-
-    def convert_geom(self, hex, geo_field):
-        """
-        Converts the geometry returned from PostGIS aggregates.
-        """
-        if hex:
-            return Geometry(hex, srid=geo_field.srid)
-        else:
-            return None
 
     def geo_db_type(self, f):
         """
