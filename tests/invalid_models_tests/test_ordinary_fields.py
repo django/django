@@ -217,7 +217,7 @@ class CharFieldTests(TestCase):
             field = models.CharField(unique=True, max_length=256)
 
         field = Model._meta.get_field('field')
-        validator = DatabaseValidation(connection=None)
+        validator = DatabaseValidation(connection=connection)
         errors = validator.check_field(field)
         expected = [
             Error(
