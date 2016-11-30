@@ -60,6 +60,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_description(self, cursor, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
+        # user_tab_columns gives data default for columns
+        cursor.execute("""
+            SELECT column_name, data_default
+            FROM user_tab_cols
+            WHERE table_name = UPPER(%s)""", [table_name])
+        columns_default = {column: default if default != 'NULL' else None for column, default in cursor.fetchall()}
+
         self.cache_bust_counter += 1
         cursor.execute("SELECT * FROM {} WHERE ROWNUM < 2 AND {} > 0".format(
             self.connection.ops.quote_name(table_name),
@@ -67,8 +74,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         description = []
         for desc in cursor.description:
             name = force_text(desc[0])  # cx_Oracle always returns a 'str' on both Python 2 and 3
+            default = columns_default[name]
             name = name % {}  # cx_Oracle, for some reason, doubles percent signs.
-            description.append(FieldInfo(*(name.lower(),) + desc[1:]))
+            description.append(FieldInfo(*(name.lower(),) + desc[1:] + (default,)))
         return description
 
     def table_name_converter(self, name):
