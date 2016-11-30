@@ -159,6 +159,10 @@ Minor features
   :class:`~django.contrib.gis.db.models.functions.MakeValid` function, and
   :lookup:`isvalid` lookup.
 
+* Added Oracle support for the
+  :class:`~django.contrib.gis.db.models.functions.IsValid` function and
+  :lookup:`isvalid` lookup.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

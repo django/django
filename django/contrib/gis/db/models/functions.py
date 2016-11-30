@@ -285,8 +285,12 @@ class Intersection(OracleToleranceMixin, GeoFuncWithGeoParam):
     arity = 2
 
 
-class IsValid(GeoFunc):
+class IsValid(OracleToleranceMixin, GeoFunc):
     output_field_class = BooleanField
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        sql, params = super(IsValid, self).as_oracle(compiler, connection, **extra_context)
+        return "CASE %s WHEN 'TRUE' THEN 1 ELSE 0 END" % sql, params
 
 
 class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
