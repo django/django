@@ -512,6 +512,9 @@ Here are some hints about the ordering of various Django middleware classes:
    Before any view middleware that assumes that CSRF attacks have been dealt
    with.
 
+   If you are using :setting:`CSRF_USE_SESSIONS`, it must come after
+   ``SessionMiddleware``.
+
 #. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
 
    After ``SessionMiddleware``: uses session storage.
