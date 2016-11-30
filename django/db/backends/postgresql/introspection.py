@@ -1,15 +1,12 @@
 from __future__ import unicode_literals
 
 import warnings
-from collections import namedtuple
 
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
-
-FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('default',))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
