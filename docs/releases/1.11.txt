@@ -627,6 +627,8 @@ Miscellaneous
 
 * The unused ``BaseCommand.can_import_settings`` attribute is removed.
 
+* The undocumented ``django.utils.functional.lazy_property`` is removed.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
