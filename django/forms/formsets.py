@@ -87,7 +87,7 @@ class BaseFormSet(object):
     def __nonzero__(self):      # Python 2 compatibility
         return type(self).__bool__(self)
 
-    @property
+    @cached_property
     def management_form(self):
         """Returns the ManagementForm instance for this FormSet."""
         if self.is_bound:

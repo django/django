@@ -2,14 +2,15 @@
 from __future__ import unicode_literals
 
 import datetime
+from collections import Counter
 
 from django.forms import (
-    CharField, DateField, FileField, Form, IntegerField, SplitDateTimeField,
-    ValidationError, formsets,
+    BaseForm, CharField, DateField, FileField, Form, IntegerField,
+    SplitDateTimeField, ValidationError, formsets,
 )
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, mock
 from django.utils.encoding import force_text
 
 
@@ -164,6 +165,33 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = self.make_choiceformset([('Calexico', '')])
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset.errors, [{'votes': ['This field is required.']}])
+
+    def test_formset_validation_count(self):
+        """
+        ManagementForm of a FormSet is validated once per FormSet.is_valid call
+        and each form of the FormSet is cleaned once.
+        """
+        formset = self.make_choiceformset([('Calexico', '100'), ('Any1', '42'), ('Any2', '101')])
+        orig_is_valid = formsets.ManagementForm.is_valid
+        orig_full_clean = BaseForm.full_clean
+        is_valid_counter = Counter()
+        is_valid_counter.call_count = 0
+        full_clean_counter = Counter()
+        full_clean_counter.call_count = 0
+
+        def mocked_is_valid(*args, **kwargs):
+            is_valid_counter.call_count += 1
+            return orig_is_valid(*args, **kwargs)
+
+        def mocked_full_clean(*args, **kwargs):
+            full_clean_counter.call_count += 1
+            return orig_full_clean(*args, **kwargs)
+
+        with mock.patch("django.forms.formsets.ManagementForm.is_valid", mocked_is_valid):
+            with mock.patch("django.forms.forms.BaseForm.full_clean", mocked_full_clean):
+                self.assertTrue(formset.is_valid())
+                self.assertEqual(is_valid_counter.call_count, 1)
+                self.assertEqual(full_clean_counter.call_count, 4)
 
     def test_formset_has_changed(self):
         # FormSet instances has_changed method will be True if any data is
