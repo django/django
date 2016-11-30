@@ -83,9 +83,6 @@ class BaseSpatialOperations(object):
     def convert_extent3d(self, box, srid):
         raise NotImplementedError('Aggregate 3D extent not implemented for this spatial backend.')
 
-    def convert_geom(self, geom_val, geom_field):
-        raise NotImplementedError('Aggregate method not implemented for this spatial backend.')
-
     # For quoting column values, rather than columns.
     def geo_quote_name(self, name):
         return "'%s'" % name
