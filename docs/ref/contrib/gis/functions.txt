@@ -298,14 +298,14 @@ intersection between them.
 
 .. versionadded:: 1.10
 
-*Availability*: PostGIS, SpatiaLite (LWGEOM)
+*Availability*: PostGIS, Oracle, SpatiaLite (LWGEOM)
 
 Accepts a geographic field or expression and tests if the value is well formed.
 Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
 
 .. versionchanged:: 1.11
 
-    SpatiaLite support was added.
+    SpatiaLite and Oracle support was added.
 
 ``Length``
 ==========

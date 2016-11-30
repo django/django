@@ -5,7 +5,7 @@ import re
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Expression
-from django.db.models.lookups import BuiltinLookup, Lookup, Transform
+from django.db.models.lookups import Lookup, Transform
 from django.db.models.sql.query import Query
 from django.utils import six
 
@@ -352,15 +352,16 @@ class IntersectsLookup(GISLookup):
 gis_lookups['intersects'] = IntersectsLookup
 
 
-class IsValidLookup(BuiltinLookup):
+class IsValidLookup(GISLookup):
     lookup_name = 'isvalid'
+    sql_template = '%(func)s(%(lhs)s)'
 
     def as_sql(self, compiler, connection):
         if self.lhs.field.geom_type == 'RASTER':
             raise ValueError('The isvalid lookup is only available on geometry fields.')
         gis_op = connection.ops.gis_operators[self.lookup_name]
         sql, params = self.process_lhs(compiler, connection)
-        sql = '%(func)s(%(lhs)s)' % {'func': gis_op.func, 'lhs': sql}
+        sql, params = gis_op.as_sql(connection, self, {'func': gis_op.func, 'lhs': sql}, params)
         if not self.rhs:
             sql = 'NOT ' + sql
         return sql, params
