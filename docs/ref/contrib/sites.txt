@@ -330,7 +330,7 @@ your model explicitly. For example::
     from django.contrib.sites.managers import CurrentSiteManager
 
     class Photo(models.Model):
-        photo = models.FileField(upload_to='/home/photos')
+        photo = models.FileField(upload_to='photos')
         photographer_name = models.CharField(max_length=100)
         pub_date = models.DateField()
         site = models.ForeignKey(Site, on_delete=models.CASCADE)
@@ -367,7 +367,7 @@ demonstrates this::
     from django.contrib.sites.managers import CurrentSiteManager
 
     class Photo(models.Model):
-        photo = models.FileField(upload_to='/home/photos')
+        photo = models.FileField(upload_to='photos')
         photographer_name = models.CharField(max_length=100)
         pub_date = models.DateField()
         publish_on = models.ForeignKey(Site, on_delete=models.CASCADE)

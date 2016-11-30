@@ -44,7 +44,7 @@ class EmailData(models.Model):
 
 
 class FileData(models.Model):
-    data = models.FileField(null=True, upload_to='/foo/bar')
+    data = models.FileField(null=True)
 
 
 class FilePathData(models.Model):
@@ -205,7 +205,7 @@ class EmailPKData(models.Model):
     data = models.EmailField(primary_key=True)
 
 # class FilePKData(models.Model):
-#    data = models.FileField(primary_key=True, upload_to='/foo/bar')
+#    data = models.FileField(primary_key=True)
 
 
 class FilePathPKData(models.Model):
