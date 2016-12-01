@@ -116,15 +116,15 @@
             var actionSelected = $('select[name="action"]').val(),
                 itemSelected = $('table#result_list td.action-checkbox input:checked').length > 0,
                 messageList = $('div#container ul.messagelist'),  // admin base.html's message list
-                getMessageList = function () {
+                getMessageList = function() {
                     return (messageList.length) ? messageList : function() {
                         // insert in the original django admin position
                         $('<ul class="messagelist"></ul>').insertBefore('div#content');
                         messageList = $('div#container ul.messagelist');
-                        return messageList // return the list (<ul><>) instance
+                        return messageList; // return the list (<ul><>) instance
                     }();
                 },
-                skipChangeListFormSubmit = function (msg, type, replace) {
+                skipChangeListFormSubmit = function(msg, type, replace) {
                     event.preventDefault();  // skip submit
                     if (replace) {
                         // replace the message list with the new item error
@@ -137,18 +137,18 @@
                     return;
                 };
 
-            if (!actionSelected) skipChangeListFormSubmit(
-                gettext("No action selected."),
-                'warning',
-                true
-            );
-            if (!itemSelected) skipChangeListFormSubmit(
-                gettext("Items must be selected in order to perform actions on them. No items have been changed."),
-                'warning',
-                // if `actionSelected` is false, the new item error will be appended to the message list,
-                // keeping the previous item error
-                actionSelected
-            );
+            if (!actionSelected) {
+                skipChangeListFormSubmit(gettext("No action selected."), 'warning', true);
+            }
+            if (!itemSelected) {
+                skipChangeListFormSubmit(
+                    gettext("Items must be selected in order to perform actions on them. No items have been changed."),
+                    'warning',
+                    // if `actionSelected` is false, the new item error will be appended to the message list,
+                    // keeping the previous item error
+                    actionSelected
+                );
+            }
             if (list_editable_changed) {
                 return confirm(gettext("You have unsaved changes on individual editable fields. If you run an action, your unsaved changes will be lost."));
             }

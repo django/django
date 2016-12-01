@@ -16,8 +16,8 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils import formats, six
 from django.utils.deprecation import RemovedInDjango20Warning
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 from .admin import (
     BandAdmin, ChildAdmin, ChordsBandAdmin, ConcertAdmin,
