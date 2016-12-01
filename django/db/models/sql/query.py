@@ -86,7 +86,7 @@ class RawQuery(object):
         return iter(result)
 
     def __repr__(self):
-        return "<RawQuery: %s>" % self
+        return "<%s: %s>" % (self.__class__.__name__, self)
 
     @property
     def params_type(self):

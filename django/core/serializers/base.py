@@ -198,8 +198,11 @@ class DeserializedObject(object):
         self.m2m_data = m2m_data
 
     def __repr__(self):
-        return "<DeserializedObject: %s(pk=%s)>" % (
-            self.object._meta.label, self.object.pk)
+        return "<%s: %s(pk=%s)>" % (
+            self.__class__.__name__,
+            self.object._meta.label,
+            self.object.pk,
+        )
 
     def save(self, save_m2m=True, using=None, **kwargs):
         # Call save on the Model baseclass directly. This bypasses any

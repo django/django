@@ -46,7 +46,10 @@ class TranslatableFile(object):
         self.locale_dir = locale_dir
 
     def __repr__(self):
-        return "<TranslatableFile: %s>" % os.sep.join([self.dirpath, self.file])
+        return "<%s: %s>" % (
+            self.__class__.__name__,
+            os.sep.join([self.dirpath, self.file]),
+        )
 
     def __eq__(self, other):
         return self.path == other.path

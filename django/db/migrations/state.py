@@ -588,7 +588,7 @@ class ModelState(object):
         raise ValueError("No index named %s on model %s" % (name, self.name))
 
     def __repr__(self):
-        return "<ModelState: '%s.%s'>" % (self.app_label, self.name)
+        return "<%s: '%s.%s'>" % (self.__class__.__name__, self.app_label, self.name)
 
     def __eq__(self, other):
         return (
