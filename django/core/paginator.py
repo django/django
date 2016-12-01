@@ -25,12 +25,6 @@ class EmptyPage(InvalidPage):
 
 class Paginator(object):
 
-    error_messages = {
-        'page_not_an_integer': _('That page number is not an integer'),
-        'page_not_a_positive_integer': _('That page number is less than 1'),
-        'no_results': _('That page contains no results')
-    }
-
     def __init__(self, object_list, per_page, orphans=0,
                  allow_empty_first_page=True):
         self.object_list = object_list
@@ -46,14 +40,14 @@ class Paginator(object):
         try:
             number = int(number)
         except (TypeError, ValueError):
-            raise PageNotAnInteger(self.error_messages['page_not_an_integer'])
+            raise PageNotAnInteger(_('That page number is not an integer'))
         if number < 1:
-            raise EmptyPage(self.error_messages['page_not_a_positive_integer'])
+            raise EmptyPage(_('That page number is less than 1'))
         if number > self.num_pages:
             if number == 1 and self.allow_empty_first_page:
                 pass
             else:
-                raise EmptyPage(self.error_messages['no_results'])
+                raise EmptyPage(_('That page contains no results'))
         return number
 
     def page(self, number):
