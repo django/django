@@ -741,7 +741,6 @@ class ExpressionOperatorTests(TestCase):
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 40)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
-    @skipUnlessDBFeature('supports_bitwise_or')
     def test_lefthand_bitwise_or(self):
         # LH Bitwise or on integers
         Number.objects.filter(pk=self.n.pk).update(integer=F('integer').bitor(48))
