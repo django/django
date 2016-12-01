@@ -418,7 +418,7 @@ class BaseDatabaseSchemaEditor(object):
             }
             self.execute(sql)
         # Add an index, if required
-        if field.db_index and not field.unique:
+        if self._field_should_be_indexed(model, field):
             self.deferred_sql.append(self._create_index_sql(model, [field]))
         # Add any FK constraints later
         if field.remote_field and self.connection.features.supports_foreign_keys and field.db_constraint:
