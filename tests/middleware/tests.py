@@ -2,7 +2,6 @@ import gzip
 import random
 import re
 from io import BytesIO
-from unittest import skipIf
 
 from django.conf import settings
 from django.core import mail
@@ -400,24 +399,6 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         self.req.path = self.req.path_info = 'foo_url/that/does/not/exist'
         BrokenLinkEmailsMiddleware().process_response(self.req, self.resp)
         self.assertEqual(len(mail.outbox), 0)
-
-    @skipIf(six.PY3, "HTTP_REFERER is str type on Python 3")
-    def test_404_error_nonascii_referrer(self):
-        # Such referer strings should not happen, but anyway, if it happens,
-        # let's not crash
-        self.req.META['HTTP_REFERER'] = b'http://testserver/c/\xd0\xbb\xd0\xb8/'
-        BrokenLinkEmailsMiddleware().process_response(self.req, self.resp)
-        self.assertEqual(len(mail.outbox), 1)
-
-    @skipIf(six.PY3, "HTTP_USER_AGENT is str type on Python 3")
-    def test_404_error_nonascii_user_agent(self):
-        # Such user agent strings should not happen, but anyway, if it happens,
-        # let's not crash
-        self.req.META['HTTP_REFERER'] = '/another/url/'
-        self.req.META['HTTP_USER_AGENT'] = b'\xd0\xbb\xd0\xb8\xff\xff'
-        BrokenLinkEmailsMiddleware().process_response(self.req, self.resp)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('User agent: \u043b\u0438\ufffd\ufffd\n', mail.outbox[0].body)
 
     def test_custom_request_checker(self):
         class SubclassedMiddleware(BrokenLinkEmailsMiddleware):

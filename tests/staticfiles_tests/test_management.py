@@ -183,8 +183,7 @@ class TestInteractiveMessages(CollectionTestCase):
     @staticmethod
     def mock_input(stdout):
         def _input(msg):
-            # Python 2 reads bytes from the console output, use bytes for the StringIO
-            stdout.write(msg.encode('utf-8') if six.PY2 else msg)
+            stdout.write(msg)
             return 'yes'
         return _input
 

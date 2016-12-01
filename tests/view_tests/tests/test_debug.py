@@ -4,7 +4,6 @@ import os
 import re
 import sys
 import tempfile
-from unittest import skipIf
 
 from django.conf.urls import url
 from django.core import mail
@@ -29,9 +28,6 @@ from ..views import (
     sensitive_args_function_caller, sensitive_kwargs_function_caller,
     sensitive_method_view, sensitive_view,
 )
-
-if six.PY3:
-    from .py3_test_debug import Py3ExceptionReporterTests  # NOQA
 
 PY36 = sys.version_info >= (3, 6)
 
@@ -352,6 +348,34 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn('<h2>Request information</h2>', html)
         self.assertNotIn('<p>Request data not supplied</p>', html)
 
+    def test_reporting_of_nested_exceptions(self):
+        request = self.rf.get('/test_view/')
+        try:
+            try:
+                raise AttributeError('Top level')
+            except AttributeError as explicit:
+                try:
+                    raise ValueError('Second exception') from explicit
+                except ValueError:
+                    raise IndexError('Final exception')
+        except Exception:
+            # Custom exception handler, just pass it into ExceptionReporter
+            exc_type, exc_value, tb = sys.exc_info()
+
+        explicit_exc = 'The above exception ({0}) was the direct cause of the following exception:'
+        implicit_exc = 'During handling of the above exception ({0}), another exception occurred:'
+
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        # Both messages are twice on page -- one rendered as html,
+        # one as plain text (for pastebin)
+        self.assertEqual(2, html.count(explicit_exc.format("Top level")))
+        self.assertEqual(2, html.count(implicit_exc.format("Second exception")))
+
+        text = reporter.get_traceback_text()
+        self.assertIn(explicit_exc.format("Top level"), text)
+        self.assertIn(implicit_exc.format("Second exception"), text)
+
     def test_request_and_message(self):
         "A message can be provided in addition to a request"
         request = self.rf.get('/test_view/')
@@ -426,11 +450,10 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertEqual(len(html) // 1024 // 128, 0)  # still fit in 128Kb
         self.assertIn('&lt;trimmed %d bytes string&gt;' % (large + repr_of_str_adds,), html)
 
-    @skipIf(six.PY2, 'Bug manifests on PY3 only')
     def test_unfrozen_importlib(self):
         """
         importlib is not a frozen app, but its loader thinks it's frozen which
-        results in an ImportError on Python 3. Refs #21443.
+        results in an ImportError. Refs #21443.
         """
         try:
             request = self.rf.get('/test_view/')
@@ -478,10 +501,7 @@ class ExceptionReporterTests(SimpleTestCase):
         An exception report can be generated for requests with 'items' in
         request GET, POST, FILES, or COOKIES QueryDicts.
         """
-        if six.PY3:
-            value = '<td>items</td><td class="code"><pre>&#39;Oops&#39;</pre></td>'
-        else:
-            value = '<td>items</td><td class="code"><pre>u&#39;Oops&#39;</pre></td>'
+        value = '<td>items</td><td class="code"><pre>&#39;Oops&#39;</pre></td>'
         # GET
         request = self.rf.get('/test_view/?items=Oops')
         reporter = ExceptionReporter(request, None, None, None)
@@ -597,20 +617,16 @@ class PlainTextReportTests(SimpleTestCase):
         An exception report can be generated for requests with 'items' in
         request GET, POST, FILES, or COOKIES QueryDicts.
         """
-        if six.PY3:
-            value = "items = 'Oops'"
-        else:
-            value = "items = u'Oops'"
         # GET
         request = self.rf.get('/test_view/?items=Oops')
         reporter = ExceptionReporter(request, None, None, None)
         text = reporter.get_traceback_text()
-        self.assertIn(value, text)
+        self.assertIn("items = 'Oops'", text)
         # POST
         request = self.rf.post('/test_view/', data={'items': 'Oops'})
         reporter = ExceptionReporter(request, None, None, None)
         text = reporter.get_traceback_text()
-        self.assertIn(value, text)
+        self.assertIn("items = 'Oops'", text)
         # FILES
         fp = six.StringIO('filecontent')
         request = self.rf.post('/test_view/', data={'name': 'filename', 'items': fp})

@@ -510,9 +510,7 @@ class Model(six.with_metaclass(ModelBase)):
         return force_str('<%s: %s>' % (self.__class__.__name__, u))
 
     def __str__(self):
-        if six.PY2 and hasattr(self, '__unicode__'):
-            return force_text(self).encode('utf-8')
-        return str('%s object' % self.__class__.__name__)
+        return '%s object' % self.__class__.__name__
 
     def __eq__(self, other):
         if not isinstance(other, Model):

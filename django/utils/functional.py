@@ -92,16 +92,9 @@ def lazy(func, *resultclasses):
             assert not (cls._delegate_bytes and cls._delegate_text), (
                 "Cannot call lazy() with both bytes and text return types.")
             if cls._delegate_text:
-                if six.PY3:
-                    cls.__str__ = cls.__text_cast
-                else:
-                    cls.__unicode__ = cls.__text_cast
-                    cls.__str__ = cls.__bytes_cast_encoded
+                cls.__str__ = cls.__text_cast
             elif cls._delegate_bytes:
-                if six.PY3:
-                    cls.__bytes__ = cls.__bytes_cast
-                else:
-                    cls.__str__ = cls.__bytes_cast
+                cls.__bytes__ = cls.__bytes_cast
 
         @classmethod
         def __promise__(cls, method_name):
@@ -154,9 +147,7 @@ def lazy(func, *resultclasses):
             return hash(self.__cast())
 
         def __mod__(self, rhs):
-            if self._delegate_bytes and six.PY2:
-                return bytes(self) % rhs
-            elif self._delegate_text:
+            if self._delegate_text:
                 return six.text_type(self) % rhs
             return self.__cast() % rhs
 
@@ -316,14 +307,9 @@ class LazyObject(object):
             return result
         return copy.deepcopy(self._wrapped, memo)
 
-    if six.PY3:
-        __bytes__ = new_method_proxy(bytes)
-        __str__ = new_method_proxy(str)
-        __bool__ = new_method_proxy(bool)
-    else:
-        __str__ = new_method_proxy(str)
-        __unicode__ = new_method_proxy(unicode)  # NOQA: unicode undefined on PY3
-        __nonzero__ = new_method_proxy(bool)
+    __bytes__ = new_method_proxy(bytes)
+    __str__ = new_method_proxy(str)
+    __bool__ = new_method_proxy(bool)
 
     # Introspection support
     __dir__ = new_method_proxy(dir)

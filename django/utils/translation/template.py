@@ -5,7 +5,6 @@ from django.template.base import (
     TOKEN_BLOCK, TOKEN_COMMENT, TOKEN_TEXT, TOKEN_VAR, TRANSLATOR_COMMENT_MARK,
     Lexer,
 )
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.six import StringIO
 
@@ -57,7 +56,7 @@ def templatize(src, origin=None, charset='utf-8'):
     comment_lineno_cache = None
     # Adding the u prefix allows gettext to recognize the Unicode string
     # (#26093).
-    raw_prefix = 'u' if six.PY3 else ''
+    raw_prefix = 'u'
 
     def join_tokens(tokens, trim=False):
         message = ''.join(tokens)

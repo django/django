@@ -12,7 +12,7 @@ from django.core.management.commands.makemessages import \
 from django.core.management.utils import find_command
 from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import captured_stderr, captured_stdout
-from django.utils import six, translation
+from django.utils import translation
 from django.utils.encoding import force_text
 from django.utils.six import StringIO
 from django.utils.translation import ugettext
@@ -144,18 +144,11 @@ class CompilationErrorHandling(MessageCompilationTests):
         env = os.environ.copy()
         env.update({str('LANG'): str('C')})
         with mock.patch('django.core.management.utils.Popen', lambda *args, **kwargs: Popen(*args, env=env, **kwargs)):
-            if six.PY2:
-                # Various assertRaises on PY2 don't support unicode error messages.
-                try:
-                    call_command('compilemessages', locale=['ko'], verbosity=0)
-                except CommandError as err:
-                    self.assertIn("' cannot start a field name", six.text_type(err))
-            else:
-                cmd = MakeMessagesCommand()
-                if cmd.gettext_version < (0, 18, 3):
-                    self.skipTest("python-brace-format is a recent gettext addition.")
-                with self.assertRaisesMessage(CommandError, "' cannot start a field name"):
-                    call_command('compilemessages', locale=['ko'], verbosity=0)
+            cmd = MakeMessagesCommand()
+            if cmd.gettext_version < (0, 18, 3):
+                self.skipTest("python-brace-format is a recent gettext addition.")
+            with self.assertRaisesMessage(CommandError, "' cannot start a field name"):
+                call_command('compilemessages', locale=['ko'], verbosity=0)
 
 
 class ProjectAndAppTests(MessageCompilationTests):

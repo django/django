@@ -322,10 +322,10 @@ class RequestFactory(object):
         if parsed[3]:
             path += str(";") + force_str(parsed[3])
         path = uri_to_iri(path).encode(UTF_8)
-        # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
-        # decoded with ISO-8859-1. We replicate this behavior here.
+        # Replace the behavior where non-ASCII values in the WSGI environ are
+        # arbitrarily decoded with ISO-8859-1.
         # Refs comment in `get_bytes_from_wsgi()`.
-        return path.decode(ISO_8859_1) if six.PY3 else path
+        return path.decode(ISO_8859_1)
 
     def get(self, path, data=None, secure=False, **extra):
         "Construct a GET request."
@@ -406,10 +406,8 @@ class RequestFactory(object):
         r.update(extra)
         # If QUERY_STRING is absent or empty, we want to extract it from the URL.
         if not r.get('QUERY_STRING'):
-            query_string = force_bytes(parsed[4])
             # WSGI requires latin-1 encoded strings. See get_path_info().
-            if six.PY3:
-                query_string = query_string.decode('iso-8859-1')
+            query_string = force_bytes(parsed[4]).decode('iso-8859-1')
             r['QUERY_STRING'] = query_string
         return self.request(**r)
 

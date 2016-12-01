@@ -11,7 +11,6 @@ from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import NothingNode, WhereNode
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
-from django.utils import six
 from django.utils.six.moves import range
 
 from .models import (
@@ -406,7 +405,7 @@ class Queries1Tests(TestCase):
         local_recursion_limit = 127
         msg = 'Maximum recursion depth exceeded: too many subqueries.'
         with self.assertRaisesMessage(RuntimeError, msg):
-            for i in six.moves.range(local_recursion_limit * 2):
+            for i in range(local_recursion_limit * 2):
                 x = Tag.objects.filter(pk__in=x)
 
     def test_reasonable_number_of_subq_aliases(self):
@@ -2249,25 +2248,6 @@ class QuerySetSupportsPythonIdioms(TestCase):
             ]
         )
 
-    @unittest.skipUnless(six.PY2, "Python 2 only -- Python 3 doesn't have longs.")
-    def test_slicing_works_with_longs(self):
-        # NOQA: long undefined on PY3
-        self.assertEqual(self.get_ordered_articles()[long(0)].name, 'Article 1')  # NOQA
-        self.assertQuerysetEqual(self.get_ordered_articles()[long(1):long(3)],  # NOQA
-            ["<Article: Article 2>", "<Article: Article 3>"])
-        self.assertQuerysetEqual(
-            self.get_ordered_articles()[::long(2)], [  # NOQA
-                "<Article: Article 1>",
-                "<Article: Article 3>",
-                "<Article: Article 5>",
-                "<Article: Article 7>"
-            ]
-        )
-
-        # And can be mixed with ints.
-        self.assertQuerysetEqual(self.get_ordered_articles()[1:long(3)],  # NOQA
-            ["<Article: Article 2>", "<Article: Article 3>"])
-
     def test_slicing_without_step_is_lazy(self):
         with self.assertNumQueries(0):
             self.get_ordered_articles()[0:5]
@@ -2965,8 +2945,6 @@ class QuerySetExceptionTests(TestCase):
 
     def test_invalid_order_by(self):
         msg = "Invalid order_by arguments: ['*']"
-        if six.PY2:
-            msg = msg.replace("[", "[u")
         with self.assertRaisesMessage(FieldError, msg):
             list(Article.objects.order_by('*'))
 

@@ -1,13 +1,12 @@
 import datetime
-import unittest
 from decimal import Decimal
 
 from django.db.models.fields import (
-    AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
-    DateField, DateTimeField, DecimalField, EmailField, FilePathField,
-    FloatField, GenericIPAddressField, IntegerField, IPAddressField,
-    NullBooleanField, PositiveIntegerField, PositiveSmallIntegerField,
-    SlugField, SmallIntegerField, TextField, TimeField, URLField,
+    AutoField, BinaryField, BooleanField, CharField, DateField, DateTimeField,
+    DecimalField, EmailField, FilePathField, FloatField, GenericIPAddressField,
+    IntegerField, IPAddressField, NullBooleanField, PositiveIntegerField,
+    PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
+    TimeField, URLField,
 )
 from django.db.models.fields.files import FileField, ImageField
 from django.test import SimpleTestCase
@@ -20,11 +19,6 @@ class PromiseTest(SimpleTestCase):
     def test_AutoField(self):
         lazy_func = lazy(lambda: 1, int)
         self.assertIsInstance(AutoField(primary_key=True).get_prep_value(lazy_func()), int)
-
-    @unittest.skipIf(six.PY3, 'Python 3 has no `long` type.')
-    def test_BigIntegerField(self):
-        lazy_func = lazy(lambda: long(9999999999999999999), long)  # NOQA: long undefined on PY3
-        self.assertIsInstance(BigIntegerField().get_prep_value(lazy_func()), long)  # NOQA
 
     def test_BinaryField(self):
         lazy_func = lazy(lambda: b'', bytes)

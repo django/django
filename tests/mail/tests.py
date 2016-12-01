@@ -8,8 +8,10 @@ import socket
 import sys
 import tempfile
 import threading
+from email import message_from_binary_file, message_from_bytes
 from email.header import Header
 from email.mime.text import MIMEText
+from email.utils import parseaddr
 from smtplib import SMTP, SMTPAuthenticationError, SMTPException
 from ssl import SSLError
 
@@ -24,18 +26,8 @@ from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.utils._os import upath
 from django.utils.encoding import force_bytes, force_text
-from django.utils.six import PY3, StringIO, binary_type
+from django.utils.six import StringIO, binary_type
 from django.utils.translation import ugettext_lazy
-
-if PY3:
-    from email.utils import parseaddr
-    from email import message_from_bytes, message_from_binary_file
-else:
-    from email.Utils import parseaddr
-    from email import (
-        message_from_string as message_from_bytes,
-        message_from_file as message_from_binary_file,
-    )
 
 
 class HeadersCheckMixin(object):
@@ -656,16 +648,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             sanitize_address(('A name', 'to@example.com'), 'ascii'),
             'A name <to@example.com>'
         )
-        if PY3:
-            self.assertEqual(
-                sanitize_address(('A name', 'to@example.com'), 'utf-8'),
-                '=?utf-8?q?A_name?= <to@example.com>'
-            )
-        else:
-            self.assertEqual(
-                sanitize_address(('A name', 'to@example.com'), 'utf-8'),
-                'A name <to@example.com>'
-            )
+        self.assertEqual(
+            sanitize_address(('A name', 'to@example.com'), 'utf-8'),
+            '=?utf-8?q?A_name?= <to@example.com>'
+        )
 
         # Unicode characters are are supported in RFC-6532.
         self.assertEqual(
@@ -1165,18 +1151,8 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         self.active_lock = threading.Lock()
         self.sink_lock = threading.Lock()
 
-    if not PY3:
-        def handle_accept(self):
-            # copy of Python 2.7 smtpd.SMTPServer.handle_accept with hardcoded
-            # SMTPChannel replaced by self.channel_class
-            pair = self.accept()
-            if pair is not None:
-                conn, addr = pair
-                self.channel_class(self, conn, addr)
-
     def process_message(self, peer, mailfrom, rcpttos, data):
-        if PY3:
-            data = data.encode('utf-8')
+        data = data.encode('utf-8')
         m = message_from_bytes(data)
         maddr = parseaddr(m.get('from'))[1]
 
@@ -1448,8 +1424,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
             self.assertTrue(msg)
 
-            if PY3:
-                msg = msg.decode('utf-8')
+            msg = msg.decode('utf-8')
             # The message only contains CRLF and not combinations of CRLF, LF, and CR.
             msg = msg.replace('\r\n', '')
             self.assertNotIn('\r', msg)

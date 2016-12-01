@@ -19,7 +19,6 @@ from django.utils.dateparse import (
     parse_date, parse_datetime, parse_duration, parse_time,
 )
 from django.utils.encoding import force_text
-from django.utils.safestring import SafeBytes
 
 try:
     try:
@@ -55,9 +54,6 @@ Database.register_converter(str("TIMESTAMP"), decoder(parse_datetime))
 Database.register_converter(str("decimal"), decoder(backend_utils.typecast_decimal))
 
 Database.register_adapter(decimal.Decimal, backend_utils.rev_typecast_decimal)
-if six.PY2:
-    Database.register_adapter(str, lambda s: s.decode('utf-8'))
-    Database.register_adapter(SafeBytes, lambda s: s.decode('utf-8'))
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):

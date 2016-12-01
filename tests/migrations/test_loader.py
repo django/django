@@ -1,5 +1,3 @@
-from unittest import skipIf
-
 from django.db import connection, connections
 from django.db.migrations.exceptions import (
     AmbiguityError, InconsistentMigrationHistory, NodeNotFoundError,
@@ -7,7 +5,6 @@ from django.db.migrations.exceptions import (
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, modify_settings, override_settings
-from django.utils import six
 
 
 class RecorderTests(TestCase):
@@ -170,7 +167,6 @@ class LoaderTests(TestCase):
                 "App with migrations module file not in unmigrated apps."
             )
 
-    @skipIf(six.PY2, "PY2 doesn't load empty dirs.")
     def test_load_empty_dir(self):
         with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.namespace"}):
             loader = MigrationLoader(connection)

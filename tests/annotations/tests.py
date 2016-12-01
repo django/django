@@ -8,7 +8,6 @@ from django.db.models import (
 )
 from django.db.models.functions import Lower
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils import six
 
 from .models import (
     Author, Book, Company, DepartmentStore, Employee, Publisher, Store, Ticket,
@@ -24,7 +23,7 @@ def cxOracle_py3_bug(func):
     """
     from unittest import expectedFailure
     from django.db import connection
-    return expectedFailure(func) if connection.vendor == 'oracle' and six.PY3 else func
+    return expectedFailure(func) if connection.vendor == 'oracle' else func
 
 
 class NonAggregateAnnotationTestCase(TestCase):

@@ -12,7 +12,6 @@ from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
 from django.test.utils import freeze_time, str_prefix
-from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.http import cookie_date, urlencode
 from django.utils.six.moves import http_cookies
@@ -168,9 +167,8 @@ class RequestsTests(SimpleTestCase):
 
     def test_wsgirequest_path_info(self):
         def wsgi_str(path_info, encoding='utf-8'):
-            path_info = path_info.encode(encoding)           # Actual URL sent by the browser (bytestring)
-            if six.PY3:
-                path_info = path_info.decode('iso-8859-1')  # Value in the WSGI environ dict (native string)
+            path_info = path_info.encode(encoding)  # Actual URL sent by the browser (bytestring)
+            path_info = path_info.decode('iso-8859-1')  # Value in the WSGI environ dict (native string)
             return path_info
         # Regression for #19468
         request = WSGIRequest({'PATH_INFO': wsgi_str("/سلام/"), 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
@@ -583,7 +581,7 @@ class RequestsTests(SimpleTestCase):
         request = WSGIRequest({
             'REQUEST_METHOD': 'GET',
             'wsgi.input': '',
-            'QUERY_STRING': b'name=Hello%20G%C3%BCnter' if six.PY2 else 'name=Hello%20G%C3%BCnter'
+            'QUERY_STRING': 'name=Hello%20G%C3%BCnter',
         })
         self.assertEqual(request.GET, {'name': ['Hello Günter']})
         request.encoding = 'iso-8859-16'

@@ -14,7 +14,7 @@ DEFAULT_DB_ALIAS = 'default'
 DJANGO_VERSION_PICKLE_KEY = '_django_version'
 
 
-class Error(Exception if six.PY3 else StandardError):  # NOQA: StandardError undefined on PY3
+class Error(Exception):
     pass
 
 

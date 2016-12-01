@@ -1,10 +1,8 @@
 import datetime
 import pickle
-import unittest
 
 from django.db import models
 from django.test import TestCase
-from django.utils import six
 from django.utils.version import get_version
 
 from .models import Container, Event, Group, Happening, M2MModel
@@ -33,7 +31,6 @@ class PickleabilityTestCase(TestCase):
     def test_standalone_method_as_default(self):
         self.assert_pickles(Happening.objects.filter(number1=1))
 
-    @unittest.skipIf(six.PY2, "Field doesn't exist on Python 2.")
     def test_staticmethod_as_default(self):
         self.assert_pickles(Happening.objects.filter(number2=1))
 

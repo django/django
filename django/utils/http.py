@@ -189,12 +189,7 @@ def base36_to_int(s):
     # is sufficient to base36-encode any 64-bit integer)
     if len(s) > 13:
         raise ValueError("Base36 input too large")
-    value = int(s, 36)
-    # ... then do a final check that the value will fit into an int to avoid
-    # returning a long (#15067). The long type was removed in Python 3.
-    if six.PY2 and value > sys.maxint:
-        raise ValueError("Base36 input too large")
-    return value
+    return int(s, 36)
 
 
 def int_to_base36(i):
@@ -204,11 +199,6 @@ def int_to_base36(i):
     char_set = '0123456789abcdefghijklmnopqrstuvwxyz'
     if i < 0:
         raise ValueError("Negative base36 conversion input.")
-    if six.PY2:
-        if not isinstance(i, six.integer_types):
-            raise TypeError("Non-integer base36 conversion input.")
-        if i > sys.maxint:
-            raise ValueError("Base36 conversion input too large.")
     if i < 36:
         return char_set[i]
     b36 = ''
@@ -296,11 +286,6 @@ def is_safe_url(url, host=None, allowed_hosts=None, require_https=False):
         url = url.strip()
     if not url:
         return False
-    if six.PY2:
-        try:
-            url = force_text(url)
-        except UnicodeDecodeError:
-            return False
     if allowed_hosts is None:
         allowed_hosts = set()
     if host:
@@ -388,13 +373,9 @@ def limited_parse_qsl(qs, keep_blank_values=False, encoding='utf-8',
             else:
                 continue
         if len(nv[1]) or keep_blank_values:
-            if six.PY3:
-                name = nv[0].replace('+', ' ')
-                name = unquote(name, encoding=encoding, errors=errors)
-                value = nv[1].replace('+', ' ')
-                value = unquote(value, encoding=encoding, errors=errors)
-            else:
-                name = unquote(nv[0].replace(b'+', b' '))
-                value = unquote(nv[1].replace(b'+', b' '))
+            name = nv[0].replace('+', ' ')
+            name = unquote(name, encoding=encoding, errors=errors)
+            value = nv[1].replace('+', ' ')
+            value = unquote(value, encoding=encoding, errors=errors)
             r.append((name, value))
     return r

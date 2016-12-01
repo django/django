@@ -55,8 +55,6 @@ class QueryDictTests(SimpleTestCase):
     def test_immutable_basic_operations(self):
         q = QueryDict()
         self.assertEqual(q.getlist('foo'), [])
-        if six.PY2:
-            self.assertIs(q.has_key('foo'), False)
         self.assertNotIn('foo', q)
         self.assertEqual(list(six.iteritems(q)), [])
         self.assertEqual(list(six.iterlists(q)), [])
@@ -85,11 +83,7 @@ class QueryDictTests(SimpleTestCase):
         with self.assertRaises(AttributeError):
             q.appendlist('foo', ['bar'])
 
-        if six.PY2:
-            self.assertTrue(q.has_key('foo'))
         self.assertIn('foo', q)
-        if six.PY2:
-            self.assertFalse(q.has_key('bar'))
         self.assertNotIn('bar', q)
 
         self.assertEqual(list(six.iteritems(q)), [('foo', 'bar')])
@@ -150,8 +144,6 @@ class QueryDictTests(SimpleTestCase):
         q.appendlist('foo', 'another')
         self.assertEqual(q.getlist('foo'), ['bar', 'baz', 'another'])
         self.assertEqual(q['foo'], 'another')
-        if six.PY2:
-            self.assertTrue(q.has_key('foo'))
         self.assertIn('foo', q)
 
         self.assertListEqual(sorted(six.iteritems(q)),
@@ -199,11 +191,7 @@ class QueryDictTests(SimpleTestCase):
         with self.assertRaises(AttributeError):
             q.appendlist('foo', ['bar'])
 
-        if six.PY2:
-            self.assertIs(q.has_key('vote'), True)
         self.assertIn('vote', q)
-        if six.PY2:
-            self.assertIs(q.has_key('foo'), False)
         self.assertNotIn('foo', q)
         self.assertEqual(list(six.iteritems(q)), [('vote', 'no')])
         self.assertEqual(list(six.iterlists(q)), [('vote', ['yes', 'no'])])
@@ -223,19 +211,6 @@ class QueryDictTests(SimpleTestCase):
             q.setdefault('foo', 'bar')
         with self.assertRaises(AttributeError):
             q.__delitem__('vote')
-
-    if six.PY2:
-        def test_invalid_input_encoding(self):
-            """
-            QueryDicts must be able to handle invalid input encoding (in this
-            case, bad UTF-8 encoding), falling back to ISO-8859-1 decoding.
-
-            This test doesn't apply under Python 3 because the URL is a string
-            and not a bytestring.
-            """
-            q = QueryDict(str(b'foo=bar&foo=\xff'))
-            self.assertEqual(q['foo'], '\xff')
-            self.assertEqual(q.getlist('foo'), ['bar', '\xff'])
 
     def test_pickle(self):
         q = QueryDict()
@@ -806,15 +781,6 @@ class CookieTests(unittest.TestCase):
         c = SimpleCookie()
         c.load({'name': 'val'})
         self.assertEqual(c['name'].value, 'val')
-
-    @unittest.skipUnless(six.PY2, "PY3 throws an exception on invalid cookie keys.")
-    def test_bad_cookie(self):
-        """
-        Regression test for #18403
-        """
-        r = HttpResponse()
-        r.set_cookie("a:.b/", 1)
-        self.assertEqual(len(r.cookies.bad_cookies), 1)
 
     def test_pickle(self):
         rawdata = 'Customer="WILE_E_COYOTE"; Path=/acme; Version=1'

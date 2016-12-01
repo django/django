@@ -181,10 +181,7 @@ class ContentFileTestCase(unittest.TestCase):
         retrieved content is of the same type.
         """
         self.assertIsInstance(ContentFile(b"content").read(), bytes)
-        if six.PY3:
-            self.assertIsInstance(ContentFile("español").read(), six.text_type)
-        else:
-            self.assertIsInstance(ContentFile("español").read(), bytes)
+        self.assertIsInstance(ContentFile("español").read(), six.text_type)
 
 
 class DimensionClosingBug(unittest.TestCase):

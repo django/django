@@ -32,9 +32,6 @@ def mock_inputs(inputs):
             class mock_getpass:
                 @staticmethod
                 def getpass(prompt=b'Password: ', stream=None):
-                    if six.PY2:
-                        # getpass on Windows only supports prompt as bytestring (#19807)
-                        assert isinstance(prompt, six.binary_type)
                     if callable(inputs['password']):
                         return inputs['password']()
                     return inputs['password']

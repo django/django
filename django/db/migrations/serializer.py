@@ -53,11 +53,7 @@ class BaseSimpleSerializer(BaseSerializer):
 
 class ByteTypeSerializer(BaseSerializer):
     def serialize(self):
-        value_repr = repr(self.value)
-        if six.PY2:
-            # Prepend the `b` prefix since we're importing unicode_literals
-            value_repr = 'b' + value_repr
-        return value_repr, set()
+        return repr(self.value), set()
 
 
 class DatetimeSerializer(BaseSerializer):
@@ -276,11 +272,7 @@ class SettingsReferenceSerializer(BaseSerializer):
 
 class TextTypeSerializer(BaseSerializer):
     def serialize(self):
-        value_repr = repr(self.value)
-        if six.PY2:
-            # Strip the `u` prefix since we're importing unicode_literals
-            value_repr = value_repr[1:]
-        return value_repr, set()
+        return repr(self.value), set()
 
 
 class TimedeltaSerializer(BaseSerializer):

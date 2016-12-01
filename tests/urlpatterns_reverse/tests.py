@@ -3,7 +3,6 @@ Unit tests for reverse URL lookups.
 """
 import sys
 import threading
-import unittest
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -430,7 +429,7 @@ class ResolverTests(SimpleTestCase):
             [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': None}],
             [{'type': RegexURLResolver}, {'type': RegexURLResolver}],
         ]
-        with self.assertRaisesMessage(Resolver404, b'tried' if six.PY2 else 'tried') as cm:
+        with self.assertRaisesMessage(Resolver404, 'tried') as cm:
             resolve('/included/non-existent-url', urlconf=urls)
         e = cm.exception
         # make sure we at least matched the root ('/') url resolver:
@@ -463,7 +462,6 @@ class ResolverTests(SimpleTestCase):
         self.assertTrue(resolver._is_callback('urlpatterns_reverse.nested_urls.View3'))
         self.assertFalse(resolver._is_callback('urlpatterns_reverse.nested_urls.blub'))
 
-    @unittest.skipIf(six.PY2, "Python 2 doesn't support __qualname__.")
     def test_view_detail_as_method(self):
         # Views which have a class name as part of their path.
         resolver = get_resolver('urlpatterns_reverse.method_view_urls')
@@ -503,11 +501,6 @@ class ReverseLazyTest(TestCase):
             'Some URL: %s' % reverse_lazy('some-login-page'),
             'Some URL: /login/'
         )
-        if six.PY2:
-            self.assertEqual(
-                b'Some URL: %s' % reverse_lazy('some-login-page'),
-                'Some URL: /login/'
-            )
 
 
 class ReverseLazySettingsTest(AdminScriptTestCase):

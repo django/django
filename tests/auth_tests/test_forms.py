@@ -1,6 +1,5 @@
 import datetime
 import re
-from unittest import skipIf
 
 from django import forms
 from django.contrib.auth.forms import (
@@ -15,7 +14,7 @@ from django.core import mail
 from django.core.mail import EmailMultiAlternatives
 from django.forms.fields import CharField, Field, IntegerField
 from django.test import SimpleTestCase, TestCase, mock, override_settings
-from django.utils import six, translation
+from django.utils import translation
 from django.utils.encoding import force_text
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
@@ -114,14 +113,10 @@ class UserCreationFormTest(TestDataMixin, TestCase):
             'password2': 'test123',
         }
         form = UserCreationForm(data)
-        if six.PY3:
-            self.assertTrue(form.is_valid())
-            u = form.save()
-            self.assertEqual(u.username, '宝')
-        else:
-            self.assertFalse(form.is_valid())
+        self.assertTrue(form.is_valid())
+        u = form.save()
+        self.assertEqual(u.username, '宝')
 
-    @skipIf(six.PY2, "Python 2 doesn't support unicode usernames by default.")
     def test_normalize_username(self):
         # The normalization happens in AbstractBaseUser.clean() and ModelForm
         # validation calls Model.clean().
@@ -137,7 +132,6 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         self.assertNotEqual(user.username, ohm_username)
         self.assertEqual(user.username, 'testΩ')  # U+03A9 GREEK CAPITAL LETTER OMEGA
 
-    @skipIf(six.PY2, "Python 2 doesn't support unicode usernames by default.")
     def test_duplicate_normalized_unicode(self):
         """
         To prevent almost identical usernames, visually identical but differing

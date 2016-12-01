@@ -15,7 +15,6 @@ from django.db import models
 from django.http import Http404
 from django.template.engine import Engine
 from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
-from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.inspect import (
     func_accepts_kwargs, func_accepts_var_args, func_has_no_args,
@@ -132,12 +131,7 @@ class ViewIndexView(BaseAdminDocsView):
     @staticmethod
     def _get_full_name(func):
         mod_name = func.__module__
-        if six.PY3:
-            return '%s.%s' % (mod_name, func.__qualname__)
-        else:
-            # PY2 does not support __qualname__
-            func_name = getattr(func, '__name__', func.__class__.__name__)
-            return '%s.%s' % (mod_name, func_name)
+        return '%s.%s' % (mod_name, func.__qualname__)
 
     def get_context_data(self, **kwargs):
         views = []

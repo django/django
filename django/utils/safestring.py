@@ -83,12 +83,7 @@ class SafeText(six.text_type, SafeData):
     encode = curry(_proxy_method, method=six.text_type.encode)
 
 
-if six.PY3:
-    SafeString = SafeText
-else:
-    SafeString = SafeBytes
-    # backwards compatibility for Python 2
-    SafeUnicode = SafeText
+SafeString = SafeText
 
 
 def _safety_decorator(safety_marker, func):

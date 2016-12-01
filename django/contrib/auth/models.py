@@ -9,7 +9,7 @@ from django.db.models.manager import EmptyManager
 from django.utils import six, timezone
 from django.utils.translation import ugettext_lazy as _
 
-from .validators import ASCIIUsernameValidator, UnicodeUsernameValidator
+from .validators import UnicodeUsernameValidator
 
 
 def update_last_login(sender, user, **kwargs):
@@ -297,7 +297,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
     Username and password are required. Other fields are optional.
     """
-    username_validator = UnicodeUsernameValidator() if six.PY3 else ASCIIUsernameValidator()
+    username_validator = UnicodeUsernameValidator()
 
     username = models.CharField(
         _('username'),

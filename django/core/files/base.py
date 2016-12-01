@@ -3,7 +3,7 @@ from io import BytesIO, StringIO, UnsupportedOperation
 
 from django.core.files.utils import FileProxyMixin
 from django.utils import six
-from django.utils.encoding import force_bytes, force_str, force_text
+from django.utils.encoding import force_str, force_text
 
 
 class File(FileProxyMixin):
@@ -140,11 +140,7 @@ class ContentFile(File):
     A File-like object that takes just raw content, rather than an actual file.
     """
     def __init__(self, content, name=None):
-        if six.PY3:
-            stream_class = StringIO if isinstance(content, six.text_type) else BytesIO
-        else:
-            stream_class = BytesIO
-            content = force_bytes(content)
+        stream_class = StringIO if isinstance(content, six.text_type) else BytesIO
         super(ContentFile, self).__init__(stream_class(content), name=name)
         self.size = len(content)
 

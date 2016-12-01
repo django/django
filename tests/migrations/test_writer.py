@@ -47,12 +47,6 @@ class Money(decimal.Decimal):
         )
 
 
-class TestModel1(object):
-    def upload_to(self):
-        return "somewhere dynamic"
-    thing = models.FileField(upload_to=upload_to)
-
-
 class OperationWriterTests(SimpleTestCase):
 
     def test_empty_signature(self):
@@ -485,15 +479,6 @@ class WriterTests(SimpleTestCase):
         string, imports = MigrationWriter.serialize(range)
         self.assertEqual(string, 'range')
         self.assertEqual(imports, set())
-
-    @unittest.skipUnless(six.PY2, "Only applies on Python 2")
-    def test_serialize_direct_function_reference(self):
-        """
-        Ticket #22436: You cannot use a function straight from its body
-        (e.g. define the method and use it in the same body)
-        """
-        with self.assertRaises(ValueError):
-            self.serialize_round_trip(TestModel1.thing)
 
     def test_serialize_local_function_reference(self):
         """

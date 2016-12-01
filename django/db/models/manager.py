@@ -4,7 +4,6 @@ from importlib import import_module
 
 from django.db import router
 from django.db.models.query import QuerySet
-from django.utils import six
 
 
 class BaseManager(object):
@@ -86,9 +85,7 @@ class BaseManager(object):
             return manager_method
 
         new_methods = {}
-        # Refs http://bugs.python.org/issue1785.
-        predicate = inspect.isfunction if six.PY3 else inspect.ismethod
-        for name, method in inspect.getmembers(queryset_class, predicate=predicate):
+        for name, method in inspect.getmembers(queryset_class, predicate=inspect.isfunction):
             # Only copy missing methods.
             if hasattr(cls, name):
                 continue

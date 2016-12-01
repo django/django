@@ -9,7 +9,7 @@ from django.core.signals import setting_changed
 from django.db import connections, router
 from django.db.utils import ConnectionRouter
 from django.dispatch import Signal, receiver
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.formats import FORMAT_SETTINGS, reset_format_cache
 from django.utils.functional import empty
 
@@ -139,7 +139,7 @@ def complex_setting_changed(**kwargs):
         # Considering the current implementation of the signals framework,
         # this stacklevel shows the line containing the override_settings call.
         warnings.warn("Overriding setting %s can lead to unexpected behavior."
-                      % kwargs['setting'], stacklevel=5 if six.PY2 else 6)
+                      % kwargs['setting'], stacklevel=6)
 
 
 @receiver(setting_changed)

@@ -7,7 +7,6 @@ from contextlib import contextmanager
 from django.template import TemplateDoesNotExist
 from django.template.engine import Engine
 from django.test import SimpleTestCase, override_settings
-from django.utils import six
 from django.utils.functional import lazystr
 
 from .utils import TEMPLATE_DIR
@@ -64,7 +63,6 @@ class CachedLoaderTests(SimpleTestCase):
         self.assertIsInstance(e, TemplateDoesNotExist)
         self.assertEqual(e.args[0], 'debug-template-missing.html')
 
-    @unittest.skipIf(six.PY2, "Python 2 doesn't set extra exception attributes")
     def test_cached_exception_no_traceback(self):
         """
         When a TemplateDoesNotExist instance is cached, the cached instance

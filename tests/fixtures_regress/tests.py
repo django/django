@@ -2,10 +2,8 @@
 import json
 import os
 import re
-import unittest
 import warnings
 
-import django
 from django.core import management, serializers
 from django.core.exceptions import ImproperlyConfigured
 from django.core.serializers.base import DeserializationError
@@ -15,9 +13,8 @@ from django.test import (
     TestCase, TransactionTestCase, override_settings, skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.utils import six
 from django.utils._os import upath
-from django.utils.six import PY3, StringIO
+from django.utils.six import StringIO
 
 from .models import (
     Absolute, Animal, Article, Book, Child, Circle1, Circle2, Circle3,
@@ -30,16 +27,6 @@ from .models import (
 )
 
 _cur_dir = os.path.dirname(os.path.abspath(upath(__file__)))
-
-
-def is_ascii(s):
-    return all(ord(c) < 128 for c in s)
-
-
-skipIfNonASCIIPath = unittest.skipIf(
-    not is_ascii(django.__file__) and six.PY2,
-    'Python 2 crashes when checking non-ASCII exception messages.'
-)
 
 
 class TestFixtures(TestCase):
@@ -205,7 +192,6 @@ class TestFixtures(TestCase):
                 verbosity=0,
             )
 
-    @skipIfNonASCIIPath
     @override_settings(SERIALIZATION_MODULES={'unkn': 'unexistent.path'})
     def test_unimportable_serializer(self):
         """
@@ -350,8 +336,8 @@ class TestFixtures(TestCase):
             self.assertEqual(
                 self.pre_save_checks,
                 [
-                    ("Count = 42 (<%s 'int'>)" % ('class' if PY3 else 'type'),
-                     "Weight = 1.2 (<%s 'float'>)" % ('class' if PY3 else 'type'))
+                    ("Count = 42 (<class 'int'>)",
+                     "Weight = 1.2 (<class 'float'>)")
                 ]
             )
         finally:
@@ -531,7 +517,6 @@ class TestFixtures(TestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, "settings.FIXTURE_DIRS contains duplicates."):
             management.call_command('loaddata', 'absolute.json', verbosity=0)
 
-    @skipIfNonASCIIPath
     @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures')])
     def test_fixture_dirs_with_default_fixture_path(self):
         """

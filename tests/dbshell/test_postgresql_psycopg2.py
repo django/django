@@ -3,7 +3,6 @@ import os
 
 from django.db.backends.postgresql.client import DatabaseClient
 from django.test import SimpleTestCase, mock
-from django.utils import six
 from django.utils.encoding import force_bytes, force_str
 
 
@@ -91,16 +90,12 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
         encoding = locale.getpreferredencoding()
         username = 'rôle'
         password = 'sésame'
-        try:
-            username_str = force_str(username, encoding)
-            password_str = force_str(password, encoding)
-            pgpass_bytes = force_bytes(
-                'somehost:444:dbname:%s:%s' % (username, password),
-                encoding=encoding,
-            )
-        except UnicodeEncodeError:
-            if six.PY2:
-                self.skipTest("Your locale can't run this test.")
+        username_str = force_str(username, encoding)
+        password_str = force_str(password, encoding)
+        pgpass_bytes = force_bytes(
+            'somehost:444:dbname:%s:%s' % (username, password),
+            encoding=encoding,
+        )
         self.assertEqual(
             self._run_it({
                 'database': 'dbname',

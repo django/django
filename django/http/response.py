@@ -100,10 +100,7 @@ class HttpResponseBase(six.Iterator):
         ]
         return b'\r\n'.join(headers)
 
-    if six.PY3:
-        __bytes__ = serialize_headers
-    else:
-        __str__ = serialize_headers
+    __bytes__ = serialize_headers
 
     @property
     def _content_type_for_repr(self):
@@ -122,20 +119,12 @@ class HttpResponseBase(six.Iterator):
                 isinstance(value, six.text_type) and ('\n' in value or '\r' in value)):
             raise BadHeaderError("Header values can't contain newlines (got %r)" % value)
         try:
-            if six.PY3:
-                if isinstance(value, str):
-                    # Ensure string is valid in given charset
-                    value.encode(charset)
-                else:
-                    # Convert bytestring using given charset
-                    value = value.decode(charset)
+            if isinstance(value, str):
+                # Ensure string is valid in given charset
+                value.encode(charset)
             else:
-                if isinstance(value, str):
-                    # Ensure string is valid in given charset
-                    value.decode(charset)
-                else:
-                    # Convert unicode string to given charset
-                    value = value.encode(charset)
+                # Convert bytestring using given charset
+                value = value.decode(charset)
         except UnicodeError as e:
             if mime_encode:
                 # Wrapping in str() is a workaround for #12422 under Python 2.
@@ -311,10 +300,7 @@ class HttpResponse(HttpResponseBase):
         """Full HTTP message, including headers, as a bytestring."""
         return self.serialize_headers() + b'\r\n\r\n' + self.content
 
-    if six.PY3:
-        __bytes__ = serialize
-    else:
-        __str__ = serialize
+    __bytes__ = serialize
 
     @property
     def content(self):

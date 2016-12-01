@@ -179,7 +179,7 @@ class MultiValueDict(dict):
         """Appends an item to the internal list associated with key."""
         self.setlistdefault(key).append(value)
 
-    def _iteritems(self):
+    def items(self):
         """
         Yields (key, value) pairs, where value is the last item in the list
         associated with the key.
@@ -187,32 +187,14 @@ class MultiValueDict(dict):
         for key in self:
             yield key, self[key]
 
-    def _iterlists(self):
+    def lists(self):
         """Yields (key, list) pairs."""
         return six.iteritems(super(MultiValueDict, self))
 
-    def _itervalues(self):
+    def values(self):
         """Yield the last value on every key list."""
         for key in self:
             yield self[key]
-
-    if six.PY3:
-        items = _iteritems
-        lists = _iterlists
-        values = _itervalues
-    else:
-        iteritems = _iteritems
-        iterlists = _iterlists
-        itervalues = _itervalues
-
-        def items(self):
-            return list(self.iteritems())
-
-        def lists(self):
-            return list(self.iterlists())
-
-        def values(self):
-            return list(self.itervalues())
 
     def copy(self):
         """Returns a shallow copy of this object."""

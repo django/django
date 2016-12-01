@@ -7,8 +7,6 @@ except ImportError:
 
 from functools import WRAPPER_ASSIGNMENTS, update_wrapper, wraps
 
-from django.utils import six
-
 
 class classonlymethod(classmethod):
     def __get__(self, instance, cls=None):
@@ -121,13 +119,10 @@ def decorator_from_middleware(middleware_class):
 def available_attrs(fn):
     """
     Return the list of functools-wrappable attributes on a callable.
-    This is required as a workaround for http://bugs.python.org/issue3445
+    This was required as a workaround for http://bugs.python.org/issue3445
     under Python 2.
     """
-    if six.PY3:
-        return WRAPPER_ASSIGNMENTS
-    else:
-        return tuple(a for a in WRAPPER_ASSIGNMENTS if hasattr(fn, a))
+    return WRAPPER_ASSIGNMENTS
 
 
 def make_middleware_decorator(middleware_class):

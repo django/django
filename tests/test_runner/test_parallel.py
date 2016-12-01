@@ -2,7 +2,6 @@ import unittest
 
 from django.test import SimpleTestCase
 from django.test.runner import RemoteTestResult
-from django.utils import six
 
 try:
     import tblib
@@ -28,7 +27,6 @@ class ParallelTestRunnerTest(SimpleTestCase):
     parallel.
     """
 
-    @unittest.skipUnless(six.PY3, 'subtests were added in Python 3.4')
     def test_subtest(self):
         """
         Passing subtests work.
@@ -61,12 +59,10 @@ class RemoteTestResultTest(SimpleTestCase):
         result._confirm_picklable(picklable_error)
 
         msg = '__init__() missing 1 required positional argument'
-        if six.PY2:
-            msg = '__init__() takes exactly 2 arguments (1 given)'
         with self.assertRaisesMessage(TypeError, msg):
             result._confirm_picklable(not_unpicklable_error)
 
-    @unittest.skipUnless(six.PY3 and tblib is not None, 'requires tblib to be installed')
+    @unittest.skipUnless(tblib is not None, 'requires tblib to be installed')
     def test_add_failing_subtests(self):
         """
         Failing subtests are added correctly using addSubTest().

@@ -5,7 +5,9 @@ import time
 from email import (
     charset as Charset, encoders as Encoders, generator, message_from_string,
 )
+from email.errors import InvalidHeaderDefect, NonASCIILocalPartDefect
 from email.header import Header
+from email.headerregistry import Address
 from email.message import Message
 from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
@@ -139,18 +141,8 @@ def sanitize_address(addr, encoding):
     except UnicodeEncodeError:  # IDN or non-ascii in the local part
         localpart, domain = split_addr(addr, encoding)
 
-    if six.PY2:
-        # On Python 2, use the stdlib since `email.headerregistry` doesn't exist.
-        from email.utils import formataddr
-        if localpart and domain:
-            addr = '@'.join([localpart, domain])
-        return formataddr((nm, addr))
-
-    # On Python 3, an `email.headerregistry.Address` object is used since
+    # An `email.headerregistry.Address` object is used since
     # email.utils.formataddr() naively encodes the name as ascii (see #25986).
-    from email.headerregistry import Address
-    from email.errors import InvalidHeaderDefect, NonASCIILocalPartDefect
-
     if localpart and domain:
         address = Address(nm, username=localpart, domain=domain)
         return str(address)
@@ -174,27 +166,21 @@ class MIMEMixin():
         """
         fp = six.StringIO()
         g = generator.Generator(fp, mangle_from_=False)
-        if six.PY2:
-            g.flatten(self, unixfrom=unixfrom)
-        else:
-            g.flatten(self, unixfrom=unixfrom, linesep=linesep)
+        g.flatten(self, unixfrom=unixfrom, linesep=linesep)
         return fp.getvalue()
 
-    if six.PY2:
-        as_bytes = as_string
-    else:
-        def as_bytes(self, unixfrom=False, linesep='\n'):
-            """Return the entire formatted message as bytes.
-            Optional `unixfrom' when True, means include the Unix From_ envelope
-            header.
+    def as_bytes(self, unixfrom=False, linesep='\n'):
+        """Return the entire formatted message as bytes.
+        Optional `unixfrom' when True, means include the Unix From_ envelope
+        header.
 
-            This overrides the default as_bytes() implementation to not mangle
-            lines that begin with 'From '. See bug #13433 for details.
-            """
-            fp = BytesIO()
-            g = generator.BytesGenerator(fp, mangle_from_=False)
-            g.flatten(self, unixfrom=unixfrom, linesep=linesep)
-            return fp.getvalue()
+        This overrides the default as_bytes() implementation to not mangle
+        lines that begin with 'From '. See bug #13433 for details.
+        """
+        fp = BytesIO()
+        g = generator.BytesGenerator(fp, mangle_from_=False)
+        g.flatten(self, unixfrom=unixfrom, linesep=linesep)
+        return fp.getvalue()
 
 
 class SafeMIMEMessage(MIMEMixin, MIMEMessage):
@@ -450,8 +436,6 @@ class EmailMessage(object):
             try:
                 filename.encode('ascii')
             except UnicodeEncodeError:
-                if six.PY2:
-                    filename = filename.encode('utf-8')
                 filename = ('utf-8', '', filename)
             attachment.add_header('Content-Disposition', 'attachment',
                                   filename=filename)

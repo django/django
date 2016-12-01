@@ -661,18 +661,10 @@ class MakeMigrationsTests(MigrationTestBase):
                 self.assertIn('migrations.CreateModel', content)
                 self.assertIn('initial = True', content)
 
-                if six.PY3:
-                    self.assertIn('úñí©óðé µóðéø', content)  # Meta.verbose_name
-                    self.assertIn('úñí©óðé µóðéøß', content)  # Meta.verbose_name_plural
-                    self.assertIn('ÚÑÍ¢ÓÐÉ', content)  # title.verbose_name
-                    self.assertIn('“Ðjáñgó”', content)  # title.default
-                else:
-                    # Meta.verbose_name
-                    self.assertIn('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8', content)
-                    # Meta.verbose_name_plural
-                    self.assertIn('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8\\xdf', content)
-                    self.assertIn('\\xda\\xd1\\xcd\\xa2\\xd3\\xd0\\xc9', content)  # title.verbose_name
-                    self.assertIn('\\u201c\\xd0j\\xe1\\xf1g\\xf3\\u201d', content)  # title.default
+                self.assertIn('úñí©óðé µóðéø', content)  # Meta.verbose_name
+                self.assertIn('úñí©óðé µóðéøß', content)  # Meta.verbose_name_plural
+                self.assertIn('ÚÑÍ¢ÓÐÉ', content)  # title.verbose_name
+                self.assertIn('“Ðjáñgó”', content)  # title.default
 
     def test_makemigrations_order(self):
         """

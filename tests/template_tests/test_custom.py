@@ -1,12 +1,10 @@
 import os
-from unittest import skipUnless
 
 from django.template import Context, Engine, TemplateSyntaxError
 from django.template.base import Node
 from django.template.library import InvalidTemplateLibrary
 from django.test import SimpleTestCase
 from django.test.utils import extend_sys_path
-from django.utils import six
 
 from .templatetags import custom, inclusion
 from .utils import ROOT
@@ -344,7 +342,6 @@ class TemplateTagLoadingTests(SimpleTestCase):
             })
             engine.from_string(ttext)
 
-    @skipUnless(six.PY3, "Python 3 only -- Python 2 doesn't have annotations.")
     def test_load_annotated_function(self):
         Engine(libraries={
             'annotated_tag_function': 'template_tests.annotated_tag_function',

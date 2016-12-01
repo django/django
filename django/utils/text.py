@@ -12,11 +12,6 @@ from django.utils.safestring import SafeText, mark_safe
 from django.utils.six.moves import html_entities
 from django.utils.translation import pgettext, ugettext as _, ugettext_lazy
 
-if six.PY2:
-    # Import force_unicode even though this module doesn't use it, because some
-    # people rely on it being here.
-    from django.utils.encoding import force_unicode  # NOQA
-
 
 @keep_lazy_text
 def capfirst(x):

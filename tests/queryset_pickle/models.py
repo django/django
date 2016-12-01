@@ -1,7 +1,6 @@
 import datetime
 
 from django.db import DJANGO_VERSION_PICKLE_KEY, models
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -45,9 +44,7 @@ class Happening(models.Model):
     when = models.DateTimeField(blank=True, default=datetime.datetime.now)
     name = models.CharField(blank=True, max_length=100, default="test")
     number1 = models.IntegerField(blank=True, default=standalone_number)
-    if six.PY3:
-        # default serializable on Python 3 only
-        number2 = models.IntegerField(blank=True, default=Numbers.get_static_number)
+    number2 = models.IntegerField(blank=True, default=Numbers.get_static_number)
 
 
 class Container(object):

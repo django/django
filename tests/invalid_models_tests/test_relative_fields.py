@@ -3,7 +3,6 @@ from django.db import models
 from django.db.models.fields.related import ForeignObject
 from django.test.testcases import SimpleTestCase, skipIfDBFeature
 from django.test.utils import isolate_apps, override_settings
-from django.utils import six
 
 
 @isolate_apps('invalid_models_tests')
@@ -655,10 +654,8 @@ class RelativeFieldTests(SimpleTestCase):
             'with',  # a Python keyword
             'related_name\n',
             '',
+            '，',  # non-ASCII
         ]
-        # Python 2 crashes on non-ASCII strings.
-        if six.PY3:
-            invalid_related_names.append('，')
 
         class Parent(models.Model):
             pass
@@ -695,10 +692,9 @@ class RelativeFieldTests(SimpleTestCase):
             'ends_with_plus+',
             '_+',
             '+',
+            '試',
+            '試驗+',
         ]
-        # Python 2 crashes on non-ASCII strings.
-        if six.PY3:
-            related_names.extend(['試', '試驗+'])
 
         class Parent(models.Model):
             pass

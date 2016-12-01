@@ -928,11 +928,7 @@ class BaseCacheTests(object):
         self.assertEqual(cache.get_or_set('mykey', my_callable()), 'value')
 
     def test_get_or_set_version(self):
-        msg = (
-            "get_or_set() missing 1 required positional argument: 'default'"
-            if six.PY3
-            else 'get_or_set() takes at least 3 arguments'
-        )
+        msg = "get_or_set() missing 1 required positional argument: 'default'"
         cache.get_or_set('brian', 1979, version=2)
         with self.assertRaisesMessage(TypeError, msg):
             cache.get_or_set('brian')

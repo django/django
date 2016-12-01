@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 from django.test import SimpleTestCase
-from django.utils import html, safestring, six
+from django.utils import html, safestring
 from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.functional import lazystr
@@ -168,12 +168,8 @@ class TestUtilsHtml(SimpleTestCase):
     def test_html_safe(self):
         @html.html_safe
         class HtmlClass(object):
-            if six.PY2:
-                def __unicode__(self):
-                    return "<h1>I'm a html class!</h1>"
-            else:
-                def __str__(self):
-                    return "<h1>I'm a html class!</h1>"
+            def __str__(self):
+                return "<h1>I'm a html class!</h1>"
 
         html_obj = HtmlClass()
         self.assertTrue(hasattr(HtmlClass, '__html__'))
@@ -181,34 +177,19 @@ class TestUtilsHtml(SimpleTestCase):
         self.assertEqual(force_text(html_obj), html_obj.__html__())
 
     def test_html_safe_subclass(self):
-        if six.PY2:
-            class BaseClass(object):
-                def __html__(self):
-                    # defines __html__ on its own
-                    return 'some html content'
+        class BaseClass(object):
+            def __html__(self):
+                # defines __html__ on its own
+                return 'some html content'
 
-                def __unicode__(self):
-                    return 'some non html content'
+            def __str__(self):
+                return 'some non html content'
 
-            @html.html_safe
-            class Subclass(BaseClass):
-                def __unicode__(self):
-                    # overrides __unicode__ and is marked as html_safe
-                    return 'some html safe content'
-        else:
-            class BaseClass(object):
-                def __html__(self):
-                    # defines __html__ on its own
-                    return 'some html content'
-
-                def __str__(self):
-                    return 'some non html content'
-
-            @html.html_safe
-            class Subclass(BaseClass):
-                def __str__(self):
-                    # overrides __str__ and is marked as html_safe
-                    return 'some html safe content'
+        @html.html_safe
+        class Subclass(BaseClass):
+            def __str__(self):
+                # overrides __str__ and is marked as html_safe
+                return 'some html safe content'
 
         subclass_obj = Subclass()
         self.assertEqual(force_text(subclass_obj), subclass_obj.__html__())
@@ -222,8 +203,7 @@ class TestUtilsHtml(SimpleTestCase):
                     return "<h1>I'm a html class!</h1>"
 
     def test_html_safe_doesnt_define_str(self):
-        method_name = '__unicode__()' if six.PY2 else '__str__()'
-        msg = "can't apply @html_safe to HtmlClass because it doesn't define %s." % method_name
+        msg = "can't apply @html_safe to HtmlClass because it doesn't define __str__()."
         with self.assertRaisesMessage(ValueError, msg):
             @html.html_safe
             class HtmlClass(object):

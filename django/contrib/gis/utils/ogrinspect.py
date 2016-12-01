@@ -235,5 +235,4 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
 
     if name_field:
         yield ''
-        yield '    def __%s__(self): return self.%s' % (
-            'str' if six.PY3 else 'unicode', name_field)
+        yield '    def __str__(self): return self.%s' % name_field

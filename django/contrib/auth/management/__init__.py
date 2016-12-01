@@ -8,8 +8,6 @@ from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
 from django.core import exceptions
 from django.db import DEFAULT_DB_ALIAS, router
-from django.utils import six
-from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 
 
 def _get_all_permissions(opts):
@@ -98,12 +96,6 @@ def get_system_username():
         # if there is no corresponding entry in the /etc/passwd file
         # (a very restricted chroot environment, for example).
         return ''
-    if six.PY2:
-        try:
-            result = result.decode(DEFAULT_LOCALE_ENCODING)
-        except UnicodeDecodeError:
-            # UnicodeDecodeError - preventive treatment for non-latin Windows.
-            return ''
     return result
 
 

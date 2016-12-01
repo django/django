@@ -6,6 +6,7 @@ import time
 import warnings
 from contextlib import contextmanager
 from functools import wraps
+from types import SimpleNamespace
 from unittest import TestCase, skipIf, skipUnless
 from xml.dom.minidom import Node, parseString
 
@@ -24,12 +25,6 @@ from django.utils import six
 from django.utils.decorators import available_attrs
 from django.utils.encoding import force_str
 from django.utils.translation import deactivate
-
-if six.PY3:
-    from types import SimpleNamespace
-else:
-    class SimpleNamespace(object):
-        pass
 
 try:
     import jinja2
@@ -615,7 +610,7 @@ def strip_quotes(want, got):
 
 
 def str_prefix(s):
-    return s % {'_': '' if six.PY3 else 'u'}
+    return s % {'_': ''}
 
 
 class CaptureQueriesContext(object):

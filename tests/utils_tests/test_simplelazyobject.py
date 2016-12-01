@@ -2,7 +2,6 @@ import pickle
 
 from django.contrib.auth.models import User
 from django.test import TestCase
-from django.utils import six
 from django.utils.functional import SimpleLazyObject
 
 
@@ -21,9 +20,3 @@ class TestUtilsSimpleLazyObjectDjangoTestCase(TestCase):
         pickle.dumps(x, 0)
         pickle.dumps(x, 1)
         pickle.dumps(x, 2)
-
-        if six.PY2:
-            import cPickle
-
-            # This would fail with "TypeError: expected string or Unicode object, NoneType found".
-            cPickle.dumps(x)
