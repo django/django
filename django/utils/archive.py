@@ -164,6 +164,7 @@ class TarArchive(BaseArchive):
                         os.makedirs(dirname)
                     with open(filename, 'wb') as outfile:
                         shutil.copyfileobj(extracted, outfile)
+                        os.chmod(filename, member.mode)
                 finally:
                     if extracted:
                         extracted.close()
@@ -185,6 +186,7 @@ class ZipArchive(BaseArchive):
         leading = self.has_leading_dir(namelist)
         for name in namelist:
             data = self._archive.read(name)
+            info = self._archive.getinfo(name)
             if leading:
                 name = self.split_leading_dir(name)[1]
             filename = os.path.join(to_path, name)
@@ -198,6 +200,9 @@ class ZipArchive(BaseArchive):
             else:
                 with open(filename, 'wb') as outfile:
                     outfile.write(data)
+                # convert ZipInfo.external_attr to mode
+                mode = info.external_attr >> 16
+                os.chmod(filename, mode)
 
     def close(self):
         self._archive.close()

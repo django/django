@@ -1,5 +1,7 @@
 import os
 import shutil
+import stat
+import sys
 import tempfile
 import unittest
 
@@ -41,6 +43,14 @@ class ArchiveTester(object):
     def test_extract_function(self):
         extract(self.archive_path, self.tmpdir)
         self.check_files(self.tmpdir)
+
+    @unittest.skipIf(sys.platform == 'win32', 'Python on Windows has a limited os.chmod().')
+    def test_extract_file_permissions(self):
+        """Archive.extract() preserves file permissions."""
+        extract(self.archive_path, self.tmpdir)
+        filepath = os.path.join(self.tmpdir, 'executable')
+        # The file has executable permission.
+        self.assertTrue(os.stat(filepath).st_mode & stat.S_IXOTH)
 
     def test_extract_function_with_leadpath(self):
         extract(self.archive_lead_path, self.tmpdir)
