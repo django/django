@@ -78,7 +78,7 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"Bitte einen gültigen %(username)s und ein Passwort für einen Staff-Account "
+"Bitte einen gültigen %(username)sn und ein Passwort für einen Staff-Account "
 "eingeben. Beide Felder berücksichtigen die Groß-/Kleinschreibung."
 
 msgid "Action:"
