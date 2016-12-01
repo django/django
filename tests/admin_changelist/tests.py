@@ -2,6 +2,9 @@ from __future__ import unicode_literals
 
 import datetime
 
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import IncorrectLookupParameters
@@ -16,8 +19,6 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils import formats, six
 from django.utils.deprecation import RemovedInDjango20Warning
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 
 from .admin import (
     BandAdmin, ChildAdmin, ChordsBandAdmin, ConcertAdmin,
