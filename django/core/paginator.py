@@ -4,6 +4,7 @@ from math import ceil
 
 from django.utils import six
 from django.utils.functional import cached_property
+from django.utils.translation import ugettext_lazy as _
 
 
 class UnorderedObjectListWarning(RuntimeWarning):
@@ -39,14 +40,14 @@ class Paginator(object):
         try:
             number = int(number)
         except (TypeError, ValueError):
-            raise PageNotAnInteger('That page number is not an integer')
+            raise PageNotAnInteger(_('That page number is not an integer'))
         if number < 1:
-            raise EmptyPage('That page number is less than 1')
+            raise EmptyPage(_('That page number is less than 1'))
         if number > self.num_pages:
             if number == 1 and self.allow_empty_first_page:
                 pass
             else:
-                raise EmptyPage('That page contains no results')
+                raise EmptyPage(_('That page contains no results'))
         return number
 
     def page(self, number):
