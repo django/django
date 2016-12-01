@@ -10,6 +10,7 @@ from django.db import connections, router
 from django.db.utils import ConnectionRouter
 from django.dispatch import Signal, receiver
 from django.utils import six, timezone
+from django.utils.formats import FORMAT_SETTINGS, reset_format_cache
 from django.utils.functional import empty
 
 template_rendered = Signal(providing_args=["template", "context"])
@@ -115,6 +116,12 @@ def language_changed(**kwargs):
         from django.utils.translation import trans_real
         trans_real._translations = {}
         trans_real.check_for_language.cache_clear()
+
+
+@receiver(setting_changed)
+def localize_settings_changed(**kwargs):
+    if kwargs['setting'] in FORMAT_SETTINGS or kwargs['setting'] == 'USE_THOUSAND_SEPARATOR':
+        reset_format_cache()
 
 
 @receiver(setting_changed)

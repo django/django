@@ -186,9 +186,6 @@ class AdminViewBasicTestCase(TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    def tearDown(self):
-        formats.reset_format_cache()
-
     def assertContentBefore(self, response, text1, text2, failing_msg=None):
         """
         Testing utility asserting that text1 appears before text2 in response
@@ -5300,9 +5297,6 @@ class DateHierarchyTests(TestCase):
 
     def setUp(self):
         self.client.force_login(self.superuser)
-
-    def tearDown(self):
-        formats.reset_format_cache()
 
     def assert_non_localized_year(self, response, year):
         """
