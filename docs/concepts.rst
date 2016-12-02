@@ -261,7 +261,7 @@ start thinking about them. Remember, Django provides some channels
 but you're free to make and consume your own, and all channels are
 network-transparent.
 
-One thing channels do not, however, is guarantee delivery. If you need
+One thing channels do not do, however, is guarantee delivery. If you need
 certainty that tasks will complete, use a system designed for this with 
 retries and persistence (e.g. Celery), or alternatively make a management
 command that checks for completion and re-submits a message to the channel
