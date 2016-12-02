@@ -443,6 +443,10 @@ WHEN (new.%(col_name)s IS NULL)
             return 'BITAND(%s)' % ','.join(sub_expressions)
         elif connector == '|':
             raise NotImplementedError("Bit-wise or is not supported in Oracle.")
+        elif connector == '<<':
+            raise NotImplementedError("Bit-wise left shift is not supported in Oracle.")
+        elif connector == '>>':
+            raise NotImplementedError("Bit-wise right shift is not supported in Oracle.")
         elif connector == '^':
             return 'POWER(%s)' % ','.join(sub_expressions)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)

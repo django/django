@@ -30,6 +30,8 @@ class Combinable(object):
     # usage.
     BITAND = '&'
     BITOR = '|'
+    BITLEFTSHIFT = '<<'
+    BITRIGHTSHIFT = '>>'
 
     def _combine(self, other, connector, reversed, node=None):
         if not hasattr(other, 'resolve_expression'):
@@ -75,6 +77,12 @@ class Combinable(object):
 
     def bitand(self, other):
         return self._combine(other, self.BITAND, False)
+
+    def bitleftshift(self, other):
+        return self._combine(other, self.BITLEFTSHIFT, False)
+
+    def bitrightshift(self, other):
+        return self._combine(other, self.BITRIGHTSHIFT, False)
 
     def __or__(self, other):
         raise NotImplementedError(
