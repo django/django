@@ -47,7 +47,12 @@ class Point(GEOSGeometry):
     def _ogr_ptr(self):
         return gdal.geometries.Point._create_empty() if self.empty else super(Point, self)._ogr_ptr()
 
-    def _create_point(self, ndim, coords):
+    @classmethod
+    def _create_empty(cls):
+        return cls._create_point(None, None)
+
+    @classmethod
+    def _create_point(cls, ndim, coords):
         """
         Create a coordinate sequence, set X, Y, [Z], and create point
         """

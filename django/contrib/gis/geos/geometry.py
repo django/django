@@ -169,6 +169,10 @@ class GEOSGeometry(GEOSBase, ListMixin):
         self._post_init(srid)
 
     @classmethod
+    def _from_wkb(cls, wkb):
+        return wkb_r().read(wkb)
+
+    @classmethod
     def from_gml(cls, gml_string):
         return gdal.OGRGeometry.from_gml(gml_string).geos
 
