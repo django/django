@@ -442,7 +442,8 @@ WHEN (new.%(col_name)s IS NULL)
         elif connector == '&':
             return 'BITAND(%s)' % ','.join(sub_expressions)
         elif connector == '|':
-            raise NotImplementedError("Bit-wise or is not supported in Oracle.")
+            lhs, rhs = sub_expressions
+            return 'BITAND(-%(lhs)s-1,%(rhs)s)+%(lhs)s' % {'lhs': lhs, 'rhs': rhs}
         elif connector == '^':
             return 'POWER(%s)' % ','.join(sub_expressions)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
