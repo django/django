@@ -72,7 +72,14 @@ class PostgreSQLDatabaseCreationTests(SimpleTestCase):
             creation = DatabaseCreation(connection)
             suffix = creation.sql_table_creation_suffix()
             self.assertEqual(suffix, expected)
-
+            
+    def get_connection_copy(self):
+        # Get a copy of the connection under test. (Can't use django.db.connection
+        # because it'll modify the default connection itself.)
+        test_connection = copy.copy(connection)
+        test_connection.settings_dict = copy.copy(connections.settings_dict)
+        return test_connection            
+            
     def test_sql_table_creation_suffix_with_none_settings(self):
         settings = dict(CHARSET=None, TEMPLATE=None)
         self.check_sql_table_creation_suffix(settings, "")
@@ -88,3 +95,15 @@ class PostgreSQLDatabaseCreationTests(SimpleTestCase):
     def test_sql_table_creation_suffix_with_encoding_and_template(self):
         settings = dict(CHARSET='UTF8', TEMPLATE='template0')
         self.check_sql_table_creation_suffix(settings, '''WITH ENCODING 'UTF8' TEMPLATE "template0"''')
+
+    def test_default_name(self):
+        # A test db name isn't set. but the db name already contains the prefix
+        prod_name = TEST_DATABASE_PREFIX +'hodor'
+        test_connection = self.get_connection_copy()
+        test_connection.settings_dict['NAME'] = prod_name
+        test_connection.settings_dict['TEST'] = {'NAME': None}
+        signature = DatabaseCreation(test_connection).test_db_signature()
+        # the test db name doesn't have 'test_' added to it again
+        self.assertEqual(signature[3], prod_name)
+    
+        
