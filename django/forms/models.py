@@ -170,6 +170,11 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
             formfield = formfield_callback(f, **kwargs)
 
         if formfield:
+            # Apply ``limit_choices_to``.
+            if hasattr(formfield, 'queryset') and hasattr(formfield, 'get_limit_choices_to'):
+                limit_choices_to = formfield.get_limit_choices_to()
+                if limit_choices_to is not None:
+                    formfield.queryset = formfield.queryset.complex_filter(limit_choices_to)
             field_list.append((f.name, formfield))
         else:
             ignored.append(f.name)
@@ -291,13 +296,6 @@ class BaseModelForm(BaseForm):
             data, files, auto_id, prefix, object_data, error_class,
             label_suffix, empty_permitted, use_required_attribute=use_required_attribute,
         )
-        # Apply ``limit_choices_to`` to each field.
-        for field_name in self.fields:
-            formfield = self.fields[field_name]
-            if hasattr(formfield, 'queryset') and hasattr(formfield, 'get_limit_choices_to'):
-                limit_choices_to = formfield.get_limit_choices_to()
-                if limit_choices_to is not None:
-                    formfield.queryset = formfield.queryset.complex_filter(limit_choices_to)
 
     def _get_validation_exclusions(self):
         """
