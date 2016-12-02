@@ -532,10 +532,10 @@ class GEOSGeometry(GEOSBase, ListMixin):
             raise GEOSException("Calling transform() with no SRID set is not supported")
 
         # Creating an OGR Geometry, which is then transformed.
-        g = gdal.OGRGeometry(self.wkb, srid)
+        g = gdal.OGRGeometry(self._ogr_ptr(), srid)
         g.transform(ct)
         # Getting a new GEOS pointer
-        ptr = wkb_r().read(g.wkb)
+        ptr = g._geos_ptr()
         if clone:
             # User wants a cloned transformed geometry returned.
             return GEOSGeometry(ptr, srid=g.srid)

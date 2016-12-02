@@ -1359,6 +1359,10 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         p = Point(srid=4326)
         self.assertEqual(p.ogr.ewkt, p.ewkt)
 
+        self.assertEqual(p.transform(2774, clone=True), Point(srid=2774))
+        p.transform(2774)
+        self.assertEqual(p, Point(srid=2774))
+
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_deprecated_srid_getters_setters(self):
         p = Point(1, 2, srid=123)
