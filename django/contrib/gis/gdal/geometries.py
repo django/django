@@ -97,7 +97,7 @@ class OGRGeometry(GDALBase):
                 g = capi.create_geom(OGRGeomType(geom_input).num)
         elif isinstance(geom_input, six.memoryview):
             # WKB was passed in
-            g = capi.from_wkb(bytes(geom_input), None, byref(c_void_p()), len(geom_input))
+            g = self._from_wkb(geom_input)
         elif isinstance(geom_input, OGRGeomType):
             # OGRGeomType was passed in, an empty geometry will be created.
             g = capi.create_geom(geom_input.num)
@@ -143,6 +143,10 @@ class OGRGeometry(GDALBase):
             raise GDALException('Invalid OGRGeometry loaded from pickled state.')
         self.ptr = ptr
         self.srs = srs
+
+    @classmethod
+    def _from_wkb(cls, geom_input):
+        return capi.from_wkb(bytes(geom_input), None, byref(c_void_p()), len(geom_input))
 
     @classmethod
     def from_bbox(cls, bbox):
@@ -499,6 +503,10 @@ class OGRGeometry(GDALBase):
 
 # The subclasses for OGR Geometry.
 class Point(OGRGeometry):
+
+    @classmethod
+    def _create_empty(cls):
+        return capi.create_geom(OGRGeomType('point').num)
 
     @property
     def x(self):

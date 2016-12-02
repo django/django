@@ -479,15 +479,13 @@ class GEOSGeometry(GEOSBase, ListMixin):
         return PreparedGeometry(self)
 
     # #### GDAL-specific output routines ####
+    def _ogr_ptr(self):
+        return gdal.OGRGeometry._from_wkb(self.wkb)
+
     @property
     def ogr(self):
         "Returns the OGR Geometry for this Geometry."
-        if self.srid:
-            try:
-                return gdal.OGRGeometry(self.wkb, self.srid)
-            except gdal.SRSException:
-                pass
-        return gdal.OGRGeometry(self.wkb)
+        return gdal.OGRGeometry(self._ogr_ptr(), self.srs)
 
     @property
     def srs(self):

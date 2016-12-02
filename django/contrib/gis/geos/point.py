@@ -1,6 +1,7 @@
 import warnings
 from ctypes import c_uint
 
+from django.contrib.gis import gdal
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry
@@ -42,6 +43,9 @@ class Point(GEOSGeometry):
         # Initializing using the address returned from the GEOS
         #  createPoint factory.
         super(Point, self).__init__(point, srid=srid)
+
+    def _ogr_ptr(self):
+        return gdal.geometries.Point._create_empty() if self.empty else super(Point, self)._ogr_ptr()
 
     def _create_point(self, ndim, coords):
         """
