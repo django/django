@@ -285,11 +285,23 @@ class ExceptionReporter(object):
                     'ascii', errors='replace'
                 )
         from django import get_version
+
+        if self.request is None:
+            user_str = None
+        else:
+            try:
+                user_str = force_text(self.request.user)
+            except Exception:
+                # request.user may raise OperationalError if the database is
+                # unavailable, for example.
+                user_str = '[unable to retrieve the current user]'
+
         c = {
             'is_email': self.is_email,
             'unicode_hint': unicode_hint,
             'frames': frames,
             'request': self.request,
+            'user_str': user_str,
             'filtered_POST_items': self.filter.get_post_parameters(self.request).items(),
             'settings': get_safe_settings(),
             'sys_executable': sys.executable,
@@ -903,9 +915,9 @@ Exception Value: {{ exception_value|force_escape }}
   <h2>Request information</h2>
 
 {% if request %}
-  {% if request.user %}
+  {% if user_str %}
     <h3 id="user-info">USER</h3>
-    <p>{{ request.user }}</p>
+    <p>{{ user_str }}</p>
   {% endif %}
 
   <h3 id="get-info">GET</h3>
@@ -1104,7 +1116,7 @@ File "{{ frame.filename }}" in {{ frame.function }}
 {% if exception_type %}Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
 {% if exception_value %}Exception Value: {{ exception_value }}{% endif %}{% endif %}{% endif %}
 {% if request %}Request information:
-{% if request.user %}USER: {{ request.user }}{% endif %}
+{% if user_str %}USER: {{ user_str }}{% endif %}
 
 GET:{% for k, v in request_GET_items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No GET data{% endfor %}
