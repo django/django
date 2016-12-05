@@ -171,28 +171,18 @@ class DistanceTest(TestCase):
         #    'SPHEROID["WGS 84",6378137.0,298.257223563]') FROM distapp_australiacity WHERE (NOT (id = 11));
         #  SELECT ST_distance_sphere(point, ST_GeomFromText('POINT(151.231341 -33.952685)', 4326))
         #  FROM distapp_australiacity WHERE (NOT (id = 11));  st_distance_sphere
-        if connection.ops.postgis and connection.ops.proj_version_tuple() >= (4, 7, 0):
-            # PROJ.4 versions 4.7+ have updated datums, and thus different
-            # distance values.
-            spheroid_distances = [60504.0628957201, 77023.9489850262, 49154.8867574404,
-                                  90847.4358768573, 217402.811919332, 709599.234564757,
-                                  640011.483550888, 7772.00667991925, 1047861.78619339,
-                                  1165126.55236034]
-            sphere_distances = [60580.9693849267, 77144.0435286473, 49199.4415344719,
-                                90804.7533823494, 217713.384600405, 709134.127242793,
-                                639828.157159169, 7786.82949717788, 1049204.06569028,
-                                1162623.7238134]
-
-        else:
-            spheroid_distances = [60504.0628825298, 77023.948962654, 49154.8867507115,
-                                  90847.435881812, 217402.811862568, 709599.234619957,
-                                  640011.483583758, 7772.00667666425, 1047861.7859506,
-                                  1165126.55237647]
-            sphere_distances = [60580.7612632291, 77143.7785056615, 49199.2725132184,
-                                90804.4414289463, 217712.63666124, 709131.691061906,
-                                639825.959074112, 7786.80274606706, 1049200.46122281,
-                                1162619.7297006]
-
+        spheroid_distances = [
+            60504.0628957201, 77023.9489850262, 49154.8867574404,
+            90847.4358768573, 217402.811919332, 709599.234564757,
+            640011.483550888, 7772.00667991925, 1047861.78619339,
+            1165126.55236034,
+        ]
+        sphere_distances = [
+            60580.9693849267, 77144.0435286473, 49199.4415344719,
+            90804.7533823494, 217713.384600405, 709134.127242793,
+            639828.157159169, 7786.82949717788, 1049204.06569028,
+            1162623.7238134,
+        ]
         # Testing with spheroid distances first.
         hillsdale = AustraliaCity.objects.get(name='Hillsdale')
         qs = AustraliaCity.objects.exclude(id=hillsdale.id).distance(hillsdale.point, spheroid=True).order_by('id')
@@ -566,28 +556,18 @@ class DistanceFunctionsTests(TestCase):
         #    'SPHEROID["WGS 84",6378137.0,298.257223563]') FROM distapp_australiacity WHERE (NOT (id = 11));
         #  SELECT ST_distance_sphere(point, ST_GeomFromText('POINT(151.231341 -33.952685)', 4326))
         #  FROM distapp_australiacity WHERE (NOT (id = 11));  st_distance_sphere
-        if connection.ops.postgis and connection.ops.proj_version_tuple() >= (4, 7, 0):
-            # PROJ.4 versions 4.7+ have updated datums, and thus different
-            # distance values.
-            spheroid_distances = [60504.0628957201, 77023.9489850262, 49154.8867574404,
-                                  90847.4358768573, 217402.811919332, 709599.234564757,
-                                  640011.483550888, 7772.00667991925, 1047861.78619339,
-                                  1165126.55236034]
-            sphere_distances = [60580.9693849267, 77144.0435286473, 49199.4415344719,
-                                90804.7533823494, 217713.384600405, 709134.127242793,
-                                639828.157159169, 7786.82949717788, 1049204.06569028,
-                                1162623.7238134]
-
-        else:
-            spheroid_distances = [60504.0628825298, 77023.948962654, 49154.8867507115,
-                                  90847.435881812, 217402.811862568, 709599.234619957,
-                                  640011.483583758, 7772.00667666425, 1047861.7859506,
-                                  1165126.55237647]
-            sphere_distances = [60580.7612632291, 77143.7785056615, 49199.2725132184,
-                                90804.4414289463, 217712.63666124, 709131.691061906,
-                                639825.959074112, 7786.80274606706, 1049200.46122281,
-                                1162619.7297006]
-
+        spheroid_distances = [
+            60504.0628957201, 77023.9489850262, 49154.8867574404,
+            90847.4358768573, 217402.811919332, 709599.234564757,
+            640011.483550888, 7772.00667991925, 1047861.78619339,
+            1165126.55236034,
+        ]
+        sphere_distances = [
+            60580.9693849267, 77144.0435286473, 49199.4415344719,
+            90804.7533823494, 217713.384600405, 709134.127242793,
+            639828.157159169, 7786.82949717788, 1049204.06569028,
+            1162623.7238134,
+        ]
         # Testing with spheroid distances first.
         hillsdale = AustraliaCity.objects.get(name='Hillsdale')
         qs = AustraliaCity.objects.exclude(id=hillsdale.id).annotate(
