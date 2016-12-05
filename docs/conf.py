@@ -192,9 +192,6 @@ html_last_updated_fmt = '%b %d, %Y'
 # typographically correct entities.
 html_use_smartypants = True
 
-# HTML translator class for the builder
-html_translator_class = "djangodocs.DjangoHTMLTranslator"
-
 # Content template for the index page.
 # html_index = ''
 
