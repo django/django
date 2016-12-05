@@ -8,7 +8,7 @@ the `asgi.delay` channel for messages to delay.
 
 
 Getting Started with Delay
-==========================
+--------------------------
 
 To Install the app add `channels.delay` to `INSTALLED_APPS`::
 
@@ -29,7 +29,7 @@ Run the delay process to start processing messages
 Now you're ready to start delaying messages.
 
 Delaying Messages
-=================
+-----------------
 
 To delay a message by a fixed number of milliseconds use the `delay` parameter.
 
