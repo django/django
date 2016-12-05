@@ -220,14 +220,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT
                 cons.constraint_name,
                 LOWER(cols.column_name) AS column_name,
-                LOWER(rcons.table_name),
+                LOWER(rcols.table_name),
                 LOWER(rcols.column_name)
             FROM
                 user_constraints cons
             INNER JOIN
-                user_constraints rcons ON cons.r_constraint_name = rcons.constraint_name
-            INNER JOIN
-                user_cons_columns rcols ON rcols.constraint_name = rcons.constraint_name
+                user_cons_columns rcols ON rcols.constraint_name = cons.r_constraint_name
             LEFT OUTER JOIN
                 user_cons_columns cols ON cons.constraint_name = cols.constraint_name
             WHERE
