@@ -15,7 +15,7 @@ to run against a set of Redis servers in a sharded mode.
 
 To use the Redis layer, simply install it from PyPI (it lives in a separate
 package, as we didn't want to force a dependency on the redis-py for the main
-install):
+install)::
 
     pip install -U asgi_redis
 
