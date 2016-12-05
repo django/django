@@ -30,9 +30,9 @@ Measurement         Relationships             Operations              Editors   
 :class:`Length`     :class:`Envelope`         :class:`SymDifference`  :class:`Scale`       :class:`AsKML`      :class:`NumPoints`
 :class:`Perimeter`  :class:`PointOnSurface`   :class:`Union`          :class:`SnapToGrid`  :class:`AsSVG`
 
-                                                                      :class:`Transform`   :class:`GeoHash`
+..                                                                    :class:`Transform`   :class:`GeoHash`
 
-                                                                      :class:`Translate`
+..                                                                    :class:`Translate`
 ==================  =======================   ======================  ===================  ==================  =====================
 
 ``Area``
