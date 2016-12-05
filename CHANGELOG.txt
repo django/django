@@ -1,3 +1,18 @@
+0.17.3 (2016-10-12)
+-------------------
+
+* channel_session now also rehydrates the http session with an option
+
+* request.META['PATH_INFO'] is now present
+
+* runserver shows Daphne log messages
+
+* runserver --nothreading only starts a single worker thread
+
+* Databinding changed to call group_names dynamically and imply changed/created from that;
+  other small changes to databinding, and more changes likely.
+
+
 0.17.2 (2016-08-04)
 -------------------
 
