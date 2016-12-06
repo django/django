@@ -1326,7 +1326,7 @@ templates used by the :class:`ModelAdmin` views:
 
 .. warning::
 
-    When implementing :meth:`ModelAdmin.save_model` and
+    When overriding :meth:`ModelAdmin.save_model` and
     :meth:`ModelAdmin.delete_model`, your code must save/delete the
     object. They are not meant for veto purposes, rather they allow you to
     perform extra operations.
@@ -1336,8 +1336,9 @@ templates used by the :class:`ModelAdmin` views:
     The ``save_model`` method is given the ``HttpRequest``, a model instance,
     a ``ModelForm`` instance and a boolean value based on whether it is adding
     or changing the object. By overriding this method, your ``ModelAdmin``
-    subclass can do pre- or post-save operations. Your code must call
-    ``obj.save()``.
+    subclass can do pre- or post-save operations. Your code should call
+    ``super().save_model()`` to save the object. If that's not appropriate for
+    your class, call ``obj.save()``.
 
     For example to attach ``request.user`` to the object prior to saving::
 
@@ -1346,13 +1347,15 @@ templates used by the :class:`ModelAdmin` views:
         class ArticleAdmin(admin.ModelAdmin):
             def save_model(self, request, obj, form, change):
                 obj.user = request.user
-                obj.save()
+                return super(ArticleAdmin, self).save_model()
 
 .. method:: ModelAdmin.delete_model(request, obj)
 
     The ``delete_model`` method is given the ``HttpRequest`` and a model
     instance. By overriding this method, your ``ModelAdmin`` subclass can do
-    pre- or post-delete operations. Your code must call ``obj.delete()``.
+    pre- or post-delete operations. Your code should call
+    ``super().delete_model()`` to delete the object. If that's not appropriate
+    for your class, call ``obj.delete()``.
 
 .. method:: ModelAdmin.save_formset(request, form, formset, change)
 
