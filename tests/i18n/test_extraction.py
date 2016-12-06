@@ -80,16 +80,9 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
         needle = ''.join(parts)
         pattern = re.compile(r'^\#\:.*' + re.escape(needle), re.MULTILINE)
         if assert_presence:
-            return six.assertRegex(self, po_contents, pattern, '"%s" not found in final .po file.' % needle)
+            return self.assertRegex(po_contents, pattern, '"%s" not found in final .po file.' % needle)
         else:
-            if six.PY3:
-                return self.assertNotRegex(
-                    po_contents, pattern, '"%s" shouldn\'t be in final .po file.' % needle
-                )
-            else:
-                return self.assertNotRegexpMatches(
-                    po_contents, pattern, '"%s" shouldn\'t be in final .po file.' % needle
-                )
+            return self.assertNotRegex(po_contents, pattern, '"%s" shouldn\'t be in final .po file.' % needle)
 
     def _get_token_line_number(self, path, token):
         with open(path) as f:
@@ -292,20 +285,20 @@ class BasicExtractorTests(ExtractorTests):
             self.assertEqual(len(ws), 3)
             for w in ws:
                 self.assertTrue(issubclass(w.category, TranslatorCommentWarning))
-            six.assertRegex(
-                self, str(ws[0].message),
+            self.assertRegex(
+                str(ws[0].message),
                 r"The translator-targeted comment 'Translators: ignored i18n "
                 r"comment #1' \(file templates[/\\]comments.thtml, line 4\) "
                 r"was ignored, because it wasn't the last item on the line\."
             )
-            six.assertRegex(
-                self, str(ws[1].message),
+            self.assertRegex(
+                str(ws[1].message),
                 r"The translator-targeted comment 'Translators: ignored i18n "
                 r"comment #3' \(file templates[/\\]comments.thtml, line 6\) "
                 r"was ignored, because it wasn't the last item on the line\."
             )
-            six.assertRegex(
-                self, str(ws[2].message),
+            self.assertRegex(
+                str(ws[2].message),
                 r"The translator-targeted comment 'Translators: ignored i18n "
                 r"comment #4' \(file templates[/\\]comments.thtml, line 8\) "
                 r"was ignored, because it wasn't the last item on the line\."
@@ -343,8 +336,8 @@ class BasicExtractorTests(ExtractorTests):
             self.assertIn('#. Translators: valid i18n comment #7', po_contents)
             self.assertMsgId('Translatable literal #9i', po_contents)
 
-            six.assertRegex(self, po_contents, r'#\..+Translators: valid i18n comment #8')
-            six.assertRegex(self, po_contents, r'#\..+Translators: valid i18n comment #9')
+            self.assertRegex(po_contents, r'#\..+Translators: valid i18n comment #8')
+            self.assertRegex(po_contents, r'#\..+Translators: valid i18n comment #9')
             self.assertMsgId("Translatable literal #9j", po_contents)
 
     def test_makemessages_find_files(self):
@@ -392,7 +385,7 @@ class BasicExtractorTests(ExtractorTests):
         mocked_popen_wrapper.return_value = (
             "any other return value\n", '', 0)
         cmd = MakeMessagesCommand()
-        with six.assertRaisesRegex(self, CommandError, "Unable to get gettext version. Is it installed?"):
+        with self.assertRaisesMessage(CommandError, "Unable to get gettext version. Is it installed?"):
             cmd.gettext_version
 
     def test_po_file_encoding_when_updating(self):

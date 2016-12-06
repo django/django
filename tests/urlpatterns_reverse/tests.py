@@ -1005,7 +1005,7 @@ class ViewLoadingTests(SimpleTestCase):
     def test_exceptions(self):
         # A missing view (identified by an AttributeError) should raise
         # ViewDoesNotExist, ...
-        with six.assertRaisesRegex(self, ViewDoesNotExist, ".*View does not exist in.*"):
+        with self.assertRaisesMessage(ViewDoesNotExist, "View does not exist in"):
             get_callable('urlpatterns_reverse.views.i_should_not_exist')
         # ... but if the AttributeError is caused by something else don't
         # swallow it.

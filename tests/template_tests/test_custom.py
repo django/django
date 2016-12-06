@@ -342,7 +342,7 @@ class TemplateTagLoadingTests(SimpleTestCase):
             "trying to load 'template_tests.broken_tag': cannot import name "
             "'?Xtemplate'?"
         )
-        with six.assertRaisesRegex(self, InvalidTemplateLibrary, msg):
+        with self.assertRaisesRegex(InvalidTemplateLibrary, msg):
             Engine(libraries={
                 'broken_tag': 'template_tests.broken_tag',
             })
@@ -355,7 +355,7 @@ class TemplateTagLoadingTests(SimpleTestCase):
             "import name '?Xtemplate'?"
         )
         with extend_sys_path(egg_name):
-            with six.assertRaisesRegex(self, InvalidTemplateLibrary, msg):
+            with self.assertRaisesRegex(InvalidTemplateLibrary, msg):
                 Engine(libraries={
                     'broken_egg': 'tagsegg.templatetags.broken_egg',
                 })

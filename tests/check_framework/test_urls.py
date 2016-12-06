@@ -4,7 +4,6 @@ from django.core.checks.urls import (
 )
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.utils import six
 
 
 class CheckUrlsTest(SimpleTestCase):
@@ -35,7 +34,7 @@ class CheckUrlsTest(SimpleTestCase):
         result = check_url_config(None)
         warning = result[0]
         self.assertEqual(warning.id, 'urls.E004')
-        six.assertRegex(self, warning.msg, (
+        self.assertRegex(warning.msg, (
             r"^Your URL pattern \('\^tuple/\$', <function <lambda> at 0x(\w+)>\) is "
             r"invalid. Ensure that urlpatterns is a list of url\(\) instances.$"
         ))

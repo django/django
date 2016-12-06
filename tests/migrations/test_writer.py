@@ -465,7 +465,7 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(string, "migrations.test_writer.EmailValidator(message='hello')")
 
         validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
-        with six.assertRaisesRegex(self, ImportError, "No module named '?custom'?"):
+        with self.assertRaisesRegex(ImportError, "No module named '?custom'?"):
             MigrationWriter.serialize(validator)
 
         validator = deconstructible(path="django.core.validators.EmailValidator2")(EmailValidator)(message="hello")
