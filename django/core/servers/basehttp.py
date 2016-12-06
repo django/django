@@ -77,6 +77,11 @@ class WSGIServer(simple_server.WSGIServer):
             super().handle_error(request, client_address)
 
 
+class ThreadedWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
+    """A threaded version of the WSGIServer"""
+    pass
+
+
 class ServerHandler(simple_server.ServerHandler):
     def handle_error(self):
         # Ignore broken pipe errors, otherwise pass on

@@ -130,3 +130,19 @@ class LiveServerPort(LiveServerBase):
         finally:
             if hasattr(TestCase, 'server_thread'):
                 TestCase.server_thread.terminate()
+
+
+class LiverServerThreadedTests(LiveServerBase):
+    """If LiverServerTestCase isn't threaded, these tests will hang."""
+
+    def test_view_calls_subview(self):
+        url = '/subview_calling_view/?%s' % urlencode({'url': self.live_server_url})
+        with self.urlopen(url) as f:
+            self.assertEqual(f.read(), b'subview calling view: subview')
+
+    def test_check_model_instance_from_subview(self):
+        url = '/check_model_instance_from_subview/?%s' % urlencode({
+            'url': self.live_server_url,
+        })
+        with self.urlopen(url) as f:
+            self.assertIn(b'emily', f.read())

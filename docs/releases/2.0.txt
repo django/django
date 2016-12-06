@@ -193,7 +193,7 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* Added threading support to :class:`~django.test.LiveServerTestCase`.
 
 URLs
 ~~~~

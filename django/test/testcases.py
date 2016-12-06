@@ -21,7 +21,7 @@ from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.management.sql import emit_post_migrate_signal
-from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
+from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
@@ -1248,7 +1248,7 @@ class LiveServerThread(threading.Thread):
             connections.close_all()
 
     def _create_server(self, port):
-        return WSGIServer((self.host, port), QuietWSGIRequestHandler, allow_reuse_address=False)
+        return ThreadedWSGIServer((self.host, port), QuietWSGIRequestHandler, allow_reuse_address=False)
 
     def terminate(self):
         if hasattr(self, 'httpd'):
