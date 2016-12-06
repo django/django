@@ -41,8 +41,12 @@ Measurement         Relationships             Operations              Editors   
 
 Accepts a single geographic field or expression and returns the area of the
 field as an :class:`~django.contrib.gis.measure.Area` measure. On MySQL, a raw
-float value is returned, as it's not possible to automatically determine the
-unit of the field.
+float value is returned when the coordinates are geodetic.
+
+.. versionchanged:: 1.11
+
+    In older versions, a raw value was returned on MySQL when used on
+    projected SRS.
 
 ``AsGeoJSON``
 =============
@@ -211,8 +215,7 @@ geometry B.
 
 Accepts two geographic fields or expressions and returns the distance between
 them, as a :class:`~django.contrib.gis.measure.Distance` object. On MySQL, a raw
-float value is returned, as it's not possible to automatically determine the
-unit of the field.
+float value is returned when the coordinates are geodetic.
 
 On backends that support distance calculation on geodetic coordinates, the
 proper backend function is automatically chosen depending on the SRID value of
@@ -245,6 +248,11 @@ queryset is calculated::
     the distance value in miles and ``city.distance.km`` is the distance value
     in kilometers. See :doc:`measure` for usage details and the list of
     :ref:`supported_units`.
+
+.. versionchanged:: 1.11
+
+    In older versions, a raw value was returned on MySQL when used on
+    projected SRS.
 
 ``Envelope``
 ============
@@ -325,13 +333,18 @@ Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
 
 Accepts a single geographic linestring or multilinestring field or expression
 and returns its length as an :class:`~django.contrib.gis.measure.Distance`
-measure. On MySQL, a raw float value is returned, as it's not possible to
-automatically determine the unit of the field.
+measure. On MySQL, a raw float value is returned when the coordinates
+are geodetic.
 
 On PostGIS and SpatiaLite, when the coordinates are geodetic (angular), you can
 specify if the calculation should be based on a simple sphere (less
 accurate, less resource-intensive) or on a spheroid (more accurate, more
 resource-intensive) with the ``spheroid`` keyword argument.
+
+.. versionchanged:: 1.11
+
+    In older versions, a raw value was returned on MySQL when used on
+    projected SRS.
 
 ``MakeValid``
 =============
