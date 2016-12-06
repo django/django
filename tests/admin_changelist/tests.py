@@ -445,6 +445,81 @@ class ChangeListTests(TestCase):
         # There's only one Concert instance
         self.assertEqual(cl.queryset.count(), 1)
 
+    def test_no_distinct_for_m2m_in_list_filter_without_lookup(self):
+        """
+        Regression test for #18729: When having a ManyToMany in list_filter (Basic ManyToMany),
+        but it isn't in any lookup fields, the changelist's query shouldn't have distinct.
+        """
+        m = BandAdmin(Band, custom_site)
+
+        for lookup_params in ({}, {'name': 'test'}):
+            request = self.factory.get('/band/', lookup_params)
+            cl = ChangeList(request, Band, *get_changelist_args(m))
+            self.assertFalse(cl.queryset.query.distinct)
+
+    def test_no_distinct_for_through_m2m_in_list_filter_without_lookup(self):
+        """
+        Regression test for #18729: When using a ManyToMany in list_filter,
+        but it isn't in any lookup fields, the changelist's query shouldn't have distinct.
+        """
+        m = GroupAdmin(Group, custom_site)
+
+        for lookup_params in ({}, {'name': 'test'}):
+            request = self.factory.get('/group/', lookup_params)
+            cl = ChangeList(request, Group, *get_changelist_args(m))
+            self.assertFalse(cl.queryset.query.distinct)
+
+    def test_no_distinct_for_through_m2m_at_second_level_in_list_filter_without_lookup(self):
+        """
+        Regression test for #18729: When using a ManyToMany in list_filter at the second level behind a
+        ForeignKey, but it isn't in any lookup fields, distinct() shouldn't be called.
+        """
+        m = ConcertAdmin(Concert, custom_site)
+
+        for lookup_params in ({}, {'name': 'test'}):
+            request = self.factory.get('/concert/', lookup_params)
+            cl = ChangeList(request, Concert, *get_changelist_args(m))
+            self.assertFalse(cl.queryset.query.distinct)
+
+    def test_no_distinct_for_inherited_m2m_in_list_filter_without_lookup(self):
+        """
+        Regression test for #18729: When using a ManyToMany in list_filter,
+        but it isn't in any lookup fields, the changelist's query shouldn't have distinct.
+        Model managed in the admin inherits from the one that defines the relationship.
+        """
+        m = QuartetAdmin(Quartet, custom_site)
+
+        for lookup_params in ({}, {'name': 'test'}):
+            request = self.factory.get('/quartet/', lookup_params)
+            cl = ChangeList(request, Quartet, *get_changelist_args(m))
+            self.assertFalse(cl.queryset.query.distinct)
+
+    def test_no_distinct_for_m2m_to_inherited_in_list_filter_without_lookup(self):
+        """
+        Regression test for #18729: When using a ManyToMany in list_filter,
+        but it isn't in any lookup fields, the changelist's query shouldn't have distinct.
+        Target of the relationship inherits from another.
+        """
+        m = ChordsBandAdmin(ChordsBand, custom_site)
+
+        for lookup_params in ({}, {'name': 'test'}):
+            request = self.factory.get('/chordsband/', lookup_params)
+            cl = ChangeList(request, ChordsBand, *get_changelist_args(m))
+            self.assertFalse(cl.queryset.query.distinct)
+
+    def test_no_distinct_for_non_unique_related_object_in_list_filter_without_lookup(self):
+        """
+        Regressions tests for #18729: If a field listed in list_filters
+        is a non-unique related object, but it isn't in any lookup fields,
+        the changelist's query shouldn't have distinct.
+        """
+        m = ParentAdmin(Parent, custom_site)
+
+        for lookup_params in ({}, {'name': 'test'}):
+            request = self.factory.get('/parent/', lookup_params)
+            cl = ChangeList(request, Parent, *get_changelist_args(m))
+            self.assertFalse(cl.queryset.query.distinct)
+
     def test_pagination(self):
         """
         Regression tests for #12893: Pagination in admins changelist doesn't
