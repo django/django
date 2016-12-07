@@ -579,6 +579,8 @@ class Value(Expression):
                 val = self.output_field.get_db_prep_save(val, connection=connection)
             else:
                 val = self.output_field.get_db_prep_value(val, connection=connection)
+            if hasattr(self._output_field, 'get_placeholder'):
+                return self._output_field.get_placeholder(val, compiler, connection), [val]
         if val is None:
             # cx_Oracle does not always convert None to the appropriate
             # NULL type (like in case expressions using numbers), so we
