@@ -54,11 +54,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return "'%s'" % six.text_type(value).replace("\'", "\'\'")
         elif value is None:
             return "NULL"
-        elif isinstance(value, (bytes, bytearray, six.memoryview)):
+        elif isinstance(value, six.buffer_types):
             # Bytes are only allowed for BLOB fields, encoded as string
             # literals containing hexadecimal data and preceded by a single "X"
             # character:
             # value = b'\x01\x02' => value_hex = b'0102' => return X'0102'
+            if hasattr(value, 'tobytes'):
+                value = value.tobytes()
+            else:
+                value = bytes(value)
             value = bytes(value)
             hex_encoder = codecs.getencoder('hex_codec')
             value_hex, _length = hex_encoder(value)

@@ -70,7 +70,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         elif isinstance(geo_input, GEOM_PTR):
             # When the input is a pointer to a geometry (GEOM_PTR).
             g = geo_input
-        elif isinstance(geo_input, six.memoryview):
+        elif isinstance(geo_input, six.buffer_types):
             # When the input is a buffer (WKB).
             g = wkb_r().read(geo_input)
         elif isinstance(geo_input, GEOSGeometry):
