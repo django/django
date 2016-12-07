@@ -5,7 +5,6 @@ from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import models, transaction
 from django.db.utils import IntegrityError
 from django.test import TestCase, ignore_warnings
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy
 
@@ -73,8 +72,7 @@ class ManyToOneTests(TestCase):
 
         # Adding an object of the wrong type raises TypeError.
         with transaction.atomic():
-            with six.assertRaisesRegex(self, TypeError,
-                                       "'Article' instance expected, got <Reporter.*"):
+            with self.assertRaisesMessage(TypeError, "'Article' instance expected, got <Reporter:"):
                 self.r.article_set.add(self.r2)
         self.assertQuerysetEqual(
             self.r.article_set.all(),
@@ -440,7 +438,7 @@ class ManyToOneTests(TestCase):
         reporter = Reporter.objects.create(first_name='John', last_name='Smith', email='john.smith@example.com')
         lazy = ugettext_lazy('test')
         reporter.article_set.create(headline=lazy, pub_date=datetime.date(2011, 6, 10))
-        notlazy = six.text_type(lazy)
+        notlazy = str(lazy)
         article = reporter.article_set.get()
         self.assertEqual(article.headline, notlazy)
 

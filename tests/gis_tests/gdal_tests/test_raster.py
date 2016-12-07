@@ -60,7 +60,7 @@ if HAS_GDAL:
 
 
 @unittest.skipUnless(HAS_GDAL, "GDAL is required")
-class GDALRasterTests(unittest.TestCase):
+class GDALRasterTests(SimpleTestCase):
     """
     Test a GDALRaster instance created from a file (GeoTiff).
     """
@@ -71,7 +71,7 @@ class GDALRasterTests(unittest.TestCase):
 
     def test_rs_name_repr(self):
         self.assertEqual(self.rs_path, self.rs.name)
-        six.assertRegex(self, repr(self.rs), r"<Raster object at 0x\w+>")
+        self.assertRegex(repr(self.rs), r"<Raster object at 0x\w+>")
 
     def test_rs_driver(self):
         self.assertEqual(self.rs.driver.name, 'GTiff')

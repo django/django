@@ -12,7 +12,6 @@ from django.contrib.auth.hashers import (
 )
 from django.test import SimpleTestCase, mock
 from django.test.utils import override_settings
-from django.utils import six
 from django.utils.encoding import force_bytes
 
 try:
@@ -436,7 +435,7 @@ class TestUtilsHashPass(SimpleTestCase):
         PlainHasher = type(str('PlainHasher'), (BasePasswordHasher,), {'algorithm': 'plain', 'library': 'plain'})
         # Python 3 adds quotes around module name
         msg = "Couldn't load 'PlainHasher' algorithm library: No module named '?plain'?"
-        with six.assertRaisesRegex(self, ValueError, msg):
+        with self.assertRaisesRegex(ValueError, msg):
             PlainHasher()._load_library()
 
 

@@ -214,7 +214,7 @@ class TestFixtures(TestCase):
         """
         Failing serializer import raises the proper error
         """
-        with six.assertRaisesRegex(self, ImportError, r"No module named.*unexistent"):
+        with self.assertRaisesRegex(ImportError, r"No module named.*unexistent"):
             management.call_command(
                 'loaddata',
                 'bad_fixture1.unkn',
