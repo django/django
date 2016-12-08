@@ -121,19 +121,17 @@
                         // insert in the original django admin position
                         $('<ul class="messagelist"></ul>').insertBefore('div#content');
                         messageList = $('div#container ul.messagelist');
-                        return messageList; // return the list (<ul><>) instance
+                        return messageList; // return the list (<ul></ul>) instance
                     }();
                 },
                 skipChangeListFormSubmit = function(msg, type, replace) {
                     event.preventDefault();  // skip submit
                     if (replace) {
-                        // replace the message list with the new item error
-                        getMessageList().html('<li class="' + type + '">' + msg + '</li>');
+                        // clean the message list, the new item list will replace the list content
+                        getMessageList().find('li').remove();
                     }
-                    else {
-                        // add new item error to the message list
-                        $('<li class="' + type + '">' + msg + '</li>').appendTo(getMessageList());
-                    }
+                    // add new item error to the message list
+                    $('<li></li>').attr('class', type).text(msg).appendTo(getMessageList());
                     return;
                 };
 
