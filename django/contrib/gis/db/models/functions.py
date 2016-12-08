@@ -425,19 +425,14 @@ class Transform(GeoFunc):
             expression,
             self._handle_param(srid, 'srid', six.integer_types),
         ]
+        if 'output_field' not in extra:
+            extra['output_field'] = GeometryField(srid=srid)
         super(Transform, self).__init__(*expressions, **extra)
 
     @property
     def srid(self):
         # Make srid the resulting srid of the transformation
         return self.source_expressions[self.geom_param_pos + 1].value
-
-    def convert_value(self, value, expression, connection, context):
-        value = super(Transform, self).convert_value(value, expression, connection, context)
-        if not connection.ops.postgis and not value.srid:
-            # Some backends do not set the srid on the returning geometry
-            value.srid = self.srid
-        return value
 
 
 class Translate(Scale):
