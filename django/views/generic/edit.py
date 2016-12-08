@@ -192,7 +192,7 @@ class ProcessFormView(View):
 
 class BaseFormView(FormMixin, ProcessFormView):
     """
-    A base view for displaying a form
+    A base view for displaying a form.
     """
 
 
