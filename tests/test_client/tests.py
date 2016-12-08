@@ -549,6 +549,17 @@ class ClientTest(TestCase):
         self.assertEqual(response.context['user'].username, 'testclient')
         self.assertEqual(self.u1.backend, 'django.contrib.auth.backends.ModelBackend')
 
+    @override_settings(AUTHENTICATION_BACKENDS=[
+        'test_client.auth_backends.BackendWithoutGetUserMethod',
+        'django.contrib.auth.backends.ModelBackend',
+    ])
+    def test_force_login_with_backend_missing_get_user(self):
+        """
+        force_login() skips auth backends without a get_user() method.
+        """
+        self.client.force_login(self.u1)
+        self.assertEqual(self.u1.backend, 'django.contrib.auth.backends.ModelBackend')
+
     @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies")
     def test_logout_cookie_sessions(self):
         self.test_logout()

@@ -7,52 +7,22 @@ import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest
 from django.middleware.csrf import (
     CSRF_SESSION_KEY, CSRF_TOKEN_LENGTH, REASON_BAD_TOKEN,
     REASON_NO_CSRF_COOKIE, CsrfViewMiddleware,
     _compare_salted_tokens as equivalent_tokens, get_token,
 )
-from django.template import RequestContext, Template
-from django.template.context_processors import csrf
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import patch_logger
 from django.utils.encoding import force_bytes
 from django.utils.six import text_type
-from django.views.decorators.csrf import (
-    csrf_exempt, ensure_csrf_cookie, requires_csrf_token,
+from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
+
+from .views import (
+    ensure_csrf_cookie_view, non_token_view_using_request_processor,
+    post_form_view, token_view,
 )
-
-
-# Response/views used for CsrfResponseMiddleware and CsrfViewMiddleware tests
-def post_form_response():
-    resp = HttpResponse(content="""
-<html><body><h1>\u00a1Unicode!<form method="post"><input type="text" /></form></body></html>
-""", mimetype="text/html")
-    return resp
-
-
-def post_form_view(request):
-    """A view that returns a POST form (without a token)"""
-    return post_form_response()
-
-
-# Response/views used for template tag tests
-
-def token_view(request):
-    """A view that uses {% csrf_token %}"""
-    context = RequestContext(request, processors=[csrf])
-    template = Template("{% csrf_token %}")
-    return HttpResponse(template.render(context))
-
-
-def non_token_view_using_request_processor(request):
-    """
-    A view that doesn't use the token, but does use the csrf view processor.
-    """
-    context = RequestContext(request, processors=[csrf])
-    template = Template("")
-    return HttpResponse(template.render(context))
 
 
 class TestingHttpRequest(HttpRequest):
@@ -439,11 +409,6 @@ class CsrfViewMiddlewareTestMixin(object):
         """
         ensure_csrf_cookie() doesn't log warnings (#19436).
         """
-        @ensure_csrf_cookie
-        def view(request):
-            # Doesn't insert a token or anything
-            return HttpResponse(content="")
-
         class TestHandler(logging.Handler):
             def emit(self, record):
                 raise Exception("This shouldn't have happened!")
@@ -456,7 +421,7 @@ class CsrfViewMiddlewareTestMixin(object):
             logger.setLevel(logging.WARNING)
 
             req = self._get_GET_no_csrf_cookie_request()
-            view(req)
+            ensure_csrf_cookie_view(req)
         finally:
             logger.removeHandler(test_handler)
             logger.setLevel(old_log_level)
@@ -532,13 +497,8 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         """
         The ensure_csrf_cookie() decorator works without middleware.
         """
-        @ensure_csrf_cookie
-        def view(request):
-            # Doesn't insert a token or anything
-            return HttpResponse(content="")
-
         req = self._get_GET_no_csrf_cookie_request()
-        resp = view(req)
+        resp = ensure_csrf_cookie_view(req)
         self.assertTrue(resp.cookies.get(settings.CSRF_COOKIE_NAME, False))
         self.assertIn('Cookie', resp.get('Vary', ''))
 
@@ -547,14 +507,9 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         The ensure_csrf_cookie() decorator works with the CsrfViewMiddleware
         enabled.
         """
-        @ensure_csrf_cookie
-        def view(request):
-            # Doesn't insert a token or anything
-            return HttpResponse(content="")
-
         req = self._get_GET_no_csrf_cookie_request()
-        CsrfViewMiddleware().process_view(req, view, (), {})
-        resp = view(req)
+        CsrfViewMiddleware().process_view(req, ensure_csrf_cookie_view, (), {})
+        resp = ensure_csrf_cookie_view(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
         self.assertTrue(resp2.cookies.get(settings.CSRF_COOKIE_NAME, False))
         self.assertIn('Cookie', resp2.get('Vary', ''))
@@ -728,13 +683,8 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
 
     def test_process_response_get_token_used(self):
         """The ensure_csrf_cookie() decorator works without middleware."""
-        @ensure_csrf_cookie
-        def view(request):
-            # Doesn't insert a token or anything
-            return HttpResponse(content="")
-
         req = self._get_GET_no_csrf_cookie_request()
-        view(req)
+        ensure_csrf_cookie_view(req)
         self.assertTrue(req.session.get(CSRF_SESSION_KEY, False))
 
     def test_ensures_csrf_cookie_with_middleware(self):
@@ -742,14 +692,9 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
         The ensure_csrf_cookie() decorator works with the CsrfViewMiddleware
         enabled.
         """
-        @ensure_csrf_cookie
-        def view(request):
-            # Doesn't insert a token or anything
-            return HttpResponse(content="")
-
         req = self._get_GET_no_csrf_cookie_request()
-        CsrfViewMiddleware().process_view(req, view, (), {})
-        resp = view(req)
+        CsrfViewMiddleware().process_view(req, ensure_csrf_cookie_view, (), {})
+        resp = ensure_csrf_cookie_view(req)
         CsrfViewMiddleware().process_response(req, resp)
         self.assertTrue(req.session.get(CSRF_SESSION_KEY, False))
 

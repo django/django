@@ -14,7 +14,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_subqueries_in_group_by = False
     supports_transactions = True
     supports_timezones = False
-    supports_bitwise_or = False
     has_native_duration_field = True
     can_defer_constraint_checks = True
     supports_partially_nullable_unique_constraints = False

@@ -6,8 +6,8 @@ import tempfile
 from django.contrib.gis import gdal
 from django.contrib.gis.db.models import Extent, MakeLine, Union
 from django.contrib.gis.geos import (
-    GeometryCollection, GEOSGeometry, LinearRing, LineString, Point, Polygon,
-    fromstr,
+    GeometryCollection, GEOSGeometry, LinearRing, LineString, MultiLineString,
+    MultiPoint, MultiPolygon, Point, Polygon, fromstr,
 )
 from django.core.management import call_command
 from django.db import connection
@@ -214,6 +214,29 @@ class GeoModelTest(TestCase):
             tmp.seek(0)
             call_command('loaddata', tmp.name, verbosity=0)
         self.assertListEqual(original_data, list(City.objects.all().order_by('name')))
+
+    @skipUnlessDBFeature("supports_empty_geometries")
+    def test_empty_geometries(self):
+        geometry_classes = [
+            Point,
+            LineString,
+            LinearRing,
+            Polygon,
+            MultiPoint,
+            MultiLineString,
+            MultiPolygon,
+            GeometryCollection,
+        ]
+        for klass in geometry_classes:
+            g = klass(srid=4326)
+            feature = Feature.objects.create(name='Empty %s' % klass.__name__, geom=g)
+            feature.refresh_from_db()
+            if klass is LinearRing:
+                # LinearRing isn't representable in WKB, so GEOSGeomtry.wkb
+                # uses LineString instead.
+                g = LineString(srid=4326)
+            self.assertEqual(feature.geom, g)
+            self.assertEqual(feature.geom.srid, g.srid)
 
 
 @skipUnlessDBFeature("gis_enabled")

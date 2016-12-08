@@ -1,6 +1,8 @@
 from unittest import skipUnless
 
 from django.db import connection
+from django.db.models.deletion import CASCADE
+from django.db.models.fields.related import ForeignKey
 from django.test import TestCase
 
 from .models import Article, ArticleTranslation, IndexTogetherSingleList
@@ -98,3 +100,15 @@ class SchemaIndexesTests(TestCase):
             'CREATE INDEX `indexes_articletranslation_article_no_constraint_id_d6c0806b` '
             'ON `indexes_articletranslation` (`article_no_constraint_id`)'
         ])
+
+        # The index also shouldn't be created if the ForeignKey is added after
+        # the model was created.
+        with connection.schema_editor() as editor:
+            new_field = ForeignKey(Article, CASCADE)
+            new_field.set_attributes_from_name('new_foreign_key')
+            editor.add_field(ArticleTranslation, new_field)
+            self.assertEqual(editor.deferred_sql, [
+                'ALTER TABLE `indexes_articletranslation` '
+                'ADD CONSTRAINT `indexes_articletrans_new_foreign_key_id_d27a9146_fk_indexes_a` '
+                'FOREIGN KEY (`new_foreign_key_id`) REFERENCES `indexes_article` (`id`)'
+            ])

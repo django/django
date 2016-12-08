@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from datetime import date
 from decimal import Decimal
 
+from django.db.models.query import RawQuerySet
 from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase, skipUnlessDBFeature
 
@@ -89,6 +90,11 @@ class RawQueryTests(TestCase):
                 annotation, value = expected_annotations[index]
                 self.assertTrue(hasattr(result, annotation))
                 self.assertEqual(getattr(result, annotation), value)
+
+    def test_rawqueryset_repr(self):
+        queryset = RawQuerySet(raw_query='SELECT * FROM raw_query_author')
+        self.assertEqual(repr(queryset), '<RawQuerySet: SELECT * FROM raw_query_author>')
+        self.assertEqual(repr(queryset.query), '<RawQuery: SELECT * FROM raw_query_author>')
 
     def test_simple_raw_query(self):
         """

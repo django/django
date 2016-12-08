@@ -49,9 +49,8 @@ Python style
 
 * In tests, use :meth:`~django.test.SimpleTestCase.assertRaisesMessage` instead
   of :meth:`~unittest.TestCase.assertRaises` so you can check the exception
-  message. Use :meth:`~unittest.TestCase.assertRaisesRegex`
-  (``six.assertRaisesRegex()`` as long as we support Python 2) only if you need
-  to use regular expression matching.
+  message. Use :meth:`~unittest.TestCase.assertRaisesRegex` only if you need
+  regular expression matching.
 
 * In test docstrings, state the expected behavior that each test demonstrates.
   Don't include preambles such as "Tests that" or "Ensures that".

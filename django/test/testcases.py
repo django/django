@@ -802,6 +802,12 @@ class SimpleTestCase(unittest.TestCase):
                 standardMsg = '%s == %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
                 self.fail(self._formatMessage(msg, standardMsg))
 
+    if six.PY2:
+        assertCountEqual = unittest.TestCase.assertItemsEqual
+        assertNotRegex = unittest.TestCase.assertNotRegexpMatches
+        assertRaisesRegex = unittest.TestCase.assertRaisesRegexp
+        assertRegex = unittest.TestCase.assertRegexpMatches
+
 
 class TransactionTestCase(SimpleTestCase):
 

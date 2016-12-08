@@ -319,11 +319,11 @@ class BaseExpression(object):
         """
         return [e._output_field_or_none for e in self.get_source_expressions()]
 
-    def asc(self):
-        return OrderBy(self)
+    def asc(self, **kwargs):
+        return OrderBy(self, **kwargs)
 
-    def desc(self):
-        return OrderBy(self, descending=True)
+    def desc(self, **kwargs):
+        return OrderBy(self, descending=True, **kwargs)
 
     def reverse_ordering(self):
         return self
@@ -462,11 +462,11 @@ class F(Combinable):
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         return query.resolve_ref(self.name, allow_joins, reuse, summarize)
 
-    def asc(self):
-        return OrderBy(self)
+    def asc(self, **kwargs):
+        return OrderBy(self, **kwargs)
 
-    def desc(self):
-        return OrderBy(self, descending=True)
+    def desc(self, **kwargs):
+        return OrderBy(self, descending=True, **kwargs)
 
 
 class Func(Expression):
@@ -579,6 +579,8 @@ class Value(Expression):
                 val = self.output_field.get_db_prep_save(val, connection=connection)
             else:
                 val = self.output_field.get_db_prep_value(val, connection=connection)
+            if hasattr(self._output_field, 'get_placeholder'):
+                return self._output_field.get_placeholder(val, compiler, connection), [val]
         if val is None:
             # cx_Oracle does not always convert None to the appropriate
             # NULL type (like in case expressions using numbers), so we
@@ -867,7 +869,11 @@ class Case(Expression):
 class OrderBy(BaseExpression):
     template = '%(expression)s %(ordering)s'
 
-    def __init__(self, expression, descending=False):
+    def __init__(self, expression, descending=False, nulls_first=False, nulls_last=False):
+        if nulls_first and nulls_last:
+            raise ValueError('nulls_first and nulls_last are mutually exclusive')
+        self.nulls_first = nulls_first
+        self.nulls_last = nulls_last
         self.descending = descending
         if not hasattr(expression, 'resolve_expression'):
             raise ValueError('expression must be an expression type')
@@ -884,6 +890,11 @@ class OrderBy(BaseExpression):
         return [self.expression]
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
+        if not template:
+            if self.nulls_last:
+                template = '%s NULLS LAST' % self.template
+            elif self.nulls_first:
+                template = '%s NULLS FIRST' % self.template
         connection.ops.check_expression_support(self)
         expression_sql, params = compiler.compile(self.expression)
         placeholders = {
@@ -893,6 +904,22 @@ class OrderBy(BaseExpression):
         placeholders.update(extra_context)
         template = template or self.template
         return (template % placeholders).rstrip(), params
+
+    def as_sqlite(self, compiler, connection):
+        template = None
+        if self.nulls_last:
+            template = '%(expression)s IS NULL, %(expression)s %(ordering)s'
+        elif self.nulls_first:
+            template = '%(expression)s IS NOT NULL, %(expression)s %(ordering)s'
+        return self.as_sql(compiler, connection, template=template)
+
+    def as_mysql(self, compiler, connection):
+        template = None
+        if self.nulls_last:
+            template = 'IF(ISNULL(%(expression)s),1,0), %(expression)s %(ordering)s '
+        elif self.nulls_first:
+            template = 'IF(ISNULL(%(expression)s),0,1), %(expression)s %(ordering)s '
+        return self.as_sql(compiler, connection, template=template)
 
     def get_group_by_cols(self):
         cols = []

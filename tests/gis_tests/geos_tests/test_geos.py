@@ -1355,6 +1355,14 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertIsNone(g.normalize())
         self.assertTrue(g.equals_exact(MultiPoint(Point(2, 2), Point(1, 1), Point(0, 0))))
 
+    def test_empty_point(self):
+        p = Point(srid=4326)
+        self.assertEqual(p.ogr.ewkt, p.ewkt)
+
+        self.assertEqual(p.transform(2774, clone=True), Point(srid=2774))
+        p.transform(2774)
+        self.assertEqual(p, Point(srid=2774))
+
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_deprecated_srid_getters_setters(self):
         p = Point(1, 2, srid=123)

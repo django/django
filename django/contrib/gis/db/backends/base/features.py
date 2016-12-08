@@ -26,6 +26,8 @@ class BaseSpatialFeatures(object):
     supports_real_shape_operations = True
     # Can geometry fields be null?
     supports_null_geometries = True
+    # Are empty geometries supported?
+    supports_empty_geometries = False
     # Can the the function be applied on geodetic coordinate systems?
     supports_distance_geodetic = True
     supports_length_geodetic = True

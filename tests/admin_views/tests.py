@@ -1952,7 +1952,7 @@ class AdminViewPermissionsTest(TestCase):
         # Can't use self.assertRedirects() because User.get_absolute_url() is silly.
         self.assertEqual(response.status_code, 302)
         # Domain may depend on contrib.sites tests also run
-        six.assertRegex(self, response.url, 'http://(testserver|example.com)/dummy/foo/')
+        self.assertRegex(response.url, 'http://(testserver|example.com)/dummy/foo/')
 
     def test_has_module_permission(self):
         """
@@ -2113,7 +2113,7 @@ class AdminViewDeletedObjectsTest(TestCase):
             )
         )
         response = self.client.get(reverse('admin:admin_views_villain_delete', args=(self.v1.pk,)))
-        six.assertRegex(self, response.content, pattern)
+        self.assertRegex(response.content, pattern)
 
     def test_cyclic(self):
         """

@@ -226,13 +226,37 @@ class WKBWriter(IOBase):
         super(WKBWriter, self).__init__()
         self.outdim = dim
 
+    def _handle_empty_point(self, geom):
+        from django.contrib.gis.geos import Point
+        if isinstance(geom, Point) and geom.empty:
+            if self.srid:
+                # PostGIS uses POINT(NaN NaN) for WKB representation of empty
+                # points. Use it for EWKB as it's a PostGIS specific format.
+                # https://trac.osgeo.org/postgis/ticket/3181
+                geom = Point(float('NaN'), float('NaN'), srid=geom.srid)
+            else:
+                raise ValueError('Empty point is not representable in WKB.')
+        return geom
+
     def write(self, geom):
         "Returns the WKB representation of the given geometry."
-        return six.memoryview(wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t())))
+        from django.contrib.gis.geos import Polygon
+        geom = self._handle_empty_point(geom)
+        wkb = wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t()))
+        if isinstance(geom, Polygon) and geom.empty:
+            # Fix GEOS output for empty polygon.
+            # See https://trac.osgeo.org/geos/ticket/680.
+            wkb = wkb[:-8] + b'\0' * 4
+        return six.memoryview(wkb)
 
     def write_hex(self, geom):
         "Returns the HEXEWKB representation of the given geometry."
-        return wkb_writer_write_hex(self.ptr, geom.ptr, byref(c_size_t()))
+        from django.contrib.gis.geos.polygon import Polygon
+        geom = self._handle_empty_point(geom)
+        wkb = wkb_writer_write_hex(self.ptr, geom.ptr, byref(c_size_t()))
+        if isinstance(geom, Polygon) and geom.empty:
+            wkb = wkb[:-16] + b'0' * 8
+        return wkb
 
     # ### WKBWriter Properties ###
 

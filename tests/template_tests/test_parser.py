@@ -3,17 +3,15 @@ Testing some internals of the template processing. These are *not* examples to b
 """
 from __future__ import unicode_literals
 
-from unittest import TestCase
-
 from django.template import Library, TemplateSyntaxError
 from django.template.base import (
     TOKEN_BLOCK, FilterExpression, Parser, Token, Variable,
 )
 from django.template.defaultfilters import register as filter_library
-from django.utils import six
+from django.test import SimpleTestCase
 
 
-class ParserTests(TestCase):
+class ParserTests(SimpleTestCase):
 
     def test_token_smart_split(self):
         """
@@ -72,7 +70,7 @@ class ParserTests(TestCase):
             Variable("article._hidden")
 
         # Variables should raise on non string type
-        with six.assertRaisesRegex(self, TypeError, "Variable must be a string or number, got <(class|type) 'dict'>"):
+        with self.assertRaisesRegex(TypeError, "Variable must be a string or number, got <(class|type) 'dict'>"):
             Variable({})
 
     def test_filter_args_count(self):

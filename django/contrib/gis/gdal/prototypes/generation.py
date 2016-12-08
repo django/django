@@ -49,10 +49,12 @@ def geom_output(func, argtypes, offset=None):
     return func
 
 
-def int_output(func, argtypes):
+def int_output(func, argtypes, errcheck=None):
     "Generates a ctypes function that returns an integer value."
     func.argtypes = argtypes
     func.restype = c_int
+    if errcheck:
+        func.errcheck = errcheck
     return func
 
 

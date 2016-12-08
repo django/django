@@ -215,17 +215,17 @@ class TranslationTests(SimpleTestCase):
             self.assertEqual(complex_nonlazy % {'num': 4, 'name': 'Jim'}, 'Hallo Jim, 4 guten Resultate')
             self.assertEqual(complex_deferred % {'name': 'Jim', 'num': 1}, 'Hallo Jim, 1 gutes Resultat')
             self.assertEqual(complex_deferred % {'name': 'Jim', 'num': 5}, 'Hallo Jim, 5 guten Resultate')
-            with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
+            with self.assertRaisesMessage(KeyError, 'Your dictionary lacks key'):
                 complex_deferred % {'name': 'Jim'}
             self.assertEqual(complex_str_nonlazy % {'num': 4, 'name': 'Jim'}, str('Hallo Jim, 4 guten Resultate'))
             self.assertEqual(complex_str_deferred % {'name': 'Jim', 'num': 1}, str('Hallo Jim, 1 gutes Resultat'))
             self.assertEqual(complex_str_deferred % {'name': 'Jim', 'num': 5}, str('Hallo Jim, 5 guten Resultate'))
-            with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
+            with self.assertRaisesMessage(KeyError, 'Your dictionary lacks key'):
                 complex_str_deferred % {'name': 'Jim'}
             self.assertEqual(complex_context_nonlazy % {'num': 4, 'name': 'Jim'}, 'Willkommen Jim, 4 guten Resultate')
             self.assertEqual(complex_context_deferred % {'name': 'Jim', 'num': 1}, 'Willkommen Jim, 1 gutes Resultat')
             self.assertEqual(complex_context_deferred % {'name': 'Jim', 'num': 5}, 'Willkommen Jim, 5 guten Resultate')
-            with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
+            with self.assertRaisesMessage(KeyError, 'Your dictionary lacks key'):
                 complex_context_deferred % {'name': 'Jim'}
 
     @skipUnless(six.PY2, "PY3 doesn't have distinct int and long types")
@@ -1630,7 +1630,8 @@ class TestLanguageInfo(SimpleTestCase):
         self.assertIs(li['bidi'], False)
 
     def test_unknown_language_code(self):
-        six.assertRaisesRegex(self, KeyError, r"Unknown language code xx\.", get_language_info, 'xx')
+        with self.assertRaisesMessage(KeyError, "Unknown language code xx"):
+            get_language_info('xx')
         with translation.override('xx'):
             # A language with no translation catalogs should fallback to the
             # untranslated string.
@@ -1644,7 +1645,8 @@ class TestLanguageInfo(SimpleTestCase):
         self.assertIs(li['bidi'], False)
 
     def test_unknown_language_code_and_country_code(self):
-        six.assertRaisesRegex(self, KeyError, r"Unknown language code xx-xx and xx\.", get_language_info, 'xx-xx')
+        with self.assertRaisesMessage(KeyError, "Unknown language code xx-xx and xx"):
+            get_language_info('xx-xx')
 
     def test_fallback_language_code(self):
         """

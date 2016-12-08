@@ -79,6 +79,7 @@ get_centroid = void_output(lgdal.OGR_G_Centroid, [c_void_p, c_void_p])
 get_dims = int_output(lgdal.OGR_G_GetDimension, [c_void_p])
 get_coord_dim = int_output(lgdal.OGR_G_GetCoordinateDimension, [c_void_p])
 set_coord_dim = void_output(lgdal.OGR_G_SetCoordinateDimension, [c_void_p, c_int], errcheck=False)
+is_empty = int_output(lgdal.OGR_G_IsEmpty, [c_void_p], errcheck=lambda result, func, cargs: bool(result))
 
 get_geom_count = int_output(lgdal.OGR_G_GetGeometryCount, [c_void_p])
 get_geom_name = const_string_output(lgdal.OGR_G_GetGeometryName, [c_void_p], decoding='ascii')

@@ -2813,46 +2813,49 @@ class StumpJokeWithCustomFieldForm(forms.ModelForm):
 
     class Meta:
         model = StumpJoke
-        fields = ()  # We don't need any fields from the model
+        fields = ()
 
 
-class LimitChoicesToTest(TestCase):
+class LimitChoicesToTests(TestCase):
     """
     Tests the functionality of ``limit_choices_to``.
     """
-    def setUp(self):
-        self.threepwood = Character.objects.create(
+    @classmethod
+    def setUpTestData(cls):
+        cls.threepwood = Character.objects.create(
             username='threepwood',
             last_action=datetime.datetime.today() + datetime.timedelta(days=1),
         )
-        self.marley = Character.objects.create(
+        cls.marley = Character.objects.create(
             username='marley',
             last_action=datetime.datetime.today() - datetime.timedelta(days=1),
         )
 
     def test_limit_choices_to_callable_for_fk_rel(self):
         """
-        A ForeignKey relation can use ``limit_choices_to`` as a callable, re #2554.
+        A ForeignKey can use limit_choices_to as a callable (#2554).
         """
         stumpjokeform = StumpJokeForm()
-        self.assertIn(self.threepwood, stumpjokeform.fields['most_recently_fooled'].queryset)
-        self.assertNotIn(self.marley, stumpjokeform.fields['most_recently_fooled'].queryset)
+        self.assertSequenceEqual(stumpjokeform.fields['most_recently_fooled'].queryset, [self.threepwood])
 
     def test_limit_choices_to_callable_for_m2m_rel(self):
         """
-        A ManyToMany relation can use ``limit_choices_to`` as a callable, re #2554.
+        A ManyToManyField can use limit_choices_to as a callable (#2554).
         """
         stumpjokeform = StumpJokeForm()
-        self.assertIn(self.threepwood, stumpjokeform.fields['has_fooled_today'].queryset)
-        self.assertNotIn(self.marley, stumpjokeform.fields['has_fooled_today'].queryset)
+        self.assertSequenceEqual(stumpjokeform.fields['most_recently_fooled'].queryset, [self.threepwood])
 
     def test_custom_field_with_queryset_but_no_limit_choices_to(self):
         """
-        Regression test for #23795: Make sure a custom field with a `queryset`
-        attribute but no `limit_choices_to` still works.
+        A custom field with a `queryset` attribute but no `limit_choices_to`
+        works (#23795).
         """
         f = StumpJokeWithCustomFieldForm()
         self.assertEqual(f.fields['custom'].queryset, 42)
+
+    def test_fields_for_model_applies_limit_choices_to(self):
+        fields = fields_for_model(StumpJoke, ['has_fooled_today'])
+        self.assertSequenceEqual(fields['has_fooled_today'].queryset, [self.threepwood])
 
 
 class FormFieldCallbackTests(SimpleTestCase):

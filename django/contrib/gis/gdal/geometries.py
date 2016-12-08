@@ -97,7 +97,7 @@ class OGRGeometry(GDALBase):
                 g = capi.create_geom(OGRGeomType(geom_input).num)
         elif isinstance(geom_input, six.memoryview):
             # WKB was passed in
-            g = capi.from_wkb(bytes(geom_input), None, byref(c_void_p()), len(geom_input))
+            g = self._from_wkb(geom_input)
         elif isinstance(geom_input, OGRGeomType):
             # OGRGeomType was passed in, an empty geometry will be created.
             g = capi.create_geom(geom_input.num)
@@ -143,6 +143,10 @@ class OGRGeometry(GDALBase):
             raise GDALException('Invalid OGRGeometry loaded from pickled state.')
         self.ptr = ptr
         self.srs = srs
+
+    @classmethod
+    def _from_wkb(cls, geom_input):
+        return capi.from_wkb(bytes(geom_input), None, byref(c_void_p()), len(geom_input))
 
     @classmethod
     def from_bbox(cls, bbox):
@@ -251,6 +255,10 @@ class OGRGeometry(GDALBase):
         return Envelope(capi.get_envelope(self.ptr, byref(OGREnvelope())))
 
     @property
+    def empty(self):
+        return capi.is_empty(self.ptr)
+
+    @property
     def extent(self):
         "Returns the envelope as a 4-tuple, instead of as an Envelope object."
         return self.envelope.tuple
@@ -301,11 +309,15 @@ class OGRGeometry(GDALBase):
     srid = property(_get_srid, _set_srid)
 
     # #### Output Methods ####
+    def _geos_ptr(self):
+        from django.contrib.gis.geos import GEOSGeometry
+        return GEOSGeometry._from_wkb(self.wkb)
+
     @property
     def geos(self):
         "Returns a GEOSGeometry object from this OGRGeometry."
         from django.contrib.gis.geos import GEOSGeometry
-        return GEOSGeometry(self.wkb, self.srid)
+        return GEOSGeometry(self._geos_ptr(), self.srid)
 
     @property
     def gml(self):
@@ -499,6 +511,14 @@ class OGRGeometry(GDALBase):
 
 # The subclasses for OGR Geometry.
 class Point(OGRGeometry):
+
+    def _geos_ptr(self):
+        from django.contrib.gis import geos
+        return geos.Point._create_empty() if self.empty else super(Point, self)._geos_ptr()
+
+    @classmethod
+    def _create_empty(cls):
+        return capi.create_geom(OGRGeomType('point').num)
 
     @property
     def x(self):

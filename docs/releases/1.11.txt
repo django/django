@@ -337,6 +337,11 @@ Models
 * You can now use the ``unique=True`` option with
   :class:`~django.db.models.FileField`.
 
+* Added the ``nulls_first`` and ``nulls_last`` parameters to
+  :class:`Expression.asc() <django.db.models.Expression.asc>` and
+  :meth:`~django.db.models.Expression.desc` to control
+  the ordering of null values.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -633,6 +638,10 @@ Miscellaneous
 * The unused ``BaseCommand.can_import_settings`` attribute is removed.
 
 * The undocumented ``django.utils.functional.lazy_property`` is removed.
+
+* For consistency with non-multipart requests, ``MultiPartParser.parse()`` now
+  leaves ``request.POST`` immutable. If you're modifying that ``QueryDict``,
+  you must now first copy it, e.g. ``request.POST.copy()``.
 
 .. _deprecated-features-1.11:
 

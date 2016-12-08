@@ -22,7 +22,6 @@ from django.http import QueryDict
 from django.template import Context, Template
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
-from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import format_html
@@ -1101,7 +1100,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
         self.assertEqual(f.errors['password1'], ['Forbidden value 2.'])
         self.assertEqual(f.errors['password2'], ['Forbidden value 2.'])
 
-        with six.assertRaisesRegex(self, ValueError, "has no field named"):
+        with self.assertRaisesMessage(ValueError, "has no field named"):
             f.add_error('missing_field', 'Some error.')
 
     def test_update_error_dict(self):
@@ -2442,7 +2441,7 @@ Password: <input type="password" name="password" required />
                 form = UserRegistration(auto_id=False)
 
             if form.is_valid():
-                return 'VALID: %r' % sorted(six.iteritems(form.cleaned_data))
+                return 'VALID: %r' % sorted(form.cleaned_data.items())
 
             t = Template(
                 '<form action="" method="post">\n'
@@ -2912,8 +2911,8 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         with self.assertRaisesMessage(ValidationError, "'Enter a complete value.'"):
             f.clean(['+61'])
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
-        six.assertRaisesRegex(
-            self, ValidationError,
+        self.assertRaisesRegex(
+            ValidationError,
             r"'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home']
         )
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
@@ -2928,10 +2927,8 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         with self.assertRaisesMessage(ValidationError, "'Enter a complete value.'"):
             f.clean(['+61'])
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
-        six.assertRaisesRegex(
-            self, ValidationError,
-            r"'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home']
-        )
+        with self.assertRaisesRegex(ValidationError, r"'Enter a complete value\.', u?'Enter an extension\.'"):
+            f.clean(['', '', '', 'Home'])
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(['61', '287654321', '123', 'Home'])
 

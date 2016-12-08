@@ -225,7 +225,7 @@ class QuerySet(object):
         data = list(self[:REPR_OUTPUT_SIZE + 1])
         if len(data) > REPR_OUTPUT_SIZE:
             data[-1] = "...(remaining elements truncated)..."
-        return '<QuerySet %r>' % data
+        return '<%s %r>' % (self.__class__.__name__, data)
 
     def __len__(self):
         self._fetch_all()
@@ -1220,7 +1220,7 @@ class RawQuerySet(object):
                 self.query.cursor.close()
 
     def __repr__(self):
-        return "<RawQuerySet: %s>" % self.query
+        return "<%s: %s>" % (self.__class__.__name__, self.query)
 
     def __getitem__(self, k):
         return list(self)[k]

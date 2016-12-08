@@ -1,0 +1,13 @@
+===========================
+Django 1.10.5 release notes
+===========================
+
+*Under development*
+
+Django 1.10.5 fixes several bugs in 1.10.4.
+
+Bugfixes
+========
+
+* Fixed a crash in the debug view if ``request.user`` can't be retrieved, such
+  as if the database is unavailable (:ticket:`27567`).

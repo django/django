@@ -177,10 +177,10 @@ class BaseSpatialField(Field):
         """
         Prepare the value for saving in the database.
         """
-        if not value:
-            return None
-        else:
+        if isinstance(value, Geometry) or value:
             return connection.ops.Adapter(self.get_prep_value(value))
+        else:
+            return None
 
     def get_raster_prep_value(self, value, is_candidate):
         """
@@ -311,6 +311,12 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
         then 1000 would be returned.
         """
         return connection.ops.get_distance(self, value, lookup_type)
+
+    def get_db_prep_value(self, value, connection, *args, **kwargs):
+        return connection.ops.Adapter(
+            super(GeometryField, self).get_db_prep_value(value, connection, *args, **kwargs),
+            **({'geography': True} if self.geography else {})
+        )
 
     def from_db_value(self, value, expression, connection, context):
         if value:

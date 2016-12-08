@@ -895,7 +895,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             # For non-autocreated 'through' models, can't assume we are
             # dealing with PK values.
             fk = self.through._meta.get_field(self.source_field_name)
-            join_table = self.through._meta.db_table
+            join_table = fk.model._meta.db_table
             connection = connections[queryset.db]
             qn = connection.ops.quote_name
             queryset = queryset.extra(select={

@@ -549,3 +549,11 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
                 '</gml:Point>'
             ),
         )
+
+    def test_empty(self):
+        self.assertIs(OGRGeometry('POINT (0 0)').empty, False)
+        self.assertIs(OGRGeometry('POINT EMPTY').empty, True)
+
+    def test_empty_point_to_geos(self):
+        p = OGRGeometry('POINT EMPTY', srs=4326)
+        self.assertEqual(p.geos.ewkt, p.ewkt)
