@@ -29,7 +29,7 @@ class Command(BaseCommand):
     requires_system_checks = False
     leave_locale_alone = True
 
-    default_port = '8000'
+    default_port = settings.RUNSERVER_PORT
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -75,7 +75,7 @@ class Command(BaseCommand):
         self._raw_ipv6 = False
         if not options['addrport']:
             self.addr = ''
-            self.port = self.default_port
+            self.port = settings.RUNSERVER_PORT
         else:
             m = re.match(naiveip_re, options['addrport'])
             if m is None:
@@ -92,7 +92,7 @@ class Command(BaseCommand):
                 elif self.use_ipv6 and not _fqdn:
                     raise CommandError('"%s" is not a valid IPv6 address.' % self.addr)
         if not self.addr:
-            self.addr = '::1' if self.use_ipv6 else '127.0.0.1'
+            self.addr = '::1' if self.use_ipv6 else settings.RUNSERVER_IP
             self._raw_ipv6 = self.use_ipv6
         self.run(**options)
 
