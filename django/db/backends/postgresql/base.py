@@ -206,8 +206,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             if not self.get_autocommit():
                 self.connection.commit()
 
-    def create_cursor(self):
-        cursor = self.connection.cursor()
+    def create_cursor(self, *args, **kwargs):
+        cursor = self.connection.cursor(*args, **kwargs)
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return cursor
 

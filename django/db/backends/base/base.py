@@ -165,7 +165,7 @@ class BaseDatabaseWrapper(object):
         """Initializes the database connection settings."""
         raise NotImplementedError('subclasses of BaseDatabaseWrapper may require an init_connection_state() method')
 
-    def create_cursor(self):
+    def create_cursor(self, *args, **kwargs):
         """Creates a cursor. Assumes that a connection is established."""
         raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a create_cursor() method')
 
@@ -214,10 +214,10 @@ class BaseDatabaseWrapper(object):
 
     # ##### Backend-specific wrappers for PEP-249 connection methods #####
 
-    def _cursor(self):
+    def _cursor(self, *args, **kwargs):
         self.ensure_connection()
         with self.wrap_database_errors:
-            return self.create_cursor()
+            return self.create_cursor(*args, **kwargs)
 
     def _commit(self):
         if self.connection is not None:
@@ -236,15 +236,18 @@ class BaseDatabaseWrapper(object):
 
     # ##### Generic wrappers for PEP-249 connection methods #####
 
-    def cursor(self):
+    def cursor(self, *args, **kwargs):
         """
         Creates a cursor, opening a connection if necessary.
+        args and kwargs will be passed unchanged to underlying connection's
+        cursor.
+
         """
         self.validate_thread_sharing()
         if self.queries_logged:
-            cursor = self.make_debug_cursor(self._cursor())
+            cursor = self.make_debug_cursor(self._cursor(*args, **kwargs))
         else:
-            cursor = self.make_cursor(self._cursor())
+            cursor = self.make_cursor(self._cursor(*args, **kwargs))
         return cursor
 
     def commit(self):
