@@ -796,6 +796,20 @@ class Model(six.with_metaclass(ModelBase)):
                        force_update=force_update, update_fields=update_fields)
     save.alters_data = True
 
+    def _refresh_expressions(self, update_fields):
+        """
+        Refresh fields that are expressions with the value from the database.
+        """
+        to_refresh = set()
+        for field in self._meta.concrete_fields:
+            if update_fields and field.attname not in update_fields:
+                continue
+            val = getattr(self, field.attname, None)
+            if hasattr(val, 'as_sql'):
+                to_refresh.add(field.attname)
+        if to_refresh:
+            self.refresh_from_db(fields=to_refresh)
+
     def save_base(self, raw=False, force_insert=False,
                   force_update=False, using=None, update_fields=None):
         """
@@ -827,6 +841,7 @@ class Model(six.with_metaclass(ModelBase)):
         # Once saved, this is no longer a to-be-added instance.
         self._state.adding = False
 
+        self._refresh_expressions(update_fields)
         # Signal that the save is complete
         if not meta.auto_created:
             signals.post_save.send(sender=origin, instance=self, created=(not updated),
