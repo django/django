@@ -103,35 +103,19 @@ class GeoModelTest(TestCase):
         # San Antonio in 'WGS84' (SRID 4326)
         sa_4326 = 'POINT (-98.493183 29.424170)'
         wgs_pnt = fromstr(sa_4326, srid=4326)  # Our reference point in WGS84
-
-        # Oracle doesn't have SRID 3084, using 41157.
-        if oracle:
-            # San Antonio in 'Texas 4205, Southern Zone (1983, meters)' (SRID 41157)
-            # Used the following Oracle SQL to get this value:
-            #  SELECT SDO_UTIL.TO_WKTGEOMETRY(
-            #    SDO_CS.TRANSFORM(SDO_GEOMETRY('POINT (-98.493183 29.424170)', 4326), 41157))
-            #  )
-            #  FROM DUAL;
-            nad_wkt = 'POINT (300662.034646583 5416427.45974934)'
-            nad_srid = 41157
-        else:
-            # San Antonio in 'NAD83(HARN) / Texas Centric Lambert Conformal' (SRID 3084)
-            # Used ogr.py in gdal 1.4.1 for this transform
-            nad_wkt = 'POINT (1645978.362408288754523 6276356.025927528738976)'
-            nad_srid = 3084
-
+        # San Antonio in 'WGS 84 / Pseudo-Mercator' (SRID 3857)
+        other_srid_pnt = wgs_pnt.transform(3857, clone=True)
         # Constructing & querying with a point from a different SRID. Oracle
         # `SDO_OVERLAPBDYINTERSECT` operates differently from
         # `ST_Intersects`, so contains is used instead.
-        nad_pnt = fromstr(nad_wkt, srid=nad_srid)
         if oracle:
-            tx = Country.objects.get(mpoly__contains=nad_pnt)
+            tx = Country.objects.get(mpoly__contains=other_srid_pnt)
         else:
-            tx = Country.objects.get(mpoly__intersects=nad_pnt)
+            tx = Country.objects.get(mpoly__intersects=other_srid_pnt)
         self.assertEqual('Texas', tx.name)
 
         # Creating San Antonio.  Remember the Alamo.
-        sa = City.objects.create(name='San Antonio', point=nad_pnt)
+        sa = City.objects.create(name='San Antonio', point=other_srid_pnt)
 
         # Now verifying that San Antonio was transformed correctly
         sa = City.objects.get(name='San Antonio')
