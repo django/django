@@ -2398,6 +2398,18 @@ applications.
     The default :file:`settings.py` file created by :djadmin:`django-admin
     startproject <startproject>` sets ``'APP_DIRS': True``.
 
+.. setting:: TEMPLATES-POST_APP_DIRS
+
+``POST_APP_DIRS``
+~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.11
+
+Default: ``[]`` (Empty list)
+
+Directories where the engine should look for template source files, in search
+order, after looking at the directories specified by ``DIRS`` and ``APP_DIRS``.
+
 .. setting:: TEMPLATES-OPTIONS
 
 ``OPTIONS``

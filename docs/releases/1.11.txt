@@ -408,6 +408,10 @@ Templates
 * You can now specify specific directories for a particular
   :class:`filesystem.Loader <django.template.loaders.filesystem.Loader>`.
 
+* The new :setting:`POST_APP_DIRS <TEMPLATES-POST_APP_DIRS>` option in
+  :setting:`TEMPLATES` allows searching some template directories after the
+  apps' templates directories.
+
 Tests
 ~~~~~
 
