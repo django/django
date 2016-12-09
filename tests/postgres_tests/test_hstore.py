@@ -195,7 +195,11 @@ class TestValidation(HStoreTestCase):
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean({'a': 1}, None)
         self.assertEqual(cm.exception.code, 'not_a_string')
-        self.assertEqual(cm.exception.message % cm.exception.params, 'The value of "a" is not a string.')
+        self.assertEqual(cm.exception.message % cm.exception.params, 'The value of "a" is not a string or null.')
+
+    def test_none_allowed_as_value(self):
+        field = HStoreField()
+        self.assertEqual(field.clean({'a': None}, None), {'a': None})
 
 
 class TestFormField(HStoreTestCase):
@@ -223,6 +227,11 @@ class TestFormField(HStoreTestCase):
         field = forms.HStoreField()
         value = field.clean('{"a": 1}')
         self.assertEqual(value, {'a': '1'})
+
+    def test_none_value(self):
+        field = forms.HStoreField()
+        value = field.clean('{"a": null}')
+        self.assertEqual(value, {'a': None})
 
     def test_empty(self):
         field = forms.HStoreField(required=False)

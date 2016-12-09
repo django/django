@@ -194,6 +194,10 @@ Minor features
 * The new :class:`~django.contrib.postgres.aggregates.JSONBAgg` allows
   aggregating values as a JSON array.
 
+* :class:`~django.contrib.postgres.fields.HStoreField` and
+  :class:`~django.contrib.postgres.forms.HStoreField` allow storing null
+  values.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

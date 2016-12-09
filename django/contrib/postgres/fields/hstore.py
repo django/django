@@ -13,9 +13,9 @@ __all__ = ['HStoreField']
 
 class HStoreField(Field):
     empty_strings_allowed = False
-    description = _('Map of strings to strings')
+    description = _('Map of strings to strings/nulls')
     default_error_messages = {
-        'not_a_string': _('The value of "%(key)s" is not a string.'),
+        'not_a_string': _('The value of "%(key)s" is not a string or null.'),
     }
 
     def db_type(self, connection):
@@ -30,7 +30,7 @@ class HStoreField(Field):
     def validate(self, value, model_instance):
         super(HStoreField, self).validate(value, model_instance)
         for key, val in value.items():
-            if not isinstance(val, six.string_types):
+            if not isinstance(val, six.string_types) and val is not None:
                 raise exceptions.ValidationError(
                     self.error_messages['not_a_string'],
                     code='not_a_string',
