@@ -314,6 +314,18 @@ class JsI18NTests(SimpleTestCase):
             self.assertContains(response, 'il faut le traduire')
             self.assertNotContains(response, "Untranslated string")
 
+    def test_i18n_fallback_language_plural(self):
+        """
+        The fallback to a language with less plural forms maintains the real
+        language's number of plural forms.
+        """
+        with self.settings(LANGUAGE_CODE='pt'), override('ru'):
+            response = self.client.get('/jsi18n/')
+            self.assertEqual(
+                response.context['catalog']['{count} plural3'],
+                ['{count} plural3', '{count} plural3s', '{count} plural3 p3t']
+            )
+
     def test_i18n_english_variant(self):
         with override('en-gb'):
             response = self.client.get('/jsi18n/')

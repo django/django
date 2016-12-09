@@ -253,7 +253,7 @@ def get_javascript_catalog(locale, domain, packages):
         else:
             raise TypeError(key)
     for k, v in pdict.items():
-        catalog[k] = [v.get(i, '') for i in range(maxcnts[msgid] + 1)]
+        catalog[k] = [v.get(i, '') for i in range(maxcnts[k] + 1)]
 
     return catalog, plural
 
@@ -401,7 +401,7 @@ class JavaScriptCatalog(View):
             else:
                 raise TypeError(key)
         for k, v in pdict.items():
-            catalog[k] = [v.get(i, '') for i in range(maxcnts[msgid] + 1)]
+            catalog[k] = [v.get(i, '') for i in range(maxcnts[k] + 1)]
         return catalog
 
     def get_context_data(self, **kwargs):

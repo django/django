@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed a crash in the debug view if ``request.user`` can't be retrieved, such
   as if the database is unavailable (:ticket:`27567`).
+
+* Fixed occasional missing plural forms in ``JavaScriptCatalog``
+  (:ticket:`27418`).
