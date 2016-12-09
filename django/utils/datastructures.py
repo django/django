@@ -146,7 +146,7 @@ class MultiValueDict(dict):
             return default
         else:
             if force_list:
-                values = list(values)
+                values = list(values) if values is not None else None
             return values
 
     def getlist(self, key, default=None):
