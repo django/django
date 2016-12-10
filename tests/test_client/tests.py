@@ -717,8 +717,8 @@ class ClientTest(TestCase):
             self.client.get('/nesting_exception_view/')
 
     def test_uploading_temp_file(self):
-        test_file = tempfile.TemporaryFile()
-        response = self.client.post('/upload_view/', data={'temp_file': test_file})
+        with tempfile.TemporaryFile() as test_file:
+            response = self.client.post('/upload_view/', data={'temp_file': test_file})
         self.assertEqual(response.content, b'temp_file')
 
     def test_uploading_named_temp_file(self):
