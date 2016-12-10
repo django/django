@@ -182,8 +182,8 @@ class AsgiHandler(base.BaseHandler):
         self.load_middleware()
 
     def __call__(self, message):
-        # Set script prefix from message root_path
-        set_script_prefix(message.get('root_path', ''))
+        # Set script prefix from message root_path, turning None into empty string
+        set_script_prefix(message.get('root_path', '') or '')
         signals.request_started.send(sender=self.__class__, message=message)
         # Run request through view system
         try:
