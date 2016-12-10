@@ -41,7 +41,11 @@ class RunWorkerTests(TestCase):
             # Use 'fake_channel' that bypasses the 'inmemory' check
             call_command('runworker', '--layer', 'fake_channel')
             mock_worker.assert_called_with(
-                only_channels=None, exclude_channels=None, callback=None, channel_layer=mock.ANY)
+                only_channels=None,
+                exclude_channels=None,
+                callback=None,
+                channel_layer=mock.ANY,
+            )
 
             channel_layer = mock_worker.call_args[1]['channel_layer']
             static_consumer = channel_layer.router.root.routing[0].consumer
@@ -50,21 +54,24 @@ class RunWorkerTests(TestCase):
     def test_runworker(self, mock_worker):
         # Use 'fake_channel' that bypasses the 'inmemory' check
         call_command('runworker', '--layer', 'fake_channel')
-        mock_worker.assert_called_with(callback=None,
-                                       only_channels=None,
-                                       channel_layer=mock.ANY,
-                                       exclude_channels=None)
+        mock_worker.assert_called_with(
+            callback=None,
+            only_channels=None,
+            channel_layer=mock.ANY,
+            exclude_channels=None,
+        )
 
     def test_runworker_verbose(self, mocked_worker):
         # Use 'fake_channel' that bypasses the 'inmemory' check
-        call_command('runworker', '--layer',
-                     'fake_channel', '--verbosity', '2')
+        call_command('runworker', '--layer', 'fake_channel', '--verbosity', '2')
 
         # Verify the callback is set
-        mocked_worker.assert_called_with(callback=mock.ANY,
-                                         only_channels=None,
-                                         channel_layer=mock.ANY,
-                                         exclude_channels=None)
+        mocked_worker.assert_called_with(
+            callback=mock.ANY,
+            only_channels=None,
+            channel_layer=mock.ANY,
+            exclude_channels=None,
+        )
 
 
 class RunServerTests(TestCase):
@@ -161,33 +168,26 @@ class RunServerTests(TestCase):
     def test_log_action(self, mocked_stderr):
         cmd = runserver.Command()
         test_actions = [
-            (100, 'http', 'complete',
-             'HTTP GET /a-path/ 100 [0.12, a-client]'),
-            (200, 'http', 'complete',
-             'HTTP GET /a-path/ 200 [0.12, a-client]'),
-            (300, 'http', 'complete',
-             'HTTP GET /a-path/ 300 [0.12, a-client]'),
-            (304, 'http', 'complete',
-             'HTTP GET /a-path/ 304 [0.12, a-client]'),
-            (400, 'http', 'complete',
-             'HTTP GET /a-path/ 400 [0.12, a-client]'),
-            (404, 'http', 'complete',
-             'HTTP GET /a-path/ 404 [0.12, a-client]'),
-            (500, 'http', 'complete',
-             'HTTP GET /a-path/ 500 [0.12, a-client]'),
-            (None, 'websocket', 'connected',
-             'WebSocket CONNECT /a-path/ [a-client]'),
-            (None, 'websocket', 'disconnected',
-             'WebSocket DISCONNECT /a-path/ [a-client]'),
+            (100, 'http', 'complete', 'HTTP GET /a-path/ 100 [0.12, a-client]'),
+            (200, 'http', 'complete', 'HTTP GET /a-path/ 200 [0.12, a-client]'),
+            (300, 'http', 'complete', 'HTTP GET /a-path/ 300 [0.12, a-client]'),
+            (304, 'http', 'complete', 'HTTP GET /a-path/ 304 [0.12, a-client]'),
+            (400, 'http', 'complete', 'HTTP GET /a-path/ 400 [0.12, a-client]'),
+            (404, 'http', 'complete', 'HTTP GET /a-path/ 404 [0.12, a-client]'),
+            (500, 'http', 'complete', 'HTTP GET /a-path/ 500 [0.12, a-client]'),
+            (None, 'websocket', 'connected', 'WebSocket CONNECT /a-path/ [a-client]'),
+            (None, 'websocket', 'disconnected', 'WebSocket DISCONNECT /a-path/ [a-client]'),
             (None, 'websocket', 'something', ''),  # This shouldn't happen
         ]
 
         for status_code, protocol, action, output in test_actions:
-            details = {'status': status_code,
-                       'method': 'GET',
-                       'path': '/a-path/',
-                       'time_taken': 0.12345,
-                       'client': 'a-client'}
+            details = {
+                'status': status_code,
+                'method': 'GET',
+                'path': '/a-path/',
+                'time_taken': 0.12345,
+                'client': 'a-client',
+            }
             cmd.log_action(protocol, action, details)
             self.assertIn(output, mocked_stderr.getvalue())
             # Clear previous output
