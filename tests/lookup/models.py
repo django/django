@@ -86,3 +86,13 @@ class MyISAMArticle(models.Model):
     class Meta:
         db_table = 'myisam_article'
         managed = False
+
+
+class Product(models.Model):
+    name = models.CharField(max_length=80)
+    qty_target = models.DecimalField(max_digits=6, decimal_places=2)
+
+
+class Stock(models.Model):
+    product = models.ForeignKey(Product, models.CASCADE)
+    qty_available = models.DecimalField(max_digits=6, decimal_places=2)

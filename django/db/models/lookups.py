@@ -2,10 +2,13 @@ import itertools
 import math
 import warnings
 from copy import copy
+from decimal import Decimal
 
 from django.core.exceptions import EmptyResultSet
 from django.db.models.expressions import Func, Value
-from django.db.models.fields import DateTimeField, Field, IntegerField
+from django.db.models.fields import (
+    DateTimeField, DecimalField, Field, IntegerField,
+)
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
@@ -304,6 +307,40 @@ class IntegerLessThan(IntegerFieldFloatRounding, LessThan):
 
 
 IntegerField.register_lookup(IntegerLessThan)
+
+
+class DecimalComparisonLookup(object):
+    def as_sqlite(self, compiler, connection):
+        lhs_sql, params = self.process_lhs(compiler, connection)
+        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
+        params.extend(rhs_params)
+        # For comparisons whose lhs is a DecimalField, cast rhs AS NUMERIC
+        # because the rhs will have been converted to a string by the
+        # rev_typecast_decimal() adapter.
+        if isinstance(self.rhs, Decimal):
+            rhs_sql = 'CAST(%s AS NUMERIC)' % rhs_sql
+        rhs_sql = self.get_rhs_op(connection, rhs_sql)
+        return '%s %s' % (lhs_sql, rhs_sql), params
+
+
+@DecimalField.register_lookup
+class DecimalGreaterThan(DecimalComparisonLookup, GreaterThan):
+    pass
+
+
+@DecimalField.register_lookup
+class DecimalGreaterThanOrEqual(DecimalComparisonLookup, GreaterThanOrEqual):
+    pass
+
+
+@DecimalField.register_lookup
+class DecimalLessThan(DecimalComparisonLookup, LessThan):
+    pass
+
+
+@DecimalField.register_lookup
+class DecimalLessThanOrEqual(DecimalComparisonLookup, LessThanOrEqual):
+    pass
 
 
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
