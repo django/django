@@ -1097,7 +1097,7 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Til hamingju með fyrstu Django síðuna þína."
 
 msgid ""
-"Of course, there's still more work to do. Next, start your first "
+"Of course, you haven't actually done any work yet. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
 "Þetta er auðvitað ekki nóg. Næst skaltu búa til fyrsta appið þitt með því að "

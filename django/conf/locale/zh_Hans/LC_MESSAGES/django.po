@@ -1091,7 +1091,7 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "祝贺你的第一个由Django驱动的页面。"
 
 msgid ""
-"Of course, there's still more work to do. Next, start your first "
+"Of course, you haven't actually done any work yet. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
 "当然，您还没有真正开始工作。接下来，请执行 <code>python manage.py startapp "

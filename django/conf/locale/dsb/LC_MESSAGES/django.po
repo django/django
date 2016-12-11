@@ -1176,7 +1176,7 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Glukužycenje za waš prědny bok, kótaryž spěchujo se wót Django."
 
 msgid ""
-"Of course, there's still more work to do. Next, start your first "
+"Of course, you haven't actually done any work yet. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
 "Zawěsće, pópšawem hyšći njejsćo žedno źěło gótował. Wuwjeźćo ako pśiduce "
