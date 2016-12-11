@@ -8,8 +8,9 @@ from django.db import connection, migrations, models
 from django.db.migrations.state import ProjectState
 from django.db.migrations.writer import MigrationWriter
 from django.db.models.expressions import F
-from . import PostgreSQLTestCase
 from django.test.utils import isolate_apps
+
+from . import PostgreSQLTestCase
 
 
 class SearchVectorFieldMigrationWriterTests(PostgreSQLTestCase):
