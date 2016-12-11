@@ -3,6 +3,7 @@ from django.db.models import Field, FloatField
 from django.db.models.expressions import CombinedExpression, Func, Value
 from django.db.models.functions import Coalesce
 from django.db.models.lookups import Lookup
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -33,7 +34,7 @@ class WeightedColumn:
 
     def deconstruct(self):
         path = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
-        return path, [self.name, self.weight], {}
+        return path, [force_text(self.name), force_text(self.weight)], {}
 
 
 class SearchVectorField(Field):
@@ -51,7 +52,7 @@ class SearchVectorField(Field):
         if self.columns is not None:
             kwargs['columns'] = self.columns
         if self.language is not None:
-            kwargs['language'] = self.language
+            kwargs['language'] = force_text(self.language)
         del kwargs['db_index']
         del kwargs['null']
         return name, path, args, kwargs

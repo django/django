@@ -32,14 +32,20 @@ class SearchVectorFieldMigrationWriterTests(PostgreSQLTestCase):
             WeightedColumn('description', 'D'),
         ], 'english')
 
+        definition, path = MigrationWriter.serialize(svf)
+
         self.assertEqual(
-            ("django.contrib.postgres.search.SearchVectorField("
-             "columns=["
-             "django.contrib.postgres.search.WeightedColumn('name', 'A'), "
-             "django.contrib.postgres.search.WeightedColumn('description', 'D')], "
-             "language='english')",
-             {'import django.contrib.postgres.search'}),
-            MigrationWriter.serialize(svf)
+            "django.contrib.postgres.search.SearchVectorField("
+            "columns=["
+            "django.contrib.postgres.search.WeightedColumn('name', 'A'), "
+            "django.contrib.postgres.search.WeightedColumn('description', 'D')], "
+            "language='english')",
+            definition
+        )
+
+        self.assertSetEqual(
+            {'import django.contrib.postgres.search'},
+            path
         )
 
 
