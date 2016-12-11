@@ -2,9 +2,9 @@
 Test PostgreSQL full text search vector field.
 """
 from django.contrib.postgres.search import (
-    SearchQuery, SearchRank, SearchVectorField, WeightedColumn
+    SearchQuery, SearchRank, SearchVectorField, WeightedColumn,
 )
-from django.db import models, connection, migrations
+from django.db import connection, migrations, models
 from django.db.migrations.state import ProjectState
 from django.db.migrations.writer import MigrationWriter
 from django.db.models.expressions import F
