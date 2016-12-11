@@ -8,11 +8,11 @@ from django.db import connection, migrations, models
 from django.db.migrations.state import ProjectState
 from django.db.migrations.writer import MigrationWriter
 from django.db.models.expressions import F
-from django.test import TestCase
+from . import PostgreSQLTestCase
 from django.test.utils import isolate_apps
 
 
-class SearchVectorFieldMigrationWriterTests(TestCase):
+class SearchVectorFieldMigrationWriterTests(PostgreSQLTestCase):
 
     def test_deconstruct_no_columns(self):
 
@@ -43,7 +43,7 @@ class SearchVectorFieldMigrationWriterTests(TestCase):
 
 
 @isolate_apps('postgres_tests')
-class SearchVectorFieldDDLTests(TestCase):
+class SearchVectorFieldDDLTests(PostgreSQLTestCase):
 
     def test_sql_create_model_no_weightedcolumns(self):
         """
@@ -94,7 +94,7 @@ class SearchVectorFieldDDLTests(TestCase):
 
 
 @isolate_apps('postgres_tests', attr_name='apps')
-class SearchVectorFieldMigrationTests(TestCase):
+class SearchVectorFieldMigrationTests(PostgreSQLTestCase):
 
     create_model = migrations.CreateModel(
         'textdocument', [
@@ -251,7 +251,7 @@ class SearchVectorFieldMigrationTests(TestCase):
 
 
 @isolate_apps('postgres_tests')
-class SearchVectorFieldQueryTests(TestCase):
+class SearchVectorFieldQueryTests(PostgreSQLTestCase):
 
     def setUp(self):
 
