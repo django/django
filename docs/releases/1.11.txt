@@ -73,8 +73,8 @@ Minor features
   exclude fields based on the request or model instance.
 
 * The ``popup_response.html`` template can now be overridden per app or per
-  model, or by setting the ``popup_response_template`` attribute on
-  :class:`~django.contrib.admin.ModelAdmin`.
+  model, or by setting the :attr:`.ModelAdmin.popup_response_template`
+  attribute.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

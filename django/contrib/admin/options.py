@@ -1074,9 +1074,9 @@ class ModelAdmin(BaseModelAdmin):
                 'obj': six.text_type(obj),
             })
             return TemplateResponse(request, self.popup_response_template or [
-                "admin/%s/%s/popup_response.html" % (opts.app_label, opts.model_name),
-                "admin/%s/popup_response.html" % opts.app_label,
-                "admin/popup_response.html"
+                'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
+                'admin/%s/popup_response.html' % opts.app_label,
+                'admin/popup_response.html',
             ], {
                 'popup_response_data': popup_response_data,
             })
@@ -1137,9 +1137,9 @@ class ModelAdmin(BaseModelAdmin):
                 'new_value': six.text_type(new_value),
             })
             return TemplateResponse(request, self.popup_response_template or [
-                "admin/%s/%s/popup_response.html" % (opts.app_label, opts.model_name),
-                "admin/%s/popup_response.html" % opts.app_label,
-                "admin/popup_response.html"
+                'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
+                'admin/%s/popup_response.html' % opts.app_label,
+                'admin/popup_response.html',
             ], {
                 'popup_response_data': popup_response_data,
             })
@@ -1310,9 +1310,9 @@ class ModelAdmin(BaseModelAdmin):
                 'value': str(obj_id),
             })
             return TemplateResponse(request, self.popup_response_template or [
-                "admin/%s/%s/popup_response.html" % (opts.app_label, opts.model_name),
-                "admin/%s/popup_response.html" % opts.app_label,
-                "admin/popup_response.html"
+                'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
+                'admin/%s/popup_response.html' % opts.app_label,
+                'admin/popup_response.html',
             ], {
                 'popup_response_data': popup_response_data,
             })

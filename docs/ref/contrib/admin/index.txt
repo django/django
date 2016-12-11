@@ -1321,9 +1321,9 @@ templates used by the :class:`ModelAdmin` views:
 .. attribute:: ModelAdmin.popup_response_template
 
     Path to a custom template, used by :meth:`response_add`,
-    :meth:`response_change` and :meth:`response_delete`.
+    :meth:`response_change`, and :meth:`response_delete`.
 
-    .. versionchanged:: 1.11
+    .. versionadded:: 1.11
 
         The ``popup_response_template`` attribute was added.
 
