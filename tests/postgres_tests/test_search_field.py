@@ -75,7 +75,8 @@ class SearchVectorFieldDDLTests(TestCase):
         with connection.schema_editor() as schema_editor:
             schema_editor.create_model(TextDocument)
             self.assertEqual([
-                'CREATE INDEX "postgres_tests_textdocument_search_9f678d09" ON "postgres_tests_textdocument" ("search")',
+                'CREATE INDEX "postgres_tests_textdocument_search_9f678d09"'
+                ' ON "postgres_tests_textdocument" ("search")',
 
                 'CREATE FUNCTION postgres_tests_textdocument_search_9f678d09_func() RETURNS trigger AS $$\n'
                 'BEGIN\n'
@@ -193,7 +194,7 @@ class SearchVectorFieldMigrationTests(TestCase):
         self.assertFITNotExists()
 
     SEARCH_COL = 'postgres_tests_{table}_{column}_.{{8}}'
-    FIT = [SEARCH_COL+'_func', SEARCH_COL, SEARCH_COL+'_trig']
+    FIT = [SEARCH_COL + '_func', SEARCH_COL, SEARCH_COL + '_trig']
 
     def assertFITExists(self, column='search', table='textdocument'):
         with_column = [fit.format(column=column, table=table) for fit in self.FIT]
@@ -208,16 +209,28 @@ class SearchVectorFieldMigrationTests(TestCase):
         self.assertTriggerNotExists(with_column[2])
 
     _sql_check_function = "select proname from pg_proc where proname ~ %s"
-    assertFunctionExists = lambda self, x: self.assertXExists(self._sql_check_function, x)
-    assertFunctionNotExists = lambda self, x: self.assertXNotExists(self._sql_check_function, x)
+
+    def assertFunctionExists(self, name):
+        return self.assertXExists(self._sql_check_function, name)
+
+    def assertFunctionNotExists(self, name):
+        return self.assertXNotExists(self._sql_check_function, name)
 
     _sql_check_trigger = "select tgname from pg_trigger where tgname ~ %s"
-    assertTriggerExists = lambda self, x: self.assertXExists(self._sql_check_trigger, x)
-    assertTriggerNotExists = lambda self, x: self.assertXNotExists(self._sql_check_trigger, x)
+
+    def assertTriggerExists(self, name):
+        return self.assertXExists(self._sql_check_trigger, name)
+
+    def assertTriggerNotExists(self, name):
+        return self.assertXNotExists(self._sql_check_trigger, name)
 
     _sql_check_index = "select indexname from pg_indexes where indexname ~ %s"
-    assertIndexExists = lambda self, x: self.assertXExists(self._sql_check_index, x)
-    assertIndexNotExists = lambda self, x: self.assertXNotExists(self._sql_check_index, x)
+
+    def assertIndexExists(self, name):
+        return self.assertXExists(self._sql_check_index, name)
+
+    def assertIndexNotExists(self, name):
+        return self.assertXNotExists(self._sql_check_index, name)
 
     def assertXExists(self, sql, x):
         self.assertTrue(self._does_x_exist(sql, x), x)

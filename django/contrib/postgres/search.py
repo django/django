@@ -65,7 +65,7 @@ class SearchVectorField(Field):
 
     def _check_columns_attribute(self, **kwargs):
         if not isinstance(self.columns, (list, tuple)) or \
-             not all(isinstance(tsv, WeightedColumn) for tsv in self.columns):
+                not all(isinstance(tsv, WeightedColumn) for tsv in self.columns):
             return [
                 checks.Error(
                     "'columns' must be a list or tuple of WeightedColumn instances.",
