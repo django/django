@@ -1091,7 +1091,7 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "Django ले बनाइएको प्रथम वेब पृष्ठको लागी तपाईँलाई शुभकामना ।"
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
+"Of course, there's still more work to do. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
 "सबै काम सिद्धिएको छैन । आफ्नो एप चलाउन  <code>python manage.py startapp "

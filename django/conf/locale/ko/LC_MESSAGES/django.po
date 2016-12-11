@@ -1103,7 +1103,7 @@ msgid "Congratulations on your first Django-powered page."
 msgstr "첫 번째 Django 페이지를 만든 것을 축하드립니다."
 
 msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
+"Of course, there's still more work to do. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
 "물론, 당신은 아직 어떤 결과물을 만든 것은 아닙니다. 첫 어플리케이션은 다음 명"
