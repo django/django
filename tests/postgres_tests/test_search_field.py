@@ -57,10 +57,12 @@ class SearchVectorFieldDDLTests(PostgreSQLTestCase):
 
         with connection.schema_editor() as schema_editor:
             schema_editor.create_model(NoWeightedColumns)
-            self.assertEqual([
+            self.assertEqual(len(schema_editor.deferred_sql), 1)
+            self.assertIn(
                 'CREATE INDEX "postgres_tests_noweightedcolumns_search_7d3fd766"'
                 ' ON "postgres_tests_noweightedcolumns" ("search")',
-            ], schema_editor.deferred_sql)
+                schema_editor.deferred_sql[0]
+            )
 
     def test_sql_create_model_with_weightedcolumns(self):
 
@@ -74,10 +76,13 @@ class SearchVectorFieldDDLTests(PostgreSQLTestCase):
 
         with connection.schema_editor() as schema_editor:
             schema_editor.create_model(TextDocument)
-            self.assertEqual([
+            self.assertEqual(len(schema_editor.deferred_sql), 3)
+            self.assertIn(
                 'CREATE INDEX "postgres_tests_textdocument_search_9f678d09"'
                 ' ON "postgres_tests_textdocument" ("search")',
-
+                schema_editor.deferred_sql[0]
+            )
+            self.assertIn(
                 'CREATE FUNCTION postgres_tests_textdocument_search_9f678d09_func() RETURNS trigger AS $$\n'
                 'BEGIN\n'
                 ' NEW."search" :=\n'
@@ -86,11 +91,14 @@ class SearchVectorFieldDDLTests(PostgreSQLTestCase):
                 ' RETURN NEW;\n'
                 'END\n'
                 '$$ LANGUAGE plpgsql',
-
+                schema_editor.deferred_sql[1]
+            )
+            self.assertIn(
                 'CREATE TRIGGER "postgres_tests_textdocument_search_9f678d09_trig" BEFORE INSERT OR UPDATE'
                 ' ON "postgres_tests_textdocument" FOR EACH ROW'
-                ' EXECUTE PROCEDURE postgres_tests_textdocument_search_9f678d09_func()'
-            ], schema_editor.deferred_sql)
+                ' EXECUTE PROCEDURE postgres_tests_textdocument_search_9f678d09_func()',
+                schema_editor.deferred_sql[2]
+            )
 
 
 @isolate_apps('postgres_tests', attr_name='apps')
