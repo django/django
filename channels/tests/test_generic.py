@@ -5,6 +5,7 @@ import json
 from django.test import override_settings
 
 from channels import route_class
+from channels.exceptions import SendNotAvailableOnDemultiplexer
 from channels.generic import BaseConsumer, websockets
 from channels.tests import ChannelTestCase, Client, apply_routes
 
@@ -144,7 +145,7 @@ class GenericTests(ChannelTestCase):
             def receive(self, content, multiplexer=None, **kwargs):
                 multiplexer.send(content)
 
-        class Demultiplexer(websockets.WebsocketConsumerDemultiplexer):
+        class Demultiplexer(websockets.WebsocketDemultiplexer):
 
             consumers = {
                 "mystream": MyWebsocketConsumer
@@ -185,3 +186,34 @@ class GenericTests(ChannelTestCase):
                     "payload": {"id": "1"},
                 })
             })
+
+    def test_websocket_demultiplexer_send(self):
+
+        class MyWebsocketConsumer(websockets.JsonWebsocketConsumer):
+            def receive(self, content, multiplexer=None, **kwargs):
+                import pdb; pdb.set_trace()  # breakpoint 69f2473b //
+
+                self.send(content)
+
+        class Demultiplexer(websockets.WebsocketDemultiplexer):
+
+            consumers = {
+                "mystream": MyWebsocketConsumer
+            }
+
+        with apply_routes([
+            route_class(Demultiplexer, path='/path/(?P<id>\d+)'),
+            route_class(MyWebsocketConsumer),
+        ]):
+            client = Client()
+
+            with self.assertRaises(SendNotAvailableOnDemultiplexer):
+                client.send_and_consume('websocket.receive', {
+                    'path': '/path/1',
+                    'text': json.dumps({
+                        "stream": "mystream",
+                        "payload": {"text_field": "mytext"}
+                    })
+                })
+
+                client.receive()

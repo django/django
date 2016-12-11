@@ -33,7 +33,14 @@ class RequestAborted(Exception):
 
 class DenyConnection(Exception):
     """
-    Raise during a websocket.connect (or other supported connection) handler
+    Raised during a websocket.connect (or other supported connection) handler
     to deny the connection.
+    """
+    pass
+
+
+class SendNotAvailableOnDemultiplexer(Exception):
+    """
+    Raised when trying to send with a WebsocketDemultiplexer. Use the multiplexer instead.
     """
     pass

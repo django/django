@@ -3,7 +3,7 @@ import json
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 
-from ..generic.websockets import WebsocketDemultiplexer
+from ..generic.websockets import WebsocketMultiplexer
 from ..sessions import enforce_ordering
 from .base import Binding
 
@@ -40,7 +40,7 @@ class WebsocketBinding(Binding):
     # Outbound
     @classmethod
     def encode(cls, stream, payload):
-        return WebsocketDemultiplexer.encode(stream, payload)
+        return WebsocketMultiplexer.encode(stream, payload)
 
     def serialize(self, instance, action):
         payload = {
