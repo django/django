@@ -526,7 +526,6 @@ def default_urlconf(request):
         "heading": _("It worked!"),
         "subheading": _("Congratulations on your first Django-powered page."),
         "instructions": _(
-            "Of course, you haven't actually done any work yet. "
             "Next, start your first app by running <code>python manage.py startapp [app_label]</code>."
         ),
         "explanation": _(
