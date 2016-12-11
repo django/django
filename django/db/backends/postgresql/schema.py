@@ -1,6 +1,7 @@
 import psycopg2
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.contrib.postgres.search import SearchVectorField
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -121,3 +122,95 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             for index_name in index_names:
                 if index_name == index_to_remove:
                     self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
+
+        if isinstance(old_field, SearchVectorField) or isinstance(new_field, SearchVectorField):
+            if not isinstance(new_field, SearchVectorField):
+                self.deferred_sql.extend(self._drop_tsvector_trigger(model, old_field))
+            elif not isinstance(old_field, SearchVectorField) and isinstance(new_field, SearchVectorField):
+                self.deferred_sql.extend(self._create_tsvector_trigger(model, new_field))
+            elif old_field.columns != new_field.columns:
+                self.deferred_sql.extend(self._drop_tsvector_trigger(model, old_field))
+                self.deferred_sql.extend(self._create_tsvector_trigger(model, new_field))
+
+    sql_create_trigger = (
+        "CREATE TRIGGER {trigger} BEFORE INSERT OR UPDATE"
+        " ON {table} FOR EACH ROW EXECUTE PROCEDURE {function}()"
+    )
+    sql_drop_trigger = "DROP TRIGGER IF EXISTS {trigger} ON {table}"
+
+    sql_create_function = (
+        "CREATE FUNCTION {function}() RETURNS trigger AS $$\n"
+        "BEGIN\n"
+        " NEW.{column} :=\n{weights};\n"
+        " RETURN NEW;\n"
+        "END\n"
+        "$$ LANGUAGE plpgsql"
+    )
+    sql_drop_function = "DROP FUNCTION IF EXISTS {function}()"
+
+    sql_setweight = (
+        "  setweight(to_tsvector('pg_catalog.{lang}', COALESCE(NEW.{column}, '')), '{weight}') "
+    )
+
+    def _create_tsvector_trigger(self, model, field):
+
+        tsvector_function = self._create_index_name(model, [field.column], '_func')
+        tsvector_trigger = self._create_index_name(model, [field.column], '_trig')
+
+        weights = []
+        for tsv in field.columns:
+            weights.append(
+                self.sql_setweight.format(
+                    lang=field.language,
+                    column=self.quote_name(tsv.name),
+                    weight=tsv.weight
+                )
+            )
+
+        yield self.sql_create_function.format(
+            function=tsvector_function,
+            column=self.quote_name(field.column),
+            weights='||\n'.join(weights)
+        )
+
+        yield self.sql_create_trigger.format(
+            table=self.quote_name(model._meta.db_table),
+            trigger=self.quote_name(tsvector_trigger),
+            function=tsvector_function,
+        )
+
+    def _drop_tsvector_trigger(self, model, field):
+
+        tsvector_function = self._create_index_name(model, [field.column], '_func')
+        tsvector_trigger = self._create_index_name(model, [field.column], '_trig')
+
+        yield self.sql_drop_trigger.format(
+            table=self.quote_name(model._meta.db_table),
+            trigger=tsvector_trigger,
+        )
+
+        yield self.sql_drop_function.format(
+            function=tsvector_function,
+        )
+
+    def create_model(self, model):
+        super(DatabaseSchemaEditor, self).create_model(model)
+        for field in model._meta.local_fields:
+            if isinstance(field, SearchVectorField) and field.columns:
+                self.deferred_sql.extend(self._create_tsvector_trigger(model, field))
+
+    def delete_model(self, model):
+        super(DatabaseSchemaEditor, self).delete_model(model)
+        for field in model._meta.local_fields:
+            if isinstance(field, SearchVectorField):
+                self.deferred_sql.extend(self._drop_tsvector_trigger(model, field))
+
+    def add_field(self, model, field):
+        super(DatabaseSchemaEditor, self).add_field(model, field)
+        if isinstance(field, SearchVectorField) and field.columns:
+            self.deferred_sql.extend(self._create_tsvector_trigger(model, field))
+
+    def remove_field(self, model, field):
+        super(DatabaseSchemaEditor, self).remove_field(model, field)
+        if isinstance(field, SearchVectorField):
+            self.deferred_sql.extend(self._drop_tsvector_trigger(model, field))

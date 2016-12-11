@@ -1,7 +1,9 @@
+from django.core import checks
 from django.db.models import Field, FloatField
 from django.db.models.expressions import CombinedExpression, Func, Value
 from django.db.models.functions import Coalesce
 from django.db.models.lookups import Lookup
+from django.utils.translation import ugettext_lazy as _
 
 
 class SearchVectorExact(Lookup):
@@ -21,7 +23,78 @@ class SearchVectorExact(Lookup):
         return '%s @@ %s = true' % (lhs, rhs), params
 
 
+class WeightedColumn:
+
+    def __init__(self, name, weight):
+        assert isinstance(name, str)
+        assert weight in ('A', 'B', 'C', 'D')
+        self.name = name
+        self.weight = weight
+
+    def deconstruct(self):
+        path = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
+        return path, [self.name, self.weight], {}
+
+
 class SearchVectorField(Field):
+    description = _("PostgreSQL tsvector field.")
+
+    def __init__(self, columns=None, language=None, *args, **kwargs):
+        self.columns = columns
+        self.language = language
+        kwargs['db_index'] = True
+        kwargs['null'] = True
+        super(SearchVectorField, self).__init__(*args, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(SearchVectorField, self).deconstruct()
+        if self.columns is not None:
+            kwargs['columns'] = self.columns
+        if self.language is not None:
+            kwargs['language'] = self.language
+        del kwargs['db_index']
+        del kwargs['null']
+        return name, path, args, kwargs
+
+    def check(self, **kwargs):
+        errors = super(SearchVectorField, self).check(**kwargs)
+        if self.columns is not None:
+            errors.extend(self._check_columns_attribute(**kwargs))
+            errors.extend(self._check_language_attribute(**kwargs))
+        return errors
+
+    def _check_columns_attribute(self, **kwargs):
+        if not isinstance(self.columns, (list, tuple)) or \
+             not all(isinstance(tsv, WeightedColumn) for tsv in self.columns):
+            return [
+                checks.Error(
+                    "'columns' must be a list or tuple of WeightedColumn instances.",
+                    obj=self,
+                    id='fields.E402',
+                )
+            ]
+        else:
+            return []
+
+    def _check_language_attribute(self, **kwargs):
+        if self.language is None:
+            return [
+                checks.Error(
+                    "{} must define a 'language' attribute.".format(self.__class__.__name__),
+                    obj=self,
+                    id='fields.E403',
+                )
+            ]
+        elif not isinstance(self.language, str):
+            return [
+                checks.Error(
+                    "'language' must be a string.",
+                    obj=self,
+                    id='fields.E404',
+                )
+            ]
+        else:
+            return []
 
     def db_type(self, connection):
         return 'tsvector'
