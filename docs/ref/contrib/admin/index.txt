@@ -641,6 +641,18 @@ subclass::
           :func:`~django.utils.html.format_html_join`, or
           :func:`~django.utils.safestring.mark_safe` instead.
 
+    * When using a callable, a model method, or a ``ModelAdmin``
+      method, you can customize the column's title, by adding a
+      ``.short_description`` attribute to the callable. For example::
+
+          class PersonAdmin(admin.ModelAdmin):
+              list_display = ('name', 'birth_date_view')
+
+              def birth_date_view(self, obj):
+                   return obj.birth_date
+
+              birth_date_view.short_description = 'birth date'
+
     * If the value of a field is ``None``, an empty string, or an iterable
       without elements, Django will display ``-`` (a dash). You can override
       this with :attr:`AdminSite.empty_value_display`::
