@@ -1,6 +1,8 @@
 """
 Test PostgreSQL full text search vector field.
 """
+from datetime import datetime
+
 from django.contrib.postgres.search import (
     SearchQuery, SearchRank, SearchVectorField, WeightedColumn,
 )
@@ -11,26 +13,166 @@ from django.db.models.expressions import F
 from django.test.utils import isolate_apps
 
 from . import PostgreSQLTestCase
+from .test_search import VERSES
 
 
-class SearchVectorFieldMigrationWriterTests(PostgreSQLTestCase):
+@isolate_apps('postgres_tests')
+class CheckTests(PostgreSQLTestCase):
 
-    def test_deconstruct_no_columns(self):
+    def test_without_arguments(self):
 
+        class TextDocument(models.Model):
+            search = SearchVectorField()
+
+        errors = TextDocument.check()
+        self.assertEqual(len(errors), 0)
+
+    def test_good_arguments(self):
+
+        class TextDocument(models.Model):
+            title = models.CharField(max_length=128)
+            title2 = models.CharField(max_length=128, db_column='body')
+            search = SearchVectorField([
+                WeightedColumn('title', 'A'),
+                WeightedColumn('body', 'D')
+            ], language='english')
+
+        errors = TextDocument.check()
+        self.assertEqual(len(errors), 0)
+
+    def test_columns_E100(self):
+
+        class TextDocument(models.Model):
+            search = SearchVectorField([
+                WeightedColumn('title', 'A')
+            ], language='english')
+
+        errors = TextDocument.check()
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0].id, 'postgres.E100')
+        self.assertIn('No textual columns', errors[0].msg)
+
+    def test_columns_E101(self):
+
+        class TextDocument(models.Model):
+            title = models.CharField(max_length=128)
+            search = SearchVectorField([
+                ('title', 'A')
+            ], language='english')
+
+        errors = TextDocument.check()
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0].id, 'postgres.E101')
+        self.assertIn('columns', errors[0].msg)
+        self.assertIn('iterable', errors[0].msg)
+        self.assertIn('WeightedColumn', errors[0].msg)
+
+    def test_languages_required_E102(self):
+
+        class TextDocument(models.Model):
+            title = models.CharField(max_length=128)
+            search = SearchVectorField([
+                WeightedColumn('title', 'A')
+            ])
+
+        errors = TextDocument.check()
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0].id, 'postgres.E102')
+        self.assertIn('required', errors[0].msg)
+        self.assertIn('language', errors[0].msg)
+        self.assertIn('language_column', errors[0].msg)
+
+    def test_language_E103(self):
+
+        class TextDocument(models.Model):
+            search = SearchVectorField(language=1)
+
+        errors = TextDocument.check()
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0].id, 'postgres.E103')
+        self.assertIn('language', errors[0].msg)
+
+    def test_language_column_E104(self):
+
+        class TextDocument(models.Model):
+            title = models.CharField(max_length=128)
+            search = SearchVectorField(language_column='body')
+
+        errors = TextDocument.check()
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0].id, 'postgres.E104')
+        self.assertIn('language_column', errors[0].msg)
+        self.assertIn('title', errors[0].msg)
+
+    def test_force_update_E105(self):
+
+        class TextDocument(models.Model):
+            search = SearchVectorField(force_update='invalid')
+
+        errors = TextDocument.check()
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0].id, 'postgres.E105')
+        self.assertIn('force_update', errors[0].msg)
+        self.assertIn('True or False', errors[0].msg)
+
+    def test_WeightedColumn_name_E110(self):
+
+        class TextDocument(models.Model):
+            title = models.CharField(max_length=128)
+            search = SearchVectorField([
+                WeightedColumn('body', 'A')
+            ], language='english')
+
+        errors = TextDocument.check()
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0].id, 'postgres.E110')
+        self.assertIn('body', errors[0].msg)
+        self.assertIn('available columns', errors[0].msg)
+        self.assertIn('title', errors[0].msg)
+
+    def test_WeightedColumn_weight_E111(self):
+
+        class TextDocument(models.Model):
+            title = models.CharField(max_length=128)
+            search = SearchVectorField([
+                WeightedColumn('title', 'X')
+            ], language='english')
+
+        errors = TextDocument.check()
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0].id, 'postgres.E111')
+        self.assertIn('weight', errors[0].msg)
+        self.assertIn('"A", "B", "C"', errors[0].msg)
+
+    def test_several_errors(self):
+
+        class TextDocument(models.Model):
+            title = models.CharField(max_length=128)
+            search = SearchVectorField([
+                WeightedColumn('body', 'A'),
+                WeightedColumn('name', 'X')
+            ], language=9, force_update=False)
+
+        errors = TextDocument.check()
+        self.assertEqual(len(errors), 4)
+
+
+class MigrationWriterTests(PostgreSQLTestCase):
+
+    def test_deconstruct_with_no_arguments(self):
         svf = SearchVectorField()
-
         self.assertEqual(
             ("django.contrib.postgres.search.SearchVectorField()",
              {'import django.contrib.postgres.search'}),
             MigrationWriter.serialize(svf)
         )
 
-    def test_deconstruct(self):
+    def test_deconstruct_default_arguments(self):
 
         svf = SearchVectorField([
             WeightedColumn('name', 'A'),
             WeightedColumn('description', 'D'),
-        ], 'english')
+        ], language=None, language_column=None, force_update=False)
 
         definition, path = MigrationWriter.serialize(svf)
 
@@ -38,8 +180,8 @@ class SearchVectorFieldMigrationWriterTests(PostgreSQLTestCase):
             "django.contrib.postgres.search.SearchVectorField("
             "columns=["
             "django.contrib.postgres.search.WeightedColumn('name', 'A'), "
-            "django.contrib.postgres.search.WeightedColumn('description', 'D')], "
-            "language='english')",
+            "django.contrib.postgres.search.WeightedColumn('description', 'D')]"
+            ")",
             definition
         )
 
@@ -48,16 +190,179 @@ class SearchVectorFieldMigrationWriterTests(PostgreSQLTestCase):
             path
         )
 
+    def test_deconstruct_all_arguments(self):
+
+        class TextDocument(models.Model):
+            svf = SearchVectorField([
+                WeightedColumn('name', 'A'),
+                WeightedColumn('description', 'D'),
+            ], language='english', language_column='lang', force_update=True)
+
+        name, path, args, kwargs = TextDocument._meta.get_field('svf').deconstruct()
+
+        self.assertEqual(name, "svf")
+        self.assertEqual(path, "django.contrib.postgres.search.SearchVectorField")
+        self.assertFalse(args)
+        self.assertSetEqual(set(kwargs.keys()), {
+            'columns', 'language', 'language_column', 'force_update'
+        })
+
 
 @isolate_apps('postgres_tests')
-class SearchVectorFieldDDLTests(PostgreSQLTestCase):
+class SchemaEditorTests(PostgreSQLTestCase):
 
-    def test_sql_create_model_no_weightedcolumns(self):
-        """
-        If user does not provide 'columns' we still generate the index.
-        Presumably, they will have to update the column themselves either in Python
-        or via an unmanaged custom postgres trigger function.
-        """
+    def test_sql_setweight(self):
+
+        def check_sql(model, sql):
+            with connection.schema_editor() as schema_editor:
+                field = model._meta.get_field('search')
+                self.assertEqual(
+                    sql, schema_editor._tsvector_setweight(field)
+                )
+
+        class WithLanguageTwoColumn(models.Model):
+            search = SearchVectorField([
+                WeightedColumn('title', 'A'),
+                WeightedColumn('body', 'D'),
+            ], language='ukrainian')
+
+        class WithLanguage(models.Model):
+            search = SearchVectorField([
+                WeightedColumn('body', 'D'),
+            ], language='ukrainian')
+
+        class WithLanguageColumn(models.Model):
+            search = SearchVectorField([
+                WeightedColumn('body', 'D'),
+            ], language_column='lang')
+
+        class WithLanguageAndLanguageColumn(models.Model):
+            search = SearchVectorField([
+                WeightedColumn('body', 'D'),
+            ], language='ukrainian', language_column='lang')
+
+        check_sql(
+            WithLanguageTwoColumn, [
+                """setweight(to_tsvector('ukrainian', COALESCE(NEW."title", '')), 'A') ||""",
+                """setweight(to_tsvector('ukrainian', COALESCE(NEW."body", '')), 'D');"""
+            ]
+        )
+
+        check_sql(
+            WithLanguage, [
+                """setweight(to_tsvector('ukrainian', COALESCE(NEW."body", '')), 'D');"""
+            ]
+        )
+
+        check_sql(
+            WithLanguageColumn, [
+                """setweight(to_tsvector(NEW."lang"::regconfig, COALESCE(NEW."body", '')), 'D');"""
+            ]
+        )
+
+        check_sql(
+            WithLanguageAndLanguageColumn, [
+                """setweight(to_tsvector(COALESCE(NEW."lang"::regconfig, 'ukrainian'),"""
+                """ COALESCE(NEW."body", '')), 'D');"""
+            ]
+        )
+
+    def test_sql_update_column_checks(self):
+
+        def check_sql(model, sql):
+            with connection.schema_editor() as schema_editor:
+                field = model._meta.get_field('search')
+                self.assertEqual(
+                    sql, schema_editor._tsvector_update_column_checks(field)
+                )
+
+        class OneColumn(models.Model):
+            search = SearchVectorField([
+                WeightedColumn('name', 'A'),
+            ])
+
+        class ThreeColumns(models.Model):
+            search = SearchVectorField([
+                WeightedColumn('name', 'A'),
+                WeightedColumn('title', 'B'),
+                WeightedColumn('body', 'C'),
+            ])
+
+        check_sql(
+            OneColumn, [
+                'IF (NEW."name" <> OLD."name") THEN do_update = true;',
+                'END IF;'
+            ]
+        )
+
+        check_sql(
+            ThreeColumns, [
+                'IF (NEW."name" <> OLD."name") THEN do_update = true;',
+                'ELSIF (NEW."title" <> OLD."title") THEN do_update = true;',
+                'ELSIF (NEW."body" <> OLD."body") THEN do_update = true;',
+                'END IF;'
+            ]
+        )
+
+    def test_sql_update_function(self):
+
+        def check_sql(model, sql):
+            with connection.schema_editor() as schema_editor:
+                field = model._meta.get_field('search')
+                self.assertEqual(
+                    sql, schema_editor._create_tsvector_update_function('thefunction', field)
+                )
+
+        class TextDocument(models.Model):
+            search = SearchVectorField([
+                WeightedColumn('title', 'A'),
+                WeightedColumn('body', 'D'),
+            ], 'english')
+
+        check_sql(
+            TextDocument,
+            "CREATE FUNCTION thefunction() RETURNS trigger AS $$\n"
+            "DECLARE\n"
+            " do_update bool default false;\n"
+            "BEGIN\n"
+            " IF (TG_OP = 'INSERT') THEN do_update = true;\n"
+            " ELSIF (TG_OP = 'UPDATE') THEN\n"
+            '  IF (NEW."title" <> OLD."title") THEN do_update = true;\n'
+            '  ELSIF (NEW."body" <> OLD."body") THEN do_update = true;\n'
+            "  END IF;\n"
+            " END IF;\n"
+            " IF do_update THEN\n"
+            '  NEW."search" :=\n'
+            "   setweight(to_tsvector('english', COALESCE(NEW.\"title\", '')), 'A') ||\n"
+            "   setweight(to_tsvector('english', COALESCE(NEW.\"body\", '')), 'D');\n"
+            " END IF;\n"
+            " RETURN NEW;\n"
+            "END\n"
+            "$$ LANGUAGE plpgsql"
+        )
+
+        class TextDocumentForceUpdate(models.Model):
+            search = SearchVectorField([
+                WeightedColumn('body', 'D'),
+            ], 'english', force_update=True)
+
+        check_sql(
+            TextDocumentForceUpdate,
+            "CREATE FUNCTION thefunction() RETURNS trigger AS $$\n"
+            "DECLARE\n"
+            " do_update bool default false;\n"
+            "BEGIN\n"
+            " do_update = true;\n"
+            " IF do_update THEN\n"
+            '  NEW."search" :=\n'
+            "   setweight(to_tsvector('english', COALESCE(NEW.\"body\", '')), 'D');\n"
+            " END IF;\n"
+            " RETURN NEW;\n"
+            "END\n"
+            "$$ LANGUAGE plpgsql"
+        )
+
+    def test_create_model_no_function(self):
 
         class NoWeightedColumns(models.Model):
             search = SearchVectorField()
@@ -65,51 +370,26 @@ class SearchVectorFieldDDLTests(PostgreSQLTestCase):
         with connection.schema_editor() as schema_editor:
             schema_editor.create_model(NoWeightedColumns)
             self.assertEqual(len(schema_editor.deferred_sql), 1)
-            self.assertIn(
-                'CREATE INDEX "postgres_tests_noweightedcolumns_search_7d3fd766"'
-                ' ON "postgres_tests_noweightedcolumns" ("search")',
-                schema_editor.deferred_sql[0]
-            )
+            self.assertIn('CREATE INDEX', schema_editor.deferred_sql[0])
 
-    def test_sql_create_model_with_weightedcolumns(self):
+    def test_create_model(self):
 
         class TextDocument(models.Model):
             title = models.CharField(max_length=128)
-            body = models.TextField()
             search = SearchVectorField([
                 WeightedColumn('title', 'A'),
-                WeightedColumn('body', 'D'),
             ], 'english')
 
         with connection.schema_editor() as schema_editor:
             schema_editor.create_model(TextDocument)
             self.assertEqual(len(schema_editor.deferred_sql), 3)
-            self.assertIn(
-                'CREATE INDEX "postgres_tests_textdocument_search_9f678d09"'
-                ' ON "postgres_tests_textdocument" ("search")',
-                schema_editor.deferred_sql[0]
-            )
-            self.assertIn(
-                'CREATE FUNCTION postgres_tests_textdocument_search_9f678d09_func() RETURNS trigger AS $$\n'
-                'BEGIN\n'
-                ' NEW."search" :=\n'
-                '  setweight(to_tsvector(\'pg_catalog.english\', COALESCE(NEW."title", \'\')), \'A\') ||\n'
-                '  setweight(to_tsvector(\'pg_catalog.english\', COALESCE(NEW."body", \'\')), \'D\') ;\n'
-                ' RETURN NEW;\n'
-                'END\n'
-                '$$ LANGUAGE plpgsql',
-                schema_editor.deferred_sql[1]
-            )
-            self.assertIn(
-                'CREATE TRIGGER "postgres_tests_textdocument_search_9f678d09_trig" BEFORE INSERT OR UPDATE'
-                ' ON "postgres_tests_textdocument" FOR EACH ROW'
-                ' EXECUTE PROCEDURE postgres_tests_textdocument_search_9f678d09_func()',
-                schema_editor.deferred_sql[2]
-            )
+            self.assertIn('CREATE INDEX', schema_editor.deferred_sql[0])
+            self.assertIn('CREATE FUNCTION', schema_editor.deferred_sql[1])
+            self.assertIn('CREATE TRIGGER', schema_editor.deferred_sql[2])
 
 
 @isolate_apps('postgres_tests', attr_name='apps')
-class SearchVectorFieldMigrationTests(PostgreSQLTestCase):
+class MigrationTests(PostgreSQLTestCase):
 
     create_model = migrations.CreateModel(
         'textdocument', [
@@ -266,7 +546,100 @@ class SearchVectorFieldMigrationTests(PostgreSQLTestCase):
 
 
 @isolate_apps('postgres_tests')
-class SearchVectorFieldQueryTests(PostgreSQLTestCase):
+class TriggerTests(PostgreSQLTestCase):
+
+    def setUp(self):
+
+        class TextDocument(models.Model):
+            body = models.TextField()
+            other = models.TextField()
+            search = SearchVectorField([
+                WeightedColumn('body', 'D'),
+            ], 'english')
+
+        class TextDocumentLanguageColumn(models.Model):
+            body = models.TextField()
+            lang = models.TextField(null=True)
+            search = SearchVectorField([
+                WeightedColumn('body', 'D'),
+            ], language_column='lang', language='english')
+
+        with connection.schema_editor() as schema_editor:
+            schema_editor.create_model(TextDocument)
+            schema_editor.create_model(TextDocumentLanguageColumn)
+
+        self.create = TextDocument.objects.create
+        self.lang = TextDocumentLanguageColumn.objects.create
+
+    def test_insert_and_update(self):
+        doc = self.create(body="My hovercraft is full of eels.")
+        doc.refresh_from_db()
+        self.assertEqual(doc.search, "'eel':6 'full':4 'hovercraft':2")
+
+        doc.body = 'No hovercraft for you!'
+        doc.save()
+        doc.refresh_from_db()
+        self.assertEqual(doc.search, "'hovercraft':2")
+
+    def test_performance_improvement_for_guarded_update(self):
+
+        text = '\n'.join(VERSES * 20)
+        text2 = text.replace('brave', 'wimpy')
+
+        start = datetime.now()
+        doc = self.create(body=text)
+        create_elapsed = (datetime.now() - start).microseconds
+        doc.refresh_from_db()
+
+        doc.body = text2
+        start = datetime.now()
+        doc.save(update_fields=['body'])
+        update_elapsed = (datetime.now() - start).microseconds
+        doc.refresh_from_db()
+
+        longest = max(create_elapsed, update_elapsed)
+
+        # check that insert and update times are within 50% of each other
+        percent = abs(create_elapsed - update_elapsed) / longest
+        self.assertGreater(.5, percent)
+
+        # update not indexed column
+        doc.other = text2
+        start = datetime.now()
+        doc.save(update_fields=['other'])
+        noindex_elapsed = (datetime.now() - start).microseconds
+
+        # skipping unnecessary to_tsvector() call is faster
+        self.assertGreater(longest, noindex_elapsed)
+
+        # update indexed column with the same value
+        doc.body = text2
+        start = datetime.now()
+        doc.save(update_fields=['body'])
+        noindex_elapsed = (datetime.now() - start).microseconds
+
+        # skipping unnecessary to_tsvector() call is faster
+        self.assertGreater(longest, noindex_elapsed)
+
+    def test_using_language_column(self):
+        # use english config to parse english text, stop words removed
+        doc = self.lang(lang='english', body="My hovercraft is full of eels.")
+        doc.refresh_from_db()
+        self.assertEqual(doc.search, "'eel':6 'full':4 'hovercraft':2")
+
+        # use german config to parse english text, stop words not removed
+        doc = self.lang(lang='german', body="My hovercraft is full of eels.")
+        doc.refresh_from_db()
+        self.assertEqual(doc.search, "'eel':6 'full':4 'hovercraft':2 'is':3 'my':1 'of':5")
+
+        # use english backup config to parse english text, stop words removed
+        doc = self.lang(lang=None, body="My hovercraft is full of eels.")
+        doc.refresh_from_db()
+        self.assertEqual(doc.search, "'eel':6 'full':4 'hovercraft':2")
+
+
+@isolate_apps('postgres_tests')
+class QueryTests(PostgreSQLTestCase):
 
     def setUp(self):
 
