@@ -214,7 +214,7 @@ class Command(BaseCommand):
                         migration_string = writer.path
                     if migration_string.startswith('..'):
                         migration_string = writer.path
-                    self.stdout.write("  %s:\n" % (self.style.MIGRATE_LABEL(migration_string),))
+                    self.stdout.write("  %s\n" % (self.style.MIGRATE_LABEL(migration_string),))
                     for operation in migration.operations:
                         self.stdout.write("    - %s\n" % operation.describe())
                 if not self.dry_run:
