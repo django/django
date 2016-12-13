@@ -102,3 +102,12 @@ class Child3(Child2):
 
 class Child4(Child1):
     value4 = models.IntegerField()
+
+
+class LinkedList(models.Model):
+    name = models.CharField(max_length=50)
+    previous_item = models.OneToOneField(
+        'self', models.CASCADE,
+        related_name='next_item',
+        blank=True, null=True,
+    )

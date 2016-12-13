@@ -713,7 +713,7 @@ class SQLCompiler(object):
 
                 _, _, _, joins, _ = self.query.setup_joins([related_field_name], opts, root_alias)
                 alias = joins[-1]
-                from_parent = issubclass(model, opts.model)
+                from_parent = issubclass(model, opts.model) and model is not opts.model
                 klass_info = {
                     'model': model,
                     'field': f,
