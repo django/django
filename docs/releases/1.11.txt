@@ -391,6 +391,9 @@ Templates
 * Added a :ttag:`resetcycle` template tag to allow resetting the sequence of
   the :ttag:`cycle` template tag.
 
+* You can now specify specific directories for a particular
+  :class:`filesystem.Loader <django.template.loaders.filesystem.Loader>`.
+
 Tests
 ~~~~~
 
