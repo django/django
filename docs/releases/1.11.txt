@@ -314,6 +314,9 @@ Management Commands
 * The new :option:`diffsettings --default` option allows specifying a settings
   module other than Django's default settings to compare against.
 
+* Improved the way the :djadmin:`shell` command reads python code from standard
+  input.
+
 Migrations
 ~~~~~~~~~~
 
