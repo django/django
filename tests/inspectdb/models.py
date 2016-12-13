@@ -17,6 +17,7 @@ class PeopleData(models.Model):
 
 class PeopleMoreData(models.Model):
     people_unique = models.ForeignKey(People, models.CASCADE, unique=True)
+    message = models.ForeignKey(Message, models.CASCADE, blank=True, null=True)
     license = models.CharField(max_length=255)
 
 
