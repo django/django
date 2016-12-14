@@ -200,16 +200,13 @@ class Template(object):
 
     def render(self, context):
         "Display stage -- can be called many times"
-        context.render_context.push()
-        try:
+        with context.render_context.push_state(self):
             if context.template is None:
                 with context.bind_template(self):
                     context.template_name = self.name
                     return self._render(context)
             else:
                 return self._render(context)
-        finally:
-            context.render_context.pop()
 
     def compile_nodelist(self):
         """
@@ -960,7 +957,7 @@ class Node(object):
             return self.render(context)
         except Exception as e:
             if context.template.engine.debug and not hasattr(e, 'template_debug'):
-                e.template_debug = context.template.get_exception_info(e, self.token)
+                e.template_debug = context.render_context.template.get_exception_info(e, self.token)
             raise
 
     def __iter__(self):
