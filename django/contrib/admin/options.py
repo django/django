@@ -509,6 +509,7 @@ class ModelAdmin(BaseModelAdmin):
     delete_confirmation_template = None
     delete_selected_confirmation_template = None
     object_history_template = None
+    popup_response_template = None
 
     # Actions
     actions = []
@@ -1073,7 +1074,11 @@ class ModelAdmin(BaseModelAdmin):
                 'value': six.text_type(value),
                 'obj': six.text_type(obj),
             })
-            return SimpleTemplateResponse('admin/popup_response.html', {
+            return TemplateResponse(request, self.popup_response_template or [
+                'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
+                'admin/%s/popup_response.html' % opts.app_label,
+                'admin/popup_response.html',
+            ], {
                 'popup_response_data': popup_response_data,
             })
 
@@ -1119,8 +1124,10 @@ class ModelAdmin(BaseModelAdmin):
         """
 
         if IS_POPUP_VAR in request.POST:
+            opts = obj._meta
+
             to_field = request.POST.get(TO_FIELD_VAR)
-            attr = str(to_field) if to_field else obj._meta.pk.attname
+            attr = str(to_field) if to_field else opts.pk.attname
             # Retrieve the `object_id` from the resolved pattern arguments.
             value = request.resolver_match.args[0]
             new_value = obj.serializable_value(attr)
@@ -1130,7 +1137,11 @@ class ModelAdmin(BaseModelAdmin):
                 'obj': six.text_type(obj),
                 'new_value': six.text_type(new_value),
             })
-            return SimpleTemplateResponse('admin/popup_response.html', {
+            return TemplateResponse(request, self.popup_response_template or [
+                'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
+                'admin/%s/popup_response.html' % opts.app_label,
+                'admin/popup_response.html',
+            ], {
                 'popup_response_data': popup_response_data,
             })
 
@@ -1299,7 +1310,11 @@ class ModelAdmin(BaseModelAdmin):
                 'action': 'delete',
                 'value': str(obj_id),
             })
-            return SimpleTemplateResponse('admin/popup_response.html', {
+            return TemplateResponse(request, self.popup_response_template or [
+                'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
+                'admin/%s/popup_response.html' % opts.app_label,
+                'admin/popup_response.html',
+            ], {
                 'popup_response_data': popup_response_data,
             })
 
