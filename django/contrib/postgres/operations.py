@@ -1,4 +1,5 @@
 from django.contrib.postgres.signals import register_hstore_handler
+from django.db.migrations import RunSQL
 from django.db.migrations.operations.base import Operation
 
 
@@ -33,6 +34,31 @@ class CITextExtension(CreateExtension):
 
     def __init__(self):
         self.name = 'citext'
+
+
+class CITextArrayGinOperatorClass(RunSQL):
+
+    # SQL taken from
+    # http://stackoverflow.com/questions/18082625/postgresql-9-2-gin-index-on-citext/20102665#20102665
+    sql = """
+        CREATE OPERATOR CLASS _citext_ops DEFAULT FOR TYPE citext[] USING gin AS
+            OPERATOR        1       && (anyarray, anyarray),
+            OPERATOR        4       = (anyarray, anyarray),
+            OPERATOR        2       @> (anyarray, anyarray),
+            OPERATOR        3       <@ (anyarray, anyarray),
+            FUNCTION        1       citext_cmp (citext, citext),
+            FUNCTION        2       ginarrayextract(anyarray, internal, internal),
+            FUNCTION        3       ginqueryarrayextract(anyarray, internal, smallint, internal, internal,
+                                                         internal, internal),
+            FUNCTION        4       ginarrayconsistent(internal, smallint, anyarray, integer, internal, internal,
+                                                       internal, internal),
+            STORAGE         citext"""
+
+    def __init__(self, sql=None, reverse_sql="DROP OPERATOR CLASS _citext_ops", **kwargs):
+        super(CITextArrayGinOperatorClass, self).__init__(sql=self.sql, reverse_sql=reverse_sql, **kwargs)
+
+    def describe(self):
+        return "Creates an operator class for CIText for use in ArrayField"
 
 
 class HStoreExtension(CreateExtension):

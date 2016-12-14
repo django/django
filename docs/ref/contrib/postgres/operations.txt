@@ -58,6 +58,16 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
     Install the ``btree_gin`` extension.
 
+``CITextArrayGinOperatorClass``
+===============================
+
+.. class:: CITextArrayGinOperatorClass()
+
+    .. versionadded:: 1.11
+
+    Installs an operator class to support using a ``citext``-field in
+    :class:`~django.contrib.postgres.fields.ArrayField`.
+
 ``CITextExtension``
 ===================
 
