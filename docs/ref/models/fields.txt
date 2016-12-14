@@ -316,6 +316,25 @@ Note that when ``unique`` is ``True``, you don't need to specify
 
     In older versions, ``unique=True`` can't be used on :class:`FileField`.
 
+``readonly``
+------------
+
+.. versionadded:: 1.11
+
+.. attribute:: Field.readonly
+
+If ``True``, this field will be excluded from ``INSERT`` and ``UPDATE``
+queries at the SQL level.
+
+This allows for database level population and updating of the field by
+making use of features such as triggers and functions.
+
+If a model has any ``readonly`` fields, calls to
+:meth:`Model.save() <django.db.models.Model.save>` will result
+in an additional ``SELECT`` query as
+:meth:`Model.refresh_from_db() <django.db.models.Model.refresh_from_db>` is called
+to ensure the model instance has the field values as set by the database.
+
 ``unique_for_date``
 -------------------
 
