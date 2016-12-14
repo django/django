@@ -490,10 +490,14 @@ a subclass of dictionary. Exceptions are outlined here:
     :meth:`QueryDict.items()` this uses the same last-value logic as
     :meth:`QueryDict.__getitem__()`.
 
+    Available only on Python 2.
+
 .. method:: QueryDict.iterlists()
 
     Like :meth:`QueryDict.iteritems()` except it includes all values, as a list,
     for each member of the dictionary.
+
+    Available only on Python 2.
 
 .. method:: QueryDict.values()
 
@@ -507,6 +511,8 @@ a subclass of dictionary. Exceptions are outlined here:
 .. method:: QueryDict.itervalues()
 
     Just like :meth:`QueryDict.values()`, except an iterator.
+
+    Available only on Python 2.
 
 In addition, ``QueryDict`` has the following methods:
 
