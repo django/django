@@ -18,6 +18,7 @@ from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.db.backends.oracle.operations import DatabaseOperations
 from django.utils import six
+from django.utils.functional import cached_property
 
 DEFAULT_TOLERANCE = '0.05'
 
@@ -85,6 +86,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     function_names = {
         'Area': 'SDO_GEOM.SDO_AREA',
+        'BoundingCircle': 'SDO_GEOM.SDO_MBC',
         'Centroid': 'SDO_GEOM.SDO_CENTROID',
         'Difference': 'SDO_GEOM.SDO_DIFFERENCE',
         'Distance': 'SDO_GEOM.SDO_DISTANCE',
@@ -131,11 +133,15 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     truncate_params = {'relate': None}
 
-    unsupported_functions = {
-        'AsGeoJSON', 'AsKML', 'AsSVG', 'BoundingCircle', 'Envelope',
-        'ForceRHR', 'GeoHash', 'MakeValid', 'MemSize', 'Scale',
-        'SnapToGrid', 'Translate',
-    }
+    @cached_property
+    def unsupported_functions(self):
+        unsupported = {
+            'AsGeoJSON', 'AsKML', 'AsSVG', 'Envelope', 'ForceRHR', 'GeoHash',
+            'MakeValid', 'MemSize', 'Scale', 'SnapToGrid', 'Translate',
+        }
+        if self.connection.oracle_full_version < '12.1.0.2':
+            unsupported.add('BoundingCircle')
+        return unsupported
 
     def geo_quote_name(self, name):
         return super(OracleOperations, self).geo_quote_name(name).upper()

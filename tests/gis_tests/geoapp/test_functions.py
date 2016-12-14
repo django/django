@@ -11,7 +11,7 @@ from django.db.models import Sum
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
-from ..utils import mysql, oracle, spatialite
+from ..utils import mysql, oracle, postgis, spatialite
 from .models import City, Country, CountryWebMercator, State, Track
 
 
@@ -148,21 +148,25 @@ class GISFunctionsTests(TestCase):
             # num_seg is the number of segments per quarter circle.
             return (4 * num_seg) + 1
 
-        # The weak precision in the assertions is because the BoundingCircle
-        # calculation changed on PostGIS 2.3.
+        expected_areas = (169, 136) if postgis else (171, 126)
         qs = Country.objects.annotate(circle=functions.BoundingCircle('mpoly')).order_by('name')
-        self.assertAlmostEqual(qs[0].circle.area, 169, 0)
-        self.assertAlmostEqual(qs[1].circle.area, 136, 0)
-        # By default num_seg=48.
-        self.assertEqual(qs[0].circle.num_points, circle_num_points(48))
-        self.assertEqual(qs[1].circle.num_points, circle_num_points(48))
+        self.assertAlmostEqual(qs[0].circle.area, expected_areas[0], 0)
+        self.assertAlmostEqual(qs[1].circle.area, expected_areas[1], 0)
+        if postgis:
+            # By default num_seg=48.
+            self.assertEqual(qs[0].circle.num_points, circle_num_points(48))
+            self.assertEqual(qs[1].circle.num_points, circle_num_points(48))
 
         qs = Country.objects.annotate(circle=functions.BoundingCircle('mpoly', num_seg=12)).order_by('name')
-        self.assertGreater(qs[0].circle.area, 168.4, 0)
-        self.assertLess(qs[0].circle.area, 169.5, 0)
-        self.assertAlmostEqual(qs[1].circle.area, 136, 0)
-        self.assertEqual(qs[0].circle.num_points, circle_num_points(12))
-        self.assertEqual(qs[1].circle.num_points, circle_num_points(12))
+        if postgis:
+            self.assertGreater(qs[0].circle.area, 168.4, 0)
+            self.assertLess(qs[0].circle.area, 169.5, 0)
+            self.assertAlmostEqual(qs[1].circle.area, 136, 0)
+            self.assertEqual(qs[0].circle.num_points, circle_num_points(12))
+            self.assertEqual(qs[1].circle.num_points, circle_num_points(12))
+        else:
+            self.assertAlmostEqual(qs[0].circle.area, expected_areas[0], 0)
+            self.assertAlmostEqual(qs[1].circle.area, expected_areas[1], 0)
 
     @skipUnlessDBFeature("has_Centroid_function")
     def test_centroid(self):

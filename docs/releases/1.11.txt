@@ -165,6 +165,7 @@ Minor features
 
 * Added Oracle support for the
   :class:`~django.contrib.gis.db.models.functions.AsGML` function,
+  :class:`~django.contrib.gis.db.models.functions.BoundingCircle` function,
   :class:`~django.contrib.gis.db.models.functions.IsValid` function, and
   :lookup:`isvalid` lookup.
 
