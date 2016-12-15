@@ -81,7 +81,7 @@ Keyword Argument       Description
 
 .. class:: AsGML(expression, version=2, precision=8, **extra)
 
-*Availability*: PostGIS, SpatiaLite
+*Availability*: Oracle, PostGIS, SpatiaLite
 
 Accepts a single geographic field or expression and returns a `Geographic Markup
 Language (GML)`__ representation of the geometry.
@@ -98,12 +98,16 @@ Keyword Argument       Description
 =====================  =====================================================
 ``precision``          Specifies the number of significant digits for the
                        coordinates in the GML representation -- the default
-                       value is 8.
+                       value is 8. Ignored on Oracle.
 
 ``version``            Specifies the GML version to use: 2 (default) or 3.
 =====================  =====================================================
 
 __ https://en.wikipedia.org/wiki/Geography_Markup_Language
+
+.. versionchanged:: 1.11
+
+    Oracle support was added.
 
 ``AsKML``
 =========

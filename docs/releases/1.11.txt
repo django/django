@@ -164,7 +164,8 @@ Minor features
   :lookup:`isvalid` lookup.
 
 * Added Oracle support for the
-  :class:`~django.contrib.gis.db.models.functions.IsValid` function and
+  :class:`~django.contrib.gis.db.models.functions.AsGML` function,
+  :class:`~django.contrib.gis.db.models.functions.IsValid` function, and
   :lookup:`isvalid` lookup.
 
 :mod:`django.contrib.messages`

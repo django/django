@@ -11,7 +11,7 @@ from django.db.models import Sum
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
-from ..utils import mysql, oracle, postgis, spatialite
+from ..utils import mysql, oracle, spatialite
 from .models import City, Country, CountryWebMercator, State, Track
 
 
@@ -104,7 +104,7 @@ class GISFunctionsTests(TestCase):
         if oracle:
             # No precision parameter for Oracle :-/
             gml_regex = re.compile(
-                r'^<gml:Point srsName="SDO:4326" xmlns:gml="http://www.opengis.net/gml">'
+                r'^<gml:Point srsName="EPSG:4326" xmlns:gml="http://www.opengis.net/gml">'
                 r'<gml:coordinates decimal="\." cs="," ts=" ">-104.60925\d+,38.25500\d+ '
                 r'</gml:coordinates></gml:Point>'
             )
@@ -113,14 +113,11 @@ class GISFunctionsTests(TestCase):
                 r'^<gml:Point srsName="EPSG:4326"><gml:coordinates>'
                 r'-104\.60925\d+,38\.255001</gml:coordinates></gml:Point>'
             )
-
         self.assertTrue(gml_regex.match(ptown.gml))
-
-        if postgis:
-            self.assertIn(
-                '<gml:pos srsDimension="2">',
-                City.objects.annotate(gml=functions.AsGML('point', version=3)).get(name='Pueblo').gml
-            )
+        self.assertIn(
+            '<gml:pos srsDimension="2">',
+            City.objects.annotate(gml=functions.AsGML('point', version=3)).get(name='Pueblo').gml
+        )
 
     @skipUnlessDBFeature("has_AsKML_function")
     def test_askml(self):

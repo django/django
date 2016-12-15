@@ -379,7 +379,7 @@ Function                              PostGIS  Oracle  MySQL        SpatiaLite
 ====================================  =======  ======  ===========  ==========
 :class:`Area`                         X        X       X            X
 :class:`AsGeoJSON`                    X                             X
-:class:`AsGML`                        X                             X
+:class:`AsGML`                        X        X                    X
 :class:`AsKML`                        X                             X
 :class:`AsSVG`                        X                             X
 :class:`BoundingCircle`               X

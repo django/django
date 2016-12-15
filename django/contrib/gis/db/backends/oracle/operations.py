@@ -132,8 +132,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     truncate_params = {'relate': None}
 
     unsupported_functions = {
-        'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG',
-        'BoundingCircle', 'Envelope',
+        'AsGeoJSON', 'AsKML', 'AsSVG', 'BoundingCircle', 'Envelope',
         'ForceRHR', 'GeoHash', 'MakeValid', 'MemSize', 'Scale',
         'SnapToGrid', 'Translate',
     }
