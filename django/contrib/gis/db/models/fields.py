@@ -1,8 +1,11 @@
+from collections import defaultdict
+
 from django.contrib.gis import forms, gdal
 from django.contrib.gis.db.models.lookups import (
     RasterBandTransform, gis_lookups,
 )
 from django.contrib.gis.db.models.proxy import SpatialProxy
+from django.contrib.gis.gdal import SpatialReference
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.core.exceptions import ImproperlyConfigured
@@ -14,7 +17,7 @@ from django.utils.translation import ugettext_lazy as _
 # Local cache of the spatial_ref_sys table, which holds SRID data for each
 # spatial database alias. This cache exists so that the database isn't queried
 # for SRID info each time a distance query is constructed.
-_srid_cache = {}
+_srid_cache = defaultdict(dict)
 
 
 def get_srid_info(srid, connection):
@@ -29,21 +32,21 @@ def get_srid_info(srid, connection):
         # The SpatialRefSys model for the spatial backend.
         SpatialRefSys = connection.ops.spatial_ref_sys()
     except NotImplementedError:
-        # No `spatial_ref_sys` table in spatial backend (e.g., MySQL).
-        return None, None, None
+        SpatialRefSys = None
 
-    if connection.alias not in _srid_cache:
-        # Initialize SRID dictionary for database if it doesn't exist.
-        _srid_cache[connection.alias] = {}
+    alias, get_srs = (
+        (connection.alias, lambda srid: SpatialRefSys.objects.using(connection.alias).get(srid=srid).srs)
+        if SpatialRefSys else
+        (None, SpatialReference)
+    )
+    if srid not in _srid_cache[alias]:
+        srs = get_srs(srid)
+        units, units_name = srs.units
+        sphere_name = srs['spheroid']
+        spheroid = 'SPHEROID["%s",%s,%s]' % (sphere_name, srs.semi_major, srs.inverse_flattening)
+        _srid_cache[alias][srid] = (units, units_name, spheroid)
 
-    if srid not in _srid_cache[connection.alias]:
-        # Use `SpatialRefSys` model to query for spatial reference info.
-        sr = SpatialRefSys.objects.using(connection.alias).get(srid=srid)
-        units, units_name = sr.units
-        spheroid = SpatialRefSys.get_spheroid(sr.wkt)
-        _srid_cache[connection.alias][srid] = (units, units_name, spheroid)
-
-    return _srid_cache[connection.alias][srid]
+    return _srid_cache[alias][srid]
 
 
 class GeoSelectFormatMixin(object):
@@ -149,8 +152,6 @@ class BaseSpatialField(Field):
         system that uses non-projected units (e.g., latitude/longitude).
         """
         units_name = self.units_name(connection)
-        # Some backends like MySQL cannot determine units name. In that case,
-        # test if srid is 4326 (WGS84), even if this is over-simplification.
         return units_name.lower() in self.geodetic_units if units_name else self.srid == 4326
 
     def get_placeholder(self, value, compiler, connection):

@@ -475,8 +475,7 @@ class DistanceFunctionsTests(TestCase):
         # Tolerance has to be lower for Oracle
         tol = 2
         for i, z in enumerate(SouthTexasZipcode.objects.annotate(area=Area('poly')).order_by('name')):
-            # MySQL is returning a raw float value
-            self.assertAlmostEqual(area_sq_m[i], z.area.sq_m if hasattr(z.area, 'sq_m') else z.area, tol)
+            self.assertAlmostEqual(area_sq_m[i], z.area.sq_m, tol)
 
     @skipUnlessDBFeature("has_Distance_function")
     def test_distance_simple(self):
@@ -488,7 +487,7 @@ class DistanceFunctionsTests(TestCase):
         houston = SouthTexasCity.objects.annotate(dist=Distance('point', lagrange)).order_by('id').first()
         tol = 2 if oracle else 5
         self.assertAlmostEqual(
-            houston.dist.m if hasattr(houston.dist, 'm') else houston.dist,
+            houston.dist.m,
             147075.069813,
             tol
         )
@@ -656,7 +655,7 @@ class DistanceFunctionsTests(TestCase):
 
         # Now doing length on a projected coordinate system.
         i10 = SouthTexasInterstate.objects.annotate(length=Length('path')).get(name='I-10')
-        self.assertAlmostEqual(len_m2, i10.length.m if isinstance(i10.length, D) else i10.length, 2)
+        self.assertAlmostEqual(len_m2, i10.length.m, 2)
         self.assertTrue(
             SouthTexasInterstate.objects.annotate(length=Length('path')).filter(length__gt=4000).exists()
         )
