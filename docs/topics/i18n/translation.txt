@@ -1028,6 +1028,14 @@ The ``JavaScriptCatalog`` view
                 name='javascript-catalog'),
         ]
 
+    **Example with i18n_patterns**::
+
+        from django.conf.urls.i18n import i18n_patterns
+
+        urlpatterns = i18n_patterns(
+            url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+        )
+
 The precedence of translations is such that the packages appearing later in the
 ``packages`` argument have higher precedence than the ones appearing at the
 beginning. This is important in the case of clashing translations for the same
@@ -1118,6 +1126,13 @@ with the translations lookup order algorithm used for Python and templates, the
 directories listed in :setting:`LOCALE_PATHS` have the highest precedence with
 the ones appearing first having higher precedence than the ones appearing
 later.
+
+.. admonition:: i18n_patterns
+
+    If you are defining your URLs within :func:`~django.conf.urls.i18n.i18n_patterns`
+    in :setting:`ROOT_URLCONF`, you will also need to place the ``javascript_catalog``
+    routes within :func:`~django.conf.urls.i18n.i18n_patterns` for the catalog to be
+    generated correctly for the relevant language.
 
 Using the JavaScript translation catalog
 ----------------------------------------
@@ -1448,10 +1463,17 @@ Setting ``prefix_default_language`` to ``False`` removes the prefix from the
 default language (:setting:`LANGUAGE_CODE`). This can be useful when adding
 translations to existing site so that the current URLs won't change.
 
+When using :func:`~django.conf.urls.i18n.i18n_patterns` within
+:setting:`ROOT_URLCONF`, be aware that any JavaScript catalog routes will also
+need to be placed within your :func:`~django.conf.urls.i18n.i18n_patterns`
+block in order for the catalog to be generated correctly for the relevant
+language.
+
 Example URL patterns::
 
     from django.conf.urls import include, url
     from django.conf.urls.i18n import i18n_patterns
+    from django.views.i18n import JavaScriptCatalog
 
     from about import views as about_views
     from news import views as news_views
@@ -1470,6 +1492,7 @@ Example URL patterns::
     urlpatterns += i18n_patterns(
         url(r'^about/$', about_views.main, name='about'),
         url(r'^news/', include(news_patterns, namespace='news')),
+        url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
     )
 
 After defining these URL patterns, Django will automatically add the
