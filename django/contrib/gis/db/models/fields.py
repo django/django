@@ -5,7 +5,6 @@ from django.contrib.gis.db.models.lookups import (
     RasterBandTransform, gis_lookups,
 )
 from django.contrib.gis.db.models.proxy import SpatialProxy
-from django.contrib.gis.gdal import SpatialReference
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.core.exceptions import ImproperlyConfigured
@@ -26,6 +25,7 @@ def get_srid_info(srid, connection):
     given SRID from the `spatial_ref_sys` (or equivalent) spatial database
     table for the given database connection.  These results are cached.
     """
+    from django.contrib.gis.gdal import SpatialReference
     global _srid_cache
 
     try:
