@@ -38,12 +38,12 @@ class GeoFunc(Func):
         except (AttributeError, FieldError):
             return None
 
-    def as_sql(self, compiler, connection):
+    def as_sql(self, compiler, connection, **extra_context):
         if self.function is None:
             self.function = connection.ops.spatial_function_name(self.name)
         if any(isinstance(field, RasterField) for field in self.get_source_fields()):
             raise TypeError("Geometry functions not supported for raster fields.")
-        return super(GeoFunc, self).as_sql(compiler, connection)
+        return super(GeoFunc, self).as_sql(compiler, connection, **extra_context)
 
     def resolve_expression(self, *args, **kwargs):
         res = super(GeoFunc, self).resolve_expression(*args, **kwargs)
@@ -171,6 +171,14 @@ class AsGML(GeoFunc):
         if precision is not None:
             expressions.append(self._handle_param(precision, 'precision', six.integer_types))
         super(AsGML, self).__init__(*expressions, **extra)
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        source_expressions = self.get_source_expressions()
+        version = source_expressions[0]
+        clone = self.copy()
+        clone.set_source_expressions([source_expressions[1]])
+        extra_context['function'] = 'SDO_UTIL.TO_GML311GEOMETRY' if version.value == 3 else 'SDO_UTIL.TO_GMLGEOMETRY'
+        return super(AsGML, clone).as_sql(compiler, connection, **extra_context)
 
 
 class AsKML(AsGML):
