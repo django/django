@@ -119,16 +119,9 @@ class IOBase(GEOSBase):
         self.ptr = self._constructor()
         # Loading the real destructor function at this point as doing it in
         # __del__ is too late (import error).
-        self._destructor.func = self._destructor.get_func(
-            *self._destructor.args, **self._destructor.kwargs
+        self.destructor.func = self.destructor.get_func(
+            *self.destructor.args, **self.destructor.kwargs
         )
-
-    def __del__(self):
-        # Cleaning up with the appropriate destructor.
-        try:
-            self._destructor(self._ptr)
-        except (AttributeError, TypeError):
-            pass  # Some part might already have been garbage collected
 
 # ### Base WKB/WKT Reading and Writing objects ###
 
@@ -138,8 +131,8 @@ class IOBase(GEOSBase):
 # objects.
 class _WKTReader(IOBase):
     _constructor = wkt_reader_create
-    _destructor = wkt_reader_destroy
     ptr_type = WKT_READ_PTR
+    destructor = wkt_reader_destroy
 
     def read(self, wkt):
         if not isinstance(wkt, (bytes, six.string_types)):
@@ -149,8 +142,8 @@ class _WKTReader(IOBase):
 
 class _WKBReader(IOBase):
     _constructor = wkb_reader_create
-    _destructor = wkb_reader_destroy
     ptr_type = WKB_READ_PTR
+    destructor = wkb_reader_destroy
 
     def read(self, wkb):
         "Returns a _pointer_ to C GEOS Geometry object from the given WKB."
@@ -166,8 +159,8 @@ class _WKBReader(IOBase):
 # ### WKB/WKT Writer Classes ###
 class WKTWriter(IOBase):
     _constructor = wkt_writer_create
-    _destructor = wkt_writer_destroy
     ptr_type = WKT_WRITE_PTR
+    destructor = wkt_writer_destroy
 
     _trim = False
     _precision = None
@@ -219,8 +212,8 @@ class WKTWriter(IOBase):
 
 class WKBWriter(IOBase):
     _constructor = wkb_writer_create
-    _destructor = wkb_writer_destroy
     ptr_type = WKB_WRITE_PTR
+    destructor = wkb_writer_destroy
 
     def __init__(self, dim=2):
         super(WKBWriter, self).__init__()

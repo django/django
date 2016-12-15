@@ -57,6 +57,8 @@ class GDALRaster(GDALBase):
     """
     Wraps a raster GDAL Data Source object.
     """
+    destructor = capi.close_ds
+
     def __init__(self, ds_input, write=False):
         self._write = 1 if write else 0
         Driver.ensure_registered()
@@ -142,12 +144,6 @@ class GDALRaster(GDALBase):
             self._ptr = ds_input
         else:
             raise GDALException('Invalid data source input type: "{}".'.format(type(ds_input)))
-
-    def __del__(self):
-        try:
-            capi.close_ds(self._ptr)
-        except (AttributeError, TypeError):
-            pass  # Some part might already have been garbage collected
 
     def __str__(self):
         return self.name

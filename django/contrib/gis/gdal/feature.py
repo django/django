@@ -17,6 +17,7 @@ class Feature(GDALBase):
     This class that wraps an OGR Feature, needs to be instantiated
     from a Layer object.
     """
+    destructor = capi.destroy_feature
 
     def __init__(self, feat, layer):
         """
@@ -26,13 +27,6 @@ class Feature(GDALBase):
             raise GDALException('Cannot create OGR Feature, invalid pointer given.')
         self.ptr = feat
         self._layer = layer
-
-    def __del__(self):
-        "Releases a reference to this object."
-        try:
-            capi.destroy_feature(self._ptr)
-        except (AttributeError, TypeError):
-            pass  # Some part might already have been garbage collected
 
     def __getitem__(self, index):
         """

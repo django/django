@@ -37,7 +37,7 @@ class GEOSIOTest(SimpleTestCase):
         # Creating a WKTWriter instance, testing its ptr property.
         wkt_w = WKTWriter()
         with self.assertRaises(TypeError):
-            wkt_w._set_ptr(WKTReader.ptr_type())
+            wkt_w.ptr = WKTReader.ptr_type()
 
         ref = GEOSGeometry('POINT (5 23)')
         ref_wkt = 'POINT (5.0000000000000000 23.0000000000000000)'

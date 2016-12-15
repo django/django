@@ -51,6 +51,7 @@ from django.utils.six.moves import range
 # The OGR_DS_* routines are relevant here.
 class DataSource(GDALBase):
     "Wraps an OGR Data Source object."
+    destructor = capi.destroy_ds
 
     def __init__(self, ds_input, ds_driver=False, write=False, encoding='utf-8'):
         # The write flag.
@@ -84,13 +85,6 @@ class DataSource(GDALBase):
         else:
             # Raise an exception if the returned pointer is NULL
             raise GDALException('Invalid data source file "%s"' % ds_input)
-
-    def __del__(self):
-        "Destroys this DataStructure object."
-        try:
-            capi.destroy_ds(self._ptr)
-        except (AttributeError, TypeError):
-            pass  # Some part might already have been garbage collected
 
     def __iter__(self):
         "Allows for iteration over the layers in a data source."
