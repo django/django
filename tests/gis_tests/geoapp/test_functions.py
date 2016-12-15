@@ -147,16 +147,25 @@ class GISFunctionsTests(TestCase):
 
     @skipUnlessDBFeature("has_BoundingCircle_function")
     def test_bounding_circle(self):
+        def circle_num_points(num_seg):
+            # num_seg is a number of segments per quarter circle.
+            return 4 * num_seg + 1
+
         # The weak precision in the assertions is because the BoundingCircle
         # calculation changed on PostGIS 2.3.
         qs = Country.objects.annotate(circle=functions.BoundingCircle('mpoly')).order_by('name')
         self.assertAlmostEqual(qs[0].circle.area, 169, 0)
         self.assertAlmostEqual(qs[1].circle.area, 136, 0)
+        # By default num_seg=48.
+        self.assertEqual(qs[0].circle.num_points, circle_num_points(48))
+        self.assertEqual(qs[1].circle.num_points, circle_num_points(48))
 
         qs = Country.objects.annotate(circle=functions.BoundingCircle('mpoly', num_seg=12)).order_by('name')
         self.assertGreater(qs[0].circle.area, 168.4, 0)
         self.assertLess(qs[0].circle.area, 169.5, 0)
         self.assertAlmostEqual(qs[1].circle.area, 136, 0)
+        self.assertEqual(qs[0].circle.num_points, circle_num_points(12))
+        self.assertEqual(qs[1].circle.num_points, circle_num_points(12))
 
     @skipUnlessDBFeature("has_Centroid_function")
     def test_centroid(self):
