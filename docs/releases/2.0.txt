@@ -247,3 +247,5 @@ these features.
 * The ``host`` argument to ``SimpleTestCase.assertsRedirects()`` is removed.
   The compatibility layer which allows absolute URLs to be considered equal to
   relative ones when the path is identical is also removed.
+
+* ``Field.rel`` and ``Field.remote_field.to`` are removed.

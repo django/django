@@ -11,10 +11,7 @@ they're the closest concept currently available.
 
 from __future__ import unicode_literals
 
-import warnings
-
 from django.core import exceptions
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 
@@ -56,14 +53,6 @@ class ForeignObjectRel(object):
     # __init__ as the field doesn't have its model yet. Calling these methods
     # before field.contribute_to_class() has been called will result in
     # AttributeError
-    @property
-    def to(self):
-        warnings.warn(
-            "Usage of ForeignObjectRel.to attribute has been deprecated. "
-            "Use the model attribute instead.",
-            RemovedInDjango20Warning, 2)
-        return self.model
-
     @cached_property
     def hidden(self):
         return self.is_hidden()
