@@ -59,9 +59,7 @@ def normalize(pattern):
     (3) Select the first (essentially an arbitrary) element from any character
         class. Select an arbitrary character for any unordered class (e.g. '.'
         or '\w') in the pattern.
-    (4) Ignore comments, look-ahead and look-behind assertions, and any of the
-        reg-exp flags that won't change what we construct ("iLmsu"). "(?x)" is
-        an error, however.
+    (4) Ignore look-ahead and look-behind assertions.
     (5) Raise an error on any disjunctive ('|') constructs.
 
     Django's URLs for forward resolving are either all positional arguments or
@@ -128,7 +126,7 @@ def normalize(pattern):
                     walk_to_end(ch, pattern_iter)
                 else:
                     ch, escaped = next(pattern_iter)
-                    if ch in "iLmsu#!=<":
+                    if ch in "!=<":
                         # All of these are ignorable. Walk to the end of the
                         # group.
                         walk_to_end(ch, pattern_iter)

@@ -24,12 +24,6 @@ class NormalizeTests(unittest.TestCase):
         result = regex_helper.normalize(pattern)
         self.assertEqual(result, expected)
 
-    def test_group_ignored(self):
-        pattern = r"(?i)(?L)(?m)(?s)(?u)(?#)"
-        expected = [('', [])]
-        result = regex_helper.normalize(pattern)
-        self.assertEqual(result, expected)
-
     def test_group_noncapturing(self):
         pattern = r"(?:non-capturing)"
         expected = [('non-capturing', [])]
