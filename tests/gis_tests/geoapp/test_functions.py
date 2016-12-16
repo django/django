@@ -304,11 +304,14 @@ class GISFunctionsTests(TestCase):
         Track.objects.create(name='Foo', line=LineString(coords))
         qs = Track.objects.annotate(num_points=functions.NumPoints('line'))
         self.assertEqual(qs.first().num_points, 2)
-        if spatialite or mysql:
-            # SpatiaLite and MySQL can only count points on LineStrings
+        mpoly_qs = Country.objects.annotate(num_points=functions.NumPoints('mpoly'))
+        if not connection.features.supports_num_points_poly:
+            msg = 'NumPoints can only operate on LineString content on this database.'
+            with self.assertRaisesMessage(TypeError, msg):
+                list(mpoly_qs)
             return
 
-        for c in Country.objects.annotate(num_points=functions.NumPoints('mpoly')):
+        for c in mpoly_qs:
             self.assertEqual(c.mpoly.num_points, c.num_points)
 
         if not oracle:
