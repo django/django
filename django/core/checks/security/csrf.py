@@ -43,6 +43,7 @@ def check_csrf_middleware(app_configs, **kwargs):
 @register(Tags.security, deploy=True)
 def check_csrf_cookie_secure(app_configs, **kwargs):
     passed_check = (
+        settings.CSRF_USE_SESSIONS or
         not _csrf_middleware() or
         settings.CSRF_COOKIE_SECURE
     )
@@ -52,6 +53,7 @@ def check_csrf_cookie_secure(app_configs, **kwargs):
 @register(Tags.security, deploy=True)
 def check_csrf_cookie_httponly(app_configs, **kwargs):
     passed_check = (
+        settings.CSRF_USE_SESSIONS or
         not _csrf_middleware() or
         settings.CSRF_COOKIE_HTTPONLY
     )
