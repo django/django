@@ -6,8 +6,6 @@ from django.utils.functional import cached_property
 
 class DatabaseFeatures(BaseSpatialFeatures, SQLiteDatabaseFeatures):
     supports_3d_storage = True
-    # SpatiaLite can only count vertices in LineStrings
-    supports_num_points_poly = False
 
     @cached_property
     def supports_initspatialmetadata_in_one_transaction(self):

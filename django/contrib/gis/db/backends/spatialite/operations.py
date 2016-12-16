@@ -83,6 +83,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     def function_names(self):
         return {
             'Length': 'ST_Length',
+            'NumPoints': 'ST_NPoints',
             'Reverse': 'ST_Reverse',
             'Scale': 'ScaleCoords',
             'Translate': 'ST_Translate',
