@@ -985,6 +985,15 @@ entry::
     entry.save()
     entry.authors.set(old_authors)
 
+For a ``OneToOneField``, you must duplicate the related object and assign it
+to the new object's field to avoid violating the one-to-one unique constraint.
+For example, assuming ``entry`` is already duplicated as above::
+
+    detail = EntryDetail.objects.all()[0]
+    detail.pk = None
+    detail.entry = entry
+    detail.save()
+
 .. _topics-db-queries-update:
 
 Updating multiple objects at once
