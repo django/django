@@ -155,8 +155,8 @@ class WebsocketBindingWithMembers(WebsocketBinding):
 
     encoder = DjangoJSONEncoder()
 
-    def serialize_data(self, instance):
-        data = super(WebsocketBindingWithMembers, self).serialize_data(instance)
+    def serialize_data(self, instance, **kwargs):
+        data = super(WebsocketBindingWithMembers, self).serialize_data(instance, **kwargs)
         member_data = {}
         for m in self.send_members:
             member = instance

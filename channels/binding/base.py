@@ -71,6 +71,9 @@ class Binding(object):
     channel_session_user = True
     channel_session = False
 
+    # the kwargs the triggering signal (e.g. post_save) was emitted with
+    signal_kwargs = None
+
     @classmethod
     def register(cls):
         """
@@ -121,7 +124,7 @@ class Binding(object):
 
     @classmethod
     def post_save_receiver(cls, instance, created, **kwargs):
-        cls.post_change_receiver(instance, CREATE if created else UPDATE)
+        cls.post_change_receiver(instance, CREATE if created else UPDATE, **kwargs)
 
     @classmethod
     def pre_delete_receiver(cls, instance, **kwargs):
@@ -129,7 +132,7 @@ class Binding(object):
 
     @classmethod
     def post_delete_receiver(cls, instance, **kwargs):
-        cls.post_change_receiver(instance, DELETE)
+        cls.post_change_receiver(instance, DELETE, **kwargs)
 
     @classmethod
     def pre_change_receiver(cls, instance, action):
@@ -146,7 +149,7 @@ class Binding(object):
         instance._binding_group_names[cls] = group_names
 
     @classmethod
-    def post_change_receiver(cls, instance, action):
+    def post_change_receiver(cls, instance, action, **kwargs):
         """
         Triggers the binding to possibly send to its group.
         """
@@ -161,16 +164,17 @@ class Binding(object):
         self.instance = instance
 
         # Django DDP had used the ordering of DELETE, UPDATE then CREATE for good reasons.
-        self.send_messages(instance, old_group_names - new_group_names, DELETE)
-        self.send_messages(instance, old_group_names & new_group_names, UPDATE)
-        self.send_messages(instance, new_group_names - old_group_names, CREATE)
+        self.send_messages(instance, old_group_names - new_group_names, DELETE, **kwargs)
+        self.send_messages(instance, old_group_names & new_group_names, UPDATE, **kwargs)
+        self.send_messages(instance, new_group_names - old_group_names, CREATE, **kwargs)
 
-    def send_messages(self, instance, group_names, action):
+    def send_messages(self, instance, group_names, action, **kwargs):
         """
         Serializes the instance and sends it to all provided group names.
         """
         if not group_names:
             return  # no need to serialize, bail.
+        self.signal_kwargs = kwargs
         payload = self.serialize(instance, action)
         if payload == {}:
             return  # nothing to send, bail.
@@ -193,6 +197,7 @@ class Binding(object):
         """
         Should return a serialized version of the instance to send over the
         wire (e.g. {"pk": 12, "value": 42, "string": "some string"})
+        Kwargs are passed from the models save and delete methods.
         """
         raise NotImplementedError()
 
