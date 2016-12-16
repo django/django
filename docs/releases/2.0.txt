@@ -243,3 +243,7 @@ these features.
 * The ``django.forms.extras`` package is removed.
 
 * The ``assignment_tag`` helper is removed.
+
+* The ``host`` argument to ``SimpleTestCase.assertsRedirects()`` is removed.
+  The compatibility layer which allows absolute URLs to be considered equal to
+  relative ones when the path is identical is also removed.

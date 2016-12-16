@@ -15,14 +15,12 @@ from django.template import (
 )
 from django.template.response import SimpleTemplateResponse
 from django.test import (
-    Client, SimpleTestCase, TestCase, ignore_warnings, modify_settings,
-    override_settings,
+    Client, SimpleTestCase, TestCase, modify_settings, override_settings,
 )
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
 from django.urls import NoReverseMatch, reverse
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy
 
 from .models import CustomUser
@@ -513,15 +511,6 @@ class AssertRedirectsTests(SimpleTestCase):
             self.assertRedirects(response, 'https://testserver/secure_view/', status_code=302)
             with self.assertRaises(AssertionError):
                 self.assertRedirects(response, 'http://testserver/secure_view/', status_code=302)
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_full_path_in_expected_urls(self):
-        """
-        Specifying a full URL as assertRedirects expected_url still
-        work as backwards compatible behavior until Django 2.0.
-        """
-        response = self.client.get('/redirect_view/')
-        self.assertRedirects(response, 'http://testserver/get_view/')
 
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')

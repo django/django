@@ -39,7 +39,7 @@ from django.utils.decorators import classproperty
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.six.moves.urllib.parse import (
-    unquote, urljoin, urlparse, urlsplit, urlunsplit,
+    unquote, urljoin, urlparse, urlsplit,
 )
 from django.utils.six.moves.urllib.request import url2pathname
 from django.views.static import serve
@@ -245,7 +245,7 @@ class SimpleTestCase(unittest.TestCase):
         return modify_settings(**kwargs)
 
     def assertRedirects(self, response, expected_url, status_code=302,
-                        target_status_code=200, host=None, msg_prefix='',
+                        target_status_code=200, msg_prefix='',
                         fetch_redirect_response=True):
         """Asserts that a response redirected to a specific URL, and that the
         redirect URL can be loaded.
@@ -254,12 +254,6 @@ class SimpleTestCase(unittest.TestCase):
         TestClient to do a request (use fetch_redirect_response=False to check
         such links without fetching them).
         """
-        if host is not None:
-            warnings.warn(
-                "The host argument is deprecated and no longer used by assertRedirects",
-                RemovedInDjango20Warning, stacklevel=2
-            )
-
         if msg_prefix:
             msg_prefix += ": "
 
@@ -323,19 +317,6 @@ class SimpleTestCase(unittest.TestCase):
                     msg_prefix + "Couldn't retrieve redirection page '%s': response code was %d (expected %d)"
                     % (path, redirect_response.status_code, target_status_code)
                 )
-
-        if url != expected_url:
-            # For temporary backwards compatibility, try to compare with a relative url
-            e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
-            relative_url = urlunsplit(('', '', e_path, e_query, e_fragment))
-            if url == relative_url:
-                warnings.warn(
-                    "assertRedirects had to strip the scheme and domain from the "
-                    "expected URL, as it was always added automatically to URLs "
-                    "before Django 1.9. Please update your expected URLs by "
-                    "removing the scheme and domain.",
-                    RemovedInDjango20Warning, stacklevel=2)
-                expected_url = relative_url
 
         self.assertEqual(
             url, expected_url,

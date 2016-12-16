@@ -1479,11 +1479,6 @@ your test suite.
     the original request's scheme is used. If present, the scheme in
     ``expected_url`` is the one used to make the comparisons to.
 
-    .. deprecated:: 1.9
-
-        The ``host`` argument is deprecated, as redirections are no longer
-        forced to be absolute URLs.
-
 .. method:: SimpleTestCase.assertHTMLEqual(html1, html2, msg=None)
 
     Asserts that the strings ``html1`` and ``html2`` are equal. The comparison
