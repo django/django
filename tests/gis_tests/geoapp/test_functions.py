@@ -46,11 +46,6 @@ class GISFunctionsTests(TestCase):
             '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},'
             '"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
         )
-        if spatialite:
-            victoria_json = (
-                '{"type":"Point","bbox":[-123.305196,48.462611,-123.305196,48.462611],'
-                '"coordinates":[-123.305196,48.462611]}'
-            )
 
         # Precision argument should only be an integer
         with self.assertRaises(TypeError):
@@ -59,7 +54,7 @@ class GISFunctionsTests(TestCase):
         # Reference queries and values.
         # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 0)
         # FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Pueblo';
-        self.assertEqual(
+        self.assertJSONEqual(
             pueblo_json,
             City.objects.annotate(geojson=functions.AsGeoJSON('point')).get(name='Pueblo').geojson
         )
@@ -67,7 +62,7 @@ class GISFunctionsTests(TestCase):
         # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 2) FROM "geoapp_city"
         # WHERE "geoapp_city"."name" = 'Houston';
         # This time we want to include the CRS by using the `crs` keyword.
-        self.assertEqual(
+        self.assertJSONEqual(
             houston_json,
             City.objects.annotate(json=functions.AsGeoJSON('point', crs=True)).get(name='Houston').json
         )
@@ -75,7 +70,7 @@ class GISFunctionsTests(TestCase):
         # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 1) FROM "geoapp_city"
         # WHERE "geoapp_city"."name" = 'Houston';
         # This time we include the bounding box by using the `bbox` keyword.
-        self.assertEqual(
+        self.assertJSONEqual(
             victoria_json,
             City.objects.annotate(
                 geojson=functions.AsGeoJSON('point', bbox=True)
@@ -85,7 +80,7 @@ class GISFunctionsTests(TestCase):
         # SELECT ST_AsGeoJson("geoapp_city"."point", 5, 3) FROM "geoapp_city"
         # WHERE "geoapp_city"."name" = 'Chicago';
         # Finally, we set every available keyword.
-        self.assertEqual(
+        self.assertJSONEqual(
             chicago_json,
             City.objects.annotate(
                 geojson=functions.AsGeoJSON('point', bbox=True, crs=True, precision=5)
