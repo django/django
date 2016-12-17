@@ -420,11 +420,11 @@ class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ['http', 'https', 'ftp']
 
     def __init__(self, redirect_to, *args, **kwargs):
+        super(HttpResponseRedirectBase, self).__init__(*args, **kwargs)
+        self['Location'] = iri_to_uri(redirect_to)
         parsed = urlparse(force_text(redirect_to))
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
             raise DisallowedRedirect("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
-        super(HttpResponseRedirectBase, self).__init__(*args, **kwargs)
-        self['Location'] = iri_to_uri(redirect_to)
 
     url = property(lambda self: self['Location'])
 
