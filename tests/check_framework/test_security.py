@@ -166,6 +166,17 @@ class CheckCSRFCookieSecureTest(SimpleTestCase):
         """
         self.assertEqual(self.func(None), [csrf.W016])
 
+    @override_settings(
+        MIDDLEWARE=["django.middleware.csrf.CsrfViewMiddleware"],
+        CSRF_USE_SESSIONS=True,
+        CSRF_COOKIE_SECURE=False)
+    def test_use_sessions_with_csrf_cookie_secure_false(self):
+        """
+        No warning if CSRF_COOKIE_SECURE isn't True while CSRF_USE_SESSIONS
+        is True.
+        """
+        self.assertEqual(self.func(None), [])
+
     @override_settings(MIDDLEWARE=[], MIDDLEWARE_CLASSES=[], CSRF_COOKIE_SECURE=False)
     def test_with_csrf_cookie_secure_false_no_middleware(self):
         """
@@ -196,6 +207,17 @@ class CheckCSRFCookieHttpOnlyTest(SimpleTestCase):
         CSRF_COOKIE_HTTPONLY isn't True.
         """
         self.assertEqual(self.func(None), [csrf.W017])
+
+    @override_settings(
+        MIDDLEWARE=["django.middleware.csrf.CsrfViewMiddleware"],
+        CSRF_USE_SESSIONS=True,
+        CSRF_COOKIE_HTTPONLY=False)
+    def test_use_sessions_with_csrf_cookie_httponly_false(self):
+        """
+        No warning if CSRF_COOKIE_HTTPONLY isn't True while CSRF_USE_SESSIONS
+        is True.
+        """
+        self.assertEqual(self.func(None), [])
 
     @override_settings(MIDDLEWARE=[], MIDDLEWARE_CLASSES=[], CSRF_COOKIE_HTTPONLY=False)
     def test_with_csrf_cookie_httponly_false_no_middleware(self):
