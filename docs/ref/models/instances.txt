@@ -413,43 +413,36 @@ What happens when you save?
 
 When you save an object, Django performs the following steps:
 
-1. **Emit a pre-save signal.** The :doc:`signal </ref/signals>`
-   :attr:`django.db.models.signals.pre_save` is sent, allowing any
-   functions listening for that signal to take some customized
-   action.
+#. **Emit a pre-save signal.** The :data:`~django.db.models.signals.pre_save`
+   signal is sent, allowing any functions listening for that signal to do
+   something.
 
-2. **Pre-process the data.** Each field on the object is asked to
-   perform any automated data modification that the field may need
-   to perform.
+#. **Preprocess the data.** Each field's
+   :meth:`~django.db.models.Field.pre_save` method is called to perform any
+   automated data modification that's needed. For example, the date/time fields
+   override ``pre_save()`` to implement
+   :attr:`~django.db.models.DateField.auto_now_add` and
+   :attr:`~django.db.models.DateField.auto_now`.
 
-   Most fields do *no* pre-processing — the field data is kept as-is.
-   Pre-processing is only used on fields that have special behavior.  For
-   example, if your model has a :class:`~django.db.models.DateField` with
-   ``auto_now=True``, the pre-save phase will alter the data in the object
-   to ensure that the date field contains the current date stamp. (Our
-   documentation doesn't yet include a list of all the fields with this
-   "special behavior.")
-
-3. **Prepare the data for the database.** Each field is asked to provide
+#. **Prepare the data for the database.** Each field's
+   :meth:`~django.db.models.Field.get_db_prep_save` method is asked to provide
    its current value in a data type that can be written to the database.
 
-   Most fields require *no* data preparation. Simple data types, such as
-   integers and strings, are 'ready to write' as a Python object. However,
-   more complex data types often require some modification.
+   Most fields don't require data preparation. Simple data types, such as
+   integers and strings, are 'ready to write' as a Python object. However, more
+   complex data types often require some modification.
 
    For example, :class:`~django.db.models.DateField` fields use a Python
    ``datetime`` object to store data. Databases don't store ``datetime``
    objects, so the field value must be converted into an ISO-compliant date
    string for insertion into the database.
 
-4. **Insert the data into the database.** The pre-processed, prepared
-   data is then composed into an SQL statement for insertion into the
-   database.
+#. **Insert the data into the database.** The preprocessed, prepared data is
+   composed into an SQL statement for insertion into the database.
 
-5. **Emit a post-save signal.** The signal
-   :attr:`django.db.models.signals.post_save` is sent, allowing
-   any functions listening for that signal to take some customized
-   action.
+#. **Emit a post-save signal.** The :data:`~django.db.models.signals.post_save`
+   signal is sent, allowing any functions listening for that signal to do
+   something.
 
 How Django knows to UPDATE vs. INSERT
 -------------------------------------
