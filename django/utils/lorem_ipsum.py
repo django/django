@@ -103,10 +103,7 @@ def words(count, common=True):
     If `common` is True, then the first 19 words will be the standard
     'lorem ipsum' words. Otherwise, all words will be selected randomly.
     """
-    if common:
-        word_list = list(COMMON_WORDS)
-    else:
-        word_list = []
+    word_list = list(COMMON_WORDS) if common else []
     c = len(word_list)
     if count > c:
         count -= c
