@@ -8,7 +8,7 @@ import pickle
 import unittest
 import uuid
 
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import DisallowedRedirect, SuspiciousOperation
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.signals import request_finished
 from django.db import close_old_connections
@@ -515,6 +515,14 @@ class HttpResponseSubclassesTests(SimpleTestCase):
     def test_redirect_repr(self):
         response = HttpResponseRedirect('/redirected/')
         expected = '<HttpResponseRedirect status_code=302, "text/html; charset=utf-8", url="/redirected/">'
+        self.assertEqual(repr(response), expected)
+
+    def test_invalid_redirect_repr(self):
+        """Invalid redirect reprs should not crash (can happen in the django exception debug view)"""
+        response = HttpResponseRedirect.__new__(HttpResponseRedirect)
+        with self.assertRaises(DisallowedRedirect):
+            HttpResponseRedirect.__init__(response, "ssh://foo")
+        expected = '<HttpResponseRedirect status_code=302, "text/html; charset=utf-8", url="ssh://foo">'
         self.assertEqual(repr(response), expected)
 
     def test_not_modified(self):
