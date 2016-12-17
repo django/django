@@ -183,3 +183,6 @@ class UniqueTest(models.Model):
 class Node(models.Model):
     node_id = models.AutoField(primary_key=True)
     parent = models.ForeignKey('self', models.CASCADE, null=True, blank=True)
+
+    class Meta:
+        apps = new_apps

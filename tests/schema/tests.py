@@ -48,8 +48,8 @@ class SchemaTests(TransactionTestCase):
 
     models = [
         Author, AuthorWithDefaultHeight, AuthorWithEvenLongerName, Book,
-        BookWeak, BookWithLongName, BookWithO2O, BookWithSlug, IntegerPK, Note,
-        Tag, TagIndexed, TagM2MTest, TagUniqueRename, Thing, UniqueTest,
+        BookWeak, BookWithLongName, BookWithO2O, BookWithSlug, IntegerPK, Node,
+        Note, Tag, TagIndexed, TagM2MTest, TagUniqueRename, Thing, UniqueTest,
     ]
 
     # Utility functions
@@ -2173,6 +2173,8 @@ class SchemaTests(TransactionTestCase):
         """
         if connection.vendor == 'mysql' and connection.mysql_version < (5, 6, 6):
             self.skipTest('Skip known bug renaming primary keys on older MySQL versions (#24995).')
+        with connection.schema_editor() as editor:
+            editor.create_model(Node)
         old_field = Node._meta.get_field('node_id')
         new_field = AutoField(primary_key=True)
         new_field.set_attributes_from_name('id')
