@@ -974,15 +974,35 @@ Due to how inheritance works, you have to set both ``pk`` and ``id`` to None::
     django_blog.id = None
     django_blog.save() # django_blog.pk == 4
 
-This process does not copy related objects. If you want to copy relations,
-you have to write a little bit more code. In our example, ``Entry`` has a many to many
-field to ``Author``::
+This process does not copy :class:`~django.db.models.ManyToManyField`,
+:class:`~django.db.models.OneToOneField`, or
+:class:`~django.db.models.ForeignKey` _reverse_ relations. If you want to copy
+these relations, you have to write a little bit more code. In our example,
+``Entry`` has a ManyToMany field to ``Author``::
 
     entry = Entry.objects.all()[0] # some previous entry
     old_authors = entry.authors.all()
     entry.pk = None
     entry.save()
-    entry.authors = old_authors # saves new many2many relations
+    entry.authors = old_authors 
+    entry.save() # saves new many2many relations against new pk
+
+For the forward relation of a ForeignKey, as the foreign key itself is stored
+on the model, no extra code is necessary::
+
+    entry = Entry.objects.all()[0] # some entry with a blog
+    entry.pk = None
+    entry.save()
+    entry.blog # outputs the same blog as the original entry
+
+For OneToOne relations, you can also use
+:meth:`~django.db.models.query.QuerySet.select_related` before setting ``pk`` to
+``None`` and using ``save`` to avoid extra code::
+
+    detail = EntryDetail.objects.select_related().all()[0]
+    detail.pk = None
+    detail.save()
+    detail.entry # outputs a duplicated entry
 
 .. _topics-db-queries-update:
 
