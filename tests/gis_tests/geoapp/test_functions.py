@@ -177,8 +177,8 @@ class GISFunctionsTests(TestCase):
     def test_difference(self):
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(diff=functions.Difference('mpoly', geom))
-        # SpatiaLite and Oracle do something screwy with the Texas geometry.
-        if spatialite or oracle:
+        # Oracle do something screwy with the Texas geometry.
+        if oracle:
             qs = qs.exclude(name='Texas')
 
         for c in qs:
@@ -189,8 +189,8 @@ class GISFunctionsTests(TestCase):
         """Testing with mixed SRID (Country has default 4326)."""
         geom = Point(556597.4, 2632018.6, srid=3857)  # Spherical mercator
         qs = Country.objects.annotate(difference=functions.Difference('mpoly', geom))
-        # SpatiaLite and Oracle do something screwy with the Texas geometry.
-        if spatialite or oracle:
+        # Oracle do something screwy with the Texas geometry.
+        if oracle:
             qs = qs.exclude(name='Texas')
         for c in qs:
             self.assertTrue(c.mpoly.difference(geom).equals(c.difference))
@@ -468,14 +468,8 @@ class GISFunctionsTests(TestCase):
             difference=functions.Difference('mpoly', geom),
             sym_difference=functions.SymDifference('mpoly', geom),
             union=functions.Union('mpoly', geom),
+            intersection=functions.Intersection('mpoly', geom),
         )
-
-        # For some reason SpatiaLite does something screwy with the Texas geometry here.
-        # Also, it doesn't like the null intersection.
-        if spatialite:
-            qs = qs.exclude(name='Texas')
-        else:
-            qs = qs.annotate(intersection=functions.Intersection('mpoly', geom))
 
         if oracle:
             # Should be able to execute the queries; however, they won't be the same
