@@ -399,7 +399,7 @@ class BaseModelAdminChecks(object):
                 return [
                     checks.Error(
                         "The value of '%s' refers to '%s', which must not be a DateTimeField, "
-                        "a ForeignKey, or a ManyToManyField." % (label, field_name),
+                        "a ForeignKey, a OneToOneField, or a ManyToManyField." % (label, field_name),
                         obj=obj.__class__,
                         id='admin.E028',
                     )

@@ -343,8 +343,8 @@ with the admin site:
 * **admin.E027**: The value of ``prepopulated_fields`` refers to
   ``<field name>``, which is not an attribute of ``<model>``.
 * **admin.E028**: The value of ``prepopulated_fields`` refers to
-  ``<field name>``, which must not be a ``DateTimeField``, a ``ForeignKey``, or a
-  ``ManyToManyField`` field.
+  ``<field name>``, which must not be a ``DateTimeField``, a ``ForeignKey``,
+  a ``OneToOneField``, or a ``ManyToManyField`` field.
 * **admin.E029**: The value of ``prepopulated_fields[<field name>]`` must be a
   list or tuple.
 * **admin.E030**: The value of ``prepopulated_fields`` refers to

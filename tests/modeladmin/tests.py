@@ -1006,8 +1006,8 @@ class PrepopulatedFieldsCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
-            ("The value of 'prepopulated_fields' refers to 'users', which must not be "
-             "a DateTimeField, a ForeignKey, or a ManyToManyField."),
+            "The value of 'prepopulated_fields' refers to 'users', which must not be "
+            "a DateTimeField, a ForeignKey, a OneToOneField, or a ManyToManyField.",
             'admin.E028')
 
     def test_valid_case(self):
@@ -1015,6 +1015,17 @@ class PrepopulatedFieldsCheckTests(CheckTestCase):
             prepopulated_fields = {"slug": ('name',)}
 
         self.assertIsValid(ValidationTestModelAdmin, ValidationTestModel)
+
+    def test_one_to_one_field(self):
+        class ValidationTestModelAdmin(ModelAdmin):
+            prepopulated_fields = {'best_friend': ('name',)}
+
+        self.assertIsInvalid(
+            ValidationTestModelAdmin, ValidationTestModel,
+            "The value of 'prepopulated_fields' refers to 'best_friend', which must not be "
+            "a DateTimeField, a ForeignKey, a OneToOneField, or a ManyToManyField.",
+            'admin.E028'
+        )
 
 
 class ListDisplayTests(CheckTestCase):
