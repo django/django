@@ -51,13 +51,7 @@ class StaticTagTests(SimpleTestCase):
         output = self.engine.render_to_string('static-statictag04', {'base_css': 'admin/base.css'})
         self.assertEqual(output, urljoin(settings.STATIC_URL, 'admin/base.css'))
 
-    @setup({'static-statictag05': '{% load static %}{% static "test.html?foo=1&bar=2" %}'})
-    def test_static_escapes_urls(self):
+    @setup({'static-statictag05': '{% load static %}{% static "special?chars&quoted.html" %}'})
+    def test_static_quotes_urls(self):
         output = self.engine.render_to_string('static-statictag05')
-        self.assertEqual(output, urljoin(settings.STATIC_URL, '/static/test.html?foo=1&amp;bar=2'))
-
-    @setup({'static-statictag06': '{% load static %}'
-                                  '{% autoescape off %}{% static "test.html?foo=1&bar=2" %}{% endautoescape %}'})
-    def test_static_escapes_urls_autoescape_off(self):
-        output = self.engine.render_to_string('static-statictag06')
-        self.assertEqual(output, urljoin(settings.STATIC_URL, '/static/test.html?foo=1&bar=2'))
+        self.assertEqual(output, urljoin(settings.STATIC_URL, '/static/special%3Fchars%26quoted.html'))
