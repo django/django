@@ -1,10 +1,10 @@
-/* global module, test, SelectFilter */
+/* global QUnit, SelectFilter */
 /* eslint global-strict: 0, strict: 0 */
 'use strict';
 
-module('admin.SelectFilter2');
+QUnit.module('admin.SelectFilter2');
 
-test('init', function(assert) {
+QUnit.test('init', function(assert) {
     var $ = django.jQuery;
     $('<form><select id="id"></select></form>').appendTo('#qunit-fixture');
     $('<option value="0">A</option>').appendTo('#id');
