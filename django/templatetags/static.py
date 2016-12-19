@@ -2,7 +2,7 @@ from django import template
 from django.apps import apps
 from django.utils.encoding import iri_to_uri
 from django.utils.html import conditional_escape
-from django.utils.six.moves.urllib.parse import unquote, urljoin
+from django.utils.six.moves.urllib.parse import urljoin
 
 register = template.Library()
 
@@ -102,7 +102,7 @@ class StaticNode(template.Node):
         return self.handle_simple(path)
 
     def render(self, context):
-        url = unquote(self.url(context))
+        url = self.url(context)
         if context.autoescape:
             url = conditional_escape(url)
         if self.varname is None:
