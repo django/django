@@ -42,7 +42,6 @@
     </script>
 
     <script src="./qunit/qunit.js"></script>
-    <script src="./qunit/blanket.js" data-cover-flags="branchTracking"></script>
 
     <script src='../django/contrib/admin/static/admin/js/vendor/jquery/jquery.min.js'></script>
     <script src='../django/contrib/admin/static/admin/js/jquery.init.js'></script>
@@ -86,12 +85,6 @@
     <script src='https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/OpenLayers.js'></script>
     <script src='../django/contrib/gis/static/gis/js/OLMapWidget.js' data-cover></script>
     <script src='./gis/mapwidget.test.js'></script>
-
-    <script>
-       if (location.href.match(/(\?|&)gruntReport($|&|=)/)) {
-           blanket.options("reporter", "qunit/grunt-reporter.js");
-       }
-    </script>
 
 </body>
 </html>
