@@ -58,7 +58,6 @@ class InspectDBTestCase(TestCase):
         assertFieldType = self.make_field_type_asserter()
 
         # Inspecting Oracle DB doesn't produce correct results (#19884):
-        # - it gets max_length wrong: it returns a number of bytes.
         # - it reports fields as blank=True when they aren't.
         if (connection.features.can_introspect_max_length and
                 not connection.features.interprets_empty_strings_as_nulls):
