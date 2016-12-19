@@ -116,9 +116,6 @@ class BaseDatabaseFeatures(object):
     # Does the backend reset sequences between tests?
     supports_sequence_reset = True
 
-    # Can the backend determine reliably the length of a CharField?
-    can_introspect_max_length = True
-
     # Can the backend determine reliably if a field is nullable?
     # Note that this is separate from interprets_empty_strings_as_nulls,
     # although the latter feature, when true, interferes with correct
