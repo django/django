@@ -10,8 +10,8 @@
   },
   "devDependencies": {
     "eslint": "^0.22.1",
-    "grunt": "^0.4.5",
-    "grunt-blanket-qunit": "^0.2.0",
-    "grunt-cli": "^0.1.13"
+    "grunt": "^1.0.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-qunit": "^1.2.0"
   }
 }
