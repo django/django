@@ -673,3 +673,5 @@ The following checks are performed on your URL configuration:
   references.
 * **urls.E004**: Your URL pattern ``<pattern>`` is invalid. Ensure that
   ``urlpatterns`` is a list of :func:`~django.conf.urls.url()` instances.
+* **urls.W005**: URL namespace ``<namespace>`` isn't unique. You may not be
+  able to reverse all URLs in this namespace.
