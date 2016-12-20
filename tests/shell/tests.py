@@ -1,3 +1,5 @@
+import sys
+
 from django import __version__
 from django.core.management import call_command
 from django.test import SimpleTestCase, mock
@@ -18,6 +20,7 @@ class ShellCommandTestCase(SimpleTestCase):
             self.assertEqual(len(logger), 1)
             self.assertEqual(logger[0], __version__)
 
+    @unittest.skipIf(sys.platform == 'win32', "Python on Windows doesn't have working select().")
     @mock.patch('django.core.management.commands.shell.select')
     def test_stdin_read(self, select):
         with captured_stdin() as stdin, captured_stdout() as stdout:
