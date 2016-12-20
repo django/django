@@ -17,7 +17,6 @@ from django.db import utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils import six, timezone
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.duration import duration_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
 
@@ -344,11 +343,6 @@ class OracleParam(object):
                 param = param.astimezone(timezone.utc).replace(tzinfo=None)
             param = Oracle_datetime.from_datetime(param)
 
-        if isinstance(param, datetime.timedelta):
-            param = duration_string(param)
-            if ' ' not in param:
-                param = '0 ' + param
-
         string_size = 0
         # Oracle doesn't recognize True and False correctly in Python 3.
         # The conversion done below works both in 2 and 3.
@@ -358,7 +352,7 @@ class OracleParam(object):
             param = 0
         if hasattr(param, 'bind_parameter'):
             self.force_bytes = param.bind_parameter(cursor)
-        elif isinstance(param, Database.Binary):
+        elif isinstance(param, (Database.Binary, datetime.timedelta)):
             self.force_bytes = param
         else:
             # To transmit to the database, we need Unicode if supported
