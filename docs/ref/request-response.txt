@@ -366,7 +366,7 @@ Methods
     If a response varies on whether or not it's requested via AJAX and you are
     using some form of caching like Django's :mod:`cache middleware
     <django.middleware.cache>`, you should decorate the view with
-    :func:`vary_on_headers('HTTP_X_REQUESTED_WITH')
+    :func:`vary_on_headers('X-Requested-With')
     <django.views.decorators.vary.vary_on_headers>` so that the responses are
     properly cached.
 
