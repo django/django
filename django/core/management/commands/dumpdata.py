@@ -13,6 +13,7 @@ class ProxyModelWarning(Warning):
 
 
 class Command(BaseCommand):
+    requires_system_checks = False
     help = (
         "Output the contents of the database as a fixture of the given format "
         "(using each model's default manager unless --all is specified)."
