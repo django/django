@@ -23,6 +23,5 @@ class ShellCommandTestCase(SimpleTestCase):
         with captured_stdin() as stdin, captured_stdout() as stdout:
             stdin.write('print(100)\n')
             stdin.seek(0)
-
             call_command('shell')
         self.assertEqual(stdout.getvalue().strip(), '100')
