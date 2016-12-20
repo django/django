@@ -10,8 +10,9 @@ from django.utils.deprecation import RemovedInDjango20Warning
 
 class Command(BaseCommand):
     help = (
-        "Runs a Python interactive interpreter. Tries to use IPython or bpython, if one of them is available"
-        "If there is standard input, it will be immediately executed as code and then the command will exit"
+        "Runs a Python interactive interpreter. Tries to use IPython or "
+        "bpython, if one of them is available. Any standard input is executed "
+        "as code."
     )
 
     requires_system_checks = False
