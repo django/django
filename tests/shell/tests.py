@@ -20,7 +20,7 @@ class ShellCommandTestCase(SimpleTestCase):
             self.assertEqual(len(logger), 1)
             self.assertEqual(logger[0], __version__)
 
-    @unittest.skipIf(sys.platform == 'win32', "Python on Windows doesn't have working select().")
+    @unittest.skipIf(sys.platform == 'win32', "Windows select() doesn't support file descriptors.")
     @mock.patch('django.core.management.commands.shell.select')
     def test_stdin_read(self, select):
         with captured_stdin() as stdin, captured_stdout() as stdout:
