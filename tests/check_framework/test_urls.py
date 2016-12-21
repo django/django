@@ -1,6 +1,7 @@
 from django.conf import settings
+from django.core.checks.messages import Warning
 from django.core.checks.urls import (
-    check_url_config, get_warning_for_invalid_pattern,
+    check_url_config, check_url_namespaces_unique, get_warning_for_invalid_pattern,
 )
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
@@ -94,3 +95,23 @@ class CheckUrlsTest(SimpleTestCase):
     def test_get_warning_for_invalid_pattern_other(self):
         warning = get_warning_for_invalid_pattern(object())[0]
         self.assertIsNone(warning.hint)
+
+    @override_settings(ROOT_URLCONF='check_framework.urls.non_unique_namespaces')
+    def test_check_non_unique_namespaces(self):
+        result = check_url_namespaces_unique(None)
+        self.assertEqual(len(result), 2)
+        non_unique_namespaces = ['app-ns1', 'app-1']
+        warning_messages = [
+            "URL namespace '{}' isn't unique. You may not be able to reverse "
+            "all URLs in this namespace".format(namespace)
+            for namespace in non_unique_namespaces
+        ]
+        for warning in result:
+            self.assertIsInstance(warning, Warning)
+            self.assertEqual('urls.W005', warning.id)
+            self.assertIn(warning.msg, warning_messages)
+
+    @override_settings(ROOT_URLCONF='check_framework.urls.unique_namespaces')
+    def test_check_unique_namespaces(self):
+        result = check_url_namespaces_unique(None)
+        self.assertEqual(result, [])
