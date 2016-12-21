@@ -1,3 +1,4 @@
+import unittest
 import sys
 
 from django import __version__
