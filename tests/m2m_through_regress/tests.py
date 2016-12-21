@@ -208,7 +208,7 @@ class ToFieldThroughTests(TestCase):
         nullcar = Car.objects.create(make=None)
         with self.assertRaisesMessage(
             ValueError,
-            '"<Car: None>" needs to have a value for field "car" '
+            '"<Car: None>" needs to have a value for field "make" '
             'before this many-to-many relationship can be used.'
         ):
             nullcar.drivers._add_items('car', 'driver', self.unused_driver)
@@ -240,7 +240,7 @@ class ToFieldThroughTests(TestCase):
         nulldriver = Driver.objects.create(name=None)
         with self.assertRaisesMessage(
             ValueError,
-            '"<Driver: None>" needs to have a value for field "driver" '
+            '"<Driver: None>" needs to have a value for field "name" '
             'before this many-to-many relationship can be used.'
         ):
             nulldriver.car_set._add_items('driver', 'car', self.car)
@@ -267,7 +267,7 @@ class ToFieldThroughTests(TestCase):
         c = Car.objects.create(make=None)
         with self.assertRaisesMessage(
             ValueError,
-            '"<Car: None>" needs to have a value for field "car" '
+            '"<Car: None>" needs to have a value for field "make" '
             'before this many-to-many relationship can be used.'
         ):
             c.drivers._remove_items('car', 'drivers', self.driver)
@@ -276,7 +276,7 @@ class ToFieldThroughTests(TestCase):
         c = Car.objects.create(make=None)
         with self.assertRaisesMessage(
             ValueError,
-            '"<Car: None>" needs to have a value for field "car" '
+            '"<Car: None>" needs to have a value for field "make" '
             'before this many-to-many relationship can be used.'
         ):
             c.drivers.clear()
@@ -286,7 +286,7 @@ class ToFieldThroughTests(TestCase):
         new_car = Car()
         with self.assertRaisesMessage(
             ValueError,
-            '"<Car: None>" needs to have a value for field "car" '
+            '"<Car: None>" needs to have a value for field "make" '
             'before this many-to-many relationship can be used.'
         ):
             new_car.drivers.all(),
