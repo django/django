@@ -216,7 +216,7 @@ class ToFieldThroughTests(TestCase):
     def test_m2m_relations_unsable_on_null_to_field(self):
         nullcar = Car(make=None)
         msg = (
-            '"<Car: None>" needs to have a value for field "car" before this '
+            '"<Car: None>" needs to have a value for field "make" before this '
             'many-to-many relationship can be used.'
         )
         with self.assertRaisesMessage(ValueError, msg):
@@ -258,7 +258,7 @@ class ToFieldThroughTests(TestCase):
     def test_add_null_reverse_related(self):
         nulldriver = Driver.objects.create(name=None)
         msg = (
-            '"<Driver: None>" needs to have a value for field "driver" before '
+            '"<Driver: None>" needs to have a value for field "name" before '
             'this many-to-many relationship can be used.'
         )
         with self.assertRaisesMessage(ValueError, msg):
