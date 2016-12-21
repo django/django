@@ -713,11 +713,11 @@ Let's dive right in.  Create a file called ``admin.py`` inside the
 
 Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
 
-    from django.conf.urls import url, include
+    from django.urls import path, include
     from django.contrib.gis import admin
 
     urlpatterns = [
-        url(r'^admin/', admin.site.urls),
+        path('admin/', admin.site.urls),
     ]
 
 Create an admin user:

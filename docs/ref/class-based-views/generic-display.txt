@@ -54,12 +54,12 @@ many projects they are typically the most commonly used views.
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from django.urls import path
 
         from article.views import ArticleDetailView
 
         urlpatterns = [
-            url(r'^(?P<slug>[-\w]+)/$', ArticleDetailView.as_view(), name='article-detail'),
+            path('<slug>/', ArticleDetailView.as_view(), name='article-detail'),
         ]
 
     **Example myapp/article_detail.html**:
@@ -123,12 +123,12 @@ many projects they are typically the most commonly used views.
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from django.urls import path
 
         from article.views import ArticleListView
 
         urlpatterns = [
-            url(r'^$', ArticleListView.as_view(), name='article-list'),
+            path('', ArticleListView.as_view(), name='article-list'),
         ]
 
     **Example myapp/article_list.html**:

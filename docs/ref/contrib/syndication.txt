@@ -77,12 +77,12 @@ a feed of the latest five news items::
 To connect a URL to this feed, put an instance of the Feed object in
 your :doc:`URLconf </topics/http/urls>`. For example::
 
-    from django.conf.urls import url
+    from django.urls import path
     from myproject.feeds import LatestEntriesFeed
 
     urlpatterns = [
         # ...
-        url(r'^latest/feed/$', LatestEntriesFeed()),
+        path('latest/feed/', LatestEntriesFeed()),
         # ...
     ]
 
@@ -217,7 +217,7 @@ The police beat feeds could be accessible via URLs like this:
 
 These can be matched with a :doc:`URLconf </topics/http/urls>` line such as::
 
-    url(r'^beats/(?P<beat_id>[0-9]+)/rss/$', BeatFeed()),
+    path('beats/<int:beat_id>/rss/', BeatFeed()),
 
 Like a view, the arguments in the URL are passed to the ``get_object()``
 method along with the request object.
@@ -366,13 +366,13 @@ Here's a full example::
 
 And the accompanying URLconf::
 
-    from django.conf.urls import url
+    from django.urls import path
     from myproject.feeds import RssSiteNewsFeed, AtomSiteNewsFeed
 
     urlpatterns = [
         # ...
-        url(r'^sitenews/rss/$', RssSiteNewsFeed()),
-        url(r'^sitenews/atom/$', AtomSiteNewsFeed()),
+        path('sitenews/rss/', RssSiteNewsFeed()),
+        path('sitenews/atom/', AtomSiteNewsFeed()),
         # ...
     ]
 

@@ -149,14 +149,14 @@ Finally, we hook these new views into the URLconf:
 .. snippet::
     :filename: urls.py
 
-    from django.conf.urls import url
+    from django.urls import path
     from myapp.views import AuthorCreate, AuthorUpdate, AuthorDelete
 
     urlpatterns = [
         # ...
-        url(r'author/add/$', AuthorCreate.as_view(), name='author-add'),
-        url(r'author/(?P<pk>[0-9]+)/$', AuthorUpdate.as_view(), name='author-update'),
-        url(r'author/(?P<pk>[0-9]+)/delete/$', AuthorDelete.as_view(), name='author-delete'),
+        path('author/add/', AuthorCreate.as_view(), name='author-add'),
+        path('author/<int:pk>/', AuthorUpdate.as_view(), name='author-update'),
+        path('author/<int:pk>/delete/', AuthorDelete.as_view(), name='author-delete'),
     ]
 
 .. note::

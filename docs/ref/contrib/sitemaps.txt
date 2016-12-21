@@ -56,7 +56,7 @@ To activate sitemap generation on your Django site, add this line to your
 
     from django.contrib.sitemaps.views import sitemap
 
-    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
         name='django.contrib.sitemaps.views.sitemap')
 
 This tells Django to build a sitemap when a client accesses :file:`/sitemap.xml`.
@@ -293,7 +293,7 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using
         # ...
 
         # the sitemap
-        url(r'^sitemap\.xml$', sitemap,
+        path('sitemap.xml', sitemap,
             {'sitemaps': {'blog': GenericSitemap(info_dict, priority=0.6)}},
             name='django.contrib.sitemaps.views.sitemap'),
     ]
@@ -334,11 +334,11 @@ the ``location`` method of the sitemap. For example::
     }
 
     urlpatterns = [
-        url(r'^$', views.main, name='main'),
-        url(r'^about/$', views.about, name='about'),
-        url(r'^license/$', views.license, name='license'),
+        path('', views.main, name='main'),
+        path('about/', views.about, name='about'),
+        path('license/', views.license, name='license'),
         # ...
-        url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
+        path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
             name='django.contrib.sitemaps.views.sitemap')
     ]
 
@@ -362,8 +362,8 @@ Here's what the relevant URLconf lines would look like for the example above::
     from django.contrib.sitemaps import views
 
     urlpatterns = [
-        url(r'^sitemap\.xml$', views.index, {'sitemaps': sitemaps}),
-        url(r'^sitemap-(?P<section>.+)\.xml$', views.sitemap, {'sitemaps': sitemaps},
+        path('sitemap.xml', views.index, {'sitemaps': sitemaps}),
+        path('sitemap-<section>.xml', views.sitemap, {'sitemaps': sitemaps},
             name='django.contrib.sitemaps.views.sitemap'),
     ]
 
@@ -384,10 +384,10 @@ with a caching decorator -- you must name your sitemap view and pass
     from django.views.decorators.cache import cache_page
 
     urlpatterns = [
-        url(r'^sitemap\.xml$',
+        path('sitemap.xml',
             cache_page(86400)(sitemaps_views.index),
             {'sitemaps': sitemaps, 'sitemap_url_name': 'sitemaps'}),
-        url(r'^sitemap-(?P<section>.+)\.xml$',
+        path('sitemap-<section>.xml',
             cache_page(86400)(sitemaps_views.sitemap),
             {'sitemaps': sitemaps}, name='sitemaps'),
     ]
@@ -403,11 +403,11 @@ parameter to the ``sitemap`` and ``index`` views via the URLconf::
     from django.contrib.sitemaps import views
 
     urlpatterns = [
-        url(r'^custom-sitemap\.xml$', views.index, {
+        path('custom-sitemap.xml', views.index, {
             'sitemaps': sitemaps,
             'template_name': 'custom_sitemap.html'
         }),
-        url(r'^custom-sitemap-(?P<section>.+)\.xml$', views.sitemap, {
+        path('custom-sitemap-<section>.xml', views.sitemap, {
             'sitemaps': sitemaps,
             'template_name': 'custom_sitemap.html'
         }, name='django.contrib.sitemaps.views.sitemap'),

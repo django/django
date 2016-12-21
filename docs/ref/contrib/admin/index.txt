@@ -1542,7 +1542,7 @@ templates used by the :class:`ModelAdmin` views:
             def get_urls(self):
                 urls = super(MyModelAdmin, self).get_urls()
                 my_urls = [
-                    url(r'^my_view/$', self.my_view),
+                    path('my_view/', self.my_view),
                 ]
                 return my_urls + urls
 
@@ -1594,13 +1594,13 @@ templates used by the :class:`ModelAdmin` views:
             def get_urls(self):
                 urls = super(MyModelAdmin, self).get_urls()
                 my_urls = [
-                    url(r'^my_view/$', self.admin_site.admin_view(self.my_view))
+                    path('my_view/', self.admin_site.admin_view(self.my_view))
                 ]
                 return my_urls + urls
 
     Notice the wrapped view in the fifth line above::
 
-        url(r'^my_view/$', self.admin_site.admin_view(self.my_view))
+        path('my_view/', self.admin_site.admin_view(self.my_view))
 
     This wrapping will protect ``self.my_view`` from unauthorized access and
     will apply the :func:`django.views.decorators.cache.never_cache` decorator to
@@ -1610,7 +1610,7 @@ templates used by the :class:`ModelAdmin` views:
     performed, you can pass a ``cacheable=True`` argument to
     ``AdminSite.admin_view()``::
 
-        url(r'^my_view/$', self.admin_site.admin_view(self.my_view, cacheable=True))
+        path('my_view/', self.admin_site.admin_view(self.my_view, cacheable=True))
 
     ``ModelAdmin`` views have ``model_admin`` attributes. Other
     ``AdminSite`` views have ``admin_site`` attributes.
@@ -2714,7 +2714,7 @@ In this example, we register the default ``AdminSite`` instance
     from django.contrib import admin
 
     urlpatterns = [
-        url(r'^admin/', admin.site.urls),
+        path('admin/', admin.site.urls),
     ]
 
 .. _customizing-adminsite:
@@ -2751,7 +2751,7 @@ update :file:`myproject/urls.py` to reference your :class:`AdminSite` subclass.
     from myapp.admin import admin_site
 
     urlpatterns = [
-        url(r'^myadmin/', admin_site.urls),
+        path('myadmin/', admin_site.urls),
     ]
 
 Note that you may not want autodiscovery of ``admin`` modules when using your
@@ -2775,12 +2775,12 @@ separate versions of the admin site -- using the ``AdminSite`` instances
 respectively::
 
     # urls.py
-    from django.conf.urls import url
+    from django.urls import path
     from myproject.admin import basic_site, advanced_site
 
     urlpatterns = [
-        url(r'^basic-admin/', basic_site.urls),
-        url(r'^advanced-admin/', advanced_site.urls),
+        path('basic-admin/', basic_site.urls),
+        path('advanced-admin/', advanced_site.urls),
     ]
 
 ``AdminSite`` instances take a single argument to their constructor, their
@@ -2816,10 +2816,10 @@ your URLconf. Specifically, add these four patterns::
 
     from django.contrib.auth import views as auth_views
 
-    url(r'^admin/password_reset/$', auth_views.PasswordResetView.as_view(), name='admin_password_reset'),
-    url(r'^admin/password_reset/done/$', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
-    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-    url(r'^reset/done/$', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path('admin/password_reset/', auth_views.PasswordResetView.as_view(), name='admin_password_reset'),
+    path('admin/password_reset/done/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
 (This assumes you've added the admin at ``admin/`` and requires that you put
 the URLs starting with ``^admin/`` before the line that includes the admin app
