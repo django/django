@@ -1,5 +1,5 @@
-import unittest
 import sys
+import unittest
 
 from django import __version__
 from django.core.management import call_command

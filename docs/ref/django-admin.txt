@@ -979,6 +979,19 @@ Lets you pass a command as a string to execute it as Django, like so::
 
     django-admin shell --command="import django; print(django.__version__)"
 
+.. versionchanged:: 1.11
+
+You can now pass code in on standard input and it will be executed without any
+extra output from the REPL. For example::
+
+    django-admin shell <<EOF
+    import django
+    print(django.__version__)
+    EOF
+
+On Windows the REPL is still output, due to limitations in its implementation
+of ``select()``.
+
 ``showmigrations``
 ------------------
 
