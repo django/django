@@ -389,32 +389,25 @@ class TrailingSlashURLTests(SimpleTestCase):
 
 
 class SecureProxySslHeaderTest(SimpleTestCase):
-    settings_module = settings
 
-    def setUp(self):
-        self._original_setting = self.settings_module.SECURE_PROXY_SSL_HEADER
-
-    def tearDown(self):
-        self.settings_module.SECURE_PROXY_SSL_HEADER = self._original_setting
-
+    @override_settings(SECURE_PROXY_SSL_HEADER=None)
     def test_none(self):
-        self.settings_module.SECURE_PROXY_SSL_HEADER = None
         req = HttpRequest()
         self.assertIs(req.is_secure(), False)
 
+    @override_settings(SECURE_PROXY_SSL_HEADER=('HTTP_X_FORWARDED_PROTOCOL', 'https'))
     def test_set_without_xheader(self):
-        self.settings_module.SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
         req = HttpRequest()
         self.assertIs(req.is_secure(), False)
 
+    @override_settings(SECURE_PROXY_SSL_HEADER=('HTTP_X_FORWARDED_PROTOCOL', 'https'))
     def test_set_with_xheader_wrong(self):
-        self.settings_module.SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
         req = HttpRequest()
         req.META['HTTP_X_FORWARDED_PROTOCOL'] = 'wrongvalue'
         self.assertIs(req.is_secure(), False)
 
+    @override_settings(SECURE_PROXY_SSL_HEADER=('HTTP_X_FORWARDED_PROTOCOL', 'https'))
     def test_set_with_xheader_right(self):
-        self.settings_module.SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
         req = HttpRequest()
         req.META['HTTP_X_FORWARDED_PROTOCOL'] = 'https'
         self.assertIs(req.is_secure(), True)
