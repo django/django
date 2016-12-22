@@ -22,6 +22,7 @@ from django.core.exceptions import FieldDoesNotExist  # NOQA
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
+from django.db.models.signals import formfield_cast
 from django.utils import six, timezone
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
@@ -37,7 +38,6 @@ from django.utils.encoding import (
 from django.utils.functional import Promise, cached_property, curry
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.itercompat import is_iterable
-from django.utils.module_loading import import_string
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 
@@ -886,9 +886,21 @@ class Field(RegisterLookupMixin):
         if form_class is None:
             form_class = forms.CharField
 
-        if getattr(settings, 'DEFAULT_FORMFIELD', None):
-            factory = import_string(settings.DEFAULT_FORMFIELD)
-            return factory(self, form_class, defaults)
+        results = formfield_cast.send(
+            sender=type(self),
+            field=self,
+            form_class=form_class,
+            defaults=defaults
+        )
+        for callback, result in results:
+            if result is None:
+                continue
+
+            if not isinstance(result, forms.Field):
+                raise exceptions.FieldError()
+
+            return result
+
         return form_class(**defaults)
 
     def value_from_object(self, obj):

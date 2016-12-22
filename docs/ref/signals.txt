@@ -43,6 +43,31 @@ model system.
     as ``'polls.Answer'``. This sort of reference can be quite handy when
     dealing with circular import dependencies and swappable models.
 
+``formfield_cast``
+------------------
+
+.. attribute:: django.db.models.signals.formfield_cast
+   :module:
+
+Whenever you make a ``ModelForm`` without explicitly defining a form field
+instance for a model field, then the model field's method ``formfield()`` will
+be called to return a form field instance corresponding to the model field. For
+usage details, see :ref:`modelforms-overriding-default-fields-globally`.
+
+Arguments sent with this signal:
+
+``sender``
+    The model field class that is being casted to form field.
+
+``field``
+    The model field instance.
+
+``form_class``
+    The default form class for this model field.
+
+``defaults``
+    The default options for the form field of this model field.
+
 ``pre_init``
 ------------
 
