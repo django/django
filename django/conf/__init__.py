@@ -49,9 +49,32 @@ class LazySettings(LazyObject):
         }
 
     def __getattr__(self, name):
+        """
+        Return the value of a setting and cache it in self.__dict__.
+        """
         if self._wrapped is empty:
             self._setup(name)
-        return getattr(self._wrapped, name)
+        val = getattr(self._wrapped, name)
+        self.__dict__[name] = val
+        return val
+
+    def __setattr__(self, name, value):
+        """
+        Set the value of setting. Clear all cached values if _wrapped changes
+        (@override_settings does this) or clear single values when set.
+        """
+        if name == '_wrapped':
+            self.__dict__.clear()
+        else:
+            self.__dict__.pop(name, None)
+        super(LazySettings, self).__setattr__(name, value)
+
+    def __delattr__(self, name):
+        """
+        Delete a setting and clear it from cache if needed.
+        """
+        super(LazySettings, self).__delattr__(name)
+        self.__dict__.pop(name, None)
 
     def configure(self, default_settings=global_settings, **options):
         """
