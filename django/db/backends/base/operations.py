@@ -29,6 +29,11 @@ class BaseDatabaseOperations(object):
         'PositiveSmallIntegerField': (0, 32767),
         'PositiveIntegerField': (0, 2147483647),
     }
+    set_operators = {
+        'union': 'UNION',
+        'intersection': 'INTERSECT',
+        'difference': 'EXCEPT',
+    }
 
     def __init__(self, connection):
         self.connection = connection

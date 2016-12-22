@@ -31,6 +31,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     greatest_least_ignores_nulls = True
     can_clone_databases = True
     supports_temporal_subtraction = True
+    supports_slicing_ordering_in_compound = True
 
     @cached_property
     def has_select_for_update_skip_locked(self):

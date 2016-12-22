@@ -41,6 +41,10 @@ BEGIN
 END;
 /"""
 
+    def __init__(self, *args, **kwargs):
+        super(DatabaseOperations, self).__init__(*args, **kwargs)
+        self.set_operators['difference'] = 'MINUS'
+
     def autoinc_sql(self, table, column):
         # To simulate auto-incrementing primary keys in Oracle, we have to
         # create a sequence and a trigger.

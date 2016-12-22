@@ -589,6 +589,9 @@ class ManagerTest(SimpleTestCase):
         '_insert',
         '_update',
         'raw',
+        'union',
+        'intersection',
+        'difference',
     ]
 
     def test_manager_methods(self):
