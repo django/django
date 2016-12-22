@@ -5,6 +5,8 @@ import six
 from django.apps import apps
 from django.conf import settings
 
+from django.http.cookie import SimpleCookie
+
 from ..sessions import session_for_reply_channel
 from .base import Client
 
@@ -125,4 +127,10 @@ class HttpClient(Client):
 
 def _encoded_cookies(cookies):
     """Encode dict of cookies to ascii string"""
-    return ('&'.join('{0}={1}'.format(k, v) for k, v in cookies.items())).encode("ascii")
+
+    cookie_encoder = SimpleCookie()
+
+    for k, v in cookies.items():
+        cookie_encoder[k] = v
+
+    return cookie_encoder.output(header='', sep=';').encode("ascii")
