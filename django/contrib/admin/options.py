@@ -1575,14 +1575,19 @@ class ModelAdmin(BaseModelAdmin):
                 else:
                     action_failed = True
 
+        if action_failed:
+            # Redirect back to the changelist page to avoid resubmitting the
+            # form if the user refreshes the browser or uses the "No, take
+            # me back" button on the action confirmation page.
+            return HttpResponseRedirect(request.get_full_path())
+
         # If we're allowing changelist editing, we need to construct a formset
         # for the changelist given all the fields to be edited. Then we'll
         # use the formset to validate/process POSTed data.
         formset = cl.formset = None
 
         # Handle POSTed bulk-edit data.
-        if (request.method == "POST" and cl.list_editable and
-                '_save' in request.POST and not action_failed):
+        if request.method == 'POST' and cl.list_editable and '_save' in request.POST:
             FormSet = self.get_changelist_formset(request)
             formset = cl.formset = FormSet(request.POST, request.FILES, queryset=self.get_queryset(request))
             if formset.is_valid():
