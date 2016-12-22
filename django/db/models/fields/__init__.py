@@ -37,6 +37,7 @@ from django.utils.encoding import (
 from django.utils.functional import Promise, cached_property, curry
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.itercompat import is_iterable
+from django.utils.module_loading import import_string
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 
@@ -884,6 +885,10 @@ class Field(RegisterLookupMixin):
         defaults.update(kwargs)
         if form_class is None:
             form_class = forms.CharField
+
+        if getattr(settings, 'DEFAULT_FORMFIELD', None):
+            factory = import_string(settings.DEFAULT_FORMFIELD)
+            return factory(self, form_class, defaults)
         return form_class(**defaults)
 
     def value_from_object(self, obj):

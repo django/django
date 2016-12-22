@@ -1,6 +1,6 @@
 from django import forms
 from django.db import models
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, override_settings
 
 from .models import (
     Foo, RenamedField, VerboseNameField, Whiz, WhizIter, WhizIterEmpty,
@@ -21,6 +21,13 @@ class BasicFieldTests(TestCase):
 
         form_field = model_field.formfield(show_hidden_initial=False)
         self.assertFalse(form_field.show_hidden_initial)
+
+    @override_settings(DEFAULT_FORMFIELD='tests.model_fields.default_formfield.default_formfield')
+    def test_formfield_override(self):
+        """
+        DEFAULT_FORMFIELD should set the widget to forms.Textarea.
+        """
+        self.assertIsInstance(models.Field().formfield().widget, forms.Textarea)
 
     def test_field_repr(self):
         """

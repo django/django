@@ -1172,6 +1172,26 @@ specify a particular storage system. See :doc:`/topics/files`.
 
 .. setting:: DEFAULT_FROM_EMAIL
 
+``DEFAULT_FORMFIELD``
+---------------------
+
+.. versionadded: 1.11
+
+May be set to a dotted string path to a callback that will be imported. The
+callback will have to return the default form fields for model fields. For
+example, this would make all relation fields to model ``Foo`` a ``RadioSelect``
+by default::
+
+    def default_formfield(db_field, form_class, defaults):
+        if getattr(db_field, 'rel', None) and db_field.rel.to == Foo:
+            defaults['widget'] = forms.RadioSelect
+        return form_class(**defaults)
+
+So, you can override the default form field for the any arbitrary set of model
+fields instead of having to go over all form classes for that.
+
+.. setting:: DEFAULT_FORMFIELD
+
 ``DEFAULT_FROM_EMAIL``
 ----------------------
 
