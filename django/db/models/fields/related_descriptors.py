@@ -814,15 +814,19 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             self.target_field = self.through._meta.get_field(self.target_field_name)
 
             self.core_filters = {}
+            self.pk_field_names = {}
             for lh_field, rh_field in self.source_field.related_fields:
                 core_filter_key = '%s__%s' % (self.query_field_name, rh_field.name)
                 self.core_filters[core_filter_key] = getattr(instance, rh_field.attname)
+                self.pk_field_names[lh_field.name] = rh_field.name
 
             self.related_val = self.source_field.get_foreign_related_value(instance)
-            if None in self.related_val:
-                raise ValueError('"%r" needs to have a value for field "%s" before '
-                                 'this many-to-many relationship can be used.' %
-                                 (instance, self.source_field_name))
+            if None in self.related_val and instance.pk is None:
+                raise ValueError(
+                    '"%r" needs to have a value for field "%s" before '
+                    'this many-to-many relationship can be used.' %
+                    (instance, self.pk_field_names[self.source_field_name])
+                )
             # Even if this relation is not to pk, we require still pk value.
             # The wish is that the instance has been already saved to DB,
             # although having a pk value isn't a guarantee of that.
@@ -875,7 +879,17 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
             except (AttributeError, KeyError):
                 queryset = super(ManyRelatedManager, self).get_queryset()
+                if self.instance.pk is None or None in self.related_val:
+                    return queryset.none()
                 return self._apply_rel_filters(queryset)
+
+        def _check_has_fk_val(self):
+            if self.instance.pk is None or None in self.related_val:
+                raise ValueError(
+                    '"%r" needs to have a value for field "%s" before '
+                    'this many-to-many relationship can be used.' %
+                    (self.instance, self.pk_field_names[self.source_field_name])
+                )
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:
@@ -946,6 +960,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
         remove.alters_data = True
 
         def clear(self):
+            self._check_has_fk_val()
             db = router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 signals.m2m_changed.send(
@@ -1043,6 +1058,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             # target_field_name: the PK fieldname in join table for the target object
             # *objs - objects to add. Either object instances, or primary keys of object instances.
 
+            self._check_has_fk_val()
             # If there aren't any objects, there is nothing to do.
             from django.db.models import Model
             if objs:
@@ -1114,6 +1130,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             if not objs:
                 return
 
+            self._check_has_fk_val()
             # Check that all the objects are of the right type
             old_ids = set()
             for obj in objs:
