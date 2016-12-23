@@ -1241,38 +1241,34 @@ class RawQuerySet(object):
             using=alias,
         )
 
-    @property
+    @cached_property
     def columns(self):
         """
         A list of model field names in the order they'll appear in the
         query results.
         """
-        if not hasattr(self, '_columns'):
-            self._columns = self.query.get_columns()
+        columns = self.query.get_columns()
+        # Adjust any column names which don't match field names
+        for (query_name, model_name) in self.translations.items():
+            try:
+                index = columns.index(query_name)
+                columns[index] = model_name
+            except ValueError:
+                # Ignore translations for non-existent column names
+                pass
+        return columns
 
-            # Adjust any column names which don't match field names
-            for (query_name, model_name) in self.translations.items():
-                try:
-                    index = self._columns.index(query_name)
-                    self._columns[index] = model_name
-                except ValueError:
-                    # Ignore translations for non-existent column names
-                    pass
-
-        return self._columns
-
-    @property
+    @cached_property
     def model_fields(self):
         """
         A dict mapping column names to model field names.
         """
-        if not hasattr(self, '_model_fields'):
-            converter = connections[self.db].introspection.table_name_converter
-            self._model_fields = {}
-            for field in self.model._meta.fields:
-                name, column = field.get_attname_column()
-                self._model_fields[converter(column)] = field
-        return self._model_fields
+        converter = connections[self.db].introspection.table_name_converter
+        model_fields = {}
+        for field in self.model._meta.fields:
+            name, column = field.get_attname_column()
+            model_fields[converter(column)] = field
+        return model_fields
 
 
 class Prefetch(object):
