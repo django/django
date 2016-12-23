@@ -90,3 +90,20 @@ def get_warning_for_invalid_pattern(pattern):
         hint=hint,
         id="urls.E004",
     )]
+
+
+@register(Tags.urls)
+def check_url_settings(app_configs, **kwargs):
+    errors = []
+    for name in ('STATIC_URL', 'MEDIA_URL'):
+        value = getattr(settings, name)
+        if value and not value.endswith('/'):
+            errors.append(E006(name))
+    return errors
+
+
+def E006(name):
+    return Error(
+        'The {} setting must end with a slash.'.format(name),
+        id='urls.E006',
+    )
