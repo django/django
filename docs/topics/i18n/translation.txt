@@ -1557,6 +1557,7 @@ will be::
     Ensure that you don't have non-prefixed URL patterns that might collide
     with an automatically-added language prefix.
 
+.. _translating-urlpatterns:
 
 Translating URL patterns
 ------------------------
