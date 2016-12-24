@@ -107,6 +107,19 @@ class AggregationTests(TestCase):
         for attr, value in six.iteritems(kwargs):
             self.assertEqual(getattr(obj, attr), value)
 
+    def test_annotation_with_value(self):
+        values = Book.objects.filter(
+            name='Practical Django Projects',
+        ).annotate(
+            discount_price=F('price') * 2,
+        ).values(
+            'discount_price',
+        ).annotate(sum_discount=Sum('discount_price'))
+        self.assertSequenceEqual(
+            values,
+            [{'discount_price': Decimal('59.38'), 'sum_discount': Decimal('59.38')}]
+        )
+
     def test_aggregates_in_where_clause(self):
         """
         Regression test for #12822: DatabaseError: aggregates not allowed in
