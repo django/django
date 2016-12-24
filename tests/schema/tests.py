@@ -17,7 +17,7 @@ from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
 from django.db.models.indexes import Index
-from django.db.transaction import atomic
+from django.db.transaction import TransactionManagementError, atomic
 from django.test import (
     TransactionTestCase, mock, skipIfDBFeature, skipUnlessDBFeature,
 )
@@ -76,14 +76,13 @@ class SchemaTests(TransactionTestCase):
     def delete_tables(self):
         "Deletes all model tables for our models for a clean test environment"
         converter = connection.introspection.table_name_converter
-        with atomic():
+        with connection.schema_editor() as editor:
             connection.disable_constraint_checking()
             table_names = connection.introspection.table_names()
             for model in itertools.chain(SchemaTests.models, self.local_models):
                 tbl = converter(model._meta.db_table)
                 if tbl in table_names:
-                    with connection.schema_editor() as editor:
-                        editor.delete_model(model)
+                    editor.delete_model(model)
                     table_names.remove(tbl)
             connection.enable_constraint_checking()
 
@@ -1739,6 +1738,16 @@ class SchemaTests(TransactionTestCase):
                 raise SomeError
         except SomeError:
             self.assertFalse(connection.in_atomic_block)
+
+    @skipIfDBFeature('can_rollback_ddl')
+    def test_unsupported_transactional_ddl_disallowed(self):
+        message = (
+            "Executing DDL statements while in a transaction on databases "
+            "that can't perform a rollback is prohibited."
+        )
+        with atomic(), connection.schema_editor() as editor:
+            with self.assertRaisesMessage(TransactionManagementError, message):
+                editor.execute(editor.sql_create_table % {'table': 'foo', 'definition': ''})
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_foreign_key_index_long_names_regression(self):
