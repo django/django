@@ -288,6 +288,7 @@ class QuerySet(object):
         return list(qs)[0]
 
     def __and__(self, other):
+        self._check_allowed('combine')
         self._merge_sanity_check(other)
         if isinstance(other, EmptyQuerySet):
             return other
@@ -299,6 +300,7 @@ class QuerySet(object):
         return combined
 
     def __or__(self, other):
+        self._check_allowed('combine')
         self._merge_sanity_check(other)
         if isinstance(self, EmptyQuerySet):
             return other
@@ -367,7 +369,7 @@ class QuerySet(object):
         keyword arguments.
         """
         clone = self.filter(*args, **kwargs)
-        if self.query.can_filter() and not self.query.distinct_fields:
+        if not self.query.has_limit() and not self.query.distinct_fields:
             clone = clone.order_by()
         num = len(clone)
         if num == 1:
@@ -539,8 +541,7 @@ class QuerySet(object):
         order_by = field_name or getattr(self.model._meta, 'get_latest_by')
         assert bool(order_by), "earliest() and latest() require either a "\
             "field_name parameter or 'get_latest_by' in the model"
-        assert self.query.can_filter(), \
-            "Cannot change a query once a slice has been taken."
+        self._check_allowed('earliest_or_latest')
         obj = self._clone()
         obj.query.set_limits(high=1)
         obj.query.clear_ordering(force_empty=True)
@@ -576,8 +577,7 @@ class QuerySet(object):
         Returns a dictionary mapping each of the given IDs to the object with
         that ID. If `id_list` isn't provided, the entire QuerySet is evaluated.
         """
-        assert self.query.can_filter(), \
-            "Cannot use 'limit' or 'offset' with in_bulk"
+        self._check_allowed('in_bulk')
         if id_list is not None:
             if not id_list:
                 return {}
@@ -590,8 +590,7 @@ class QuerySet(object):
         """
         Deletes the records in the current QuerySet.
         """
-        assert self.query.can_filter(), \
-            "Cannot use 'limit' or 'offset' with delete."
+        self._check_allowed('delete')
 
         if self._fields is not None:
             raise TypeError("Cannot call delete() after .values() or .values_list()")
@@ -632,8 +631,7 @@ class QuerySet(object):
         Updates all elements in the current QuerySet, setting all the given
         fields to the appropriate values.
         """
-        assert self.query.can_filter(), \
-            "Cannot update a query once a slice has been taken."
+        self._check_allowed('update')
         self._for_write = True
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
@@ -652,8 +650,7 @@ class QuerySet(object):
         code (it requires too much poking around at model internals to be
         useful at that level).
         """
-        assert self.query.can_filter(), \
-            "Cannot update a query once a slice has been taken."
+        self._check_allowed('update')
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_fields(values)
         self._result_cache = None
@@ -788,8 +785,7 @@ class QuerySet(object):
 
     def _filter_or_exclude(self, negate, *args, **kwargs):
         if args or kwargs:
-            assert self.query.can_filter(), \
-                "Cannot filter a query once a slice has been taken."
+            self._check_allowed('filter_or_exclude')
 
         clone = self._clone()
         if negate:
@@ -914,8 +910,7 @@ class QuerySet(object):
         """
         Returns a new QuerySet instance with the ordering changed.
         """
-        assert self.query.can_filter(), \
-            "Cannot reorder a query once a slice has been taken."
+        self._check_allowed('order_by')
         obj = self._clone()
         obj.query.clear_ordering(force_empty=False)
         obj.query.add_ordering(*field_names)
@@ -925,8 +920,7 @@ class QuerySet(object):
         """
         Returns a new QuerySet instance that will select only distinct results.
         """
-        assert self.query.can_filter(), \
-            "Cannot create distinct fields once a slice has been taken."
+        self._check_allowed('distinct')
         obj = self._clone()
         obj.query.add_distinct_fields(*field_names)
         return obj
@@ -936,8 +930,7 @@ class QuerySet(object):
         """
         Adds extra SQL fragments to the query.
         """
-        assert self.query.can_filter(), \
-            "Cannot change a query once a slice has been taken"
+        self._check_allowed('extra')
         clone = self._clone()
         clone.query.add_extra(select, select_params, where, params, tables, order_by)
         return clone
@@ -1136,6 +1129,21 @@ class QuerySet(object):
         for example qs[1:]._has_filters() -> False.
         """
         return self.query.has_filters()
+
+    def _check_allowed(self, action):
+        require_no_limits = {
+            'combine': "Cannot combine queries once a slice has been taken.",
+            'in_bulk': "Cannot use 'limit' or 'offset' with in_bulk",
+            'delete': "Cannot use 'limit' or 'offset' with delete.",
+            'update': "Cannot update a query once a slice has been taken.",
+            'earliest_or_latest': "Cannot change a query once a slice has been taken.",
+            'filter_or_exclude': "Cannot filter a query once a slice has been taken.",
+            'order_by': "Cannot reorder a query once a slice has been taken.",
+            'distinct': "Cannot create distinct fields once a slice has been taken.",
+            'extra': "Cannot change a query once a slice has been taken",
+        }
+        if action in require_no_limits:
+            assert not self.query.has_limit(), require_no_limits[action]
 
 
 class InstanceCheckMeta(type):
