@@ -161,22 +161,20 @@ def validate_integer(value):
 
 
 @deconstructible
-class EmailValidator:
+class EmailValidator
+    # Matches https://html.spec.whatwg.org/multipage/forms.html#valid-e-mail-address
     message = _('Enter a valid email address.')
     code = 'invalid'
     user_regex = _lazy_re_compile(
-        r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*\Z"  # dot-atom
-        r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"\Z)',  # quoted-string
+        r"^[a-z0-9.!#$%&'*+\/=?^_`{|}~-]+\Z",
         re.IGNORECASE)
     domain_regex = _lazy_re_compile(
-        # max length for domain name labels is 63 characters per RFC 1034
-        r'((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+)(?:[A-Z0-9-]{2,63}(?<!-))\Z',
+        r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*\Z',
         re.IGNORECASE)
     literal_regex = _lazy_re_compile(
         # literal form, ipv4 or ipv6 address (SMTP 4.1.3)
         r'\[([A-f0-9:\.]+)\]\Z',
         re.IGNORECASE)
-    domain_whitelist = ['localhost']
 
     def __init__(self, message=None, code=None, whitelist=None):
         if message is not None:
@@ -184,7 +182,7 @@ class EmailValidator:
         if code is not None:
             self.code = code
         if whitelist is not None:
-            self.domain_whitelist = whitelist
+            pass # deprecated
 
     def __call__(self, value):
         if not value or '@' not in value:
@@ -195,15 +193,12 @@ class EmailValidator:
         if not self.user_regex.match(user_part):
             raise ValidationError(self.message, code=self.code)
 
-        if (domain_part not in self.domain_whitelist and
-                not self.validate_domain_part(domain_part)):
-            # Try for possible IDN domain-part
-            try:
-                domain_part = domain_part.encode('idna').decode('ascii')
-                if self.validate_domain_part(domain_part):
-                    return
-            except UnicodeError:
-                pass
+        try:
+            domain_part = domain_part.encode('idna').decode()
+        except UnicodeError:
+            raise ValidationError(self.message, code=self.code)
+
+        if not self.validate_domain_part(domain_part):
             raise ValidationError(self.message, code=self.code)
 
     def validate_domain_part(self, domain_part):
@@ -223,7 +218,6 @@ class EmailValidator:
     def __eq__(self, other):
         return (
             isinstance(other, EmailValidator) and
-            (self.domain_whitelist == other.domain_whitelist) and
             (self.message == other.message) and
             (self.code == other.code)
         )
