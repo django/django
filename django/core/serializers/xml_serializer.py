@@ -142,6 +142,22 @@ class Serializer(base.Serializer):
 
             self.xml.endElement("field")
 
+    def handle_gfk_field(self, obj, field, gfk_field):
+        gfk_object = getattr(obj, gfk_field.name)
+        if self.use_natural_foreign_keys and hasattr(gfk_object, 'natural_key'):
+            self.indent(2)
+            self.xml.startElement("field", OrderedDict([
+                ("name", gfk_field.name),
+                ("type", "GenericForeignKey"),
+            ]))
+            for key_value in gfk_object.natural_key():
+                self.xml.startElement("natural", {})
+                self.xml.characters(force_text(key_value))
+                self.xml.endElement("natural")
+            self.xml.endElement("field")
+        else:
+            self.handle_field(obj, field)
+
     def _start_relational_field(self, field):
         """
         Helper to output the <field> element for relational fields
@@ -195,6 +211,8 @@ class Deserializer(base.Deserializer):
         m2m_data = {}
 
         field_names = {f.name for f in Model._meta.get_fields()}
+        gfk_fields = []
+
         # Deserialize each field.
         for field_node in node.getElementsByTagName("field"):
             # If the field is missing the name attribute, bail (are you
@@ -215,6 +233,8 @@ class Deserializer(base.Deserializer):
                 m2m_data[field.name] = self._handle_m2m_field_node(field_node, field)
             elif field.remote_field and isinstance(field.remote_field, models.ManyToOneRel):
                 data[field.attname] = self._handle_fk_field_node(field_node, field)
+            elif not field.remote_field and field.is_relation and field.many_to_one:
+                gfk_fields.append((field_node, field))
             else:
                 if field_node.getElementsByTagName('None'):
                     value = None
@@ -222,6 +242,14 @@ class Deserializer(base.Deserializer):
                     value = field.to_python(getInnerText(field_node).strip())
                 data[field.name] = value
 
+        for field_node, field in gfk_fields:
+            if field_node.getElementsByTagName('None'):
+                data[field.fk_field] = None
+            else:
+                ct_type = field.get_content_type(id=data['%s_id' % field.ct_field])
+                keys = field_node.getElementsByTagName('natural')
+                field_value = [getInnerText(k).strip() for k in keys]
+                data[field.fk_field] = ct_type.model_class()._default_manager.get_by_natural_key(*field_value).pk
         obj = base.build_instance(Model, data, self.db)
 
         # Return a DeserializedObject so that the m2m data has a place to live.

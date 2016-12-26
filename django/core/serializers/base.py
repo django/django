@@ -65,6 +65,8 @@ class Serializer(object):
         """
         Serialize a queryset.
         """
+        def is_a_generic_foreign_key(f):
+            return f.is_relation and f.many_to_one and not (hasattr(f.remote_field, 'model') and f.remote_field.model)
         self.options = options
 
         self.stream = options.pop("stream", self.stream_class())
@@ -82,11 +84,18 @@ class Serializer(object):
             # Use the concrete parent class' _meta instead of the object's _meta
             # This is to avoid local_fields problems for proxy models. Refs #17717.
             concrete_model = obj._meta.concrete_model
+            generic_foreign_key_fields = {
+                concrete_model._meta.get_field(f.fk_field): f
+                for f in filter(is_a_generic_foreign_key, concrete_model._meta.private_fields)
+            }
             for field in concrete_model._meta.local_fields:
                 if field.serialize:
                     if field.remote_field is None:
                         if self.selected_fields is None or field.attname in self.selected_fields:
-                            self.handle_field(obj, field)
+                            if field in generic_foreign_key_fields:
+                                self.handle_gfk_field(obj, field, generic_foreign_key_fields[field])
+                            else:
+                                self.handle_field(obj, field)
                     else:
                         if self.field_is_selected(field) and self.output_pk_field(obj, field):
                             self.handle_fk_field(obj, field)

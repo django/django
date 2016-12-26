@@ -1,10 +1,11 @@
 from __future__ import unicode_literals
 
+from django.contrib.contenttypes.models import ContentType
 from django.core import serializers
 from django.db import connection
 from django.test import TestCase
 
-from .models import Child, FKDataNaturalKey, NaturalKeyAnchor
+from .models import Child, FKDataNaturalKey, NaturalKeyAnchor, TaggedItem
 from .tests import register_tests
 
 
@@ -15,10 +16,12 @@ class NaturalKeySerializerTests(TestCase):
 def natural_key_serializer_test(format, self):
     # Create all the objects defined in the test data
     with connection.constraint_checks_disabled():
+        ctype = ContentType.objects.get_for_model(NaturalKeyAnchor)
         objects = [
             NaturalKeyAnchor.objects.create(id=1100, data="Natural Key Anghor"),
             FKDataNaturalKey.objects.create(id=1101, data_id=1100),
             FKDataNaturalKey.objects.create(id=1102, data_id=None),
+            TaggedItem.objects.create(content_type=ctype, object_id=1100)
         ]
     # Serialize the test database
     serialized_data = serializers.serialize(format, objects, indent=2, use_natural_foreign_keys=True)

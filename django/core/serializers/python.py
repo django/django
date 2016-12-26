@@ -78,6 +78,13 @@ class Serializer(base.Serializer):
                 m2m_value(related) for related in getattr(obj, field.name).iterator()
             ]
 
+    def handle_gfk_field(self, obj, field, gfk_field):
+        gfk_object = getattr(obj, gfk_field.name)
+        if self.use_natural_foreign_keys and hasattr(gfk_object, 'natural_key'):
+            self._current[gfk_field.name] = gfk_object.natural_key()
+        else:
+            self.handle_field(obj, field)
+
     def getvalue(self):
         return self.objects
 
@@ -113,6 +120,8 @@ def Deserializer(object_list, **options):
         if Model not in field_names_cache:
             field_names_cache[Model] = {f.name for f in Model._meta.get_fields()}
         field_names = field_names_cache[Model]
+
+        gfk_fields = []
 
         # Handle each field
         for (field_name, field_value) in six.iteritems(d["fields"]):
@@ -173,12 +182,28 @@ def Deserializer(object_list, **options):
                 else:
                     data[field.attname] = None
 
+            # Handle GFK fields
+            elif not field.remote_field and field.is_relation and field.many_to_one:
+                # The gfk fields are stored in a temp list and will be deserialized after all
+                # other fields are deserialized. This will ensure that the content_type field
+                # has been properly deserialized
+                gfk_fields.append((field_name, field_value))
+
             # Handle all other fields
             else:
                 try:
                     data[field.name] = field.to_python(field_value)
                 except Exception as e:
                     raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value)
+
+        # Deserialize generic foreign keys
+        for field_name, field_value in gfk_fields:
+            if field_value is not None:
+                field = Model._meta.get_field(field_name)
+                ct_type = field.get_content_type(id=data['%s_id' % field.ct_field])
+                data[field.fk_field] = ct_type.model_class()._default_manager.get_by_natural_key(*field_value).pk
+            else:
+                data[field.fk_field] = None
 
         obj = base.build_instance(Model, data, db)
         yield base.DeserializedObject(obj, m2m_data)
