@@ -34,6 +34,7 @@ class FormsUtilsTestCase(SimpleTestCase):
             flatatt({'class': "news", 'title': "Read this", 'required': False}),
             ' class="news" title="Read this"'
         )
+        self.assertEqual(flatatt({'class': None}), '')
         self.assertEqual(flatatt({}), '')
 
     def test_flatatt_no_side_effects(self):
