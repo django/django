@@ -48,6 +48,9 @@ details on these changes.
 
 * The ``Model._meta.has_auto_field`` attribute will be removed.
 
+* Support for regular expression groups with ``iLmsu#`` in ``url()`` will be
+  removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0
