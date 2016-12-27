@@ -56,6 +56,7 @@ import logging
 import re
 import warnings
 
+from django.db import transaction
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
 )
@@ -196,7 +197,11 @@ class Template(object):
                 yield subnode
 
     def _render(self, context):
-        return self.nodelist.render(context)
+        with transaction.atomic():
+            try:
+                return self.nodelist.render(context)
+            finally:
+                transaction.set_rollback(True)
 
     def render(self, context):
         "Display stage -- can be called many times"
