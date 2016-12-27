@@ -1826,9 +1826,8 @@ efficient manner (generally only 1 query, no matter how many objects there
 are)::
 
     >>> Entry.objects.bulk_create([
-    ...     Entry(headline="Django 1.0 Released"),
-    ...     Entry(headline="Django 1.1 Announced"),
-    ...     Entry(headline="Breaking: Django is awesome")
+    ...     Entry(headline='This is a test'),
+    ...     Entry(headline='This is only a test'),
     ... ])
 
 This has a number of caveats though:
