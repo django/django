@@ -536,6 +536,10 @@ class HttpResponseSubclassesTests(SimpleTestCase):
             response.content = "Hello dear"
         self.assertNotIn('content-type', response)
 
+    def test_not_modified_repr(self):
+        response = HttpResponseNotModified()
+        self.assertEqual(repr(response), '<HttpResponseNotModified status_code=304>')
+
     def test_not_allowed(self):
         response = HttpResponseNotAllowed(['GET'])
         self.assertEqual(response.status_code, 405)
@@ -547,6 +551,11 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         response = HttpResponseNotAllowed(['GET', 'OPTIONS'], content_type='text/plain')
         expected = '<HttpResponseNotAllowed [GET, OPTIONS] status_code=405, "text/plain">'
         self.assertEqual(repr(response), expected)
+
+    def test_not_allowed_repr_no_content_type(self):
+        response = HttpResponseNotAllowed(('GET', 'POST'))
+        del response['Content-Type']
+        self.assertEqual(repr(response), '<HttpResponseNotAllowed [GET, POST] status_code=405>')
 
 
 class JsonResponseTests(SimpleTestCase):
