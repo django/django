@@ -123,6 +123,11 @@ class TimesinceTests(unittest.TestCase):
         self.assertEqual(timeuntil(today - self.oneday, today), '0\xa0minutes')
         self.assertEqual(timeuntil(today + self.oneweek, today), '1\xa0week')
 
+    def test_leap_year(self):
+        start_date = datetime.date(2016, 12, 25)
+        self.assertEqual(timeuntil(start_date + self.oneweek, start_date), '1\xa0week')
+        self.assertEqual(timesince(start_date, start_date + self.oneweek), '1\xa0week')
+
     def test_naive_datetime_with_tzinfo_attribute(self):
         class naive(datetime.tzinfo):
             def utcoffset(self, dt):
@@ -135,3 +140,4 @@ class TimesinceTests(unittest.TestCase):
     def test_thousand_years_ago(self):
         t = datetime.datetime(1007, 8, 14, 13, 46, 0)
         self.assertEqual(timesince(t, self.t), '1000\xa0years')
+        self.assertEqual(timeuntil(self.t, t), '1000\xa0years')

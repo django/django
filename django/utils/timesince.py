@@ -40,10 +40,15 @@ def timesince(d, now=None, reversed=False):
     if not now:
         now = datetime.datetime.now(utc if is_aware(d) else None)
 
-    delta = (d - now) if reversed else (now - d)
+    if reversed:
+        d, now = now, d
+    delta = now - d
 
     # Deal with leapyears by subtracing the number of leapdays
-    delta -= datetime.timedelta(calendar.leapdays(d.year, now.year))
+    leapdays = calendar.leapdays(d.year, now.year)
+    if leapdays != 0 and calendar.isleap(d.year):
+        leapdays -= 1
+    delta -= datetime.timedelta(leapdays)
 
     # ignore microseconds
     since = delta.days * 24 * 60 * 60 + delta.seconds
