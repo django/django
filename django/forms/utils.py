@@ -40,7 +40,7 @@ def flatatt(attrs):
         if isinstance(value, bool):
             if value:
                 boolean_attrs.append((attr,))
-        else:
+        elif value is not None:
             key_value_attrs.append((attr, value))
 
     return (
