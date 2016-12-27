@@ -1,5 +1,6 @@
 from template_tests.test_response import test_processor_name
 
+from django.core.exceptions import ImproperlyConfigured
 from django.template import EngineHandler
 from django.template.backends.django import DjangoTemplates
 from django.template.library import InvalidTemplateLibrary
@@ -145,3 +146,32 @@ class DjangoTemplatesTests(TemplateStringsTests):
     def test_debug_default_template_loaders(self):
         engine = DjangoTemplates({'DIRS': [], 'APP_DIRS': True, 'NAME': 'django', 'OPTIONS': {}})
         self.assertEqual(engine.engine.loaders, self.default_loaders)
+
+    @override_settings(DEBUG=True)
+    def test_debug_template_loaders_with_dirs(self):
+        engine = DjangoTemplates({
+            'DIRS': ['dirs'],
+            'APP_DIRS': True,
+            'NAME': 'django',
+            'OPTIONS': {},
+            'POST_APP_DIRS': ['post_app_dirs'],
+        })
+        self.assertEqual(engine.dirs, ['dirs'])
+        self.assertEqual(
+            engine.engine.loaders, [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+                ('django.template.loaders.filesystem.Loader', ['post_app_dirs']),
+            ]
+        )
+
+    def test_post_app_dir_incompatible_with_loaders(self):
+        msg = 'post_app_dirs must not be set when loaders is defined.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            DjangoTemplates({
+                'DIRS': [],
+                'APP_DIRS': False,
+                'NAME': 'django',
+                'OPTIONS': {'loaders': ['django.template.loaders.filesystem.Loader']},
+                'POST_APP_DIRS': ['post_app_dirs'],
+            })

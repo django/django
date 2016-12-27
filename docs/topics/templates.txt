@@ -66,7 +66,7 @@ are :class:`django.template.backends.django.DjangoTemplates` and
 :class:`django.template.backends.jinja2.Jinja2`.
 
 Since most engines load templates from files, the top-level configuration for
-each engine contains two common settings:
+each engine contains some common settings:
 
 * :setting:`DIRS <TEMPLATES-DIRS>` defines a list of directories where the
   engine should look for template source files, in search order.
@@ -74,6 +74,10 @@ each engine contains two common settings:
   look for templates inside installed applications. Each backend defines a
   conventional name for the subdirectory inside applications where its
   templates should be stored.
+* :setting:`POST_APP_DIRS <TEMPLATES-POST_APP_DIRS>` defines a list of
+  directories where the engine should look for template source files, in
+  search order, after looking at the directories specified by ``DIRS`` and
+  ``APP_DIRS``.
 
 While uncommon, it's possible to configure several instances of the same
 backend with different options. In that case you should define a unique

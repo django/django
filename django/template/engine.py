@@ -18,7 +18,8 @@ class Engine(object):
 
     def __init__(self, dirs=None, app_dirs=False, context_processors=None,
                  debug=False, loaders=None, string_if_invalid='',
-                 file_charset='utf-8', libraries=None, builtins=None, autoescape=True):
+                 file_charset='utf-8', libraries=None, builtins=None, autoescape=True,
+                 post_app_dirs=None):
         if dirs is None:
             dirs = []
         if context_processors is None:
@@ -27,12 +28,15 @@ class Engine(object):
             loaders = ['django.template.loaders.filesystem.Loader']
             if app_dirs:
                 loaders += ['django.template.loaders.app_directories.Loader']
+            if post_app_dirs:
+                loaders += [('django.template.loaders.filesystem.Loader', post_app_dirs)]
             if not debug:
                 loaders = [('django.template.loaders.cached.Loader', loaders)]
         else:
             if app_dirs:
-                raise ImproperlyConfigured(
-                    "app_dirs must not be set when loaders is defined.")
+                raise ImproperlyConfigured('app_dirs must not be set when loaders is defined.')
+            if post_app_dirs:
+                raise ImproperlyConfigured('post_app_dirs must not be set when loaders is defined.')
         if libraries is None:
             libraries = {}
         if builtins is None:

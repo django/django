@@ -24,6 +24,7 @@ class BaseEngine(object):
         self.name = params.pop('NAME')
         self.dirs = list(params.pop('DIRS'))
         self.app_dirs = bool(params.pop('APP_DIRS'))
+        self.post_app_dirs = list(params.pop('POST_APP_DIRS', []))
         if params:
             raise ImproperlyConfigured(
                 "Unknown parameters: {}".format(", ".join(params)))
@@ -66,6 +67,8 @@ class BaseEngine(object):
         template_dirs = tuple(self.dirs)
         if self.app_dirs:
             template_dirs += get_app_template_dirs(self.app_dirname)
+        if self.post_app_dirs:
+            template_dirs += tuple(self.post_app_dirs)
         return template_dirs
 
     def iter_template_filenames(self, template_name):

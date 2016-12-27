@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+import os
 import re
 
 from django.forms import CharField, Form, Media
@@ -11,7 +12,12 @@ from django.middleware.csrf import (
 )
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.backends.dummy import TemplateStrings
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
+from django.utils._os import upath
+
+from . import __file__ as template_backends_test_dir
+
+ROOT = upath(os.path.dirname(template_backends_test_dir))
 
 
 class TemplateStringsTests(SimpleTestCase):
@@ -98,3 +104,18 @@ class TemplateStringsTests(SimpleTestCase):
         template = self.engine.get_template('template_backends/hello.html')
         content = template.render({'name': 'Jérôme'})
         self.assertEqual(content, "Hello Jérôme!\n")
+
+    @override_settings(INSTALLED_APPS=['template_backends'])
+    def test_template_dirs(self):
+        engine = self.engine_class({
+            'DIRS': ['dirs'],
+            'APP_DIRS': True,
+            'NAME': 'django',
+            'OPTIONS': {},
+            'POST_APP_DIRS': ['post_app_dirs'],
+        })
+        self.assertEqual(engine.dirs, ['dirs'])
+        self.assertEqual(
+            engine.template_dirs,
+            ('dirs', os.path.join(ROOT, self.engine_class.app_dirname), 'post_app_dirs')
+        )

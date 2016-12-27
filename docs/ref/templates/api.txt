@@ -48,7 +48,7 @@ probably isn't the documentation you're looking for. An instance of the
 of that backend and any attribute defaults mentioned below are overridden by
 what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
 
-.. class:: Engine(dirs=None, app_dirs=False, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None, autoescape=True)
+.. class:: Engine(dirs=None, app_dirs=False, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None, autoescape=True, post_app_dirs=None)
 
     When instantiating an ``Engine`` all arguments must be passed as keyword
     arguments:
@@ -62,6 +62,14 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
     * ``app_dirs`` only affects the default value of ``loaders``. See below.
 
       It defaults to ``False``.
+
+    * ``post_app_dirs`` only affects the default value of ``loaders``. See below.
+
+      It defaults to an empty list.
+
+      .. versionadded:: 1.11
+
+          The ``post_app_dirs`` option was added.
 
     * ``autoescape`` controls whether HTML autoescaping is enabled.
 
@@ -102,6 +110,8 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
       * ``'django.template.loaders.filesystem.Loader'``
       * ``'django.template.loaders.app_directories.Loader'`` if and only if
         ``app_dirs`` is ``True``.
+      * Another instance of ``'django.template.loaders.filesystem.Loader'``
+        with the ``post_app_dirs`` directories, if any.
 
       If ``debug`` is ``False``, these loaders are wrapped in
       :class:`django.template.loaders.cached.Loader`.
