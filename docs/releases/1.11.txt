@@ -747,3 +747,10 @@ Miscellaneous
 
 * ``Model._meta.has_auto_field`` is deprecated in favor of checking if
   ``Model._meta.auto_field is not None``.
+
+* Using regular expression groups with ``iLmsu#`` in ``url()`` is deprecated.
+  The only group that's useful is ``(?i)`` for case-insensitive URLs, however,
+  case-insensitive URLs aren't a good practice because they create multiple
+  entries for search engines, for example. An alternative solution could be to
+  create a :data:`~django.conf.urls.handler404` that looks for uppercase
+  characters in the URL and redirects to a lowercase equivalent.
