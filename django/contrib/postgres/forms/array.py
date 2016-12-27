@@ -117,7 +117,7 @@ class SplitArrayWidget(forms.Widget):
             id_ += '_0'
         return id_
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         if self.is_localized:
             self.widget.is_localized = self.is_localized
         value = value or []
@@ -131,7 +131,7 @@ class SplitArrayWidget(forms.Widget):
                 widget_value = None
             if id_:
                 final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
-            output.append(self.widget.render(name + '_%s' % i, widget_value, final_attrs))
+            output.append(self.widget.render(name + '_%s' % i, widget_value, final_attrs, renderer))
         return mark_safe(self.format_output(output))
 
     def format_output(self, rendered_widgets):

@@ -51,6 +51,9 @@ details on these changes.
 * Support for regular expression groups with ``iLmsu#`` in ``url()`` will be
   removed.
 
+* Support for ``Widget.render()`` methods without the ``renderer`` argument
+  will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

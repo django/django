@@ -216,6 +216,9 @@ INSTALLED_APPS = []
 
 TEMPLATES = []
 
+# Default form rendering class.
+FORM_RENDERER = 'django.forms.renderers.DjangoTemplates'
+
 # Default email address to use for various automated correspondence from
 # the site managers.
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'

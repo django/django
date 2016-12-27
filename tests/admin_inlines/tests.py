@@ -184,9 +184,11 @@ class TestInline(TestDataMixin, TestCase):
         SomeChildModel.objects.create(name='c', position='1', parent=parent)
         response = self.client.get(reverse('admin:admin_inlines_someparentmodel_change', args=(parent.pk,)))
         self.assertNotContains(response, '<td class="field-position">')
-        self.assertContains(response, (
+        self.assertInHTML(
             '<input id="id_somechildmodel_set-1-position" '
-            'name="somechildmodel_set-1-position" type="hidden" value="1" />'))
+            'name="somechildmodel_set-1-position" type="hidden" value="1" />',
+            response.rendered_content,
+        )
 
     def test_non_related_name_inline(self):
         """
@@ -273,12 +275,12 @@ class TestInline(TestDataMixin, TestCase):
             'name="binarytree_set-TOTAL_FORMS" type="hidden" value="2" />'
         )
         response = self.client.get(reverse('admin:admin_inlines_binarytree_add'))
-        self.assertContains(response, max_forms_input % 3)
-        self.assertContains(response, total_forms_hidden)
+        self.assertInHTML(max_forms_input % 3, response.rendered_content)
+        self.assertInHTML(total_forms_hidden, response.rendered_content)
 
         response = self.client.get(reverse('admin:admin_inlines_binarytree_change', args=(bt_head.id,)))
-        self.assertContains(response, max_forms_input % 2)
-        self.assertContains(response, total_forms_hidden)
+        self.assertInHTML(max_forms_input % 2, response.rendered_content)
+        self.assertInHTML(total_forms_hidden, response.rendered_content)
 
     def test_min_num(self):
         """
@@ -302,8 +304,8 @@ class TestInline(TestDataMixin, TestCase):
         request = self.factory.get(reverse('admin:admin_inlines_binarytree_add'))
         request.user = User(username='super', is_superuser=True)
         response = modeladmin.changeform_view(request)
-        self.assertContains(response, min_forms)
-        self.assertContains(response, total_forms)
+        self.assertInHTML(min_forms, response.rendered_content)
+        self.assertInHTML(total_forms, response.rendered_content)
 
     def test_custom_min_num(self):
         bt_head = BinaryTree.objects.create(name="Tree Head")
@@ -331,14 +333,14 @@ class TestInline(TestDataMixin, TestCase):
         request = self.factory.get(reverse('admin:admin_inlines_binarytree_add'))
         request.user = User(username='super', is_superuser=True)
         response = modeladmin.changeform_view(request)
-        self.assertContains(response, min_forms % 2)
-        self.assertContains(response, total_forms % 5)
+        self.assertInHTML(min_forms % 2, response.rendered_content)
+        self.assertInHTML(total_forms % 5, response.rendered_content)
 
         request = self.factory.get(reverse('admin:admin_inlines_binarytree_change', args=(bt_head.id,)))
         request.user = User(username='super', is_superuser=True)
         response = modeladmin.changeform_view(request, object_id=str(bt_head.id))
-        self.assertContains(response, min_forms % 5)
-        self.assertContains(response, total_forms % 8)
+        self.assertInHTML(min_forms % 5, response.rendered_content)
+        self.assertInHTML(total_forms % 8, response.rendered_content)
 
     def test_inline_nonauto_noneditable_pk(self):
         response = self.client.get(reverse('admin:admin_inlines_author_add'))

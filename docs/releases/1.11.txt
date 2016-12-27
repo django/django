@@ -61,6 +61,15 @@ It can be subclassed to support different index types, such as
 :class:`~django.contrib.postgres.indexes.GinIndex`. It also allows defining the
 order (ASC/DESC) for the columns of the index.
 
+Template-based widget rendering
+-------------------------------
+
+To ease customizing widgets, form widget rendering is now done using the
+template system rather than in Python. See :doc:`/ref/forms/renderers`.
+
+You may need to adjust any custom widgets that you've written for a few
+:ref:`backwards incompatible changes <template-widget-incompatibilities-1-11>`.
+
 Minor features
 --------------
 
@@ -551,6 +560,21 @@ inside help text.
 Read-only fields are wrapped in ``<div class="readonly">...</div>`` instead of
 ``<p>...</p>`` to allow any kind of HTML as the field's content.
 
+.. _template-widget-incompatibilities-1-11:
+
+Changes due to the introduction of template-based widget rendering
+------------------------------------------------------------------
+
+Some undocumented classes in ``django.forms.widgets`` are removed:
+
+* ``SubWidget``
+* ``RendererMixin``, ``ChoiceFieldRenderer``, ``RadioFieldRenderer``,
+  ``CheckboxFieldRenderer``
+* ``ChoiceInput``, ``RadioChoiceInput``, ``CheckboxChoiceInput``
+
+The ``Widget.format_output()`` method is removed. Use a custom widget template
+instead.
+
 Miscellaneous
 -------------
 
@@ -754,3 +778,7 @@ Miscellaneous
   entries for search engines, for example. An alternative solution could be to
   create a :data:`~django.conf.urls.handler404` that looks for uppercase
   characters in the URL and redirects to a lowercase equivalent.
+
+* The ``renderer`` argument is added to the :meth:`Widget.render()
+  <django.forms.Widget.render>` method. Methods that don't accept that argument
+  will work through a deprecation period.
