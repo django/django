@@ -1209,6 +1209,12 @@ class RequestMethodStringDataTests(SimpleTestCase):
         response = self.client.get('/json_response/')
         self.assertEqual(response.json(), {'key': 'value'})
 
+    def test_json_vendor(self):
+        for content_type in ('application/vnd.api+json', 'application/vnd.api.foo+json'):
+            response = self.client.get('/json_response/', {'content_type': content_type})
+            self.assertEqual(response['Content-Type'], content_type)
+            self.assertEqual(response.json(), {'key': 'value'})
+
     def test_json_multiple_access(self):
         response = self.client.get('/json_response/')
         self.assertIs(response.json(), response.json())
