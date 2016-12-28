@@ -89,6 +89,9 @@ class EngineHandler(object):
         return [self[alias] for alias in self]
 
 
+engines = EngineHandler()
+
+
 @lru_cache.lru_cache()
 def get_app_template_dirs(dirname):
     """
