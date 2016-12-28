@@ -28,7 +28,7 @@ class SharedTests(object):
                 self.expected_widget_dir + '/forms_tests/custom_widget.html',
             )
         )
-        self.assertEqual(tpl.origin.name, expected_path)
+        self.assertEqual(upath(tpl.origin.name), expected_path)
 
 
 class BaseTemplateRendererTests(SimpleTestCase):
