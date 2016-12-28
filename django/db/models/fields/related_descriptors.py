@@ -66,6 +66,7 @@ and two directions (forward and reverse) for a total of six combinations.
 from django.db import connections, router, transaction
 from django.db.models import Q, signals
 from django.db.models.query import QuerySet
+from django.template.utils import AltersDataMixin
 from django.utils.functional import cached_property
 
 
@@ -540,7 +541,11 @@ def create_reverse_many_to_one_manager(superclass, rel):
     the related model, and adds behaviors specific to many-to-one relations.
     """
 
-    class RelatedManager(superclass):
+    class RelatedManager(superclass, AltersDataMixin):
+        data_altering_methods = (
+            'add', 'create', 'get_or_create', 'update_or_create', 'set',
+        )
+
         def __init__(self, instance):
             super().__init__()
 
@@ -637,25 +642,21 @@ def create_reverse_many_to_one_manager(superclass, rel):
                     for obj in objs:
                         check_and_update_obj(obj)
                         obj.save()
-        add.alters_data = True
 
         def create(self, **kwargs):
             kwargs[self.field.name] = self.instance
             db = router.db_for_write(self.model, instance=self.instance)
             return super(RelatedManager, self.db_manager(db)).create(**kwargs)
-        create.alters_data = True
 
         def get_or_create(self, **kwargs):
             kwargs[self.field.name] = self.instance
             db = router.db_for_write(self.model, instance=self.instance)
             return super(RelatedManager, self.db_manager(db)).get_or_create(**kwargs)
-        get_or_create.alters_data = True
 
         def update_or_create(self, **kwargs):
             kwargs[self.field.name] = self.instance
             db = router.db_for_write(self.model, instance=self.instance)
             return super(RelatedManager, self.db_manager(db)).update_or_create(**kwargs)
-        update_or_create.alters_data = True
 
         # remove() and clear() are only provided if the ForeignKey can have a value of null.
         if rel.field.null:
@@ -673,11 +674,9 @@ def create_reverse_many_to_one_manager(superclass, rel):
                             "%r is not related to %r." % (obj, self.instance)
                         )
                 self._clear(self.filter(pk__in=old_ids), bulk)
-            remove.alters_data = True
 
             def clear(self, *, bulk=True):
                 self._clear(self, bulk)
-            clear.alters_data = True
 
             def _clear(self, queryset, bulk):
                 self._remove_prefetched_objects()
@@ -691,7 +690,8 @@ def create_reverse_many_to_one_manager(superclass, rel):
                         for obj in queryset:
                             setattr(obj, self.field.name, None)
                             obj.save(update_fields=[self.field.name])
-            _clear.alters_data = True
+
+            data_altering_methods += ('remove', 'clear', '_clear')
 
         def set(self, objs, *, bulk=True, clear=False):
             # Force evaluation of `objs` in case it's a queryset whose value
@@ -717,7 +717,6 @@ def create_reverse_many_to_one_manager(superclass, rel):
                         self.add(*new_objs, bulk=bulk)
             else:
                 self.add(*objs, bulk=bulk)
-        set.alters_data = True
 
     return RelatedManager
 
@@ -776,7 +775,12 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
     the related model, and adds behaviors specific to many-to-many relations.
     """
 
-    class ManyRelatedManager(superclass):
+    class ManyRelatedManager(superclass, AltersDataMixin):
+        data_altering_methods = (
+            'add', 'remove', 'clear', 'set', 'create',
+            'get_or_create', 'update_or_create',
+        )
+
         def __init__(self, instance=None):
             super().__init__()
 
@@ -922,7 +926,6 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 # If this is a symmetrical m2m relation to self, add the mirror entry in the m2m table
                 if self.symmetrical:
                     self._add_items(self.target_field_name, self.source_field_name, *objs)
-        add.alters_data = True
 
         def remove(self, *objs):
             if not rel.through._meta.auto_created:
@@ -934,7 +937,6 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 )
             self._remove_prefetched_objects()
             self._remove_items(self.source_field_name, self.target_field_name, *objs)
-        remove.alters_data = True
 
         def clear(self):
             db = router.db_for_write(self.through, instance=self.instance)
@@ -953,7 +955,6 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     instance=self.instance, reverse=self.reverse,
                     model=self.model, pk_set=None, using=db,
                 )
-        clear.alters_data = True
 
         def set(self, objs, *, clear=False):
             if not rel.through._meta.auto_created:
@@ -989,7 +990,6 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
                     self.remove(*old_ids)
                     self.add(*new_objs)
-        set.alters_data = True
 
         def create(self, **kwargs):
             # This check needs to be done here, since we can't later remove this
@@ -1005,7 +1005,6 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             new_obj = super(ManyRelatedManager, self.db_manager(db)).create(**kwargs)
             self.add(new_obj)
             return new_obj
-        create.alters_data = True
 
         def get_or_create(self, **kwargs):
             db = router.db_for_write(self.instance.__class__, instance=self.instance)
@@ -1015,7 +1014,6 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             if created:
                 self.add(obj)
             return obj, created
-        get_or_create.alters_data = True
 
         def update_or_create(self, **kwargs):
             db = router.db_for_write(self.instance.__class__, instance=self.instance)
@@ -1025,7 +1023,6 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             if created:
                 self.add(obj)
             return obj, created
-        update_or_create.alters_data = True
 
         def _add_items(self, source_field_name, target_field_name, *objs):
             # source_field_name: the PK fieldname in join table for the source object

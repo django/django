@@ -12,6 +12,7 @@ from django.db.models.fields.related import (
     lazy_related_operation,
 )
 from django.db.models.query_utils import PathInfo
+from django.template.utils import AltersDataMixin
 from django.utils.functional import cached_property
 
 
@@ -499,7 +500,12 @@ def create_generic_related_manager(superclass, rel):
     specific to generic relations.
     """
 
-    class GenericRelatedObjectManager(superclass):
+    class GenericRelatedObjectManager(superclass, AltersDataMixin):
+        data_altering_methods = (
+            'add', 'remove', 'clear', '_clear', 'set',
+            'create', 'get_or_create', 'update_or_create',
+        )
+
         def __init__(self, instance=None):
             super().__init__()
 
@@ -598,17 +604,14 @@ def create_generic_related_manager(superclass, rel):
                     for obj in objs:
                         check_and_update_obj(obj)
                         obj.save()
-        add.alters_data = True
 
         def remove(self, *objs, bulk=True):
             if not objs:
                 return
             self._clear(self.filter(pk__in=[o.pk for o in objs]), bulk)
-        remove.alters_data = True
 
         def clear(self, *, bulk=True):
             self._clear(self, bulk)
-        clear.alters_data = True
 
         def _clear(self, queryset, bulk):
             db = router.db_for_write(self.model, instance=self.instance)
@@ -621,7 +624,6 @@ def create_generic_related_manager(superclass, rel):
                 with transaction.atomic(using=db, savepoint=False):
                     for obj in queryset:
                         obj.delete()
-        _clear.alters_data = True
 
         def set(self, objs, *, bulk=True, clear=False):
             # Force evaluation of `objs` in case it's a queryset whose value
@@ -644,27 +646,23 @@ def create_generic_related_manager(superclass, rel):
 
                     self.remove(*old_objs)
                     self.add(*new_objs, bulk=bulk)
-        set.alters_data = True
 
         def create(self, **kwargs):
             kwargs[self.content_type_field_name] = self.content_type
             kwargs[self.object_id_field_name] = self.pk_val
             db = router.db_for_write(self.model, instance=self.instance)
             return super().using(db).create(**kwargs)
-        create.alters_data = True
 
         def get_or_create(self, **kwargs):
             kwargs[self.content_type_field_name] = self.content_type
             kwargs[self.object_id_field_name] = self.pk_val
             db = router.db_for_write(self.model, instance=self.instance)
             return super().using(db).get_or_create(**kwargs)
-        get_or_create.alters_data = True
 
         def update_or_create(self, **kwargs):
             kwargs[self.content_type_field_name] = self.content_type
             kwargs[self.object_id_field_name] = self.pk_val
             db = router.db_for_write(self.model, instance=self.instance)
             return super().using(db).update_or_create(**kwargs)
-        update_or_create.alters_data = True
 
     return GenericRelatedObjectManager

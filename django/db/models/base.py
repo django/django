@@ -27,6 +27,7 @@ from django.db.models.signals import (
     class_prepared, post_init, post_save, pre_init, pre_save,
 )
 from django.db.models.utils import make_model_tuple
+from django.template.utils import AltersDataMixin
 from django.utils.encoding import force_text
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext_lazy as _
@@ -380,7 +381,10 @@ class ModelState:
     fields_cache = ModelStateFieldsCacheDescriptor()
 
 
-class Model(metaclass=ModelBase):
+class Model(AltersDataMixin, metaclass=ModelBase):
+    data_altering_methods = (
+        'save', 'save_base', 'delete',
+    )
 
     def __init__(self, *args, **kwargs):
         # Alias some things as locals to avoid repeat global lookups
@@ -717,7 +721,6 @@ class Model(metaclass=ModelBase):
 
         self.save_base(using=using, force_insert=force_insert,
                        force_update=force_update, update_fields=update_fields)
-    save.alters_data = True
 
     def save_base(self, raw=False, force_insert=False,
                   force_update=False, using=None, update_fields=None):
@@ -758,8 +761,6 @@ class Model(metaclass=ModelBase):
                 sender=origin, instance=self, created=(not updated),
                 update_fields=update_fields, raw=raw, using=using,
             )
-
-    save_base.alters_data = True
 
     def _save_parents(self, cls, using, update_fields):
         """Save all the parents of cls using values from self."""
@@ -879,8 +880,6 @@ class Model(metaclass=ModelBase):
         collector = Collector(using=using)
         collector.collect([self], keep_parents=keep_parents)
         return collector.delete()
-
-    delete.alters_data = True
 
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)

@@ -105,3 +105,30 @@ def get_app_template_dirs(dirname):
             template_dirs.append(template_dir)
     # Immutable return value because it will be cached and shared by callers.
     return tuple(template_dirs)
+
+
+class AltersDataMixin:
+    """
+    Mixin to set alters_data attribute to True for methods
+    given in data_altering_methods
+    """
+    data_altering_methods = None
+
+    def __new__(cls, *args, **kwargs):
+        obj = super().__new__(cls, *args, **kwargs)
+        data_altering_methods = obj.data_altering_methods or ()
+
+        for method in data_altering_methods:
+            method_func = getattr(obj, method, None)
+            if not callable(method_func):
+                raise ValueError(
+                    '{} has no method {}'.format(cls, method)
+                )
+
+            # Do not override if explicitly set
+            if hasattr(method_func, 'alters_data'):
+                continue
+
+            setattr(method_func, 'alters_data', True)
+
+        return obj

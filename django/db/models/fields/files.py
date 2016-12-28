@@ -8,10 +8,16 @@ from django.core.files.images import ImageFile
 from django.core.files.storage import default_storage
 from django.db.models import signals
 from django.db.models.fields import Field
+from django.template.utils import AltersDataMixin
 from django.utils.translation import gettext_lazy as _
 
 
-class FieldFile(File):
+class FieldFile(File, AltersDataMixin):
+    # open() doesn't alter the file's contents, but it does reset the pointer
+    data_altering_methods = (
+        'open', 'save', 'delete',
+    )
+
     def __init__(self, instance, field, name):
         super().__init__(None, name)
         self.instance = instance
@@ -75,8 +81,6 @@ class FieldFile(File):
         else:
             self.file = self.storage.open(self.name, mode)
         return self
-    # open() doesn't alter the file's contents, but it does reset the pointer
-    open.alters_data = True
 
     # In addition to the standard File API, FieldFiles have extra methods
     # to further manipulate the underlying file, as well as update the
@@ -91,7 +95,6 @@ class FieldFile(File):
         # Save the object because it has changed, unless save is False
         if save:
             self.instance.save()
-    save.alters_data = True
 
     def delete(self, save=True):
         if not self:
@@ -110,7 +113,6 @@ class FieldFile(File):
 
         if save:
             self.instance.save()
-    delete.alters_data = True
 
     @property
     def closed(self):
