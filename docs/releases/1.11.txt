@@ -694,6 +694,8 @@ Miscellaneous
   leaves ``request.POST`` immutable. If you're modifying that ``QueryDict``,
   you must now first copy it, e.g. ``request.POST.copy()``.
 
+* Support for ``cx_Oracle`` < 5.2 is removed.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
