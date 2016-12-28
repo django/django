@@ -1447,8 +1447,10 @@ class ManyToManyField(RelatedField):
             if model != self.remote_field.through and model._meta.managed
         }
         m2m_db_table = self.m2m_db_table()
-        if m2m_db_table in registered_tables:
-            model = registered_tables[m2m_db_table]
+        model = registered_tables.get(m2m_db_table)
+        # The second condition allows multiple m2m relations on a model if
+        # some point to a through model that proxies another through model.
+        if model and model._meta.concrete_model != self.remote_field.through._meta.concrete_model:
             if model._meta.auto_created:
                 def _get_field_name(model):
                     for field in model._meta.auto_created._meta.many_to_many:
