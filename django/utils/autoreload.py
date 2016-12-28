@@ -30,6 +30,7 @@
 
 import os
 import signal
+import subprocess
 import sys
 import time
 import traceback
@@ -283,11 +284,9 @@ def reloader_thread():
 def restart_with_reloader():
     while True:
         args = [sys.executable] + ['-W%s' % o for o in sys.warnoptions] + sys.argv
-        if sys.platform == "win32":
-            args = ['"%s"' % arg for arg in args]
         new_environ = os.environ.copy()
         new_environ["RUN_MAIN"] = 'true'
-        exit_code = os.spawnve(os.P_WAIT, sys.executable, args, new_environ)
+        exit_code = subprocess.call(args, env=new_environ)
         if exit_code != 3:
             return exit_code
 
