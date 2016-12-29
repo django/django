@@ -32,8 +32,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def skip_default(self, field):
         """
         MySQL doesn't accept default values for some data types and implicitly
-        treats these columns as nullable.
+        treats these columns as nullable. MariaDB 10.2+ fixes this.
         """
+        if self.connection.mysql_is_mariadb and self.connection.mysql_version[:2] > (10, 2):
+            return False
         db_type = field.db_type(self.connection)
         return (
             db_type is not None and
