@@ -106,7 +106,9 @@ def return_undecodable_binary(request):
 
 
 def return_json_response(request):
-    return JsonResponse({'key': 'value'})
+    content_type = request.GET.get('content_type')
+    kwargs = {'content_type': content_type} if content_type else {}
+    return JsonResponse({'key': 'value'}, **kwargs)
 
 
 def return_json_file(request):
