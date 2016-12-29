@@ -434,6 +434,9 @@ Tests
 * Added support for :meth:`python:unittest.TestCase.subTest`’s when using the
   :option:`test --parallel` option.
 
+* ``DiscoverRunner`` now run checks at the start of the test run, after
+  databases have been set up.
+
 URLs
 ~~~~
 

@@ -566,6 +566,10 @@ Methods
     Creates the test databases by calling
     :func:`~django.test.utils.setup_databases`.
 
+.. method:: DiscoverRunner.run_checks()
+
+    Runs system checks.
+
 .. method:: DiscoverRunner.run_suite(suite, **kwargs)
 
     Runs the test suite.
