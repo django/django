@@ -20,8 +20,9 @@ for the previous LTS, Django 1.8, will end in April 2018.
 Python compatibility
 ====================
 
-Like Django 1.10, Django 1.11 requires Python 2.7, 3.4, or 3.5. We **highly
-recommend** and only officially support the latest release of each series.
+Django 1.11 requires Python 2.7, 3.4, 3.5, or 3.6. Django 1.11 is the first
+release to support Python 3.6. We **highly recommend** and only officially
+support the latest release of each series.
 
 The Django 1.11.x series is the last to support Python 2. The next major
 release, Django 2.0, will only support Python 3.5+.
@@ -59,6 +60,15 @@ used :attr:`~django.db.models.Field.db_index` on the model field or
 It can be subclassed to support different index types, such as
 :class:`~django.contrib.postgres.indexes.GinIndex`. It also allows defining the
 order (ASC/DESC) for the columns of the index.
+
+Template-based widget rendering
+-------------------------------
+
+To ease customizing widgets, form widget rendering is now done using the
+template system rather than in Python. See :doc:`/ref/forms/renderers`.
+
+You may need to adjust any custom widgets that you've written for a few
+:ref:`backwards incompatible changes <template-widget-incompatibilities-1-11>`.
 
 Minor features
 --------------
@@ -550,6 +560,30 @@ inside help text.
 Read-only fields are wrapped in ``<div class="readonly">...</div>`` instead of
 ``<p>...</p>`` to allow any kind of HTML as the field's content.
 
+.. _template-widget-incompatibilities-1-11:
+
+Changes due to the introduction of template-based widget rendering
+------------------------------------------------------------------
+
+Some undocumented classes in ``django.forms.widgets`` are removed:
+
+* ``SubWidget``
+* ``RendererMixin``, ``ChoiceFieldRenderer``, ``RadioFieldRenderer``,
+  ``CheckboxFieldRenderer``
+* ``ChoiceInput``, ``RadioChoiceInput``, ``CheckboxChoiceInput``
+
+The ``Widget.format_output()`` method is removed. Use a custom widget template
+instead.
+
+``django.Template.render()`` prohibits non-dict context
+-------------------------------------------------------
+
+For compatibility with multiple template engines, ``django.Template.render()``
+must receive a dictionary of context rather than ``Context`` or
+``RequestContext``. If you were passing either of the two classes, pass a
+dictionary instead -- doing so is backwards-compatible with older versions of
+Django.
+
 Miscellaneous
 -------------
 
@@ -746,3 +780,14 @@ Miscellaneous
 
 * ``Model._meta.has_auto_field`` is deprecated in favor of checking if
   ``Model._meta.auto_field is not None``.
+
+* Using regular expression groups with ``iLmsu#`` in ``url()`` is deprecated.
+  The only group that's useful is ``(?i)`` for case-insensitive URLs, however,
+  case-insensitive URLs aren't a good practice because they create multiple
+  entries for search engines, for example. An alternative solution could be to
+  create a :data:`~django.conf.urls.handler404` that looks for uppercase
+  characters in the URL and redirects to a lowercase equivalent.
+
+* The ``renderer`` argument is added to the :meth:`Widget.render()
+  <django.forms.Widget.render>` method. Methods that don't accept that argument
+  will work through a deprecation period.

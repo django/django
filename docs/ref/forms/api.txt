@@ -720,6 +720,29 @@ When set to ``True`` (the default), required form fields will have the
 ``use_required_attribute=False`` to avoid incorrect browser validation when
 adding and deleting forms from a formset.
 
+Configuring the rendering of a form's widgets
+---------------------------------------------
+
+.. attribute:: Form.default_renderer
+
+.. versionadded:: 1.11
+
+Specifies the :doc:`renderer <renderers>` to use for the form. Defaults to
+``None`` which means to use the default renderer specified by the
+:setting:`FORM_RENDERER` setting.
+
+You can set this as a class attribute when declaring your form or use the
+``renderer`` argument to ``Form.__init__()``. For example::
+
+    from django import forms
+
+    class MyForm(forms.Form):
+        default_renderer = MyRenderer()
+
+or::
+
+    form = MyForm(renderer=MyRenderer())
+
 Notes on field ordering
 -----------------------
 

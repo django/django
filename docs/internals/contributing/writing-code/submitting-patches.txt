@@ -249,9 +249,9 @@ the "Triage Stage" on the corresponding Trac ticket to "Ready for checkin".
 If you've left comments for improvement on the pull request, please tick the
 appropriate flags on the Trac ticket based on the results of your review:
 "Patch needs improvement", "Needs documentation", and/or "Needs tests". As time
-and interest permits, core developers do final reviews of "Ready for checkin"
+and interest permits, committers do final reviews of "Ready for checkin"
 tickets and will either commit the patch or bump it back to "Accepted" if
-further works need to be done. If you're looking to become a core developer,
+further works need to be done. If you're looking to become a committer,
 doing thorough reviews of patches is a great way to earn trust.
 
 Looking for a patch to review? Check out the "Patches needing review" section
@@ -296,8 +296,7 @@ All code changes
   guidelines? Are there any ``flake8`` errors?
 * If the change is backwards incompatible in any way, is there a note
   in the release notes (``docs/releases/A.B.txt``)?
-* Is Django's test suite passing? Ask in ``#django-dev`` for a core dev
-  to build the pull request against our continuous integration server.
+* Is Django's test suite passing?
 
 All tickets
 -----------

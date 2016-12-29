@@ -13,12 +13,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives
-from django.forms.utils import flatatt
 from django.template import loader
 from django.utils.encoding import force_bytes
-from django.utils.html import format_html, format_html_join
 from django.utils.http import urlsafe_base64_encode
-from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext, ugettext_lazy as _
 
@@ -26,26 +23,23 @@ UserModel = get_user_model()
 
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
-    def render(self, name, value, attrs):
-        encoded = value
-        final_attrs = self.build_attrs(attrs)
+    template_name = 'auth/widgets/read_only_password_hash.html'
 
-        if not encoded or encoded.startswith(UNUSABLE_PASSWORD_PREFIX):
-            summary = mark_safe("<strong>%s</strong>" % ugettext("No password set."))
+    def get_context(self, name, value, attrs):
+        context = super(ReadOnlyPasswordHashWidget, self).get_context(name, value, attrs)
+        summary = []
+        if not value or value.startswith(UNUSABLE_PASSWORD_PREFIX):
+            summary.append({'label': ugettext("No password set.")})
         else:
             try:
-                hasher = identify_hasher(encoded)
+                hasher = identify_hasher(value)
             except ValueError:
-                summary = mark_safe("<strong>%s</strong>" % ugettext(
-                    "Invalid password format or unknown hashing algorithm."
-                ))
+                summary.append({'label': ugettext("Invalid password format or unknown hashing algorithm.")})
             else:
-                summary = format_html_join(
-                    '', '<strong>{}</strong>: {} ',
-                    ((ugettext(key), value) for key, value in hasher.safe_summary(encoded).items())
-                )
-
-        return format_html("<div{}>{}</div>", flatatt(final_attrs), summary)
+                for key, value_ in hasher.safe_summary(value).items():
+                    summary.append({'label': ugettext(key), 'value': value_})
+        context['summary'] = summary
+        return context
 
 
 class ReadOnlyPasswordHashField(forms.Field):

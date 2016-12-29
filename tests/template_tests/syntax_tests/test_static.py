@@ -5,7 +5,7 @@ from django.utils.six.moves.urllib.parse import urljoin
 from ..utils import setup
 
 
-@override_settings(MEDIA_URL="/media/", STATIC_URL="/static/")
+@override_settings(INSTALLED_APPS=[], MEDIA_URL='/media/', STATIC_URL='/static/')
 class StaticTagTests(SimpleTestCase):
     libraries = {'static': 'django.templatetags.static'}
 
@@ -50,3 +50,8 @@ class StaticTagTests(SimpleTestCase):
     def test_static_statictag04(self):
         output = self.engine.render_to_string('static-statictag04', {'base_css': 'admin/base.css'})
         self.assertEqual(output, urljoin(settings.STATIC_URL, 'admin/base.css'))
+
+    @setup({'static-statictag05': '{% load static %}{% static "special?chars&quoted.html" %}'})
+    def test_static_quotes_urls(self):
+        output = self.engine.render_to_string('static-statictag05')
+        self.assertEqual(output, urljoin(settings.STATIC_URL, '/static/special%3Fchars%26quoted.html'))

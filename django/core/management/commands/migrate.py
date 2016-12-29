@@ -11,7 +11,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management.sql import (
     emit_post_migrate_signal, emit_pre_migrate_signal,
 )
-from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
+from django.db import DEFAULT_DB_ALIAS, connections, router
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
@@ -259,63 +259,50 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(" DONE" + elapsed))
 
     def sync_apps(self, connection, app_labels):
-        "Runs the old syncdb-style operation on a list of app_labels."
-        cursor = connection.cursor()
-
-        try:
-            # Get a list of already installed *models* so that references work right.
+        """Run the old syncdb-style operation on a list of app_labels."""
+        with connection.cursor() as cursor:
             tables = connection.introspection.table_names(cursor)
-            created_models = set()
 
-            # Build the manifest of apps and models that are to be synchronized
-            all_models = [
-                (app_config.label,
-                    router.get_migratable_models(app_config, connection.alias, include_auto_created=False))
-                for app_config in apps.get_app_configs()
-                if app_config.models_module is not None and app_config.label in app_labels
-            ]
+        # Build the manifest of apps and models that are to be synchronized.
+        all_models = [
+            (
+                app_config.label,
+                router.get_migratable_models(app_config, connection.alias, include_auto_created=False),
+            )
+            for app_config in apps.get_app_configs()
+            if app_config.models_module is not None and app_config.label in app_labels
+        ]
 
-            def model_installed(model):
-                opts = model._meta
-                converter = connection.introspection.table_name_converter
-                # Note that if a model is unmanaged we short-circuit and never try to install it
-                return not (
-                    (converter(opts.db_table) in tables) or
-                    (opts.auto_created and converter(opts.auto_created._meta.db_table) in tables)
-                )
-
-            manifest = OrderedDict(
-                (app_name, list(filter(model_installed, model_list)))
-                for app_name, model_list in all_models
+        def model_installed(model):
+            opts = model._meta
+            converter = connection.introspection.table_name_converter
+            return not (
+                (converter(opts.db_table) in tables) or
+                (opts.auto_created and converter(opts.auto_created._meta.db_table) in tables)
             )
 
-            # Create the tables for each model
+        manifest = OrderedDict(
+            (app_name, list(filter(model_installed, model_list)))
+            for app_name, model_list in all_models
+        )
+
+        # Create the tables for each model
+        if self.verbosity >= 1:
+            self.stdout.write("  Creating tables...\n")
+        with connection.schema_editor() as editor:
+            for app_name, model_list in manifest.items():
+                for model in model_list:
+                    # Never install unmanaged models, etc.
+                    if not model._meta.can_migrate(connection):
+                        continue
+                    if self.verbosity >= 3:
+                        self.stdout.write(
+                            "    Processing %s.%s model\n" % (app_name, model._meta.object_name)
+                        )
+                    if self.verbosity >= 1:
+                        self.stdout.write("    Creating table %s\n" % model._meta.db_table)
+                    editor.create_model(model)
+
+            # Deferred SQL is executed when exiting the editor's context.
             if self.verbosity >= 1:
-                self.stdout.write("  Creating tables...\n")
-            with transaction.atomic(using=connection.alias, savepoint=connection.features.can_rollback_ddl):
-                deferred_sql = []
-                for app_name, model_list in manifest.items():
-                    for model in model_list:
-                        if not model._meta.can_migrate(connection):
-                            continue
-                        if self.verbosity >= 3:
-                            self.stdout.write(
-                                "    Processing %s.%s model\n" % (app_name, model._meta.object_name)
-                            )
-                        with connection.schema_editor() as editor:
-                            if self.verbosity >= 1:
-                                self.stdout.write("    Creating table %s\n" % model._meta.db_table)
-                            editor.create_model(model)
-                            deferred_sql.extend(editor.deferred_sql)
-                            editor.deferred_sql = []
-                        created_models.add(model)
-
-                if self.verbosity >= 1:
-                    self.stdout.write("    Running deferred SQL...\n")
-                with connection.schema_editor() as editor:
-                    for statement in deferred_sql:
-                        editor.execute(statement)
-        finally:
-            cursor.close()
-
-        return created_models
+                self.stdout.write("    Running deferred SQL...\n")

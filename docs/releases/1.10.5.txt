@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed occasional missing plural forms in ``JavaScriptCatalog``
   (:ticket:`27418`).
+
+* Fixed a regression in the ``timesince`` and ``timeuntil`` filters that caused
+  incorrect results for dates in a leap year.

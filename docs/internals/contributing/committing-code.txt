@@ -119,10 +119,9 @@ Django's Git repository:
 
   If you bring something up on |django-developers| and nobody responds,
   please don't take that to mean your idea is great and should be
-  implemented immediately because nobody contested it. Django's core
-  developers don't have a lot of time to read mailing-list discussions
-  immediately, so you may have to wait a couple of days before getting a
-  response.
+  implemented immediately because nobody contested it. Everyone doesn't always
+  have a lot of time to read mailing list discussions immediately, so you may
+  have to wait a couple of days before getting a response.
 
 * Write detailed commit messages in the past tense, not present tense.
 
@@ -151,9 +150,8 @@ Django's Git repository:
 * Limit commits to the most granular change that makes sense. This means,
   use frequent small commits rather than infrequent large commits. For
   example, if implementing feature X requires a small change to library Y,
-  first commit the change to library Y, then commit feature X in a
-  separate commit. This goes a *long way* in helping all Django core
-  developers follow your changes.
+  first commit the change to library Y, then commit feature X in a separate
+  commit. This goes a *long way* in helping everyone follow your changes.
 
 * Separate bug fixes from feature changes. Bugfixes may need to be backported
   to the stable branch, according to the :ref:`backwards-compatibility policy

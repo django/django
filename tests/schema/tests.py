@@ -17,7 +17,7 @@ from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
 from django.db.models.indexes import Index
-from django.db.transaction import atomic
+from django.db.transaction import TransactionManagementError, atomic
 from django.test import (
     TransactionTestCase, mock, skipIfDBFeature, skipUnlessDBFeature,
 )
@@ -48,8 +48,8 @@ class SchemaTests(TransactionTestCase):
 
     models = [
         Author, AuthorWithDefaultHeight, AuthorWithEvenLongerName, Book,
-        BookWeak, BookWithLongName, BookWithO2O, BookWithSlug, IntegerPK, Note,
-        Tag, TagIndexed, TagM2MTest, TagUniqueRename, Thing, UniqueTest,
+        BookWeak, BookWithLongName, BookWithO2O, BookWithSlug, IntegerPK, Node,
+        Note, Tag, TagIndexed, TagM2MTest, TagUniqueRename, Thing, UniqueTest,
     ]
 
     # Utility functions
@@ -76,14 +76,13 @@ class SchemaTests(TransactionTestCase):
     def delete_tables(self):
         "Deletes all model tables for our models for a clean test environment"
         converter = connection.introspection.table_name_converter
-        with atomic():
+        with connection.schema_editor() as editor:
             connection.disable_constraint_checking()
             table_names = connection.introspection.table_names()
             for model in itertools.chain(SchemaTests.models, self.local_models):
                 tbl = converter(model._meta.db_table)
                 if tbl in table_names:
-                    with connection.schema_editor() as editor:
-                        editor.delete_model(model)
+                    editor.delete_model(model)
                     table_names.remove(tbl)
             connection.enable_constraint_checking()
 
@@ -531,6 +530,23 @@ class SchemaTests(TransactionTestCase):
         new_field.set_attributes_from_name("info")
         with connection.schema_editor() as editor:
             editor.alter_field(Note, old_field, new_field, strict=True)
+
+    @skipUnlessDBFeature('can_defer_constraint_checks', 'can_rollback_ddl')
+    def test_alter_fk_checks_deferred_constraints(self):
+        """
+        #25492 - Altering a foreign key's structure and data in the same
+        transaction.
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(Node)
+        old_field = Node._meta.get_field('parent')
+        new_field = ForeignKey(Node, CASCADE)
+        new_field.set_attributes_from_name('parent')
+        parent = Node.objects.create()
+        with connection.schema_editor() as editor:
+            # Update the parent FK to create a deferred constraint check.
+            Node.objects.update(parent=parent)
+            editor.alter_field(Node, old_field, new_field, strict=True)
 
     def test_alter_text_field_to_date_field(self):
         """
@@ -1723,6 +1739,16 @@ class SchemaTests(TransactionTestCase):
         except SomeError:
             self.assertFalse(connection.in_atomic_block)
 
+    @skipIfDBFeature('can_rollback_ddl')
+    def test_unsupported_transactional_ddl_disallowed(self):
+        message = (
+            "Executing DDL statements while in a transaction on databases "
+            "that can't perform a rollback is prohibited."
+        )
+        with atomic(), connection.schema_editor() as editor:
+            with self.assertRaisesMessage(TransactionManagementError, message):
+                editor.execute(editor.sql_create_table % {'table': 'foo', 'definition': ''})
+
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_foreign_key_index_long_names_regression(self):
         """
@@ -2173,6 +2199,8 @@ class SchemaTests(TransactionTestCase):
         """
         if connection.vendor == 'mysql' and connection.mysql_version < (5, 6, 6):
             self.skipTest('Skip known bug renaming primary keys on older MySQL versions (#24995).')
+        with connection.schema_editor() as editor:
+            editor.create_model(Node)
         old_field = Node._meta.get_field('node_id')
         new_field = AutoField(primary_key=True)
         new_field.set_attributes_from_name('id')

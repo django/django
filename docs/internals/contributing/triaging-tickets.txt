@@ -40,8 +40,7 @@ tickets have patches, but those patches don't meet all the requirements of a
 :ref:`good patch<patch-style>`.
 
 One way to help out is to *triage* tickets that have been created by other
-users. The core team and several community members work on this regularly, but
-more help is always appreciated.
+users.
 
 Most of the workflow is based around the concept of a ticket's
 :ref:`triage stages <triage-stages>`. Each stage describes where in its
@@ -57,9 +56,8 @@ Since a picture is worth a thousand words, let's start there:
 
 We've got two roles in this diagram:
 
-* Committers (also called core developers): people with commit access who are
-  responsible for making decisions and integrating the contributions of the
-  community.
+* Committers: people with commit access who are responsible for making the
+  final decision to merge a patch.
 
 * Ticket triagers: anyone in the Django community who chooses to
   become involved in Django's development process. Our Trac installation
@@ -69,26 +67,25 @@ We've got two roles in this diagram:
 
 By way of example, here we see the lifecycle of an average ticket:
 
-* Alice creates a ticket, and uploads an incomplete patch (no tests, incorrect
-  implementation).
+* Alice creates a ticket and sends an incomplete pull request (no tests,
+  incorrect implementation).
 
-* Bob reviews the patch, marks it "Accepted", "needs tests", and "patch needs
-  improvement", and leaves a comment telling Alice how the patch could be
-  improved.
+* Bob reviews the pull request, marks the ticket as "Accepted", "needs tests",
+  and "patch needs improvement", and leaves a comment telling Alice how the
+  patch could be improved.
 
-* Alice updates the patch, adding tests (but not changing the
+* Alice updates the pull request, adding tests (but not changing the
   implementation). She removes the two flags.
 
-* Charlie reviews the patch and resets the "patch needs improvement" flag with
-  another comment about improving the implementation.
+* Charlie reviews the pull request and resets the "patch needs improvement"
+  flag with another comment about improving the implementation.
 
-* Alice updates the patch, fixing the implementation. She removes the "patch
-  needs improvement" flag.
+* Alice updates the pull request, fixing the implementation. She removes the
+  "patch needs improvement" flag.
 
-* Daisy reviews the patch, and marks it RFC.
+* Daisy reviews the pull request and marks the ticket as "Ready for checkin".
 
-* Jacob, a core developer, reviews the RFC patch, applies it to his checkout,
-  and commits it.
+* Jacob, a committer, reviews the pull request and merges it.
 
 Some tickets require much less feedback than this, but then again some tickets
 require much much more.
@@ -154,8 +151,8 @@ RFC forever! What should I do?"
 Someday/Maybe
 -------------
 
-This stage isn't shown on the diagram. It's only used by core developers to
-keep track of high-level ideas or long term feature requests.
+This stage isn't shown on the diagram. It's used sparingly to keep track of
+high-level ideas or long term feature requests.
 
 These tickets are uncommon and overall less useful since they don't describe
 concrete actionable issues. They are enhancement requests that we might
@@ -297,8 +294,7 @@ If you do close a ticket, you should always make sure of the following:
 A ticket can be resolved in a number of ways:
 
 * fixed
-      Used by the core developers once a patch has been rolled into
-      Django and the issue is fixed.
+      Used once a patch has been rolled into Django and the issue is fixed.
 
 * invalid
       Used if the ticket is found to be incorrect. This means that the
@@ -308,12 +304,13 @@ A ticket can be resolved in a number of ways:
       submit support queries as tickets).
 
 * wontfix
-      Used when a core developer decides that this request is not
-      appropriate for consideration in Django. This is usually chosen after
-      discussion in the |django-developers| mailing list. Feel free to
-      start or join in discussions of "wontfix" tickets on the
-      |django-developers| mailing list, but please do not reopen tickets
-      closed as "wontfix" by a :doc:`core developer</internals/team>`.
+      Used when a someone decides that the request isn't appropriate for
+      consideration in Django. Sometimes a ticket is closed as "wontfix" with a
+      request for the reporter to start a discussion on the |django-developers|
+      mailing list if they feel differently from the rationale provided by the
+      person who closed the ticket. Other times, a mailing list discussion
+      precedes the decision to close a ticket. Always use the mailing list to
+      get a consensus before reopening tickets closed as "wontfix".
 
 * duplicate
       Used when another ticket covers the same issue. By closing duplicate
@@ -332,8 +329,8 @@ A ticket can be resolved in a number of ways:
 If you believe that the ticket was closed in error -- because you're
 still having the issue, or it's popped up somewhere else, or the triagers have
 made a mistake -- please reopen the ticket and provide further information.
-Again, please do not reopen tickets that have been marked as "wontfix" by core
-developers and bring the issue to |django-developers| instead.
+Again, please do not reopen tickets that have been marked as "wontfix" and
+bring the issue to |django-developers| instead.
 
 .. _how-can-i-help-with-triaging:
 
@@ -343,17 +340,14 @@ How can I help with triaging?
 The triage process is primarily driven by community members. Really,
 **ANYONE** can help.
 
-Core developers may provide feedback on issues they're familiar with, or make
-decisions on controversial ones, but they aren't responsible for triaging
-tickets in general.
-
 To get involved, start by `creating an account on Trac`_. If you have an
 account but have forgotten your password, you can reset it using the `password
 reset page`_.
 
 Then, you can help out by:
 
-* Closing "Unreviewed" tickets as "invalid", "worksforme" or "duplicate."
+* Closing "Unreviewed" tickets as "invalid", "worksforme", or "duplicate", or
+  "wontfix".
 
 * Closing "Unreviewed" tickets as "needsinfo" when the description is too
   sparse to be actionable, or when they're feature requests requiring a
@@ -396,18 +390,13 @@ Then, you can help out by:
 However, we do ask the following of all general community members working in
 the ticket database:
 
-* Please **don't** close tickets as "wontfix." The core developers will
-  make the final determination of the fate of a ticket, usually after
-  consultation with the community.
-
 * Please **don't** promote your own tickets to "Ready for checkin". You
   may mark other people's tickets which you've reviewed as "Ready for
   checkin", but you should get at minimum one other community member to
   review a patch that you submit.
 
-* Please **don't** reverse a decision that has been made by a :doc:`core
-  developer</internals/team>`. If you disagree with a decision that
-  has been made, please post a message to |django-developers|.
+* Please **don't** reverse a decision without posting a message to
+  |django-developers| to find consensus.
 
 * If you're unsure if you should be making a change, don't make the
   change but instead leave a comment with your concerns on the ticket,

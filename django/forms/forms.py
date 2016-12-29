@@ -21,6 +21,8 @@ from django.utils.html import conditional_escape, html_safe
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
+from .renderers import get_default_renderer
+
 __all__ = ('BaseForm', 'Form')
 
 
@@ -65,13 +67,14 @@ class BaseForm(object):
     # class is different than Form. See the comments by the Form class for more
     # information. Any improvements to the form API should be made to *this*
     # class, not to the Form class.
+    default_renderer = None
     field_order = None
     prefix = None
     use_required_attribute = True
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=None,
-                 empty_permitted=False, field_order=None, use_required_attribute=None):
+                 empty_permitted=False, field_order=None, use_required_attribute=None, renderer=None):
         self.is_bound = data is not None or files is not None
         self.data = data or {}
         self.files = files or {}
@@ -96,6 +99,17 @@ class BaseForm(object):
 
         if use_required_attribute is not None:
             self.use_required_attribute = use_required_attribute
+
+        # Initialize form renderer. Use a global default if not specified
+        # either as an argument or as self.default_renderer.
+        if renderer is None:
+            if self.default_renderer is None:
+                renderer = get_default_renderer()
+            else:
+                renderer = self.default_renderer
+                if isinstance(self.default_renderer, type):
+                    renderer = renderer()
+        self.renderer = renderer
 
     def order_fields(self, field_order):
         """

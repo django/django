@@ -51,6 +51,10 @@ class ArchiveTester(object):
         filepath = os.path.join(self.tmpdir, 'executable')
         # The file has executable permission.
         self.assertTrue(os.stat(filepath).st_mode & stat.S_IXOTH)
+        filepath = os.path.join(self.tmpdir, 'no_permissions')
+        # The file is readable even though it doesn't have permission data in
+        # the archive.
+        self.assertTrue(os.stat(filepath).st_mode & stat.S_IROTH)
 
     def test_extract_function_with_leadpath(self):
         extract(self.archive_lead_path, self.tmpdir)

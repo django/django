@@ -58,39 +58,28 @@ class InspectDBTestCase(TestCase):
         assertFieldType = self.make_field_type_asserter()
 
         # Inspecting Oracle DB doesn't produce correct results (#19884):
-        # - it gets max_length wrong: it returns a number of bytes.
         # - it reports fields as blank=True when they aren't.
-        if (connection.features.can_introspect_max_length and
-                not connection.features.interprets_empty_strings_as_nulls):
+        if not connection.features.interprets_empty_strings_as_nulls:
             assertFieldType('char_field', "models.CharField(max_length=10)")
             assertFieldType('null_char_field', "models.CharField(max_length=10, blank=True, null=True)")
             assertFieldType('comma_separated_int_field', "models.CharField(max_length=99)")
-        assertFieldType('date_field', "models.DateField()")
-        assertFieldType('date_time_field', "models.DateTimeField()")
-        if (connection.features.can_introspect_max_length and
-                not connection.features.interprets_empty_strings_as_nulls):
             assertFieldType('email_field', "models.CharField(max_length=254)")
             assertFieldType('file_field', "models.CharField(max_length=100)")
             assertFieldType('file_path_field', "models.CharField(max_length=100)")
+            assertFieldType('slug_field', "models.CharField(max_length=50)")
+            assertFieldType('text_field', "models.TextField()")
+            assertFieldType('url_field', "models.CharField(max_length=200)")
+        assertFieldType('date_field', "models.DateField()")
+        assertFieldType('date_time_field', "models.DateTimeField()")
         if connection.features.can_introspect_ip_address_field:
             assertFieldType('gen_ip_adress_field', "models.GenericIPAddressField()")
-        elif (connection.features.can_introspect_max_length and
-                not connection.features.interprets_empty_strings_as_nulls):
+        elif not connection.features.interprets_empty_strings_as_nulls:
             assertFieldType('gen_ip_adress_field', "models.CharField(max_length=39)")
-        if (connection.features.can_introspect_max_length and
-                not connection.features.interprets_empty_strings_as_nulls):
-            assertFieldType('slug_field', "models.CharField(max_length=50)")
-        if not connection.features.interprets_empty_strings_as_nulls:
-            assertFieldType('text_field', "models.TextField()")
         if connection.features.can_introspect_time_field:
             assertFieldType('time_field', "models.TimeField()")
-        if (connection.features.can_introspect_max_length and
-                not connection.features.interprets_empty_strings_as_nulls):
-            assertFieldType('url_field', "models.CharField(max_length=200)")
         if connection.features.has_native_uuid_field:
             assertFieldType('uuid_field', "models.UUIDField()")
-        elif (connection.features.can_introspect_max_length and
-                not connection.features.interprets_empty_strings_as_nulls):
+        elif not connection.features.interprets_empty_strings_as_nulls:
             assertFieldType('uuid_field', "models.CharField(max_length=32)")
 
     def test_number_field_types(self):

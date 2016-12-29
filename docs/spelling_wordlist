@@ -452,6 +452,7 @@ lowercasing
 lt
 lte
 Luhn
+macOS
 Magee
 makemessages
 makemigrations
@@ -672,6 +673,7 @@ releasers
 reloader
 removetags
 renderer
+renderers
 repo
 reportable
 reprojection

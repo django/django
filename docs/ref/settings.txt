@@ -334,10 +334,18 @@ Default: ``False``
 Whether to use ``HttpOnly`` flag on the CSRF cookie. If this is set to
 ``True``, client-side JavaScript will not to be able to access the CSRF cookie.
 
-This can help prevent malicious JavaScript from bypassing CSRF protection. If
-you enable this and need to send the value of the CSRF token with Ajax requests,
-your JavaScript will need to pull the value from a hidden CSRF token form input
-on the page instead of from the cookie.
+Designating the CSRF cookie as ``HttpOnly`` doesn't offer any practical
+protection because CSRF is only to protect against cross-domain attacks. If an
+attacker can read the cookie via JavaScript, they're already on the same domain
+as far as the browser knows, so they can do anything they like anyway. (XSS is
+a much bigger hole than CSRF.)
+
+Although the setting offers little practical benefit, it's sometimes required
+by security auditors.
+
+If you enable this and need to send the value of the CSRF token with an AJAX
+request, your JavaScript must pull the value from a hidden CSRF token form
+input on the page instead of from the cookie.
 
 See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
 
@@ -1509,6 +1517,18 @@ generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
 
     The setting's use in :func:`django.setup()` was added.
 
+.. setting:: FORM_RENDERER
+
+``FORM_RENDERER``
+-----------------
+
+.. versionadded:: 1.11
+
+Default: ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
+
+The class that renders form widgets. It must implement :ref:`the low-level
+render API <low-level-widget-render-api>`.
+
 .. setting:: FORMAT_MODULE_PATH
 
 ``FORMAT_MODULE_PATH``
@@ -2027,6 +2047,10 @@ unpredictable value.
 
 :djadmin:`django-admin startproject <startproject>` automatically adds a
 randomly-generated ``SECRET_KEY`` to each new project.
+
+Uses of the key shouldn't assume that it's text or bytes. Every use should go
+through :func:`~django.utils.encoding.force_text` or
+:func:`~django.utils.encoding.force_bytes` to convert it to the desired type.
 
 Django will refuse to start if :setting:`SECRET_KEY` is not set.
 
@@ -3342,6 +3366,10 @@ File uploads
 * :setting:`FILE_UPLOAD_TEMP_DIR`
 * :setting:`MEDIA_ROOT`
 * :setting:`MEDIA_URL`
+
+Forms
+-----
+* :setting:`FORM_RENDERER`
 
 Globalization (``i18n``/``l10n``)
 ---------------------------------

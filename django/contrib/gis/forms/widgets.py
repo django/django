@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.forms.widgets import Widget
-from django.template import loader
 from django.utils import six, translation
 
 logger = logging.getLogger('django.contrib.gis')
@@ -43,7 +42,7 @@ class BaseGeometryWidget(Widget):
             logger.error("Error creating geometry from value '%s' (%s)", value, err)
         return None
 
-    def render(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs=None):
         # If a string reaches here (via a validation error on another
         # field) then just reconstruct the Geometry.
         if value and isinstance(value, six.string_types):
@@ -62,16 +61,19 @@ class BaseGeometryWidget(Widget):
                         value.srid, self.map_srid, err
                     )
 
-        context = self.build_attrs(
-            attrs,
+        if attrs is None:
+            attrs = {}
+
+        context = self.build_attrs(self.attrs, dict(
             name=name,
             module='geodjango_%s' % name.replace('-', '_'),  # JS-safe
             serialized=self.serialize(value),
             geom_type=gdal.OGRGeomType(self.attrs['geom_type']),
             STATIC_URL=settings.STATIC_URL,
             LANGUAGE_BIDI=translation.get_language_bidi(),
-        )
-        return loader.render_to_string(self.template_name, context)
+            **attrs
+        ))
+        return context
 
 
 class OpenLayersWidget(BaseGeometryWidget):

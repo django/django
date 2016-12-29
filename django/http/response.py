@@ -107,6 +107,10 @@ class HttpResponseBase(six.Iterator):
     else:
         __str__ = serialize_headers
 
+    @property
+    def _content_type_for_repr(self):
+        return ', "%s"' % self['Content-Type'] if 'Content-Type' in self else ''
+
     def _convert_to_charset(self, value, charset, mime_encode=False):
         """Converts headers key/value to ascii/latin-1 native strings.
 
@@ -299,10 +303,10 @@ class HttpResponse(HttpResponseBase):
         self.content = content
 
     def __repr__(self):
-        return '<%(cls)s status_code=%(status_code)d, "%(content_type)s">' % {
+        return '<%(cls)s status_code=%(status_code)d%(content_type)s>' % {
             'cls': self.__class__.__name__,
             'status_code': self.status_code,
-            'content_type': self['Content-Type'],
+            'content_type': self._content_type_for_repr,
         }
 
     def serialize(self):
@@ -420,19 +424,19 @@ class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ['http', 'https', 'ftp']
 
     def __init__(self, redirect_to, *args, **kwargs):
+        super(HttpResponseRedirectBase, self).__init__(*args, **kwargs)
+        self['Location'] = iri_to_uri(redirect_to)
         parsed = urlparse(force_text(redirect_to))
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
             raise DisallowedRedirect("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
-        super(HttpResponseRedirectBase, self).__init__(*args, **kwargs)
-        self['Location'] = iri_to_uri(redirect_to)
 
     url = property(lambda self: self['Location'])
 
     def __repr__(self):
-        return '<%(cls)s status_code=%(status_code)d, "%(content_type)s", url="%(url)s">' % {
+        return '<%(cls)s status_code=%(status_code)d%(content_type)s, url="%(url)s">' % {
             'cls': self.__class__.__name__,
             'status_code': self.status_code,
-            'content_type': self['Content-Type'],
+            'content_type': self._content_type_for_repr,
             'url': self.url,
         }
 
@@ -479,10 +483,10 @@ class HttpResponseNotAllowed(HttpResponse):
         self['Allow'] = ', '.join(permitted_methods)
 
     def __repr__(self):
-        return '<%(cls)s [%(methods)s] status_code=%(status_code)d, "%(content_type)s">' % {
+        return '<%(cls)s [%(methods)s] status_code=%(status_code)d%(content_type)s>' % {
             'cls': self.__class__.__name__,
             'status_code': self.status_code,
-            'content_type': self['Content-Type'],
+            'content_type': self._content_type_for_repr,
             'methods': self['Allow'],
         }
 

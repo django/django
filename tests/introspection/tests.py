@@ -83,9 +83,6 @@ class IntrospectionTests(TransactionTestCase):
              'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField']
         )
 
-    # The following test fails on Oracle due to #17202 (can't correctly
-    # inspect the length of character columns).
-    @skipUnlessDBFeature('can_introspect_max_length')
     def test_get_table_description_col_lengths(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)

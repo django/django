@@ -302,6 +302,8 @@ above example, if your server runs as the user ``apache``, make sure the
 directory ``/var/tmp/django_cache`` exists and is readable and writable by the
 user ``apache``.
 
+.. _local-memory-caching:
+
 Local-memory caching
 --------------------
 

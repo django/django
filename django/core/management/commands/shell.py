@@ -1,4 +1,6 @@
 import os
+import select
+import sys
 import warnings
 
 from django.core.management.base import BaseCommand
@@ -7,7 +9,12 @@ from django.utils.deprecation import RemovedInDjango20Warning
 
 
 class Command(BaseCommand):
-    help = "Runs a Python interactive interpreter. Tries to use IPython or bpython, if one of them is available."
+    help = (
+        "Runs a Python interactive interpreter. Tries to use IPython or "
+        "bpython, if one of them is available. Any standard input is executed "
+        "as code."
+    )
+
     requires_system_checks = False
     shells = ['ipython', 'bpython', 'python']
 
@@ -112,6 +119,12 @@ class Command(BaseCommand):
         # Execute the command and exit.
         if options['command']:
             exec(options['command'])
+            return
+
+        # Execute stdin if it has anything to read and exit.
+        # Not supported on Windows due to select.select() limitations.
+        if sys.platform != 'win32' and select.select([sys.stdin], [], [], 0)[0]:
+            exec(sys.stdin.read())
             return
 
         available_shells = [options['interface']] if options['interface'] else self.shells

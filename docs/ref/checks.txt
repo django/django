@@ -343,8 +343,8 @@ with the admin site:
 * **admin.E027**: The value of ``prepopulated_fields`` refers to
   ``<field name>``, which is not an attribute of ``<model>``.
 * **admin.E028**: The value of ``prepopulated_fields`` refers to
-  ``<field name>``, which must not be a ``DateTimeField``, a ``ForeignKey``, or a
-  ``ManyToManyField`` field.
+  ``<field name>``, which must not be a ``DateTimeField``, a ``ForeignKey``,
+  a ``OneToOneField``, or a ``ManyToManyField`` field.
 * **admin.E029**: The value of ``prepopulated_fields[<field name>]`` must be a
   list or tuple.
 * **admin.E030**: The value of ``prepopulated_fields`` refers to
@@ -593,7 +593,9 @@ The following checks are run if you use the :option:`check --deploy` option:
   sniffers to steal the CSRF token.
 * **security.W017**: :setting:`CSRF_COOKIE_HTTPONLY` is not set to ``True``.
   Using an ``HttpOnly`` CSRF cookie makes it more difficult for cross-site
-  scripting attacks to steal the CSRF token.
+  scripting attacks to steal the CSRF token. *This check is removed in Django
+  1.11 as the* :setting:`CSRF_COOKIE_HTTPONLY` *setting offers no pratical
+  benefit.*
 * **security.W018**: You should not have :setting:`DEBUG` set to ``True`` in
   deployment.
 * **security.W019**: You have
@@ -671,3 +673,7 @@ The following checks are performed on your URL configuration:
   references.
 * **urls.E004**: Your URL pattern ``<pattern>`` is invalid. Ensure that
   ``urlpatterns`` is a list of :func:`~django.conf.urls.url()` instances.
+* **urls.W005**: URL namespace ``<namespace>`` isn't unique. You may not be
+  able to reverse all URLs in this namespace.
+* **urls.E006**: The :setting:`MEDIA_URL`/ :setting:`STATIC_URL` setting must
+  end with a slash.

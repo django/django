@@ -731,17 +731,16 @@ class FormattingTests(SimpleTestCase):
         even if they would be interpreted as False in a conditional test
         (e.g. 0 or empty string) (#16938).
         """
-        with patch_formats('fr', THOUSAND_SEPARATOR='', FIRST_DAY_OF_WEEK=0):
-            with translation.override('fr'):
-                with self.settings(USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='!'):
-                    self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
-                    # Even a second time (after the format has been cached)...
-                    self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
+        with translation.override('fr'):
+            with self.settings(USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='!'):
+                self.assertEqual('\xa0', get_format('THOUSAND_SEPARATOR'))
+                # Even a second time (after the format has been cached)...
+                self.assertEqual('\xa0', get_format('THOUSAND_SEPARATOR'))
 
-                with self.settings(FIRST_DAY_OF_WEEK=1):
-                    self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
-                    # Even a second time (after the format has been cached)...
-                    self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
+            with self.settings(FIRST_DAY_OF_WEEK=0):
+                self.assertEqual(1, get_format('FIRST_DAY_OF_WEEK'))
+                # Even a second time (after the format has been cached)...
+                self.assertEqual(1, get_format('FIRST_DAY_OF_WEEK'))
 
     def test_l10n_enabled(self):
         self.maxDiff = 3000
@@ -1161,8 +1160,8 @@ class FormattingTests(SimpleTestCase):
             with self.settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=False):
                 self.assertEqual(sanitize_separators('12\xa0345'), '12\xa0345')
 
-        with patch_formats(get_language(), THOUSAND_SEPARATOR='.', DECIMAL_SEPARATOR=','):
-            with self.settings(USE_THOUSAND_SEPARATOR=True):
+        with self.settings(USE_THOUSAND_SEPARATOR=True):
+            with patch_formats(get_language(), THOUSAND_SEPARATOR='.', DECIMAL_SEPARATOR=','):
                 self.assertEqual(sanitize_separators('10.234'), '10234')
                 # Suspicion that user entered dot as decimal separator (#22171)
                 self.assertEqual(sanitize_separators('10.10'), '10.10')

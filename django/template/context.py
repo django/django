@@ -199,6 +199,8 @@ class RenderContext(BaseContext):
     rendering of other templates as they would if they were stored in the normal
     template context.
     """
+    template = None
+
     def __iter__(self):
         for d in self.dicts[-1]:
             yield d
@@ -211,6 +213,17 @@ class RenderContext(BaseContext):
 
     def __getitem__(self, key):
         return self.dicts[-1][key]
+
+    @contextmanager
+    def push_state(self, template):
+        initial = self.template
+        self.template = template
+        self.push()
+        try:
+            yield
+        finally:
+            self.template = initial
+            self.pop()
 
 
 class RequestContext(Context):
@@ -268,6 +281,8 @@ def make_context(context, request=None, **kwargs):
     """
     Create a suitable Context from a plain dict and optionally an HttpRequest.
     """
+    if context is not None and not isinstance(context, dict):
+        raise TypeError('context must be a dict rather than %s.' % context.__class__.__name__)
     if request is None:
         context = Context(context, **kwargs)
     else:

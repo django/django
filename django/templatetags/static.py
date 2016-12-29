@@ -1,7 +1,8 @@
 from django import template
 from django.apps import apps
 from django.utils.encoding import iri_to_uri
-from django.utils.six.moves.urllib.parse import urljoin
+from django.utils.html import conditional_escape
+from django.utils.six.moves.urllib.parse import quote, urljoin
 
 register = template.Library()
 
@@ -102,6 +103,8 @@ class StaticNode(template.Node):
 
     def render(self, context):
         url = self.url(context)
+        if context.autoescape:
+            url = conditional_escape(url)
         if self.varname is None:
             return url
         context[self.varname] = url
@@ -113,7 +116,7 @@ class StaticNode(template.Node):
             from django.contrib.staticfiles.storage import staticfiles_storage
             return staticfiles_storage.url(path)
         else:
-            return urljoin(PrefixNode.handle_simple("STATIC_URL"), path)
+            return urljoin(PrefixNode.handle_simple("STATIC_URL"), quote(path))
 
     @classmethod
     def handle_token(cls, parser, token):

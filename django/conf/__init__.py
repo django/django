@@ -49,9 +49,32 @@ class LazySettings(LazyObject):
         }
 
     def __getattr__(self, name):
+        """
+        Return the value of a setting and cache it in self.__dict__.
+        """
         if self._wrapped is empty:
             self._setup(name)
-        return getattr(self._wrapped, name)
+        val = getattr(self._wrapped, name)
+        self.__dict__[name] = val
+        return val
+
+    def __setattr__(self, name, value):
+        """
+        Set the value of setting. Clear all cached values if _wrapped changes
+        (@override_settings does this) or clear single values when set.
+        """
+        if name == '_wrapped':
+            self.__dict__.clear()
+        else:
+            self.__dict__.pop(name, None)
+        super(LazySettings, self).__setattr__(name, value)
+
+    def __delattr__(self, name):
+        """
+        Delete a setting and clear it from cache if needed.
+        """
+        super(LazySettings, self).__delattr__(name)
+        self.__dict__.pop(name, None)
 
     def configure(self, default_settings=global_settings, **options):
         """
@@ -74,17 +97,7 @@ class LazySettings(LazyObject):
         return self._wrapped is not empty
 
 
-class BaseSettings(object):
-    """
-    Common logic for settings whether set by a module or by the user.
-    """
-    def __setattr__(self, name, value):
-        if name in ("MEDIA_URL", "STATIC_URL") and value and not value.endswith('/'):
-            raise ImproperlyConfigured("If set, %s must end with a slash" % name)
-        object.__setattr__(self, name, value)
-
-
-class Settings(BaseSettings):
+class Settings(object):
     def __init__(self, settings_module):
         # update this dict from global settings (but only for ALL_CAPS settings)
         for setting in dir(global_settings):
@@ -137,7 +150,7 @@ class Settings(BaseSettings):
         }
 
 
-class UserSettingsHolder(BaseSettings):
+class UserSettingsHolder(object):
     """
     Holder for user configured settings.
     """

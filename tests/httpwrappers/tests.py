@@ -8,7 +8,7 @@ import pickle
 import unittest
 import uuid
 
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import DisallowedRedirect, SuspiciousOperation
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.signals import request_finished
 from django.db import close_old_connections
@@ -517,6 +517,17 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         expected = '<HttpResponseRedirect status_code=302, "text/html; charset=utf-8", url="/redirected/">'
         self.assertEqual(repr(response), expected)
 
+    def test_invalid_redirect_repr(self):
+        """
+        If HttpResponseRedirect raises DisallowedRedirect, its __repr__()
+        should work (in the debug view, for example).
+        """
+        response = HttpResponseRedirect.__new__(HttpResponseRedirect)
+        with self.assertRaisesMessage(DisallowedRedirect, "Unsafe redirect to URL with protocol 'ssh'"):
+            HttpResponseRedirect.__init__(response, 'ssh://foo')
+        expected = '<HttpResponseRedirect status_code=302, "text/html; charset=utf-8", url="ssh://foo">'
+        self.assertEqual(repr(response), expected)
+
     def test_not_modified(self):
         response = HttpResponseNotModified()
         self.assertEqual(response.status_code, 304)
@@ -524,6 +535,10 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         with self.assertRaises(AttributeError):
             response.content = "Hello dear"
         self.assertNotIn('content-type', response)
+
+    def test_not_modified_repr(self):
+        response = HttpResponseNotModified()
+        self.assertEqual(repr(response), '<HttpResponseNotModified status_code=304>')
 
     def test_not_allowed(self):
         response = HttpResponseNotAllowed(['GET'])
@@ -536,6 +551,11 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         response = HttpResponseNotAllowed(['GET', 'OPTIONS'], content_type='text/plain')
         expected = '<HttpResponseNotAllowed [GET, OPTIONS] status_code=405, "text/plain">'
         self.assertEqual(repr(response), expected)
+
+    def test_not_allowed_repr_no_content_type(self):
+        response = HttpResponseNotAllowed(('GET', 'POST'))
+        del response['Content-Type']
+        self.assertEqual(repr(response), '<HttpResponseNotAllowed [GET, POST] status_code=405>')
 
 
 class JsonResponseTests(SimpleTestCase):

@@ -326,6 +326,15 @@ You can resolve this on Debian-based systems, for example, by running::
     $ apt-get install locales
     $ dpkg-reconfigure locales
 
+You can resolve this for macOS systems by configuring your shell's locale::
+
+    $ export LANG="en_US.UTF-8"
+    $ export LC_ALL="en_US.UTF-8"
+
+Run the ``locale`` command to confirm the change. Optionally, add those export
+commands to your shell's startup file (e.g. ``~/.bashrc`` for Bash) to avoid
+having to retype them.
+
 Tests that only fail in combination
 -----------------------------------
 

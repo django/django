@@ -979,6 +979,22 @@ Lets you pass a command as a string to execute it as Django, like so::
 
     django-admin shell --command="import django; print(django.__version__)"
 
+You can also pass code in on standard input to execute it. For example:
+
+.. code-block:: console
+
+    $ django-admin shell <<EOF
+    > import django
+    > print(django.__version__)
+    > EOF
+
+On Windows, the REPL is output due to implementation limits of
+:func:`select.select` on that platform.
+
+.. versionchanged:: 1.11
+
+    In older versions, the REPL is also output on UNIX systems.
+
 ``showmigrations``
 ------------------
 

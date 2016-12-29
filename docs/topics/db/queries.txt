@@ -974,15 +974,25 @@ Due to how inheritance works, you have to set both ``pk`` and ``id`` to None::
     django_blog.id = None
     django_blog.save() # django_blog.pk == 4
 
-This process does not copy related objects. If you want to copy relations,
-you have to write a little bit more code. In our example, ``Entry`` has a many to many
-field to ``Author``::
+This process doesn't copy relations that aren't part of the model's database
+table. For example, ``Entry`` has a ``ManyToManyField`` to ``Author``. After
+duplicating an entry, you must set the many-to-many relations for the new
+entry::
 
     entry = Entry.objects.all()[0] # some previous entry
     old_authors = entry.authors.all()
     entry.pk = None
     entry.save()
-    entry.authors = old_authors # saves new many2many relations
+    entry.authors.set(old_authors)
+
+For a ``OneToOneField``, you must duplicate the related object and assign it
+to the new object's field to avoid violating the one-to-one unique constraint.
+For example, assuming ``entry`` is already duplicated as above::
+
+    detail = EntryDetail.objects.all()[0]
+    detail.pk = None
+    detail.entry = entry
+    detail.save()
 
 .. _topics-db-queries-update:
 

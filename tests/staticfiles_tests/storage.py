@@ -58,6 +58,11 @@ class PathNotImplementedStorage(storage.Storage):
         raise NotImplementedError
 
 
+class QueryStringStorage(storage.Storage):
+    def url(self, path):
+        return path + '?a=b&c=d'
+
+
 class SimpleCachedStaticFilesStorage(CachedStaticFilesStorage):
 
     def file_hash(self, name, content=None):
