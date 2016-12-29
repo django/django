@@ -11,7 +11,7 @@ from django.utils import six, timezone
 from django.utils.encoding import force_bytes, force_text
 
 from .base import Database
-from .utils import InsertIdVar, Oracle_datetime, convert_unicode
+from .utils import InsertIdVar, Oracle_datetime
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -310,10 +310,10 @@ WHEN (new.%(col_name)s IS NULL)
         return "RETURNING %s INTO %%s", (InsertIdVar(),)
 
     def savepoint_create_sql(self, sid):
-        return convert_unicode("SAVEPOINT " + self.quote_name(sid))
+        return "SAVEPOINT " + self.quote_name(sid)
 
     def savepoint_rollback_sql(self, sid):
-        return convert_unicode("ROLLBACK TO SAVEPOINT " + self.quote_name(sid))
+        return "ROLLBACK TO SAVEPOINT " + self.quote_name(sid)
 
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
         # Return a list of 'TRUNCATE x;', 'TRUNCATE y;',
