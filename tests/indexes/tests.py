@@ -58,7 +58,7 @@ class SchemaIndexesTests(TestCase):
             connection.ops.quote_name(
                 editor._create_index_name(Article, ['headline', 'pub_date'], suffix='_idx')
             ),
-            index_sql[0]
+            index_sql[0][0]
         )
 
     def test_index_together_single_list(self):
@@ -72,11 +72,11 @@ class SchemaIndexesTests(TestCase):
         from .models import IndexedArticle
         index_sql = connection.schema_editor()._model_indexes_sql(IndexedArticle)
         self.assertEqual(len(index_sql), 5)
-        self.assertIn('("headline" varchar_pattern_ops)', index_sql[1])
-        self.assertIn('("body" text_pattern_ops)', index_sql[3])
+        self.assertIn('("headline" varchar_pattern_ops)', index_sql[1][0])
+        self.assertIn('("body" text_pattern_ops)', index_sql[3][0])
         # unique=True and db_index=True should only create the varchar-specific
         # index (#19441).
-        self.assertIn('("slug" varchar_pattern_ops)', index_sql[4])
+        self.assertIn('("slug" varchar_pattern_ops)', index_sql[4][0])
 
     @skipUnless(connection.vendor == 'postgresql', "This is a postgresql-specific issue")
     def test_postgresql_virtual_relation_indexes(self):
@@ -100,10 +100,11 @@ class SchemaIndexesMySQLTests(TransactionTestCase):
         if storage != "InnoDB":
             self.skip("This test only applies to the InnoDB storage engine")
         index_sql = connection.schema_editor()._model_indexes_sql(ArticleTranslation)
-        self.assertEqual(index_sql, [
+        self.assertEqual(index_sql, [(
             'CREATE INDEX `indexes_articletranslation_article_no_constraint_id_d6c0806b` '
-            'ON `indexes_articletranslation` (`article_no_constraint_id`)'
-        ])
+            'ON `indexes_articletranslation` (`article_no_constraint_id`)',
+            [],
+        )])
 
         # The index also shouldn't be created if the ForeignKey is added after
         # the model was created.

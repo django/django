@@ -58,7 +58,7 @@ class Index(object):
             'columns': ', '.join(columns),
             'using': using,
             'extra': tablespace_sql,
-        }
+        }, []  # (sql, params)
 
     def remove_sql(self, model, schema_editor):
         quote_name = schema_editor.quote_name
