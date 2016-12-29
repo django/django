@@ -157,6 +157,15 @@ application and imports it.
     This class works like :class:`~django.contrib.admin.apps.AdminConfig`,
     except it doesn't call :func:`~django.contrib.admin.autodiscover()`.
 
+    .. attribute:: default_site
+
+        .. versionadded:: 2.1
+
+        A dotted import path to the default admin site's class or to a callable
+        that returns a site instance. Defaults to
+        ``'django.contrib.admin.sites.AdminSite'``. See
+        :ref:`overriding-default-admin-site` for usage.
+
 .. function:: autodiscover
 
     This function attempts to import an ``admin`` module in each installed
@@ -2627,6 +2636,9 @@ creating your own ``AdminSite`` instance (see below), and changing the
     this class is created as ``django.contrib.admin.site`` and you can
     register your models and ``ModelAdmin`` instances with it.
 
+    If you want to customize the default admin site, you can :ref:`override it
+    <overriding-default-admin-site>`.
+
     When constructing an instance of an ``AdminSite``, you can provide
     a unique instance name using the ``name`` argument to the constructor. This
     instance name is used to identify the instance, especially when
@@ -2818,6 +2830,43 @@ own ``AdminSite`` instance since you will likely be importing all the per-app
 ``admin`` modules in your ``myproject.admin`` module. This means you need to
 put ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
 ``'django.contrib.admin'`` in your :setting:`INSTALLED_APPS` setting.
+
+.. _overriding-default-admin-site:
+
+Overriding the default admin site
+---------------------------------
+
+.. versionadded:: 2.1
+
+You can override the default ``django.contrib.admin.site`` by setting the
+:attr:`~.SimpleAdminConfig.default_site` attribute of a custom ``AppConfig``
+to the dotted import path of either a ``AdminSite`` subclass or a callable that
+returns a site instance.
+
+.. snippet::
+    :filename: myproject/admin.py
+
+    from django.contrib import admin
+
+    class MyAdminSite(admin.AdminSite):
+        ...
+
+.. snippet::
+    :filename: myproject/apps.py
+
+    from django.contrib.admin.apps import AdminConfig
+
+    class MyAdminConfig(AdminConfig):
+        default_site = 'myproject.admin.MyAdminSite'
+
+.. snippet::
+    :filename: myproject/settings.py
+
+    INSTALLED_APPS = [
+        ...
+        'myproject.apps.MyAdminConfig',  # replaces 'django.contrib.admin'
+        ...
+    ]
 
 .. _multiple-admin-sites:
 

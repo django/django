@@ -40,6 +40,9 @@ Minor features
 * The new :meth:`.ModelAdmin.delete_queryset` method allows customizing the
   deletion process of the "delete selected objects" action.
 
+* You can now :ref:`override the the default admin site
+  <overriding-default-admin-site>`.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
