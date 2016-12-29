@@ -8,11 +8,11 @@ from django.core.files.images import ImageFile
 from django.core.files.storage import default_storage
 from django.db.models import signals
 from django.db.models.fields import Field
-from django.template.utils import AltersDataMixin
+from django.utils.mixin import AltersDataMixin
 from django.utils.translation import gettext_lazy as _
 
 
-class FieldFile(File, AltersDataMixin):
+class FieldFile(File, metaclass=AltersDataMixin):
     # open() doesn't alter the file's contents, but it does reset the pointer
     data_altering_methods = (
         'open', 'save', 'delete',

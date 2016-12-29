@@ -27,8 +27,8 @@ from django.db.models.signals import (
     class_prepared, post_init, post_save, pre_init, pre_save,
 )
 from django.db.models.utils import make_model_tuple
-from django.template.utils import AltersDataMixin
 from django.utils.encoding import force_text
+from django.utils.mixin import AltersDataMixin
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext_lazy as _
 from django.utils.version import get_version
@@ -59,7 +59,7 @@ def subclass_exception(name, bases, module, attached_to):
     })
 
 
-class ModelBase(type):
+class ModelBase(AltersDataMixin):
     """Metaclass for all models."""
     def __new__(cls, name, bases, attrs, **kwargs):
         super_new = super().__new__
@@ -381,7 +381,7 @@ class ModelState:
     fields_cache = ModelStateFieldsCacheDescriptor()
 
 
-class Model(AltersDataMixin, metaclass=ModelBase):
+class Model(metaclass=ModelBase):
     data_altering_methods = (
         'save', 'save_base', 'delete',
     )

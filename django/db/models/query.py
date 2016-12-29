@@ -24,10 +24,10 @@ from django.db.models.fields import AutoField
 from django.db.models.functions import Trunc
 from django.db.models.query_utils import FilteredRelation, InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
-from django.template.utils import AltersDataMixin
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.functional import cached_property, partition
+from django.utils.mixin import AltersDataMixin
 from django.utils.version import get_version
 
 # The maximum number of items to display in a QuerySet.__repr__
@@ -178,7 +178,7 @@ class FlatValuesListIterable(BaseIterable):
         return chain.from_iterable(compiler.results_iter())
 
 
-class QuerySet(AltersDataMixin):
+class QuerySet(metaclass=AltersDataMixin):
     """Represent a lazy database lookup for a set of objects."""
     data_altering_methods = (
         'delete', '_raw_delete', 'update', '_update', '_insert',

@@ -16,7 +16,7 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import (
     HiddenInput, MultipleHiddenInput, SelectMultiple,
 )
-from django.template.utils import AltersDataMixin
+from django.utils.mixin import AltersDataMixin
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext, gettext_lazy as _
 
@@ -204,7 +204,7 @@ class ModelFormOptions:
         self.field_classes = getattr(options, 'field_classes', None)
 
 
-class ModelFormMetaclass(DeclarativeFieldsMetaclass):
+class ModelFormBaseMetaclass(DeclarativeFieldsMetaclass):
     def __new__(mcs, name, bases, attrs):
         base_formfield_callback = None
         for b in bases:
@@ -214,7 +214,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
 
         formfield_callback = attrs.pop('formfield_callback', base_formfield_callback)
 
-        new_class = super(ModelFormMetaclass, mcs).__new__(mcs, name, bases, attrs)
+        new_class = super().__new__(mcs, name, bases, attrs)
 
         if bases == (BaseModelForm,):
             return new_class
@@ -276,7 +276,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
         return new_class
 
 
-class BaseModelForm(BaseForm, AltersDataMixin):
+class BaseModelForm(BaseForm, metaclass=AltersDataMixin):
     data_altering_methods = ('save',)
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
@@ -465,6 +465,10 @@ class BaseModelForm(BaseForm, AltersDataMixin):
         return self.instance
 
 
+class ModelFormMetaclass(ModelFormBaseMetaclass, AltersDataMixin):
+    """This is just to prevent metaclass conflict in ModelForm."""
+
+
 class ModelForm(BaseModelForm, metaclass=ModelFormMetaclass):
     pass
 
@@ -552,7 +556,7 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
 
 # ModelFormSets ##############################################################
 
-class BaseModelFormSet(BaseFormSet, AltersDataMixin):
+class BaseModelFormSet(BaseFormSet, metaclass=AltersDataMixin):
     """
     A ``FormSet`` for editing a queryset and/or adding new objects to it.
     """
