@@ -103,7 +103,8 @@ default server to return "444 No Response" on an unrecognized host:
 -----------------
 
 If you're using a cache, connection parameters may be different in development
-and in production.
+and in production. Django defaults to per-process :ref:`local-memory caching
+<local-memory-caching>` which may not be desirable.
 
 Cache servers often have weak authentication. Make sure they only accept
 connections from your application servers.
