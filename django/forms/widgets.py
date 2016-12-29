@@ -498,7 +498,7 @@ class CheckboxInput(Input):
         value = data.get(name)
         # Translate true and false strings to boolean values.
         values = {'true': True, 'false': False}
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             value = values.get(value.lower(), value)
         return bool(value)
 
@@ -671,10 +671,7 @@ class Select(ChoiceWidget):
     def _choice_has_empty_value(choice):
         """Return True if the choice's value is empty string or None."""
         value, _ = choice
-        return (
-            (isinstance(value, six.string_types) and not bool(value)) or
-            value is None
-        )
+        return (isinstance(value, str) and not bool(value)) or value is None
 
     def use_required_attribute(self, initial):
         """
@@ -986,7 +983,7 @@ class SelectDateWidget(Widget):
         year, month, day = None, None, None
         if isinstance(value, (datetime.date, datetime.datetime)):
             year, month, day = value.year, value.month, value.day
-        elif isinstance(value, six.string_types):
+        elif isinstance(value, str):
             if settings.USE_L10N:
                 try:
                     input_format = get_format('DATE_INPUT_FORMATS')[0]

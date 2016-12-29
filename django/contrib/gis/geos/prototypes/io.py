@@ -135,7 +135,7 @@ class _WKTReader(IOBase):
     destructor = wkt_reader_destroy
 
     def read(self, wkt):
-        if not isinstance(wkt, (bytes, six.string_types)):
+        if not isinstance(wkt, (bytes, str)):
             raise TypeError
         return wkt_reader_read(self.ptr, force_bytes(wkt))
 
@@ -150,7 +150,7 @@ class _WKBReader(IOBase):
         if isinstance(wkb, six.memoryview):
             wkb_s = bytes(wkb)
             return wkb_reader_read(self.ptr, wkb_s, len(wkb_s))
-        elif isinstance(wkb, (bytes, six.string_types)):
+        elif isinstance(wkb, (bytes, str)):
             return wkb_reader_read_hex(self.ptr, wkb, len(wkb))
         else:
             raise TypeError

@@ -1,6 +1,5 @@
 import unittest
 
-from django.utils import six
 from django.utils.functional import cached_property, lazy
 
 
@@ -45,8 +44,8 @@ class FunctionalTestCase(unittest.TestCase):
                 return b"\xc3\x8e am \xc4\x81 binary \xc7\xa8l\xc3\xa2zz."
 
         t = lazy(lambda: Klazz(), Klazz)()
-        self.assertEqual(six.text_type(t), "Î am ā Ǩlâzz.")
-        self.assertEqual(six.binary_type(t), b"\xc3\x8e am \xc4\x81 binary \xc7\xa8l\xc3\xa2zz.")
+        self.assertEqual(str(t), "Î am ā Ǩlâzz.")
+        self.assertEqual(bytes(t), b"\xc3\x8e am \xc4\x81 binary \xc7\xa8l\xc3\xa2zz.")
 
     def test_cached_property(self):
         """
@@ -99,7 +98,7 @@ class FunctionalTestCase(unittest.TestCase):
 
     def test_lazy_repr_text(self):
         original_object = 'Lazy translation text'
-        lazy_obj = lazy(lambda: original_object, six.text_type)
+        lazy_obj = lazy(lambda: original_object, str)
         self.assertEqual(repr(original_object), repr(lazy_obj()))
 
     def test_lazy_repr_int(self):

@@ -4,7 +4,6 @@ from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
 
 from django.contrib.postgres import forms, lookups
 from django.db import models
-from django.utils import six
 
 from .utils import AttributeSetter
 
@@ -45,7 +44,7 @@ class RangeField(models.Field):
         return value
 
     def to_python(self, value):
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             # Assume we're deserializing
             vals = json.loads(value)
             for end in ('lower', 'upper'):

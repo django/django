@@ -2,7 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.encoding import force_text
 
 
@@ -168,7 +168,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if not self.connection.features.supports_microsecond_precision:
             value = value.replace(microsecond=0)
 
-        return six.text_type(value)
+        return str(value)
 
     def adapt_timefield_value(self, value):
         if value is None:
@@ -182,7 +182,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if timezone.is_aware(value):
             raise ValueError("MySQL backend does not support timezone-aware times.")
 
-        return six.text_type(value)
+        return str(value)
 
     def max_name_length(self):
         return 64

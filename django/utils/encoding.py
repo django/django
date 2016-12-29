@@ -36,8 +36,8 @@ def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     return force_text(s, encoding, strings_only, errors)
 
 
-_PROTECTED_TYPES = six.integer_types + (
-    type(None), float, Decimal, datetime.datetime, datetime.date, datetime.time
+_PROTECTED_TYPES = (
+    type(None), int, float, Decimal, datetime.datetime, datetime.date, datetime.time,
 )
 
 
@@ -58,18 +58,18 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     If strings_only is True, don't convert (some) non-string-like objects.
     """
     # Handle the common case first for performance reasons.
-    if issubclass(type(s), six.text_type):
+    if issubclass(type(s), str):
         return s
     if strings_only and is_protected_type(s):
         return s
     try:
-        if not issubclass(type(s), six.string_types):
+        if not issubclass(type(s), str):
             if isinstance(s, bytes):
-                s = six.text_type(s, encoding, errors)
+                s = str(s, encoding, errors)
             else:
-                s = six.text_type(s)
+                s = str(s)
         else:
-            # Note: We use .decode() here, instead of six.text_type(s, encoding,
+            # Note: We use .decode() here, instead of str(s, encoding,
             # errors), so that if s is a SafeBytes, it ends up being a
             # SafeText at the end.
             s = s.decode(encoding, errors)
@@ -114,13 +114,13 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
             return s.decode('utf-8', errors).encode(encoding, errors)
     if strings_only and is_protected_type(s):
         return s
-    if isinstance(s, six.memoryview):
+    if isinstance(s, memoryview):
         return bytes(s)
     if isinstance(s, Promise):
-        return six.text_type(s).encode(encoding, errors)
-    if not isinstance(s, six.string_types):
+        return str(s).encode(encoding, errors)
+    if not isinstance(s, str):
         try:
-            return six.text_type(s).encode(encoding)
+            return str(s).encode(encoding)
         except UnicodeEncodeError:
             if isinstance(s, Exception):
                 # An Exception subclass containing non-ASCII data that doesn't
@@ -128,7 +128,7 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
                 # further exception.
                 return b' '.join(force_bytes(arg, encoding, strings_only, errors)
                                  for arg in s)
-            return six.text_type(s).encode(encoding, errors)
+            return str(s).encode(encoding, errors)
     else:
         return s.encode(encoding, errors)
 

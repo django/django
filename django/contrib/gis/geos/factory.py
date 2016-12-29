@@ -8,7 +8,7 @@ def fromfile(file_h):
     WKT, or HEX.
     """
     # If given a file name, get a real handle.
-    if isinstance(file_h, six.string_types):
+    if isinstance(file_h, str):
         with open(file_h, 'rb') as file_h:
             buf = file_h.read()
     else:

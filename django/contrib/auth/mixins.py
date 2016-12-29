@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.utils import six
 from django.utils.encoding import force_text
 
 
@@ -73,7 +72,7 @@ class PermissionRequiredMixin(AccessMixin):
                 '{0} is missing the permission_required attribute. Define {0}.permission_required, or override '
                 '{0}.get_permission_required().'.format(self.__class__.__name__)
             )
-        if isinstance(self.permission_required, six.string_types):
+        if isinstance(self.permission_required, str):
             perms = (self.permission_required, )
         else:
             perms = self.permission_required

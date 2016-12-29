@@ -7,7 +7,6 @@ should be good enough for a large class of URLS, however.
 """
 import warnings
 
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.six.moves import zip
 
@@ -318,7 +317,7 @@ def flatten_result(source):
     result_args = [[]]
     pos = last = 0
     for pos, elt in enumerate(source):
-        if isinstance(elt, six.string_types):
+        if isinstance(elt, str):
             continue
         piece = ''.join(source[last:pos])
         if isinstance(elt, Group):

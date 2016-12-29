@@ -3,7 +3,6 @@ from django.contrib.gis.gdal.error import GDALException, OGRIndexError
 from django.contrib.gis.gdal.field import Field
 from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api
-from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 from django.utils.six.moves import range
 
@@ -35,7 +34,7 @@ class Feature(GDALBase):
         is not the field's _value_ -- use the `get` method instead to
         retrieve the value (e.g. an integer) instead of a Field instance.
         """
-        if isinstance(index, six.string_types):
+        if isinstance(index, str):
             i = self.index(index)
         else:
             if index < 0 or index > self.num_fields:

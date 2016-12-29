@@ -220,7 +220,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
         # of ('foo',)
         for opt in ['fields', 'exclude', 'localized_fields']:
             value = getattr(opts, opt)
-            if isinstance(value, six.string_types) and value != ALL_FIELDS:
+            if isinstance(value, str) and value != ALL_FIELDS:
                 msg = ("%(model)s.Meta.%(opt)s cannot be a string. "
                        "Did you mean to type: ('%(value)s',)?" % {
                            'model': new_class.__name__,
@@ -727,7 +727,7 @@ class BaseModelFormSet(BaseFormSet):
             }
         else:
             return ugettext("Please correct the duplicate data for %(field)s, which must be unique.") % {
-                "field": get_text_list(unique_check, six.text_type(_("and"))),
+                "field": get_text_list(unique_check, _("and")),
             }
 
     def get_date_error_message(self, date_check):
@@ -737,7 +737,7 @@ class BaseModelFormSet(BaseFormSet):
         ) % {
             'field_name': date_check[2],
             'date_field': date_check[3],
-            'lookup': six.text_type(date_check[1]),
+            'lookup': str(date_check[1]),
         }
 
     def get_form_error(self):
@@ -1305,7 +1305,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
     def prepare_value(self, value):
         if (hasattr(value, '__iter__') and
-                not isinstance(value, six.text_type) and
+                not isinstance(value, str) and
                 not hasattr(value, '_meta')):
             return [super(ModelMultipleChoiceField, self).prepare_value(v) for v in value]
         return super(ModelMultipleChoiceField, self).prepare_value(value)

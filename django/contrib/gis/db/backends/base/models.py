@@ -1,5 +1,4 @@
 from django.contrib.gis import gdal
-from django.utils import six
 
 
 class SpatialRefSysMixin(object):
@@ -134,4 +133,4 @@ class SpatialRefSysMixin(object):
         """
         Returns the string representation, a 'pretty' OGC WKT.
         """
-        return six.text_type(self.srs)
+        return str(self.srs)

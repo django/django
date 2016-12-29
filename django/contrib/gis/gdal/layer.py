@@ -13,7 +13,6 @@ from django.contrib.gis.gdal.prototypes import (
     ds as capi, geom as geom_api, srs as srs_api,
 )
 from django.contrib.gis.gdal.srs import SpatialReference
-from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 from django.utils.six.moves import range
 
@@ -42,7 +41,7 @@ class Layer(GDALBase):
 
     def __getitem__(self, index):
         "Gets the Feature at the specified index."
-        if isinstance(index, six.integer_types):
+        if isinstance(index, int):
             # An integer index was given -- we cannot do a check based on the
             # number of features because the beginning and ending feature IDs
             # are not guaranteed to be 0 and len(layer)-1, respectively.

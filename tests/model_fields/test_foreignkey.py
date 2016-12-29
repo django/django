@@ -5,7 +5,6 @@ from django.core import checks
 from django.db import models
 from django.test import TestCase, skipIfDBFeature
 from django.test.utils import isolate_apps
-from django.utils import six
 
 from .models import Bar, FkToChar, Foo, PrimaryKeyCharModel
 
@@ -50,7 +49,7 @@ class ForeignKeyTests(TestCase):
 
     def test_related_name_converted_to_text(self):
         rel_name = Bar._meta.get_field('a').remote_field.related_name
-        self.assertIsInstance(rel_name, six.text_type)
+        self.assertIsInstance(rel_name, str)
 
     def test_abstract_model_pending_operations(self):
         """

@@ -9,7 +9,6 @@ from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql.operations import DatabaseOperations
 from django.db.utils import ProgrammingError
-from django.utils import six
 from django.utils.functional import cached_property
 
 from .adapter import PostGISAdapter
@@ -337,7 +336,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         # Get the srid for this object
         if value is None:
             value_srid = None
-        elif f.geom_type == 'RASTER' and isinstance(value, six.string_types):
+        elif f.geom_type == 'RASTER' and isinstance(value, str):
             value_srid = get_pgraster_srid(value)
         else:
             value_srid = value.srid
@@ -346,7 +345,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         # is not equal to the field srid.
         if value_srid is None or value_srid == f.srid:
             placeholder = '%s'
-        elif f.geom_type == 'RASTER' and isinstance(value, six.string_types):
+        elif f.geom_type == 'RASTER' and isinstance(value, str):
             placeholder = '%s((%%s)::raster, %s)' % (self.transform, f.srid)
         else:
             placeholder = '%s(%%s, %s)' % (self.transform, f.srid)

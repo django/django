@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
 from django.urls import reverse
-from django.utils import six, translation
+from django.utils import translation
 from django.utils.encoding import force_bytes
 from django.utils.html import escape
 
@@ -164,17 +164,17 @@ class LogEntryTests(TestCase):
         log_entry = LogEntry()
 
         log_entry.action_flag = ADDITION
-        self.assertTrue(six.text_type(log_entry).startswith('Added '))
+        self.assertTrue(str(log_entry).startswith('Added '))
 
         log_entry.action_flag = CHANGE
-        self.assertTrue(six.text_type(log_entry).startswith('Changed '))
+        self.assertTrue(str(log_entry).startswith('Changed '))
 
         log_entry.action_flag = DELETION
-        self.assertTrue(six.text_type(log_entry).startswith('Deleted '))
+        self.assertTrue(str(log_entry).startswith('Deleted '))
 
         # Make sure custom action_flags works
         log_entry.action_flag = 4
-        self.assertEqual(six.text_type(log_entry), 'LogEntry Object')
+        self.assertEqual(str(log_entry), 'LogEntry Object')
 
     def test_log_action(self):
         content_type_pk = ContentType.objects.get_for_model(Article).pk

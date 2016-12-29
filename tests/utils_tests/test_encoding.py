@@ -1,7 +1,6 @@
 import datetime
 import unittest
 
-from django.utils import six
 from django.utils.encoding import (
     escape_uri_path, filepath_to_uri, force_bytes, force_text, iri_to_uri,
     smart_text, uri_to_iri,
@@ -27,7 +26,7 @@ class TestEncodingUtils(unittest.TestCase):
 
     def test_force_text_lazy(self):
         s = SimpleLazyObject(lambda: 'x')
-        self.assertTrue(issubclass(type(force_text(s)), six.text_type))
+        self.assertTrue(issubclass(type(force_text(s)), str))
 
     def test_force_bytes_exception(self):
         """

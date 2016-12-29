@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.utils import six
 
 from .models import Person
 
@@ -18,7 +17,7 @@ class SaveDeleteHookTests(TestCase):
             Person.objects.all(), [
                 "John Smith",
             ],
-            six.text_type
+            str
         )
 
         p.delete()

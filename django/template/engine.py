@@ -1,5 +1,5 @@
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import lru_cache, six
+from django.utils import lru_cache
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -120,7 +120,7 @@ class Engine(object):
         else:
             args = []
 
-        if isinstance(loader, six.string_types):
+        if isinstance(loader, str):
             loader_class = import_string(loader)
             return loader_class(self, *args)
         else:

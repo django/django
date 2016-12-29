@@ -5,7 +5,6 @@ from django.core.exceptions import EmptyResultSet, FieldError
 from django.db.backends import utils as backend_utils
 from django.db.models import fields
 from django.db.models.query_utils import Q
-from django.utils import six
 from django.utils.functional import cached_property
 
 
@@ -149,7 +148,7 @@ class BaseExpression(object):
     def _parse_expressions(self, *expressions):
         return [
             arg if hasattr(arg, 'resolve_expression') else (
-                F(arg) if isinstance(arg, six.string_types) else Value(arg)
+                F(arg) if isinstance(arg, str) else Value(arg)
             ) for arg in expressions
         ]
 

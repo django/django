@@ -10,7 +10,6 @@ from django.db.migrations.state import (
 )
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import isolate_apps
-from django.utils import six
 
 from .models import (
     FoodManager, FoodQuerySet, ModelWithCustomBase, NoMigrationFoodManager,
@@ -157,7 +156,7 @@ class StateTests(SimpleTestCase):
 
         # The default manager is used in migrations
         self.assertEqual([name for name, mgr in food_state.managers], ['food_mgr'])
-        self.assertTrue(all(isinstance(name, six.text_type) for name, mgr in food_state.managers))
+        self.assertTrue(all(isinstance(name, str) for name, mgr in food_state.managers))
         self.assertEqual(food_state.managers[0][1].args, ('a', 'b', 1, 2))
 
         # No explicit managers defined. Migrations will fall back to the default
@@ -167,13 +166,13 @@ class StateTests(SimpleTestCase):
         # default
         self.assertEqual([name for name, mgr in food_no_default_manager_state.managers],
                          ['food_no_mgr', 'food_mgr'])
-        self.assertTrue(all(isinstance(name, six.text_type) for name, mgr in food_no_default_manager_state.managers))
+        self.assertTrue(all(isinstance(name, str) for name, mgr in food_no_default_manager_state.managers))
         self.assertEqual(food_no_default_manager_state.managers[0][1].__class__, models.Manager)
         self.assertIsInstance(food_no_default_manager_state.managers[1][1], FoodManager)
 
         self.assertEqual([name for name, mgr in food_order_manager_state.managers],
                          ['food_mgr1', 'food_mgr2'])
-        self.assertTrue(all(isinstance(name, six.text_type) for name, mgr in food_order_manager_state.managers))
+        self.assertTrue(all(isinstance(name, str) for name, mgr in food_order_manager_state.managers))
         self.assertEqual([mgr.args for name, mgr in food_order_manager_state.managers],
                          [('a', 'b', 1, 2), ('x', 'y', 3, 4)])
 
@@ -373,7 +372,7 @@ class StateTests(SimpleTestCase):
         Food = new_apps.get_model("migrations", "Food")
         self.assertEqual([mgr.name for mgr in Food._meta.managers],
                          ['default', 'food_mgr1', 'food_mgr2'])
-        self.assertTrue(all(isinstance(mgr.name, six.text_type) for mgr in Food._meta.managers))
+        self.assertTrue(all(isinstance(mgr.name, str) for mgr in Food._meta.managers))
         self.assertEqual([mgr.__class__ for mgr in Food._meta.managers],
                          [models.Manager, FoodManager, FoodManager])
 

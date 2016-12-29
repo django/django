@@ -362,11 +362,11 @@ def serializer_factory(value):
         return SettingsReferenceSerializer(value)
     if isinstance(value, float):
         return FloatSerializer(value)
-    if isinstance(value, six.integer_types + (bool, type(None))):
+    if isinstance(value, (bool, int, type(None))):
         return BaseSimpleSerializer(value)
-    if isinstance(value, six.binary_type):
+    if isinstance(value, bytes):
         return ByteTypeSerializer(value)
-    if isinstance(value, six.text_type):
+    if isinstance(value, str):
         return TextTypeSerializer(value)
     if isinstance(value, decimal.Decimal):
         return DecimalSerializer(value)

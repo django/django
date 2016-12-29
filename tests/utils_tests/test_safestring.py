@@ -1,6 +1,6 @@
 from django.template import Context, Template
 from django.test import SimpleTestCase
-from django.utils import html, six, text
+from django.utils import html, text
 from django.utils.encoding import force_bytes
 from django.utils.functional import lazy, lazystr
 from django.utils.safestring import SafeData, mark_safe
@@ -8,7 +8,7 @@ from django.utils.safestring import SafeData, mark_safe
 lazybytes = lazy(force_bytes, bytes)
 
 
-class customescape(six.text_type):
+class customescape(str):
     def __html__(self):
         # implement specific and obviously wrong escaping
         # in order to be able to tell for sure when it runs

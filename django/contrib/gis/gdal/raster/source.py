@@ -10,7 +10,6 @@ from django.contrib.gis.gdal.raster.band import BandList
 from django.contrib.gis.gdal.raster.const import GDAL_RESAMPLE_ALGORITHMS
 from django.contrib.gis.gdal.srs import SpatialReference, SRSException
 from django.contrib.gis.geometry.regex import json_regex
-from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
 
@@ -62,11 +61,11 @@ class GDALRaster(GDALBase):
 
         # Preprocess json inputs. This converts json strings to dictionaries,
         # which are parsed below the same way as direct dictionary inputs.
-        if isinstance(ds_input, six.string_types) and json_regex.match(ds_input):
+        if isinstance(ds_input, str) and json_regex.match(ds_input):
             ds_input = json.loads(ds_input)
 
         # If input is a valid file path, try setting file as source.
-        if isinstance(ds_input, six.string_types):
+        if isinstance(ds_input, str):
             if not os.path.exists(ds_input):
                 raise GDALException('Unable to read raster source input "{}"'.format(ds_input))
             try:
@@ -215,7 +214,7 @@ class GDALRaster(GDALBase):
         """
         if isinstance(value, SpatialReference):
             srs = value
-        elif isinstance(value, six.integer_types + six.string_types):
+        elif isinstance(value, (int, str)):
             srs = SpatialReference(value)
         else:
             raise ValueError('Could not create a SpatialReference from input.')

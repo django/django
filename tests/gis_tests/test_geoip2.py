@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.gis.geoip2 import HAS_GEOIP2
 from django.contrib.gis.geos import HAS_GEOS, GEOSGeometry
 from django.test import mock
-from django.utils import six
 
 if HAS_GEOIP2:
     from django.contrib.gis.geoip2 import GeoIP2, GeoIP2Exception
@@ -48,7 +47,7 @@ class GeoIPTest(unittest.TestCase):
         for bad in bad_params:
             with self.assertRaises(GeoIP2Exception):
                 GeoIP2(cache=bad)
-            if isinstance(bad, six.string_types):
+            if isinstance(bad, str):
                 e = GeoIP2Exception
             else:
                 e = TypeError

@@ -56,7 +56,6 @@ import re
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
 )
-from django.utils import six
 from django.utils.encoding import force_str, force_text
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
@@ -771,7 +770,7 @@ class Variable(object):
         self.translate = False
         self.message_context = None
 
-        if not isinstance(var, six.string_types):
+        if not isinstance(var, str):
             raise TypeError(
                 "Variable must be a string or number, got %s" % type(var))
         try:

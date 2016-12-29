@@ -5,7 +5,7 @@ import uuid
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import strip_quotes, truncate_name
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.encoding import force_bytes, force_text
 
 from .base import Database
@@ -490,7 +490,7 @@ WHEN (new.%(col_name)s IS NULL)
         if hasattr(value, 'resolve_expression'):
             return value
 
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             return datetime.datetime.strptime(value, '%H:%M:%S')
 
         # Oracle doesn't support tz-aware times

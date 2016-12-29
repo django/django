@@ -408,7 +408,7 @@ def unescape_string_literal(s):
     return s[1:-1].replace(r'\%s' % quote, quote).replace(r'\\', '\\')
 
 
-@keep_lazy(six.text_type, SafeText)
+@keep_lazy(str, SafeText)
 def slugify(value, allow_unicode=False):
     """
     Convert to ASCII if 'allow_unicode' is False. Convert spaces to hyphens.
@@ -441,4 +441,4 @@ def _format_lazy(format_string, *args, **kwargs):
     return format_string.format(*args, **kwargs)
 
 
-format_lazy = lazy(_format_lazy, six.text_type)
+format_lazy = lazy(_format_lazy, str)

@@ -350,7 +350,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.patched_settings = self.settings(
             STATICFILES_DIRS=settings.STATICFILES_DIRS + [temp_dir])
         self.patched_settings.enable()
-        self.addCleanup(shutil.rmtree, six.text_type(temp_dir))
+        self.addCleanup(shutil.rmtree, temp_dir)
         self._manifest_strict = storage.staticfiles_storage.manifest_strict
 
     def tearDown(self):

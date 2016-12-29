@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils import six
 
 
 class Animal(models.Model):
@@ -29,7 +28,7 @@ class Stuff(models.Model):
     owner = models.ForeignKey(User, models.SET_NULL, null=True)
 
     def __str__(self):
-        return six.text_type(self.name) + ' is owned by ' + six.text_type(self.owner)
+        return self.name + ' is owned by ' + str(self.owner)
 
 
 class Absolute(models.Model):

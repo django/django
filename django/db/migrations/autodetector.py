@@ -12,7 +12,6 @@ from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.utils import (
     COMPILED_REGEX_TYPE, RegexObject, get_migration_name_timestamp,
 )
-from django.utils import six
 
 from .topological_sort import stable_topological_sort
 
@@ -538,7 +537,7 @@ class MigrationAutodetector(object):
             ]
             # Depend on all bases
             for base in model_state.bases:
-                if isinstance(base, six.string_types) and "." in base:
+                if isinstance(base, str) and "." in base:
                     base_app_label, base_name = base.split(".", 1)
                     dependencies.append((base_app_label, base_name, None, True))
             # Depend on the other end of the primary key if it's a relation
@@ -659,7 +658,7 @@ class MigrationAutodetector(object):
             ]
             # Depend on all bases
             for base in model_state.bases:
-                if isinstance(base, six.string_types) and "." in base:
+                if isinstance(base, str) and "." in base:
                     base_app_label, base_name = base.split(".", 1)
                     dependencies.append((base_app_label, base_name, None, True))
             # Generate creation operation

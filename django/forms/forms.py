@@ -209,7 +209,7 @@ class BaseForm(object):
                     top_errors.extend(
                         [_('(Hidden field %(name)s) %(error)s') % {'name': name, 'error': force_text(e)}
                          for e in bf_errors])
-                hidden_fields.append(six.text_type(bf))
+                hidden_fields.append(str(bf))
             else:
                 # Create a 'class="..."' attribute if the row should have any
                 # CSS classes applied.
@@ -234,7 +234,7 @@ class BaseForm(object):
                 output.append(normal_row % {
                     'errors': force_text(bf_errors),
                     'label': force_text(label),
-                    'field': six.text_type(bf),
+                    'field': str(bf),
                     'help_text': help_text,
                     'html_class_attr': html_class_attr,
                     'css_classes': css_classes,

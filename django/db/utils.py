@@ -247,7 +247,7 @@ class ConnectionRouter(object):
             self._routers = settings.DATABASE_ROUTERS
         routers = []
         for r in self._routers:
-            if isinstance(r, six.string_types):
+            if isinstance(r, str):
                 router = import_string(r)()
             else:
                 router = r

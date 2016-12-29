@@ -31,7 +31,6 @@ from ctypes import byref, c_char_p, c_int
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import SRSException
 from django.contrib.gis.gdal.prototypes import srs as capi
-from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 
 
@@ -55,7 +54,7 @@ class SpatialReference(GDALBase):
             self.ptr = capi.new_srs(c_char_p(b''))
             self.import_wkt(srs_input)
             return
-        elif isinstance(srs_input, six.string_types):
+        elif isinstance(srs_input, str):
             try:
                 # If SRID is a string, e.g., '4326', then make acceptable
                 # as user input.
@@ -63,7 +62,7 @@ class SpatialReference(GDALBase):
                 srs_input = 'EPSG:%d' % srid
             except ValueError:
                 pass
-        elif isinstance(srs_input, six.integer_types):
+        elif isinstance(srs_input, int):
             # EPSG integer code was input.
             srs_type = 'epsg'
         elif isinstance(srs_input, self.ptr_type):
@@ -130,7 +129,7 @@ class SpatialReference(GDALBase):
         The attribute value for the given target node (e.g. 'PROJCS'). The index
         keyword specifies an index of the child node to return.
         """
-        if not isinstance(target, six.string_types) or not isinstance(index, int):
+        if not isinstance(target, str) or not isinstance(index, int):
             raise TypeError
         return capi.get_attr_value(self.ptr, force_bytes(target), index)
 

@@ -7,7 +7,6 @@
 import unittest
 
 from django.contrib.gis.geos.mutable_list import ListMixin
-from django.utils import six
 
 
 class UserListA(ListMixin):
@@ -298,7 +297,7 @@ class ListMixinTest(unittest.TestCase):
     def test07_allowed_types(self):
         'Type-restricted list'
         pl, ul = self.lists_of_len()
-        ul._allowed = six.integer_types
+        ul._allowed = int
         ul[1] = 50
         ul[:2] = [60, 70, 80]
 

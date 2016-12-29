@@ -3,7 +3,6 @@ from ctypes import c_void_p
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.prototypes import ds as vcapi, raster as rcapi
-from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 
 
@@ -36,7 +35,7 @@ class Driver(GDALBase):
         """
         Initializes an GDAL/OGR driver on either a string or integer input.
         """
-        if isinstance(dr_input, six.string_types):
+        if isinstance(dr_input, str):
             # If a string name of the driver was passed in
             self.ensure_registered()
 

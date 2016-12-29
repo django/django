@@ -19,7 +19,7 @@ from django.core.exceptions import FieldDoesNotExist  # NOQA
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
     parse_date, parse_datetime, parse_duration, parse_time,
@@ -244,8 +244,7 @@ class Field(RegisterLookupMixin):
 
     def _check_choices(self):
         if self.choices:
-            if (isinstance(self.choices, six.string_types) or
-                    not is_iterable(self.choices)):
+            if isinstance(self.choices, str) or not is_iterable(self.choices):
                 return [
                     checks.Error(
                         "'choices' must be an iterable (e.g., a list or tuple).",
@@ -253,7 +252,7 @@ class Field(RegisterLookupMixin):
                         id='fields.E004',
                     )
                 ]
-            elif any(isinstance(choice, six.string_types) or
+            elif any(isinstance(choice, str) or
                      not is_iterable(choice) or len(choice) != 2
                      for choice in self.choices):
                 return [
@@ -763,7 +762,7 @@ class Field(RegisterLookupMixin):
 
         if not self.empty_strings_allowed or self.null and not connection.features.interprets_empty_strings_as_nulls:
             return return_None
-        return six.text_type  # returns empty string
+        return str  # returns empty string
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None):
         """Returns choices with a default blank choices included, for use
@@ -1038,7 +1037,7 @@ class CharField(Field):
                     id='fields.E120',
                 )
             ]
-        elif not isinstance(self.max_length, six.integer_types) or self.max_length <= 0:
+        elif not isinstance(self.max_length, int) or self.max_length <= 0:
             return [
                 checks.Error(
                     "'max_length' must be a positive integer.",
@@ -1053,7 +1052,7 @@ class CharField(Field):
         return "CharField"
 
     def to_python(self, value):
-        if isinstance(value, six.string_types) or value is None:
+        if isinstance(value, str) or value is None:
             return value
         return force_text(value)
 
@@ -1535,7 +1534,7 @@ class DecimalField(Field):
             )
 
     def _format(self, value):
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             return value
         else:
             return self.format_number(value)
@@ -1703,7 +1702,7 @@ class FilePathField(Field):
         value = super(FilePathField, self).get_prep_value(value)
         if value is None:
             return None
-        return six.text_type(value)
+        return str(value)
 
     def formfield(self, **kwargs):
         defaults = {
@@ -1867,7 +1866,7 @@ class IPAddressField(Field):
         value = super(IPAddressField, self).get_prep_value(value)
         if value is None:
             return None
-        return six.text_type(value)
+        return str(value)
 
     def get_internal_type(self):
         return "IPAddressField"
@@ -1922,7 +1921,7 @@ class GenericIPAddressField(Field):
     def to_python(self, value):
         if value is None:
             return None
-        if not isinstance(value, six.string_types):
+        if not isinstance(value, str):
             value = force_text(value)
         value = value.strip()
         if ':' in value:
@@ -1943,7 +1942,7 @@ class GenericIPAddressField(Field):
                 return clean_ipv6_address(value, self.unpack_ipv4)
             except exceptions.ValidationError:
                 pass
-        return six.text_type(value)
+        return str(value)
 
     def formfield(self, **kwargs):
         defaults = {
@@ -2094,7 +2093,7 @@ class TextField(Field):
         return "TextField"
 
     def to_python(self, value):
-        if isinstance(value, six.string_types) or value is None:
+        if isinstance(value, str) or value is None:
             return value
         return force_text(value)
 
@@ -2310,8 +2309,8 @@ class BinaryField(Field):
 
     def to_python(self, value):
         # If it's a string, it should be base64-encoded data
-        if isinstance(value, six.text_type):
-            return six.memoryview(b64decode(force_bytes(value)))
+        if isinstance(value, str):
+            return memoryview(b64decode(force_bytes(value)))
         return value
 
 

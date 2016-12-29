@@ -17,7 +17,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import CharField, DateField, DateTimeField
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
-from django.utils import six, translation
+from django.utils import translation
 
 from .models import (
     Advisor, Album, Band, Bee, Car, Company, Event, Honeycomb, Individual,
@@ -180,7 +180,7 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
         ma = AdvisorAdmin(Advisor, admin.site)
         f = ma.formfield_for_dbfield(Advisor._meta.get_field('companies'), request=None)
         self.assertEqual(
-            six.text_type(f.help_text),
+            f.help_text,
             'Hold down "Control", or "Command" on a Mac, to select more than one.'
         )
 

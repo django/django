@@ -4,7 +4,7 @@ from datetime import datetime
 
 from django.db.backends.utils import strip_quotes
 from django.db.transaction import TransactionManagementError, atomic
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.encoding import force_bytes
 
 logger = logging.getLogger('django.db.backends.schema')
@@ -206,9 +206,9 @@ class BaseDatabaseSchemaEditor(object):
             default = field.get_default()
         elif not field.null and field.blank and field.empty_strings_allowed:
             if field.get_internal_type() == "BinaryField":
-                default = six.binary_type()
+                default = bytes()
             else:
-                default = six.text_type()
+                default = str()
         elif getattr(field, 'auto_now', False) or getattr(field, 'auto_now_add', False):
             default = datetime.now()
             internal_type = field.get_internal_type()

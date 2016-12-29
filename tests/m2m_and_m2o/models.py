@@ -4,7 +4,6 @@ Many-to-many and many-to-one relationships to the same table
 Make sure to set ``related_name`` if you use relationships to the same table.
 """
 from django.db import models
-from django.utils import six
 
 
 class User(models.Model):
@@ -17,7 +16,7 @@ class Issue(models.Model):
     client = models.ForeignKey(User, models.CASCADE, related_name='test_issue_client')
 
     def __str__(self):
-        return six.text_type(self.num)
+        return str(self.num)
 
     class Meta:
         ordering = ('num',)

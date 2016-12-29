@@ -7,7 +7,6 @@ Serialization
 from decimal import Decimal
 
 from django.db import models
-from django.utils import six
 
 
 class CategoryMetaDataManager(models.Manager):
@@ -118,7 +117,7 @@ class TeamField(models.CharField):
         super(TeamField, self).__init__(max_length=100)
 
     def get_db_prep_save(self, value, connection):
-        return six.text_type(value.title)
+        return str(value.title)
 
     def to_python(self, value):
         if isinstance(value, Team):

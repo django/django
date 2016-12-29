@@ -5,7 +5,6 @@ This demonstrates features of the database API.
 """
 
 from django.db import models
-from django.utils import six
 
 
 class Alarm(models.Model):
@@ -48,7 +47,7 @@ class Season(models.Model):
     gt = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        return six.text_type(self.year)
+        return str(self.year)
 
 
 class Game(models.Model):

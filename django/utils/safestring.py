@@ -5,7 +5,6 @@ that the producer of the string has already turned characters that should not
 be interpreted by the HTML engine (e.g. '<') into the appropriate entities.
 """
 
-from django.utils import six
 from django.utils.functional import Promise, curry, wraps
 
 
@@ -52,10 +51,10 @@ class SafeBytes(bytes, SafeData):
     decode = curry(_proxy_method, method=bytes.decode)
 
 
-class SafeText(six.text_type, SafeData):
+class SafeText(str, SafeData):
     """
-    A unicode (Python 2) / str (Python 3) subclass that has been specifically
-    marked as "safe" for HTML output purposes.
+    A str subclass that has been specifically marked as "safe" for HTML output
+    purposes.
     """
     def __add__(self, rhs):
         """
@@ -80,7 +79,7 @@ class SafeText(six.text_type, SafeData):
         else:
             return SafeText(data)
 
-    encode = curry(_proxy_method, method=six.text_type.encode)
+    encode = curry(_proxy_method, method=str.encode)
 
 
 SafeString = SafeText
@@ -106,7 +105,7 @@ def mark_safe(s):
         return s
     if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):
         return SafeBytes(s)
-    if isinstance(s, (six.text_type, Promise)):
+    if isinstance(s, (str, Promise)):
         return SafeText(s)
     if callable(s):
         return _safety_decorator(mark_safe, s)

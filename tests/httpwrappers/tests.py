@@ -578,7 +578,7 @@ class StreamingHttpResponseTests(SimpleTestCase):
         chunks = list(r)
         self.assertEqual(chunks, [b'hello', b'world'])
         for chunk in chunks:
-            self.assertIsInstance(chunk, six.binary_type)
+            self.assertIsInstance(chunk, bytes)
 
         # and the response can only be iterated once.
         self.assertEqual(list(r), [])
@@ -595,7 +595,7 @@ class StreamingHttpResponseTests(SimpleTestCase):
         # '\xc3\xa9' == unichr(233).encode('utf-8')
         self.assertEqual(chunks, [b'hello', b'caf\xc3\xa9'])
         for chunk in chunks:
-            self.assertIsInstance(chunk, six.binary_type)
+            self.assertIsInstance(chunk, bytes)
 
         # streaming responses don't have a `content` attribute.
         self.assertFalse(hasattr(r, 'content'))
@@ -616,8 +616,7 @@ class StreamingHttpResponseTests(SimpleTestCase):
         # coercing a streaming response to bytes doesn't return a complete HTTP
         # message like a regular response does. it only gives us the headers.
         r = StreamingHttpResponse(iter(['hello', 'world']))
-        self.assertEqual(
-            six.binary_type(r), b'Content-Type: text/html; charset=utf-8')
+        self.assertEqual(bytes(r), b'Content-Type: text/html; charset=utf-8')
 
         # and this won't consume its content.
         self.assertEqual(list(r), [b'hello', b'world'])

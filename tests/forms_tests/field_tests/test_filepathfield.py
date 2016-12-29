@@ -2,12 +2,11 @@ import os.path
 
 from django.forms import FilePathField, ValidationError, forms
 from django.test import SimpleTestCase
-from django.utils import six
 from django.utils._os import upath
 
 
 def fix_os_paths(x):
-    if isinstance(x, six.string_types):
+    if isinstance(x, str):
         return x.replace('\\', '/')
     elif isinstance(x, tuple):
         return tuple(fix_os_paths(list(x)))

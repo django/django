@@ -1,7 +1,6 @@
 from decimal import Decimal
 
 from django.conf import settings
-from django.utils import six
 from django.utils.safestring import mark_safe
 
 
@@ -24,13 +23,13 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
     use_grouping = use_grouping and grouping != 0
     # Make the common case fast
     if isinstance(number, int) and not use_grouping and not decimal_pos:
-        return mark_safe(six.text_type(number))
+        return mark_safe(str(number))
     # sign
     sign = ''
     if isinstance(number, Decimal):
         str_number = '{:f}'.format(number)
     else:
-        str_number = six.text_type(number)
+        str_number = str(number)
     if str_number[0] == '-':
         sign = '-'
         str_number = str_number[1:]

@@ -20,7 +20,6 @@ from django.urls import (
     NoReverseMatch, RegexURLPattern, RegexURLResolver, Resolver404,
     ResolverMatch, get_callable, get_resolver, resolve, reverse, reverse_lazy,
 )
-from django.utils import six
 
 from . import middleware, urlconf_outer, views
 from .utils import URLObject
@@ -334,13 +333,6 @@ class URLPatternReverse(SimpleTestCase):
         self.assertEqual(
             reverse('optional', args=['foo:bar']),
             '/script:name/optional/foo:bar/'
-        )
-
-    def test_reverse_returns_unicode(self):
-        name, expected, args, kwargs = test_data[0]
-        self.assertIsInstance(
-            reverse(name, args=args, kwargs=kwargs),
-            six.text_type
         )
 
     def test_view_not_found_message(self):

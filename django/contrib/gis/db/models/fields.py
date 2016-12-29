@@ -10,7 +10,6 @@ from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.expressions import Expression
 from django.db.models.fields import Field
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 # Local cache of the spatial_ref_sys table, which holds SRID data for each
@@ -226,7 +225,7 @@ class BaseSpatialField(Field):
             pass
         else:
             # Check if input is a candidate for conversion to raster or geometry.
-            is_candidate = isinstance(obj, (bytes, six.string_types)) or hasattr(obj, '__geo_interface__')
+            is_candidate = isinstance(obj, (bytes, str)) or hasattr(obj, '__geo_interface__')
             # Try to convert the input to raster.
             raster = self.get_raster_prep_value(obj, is_candidate)
 

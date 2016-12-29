@@ -244,25 +244,25 @@ class EmailMessage(object):
         necessary encoding conversions.
         """
         if to:
-            if isinstance(to, six.string_types):
+            if isinstance(to, str):
                 raise TypeError('"to" argument must be a list or tuple')
             self.to = list(to)
         else:
             self.to = []
         if cc:
-            if isinstance(cc, six.string_types):
+            if isinstance(cc, str):
                 raise TypeError('"cc" argument must be a list or tuple')
             self.cc = list(cc)
         else:
             self.cc = []
         if bcc:
-            if isinstance(bcc, six.string_types):
+            if isinstance(bcc, str):
                 raise TypeError('"bcc" argument must be a list or tuple')
             self.bcc = list(bcc)
         else:
             self.bcc = []
         if reply_to:
-            if isinstance(reply_to, six.string_types):
+            if isinstance(reply_to, str):
                 raise TypeError('"reply_to" argument must be a list or tuple')
             self.reply_to = list(reply_to)
         else:
@@ -352,7 +352,7 @@ class EmailMessage(object):
             basetype, subtype = mimetype.split('/', 1)
 
             if basetype == 'text':
-                if isinstance(content, six.binary_type):
+                if isinstance(content, bytes):
                     try:
                         content = content.decode('utf-8')
                     except UnicodeDecodeError:

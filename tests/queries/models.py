@@ -4,7 +4,6 @@ Various complex queries that have been problematic in the past.
 import threading
 
 from django.db import models
-from django.utils import six
 
 
 class DumbCategory(models.Model):
@@ -142,7 +141,7 @@ class Number(models.Model):
     num = models.IntegerField()
 
     def __str__(self):
-        return six.text_type(self.num)
+        return str(self.num)
 
 # Symmetrical m2m field with a normal field using the reverse accessor name
 # ("valid").

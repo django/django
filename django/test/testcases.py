@@ -674,8 +674,7 @@ class SimpleTestCase(unittest.TestCase):
             standardMsg = '%s != %s' % (
                 safe_repr(dom1, True), safe_repr(dom2, True))
             diff = ('\n' + '\n'.join(difflib.ndiff(
-                six.text_type(dom1).splitlines(),
-                six.text_type(dom2).splitlines(),
+                str(dom1).splitlines(), str(dom2).splitlines(),
             )))
             standardMsg = self._truncateMessage(standardMsg, diff)
             self.fail(self._formatMessage(msg, standardMsg))
@@ -712,7 +711,7 @@ class SimpleTestCase(unittest.TestCase):
             data = json.loads(raw)
         except ValueError:
             self.fail("First argument is not valid JSON: %r" % raw)
-        if isinstance(expected_data, six.string_types):
+        if isinstance(expected_data, str):
             try:
                 expected_data = json.loads(expected_data)
             except ValueError:
@@ -729,7 +728,7 @@ class SimpleTestCase(unittest.TestCase):
             data = json.loads(raw)
         except ValueError:
             self.fail("First argument is not valid JSON: %r" % raw)
-        if isinstance(expected_data, six.string_types):
+        if isinstance(expected_data, str):
             try:
                 expected_data = json.loads(expected_data)
             except ValueError:
@@ -751,10 +750,7 @@ class SimpleTestCase(unittest.TestCase):
             if not result:
                 standardMsg = '%s != %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
                 diff = ('\n' + '\n'.join(
-                    difflib.ndiff(
-                        six.text_type(xml1).splitlines(),
-                        six.text_type(xml2).splitlines(),
-                    )
+                    difflib.ndiff(xml1.splitlines(), xml2.splitlines())
                 ))
                 standardMsg = self._truncateMessage(standardMsg, diff)
                 self.fail(self._formatMessage(msg, standardMsg))

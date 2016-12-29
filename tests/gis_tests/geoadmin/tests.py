@@ -96,6 +96,6 @@ class GeoAdminTest(TestCase):
         self.assertEqual(len(logger_calls), 1)
         self.assertEqual(
             logger_calls[0],
-            "Error creating geometry from value 'INVALID()' (String or unicode input "
+            "Error creating geometry from value 'INVALID()' (String input "
             "unrecognized as WKT EWKT, and HEXEWKB.)"
         )

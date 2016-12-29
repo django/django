@@ -67,7 +67,7 @@ class OGRGeometry(GDALBase):
     def __init__(self, geom_input, srs=None):
         "Initializes Geometry on either WKT or an OGR pointer as input."
 
-        str_instance = isinstance(geom_input, six.string_types)
+        str_instance = isinstance(geom_input, str)
 
         # If HEX, unpack input to a binary buffer.
         if str_instance and hex_regex.match(geom_input):
@@ -276,7 +276,7 @@ class OGRGeometry(GDALBase):
         # (decremented) when this geometry's destructor is called.
         if isinstance(srs, SpatialReference):
             srs_ptr = srs.ptr
-        elif isinstance(srs, six.integer_types + six.string_types):
+        elif isinstance(srs, (int, str)):
             sr = SpatialReference(srs)
             srs_ptr = sr.ptr
         elif srs is None:
@@ -295,7 +295,7 @@ class OGRGeometry(GDALBase):
         return None
 
     def _set_srid(self, srid):
-        if isinstance(srid, six.integer_types) or srid is None:
+        if isinstance(srid, int) or srid is None:
             self.srs = srid
         else:
             raise TypeError('SRID must be set with an integer.')
@@ -403,7 +403,7 @@ class OGRGeometry(GDALBase):
             capi.geom_transform(self.ptr, coord_trans.ptr)
         elif isinstance(coord_trans, SpatialReference):
             capi.geom_transform_to(self.ptr, coord_trans.ptr)
-        elif isinstance(coord_trans, six.integer_types + six.string_types):
+        elif isinstance(coord_trans, (int, str)):
             sr = SpatialReference(coord_trans)
             capi.geom_transform_to(self.ptr, sr.ptr)
         else:
@@ -675,7 +675,7 @@ class GeometryCollection(OGRGeometry):
                     capi.add_geom(self.ptr, g.ptr)
             else:
                 capi.add_geom(self.ptr, geom.ptr)
-        elif isinstance(geom, six.string_types):
+        elif isinstance(geom, str):
             tmp = OGRGeometry(geom)
             capi.add_geom(self.ptr, tmp.ptr)
         else:

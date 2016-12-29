@@ -20,7 +20,6 @@ from django.db.models.sql import constants
 from django.db.models.sql.datastructures import Join
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
-from django.utils import six
 
 from .models import (
     UUID, Company, Employee, Experiment, Number, Result, SimulationRun, Time,
@@ -202,7 +201,7 @@ class BasicExpressionsTests(TestCase):
                 "Frank Meyer",
                 "Max Mustermann",
             ],
-            lambda c: six.text_type(c.point_of_contact),
+            lambda c: str(c.point_of_contact),
             ordered=False
         )
 

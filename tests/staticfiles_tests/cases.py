@@ -7,7 +7,6 @@ from django.conf import settings
 from django.core.management import call_command
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
-from django.utils import six
 from django.utils.encoding import force_text
 
 from .settings import TEST_SETTINGS
@@ -30,7 +29,7 @@ class BaseStaticFilesMixin(object):
             self._get_file(filepath)
 
     def render_template(self, template, **kwargs):
-        if isinstance(template, six.string_types):
+        if isinstance(template, str):
             template = Template(template)
         return template.render(Context(**kwargs)).strip()
 
@@ -72,7 +71,7 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
         self.patched_settings.enable()
         self.run_collectstatic()
         # Same comment as in runtests.teardown.
-        self.addCleanup(shutil.rmtree, six.text_type(temp_dir))
+        self.addCleanup(shutil.rmtree, temp_dir)
 
     def tearDown(self):
         self.patched_settings.disable()

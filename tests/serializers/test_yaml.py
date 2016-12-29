@@ -4,7 +4,6 @@ import unittest
 from django.core import management, serializers
 from django.core.serializers.base import DeserializationError
 from django.test import SimpleTestCase, TestCase, TransactionTestCase
-from django.utils import six
 from django.utils.six import StringIO
 
 from .models import Author
@@ -147,7 +146,7 @@ class YamlSerializerTestCase(SerializersTestBase, TestCase):
                 # yaml.safe_load will return non-string objects for some
                 # of the fields we are interested in, this ensures that
                 # everything comes back as a string
-                if isinstance(field_value, six.string_types):
+                if isinstance(field_value, str):
                     ret_list.append(field_value)
                 else:
                     ret_list.append(str(field_value))

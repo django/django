@@ -1,7 +1,6 @@
 from collections import Counter
 
 from django.conf import settings
-from django.utils import six
 
 from . import Error, Tags, Warning, register
 
@@ -72,7 +71,7 @@ def get_warning_for_invalid_pattern(pattern):
     describe_pattern() cannot be used here, because we cannot rely on the
     urlpattern having regex or name attributes.
     """
-    if isinstance(pattern, six.string_types):
+    if isinstance(pattern, str):
         hint = (
             "Try removing the string '{}'. The list of urlpatterns should not "
             "have a prefix string as the first element.".format(pattern)

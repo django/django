@@ -6,7 +6,6 @@ from django.contrib.postgres.validators import (
     ArrayMaxLengthValidator, ArrayMinLengthValidator,
 )
 from django.core.exceptions import ValidationError
-from django.utils import six
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
@@ -31,7 +30,7 @@ class SimpleArrayField(forms.CharField):
 
     def prepare_value(self, value):
         if isinstance(value, list):
-            return self.delimiter.join(six.text_type(self.base_field.prepare_value(v)) for v in value)
+            return self.delimiter.join(str(self.base_field.prepare_value(v)) for v in value)
         return value
 
     def to_python(self, value):

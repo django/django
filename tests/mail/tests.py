@@ -26,7 +26,7 @@ from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.utils._os import upath
 from django.utils.encoding import force_bytes, force_text
-from django.utils.six import StringIO, binary_type
+from django.utils.six import StringIO
 from django.utils.translation import ugettext_lazy
 
 
@@ -40,7 +40,7 @@ class HeadersCheckMixin(object):
                  with the contents of an email message.
         headers: should be a set of (header-name, header-value) tuples.
         """
-        if isinstance(message, binary_type):
+        if isinstance(message, bytes):
             message = message_from_bytes(message)
         msg_headers = set(message.items())
         self.assertTrue(headers.issubset(msg_headers), msg='Message is missing '

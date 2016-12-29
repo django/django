@@ -9,9 +9,8 @@ from django.contrib.gis.measure import (
 from django.core.exceptions import FieldError
 from django.db.models import BooleanField, FloatField, IntegerField, TextField
 from django.db.models.expressions import Func, Value
-from django.utils import six
 
-NUMERIC_TYPES = six.integer_types + (float, Decimal)
+NUMERIC_TYPES = (int, float, Decimal)
 
 
 class GeoFunc(Func):
@@ -161,7 +160,7 @@ class AsGeoJSON(GeoFunc):
     def __init__(self, expression, bbox=False, crs=False, precision=8, **extra):
         expressions = [expression]
         if precision is not None:
-            expressions.append(self._handle_param(precision, 'precision', six.integer_types))
+            expressions.append(self._handle_param(precision, 'precision', int))
         options = 0
         if crs and bbox:
             options = 3
@@ -181,7 +180,7 @@ class AsGML(GeoFunc):
     def __init__(self, expression, version=2, precision=8, **extra):
         expressions = [version, expression]
         if precision is not None:
-            expressions.append(self._handle_param(precision, 'precision', six.integer_types))
+            expressions.append(self._handle_param(precision, 'precision', int))
         super(AsGML, self).__init__(*expressions, **extra)
 
     def as_oracle(self, compiler, connection, **extra_context):
@@ -208,7 +207,7 @@ class AsSVG(GeoFunc):
         expressions = [
             expression,
             relative,
-            self._handle_param(precision, 'precision', six.integer_types),
+            self._handle_param(precision, 'precision', int),
         ]
         super(AsSVG, self).__init__(*expressions, **extra)
 
@@ -311,7 +310,7 @@ class GeoHash(GeoFunc):
     def __init__(self, expression, precision=None, **extra):
         expressions = [expression]
         if precision is not None:
-            expressions.append(self._handle_param(precision, 'precision', six.integer_types))
+            expressions.append(self._handle_param(precision, 'precision', int))
         super(GeoHash, self).__init__(*expressions, **extra)
 
 
@@ -458,7 +457,7 @@ class Transform(GeoFunc):
     def __init__(self, expression, srid, **extra):
         expressions = [
             expression,
-            self._handle_param(srid, 'srid', six.integer_types),
+            self._handle_param(srid, 'srid', int),
         ]
         if 'output_field' not in extra:
             extra['output_field'] = GeometryField(srid=srid)

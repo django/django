@@ -84,7 +84,7 @@ class MultiPartParser(object):
             # This means we shouldn't continue...raise an error.
             raise MultiPartParserError("Invalid content length: %r" % content_length)
 
-        if isinstance(boundary, six.text_type):
+        if isinstance(boundary, str):
             boundary = boundary.encode('ascii')
         self._boundary = boundary
         self._input_data = input_data

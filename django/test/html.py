@@ -4,8 +4,6 @@ Comparing two html documents.
 
 import re
 
-from django.utils import six
-from django.utils.encoding import force_text
 from django.utils.html_parser import HTMLParseError, HTMLParser
 
 WHITESPACE = re.compile(r'\s+')
@@ -22,11 +20,10 @@ class Element(object):
         self.children = []
 
     def append(self, element):
-        if isinstance(element, six.string_types):
-            element = force_text(element)
+        if isinstance(element, str):
             element = normalize_whitespace(element)
             if self.children:
-                if isinstance(self.children[-1], six.string_types):
+                if isinstance(self.children[-1], str):
                     self.children[-1] += element
                     self.children[-1] = normalize_whitespace(self.children[-1])
                     return
@@ -34,7 +31,7 @@ class Element(object):
             # removing last children if it is only whitespace
             # this can result in incorrect dom representations since
             # whitespace between inline tags like <span> is significant
-            if isinstance(self.children[-1], six.string_types):
+            if isinstance(self.children[-1], str):
                 if self.children[-1].isspace():
                     self.children.pop()
         if element:
@@ -43,7 +40,7 @@ class Element(object):
     def finalize(self):
         def rstrip_last_element(children):
             if children:
-                if isinstance(children[-1], six.string_types):
+                if isinstance(children[-1], str):
                     children[-1] = children[-1].rstrip()
                     if not children[-1]:
                         children.pop()
@@ -52,7 +49,7 @@ class Element(object):
 
         rstrip_last_element(self.children)
         for i, child in enumerate(self.children):
-            if isinstance(child, six.string_types):
+            if isinstance(child, str):
                 self.children[i] = child.strip()
             elif hasattr(child, 'finalize'):
                 child.finalize()
@@ -88,7 +85,7 @@ class Element(object):
         return not self.__eq__(element)
 
     def _count(self, element, count=True):
-        if not isinstance(element, six.string_types):
+        if not isinstance(element, str):
             if self == element:
                 return 1
         if isinstance(element, RootElement):
@@ -98,8 +95,8 @@ class Element(object):
         for child in self.children:
             # child is text content and element is also text content, then
             # make a simple "text" in "text"
-            if isinstance(child, six.string_types):
-                if isinstance(element, six.string_types):
+            if isinstance(child, str):
+                if isinstance(element, str):
                     if count:
                         i += child.count(element)
                     elif element in child:
@@ -128,14 +125,14 @@ class Element(object):
                 output += ' %s' % key
         if self.children:
             output += '>\n'
-            output += ''.join(six.text_type(c) for c in self.children)
+            output += ''.join(str(c) for c in self.children)
             output += '\n</%s>' % self.name
         else:
             output += ' />'
         return output
 
     def __repr__(self):
-        return six.text_type(self)
+        return str(self)
 
 
 class RootElement(Element):
@@ -143,7 +140,7 @@ class RootElement(Element):
         super(RootElement, self).__init__(None, ())
 
     def __str__(self):
-        return ''.join(six.text_type(c) for c in self.children)
+        return ''.join(str(c) for c in self.children)
 
 
 class Parser(HTMLParser):
@@ -232,6 +229,6 @@ def parse_html(html):
     document.finalize()
     # Removing ROOT element if it's not necessary
     if len(document.children) == 1:
-        if not isinstance(document.children[0], six.string_types):
+        if not isinstance(document.children[0], str):
             document = document.children[0]
     return document

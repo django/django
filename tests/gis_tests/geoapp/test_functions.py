@@ -7,7 +7,6 @@ from django.contrib.gis.measure import Area
 from django.db import connection
 from django.db.models import Sum
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils import six
 
 from ..utils import mysql, oracle, postgis, spatialite
 from .models import City, Country, CountryWebMercator, State, Track
@@ -361,7 +360,7 @@ class GISFunctionsTests(TestCase):
         for bad_args in ((), range(3), range(5)):
             with self.assertRaises(ValueError):
                 Country.objects.annotate(snap=functions.SnapToGrid('mpoly', *bad_args))
-        for bad_args in (('1.0',), (1.0, None), tuple(map(six.text_type, range(4)))):
+        for bad_args in (('1.0',), (1.0, None), tuple(map(str, range(4)))):
             with self.assertRaises(TypeError):
                 Country.objects.annotate(snap=functions.SnapToGrid('mpoly', *bad_args))
 

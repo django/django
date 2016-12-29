@@ -197,7 +197,7 @@ def encode_multipart(boundary, data):
     for (key, value) in data.items():
         if is_file(value):
             lines.extend(encode_file(boundary, key, value))
-        elif not isinstance(value, six.string_types) and is_iterable(value):
+        elif not isinstance(value, str) and is_iterable(value):
             for item in value:
                 if is_file(item):
                     lines.extend(encode_file(boundary, key, item))
@@ -229,7 +229,7 @@ def encode_file(boundary, key, file):
 
     # file.name might not be a string. For example, it's an int for
     # tempfile.TemporaryFile().
-    file_has_string_name = hasattr(file, 'name') and isinstance(file.name, six.string_types)
+    file_has_string_name = hasattr(file, 'name') and isinstance(file.name, str)
     filename = os.path.basename(file.name) if file_has_string_name else ''
 
     if hasattr(file, 'content_type'):

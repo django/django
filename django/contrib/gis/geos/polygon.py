@@ -4,7 +4,6 @@ from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.libgeos import GEOM_PTR, get_pointer_arr
 from django.contrib.gis.geos.linestring import LinearRing
-from django.utils import six
 from django.utils.six.moves import range
 
 
@@ -63,7 +62,7 @@ class Polygon(GEOSGeometry):
         "Constructs a Polygon from a bounding box (4-tuple)."
         x0, y0, x1, y1 = bbox
         for z in bbox:
-            if not isinstance(z, six.integer_types + (float,)):
+            if not isinstance(z, (float, int)):
                 return GEOSGeometry('POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' %
                                     (x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
         return Polygon(((x0, y0), (x0, y1), (x1, y1), (x1, y0), (x0, y0)))

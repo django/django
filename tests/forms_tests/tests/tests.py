@@ -7,7 +7,6 @@ from django.forms import (
 )
 from django.forms.models import ModelFormMetaclass
 from django.test import SimpleTestCase, TestCase
-from django.utils import six
 
 from ..models import (
     BoundaryModel, ChoiceFieldModel, ChoiceModel, ChoiceOptionModel, Defaults,
@@ -97,7 +96,7 @@ class ModelFormCallableModelDefault(TestCase):
 
         choices = list(ChoiceFieldForm().fields['choice'].choices)
         self.assertEqual(len(choices), 1)
-        self.assertEqual(choices[0], (option.pk, six.text_type(option)))
+        self.assertEqual(choices[0], (option.pk, str(option)))
 
     def test_callable_initial_value(self):
         "The initial value for a callable default returning a queryset is the pk (refs #13769)"

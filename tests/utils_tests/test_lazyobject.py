@@ -73,7 +73,7 @@ class LazyObjectTestCase(TestCase):
 
     def test_text(self):
         obj = self.lazy_wrap('foo')
-        self.assertEqual(six.text_type(obj), 'foo')
+        self.assertEqual(str(obj), 'foo')
 
     def test_bool(self):
         # Refs #21840

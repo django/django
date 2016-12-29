@@ -13,7 +13,6 @@ from django.utils.encoding import force_text
 from django.utils.functional import lazy
 from django.utils.html import format_html
 from django.utils.module_loading import import_string
-from django.utils.six import string_types, text_type
 from django.utils.translation import ugettext as _, ungettext
 
 
@@ -88,7 +87,7 @@ def _password_validators_help_text_html(password_validators=None):
     return '<ul>%s</ul>' % ''.join(help_items) if help_items else ''
 
 
-password_validators_help_text_html = lazy(_password_validators_help_text_html, text_type)
+password_validators_help_text_html = lazy(_password_validators_help_text_html, str)
 
 
 class MinimumLengthValidator(object):
@@ -141,7 +140,7 @@ class UserAttributeSimilarityValidator(object):
 
         for attribute_name in self.user_attributes:
             value = getattr(user, attribute_name, None)
-            if not value or not isinstance(value, string_types):
+            if not value or not isinstance(value, str):
                 continue
             value_parts = re.split(r'\W+', value) + [value]
             for value_part in value_parts:

@@ -15,7 +15,6 @@ from django.core import validators
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.utils import six
 from django.utils._os import upath
 from django.utils.six.moves import range
 
@@ -319,7 +318,7 @@ class BigInt(models.Model):
     biggie = models.BigIntegerField()
 
     def __str__(self):
-        return six.text_type(self.biggie)
+        return str(self.biggie)
 
 
 class MarkupField(models.CharField):

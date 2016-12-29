@@ -2,7 +2,6 @@ import datetime
 import uuid
 
 from django.db import models
-from django.utils import six
 
 
 class Author(models.Model):
@@ -172,7 +171,7 @@ class Revision(models.Model):
         unique_together = (("repository", "revision"),)
 
     def __str__(self):
-        return "%s (%s)" % (self.revision, six.text_type(self.repository))
+        return "%s (%s)" % (self.revision, str(self.repository))
 
 
 # models for testing callable defaults (see bug #7975). If you define a model

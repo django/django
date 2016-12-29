@@ -3,7 +3,6 @@ from django.forms import Form
 from django.forms.fields import BooleanField, IntegerField
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
-from django.utils import six
 from django.utils.functional import cached_property
 from django.utils.html import html_safe
 from django.utils.safestring import mark_safe
@@ -416,17 +415,17 @@ class BaseFormSet(object):
         # probably should be. It might make sense to render each form as a
         # table row with each field as a td.
         forms = ' '.join(form.as_table() for form in self)
-        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
+        return mark_safe('\n'.join([str(self.management_form), forms]))
 
     def as_p(self):
         "Returns this formset rendered as HTML <p>s."
         forms = ' '.join(form.as_p() for form in self)
-        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
+        return mark_safe('\n'.join([str(self.management_form), forms]))
 
     def as_ul(self):
         "Returns this formset rendered as HTML <li>s."
         forms = ' '.join(form.as_ul() for form in self)
-        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
+        return mark_safe('\n'.join([str(self.management_form), forms]))
 
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,

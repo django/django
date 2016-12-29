@@ -1,6 +1,3 @@
-from django.utils import six
-
-
 def make_model_tuple(model):
     """
     Takes a model or a string of the form "app_label.ModelName" and returns a
@@ -10,7 +7,7 @@ def make_model_tuple(model):
     try:
         if isinstance(model, tuple):
             model_tuple = model
-        elif isinstance(model, six.string_types):
+        elif isinstance(model, str):
             app_label, model_name = model.split(".")
             model_tuple = app_label, model_name.lower()
         else:

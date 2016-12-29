@@ -14,7 +14,7 @@ from django.template import Context, Template
 from django.test import (
     RequestFactory, SimpleTestCase, TestCase, override_settings,
 )
-from django.utils import six, translation
+from django.utils import translation
 from django.utils._os import upath
 from django.utils.formats import (
     date_format, get_format, get_format_modules, iter_format_modules, localize,
@@ -140,9 +140,9 @@ class TranslationTests(SimpleTestCase):
 
     def test_lazy_pickle(self):
         s1 = ugettext_lazy("test")
-        self.assertEqual(six.text_type(s1), "test")
+        self.assertEqual(str(s1), "test")
         s2 = pickle.loads(pickle.dumps(s1))
-        self.assertEqual(six.text_type(s2), "test")
+        self.assertEqual(str(s2), "test")
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_ungettext_lazy(self):

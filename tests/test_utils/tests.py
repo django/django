@@ -226,7 +226,7 @@ class AssertQuerysetEqualTests(TestCase):
 class CaptureQueriesContextManagerTests(TestCase):
 
     def setUp(self):
-        self.person_pk = six.text_type(Person.objects.create(name='test').pk)
+        self.person_pk = str(Person.objects.create(name='test').pk)
 
     def test_simple(self):
         with CaptureQueriesContext(connection) as captured_queries:

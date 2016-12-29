@@ -5,7 +5,7 @@ from importlib import import_module
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends import utils
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.dateparse import parse_duration
 from django.utils.encoding import force_text
 
@@ -201,17 +201,17 @@ class BaseDatabaseOperations(object):
         exists for database backends to provide a better implementation
         according to their own quoting schemes.
         """
-        # Convert params to contain Unicode values.
-        def to_unicode(s):
+        # Convert params to contain string values.
+        def to_string(s):
             return force_text(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
-            u_params = tuple(to_unicode(val) for val in params)
+            u_params = tuple(to_string(val) for val in params)
         elif params is None:
             u_params = ()
         else:
-            u_params = {to_unicode(k): to_unicode(v) for k, v in params.items()}
+            u_params = {to_string(k): to_string(v) for k, v in params.items()}
 
-        return six.text_type("QUERY = %r - PARAMS = %r") % (sql, u_params)
+        return "QUERY = %r - PARAMS = %r" % (sql, u_params)
 
     def last_insert_id(self, cursor, table_name, pk_name):
         """
@@ -462,7 +462,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return six.text_type(value)
+        return str(value)
 
     def adapt_datetimefield_value(self, value):
         """
@@ -471,7 +471,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return six.text_type(value)
+        return str(value)
 
     def adapt_timefield_value(self, value):
         """
@@ -482,7 +482,7 @@ class BaseDatabaseOperations(object):
             return None
         if timezone.is_aware(value):
             raise ValueError("Django does not support timezone-aware times.")
-        return six.text_type(value)
+        return str(value)
 
     def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
         """

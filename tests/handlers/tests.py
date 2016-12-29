@@ -7,7 +7,6 @@ from django.db import close_old_connections, connection
 from django.test import (
     RequestFactory, SimpleTestCase, TransactionTestCase, override_settings,
 )
-from django.utils import six
 from django.utils.encoding import force_str
 
 try:
@@ -185,7 +184,7 @@ class HandlerRequestTests(SimpleTestCase):
 
     def test_environ_path_info_type(self):
         environ = RequestFactory().get('/%E2%A8%87%87%A5%E2%A8%A0').environ
-        self.assertIsInstance(environ['PATH_INFO'], six.text_type)
+        self.assertIsInstance(environ['PATH_INFO'], str)
 
     @unittest.skipIf(HTTPStatus is None, 'HTTPStatus only exists on Python 3.5+')
     def test_handle_accepts_httpstatus_enum_value(self):

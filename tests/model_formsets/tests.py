@@ -11,7 +11,6 @@ from django.forms.models import (
     modelformset_factory,
 )
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils import six
 
 from .models import (
     AlternateBook, Author, AuthorMeeting, BetterAuthor, Book, BookWithCustomPK,
@@ -54,11 +53,11 @@ class DeletionTests(TestCase):
             'form-TOTAL_FORMS': '3',
             'form-INITIAL_FORMS': '1',
             'form-MAX_NUM_FORMS': '0',
-            'form-0-id': six.text_type(poet.id),
+            'form-0-id': str(poet.id),
             'form-0-name': 'test',
             'form-1-id': '',
             'form-1-name': 'x' * 1000,  # Too long
-            'form-2-id': six.text_type(poet.id),  # Violate unique constraint
+            'form-2-id': str(poet.id),  # Violate unique constraint
             'form-2-name': 'test2',
         }
         formset = PoetFormSet(data, queryset=Poet.objects.all())
@@ -87,7 +86,7 @@ class DeletionTests(TestCase):
             'form-TOTAL_FORMS': '1',
             'form-INITIAL_FORMS': '1',
             'form-MAX_NUM_FORMS': '0',
-            'form-0-id': six.text_type(poet.id),
+            'form-0-id': str(poet.id),
             'form-0-name': 'x' * 1000,
         }
         formset = PoetFormSet(data, queryset=Poet.objects.all())
@@ -1109,7 +1108,7 @@ class ModelFormsetTest(TestCase):
             'owner_set-TOTAL_FORMS': '3',
             'owner_set-INITIAL_FORMS': '1',
             'owner_set-MAX_NUM_FORMS': '',
-            'owner_set-0-auto_id': six.text_type(owner1.auto_id),
+            'owner_set-0-auto_id': str(owner1.auto_id),
             'owner_set-0-name': 'Joe Perry',
             'owner_set-1-auto_id': '',
             'owner_set-1-name': 'Jack Berry',
@@ -1184,7 +1183,7 @@ class ModelFormsetTest(TestCase):
             'ownerprofile-TOTAL_FORMS': '1',
             'ownerprofile-INITIAL_FORMS': '1',
             'ownerprofile-MAX_NUM_FORMS': '1',
-            'ownerprofile-0-owner': six.text_type(owner1.auto_id),
+            'ownerprofile-0-owner': str(owner1.auto_id),
             'ownerprofile-0-age': '55',
         }
         formset = FormSet(data, instance=owner1)
@@ -1383,8 +1382,8 @@ class ModelFormsetTest(TestCase):
             'membership_set-TOTAL_FORMS': '1',
             'membership_set-INITIAL_FORMS': '0',
             'membership_set-MAX_NUM_FORMS': '',
-            'membership_set-0-date_joined': six.text_type(now.strftime('%Y-%m-%d %H:%M:%S')),
-            'initial-membership_set-0-date_joined': six.text_type(now.strftime('%Y-%m-%d %H:%M:%S')),
+            'membership_set-0-date_joined': now.strftime('%Y-%m-%d %H:%M:%S'),
+            'initial-membership_set-0-date_joined': now.strftime('%Y-%m-%d %H:%M:%S'),
             'membership_set-0-karma': '',
         }
         formset = FormSet(data, instance=person)
@@ -1397,8 +1396,8 @@ class ModelFormsetTest(TestCase):
             'membership_set-TOTAL_FORMS': '1',
             'membership_set-INITIAL_FORMS': '0',
             'membership_set-MAX_NUM_FORMS': '',
-            'membership_set-0-date_joined': six.text_type(one_day_later.strftime('%Y-%m-%d %H:%M:%S')),
-            'initial-membership_set-0-date_joined': six.text_type(now.strftime('%Y-%m-%d %H:%M:%S')),
+            'membership_set-0-date_joined': one_day_later.strftime('%Y-%m-%d %H:%M:%S'),
+            'initial-membership_set-0-date_joined': now.strftime('%Y-%m-%d %H:%M:%S'),
             'membership_set-0-karma': '',
         }
         formset = FormSet(filled_data, instance=person)
@@ -1429,9 +1428,9 @@ class ModelFormsetTest(TestCase):
             'membership_set-TOTAL_FORMS': '1',
             'membership_set-INITIAL_FORMS': '0',
             'membership_set-MAX_NUM_FORMS': '',
-            'membership_set-0-date_joined_0': six.text_type(now.strftime('%Y-%m-%d')),
-            'membership_set-0-date_joined_1': six.text_type(now.strftime('%H:%M:%S')),
-            'initial-membership_set-0-date_joined': six.text_type(now.strftime('%Y-%m-%d %H:%M:%S')),
+            'membership_set-0-date_joined_0': now.strftime('%Y-%m-%d'),
+            'membership_set-0-date_joined_1': now.strftime('%H:%M:%S'),
+            'initial-membership_set-0-date_joined': now.strftime('%Y-%m-%d %H:%M:%S'),
             'membership_set-0-karma': '',
         }
         formset = FormSet(data, instance=person)

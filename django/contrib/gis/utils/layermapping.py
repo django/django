@@ -89,7 +89,7 @@ class LayerMapping(object):
         argument usage.
         """
         # Getting the DataSource and the associated Layer.
-        if isinstance(data, six.string_types):
+        if isinstance(data, str):
             self.ds = DataSource(data, encoding=encoding)
         else:
             self.ds = data
@@ -266,7 +266,7 @@ class LayerMapping(object):
             sr = source_srs
         elif isinstance(source_srs, self.spatial_backend.spatial_ref_sys()):
             sr = source_srs.srs
-        elif isinstance(source_srs, (int, six.string_types)):
+        elif isinstance(source_srs, (int, str)):
             sr = SpatialReference(source_srs)
         else:
             # Otherwise just pulling the SpatialReference from the layer
@@ -284,7 +284,7 @@ class LayerMapping(object):
             for attr in unique:
                 if attr not in self.mapping:
                     raise ValueError
-        elif isinstance(unique, six.string_types):
+        elif isinstance(unique, str):
             # Only a single field passed in.
             if unique not in self.mapping:
                 raise ValueError
@@ -331,7 +331,7 @@ class LayerMapping(object):
         will construct and return the uniqueness keyword arguments -- a subset
         of the feature kwargs.
         """
-        if isinstance(self.unique, six.string_types):
+        if isinstance(self.unique, str):
             return {self.unique: kwargs[self.unique]}
         else:
             return {fld: kwargs[fld] for fld in self.unique}

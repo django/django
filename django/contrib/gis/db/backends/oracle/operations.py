@@ -17,7 +17,6 @@ from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.db.backends.oracle.operations import DatabaseOperations
-from django.utils import six
 from django.utils.functional import cached_property
 
 DEFAULT_TOLERANCE = '0.05'
@@ -45,7 +44,7 @@ class SDORelate(SpatialOperator):
     def check_relate_argument(self, arg):
         masks = 'TOUCH|OVERLAPBDYDISJOINT|OVERLAPBDYINTERSECT|EQUAL|INSIDE|COVEREDBY|CONTAINS|COVERS|ANYINTERACT|ON'
         mask_regex = re.compile(r'^(%s)(\+(%s))*$' % (masks, masks), re.I)
-        if not isinstance(arg, six.string_types) or not mask_regex.match(arg):
+        if not isinstance(arg, str) or not mask_regex.match(arg):
             raise ValueError('Invalid SDO_RELATE mask: "%s"' % arg)
 
     def as_sql(self, connection, lookup, template_params, sql_params):

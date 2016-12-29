@@ -1,6 +1,5 @@
 from django.db import IntegrityError, transaction
 from django.test import TestCase, skipIfDBFeature
-from django.utils import six
 
 from .models import Bar, Business, Employee, Foo
 
@@ -25,14 +24,14 @@ class BasicCustomPKTests(TestCase):
             Employee.objects.filter(pk=123), [
                 "Dan Jones",
             ],
-            six.text_type
+            str
         )
 
         self.assertQuerysetEqual(
             Employee.objects.filter(employee_code=123), [
                 "Dan Jones",
             ],
-            six.text_type
+            str
         )
 
         self.assertQuerysetEqual(
@@ -40,7 +39,7 @@ class BasicCustomPKTests(TestCase):
                 "Fran Bones",
                 "Dan Jones",
             ],
-            six.text_type
+            str
         )
 
         self.assertQuerysetEqual(
@@ -48,7 +47,7 @@ class BasicCustomPKTests(TestCase):
                 "Fran Bones",
                 "Dan Jones",
             ],
-            six.text_type
+            str
         )
 
         self.assertQuerysetEqual(
@@ -73,7 +72,7 @@ class BasicCustomPKTests(TestCase):
                 "Fran Bones",
                 "Dan Jones",
             ],
-            six.text_type
+            str
         )
         self.assertQuerysetEqual(
             self.fran.business_set.all(), [
@@ -91,14 +90,14 @@ class BasicCustomPKTests(TestCase):
                 "Fran Bones",
                 "Dan Jones",
             ],
-            six.text_type,
+            str,
         )
         self.assertQuerysetEqual(
             Employee.objects.filter(business__pk="Sears"), [
                 "Fran Bones",
                 "Dan Jones",
             ],
-            six.text_type,
+            str,
         )
 
         self.assertQuerysetEqual(
@@ -173,7 +172,7 @@ class BasicCustomPKTests(TestCase):
                 "Dan Jones",
                 "Fran Jones",
             ],
-            six.text_type
+            str
         )
 
 

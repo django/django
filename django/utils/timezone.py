@@ -8,7 +8,7 @@ from threading import local
 import pytz
 
 from django.conf import settings
-from django.utils import lru_cache, six
+from django.utils import lru_cache
 from django.utils.decorators import ContextDecorator
 
 __all__ = [
@@ -130,7 +130,7 @@ def activate(timezone):
     """
     if isinstance(timezone, tzinfo):
         _active.value = timezone
-    elif isinstance(timezone, six.string_types):
+    elif isinstance(timezone, str):
         _active.value = pytz.timezone(timezone)
     else:
         raise ValueError("Invalid timezone: %r" % timezone)

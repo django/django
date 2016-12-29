@@ -5,7 +5,6 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Expression
 from django.db.models.lookups import Lookup, Transform
 from django.db.models.sql.query import Query
-from django.utils import six
 
 gis_lookups = {}
 
@@ -389,7 +388,7 @@ class RelateLookup(GISLookup):
             backend_op.check_relate_argument(value[1])
         else:
             pattern = value[1]
-            if not isinstance(pattern, six.string_types) or not self.pattern_regex.match(pattern):
+            if not isinstance(pattern, str) or not self.pattern_regex.match(pattern):
                 raise ValueError('Invalid intersection matrix pattern "%s".' % pattern)
         return super(RelateLookup, self).get_db_prep_lookup(value, connection)
 

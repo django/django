@@ -3,7 +3,7 @@ from datetime import datetime, tzinfo
 import pytz
 
 from django.template import Library, Node, TemplateSyntaxError
-from django.utils import six, timezone
+from django.utils import timezone
 
 register = Library()
 
@@ -59,7 +59,7 @@ def do_timezone(value, arg):
     # Obtain a tzinfo instance
     if isinstance(arg, tzinfo):
         tz = arg
-    elif isinstance(arg, six.string_types):
+    elif isinstance(arg, str):
         try:
             tz = pytz.timezone(arg)
         except pytz.UnknownTimeZoneError:

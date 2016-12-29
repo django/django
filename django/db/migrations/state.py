@@ -10,7 +10,6 @@ from django.db.models.fields.proxy import OrderWrt
 from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.utils import make_model_tuple
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
@@ -20,7 +19,7 @@ from .exceptions import InvalidBasesError
 
 
 def _get_app_label_and_model_name(model, app_label=''):
-    if isinstance(model, six.string_types):
+    if isinstance(model, str):
         split = model.split('.', 1)
         return (tuple(split) if len(split) == 2 else (app_label, split[0]))
     else:
@@ -37,7 +36,7 @@ def _get_related_models(m):
     ]
     related_fields_models = set()
     for f in m._meta.get_fields(include_parents=True, include_hidden=True):
-        if f.is_relation and f.related_model is not None and not isinstance(f.related_model, six.string_types):
+        if f.is_relation and f.related_model is not None and not isinstance(f.related_model, str):
             related_fields_models.add(f.model)
             related_models.append(f.related_model)
     # Reverse accessors of foreign keys to proxy models are attached to their
@@ -458,7 +457,7 @@ class ModelState(object):
                     options[name] = set(normalize_together(it))
                 else:
                     options[name] = model._meta.original_attrs[name]
-        # Force-convert all options to text_type (#23226)
+        # Force-convert all options to str (#23226)
         options = cls.force_text_recursive(options)
         # If we're ignoring relationships, remove all field-listing model
         # options (that option basically just means "make a stub model")
@@ -496,7 +495,7 @@ class ModelState(object):
             for base in flattened_bases
         )
         # Ensure at least one base inherits from models.Model
-        if not any((isinstance(base, six.string_types) or issubclass(base, models.Model)) for base in bases):
+        if not any((isinstance(base, str) or issubclass(base, models.Model)) for base in bases):
             bases = (models.Model,)
 
         managers = []
@@ -539,9 +538,7 @@ class ModelState(object):
 
     @classmethod
     def force_text_recursive(cls, value):
-        if isinstance(value, six.string_types):
-            return force_text(value)
-        elif isinstance(value, list):
+        if isinstance(value, list):
             return [cls.force_text_recursive(x) for x in value]
         elif isinstance(value, tuple):
             return tuple(cls.force_text_recursive(x) for x in value)
@@ -588,7 +585,7 @@ class ModelState(object):
         # Then, work out our bases
         try:
             bases = tuple(
-                (apps.get_model(base) if isinstance(base, six.string_types) else base)
+                (apps.get_model(base) if isinstance(base, str) else base)
                 for base in self.bases
             )
         except LookupError:

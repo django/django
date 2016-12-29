@@ -4,7 +4,6 @@ from django.contrib.postgres import forms, lookups
 from django.contrib.postgres.fields.array import ArrayField
 from django.core import exceptions
 from django.db.models import Field, TextField, Transform
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
@@ -30,7 +29,7 @@ class HStoreField(Field):
     def validate(self, value, model_instance):
         super(HStoreField, self).validate(value, model_instance)
         for key, val in value.items():
-            if not isinstance(val, six.string_types) and val is not None:
+            if not isinstance(val, str) and val is not None:
                 raise exceptions.ValidationError(
                     self.error_messages['not_a_string'],
                     code='not_a_string',
@@ -38,7 +37,7 @@ class HStoreField(Field):
                 )
 
     def to_python(self, value):
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             value = json.loads(value)
         return value
 

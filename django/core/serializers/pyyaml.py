@@ -71,7 +71,7 @@ def Deserializer(stream_or_string, **options):
     """
     if isinstance(stream_or_string, bytes):
         stream_or_string = stream_or_string.decode('utf-8')
-    if isinstance(stream_or_string, six.string_types):
+    if isinstance(stream_or_string, str):
         stream = StringIO(stream_or_string)
     else:
         stream = stream_or_string

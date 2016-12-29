@@ -79,7 +79,7 @@ class GetDefaultUsernameTestCase(TestCase):
         management.get_system_username = self.old_get_system_username
 
     def test_actual_implementation(self):
-        self.assertIsInstance(management.get_system_username(), six.text_type)
+        self.assertIsInstance(management.get_system_username(), str)
 
     def test_simple(self):
         management.get_system_username = lambda: 'joe'

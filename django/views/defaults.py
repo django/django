@@ -1,6 +1,5 @@
 from django import http
 from django.template import Context, Engine, TemplateDoesNotExist, loader
-from django.utils import six
 from django.utils.encoding import force_text
 from django.views.decorators.csrf import requires_csrf_token
 
@@ -34,7 +33,7 @@ def page_not_found(request, exception, template_name=ERROR_404_TEMPLATE_NAME):
     except (AttributeError, IndexError):
         pass
     else:
-        if isinstance(message, six.text_type):
+        if isinstance(message, str):
             exception_repr = message
     context = {
         'request_path': request.path,

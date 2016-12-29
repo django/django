@@ -6,7 +6,6 @@ objects corresponding to geographic model fields.
 Thanks to Robert Coup for providing this functionality (see #4322).
 """
 from django.db.models.query_utils import DeferredAttribute
-from django.utils import six
 
 
 class SpatialProxy(DeferredAttribute):
@@ -58,7 +57,7 @@ class SpatialProxy(DeferredAttribute):
         # The geographic type of the field.
         gtype = self._field.geom_type
 
-        if gtype == 'RASTER' and (value is None or isinstance(value, six.string_types + (dict, self._klass))):
+        if gtype == 'RASTER' and (value is None or isinstance(value, (str, dict, self._klass))):
             # For raster fields, assure input is None or a string, dict, or
             # raster instance.
             pass
@@ -68,7 +67,7 @@ class SpatialProxy(DeferredAttribute):
             if value.srid is None:
                 # Assigning the field SRID if the geometry has no SRID.
                 value.srid = self._field.srid
-        elif value is None or isinstance(value, six.string_types + (six.memoryview,)):
+        elif value is None or isinstance(value, (str, memoryview)):
             # Set geometries with None, WKT, HEX, or WKB
             pass
         else:

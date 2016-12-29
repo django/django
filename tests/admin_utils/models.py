@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -37,7 +36,7 @@ class Count(models.Model):
     parent = models.ForeignKey('self', models.CASCADE, null=True)
 
     def __str__(self):
-        return six.text_type(self.num)
+        return str(self.num)
 
 
 class Event(models.Model):

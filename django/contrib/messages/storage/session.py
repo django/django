@@ -5,7 +5,6 @@ from django.contrib.messages.storage.base import BaseStorage
 from django.contrib.messages.storage.cookie import (
     MessageDecoder, MessageEncoder,
 )
-from django.utils import six
 
 
 class SessionStorage(BaseStorage):
@@ -44,6 +43,6 @@ class SessionStorage(BaseStorage):
         return encoder.encode(messages)
 
     def deserialize_messages(self, data):
-        if data and isinstance(data, six.string_types):
+        if data and isinstance(data, str):
             return json.loads(data, cls=MessageDecoder)
         return data

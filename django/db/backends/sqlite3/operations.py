@@ -7,7 +7,7 @@ from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models import aggregates, fields
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.duration import duration_string
 
@@ -178,7 +178,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             else:
                 raise ValueError("SQLite backend does not support timezone-aware datetimes when USE_TZ is False.")
 
-        return six.text_type(value)
+        return str(value)
 
     def adapt_timefield_value(self, value):
         if value is None:
@@ -192,7 +192,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if timezone.is_aware(value):
             raise ValueError("SQLite backend does not support timezone-aware times.")
 
-        return six.text_type(value)
+        return str(value)
 
     def get_db_converters(self, expression):
         converters = super(DatabaseOperations, self).get_db_converters(expression)

@@ -6,7 +6,6 @@ from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
 from django.db.models import Field, IntegerField, Transform
 from django.db.models.lookups import Exact, In
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 from ..utils import prefix_validation_error
@@ -98,7 +97,7 @@ class ArrayField(Field):
         return name, path, args, kwargs
 
     def to_python(self, value):
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             # Assume we're deserializing
             vals = json.loads(value)
             value = [self.base_field.to_python(val) for val in vals]

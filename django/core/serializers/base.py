@@ -168,7 +168,7 @@ class Deserializer(six.Iterator):
         Init this serializer given a stream or a string
         """
         self.options = options
-        if isinstance(stream_or_string, six.string_types):
+        if isinstance(stream_or_string, str):
             self.stream = six.StringIO(stream_or_string)
         else:
             self.stream = stream_or_string

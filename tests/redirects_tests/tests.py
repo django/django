@@ -5,7 +5,6 @@ from django.contrib.redirects.models import Redirect
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, modify_settings, override_settings
-from django.utils import six
 
 
 @modify_settings(MIDDLEWARE={'append': 'django.contrib.redirects.middleware.RedirectFallbackMiddleware'})
@@ -17,7 +16,7 @@ class RedirectTests(TestCase):
 
     def test_model(self):
         r1 = Redirect.objects.create(site=self.site, old_path='/initial', new_path='/new_target')
-        self.assertEqual(six.text_type(r1), "/initial ---> /new_target")
+        self.assertEqual(str(r1), "/initial ---> /new_target")
 
     def test_redirect(self):
         Redirect.objects.create(site=self.site, old_path='/initial', new_path='/new_target')

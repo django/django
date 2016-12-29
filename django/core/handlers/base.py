@@ -5,7 +5,6 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
 from django.db import connections, transaction
 from django.urls import get_resolver, set_urlconf
-from django.utils import six
 from django.utils.module_loading import import_string
 
 from .exception import convert_exception_to_response, get_exception_response
@@ -42,7 +41,7 @@ class BaseHandler(object):
                 mw_instance = middleware(handler)
             except MiddlewareNotUsed as exc:
                 if settings.DEBUG:
-                    if six.text_type(exc):
+                    if str(exc):
                         logger.debug('MiddlewareNotUsed(%r): %s', middleware_path, exc)
                     else:
                         logger.debug('MiddlewareNotUsed: %r', middleware_path)

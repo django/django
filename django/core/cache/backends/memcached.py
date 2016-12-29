@@ -6,7 +6,6 @@ import time
 import warnings
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
@@ -15,7 +14,7 @@ from django.utils.functional import cached_property
 class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
         super(BaseMemcachedCache, self).__init__(params)
-        if isinstance(server, six.string_types):
+        if isinstance(server, str):
             self._servers = re.split('[;,]', server)
         else:
             self._servers = server

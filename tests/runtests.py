@@ -17,7 +17,6 @@ from django.test import TestCase, TransactionTestCase
 from django.test.runner import default_test_processes
 from django.test.selenium import SeleniumTestCaseBase
 from django.test.utils import get_runner
-from django.utils import six
 from django.utils._os import upath
 from django.utils.deprecation import (
     RemovedInDjango21Warning, RemovedInDjango30Warning,
@@ -42,10 +41,8 @@ TMPDIR = tempfile.mkdtemp(prefix='django_')
 # so that children processes inherit it.
 tempfile.tempdir = os.environ['TMPDIR'] = TMPDIR
 
-# Removing the temporary TMPDIR. Ensure we pass in unicode so that it will
-# successfully remove temp trees containing non-ASCII filenames on Windows.
-# (We're assuming the temp dir name itself only contains ASCII characters.)
-atexit.register(shutil.rmtree, six.text_type(TMPDIR))
+# Removing the temporary TMPDIR.
+atexit.register(shutil.rmtree, TMPDIR)
 
 
 SUBDIRS_TO_SKIP = [

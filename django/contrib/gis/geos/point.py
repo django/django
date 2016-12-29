@@ -4,7 +4,6 @@ from django.contrib.gis import gdal
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry
-from django.utils import six
 from django.utils.six.moves import range
 
 
@@ -27,9 +26,9 @@ class Point(GEOSGeometry):
         elif isinstance(x, (tuple, list)):
             # Here a tuple or list was passed in under the `x` parameter.
             coords = x
-        elif isinstance(x, six.integer_types + (float,)) and isinstance(y, six.integer_types + (float,)):
+        elif isinstance(x, (float, int)) and isinstance(y, (float, int)):
             # Here X, Y, and (optionally) Z were passed in individually, as parameters.
-            if isinstance(z, six.integer_types + (float,)):
+            if isinstance(z, (float, int)):
                 coords = [x, y, z]
             else:
                 coords = [x, y]

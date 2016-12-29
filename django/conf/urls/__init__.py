@@ -4,7 +4,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.urls import (
     LocaleRegexURLResolver, RegexURLPattern, RegexURLResolver,
 )
-from django.utils import six
 
 __all__ = ['handler400', 'handler403', 'handler404', 'handler500', 'include', 'url']
 
@@ -34,7 +33,7 @@ def include(arg, namespace=None):
         # No namespace hint - use manually provided namespace
         urlconf_module = arg
 
-    if isinstance(urlconf_module, six.string_types):
+    if isinstance(urlconf_module, str):
         urlconf_module = import_module(urlconf_module)
     patterns = getattr(urlconf_module, 'urlpatterns', urlconf_module)
     app_name = getattr(urlconf_module, 'app_name', app_name)

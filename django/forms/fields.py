@@ -393,10 +393,10 @@ class BaseTemporalField(Field):
     def to_python(self, value):
         # Try to coerce the value to unicode.
         unicode_value = force_text(value, strings_only=True)
-        if isinstance(unicode_value, six.text_type):
+        if isinstance(unicode_value, str):
             value = unicode_value.strip()
         # If unicode, try to strptime against each input format.
-        if isinstance(value, six.text_type):
+        if isinstance(value, str):
             for format in self.input_formats:
                 try:
                     return self.strptime(value, format)
@@ -521,7 +521,7 @@ class RegexField(CharField):
         return self._regex
 
     def _set_regex(self, regex):
-        if isinstance(regex, six.string_types):
+        if isinstance(regex, str):
             regex = re.compile(regex, re.UNICODE)
         self._regex = regex
         if hasattr(self, '_regex_validator') and self._regex_validator in self.validators:
@@ -712,7 +712,7 @@ class BooleanField(Field):
         # will submit for False. Also check for '0', since this is what
         # RadioSelect will provide. Because bool("True") == bool('1') == True,
         # we don't need to handle that explicitly.
-        if isinstance(value, six.string_types) and value.lower() in ('false', '0'):
+        if isinstance(value, str) and value.lower() in ('false', '0'):
             value = False
         else:
             value = bool(value)

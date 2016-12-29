@@ -2,7 +2,6 @@ import decimal
 
 from django.forms import TypedChoiceField, ValidationError
 from django.test import SimpleTestCase
-from django.utils import six
 
 
 class TypedChoiceFieldTest(SimpleTestCase):
@@ -53,7 +52,7 @@ class TypedChoiceFieldTest(SimpleTestCase):
         self.assertFalse(f.has_changed('1', '1'))
 
         f = TypedChoiceField(
-            choices=[('', '---------'), ('a', "a"), ('b', "b")], coerce=six.text_type,
+            choices=[('', '---------'), ('a', "a"), ('b', "b")], coerce=str,
             required=False, initial=None, empty_value=None,
         )
         self.assertFalse(f.has_changed(None, ''))

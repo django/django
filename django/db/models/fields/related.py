@@ -11,7 +11,6 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property, curry
 from django.utils.lru_cache import lru_cache
@@ -52,7 +51,7 @@ def resolve_relation(scope_model, relation):
         relation = scope_model
 
     # Look for an "app.Model" relation
-    if isinstance(relation, six.string_types):
+    if isinstance(relation, str):
         if "." not in relation:
             relation = "%s.%s" % (scope_model._meta.app_label, relation)
 
@@ -160,7 +159,7 @@ class RelatedField(Field):
 
     def _check_relation_model_exists(self):
         rel_is_missing = self.remote_field.model not in self.opts.apps.get_models()
-        rel_is_string = isinstance(self.remote_field.model, six.string_types)
+        rel_is_string = isinstance(self.remote_field.model, str)
         model_name = self.remote_field.model if rel_is_string else self.remote_field.model._meta.object_name
         if rel_is_missing and (rel_is_string or not self.remote_field.model._meta.swapped):
             return [
@@ -175,7 +174,7 @@ class RelatedField(Field):
 
     def _check_referencing_to_swapped_model(self):
         if (self.remote_field.model not in self.opts.apps.get_models() and
-                not isinstance(self.remote_field.model, six.string_types) and
+                not isinstance(self.remote_field.model, str) and
                 self.remote_field.model._meta.swapped):
             model = "%s.%s" % (
                 self.remote_field.model._meta.app_label,
@@ -364,7 +363,7 @@ class RelatedField(Field):
         """
         if self.swappable:
             # Work out string form of "to"
-            if isinstance(self.remote_field.model, six.string_types):
+            if isinstance(self.remote_field.model, str):
                 to_string = self.remote_field.model
             else:
                 to_string = self.remote_field.model._meta.label
@@ -479,7 +478,7 @@ class ForeignObject(RelatedField):
 
     def _check_to_fields_exist(self):
         # Skip nonexistent models.
-        if isinstance(self.remote_field.model, six.string_types):
+        if isinstance(self.remote_field.model, str):
             return []
 
         errors = []
@@ -500,7 +499,7 @@ class ForeignObject(RelatedField):
         return errors
 
     def _check_unique_target(self):
-        rel_is_string = isinstance(self.remote_field.model, six.string_types)
+        rel_is_string = isinstance(self.remote_field.model, str)
         if rel_is_string or not self.requires_unique_target:
             return []
 
@@ -568,7 +567,7 @@ class ForeignObject(RelatedField):
         if self.remote_field.parent_link:
             kwargs['parent_link'] = self.remote_field.parent_link
         # Work out string form of "to"
-        if isinstance(self.remote_field.model, six.string_types):
+        if isinstance(self.remote_field.model, str):
             kwargs['to'] = self.remote_field.model
         else:
             kwargs['to'] = "%s.%s" % (
@@ -598,7 +597,7 @@ class ForeignObject(RelatedField):
     def resolve_related_fields(self):
         if len(self.from_fields) < 1 or len(self.from_fields) != len(self.to_fields):
             raise ValueError('Foreign Object from and to fields must be the same non-zero length')
-        if isinstance(self.remote_field.model, six.string_types):
+        if isinstance(self.remote_field.model, str):
             raise ValueError('Related model %r cannot be resolved' % self.remote_field.model)
         related_fields = []
         for index in range(len(self.from_fields)):
@@ -772,7 +771,7 @@ class ForeignKey(ForeignObject):
         try:
             to._meta.model_name
         except AttributeError:
-            assert isinstance(to, six.string_types), (
+            assert isinstance(to, str), (
                 "%s(%r) is invalid. First parameter to ForeignKey must be "
                 "either a model, a model name, or the string %r" % (
                     self.__class__.__name__, to,
@@ -926,7 +925,7 @@ class ForeignKey(ForeignObject):
 
     def formfield(self, **kwargs):
         db = kwargs.pop('using', None)
-        if isinstance(self.remote_field.model, six.string_types):
+        if isinstance(self.remote_field.model, str):
             raise ValueError("Cannot create form field for %r yet, because "
                              "its related model %r has not been loaded yet" %
                              (self.name, self.remote_field.model))
@@ -948,7 +947,7 @@ class ForeignKey(ForeignObject):
         return {"type": self.db_type(connection), "check": self.db_check(connection)}
 
     def convert_empty_strings(self, value, expression, connection, context):
-        if (not value) and isinstance(value, six.string_types):
+        if (not value) and isinstance(value, str):
             return None
         return value
 
@@ -1082,14 +1081,11 @@ class ManyToManyField(RelatedField):
         try:
             to._meta
         except AttributeError:
-            assert isinstance(to, six.string_types), (
+            assert isinstance(to, str), (
                 "%s(%r) is invalid. First parameter to ManyToManyField must be "
                 "either a model, a model name, or the string %r" %
                 (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
             )
-            # Class names must be ASCII in Python 2.x, so we forcibly coerce it
-            # here to break early if there's a problem.
-            to = str(to)
 
         if symmetrical is None:
             symmetrical = (to == RECURSIVE_RELATIONSHIP_CONSTANT)
@@ -1197,7 +1193,7 @@ class ManyToManyField(RelatedField):
             # Set some useful local variables
             to_model = resolve_relation(from_model, self.remote_field.model)
             from_model_name = from_model._meta.object_name
-            if isinstance(to_model, six.string_types):
+            if isinstance(to_model, str):
                 to_model_name = to_model
             else:
                 to_model_name = to_model._meta.object_name
@@ -1368,7 +1364,7 @@ class ManyToManyField(RelatedField):
         return errors
 
     def _check_table_uniqueness(self, **kwargs):
-        if isinstance(self.remote_field.through, six.string_types) or not self.remote_field.through._meta.managed:
+        if isinstance(self.remote_field.through, str) or not self.remote_field.through._meta.managed:
             return []
         registered_tables = {
             model._meta.db_table: model
@@ -1411,7 +1407,7 @@ class ManyToManyField(RelatedField):
         if self.remote_field.related_query_name is not None:
             kwargs['related_query_name'] = self.remote_field.related_query_name
         # Rel needs more work.
-        if isinstance(self.remote_field.model, six.string_types):
+        if isinstance(self.remote_field.model, str):
             kwargs['to'] = self.remote_field.model
         else:
             kwargs['to'] = "%s.%s" % (
@@ -1419,7 +1415,7 @@ class ManyToManyField(RelatedField):
                 self.remote_field.model._meta.object_name,
             )
         if getattr(self.remote_field, 'through', None) is not None:
-            if isinstance(self.remote_field.through, six.string_types):
+            if isinstance(self.remote_field.through, str):
                 kwargs['through'] = self.remote_field.through
             elif not self.remote_field.through._meta.auto_created:
                 kwargs['through'] = "%s.%s" % (

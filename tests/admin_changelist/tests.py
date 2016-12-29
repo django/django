@@ -12,7 +12,7 @@ from django.template import Context, Template
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
-from django.utils import formats, six
+from django.utils import formats
 
 from .admin import (
     BandAdmin, ChildAdmin, ChordsBandAdmin, ConcertAdmin,
@@ -466,7 +466,7 @@ class ChangeListTests(TestCase):
         event = Event.objects.create(date=datetime.date.today())
         response = self.client.get(reverse('admin:admin_changelist_event_changelist'))
         self.assertContains(response, formats.localize(event.date))
-        self.assertNotContains(response, six.text_type(event.date))
+        self.assertNotContains(response, str(event.date))
 
     def test_dynamic_list_display(self):
         """
@@ -581,9 +581,9 @@ class ChangeListTests(TestCase):
         request = self._mocked_authenticated_request('/swallow/', superuser)
         response = model_admin.changelist_view(request)
         # just want to ensure it doesn't blow up during rendering
-        self.assertContains(response, six.text_type(swallow.origin))
-        self.assertContains(response, six.text_type(swallow.load))
-        self.assertContains(response, six.text_type(swallow.speed))
+        self.assertContains(response, str(swallow.origin))
+        self.assertContains(response, str(swallow.load))
+        self.assertContains(response, str(swallow.speed))
         # Reverse one-to-one relations should work.
         self.assertContains(response, '<td class="field-swallowonetoone">-</td>')
         self.assertContains(response, '<td class="field-swallowonetoone">%s</td>' % swallow_o2o)

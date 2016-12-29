@@ -2,7 +2,6 @@ from functools import partial
 
 from django.db.models.utils import make_model_tuple
 from django.dispatch import Signal
-from django.utils import six
 
 
 class_prepared = Signal(providing_args=["class"])
@@ -18,7 +17,7 @@ class ModelSignal(Signal):
 
         # This partial takes a single optional argument named "sender".
         partial_method = partial(method, receiver, **kwargs)
-        if isinstance(sender, six.string_types):
+        if isinstance(sender, str):
             apps = apps or Options.default_apps
             apps.lazy_model_operation(partial_method, make_model_tuple(sender))
         else:

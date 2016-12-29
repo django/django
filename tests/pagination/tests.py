@@ -256,7 +256,7 @@ class ModelPaginationTests(TestCase):
     def test_first_page(self):
         paginator = Paginator(Article.objects.order_by('id'), 5)
         p = paginator.page(1)
-        self.assertEqual("<Page 1 of 2>", six.text_type(p))
+        self.assertEqual("<Page 1 of 2>", str(p))
         self.assertQuerysetEqual(p.object_list, [
             "<Article: Article 1>",
             "<Article: Article 2>",
@@ -276,7 +276,7 @@ class ModelPaginationTests(TestCase):
     def test_last_page(self):
         paginator = Paginator(Article.objects.order_by('id'), 5)
         p = paginator.page(2)
-        self.assertEqual("<Page 2 of 2>", six.text_type(p))
+        self.assertEqual("<Page 2 of 2>", str(p))
         self.assertQuerysetEqual(p.object_list, [
             "<Article: Article 6>",
             "<Article: Article 7>",

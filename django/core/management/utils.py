@@ -55,7 +55,7 @@ def handle_extensions(extensions):
 def find_command(cmd, path=None, pathext=None):
     if path is None:
         path = os.environ.get('PATH', '').split(os.pathsep)
-    if isinstance(path, six.string_types):
+    if isinstance(path, str):
         path = [path]
     # check if there are funny path extensions for executables, e.g. Windows
     if pathext is None:

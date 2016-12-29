@@ -2,7 +2,6 @@ import os
 import re
 
 from django.core.exceptions import ValidationError
-from django.utils import six
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_text
 from django.utils.functional import SimpleLazyObject
@@ -18,7 +17,7 @@ def _lazy_re_compile(regex, flags=0):
     """Lazily compile a regex with flags."""
     def _compile():
         # Compile the regex if it was not passed pre-compiled.
-        if isinstance(regex, six.string_types):
+        if isinstance(regex, str):
             return re.compile(regex, flags)
         else:
             assert not flags, "flags must be empty if regex is passed pre-compiled"
@@ -45,7 +44,7 @@ class RegexValidator(object):
             self.inverse_match = inverse_match
         if flags is not None:
             self.flags = flags
-        if self.flags and not isinstance(self.regex, six.string_types):
+        if self.flags and not isinstance(self.regex, str):
             raise TypeError("If the flags are set, regex must be a regular expression string.")
 
         self.regex = _lazy_re_compile(self.regex, self.flags)

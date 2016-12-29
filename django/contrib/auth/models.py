@@ -6,7 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.db import models
 from django.db.models.manager import EmptyManager
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from .validators import UnicodeUsernameValidator
@@ -75,9 +75,10 @@ class Permission(models.Model):
 
     def __str__(self):
         return "%s | %s | %s" % (
-            six.text_type(self.content_type.app_label),
-            six.text_type(self.content_type),
-            six.text_type(self.name))
+            self.content_type.app_label,
+            self.content_type,
+            self.name,
+        )
 
     def natural_key(self):
         return (self.codename,) + self.content_type.natural_key()

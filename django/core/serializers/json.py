@@ -69,7 +69,7 @@ def Deserializer(stream_or_string, **options):
     """
     Deserialize a stream or string of JSON data.
     """
-    if not isinstance(stream_or_string, (bytes, six.string_types)):
+    if not isinstance(stream_or_string, (bytes, str)):
         stream_or_string = stream_or_string.read()
     if isinstance(stream_or_string, bytes):
         stream_or_string = stream_or_string.decode('utf-8')
@@ -108,11 +108,7 @@ class DjangoJSONEncoder(json.JSONEncoder):
             return r
         elif isinstance(o, datetime.timedelta):
             return duration_iso_string(o)
-        elif isinstance(o, decimal.Decimal):
+        elif isinstance(o, (decimal.Decimal, uuid.UUID, Promise)):
             return str(o)
-        elif isinstance(o, uuid.UUID):
-            return str(o)
-        elif isinstance(o, Promise):
-            return six.text_type(o)
         else:
             return super(DjangoJSONEncoder, self).default(o)

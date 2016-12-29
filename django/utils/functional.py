@@ -88,7 +88,7 @@ def lazy(func, *resultclasses):
                         meth = cls.__promise__(method_name)
                         setattr(cls, method_name, meth)
             cls._delegate_bytes = bytes in resultclasses
-            cls._delegate_text = six.text_type in resultclasses
+            cls._delegate_text = str in resultclasses
             assert not (cls._delegate_bytes and cls._delegate_text), (
                 "Cannot call lazy() with both bytes and text return types.")
             if cls._delegate_text:
@@ -148,7 +148,7 @@ def lazy(func, *resultclasses):
 
         def __mod__(self, rhs):
             if self._delegate_text:
-                return six.text_type(self) % rhs
+                return str(self) % rhs
             return self.__cast() % rhs
 
         def __deepcopy__(self, memo):
@@ -175,7 +175,7 @@ def lazystr(text):
     Shortcut for the common case of a lazy callable that returns str.
     """
     from django.utils.encoding import force_text  # Avoid circular import
-    return lazy(force_text, six.text_type)(text)
+    return lazy(force_text, str)(text)
 
 
 def keep_lazy(*resultclasses):
@@ -207,7 +207,7 @@ def keep_lazy_text(func):
     """
     A decorator for functions that accept lazy arguments and return text.
     """
-    return keep_lazy(six.text_type)(func)
+    return keep_lazy(str)(func)
 
 
 empty = object()

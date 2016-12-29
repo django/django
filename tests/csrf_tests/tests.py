@@ -13,7 +13,6 @@ from django.middleware.csrf import (
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import patch_logger
 from django.utils.encoding import force_bytes
-from django.utils.six import text_type
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
 
 from .views import (
@@ -65,7 +64,7 @@ class CsrfViewMiddlewareTestMixin(object):
         return req
 
     def _check_token_present(self, response, csrf_id=None):
-        text = text_type(response.content, response.charset)
+        text = str(response.content, response.charset)
         match = re.search("name='csrfmiddlewaretoken' value='(.*?)'", text)
         csrf_token = csrf_id or self._csrf_id
         self.assertTrue(

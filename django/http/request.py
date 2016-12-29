@@ -522,7 +522,7 @@ def bytes_to_text(s, encoding):
     Returns any non-basestring objects without change.
     """
     if isinstance(s, bytes):
-        return six.text_type(s, encoding, 'replace')
+        return str(s, encoding, 'replace')
     else:
         return s
 

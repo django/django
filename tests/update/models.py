@@ -4,7 +4,6 @@ updates.
 """
 
 from django.db import models
-from django.utils import six
 
 
 class DataPoint(models.Model):
@@ -13,7 +12,7 @@ class DataPoint(models.Model):
     another_value = models.CharField(max_length=20, blank=True)
 
     def __str__(self):
-        return six.text_type(self.name)
+        return self.name
 
 
 class RelatedPoint(models.Model):
@@ -21,7 +20,7 @@ class RelatedPoint(models.Model):
     data = models.ForeignKey(DataPoint, models.CASCADE)
 
     def __str__(self):
-        return six.text_type(self.name)
+        return self.name
 
 
 class A(models.Model):

@@ -75,7 +75,7 @@ def get_formats():
         result[attr] = get_format(attr)
     formats = {}
     for k, v in result.items():
-        if isinstance(v, (six.string_types, int)):
+        if isinstance(v, (int, str)):
             formats[k] = force_text(v)
         elif isinstance(v, (tuple, list)):
             formats[k] = [force_text(value) for value in v]
@@ -268,7 +268,7 @@ class JavaScriptCatalog(View):
         for key, value in itertools.chain(six.iteritems(trans_cat), six.iteritems(trans_fallback_cat)):
             if key == '' or key in catalog:
                 continue
-            if isinstance(key, six.string_types):
+            if isinstance(key, str):
                 catalog[key] = value
             elif isinstance(key, tuple):
                 msgid = key[0]

@@ -10,7 +10,7 @@ from django.db.models.deletion import Collector
 from django.db.models.sql.constants import QUERY_TERMS
 from django.forms.utils import pretty_name
 from django.urls import NoReverseMatch, reverse
-from django.utils import formats, six, timezone
+from django.utils import formats, timezone
 from django.utils.encoding import force_str, force_text, smart_text
 from django.utils.html import format_html
 from django.utils.text import capfirst
@@ -68,7 +68,7 @@ def quote(s):
     Similar to urllib.quote, except that the quoting is slightly different so
     that it doesn't get automatically unquoted by the Web browser.
     """
-    if not isinstance(s, six.string_types):
+    if not isinstance(s, str):
         return s
     res = list(s)
     for i in range(len(res)):
@@ -342,7 +342,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
     except FieldDoesNotExist:
         if name == "__unicode__":
             label = force_text(model._meta.verbose_name)
-            attr = six.text_type
+            attr = str
         elif name == "__str__":
             label = force_str(model._meta.verbose_name)
             attr = bytes
@@ -430,7 +430,7 @@ def display_for_value(value, empty_value_display, boolean=False):
         return formats.localize(timezone.template_localtime(value))
     elif isinstance(value, (datetime.date, datetime.time)):
         return formats.localize(value)
-    elif isinstance(value, six.integer_types + (decimal.Decimal, float)):
+    elif isinstance(value, (int, decimal.Decimal, float)):
         return formats.number_format(value)
     elif isinstance(value, (list, tuple)):
         return ', '.join(force_text(v) for v in value)

@@ -1,6 +1,5 @@
 from django.template.defaultfilters import linebreaks_filter
 from django.test import SimpleTestCase
-from django.utils import six
 from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
 
@@ -54,7 +53,7 @@ class FunctionTests(SimpleTestCase):
         )
 
     def test_lazy_string_input(self):
-        add_header = lazy(lambda string: 'Header\n\n' + string, six.text_type)
+        add_header = lazy(lambda string: 'Header\n\n' + string, str)
         self.assertEqual(
             linebreaks_filter(add_header('line 1\r\nline2')),
             '<p>Header</p>\n\n<p>line 1<br />line2</p>'

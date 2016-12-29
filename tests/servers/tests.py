@@ -9,7 +9,6 @@ import socket
 from django.test import LiveServerTestCase, override_settings
 from django.utils._os import upath
 from django.utils.http import urlencode
-from django.utils.six import text_type
 from django.utils.six.moves.urllib.error import HTTPError
 from django.utils.six.moves.urllib.request import urlopen
 
@@ -48,7 +47,7 @@ class LiveServerAddress(LiveServerBase):
         cls.live_server_url_test = [cls.live_server_url]
 
     def test_live_server_url_is_class_property(self):
-        self.assertIsInstance(self.live_server_url_test[0], text_type)
+        self.assertIsInstance(self.live_server_url_test[0], str)
         self.assertEqual(self.live_server_url_test[0], self.live_server_url)
 
 

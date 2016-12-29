@@ -113,10 +113,10 @@ class HttpResponseBase(six.Iterator):
         `value` can't be represented in the given charset, MIME-encoding
         is applied.
         """
-        if not isinstance(value, (bytes, six.text_type)):
+        if not isinstance(value, (bytes, str)):
             value = str(value)
         if ((isinstance(value, bytes) and (b'\n' in value or b'\r' in value)) or
-                isinstance(value, six.text_type) and ('\n' in value or '\r' in value)):
+                isinstance(value, str) and ('\n' in value or '\r' in value)):
             raise BadHeaderError("Header values can't contain newlines (got %r)" % value)
         try:
             if isinstance(value, str):
@@ -226,11 +226,11 @@ class HttpResponseBase(six.Iterator):
         # This doesn't make a copy when `value` already contains bytes.
 
         # Handle string types -- we can't rely on force_bytes here because:
-        # - under Python 3 it attempts str conversion first
+        # - Python attempts str conversion first
         # - when self._charset != 'utf-8' it re-encodes the content
         if isinstance(value, bytes):
             return bytes(value)
-        if isinstance(value, six.text_type):
+        if isinstance(value, str):
             return bytes(value.encode(self.charset))
 
         # Handle non-string types (#16494)
@@ -309,7 +309,7 @@ class HttpResponse(HttpResponseBase):
     @content.setter
     def content(self, value):
         # Consume iterators upon assignment to allow repeated iteration.
-        if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
+        if hasattr(value, '__iter__') and not isinstance(value, (bytes, str)):
             content = b''.join(self.make_bytes(chunk) for chunk in value)
             if hasattr(value, 'close'):
                 try:

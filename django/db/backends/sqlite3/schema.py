@@ -5,7 +5,6 @@ from decimal import Decimal
 
 from django.apps.registry import Apps
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
-from django.utils import six
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -46,15 +45,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Manual emulation of SQLite parameter quoting
         if isinstance(value, type(True)):
             return str(int(value))
-        elif isinstance(value, (Decimal, float)):
+        elif isinstance(value, (Decimal, float, int)):
             return str(value)
-        elif isinstance(value, six.integer_types):
-            return str(value)
-        elif isinstance(value, six.string_types):
-            return "'%s'" % six.text_type(value).replace("\'", "\'\'")
+        elif isinstance(value, str):
+            return "'%s'" % value.replace("\'", "\'\'")
         elif value is None:
             return "NULL"
-        elif isinstance(value, (bytes, bytearray, six.memoryview)):
+        elif isinstance(value, (bytes, bytearray, memoryview)):
             # Bytes are only allowed for BLOB fields, encoded as string
             # literals containing hexadecimal data and preceded by a single "X"
             # character:

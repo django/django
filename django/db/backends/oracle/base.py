@@ -338,7 +338,7 @@ class OracleParam(object):
             # To transmit to the database, we need Unicode if supported
             # To get size right, we must consider bytes.
             self.force_bytes = force_text(param, cursor.charset, strings_only)
-            if isinstance(self.force_bytes, six.string_types):
+            if isinstance(self.force_bytes, str):
                 # We could optimize by only converting up to 4000 bytes here
                 string_size = len(force_bytes(param, cursor.charset, strings_only))
         if hasattr(param, 'input_size'):
@@ -566,18 +566,5 @@ def _rowfactory(row, cursor):
                 value = decimal.Decimal(value)
             else:
                 value = int(value)
-        elif desc[1] in (Database.STRING, Database.FIXED_CHAR,
-                         Database.LONG_STRING):
-            value = to_unicode(value)
         casted.append(value)
     return tuple(casted)
-
-
-def to_unicode(s):
-    """
-    Convert strings to Unicode objects (and return all other data types
-    unchanged).
-    """
-    if isinstance(s, six.string_types):
-        return force_text(s)
-    return s
