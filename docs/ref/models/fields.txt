@@ -1277,11 +1277,6 @@ relation works.
             null=True,
         )
 
-    .. deprecated:: 1.9
-
-        :attr:`~ForeignKey.on_delete` will become a required argument in Django
-        2.0. In older versions it defaults to ``CASCADE``.
-
 The possible values for :attr:`~ForeignKey.on_delete` are found in
 :mod:`django.db.models`:
 

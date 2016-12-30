@@ -249,3 +249,6 @@ these features.
   relative ones when the path is identical is also removed.
 
 * ``Field.rel`` and ``Field.remote_field.to`` are removed.
+
+* The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField`` are now
+  required.

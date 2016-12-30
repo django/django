@@ -20,7 +20,6 @@ from django.utils.encoding import force_text
 from django.utils.functional import cached_property, curry
 from django.utils.lru_cache import lru_cache
 from django.utils.translation import ugettext_lazy as _
-from django.utils.version import get_docs_version
 
 from . import Field
 from .related_descriptors import (
@@ -789,7 +788,7 @@ class ForeignKey(ForeignObject):
     }
     description = _("Foreign Key (type determined by related field)")
 
-    def __init__(self, to, on_delete=None, related_name=None, related_query_name=None,
+    def __init__(self, to, on_delete, related_name=None, related_query_name=None,
                  limit_choices_to=None, parent_link=False, to_field=None,
                  db_constraint=True, **kwargs):
         try:
@@ -807,29 +806,6 @@ class ForeignKey(ForeignObject):
             # the to_field during FK construction. It won't be guaranteed to
             # be correct until contribute_to_class is called. Refs #12190.
             to_field = to_field or (to._meta.pk and to._meta.pk.name)
-
-        if on_delete is None:
-            warnings.warn(
-                "on_delete will be a required arg for %s in Django 2.0. Set "
-                "it to models.CASCADE on models and in existing migrations "
-                "if you want to maintain the current default behavior. "
-                "See https://docs.djangoproject.com/en/%s/ref/models/fields/"
-                "#django.db.models.ForeignKey.on_delete" % (
-                    self.__class__.__name__,
-                    get_docs_version(),
-                ),
-                RemovedInDjango20Warning, 2)
-            on_delete = CASCADE
-
-        elif not callable(on_delete):
-            warnings.warn(
-                "The signature for {0} will change in Django 2.0. "
-                "Pass to_field='{1}' as a kwarg instead of as an arg.".format(
-                    self.__class__.__name__,
-                    on_delete,
-                ),
-                RemovedInDjango20Warning, 2)
-            on_delete, to_field = to_field, on_delete
 
         kwargs['rel'] = self.rel_class(
             self, to, to_field,
@@ -1028,33 +1004,8 @@ class OneToOneField(ForeignKey):
 
     description = _("One-to-one relationship")
 
-    def __init__(self, to, on_delete=None, to_field=None, **kwargs):
+    def __init__(self, to, on_delete, to_field=None, **kwargs):
         kwargs['unique'] = True
-
-        if on_delete is None:
-            warnings.warn(
-                "on_delete will be a required arg for %s in Django 2.0. Set "
-                "it to models.CASCADE on models and in existing migrations "
-                "if you want to maintain the current default behavior. "
-                "See https://docs.djangoproject.com/en/%s/ref/models/fields/"
-                "#django.db.models.ForeignKey.on_delete" % (
-                    self.__class__.__name__,
-                    get_docs_version(),
-                ),
-                RemovedInDjango20Warning, 2)
-            on_delete = CASCADE
-
-        elif not callable(on_delete):
-            warnings.warn(
-                "The signature for {0} will change in Django 2.0. "
-                "Pass to_field='{1}' as a kwarg instead of as an arg.".format(
-                    self.__class__.__name__,
-                    on_delete,
-                ),
-                RemovedInDjango20Warning, 2)
-            to_field = on_delete
-            on_delete = CASCADE  # Avoid warning in superclass
-
         super(OneToOneField, self).__init__(to, on_delete, to_field=to_field, **kwargs)
 
     def deconstruct(self):
