@@ -164,7 +164,7 @@ class MultiPartParser(object):
                 try:
                     disposition = meta_data['content-disposition'][1]
                     field_name = disposition['name'].strip()
-                except (KeyError, IndexError, AttributeError):
+                except (AttributeError, LookupError):
                     continue
 
                 transfer_encoding = meta_data.get('content-transfer-encoding')

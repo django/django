@@ -880,9 +880,9 @@ class Variable(object):
             for bit in self.lookups:
                 try:  # dictionary lookup
                     current = current[bit]
-                    # ValueError/IndexError are for numpy.array lookup on
+                    # ValueError/LookupError are for numpy.array lookup on
                     # numpy < 1.9 and 1.9+ respectively
-                except (TypeError, AttributeError, KeyError, ValueError, IndexError):
+                except (AttributeError, LookupError, TypeError, ValueError):
                     try:  # attribute lookup
                         # Don't return class attributes if the class is the context:
                         if isinstance(current, BaseContext) and getattr(type(current), bit):
@@ -894,10 +894,9 @@ class Variable(object):
                             raise
                         try:  # list-index lookup
                             current = current[int(bit)]
-                        except (IndexError,  # list index out of range
-                                ValueError,  # invalid literal for int()
-                                KeyError,    # current is a dict without `int(bit)` key
-                                TypeError):  # unsubscriptable object
+                        except (LookupError,  # list index out of range or current is a dict without `int(bit)` key
+                                ValueError,   # invalid literal for int()
+                                TypeError):   # unsubscriptable object
                             raise VariableDoesNotExist("Failed lookup for key "
                                                        "[%s] in %r",
                                                        (bit, current))  # missing attribute
