@@ -263,3 +263,5 @@ these features.
 * ``django.contrib.auth.tests.utils.skipIfCustomUser()`` is removed.
 
 * The ``GeoManager`` and ``GeoQuerySet`` classes are removed.
+
+* The ``django.contrib.gis.geoip`` module is removed.
