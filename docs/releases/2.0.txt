@@ -252,3 +252,5 @@ these features.
 
 * The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField`` are now
   required.
+
+* ``django.db.models.fields.add_lazy_relation()`` is removed.

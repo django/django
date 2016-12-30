@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import inspect
-import warnings
 from functools import partial
 
 from django import forms
@@ -15,7 +14,6 @@ from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property, curry
 from django.utils.lru_cache import lru_cache
@@ -82,19 +80,6 @@ def lazy_related_operation(function, model, *related_models, **kwargs):
     model_keys = (make_model_tuple(m) for m in models)
     apps = model._meta.apps
     return apps.lazy_model_operation(partial(function, **kwargs), *model_keys)
-
-
-def add_lazy_relation(cls, field, relation, operation):
-    warnings.warn(
-        "add_lazy_relation() has been superseded by lazy_related_operation() "
-        "and related methods on the Apps class.",
-        RemovedInDjango20Warning, stacklevel=2)
-    # Rearrange args for new Apps.lazy_model_operation
-
-    def function(local, related, field):
-        return operation(field, related, local)
-
-    lazy_related_operation(function, cls, relation, field=field)
 
 
 class RelatedField(Field):
