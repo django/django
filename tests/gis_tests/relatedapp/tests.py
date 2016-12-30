@@ -98,7 +98,7 @@ class RelatedGeoModelTest(TestCase):
             tol
         )
 
-    @skipUnlessDBFeature("has_unionagg_method")
+    @skipUnlessDBFeature('supports_union_aggr')
     def test_related_union_aggregate(self):
         "Testing the `Union` aggregate on related geographic models."
         # This combines the Extent and Union aggregates into one query
