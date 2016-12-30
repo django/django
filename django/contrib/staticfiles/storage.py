@@ -85,12 +85,12 @@ class HashedFilesMixin(object):
             md5.update(chunk)
         return md5.hexdigest()[:12]
 
-    def hashed_name(self, name, content=None):
+    def hashed_name(self, name, content=None, accept_fragments=False):
         parsed_name = urlsplit(unquote(name))
         clean_name = parsed_name.path.strip()
         opened = False
         if content is None:
-            if not self.exists(clean_name):
+            if not (accept_fragments or self.exists(clean_name)):
                 raise ValueError("The file '%s' could not be found with %r." %
                                  (clean_name, self))
             try:
@@ -289,7 +289,7 @@ class HashedFilesMixin(object):
         hash_key = self.hash_key(name)
         cache_name = self.hashed_files.get(hash_key)
         if cache_name is None:
-            cache_name = self.clean_name(self.hashed_name(name))
+            cache_name = self.clean_name(self.hashed_name(name, accept_fragments=True))
             # store the hashed name if there was a miss, e.g.
             # when the files are still processed
             self.hashed_files[hash_key] = cache_name
