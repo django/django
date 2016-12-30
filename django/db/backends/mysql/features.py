@@ -82,7 +82,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def uses_savepoints(self):
         """
-        All storage engines except NDB/NDBCLUSTER support savepoints.
+        All storage engines supporting transactions do support savepoints, except NDB/NDBCLUSTER.
         But allow the user to overwrite explicitly if some new engine got used.
         """
         if self.connection.settings_dict.get('USES_SAVEPOINTS', None) is None:
