@@ -633,6 +633,12 @@ If you're using MySQL, the following checks will be performed:
 * **mysql.W002**: MySQL Strict Mode is not set for database connection
   '<alias>'. See also :ref:`mysql-sql-mode`.
 
+Migrations
+~~~~~~~~~~
+
+* **migrations.W001**: ``<module>`` in :setting:`MIGRATION_MODULES` could not
+  be imported.
+
 Templates
 ---------
 
