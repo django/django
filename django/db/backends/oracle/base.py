@@ -10,14 +10,12 @@ import decimal
 import os
 import platform
 import sys
-import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.utils import six, timezone
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
 
@@ -326,13 +324,6 @@ class OracleParam(object):
         # without being converted by DateTimeField.get_db_prep_value.
         if settings.USE_TZ and (isinstance(param, datetime.datetime) and
                                 not isinstance(param, Oracle_datetime)):
-            if timezone.is_aware(param):
-                warnings.warn(
-                    "The Oracle database adapter received an aware datetime (%s), "
-                    "probably from cursor.execute(). Update your code to pass a "
-                    "naive datetime in the database connection's time zone (UTC by "
-                    "default).", RemovedInDjango20Warning)
-                param = param.astimezone(timezone.utc).replace(tzinfo=None)
             param = Oracle_datetime.from_datetime(param)
 
         string_size = 0

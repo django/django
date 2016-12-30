@@ -6,18 +6,14 @@ MySQLdb is supported for Python 2 only: http://sourceforge.net/projects/mysql-py
 """
 from __future__ import unicode_literals
 
-import datetime
 import re
 import sys
-import warnings
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.utils import six, timezone
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes, SafeText
@@ -31,7 +27,7 @@ except ImportError as e:
     )
 
 from MySQLdb.constants import CLIENT, FIELD_TYPE                # isort:skip
-from MySQLdb.converters import Thing2Literal, conversions       # isort:skip
+from MySQLdb.converters import conversions                      # isort:skip
 
 # Some of these import MySQLdb, so import them after checking if it's installed.
 from .client import DatabaseClient                          # isort:skip
@@ -51,20 +47,6 @@ if (version < (1, 2, 1) or (
     raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
 
-def adapt_datetime_warn_on_aware_datetime(value, conv):
-    # Remove this function and rely on the default adapter in Django 2.0.
-    if settings.USE_TZ and timezone.is_aware(value):
-        warnings.warn(
-            "The MySQL database adapter received an aware datetime (%s), "
-            "probably from cursor.execute(). Update your code to pass a "
-            "naive datetime in the database connection's time zone (UTC by "
-            "default).", RemovedInDjango20Warning)
-        # This doesn't account for the database connection's timezone,
-        # which isn't known. (That's why this adapter is deprecated.)
-        value = value.astimezone(timezone.utc).replace(tzinfo=None)
-    return Thing2Literal(value.strftime("%Y-%m-%d %H:%M:%S.%f"), conv)
-
-
 # MySQLdb-1.2.1 returns TIME columns as timedelta -- they are more like
 # timedelta in terms of actual behavior as they are signed and include days --
 # and Django expects time, so we still need to override that. We also need to
@@ -75,7 +57,6 @@ django_conversions.update({
     FIELD_TYPE.TIME: backend_utils.typecast_time,
     FIELD_TYPE.DECIMAL: backend_utils.typecast_decimal,
     FIELD_TYPE.NEWDECIMAL: backend_utils.typecast_decimal,
-    datetime.datetime: adapt_datetime_warn_on_aware_datetime,
 })
 
 # This should match the numerical portion of the version numbers (we can treat

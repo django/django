@@ -6,14 +6,12 @@ standard library.
 """
 from __future__ import unicode_literals
 
-import datetime
 import decimal
 import re
 import warnings
 
 import pytz
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends import utils as backend_utils
@@ -22,7 +20,6 @@ from django.utils import six, timezone
 from django.utils.dateparse import (
     parse_date, parse_datetime, parse_duration, parse_time,
 )
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.safestring import SafeBytes
 
@@ -43,20 +40,6 @@ from .operations import DatabaseOperations                  # isort:skip
 from .schema import DatabaseSchemaEditor                    # isort:skip
 
 
-def adapt_datetime_warn_on_aware_datetime(value):
-    # Remove this function and rely on the default adapter in Django 2.0.
-    if settings.USE_TZ and timezone.is_aware(value):
-        warnings.warn(
-            "The SQLite database adapter received an aware datetime (%s), "
-            "probably from cursor.execute(). Update your code to pass a "
-            "naive datetime in the database connection's time zone (UTC by "
-            "default).", RemovedInDjango20Warning)
-        # This doesn't account for the database connection's timezone,
-        # which isn't known. (That's why this adapter is deprecated.)
-        value = value.astimezone(timezone.utc).replace(tzinfo=None)
-    return value.isoformat(str(" "))
-
-
 def decoder(conv_func):
     """ The Python sqlite3 interface returns always byte strings.
         This function converts the received value to a regular string before
@@ -73,7 +56,6 @@ Database.register_converter(str("timestamp"), decoder(parse_datetime))
 Database.register_converter(str("TIMESTAMP"), decoder(parse_datetime))
 Database.register_converter(str("decimal"), decoder(backend_utils.typecast_decimal))
 
-Database.register_adapter(datetime.datetime, adapt_datetime_warn_on_aware_datetime)
 Database.register_adapter(decimal.Decimal, backend_utils.rev_typecast_decimal)
 if six.PY2:
     Database.register_adapter(str, lambda s: s.decode('utf-8'))
