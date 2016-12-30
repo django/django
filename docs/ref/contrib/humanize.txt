@@ -34,7 +34,7 @@ You can pass in either an integer or a string representation of an integer.
 ``intcomma``
 ============
 
-Converts an integer to a string containing commas every three digits.
+Converts an integer or float (or a string representation of either) to a string containing commas every three digits.
 
 Examples:
 
@@ -49,7 +49,6 @@ e.g. with the ``'de'`` language:
 * ``45000`` becomes ``'45.000'``.
 * ``450000`` becomes ``'450.000'``.
 
-You can pass in either an integer or a string representation of an integer.
 
 .. templatefilter:: intword
 
