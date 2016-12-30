@@ -27,7 +27,8 @@ def resolve(path, urlconf=None):
     return get_resolver(urlconf).resolve(path)
 
 
-def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
+def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None,
+            request=None):
     if urlconf is None:
         urlconf = get_urlconf()
     resolver = get_resolver(urlconf)
@@ -88,7 +89,14 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
         if ns_pattern:
             resolver = get_ns_resolver(ns_pattern, resolver)
 
-    return force_text(iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs)))
+    uri = force_text(iri_to_uri(resolver._reverse_with_prefix(
+        view, prefix, *args, **kwargs)))
+
+    if request:
+        uri = request.build_absolute_uri(uri)
+
+    return uri
+
 
 
 reverse_lazy = lazy(reverse, six.text_type)

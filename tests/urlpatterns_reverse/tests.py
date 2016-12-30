@@ -19,7 +19,8 @@ from django.http import (
 )
 from django.shortcuts import redirect
 from django.test import (
-    SimpleTestCase, TestCase, ignore_warnings, override_settings,
+    RequestFactory, SimpleTestCase, TestCase, ignore_warnings,
+    override_settings,
 )
 from django.test.utils import override_script_prefix
 from django.urls import (
@@ -330,6 +331,15 @@ class URLPatternReverse(SimpleTestCase):
             six.text_type
         )
 
+    def test_reverse_with_request(self):
+        factory = RequestFactory()
+        request = factory.get('/')
+
+        name, expected, args, kwargs = test_data[0]
+        resolved_url = reverse(name, args=args, kwargs=kwargs, request=request)
+
+        self.assertEqual(resolved_url, 'http://testserver/places/3/')
+
 
 class ResolverTests(SimpleTestCase):
     @ignore_warnings(category=RemovedInDjango20Warning)
@@ -472,6 +482,15 @@ class ReverseLazyTest(TestCase):
                 b'Some URL: %s' % reverse_lazy('some-login-page'),
                 'Some URL: /login/'
             )
+
+    def test_reverse_lazy_with_request(self):
+        factory = RequestFactory()
+        request = factory.get('/')
+
+        self.assertEqual(
+            reverse_lazy('some-login-page', request=request),
+            'http://testserver/login/'
+        )
 
 
 class ReverseLazySettingsTest(AdminScriptTestCase):

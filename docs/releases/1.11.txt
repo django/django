@@ -441,7 +441,9 @@ Tests
 URLs
 ~~~~
 
-* ...
+* Added `request` as an optional argument to :func:`django.urls.reverse`
+  and :func:`django.urls.reverse_lazy` to be able to get a fully
+  qualified URL.
 
 Validators
 ~~~~~~~~~~

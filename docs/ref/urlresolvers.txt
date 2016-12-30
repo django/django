@@ -16,7 +16,7 @@
 If you need to use something similar to the :ttag:`url` template tag in
 your code, Django provides the following function:
 
-.. function:: reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
+.. function:: reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, request=None)
 
 ``viewname`` can be a :ref:`URL pattern name <naming-url-patterns>` or the
 callable view object. For example, given the following ``url``::
@@ -68,6 +68,17 @@ namespaces into URLs on specific application instances, according to the
 The ``urlconf`` argument is the URLconf module containing the URL patterns to
 use for reversing. By default, the root URLconf for the current thread is used.
 
+The ``request`` argument must be an instance of
+``django.core.handlers.wsgi.WSGIRequest``  and it provides you a way to
+construct a fully qualified URL when using the method. For example::
+
+    >>> reverse('admin:app_list', kwargs={'app_label': 'auth'}, request=request)
+    'htttp://example.com/admin/auth/'
+
+.. versionchanged:: 1.11
+
+    The ``request`` argument was added.
+
 .. note::
 
     The string returned by ``reverse()`` is already
@@ -85,7 +96,7 @@ use for reversing. By default, the root URLconf for the current thread is used.
 
 A lazily evaluated version of `reverse()`_.
 
-.. function:: reverse_lazy(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
+.. function:: reverse_lazy(viewname, urlconf=None, args=None, kwargs=None, current_app=None, request=None)
 
 It is useful for when you need to use a URL reversal before your project's
 URLConf is loaded. Some common cases where this function is necessary are:
