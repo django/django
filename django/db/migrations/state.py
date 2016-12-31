@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import copy
-import warnings
 from collections import OrderedDict
 from contextlib import contextmanager
 
@@ -14,7 +13,6 @@ from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.utils import make_model_tuple
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
@@ -604,18 +602,8 @@ class ModelState(object):
 
         # Restore managers
         body.update(self.construct_managers())
-
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore", "Managers from concrete parents will soon qualify as default managers",
-                RemovedInDjango20Warning)
-
-            # Then, make a Model object (apps.register_model is called in __new__)
-            return type(
-                str(self.name),
-                bases,
-                body,
-            )
+        # Then, make a Model object (apps.register_model is called in __new__)
+        return type(str(self.name), bases, body)
 
     def get_field_by_name(self, name):
         for fname, field in self.fields:

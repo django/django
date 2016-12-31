@@ -4,8 +4,7 @@ from copy import deepcopy
 from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import models, transaction
 from django.db.utils import IntegrityError
-from django.test import TestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.test import TestCase
 from django.utils.translation import ugettext_lazy
 
 from .models import (
@@ -577,7 +576,6 @@ class ManyToOneTests(TestCase):
         with self.assertNumQueries(1):
             self.assertEqual(th.child_set.count(), 0)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)  # for use_for_related_fields deprecation
     def test_related_object(self):
         public_school = School.objects.create(is_public=True)
         public_student = Student.objects.create(school=public_school)
@@ -594,17 +592,6 @@ class ManyToOneTests(TestCase):
         # its related school even if the default manager doesn't normally
         # allow it.
         self.assertEqual(private_student.school, private_school)
-
-        # If the manager is marked "use_for_related_fields", it'll get used instead
-        # of the "bare" queryset. Usually you'd define this as a property on the class,
-        # but this approximates that in a way that's easier in tests.
-        School._default_manager.use_for_related_fields = True
-        try:
-            private_student = Student.objects.get(pk=private_student.pk)
-            with self.assertRaises(School.DoesNotExist):
-                private_student.school
-        finally:
-            School._default_manager.use_for_related_fields = False
 
         School._meta.base_manager_name = 'objects'
         School._meta._expire_cache()

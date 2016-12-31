@@ -17,6 +17,3 @@ class Parent(models.Model):
 
 class Child(Parent):
     child_data = models.CharField(max_length=30, unique=True)
-
-    class Meta:
-        manager_inheritance_from_future = True

@@ -118,9 +118,6 @@ class Child5(AbstractBase3):
 class Child6(Child4):
     value = models.IntegerField()
 
-    class Meta:
-        manager_inheritance_from_future = True
-
 
 class Child7(Parent):
     objects = models.Manager()

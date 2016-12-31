@@ -65,13 +65,11 @@ and two directions (forward and reverse) for a total of six combinations.
 
 from __future__ import unicode_literals
 
-import warnings
 from operator import attrgetter
 
 from django.db import connections, router, transaction
 from django.db.models import Q, signals
 from django.db.models.query import QuerySet
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 
 
@@ -107,20 +105,7 @@ class ForwardManyToOneDescriptor(object):
         return hasattr(instance, self.cache_name)
 
     def get_queryset(self, **hints):
-        related_model = self.field.remote_field.model
-
-        if getattr(related_model._default_manager, 'use_for_related_fields', False):
-            if not getattr(related_model._default_manager, 'silence_use_for_related_fields_deprecation', False):
-                warnings.warn(
-                    "use_for_related_fields is deprecated, instead "
-                    "set Meta.base_manager_name on '{}'.".format(related_model._meta.label),
-                    RemovedInDjango20Warning, 2
-                )
-            manager = related_model._default_manager
-        else:
-            manager = related_model._base_manager
-
-        return manager.db_manager(hints=hints).all()
+        return self.field.remote_field.model._base_manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
         if queryset is None:
@@ -323,20 +308,7 @@ class ReverseOneToOneDescriptor(object):
         return hasattr(instance, self.cache_name)
 
     def get_queryset(self, **hints):
-        related_model = self.related.related_model
-
-        if getattr(related_model._default_manager, 'use_for_related_fields', False):
-            if not getattr(related_model._default_manager, 'silence_use_for_related_fields_deprecation', False):
-                warnings.warn(
-                    "use_for_related_fields is deprecated, instead "
-                    "set Meta.base_manager_name on '{}'.".format(related_model._meta.label),
-                    RemovedInDjango20Warning, 2
-                )
-            manager = related_model._default_manager
-        else:
-            manager = related_model._base_manager
-
-        return manager.db_manager(hints=hints).all()
+        return self.related.related_model._base_manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
         if queryset is None:

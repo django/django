@@ -17,9 +17,7 @@ from django.db.models.fields.related import OneToOneField
 from django.db.models.query_utils import PathInfo
 from django.utils import six
 from django.utils.datastructures import ImmutableList, OrderedSet
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango21Warning,
-)
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.text import camel_case_to_spaces, format_lazy
@@ -41,7 +39,7 @@ DEFAULT_NAMES = (
     'auto_created', 'index_together', 'apps', 'default_permissions',
     'select_on_save', 'default_related_name', 'required_db_features',
     'required_db_vendor', 'base_manager_name', 'default_manager_name',
-    'manager_inheritance_from_future', 'indexes',
+    'indexes',
 )
 
 
@@ -87,7 +85,6 @@ class Options(object):
         self.local_fields = []
         self.local_many_to_many = []
         self.private_fields = []
-        self.manager_inheritance_from_future = False
         self.local_managers = []
         self.base_manager_name = None
         self.default_manager_name = None
@@ -375,10 +372,6 @@ class Options(object):
                 seen_managers.add(manager.name)
                 managers.append((depth, manager.creation_counter, manager))
 
-                # Used for deprecation of legacy manager inheritance,
-                # remove afterwards. (RemovedInDjango20Warning)
-                manager._originating_model = base
-
         return make_immutable_fields_list(
             "managers",
             (m[2] for m in sorted(managers)),
@@ -409,25 +402,6 @@ class Options(object):
                         base_manager_name,
                     )
                 )
-
-        # Deprecation shim for `use_for_related_fields`.
-        for i, base_manager_class in enumerate(self.default_manager.__class__.mro()):
-            if getattr(base_manager_class, 'use_for_related_fields', False):
-                if not getattr(base_manager_class, 'silence_use_for_related_fields_deprecation', False):
-                    warnings.warn(
-                        "use_for_related_fields is deprecated, instead "
-                        "set Meta.base_manager_name on '{}'.".format(self.model._meta.label),
-                        RemovedInDjango20Warning, 2
-                    )
-
-                if i == 0:
-                    manager = self.default_manager
-                else:
-                    manager = base_manager_class()
-                    manager.name = '_base_manager'
-                    manager.model = self.model
-
-                return manager
 
         manager = Manager()
         manager.name = '_base_manager'

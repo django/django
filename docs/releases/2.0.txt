@@ -384,3 +384,9 @@ these features.
   removed.
 
 * The ``escape`` filter now uses ``django.utils.html.conditional_escape()``.
+
+* ``Manager.use_for_related_fields`` is removed.
+
+* Model ``Manager`` inheritance follows MRO inheritance rules. The requirement
+  to use ``Meta.manager_inheritance_from_future`` to opt-in to the behavior is
+  removed.
