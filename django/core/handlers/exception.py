@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import logging
 import sys
-import warnings
 from functools import wraps
 
 from django.conf import settings
@@ -12,7 +11,6 @@ from django.http import Http404
 from django.http.multipartparser import MultiPartParserError
 from django.urls import get_resolver, get_urlconf
 from django.utils.decorators import available_attrs
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.views import debug
 
@@ -94,18 +92,7 @@ def response_for_exception(request, exc):
 def get_exception_response(request, resolver, status_code, exception, sender=None):
     try:
         callback, param_dict = resolver.resolve_error_handler(status_code)
-        # Unfortunately, inspect.getargspec result is not trustable enough
-        # depending on the callback wrapping in decorators (frequent for handlers).
-        # Falling back on try/except:
-        try:
-            response = callback(request, **dict(param_dict, exception=exception))
-        except TypeError:
-            warnings.warn(
-                "Error handlers should accept an exception parameter. Update "
-                "your code as this parameter will be required in Django 2.0",
-                RemovedInDjango20Warning, stacklevel=2
-            )
-            response = callback(request, **param_dict)
+        response = callback(request, **dict(param_dict, exception=exception))
     except Exception:
         signals.got_request_exception.send(sender=sender, request=request)
         response = handle_uncaught_exception(request, resolver, sys.exc_info())

@@ -285,3 +285,6 @@ these features.
   * ``django.template.loaders.filesystem.Loader.get_template_sources()``
 
 * ``django.template.loaders.base.Loader.__call__()`` is removed.
+
+* Support for custom error views that don't accept an ``exception`` parameter
+  is removed.
