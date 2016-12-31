@@ -7,7 +7,6 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 import copy
-import warnings
 from collections import Counter, Iterator, Mapping, OrderedDict
 from itertools import chain, count, product
 from string import ascii_uppercase
@@ -32,7 +31,6 @@ from django.db.models.sql.where import (
     AND, OR, ExtraWhere, NothingNode, WhereNode,
 )
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.tree import Node
 
@@ -1320,19 +1318,6 @@ class Query(object):
             except FieldDoesNotExist:
                 if name in self.annotation_select:
                     field = self.annotation_select[name].output_field
-                elif pos == 0:
-                    for rel in opts.related_objects:
-                        if (name == rel.related_model._meta.model_name and
-                                rel.related_name == rel.related_model._meta.default_related_name):
-                            related_name = rel.related_name
-                            field = opts.get_field(related_name)
-                            warnings.warn(
-                                "Query lookup '%s' is deprecated in favor of "
-                                "Meta.default_related_name '%s'."
-                                % (name, related_name),
-                                RemovedInDjango20Warning, 2
-                            )
-                            break
 
             if field is not None:
                 # Fields that contain one-to-many relations with a generic

@@ -350,3 +350,6 @@ these features.
 
 * Support for the ``django.core.files.storage.Storage.accessed_time()``,
   ``created_time()``, and ``modified_time()`` methods is removed.
+
+* Support for query lookups using the model name when
+  ``Meta.default_related_name`` is set is removed.
