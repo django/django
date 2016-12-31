@@ -345,3 +345,5 @@ these features.
 
 * ``CommaSeparatedIntegerField`` is removed, except for support in historical
   migrations.
+
+* The template ``Context.has_key()`` method is removed.
