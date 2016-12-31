@@ -1351,11 +1351,6 @@ your test suite.
         with self.assertRaisesMessage(ValueError, 'invalid literal for int()'):
             int('a')
 
-    .. deprecated:: 1.9
-
-        Passing ``callable`` as a keyword argument called ``callable_obj`` is
-        deprecated. Pass the callable as a positional argument instead.
-
 .. method:: SimpleTestCase.assertFieldOutput(fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value='')
 
     Asserts that a form field behaves correctly with various inputs.

@@ -306,3 +306,6 @@ these features.
 
 * The ``current_app`` parameter to the ``contrib.auth`` function-based views is
   removed.
+
+* The ``callable_obj`` keyword argument to
+  ``SimpleTestCase.assertRaisesMessage()`` is removed.

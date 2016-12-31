@@ -6,7 +6,6 @@ import posixpath
 import sys
 import threading
 import unittest
-import warnings
 from collections import Counter
 from contextlib import contextmanager
 from copy import copy
@@ -36,7 +35,6 @@ from django.test.utils import (
 )
 from django.utils import six
 from django.utils.decorators import classproperty
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.six.moves.urllib.parse import (
     unquote, urljoin, urlparse, urlsplit,
@@ -606,14 +604,8 @@ class SimpleTestCase(unittest.TestCase):
             args: Function to be called and extra positional args.
             kwargs: Extra kwargs.
         """
-        # callable_obj was a documented kwarg in Django 1.8 and older.
-        callable_obj = kwargs.pop('callable_obj', None)
-        if callable_obj:
-            warnings.warn(
-                'The callable_obj kwarg is deprecated. Pass the callable '
-                'as a positional argument instead.', RemovedInDjango20Warning
-            )
-        elif len(args):
+        callable_obj = None
+        if len(args):
             callable_obj = args[0]
             args = args[1:]
 
