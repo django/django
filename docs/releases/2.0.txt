@@ -212,7 +212,9 @@ Database backend API
 Miscellaneous
 -------------
 
-* ...
+* The ``SessionAuthenticationMiddleware`` class is removed. It provided no
+  functionality since session authentication is unconditionally enabled in
+  Django 1.10.
 
 .. _deprecated-features-2.0:
 

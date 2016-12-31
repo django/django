@@ -824,15 +824,6 @@ user to the login page or issue an HTTP 403 Forbidden response.
 Session invalidation on password change
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionchanged:: 1.10
-
-    Session verification is enabled and mandatory in Django 1.10 (there's no
-    way to disable it) regardless of whether or not
-    ``SessionAuthenticationMiddleware`` is enabled. In older
-    versions, this protection only applies if
-    ``django.contrib.auth.middleware.SessionAuthenticationMiddleware``
-    is enabled in :setting:`MIDDLEWARE`.
-
 If your :setting:`AUTH_USER_MODEL` inherits from
 :class:`~django.contrib.auth.models.AbstractBaseUser` or implements its own
 :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`

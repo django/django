@@ -24,19 +24,6 @@ class AuthenticationMiddleware(MiddlewareMixin):
         request.user = SimpleLazyObject(lambda: get_user(request))
 
 
-class SessionAuthenticationMiddleware(MiddlewareMixin):
-    """
-    Formerly, a middleware for invalidating a user's sessions that don't
-    correspond to the user's current session authentication hash. However, it
-    caused the "Vary: Cookie" header on all responses.
-
-    It's now a shim to allow a single settings file to more easily support
-    multiple versions of Django. Will be RemovedInDjango20Warning.
-    """
-    def process_request(self, request):
-        pass
-
-
 class RemoteUserMiddleware(MiddlewareMixin):
     """
     Middleware for utilizing Web-server-provided authentication.
