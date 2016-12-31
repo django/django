@@ -6,14 +6,15 @@ class AltersDataMixin(type):
     data_altering_methods = None
 
     def __new__(mcs, name, bases, attrs):
-        data_altering_methods = attrs.pop('data_altering_methods', ())
         new_cls = super().__new__(mcs, name, bases, attrs)
+        data_altering_methods = getattr(new_cls, 'data_altering_methods', None)
+        data_altering_methods = data_altering_methods or ()
 
         for method in data_altering_methods:
-            method_func = attrs.get(method)
+            method_func = getattr(new_cls, method, None)
             if not callable(method_func):
                 raise ValueError(
-                    '{} has no method {}'.format(mcs, method)
+                    '{} has no method {}'.format(new_cls, method)
                 )
 
             # Do not override if explicitly set

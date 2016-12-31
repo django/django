@@ -47,7 +47,7 @@ DEFERRED = Deferred()
 
 def subclass_exception(name, bases, module, attached_to):
     """
-    Create exception subclass. Used by ModelBase below.
+    Create exception subclass. Used by ModelMetaclass below.
 
     The exception is created in a way that allows it to be pickled, assuming
     that the returned exception class will be added as an attribute to the
@@ -59,7 +59,7 @@ def subclass_exception(name, bases, module, attached_to):
     })
 
 
-class ModelBase(AltersDataMixin):
+class ModelMetaclass(type):
     """Metaclass for all models."""
     def __new__(cls, name, bases, attrs, **kwargs):
         super_new = super().__new__
@@ -360,6 +360,15 @@ class ModelBase(AltersDataMixin):
     @property
     def _default_manager(cls):
         return cls._meta.default_manager
+
+
+class ModelBase(AltersDataMixin, ModelMetaclass):
+    """
+    We can't have ModelMetaclass inherit from AltersDataMixin.
+    ModelMetaclass does not pass all the attrs to it's super class.
+    So, AltersDataMixin will not be able set alters_data attribute
+    on the updated definition of subclass methods
+    """
 
 
 class ModelStateFieldsCacheDescriptor:
