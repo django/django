@@ -299,3 +299,5 @@ these features.
 
 * Support for setting a URL instance namespace without an application namespace
   is removed.
+
+* ``Field._get_val_from_obj()`` is removed.

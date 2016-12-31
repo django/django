@@ -27,9 +27,7 @@ from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
     parse_date, parse_datetime, parse_duration, parse_time,
 )
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, warn_about_renamed_method,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.duration import duration_string
 from django.utils.encoding import (
     force_bytes, force_text, python_2_unicode_compatible, smart_text,
@@ -809,16 +807,6 @@ class Field(RegisterLookupMixin):
                    for x in rel_model._default_manager.complex_filter(
                        limit_choices_to)]
         return first_choice + lst
-
-    @warn_about_renamed_method(
-        'Field', '_get_val_from_obj', 'value_from_object',
-        RemovedInDjango20Warning
-    )
-    def _get_val_from_obj(self, obj):
-        if obj is not None:
-            return getattr(obj, self.attname)
-        else:
-            return self.get_default()
 
     def value_to_string(self, obj):
         """
