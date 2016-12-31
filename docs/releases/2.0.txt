@@ -366,3 +366,5 @@ these features.
 
 * The keyword arguments ``virtual_only`` in ``Field.contribute_to_class()`` and
   ``virtual`` in ``Model._meta.add_field()`` are removed.
+
+* The ``javascript_catalog()`` and ``json_catalog()`` views are removed.
