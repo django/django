@@ -368,3 +368,5 @@ these features.
   ``virtual`` in ``Model._meta.add_field()`` are removed.
 
 * The ``javascript_catalog()`` and ``json_catalog()`` views are removed.
+
+* ``django.contrib.gis.utils.precision_wkt()`` is removed.

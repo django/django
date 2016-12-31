@@ -2,7 +2,6 @@
  This module contains useful utilities for GeoDjango.
 """
 from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.utils.wkt import precision_wkt  # NOQA
 from django.core.exceptions import ImproperlyConfigured
 
 if HAS_GDAL:
