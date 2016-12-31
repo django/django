@@ -466,7 +466,7 @@ class FormatStylePlaceholderCursor(object):
             params = [(param, type(param)) for param in params]
             params_dict = {param: ':arg%d' % i for i, param in enumerate(set(params))}
             args = [params_dict[param] for param in params]
-            params = dict(zip(params_dict.values(), list(zip(*params_dict.keys()))[0]))
+            params = {value: key[0] for key, value in params_dict.items()}
             query = query % tuple(args)
         else:
             # Handle params as sequence
