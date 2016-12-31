@@ -355,3 +355,6 @@ these features.
   ``Meta.default_related_name`` is set is removed.
 
 * The MySQL ``__search`` lookup is removed.
+
+* The shim for supporting custom related manager classes without a
+  ``_apply_rel_filters()`` method is removed.

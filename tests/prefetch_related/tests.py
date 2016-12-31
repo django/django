@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import warnings
-
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
@@ -710,30 +708,6 @@ class CustomPrefetchTests(TestCase):
             houses.all()[0].occupants.all()[0].houses.all()[1].rooms.all()[0],
             self.room2_1
         )
-
-    def test_apply_rel_filters_deprecation_shim(self):
-        # Simulate a missing `_apply_rel_filters` method.
-        del Person.houses.related_manager_cls._apply_rel_filters
-        # Also remove `get_queryset` as it rely on `_apply_rel_filters`.
-        del Person.houses.related_manager_cls.get_queryset
-        try:
-            with warnings.catch_warnings(record=True) as warns:
-                warnings.simplefilter('always')
-                list(Person.objects.prefetch_related(
-                    Prefetch('houses', queryset=House.objects.filter(name='House 1'))
-                ))
-        finally:
-            # Deleting `related_manager_cls` will force the creation of a new
-            # class since it's a `cached_property`.
-            del Person.houses.related_manager_cls
-        msg = (
-            'The `django.db.models.fields.related_descriptors.ManyRelatedManager` class '
-            'must implement a `_apply_rel_filters()` method that accepts a `QuerySet` as '
-            'its single argument and returns an appropriately filtered version of it.'
-        )
-        self.assertEqual(len(warns), 2)  # Once person.
-        self.assertEqual(str(warns[0].message), msg)
-        self.assertEqual(str(warns[0].message), msg)
 
     def test_values_queryset(self):
         with self.assertRaisesMessage(ValueError, 'Prefetch querysets cannot use values().'):

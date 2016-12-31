@@ -22,7 +22,6 @@ from django.db.models.functions import Trunc
 from django.db.models.query_utils import InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR
 from django.utils import six, timezone
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property, partition
 from django.utils.version import get_version
 
@@ -1613,19 +1612,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
             else:
                 manager = getattr(obj, to_attr)
                 if leaf and lookup.queryset is not None:
-                    try:
-                        apply_rel_filter = manager._apply_rel_filters
-                    except AttributeError:
-                        warnings.warn(
-                            "The `%s.%s` class must implement a `_apply_rel_filters()` "
-                            "method that accepts a `QuerySet` as its single "
-                            "argument and returns an appropriately filtered version "
-                            "of it." % (manager.__class__.__module__, manager.__class__.__name__),
-                            RemovedInDjango20Warning,
-                        )
-                        qs = manager.get_queryset()
-                    else:
-                        qs = apply_rel_filter(lookup.queryset)
+                    qs = manager._apply_rel_filters(lookup.queryset)
                 else:
                     qs = manager.get_queryset()
                 qs._result_cache = vals
