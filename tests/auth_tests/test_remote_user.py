@@ -6,9 +6,7 @@ from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.test import TestCase, modify_settings, override_settings
-from django.test.utils import ignore_warnings
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango20Warning
 
 
 @override_settings(ROOT_URLCONF='auth_tests.urls')
@@ -151,22 +149,6 @@ class RemoteUserTest(TestCase):
         User.objects.create(username='knownuser', is_active=False)
         response = self.client.get('/remote_user/', **{self.header: 'knownuser'})
         self.assertTrue(response.context['user'].is_anonymous)
-
-
-@ignore_warnings(category=RemovedInDjango20Warning)
-@override_settings(MIDDLEWARE=None)
-class RemoteUserTestMiddlewareClasses(RemoteUserTest):
-
-    def setUp(self):
-        self.patched_settings = modify_settings(
-            AUTHENTICATION_BACKENDS={'append': self.backend},
-            MIDDLEWARE_CLASSES={'append': [
-                'django.contrib.sessions.middleware.SessionMiddleware',
-                'django.contrib.auth.middleware.AuthenticationMiddleware',
-                self.middleware,
-            ]},
-        )
-        self.patched_settings.enable()
 
 
 class RemoteUserNoCreateBackend(RemoteUserBackend):

@@ -390,3 +390,6 @@ these features.
 * Model ``Manager`` inheritance follows MRO inheritance rules. The requirement
   to use ``Meta.manager_inheritance_from_future`` to opt-in to the behavior is
   removed.
+
+* Support for old-style middleware using ``settings.MIDDLEWARE_CLASSES`` is
+  removed.

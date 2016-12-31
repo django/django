@@ -2,8 +2,6 @@ from django.template import TemplateDoesNotExist
 from django.test import (
     Client, RequestFactory, SimpleTestCase, override_settings,
 )
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import override
 from django.views.csrf import CSRF_FAILURE_TEMPLATE_NAME, csrf_failure
 
@@ -24,33 +22,6 @@ class CsrfViewTests(SimpleTestCase):
         ],
     )
     def test_translation(self):
-        """
-        An invalid request is rejected with a localized error message.
-        """
-        response = self.client.post('/')
-        self.assertContains(response, "Forbidden", status_code=403)
-        self.assertContains(response,
-                            "CSRF verification failed. Request aborted.",
-                            status_code=403)
-
-        with self.settings(LANGUAGE_CODE='nl'), override('en-us'):
-            response = self.client.post('/')
-            self.assertContains(response, "Verboden", status_code=403)
-            self.assertContains(response,
-                                "CSRF-verificatie mislukt. Verzoek afgebroken.",
-                                status_code=403)
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @override_settings(
-        USE_I18N=True,
-        MIDDLEWARE=None,
-        MIDDLEWARE_CLASSES=[
-            'django.middleware.locale.LocaleMiddleware',
-            'django.middleware.common.CommonMiddleware',
-            'django.middleware.csrf.CsrfViewMiddleware',
-        ],
-    )
-    def test_translation_middleware_classes(self):
         """
         An invalid request is rejected with a localized error message.
         """

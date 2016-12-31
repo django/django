@@ -571,7 +571,7 @@ details on these changes.
 
 * The ``SEND_BROKEN_LINK_EMAILS`` setting will be removed. Add the
   :class:`django.middleware.common.BrokenLinkEmailsMiddleware` middleware to
-  your :setting:`MIDDLEWARE_CLASSES` setting instead.
+  your ``MIDDLEWARE_CLASSES`` setting instead.
 
 * ``django.middleware.doc.XViewMiddleware`` will be removed. Use
   ``django.contrib.admindocs.middleware.XViewMiddleware`` instead.

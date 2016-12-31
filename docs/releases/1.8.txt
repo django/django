@@ -1641,7 +1641,7 @@ Using ``AuthenticationMiddleware`` without ``SessionAuthenticationMiddleware``
 added in Django 1.7. In Django 1.7.2, its functionality was moved to
 ``auth.get_user()`` and, for backwards compatibility, enabled only if
 ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` appears in
-:setting:`MIDDLEWARE_CLASSES`.
+``MIDDLEWARE_CLASSES``.
 
 In Django 1.10, session verification will be enabled regardless of whether or not
 ``SessionAuthenticationMiddleware`` is enabled (at which point

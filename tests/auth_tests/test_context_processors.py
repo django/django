@@ -4,8 +4,6 @@ from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.test import SimpleTestCase, TestCase, override_settings
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
 
 from .settings import AUTH_MIDDLEWARE, AUTH_TEMPLATES
 
@@ -78,24 +76,12 @@ class AuthContextProcessorTests(TestCase):
         response = self.client.get('/auth_processor_no_attr_access/')
         self.assertContains(response, "Session not accessed")
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @override_settings(MIDDLEWARE_CLASSES=AUTH_MIDDLEWARE, MIDDLEWARE=None)
-    def test_session_not_accessed_middleware_classes(self):
-        response = self.client.get('/auth_processor_no_attr_access/')
-        self.assertContains(response, "Session not accessed")
-
     @override_settings(MIDDLEWARE=AUTH_MIDDLEWARE)
     def test_session_is_accessed(self):
         """
         The session is accessed if the auth context processor
         is used and relevant attributes accessed.
         """
-        response = self.client.get('/auth_processor_attr_access/')
-        self.assertContains(response, "Session accessed")
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @override_settings(MIDDLEWARE_CLASSES=AUTH_MIDDLEWARE, MIDDLEWARE=None)
-    def test_session_is_accessed_middleware_classes(self):
         response = self.client.get('/auth_processor_attr_access/')
         self.assertContains(response, "Session accessed")
 
