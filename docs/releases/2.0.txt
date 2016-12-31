@@ -338,3 +338,5 @@ these features.
   is removed.
 
 * ``django.utils.functional.allow_lazy()`` is removed.
+
+* The ``shell --plain`` option is removed.
