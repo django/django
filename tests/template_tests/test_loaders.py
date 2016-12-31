@@ -4,23 +4,16 @@ from __future__ import unicode_literals
 import os.path
 import sys
 import tempfile
-import types
 import unittest
 from contextlib import contextmanager
 
-from django.template import Context, TemplateDoesNotExist
+from django.template import TemplateDoesNotExist
 from django.template.engine import Engine
-from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import lazystr
 
 from .utils import TEMPLATE_DIR
-
-try:
-    import pkg_resources
-except ImportError:
-    pkg_resources = None
 
 
 class CachedLoaderTests(SimpleTestCase):
@@ -104,105 +97,6 @@ class CachedLoaderTests(SimpleTestCase):
         to text before computing its cache key.
         """
         self.assertEqual(self.engine.template_loaders[0].cache_key(lazystr('template.html'), []), 'template.html')
-
-
-@unittest.skipUnless(pkg_resources, 'setuptools is not installed')
-class EggLoaderTests(SimpleTestCase):
-
-    @contextmanager
-    def create_egg(self, name, resources):
-        """
-        Creates a mock egg with a list of resources.
-
-        name: The name of the module.
-        resources: A dictionary of template names mapped to file-like objects.
-        """
-
-        if six.PY2:
-            name = name.encode('utf-8')
-
-        class MockLoader(object):
-            pass
-
-        class MockProvider(pkg_resources.NullProvider):
-            def __init__(self, module):
-                pkg_resources.NullProvider.__init__(self, module)
-                self.module = module
-
-            def _has(self, path):
-                return path in self.module._resources
-
-            def _isdir(self, path):
-                return False
-
-            def get_resource_stream(self, manager, resource_name):
-                return self.module._resources[resource_name]
-
-            def _get(self, path):
-                return self.module._resources[path].read()
-
-            def _fn(self, base, resource_name):
-                return os.path.normcase(resource_name)
-
-        egg = types.ModuleType(name)
-        egg.__loader__ = MockLoader()
-        egg.__path__ = ['/some/bogus/path/']
-        egg.__file__ = '/some/bogus/path/__init__.pyc'
-        egg._resources = resources
-        sys.modules[name] = egg
-        pkg_resources._provider_factories[MockLoader] = MockProvider
-
-        try:
-            yield
-        finally:
-            del sys.modules[name]
-            del pkg_resources._provider_factories[MockLoader]
-
-    @classmethod
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def setUpClass(cls):
-        cls.engine = Engine(loaders=[
-            'django.template.loaders.eggs.Loader',
-        ])
-        cls.loader = cls.engine.template_loaders[0]
-        super(EggLoaderTests, cls).setUpClass()
-
-    def test_get_template(self):
-        templates = {
-            os.path.normcase('templates/y.html'): six.StringIO("y"),
-        }
-
-        with self.create_egg('egg', templates):
-            with override_settings(INSTALLED_APPS=['egg']):
-                template = self.engine.get_template("y.html")
-
-        self.assertEqual(template.origin.name, 'egg:egg:templates/y.html')
-        self.assertEqual(template.origin.template_name, 'y.html')
-        self.assertEqual(template.origin.loader, self.engine.template_loaders[0])
-
-        output = template.render(Context({}))
-        self.assertEqual(output, "y")
-
-    def test_non_existing(self):
-        """
-        Template loading fails if the template is not in the egg.
-        """
-        with self.create_egg('egg', {}):
-            with override_settings(INSTALLED_APPS=['egg']):
-                with self.assertRaises(TemplateDoesNotExist):
-                    self.engine.get_template('not-existing.html')
-
-    def test_not_installed(self):
-        """
-        Template loading fails if the egg is not in INSTALLED_APPS.
-        """
-        templates = {
-            os.path.normcase('templates/y.html'): six.StringIO("y"),
-        }
-
-        with self.create_egg('egg', templates):
-            with self.assertRaises(TemplateDoesNotExist):
-                self.engine.get_template('y.html')
 
 
 class FileSystemLoaderTests(SimpleTestCase):

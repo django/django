@@ -301,3 +301,5 @@ these features.
   is removed.
 
 * ``Field._get_val_from_obj()`` is removed.
+
+* ``django.template.loaders.eggs.Loader`` is removed.

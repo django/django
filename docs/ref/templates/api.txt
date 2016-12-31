@@ -910,19 +910,6 @@ loaders that come with Django:
             'APP_DIRS': True,
         }]
 
-``django.template.loaders.eggs.Loader``
-
-.. class:: eggs.Loader
-
-    .. deprecated:: 1.9
-
-        Distributing applications as eggs is not recommended.
-
-    Just like ``app_directories`` above, but it loads templates from Python
-    eggs rather than from the filesystem.
-
-    This loader is disabled by default.
-
 ``django.template.loaders.cached.Loader``
 
 .. class:: cached.Loader
