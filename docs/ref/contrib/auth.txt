@@ -137,11 +137,6 @@ Attributes
         (representing the currently logged-in user), you should know this
         attribute is ``True`` for any :class:`~models.User` instance.
 
-        .. versionchanged:: 1.10
-
-            In older versions, this was a method. Backwards-compatibility
-            support for using it as a method will be removed in Django 2.0.
-
     .. attribute:: is_anonymous
 
         Read-only attribute which is always ``False``. This is a way of
@@ -149,11 +144,6 @@ Attributes
         objects. Generally, you should prefer using
         :attr:`~django.contrib.auth.models.User.is_authenticated` to this
         attribute.
-
-        .. versionchanged:: 1.10
-
-            In older versions, this was a method. Backwards-compatibility
-            support for using it as a method will be removed in Django 2.0.
 
     .. attribute:: username_validator
 

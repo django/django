@@ -695,22 +695,12 @@ The following attributes and methods are available on any subclass of
         (representing the currently logged-in user), you should know this
         attribute is ``True`` for any :class:`~models.User` instance.
 
-        .. versionchanged:: 1.10
-
-            In older versions, this was a method. Backwards-compatibility
-            support for using it as a method will be removed in Django 2.0.
-
     .. attribute:: models.AbstractBaseUser.is_anonymous
 
         Read-only attribute which is always ``False``. This is a way of
         differentiating :class:`~models.User` and :class:`~models.AnonymousUser`
         objects. Generally, you should prefer using
         :attr:`~models.User.is_authenticated` to this attribute.
-
-        .. versionchanged:: 1.10
-
-            In older versions, this was a method. Backwards-compatibility
-            support for using it as a method will be removed in Django 2.0.
 
     .. method:: models.AbstractBaseUser.set_password(raw_password)
 
