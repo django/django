@@ -91,62 +91,6 @@ class CachedLoaderTests(SimpleTestCase):
         self.assertIsNone(e.__context__, error_msg)
         self.assertIsNone(e.__cause__, error_msg)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_load_template(self):
-        loader = self.engine.template_loaders[0]
-        template, origin = loader.load_template('index.html')
-        self.assertEqual(template.origin.template_name, 'index.html')
-
-        cache = self.engine.template_loaders[0].template_cache
-        self.assertEqual(cache['index.html'][0], template)
-
-        # Run a second time from cache
-        loader = self.engine.template_loaders[0]
-        source, name = loader.load_template('index.html')
-        self.assertEqual(template.origin.template_name, 'index.html')
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_load_template_missing(self):
-        """
-        #19949 -- TemplateDoesNotExist exceptions should be cached.
-        """
-        loader = self.engine.template_loaders[0]
-
-        self.assertNotIn('missing.html', loader.template_cache)
-
-        with self.assertRaises(TemplateDoesNotExist):
-            loader.load_template("missing.html")
-
-        self.assertEqual(
-            loader.template_cache["missing.html"],
-            TemplateDoesNotExist,
-            "Cached loader failed to cache the TemplateDoesNotExist exception",
-        )
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_load_nonexistent_cached_template(self):
-        loader = self.engine.template_loaders[0]
-        template_name = 'nonexistent.html'
-
-        # fill the template cache
-        with self.assertRaises(TemplateDoesNotExist):
-            loader.find_template(template_name)
-
-        with self.assertRaisesMessage(TemplateDoesNotExist, template_name):
-            loader.get_template(template_name)
-
-    def test_templatedir_caching(self):
-        """
-        #13573 -- Template directories should be part of the cache key.
-        """
-        # Retrieve a template specifying a template directory to check
-        t1, name = self.engine.find_template('test.html', (os.path.join(TEMPLATE_DIR, 'first'),))
-        # Now retrieve the same template name, but from a different directory
-        t2, name = self.engine.find_template('test.html', (os.path.join(TEMPLATE_DIR, 'second'),))
-
-        # The two templates should not have the same content
-        self.assertNotEqual(t1.render(Context({})), t2.render(Context({})))
-
     def test_template_name_leading_dash_caching(self):
         """
         #26536 -- A leading dash in a template name shouldn't be stripped
@@ -239,20 +183,6 @@ class EggLoaderTests(SimpleTestCase):
         output = template.render(Context({}))
         self.assertEqual(output, "y")
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_load_template_source(self):
-        loader = self.engine.template_loaders[0]
-        templates = {
-            os.path.normcase('templates/y.html'): six.StringIO("y"),
-        }
-
-        with self.create_egg('egg', templates):
-            with override_settings(INSTALLED_APPS=['egg']):
-                source, name = loader.load_template_source('y.html')
-
-        self.assertEqual(source.strip(), 'y')
-        self.assertEqual(name, 'egg:egg:templates/y.html')
-
     def test_non_existing(self):
         """
         Template loading fails if the template is not in the egg.
@@ -323,13 +253,6 @@ class FileSystemLoaderTests(SimpleTestCase):
         with self.assertRaises(TemplateDoesNotExist):
             engine.get_template('index.html')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_load_template_source(self):
-        loader = self.engine.template_loaders[0]
-        source, name = loader.load_template_source('index.html')
-        self.assertEqual(source.strip(), 'index')
-        self.assertEqual(name, os.path.join(TEMPLATE_DIR, 'index.html'))
-
     def test_directory_security(self):
         with self.source_checker(['/dir1', '/dir2']) as check_sources:
             check_sources('index.html', ['/dir1/index.html', '/dir2/index.html'])
@@ -353,10 +276,10 @@ class FileSystemLoaderTests(SimpleTestCase):
         """
         Invalid UTF-8 encoding in bytestrings should raise a useful error
         """
-        engine = Engine()
+        engine = self.engine
         loader = engine.template_loaders[0]
         with self.assertRaises(UnicodeDecodeError):
-            list(loader.get_template_sources(b'\xc3\xc3', ['/dir1']))
+            list(loader.get_template_sources(b'\xc3\xc3'))
 
     def test_unicode_dir_name(self):
         with self.source_checker([b'/Stra\xc3\x9fe']) as check_sources:
@@ -410,14 +333,6 @@ class AppDirectoriesLoaderTests(SimpleTestCase):
         self.assertEqual(template.origin.template_name, 'index.html')
         self.assertEqual(template.origin.loader, self.engine.template_loaders[0])
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @override_settings(INSTALLED_APPS=['template_tests'])
-    def test_load_template_source(self):
-        loader = self.engine.template_loaders[0]
-        source, name = loader.load_template_source('index.html')
-        self.assertEqual(source.strip(), 'index')
-        self.assertEqual(name, os.path.join(TEMPLATE_DIR, 'index.html'))
-
     @override_settings(INSTALLED_APPS=[])
     def test_not_installed(self):
         with self.assertRaises(TemplateDoesNotExist):
@@ -440,10 +355,3 @@ class LocmemLoaderTests(SimpleTestCase):
         self.assertEqual(template.origin.name, 'index.html')
         self.assertEqual(template.origin.template_name, 'index.html')
         self.assertEqual(template.origin.loader, self.engine.template_loaders[0])
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_load_template_source(self):
-        loader = self.engine.template_loaders[0]
-        source, name = loader.load_template_source('index.html')
-        self.assertEqual(source.strip(), 'index')
-        self.assertEqual(name, 'index.html')

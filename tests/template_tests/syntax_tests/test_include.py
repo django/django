@@ -248,9 +248,6 @@ class IncludeTests(SimpleTestCase):
         self.assertEqual(e.exception.args[0], 'missing.html')
 
     def test_extends_include_missing_cachedloader(self):
-        """
-        Test the cache loader separately since it overrides load_template.
-        """
         engine = Engine(debug=True, loaders=[
             ('django.template.loaders.cached.Loader', [
                 'django.template.loaders.app_directories.Loader',

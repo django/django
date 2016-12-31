@@ -2,10 +2,7 @@
 Wrapper for loading templates from a plain Python dict.
 """
 
-import warnings
-
 from django.template import Origin, TemplateDoesNotExist
-from django.utils.deprecation import RemovedInDjango20Warning
 
 from .base import Loader as BaseLoader
 
@@ -28,14 +25,3 @@ class Loader(BaseLoader):
             template_name=template_name,
             loader=self,
         )
-
-    def load_template_source(self, template_name, template_dirs=None):
-        warnings.warn(
-            'The load_template_sources() method is deprecated. Use '
-            'get_template() or get_contents() instead.',
-            RemovedInDjango20Warning,
-        )
-        try:
-            return self.templates_dict[template_name], template_name
-        except KeyError:
-            raise TemplateDoesNotExist(template_name)

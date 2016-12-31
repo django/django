@@ -19,10 +19,6 @@ BLOCK_CONTEXT_KEY = 'block_context'
 logger = logging.getLogger('django.template')
 
 
-class ExtendsError(Exception):
-    pass
-
-
 class BlockContext(object):
     def __init__(self):
         # Dictionary of FIFO queues.
@@ -107,23 +103,6 @@ class ExtendsNode(Node):
         passed as the skip argument. This enables extends to work recursively
         without extending the same template twice.
         """
-        # RemovedInDjango20Warning: If any non-recursive loaders are installed
-        # do a direct template lookup. If the same template name appears twice,
-        # raise an exception to avoid system recursion.
-        for loader in context.template.engine.template_loaders:
-            if not loader.supports_recursion:
-                history = context.render_context.setdefault(
-                    self.context_key, [context.template.origin.template_name],
-                )
-                if template_name in history:
-                    raise ExtendsError(
-                        "Cannot extend templates recursively when using "
-                        "non-recursive template loaders",
-                    )
-                template = context.template.engine.get_template(template_name)
-                history.append(template_name)
-                return template
-
         history = context.render_context.setdefault(
             self.context_key, [context.template.origin],
         )

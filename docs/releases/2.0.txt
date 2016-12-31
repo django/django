@@ -265,3 +265,23 @@ these features.
 * The ``GeoManager`` and ``GeoQuerySet`` classes are removed.
 
 * The ``django.contrib.gis.geoip`` module is removed.
+
+* The ``supports_recursion`` check for template loaders is removed from:
+
+  * ``django.template.engine.Engine.find_template()``
+  * ``django.template.loader_tags.ExtendsNode.find_template()``
+  * ``django.template.loaders.base.Loader.supports_recursion()``
+  * ``django.template.loaders.cached.Loader.supports_recursion()``
+
+* The ``load_template`` and ``load_template_sources`` template loader methods
+  are removed.
+
+* The ``template_dirs`` argument for template loaders is removed:
+
+  * ``django.template.loaders.base.Loader.get_template()``
+  * ``django.template.loaders.cached.Loader.cache_key()``
+  * ``django.template.loaders.cached.Loader.get_template()``
+  * ``django.template.loaders.cached.Loader.get_template_sources()``
+  * ``django.template.loaders.filesystem.Loader.get_template_sources()``
+
+* ``django.template.loaders.base.Loader.__call__()`` is removed.

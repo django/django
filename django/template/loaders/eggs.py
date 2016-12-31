@@ -54,21 +54,3 @@ class Loader(BaseLoader):
                 template_name=template_name,
                 loader=self,
             )
-
-    def load_template_source(self, template_name, template_dirs=None):
-        """
-        Loads templates from Python eggs via pkg_resource.resource_string.
-
-        For every installed app, it tries to get the resource (app, template_name).
-        """
-        warnings.warn(
-            'The load_template_sources() method is deprecated. Use '
-            'get_template() or get_contents() instead.',
-            RemovedInDjango20Warning,
-        )
-        for origin in self.get_template_sources(template_name):
-            try:
-                return self.get_contents(origin), origin.name
-            except TemplateDoesNotExist:
-                pass
-        raise TemplateDoesNotExist(template_name)
