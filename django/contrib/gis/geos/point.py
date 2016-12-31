@@ -140,48 +140,6 @@ class Point(GEOSGeometry):
             raise GEOSException('Cannot set Z on 2D Point.')
         self._cs.setOrdinate(2, 0, value)
 
-    def get_x(self):
-        warnings.warn(
-            "`get_x()` is deprecated, use the `x` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        return self.x
-
-    def set_x(self, value):
-        warnings.warn(
-            "`set_x()` is deprecated, use the `x` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        self.x = value
-
-    def get_y(self):
-        warnings.warn(
-            "`get_y()` is deprecated, use the `y` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        return self.y
-
-    def set_y(self, value):
-        warnings.warn(
-            "`set_y()` is deprecated, use the `y` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        self.y = value
-
-    def get_z(self):
-        warnings.warn(
-            "`get_z()` is deprecated, use the `z` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        return self.z
-
-    def set_z(self, value):
-        warnings.warn(
-            "`set_z()` is deprecated, use the `z` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        self.z = value
-
     # ### Tuple setting and retrieval routines. ###
     @property
     def tuple(self):
