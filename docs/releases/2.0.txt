@@ -236,3 +236,6 @@ these features.
 
 * The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` is
   removed.
+
+* ``django.db.backends.base.BaseDatabaseOperations.check_aggregate_support()``
+  is removed.

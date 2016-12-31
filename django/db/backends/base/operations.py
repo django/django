@@ -1,6 +1,5 @@
 import datetime
 import decimal
-import warnings
 from importlib import import_module
 
 from django.conf import settings
@@ -8,7 +7,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.backends import utils
 from django.utils import six, timezone
 from django.utils.dateparse import parse_duration
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 
 
@@ -555,13 +553,6 @@ class BaseDatabaseOperations(object):
             value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
             value = parse_duration(value)
         return value
-
-    def check_aggregate_support(self, aggregate_func):
-        warnings.warn(
-            "check_aggregate_support has been deprecated. Use "
-            "check_expression_support instead.",
-            RemovedInDjango20Warning, stacklevel=2)
-        return self.check_expression_support(aggregate_func)
 
     def check_expression_support(self, expression):
         """
