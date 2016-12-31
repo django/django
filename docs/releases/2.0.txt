@@ -312,3 +312,6 @@ these features.
 
 * Support for the ``allow_tags`` attribute on ``ModelAdmin`` methods is
   removed.
+
+* The ``enclosure`` keyword argument to ``SyndicationFeed.add_item()`` is
+  removed.

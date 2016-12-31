@@ -9,10 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.feedgenerator import (
-    Enclosure, SyndicationFeed, rfc2822_date, rfc3339_date,
-)
+from django.utils.feedgenerator import rfc2822_date, rfc3339_date
 
 from .models import Article, Entry
 
@@ -520,16 +517,3 @@ class SyndicationFeedTest(FeedTestCase):
             views.add_domain('example.com', '//example.com/foo/?arg=value'),
             'http://example.com/foo/?arg=value'
         )
-
-
-class FeedgeneratorTestCase(TestCase):
-    def test_add_item_warns_when_enclosure_kwarg_is_used(self):
-        feed = SyndicationFeed(title='Example', link='http://example.com', description='Foo')
-        msg = 'The enclosure keyword argument is deprecated, use enclosures instead.'
-        with self.assertRaisesMessage(RemovedInDjango20Warning, msg):
-            feed.add_item(
-                title='Example Item',
-                link='https://example.com/item',
-                description='bar',
-                enclosure=Enclosure('http://example.com/favicon.ico', 0, 'image/png'),
-            )

@@ -24,10 +24,8 @@ http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/
 from __future__ import unicode_literals
 
 import datetime
-import warnings
 
 from django.utils import datetime_safe, six
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.six import StringIO
 from django.utils.six.moves.urllib.parse import urlparse
@@ -119,9 +117,8 @@ class SyndicationFeed(object):
 
     def add_item(self, title, link, description, author_email=None,
                  author_name=None, author_link=None, pubdate=None, comments=None,
-                 unique_id=None, unique_id_is_permalink=None, enclosure=None,
-                 categories=(), item_copyright=None, ttl=None, updateddate=None,
-                 enclosures=None, **kwargs):
+                 unique_id=None, unique_id_is_permalink=None, categories=(),
+                 item_copyright=None, ttl=None, updateddate=None, enclosures=None, **kwargs):
         """
         Adds an item to the feed. All args are expected to be Python Unicode
         objects except pubdate and updateddate, which are datetime.datetime
@@ -135,16 +132,6 @@ class SyndicationFeed(object):
         if ttl is not None:
             # Force ints to unicode
             ttl = force_text(ttl)
-        if enclosure is None:
-            enclosures = [] if enclosures is None else enclosures
-        else:
-            warnings.warn(
-                "The enclosure keyword argument is deprecated, "
-                "use enclosures instead.",
-                RemovedInDjango20Warning,
-                stacklevel=2,
-            )
-            enclosures = [enclosure]
         item = {
             'title': to_unicode(title),
             'link': iri_to_uri(link),

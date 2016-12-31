@@ -963,7 +963,6 @@ They share this interface:
     * ``pubdate``
     * ``comments``
     * ``unique_id``
-    * ``enclosure``
     * ``enclosures``
     * ``categories``
     * ``item_copyright``
@@ -976,16 +975,9 @@ They share this interface:
 
     * ``pubdate`` should be a Python  :class:`~datetime.datetime` object.
     * ``updateddate`` should be a Python  :class:`~datetime.datetime` object.
-    * ``enclosure`` should be an instance of
-      :class:`django.utils.feedgenerator.Enclosure`.
     * ``enclosures`` should be a list of
       :class:`django.utils.feedgenerator.Enclosure` instances.
     * ``categories`` should be a sequence of Unicode objects.
-
-    .. deprecated:: 1.9
-
-        The ``enclosure`` keyword argument is deprecated in favor of the
-        ``enclosures`` keyword argument.
 
 :meth:`.SyndicationFeed.write`
     Outputs the feed in the given encoding to outfile, which is a file-like object.
