@@ -633,14 +633,6 @@ subclass::
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('first_name', 'last_name', 'colored_name')
 
-      .. deprecated:: 1.9
-
-          In older versions, you could add an ``allow_tags`` attribute to the
-          method to prevent auto-escaping. This attribute is deprecated as it's
-          safer to use :func:`~django.utils.html.format_html`,
-          :func:`~django.utils.html.format_html_join`, or
-          :func:`~django.utils.safestring.mark_safe` instead.
-
     * As some examples have already demonstrated, when using a callable, a
       model method, or a ``ModelAdmin`` method, you can customize the column's
       title by adding a ``short_description`` attribute to the callable.

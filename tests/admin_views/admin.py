@@ -447,7 +447,7 @@ class PostAdmin(admin.ModelAdmin):
     readonly_fields = (
         'posted', 'awesomeness_level', 'coolness', 'value',
         'multiline', 'multiline_html', lambda obj: "foo",
-        'multiline_html_allow_tags', 'readonly_content',
+        'readonly_content',
     )
 
     inlines = [
@@ -469,10 +469,6 @@ class PostAdmin(admin.ModelAdmin):
 
     def multiline_html(self, instance):
         return mark_safe("Multiline<br>\nhtml<br>\ncontent")
-
-    def multiline_html_allow_tags(self, instance):
-        return "Multiline<br>html<br>content<br>with allow tags"
-    multiline_html_allow_tags.allow_tags = True
 
 
 class FieldOverridePostForm(forms.ModelForm):

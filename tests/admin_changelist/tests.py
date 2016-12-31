@@ -11,11 +11,10 @@ from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR, ChangeList
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.template import Context, Template
-from django.test import TestCase, ignore_warnings, override_settings
+from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils import formats, six
-from django.utils.deprecation import RemovedInDjango20Warning
 
 from .admin import (
     BandAdmin, ChildAdmin, ChordsBandAdmin, ConcertAdmin,
@@ -252,34 +251,6 @@ class ChangeListTests(TestCase):
         m.list_editable = ['name']
         with self.assertRaises(IncorrectLookupParameters):
             ChangeList(request, Child, *get_changelist_args(m))
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_result_list_with_allow_tags(self):
-        """
-        Test for deprecation of allow_tags attribute
-        """
-        new_parent = Parent.objects.create(name='parent')
-        for i in range(2):
-            Child.objects.create(name='name %s' % i, parent=new_parent)
-        request = self.factory.get('/child/')
-        m = ChildAdmin(Child, custom_site)
-
-        def custom_method(self, obj=None):
-            return 'Unsafe html <br />'
-        custom_method.allow_tags = True
-
-        # Add custom method with allow_tags attribute
-        m.custom_method = custom_method
-        m.list_display = ['id', 'name', 'parent', 'custom_method']
-
-        cl = ChangeList(request, Child, *get_changelist_args(m))
-        FormSet = m.get_changelist_formset(request)
-        cl.formset = FormSet(queryset=cl.result_list)
-        template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
-        context = Context({'cl': cl})
-        table_output = template.render(context)
-        custom_field_html = '<td class="field-custom_method">Unsafe html <br /></td>'
-        self.assertInHTML(custom_field_html, table_output)
 
     def test_custom_paginator(self):
         new_parent = Parent.objects.create(name='parent')

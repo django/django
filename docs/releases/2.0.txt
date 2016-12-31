@@ -309,3 +309,6 @@ these features.
 
 * The ``callable_obj`` keyword argument to
   ``SimpleTestCase.assertRaisesMessage()`` is removed.
+
+* Support for the ``allow_tags`` attribute on ``ModelAdmin`` methods is
+  removed.

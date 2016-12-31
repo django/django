@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import datetime
-import warnings
 
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
@@ -18,7 +17,6 @@ from django.template.loader import get_template
 from django.templatetags.static import static
 from django.urls import NoReverseMatch
 from django.utils import formats
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -223,17 +221,8 @@ def items_for_result(cl, result, form):
             if f is None or f.auto_created:
                 if field_name == 'action_checkbox':
                     row_classes = ['action-checkbox']
-                allow_tags = getattr(attr, 'allow_tags', False)
                 boolean = getattr(attr, 'boolean', False)
                 result_repr = display_for_value(value, empty_value_display, boolean)
-                if allow_tags:
-                    warnings.warn(
-                        "Deprecated allow_tags attribute used on field {}. "
-                        "Use django.utils.html.format_html(), format_html_join(), "
-                        "or django.utils.safestring.mark_safe() instead.".format(field_name),
-                        RemovedInDjango20Warning
-                    )
-                    result_repr = mark_safe(result_repr)
                 if isinstance(value, (datetime.date, datetime.time)):
                     row_classes.append('nowrap')
             else:
