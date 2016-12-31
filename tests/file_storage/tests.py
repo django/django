@@ -20,14 +20,12 @@ from django.core.files.uploadedfile import (
 )
 from django.db.models.fields.files import FileDescriptor
 from django.test import (
-    LiveServerTestCase, SimpleTestCase, TestCase, ignore_warnings,
-    override_settings,
+    LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
 )
 from django.test.utils import requires_tz_support
 from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import six, timezone
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six.moves.urllib.request import urlopen
 
 from .models import Storage, temp_storage, temp_storage_location
@@ -227,21 +225,6 @@ class FileStorageTests(SimpleTestCase):
     def test_file_get_accessed_time_timezone(self):
         self._test_file_time_getter(self.storage.get_accessed_time)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_file_accessed_time(self):
-        """
-        File storage returns a datetime for the last accessed time of a file.
-        """
-        self.assertFalse(self.storage.exists('test.file'))
-
-        f = ContentFile('custom contents')
-        f_name = self.storage.save('test.file', f)
-        self.addCleanup(self.storage.delete, f_name)
-        atime = self.storage.accessed_time(f_name)
-
-        self.assertEqual(atime, datetime.fromtimestamp(os.path.getatime(self.storage.path(f_name))))
-        self.assertLess(datetime.now() - self.storage.accessed_time(f_name), timedelta(seconds=2))
-
     def test_file_get_created_time(self):
         """
         File storage returns a datetime for the creation time of a file.
@@ -260,21 +243,6 @@ class FileStorageTests(SimpleTestCase):
     def test_file_get_created_time_timezone(self):
         self._test_file_time_getter(self.storage.get_created_time)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_file_created_time(self):
-        """
-        File storage returns a datetime for the creation time of a file.
-        """
-        self.assertFalse(self.storage.exists('test.file'))
-
-        f = ContentFile('custom contents')
-        f_name = self.storage.save('test.file', f)
-        ctime = self.storage.created_time(f_name)
-        self.addCleanup(self.storage.delete, f_name)
-
-        self.assertEqual(ctime, datetime.fromtimestamp(os.path.getctime(self.storage.path(f_name))))
-        self.assertLess(datetime.now() - self.storage.created_time(f_name), timedelta(seconds=2))
-
     def test_file_get_modified_time(self):
         """
         File storage returns a datetime for the last modified time of a file.
@@ -292,21 +260,6 @@ class FileStorageTests(SimpleTestCase):
     @requires_tz_support
     def test_file_get_modified_time_timezone(self):
         self._test_file_time_getter(self.storage.get_modified_time)
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_file_modified_time(self):
-        """
-        File storage returns a datetime for the last modified time of a file.
-        """
-        self.assertFalse(self.storage.exists('test.file'))
-
-        f = ContentFile('custom contents')
-        f_name = self.storage.save('test.file', f)
-        self.addCleanup(self.storage.delete, f_name)
-        mtime = self.storage.modified_time(f_name)
-
-        self.assertEqual(mtime, datetime.fromtimestamp(os.path.getmtime(self.storage.path(f_name))))
-        self.assertLess(datetime.now() - self.storage.modified_time(f_name), timedelta(seconds=2))
 
     def test_file_save_without_name(self):
         """
@@ -611,26 +564,6 @@ class CustomStorageTests(FileStorageTests):
         self.assertEqual(second, 'custom_storage.2')
         self.storage.delete(first)
         self.storage.delete(second)
-
-
-class CustomStorageLegacyDatetimeHandling(FileSystemStorage):
-    # Use the legacy accessed_time() et al from FileSystemStorage and the
-    # shim get_accessed_time() et al from the Storage baseclass. Both of those
-    # raise warnings, so the testcase class ignores them all.
-
-    def get_accessed_time(self, name):
-        return super(FileSystemStorage, self).get_accessed_time(name)
-
-    def get_created_time(self, name):
-        return super(FileSystemStorage, self).get_created_time(name)
-
-    def get_modified_time(self, name):
-        return super(FileSystemStorage, self).get_modified_time(name)
-
-
-@ignore_warnings(category=RemovedInDjango20Warning)
-class CustomStorageLegacyDatetimeHandlingTests(FileStorageTests):
-    storage_class = CustomStorageLegacyDatetimeHandling
 
 
 class DiscardingFalseContentStorage(FileSystemStorage):

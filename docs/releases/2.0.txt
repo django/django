@@ -347,3 +347,6 @@ these features.
   migrations.
 
 * The template ``Context.has_key()`` method is removed.
+
+* Support for the ``django.core.files.storage.Storage.accessed_time()``,
+  ``created_time()``, and ``modified_time()`` methods is removed.

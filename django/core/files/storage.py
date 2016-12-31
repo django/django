@@ -1,6 +1,5 @@
 import errno
 import os
-import warnings
 from datetime import datetime
 
 from django.conf import settings
@@ -12,7 +11,6 @@ from django.utils import timezone
 from django.utils._os import abspathu, safe_join
 from django.utils.crypto import get_random_string
 from django.utils.deconstruct import deconstructible
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import filepath_to_uri, force_text
 from django.utils.functional import LazyObject, cached_property
 from django.utils.module_loading import import_string
@@ -146,103 +144,26 @@ class Storage(object):
         """
         raise NotImplementedError('subclasses of Storage must provide a url() method')
 
-    def accessed_time(self, name):
-        """
-        Returns the last accessed time (as datetime object) of the file
-        specified by name. Deprecated: use get_accessed_time() instead.
-        """
-        warnings.warn(
-            'Storage.accessed_time() is deprecated in favor of get_accessed_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        raise NotImplementedError('subclasses of Storage must provide an accessed_time() method')
-
-    def created_time(self, name):
-        """
-        Returns the creation time (as datetime object) of the file
-        specified by name. Deprecated: use get_created_time() instead.
-        """
-        warnings.warn(
-            'Storage.created_time() is deprecated in favor of get_created_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        raise NotImplementedError('subclasses of Storage must provide a created_time() method')
-
-    def modified_time(self, name):
-        """
-        Returns the last modified time (as datetime object) of the file
-        specified by name. Deprecated: use get_modified_time() instead.
-        """
-        warnings.warn(
-            'Storage.modified_time() is deprecated in favor of get_modified_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        raise NotImplementedError('subclasses of Storage must provide a modified_time() method')
-
     def get_accessed_time(self, name):
         """
         Return the last accessed time (as a datetime) of the file specified by
         name. The datetime will be timezone-aware if USE_TZ=True.
         """
-        # At the end of the deprecation:
-        # raise NotImplementedError('subclasses of Storage must provide a get_accessed_time() method')
-        warnings.warn(
-            'Storage.accessed_time() is deprecated. '
-            'Storage backends should implement get_accessed_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        dt = self.accessed_time(name)
-        return _possibly_make_aware(dt)
+        raise NotImplementedError('subclasses of Storage must provide a get_accessed_time() method')
 
     def get_created_time(self, name):
         """
         Return the creation time (as a datetime) of the file specified by name.
         The datetime will be timezone-aware if USE_TZ=True.
         """
-        # At the end of the deprecation:
-        # raise NotImplementedError('subclasses of Storage must provide a get_created_time() method')
-        warnings.warn(
-            'Storage.created_time() is deprecated. '
-            'Storage backends should implement get_created_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        dt = self.created_time(name)
-        return _possibly_make_aware(dt)
+        raise NotImplementedError('subclasses of Storage must provide a get_created_time() method')
 
     def get_modified_time(self, name):
         """
         Return the last modified time (as a datetime) of the file specified by
         name. The datetime will be timezone-aware if USE_TZ=True.
         """
-        # At the end of the deprecation:
-        # raise NotImplementedError('subclasses of Storage must provide a get_modified_time() method')
-        warnings.warn(
-            'Storage.modified_time() is deprecated. '
-            'Storage backends should implement get_modified_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        dt = self.modified_time(name)
-        return _possibly_make_aware(dt)
-
-
-def _possibly_make_aware(dt):
-    """
-    Convert a datetime object in the local timezone to aware
-    in UTC, if USE_TZ is True.
-    """
-    # This function is only needed to help with the deprecations above and can
-    # be removed in Django 2.0, RemovedInDjango20Warning.
-    if settings.USE_TZ:
-        tz = timezone.get_default_timezone()
-        return timezone.make_aware(dt, tz).astimezone(timezone.utc)
-    else:
-        return dt
+        raise NotImplementedError('subclasses of Storage must provide a get_modified_time() method')
 
 
 @deconstructible
@@ -414,33 +335,6 @@ class FileSystemStorage(Storage):
         if url is not None:
             url = url.lstrip('/')
         return urljoin(self.base_url, url)
-
-    def accessed_time(self, name):
-        warnings.warn(
-            'FileSystemStorage.accessed_time() is deprecated in favor of '
-            'get_accessed_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        return datetime.fromtimestamp(os.path.getatime(self.path(name)))
-
-    def created_time(self, name):
-        warnings.warn(
-            'FileSystemStorage.created_time() is deprecated in favor of '
-            'get_created_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        return datetime.fromtimestamp(os.path.getctime(self.path(name)))
-
-    def modified_time(self, name):
-        warnings.warn(
-            'FileSystemStorage.modified_time() is deprecated in favor of '
-            'get_modified_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        return datetime.fromtimestamp(os.path.getmtime(self.path(name)))
 
     def _datetime_from_timestamp(self, ts):
         """
