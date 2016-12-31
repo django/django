@@ -19,14 +19,11 @@ from django.utils import six
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango21Warning,
-    warn_about_renamed_method,
 )
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.text import camel_case_to_spaces, format_lazy
 from django.utils.translation import override
-
-NOT_PROVIDED = object()
 
 PROXY_PARENTS = object()
 
@@ -259,13 +256,7 @@ class Options(object):
         self.local_managers.append(manager)
         self._expire_cache()
 
-    def add_field(self, field, private=False, virtual=NOT_PROVIDED):
-        if virtual is not NOT_PROVIDED:
-            warnings.warn(
-                "The `virtual` argument of Options.add_field() has been renamed to `private`.",
-                RemovedInDjango20Warning, stacklevel=2
-            )
-            private = virtual
+    def add_field(self, field, private=False):
         # Insert the given field in the order in which it was created, using
         # the "creation_counter" attribute of the field.
         # Move many-to-many related fields from self.fields into
@@ -515,14 +506,6 @@ class Options(object):
         return make_immutable_fields_list(
             "concrete_fields", (f for f in self.fields if f.concrete)
         )
-
-    @property
-    @warn_about_renamed_method(
-        'Options', 'virtual_fields', 'private_fields',
-        RemovedInDjango20Warning
-    )
-    def virtual_fields(self):
-        return self.private_fields
 
     @cached_property
     def local_concrete_fields(self):

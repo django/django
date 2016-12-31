@@ -27,7 +27,6 @@ from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
     parse_date, parse_datetime, parse_duration, parse_time,
 )
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.duration import duration_string
 from django.utils.encoding import (
     force_bytes, force_text, python_2_unicode_compatible, smart_text,
@@ -673,7 +672,7 @@ class Field(RegisterLookupMixin):
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
 
-    def contribute_to_class(self, cls, name, private_only=False, virtual_only=NOT_PROVIDED):
+    def contribute_to_class(self, cls, name, private_only=False):
         """
         Register the field with the model class it belongs to.
 
@@ -681,13 +680,6 @@ class Field(RegisterLookupMixin):
         created for every subclass of cls, even if cls is not an abstract
         model.
         """
-        if virtual_only is not NOT_PROVIDED:
-            warnings.warn(
-                "The `virtual_only` argument of Field.contribute_to_class() "
-                "has been renamed to `private_only`.",
-                RemovedInDjango20Warning, stacklevel=2
-            )
-            private_only = virtual_only
         self.set_attributes_from_name(name)
         self.model = cls
         if private_only:
