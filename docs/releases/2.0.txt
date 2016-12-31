@@ -319,3 +319,5 @@ these features.
 * The ``django.template.loader.LoaderOrigin`` and
   ``django.template.base.StringOrigin`` aliases for
   ``django.template.base.Origin`` are removed.
+
+* The ``makemigrations --exit`` option is removed.

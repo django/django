@@ -704,12 +704,6 @@ Enables fixing of migration conflicts.
 
 Allows naming the generated migration(s) instead of using a generated name.
 
-.. django-admin-option:: --exit, -e
-
-.. deprecated:: 1.10
-
-   Use the ``--check`` option instead.
-
 Makes ``makemigrations`` exit with error code 1 when no migrations are created
 (or would have been created, if combined with ``--dry-run``).
 

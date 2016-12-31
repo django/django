@@ -17,9 +17,8 @@ from django.db.migrations.exceptions import (
     InconsistentMigrationHistory, MigrationSchemaMissing,
 )
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import ignore_warnings, mock, override_settings
+from django.test import mock, override_settings
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 
 from .models import UnicodeModel, UnserializableModel
@@ -1231,19 +1230,6 @@ class MakeMigrationsTests(MigrationTestBase):
             content = cmd("0002", migration_name_0002, "--empty")
             self.assertIn("dependencies=[\n('migrations','0001_%s'),\n]" % migration_name_0001, content)
             self.assertIn("operations=[\n]", content)
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_makemigrations_exit(self):
-        """
-        makemigrations --exit should exit with sys.exit(1) when there are no
-        changes to an app.
-        """
-        with self.temporary_migration_module():
-            call_command("makemigrations", "--exit", "migrations", verbosity=0)
-
-        with self.temporary_migration_module(module="migrations.test_migrations_no_changes"):
-            with self.assertRaises(SystemExit):
-                call_command("makemigrations", "--exit", "migrations", verbosity=0)
 
     def test_makemigrations_check(self):
         """
