@@ -375,3 +375,6 @@ these features.
   ``parent_link`` is removed.
 
 * Support for ``Widget._format_value()`` is removed.
+
+* ``FileField`` methods ``get_directory_name()`` and ``get_filename()`` are
+  removed.

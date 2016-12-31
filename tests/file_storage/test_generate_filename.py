@@ -1,5 +1,4 @@
 import os
-import warnings
 
 from django.core.files.base import ContentFile
 from django.core.files.storage import Storage
@@ -37,32 +36,6 @@ class AWSS3Storage(Storage):
 
 
 class GenerateFilenameStorageTests(SimpleTestCase):
-
-    def test_filefield_get_directory_deprecation(self):
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            f = FileField(upload_to='some/folder/')
-            self.assertEqual(f.get_directory_name(), os.path.normpath('some/folder/'))
-
-        self.assertEqual(len(warns), 1)
-        self.assertEqual(
-            warns[0].message.args[0],
-            'FileField now delegates file name and folder processing to the '
-            'storage. get_directory_name() will be removed in Django 2.0.'
-        )
-
-    def test_filefield_get_filename_deprecation(self):
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            f = FileField(upload_to='some/folder/')
-            self.assertEqual(f.get_filename('some/folder/test.txt'), 'test.txt')
-
-        self.assertEqual(len(warns), 1)
-        self.assertEqual(
-            warns[0].message.args[0],
-            'FileField now delegates file name and folder processing to the '
-            'storage. get_filename() will be removed in Django 2.0.'
-        )
 
     def test_filefield_generate_filename(self):
         f = FileField(upload_to='some/folder/')
