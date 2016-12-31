@@ -177,26 +177,3 @@ Related objects reference
        .. versionchanged:: 1.11
 
             The clearing of the prefetched cache described above was added.
-
-Direct Assignment
-=================
-
-A related object set can be replaced in bulk with one operation by assigning a
-new iterable of objects to it::
-
-    >>> new_list = [obj1, obj2, obj3]
-    >>> e.related_set = new_list
-
-If the foreign key relationship has ``null=True``, then the related manager
-will first disassociate any existing objects in the related set before adding
-the contents of ``new_list``. Otherwise the objects in ``new_list`` will be
-added to the existing related object set.
-
-.. deprecated:: 1.10
-
-    Direct assignment is deprecated in favor of the
-    :meth:`~django.db.models.fields.related.RelatedManager.set` method::
-
-        >>> e.related_set.set([obj1, obj2, obj3])
-
-    This prevents confusion about an assignment resulting in an implicit save.

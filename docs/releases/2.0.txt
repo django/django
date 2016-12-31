@@ -321,3 +321,6 @@ these features.
   ``django.template.base.Origin`` are removed.
 
 * The ``makemigrations --exit`` option is removed.
+
+* Support for direct assignment to a reverse foreign key or many-to-many
+  relation is removed.

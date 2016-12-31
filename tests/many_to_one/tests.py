@@ -115,10 +115,9 @@ class ManyToOneTests(TestCase):
     def test_reverse_assignment_deprecation(self):
         msg = (
             "Direct assignment to the reverse side of a related set is "
-            "deprecated due to the implicit save() that happens. Use "
-            "article_set.set() instead."
+            "prohibited. Use article_set.set() instead."
         )
-        with self.assertRaisesMessage(RemovedInDjango20Warning, msg):
+        with self.assertRaisesMessage(TypeError, msg):
             self.r2.article_set = []
 
     def test_assign(self):
