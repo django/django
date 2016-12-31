@@ -278,15 +278,6 @@ class RssFeed(SyndicationFeed):
     def endChannelElement(self, handler):
         handler.endElement("channel")
 
-    @property
-    def mime_type(self):
-        warnings.warn(
-            'The mime_type attribute of RssFeed is deprecated. '
-            'Use content_type instead.',
-            RemovedInDjango20Warning, stacklevel=2
-        )
-        return self.content_type
-
 
 class RssUserland091Feed(RssFeed):
     _version = "0.91"
@@ -444,15 +435,6 @@ class Atom1Feed(SyndicationFeed):
         # Rights.
         if item['item_copyright'] is not None:
             handler.addQuickElement("rights", item['item_copyright'])
-
-    @property
-    def mime_type(self):
-        warnings.warn(
-            'The mime_type attribute of Atom1Feed is deprecated. '
-            'Use content_type instead.',
-            RemovedInDjango20Warning, stacklevel=2
-        )
-        return self.content_type
 
 
 # This isolates the decision of what the system default is, so calling code can

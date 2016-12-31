@@ -288,3 +288,6 @@ these features.
 
 * Support for custom error views that don't accept an ``exception`` parameter
   is removed.
+
+* The ``mime_type`` attribute of ``django.utils.feedgenerator.Atom1Feed`` and
+  ``django.utils.feedgenerator.RssFeed`` is removed.
