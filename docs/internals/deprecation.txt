@@ -18,6 +18,9 @@ details on these changes.
 * The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` will
   be removed.
 
+* ``django.db.backends.base.BaseDatabaseOperations.check_aggregate_support()``
+  will be removed.
+
 * The ``django.forms.extras`` package will be removed.
 
 * The ``assignment_tag`` helper will be removed.
