@@ -336,3 +336,5 @@ these features.
 
 * The ``cascaded_union`` property of ``django.contrib.gis.geos.MultiPolygon``
   is removed.
+
+* ``django.utils.functional.allow_lazy()`` is removed.

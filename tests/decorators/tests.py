@@ -8,13 +8,9 @@ from django.contrib.auth.decorators import (
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.test import SimpleTestCase
-from django.utils import six
 from django.utils.decorators import method_decorator
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text
-from django.utils.functional import allow_lazy, keep_lazy, keep_lazy_text, lazy
+from django.utils.functional import keep_lazy, keep_lazy_text, lazy
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy
 from django.views.decorators.cache import (
     cache_control, cache_page, never_cache,
 )
@@ -154,15 +150,6 @@ class DecoratorsTest(TestCase):
         self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
         request.method = 'DELETE'
         self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
-
-    def test_deprecated_allow_lazy(self):
-        with self.assertRaises(RemovedInDjango20Warning):
-            def noop_text(text):
-                return force_text(text)
-            noop_text = allow_lazy(noop_text, six.text_type)
-            rendered = noop_text(ugettext_lazy("I am a text"))
-            self.assertEqual(type(rendered), six.text_type)
-            self.assertEqual(rendered, "I am a text")
 
 
 # For testing method_decorator, a decorator that assumes a single argument.

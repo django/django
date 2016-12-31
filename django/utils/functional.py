@@ -1,10 +1,8 @@
 import copy
 import operator
-import warnings
 from functools import total_ordering, wraps
 
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 
 
 # You can't trivially replace this with `functools.partial` because this binds
@@ -187,14 +185,6 @@ def lazystr(text):
     """
     from django.utils.encoding import force_text  # Avoid circular import
     return lazy(force_text, six.text_type)(text)
-
-
-def allow_lazy(func, *resultclasses):
-    warnings.warn(
-        "django.utils.functional.allow_lazy() is deprecated in favor of "
-        "django.utils.functional.keep_lazy()",
-        RemovedInDjango20Warning, 2)
-    return keep_lazy(*resultclasses)(func)
 
 
 def keep_lazy(*resultclasses):
