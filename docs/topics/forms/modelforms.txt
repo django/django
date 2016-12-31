@@ -70,8 +70,6 @@ Model field                         Form field
                                     :attr:`~django.forms.CharField.empty_value`
                                     set to ``None`` if ``null=True``.
 
-:class:`CommaSeparatedIntegerField` :class:`~django.forms.CharField`
-
 :class:`DateField`                  :class:`~django.forms.DateField`
 
 :class:`DateTimeField`              :class:`~django.forms.DateTimeField`

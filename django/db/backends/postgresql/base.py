@@ -76,7 +76,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'BinaryField': 'bytea',
         'BooleanField': 'boolean',
         'CharField': 'varchar(%(max_length)s)',
-        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
         'DateField': 'date',
         'DateTimeField': 'timestamp with time zone',
         'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',

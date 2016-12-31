@@ -24,12 +24,12 @@ from django.utils._os import upath
 
 from .models import (
     Article, ArticleStatus, Author, Author1, Award, BetterWriter, BigInt, Book,
-    Category, Character, Colour, ColourfulItem, CommaSeparatedInteger,
-    CustomErrorMessage, CustomFF, CustomFieldForExclusionModel, DateTimePost,
-    DerivedBook, DerivedPost, Document, ExplicitPK, FilePathModel,
-    FlexibleDatePost, Homepage, ImprovedArticle, ImprovedArticleWithParentLink,
-    Inventory, NullableUniqueCharFieldModel, Person, Photo, Post, Price,
-    Product, Publication, PublicationDefaults, StrictAssignmentAll,
+    Category, Character, Colour, ColourfulItem, CustomErrorMessage, CustomFF,
+    CustomFieldForExclusionModel, DateTimePost, DerivedBook, DerivedPost,
+    Document, ExplicitPK, FilePathModel, FlexibleDatePost, Homepage,
+    ImprovedArticle, ImprovedArticleWithParentLink, Inventory,
+    NullableUniqueCharFieldModel, Person, Photo, Post, Price, Product,
+    Publication, PublicationDefaults, StrictAssignmentAll,
     StrictAssignmentFieldSpecific, Student, StumpJoke, TextFile, Triple,
     Writer, WriterProfile, test_images,
 )
@@ -2410,35 +2410,6 @@ class ModelOtherFieldTests(SimpleTestCase):
         bif = BigIntForm({'biggie': '9223372036854775808'})
         self.assertFalse(bif.is_valid())
         self.assertEqual(bif.errors, {'biggie': ['Ensure this value is less than or equal to 9223372036854775807.']})
-
-    def test_comma_separated_integer_field(self):
-        class CommaSeparatedIntegerForm(forms.ModelForm):
-            class Meta:
-                model = CommaSeparatedInteger
-                fields = '__all__'
-
-        f = CommaSeparatedIntegerForm({'field': '1'})
-        self.assertTrue(f.is_valid())
-        self.assertEqual(f.cleaned_data, {'field': '1'})
-        f = CommaSeparatedIntegerForm({'field': '12'})
-        self.assertTrue(f.is_valid())
-        self.assertEqual(f.cleaned_data, {'field': '12'})
-        f = CommaSeparatedIntegerForm({'field': '1,2,3'})
-        self.assertTrue(f.is_valid())
-        self.assertEqual(f.cleaned_data, {'field': '1,2,3'})
-        f = CommaSeparatedIntegerForm({'field': '10,32'})
-        self.assertTrue(f.is_valid())
-        self.assertEqual(f.cleaned_data, {'field': '10,32'})
-        f = CommaSeparatedIntegerForm({'field': '1a,2'})
-        self.assertEqual(f.errors, {'field': ['Enter only digits separated by commas.']})
-        f = CommaSeparatedIntegerForm({'field': ',,,,'})
-        self.assertEqual(f.errors, {'field': ['Enter only digits separated by commas.']})
-        f = CommaSeparatedIntegerForm({'field': '1.2'})
-        self.assertEqual(f.errors, {'field': ['Enter only digits separated by commas.']})
-        f = CommaSeparatedIntegerForm({'field': '1,a,2'})
-        self.assertEqual(f.errors, {'field': ['Enter only digits separated by commas.']})
-        f = CommaSeparatedIntegerForm({'field': '1,,2'})
-        self.assertEqual(f.errors, {'field': ['Enter only digits separated by commas.']})
 
     def test_url_on_modelform(self):
         "Check basic URL field validation on model forms"

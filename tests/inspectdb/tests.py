@@ -60,7 +60,6 @@ class InspectDBTestCase(TestCase):
         if not connection.features.interprets_empty_strings_as_nulls:
             assertFieldType('char_field', "models.CharField(max_length=10)")
             assertFieldType('null_char_field', "models.CharField(max_length=10, blank=True, null=True)")
-            assertFieldType('comma_separated_int_field', "models.CharField(max_length=99)")
             assertFieldType('email_field', "models.CharField(max_length=254)")
             assertFieldType('file_field', "models.CharField(max_length=100)")
             assertFieldType('file_path_field', "models.CharField(max_length=100)")

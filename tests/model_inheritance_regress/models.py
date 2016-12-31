@@ -217,7 +217,6 @@ class Station(SearchableLocation):
 
 
 class BusStation(Station):
-    bus_routes = models.CommaSeparatedIntegerField(max_length=128)
     inbound = models.BooleanField(default=False)
 
 

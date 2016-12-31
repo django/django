@@ -1090,26 +1090,17 @@ class CharField(Field):
 class CommaSeparatedIntegerField(CharField):
     default_validators = [validators.validate_comma_separated_integer_list]
     description = _("Comma-separated integers")
-    system_check_deprecated_details = {
+    system_check_removed_details = {
         'msg': (
-            'CommaSeparatedIntegerField has been deprecated. Support '
-            'for it (except in historical migrations) will be removed '
-            'in Django 2.0.'
+            'CommaSeparatedIntegerField is removed except for support in '
+            'historical migrations.'
         ),
         'hint': (
-            'Use CharField(validators=[validate_comma_separated_integer_list]) instead.'
+            'Use CharField(validators=[validate_comma_separated_integer_list]) '
+            'instead.'
         ),
-        'id': 'fields.W901',
+        'id': 'fields.E901',
     }
-
-    def formfield(self, **kwargs):
-        defaults = {
-            'error_messages': {
-                'invalid': _('Enter only digits separated by commas.'),
-            }
-        }
-        defaults.update(kwargs)
-        return super(CommaSeparatedIntegerField, self).formfield(**defaults)
 
 
 class DateTimeCheckMixin(object):

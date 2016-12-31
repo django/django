@@ -6,11 +6,10 @@ from decimal import Decimal
 
 from django.db.models.fields import (
     AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
-    CommaSeparatedIntegerField, DateField, DateTimeField, DecimalField,
-    EmailField, FilePathField, FloatField, GenericIPAddressField, IntegerField,
-    IPAddressField, NullBooleanField, PositiveIntegerField,
-    PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
-    TimeField, URLField,
+    DateField, DateTimeField, DecimalField, EmailField, FilePathField,
+    FloatField, GenericIPAddressField, IntegerField, IPAddressField,
+    NullBooleanField, PositiveIntegerField, PositiveSmallIntegerField,
+    SlugField, SmallIntegerField, TextField, TimeField, URLField,
 )
 from django.db.models.fields.files import FileField, ImageField
 from django.test import SimpleTestCase
@@ -42,12 +41,6 @@ class PromiseTest(SimpleTestCase):
         self.assertIsInstance(CharField().get_prep_value(lazy_func()), six.text_type)
         lazy_func = lazy(lambda: 0, int)
         self.assertIsInstance(CharField().get_prep_value(lazy_func()), six.text_type)
-
-    def test_CommaSeparatedIntegerField(self):
-        lazy_func = lazy(lambda: '1,2', six.text_type)
-        self.assertIsInstance(CommaSeparatedIntegerField().get_prep_value(lazy_func()), six.text_type)
-        lazy_func = lazy(lambda: 0, int)
-        self.assertIsInstance(CommaSeparatedIntegerField().get_prep_value(lazy_func()), six.text_type)
 
     def test_DateField(self):
         lazy_func = lazy(lambda: datetime.date.today(), datetime.date)

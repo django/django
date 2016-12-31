@@ -18,7 +18,6 @@ class CaseTestModel(models.Model):
     big_integer = models.BigIntegerField(null=True)
     binary = models.BinaryField(default=b'')
     boolean = models.BooleanField(default=False)
-    comma_separated_integer = models.CommaSeparatedIntegerField(max_length=100, default='')
     date = models.DateField(null=True, db_column='date_field')
     date_time = models.DateTimeField(null=True)
     decimal = models.DecimalField(max_digits=2, decimal_places=1, null=True, db_column='decimal_field')

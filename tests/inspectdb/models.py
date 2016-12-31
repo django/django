@@ -50,7 +50,6 @@ class ColumnTypes(models.Model):
     null_bool_field = models.NullBooleanField()
     char_field = models.CharField(max_length=10)
     null_char_field = models.CharField(max_length=10, blank=True, null=True)
-    comma_separated_int_field = models.CommaSeparatedIntegerField(max_length=99)
     date_field = models.DateField()
     date_time_field = models.DateTimeField()
     decimal_field = models.DecimalField(max_digits=6, decimal_places=1)

@@ -584,8 +584,7 @@ Character fields
 Any fields that are stored with ``VARCHAR`` column types have their
 ``max_length`` restricted to 255 characters if you are using ``unique=True``
 for the field. This affects :class:`~django.db.models.CharField`,
-:class:`~django.db.models.SlugField` and
-:class:`~django.db.models.CommaSeparatedIntegerField`.
+:class:`~django.db.models.SlugField`.
 
 ``TextField`` limitations
 ~~~~~~~~~~~~~~~~~~~~~~~~~

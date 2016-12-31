@@ -667,20 +667,6 @@ class CaseExpressionTests(TestCase):
             transform=attrgetter('integer', 'boolean')
         )
 
-    def test_update_comma_separated_integer(self):
-        CaseTestModel.objects.update(
-            comma_separated_integer=Case(
-                When(integer=1, then=Value('1')),
-                When(integer=2, then=Value('2,2')),
-                default=Value(''),
-            ),
-        )
-        self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
-            [(1, '1'), (2, '2,2'), (3, ''), (2, '2,2'), (3, ''), (3, ''), (4, '')],
-            transform=attrgetter('integer', 'comma_separated_integer')
-        )
-
     def test_update_date(self):
         CaseTestModel.objects.update(
             date=Case(

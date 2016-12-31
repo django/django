@@ -174,7 +174,10 @@ Model fields
   (except in historical migrations) will be removed in Django 1.9. *This check
   appeared in Django 1.7 and 1.8*.
 * **fields.W901**: ``CommaSeparatedIntegerField`` has been deprecated. Support
-  for it (except in historical migrations) will be removed in Django 2.0.
+  for it (except in historical migrations) will be removed in Django 2.0. *This
+  check appeared in Django 1.10 and 1.11*.
+* **fields.E901**: ``CommaSeparatedIntegerField`` is removed except for support
+  in historical migrations.
 
 File fields
 ~~~~~~~~~~~

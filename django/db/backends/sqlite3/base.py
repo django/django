@@ -73,7 +73,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'BinaryField': 'BLOB',
         'BooleanField': 'bool',
         'CharField': 'varchar(%(max_length)s)',
-        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
         'DateField': 'date',
         'DateTimeField': 'datetime',
         'DecimalField': 'decimal',

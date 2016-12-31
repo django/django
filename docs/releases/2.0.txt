@@ -342,3 +342,6 @@ these features.
 * The ``shell --plain`` option is removed.
 
 * The ``django.core.urlresolvers`` module is removed.
+
+* ``CommaSeparatedIntegerField`` is removed, except for support in historical
+  migrations.

@@ -218,14 +218,6 @@ except ImportError:
     test_images = False
 
 
-@python_2_unicode_compatible
-class CommaSeparatedInteger(models.Model):
-    field = models.CommaSeparatedIntegerField(max_length=20)
-
-    def __str__(self):
-        return self.field
-
-
 class Homepage(models.Model):
     url = models.URLField()
 
