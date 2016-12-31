@@ -330,3 +330,6 @@ these features.
 
 * The ``get_x()``, ``set_x()``, ``get_y()``, ``set_y()``, ``get_z()``, and
   ``set_z()`` methods of ``django.contrib.gis.geos.Point`` are removed.
+
+* The ``get_coords()`` and ``set_coords()`` methods of
+  ``django.contrib.gis.geos.Point`` are removed.

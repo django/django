@@ -1317,14 +1317,6 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(p, Point(srid=2774))
 
     @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_deprecated_point_tuple_getters_setters(self):
-        p = Point(1, 2, 3)
-        self.assertEqual(p.get_coords(), (p.x, p.y, p.z))
-
-        p.set_coords((3, 2, 1))
-        self.assertEqual(p.get_coords(), (3, 2, 1))
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_deprecated_cascaded_union(self):
         for geom in self.geometries.multipolygons:
             mpoly = GEOSGeometry(geom.wkt)

@@ -1,4 +1,3 @@
-import warnings
 from ctypes import c_uint
 
 from django.contrib.gis import gdal
@@ -6,7 +5,6 @@ from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six.moves import range
 
 
@@ -150,20 +148,6 @@ class Point(GEOSGeometry):
     def tuple(self, tup):
         "Sets the coordinates of the point with the given tuple."
         self._cs[0] = tup
-
-    def get_coords(self):
-        warnings.warn(
-            "`get_coords()` is deprecated, use the `tuple` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        return self.tuple
-
-    def set_coords(self, tup):
-        warnings.warn(
-            "`set_coords()` is deprecated, use the `tuple` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        self.tuple = tup
 
     # The tuple and coords properties
     coords = tuple
