@@ -333,3 +333,6 @@ these features.
 
 * The ``get_coords()`` and ``set_coords()`` methods of
   ``django.contrib.gis.geos.Point`` are removed.
+
+* The ``cascaded_union`` property of ``django.contrib.gis.geos.MultiPolygon``
+  is removed.

@@ -839,17 +839,6 @@ Geometry Collections
         In previous versions, an empty ``MultiPolygon`` couldn't be
         instantiated.
 
-    .. attribute:: cascaded_union
-
-        .. deprecated:: 1.10
-
-            Use the :attr:`GEOSGeometry.unary_union` property instead.
-
-        Returns a :class:`Polygon` that is the union of all of the component
-        polygons in this collection.  The algorithm employed is significantly
-        more efficient (faster) than trying to union the geometries together
-        individually. [#fncascadedunion]_
-
 ``GeometryCollection``
 ----------------------
 
@@ -1142,7 +1131,6 @@ include the SRID value (in other words, EWKB).
 
 .. rubric:: Footnotes
 .. [#fnogc] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
-.. [#fncascadedunion] For more information, read Paul Ramsey's blog post about `(Much) Faster Unions in PostGIS 1.4 <http://blog.cleverelephant.ca/2009/01/must-faster-unions-in-postgis-14.html>`_ and Martin Davis' blog post on `Fast polygon merging in JTS using Cascaded Union <http://lin-ear-th-inking.blogspot.com/2007/11/fast-polygon-merging-in-jts-using.html>`_.
 
 Settings
 ========
