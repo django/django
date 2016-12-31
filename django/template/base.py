@@ -60,9 +60,7 @@ from django.template.context import (  # NOQA: imported for backwards compatibil
     BaseContext, Context, ContextPopException, RequestContext,
 )
 from django.utils import six
-from django.utils.deprecation import (
-    DeprecationInstanceCheck, RemovedInDjango20Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import (
     force_str, force_text, python_2_unicode_compatible,
 )
@@ -161,11 +159,6 @@ class Origin(object):
             return '%s.%s' % (
                 self.loader.__module__, self.loader.__class__.__name__,
             )
-
-
-class StringOrigin(six.with_metaclass(DeprecationInstanceCheck, Origin)):
-    alternative = 'django.template.Origin'
-    deprecation_warning = RemovedInDjango20Warning
 
 
 class Template(object):

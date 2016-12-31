@@ -315,3 +315,7 @@ these features.
 
 * The ``enclosure`` keyword argument to ``SyndicationFeed.add_item()`` is
   removed.
+
+* The ``django.template.loader.LoaderOrigin`` and
+  ``django.template.base.StringOrigin`` aliases for
+  ``django.template.base.Origin`` are removed.
