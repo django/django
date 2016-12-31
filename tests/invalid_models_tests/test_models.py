@@ -2,11 +2,11 @@
 from __future__ import unicode_literals
 
 import unittest
-import warnings
 
 from django.conf import settings
 from django.core.checks import Error
 from django.core.checks.model_checks import _check_lazy_references
+from django.core.exceptions import ImproperlyConfigured
 from django.db import connections, models
 from django.db.models.signals import post_init
 from django.test import SimpleTestCase
@@ -783,25 +783,13 @@ class OtherModelTests(SimpleTestCase):
         self.assertEqual(errors, expected)
 
     def test_missing_parent_link(self):
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-
+        msg = 'Add parent_link=True to invalid_models_tests.ParkingLot.parent.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             class Place(models.Model):
                 pass
 
             class ParkingLot(Place):
-                # In lieu of any other connector, an existing OneToOneField will be
-                # promoted to the primary key.
                 parent = models.OneToOneField(Place, models.CASCADE)
-
-        self.assertEqual(len(warns), 1)
-        msg = str(warns[0].message)
-        self.assertEqual(
-            msg,
-            'Add parent_link=True to invalid_models_tests.ParkingLot.parent '
-            'as an implicit link is deprecated.'
-        )
-        self.assertEqual(ParkingLot._meta.pk.name, 'parent')
 
     def test_m2m_table_name_clash(self):
         class Foo(models.Model):

@@ -8,7 +8,7 @@ from itertools import chain
 
 from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
 from django.db import connections
 from django.db.models import Manager
 from django.db.models.fields import AutoField
@@ -244,9 +244,8 @@ class Options(object):
                 field.primary_key = True
                 self.setup_pk(field)
                 if not field.remote_field.parent_link:
-                    warnings.warn(
-                        'Add parent_link=True to %s as an implicit link is '
-                        'deprecated.' % field, RemovedInDjango20Warning
+                    raise ImproperlyConfigured(
+                        'Add parent_link=True to %s.' % field,
                     )
             else:
                 auto = AutoField(verbose_name='ID', primary_key=True, auto_created=True)
