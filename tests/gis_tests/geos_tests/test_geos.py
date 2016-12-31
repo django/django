@@ -1317,14 +1317,6 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(p, Point(srid=2774))
 
     @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_deprecated_srid_getters_setters(self):
-        p = Point(1, 2, srid=123)
-        self.assertEqual(p.get_srid(), p.srid)
-
-        p.set_srid(321)
-        self.assertEqual(p.srid, 321)
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_deprecated_point_coordinate_getters_setters(self):
         p = Point(1, 2, 3)
         self.assertEqual((p.get_x(), p.get_y(), p.get_z()), (p.x, p.y, p.z))

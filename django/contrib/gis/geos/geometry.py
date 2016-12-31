@@ -5,7 +5,6 @@
 from __future__ import unicode_literals
 
 import json
-import warnings
 from ctypes import addressof, byref, c_double
 
 from django.contrib.gis import gdal
@@ -22,7 +21,6 @@ from django.contrib.gis.geos.prototypes.io import (
 )
 from django.utils import six
 from django.utils.deconstruct import deconstructible
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes, force_text
 
 
@@ -384,20 +382,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
     def srid(self, srid):
         "Sets the SRID for the geometry."
         capi.geos_set_srid(self.ptr, 0 if srid is None else srid)
-
-    def get_srid(self):
-        warnings.warn(
-            "`get_srid()` is deprecated, use the `srid` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        return self.srid
-
-    def set_srid(self, srid):
-        warnings.warn(
-            "`set_srid()` is deprecated, use the `srid` property instead.",
-            RemovedInDjango20Warning, 2
-        )
-        self.srid = srid
 
     # #### Output Routines ####
     @property
