@@ -303,3 +303,6 @@ these features.
 * ``Field._get_val_from_obj()`` is removed.
 
 * ``django.template.loaders.eggs.Loader`` is removed.
+
+* The ``current_app`` parameter to the ``contrib.auth`` function-based views is
+  removed.

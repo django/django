@@ -1,4 +1,3 @@
-import functools
 import warnings
 
 from django.conf import settings
@@ -18,9 +17,7 @@ from django.shortcuts import resolve_url
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango21Warning,
-)
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 from django.utils.http import is_safe_url, urlsafe_base64_decode
 from django.utils.six.moves.urllib.parse import urlparse, urlunparse
@@ -32,27 +29,6 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
 UserModel = get_user_model()
-
-
-def deprecate_current_app(func):
-    """
-    Handle deprecation of the current_app parameter of the views.
-    """
-    @functools.wraps(func)
-    def inner(*args, **kwargs):
-        if 'current_app' in kwargs:
-            warnings.warn(
-                "Passing `current_app` as a keyword argument is deprecated. "
-                "Instead the caller of `{0}` should set "
-                "`request.current_app`.".format(func.__name__),
-                RemovedInDjango20Warning
-            )
-            current_app = kwargs.pop('current_app')
-            request = kwargs.get('request', None)
-            if request and current_app is not None:
-                request.current_app = current_app
-        return func(*args, **kwargs)
-    return inner
 
 
 class SuccessURLAllowedHostsMixin(object):
@@ -125,7 +101,6 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
         return context
 
 
-@deprecate_current_app
 def login(request, *args, **kwargs):
     warnings.warn(
         'The login() view is superseded by the class-based LoginView().',
@@ -190,7 +165,6 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
         return context
 
 
-@deprecate_current_app
 def logout(request, *args, **kwargs):
     warnings.warn(
         'The logout() view is superseded by the class-based LogoutView().',
@@ -202,7 +176,6 @@ def logout(request, *args, **kwargs):
 _sentinel = object()
 
 
-@deprecate_current_app
 def logout_then_login(request, login_url=None, extra_context=_sentinel):
     """
     Logs out the user if they are logged in. Then redirects to the log-in page.
@@ -242,7 +215,6 @@ def redirect_to_login(next, login_url=None,
 #   prompts for a new password
 # - password_reset_complete shows a success message for the above
 
-@deprecate_current_app
 @csrf_protect
 def password_reset(request,
                    template_name='registration/password_reset_form.html',
@@ -289,7 +261,6 @@ def password_reset(request,
     return TemplateResponse(request, template_name, context)
 
 
-@deprecate_current_app
 def password_reset_done(request,
                         template_name='registration/password_reset_done.html',
                         extra_context=None):
@@ -308,7 +279,6 @@ def password_reset_done(request,
 # Doesn't need csrf_protect since no-one can guess the URL
 @sensitive_post_parameters()
 @never_cache
-@deprecate_current_app
 def password_reset_confirm(request, uidb64=None, token=None,
                            template_name='registration/password_reset_confirm.html',
                            token_generator=default_token_generator,
@@ -359,7 +329,6 @@ def password_reset_confirm(request, uidb64=None, token=None,
     return TemplateResponse(request, template_name, context)
 
 
-@deprecate_current_app
 def password_reset_complete(request,
                             template_name='registration/password_reset_complete.html',
                             extra_context=None):
@@ -518,7 +487,6 @@ class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
 @sensitive_post_parameters()
 @csrf_protect
 @login_required
-@deprecate_current_app
 def password_change(request,
                     template_name='registration/password_change_form.html',
                     post_change_redirect=None,
@@ -552,7 +520,6 @@ def password_change(request,
 
 
 @login_required
-@deprecate_current_app
 def password_change_done(request,
                          template_name='registration/password_change_done.html',
                          extra_context=None):
