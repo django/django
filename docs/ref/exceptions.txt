@@ -173,12 +173,6 @@ URL Resolver exceptions
 
 URL Resolver exceptions are defined in ``django.urls``.
 
-.. deprecated:: 1.10
-
-    In older versions, these exceptions are located in
-    ``django.core.urlresolvers``. Importing from the old location will continue
-    to work until Django 2.0.
-
 ``Resolver404``
 ---------------
 

@@ -4,12 +4,6 @@
 
 .. module:: django.urls
 
-.. deprecated:: 1.10
-
-    In older versions, these functions are located in
-    ``django.core.urlresolvers``. Importing from the old location will continue
-    to work until Django 2.0.
-
 ``reverse()``
 =============
 

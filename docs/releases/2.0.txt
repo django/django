@@ -340,3 +340,5 @@ these features.
 * ``django.utils.functional.allow_lazy()`` is removed.
 
 * The ``shell --plain`` option is removed.
+
+* The ``django.core.urlresolvers`` module is removed.
