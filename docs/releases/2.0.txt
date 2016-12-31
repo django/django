@@ -353,3 +353,5 @@ these features.
 
 * Support for query lookups using the model name when
   ``Meta.default_related_name`` is set is removed.
+
+* The MySQL ``__search`` lookup is removed.

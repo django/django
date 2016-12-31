@@ -1,6 +1,5 @@
 import itertools
 import math
-import warnings
 from copy import copy
 from decimal import Decimal
 
@@ -10,7 +9,6 @@ from django.db.models.fields import (
     DateTimeField, DecimalField, Field, IntegerField,
 )
 from django.db.models.query_utils import RegisterLookupMixin
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.six.moves import range
 
@@ -507,22 +505,6 @@ class IsNull(BuiltinLookup):
             return "%s IS NULL" % sql, params
         else:
             return "%s IS NOT NULL" % sql, params
-
-
-@Field.register_lookup
-class Search(BuiltinLookup):
-    lookup_name = 'search'
-    prepare_rhs = False
-
-    def as_sql(self, compiler, connection):
-        warnings.warn(
-            'The `__search` lookup is deprecated. See the 1.10 release notes '
-            'for how to replace it.', RemovedInDjango20Warning, stacklevel=2
-        )
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        sql_template = connection.ops.fulltext_search_sql(field_name=lhs)
-        return sql_template, lhs_params + rhs_params
 
 
 @Field.register_lookup

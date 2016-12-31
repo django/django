@@ -110,10 +110,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         return [(None, ("NULL", [], False))]
 
-    def fulltext_search_sql(self, field_name):
-        # RemovedInDjango20Warning
-        return 'MATCH (%s) AGAINST (%%s IN BOOLEAN MODE)' % field_name
-
     def last_executed_query(self, cursor, sql, params):
         # With MySQLdb, cursor objects have an (undocumented) "_last_executed"
         # attribute where the exact query sent to the database is saved.

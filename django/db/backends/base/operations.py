@@ -191,15 +191,6 @@ class BaseDatabaseOperations(object):
         else:
             return 'FOR UPDATE'
 
-    def fulltext_search_sql(self, field_name):
-        """
-        Returns the SQL WHERE clause to use in order to perform a full-text
-        search of the given field_name. Note that the resulting string should
-        contain a '%s' placeholder for the value being searched against.
-        """
-        # RemovedInDjango20Warning
-        raise NotImplementedError('Full-text search is not implemented for this database backend')
-
     def last_executed_query(self, cursor, sql, params):
         """
         Returns a string of the query last executed by the given cursor, with
