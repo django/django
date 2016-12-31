@@ -823,7 +823,6 @@ class SQLCompiler:
         """
         Returns an iterator over the results from executing this query.
         """
-        converters = None
         if results is None:
             results = self.execute_sql(MULTI)
         fields = [s[0] for s in self.select[0:self.col_count]]

@@ -140,7 +140,6 @@ class URLValidator(RegexValidator):
                     validate_ipv6_address(potential_ip)
                 except ValidationError:
                     raise ValidationError(self.message, code=self.code)
-            url = value
 
         # The maximum length of a full host name is 253 characters per RFC 1034
         # section 3.1. It's defined to be 255 bytes or less, but this includes

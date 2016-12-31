@@ -324,7 +324,6 @@ class DateFormat(TimeFormat):
     def W(self):
         "ISO-8601 week number of year, weeks starting on Monday"
         # Algorithm from http://www.personal.ecu.edu/mccartyr/ISOwdALG.txt
-        week_number = None
         jan1_weekday = self.data.replace(month=1, day=1).weekday() + 1
         weekday = self.data.weekday() + 1
         day_of_year = self.z()
