@@ -378,3 +378,9 @@ these features.
 
 * ``FileField`` methods ``get_directory_name()`` and ``get_filename()`` are
   removed.
+
+* The ``mark_for_escaping()`` function and the classes it uses: ``EscapeData``,
+  ``EscapeBytes``, ``EscapeText``, ``EscapeString``, and ``EscapeUnicode`` are
+  removed.
+
+* The ``escape`` filter now uses ``django.utils.html.conditional_escape()``.

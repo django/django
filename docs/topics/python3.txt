@@ -112,22 +112,18 @@ For forwards compatibility, the new names work as of Django 1.4.2.
     information.
 
 :mod:`django.utils.safestring` is mostly used via the
-:func:`~django.utils.safestring.mark_safe` and
-:func:`~django.utils.safestring.mark_for_escaping` functions, which didn't
-change. In case you're using the internals, here are the name changes:
+:func:`~django.utils.safestring.mark_safe` function, which didn't change. In
+case you're using the internals, here are the name changes:
 
 ==================  ==================
 Old name            New name
 ==================  ==================
-``EscapeString``    ``EscapeBytes``
-``EscapeUnicode``   ``EscapeText``
 ``SafeString``      ``SafeBytes``
 ``SafeUnicode``     ``SafeText``
 ==================  ==================
 
-For backwards compatibility, the old names still work on Python 2. Under
-Python 3, ``EscapeString`` and ``SafeString`` are aliases for ``EscapeText``
-and ``SafeText`` respectively.
+For backwards compatibility, the old names still work on Python 2. On Python 3,
+``SafeString`` is an alias for ``SafeText``.
 
 For forwards compatibility, the new names work as of Django 1.4.2.
 

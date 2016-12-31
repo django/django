@@ -841,16 +841,6 @@ appropriate entities.
 
         Added support for decorator usage.
 
-.. function:: mark_for_escaping(s)
-
-    .. deprecated:: 1.10
-
-    Explicitly mark a string as requiring HTML escaping upon output. Has no
-    effect on ``SafeData`` subclasses.
-
-    Can be called multiple times on a single string (the resulting escaping is
-    only applied once).
-
 ``django.utils.text``
 =====================
 
