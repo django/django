@@ -236,11 +236,6 @@ foundation for custom widgets.
         isn't guaranteed to be valid input, therefore subclass implementations
         should program defensively.
 
-        .. versionchanged:: 1.10
-
-            In older versions, this method is a private API named
-            ``_format_value()``. The old name will work until Django 2.0.
-
     .. method:: get_context(name, value, attrs=None)
 
         .. versionadded:: 1.11

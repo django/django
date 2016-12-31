@@ -15,9 +15,6 @@ from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
 from django.utils import datetime_safe, formats, six
 from django.utils.dates import MONTHS
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RenameMethodsBase,
-)
 from django.utils.encoding import (
     force_str, force_text, python_2_unicode_compatible,
 )
@@ -160,13 +157,7 @@ class MediaDefiningClass(type):
         return new_class
 
 
-class RenameWidgetMethods(MediaDefiningClass, RenameMethodsBase):
-    renamed_methods = (
-        ('_format_value', 'format_value', RemovedInDjango20Warning),
-    )
-
-
-class Widget(six.with_metaclass(RenameWidgetMethods)):
+class Widget(six.with_metaclass(MediaDefiningClass)):
     needs_multipart_form = False  # Determines does this widget need multipart form
     is_localized = False
     is_required = False

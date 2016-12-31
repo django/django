@@ -373,3 +373,5 @@ these features.
 
 * In multi-table inheritance, implicit promotion of a ``OneToOneField`` to a
   ``parent_link`` is removed.
+
+* Support for ``Widget._format_value()`` is removed.
