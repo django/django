@@ -1,5 +1,16 @@
 {% load i18n l10n static %}
-<style type="text/css">{% block map_css %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+
+{% comment %}
+    The following "div" is actually a disguised "style". We can't use "style"
+    here because the HTML standard doesn't allow it; so we put the style in an
+    undisplayed "div", and we have some JavaScript grab its contents and insert
+    them into a dynamically created "style" element. (It might have been more
+    elegant to include these contents in the JavaScript instead of in a fake
+    div, but there's currently no cross-browser support for JavaScript
+    multiline strings.)
+{% endcomment %}
+
+<div id="map_css" style="display: none">{% block map_css %}{% get_current_language_bidi as LANGUAGE_BIDI %}
     #{{ id }}_map { width: {{ map_width }}px; height: {{ map_height }}px; }
     #{{ id }}_map .aligned label { float: inherit; }
     #{{ id }}_div_map { position: relative; vertical-align: top; float: {{ LANGUAGE_BIDI|yesno:"right,left" }}; }
@@ -12,7 +23,7 @@
         background-image: url("{% static "admin/img/gis/move_vertex_off.svg" %}");
         background-repeat: no-repeat;
     }{% endblock %}
-</style>
+</div>
 
 <div id="{{ id }}_div_map">
     <div id="{{ id }}_map"></div>
@@ -30,6 +41,18 @@
             name: '{{ name }}'
         };
         {% endblock %}
+
+        // Create the style for the widget
+        var map_css = document.getElementById('map_css').innerHTML;
+        var style_element = document.createElement('style');
+        style_element.type = 'text/css';
+        if(style_element.styleSheet) {
+            style_element.styleSheet.cssText = map_css;
+        } else {
+            style_element.appendChild(document.createTextNode(map_css));
+        }
+        document.getElementsByTagName('head')[0].appendChild(style_element);
+
         var {{ module }} = new MapWidget(options);
     </script>
 </div>
