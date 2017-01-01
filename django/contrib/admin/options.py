@@ -48,6 +48,10 @@ from django.utils.text import capfirst, format_lazy, get_text_list
 from django.utils.translation import ugettext as _, ungettext
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
+try:
+    from django.contrib.postgres.fields import HStoreField
+except ImportError:
+    HStoreField = None
 
 IS_POPUP_VAR = '_popup'
 TO_FIELD_VAR = '_to_field'
@@ -90,6 +94,8 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
     models.FileField: {'widget': widgets.AdminFileWidget},
     models.EmailField: {'widget': widgets.AdminEmailInputWidget},
 }
+if HStoreField is not None:
+    FORMFIELD_FOR_DBFIELD_DEFAULTS[HStoreField] = {'widget': widgets.AdminHstoreWidget}
 
 csrf_protect_m = method_decorator(csrf_protect)
 
