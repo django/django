@@ -701,14 +701,13 @@ operators ``@>``, ``<@``, and ``&&`` respectively.
     >>> Event.objects.filter(ages__contained_by=NumericRange(0, 15))
     [<Event: Soft play>]
 
-.. versionadded 1.9
+.. versionadded:: 1.9
 
-    The `contained_by` lookup is also available on the non-range field types:
-    :class:`~django.db.models.fields.IntegerField`,
-    :class:`~django.db.models.fields.BigIntegerField`,
-    :class:`~django.db.models.fields.FloatField`,
-    :class:`~django.db.models.fields.DateField`, and
-    :class:`~django.db.models.fields.DateTimeField`. For example::
+The ``contained_by`` lookup is also available on the non-range field types:
+:class:`~django.db.models.IntegerField`,
+:class:`~django.db.models.BigIntegerField`,
+:class:`~django.db.models.FloatField`, :class:`~django.db.models.DateField`,
+and :class:`~django.db.models.DateTimeField`. For example::
 
     >>> from psycopg2.extras import DateTimeTZRange
     >>> Event.objects.filter(start__contained_by=DateTimeTZRange(
