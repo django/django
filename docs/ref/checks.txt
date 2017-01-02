@@ -83,6 +83,7 @@ Django's system checks are organized using the following tags:
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
 * ``signals``: Checks on signal declarations and handler registrations.
+* ``staticfiles``: Checks :mod:`django.contrib.staticfiles` configuration.
 * ``templates``: Checks template related configuration.
 * ``urls``: Checks URL configuration.
 
@@ -675,3 +676,14 @@ The following checks are performed on any model using a
   ``<field name>``.
 * **sites.E002**: ``CurrentSiteManager`` cannot use ``<field>`` as it is not a
   foreign key or a many-to-many field.
+
+``staticfiles``
+---------------
+
+The following checks verify that :mod:`django.contrib.staticfiles` is correctly
+configured:
+
+* **staticfiles.E001**: The :setting:`STATICFILES_DIRS` setting is not a tuple
+  or list.
+* **staticfiles.E002**: The :setting:`STATICFILES_DIRS` setting should not
+  contain the :setting:`STATIC_ROOT` setting.

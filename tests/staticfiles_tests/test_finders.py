@@ -103,15 +103,6 @@ class TestMiscFinder(SimpleTestCase):
             [os.path.join(TEST_ROOT, 'project', 'documents')]
         )
 
-    @override_settings(STATICFILES_DIRS='a string')
-    def test_non_tuple_raises_exception(self):
-        """
-        We can't determine if STATICFILES_DIRS is set correctly just by
-        looking at the type, but we can determine if it's definitely wrong.
-        """
-        with self.assertRaises(ImproperlyConfigured):
-            finders.FileSystemFinder()
-
     @override_settings(MEDIA_ROOT='')
     def test_location_empty(self):
         with self.assertRaises(ImproperlyConfigured):

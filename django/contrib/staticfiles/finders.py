@@ -5,6 +5,7 @@ from collections import OrderedDict
 from django.apps import apps
 from django.conf import settings
 from django.contrib.staticfiles import utils
+from django.core.checks import Error
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import (
     FileSystemStorage, Storage, default_storage,
@@ -21,6 +22,11 @@ class BaseFinder:
     """
     A base file finder to be used for custom staticfiles finder classes.
     """
+    def check(self, **kwargs):
+        raise NotImplementedError(
+            'subclasses may provide a check() method to verify the finder is '
+            'configured correctly.'
+        )
 
     def find(self, path, all=False):
         """
@@ -52,19 +58,11 @@ class FileSystemFinder(BaseFinder):
         self.locations = []
         # Maps dir paths to an appropriate storage instance
         self.storages = OrderedDict()
-        if not isinstance(settings.STATICFILES_DIRS, (list, tuple)):
-            raise ImproperlyConfigured(
-                "Your STATICFILES_DIRS setting is not a tuple or list; "
-                "perhaps you forgot a trailing comma?")
         for root in settings.STATICFILES_DIRS:
             if isinstance(root, (list, tuple)):
                 prefix, root = root
             else:
                 prefix = ''
-            if settings.STATIC_ROOT and os.path.abspath(settings.STATIC_ROOT) == os.path.abspath(root):
-                raise ImproperlyConfigured(
-                    "The STATICFILES_DIRS setting should "
-                    "not contain the STATIC_ROOT setting")
             if (prefix, root) not in self.locations:
                 self.locations.append((prefix, root))
         for prefix, root in self.locations:
@@ -72,6 +70,25 @@ class FileSystemFinder(BaseFinder):
             filesystem_storage.prefix = prefix
             self.storages[root] = filesystem_storage
         super().__init__(*args, **kwargs)
+
+    def check(self, **kwargs):
+        errors = []
+        if not isinstance(settings.STATICFILES_DIRS, (list, tuple)):
+            errors.append(Error(
+                'The STATICFILES_DIRS setting is not a tuple or list.',
+                hint='Perhaps you forgot a trailing comma?',
+                id='staticfiles.E001',
+            ))
+        for root in settings.STATICFILES_DIRS:
+            if isinstance(root, (list, tuple)):
+                _, root = root
+            if settings.STATIC_ROOT and os.path.abspath(settings.STATIC_ROOT) == os.path.abspath(root):
+                errors.append(Error(
+                    'The STATICFILES_DIRS setting should not contain the '
+                    'STATIC_ROOT setting.',
+                    id='staticfiles.E002',
+                ))
+        return errors
 
     def find(self, path, all=False):
         """
