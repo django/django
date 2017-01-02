@@ -65,6 +65,9 @@ details on these changes.
 * The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` will
   be removed.
 
+* ``django.db.backends.base.BaseDatabaseOperations.check_aggregate_support()``
+  will be removed.
+
 * The ``django.forms.extras`` package will be removed.
 
 * The ``assignment_tag`` helper will be removed.
@@ -756,9 +759,9 @@ details on these changes.
   and ``django.utils.text.truncate_html_words()`` will be removed in
   favor of the ``django.utils.text.Truncator`` class.
 
-* The :class:`~django.contrib.gis.geoip.GeoIP` class was moved to
-  :mod:`django.contrib.gis.geoip` in 1.4 -- the shortcut in
-  :mod:`django.contrib.gis.utils` will be removed.
+* The ``django.contrib.gis.geoip.GeoIP`` class was moved to
+  ``django.contrib.gis.geoip`` in 1.4 -- the shortcut in
+  ``django.contrib.gis.utils`` will be removed.
 
 * ``django.conf.urls.defaults`` will be removed. The functions
   :func:`~django.conf.urls.include`, ``patterns()`` and
