@@ -1,4 +1,5 @@
 from functools import update_wrapper
+from weakref import WeakSet
 
 from django.apps import apps
 from django.conf import settings
@@ -16,7 +17,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.i18n import JavaScriptCatalog
 
-system_check_errors = []
+all_sites = WeakSet()
 
 
 class AlreadyRegistered(Exception):
@@ -63,6 +64,26 @@ class AdminSite(object):
         self.name = name
         self._actions = {'delete_selected': actions.delete_selected}
         self._global_actions = self._actions.copy()
+        all_sites.add(self)
+
+    def check(self, app_configs):
+        """
+        Run the system checks on all ModelAdmins, except if they aren't
+        customized at all.
+        """
+        if not settings.DEBUG:
+            return []
+
+        if app_configs is None:
+            app_configs = apps.get_app_configs()
+        app_configs = set(app_configs)  # Speed up lookups below
+
+        errors = []
+        modeladmins = (o for o in self._registry.values() if o.__class__ is not ModelAdmin)
+        for modeladmin in modeladmins:
+            if modeladmin.model._meta.app_config in app_configs:
+                errors.extend(modeladmin.check())
+        return errors
 
     def register(self, model_or_iterable, admin_class=None, **options):
         """
@@ -105,11 +126,7 @@ class AdminSite(object):
                     admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
 
                 # Instantiate the admin class to save in the registry
-                admin_obj = admin_class(model, self)
-                if admin_class is not ModelAdmin and settings.DEBUG:
-                    system_check_errors.extend(admin_obj.check())
-
-                self._registry[model] = admin_obj
+                self._registry[model] = admin_class(model, self)
 
     def unregister(self, model_or_iterable):
         """
