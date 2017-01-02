@@ -307,7 +307,7 @@ class URLPatternReverse(SimpleTestCase):
     @override_script_prefix('/%7Eme/')
     def test_non_urlsafe_prefix_with_args(self):
         # Regression for #20022, adjusted for #24013 because ~ is an unreserved
-        # character. Tests whether % is escaped.
+        # character. % is escaped.
         self.assertEqual('/%257Eme/places/1/', reverse('places', args=[1]))
 
     def test_patterns_reported(self):

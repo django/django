@@ -3542,7 +3542,7 @@ class RelatedLookupTypeTests(TestCase):
 
     def test_values_queryset_lookup(self):
         """
-        #23396 - Ensure ValueQuerySets are not checked for compatibility with the lookup field
+        #23396 - ValueQuerySets are not checked for compatibility with the lookup field
         """
         # Make sure the num and objecta field values match.
         ob = ObjectB.objects.get(name='ob')

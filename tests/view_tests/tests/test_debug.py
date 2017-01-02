@@ -235,7 +235,7 @@ class DebugViewQueriesAllowedTests(SimpleTestCase):
 
     def test_handle_db_exception(self):
         """
-        Ensure the debug view works when a database exception is raised by
+        The debug view works when a database exception is raised by
         performing an invalid query and passing the exception to the debug view.
         """
         with connection.cursor() as cursor:

@@ -924,7 +924,7 @@ class UniqueTest(TestCase):
         self.assertFalse(form.is_valid())
 
     def test_explicitpk_unique(self):
-        """Ensure keys and blank character strings are tested for uniqueness."""
+        """Keys and blank character strings are tested for uniqueness."""
         form = ExplicitPKForm({'key': 'key1', 'desc': ''})
         self.assertTrue(form.is_valid())
         form.save()

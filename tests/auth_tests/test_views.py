@@ -477,7 +477,7 @@ class ChangePasswordTest(AuthViewsTestCase):
 class SessionAuthenticationTests(AuthViewsTestCase):
     def test_user_password_change_updates_session(self):
         """
-        #21649 - Ensure contrib.auth.views.password_change updates the user's
+        #21649 - contrib.auth.views.password_change updates the user's
         session auth hash after a password change so the session isn't logged out.
         """
         self.login()

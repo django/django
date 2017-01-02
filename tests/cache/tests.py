@@ -1121,7 +1121,7 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         self.assertIsNone(caches['other'].get('value'))
 
     def test_locking_on_pickle(self):
-        """#20613/#18541 -- Ensures pickling is done outside of the lock."""
+        """#20613/#18541 -- Pickling is done outside of the lock."""
         bad_obj = PicklingSideEffect(cache)
         cache.set('set', bad_obj)
         self.assertFalse(bad_obj.locked, "Cache was locked during pickling")
@@ -1995,7 +1995,7 @@ class CacheMiddlewareTest(SimpleTestCase):
 
     def test_constructor(self):
         """
-        Ensure the constructor is correctly distinguishing between usage of CacheMiddleware as
+        The constructor is correctly distinguishing between usage of CacheMiddleware as
         Middleware vs. usage of CacheMiddleware as view decorator and setting attributes
         appropriately.
         """

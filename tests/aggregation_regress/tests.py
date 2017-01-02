@@ -1348,7 +1348,7 @@ class AggregationTests(TestCase):
 
     def test_annotate_reserved_word(self):
         """
-        Regression #18333 - Ensure annotated column name is properly quoted.
+        Regression #18333 - Annotated column name is properly quoted.
         """
         vals = Book.objects.annotate(select=Count('authors__id')).aggregate(Sum('select'), Avg('select'))
         self.assertEqual(vals, {

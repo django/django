@@ -1105,7 +1105,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_localized_input(self):
         """
-        Tests if form input is correctly localized
+        Form input is correctly localized
         """
         self.maxDiff = 1200
         with translation.override('de-at', deactivate=True):
@@ -1239,7 +1239,7 @@ class FormattingTests(SimpleTestCase):
 
     def test_localized_as_text_as_hidden_input(self):
         """
-        Tests if form input with 'as_hidden' or 'as_text' is correctly localized. Ticket #18777
+        Form input with 'as_hidden' or 'as_text' is correctly localized. Ticket #18777
         """
         self.maxDiff = 1200
 
@@ -1954,7 +1954,7 @@ class TranslationFilesMissing(SimpleTestCase):
 
     def test_failure_finding_default_mo_files(self):
         '''
-        Ensure IOError is raised if the default language is unparseable.
+        IOError is raised if the default language is unparseable.
         Refs: #18192
         '''
         self.patchGettextFind()

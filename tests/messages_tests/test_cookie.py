@@ -157,7 +157,7 @@ class CookieTest(BaseTests, SimpleTestCase):
 
     def test_pre_1_5_message_format(self):
         """
-        For ticket #22426. Tests whether messages that were set in the cookie
+        For ticket #22426. Messages that were set in the cookie
         before the addition of is_safedata are decoded correctly.
         """
 

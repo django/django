@@ -245,7 +245,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_basic_edit_GET_string_PK(self):
         """
-        Ensure GET on the change_view works (returns an HTTP 404 error, see
+        GET on the change_view works (returns an HTTP 404 error, see
         #11191) when passing a string as the PK argument for a model with an
         integer PK field.
         """
@@ -263,7 +263,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_basic_inheritance_GET_string_PK(self):
         """
-        Ensure GET on the change_view works on inherited models (returns an
+        GET on the change_view works on inherited models (returns an
         HTTP 404 error, see #19951) when passing a string as the PK argument
         for a model with an integer PK field.
         """
@@ -286,7 +286,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_popup_add_POST(self):
         """
-        Ensure http response from a popup is properly escaped.
+        Http response from a popup is properly escaped.
         """
         post_data = {
             '_popup': '1',
@@ -350,7 +350,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_change_list_sorting_callable(self):
         """
-        Ensure we can sort on a list_display field that is a callable
+        We can sort on a list_display field that is a callable
         (column 2 is callable_year in ArticleAdmin)
         """
         response = self.client.get(reverse('admin:admin_views_article_changelist'), {'o': 2})
@@ -365,7 +365,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_change_list_sorting_model(self):
         """
-        Ensure we can sort on a list_display field that is a Model method
+        We can sort on a list_display field that is a Model method
         (column 3 is 'model_year' in ArticleAdmin)
         """
         response = self.client.get(reverse('admin:admin_views_article_changelist'), {'o': '-3'})
@@ -380,7 +380,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_change_list_sorting_model_admin(self):
         """
-        Ensure we can sort on a list_display field that is a ModelAdmin method
+        We can sort on a list_display field that is a ModelAdmin method
         (column 4 is 'modeladmin_year' in ArticleAdmin)
         """
         response = self.client.get(reverse('admin:admin_views_article_changelist'), {'o': '4'})
@@ -395,7 +395,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_change_list_sorting_model_admin_reverse(self):
         """
-        Ensure we can sort on a list_display field that is a ModelAdmin
+        We can sort on a list_display field that is a ModelAdmin
         method in reverse order (i.e. admin_order_field uses the '-' prefix)
         (column 6 is 'model_year_reverse' in ArticleAdmin)
         """
@@ -563,7 +563,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertIs(response.context['cl'].has_related_field_in_list_display(), False)
 
     def test_limited_filter(self):
-        """Ensure admin changelist filters do not contain objects excluded via limit_choices_to.
+        """Admin changelist filters do not contain objects excluded via limit_choices_to.
         This also tests relation-spanning filters (e.g. 'color__value').
         """
         response = self.client.get(reverse('admin:admin_views_thing_changelist'))
@@ -613,7 +613,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
                     self.assertTrue(params['test'](obj, value))
 
     def test_incorrect_lookup_parameters(self):
-        """Ensure incorrect lookup parameters are handled gracefully."""
+        """Incorrect lookup parameters are handled gracefully."""
         changelist_url = reverse('admin:admin_views_thing_changelist')
         response = self.client.get(changelist_url, {'notarealfield': '5'})
         self.assertRedirects(response, '%s?e=1' % changelist_url)
@@ -630,7 +630,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertRedirects(response, '%s?e=1' % changelist_url)
 
     def test_isnull_lookups(self):
-        """Ensure is_null is handled correctly."""
+        """is_null is handled correctly."""
         Article.objects.create(title="I Could Go Anywhere", content="Versatile", date=datetime.datetime.now())
         changelist_url = reverse('admin:admin_views_article_changelist')
         response = self.client.get(changelist_url)
@@ -651,7 +651,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_named_group_field_choices_change_list(self):
         """
-        Ensures the admin changelist shows correct values in the relevant column
+        The admin changelist shows correct values in the relevant column
         for rows corresponding to instances of a model in which a named group
         has been used in the choices option of a field.
         """
@@ -667,7 +667,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_named_group_field_choices_filter(self):
         """
-        Ensures the filter UI shows correctly when at least one named group has
+        The filter UI shows correctly when at least one named group has
         been used in the choices option of a model field.
         """
         response = self.client.get(reverse('admin:admin_views_fabric_changelist'))
@@ -838,7 +838,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_hide_change_password(self):
         """
-        Tests if the "change password" link in the admin is hidden if the User
+        The "change password" link in the admin is hidden if the User
         does not have a usable password set.
         (against 9bea85795705d015cdadc82c68b99196a8554f5c)
         """
@@ -5161,21 +5161,21 @@ class CSSTest(TestCase):
 
     def test_app_model_in_form_body_class(self):
         """
-        Ensure app and model tag are correctly read by change_form template
+        App and model tag are correctly read by change_form template
         """
         response = self.client.get(reverse('admin:admin_views_section_add'))
         self.assertContains(response, '<body class=" app-admin_views model-section ')
 
     def test_app_model_in_list_body_class(self):
         """
-        Ensure app and model tag are correctly read by change_list template
+        App and model tag are correctly read by change_list template
         """
         response = self.client.get(reverse('admin:admin_views_section_changelist'))
         self.assertContains(response, '<body class=" app-admin_views model-section ')
 
     def test_app_model_in_delete_confirmation_body_class(self):
         """
-        Ensure app and model tag are correctly read by delete_confirmation
+        App and model tag are correctly read by delete_confirmation
         template
         """
         response = self.client.get(reverse('admin:admin_views_section_delete', args=(self.s1.pk,)))
@@ -5183,14 +5183,14 @@ class CSSTest(TestCase):
 
     def test_app_model_in_app_index_body_class(self):
         """
-        Ensure app and model tag are correctly read by app_index template
+        App and model tag are correctly read by app_index template
         """
         response = self.client.get(reverse('admin:app_list', args=('admin_views',)))
         self.assertContains(response, '<body class=" dashboard app-admin_views')
 
     def test_app_model_in_delete_selected_confirmation_body_class(self):
         """
-        Ensure app and model tag are correctly read by
+        App and model tag are correctly read by
         delete_selected_confirmation template
         """
         action_data = {

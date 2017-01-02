@@ -454,7 +454,7 @@ class TestFixtures(TestCase):
 
     def test_loaddata_raises_error_when_fixture_has_invalid_foreign_key(self):
         """
-        Regression for #3615 - Ensure data with nonexistent child key references raises error
+        Regression for #3615 - Data with nonexistent child key references raises error
         """
         with self.assertRaisesMessage(IntegrityError, "Problem installing fixture"):
             management.call_command(
