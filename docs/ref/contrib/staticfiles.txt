@@ -129,8 +129,6 @@ For a full list of options, refer to the commands own help by running::
 Customizing the ignored pattern list
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.10
-
 The default ignored pattern list, ``['CVS', '.*', '*~']``, can be customized in
 a more persistent way than providing the ``--ignore`` command option at each
 ``collectstatic`` invocation. Provide a custom :class:`~django.apps.AppConfig`
@@ -319,13 +317,6 @@ following requirements are met:
 * the :setting:`DEBUG` setting is set to ``False``
 * you've collected all your static files by using the
   :djadmin:`collectstatic` management command
-
-.. versionchanged:: 1.10
-
-    In older versions, you also had to use
-    ``{% load static from staticfiles %}`` in your template. The
-    :ttag:`static` template tag (``{% load static %}``) now uses
-    :mod:`django.contrib.staticfiles` if it's installed.
 
 Since creating the MD5 hash can be a performance burden to your website
 during runtime, ``staticfiles`` will automatically store the mapping with

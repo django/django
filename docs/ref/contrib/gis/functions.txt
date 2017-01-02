@@ -202,10 +202,6 @@ Accepts two geographic fields or expressions and returns the geometric
 difference, that is the part of geometry A that does not intersect with
 geometry B.
 
-.. versionchanged:: 1.10
-
-    MySQL support was added.
-
 ``Distance``
 ============
 
@@ -288,10 +284,6 @@ representation of the geometry.
 The ``precision`` keyword argument controls the number of characters in the
 result.
 
-.. versionchanged:: 1.10
-
-    SpatiaLite support was added.
-
 __ https://en.wikipedia.org/wiki/Geohash
 
 ``Intersection``
@@ -304,16 +296,10 @@ __ https://en.wikipedia.org/wiki/Geohash
 Accepts two geographic fields or expressions and returns the geometric
 intersection between them.
 
-.. versionchanged:: 1.10
-
-    MySQL support was added.
-
 ``IsValid``
 ===========
 
 .. class:: IsValid(expr)
-
-.. versionadded:: 1.10
 
 *Availability*: PostGIS, Oracle, SpatiaLite (LWGEOM)
 
@@ -350,8 +336,6 @@ resource-intensive) with the ``spheroid`` keyword argument.
 =============
 
 .. class:: MakeValid(expr)
-
-.. versionadded:: 1.10
 
 *Availability*: PostGIS, SpatiaLite (LWGEOM)
 
@@ -468,10 +452,6 @@ Number of Arguments  Description
 Accepts two geographic fields or expressions and returns the geometric
 symmetric difference (union without the intersection) between the given
 parameters.
-
-.. versionchanged:: 1.10
-
-    MySQL support was added.
 
 ``Transform``
 =============

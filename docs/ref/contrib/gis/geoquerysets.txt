@@ -17,10 +17,6 @@ For an introduction, see the :ref:`spatial lookups introduction
 compatible with a particular spatial backend, refer to the
 :ref:`spatial lookup compatibility table <spatial-lookup-compatibility>`.
 
-.. versionchanged:: 1.10
-
-    Spatial lookups now support raster input.
-
 Lookups with rasters
 --------------------
 
@@ -297,8 +293,6 @@ SpatiaLite  ``Intersects(poly, geom)``
 
 ``isvalid``
 -----------
-
-.. versionadded:: 1.10
 
 *Availability*: PostGIS
 
@@ -603,10 +597,6 @@ of ``ST_Distance_Sphere``. The simpler ``ST_Distance`` function is used with
 projected coordinate systems. Rasters are converted to geometries for spheroid
 based lookups.
 
-.. versionadded:: 1.10
-
-    The ability to pass an expression as the distance value was added.
-
 .. versionadded:: 1.11
 
     Support for the ``'spheroid'`` option on SQLite was added.
@@ -796,10 +786,6 @@ Example::
 
 Returns a ``LineString`` constructed from the point field geometries in the
 ``QuerySet``. Currently, ordering the queryset has no effect.
-
-.. versionchanged:: 1.10
-
-    SpatiaLite support was added.
 
 Example::
 

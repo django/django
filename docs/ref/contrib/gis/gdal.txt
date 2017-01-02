@@ -1215,8 +1215,6 @@ blue.
 
     .. attribute:: srid
 
-        .. versionadded:: 1.10
-
         The Spatial Reference System Identifier (SRID) of the raster. This
         property is a shortcut to getting or setting the SRID through the
         :attr:`srs` attribute.
@@ -1418,8 +1416,6 @@ blue.
 
     .. method:: statistics(refresh=False, approximate=False)
 
-        .. versionadded:: 1.10
-
         Compute statistics on the pixel values of this band. The return value
         is a tuple with the following structure:
         ``(minimum, maximum, mean, standard deviation)``.
@@ -1455,14 +1451,10 @@ blue.
 
     .. attribute:: mean
 
-        .. versionadded:: 1.10
-
         The mean of all pixel values of the band (excluding the "no data"
         value).
 
     .. attribute:: std
-
-        .. versionadded:: 1.10
 
         The standard deviation of all pixel values of the band (excluding the
         "no data" value).
@@ -1475,11 +1467,6 @@ blue.
 
         To delete an existing "no data" value, set this property to ``None``
         (requires GDAL ≥ 2.1).
-
-        .. versionchanged:: 1.10
-
-            The "no data" value can now be deleted by setting the
-            ``nodata_value`` attribute to ``None``.
 
     .. method:: datatype(as_string=False)
 
@@ -1549,11 +1536,6 @@ blue.
                    [1, 1, 1, 1],
                    [2, 2, 2, 2],
                    [3, 3, 3, 3]], dtype=uint8)
-
-    .. versionchanged:: 1.10
-
-        The ``shape`` parameter and the ability to replicate data input when
-        setting ``GDALBand`` data was added.
 
 Settings
 ========

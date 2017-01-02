@@ -988,8 +988,6 @@ The ``JavaScriptCatalog`` view
 
 .. module:: django.views.i18n
 
-.. versionadded:: 1.10
-
 .. class:: JavaScriptCatalog
 
     A view that produces a JavaScript code library with functions that mimic
@@ -1216,8 +1214,6 @@ will render a conditional expression. This will evaluate to either a ``true``
 The ``JSONCatalog`` view
 ------------------------
 
-.. versionadded:: 1.10
-
 .. class:: JSONCatalog
 
     In order to use another client-side library to handle translations, you may
@@ -1379,21 +1375,11 @@ will be::
     >>> reverse('news:index')
     '/nl/news/'
 
-.. versionadded:: 1.10
-
-    The ``prefix_default_language`` parameter was added.
-
 .. warning::
 
     :func:`~django.conf.urls.i18n.i18n_patterns` is only allowed in a root
     URLconf. Using it within an included URLconf will throw an
     :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
-
-.. versionchanged:: 1.10
-
-    In older version, using ``i18n_patterns`` in a root URLconf different from
-    :setting:`ROOT_URLCONF` by setting :attr:`request.urlconf
-    <django.http.HttpRequest.urlconf>` wasn't supported.
 
 .. warning::
 
@@ -1813,11 +1799,6 @@ set, to ``/``, depending on the nature of the request:
 * For AJAX requests, the fallback will be performed only if the ``next``
   parameter was set. Otherwise a 204 status code (No Content) will be returned.
 * For non-AJAX requests, the fallback will always be performed.
-
-.. versionchanged:: 1.10
-
-    Returning a 204 status code for AJAX requests when no redirect is specified
-    is new.
 
 Here's example HTML template code:
 

@@ -22,10 +22,6 @@ MRO is an acronym for Method Resolution Order.
     this base class. It isn't strictly a generic view and thus can also be
     imported from ``django.views``.
 
-    .. versionchanged:: 1.10
-
-        The ability to import from ``django.views`` was added.
-
     **Method Flowchart**
 
     1. :meth:`dispatch()`

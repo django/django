@@ -423,11 +423,6 @@ an :class:`~django.http.HttpResponseForbidden`.
 parameter that defaults to ``'403_csrf.html'``. If a template with that name
 exists, it will be used to render the page.
 
-.. versionchanged:: 1.10
-
-   The ``template_name`` parameter and the behavior of searching for a template
-   called ``403_csrf.html`` were added to ``csrf_failure()``.
-
 .. setting:: CSRF_HEADER_NAME
 
 ``CSRF_HEADER_NAME``
@@ -906,8 +901,6 @@ The maximum size that the DATAFILE_TMP is allowed to grow to.
 DATA_UPLOAD_MAX_MEMORY_SIZE
 ---------------------------
 
-.. versionadded:: 1.10
-
 Default: ``2621440`` (i.e. 2.5 MB).
 
 The maximum size in bytes that a request body may be before a
@@ -929,8 +922,6 @@ See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS
 -----------------------------
-
-.. versionadded:: 1.10
 
 Default: ``1000``
 
@@ -1513,10 +1504,6 @@ of the preferred value or not supplied at all. It is also used by
 request/response cycle (e.g. in management commands and standalone scripts) to
 generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
 
-.. versionchanged:: 1.10
-
-    The setting's use in :func:`django.setup()` was added.
-
 .. setting:: FORM_RENDERER
 
 ``FORM_RENDERER``
@@ -1893,8 +1880,6 @@ Example: ``"http://media.example.com/"``
 
 ``MIDDLEWARE``
 --------------
-
-.. versionadded:: 1.10
 
 Default:: ``None``
 
@@ -2775,8 +2760,6 @@ the URL in two places (``settings`` and URLconf).
 ``LOGOUT_REDIRECT_URL``
 -----------------------
 
-.. versionadded:: 1.10
-
 Default: ``None``
 
 The URL where requests are redirected after a user logs out using
@@ -2816,22 +2799,6 @@ Default::
         'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
         'django.contrib.auth.hashers.BCryptPasswordHasher',
     ]
-
-.. versionchanged:: 1.10
-
-    The following hashers were removed from the defaults::
-
-        'django.contrib.auth.hashers.SHA1PasswordHasher'
-        'django.contrib.auth.hashers.MD5PasswordHasher'
-        'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher'
-        'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher'
-        'django.contrib.auth.hashers.CryptPasswordHasher'
-
-    Consider using a :ref:`wrapped password hasher <wrapping-password-hashers>`
-    to strengthen the hashes in your database. If that's not feasible, add this
-    setting to your project and add back any hashers that you need.
-
-    Also, the ``Argon2PasswordHasher`` was added.
 
 .. setting:: AUTH_PASSWORD_VALIDATORS
 

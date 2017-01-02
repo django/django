@@ -520,8 +520,6 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
 .. function:: keep_lazy(func, *resultclasses)
 
-    .. versionadded:: 1.10
-
     Django offers many utility functions (particularly in ``django.utils``)
     that take a string as their first argument and do something to that string.
     These functions are used by template filters as well as directly in other
@@ -564,8 +562,6 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
     the end.
 
 .. function:: keep_lazy_text(func)
-
-    .. versionadded:: 1.10
 
     A shortcut for ``keep_lazy(six.text_type)(func)``.
 

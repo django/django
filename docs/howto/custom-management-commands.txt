@@ -227,8 +227,6 @@ All attributes can be set in your derived class and can be used in
 
 .. attribute:: BaseCommand.requires_migrations_checks
 
-    .. versionadded:: 1.10
-
     A boolean; if ``True``, the command prints a warning if the set of
     migrations on disk don't match the migrations in the database. A warning
     doesn't prevent the command from executing. Default value is ``False``.

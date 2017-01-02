@@ -305,10 +305,6 @@ The JSON serializer uses ``DjangoJSONEncoder`` for encoding. A subclass of
 :class:`~decimal.Decimal`, ``Promise`` (``django.utils.functional.lazy()`` objects), :class:`~uuid.UUID`
    A string representation of the object.
 
-.. versionchanged:: 1.10
-
-    Support for ``Promise`` was added.
-
 .. versionchanged:: 1.11
 
     Support for :class:`~datetime.timedelta` was added.

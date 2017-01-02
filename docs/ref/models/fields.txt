@@ -401,8 +401,6 @@ otherwise. See :ref:`automatic-primary-key-fields`.
 
 .. class:: BigAutoField(**options)
 
-.. versionadded:: 1.10
-
 A 64-bit integer, much like an :class:`AutoField` except that it is
 guaranteed to fit numbers from ``1`` to ``9223372036854775807``.
 
@@ -1776,8 +1774,6 @@ Field API reference
         See :ref:`custom-database-types` for usage in custom fields.
 
     .. method:: rel_db_type(connection)
-
-        .. versionadded:: 1.10
 
         Returns the database column data type for fields such as ``ForeignKey``
         and ``OneToOneField`` that point to the :class:`Field`, taking

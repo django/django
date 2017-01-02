@@ -1034,11 +1034,6 @@ attribute was omitted, the reverse name for the ``m2m`` field would be
 ``childa_set`` in the ``ChildA`` case and ``childb_set`` for the ``ChildB``
 field.
 
-.. versionchanged:: 1.10
-
-   Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` for
-   ``related_query_name`` was added.
-
 .. _multi-table-inheritance:
 
 Multi-table inheritance
@@ -1236,11 +1231,6 @@ proxy model can inherit from any number of abstract model classes, providing
 they do *not* define any model fields. A proxy model may also inherit from any
 number of proxy models that share a common non-abstract parent class.
 
-.. versionchanged:: 1.10
-
-    In earlier versions, a proxy model couldn't inherit more than one proxy
-    model that shared the same parent class.
-
 Proxy model managers
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -1373,10 +1363,6 @@ an attribute called ``author`` in any class that inherits from that base class.
 This restriction doesn't apply to model fields inherited from an abstract
 model. Such fields may be overridden with another field or value, or be removed
 by setting ``field_name = None``.
-
-.. versionchanged:: 1.10
-
-    The ability to override abstract fields was added.
 
 .. warning::
 

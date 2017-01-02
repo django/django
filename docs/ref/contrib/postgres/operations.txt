@@ -80,8 +80,6 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
 .. class:: TrigramExtension()
 
-    .. versionadded:: 1.10
-
     Installs the ``pg_trgm`` extension.
 
 ``UnaccentExtension``

@@ -260,11 +260,6 @@ authenticated users do not.
 Do not forget to test for the ``is_active`` attribute of the user in your own
 backend permission methods.
 
-.. versionchanged:: 1.10
-
-    In older versions, the :class:`~django.contrib.auth.backends.ModelBackend`
-    allowed inactive users to authenticate.
-
 Handling object permissions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -661,8 +656,6 @@ The following attributes and methods are available on any subclass of
 
     .. method:: clean()
 
-        .. versionadded:: 1.10
-
         Normalizes the username by calling :meth:`normalize_username`. If you
         override this method, be sure to call ``super()`` to retain the
         normalization.
@@ -676,8 +669,6 @@ The following attributes and methods are available on any subclass of
        ``'email'`` if ``EMAIL_FIELD`` isn't specified.
 
     .. classmethod:: normalize_username(username)
-
-        .. versionadded:: 1.10
 
         Applies NFKC Unicode normalization to usernames so that visually
         identical characters with different Unicode code points are considered

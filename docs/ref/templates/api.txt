@@ -71,10 +71,6 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
 
           Only set it to ``False`` if you're rendering non-HTML templates!
 
-      .. versionadded:: 1.10
-
-          The ``autoescape`` option was added.
-
     * ``context_processors`` is a list of dotted Python paths to callables
       that are used to populate the context when a template is rendered with a
       request. These callables take a request object as their argument and
@@ -699,11 +695,6 @@ the request's IP address (``request.META['REMOTE_ADDR']``) is in the
   representing every SQL query that has happened so far during the request
   and how long it took. The list is in order by database alias and then by
   query. It's lazily generated on access.
-
-.. versionchanged:: 1.10
-
-    In older versions, only the queries for the default database alias were
-    included.
 
 ``django.template.context_processors.i18n``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

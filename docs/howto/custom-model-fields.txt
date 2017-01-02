@@ -464,10 +464,6 @@ need the foreign keys that point to that field to use the same data type::
         def rel_db_type(self, connection):
             return 'integer UNSIGNED'
 
-.. versionadded:: 1.10
-
-    The :meth:`~Field.rel_db_type` method was added.
-
 .. _converting-values-to-python-objects:
 
 Converting values to Python objects

@@ -109,11 +109,6 @@ creating new migrations. By default, it checks only the ``default`` database,
 but it consults the :meth:`allow_migrate` method of :ref:`routers
 <topics-db-multi-db-routing>` if any are installed.
 
-.. versionchanged:: 1.10
-
-    Migration consistency checks were added. Checks based on database routers
-    were added in 1.10.1.
-
 .. _topics-db-multi-db-routing:
 
 Automatic database routing

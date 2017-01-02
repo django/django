@@ -711,8 +711,6 @@ using the ``label_suffix`` parameter to
 
 .. attribute:: Form.use_required_attribute
 
-.. versionadded:: 1.10
-
 When set to ``True`` (the default), required form fields will have the
 ``required`` HTML attribute.
 

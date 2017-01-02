@@ -1949,11 +1949,6 @@ This has a number of caveats though:
   unless the database backend supports it (currently PostgreSQL).
 * It does not work with many-to-many relationships.
 
-.. versionchanged:: 1.10
-
-    Support for setting primary keys on objects created using ``bulk_create()``
-    when using PostgreSQL was added.
-
 The ``batch_size`` parameter controls how many objects are created in single
 query. The default is to create all objects in one batch, except for SQLite
 where the default is such that at most 999 variables per query are used.
@@ -2010,10 +2005,6 @@ Example::
     {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>, 3: <Blog: Django Weblog>}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
-
-.. versionchanged:: 1.10
-
-    In older versions, ``id_list`` was a required argument.
 
 ``iterator()``
 ~~~~~~~~~~~~~~
@@ -3205,8 +3196,6 @@ attribute:
 ------------------------------
 
 .. function:: prefetch_related_objects(model_instances, *related_lookups)
-
-.. versionadded:: 1.10
 
 Prefetches the given lookups on an iterable of model instances. This is useful
 in code that receives a list of model instances as opposed to a ``QuerySet``;

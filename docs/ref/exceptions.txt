@@ -223,10 +223,6 @@ to Python 3. To avoid unexpected differences with Python 3, Django will also
 ensure that the exception made available via ``__cause__`` has a usable
 ``__traceback__`` attribute.)
 
-.. versionchanged:: 1.10
-
-    The ``__traceback__`` attribute described above was added.
-
 .. exception:: models.ProtectedError
 
 Raised to prevent deletion of referenced objects when using

@@ -281,10 +281,6 @@ be removed (elided) when :ref:`squashing migrations <migration-squashing>`.
 
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
 
-.. versionadded:: 1.10
-
-    The ``elidable`` argument was added.
-
 ``RunPython``
 -------------
 
@@ -399,15 +395,6 @@ if ``atomic=True`` is passed to the ``RunPython`` operation.
     Pass the ``RunPython.noop`` method to ``code`` or ``reverse_code`` when
     you want the operation not to do anything in the given direction. This is
     especially useful in making the operation reversible.
-
-.. versionadded:: 1.10
-
-    The ``elidable`` argument was added.
-
-.. versionchanged:: 1.10
-
-    The ``atomic`` argument default was changed to ``None``, indicating that
-    the atomicity is controlled by the ``atomic`` attribute of the migration.
 
 ``SeparateDatabaseAndState``
 ----------------------------

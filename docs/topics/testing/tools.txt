@@ -371,12 +371,6 @@ Use the ``django.test.Client`` class to make requests.
         :meth:`~django.contrib.auth.models.UserManager.create_user` helper
         method to create a new user with a correctly hashed password.
 
-        .. versionchanged:: 1.10
-
-            In previous versions, inactive users (:attr:`is_active=False
-            <django.contrib.auth.models.User.is_active>`) were not permitted
-            to login.
-
     .. method:: Client.force_login(user, backend=None)
 
         If your site uses Django's :doc:`authentication
@@ -794,11 +788,6 @@ The class:
   :class:`TransactionTestCase`.
 
 * Checks deferrable database constraints at the end of each test.
-
-.. versionchanged:: 1.10
-
-    The check for deferrable database constraints at the end of each test was
-    added.
 
 It also provides an additional method:
 
@@ -1603,8 +1592,6 @@ your test suite.
 
 Tagging tests
 -------------
-
-.. versionadded:: 1.10
 
 You can tag your tests so you can easily run a particular subset. For example,
 you might label fast or slow tests::

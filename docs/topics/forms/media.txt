@@ -249,10 +249,6 @@ Or if :mod:`~django.contrib.staticfiles` is configured using the
     <script type="text/javascript" src="https://static.example.com/animations.27e20196a850.js"></script>
     <script type="text/javascript" src="http://othersite.com/actions.js"></script>
 
-.. versionchanged:: 1.10
-
-    Older versions didn't serve assets using :mod:`django.contrib.staticfiles`.
-
 ``Media`` objects
 =================
 

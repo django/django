@@ -367,13 +367,6 @@ Here's how Django handles custom managers and :ref:`model inheritance
    <django.db.models.Options.default_manager_name>`, or the first manager
    declared on the model, or the default manager of the first parent model.
 
-.. versionchanged:: 1.10
-
-    In older versions, manager inheritance varied depending on the type of
-    model inheritance (i.e. :ref:`abstract-base-classes`,
-    :ref:`multi-table-inheritance`, or :ref:`proxy-models`), especially
-    with regards to electing the default manager.
-
 These rules provide the necessary flexibility if you want to install a
 collection of custom managers on a group of models, via an abstract base
 class, but still customize the default manager. For example, suppose you have

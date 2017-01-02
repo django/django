@@ -189,8 +189,6 @@ the respective field according to your needs.
 Non-atomic migrations
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.10
-
 On databases that support DDL transactions (SQLite and PostgreSQL), migrations
 will run inside a transaction by default. For use cases such as performing data
 migrations on large tables, you may want to prevent a migration from running in

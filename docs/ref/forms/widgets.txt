@@ -291,8 +291,6 @@ foundation for custom widgets.
 
     .. method:: value_omitted_from_data(data, files, name)
 
-        .. versionadded:: 1.10.2
-
         Given ``data`` and ``files`` dictionaries and this widget's name,
         returns whether or not there's data or files for the widget.
 
@@ -306,8 +304,6 @@ foundation for custom widgets.
         actually submitted a value.
 
     .. method:: use_required_attribute(initial)
-
-        .. versionadded:: 1.10.1
 
         Given a form field's ``initial`` value, returns whether or not the
         widget can be rendered with the ``required`` HTML attribute. Forms use

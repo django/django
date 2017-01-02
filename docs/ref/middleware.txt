@@ -97,8 +97,6 @@ Exception middleware
 
 .. class:: ExceptionMiddleware
 
-.. versionadded:: 1.10
-
 Catches exceptions raised during the request/response cycle and returns the
 appropriate response.
 
@@ -160,12 +158,6 @@ If the response has an ``ETag`` header, the ETag is made weak to comply with
 
 You can apply GZip compression to individual views using the
 :func:`~django.views.decorators.gzip.gzip_page()` decorator.
-
-.. versionchanged:: 1.10
-
-    In older versions, Django's CSRF protection mechanism was vulnerable to
-    BREACH attacks when compression was used. This is no longer the case, but
-    you should still take care not to compromise your own secrets this way.
 
 Conditional GET middleware
 --------------------------

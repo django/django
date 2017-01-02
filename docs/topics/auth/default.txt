@@ -358,14 +358,6 @@ If you have an authenticated user you want to attach to the current session
                 # Return an 'invalid login' error message.
                 ...
 
-    .. versionchanged:: 1.10
-
-        In older versions, when you're manually logging a user in, you *must*
-        successfully authenticate the user with
-        :func:`~django.contrib.auth.authenticate()` before you call
-        :func:`~django.contrib.auth.login()`. Now you can set the backend using
-        the new ``backend`` argument.
-
 Selecting the authentication backend
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -955,10 +947,6 @@ implementation details see :ref:`using-the-views`.
 
     The optional arguments of this view are similar to the class-based
     ``LoginView`` attributes.
-
-    .. versionadded:: 1.10
-
-        The ``redirect_authenticated_user`` parameter was added.
 
 .. class:: LoginView
 

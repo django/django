@@ -1151,8 +1151,6 @@ subclass::
 
 .. attribute:: ModelAdmin.save_as_continue
 
-    .. versionadded:: 1.10
-
     When :attr:`save_as=True <save_as>`, the default redirect after saving the
     new object is to the change view for that object. If you set
     ``save_as_continue=False``, the redirect will be to the changelist view.
@@ -1950,10 +1948,6 @@ To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
 
-.. versionchanged:: 1.10
-
-    The embedded jQuery was upgraded from 2.1.4 to 2.2.3.
-
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
 a specific need. For example, if you require the jQuery library to be in the
@@ -2099,8 +2093,6 @@ The ``InlineModelAdmin`` class adds:
     described in the warning in :ref:`validation-on-modelform`.
 
 .. attribute:: InlineModelAdmin.classes
-
-    .. versionadded:: 1.10
 
     A list or tuple containing extra CSS classes to apply to the fieldset that
     is rendered for the inlines. Defaults to ``None``. As with classes
@@ -2588,11 +2580,6 @@ Templates can override or extend base admin templates as described in
     the current request has ``request.META['SCRIPT_NAME']`` set and uses that
     value if ``site_url`` isn't set to something other than ``/``.
 
-    .. versionchanged:: 1.10
-
-        The ``SCRIPT_NAME`` support described in the previous paragraph was
-        added.
-
 .. attribute:: AdminSite.index_title
 
     The text to put at the top of the admin index page (a string). By default,
@@ -2892,12 +2879,6 @@ password box.
     advised to use the :meth:`get_change_message` method to retrieve this value
     instead of accessing it directly.
 
-    .. versionchanged:: 1.10
-
-        Previously, this attribute was always a plain string. It is
-        now JSON-structured so that the message can be translated in the current
-        user language. Old messages are untouched.
-
 ``LogEntry`` methods
 --------------------
 
@@ -2906,8 +2887,6 @@ password box.
     A shortcut that returns the referenced object.
 
 .. method:: LogEntry.get_change_message()
-
-    .. versionadded:: 1.10
 
     Formats and translates :attr:`change_message` into the current user
     language. Messages created before Django 1.10 will always be displayed in

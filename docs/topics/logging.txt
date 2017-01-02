@@ -481,8 +481,6 @@ Messages to this logger have the following extra context:
 ``django.server``
 ~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.10
-
 Log messages related to the handling of requests received by the server invoked
 by the :djadmin:`runserver` command. HTTP 5XX responses are logged as ``ERROR``
 messages, 4XX responses are logged as ``WARNING`` messages, and everything else
@@ -583,10 +581,6 @@ queries executed by :class:`~django.db.migrations.operations.RunPython`.
 Messages to this logger have ``params`` and ``sql`` in their extra context (but
 unlike ``django.db.backends``, not duration). The values have the same meaning
 as explained in :ref:`django-db-logger`.
-
-.. versionadded:: 1.10
-
-    The ``extra`` context was added.
 
 Handlers
 --------

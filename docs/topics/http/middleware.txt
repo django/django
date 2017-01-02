@@ -86,15 +86,6 @@ caveats:
 * Unlike the ``__call__()`` method which is called once per request,
   ``__init__()`` is called only *once*, when the Web server starts.
 
-.. versionchanged:: 1.10
-
-    In older versions, ``__init__()`` wasn't called until the Web server
-    responded to its first request.
-
-    In older versions, ``__init__()`` didn't accept any arguments. To allow
-    your middleware to be used in Django 1.9 and earlier, make ``get_response``
-    an optional argument (``get_response=None``).
-
 Marking middleware as unused
 ----------------------------
 

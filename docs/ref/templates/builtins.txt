@@ -231,10 +231,6 @@ In ``template.html``, the following paths would be valid::
     {% extends "../base1.html" %}
     {% extends "./my/base3.html" %}
 
-.. versionadded:: 1.10
-
-   The ability to use relative paths was added.
-
 .. templatetag:: filter
 
 ``filter``
@@ -538,8 +534,6 @@ Not contained within. This is the negation of the ``in`` operator.
 ``is`` operator
 ^^^^^^^^^^^^^^^
 
-.. versionadded:: 1.10
-
 Object identity. Tests if two values are the same object. Example::
 
     {% if somevar is True %}
@@ -552,8 +546,6 @@ Object identity. Tests if two values are the same object. Example::
 
 ``is not`` operator
 ^^^^^^^^^^^^^^^^^^^
-
-.. versionadded:: 1.10
 
 Negated object identity. Tests if two values are not the same object. This is
 the negation of the ``is`` operator. Example::
@@ -684,10 +676,6 @@ This example includes the contents of the template ``"foo/bar.html"``::
 
 A string argument may be a relative path starting with ``./`` or ``../`` as
 described in the :ttag:`extends` tag.
-
-.. versionadded:: 1.10
-
-   The ability to use a relative path was added.
 
 This example includes the contents of the template whose name is contained in
 the variable ``template_name``::
@@ -1596,10 +1584,6 @@ You must pass the index as an integer rather than a string. The following
 produce empty output::
 
     {{ values|dictsort:"0" }}
-
-.. versionchanged:: 1.10
-
-    The ability to order a list of lists was added.
 
 .. templatefilter:: dictsortreversed
 
@@ -2584,12 +2568,6 @@ slightly different call::
 
     See :class:`~django.template.backends.jinja2.Jinja2` for information on
     using the ``static`` tag with Jinja2.
-
-.. versionchanged:: 1.10
-
-    In older versions, you had to use ``{% load static from staticfiles %}`` in
-    your template to serve files from the storage defined in
-    :setting:`STATICFILES_STORAGE`. This is no longer required.
 
 .. templatetag:: get_static_prefix
 

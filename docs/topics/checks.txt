@@ -133,10 +133,6 @@ perform any extra checks you need, and append any messages to those generated
 by the base class. It's recommended that you delegate each check to separate
 methods.
 
-.. versionchanged:: 1.10
-
-    Database backend checks were added.
-
 Consider an example where you are implementing a custom field named
 ``RangedIntegerField``. This field adds ``min`` and ``max`` arguments to the
 constructor of ``IntegerField``. You may want to add a check to ensure that users

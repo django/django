@@ -401,10 +401,6 @@ application registry.
       :setting:`FORCE_SCRIPT_NAME` if defined, or ``/`` otherwise.
     * Initializing the application registry.
 
-    .. versionchanged:: 1.10
-
-        The ability to set the URL resolver script prefix is new.
-
     This function is called automatically:
 
     * When running an HTTP server via Django's WSGI support.

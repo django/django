@@ -342,16 +342,6 @@ there is one, for that field. This behavior doesn't apply to fields that use
 form submission. Use a custom form field or widget if you're designing an API
 and want the default fallback for a :class:`~django.db.models.BooleanField`.
 
-.. versionchanged:: 1.10.1
-
-    Older versions don't have the exception for
-    :class:`~django.forms.CheckboxInput` which means that unchecked checkboxes
-    receive a value of ``True`` if that's the model field default.
-
-.. versionchanged:: 1.10.2
-
-    The :meth:`~django.forms.Widget.value_omitted_from_data` method was added.
-
 This ``save()`` method accepts an optional ``commit`` keyword argument, which
 accepts either ``True`` or ``False``. If you call ``save()`` with
 ``commit=False``, then it will return an object that hasn't yet been saved to

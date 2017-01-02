@@ -314,11 +314,6 @@ new migrations until it's fixed. When using multiple databases, you can use the
 <topics-db-multi-db-routing>` to control which databases
 :djadmin:`makemigrations` checks for consistent history.
 
-.. versionchanged:: 1.10
-
-    Migration consistency checks were added. Checks based on database routers
-    were added in 1.10.1.
-
 Adding migrations to apps
 =========================
 
@@ -678,10 +673,6 @@ Django can serialize the following:
 - Any function or method reference (e.g. ``datetime.datetime.today``) (must be in module's top-level scope)
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
-
-.. versionchanged:: 1.10
-
-    Serialization support for ``enum.Enum`` was added.
 
 .. versionchanged:: 1.11
 

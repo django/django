@@ -315,11 +315,6 @@ the HOST header <host-headers-virtual-hosting>` and that there aren't any
 (because XSS vulnerabilities already let an attacker do anything a CSRF
 vulnerability allows and much worse).
 
-.. versionchanged:: 1.10
-
-   Added salting to the token and started changing it with each request
-   to protect against `BREACH`_ attacks.
-
 .. _BREACH: http://breachattack.com/
 
 Caching

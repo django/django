@@ -428,8 +428,6 @@ a temporary ``Apps`` instance::
 
 .. function:: django.test.utils.isolate_apps(*app_labels, attr_name=None, kwarg_name=None)
 
-.. versionadded:: 1.10
-
 Since this pattern involves a lot of boilerplate, Django provides the
 :func:`~django.test.utils.isolate_apps` decorator. It's used like this::
 

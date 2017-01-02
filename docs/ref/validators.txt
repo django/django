@@ -230,10 +230,6 @@ to, or in lieu of custom ``field.clean()`` methods.
     of integers separated by ``sep``. It allows negative integers when
     ``allow_negative`` is ``True``.
 
-    .. versionchanged:: 1.10
-
-        The ``allow_negative`` parameter was added.
-
 ``MaxValueValidator``
 ---------------------
 

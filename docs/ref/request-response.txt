@@ -86,14 +86,10 @@ All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.content_type
 
-    .. versionadded:: 1.10
-
     A string representing the MIME type of the request, parsed from the
     ``CONTENT_TYPE`` header.
 
 .. attribute:: HttpRequest.content_params
-
-    .. versionadded:: 1.10
 
     A dictionary of key/value parameters included in the ``CONTENT_TYPE``
     header.
@@ -639,11 +635,6 @@ generators are immediately closed.
 If you need the response to be streamed from the iterator to the client, you
 must use the :class:`StreamingHttpResponse` class instead.
 
-.. versionchanged:: 1.10
-
-    Objects with a ``close()`` method used to be closed when the WSGI server
-    called ``close()`` on the response.
-
 Setting header fields
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -846,14 +837,10 @@ Methods
 
 .. method:: HttpResponse.readable()
 
-   .. versionadded:: 1.10
-
     Always ``False``. This method makes an :class:`HttpResponse` instance a
     stream-like object.
 
 .. method:: HttpResponse.seekable()
-
-   .. versionadded:: 1.10
 
     Always ``False``. This method makes an :class:`HttpResponse` instance a
     stream-like object.

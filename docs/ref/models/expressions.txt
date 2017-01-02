@@ -278,8 +278,6 @@ The ``Func`` API is as follows:
 
     .. attribute:: arity
 
-        .. versionadded:: 1.10
-
         A class attribute that denotes the number of arguments the function
         accepts. If this attribute is set and the function is called with a
         different number of expressions, ``TypeError`` will be raised. Defaults
@@ -307,11 +305,6 @@ The ``Func`` API is as follows:
                         function='CONCAT_WS',
                         template="%(function)s('', %(expressions)s)",
                     )
-
-        .. versionchanged:: 1.10
-
-            Support for the ``arg_joiner`` and ``**extra_context`` parameters
-            was added.
 
 The ``*expressions`` argument is a list of positional expressions that the
 function will be applied to. The expressions will be converted to strings,

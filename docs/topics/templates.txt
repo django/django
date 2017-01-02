@@ -308,10 +308,6 @@ applications. This generic name was kept for backwards-compatibility.
 
       Only set it to ``False`` if you're rendering non-HTML templates!
 
-  .. versionadded:: 1.10
-
-      The ``autoescape`` option was added.
-
 * ``'context_processors'``: a list of dotted Python paths to callables that
   are used to populate the context when a template is rendered with a request.
   These callables take a request object as their argument and return a

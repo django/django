@@ -138,8 +138,6 @@ make it part of your integration test suite.
 
 .. django-admin-option:: --fail-level {CRITICAL,ERROR,WARNING,INFO,DEBUG}
 
-.. versionadded:: 1.10
-
 Specifies the message level that will cause the command to exit with a non-zero
 status. Default is ``ERROR``.
 
@@ -392,11 +390,6 @@ modification, and deletion. If you do want to allow Django to manage the
 table's lifecycle, you'll need to change the
 :attr:`~django.db.models.Options.managed` option to ``True`` (or simply remove
 it because ``True`` is its default value).
-
-.. versionadded:: 1.10
-
-    Support for the ``table`` argument(s) to choose what tables should be
-    inspected was added.
 
 .. django-admin-option:: --database DATABASE
 
@@ -709,8 +702,6 @@ Makes ``makemigrations`` exit with error code 1 when no migrations are created
 
 .. django-admin-option:: --check
 
-.. versionadded:: 1.10
-
 Makes ``makemigrations`` exit with a non-zero status when model changes without
 migrations are detected.
 
@@ -835,11 +826,6 @@ history of migrations is created at first run of ``runserver``.
 Logging of each request and response of the server is sent to the
 :ref:`django-server-logger` logger.
 
-.. versionchanged:: 1.10
-
-    In older versions, log messages were written to ``sys.stderr`` instead of
-    being handled through Python logging.
-
 .. django-admin-option:: --noreload
 
 Disables the auto-reloader. This means any Python code changes you make while
@@ -961,8 +947,6 @@ default, the script pointed to by the :envvar:`PYTHONSTARTUP` environment
 variable or the ``~/.pythonrc.py`` script is read.
 
 .. django-admin-option:: --command COMMAND, -c COMMAND
-
-.. versionadded:: 1.10
 
 Lets you pass a command as a string to execute it as Django, like so::
 
@@ -1334,14 +1318,10 @@ don't.
 
 .. option:: --tag TAGS
 
-.. versionadded:: 1.10
-
 Runs only tests :ref:`marked with the specified tags <topics-tagging-tests>`.
 May be specified multiple times and combined with :option:`test --exclude-tag`.
 
 .. option:: --exclude-tag EXCLUDE_TAGS
-
-.. versionadded:: 1.10
 
 Excludes tests :ref:`marked with the specified tags <topics-tagging-tests>`.
 May be specified multiple times and combined with :option:`test --tag`.
@@ -1802,12 +1782,6 @@ Command options which take multiple options are passed a list::
 
 The return value of the ``call_command()`` function is the same as the return
 value of the ``handle()`` method of the command.
-
-.. versionchanged:: 1.10
-
-    ``call_command()`` now returns the value received from the
-    ``command.handle()`` method. It now also accepts a command object as the
-    first argument.
 
 Output redirection
 ==================
