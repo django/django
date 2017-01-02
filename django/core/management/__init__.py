@@ -326,6 +326,15 @@ class ManagementUtility(object):
                     apps.app_configs = OrderedDict()
                     apps.apps_ready = apps.models_ready = apps.ready = True
 
+                    # Strip options not compatible with the django runserver
+                    # (e.g. options for the contrib.staticfiles' runserver).
+                    _parser = self.fetch_command('runserver').create_parser('django', 'runserver')
+                    _options, _args = _parser.parse_known_args(self.argv[2:])
+
+                    # Remove unsupported args.
+                    for _arg in _args:
+                        self.argv.remove(_arg)
+
             # In all other cases, django.setup() is required to succeed.
             else:
                 django.setup()
