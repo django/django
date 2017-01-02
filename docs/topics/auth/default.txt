@@ -1178,13 +1178,6 @@ implementation details see :ref:`using-the-views`.
       :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
       For more on sites, see :doc:`/ref/contrib/sites`.
 
-    * ``current_app``: A hint indicating which application contains the current
-      view. See the :ref:`namespaced URL resolution strategy
-      <topics-http-reversing-url-namespaces>` for more information.
-
-    * ``extra_context``: A dictionary of context data that will be added to the
-      default context data passed to the template.
-
 .. function:: logout_then_login(request, login_url=None, current_app=None, extra_context=None)
 
     Logs a user out, then redirects to the login page.

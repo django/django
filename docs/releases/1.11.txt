@@ -434,6 +434,10 @@ Tests
 * Added support for :meth:`python:unittest.TestCase.subTest`’s when using the
   :option:`test --parallel` option.
 
+* ``DiscoverRunner`` now runs the system checks at the start of a test run.
+  Override the :meth:`.DiscoverRunner.run_checks` method if you want to disable
+  that.
+
 URLs
 ~~~~
 
@@ -693,6 +697,8 @@ Miscellaneous
 * For consistency with non-multipart requests, ``MultiPartParser.parse()`` now
   leaves ``request.POST`` immutable. If you're modifying that ``QueryDict``,
   you must now first copy it, e.g. ``request.POST.copy()``.
+
+* Support for ``cx_Oracle`` < 5.2 is removed.
 
 .. _deprecated-features-1.11:
 

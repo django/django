@@ -8,6 +8,7 @@ from django.test.utils import get_runner
 class Command(BaseCommand):
     help = 'Discover and run tests in the specified modules or the current directory.'
 
+    # DiscoverRunner runs the checks after databases are set up.
     requires_system_checks = False
 
     def __init__(self):

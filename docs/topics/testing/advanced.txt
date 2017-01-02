@@ -402,11 +402,17 @@ testing behavior. This behavior involves:
 #. Running ``migrate`` to install models and initial data into the test
    databases.
 
+#. Running the :doc:`system checks </topics/checks>`.
+
 #. Running the tests that were found.
 
 #. Destroying the test databases.
 
 #. Performing global post-test teardown.
+
+.. versionchanged:: 1.11
+
+    Running the system checks was added.
 
 If you define your own test runner class and point :setting:`TEST_RUNNER` at
 that class, Django will execute your test runner whenever you run
@@ -565,6 +571,12 @@ Methods
 
     Creates the test databases by calling
     :func:`~django.test.utils.setup_databases`.
+
+.. method:: DiscoverRunner.run_checks()
+
+    .. versionadded:: 1.11
+
+    Runs the :doc:`system checks </topics/checks>`.
 
 .. method:: DiscoverRunner.run_suite(suite, **kwargs)
 

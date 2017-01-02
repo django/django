@@ -86,11 +86,8 @@ class OracleTests(unittest.TestCase):
     def test_dbms_session(self):
         # If the backend is Oracle, test that we can call a standard
         # stored procedure through our cursor wrapper.
-        from django.db.backends.oracle.base import convert_unicode
-
         with connection.cursor() as cursor:
-            cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
-                            [convert_unicode('_django_testing!')])
+            cursor.callproc('DBMS_SESSION.SET_IDENTIFIER', ['_django_testing!'])
 
     def test_cursor_var(self):
         # If the backend is Oracle, test that we can pass cursor variables

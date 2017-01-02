@@ -17,10 +17,10 @@ from django.utils.safestring import mark_safe
 
 from .base import (
     BLOCK_TAG_END, BLOCK_TAG_START, COMMENT_TAG_END, COMMENT_TAG_START,
-    SINGLE_BRACE_END, SINGLE_BRACE_START, VARIABLE_ATTRIBUTE_SEPARATOR,
-    VARIABLE_TAG_END, VARIABLE_TAG_START, Context, Node, NodeList,
-    TemplateSyntaxError, VariableDoesNotExist, kwarg_re,
-    render_value_in_context, token_kwargs,
+    FILTER_SEPARATOR, SINGLE_BRACE_END, SINGLE_BRACE_START,
+    VARIABLE_ATTRIBUTE_SEPARATOR, VARIABLE_TAG_END, VARIABLE_TAG_START,
+    Context, Node, NodeList, TemplateSyntaxError, VariableDoesNotExist,
+    kwarg_re, render_value_in_context, token_kwargs,
 )
 from .defaultfilters import date
 from .library import Library
@@ -816,9 +816,10 @@ def do_for(parser, token):
         raise TemplateSyntaxError("'for' statements should use the format"
                                   " 'for x in y': %s" % token.contents)
 
+    invalid_chars = frozenset((' ', '"', "'", FILTER_SEPARATOR))
     loopvars = re.split(r' *, *', ' '.join(bits[1:in_index]))
     for var in loopvars:
-        if not var or ' ' in var:
+        if not var or not invalid_chars.isdisjoint(var):
             raise TemplateSyntaxError("'for' tag received an invalid argument:"
                                       " %s" % token.contents)
 

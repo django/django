@@ -17,7 +17,6 @@ from django.db import utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils import six, timezone
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.duration import duration_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
 
@@ -62,7 +61,7 @@ from .features import DatabaseFeatures                      # NOQA isort:skip
 from .introspection import DatabaseIntrospection            # NOQA isort:skip
 from .operations import DatabaseOperations                  # NOQA isort:skip
 from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
-from .utils import Oracle_datetime, convert_unicode         # NOQA isort:skip
+from .utils import Oracle_datetime                          # NOQA isort:skip
 
 
 class _UninitializedOperatorsDescriptor(object):
@@ -208,8 +207,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn_params
 
     def get_new_connection(self, conn_params):
-        conn_string = convert_unicode(self._connect_string())
-        return Database.connect(conn_string, **conn_params)
+        return Database.connect(self._connect_string(), **conn_params)
 
     def init_connection_state(self):
         cursor = self.create_cursor()
@@ -246,13 +244,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 self.operators = self._standard_operators
                 self.pattern_ops = self._standard_pattern_ops
             cursor.close()
-
-        try:
-            self.connection.stmtcachesize = 20
-        except AttributeError:
-            # Django docs specify cx_Oracle version 4.3.1 or higher, but
-            # stmtcachesize is available only in 4.3.2 and up.
-            pass
+        self.connection.stmtcachesize = 20
         # Ensure all changes are preserved even when AUTOCOMMIT is False.
         if not self.get_autocommit():
             self.commit()
@@ -265,7 +257,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             try:
                 return self.connection.commit()
             except Database.DatabaseError as e:
-                # cx_Oracle 5.0.4 raises a cx_Oracle.DatabaseError exception
+                # cx_Oracle raises a cx_Oracle.DatabaseError exception
                 # with the following attributes and values:
                 #  code = 2091
                 #  message = 'ORA-02091: transaction rolled back
@@ -344,11 +336,6 @@ class OracleParam(object):
                 param = param.astimezone(timezone.utc).replace(tzinfo=None)
             param = Oracle_datetime.from_datetime(param)
 
-        if isinstance(param, datetime.timedelta):
-            param = duration_string(param)
-            if ' ' not in param:
-                param = '0 ' + param
-
         string_size = 0
         # Oracle doesn't recognize True and False correctly in Python 3.
         # The conversion done below works both in 2 and 3.
@@ -358,12 +345,12 @@ class OracleParam(object):
             param = 0
         if hasattr(param, 'bind_parameter'):
             self.force_bytes = param.bind_parameter(cursor)
-        elif isinstance(param, Database.Binary):
+        elif isinstance(param, (Database.Binary, datetime.timedelta)):
             self.force_bytes = param
         else:
             # To transmit to the database, we need Unicode if supported
             # To get size right, we must consider bytes.
-            self.force_bytes = convert_unicode(param, cursor.charset, strings_only)
+            self.force_bytes = force_text(param, cursor.charset, strings_only)
             if isinstance(self.force_bytes, six.string_types):
                 # We could optimize by only converting up to 4000 bytes here
                 string_size = len(force_bytes(param, cursor.charset, strings_only))
@@ -459,11 +446,11 @@ class FormatStylePlaceholderCursor(object):
             query = query[:-1]
         if params is None:
             params = []
-            query = convert_unicode(query, self.charset)
+            query = query
         elif hasattr(params, 'keys'):
             # Handle params as dict
             args = {k: ":%s" % k for k in params.keys()}
-            query = convert_unicode(query % args, self.charset)
+            query = query % args
         elif unify_by_values and len(params) > 0:
             # Handle params as a dict with unified query parameters by their
             # values. It can be used only in single query execute() because
@@ -479,24 +466,18 @@ class FormatStylePlaceholderCursor(object):
             params = [(param, type(param)) for param in params]
             params_dict = {param: ':arg%d' % i for i, param in enumerate(set(params))}
             args = [params_dict[param] for param in params]
-            params = dict(zip(params_dict.values(), list(zip(*params_dict.keys()))[0]))
-            query = convert_unicode(query % tuple(args), self.charset)
+            params = {value: key[0] for key, value in params_dict.items()}
+            query = query % tuple(args)
         else:
             # Handle params as sequence
             args = [(':arg%d' % i) for i in range(len(params))]
-            query = convert_unicode(query % tuple(args), self.charset)
-        return query, self._format_params(params)
+            query = query % tuple(args)
+        return force_text(query, self.charset), self._format_params(params)
 
     def execute(self, query, params=None):
         query, params = self._fix_for_params(query, params, unify_by_values=True)
         self._guess_input_sizes([params])
-        try:
-            return self.cursor.execute(query, self._param_generator(params))
-        except Database.DatabaseError as e:
-            # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
-            if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, Database.IntegrityError):
-                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-            raise
+        return self.cursor.execute(query, self._param_generator(params))
 
     def executemany(self, query, params=None):
         if not params:
@@ -509,13 +490,7 @@ class FormatStylePlaceholderCursor(object):
         # more than once, we can't make it lazy by using a generator
         formatted = [firstparams] + [self._format_params(p) for p in params_iter]
         self._guess_input_sizes(formatted)
-        try:
-            return self.cursor.executemany(query, [self._param_generator(p) for p in formatted])
-        except Database.DatabaseError as e:
-            # cx_Oracle <= 4.4.0 wrongly raises a DatabaseError for ORA-01400.
-            if hasattr(e.args[0], 'code') and e.args[0].code == 1400 and not isinstance(e, Database.IntegrityError):
-                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-            raise
+        return self.cursor.executemany(query, [self._param_generator(p) for p in formatted])
 
     def fetchone(self):
         row = self.cursor.fetchone()

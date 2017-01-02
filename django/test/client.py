@@ -34,6 +34,8 @@ __all__ = ('Client', 'RedirectCycleError', 'RequestFactory', 'encode_file', 'enc
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
 CONTENT_TYPE_RE = re.compile(r'.*; charset=([\w\d-]+);?')
+# JSON Vendor Tree spec: https://tools.ietf.org/html/rfc6838#section-3.2
+JSON_CONTENT_TYPE_RE = re.compile(r'^application\/(vnd\..+\+)?json$')
 
 
 class RedirectCycleError(Exception):
@@ -690,7 +692,7 @@ class Client(RequestFactory):
 
     def _parse_json(self, response, **extra):
         if not hasattr(response, '_json'):
-            if 'application/json' not in response.get('Content-Type'):
+            if not JSON_CONTENT_TYPE_RE.match(response.get('Content-Type')):
                 raise ValueError(
                     'Content-Type header is "{0}", not "application/json"'
                     .format(response.get('Content-Type'))

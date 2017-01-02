@@ -252,7 +252,7 @@ class SQLCompiler(object):
             asc, desc = ORDER_DIR['DESC']
 
         order_by = []
-        for pos, field in enumerate(ordering):
+        for field in ordering:
             if hasattr(field, 'resolve_expression'):
                 if not isinstance(field, OrderBy):
                     field = field.asc()

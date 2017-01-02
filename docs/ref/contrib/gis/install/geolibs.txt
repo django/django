@@ -11,7 +11,7 @@ Program                   Description                           Required        
 :doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.5, 3.4, 3.3
 `PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.9, 4.8, 4.7, 4.6, 4.5, 4.4
 :doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes                               2.1, 2.0, 1.11, 1.10, 1.9
-:doc:`GeoIP <../geoip>`   IP-based geolocation library          No                                1.4
+:doc:`GeoIP <../geoip2>`  IP-based geolocation library          No                                2
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             2.3, 2.2, 2.1
 `SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 4.3, 4.2, 4.1, 4.0
 ========================  ====================================  ================================  ===================================
@@ -62,7 +62,7 @@ install, directly or by dependency, the required geospatial libraries:
 
 Optional packages to consider:
 
-* ``libgeoip1``: for :doc:`GeoIP <../geoip>` support
+* ``libgeoip1``: for :doc:`GeoIP <../geoip2>` support
 * ``python-gdal`` for GDAL's own Python bindings -- includes interfaces for raster manipulation
 
 Please also consult platform-specific instructions if you are on :ref:`macosx`
