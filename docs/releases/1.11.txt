@@ -86,6 +86,9 @@ Minor features
   model, or by setting the :attr:`.ModelAdmin.popup_response_template`
   attribute.
 
+* The ``submit_line.html`` template can now be overridden even per app or per
+  model, other than globally.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

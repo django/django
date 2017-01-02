@@ -1,0 +1,7 @@
+{% extends "admin/submit_line.html" %}
+{% load i18n admin_urls %}
+
+{% block submit-row %}
+{% if show_publish %}<input type="submit" value="{% trans 'Publish' %}" class="default" name="_publish" />{% endif %}
+{{ block.super }}
+{% endblock %}

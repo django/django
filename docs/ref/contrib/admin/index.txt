@@ -2527,10 +2527,12 @@ app or per model. The following can:
 * ``delete_confirmation.html``
 * ``object_history.html``
 * ``popup_response.html``
+* ``submit_line.html``
 
 .. versionchanged:: 1.11
 
-    The ability to override the ``popup_response.html`` template was added.
+    The ability to override the ``popup_response.html`` and ``submit_line.html``
+    templates were added.
 
 For those templates that cannot be overridden in this way, you may still
 override them for your entire project. Just place the new version in your
