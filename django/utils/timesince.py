@@ -46,8 +46,11 @@ def timesince(d, now=None, reversed=False):
 
     # Deal with leapyears by subtracing the number of leapdays
     leapdays = calendar.leapdays(d.year, now.year)
-    if leapdays != 0 and calendar.isleap(d.year):
-        leapdays -= 1
+    if leapdays != 0:
+        if calendar.isleap(d.year):
+            leapdays -= 1
+        elif calendar.isleap(now.year):
+            leapdays += 1
     delta -= datetime.timedelta(leapdays)
 
     # ignore microseconds
