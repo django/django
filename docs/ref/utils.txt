@@ -75,11 +75,6 @@ need to distinguish caches by the ``Accept-language`` header.
     Adds a ``Cache-Control: max-age=0, no-cache, no-store, must-revalidate``
     header to a response to indicate that a page should never be cached.
 
-    .. versionchanged:: 1.8.8
-
-        In older versions, ``Cache-Control: max-age=0`` was sent. This didn't
-        reliably prevent caching in all browsers.
-
 .. function:: patch_vary_headers(response, newheaders)
 
     Adds (or updates) the ``Vary`` header in the given ``HttpResponse`` object.
