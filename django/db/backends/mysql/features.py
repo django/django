@@ -88,4 +88,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.settings_dict.get('USES_SAVEPOINTS', None) is None:
             return self._mysql_storage_engine.lower() not in ('ndbcluster', 'ndb')
         else:
-            return self.connection.settings_dict.get['USES_SAVEPOINTS']
+            return self.connection.settings_dict['USES_SAVEPOINTS']
