@@ -12,12 +12,18 @@ from django import http
 from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
-from django.core.urlresolvers import set_script_prefix
+
 from django.http import FileResponse, HttpResponse, HttpResponseServerError
 from django.utils import six
 from django.utils.functional import cached_property
 
 from channels.exceptions import RequestAborted, RequestTimeout, ResponseLater as ResponseLaterOuter
+
+try:
+    from django.urls import set_script_prefix
+except ImportError:
+    # Django < 1.10
+    from django.core.urlresolvers import set_script_prefix
 
 logger = logging.getLogger('django.request')
 
