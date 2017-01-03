@@ -167,7 +167,7 @@ class LazyObjectTestCase(TestCase):
             del obj_dict['f']
 
     def test_iter(self):
-        # Tests whether an object's custom `__iter__` method is being
+        # An object's custom `__iter__` method is being
         # used when iterating over it.
 
         class IterObject(object):

@@ -526,7 +526,7 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
 
     def test_trans_and_plural_blocktrans_collision(self):
         """
-        Ensures a correct workaround for the gettext bug when handling a literal
+        A correct workaround for the gettext bug when handling a literal
         found inside a {% trans %} tag and also in another file inside a
         {% blocktrans %} with a plural (#17375).
         """
@@ -582,7 +582,7 @@ class LocationCommentsTests(ExtractorTests):
 
     def test_location_comments_for_templatized_files(self):
         """
-        Ensure no leaky paths in comments, e.g. #: path\to\file.html.py:123
+        No leaky paths in comments, e.g. #: path\to\file.html.py:123
         Refs #21209/#26341.
         """
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)

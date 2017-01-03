@@ -707,7 +707,7 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_list_filter_works_on_through_field_even_when_apps_not_ready(self):
         """
-        Ensure list_filter can access reverse fields even when the app registry
+        List_filter can access reverse fields even when the app registry
         is not ready; refs #24146.
         """
         class BookAdminWithListFilter(admin.ModelAdmin):

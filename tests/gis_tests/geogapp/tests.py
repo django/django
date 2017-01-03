@@ -26,7 +26,7 @@ class GeographyTest(TestCase):
     fixtures = ['initial']
 
     def test01_fixture_load(self):
-        "Ensure geography features loaded properly."
+        "Geography features loaded properly."
         self.assertEqual(8, City.objects.count())
 
     @skipIf(spatialite, "SpatiaLite doesn't support distance lookups with Distance objects.")

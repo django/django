@@ -752,7 +752,7 @@ class ListFiltersTests(TestCase):
 
     def test_fieldlistfilter_underscorelookup_tuple(self):
         """
-        Ensure ('fieldpath', ClassName ) lookups pass lookup_allowed checks
+        ('fieldpath', ClassName ) lookups pass lookup_allowed checks
         when fieldpath contains double underscore in value (#19182).
         """
         modeladmin = BookAdminWithUnderscoreLookupAndTuple(Book, site)
@@ -980,7 +980,7 @@ class ListFiltersTests(TestCase):
 
     def test_lookup_with_non_string_value(self):
         """
-        Ensure choices are set the selected class when using non-string values
+        Selected class choices are set when using non-string values
         for lookups in SimpleListFilters (#19318).
         """
         modeladmin = DepartmentFilterEmployeeAdmin(Employee, site)
@@ -1000,7 +1000,7 @@ class ListFiltersTests(TestCase):
 
     def test_lookup_with_non_string_value_underscored(self):
         """
-        Ensure SimpleListFilter lookups pass lookup_allowed checks when
+        SimpleListFilter lookups pass lookup_allowed checks when
         parameter_name attribute contains double-underscore value (#19182).
         """
         modeladmin = DepartmentFilterUnderscoredEmployeeAdmin(Employee, site)
@@ -1074,7 +1074,7 @@ class ListFiltersTests(TestCase):
 
     def test_lookup_with_dynamic_value(self):
         """
-        Ensure SimpleListFilter can access self.value() inside the lookup.
+        SimpleListFilter can access self.value() inside the lookup.
         """
         modeladmin = DepartmentFilterDynamicValueBookAdmin(Book, site)
 

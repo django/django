@@ -211,7 +211,7 @@ class BigChildDeferTests(AssertionMixin, TestCase):
 class TestDefer2(AssertionMixin, TestCase):
     def test_defer_proxy(self):
         """
-        Ensure select_related together with only on a proxy model behaves
+        select_related together with only on a proxy model behaves
         as expected. See #17876.
         """
         related = Secondary.objects.create(first='x1', second='x2')

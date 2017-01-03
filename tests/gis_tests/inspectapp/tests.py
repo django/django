@@ -181,7 +181,7 @@ def get_ogr_db_string():
 
     drv_name, db_str, param_sep = drivers[db_engine]
 
-    # Ensure that GDAL library has driver support for the database.
+    # Ensure GDAL library has driver support for the database.
     try:
         Driver(drv_name)
     except GDALException:
