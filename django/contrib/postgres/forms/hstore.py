@@ -43,7 +43,9 @@ class HStoreField(forms.CharField):
 
         # Cast everything to strings for ease.
         for key, val in value.items():
-            value[key] = six.text_type(val)
+            if val is not None:
+                val = six.text_type(val)
+            value[key] = val
         return value
 
     def has_changed(self, initial, data):

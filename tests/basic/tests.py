@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
-from django.db.models.fields import Field
 from django.db.models.manager import BaseManager
 from django.db.models.query import EmptyQuerySet, QuerySet
 from django.test import (
@@ -268,22 +267,6 @@ class ModelTest(TestCase):
         s = {a10, a11, a12}
         self.assertIn(Article.objects.get(headline='Article 11'), s)
 
-    def test_field_ordering(self):
-        """
-        Field instances have a `__lt__` comparison function to define an
-        ordering based on their creation. Prior to #17851 this ordering
-        comparison relied on the now unsupported `__cmp__` and was assuming
-        compared objects were both Field instances raising `AttributeError`
-        when it should have returned `NotImplemented`.
-        """
-        f1 = Field()
-        f2 = Field(auto_created=True)
-        f3 = Field()
-        self.assertLess(f2, f1)
-        self.assertGreater(f3, f1)
-        self.assertIsNotNone(f1)
-        self.assertNotIn(f2, (None, 1, ''))
-
     def test_extra_method_select_argument_with_dashes_and_values(self):
         # The 'select' argument to extra() supports names with dashes in
         # them, as long as you use values().
@@ -331,7 +314,7 @@ class ModelTest(TestCase):
 
     def test_create_relation_with_ugettext_lazy(self):
         """
-        Test that ugettext_lazy objects work when saving model instances
+        ugettext_lazy objects work when saving model instances
         through various methods. Refs #10498.
         """
         notlazy = 'test'
@@ -640,9 +623,8 @@ class SelectOnSaveTests(TestCase):
 
     def test_select_on_save_lying_update(self):
         """
-        Test that select_on_save works correctly if the database
-        doesn't return correct information about matched rows from
-        UPDATE.
+        select_on_save works correctly if the database doesn't return correct
+        information about matched rows from UPDATE.
         """
         # Change the manager to not return "row matched" for update().
         # We are going to change the Article's _base_manager class

@@ -36,7 +36,7 @@ class RelatedGeoModelTest(TestCase):
                 nm, st, lon, lat = ref
                 self.assertEqual(nm, c.name)
                 self.assertEqual(st, c.state)
-                self.assertEqual(Point(lon, lat), c.location.point)
+                self.assertEqual(Point(lon, lat, srid=c.location.point.srid), c.location.point)
 
     @skipUnlessDBFeature("has_transform_method")
     def test03_transform_related(self):
@@ -98,7 +98,7 @@ class RelatedGeoModelTest(TestCase):
             tol
         )
 
-    @skipUnlessDBFeature("has_unionagg_method")
+    @skipUnlessDBFeature('supports_union_aggr')
     def test_related_union_aggregate(self):
         "Testing the `Union` aggregate on related geographic models."
         # This combines the Extent and Union aggregates into one query

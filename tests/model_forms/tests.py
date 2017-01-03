@@ -601,6 +601,22 @@ class ModelFormBaseTest(TestCase):
         self.assertIsInstance(mf1.fields['active'].widget, forms.CheckboxInput)
         self.assertIs(m1._meta.get_field('active').get_default(), True)
 
+    def test_default_not_populated_on_checkboxselectmultiple(self):
+        class PubForm(forms.ModelForm):
+            mode = forms.CharField(required=False, widget=forms.CheckboxSelectMultiple)
+
+            class Meta:
+                model = PublicationDefaults
+                fields = ('mode',)
+
+        # Empty data doesn't use the model default because an unchecked
+        # CheckboxSelectMultiple doesn't have a value in HTML form submission.
+        mf1 = PubForm({})
+        self.assertEqual(mf1.errors, {})
+        m1 = mf1.save(commit=False)
+        self.assertEqual(m1.mode, '')
+        self.assertEqual(m1._meta.get_field('mode').get_default(), 'di')
+
     def test_prefixed_form_with_default_field(self):
         class PubForm(forms.ModelForm):
             prefix = 'form-prefix'
@@ -651,7 +667,7 @@ class ModelFormBaseTest(TestCase):
         m2 = mf2.save(commit=False)
         self.assertEqual(m2.file.name, 'name')
 
-    def test_selectdatewidget(self):
+    def test_default_selectdatewidget(self):
         class PubForm(forms.ModelForm):
             date_published = forms.DateField(required=False, widget=forms.SelectDateWidget)
 
@@ -1635,13 +1651,6 @@ class ModelChoiceFieldTests(TestCase):
         with self.assertNumQueries(1):
             template.render(Context({'field': field}))
 
-    def test_modelchoicefield_index_renderer(self):
-        field = forms.ModelChoiceField(Category.objects.all(), widget=forms.RadioSelect)
-        self.assertEqual(
-            str(field.widget.get_renderer('foo', [])[0]),
-            '<label><input name="foo" type="radio" value="" /> ---------</label>'
-        )
-
     def test_disabled_modelchoicefield(self):
         class ModelChoiceForm(forms.ModelForm):
             author = forms.ModelChoiceField(Author.objects.all(), disabled=True)
@@ -1813,8 +1822,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
     def test_model_multiple_choice_number_of_queries(self):
         """
-        Test that ModelMultipleChoiceField does O(1) queries instead of
-        O(n) (#10156).
+        ModelMultipleChoiceField does O(1) queries instead of O(n) (#10156).
         """
         persons = [Writer.objects.create(name="Person %s" % i) for i in range(30)]
 
@@ -1823,7 +1831,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
     def test_model_multiple_choice_run_validators(self):
         """
-        Test that ModelMultipleChoiceField run given validators (#14144).
+        ModelMultipleChoiceField run given validators (#14144).
         """
         for i in range(30):
             Writer.objects.create(name="Person %s" % i)
@@ -2100,7 +2108,7 @@ class FileAndImageFieldTests(TestCase):
 
         doc = Document.objects.create()
         form = DocumentForm(instance=doc)
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(form['myfile']),
             '<input id="id_myfile" name="myfile" type="file" />'
         )
@@ -2627,11 +2635,11 @@ class OtherModelFormTests(TestCase):
             <p><label for="id_date_published">Date published:</label>
                 <input id="id_date_published" name="date_published" type="text" value="{0}" required />
                 <input id="initial-id_date_published" name="initial-date_published" type="hidden" value="{0}" /></p>
-            <p><label for="id_mode">Mode:</label> <select id="id_mode" name="mode" required>
+            <p><label for="id_mode">Mode:</label> <select id="id_mode" name="mode">
                 <option value="di" selected>direct</option>
                 <option value="de">delayed</option></select>
                 <input id="initial-id_mode" name="initial-mode" type="hidden" value="di" /></p>
-           <p><label for="id_category">Category:</label> <select id="id_category" name="category" required>
+           <p><label for="id_category">Category:</label> <select id="id_category" name="category">
                 <option value="1">Games</option>
                 <option value="2">Comics</option>
                 <option value="3" selected>Novel</option></select>
@@ -2763,8 +2771,10 @@ class ModelFormInheritanceTests(SimpleTestCase):
         self.assertEqual(list(type(str('NewForm'), (ModelForm, Form), {'age': None})().fields.keys()), ['name'])
 
     def test_field_removal_name_clashes(self):
-        """Regression test for https://code.djangoproject.com/ticket/22510."""
-
+        """
+        Form fields can be removed in subclasses by setting them to None
+        (#22510).
+        """
         class MyForm(forms.ModelForm):
             media = forms.CharField()
 
@@ -2796,46 +2806,49 @@ class StumpJokeWithCustomFieldForm(forms.ModelForm):
 
     class Meta:
         model = StumpJoke
-        fields = ()  # We don't need any fields from the model
+        fields = ()
 
 
-class LimitChoicesToTest(TestCase):
+class LimitChoicesToTests(TestCase):
     """
     Tests the functionality of ``limit_choices_to``.
     """
-    def setUp(self):
-        self.threepwood = Character.objects.create(
+    @classmethod
+    def setUpTestData(cls):
+        cls.threepwood = Character.objects.create(
             username='threepwood',
             last_action=datetime.datetime.today() + datetime.timedelta(days=1),
         )
-        self.marley = Character.objects.create(
+        cls.marley = Character.objects.create(
             username='marley',
             last_action=datetime.datetime.today() - datetime.timedelta(days=1),
         )
 
     def test_limit_choices_to_callable_for_fk_rel(self):
         """
-        A ForeignKey relation can use ``limit_choices_to`` as a callable, re #2554.
+        A ForeignKey can use limit_choices_to as a callable (#2554).
         """
         stumpjokeform = StumpJokeForm()
-        self.assertIn(self.threepwood, stumpjokeform.fields['most_recently_fooled'].queryset)
-        self.assertNotIn(self.marley, stumpjokeform.fields['most_recently_fooled'].queryset)
+        self.assertSequenceEqual(stumpjokeform.fields['most_recently_fooled'].queryset, [self.threepwood])
 
     def test_limit_choices_to_callable_for_m2m_rel(self):
         """
-        A ManyToMany relation can use ``limit_choices_to`` as a callable, re #2554.
+        A ManyToManyField can use limit_choices_to as a callable (#2554).
         """
         stumpjokeform = StumpJokeForm()
-        self.assertIn(self.threepwood, stumpjokeform.fields['has_fooled_today'].queryset)
-        self.assertNotIn(self.marley, stumpjokeform.fields['has_fooled_today'].queryset)
+        self.assertSequenceEqual(stumpjokeform.fields['most_recently_fooled'].queryset, [self.threepwood])
 
     def test_custom_field_with_queryset_but_no_limit_choices_to(self):
         """
-        Regression test for #23795: Make sure a custom field with a `queryset`
-        attribute but no `limit_choices_to` still works.
+        A custom field with a `queryset` attribute but no `limit_choices_to`
+        works (#23795).
         """
         f = StumpJokeWithCustomFieldForm()
         self.assertEqual(f.fields['custom'].queryset, 42)
+
+    def test_fields_for_model_applies_limit_choices_to(self):
+        fields = fields_for_model(StumpJoke, ['has_fooled_today'])
+        self.assertSequenceEqual(fields['has_fooled_today'].queryset, [self.threepwood])
 
 
 class FormFieldCallbackTests(SimpleTestCase):
@@ -2851,7 +2864,7 @@ class FormFieldCallbackTests(SimpleTestCase):
                 fields = "__all__"
 
         Form = modelform_factory(Person, form=BaseForm)
-        self.assertIs(Form.base_fields['name'].widget, widget)
+        self.assertIsInstance(Form.base_fields['name'].widget, forms.Textarea)
 
     def test_factory_with_widget_argument(self):
         """ Regression for #15315: modelform_factory should accept widgets
@@ -2882,8 +2895,7 @@ class FormFieldCallbackTests(SimpleTestCase):
         self.assertEqual(list(form.base_fields), ["name"])
 
     def test_custom_callback(self):
-        """Test that a custom formfield_callback is used if provided"""
-
+        """A custom formfield_callback is used if provided"""
         callback_args = []
 
         def callback(db_field, **kwargs):
@@ -2901,8 +2913,7 @@ class FormFieldCallbackTests(SimpleTestCase):
         modelform_factory(Person, form=BaseForm, formfield_callback=callback)
         id_field, name_field = Person._meta.fields
 
-        self.assertEqual(callback_args,
-                         [(id_field, {}), (name_field, {'widget': widget})])
+        self.assertEqual(callback_args, [(id_field, {}), (name_field, {'widget': widget})])
 
     def test_bad_callback(self):
         # A bad callback provided by user still gives an error

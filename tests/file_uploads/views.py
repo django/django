@@ -17,8 +17,7 @@ from .uploadhandler import ErroringUploadHandler, QuotaUploadHandler
 
 def file_upload_view(request):
     """
-    Check that a file upload can be updated into the POST dictionary without
-    going pear-shaped.
+    A file upload can be updated into the POST dictionary.
     """
     form_data = request.POST.copy()
     form_data.update(request.FILES)

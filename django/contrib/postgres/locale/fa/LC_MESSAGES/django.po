@@ -2,14 +2,15 @@
 #
 # Translators:
 # Ali Nikneshan <ali@nikneshan.com>, 2015
+# Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2016
 # Pouya Abbassi, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-07-15 09:44+0200\n"
-"PO-Revision-Date: 2016-07-15 09:52+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-08-16 14:19+0000\n"
+"Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -45,7 +46,7 @@ msgid "Could not load JSON data."
 msgstr "امکان بارگزاری  داده های JSON  نیست."
 
 msgid "Input must be a JSON dictionary."
-msgstr ""
+msgstr "مقدار ورودی باید یک دیکشنری JSON باشد."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
@@ -96,7 +97,7 @@ msgstr "برخی کلیدها یافت نشدند: %(keys)s"
 
 #, python-format
 msgid "Some unknown keys were provided: %(keys)s"
-msgstr "برخی کلیدهای ارائه شده ناشناخته هستند: %(keys)s"
+msgstr "برخی کلیدهای ارائه شده ناشناخته‌اند: %(keys)s"
 
 #, python-format
 msgid ""

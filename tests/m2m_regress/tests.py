@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from django.core.exceptions import FieldError
 from django.test import TestCase
-from django.utils import six
 
 from .models import (
     Entry, Line, Post, RegressionModelSplit, SelfRefer, SelfReferChild,
@@ -37,10 +36,9 @@ class M2MRegressionTests(TestCase):
     def test_internal_related_name_not_in_error_msg(self):
         # The secret internal related names for self-referential many-to-many
         # fields shouldn't appear in the list when an error is made.
-
-        six.assertRaisesRegex(
-            self, FieldError,
-            "Choices are: id, name, references, related, selfreferchild, selfreferchildsibling$",
+        self.assertRaisesMessage(
+            FieldError,
+            "Choices are: id, name, references, related, selfreferchild, selfreferchildsibling",
             lambda: SelfRefer.objects.filter(porcupine='fred')
         )
 

@@ -130,8 +130,7 @@ class StaticHelperTest(StaticTests):
 class StaticUtilsTests(unittest.TestCase):
     def test_was_modified_since_fp(self):
         """
-        Test that a floating point mtime does not disturb was_modified_since.
-        (#18675)
+        A floating point mtime does not disturb was_modified_since (#18675).
         """
         mtime = 1343416141.107817
         header = http_date(mtime)

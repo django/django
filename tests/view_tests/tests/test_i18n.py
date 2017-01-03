@@ -314,6 +314,18 @@ class JsI18NTests(SimpleTestCase):
             self.assertContains(response, 'il faut le traduire')
             self.assertNotContains(response, "Untranslated string")
 
+    def test_i18n_fallback_language_plural(self):
+        """
+        The fallback to a language with less plural forms maintains the real
+        language's number of plural forms.
+        """
+        with self.settings(LANGUAGE_CODE='pt'), override('ru'):
+            response = self.client.get('/jsi18n/')
+            self.assertEqual(
+                response.context['catalog']['{count} plural3'],
+                ['{count} plural3', '{count} plural3s', '{count} plural3 p3t']
+            )
+
     def test_i18n_english_variant(self):
         with override('en-gb'):
             response = self.client.get('/jsi18n/')
@@ -384,9 +396,21 @@ class JsI18NTestsMultiPackage(SimpleTestCase):
         translations of multiple Python packages is requested. See #13388,
         #3594 and #13514 for more details.
         """
+        base_trans_string = 'il faut traduire cette cha\\u00eene de caract\\u00e8res de '
+        app1_trans_string = base_trans_string + 'app1'
+        app2_trans_string = base_trans_string + 'app2'
         with self.settings(LANGUAGE_CODE='en-us'), override('fr'):
             response = self.client.get('/jsi18n_multi_packages1/')
-            self.assertContains(response, 'il faut traduire cette cha\\u00eene de caract\\u00e8res de app1')
+            self.assertContains(response, app1_trans_string)
+            self.assertContains(response, app2_trans_string)
+
+            response = self.client.get('/jsi18n/app1/')
+            self.assertContains(response, app1_trans_string)
+            self.assertNotContains(response, app2_trans_string)
+
+            response = self.client.get('/jsi18n/app2/')
+            self.assertNotContains(response, app1_trans_string)
+            self.assertContains(response, app2_trans_string)
 
     @modify_settings(INSTALLED_APPS={'append': ['view_tests.app3', 'view_tests.app4']})
     def test_i18n_different_non_english_languages(self):

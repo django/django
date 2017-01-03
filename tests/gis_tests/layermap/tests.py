@@ -304,7 +304,7 @@ class LayerMapTest(TestCase):
             lm.save(silent=True, strict=True)
 
     def test_textfield(self):
-        "Tests that String content fits also in a TextField"
+        "String content fits also in a TextField"
         mapping = copy(city_mapping)
         mapping['name_txt'] = 'Name'
         lm = LayerMapping(City, city_shp, mapping)

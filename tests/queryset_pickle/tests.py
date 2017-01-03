@@ -57,7 +57,7 @@ class PickleabilityTestCase(TestCase):
 
     def test_model_pickle(self):
         """
-        Test that a model not defined on module level is picklable.
+        A model not defined on module level is picklable.
         """
         original = Container.SomeModel(pk=1)
         dumped = pickle.dumps(original)
@@ -114,6 +114,34 @@ class PickleabilityTestCase(TestCase):
         # Second pickling
         groups = pickle.loads(pickle.dumps(groups))
         self.assertSequenceEqual(groups, [g])
+
+    def test_pickle_prefetch_queryset_usable_outside_of_prefetch(self):
+        # Prefetch shouldn't affect the fetch-on-pickle behavior of the
+        # queryset passed to it.
+        Group.objects.create(name='foo')
+        events = Event.objects.order_by('id')
+        Group.objects.prefetch_related(models.Prefetch('event_set', queryset=events))
+        with self.assertNumQueries(1):
+            events2 = pickle.loads(pickle.dumps(events))
+        with self.assertNumQueries(0):
+            list(events2)
+
+    def test_pickle_prefetch_queryset_still_usable(self):
+        g = Group.objects.create(name='foo')
+        groups = Group.objects.prefetch_related(
+            models.Prefetch('event_set', queryset=Event.objects.order_by('id'))
+        )
+        groups2 = pickle.loads(pickle.dumps(groups))
+        self.assertSequenceEqual(groups2.filter(id__gte=0), [g])
+
+    def test_pickle_prefetch_queryset_not_evaluated(self):
+        Group.objects.create(name='foo')
+        groups = Group.objects.prefetch_related(
+            models.Prefetch('event_set', queryset=Event.objects.order_by('id'))
+        )
+        list(groups)  # evaluate QuerySet
+        with self.assertNumQueries(0):
+            pickle.loads(pickle.dumps(groups))
 
     def test_pickle_prefetch_related_with_m2m_and_objects_deletion(self):
         """

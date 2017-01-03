@@ -60,6 +60,21 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_description(self, cursor, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
+        # user_tab_columns gives data default for columns
+        cursor.execute("""
+            SELECT
+                column_name,
+                data_default,
+                CASE
+                    WHEN char_used IS NULL THEN data_length
+                    ELSE char_length
+                END as internal_size
+            FROM user_tab_cols
+            WHERE table_name = UPPER(%s)""", [table_name])
+        field_map = {
+            column: (internal_size, default if default != 'NULL' else None)
+            for column, default, internal_size in cursor.fetchall()
+        }
         self.cache_bust_counter += 1
         cursor.execute("SELECT * FROM {} WHERE ROWNUM < 2 AND {} > 0".format(
             self.connection.ops.quote_name(table_name),
@@ -67,8 +82,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         description = []
         for desc in cursor.description:
             name = force_text(desc[0])  # cx_Oracle always returns a 'str' on both Python 2 and 3
+            internal_size, default = field_map[name]
             name = name % {}  # cx_Oracle, for some reason, doubles percent signs.
-            description.append(FieldInfo(*(name.lower(),) + desc[1:]))
+            description.append(FieldInfo(*(name.lower(),) + desc[1:3] + (internal_size,) + desc[4:] + (default,)))
         return description
 
     def table_name_converter(self, name):
@@ -158,7 +174,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
         """
         constraints = {}
-        # Loop over the constraints, getting PKs and uniques
+        # Loop over the constraints, getting PKs, uniques, and checks
         cursor.execute("""
             SELECT
                 user_constraints.constraint_name,
@@ -167,29 +183,34 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     WHEN 'P' THEN 1
                     ELSE 0
                 END AS is_primary_key,
-                CASE user_indexes.uniqueness
-                    WHEN 'UNIQUE' THEN 1
+                CASE
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM user_indexes
+                        WHERE user_indexes.index_name = user_constraints.index_name
+                        AND user_indexes.uniqueness = 'UNIQUE'
+                    )
+                    THEN 1
                     ELSE 0
                 END AS is_unique,
                 CASE user_constraints.constraint_type
                     WHEN 'C' THEN 1
                     ELSE 0
-                END AS is_check_constraint
+                END AS is_check_constraint,
+                CASE
+                    WHEN user_constraints.constraint_type IN ('P', 'U') THEN 1
+                    ELSE 0
+                END AS has_index
             FROM
                 user_constraints
-            INNER JOIN
-                user_indexes ON user_indexes.index_name = user_constraints.index_name
             LEFT OUTER JOIN
                 user_cons_columns cols ON user_constraints.constraint_name = cols.constraint_name
             WHERE
-                (
-                    user_constraints.constraint_type = 'P' OR
-                    user_constraints.constraint_type = 'U'
-                )
+                user_constraints.constraint_type = ANY('P', 'U', 'C')
                 AND user_constraints.table_name = UPPER(%s)
             ORDER BY cols.position
         """, [table_name])
-        for constraint, column, pk, unique, check in cursor.fetchall():
+        for constraint, column, pk, unique, check, index in cursor.fetchall():
             # If we're the first column, make the record
             if constraint not in constraints:
                 constraints[constraint] = {
@@ -198,34 +219,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "unique": unique,
                     "foreign_key": None,
                     "check": check,
-                    "index": True,  # All P and U come with index, see inner join above
-                }
-            # Record the details
-            constraints[constraint]['columns'].append(column)
-        # Check constraints
-        cursor.execute("""
-            SELECT
-                cons.constraint_name,
-                LOWER(cols.column_name) AS column_name
-            FROM
-                user_constraints cons
-            LEFT OUTER JOIN
-                user_cons_columns cols ON cons.constraint_name = cols.constraint_name
-            WHERE
-                cons.constraint_type = 'C' AND
-                cons.table_name = UPPER(%s)
-            ORDER BY cols.position
-        """, [table_name])
-        for constraint, column in cursor.fetchall():
-            # If we're the first column, make the record
-            if constraint not in constraints:
-                constraints[constraint] = {
-                    "columns": [],
-                    "primary_key": False,
-                    "unique": False,
-                    "foreign_key": None,
-                    "check": True,
-                    "index": False,
+                    "index": index,  # All P and U come with index
                 }
             # Record the details
             constraints[constraint]['columns'].append(column)
@@ -234,14 +228,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT
                 cons.constraint_name,
                 LOWER(cols.column_name) AS column_name,
-                LOWER(rcons.table_name),
+                LOWER(rcols.table_name),
                 LOWER(rcols.column_name)
             FROM
                 user_constraints cons
             INNER JOIN
-                user_constraints rcons ON cons.r_constraint_name = rcons.constraint_name
-            INNER JOIN
-                user_cons_columns rcols ON rcols.constraint_name = rcons.constraint_name
+                user_cons_columns rcols ON rcols.constraint_name = cons.r_constraint_name
             LEFT OUTER JOIN
                 user_cons_columns cols ON cons.constraint_name = cols.constraint_name
             WHERE

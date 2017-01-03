@@ -119,14 +119,11 @@ know about it - it is dealt with entirely by the database. All Python does,
 through Django's ``F()`` class, is create the SQL syntax to refer to the field
 and describe the operation.
 
-.. note::
+To access the new value saved this way, the object must be reloaded::
 
-   In order to access the new value that has been saved in this way, the object
-   will need to be reloaded::
-
-       reporter = Reporters.objects.get(pk=reporter.pk)
-       # Or, more succinctly:
-       reporter.refresh_from_db()
+   reporter = Reporters.objects.get(pk=reporter.pk)
+   # Or, more succinctly:
+   reporter.refresh_from_db()
 
 As well as being used in operations on single instances as above, ``F()`` can
 be used on ``QuerySets`` of object instances, with ``update()``. This reduces
@@ -214,6 +211,15 @@ directly support ``output_field`` you will need to wrap the expression with
         expires=ExpressionWrapper(
             F('active_at') + F('duration'), output_field=DateTimeField()))
 
+When referencing relational fields such as ``ForeignKey``, ``F()`` returns the
+primary key value rather than a model instance::
+
+    >> car = Company.objects.annotate(built_by=F('manufacturer'))[0]
+    >> car.manufacturer
+    <Manufacturer: Toyota>
+    >> car.built_by
+    3
+
 .. _func-expressions:
 
 ``Func()`` expressions
@@ -258,6 +264,12 @@ The ``Func`` API is as follows:
         A class attribute, as a format string, that describes the SQL that is
         generated for this function. Defaults to
         ``'%(function)s(%(expressions)s)'``.
+
+        If you're constructing SQL like ``strftime('%W', 'date')`` and need a
+        literal ``%`` character in the query, quadruple it (``%%%%``) in the
+        ``template`` attribute because the string is interpolated twice: once
+        during the template interpolation in ``as_sql()`` and once in the SQL
+        interpolation with the query parameters in the database cursor.
 
     .. attribute:: arg_joiner
 
@@ -548,13 +560,25 @@ calling the appropriate methods on the wrapped expression.
         nested expressions. ``F()`` objects, in particular, hold a reference
         to a column.
 
-    .. method:: asc()
+    .. method:: asc(nulls_first=False, nulls_last=False)
 
         Returns the expression ready to be sorted in ascending order.
 
-    .. method:: desc()
+        ``nulls_first`` and ``nulls_last`` define how null values are sorted.
+
+        .. versionchanged:: 1.11
+
+            The ``nulls_last`` and ``nulls_first`` parameters were added.
+
+    .. method:: desc(nulls_first=False, nulls_last=False)
 
         Returns the expression ready to be sorted in descending order.
+
+        ``nulls_first`` and ``nulls_last`` define how null values are sorted.
+
+        .. versionchanged:: 1.11
+
+            The ``nulls_first`` and ``nulls_last`` parameters were added.
 
     .. method:: reverse_ordering()
 

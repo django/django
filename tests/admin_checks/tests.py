@@ -165,16 +165,15 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_custom_get_form_with_fieldsets(self):
         """
-        Ensure that the fieldsets checks are skipped when the ModelAdmin.get_form() method
+        The fieldsets checks are skipped when the ModelAdmin.get_form() method
         is overridden.
-        Refs #19445.
         """
         errors = ValidFormFieldsets(Song, AdminSite()).check()
         self.assertEqual(errors, [])
 
     def test_fieldsets_fields_non_tuple(self):
         """
-        Tests for a tuple/list for the first fieldset's fields.
+        The first fieldset's fields must be a list/tuple.
         """
         class NotATupleAdmin(admin.ModelAdmin):
             list_display = ["pk", "title"]
@@ -197,7 +196,7 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_nonfirst_fieldset(self):
         """
-        Tests for a tuple/list for the second fieldset's fields.
+        The second fieldset's fields must be a list/tuple.
         """
         class NotATupleAdmin(admin.ModelAdmin):
             fieldsets = [
@@ -309,7 +308,7 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_generic_inline_model_admin_non_generic_model(self):
         """
-        Ensure that a model without a GenericForeignKey raises problems if it's included
+        A model without a GenericForeignKey raises problems if it's included
         in an GenericInlineModelAdmin definition.
         """
         class BookInline(GenericStackedInline):

@@ -37,6 +37,7 @@ class DoesNotExistQuerySet(QuerySet):
     def get(self, *args, **kwargs):
         raise Author.DoesNotExist
 
+
 DoesNotExistBookManager = BaseManager.from_queryset(DoesNotExistQuerySet)
 
 

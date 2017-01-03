@@ -6,7 +6,7 @@ from decimal import Decimal
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models import (
     BooleanField, CharField, Count, DateTimeField, ExpressionWrapper, F, Func,
-    IntegerField, Q, Sum, Value,
+    IntegerField, NullBooleanField, Q, Sum, Value,
 )
 from django.db.models.functions import Lower
 from django.test import TestCase, skipUnlessDBFeature
@@ -343,7 +343,7 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_null_annotation(self):
         """
-        Test that annotating None onto a model round-trips
+        Annotating None onto a model round-trips
         """
         book = Book.objects.annotate(no_value=Value(None, output_field=IntegerField())).first()
         self.assertIsNone(book.no_value)
@@ -372,9 +372,9 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_column_field_ordering(self):
         """
-        Test that columns are aligned in the correct order for
-        resolve_columns. This test will fail on mysql if column
-        ordering is out. Column fields should be aligned as:
+        Columns are aligned in the correct order for resolve_columns. This test
+        will fail on MySQL if column ordering is out. Column fields should be
+        aligned as:
         1. extra_select
         2. model_fields
         3. annotation_fields
@@ -488,3 +488,15 @@ class NonAggregateAnnotationTestCase(TestCase):
             ],
             lambda c: (c.name, c.tagline_lower)
         )
+
+    def test_boolean_value_annotation(self):
+        books = Book.objects.annotate(
+            is_book=Value(True, output_field=BooleanField()),
+            is_pony=Value(False, output_field=BooleanField()),
+            is_none=Value(None, output_field=NullBooleanField()),
+        )
+        self.assertGreater(len(books), 0)
+        for book in books:
+            self.assertIs(book.is_book, True)
+            self.assertIs(book.is_pony, False)
+            self.assertIsNone(book.is_none)

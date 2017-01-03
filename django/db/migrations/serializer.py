@@ -6,6 +6,7 @@ import decimal
 import functools
 import math
 import types
+import uuid
 from importlib import import_module
 
 from django.db import models
@@ -320,6 +321,11 @@ class TypeSerializer(BaseSerializer):
                 return "%s.%s" % (module, self.value.__name__), {"import %s" % module}
 
 
+class UUIDSerializer(BaseSerializer):
+    def serialize(self):
+        return "uuid.%s" % repr(self.value), {"import uuid"}
+
+
 def serializer_factory(value):
     from django.db.migrations.writer import SettingsReference
     if isinstance(value, Promise):
@@ -382,6 +388,8 @@ def serializer_factory(value):
         return IterableSerializer(value)
     if isinstance(value, (COMPILED_REGEX_TYPE, RegexObject)):
         return RegexSerializer(value)
+    if isinstance(value, uuid.UUID):
+        return UUIDSerializer(value)
     raise ValueError(
         "Cannot serialize: %r\nThere are some values Django cannot serialize into "
         "migration files.\nFor more, see https://docs.djangoproject.com/en/%s/"

@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-09-15 15:53+0000\n"
+"Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -62,7 +62,7 @@ msgid "German"
 msgstr "जर्मन"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "तल्लो सोर्बियन"
 
 msgid "Greek"
 msgstr "ग्रिक"
@@ -86,7 +86,7 @@ msgid "Argentinian Spanish"
 msgstr "अर्जेन्टिनाली स्पेनिस"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "कोलम्बियाली स्पेनिस"
 
 msgid "Mexican Spanish"
 msgstr "मेक्सिकन स्पेनिस"
@@ -119,7 +119,7 @@ msgid "Irish"
 msgstr "आयरिस"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "स्कटीस गैलिक"
 
 msgid "Galician"
 msgstr "ग्यलिसियन"
@@ -134,7 +134,7 @@ msgid "Croatian"
 msgstr "क्रोषियन"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "माथिल्लो सोर्बियन "
 
 msgid "Hungarian"
 msgstr "हन्गेरियन"
@@ -197,7 +197,7 @@ msgid "Burmese"
 msgstr "बर्मेली"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "नर्वे बक्मल"
 
 msgid "Nepali"
 msgstr "नेपाली"
@@ -314,7 +314,7 @@ msgstr "अक्षर, अंक, _  र - भएका 'स्लग' मा�
 msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
-msgstr ""
+msgstr "युनिकोड अक्षर, अंक, _  र - भएका मात्र मान्य 'स्लग' राख्नु होस ।"
 
 msgid "Enter a valid IPv4 address."
 msgstr "उपयुक्त IPv4 ठेगाना राख्नुहोस"
@@ -455,7 +455,7 @@ msgstr "'%(value)s' अमान्य मिति स्वरूप भयो
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
-msgstr ""
+msgstr "'%(value)s' (YYYY-MM-DD) स्वरूपको भए पनि मिति मिलेन ।"
 
 msgid "Date (without time)"
 msgstr "मिति (समय रहित)"
@@ -499,7 +499,7 @@ msgstr "फाइलको मार्ग"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "'%(value)s' दशमलव   हुनु पर्छ ।"
 
 msgid "Floating point number"
 msgstr "दश्मलव हुने संख्या"
@@ -576,11 +576,11 @@ msgstr "एक-देखि-एक नाता"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "%(from)s-%(to)s सम्बन्ध"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "%(from)s-%(to)s सम्बन्धहरु"
 
 msgid "Many-to-many relationship"
 msgstr "अनेक-देखि-अनेक नाता"
@@ -664,7 +664,7 @@ msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(लुकेका %(name)s) %(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "म्यानेजमेन्ट फारम  डाटा चलाइएको वा नभरेको पाइयो ।"
 
 #, python-format
 msgid "Please submit %d or fewer forms."
@@ -711,7 +711,7 @@ msgstr "उपयुक्त विकल्प छान्नुहोस ।
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr ""
+msgstr "\"%(pk)s\"  प्राइमरी  कि का  लागि मान्य छैन ।"
 
 #, python-format
 msgid ""
@@ -1094,6 +1094,8 @@ msgid ""
 "Of course, you haven't actually done any work yet. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
+"सबै काम सिद्धिएको छैन । आफ्नो एप चलाउन  <code>python manage.py startapp "
+"[app_label]</code> राख्नु होस ।"
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
@@ -1144,7 +1146,7 @@ msgid "Empty list and '%(class_name)s.allow_empty' is False."
 msgstr "'%(class_name)s.allow_empty' 'False' छ र लिस्ट पनि खालि छ । "
 
 msgid "Directory indexes are not allowed here."
-msgstr ""
+msgstr "डाइरेक्टरी इन्डेक्सहरु यहाँ अनुमति छैन ।"
 
 #, python-format
 msgid "\"%(path)s\" does not exist"

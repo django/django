@@ -2,7 +2,8 @@ import hashlib
 import logging
 from datetime import datetime
 
-from django.db.transaction import atomic
+from django.db.backends.utils import strip_quotes
+from django.db.transaction import TransactionManagementError, atomic
 from django.utils import six, timezone
 from django.utils.encoding import force_bytes
 
@@ -98,6 +99,13 @@ class BaseDatabaseSchemaEditor(object):
         """
         Executes the given SQL statement, with optional parameters.
         """
+        # Don't perform the transactional DDL check if SQL is being collected
+        # as it's not going to be executed anyway.
+        if not self.collect_sql and self.connection.in_atomic_block and not self.connection.features.can_rollback_ddl:
+            raise TransactionManagementError(
+                "Executing DDL statements while in a transaction on databases "
+                "that can't perform a rollback is prohibited."
+            )
         # Log the command we're running, then run it
         logger.debug("%s; (params %r)", sql, params, extra={'params': params, 'sql': sql})
         if self.collect_sql:
@@ -375,7 +383,7 @@ class BaseDatabaseSchemaEditor(object):
         Renames the table a model points to.
         """
         if (old_db_table == new_db_table or
-            (self.connection.features.ignores_quoted_identifier_case and
+            (self.connection.features.ignores_table_name_case and
                 old_db_table.lower() == new_db_table.lower())):
             return
         self.execute(self.sql_rename_table % {
@@ -834,7 +842,7 @@ class BaseDatabaseSchemaEditor(object):
         The name is divided into 3 parts: the table name, the column names,
         and a unique digest and suffix.
         """
-        table_name = model._meta.db_table
+        table_name = strip_quotes(model._meta.db_table)
         hash_data = [table_name] + list(column_names)
         hash_suffix_part = '%s%s' % (self._digest(*hash_data), suffix)
         max_length = self.connection.ops.max_name_length() or 200

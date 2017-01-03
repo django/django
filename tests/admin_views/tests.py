@@ -35,7 +35,9 @@ from django.urls import NoReverseMatch, resolve, reverse
 from django.utils import formats, six, translation
 from django.utils._os import upath
 from django.utils.cache import get_max_age
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
 from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -184,9 +186,6 @@ class AdminViewBasicTestCase(TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    def tearDown(self):
-        formats.reset_format_cache()
-
     def assertContentBefore(self, response, text1, text2, failing_msg=None):
         """
         Testing utility asserting that text1 appears before text2 in response
@@ -211,8 +210,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_admin_static_template_tag(self):
         """
-        Test that admin_static.static is pointing to the collectstatic version
-        (as django.contrib.collectstatic is in installed apps).
+        admin_static.static points to the collectstatic version
+        (as django.contrib.collectstatic is in INSTALLED_APPS).
         """
         old_url = staticfiles_storage.base_url
         staticfiles_storage.base_url = '/test/'
@@ -484,8 +483,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertContentBefore(response, link1, link2)
 
     def test_multiple_sort_same_field(self):
-        # Check that we get the columns we expect if we have two columns
-        # that correspond to the same ordering field
+        # The changelist displays the correct columns if two columns correspond
+        # to the same ordering field.
         dt = datetime.datetime.now()
         p1 = Podcast.objects.create(name="A", release_date=dt)
         p2 = Podcast.objects.create(name="B", release_date=dt - datetime.timedelta(10))
@@ -515,9 +514,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_sort_indicators_admin_order(self):
         """
-        Ensures that the admin shows default sort indicators for all
-        kinds of 'ordering' fields: field names, method on the model
-        admin and model itself, and other callables. See #17252.
+        The admin shows default sort indicators for all kinds of 'ordering'
+        fields: field names, method on the model admin and model itself, and
+        other callables. See #17252.
         """
         models = [(AdminOrderedField, 'adminorderedfield'),
                   (AdminOrderedModelMethod, 'adminorderedmodelmethod'),
@@ -855,9 +854,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_change_view_with_show_delete_extra_context(self):
         """
-        Ensured that the 'show_delete' context variable in the admin's change
-        view actually controls the display of the delete button.
-        Refs #10057.
+        The 'show_delete' context variable in the admin's change view controls
+        the display of the delete button.
         """
         instance = UndeletableObject.objects.create(name='foo')
         response = self.client.get(reverse('admin:admin_views_undeletableobject_change', args=(instance.pk,)))
@@ -865,11 +863,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_allows_attributeerror_to_bubble_up(self):
         """
-        Ensure that AttributeErrors are allowed to bubble when raised inside
-        a change list view.
-
-        Requires a model to be created so there's something to be displayed
-
+        AttributeErrors are allowed to bubble when raised inside a change list
+        view. Requires a model to be created so there's something to display.
         Refs: #16655, #18593, and #18747
         """
         Simple.objects.create()
@@ -879,9 +874,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     def test_changelist_with_no_change_url(self):
         """
         ModelAdmin.changelist_view shouldn't result in a NoReverseMatch if url
-        for change_view is removed from get_urls
-
-        Regression test for #20934
+        for change_view is removed from get_urls (#20934).
         """
         UnchangeableObject.objects.create()
         response = self.client.get(reverse('admin:admin_views_unchangeableobject_changelist'))
@@ -973,9 +966,19 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
         response = self.client.get(reverse('admin:admin_views_customarticle_history', args=(article_pk,)))
         self.assertTemplateUsed(response, 'custom_admin/object_history.html')
 
+        # A custom popup response template may be specified by
+        # ModelAdmin.popup_response_template.
+        response = self.client.post(reverse('admin:admin_views_customarticle_add') + '?%s=1' % IS_POPUP_VAR, {
+            'content': '<p>great article</p>',
+            'date_0': '2008-03-18',
+            'date_1': '10:54:39',
+            IS_POPUP_VAR: '1'
+        })
+        self.assertEqual(response.template_name, 'custom_admin/popup_response.html')
+
     def test_extended_bodyclass_template_change_form(self):
         """
-        Ensure that the admin/change_form.html template uses block.super in the
+        The admin/change_form.html template uses block.super in the
         bodyclass block.
         """
         response = self.client.get(reverse('admin:admin_views_section_add'))
@@ -995,15 +998,14 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
 
     def test_extended_bodyclass_template_index(self):
         """
-        Ensure that the admin/index.html template uses block.super in the
-        bodyclass block.
+        The admin/index.html template uses block.super in the bodyclass block.
         """
         response = self.client.get(reverse('admin:index'))
         self.assertContains(response, 'bodyclass_consistency_check ')
 
     def test_extended_bodyclass_change_list(self):
         """
-        Ensure that the admin/change_list.html' template uses block.super
+        The admin/change_list.html' template uses block.super
         in the bodyclass block.
         """
         response = self.client.get(reverse('admin:admin_views_article_changelist'))
@@ -1011,7 +1013,7 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
 
     def test_extended_bodyclass_template_login(self):
         """
-        Ensure that the admin/login.html template uses block.super in the
+        The admin/login.html template uses block.super in the
         bodyclass block.
         """
         self.client.logout()
@@ -1020,7 +1022,7 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
 
     def test_extended_bodyclass_template_delete_confirmation(self):
         """
-        Ensure that the admin/delete_confirmation.html template uses
+        The admin/delete_confirmation.html template uses
         block.super in the bodyclass block.
         """
         group = Group.objects.create(name="foogroup")
@@ -1029,7 +1031,7 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
 
     def test_extended_bodyclass_template_delete_selected_confirmation(self):
         """
-        Ensure that the admin/delete_selected_confirmation.html template uses
+        The admin/delete_selected_confirmation.html template uses
         block.super in bodyclass block.
         """
         group = Group.objects.create(name="foogroup")
@@ -1045,8 +1047,7 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
 
     def test_filter_with_custom_template(self):
         """
-        Ensure that one can use a custom template to render an admin filter.
-        Refs #17515.
+        A custom template can be used to render an admin filter.
         """
         response = self.client.get(reverse('admin:admin_views_color2_changelist'))
         self.assertTemplateUsed(response, 'custom_filter_template.html')
@@ -1076,7 +1077,7 @@ class AdminViewFormUrlTest(TestCase):
 
     def test_change_form_URL_has_correct_value(self):
         """
-        Tests whether change_view has form_url in response.context
+        change_view has form_url in response.context
         """
         response = self.client.get(
             reverse('admin:admin_views_section_change', args=(self.s1.pk,), current_app=self.current_app)
@@ -1086,10 +1087,8 @@ class AdminViewFormUrlTest(TestCase):
 
     def test_initial_data_can_be_overridden(self):
         """
-        Tests that the behavior for setting initial
-        form data can be overridden in the ModelAdmin class.
-
-        Usually, the initial value is set via the GET params.
+        The behavior for setting initial form data can be overridden in the
+        ModelAdmin class. Usually, the initial value is set via the GET params.
         """
         response = self.client.get(
             reverse('admin:admin_views_restaurant_add', current_app=self.current_app),
@@ -1113,9 +1112,7 @@ class AdminJavaScriptTest(TestCase):
 
     def test_js_minified_only_if_debug_is_false(self):
         """
-        Ensure that the minified versions of the JS files are only used when
-        DEBUG is False.
-        Refs #17521.
+        The minified versions of the JS files are only used when DEBUG is False.
         """
         with override_settings(DEBUG=False):
             response = self.client.get(reverse('admin:admin_views_section_add'))
@@ -1155,7 +1152,7 @@ class SaveAsTests(TestCase):
         self.client.force_login(self.superuser)
 
     def test_save_as_duplication(self):
-        """Ensure save as actually creates a new person"""
+        """'save as' creates a new person"""
         post_data = {'_saveasnew': '', 'name': 'John M', 'gender': 1, 'age': 42}
         response = self.client.post(reverse('admin:admin_views_person_change', args=(self.per1.pk,)), post_data)
         self.assertEqual(len(Person.objects.filter(name='John M')), 1)
@@ -1177,7 +1174,7 @@ class SaveAsTests(TestCase):
 
     def test_save_as_new_with_validation_errors(self):
         """
-        Ensure that when you click "Save as new" and have a validation error,
+        When you click "Save as new" and have a validation error,
         you only see the "Save as new" button and not the other save buttons,
         and that only the "Save as" button is visible.
         """
@@ -1607,7 +1604,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(mail.outbox[0].subject, 'Greetings from a created object')
         self.client.get(reverse('admin:logout'))
 
-        # Check that the addition was logged correctly
+        # The addition was logged correctly
         addition_log = LogEntry.objects.all()[0]
         new_article = Article.objects.last()
         article_ct = ContentType.objects.get_for_model(Article)
@@ -1924,10 +1921,9 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get(reverse('secure_view'), follow=True)
         self.assertContains(response, 'id="login-form"')
 
-    def test_app_index_fail_early(self):
+    def test_app_list_permissions(self):
         """
-        If a user has no module perms, avoid iterating over all the modeladmins
-        in the registry.
+        If a user has no module perms, the app list returns a 404.
         """
         opts = Article._meta
         change_user = User.objects.get(username='changeuser')
@@ -1935,10 +1931,10 @@ class AdminViewPermissionsTest(TestCase):
 
         self.client.force_login(self.changeuser)
 
-        # the user has no module permissions, because this module doesn't exist
+        # the user has no module permissions
         change_user.user_permissions.remove(permission)
         response = self.client.get(reverse('admin:app_list', args=('admin_views',)))
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
 
         # the user now has module permissions
         change_user.user_permissions.add(permission)
@@ -1963,11 +1959,11 @@ class AdminViewPermissionsTest(TestCase):
         # Can't use self.assertRedirects() because User.get_absolute_url() is silly.
         self.assertEqual(response.status_code, 302)
         # Domain may depend on contrib.sites tests also run
-        six.assertRegex(self, response.url, 'http://(testserver|example.com)/dummy/foo/')
+        self.assertRegex(response.url, 'http://(testserver|example.com)/dummy/foo/')
 
     def test_has_module_permission(self):
         """
-        Ensure that has_module_permission() returns True for all users who
+        has_module_permission() returns True for all users who
         have any permission for that module (add, change, or delete), so that
         the module is displayed on the admin index page.
         """
@@ -1996,34 +1992,41 @@ class AdminViewPermissionsTest(TestCase):
 
     def test_overriding_has_module_permission(self):
         """
-        Ensure that overriding has_module_permission() has the desired effect.
-        In this case, it always returns False, so the module should not be
-        displayed on the admin index page for any users.
+        If has_module_permission() always returns False, the module shouldn't
+        be displayed on the admin index page for any users.
         """
+        articles = Article._meta.verbose_name_plural.title()
+        sections = Section._meta.verbose_name_plural.title()
         index_url = reverse('admin7:index')
 
         self.client.force_login(self.superuser)
         response = self.client.get(index_url)
-        self.assertNotContains(response, 'admin_views')
-        self.assertNotContains(response, 'Articles')
+        self.assertContains(response, sections)
+        self.assertNotContains(response, articles)
         self.client.logout()
 
         self.client.force_login(self.adduser)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
-        self.assertNotContains(response, 'Articles')
+        self.assertNotContains(response, articles)
         self.client.logout()
 
         self.client.force_login(self.changeuser)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
-        self.assertNotContains(response, 'Articles')
+        self.assertNotContains(response, articles)
         self.client.logout()
 
         self.client.force_login(self.deleteuser)
         response = self.client.get(index_url)
-        self.assertNotContains(response, 'admin_views')
-        self.assertNotContains(response, 'Articles')
+        self.assertNotContains(response, articles)
+
+        # The app list displays Sections but not Articles as the latter has
+        # ModelAdmin.has_module_permission() = False.
+        self.client.force_login(self.superuser)
+        response = self.client.get(reverse('admin7:app_list', args=('admin_views',)))
+        self.assertContains(response, sections)
+        self.assertNotContains(response, articles)
 
     def test_post_save_message_no_forbidden_links_visible(self):
         """
@@ -2117,7 +2120,7 @@ class AdminViewDeletedObjectsTest(TestCase):
             )
         )
         response = self.client.get(reverse('admin:admin_views_villain_delete', args=(self.v1.pk,)))
-        six.assertRegex(self, response.content, pattern)
+        self.assertRegex(response.content, pattern)
 
     def test_cyclic(self):
         """
@@ -2429,9 +2432,6 @@ class SecureViewTests(TestCase):
     """
 
     def test_secure_view_shows_login_if_not_logged_in(self):
-        """
-        Ensure that we see the admin login form.
-        """
         secure_url = reverse('secure_view')
         response = self.client.get(secure_url)
         self.assertRedirects(response, '%s?next=%s' % (reverse('admin:login'), secure_url))
@@ -2441,7 +2441,7 @@ class SecureViewTests(TestCase):
 
     def test_staff_member_required_decorator_works_with_argument(self):
         """
-        Ensure that staff_member_required decorator works with an argument
+        Staff_member_required decorator works with an argument
         (redirect_field_name).
         """
         secure_url = '/test_admin/admin/secure-view2/'
@@ -2509,7 +2509,7 @@ class AdminViewUnicodeTest(TestCase):
 
     def test_unicode_delete(self):
         """
-        Ensure that the delete_view handles non-ASCII characters
+        The delete_view handles non-ASCII characters
         """
         delete_dict = {'post': 'yes'}
         delete_url = reverse('admin:admin_views_book_delete', args=(self.b1.pk,))
@@ -2655,9 +2655,10 @@ class AdminViewListEditable(TestCase):
         self.assertIs(Person.objects.get(name="John Mauchly").alive, False)
 
     def test_non_field_errors(self):
-        ''' Ensure that non field errors are displayed for each of the
-            forms in the changelist's formset. Refs #13126.
-        '''
+        """
+        Non-field errors are displayed for each of the forms in the
+        changelist's formset.
+        """
         fd1 = FoodDelivery.objects.create(reference='123', driver='bill', restaurant='thai')
         fd2 = FoodDelivery.objects.create(reference='456', driver='bill', restaurant='india')
         fd3 = FoodDelivery.objects.create(reference='789', driver='bill', restaurant='pizza')
@@ -2738,7 +2739,7 @@ class AdminViewListEditable(TestCase):
             "form-0-alive": "1",
             "form-0-gender": "2",
 
-            # Ensure that the form processing understands this as a list_editable "Save"
+            # The form processing understands this as a list_editable "Save"
             # and not an action "Go".
             "_save": "Save",
         }
@@ -2793,7 +2794,7 @@ class AdminViewListEditable(TestCase):
             "form-3-id": "4",
             "form-3-collector": "1",
 
-            # Ensure that the form processing understands this as a list_editable "Save"
+            # The form processing understands this as a list_editable "Save"
             # and not an action "Go".
             "_save": "Save",
         }
@@ -2801,7 +2802,7 @@ class AdminViewListEditable(TestCase):
         # Successful post will redirect
         self.assertEqual(response.status_code, 302)
 
-        # Check that the order values have been applied to the right objects
+        # The order values have been applied to the right objects
         self.assertEqual(Category.objects.get(id=1).order, 14)
         self.assertEqual(Category.objects.get(id=2).order, 13)
         self.assertEqual(Category.objects.get(id=3).order, 1)
@@ -2809,8 +2810,7 @@ class AdminViewListEditable(TestCase):
 
     def test_list_editable_pagination(self):
         """
-        Ensure that pagination works for list_editable items.
-        Refs #16819.
+        Pagination works for list_editable items.
         """
         UnorderedObject.objects.create(id=1, name='Unordered object #1')
         UnorderedObject.objects.create(id=2, name='Unordered object #2')
@@ -2888,11 +2888,10 @@ class AdminViewListEditable(TestCase):
         self.assertEqual(response.context['cl'].list_editable, ())
 
     def test_pk_hidden_fields(self):
-        """ Ensure that hidden pk fields aren't displayed in the table body and
-            that their corresponding human-readable value is displayed instead.
-            Note that the hidden pk fields are in fact be displayed but
-            separately (not in the table), and only once.
-            Refs #12475.
+        """
+        hidden pk fields aren't displayed in the table body and their
+        corresponding human-readable value is displayed instead. The hidden pk
+        fields are displayed but separately (not in the table) and only once.
         """
         story1 = Story.objects.create(title='The adventures of Guido', content='Once upon a time in Djangoland...')
         story2 = Story.objects.create(
@@ -2982,15 +2981,15 @@ class AdminSearchTest(TestCase):
         self.client.force_login(self.superuser)
 
     def test_search_on_sibling_models(self):
-        "Check that a search that mentions sibling models"
+        "A search that mentions sibling models"
         response = self.client.get(reverse('admin:admin_views_recommendation_changelist') + '?q=bar')
         # confirm the search returned 1 object
         self.assertContains(response, "\n1 recommendation\n")
 
     def test_with_fk_to_field(self):
         """
-        Ensure that the to_field GET parameter is preserved when a search
-        is performed. Refs #10918.
+        The to_field GET parameter is preserved when a search is performed.
+        Refs #10918.
         """
         response = self.client.get(reverse('admin:auth_user_changelist') + '?q=joe&%s=id' % TO_FIELD_VAR)
         self.assertContains(response, "\n1 user\n")
@@ -3073,7 +3072,9 @@ class AdminInheritedInlinesTest(TestCase):
         self.client.force_login(self.superuser)
 
     def test_inline(self):
-        "Ensure that inline models which inherit from a common parent are correctly handled by admin."
+        """
+        Inline models which inherit from a common parent are correctly handled.
+        """
         foo_user = "foo username"
         bar_user = "bar username"
 
@@ -3291,8 +3292,8 @@ class AdminActionsTest(TestCase):
 
     def test_default_redirect(self):
         """
-        Test that actions which don't return an HttpResponse are redirected to
-        the same page, retaining the querystring (which may contain changelist
+        Actions which don't return an HttpResponse are redirected to the same
+        page, retaining the querystring (which may contain changelist
         information).
         """
         action_data = {
@@ -3329,8 +3330,7 @@ class AdminActionsTest(TestCase):
 
     def test_actions_ordering(self):
         """
-        Ensure that actions are ordered as expected.
-        Refs #15964.
+        Actions are ordered as expected.
         """
         response = self.client.get(reverse('admin:admin_views_externalsubscriber_changelist'))
         self.assertContains(response, '''<label>Action: <select name="action" required>
@@ -3355,7 +3355,7 @@ action)</option>
         self.assertNotContains(response, '<input type="checkbox" class="action-select"')
 
     def test_model_without_action_still_has_jquery(self):
-        "Tests that a ModelAdmin without any actions still gets jQuery included in page"
+        "A ModelAdmin without any actions still gets jQuery included in page"
         response = self.client.get(reverse('admin:admin_views_oldsubscriber_changelist'))
         self.assertIsNone(response.context["action_form"])
         self.assertContains(
@@ -3364,14 +3364,14 @@ action)</option>
         )
 
     def test_action_column_class(self):
-        "Tests that the checkbox column class is present in the response"
+        "The checkbox column class is present in the response"
         response = self.client.get(reverse('admin:admin_views_subscriber_changelist'))
         self.assertIsNotNone(response.context["action_form"])
         self.assertContains(response, 'action-checkbox-column')
 
     def test_multiple_actions_form(self):
         """
-        Test that actions come from the form whose submit button was pressed (#10618).
+        Actions come from the form whose submit button was pressed (#10618).
         """
         action_data = {
             ACTION_CHECKBOX_NAME: [1],
@@ -3406,7 +3406,10 @@ action)</option>
             'action': 'delete_selected',
             'index': 0,
         }
-        response = self.client.post(reverse('admin:admin_views_subscriber_changelist'), action_data)
+        url = reverse('admin:admin_views_subscriber_changelist')
+        response = self.client.post(url, action_data)
+        self.assertRedirects(response, url, fetch_redirect_response=False)
+        response = self.client.get(response.url)
         msg = """Items must be selected in order to perform actions on them. No items have been changed."""
         self.assertContains(response, msg)
         self.assertEqual(Subscriber.objects.count(), 2)
@@ -3420,7 +3423,10 @@ action)</option>
             'action': '',
             'index': 0,
         }
-        response = self.client.post(reverse('admin:admin_views_subscriber_changelist'), action_data)
+        url = reverse('admin:admin_views_subscriber_changelist')
+        response = self.client.post(url, action_data)
+        self.assertRedirects(response, url, fetch_redirect_response=False)
+        response = self.client.get(response.url)
         msg = """No action selected."""
         self.assertContains(response, msg)
         self.assertEqual(Subscriber.objects.count(), 2)
@@ -3440,7 +3446,7 @@ action)</option>
             reverse('admin:admin_views_subscriber_changelist') + '?%s' % IS_POPUP_VAR)
         self.assertIsNone(response.context["action_form"])
 
-    def test_popup_template_response(self):
+    def test_popup_template_response_on_add(self):
         """
         Success on popups shall be rendered from template in order to allow
         easy customization.
@@ -3449,7 +3455,40 @@ action)</option>
             reverse('admin:admin_views_actor_add') + '?%s=1' % IS_POPUP_VAR,
             {'name': 'Troy McClure', 'age': '55', IS_POPUP_VAR: '1'})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template_name, 'admin/popup_response.html')
+        self.assertListEqual(response.template_name, [
+            'admin/admin_views/actor/popup_response.html',
+            'admin/admin_views/popup_response.html',
+            'admin/popup_response.html',
+        ])
+        self.assertTemplateUsed(response, 'admin/popup_response.html')
+
+    def test_popup_template_response_on_change(self):
+        instance = Actor.objects.create(name='David Tennant', age=45)
+        response = self.client.post(
+            reverse('admin:admin_views_actor_change', args=(instance.pk,)) + '?%s=1' % IS_POPUP_VAR,
+            {'name': 'David Tennant', 'age': '46', IS_POPUP_VAR: '1'}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual(response.template_name, [
+            'admin/admin_views/actor/popup_response.html',
+            'admin/admin_views/popup_response.html',
+            'admin/popup_response.html',
+        ])
+        self.assertTemplateUsed(response, 'admin/popup_response.html')
+
+    def test_popup_template_response_on_delete(self):
+        instance = Actor.objects.create(name='David Tennant', age=45)
+        response = self.client.post(
+            reverse('admin:admin_views_actor_delete', args=(instance.pk,)) + '?%s=1' % IS_POPUP_VAR,
+            {IS_POPUP_VAR: '1'}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual(response.template_name, [
+            'admin/admin_views/actor/popup_response.html',
+            'admin/admin_views/popup_response.html',
+            'admin/popup_response.html',
+        ])
+        self.assertTemplateUsed(response, 'admin/popup_response.html')
 
     def test_popup_template_escaping(self):
         popup_response_data = json.dumps({
@@ -3492,7 +3531,7 @@ class TestCustomChangeList(TestCase):
         self.assertEqual(response.status_code, 302)  # redirect somewhere
         # Hit the page once to get messages out of the queue message list
         response = self.client.get(reverse('admin:admin_views_gadget_changelist'))
-        # Ensure that data is still not visible on the page
+        # Data is still not visible on the page
         response = self.client.get(reverse('admin:admin_views_gadget_changelist'))
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'First Gadget')
@@ -3756,8 +3795,7 @@ class AdminCustomQuerysetTest(TestCase):
 
     def test_history_view_custom_qs(self):
         """
-        Ensure that custom querysets are considered for the admin history view.
-        Refs #21013.
+        Custom querysets are considered for the admin history view.
         """
         self.client.post(reverse('admin:login'), self.super_login)
         FilteredManager.objects.create(pk=1)
@@ -3797,7 +3835,7 @@ class AdminInlineFileUploadTest(TestCase):
 
     def test_inline_file_upload_edit_validation_error_post(self):
         """
-        Test that inline file uploads correctly display prior data (#10002).
+        Inline file uploads correctly display prior data (#10002).
         """
         post_data = {
             "name": "Test Gallery",
@@ -3927,7 +3965,7 @@ class AdminInlineTests(TestCase):
         self.assertEqual(Widget.objects.all()[0].name, "Widget 1")
         widget_id = Widget.objects.all()[0].id
 
-        # Check that the PK link exists on the rendered form
+        # The PK link exists on the rendered form
         response = self.client.get(collector_url)
         self.assertContains(response, 'name="widget_set-0-id"')
 
@@ -3959,7 +3997,7 @@ class AdminInlineTests(TestCase):
         self.assertEqual(Grommet.objects.count(), 1)
         self.assertEqual(Grommet.objects.all()[0].name, "Grommet 1")
 
-        # Check that the PK link exists on the rendered form
+        # The PK link exists on the rendered form
         response = self.client.get(collector_url)
         self.assertContains(response, 'name="grommet_set-0-code"')
 
@@ -3992,7 +4030,7 @@ class AdminInlineTests(TestCase):
         self.assertEqual(DooHickey.objects.count(), 1)
         self.assertEqual(DooHickey.objects.all()[0].name, "Doohickey 1")
 
-        # Check that the PK link exists on the rendered form
+        # The PK link exists on the rendered form
         response = self.client.get(collector_url)
         self.assertContains(response, 'name="doohickey_set-0-code"')
 
@@ -4025,7 +4063,7 @@ class AdminInlineTests(TestCase):
         self.assertEqual(Whatsit.objects.count(), 1)
         self.assertEqual(Whatsit.objects.all()[0].name, "Whatsit 1")
 
-        # Check that the PK link exists on the rendered form
+        # The PK link exists on the rendered form
         response = self.client.get(collector_url)
         self.assertContains(response, 'name="whatsit_set-0-index"')
 
@@ -4058,7 +4096,7 @@ class AdminInlineTests(TestCase):
         self.assertEqual(FancyDoodad.objects.all()[0].name, "Fancy Doodad 1")
         doodad_pk = FancyDoodad.objects.all()[0].pk
 
-        # Check that the PK link exists on the rendered form
+        # The PK link exists on the rendered form
         response = self.client.get(collector_url)
         self.assertContains(response, 'name="fancydoodad_set-0-doodad_ptr"')
 
@@ -4081,8 +4119,9 @@ class AdminInlineTests(TestCase):
         self.assertEqual(FancyDoodad.objects.all()[0].name, "Fancy Doodad 1 Updated")
 
     def test_ordered_inline(self):
-        """Check that an inline with an editable ordering fields is
-        updated correctly. Regression for #10922"""
+        """
+        An inline with an editable ordering fields is updated correctly.
+        """
         # Create some objects with an initial ordering
         Category.objects.create(id=1, order=1, collector=self.collector)
         Category.objects.create(id=2, order=2, collector=self.collector)
@@ -4130,7 +4169,7 @@ class AdminInlineTests(TestCase):
         # Successful post will redirect
         self.assertEqual(response.status_code, 302)
 
-        # Check that the order values have been applied to the right objects
+        # The order values have been applied to the right objects
         self.assertEqual(self.collector.category_set.count(), 4)
         self.assertEqual(Category.objects.get(id=1).order, 14)
         self.assertEqual(Category.objects.get(id=2).order, 13)
@@ -4260,8 +4299,8 @@ class SeleniumTests(AdminSeleniumTestCase):
 
     def test_prepopulated_fields(self):
         """
-        Ensure that the JavaScript-automated prepopulated fields work with the
-        main form and with stacked and tabular inlines.
+        The JavaScript-automated prepopulated fields work with the main form
+        and with stacked and tabular inlines.
         Refs #13068, #9264, #9983, #9784.
         """
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
@@ -4373,9 +4412,8 @@ class SeleniumTests(AdminSeleniumTestCase):
 
     def test_populate_existing_object(self):
         """
-        Ensure that the prepopulation works for existing objects too, as long
-        as the original field is empty.
-        Refs #19082.
+        The prepopulation works for existing objects too, as long as
+        the original field is empty (#19082).
         """
         # Slugs are empty to start with.
         item = MainPrepopulated.objects.create(
@@ -4413,7 +4451,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
     def test_collapsible_fieldset(self):
         """
-        Test that the 'collapse' class in fieldsets definition allows to
+        The 'collapse' class in fieldsets definition allows to
         show/hide the appropriate field section.
         """
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
@@ -4605,12 +4643,16 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertContains(response, "Unknown coolness.")
         self.assertContains(response, "foo")
 
-        # Checks that multiline text in a readonly field gets <br /> tags
-        self.assertContains(response, "Multiline<br />test<br />string")
-        self.assertContains(response, "<p>Multiline<br />html<br />content</p>", html=True)
-        self.assertContains(response, "InlineMultiline<br />test<br />string")
+        # Multiline text in a readonly field gets <br /> tags
+        self.assertContains(response, 'Multiline<br />test<br />string')
+        self.assertContains(response, '<div class="readonly">Multiline<br />html<br />content</div>', html=True)
+        self.assertContains(response, 'InlineMultiline<br />test<br />string')
         # Remove only this last line when the deprecation completes.
-        self.assertContains(response, "<p>Multiline<br />html<br />content<br />with allow tags</p>", html=True)
+        self.assertContains(
+            response,
+            '<div class="readonly">Multiline<br />html<br />content<br />with allow tags</div>',
+            html=True
+        )
 
         self.assertContains(response, formats.localize(datetime.date.today() - datetime.timedelta(days=7)))
 
@@ -4693,8 +4735,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         """
         choice = Choice.objects.create(choice=None)
         response = self.client.get(reverse('admin:admin_views_choice_change', args=(choice.pk,)))
-        self.assertContains(response, '<p>No opinion</p>', html=True)
-        self.assertNotContains(response, '<p>(None)</p>')
+        self.assertContains(response, '<div class="readonly">No opinion</div>', html=True)
 
     def test_readonly_manytomany_backwards_ref(self):
         """
@@ -4713,7 +4754,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         pizza.toppings.add(topping)
         response = self.client.get(reverse('admin:admin_views_pizza_change', args=(pizza.pk,)))
         self.assertContains(response, '<label>Toppings:</label>', html=True)
-        self.assertContains(response, '<p>Salami</p>', html=True)
+        self.assertContains(response, '<div class="readonly">Salami</div>', html=True)
 
     def test_readonly_onetoone_backwards_ref(self):
         """
@@ -5084,8 +5125,7 @@ class CSSTest(TestCase):
     @ignore_warnings(category=RemovedInDjango20Warning)  # for allow_tags deprecation
     def test_field_prefix_css_classes(self):
         """
-        Ensure that fields have a CSS class name with a 'field-' prefix.
-        Refs #16371.
+        Fields have a CSS class name with a 'field-' prefix.
         """
         response = self.client.get(reverse('admin:admin_views_post_add'))
 
@@ -5104,9 +5144,8 @@ class CSSTest(TestCase):
 
     def test_index_css_classes(self):
         """
-        Ensure that CSS class names are used for each app and model on the
-        admin index pages.
-        Refs #17050.
+        CSS class names are used for each app and model on the admin index
+        pages (#17050).
         """
         # General index page
         response = self.client.get(reverse('admin:index'))
@@ -5265,12 +5304,9 @@ class DateHierarchyTests(TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
-    def tearDown(self):
-        formats.reset_format_cache()
-
     def assert_non_localized_year(self, response, year):
-        """Ensure that the year is not localized with
-        USE_THOUSAND_SEPARATOR. Refs #15234.
+        """
+        The year is not localized with USE_THOUSAND_SEPARATOR (#15234).
         """
         self.assertNotContains(response, formats.number_format(year))
 
@@ -5290,7 +5326,7 @@ class DateHierarchyTests(TestCase):
 
     def test_empty(self):
         """
-        Ensure that no date hierarchy links display with empty changelist.
+        No date hierarchy links display with empty changelist.
         """
         response = self.client.get(
             reverse('admin:admin_views_podcast_changelist'))
@@ -5300,7 +5336,7 @@ class DateHierarchyTests(TestCase):
 
     def test_single(self):
         """
-        Ensure that single day-level date hierarchy appears for single object.
+        Single day-level date hierarchy appears for single object.
         """
         DATE = datetime.date(2000, 6, 30)
         Podcast.objects.create(release_date=DATE)
@@ -5311,7 +5347,7 @@ class DateHierarchyTests(TestCase):
 
     def test_within_month(self):
         """
-        Ensure that day-level links appear for changelist within single month.
+        day-level links appear for changelist within single month.
         """
         DATES = (datetime.date(2000, 6, 30),
                  datetime.date(2000, 6, 15),
@@ -5326,7 +5362,7 @@ class DateHierarchyTests(TestCase):
 
     def test_within_year(self):
         """
-        Ensure that month-level links appear for changelist within single year.
+        month-level links appear for changelist within single year.
         """
         DATES = (datetime.date(2000, 1, 30),
                  datetime.date(2000, 3, 15),
@@ -5343,7 +5379,7 @@ class DateHierarchyTests(TestCase):
 
     def test_multiple_years(self):
         """
-        Ensure that year-level links appear for year-spanning changelist.
+        year-level links appear for year-spanning changelist.
         """
         DATES = (datetime.date(2001, 1, 30),
                  datetime.date(2003, 3, 15),
@@ -5402,7 +5438,7 @@ class DateHierarchyTests(TestCase):
 @override_settings(ROOT_URLCONF='admin_views.urls')
 class AdminCustomSaveRelatedTests(TestCase):
     """
-    Ensure that one can easily customize the way related objects are saved.
+    One can easily customize the way related objects are saved.
     Refs #16115.
     """
 
@@ -5944,7 +5980,7 @@ class AdminViewOnSiteTests(TestCase):
             response, 'inline_admin_formset', 0, None,
             ['Children must share a family name with their parents in this contrived test case']
         )
-        msg = "The formset 'inline_admin_formset' in context 4 does not contain any non-form errors."
+        msg = "The formset 'inline_admin_formset' in context 10 does not contain any non-form errors."
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormsetError(response, 'inline_admin_formset', None, None, ['Error'])
 
@@ -5976,7 +6012,7 @@ class AdminViewOnSiteTests(TestCase):
         )
 
     def test_check(self):
-        "Ensure that the view_on_site value is either a boolean or a callable"
+        "The view_on_site value is either a boolean or a callable"
         try:
             admin = CityAdmin(City, AdminSite())
             CityAdmin.view_on_site = True
@@ -5998,24 +6034,24 @@ class AdminViewOnSiteTests(TestCase):
             CityAdmin.view_on_site = True
 
     def test_false(self):
-        "Ensure that the 'View on site' button is not displayed if view_on_site is False"
+        "The 'View on site' button is not displayed if view_on_site is False"
         response = self.client.get(reverse('admin:admin_views_restaurant_change', args=(self.r1.pk,)))
         content_type_pk = ContentType.objects.get_for_model(Restaurant).pk
         self.assertNotContains(response, reverse('admin:view_on_site', args=(content_type_pk, 1)))
 
     def test_true(self):
-        "Ensure that the default behavior is followed if view_on_site is True"
+        "The default behavior is followed if view_on_site is True"
         response = self.client.get(reverse('admin:admin_views_city_change', args=(self.c1.pk,)))
         content_type_pk = ContentType.objects.get_for_model(City).pk
         self.assertContains(response, reverse('admin:view_on_site', args=(content_type_pk, self.c1.pk)))
 
     def test_callable(self):
-        "Ensure that the right link is displayed if view_on_site is a callable"
+        "The right link is displayed if view_on_site is a callable"
         response = self.client.get(reverse('admin:admin_views_worker_change', args=(self.w1.pk,)))
         self.assertContains(response, '"/worker/%s/%s/"' % (self.w1.surname, self.w1.name))
 
     def test_missing_get_absolute_url(self):
-        "Ensure None is returned if model doesn't have get_absolute_url"
+        "None is returned if model doesn't have get_absolute_url"
         model_admin = ModelAdmin(Worker, None)
         self.assertIsNone(model_admin.get_view_on_site_url(Worker()))
 
@@ -6047,26 +6083,26 @@ class InlineAdminViewOnSiteTest(TestCase):
         self.client.force_login(self.superuser)
 
     def test_false(self):
-        "Ensure that the 'View on site' button is not displayed if view_on_site is False"
+        "The 'View on site' button is not displayed if view_on_site is False"
         response = self.client.get(reverse('admin:admin_views_state_change', args=(self.s1.pk,)))
         content_type_pk = ContentType.objects.get_for_model(City).pk
         self.assertNotContains(response, reverse('admin:view_on_site', args=(content_type_pk, self.c1.pk)))
 
     def test_true(self):
-        "Ensure that the 'View on site' button is displayed if view_on_site is True"
+        "The 'View on site' button is displayed if view_on_site is True"
         response = self.client.get(reverse('admin:admin_views_city_change', args=(self.c1.pk,)))
         content_type_pk = ContentType.objects.get_for_model(Restaurant).pk
         self.assertContains(response, reverse('admin:view_on_site', args=(content_type_pk, self.r1.pk)))
 
     def test_callable(self):
-        "Ensure that the right link is displayed if view_on_site is a callable"
+        "The right link is displayed if view_on_site is a callable"
         response = self.client.get(reverse('admin:admin_views_restaurant_change', args=(self.r1.pk,)))
         self.assertContains(response, '"/worker_inline/%s/%s/"' % (self.w1.surname, self.w1.name))
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
 class TestETagWithAdminView(SimpleTestCase):
-    # See https://code.djangoproject.com/ticket/16003
+    # The admin is compatible with ETags (#16003).
 
     def test_admin(self):
         with self.settings(USE_ETAGS=False):
@@ -6074,7 +6110,7 @@ class TestETagWithAdminView(SimpleTestCase):
             self.assertEqual(response.status_code, 302)
             self.assertFalse(response.has_header('ETag'))
 
-        with self.settings(USE_ETAGS=True):
+        with self.settings(USE_ETAGS=True), ignore_warnings(category=RemovedInDjango21Warning):
             response = self.client.get(reverse('admin:index'))
             self.assertEqual(response.status_code, 302)
             self.assertTrue(response.has_header('ETag'))

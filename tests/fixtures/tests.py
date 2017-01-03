@@ -29,7 +29,7 @@ class TestCaseFixtureLoadingTests(TestCase):
     fixtures = ['fixture1.json', 'fixture2.json']
 
     def testClassFixtures(self):
-        "Check that test case has installed 3 fixture objects"
+        "Test case has installed 3 fixture objects"
         self.assertEqual(Article.objects.count(), 3)
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: Django conquers world!>',
@@ -45,7 +45,7 @@ class SubclassTestCaseFixtureLoadingTests(TestCaseFixtureLoadingTests):
     fixtures = []
 
     def testClassFixtures(self):
-        "Check that there were no fixture objects installed"
+        "There were no fixture objects installed"
         self.assertEqual(Article.objects.count(), 0)
 
 
@@ -563,9 +563,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
     def test_loaddata_error_message(self):
         """
-        Verifies that loading a fixture which contains an invalid object
-        outputs an error message which contains the pk of the object
-        that triggered the error.
+        Loading a fixture which contains an invalid object outputs an error
+        message which contains the pk of the object that triggered the error.
         """
         # MySQL needs a little prodding to reject invalid data.
         # This won't affect other tests because the database connection
@@ -577,9 +576,6 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             self.assertIn("Could not load fixtures.Article(pk=1):", cm.exception.args[0])
 
     def test_loaddata_app_option(self):
-        """
-        Verifies that the --app option works.
-        """
         with self.assertRaisesMessage(CommandError, "No fixture named 'db_fixture_1' found."):
             management.call_command('loaddata', 'db_fixture_1', verbosity=0, app_label="someotherapp")
         self.assertQuerysetEqual(Article.objects.all(), [])

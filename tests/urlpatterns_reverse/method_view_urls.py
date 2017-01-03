@@ -9,6 +9,7 @@ class ViewContainer(object):
     def classmethod_view(cls, request):
         pass
 
+
 view_container = ViewContainer()
 
 

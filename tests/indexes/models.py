@@ -45,6 +45,7 @@ class IndexTogetherSingleList(models.Model):
     class Meta:
         index_together = ["headline", "pub_date"]
 
+
 # Indexing a TextField on Oracle or MySQL results in index creation error.
 if connection.vendor == 'postgresql':
     class IndexedArticle(models.Model):

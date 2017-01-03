@@ -1,11 +1,6 @@
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.utils import InterfaceError
 
-try:
-    import pytz
-except ImportError:
-    pytz = None
-
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
@@ -19,8 +14,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_subqueries_in_group_by = False
     supports_transactions = True
     supports_timezones = False
-    has_zoneinfo_database = pytz is not None
-    supports_bitwise_or = False
     has_native_duration_field = True
     can_defer_constraint_checks = True
     supports_partially_nullable_unique_constraints = False
@@ -28,8 +21,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     supports_tablespaces = True
     supports_sequence_reset = False
-    can_introspect_default = False  # Pending implementation by an interested person.
-    can_introspect_max_length = False
     can_introspect_time_field = False
     atomic_transactions = False
     supports_combined_alters = False
@@ -43,7 +34,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_temporal_subtraction = True
     # Oracle doesn't ignore quoted identifiers case but the current backend
     # does by uppercasing all identifiers.
-    ignores_quoted_identifier_case = True
+    ignores_table_name_case = True
 
     def introspected_boolean_field_type(self, field=None, created_separately=False):
         """

@@ -5,7 +5,6 @@ from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import models, transaction
 from django.db.utils import IntegrityError
 from django.test import TestCase, ignore_warnings
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy
 
@@ -73,8 +72,7 @@ class ManyToOneTests(TestCase):
 
         # Adding an object of the wrong type raises TypeError.
         with transaction.atomic():
-            with six.assertRaisesRegex(self, TypeError,
-                                       "'Article' instance expected, got <Reporter.*"):
+            with self.assertRaisesMessage(TypeError, "'Article' instance expected, got <Reporter:"):
                 self.r.article_set.add(self.r2)
         self.assertQuerysetEqual(
             self.r.article_set.all(),
@@ -183,7 +181,7 @@ class ManyToOneTests(TestCase):
             Article.objects.filter(reporter__first_name__exact='John'),
             ["<Article: John's second story>", "<Article: This is a test>"]
         )
-        # Check that implied __exact also works
+        # Implied __exact also works
         self.assertQuerysetEqual(
             Article.objects.filter(reporter__first_name='John'),
             ["<Article: John's second story>", "<Article: This is a test>"]
@@ -314,7 +312,7 @@ class ManyToOneTests(TestCase):
         )
         self.assertQuerysetEqual(Reporter.objects.filter(article__reporter__exact=self.r).distinct(), john_smith)
 
-        # Check that implied __exact also works.
+        # Implied __exact also works.
         self.assertQuerysetEqual(Reporter.objects.filter(article__reporter=self.r).distinct(), john_smith)
 
         # It's possible to use values() calls across many-to-one relations.
@@ -327,8 +325,8 @@ class ManyToOneTests(TestCase):
         self.assertEqual([d], list(qs))
 
     def test_select_related(self):
-        # Check that Article.objects.select_related().dates() works properly when
-        # there are multiple Articles with the same date but different foreign-key
+        # Article.objects.select_related().dates() works properly when there
+        # are multiple Articles with the same date but different foreign-key
         # objects (Reporters).
         r1 = Reporter.objects.create(first_name='Mike', last_name='Royko', email='royko@suntimes.com')
         r2 = Reporter.objects.create(first_name='John', last_name='Kass', email='jkass@tribune.com')
@@ -440,7 +438,7 @@ class ManyToOneTests(TestCase):
         reporter = Reporter.objects.create(first_name='John', last_name='Smith', email='john.smith@example.com')
         lazy = ugettext_lazy('test')
         reporter.article_set.create(headline=lazy, pub_date=datetime.date(2011, 6, 10))
-        notlazy = six.text_type(lazy)
+        notlazy = str(lazy)
         article = reporter.article_set.get()
         self.assertEqual(article.headline, notlazy)
 
@@ -567,7 +565,7 @@ class ManyToOneTests(TestCase):
         self.assertEqual('id', cat.remote_field.get_related_field().name)
 
     def test_relation_unsaved(self):
-        # Test that the <field>_set manager does not join on Null value fields (#17541)
+        # The <field>_set manager does not join on Null value fields (#17541)
         Third.objects.create(name='Third 1')
         Third.objects.create(name='Third 2')
         th = Third(name="testing")

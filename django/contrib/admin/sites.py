@@ -4,7 +4,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.core.exceptions import ImproperlyConfigured
 from django.db.models.base import ModelBase
 from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
@@ -399,8 +399,6 @@ class AdminSite(object):
 
             has_module_perms = model_admin.has_module_permission(request)
             if not has_module_perms:
-                if label:
-                    raise PermissionDenied
                 continue
 
             perms = model_admin.get_model_perms(request)
@@ -502,6 +500,7 @@ class AdminSite(object):
             'admin/%s/app_index.html' % app_label,
             'admin/app_index.html'
         ], context)
+
 
 # This global object represents the default admin site, for the common case.
 # You can instantiate AdminSite in your own code to create a custom admin site.

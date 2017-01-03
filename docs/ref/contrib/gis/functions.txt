@@ -27,9 +27,9 @@ Measurement         Relationships             Operations              Editors   
 :class:`Distance`   :class:`Centroid`         :class:`Intersection`   :class:`MakeValid`   :class:`AsGML`      :class:`MemSize`
 :class:`Length`     :class:`Envelope`         :class:`SymDifference`  :class:`Reverse`     :class:`AsKML`      :class:`NumGeometries`
 :class:`Perimeter`  :class:`PointOnSurface`   :class:`Union`          :class:`Scale`       :class:`AsSVG`      :class:`NumPoints`
-                                                                      :class:`SnapToGrid`  :class:`GeoHash`
-                                                                      :class:`Transform`
-                                                                      :class:`Translate`
+..                                                                    :class:`SnapToGrid`  :class:`GeoHash`
+..                                                                    :class:`Transform`
+..                                                                    :class:`Translate`
 ==================  =======================   ======================  ===================  ==================  =====================
 
 ``Area``
@@ -41,8 +41,12 @@ Measurement         Relationships             Operations              Editors   
 
 Accepts a single geographic field or expression and returns the area of the
 field as an :class:`~django.contrib.gis.measure.Area` measure. On MySQL, a raw
-float value is returned, as it's not possible to automatically determine the
-unit of the field.
+float value is returned when the coordinates are geodetic.
+
+.. versionchanged:: 1.11
+
+    In older versions, a raw value was returned on MySQL when used on
+    projected SRS.
 
 ``AsGeoJSON``
 =============
@@ -96,16 +100,18 @@ Example::
 =====================  =====================================================
 Keyword Argument       Description
 =====================  =====================================================
-``precision``          Not used on Oracle. It may be used to specify the number
-                       of significant digits for the coordinates in the GML
-                       representation -- the default value is 8.
+``precision``          Specifies the number of significant digits for the
+                       coordinates in the GML representation -- the default
+                       value is 8. Ignored on Oracle.
 
-``version``            Not used on Oracle. It may be used to specify the GML
-                       version used, and may only be values of 2 or 3.  The
-                       default value is 2.
+``version``            Specifies the GML version to use: 2 (default) or 3.
 =====================  =====================================================
 
 __ https://en.wikipedia.org/wiki/Geography_Markup_Language
+
+.. versionchanged:: 1.11
+
+    Oracle support was added.
 
 ``AsKML``
 =========
@@ -163,10 +169,17 @@ __ http://www.w3.org/Graphics/SVG/
 
 .. class:: BoundingCircle(expression, num_seg=48, **extra)
 
-*Availability*: `PostGIS <http://postgis.net/docs/ST_MinimumBoundingCircle.html>`__
+*Availability*: `PostGIS <http://postgis.net/docs/ST_MinimumBoundingCircle.html>`__,
+`Oracle (≥ 12.1.0.2) <https://docs.oracle.com/database/121/SPATL/GUID-82A61626-BB64-4793-B53D-A0DBEC91831A.htm#SPATL1554>`_
 
 Accepts a single geographic field or expression and returns the smallest circle
 polygon that can fully contain the geometry.
+
+The ``num_seg`` parameter is used only on PostGIS.
+
+.. versionchanged:: 1.11
+
+    Oracle support was added.
 
 ``Centroid``
 ============
@@ -202,8 +215,7 @@ geometry B.
 
 Accepts two geographic fields or expressions and returns the distance between
 them, as a :class:`~django.contrib.gis.measure.Distance` object. On MySQL, a raw
-float value is returned, as it's not possible to automatically determine the
-unit of the field.
+float value is returned when the coordinates are geodetic.
 
 On backends that support distance calculation on geodetic coordinates, the
 proper backend function is automatically chosen depending on the SRID value of
@@ -236,6 +248,11 @@ queryset is calculated::
     the distance value in miles and ``city.distance.km`` is the distance value
     in kilometers. See :doc:`measure` for usage details and the list of
     :ref:`supported_units`.
+
+.. versionchanged:: 1.11
+
+    In older versions, a raw value was returned on MySQL when used on
+    projected SRS.
 
 ``Envelope``
 ============
@@ -298,10 +315,14 @@ intersection between them.
 
 .. versionadded:: 1.10
 
-*Availability*: PostGIS
+*Availability*: PostGIS, Oracle, SpatiaLite (LWGEOM)
 
 Accepts a geographic field or expression and tests if the value is well formed.
 Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
+
+.. versionchanged:: 1.11
+
+    SpatiaLite and Oracle support was added.
 
 ``Length``
 ==========
@@ -312,13 +333,18 @@ Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
 
 Accepts a single geographic linestring or multilinestring field or expression
 and returns its length as an :class:`~django.contrib.gis.measure.Distance`
-measure. On MySQL, a raw float value is returned, as it's not possible to
-automatically determine the unit of the field.
+measure. On MySQL, a raw float value is returned when the coordinates
+are geodetic.
 
 On PostGIS and SpatiaLite, when the coordinates are geodetic (angular), you can
 specify if the calculation should be based on a simple sphere (less
 accurate, less resource-intensive) or on a spheroid (more accurate, more
 resource-intensive) with the ``spheroid`` keyword argument.
+
+.. versionchanged:: 1.11
+
+    In older versions, a raw value was returned on MySQL when used on
+    projected SRS.
 
 ``MakeValid``
 =============
@@ -327,12 +353,16 @@ resource-intensive) with the ``spheroid`` keyword argument.
 
 .. versionadded:: 1.10
 
-*Availability*: PostGIS
+*Availability*: PostGIS, SpatiaLite (LWGEOM)
 
 Accepts a geographic field or expression and attempts to convert the value into
 a valid geometry without losing any of the input vertices. Geometries that are
 already valid are returned without changes. Simple polygons might become a
 multipolygon and the result might be of lower dimension than the input.
+
+.. versionchanged:: 1.11
+
+    SpatiaLite support was added.
 
 ``MemSize``
 ===========

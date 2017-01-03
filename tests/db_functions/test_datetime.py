@@ -1,25 +1,22 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
-from unittest import skipIf
+
+import pytz
 
 from django.conf import settings
 from django.db import connection
 from django.db.models import DateField, DateTimeField, IntegerField, TimeField
 from django.db.models.functions import (
     Extract, ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
-    ExtractSecond, ExtractWeekDay, ExtractYear, Trunc, TruncDate, TruncDay,
-    TruncHour, TruncMinute, TruncMonth, TruncSecond, TruncTime, TruncYear,
+    ExtractSecond, ExtractWeek, ExtractWeekDay, ExtractYear, Trunc, TruncDate,
+    TruncDay, TruncHour, TruncMinute, TruncMonth, TruncSecond, TruncTime,
+    TruncYear,
 )
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from .models import DTModel
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 
 def microsecond_support(value):
@@ -171,6 +168,11 @@ class DateFunctionTests(TestCase):
             lambda m: (m.start_datetime, m.extracted)
         )
         self.assertQuerysetEqual(
+            DTModel.objects.annotate(extracted=Extract('start_datetime', 'week')).order_by('start_datetime'),
+            [(start_datetime, 25), (end_datetime, 24)],
+            lambda m: (m.start_datetime, m.extracted)
+        )
+        self.assertQuerysetEqual(
             DTModel.objects.annotate(extracted=Extract('start_datetime', 'week_day')).order_by('start_datetime'),
             [
                 (start_datetime, (start_datetime.isoweekday() % 7) + 1),
@@ -257,6 +259,53 @@ class DateFunctionTests(TestCase):
             lambda m: (m.start_datetime, m.extracted)
         )
         self.assertEqual(DTModel.objects.filter(start_datetime__day=ExtractDay('start_datetime')).count(), 2)
+
+    def test_extract_week_func(self):
+        start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
+        end_datetime = microsecond_support(datetime(2016, 6, 15, 14, 10, 50, 123))
+        if settings.USE_TZ:
+            start_datetime = timezone.make_aware(start_datetime, is_dst=False)
+            end_datetime = timezone.make_aware(end_datetime, is_dst=False)
+        self.create_model(start_datetime, end_datetime)
+        self.create_model(end_datetime, start_datetime)
+        self.assertQuerysetEqual(
+            DTModel.objects.annotate(extracted=ExtractWeek('start_datetime')).order_by('start_datetime'),
+            [(start_datetime, 25), (end_datetime, 24)],
+            lambda m: (m.start_datetime, m.extracted)
+        )
+        self.assertQuerysetEqual(
+            DTModel.objects.annotate(extracted=ExtractWeek('start_date')).order_by('start_datetime'),
+            [(start_datetime, 25), (end_datetime, 24)],
+            lambda m: (m.start_datetime, m.extracted)
+        )
+        # both dates are from the same week.
+        self.assertEqual(DTModel.objects.filter(start_datetime__week=ExtractWeek('start_datetime')).count(), 2)
+
+    def test_extract_week_func_boundaries(self):
+        end_datetime = microsecond_support(datetime(2016, 6, 15, 14, 10, 50, 123))
+        if settings.USE_TZ:
+            end_datetime = timezone.make_aware(end_datetime, is_dst=False)
+
+        week_52_day_2014 = microsecond_support(datetime(2014, 12, 27, 13, 0))  # Sunday
+        week_1_day_2014_2015 = microsecond_support(datetime(2014, 12, 31, 13, 0))  # Wednesday
+        week_53_day_2015 = microsecond_support(datetime(2015, 12, 31, 13, 0))  # Thursday
+        if settings.USE_TZ:
+            week_1_day_2014_2015 = timezone.make_aware(week_1_day_2014_2015, is_dst=False)
+            week_52_day_2014 = timezone.make_aware(week_52_day_2014, is_dst=False)
+            week_53_day_2015 = timezone.make_aware(week_53_day_2015, is_dst=False)
+
+        days = [week_52_day_2014, week_1_day_2014_2015, week_53_day_2015]
+        self.create_model(week_53_day_2015, end_datetime)
+        self.create_model(week_52_day_2014, end_datetime)
+        self.create_model(week_1_day_2014_2015, end_datetime)
+        qs = DTModel.objects.filter(start_datetime__in=days).annotate(
+            extracted=ExtractWeek('start_datetime'),
+        ).order_by('start_datetime')
+        self.assertQuerysetEqual(qs, [
+            (week_52_day_2014, 52),
+            (week_1_day_2014_2015, 1),
+            (week_53_day_2015, 53),
+        ], lambda m: (m.start_datetime, m.extracted))
 
     def test_extract_weekday_func(self):
         start_datetime = microsecond_support(datetime(2015, 6, 15, 14, 30, 50, 321))
@@ -659,7 +708,6 @@ class DateFunctionTests(TestCase):
             list(DTModel.objects.annotate(truncated=TruncSecond('start_date', output_field=DateField())))
 
 
-@skipIf(pytz is None, "this test requires pytz")
 @override_settings(USE_TZ=True, TIME_ZONE='UTC')
 class DateFunctionWithTimeZoneTests(DateFunctionTests):
 
@@ -674,6 +722,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         qs = DTModel.objects.annotate(
             day=Extract('start_datetime', 'day'),
             day_melb=Extract('start_datetime', 'day', tzinfo=melb),
+            week=Extract('start_datetime', 'week', tzinfo=melb),
             weekday=ExtractWeekDay('start_datetime'),
             weekday_melb=ExtractWeekDay('start_datetime', tzinfo=melb),
             hour=ExtractHour('start_datetime'),
@@ -683,6 +732,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         utc_model = qs.get()
         self.assertEqual(utc_model.day, 15)
         self.assertEqual(utc_model.day_melb, 16)
+        self.assertEqual(utc_model.week, 25)
         self.assertEqual(utc_model.weekday, 2)
         self.assertEqual(utc_model.weekday_melb, 3)
         self.assertEqual(utc_model.hour, 23)
@@ -693,6 +743,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
 
         self.assertEqual(melb_model.day, 16)
         self.assertEqual(melb_model.day_melb, 16)
+        self.assertEqual(melb_model.week, 25)
         self.assertEqual(melb_model.weekday, 3)
         self.assertEqual(melb_model.weekday_melb, 3)
         self.assertEqual(melb_model.hour, 9)
@@ -750,7 +801,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
 
         melb = pytz.timezone('Australia/Melbourne')
 
-        def test_datetime_kind(kind, tzinfo=melb):
+        def test_datetime_kind(kind):
             self.assertQuerysetEqual(
                 DTModel.objects.annotate(
                     truncated=Trunc('start_datetime', kind, output_field=DateTimeField(), tzinfo=melb)
@@ -762,7 +813,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                 lambda m: (m.start_datetime, m.truncated)
             )
 
-        def test_date_kind(kind, tzinfo=melb):
+        def test_date_kind(kind):
             self.assertQuerysetEqual(
                 DTModel.objects.annotate(
                     truncated=Trunc('start_date', kind, output_field=DateField(), tzinfo=melb)
@@ -774,7 +825,7 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
                 lambda m: (m.start_datetime, m.truncated)
             )
 
-        def test_time_kind(kind, tzinfo=melb):
+        def test_time_kind(kind):
             self.assertQuerysetEqual(
                 DTModel.objects.annotate(
                     truncated=Trunc('start_time', kind, output_field=TimeField(), tzinfo=melb)

@@ -1144,7 +1144,11 @@ class ManageSettingsWithSettingsErrors(AdminScriptTestCase):
         Test listing available commands output note when only core commands are
         available.
         """
-        self.write_settings('settings.py', sdict={'MEDIA_URL': '"/no_ending_slash"'})
+        self.write_settings(
+            'settings.py',
+            extra='from django.core.exceptions import ImproperlyConfigured\n'
+                  'raise ImproperlyConfigured()',
+        )
         args = ['help']
         out, err = self.run_manage(args)
         self.assertOutput(out, 'only Django core commands are listed')
@@ -1428,8 +1432,8 @@ class ManageTestserver(AdminScriptTestCase):
 
 ##########################################################################
 # COMMAND PROCESSING TESTS
-# Check that user-space commands are correctly handled - in particular,
-# that arguments to the commands are correctly parsed and processed.
+# user-space commands are correctly handled - in particular, arguments to
+# the commands are correctly parsed and processed.
 ##########################################################################
 
 class CommandTypes(AdminScriptTestCase):
@@ -1671,7 +1675,7 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_run_from_argv_non_ascii_error(self):
         """
-        Test that non-ASCII message of CommandError does not raise any
+        Non-ASCII message of CommandError does not raise any
         UnicodeDecodeError in run_from_argv.
         """
         def raise_command_error(*args, **kwargs):
@@ -2127,6 +2131,20 @@ class DiffSettings(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "### STATIC_URL = None")
+
+    def test_custom_default(self):
+        """
+        The --default option specifies an alternate settings module for
+        comparison.
+        """
+        self.write_settings('settings_default.py', sdict={'FOO': '"foo"', 'BAR': '"bar1"'})
+        self.addCleanup(self.remove_settings, 'settings_default.py')
+        self.write_settings('settings_to_diff.py', sdict={'FOO': '"foo"', 'BAR': '"bar2"'})
+        self.addCleanup(self.remove_settings, 'settings_to_diff.py')
+        out, err = self.run_manage(['diffsettings', '--settings=settings_to_diff', '--default=settings_default'])
+        self.assertNoOutput(err)
+        self.assertNotInOutput(out, "FOO")
+        self.assertOutput(out, "BAR = 'bar2'")
 
 
 class Dumpdata(AdminScriptTestCase):

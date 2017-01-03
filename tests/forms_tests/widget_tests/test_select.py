@@ -221,6 +221,68 @@ class SelectTest(WidgetTest):
             </select>"""
         ))
 
+    def test_options(self):
+        options = list(self.widget(choices=self.beatles).options(
+            'name', ['J'], attrs={'class': 'super'},
+        ))
+        self.assertEqual(len(options), 4)
+        self.assertEqual(options[0]['name'], 'name')
+        self.assertEqual(options[0]['value'], 'J')
+        self.assertEqual(options[0]['label'], 'John')
+        self.assertEqual(options[0]['index'], '0')
+        self.assertEqual(options[0]['selected'], True)
+        # Template-related attributes
+        self.assertEqual(options[1]['name'], 'name')
+        self.assertEqual(options[1]['value'], 'P')
+        self.assertEqual(options[1]['label'], 'Paul')
+        self.assertEqual(options[1]['index'], '1')
+        self.assertEqual(options[1]['selected'], False)
+
+    def test_optgroups(self):
+        choices = [
+            ('Audio', [
+                ('vinyl', 'Vinyl'),
+                ('cd', 'CD'),
+            ]),
+            ('Video', [
+                ('vhs', 'VHS Tape'),
+                ('dvd', 'DVD'),
+            ]),
+            ('unknown', 'Unknown'),
+        ]
+        groups = list(self.widget(choices=choices).optgroups(
+            'name', ['vhs'], attrs={'class': 'super'},
+        ))
+        self.assertEqual(len(groups), 3)
+        self.assertEqual(groups[0][0], None)
+        self.assertEqual(groups[0][2], 0)
+        self.assertEqual(len(groups[0][1]), 1)
+        options = groups[0][1]
+        self.assertEqual(options[0]['name'], 'name')
+        self.assertEqual(options[0]['value'], 'unknown')
+        self.assertEqual(options[0]['label'], 'Unknown')
+        self.assertEqual(options[0]['index'], '0')
+        self.assertEqual(options[0]['selected'], False)
+        self.assertEqual(groups[1][0], 'Audio')
+        self.assertEqual(groups[1][2], 1)
+        self.assertEqual(len(groups[1][1]), 2)
+        options = groups[1][1]
+        self.assertEqual(options[0]['name'], 'name')
+        self.assertEqual(options[0]['value'], 'vinyl')
+        self.assertEqual(options[0]['label'], 'Vinyl')
+        self.assertEqual(options[0]['index'], '1_0')
+        self.assertEqual(options[1]['index'], '1_1')
+        self.assertEqual(groups[2][0], 'Video')
+        self.assertEqual(groups[2][2], 2)
+        self.assertEqual(len(groups[2][1]), 2)
+        options = groups[2][1]
+        self.assertEqual(options[0]['name'], 'name')
+        self.assertEqual(options[0]['value'], 'vhs')
+        self.assertEqual(options[0]['label'], 'VHS Tape')
+        self.assertEqual(options[0]['index'], '2_0')
+        self.assertEqual(options[0]['selected'], True)
+        self.assertEqual(options[1]['index'], '2_1')
+
     def test_deepcopy(self):
         """
         __deepcopy__() should copy all attributes properly (#25085).
@@ -232,3 +294,23 @@ class SelectTest(WidgetTest):
         self.assertIsNot(widget.choices, obj.choices)
         self.assertEqual(widget.attrs, obj.attrs)
         self.assertIsNot(widget.attrs, obj.attrs)
+
+    def test_doesnt_render_required_when_impossible_to_select_empty_field(self):
+        widget = self.widget(choices=[('J', 'John'), ('P', 'Paul')])
+        self.assertIs(widget.use_required_attribute(initial=None), False)
+
+    def test_renders_required_when_possible_to_select_empty_field_str(self):
+        widget = self.widget(choices=[('', 'select please'), ('P', 'Paul')])
+        self.assertIs(widget.use_required_attribute(initial=None), True)
+
+    def test_renders_required_when_possible_to_select_empty_field_list(self):
+        widget = self.widget(choices=[['', 'select please'], ['P', 'Paul']])
+        self.assertIs(widget.use_required_attribute(initial=None), True)
+
+    def test_renders_required_when_possible_to_select_empty_field_none(self):
+        widget = self.widget(choices=[(None, 'select please'), ('P', 'Paul')])
+        self.assertIs(widget.use_required_attribute(initial=None), True)
+
+    def test_doesnt_render_required_when_no_choices_are_available(self):
+        widget = self.widget(choices=[])
+        self.assertIs(widget.use_required_attribute(initial=None), False)

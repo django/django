@@ -226,7 +226,7 @@ class IncludeTests(SimpleTestCase):
 
     def test_include_missing_template(self):
         """
-        Tests that the correct template is identified as not existing
+        The correct template is identified as not existing
         when {% include %} specifies a template that does not exist.
         """
         engine = Engine(app_dirs=True, debug=True)
@@ -237,7 +237,7 @@ class IncludeTests(SimpleTestCase):
 
     def test_extends_include_missing_baseloader(self):
         """
-        #12787 -- Tests that the correct template is identified as not existing
+        #12787 -- The correct template is identified as not existing
         when {% extends %} specifies a template that does exist, but that
         template has an {% include %} of something that does not exist.
         """

@@ -80,7 +80,7 @@ class GeoModelAdmin(ModelAdmin):
             collection_type = 'None'
 
         class OLMap(self.widget):
-            template = self.map_template
+            template_name = self.map_template
             geom_type = db_field.geom_type
 
             wms_options = ''

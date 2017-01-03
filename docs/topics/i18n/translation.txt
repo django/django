@@ -418,17 +418,34 @@ Working with lazy translation objects
 -------------------------------------
 
 The result of a ``ugettext_lazy()`` call can be used wherever you would use a
-unicode string (an object with type ``unicode``) in Python. If you try to use
-it where a bytestring (a ``str`` object) is expected, things will not work as
-expected, since a ``ugettext_lazy()`` object doesn't know how to convert
-itself to a bytestring. You can't use a unicode string inside a bytestring,
-either, so this is consistent with normal Python behavior. For example::
+unicode string (a :class:`str` object) in other Django code, but it may not
+work with arbitrary Python code. For example, the following won't work because
+the `requests <https://pypi.python.org/pypi/requests/>`_ library doesn't handle
+``ugettext_lazy`` objects::
 
-    # This is fine: putting a unicode proxy into a unicode string.
+    body = ugettext_lazy("I \u2764 Django")  # (unicode :heart:)
+    requests.post('https://example.com/send', data={'body': body})
+
+You can avoid such problems by casting ``ugettext_lazy()`` objects to text
+strings before passing them to non-Django code::
+
+    requests.post('https://example.com/send', data={'body': str(body)})
+
+Use ``unicode`` in place of ``str`` on Python 2, or :data:`six.text_type` to
+support Python 2 and 3.
+
+If you try to use a ``ugettext_lazy()`` result where a bytestring (a
+:class:`bytes` object) is expected, things won't work as expected since a
+``ugettext_lazy()`` object doesn't know how to convert itself to a bytestring.
+You can't use a unicode string inside a bytestring, either, so this is
+consistent with normal Python behavior. For example, putting a unicode proxy
+into a unicode string is fine::
+
     "Hello %s" % ugettext_lazy("people")
 
-    # This will not work, since you cannot insert a unicode object
-    # into a bytestring (nor can you insert our unicode proxy there)
+But you can't insert a unicode object into a bytestring and nor can you insert
+a unicode proxy there::
+
     b"Hello %s" % ugettext_lazy("people")
 
 If you ever see output that looks like ``"hello
@@ -1011,6 +1028,18 @@ The ``JavaScriptCatalog`` view
                 name='javascript-catalog'),
         ]
 
+    If your root URLconf uses :func:`~django.conf.urls.i18n.i18n_patterns`,
+    ``JavaScriptCatalog`` must also be wrapped by ``i18n_patterns()`` for the
+    catalog to be correctly generated.
+
+    **Example with** ``i18n_patterns()``::
+
+        from django.conf.urls.i18n import i18n_patterns
+
+        urlpatterns = i18n_patterns(
+            url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+        )
+
 The precedence of translations is such that the packages appearing later in the
 ``packages`` argument have higher precedence than the ones appearing at the
 beginning. This is important in the case of clashing translations for the same
@@ -1372,8 +1401,8 @@ URL::
     ]
 
 Client-side caching will save bandwidth and make your site load faster. If
-you're using ETags (:setting:`USE_ETAGS = True <USE_ETAGS>`), you're already
-covered. Otherwise, you can apply :ref:`conditional decorators
+you're using ETags (:class:`~django.middleware.http.ConditionalGetMiddleware`),
+you're already covered. Otherwise, you can apply :ref:`conditional decorators
 <conditional-decorators>`. In the following example, the cache is invalidated
 whenever you restart your application server::
 
@@ -1504,6 +1533,7 @@ will be::
     Ensure that you don't have non-prefixed URL patterns that might collide
     with an automatically-added language prefix.
 
+.. _translating-urlpatterns:
 
 Translating URL patterns
 ------------------------
@@ -1774,6 +1804,31 @@ That's it. Your translations are ready for use.
    Django only supports ``.po`` files encoded in UTF-8 and without any BOM
    (Byte Order Mark) so if your text editor adds such marks to the beginning of
    files by default then you will need to reconfigure it.
+
+Troubleshooting: ``ugettext()`` incorrectly detects ``python-format`` in strings with percent signs
+---------------------------------------------------------------------------------------------------
+
+In some cases, such as strings with a percent sign followed by a space and a
+:ref:`string conversion type <old-string-formatting>` (e.g.
+``_("10% interest")``), :func:`~django.utils.translation.ugettext` incorrectly
+flags strings with ``python-format``.
+
+If you try to compile message files with incorrectly flagged strings, you'll
+get an error message like ``number of format specifications in 'msgid' and
+'msgstr' does not match`` or ``'msgstr' is not a valid Python format string,
+unlike 'msgid'``.
+
+To workaround this, you can escape percent signs by adding a second percent
+sign::
+
+    from django.utils.translation import ugettext as _
+    output = _("10%% interest)
+
+Or you can use ``no-python-format`` so that all percent signs are treated as
+literals::
+
+    # xgettext:no-python-format
+    output = _("10% interest)
 
 .. _creating-message-files-from-js-code:
 

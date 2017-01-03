@@ -152,6 +152,7 @@ msgstr "Додано."
 msgid "and"
 msgstr "та"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr "Змінені {fields} для {name} \"{object}\"."
 

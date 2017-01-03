@@ -77,7 +77,7 @@ class Apps(object):
             if self.app_configs:
                 raise RuntimeError("populate() isn't reentrant")
 
-            # Load app configs and app modules.
+            # Phase 1: initialize app configs and import app modules.
             for entry in installed_apps:
                 if isinstance(entry, AppConfig):
                     app_config = entry
@@ -89,6 +89,7 @@ class Apps(object):
                         "duplicates: %s" % app_config.label)
 
                 self.app_configs[app_config.label] = app_config
+                app_config.apps = self
 
             # Check for duplicate app names.
             counts = Counter(
@@ -102,15 +103,15 @@ class Apps(object):
 
             self.apps_ready = True
 
-            # Load models.
+            # Phase 2: import models modules.
             for app_config in self.app_configs.values():
-                all_models = self.all_models[app_config.label]
-                app_config.import_models(all_models)
+                app_config.import_models()
 
             self.clear_cache()
 
             self.models_ready = True
 
+            # Phase 3: run ready() methods of app configs.
             for app_config in self.get_app_configs():
                 app_config.ready()
 
@@ -164,7 +165,6 @@ class Apps(object):
 
         - auto-created models for many-to-many relations without
           an explicit intermediate table,
-        - models created to satisfy deferred attribute queries,
         - models that have been swapped out.
 
         Set the corresponding keyword argument to True to include such models.
@@ -176,7 +176,7 @@ class Apps(object):
             result.extend(list(app_config.get_models(include_auto_created, include_swapped)))
         return result
 
-    def get_model(self, app_label, model_name=None):
+    def get_model(self, app_label, model_name=None, require_ready=True):
         """
         Returns the model matching the given app_label and model_name.
 
@@ -189,10 +189,20 @@ class Apps(object):
         model exists with this name in the application. Raises ValueError if
         called with a single argument that doesn't contain exactly one dot.
         """
-        self.check_models_ready()
+        if require_ready:
+            self.check_models_ready()
+        else:
+            self.check_apps_ready()
+
         if model_name is None:
             app_label, model_name = app_label.split('.')
-        return self.get_app_config(app_label).get_model(model_name.lower())
+
+        app_config = self.get_app_config(app_label)
+
+        if not require_ready and app_config.models is None:
+            app_config.import_models()
+
+        return app_config.get_model(model_name, require_ready=require_ready)
 
     def register_model(self, app_label, model):
         # Since this method is called when models are imported, it cannot
@@ -410,5 +420,6 @@ class Apps(object):
         key = model._meta.app_label, model._meta.model_name
         for function in self._pending_operations.pop(key, []):
             function(model)
+
 
 apps = Apps(installed_apps=None)

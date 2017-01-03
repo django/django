@@ -223,7 +223,7 @@ Specifies the database onto which to open a shell. Defaults to ``default``.
 .. django-admin:: diffsettings
 
 Displays differences between the current settings file and Django's default
-settings.
+settings (or another settings file specified by :option:`--default`).
 
 Settings that don't appear in the defaults are followed by ``"###"``. For
 example, the default settings don't define :setting:`ROOT_URLCONF`, so
@@ -234,6 +234,13 @@ example, the default settings don't define :setting:`ROOT_URLCONF`, so
 
 Displays all settings, even if they have Django's default value. Such settings
 are prefixed by ``"###"``.
+
+.. django-admin-option:: --default MODULE
+
+.. versionadded:: 1.11
+
+The settings module to compare the current settings against. Leave empty to
+compare against Django's default settings.
 
 ``dumpdata``
 ------------
@@ -563,6 +570,11 @@ conf/locale (in the Django tree) or locale (for project and application)
 directory. After making changes to the messages files you need to compile them
 with :djadmin:`compilemessages` for use with the builtin gettext support. See
 the :ref:`i18n documentation <how-to-create-language-files>` for details.
+
+This command doesn't require configured settings. However, when settings aren't
+configured, the command can't ignore the :setting:`MEDIA_ROOT` and
+:setting:`STATIC_ROOT` directories or include :setting:`LOCALE_PATHS`. It will
+also write files in UTF-8 rather than in :setting:`FILE_CHARSET`.
 
 .. django-admin-option:: --all, -a
 
@@ -966,6 +978,22 @@ variable or the ``~/.pythonrc.py`` script is read.
 Lets you pass a command as a string to execute it as Django, like so::
 
     django-admin shell --command="import django; print(django.__version__)"
+
+You can also pass code in on standard input to execute it. For example:
+
+.. code-block:: console
+
+    $ django-admin shell <<EOF
+    > import django
+    > print(django.__version__)
+    > EOF
+
+On Windows, the REPL is output due to implementation limits of
+:func:`select.select` on that platform.
+
+.. versionchanged:: 1.11
+
+    In older versions, the REPL is also output on UNIX systems.
 
 ``showmigrations``
 ------------------

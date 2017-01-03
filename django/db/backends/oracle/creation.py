@@ -4,11 +4,11 @@ import time
 from django.conf import settings
 from django.db.backends.base.creation import BaseDatabaseCreation
 from django.db.utils import DatabaseError
+from django.utils.crypto import get_random_string
 from django.utils.functional import cached_property
 from django.utils.six.moves import input
 
 TEST_DATABASE_PREFIX = 'test_'
-PASSWORD = 'Im_a_lumberjack'
 
 
 class DatabaseCreation(BaseDatabaseCreation):
@@ -77,9 +77,6 @@ class DatabaseCreation(BaseDatabaseCreation):
             try:
                 self._create_test_user(cursor, parameters, verbosity, keepdb)
             except Exception as e:
-                # If we want to keep the db, then we want to also keep the user.
-                if keepdb:
-                    return
                 sys.stderr.write("Got an error creating the test user: %s\n" % e)
                 if not autoclobber:
                     confirm = input(
@@ -209,7 +206,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             print("_create_test_user(): username = %s" % parameters['user'])
         statements = [
             """CREATE USER %(user)s
-               IDENTIFIED BY %(password)s
+               IDENTIFIED BY "%(password)s"
                DEFAULT TABLESPACE %(tblspace)s
                TEMPORARY TABLESPACE %(tblspace_temp)s
                QUOTA UNLIMITED ON %(tblspace)s
@@ -223,7 +220,11 @@ class DatabaseCreation(BaseDatabaseCreation):
         ]
         # Ignore "user already exists" error when keepdb is on
         acceptable_ora_err = 'ORA-01920' if keepdb else None
-        self._execute_allow_fail_statements(cursor, statements, parameters, verbosity, acceptable_ora_err)
+        success = self._execute_allow_fail_statements(cursor, statements, parameters, verbosity, acceptable_ora_err)
+        # If the password was randomly generated, change the user accordingly.
+        if not success and self._test_settings_get('PASSWORD') is None:
+            set_password = 'ALTER USER %(user)s IDENTIFIED BY "%(password)s"'
+            self._execute_statements(cursor, [set_password], parameters, verbosity)
         # Most test-suites can be run without the create-view privilege. But some need it.
         extra = "GRANT CREATE VIEW TO %(user)s"
         success = self._execute_allow_fail_statements(cursor, [extra], parameters, verbosity, 'ORA-01031')
@@ -298,7 +299,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         """
         settings_dict = self.connection.settings_dict
         val = settings_dict['TEST'].get(key, default)
-        if val is None:
+        if val is None and prefixed:
             val = TEST_DATABASE_PREFIX + settings_dict[prefixed]
         return val
 
@@ -315,7 +316,11 @@ class DatabaseCreation(BaseDatabaseCreation):
         return self._test_settings_get('USER', prefixed='USER')
 
     def _test_database_passwd(self):
-        return self._test_settings_get('PASSWORD', default=PASSWORD)
+        password = self._test_settings_get('PASSWORD')
+        if password is None and self._test_user_create():
+            # Oracle passwords are limited to 30 chars and can't contain symbols.
+            password = get_random_string(length=30)
+        return password
 
     def _test_database_tblspace(self):
         return self._test_settings_get('TBLSPACE', prefixed='USER')

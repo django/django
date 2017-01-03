@@ -34,6 +34,8 @@ __all__ = ('Client', 'RedirectCycleError', 'RequestFactory', 'encode_file', 'enc
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
 CONTENT_TYPE_RE = re.compile(r'.*; charset=([\w\d-]+);?')
+# JSON Vendor Tree spec: https://tools.ietf.org/html/rfc6838#section-3.2
+JSON_CONTENT_TYPE_RE = re.compile(r'^application\/(vnd\..+\+)?json$')
 
 
 class RedirectCycleError(Exception):
@@ -226,7 +228,12 @@ def encode_multipart(boundary, data):
 def encode_file(boundary, key, file):
     def to_bytes(s):
         return force_bytes(s, settings.DEFAULT_CHARSET)
-    filename = os.path.basename(file.name) if hasattr(file, 'name') else ''
+
+    # file.name might not be a string. For example, it's an int for
+    # tempfile.TemporaryFile().
+    file_has_string_name = hasattr(file, 'name') and isinstance(file.name, six.string_types)
+    filename = os.path.basename(file.name) if file_has_string_name else ''
+
     if hasattr(file, 'content_type'):
         content_type = file.content_type
     elif filename:
@@ -626,8 +633,14 @@ class Client(RequestFactory):
             return False
 
     def force_login(self, user, backend=None):
+        def get_backend():
+            from django.contrib.auth import load_backend
+            for backend_path in settings.AUTHENTICATION_BACKENDS:
+                backend = load_backend(backend_path)
+                if hasattr(backend, 'get_user'):
+                    return backend_path
         if backend is None:
-            backend = settings.AUTHENTICATION_BACKENDS[0]
+            backend = get_backend()
         user.backend = backend
         self._login(user, backend)
 
@@ -678,12 +691,14 @@ class Client(RequestFactory):
         self.cookies = SimpleCookie()
 
     def _parse_json(self, response, **extra):
-        if 'application/json' not in response.get('Content-Type'):
-            raise ValueError(
-                'Content-Type header is "{0}", not "application/json"'
-                .format(response.get('Content-Type'))
-            )
-        return json.loads(response.content.decode(), **extra)
+        if not hasattr(response, '_json'):
+            if not JSON_CONTENT_TYPE_RE.match(response.get('Content-Type')):
+                raise ValueError(
+                    'Content-Type header is "{0}", not "application/json"'
+                    .format(response.get('Content-Type'))
+                )
+            response._json = json.loads(response.content.decode(), **extra)
+        return response._json
 
     def _handle_redirects(self, response, **extra):
         "Follows any redirects by requesting responses from the server using GET."

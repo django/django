@@ -11,7 +11,7 @@ used for all HTTP methods (``POST``, ``PUT``, ``DELETE``, etc.).
 For each page (response) that Django sends back from a view, it might provide
 two HTTP headers: the ``ETag`` header and the ``Last-Modified`` header. These
 headers are optional on HTTP responses. They can be set by your view function,
-or you can rely on the :class:`~django.middleware.common.CommonMiddleware`
+or you can rely on the :class:`~django.middleware.http.ConditionalGetMiddleware`
 middleware to set the ``ETag`` header.
 
 When the client next requests the same resource, it might send along a header
@@ -105,6 +105,18 @@ for your front page view::
     def front_page(request, blog_id):
         ...
 
+.. admonition:: Be careful with the order of decorators
+
+    When ``condition()`` returns a conditional response, any decorators below
+    it will be skipped and won't apply to the response. Therefore, any
+    decorators that need to apply to both the regular view response and a
+    conditional response must be above ``condition()``. In particular,
+    :func:`~django.views.decorators.vary.vary_on_cookie`,
+    :func:`~django.views.decorators.vary.vary_on_headers`, and
+    :func:`~django.views.decorators.cache.cache_control` should come first
+    because :rfc:`RFC 7232 <7232#section-4.1>` requires that the headers they
+    set be present on 304 responses.
+
 Shortcuts for only computing one value
 ======================================
 
@@ -189,17 +201,14 @@ every time.
 Comparison with middleware conditional processing
 =================================================
 
-You may notice that Django already provides simple and straightforward
-conditional ``GET`` handling via the
-:class:`django.middleware.http.ConditionalGetMiddleware` and
-:class:`~django.middleware.common.CommonMiddleware`. While certainly being
-easy to use and suitable for many situations, those pieces of middleware
-functionality have limitations for advanced usage:
+Django provides simple and straightforward conditional ``GET`` handling via
+:class:`django.middleware.http.ConditionalGetMiddleware`. While being easy to
+use and suitable for many situations, the middleware has limitations for
+advanced usage:
 
-* They are applied globally to all views in your project
-* They don't save you from generating the response itself, which may be
-  expensive
-* They are only appropriate for HTTP ``GET`` requests.
+* It's applied globally to all views in your project.
+* It doesn't save you from generating the response, which may be expensive.
+* It's only appropriate for HTTP ``GET`` requests.
 
 You should choose the most appropriate tool for your particular problem here.
 If you have a way to compute ETags and modification times quickly and if some

@@ -87,6 +87,14 @@ class ExtractDay(Extract):
     lookup_name = 'day'
 
 
+class ExtractWeek(Extract):
+    """
+    Return 1-52 or 53, based on ISO-8601, i.e., Monday is the first of the
+    week.
+    """
+    lookup_name = 'week'
+
+
 class ExtractWeekDay(Extract):
     """
     Return Sunday=1 through Saturday=7.
@@ -112,15 +120,12 @@ DateField.register_lookup(ExtractYear)
 DateField.register_lookup(ExtractMonth)
 DateField.register_lookup(ExtractDay)
 DateField.register_lookup(ExtractWeekDay)
+DateField.register_lookup(ExtractWeek)
 
 TimeField.register_lookup(ExtractHour)
 TimeField.register_lookup(ExtractMinute)
 TimeField.register_lookup(ExtractSecond)
 
-DateTimeField.register_lookup(ExtractYear)
-DateTimeField.register_lookup(ExtractMonth)
-DateTimeField.register_lookup(ExtractDay)
-DateTimeField.register_lookup(ExtractWeekDay)
 DateTimeField.register_lookup(ExtractHour)
 DateTimeField.register_lookup(ExtractMinute)
 DateTimeField.register_lookup(ExtractSecond)
@@ -191,7 +196,7 @@ class TruncBase(TimezoneMixin, Transform):
                 if value is None:
                     raise ValueError(
                         "Database returned an invalid datetime value. "
-                        "Are time zone definitions for your database and pytz installed?"
+                        "Are time zone definitions for your database installed?"
                     )
                 value = value.replace(tzinfo=None)
                 value = timezone.make_aware(value, self.tzinfo)

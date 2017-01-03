@@ -83,7 +83,7 @@ class OnDeleteTests(TestCase):
 
     def test_do_nothing_qscount(self):
         """
-        Test that a models.DO_NOTHING relation doesn't trigger a query.
+        A models.DO_NOTHING relation doesn't trigger a query.
         """
         b = Base.objects.create()
         with self.assertNumQueries(1):
@@ -358,6 +358,15 @@ class DeletionTests(TestCase):
         child.delete(keep_parents=True)
         self.assertFalse(RChild.objects.filter(id=child.id).exists())
         self.assertTrue(R.objects.filter(id=parent_id).exists())
+
+    def test_delete_with_keeping_parents_relationships(self):
+        child = RChild.objects.create()
+        parent_id = child.r_ptr_id
+        parent_referent_id = S.objects.create(r=child.r_ptr).pk
+        child.delete(keep_parents=True)
+        self.assertFalse(RChild.objects.filter(id=child.id).exists())
+        self.assertTrue(R.objects.filter(id=parent_id).exists())
+        self.assertTrue(S.objects.filter(pk=parent_referent_id).exists())
 
     def test_queryset_delete_returns_num_rows(self):
         """

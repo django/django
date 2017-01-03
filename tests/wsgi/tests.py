@@ -20,8 +20,7 @@ class WSGITest(SimpleTestCase):
 
     def test_get_wsgi_application(self):
         """
-        Verify that ``get_wsgi_application`` returns a functioning WSGI
-        callable.
+        get_wsgi_application() returns a functioning WSGI callable.
         """
         application = get_wsgi_application()
 
@@ -50,7 +49,7 @@ class WSGITest(SimpleTestCase):
 
     def test_file_wrapper(self):
         """
-        Verify that FileResponse uses wsgi.file_wrapper.
+        FileResponse uses wsgi.file_wrapper.
         """
         class FileWrapper(object):
             def __init__(self, filelike, blksize=8192):

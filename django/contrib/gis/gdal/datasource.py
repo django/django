@@ -51,6 +51,7 @@ from django.utils.six.moves import range
 # The OGR_DS_* routines are relevant here.
 class DataSource(GDALBase):
     "Wraps an OGR Data Source object."
+    destructor = capi.destroy_ds
 
     def __init__(self, ds_input, ds_driver=False, write=False, encoding='utf-8'):
         # The write flag.
@@ -85,13 +86,6 @@ class DataSource(GDALBase):
             # Raise an exception if the returned pointer is NULL
             raise GDALException('Invalid data source file "%s"' % ds_input)
 
-    def __del__(self):
-        "Destroys this DataStructure object."
-        try:
-            capi.destroy_ds(self._ptr)
-        except (AttributeError, TypeError):
-            pass  # Some part might already have been garbage collected
-
     def __iter__(self):
         "Allows for iteration over the layers in a data source."
         for i in range(self.layer_count):
@@ -100,16 +94,16 @@ class DataSource(GDALBase):
     def __getitem__(self, index):
         "Allows use of the index [] operator to get a layer at the index."
         if isinstance(index, six.string_types):
-            l = capi.get_layer_by_name(self.ptr, force_bytes(index))
-            if not l:
+            layer = capi.get_layer_by_name(self.ptr, force_bytes(index))
+            if not layer:
                 raise OGRIndexError('invalid OGR Layer name given: "%s"' % index)
         elif isinstance(index, int):
             if index < 0 or index >= self.layer_count:
                 raise OGRIndexError('index out of range')
-            l = capi.get_layer(self._ptr, index)
+            layer = capi.get_layer(self._ptr, index)
         else:
             raise TypeError('Invalid index type: %s' % type(index))
-        return Layer(l, self)
+        return Layer(layer, self)
 
     def __len__(self):
         "Returns the number of layers within the data source."

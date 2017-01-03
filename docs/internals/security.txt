@@ -25,14 +25,13 @@ Instead, if you believe you've found something in Django which has security
 implications, please send a description of the issue via email to
 ``security@djangoproject.com``. Mail sent to that address reaches a
 :ref:`subset of the core team <security-team-list>`, who can forward security
-issues into the private committers' mailing list for broader discussion if
-needed.
+issues into the private team's mailing list for broader discussion if needed.
 
 Once you've submitted an issue via email, you should receive an acknowledgment
 from a member of the security team within 48 hours, and depending on the
 action to be taken, you may receive further followup emails.
 
-.. note::
+.. admonition:: Sending encrypted reports
 
     If you want to send an encrypted email (*optional*), the public key ID for
     ``security@djangoproject.com`` is ``0xfcb84b8d1d17f80b``, and this public
@@ -48,8 +47,11 @@ Supported versions
 At any given time, the Django team provides official security support
 for several versions of Django:
 
-* The `master development branch`_, hosted on GitHub, which will
-  become the next release of Django, receives security support.
+* The `master development branch`_, hosted on GitHub, which will become the
+  next major release of Django, receives security support. Security issues that
+  only affect the master development branch and not any stable released versions
+  are fixed in public without going through the :ref:`disclosure process
+  <security-disclosure>`.
 
 * The two most recent Django release series receive security
   support. For example, during the development cycle leading to the
@@ -76,11 +78,35 @@ How Django discloses security issues
 Our process for taking a security issue from private discussion to
 public disclosure involves multiple steps.
 
-Approximately one week before full public disclosure, we will send
-advance notification of the issue to a list of people and
-organizations, primarily composed of operating-system vendors and
-other distributors of Django. This notification will consist of an
-email message, signed with the Django release key, containing:
+Approximately one week before public disclosure, we send two notifications:
+
+First, we notify |django-announce| of the date and approximate time of the
+upcoming security release, as well as the severity of the issues. This is to
+aid organizations that need to ensure they have staff available to handle
+triaging our announcement and upgrade Django as needed. Severity levels are:
+
+**High**:
+
+* Remote code execution
+* SQL injection
+
+**Moderate**:
+
+* Cross site scripting (XSS)
+* Cross site request forgery (CSRF)
+* Broken authentication
+
+**Low**:
+
+* Sensitive data exposure
+* Broken session management
+* Unvalidated redirects/forwards
+* Issues requiring an uncommon configuration option
+
+Second, we notify a list of :ref:`people and organizations
+<security-notifications>`, primarily composed of operating-system vendors and
+other distributors of Django. This email is signed with the PGP key of someone
+from :ref:`Django's release team <releasers-list>` and consists of:
 
 * A full description of the issue and the affected versions of Django.
 
@@ -91,15 +117,9 @@ email message, signed with the Django release key, containing:
 * The date on which the Django team will apply these patches, issue
   new releases and publicly disclose the issue.
 
-Simultaneously, the reporter of the issue will receive notification of
-the date on which we plan to take the issue public.
-
 On the day of disclosure, we will take the following steps:
 
-1. Apply the relevant patch(es) to Django's codebase. The commit
-   messages for these patches will indicate that they are for security
-   issues, but will not describe the issue in any detail; instead,
-   they will warn of upcoming disclosure.
+1. Apply the relevant patch(es) to Django's codebase.
 
 2. Issue the relevant release(s), by placing new packages on `the
    Python Package Index`_ and on the Django website, and tagging the
@@ -129,7 +149,6 @@ theirs.
 
 The Django team also maintains an :doc:`archive of security issues
 disclosed in Django</releases/security>`.
-
 
 .. _security-notifications:
 
@@ -187,11 +206,12 @@ Your request **must** include the following information:
 * A detailed explanation of how you or your organization fit at least
   one set of criteria listed above.
 
-* A detailed explanation of why you are requesting security
-  notifications. Again, please keep in mind that this is *not* simply
-  a list for users of Django, and the overwhelming majority of users
-  of Django should not request notifications and will not be added to
-  our notification list if they do.
+* A detailed explanation of why you are requesting security notifications.
+  Again, please keep in mind that this is *not* simply a list for users of
+  Django, and the overwhelming majority of users should subscribe to
+  |django-announce| to receive advanced notice of when a security release will
+  happen, without the details of the issues, rather than request detailed
+  notifications.
 
 * The email address you would like to have added to our notification
   list.
@@ -213,11 +233,3 @@ Please also bear in mind that for any individual or organization,
 receiving security notifications is a privilege granted at the sole
 discretion of the Django development team, and that this privilege can
 be revoked at any time, with or without explanation.
-
-If you are added to the notification list, security-related emails
-will be sent to you by Django's release team, and all notification
-emails will be signed with a key authorized to issue Django
-releases. The list of authorized keys is in `the Django releasers
-file`_.
-
-.. _the Django releasers file: https://www.djangoproject.com/m/pgp/django-releasers.txt

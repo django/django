@@ -94,8 +94,8 @@ functionality of the ``django.contrib.auth.decorators`` for class-based views.
 These mixins have been taken from, or are at least inspired by, the
 `django-braces`_ project.
 
-There are a few differences between Django's and django-braces' implementation,
-though:
+There are a few differences between Django's and ``django-braces``\'
+implementation, though:
 
 * The :attr:`~django.contrib.auth.mixins.AccessMixin.raise_exception` attribute
   can only be ``True`` or ``False``. Custom exceptions or callables are not
@@ -843,12 +843,12 @@ Changes to the default logging configuration
 --------------------------------------------
 
 To make it easier to write custom logging configurations, Django's default
-logging configuration no longer defines 'django.request' and 'django.security'
-loggers. Instead, it defines a single 'django' logger, filtered at the ``INFO``
-level, with two handlers:
+logging configuration no longer defines ``django.request`` and
+``django.security`` loggers. Instead, it defines a single ``django`` logger,
+filtered at the ``INFO`` level, with two handlers:
 
-* 'console': filtered at the ``INFO`` level and only active if ``DEBUG=True``.
-* 'mail_admins': filtered at the ``ERROR`` level and only active if
+* ``console``: filtered at the ``INFO`` level and only active if ``DEBUG=True``.
+* ``mail_admins``: filtered at the ``ERROR`` level and only active if
   ``DEBUG=False``.
 
 If you aren't overriding Django's default logging, you should see minimal

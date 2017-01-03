@@ -13,10 +13,13 @@ from django.db import connections
 from django.db.models import Manager
 from django.db.models.fields import AutoField
 from django.db.models.fields.proxy import OrderWrt
+from django.db.models.fields.related import OneToOneField
+from django.db.models.query_utils import PathInfo
 from django.utils import six
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.deprecation import (
-    RemovedInDjango20Warning, warn_about_renamed_method,
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+    warn_about_renamed_method,
 )
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
@@ -112,7 +115,6 @@ class Options(object):
         self.required_db_vendor = None
         self.meta = meta
         self.pk = None
-        self.has_auto_field = False
         self.auto_field = None
         self.abstract = False
         self.managed = True
@@ -296,7 +298,11 @@ class Options(object):
     def setup_pk(self, field):
         if not self.pk and field.primary_key:
             self.pk = field
-            field.serialize = False
+            # If the field is a OneToOneField and it's been marked as PK, then
+            # this is a multi-table inheritance PK. It needs to be serialized
+            # to relate the subclass instance to the superclass instance.
+            if not isinstance(field, OneToOneField):
+                field.serialize = False
 
     def setup_proxy(self, target):
         """
@@ -665,6 +671,50 @@ class Options(object):
                 # links
                 return self.parents[parent] or parent_link
 
+    def get_path_to_parent(self, parent):
+        """
+        Return a list of PathInfos containing the path from the current
+        model to the parent model, or an empty list if parent is not a
+        parent of the current model.
+        """
+        if self.model is parent:
+            return []
+        # Skip the chain of proxy to the concrete proxied model.
+        proxied_model = self.concrete_model
+        path = []
+        opts = self
+        for int_model in self.get_base_chain(parent):
+            if int_model is proxied_model:
+                opts = int_model._meta
+            else:
+                final_field = opts.parents[int_model]
+                targets = (final_field.remote_field.get_related_field(),)
+                opts = int_model._meta
+                path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
+        return path
+
+    def get_path_from_parent(self, parent):
+        """
+        Return a list of PathInfos containing the path from the parent
+        model to the current model, or an empty list if parent is not a
+        parent of the current model.
+        """
+        if self.model is parent:
+            return []
+        model = self.concrete_model
+        # Get a reversed base chain including both the current and parent
+        # models.
+        chain = model._meta.get_base_chain(parent)
+        chain.reverse()
+        chain.append(model)
+        # Construct a list of the PathInfos between models in chain.
+        path = []
+        for i, ancestor in enumerate(chain[:-1]):
+            child = chain[i + 1]
+            link = child._meta.get_ancestor_link(ancestor)
+            path.extend(link.get_reverse_path_info())
+        return path
+
     def _populate_directed_relation_graph(self):
         """
         This method is used by each model to find its reverse objects. As this
@@ -820,3 +870,27 @@ class Options(object):
         # Store result into cache for later access
         self._get_fields_cache[cache_key] = fields
         return fields
+
+    @property
+    def has_auto_field(self):
+        warnings.warn(
+            'Model._meta.has_auto_field is deprecated in favor of checking if '
+            'Model._meta.auto_field is not None.',
+            RemovedInDjango21Warning, stacklevel=2
+        )
+        return self.auto_field is not None
+
+    @has_auto_field.setter
+    def has_auto_field(self, value):
+        pass
+
+    @cached_property
+    def _property_names(self):
+        """
+        Return a set of the names of the properties defined on the model.
+        Internal helper for model initialization.
+        """
+        return frozenset({
+            attr for attr in
+            dir(self.model) if isinstance(getattr(self.model, attr), property)
+        })

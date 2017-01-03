@@ -5,7 +5,6 @@ from django.contrib.gis.db.backends.base.operations import \
     BaseSpatialOperations
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.gdal import GDALRaster
-from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql.operations import DatabaseOperations
@@ -91,13 +90,16 @@ class PostGISDistanceOperator(PostGISOperator):
             template_params = self.check_raster(lookup, template_params)
             sql_template = self.sql_template
             if len(lookup.rhs) == 3 and lookup.rhs[-1] == 'spheroid':
-                template_params.update({'op': self.op, 'func': 'ST_Distance_Spheroid'})
+                template_params.update({
+                    'op': self.op,
+                    'func': connection.ops.spatial_function_name('DistanceSpheroid'),
+                })
                 sql_template = '%(func)s(%(lhs)s, %(rhs)s, %%s) %(op)s %(value)s'
-                # Using distance_spheroid requires the spheroid of the field as
+                # Using DistanceSpheroid requires the spheroid of the field as
                 # a parameter.
                 sql_params.insert(1, lookup.lhs.output_field._spheroid)
             else:
-                template_params.update({'op': self.op, 'func': 'ST_Distance_Sphere'})
+                template_params.update({'op': self.op, 'func': connection.ops.spatial_function_name('DistanceSphere')})
             return sql_template % template_params, sql_params
         return super(PostGISDistanceOperator, self).as_sql(connection, lookup, template_params, sql_params)
 
@@ -146,11 +148,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     }
 
     unsupported_functions = set()
-    function_names = {
-        'BoundingCircle': 'ST_MinimumBoundingCircle',
-        'MemSize': 'ST_Mem_Size',
-        'NumPoints': 'ST_NPoints',
-    }
 
     def __init__(self, connection):
         super(PostGISOperations, self).__init__(connection)
@@ -196,6 +193,21 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         self.translate = prefix + 'Translate'
         self.union = prefix + 'Union'
         self.unionagg = prefix + 'Union'
+
+    @cached_property
+    def function_names(self):
+        function_names = {
+            'BoundingCircle': 'ST_MinimumBoundingCircle',
+            'NumPoints': 'ST_NPoints',
+        }
+        if self.spatial_version < (2, 2, 0):
+            function_names.update({
+                'DistanceSphere': 'ST_distance_sphere',
+                'DistanceSpheroid': 'ST_distance_spheroid',
+                'LengthSpheroid': 'ST_length_spheroid',
+                'MemSize': 'ST_mem_size',
+            })
+        return function_names
 
     @cached_property
     def spatial_version(self):
@@ -252,15 +264,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         xmin, ymin, zmin = map(float, ll.split())
         xmax, ymax, zmax = map(float, ur.split())
         return (xmin, ymin, zmin, xmax, ymax, zmax)
-
-    def convert_geom(self, hex, geo_field):
-        """
-        Converts the geometry returned from PostGIS aggregates.
-        """
-        if hex:
-            return Geometry(hex, srid=geo_field.srid)
-        else:
-            return None
 
     def geo_db_type(self, f):
         """

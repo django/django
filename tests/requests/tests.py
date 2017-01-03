@@ -11,6 +11,7 @@ from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import (
     HttpRequest, HttpResponse, RawPostDataException, UnreadablePostError,
 )
+from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
 from django.test.utils import freeze_time, str_prefix
@@ -95,9 +96,8 @@ class RequestsTests(SimpleTestCase):
 
     def test_wsgirequest_with_script_name(self):
         """
-        Ensure that the request's path is correctly assembled, regardless of
-        whether or not the SCRIPT_NAME has a trailing slash.
-        Refs #20169.
+        The request's path is correctly assembled, regardless of whether or
+        not the SCRIPT_NAME has a trailing slash (#20169).
         """
         # With trailing slash
         request = WSGIRequest({
@@ -120,8 +120,7 @@ class RequestsTests(SimpleTestCase):
         """
         WSGI squashes multiple successive slashes in PATH_INFO, WSGIRequest
         should take that into account when populating request.path and
-        request.META['SCRIPT_NAME'].
-        Refs #17133.
+        request.META['SCRIPT_NAME'] (#17133).
         """
         request = WSGIRequest({
             'SCRIPT_URL': '/mst/milestones//accounts/login//help',
@@ -134,9 +133,8 @@ class RequestsTests(SimpleTestCase):
 
     def test_wsgirequest_with_force_script_name(self):
         """
-        Ensure that the FORCE_SCRIPT_NAME setting takes precedence over the
-        request's SCRIPT_NAME environment parameter.
-        Refs #20169.
+        The FORCE_SCRIPT_NAME setting takes precedence over the request's
+        SCRIPT_NAME environment parameter (#20169).
         """
         with override_settings(FORCE_SCRIPT_NAME='/FORCED_PREFIX/'):
             request = WSGIRequest({
@@ -149,9 +147,8 @@ class RequestsTests(SimpleTestCase):
 
     def test_wsgirequest_path_with_force_script_name_trailing_slash(self):
         """
-        Ensure that the request's path is correctly assembled, regardless of
-        whether or not the FORCE_SCRIPT_NAME setting has a trailing slash.
-        Refs #20169.
+        The request's path is correctly assembled, regardless of whether or not
+        the FORCE_SCRIPT_NAME setting has a trailing slash (#20169).
         """
         # With trailing slash
         with override_settings(FORCE_SCRIPT_NAME='/FORCED_PREFIX/'):
@@ -250,7 +247,7 @@ class RequestsTests(SimpleTestCase):
         datetime_cookie = response.cookies['datetime']
         self.assertIn(
             datetime_cookie['expires'],
-            # Slight time dependency; refs #23450
+            # assertIn accounts for slight time dependency (#23450)
             ('Sat, 01-Jan-2028 04:05:06 GMT', 'Sat, 01-Jan-2028 04:05:07 GMT')
         )
 
@@ -536,6 +533,25 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request.read(13), b'--boundary\r\nC')
         self.assertEqual(request.POST, {'name': ['value']})
 
+    def test_POST_immutable_for_mutipart(self):
+        """
+        MultiPartParser.parse() leaves request.POST immutable.
+        """
+        payload = FakePayload("\r\n".join([
+            '--boundary',
+            'Content-Disposition: form-data; name="name"',
+            '',
+            'value',
+            '--boundary--',
+        ]))
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
+        self.assertFalse(request.POST._mutable)
+
     def test_POST_connection_error(self):
         """
         If wsgi.input.read() raises an exception while trying to read() the
@@ -565,6 +581,16 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request.POST, {'name': ['Hello Günter']})
         request.encoding = 'iso-8859-16'
         self.assertEqual(request.POST, {'name': ['Hello GĂŒnter']})
+
+    def test_set_encoding_clears_GET(self):
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'GET',
+            'wsgi.input': '',
+            'QUERY_STRING': b'name=Hello%20G%C3%BCnter' if six.PY2 else 'name=Hello%20G%C3%BCnter'
+        })
+        self.assertEqual(request.GET, {'name': ['Hello Günter']})
+        request.encoding = 'iso-8859-16'
+        self.assertEqual(request.GET, {'name': ['Hello G\u0102\u0152nter']})
 
     def test_FILES_connection_error(self):
         """
@@ -779,21 +805,22 @@ class HostValidationTests(SimpleTestCase):
         self.assertEqual(request.get_port(), '8080')
 
     @override_settings(DEBUG=True, ALLOWED_HOSTS=[])
-    def test_host_validation_disabled_in_debug_mode(self):
-        """If ALLOWED_HOSTS is empty and DEBUG is True, all hosts pass."""
-        request = HttpRequest()
-        request.META = {
-            'HTTP_HOST': 'example.com',
-        }
-        self.assertEqual(request.get_host(), 'example.com')
+    def test_host_validation_in_debug_mode(self):
+        """
+        If ALLOWED_HOSTS is empty and DEBUG is True, variants of localhost are
+        allowed.
+        """
+        valid_hosts = ['localhost', '127.0.0.1', '[::1]']
+        for host in valid_hosts:
+            request = HttpRequest()
+            request.META = {'HTTP_HOST': host}
+            self.assertEqual(request.get_host(), host)
 
-        # Invalid hostnames would normally raise a SuspiciousOperation,
-        # but we have DEBUG=True, so this check is disabled.
-        request = HttpRequest()
-        request.META = {
-            'HTTP_HOST': "invalid_hostname.com",
-        }
-        self.assertEqual(request.get_host(), "invalid_hostname.com")
+        # Other hostnames raise a SuspiciousOperation.
+        with self.assertRaises(SuspiciousOperation):
+            request = HttpRequest()
+            request.META = {'HTTP_HOST': 'example.com'}
+            request.get_host()
 
     @override_settings(ALLOWED_HOSTS=[])
     def test_get_host_suggestion_of_allowed_host(self):
@@ -835,6 +862,11 @@ class HostValidationTests(SimpleTestCase):
         with self.assertRaisesMessage(SuspiciousOperation, msg_suggestion2 % "invalid_hostname.com"):
             request.get_host()
 
+    def test_split_domain_port_removes_trailing_dot(self):
+        domain, port = split_domain_port('example.com.:8080')
+        self.assertEqual(domain, 'example.com')
+        self.assertEqual(port, '8080')
+
 
 class BuildAbsoluteURITestCase(SimpleTestCase):
     """
@@ -846,8 +878,8 @@ class BuildAbsoluteURITestCase(SimpleTestCase):
 
     def test_build_absolute_uri_no_location(self):
         """
-        Ensures that ``request.build_absolute_uri()`` returns the proper value
-        when the ``location`` argument is not provided, and ``request.path``
+        ``request.build_absolute_uri()`` returns the proper value when
+        the ``location`` argument is not provided, and ``request.path``
         begins with //.
         """
         # //// is needed to create a request with a path beginning with //
@@ -859,9 +891,9 @@ class BuildAbsoluteURITestCase(SimpleTestCase):
 
     def test_build_absolute_uri_absolute_location(self):
         """
-        Ensures that ``request.build_absolute_uri()`` returns the proper value
-        when an absolute URL ``location`` argument is provided, and
-        ``request.path`` begins with //.
+        ``request.build_absolute_uri()`` returns the proper value when
+        an absolute URL ``location`` argument is provided, and ``request.path``
+        begins with //.
         """
         # //// is needed to create a request with a path beginning with //
         request = self.factory.get('////absolute-uri')
@@ -872,8 +904,8 @@ class BuildAbsoluteURITestCase(SimpleTestCase):
 
     def test_build_absolute_uri_schema_relative_location(self):
         """
-        Ensures that ``request.build_absolute_uri()`` returns the proper value
-        when a schema-relative URL ``location`` argument is provided, and
+        ``request.build_absolute_uri()`` returns the proper value when
+        a schema-relative URL ``location`` argument is provided, and
         ``request.path`` begins with //.
         """
         # //// is needed to create a request with a path beginning with //
@@ -885,9 +917,9 @@ class BuildAbsoluteURITestCase(SimpleTestCase):
 
     def test_build_absolute_uri_relative_location(self):
         """
-        Ensures that ``request.build_absolute_uri()`` returns the proper value
-        when a relative URL ``location`` argument is provided, and
-        ``request.path`` begins with //.
+        ``request.build_absolute_uri()`` returns the proper value when
+        a relative URL ``location`` argument is provided, and ``request.path``
+        begins with //.
         """
         # //// is needed to create a request with a path beginning with //
         request = self.factory.get('////absolute-uri')

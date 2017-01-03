@@ -68,9 +68,15 @@ Adds a few conveniences for perfectionists:
 
 * Sets the ``Content-Length`` header for non-streaming responses.
 
-.. versionchanged: 1.11
+.. versionchanged:: 1.11
 
     Older versions didn't set the ``Content-Length`` header.
+
+.. deprecated:: 1.11
+
+    The :setting:`USE_ETAGS` setting is deprecated in favor of using
+    :class:`~django.middleware.http.ConditionalGetMiddleware` for ETag
+    processing.
 
 .. attribute:: CommonMiddleware.response_redirect_class
 
@@ -149,6 +155,9 @@ It will NOT compress content if any of the following are true:
 * The request (the browser) hasn't sent an ``Accept-Encoding`` header
   containing ``gzip``.
 
+If the response has an ``ETag`` header, the ETag is made weak to comply with
+:rfc:`7232#section-2.1`.
+
 You can apply GZip compression to individual views using the
 :func:`~django.views.decorators.gzip.gzip_page()` decorator.
 
@@ -166,12 +175,16 @@ Conditional GET middleware
 
 .. class:: ConditionalGetMiddleware
 
-Handles conditional GET operations. If the response has a ``ETag`` or
+Handles conditional GET operations. If the response doesn't have an ``ETag``
+header, the middleware adds one if needed. If the response has a ``ETag`` or
 ``Last-Modified`` header, and the request has ``If-None-Match`` or
 ``If-Modified-Since``, the response is replaced by an
 :class:`~django.http.HttpResponseNotModified`.
 
-Also sets the ``Date`` and ``Content-Length`` response-headers.
+.. versionchanged:: 1.11
+
+    In older versions, the middleware set the ``Content-Length`` and ``Date``
+    headers and didn't set the ``ETag`` header.
 
 Locale middleware
 -----------------
@@ -498,6 +511,9 @@ Here are some hints about the ordering of various Django middleware classes:
 
    Before any view middleware that assumes that CSRF attacks have been dealt
    with.
+
+   It must come after ``SessionMiddleware`` if you're using
+   :setting:`CSRF_USE_SESSIONS`.
 
 #. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
 

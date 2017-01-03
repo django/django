@@ -57,33 +57,21 @@ class LiveServerAddress(LiveServerBase):
 
 class LiveServerViews(LiveServerBase):
     def test_404(self):
-        """
-        Ensure that the LiveServerTestCase serves 404s.
-        Refs #2879.
-        """
         with self.assertRaises(HTTPError) as err:
             self.urlopen('/')
         self.assertEqual(err.exception.code, 404, 'Expected 404 response')
 
     def test_view(self):
-        """
-        Ensure that the LiveServerTestCase serves views.
-        Refs #2879.
-        """
         with contextlib.closing(self.urlopen('/example_view/')) as f:
             self.assertEqual(f.read(), b'example view')
 
     def test_static_files(self):
-        """
-        Ensure that the LiveServerTestCase serves static files.
-        Refs #2879.
-        """
         with contextlib.closing(self.urlopen('/static/example_static_file.txt')) as f:
             self.assertEqual(f.read().rstrip(b'\r\n'), b'example static file')
 
     def test_no_collectstatic_emulation(self):
         """
-        Test that LiveServerTestCase reports a 404 status code when HTTP client
+        LiveServerTestCase reports a 404 status code when HTTP client
         tries to access a static file that isn't explicitly put under
         STATIC_ROOT.
         """
@@ -92,10 +80,6 @@ class LiveServerViews(LiveServerBase):
         self.assertEqual(err.exception.code, 404, 'Expected 404 response')
 
     def test_media_files(self):
-        """
-        Ensure that the LiveServerTestCase serves media files.
-        Refs #2879.
-        """
         with contextlib.closing(self.urlopen('/media/example_media_file.txt')) as f:
             self.assertEqual(f.read().rstrip(b'\r\n'), b'example media file')
 
@@ -108,17 +92,14 @@ class LiveServerDatabase(LiveServerBase):
 
     def test_fixtures_loaded(self):
         """
-        Ensure that fixtures are properly loaded and visible to the
-        live server thread.
-        Refs #2879.
+        Fixtures are properly loaded and visible to the live server thread.
         """
         with contextlib.closing(self.urlopen('/model_view/')) as f:
             self.assertEqual(f.read().splitlines(), [b'jane', b'robert'])
 
     def test_database_writes(self):
         """
-        Ensure that data written to the database by a view can be read.
-        Refs #2879.
+        Data written to the database by a view can be read.
         """
         self.urlopen('/create_model_instance/')
         self.assertQuerysetEqual(

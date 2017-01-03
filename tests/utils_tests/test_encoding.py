@@ -16,7 +16,7 @@ from django.utils.http import urlquote_plus
 class TestEncodingUtils(unittest.TestCase):
     def test_force_text_exception(self):
         """
-        Check that broken __unicode__/__str__ actually raises an error.
+        Broken __unicode__/__str__ actually raises an error.
         """
         class MyString(object):
             def __str__(self):
@@ -36,7 +36,7 @@ class TestEncodingUtils(unittest.TestCase):
 
     def test_force_bytes_exception(self):
         """
-        Test that force_bytes knows how to convert to bytes an exception
+        force_bytes knows how to convert to bytes an exception
         containing non-ASCII characters in its args.
         """
         error_msg = "This is an exception, voilà"

@@ -217,7 +217,7 @@ class CharFieldTests(TestCase):
             field = models.CharField(unique=True, max_length=256)
 
         field = Model._meta.get_field('field')
-        validator = DatabaseValidation(connection=None)
+        validator = DatabaseValidation(connection=connection)
         errors = validator.check_field(field)
         expected = [
             Error(
@@ -431,6 +431,12 @@ class DecimalFieldTests(SimpleTestCase):
 @isolate_apps('invalid_models_tests')
 class FileFieldTests(SimpleTestCase):
 
+    def test_valid_default_case(self):
+        class Model(models.Model):
+            field = models.FileField()
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
     def test_valid_case(self):
         class Model(models.Model):
             field = models.FileField(upload_to='somewhere')
@@ -438,21 +444,6 @@ class FileFieldTests(SimpleTestCase):
         field = Model._meta.get_field('field')
         errors = field.check()
         expected = []
-        self.assertEqual(errors, expected)
-
-    def test_unique(self):
-        class Model(models.Model):
-            field = models.FileField(unique=False, upload_to='somewhere')
-
-        field = Model._meta.get_field('field')
-        errors = field.check()
-        expected = [
-            Error(
-                "'unique' is not a valid argument for a FileField.",
-                obj=field,
-                id='fields.E200',
-            )
-        ]
         self.assertEqual(errors, expected)
 
     def test_primary_key(self):
@@ -469,6 +460,31 @@ class FileFieldTests(SimpleTestCase):
             )
         ]
         self.assertEqual(errors, expected)
+
+    def test_upload_to_starts_with_slash(self):
+        class Model(models.Model):
+            field = models.FileField(upload_to='/somewhere')
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(), [
+            Error(
+                "FileField's 'upload_to' argument must be a relative path, not "
+                "an absolute path.",
+                obj=field,
+                id='fields.E202',
+                hint='Remove the leading slash.',
+            )
+        ])
+
+    def test_upload_to_callable_not_checked(self):
+        def callable(instance, filename):
+            return '/' + filename
+
+        class Model(models.Model):
+            field = models.FileField(upload_to=callable)
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(), [])
 
 
 @isolate_apps('invalid_models_tests')

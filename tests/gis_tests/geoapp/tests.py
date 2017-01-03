@@ -6,8 +6,8 @@ import tempfile
 from django.contrib.gis import gdal
 from django.contrib.gis.db.models import Extent, MakeLine, Union
 from django.contrib.gis.geos import (
-    GeometryCollection, GEOSGeometry, LinearRing, LineString, Point, Polygon,
-    fromstr,
+    GeometryCollection, GEOSGeometry, LinearRing, LineString, MultiLineString,
+    MultiPoint, MultiPolygon, Point, Polygon, fromstr,
 )
 from django.core.management import call_command
 from django.db import connection
@@ -15,7 +15,7 @@ from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from ..utils import no_oracle, oracle, postgis, skipUnlessGISLookup, spatialite
+from ..utils import oracle, postgis, skipUnlessGISLookup, spatialite
 from .models import (
     City, Country, Feature, MinusOneSRID, NonConcreteModel, PennsylvaniaCity,
     State, Track,
@@ -63,9 +63,9 @@ class GeoModelTest(TestCase):
         nullcity.point.x = 23
         nullcity.point.y = 5
         # Checking assignments pre & post-save.
-        self.assertNotEqual(Point(23, 5), City.objects.get(name='NullCity').point)
+        self.assertNotEqual(Point(23, 5, srid=4326), City.objects.get(name='NullCity').point)
         nullcity.save()
-        self.assertEqual(Point(23, 5), City.objects.get(name='NullCity').point)
+        self.assertEqual(Point(23, 5, srid=4326), City.objects.get(name='NullCity').point)
         nullcity.delete()
 
         # Testing on a Polygon
@@ -103,35 +103,19 @@ class GeoModelTest(TestCase):
         # San Antonio in 'WGS84' (SRID 4326)
         sa_4326 = 'POINT (-98.493183 29.424170)'
         wgs_pnt = fromstr(sa_4326, srid=4326)  # Our reference point in WGS84
-
-        # Oracle doesn't have SRID 3084, using 41157.
-        if oracle:
-            # San Antonio in 'Texas 4205, Southern Zone (1983, meters)' (SRID 41157)
-            # Used the following Oracle SQL to get this value:
-            #  SELECT SDO_UTIL.TO_WKTGEOMETRY(
-            #    SDO_CS.TRANSFORM(SDO_GEOMETRY('POINT (-98.493183 29.424170)', 4326), 41157))
-            #  )
-            #  FROM DUAL;
-            nad_wkt = 'POINT (300662.034646583 5416427.45974934)'
-            nad_srid = 41157
-        else:
-            # San Antonio in 'NAD83(HARN) / Texas Centric Lambert Conformal' (SRID 3084)
-            # Used ogr.py in gdal 1.4.1 for this transform
-            nad_wkt = 'POINT (1645978.362408288754523 6276356.025927528738976)'
-            nad_srid = 3084
-
+        # San Antonio in 'WGS 84 / Pseudo-Mercator' (SRID 3857)
+        other_srid_pnt = wgs_pnt.transform(3857, clone=True)
         # Constructing & querying with a point from a different SRID. Oracle
         # `SDO_OVERLAPBDYINTERSECT` operates differently from
         # `ST_Intersects`, so contains is used instead.
-        nad_pnt = fromstr(nad_wkt, srid=nad_srid)
         if oracle:
-            tx = Country.objects.get(mpoly__contains=nad_pnt)
+            tx = Country.objects.get(mpoly__contains=other_srid_pnt)
         else:
-            tx = Country.objects.get(mpoly__intersects=nad_pnt)
+            tx = Country.objects.get(mpoly__intersects=other_srid_pnt)
         self.assertEqual('Texas', tx.name)
 
         # Creating San Antonio.  Remember the Alamo.
-        sa = City.objects.create(name='San Antonio', point=nad_pnt)
+        sa = City.objects.create(name='San Antonio', point=other_srid_pnt)
 
         # Now verifying that San Antonio was transformed correctly
         sa = City.objects.get(name='San Antonio')
@@ -215,6 +199,29 @@ class GeoModelTest(TestCase):
             call_command('loaddata', tmp.name, verbosity=0)
         self.assertListEqual(original_data, list(City.objects.all().order_by('name')))
 
+    @skipUnlessDBFeature("supports_empty_geometries")
+    def test_empty_geometries(self):
+        geometry_classes = [
+            Point,
+            LineString,
+            LinearRing,
+            Polygon,
+            MultiPoint,
+            MultiLineString,
+            MultiPolygon,
+            GeometryCollection,
+        ]
+        for klass in geometry_classes:
+            g = klass(srid=4326)
+            feature = Feature.objects.create(name='Empty %s' % klass.__name__, geom=g)
+            feature.refresh_from_db()
+            if klass is LinearRing:
+                # LinearRing isn't representable in WKB, so GEOSGeomtry.wkb
+                # uses LineString instead.
+                g = LineString(srid=4326)
+            self.assertEqual(feature.geom, g)
+            self.assertEqual(feature.geom.srid, g.srid)
+
 
 @skipUnlessDBFeature("gis_enabled")
 class GeoLookupTest(TestCase):
@@ -295,8 +302,14 @@ class GeoLookupTest(TestCase):
     def test_isvalid_lookup(self):
         invalid_geom = fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))')
         State.objects.create(name='invalid', poly=invalid_geom)
-        self.assertEqual(State.objects.filter(poly__isvalid=False).count(), 1)
-        self.assertEqual(State.objects.filter(poly__isvalid=True).count(), State.objects.count() - 1)
+        qs = State.objects.all()
+        if oracle:
+            # Kansas has adjacent vertices with distance 6.99244813842e-12
+            # which is smaller than the default Oracle tolerance.
+            qs = qs.exclude(name='Kansas')
+            self.assertEqual(State.objects.filter(name='Kansas', poly__isvalid=False).count(), 1)
+        self.assertEqual(qs.filter(poly__isvalid=False).count(), 1)
+        self.assertEqual(qs.filter(poly__isvalid=True).count(), qs.count() - 1)
 
     @skipUnlessDBFeature("supports_left_right_lookups")
     def test_left_right_lookups(self):
@@ -479,8 +492,11 @@ class GeoQuerySetTest(TestCase):
                 # SpatiaLite).
                 pass
             else:
-                self.assertEqual(c.mpoly.difference(geom), c.difference)
-                if not spatialite:
+                if spatialite:
+                    # Spatialite `difference` doesn't have an SRID
+                    self.assertEqual(c.mpoly.difference(geom).wkt, c.difference.wkt)
+                else:
+                    self.assertEqual(c.mpoly.difference(geom), c.difference)
                     self.assertEqual(c.mpoly.intersection(geom), c.intersection)
                 # Ordering might differ in collections
                 self.assertSetEqual(set(g.wkt for g in c.mpoly.sym_difference(geom)),
@@ -848,19 +864,14 @@ class GeoQuerySetTest(TestCase):
                         self.assertAlmostEqual(c1[0] + xfac, c2[0], 5)
                         self.assertAlmostEqual(c1[1] + yfac, c2[1], 5)
 
-    # TODO: Oracle can be made to pass if
-    # union1 = union2 = fromstr('POINT (-97.5211570000000023 34.4646419999999978)')
-    # but this seems unexpected and should be investigated to determine the cause.
-    @skipUnlessDBFeature("has_unionagg_method")
-    @no_oracle
+    @skipUnlessDBFeature('supports_union_aggr')
     def test_unionagg(self):
         """
         Testing the `Union` aggregate.
         """
         tx = Country.objects.get(name='Texas').mpoly
         # Houston, Dallas -- Ordering may differ depending on backend or GEOS version.
-        union1 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
-        union2 = fromstr('MULTIPOINT(-95.363151 29.763374,-96.801611 32.782057)')
+        union = GEOSGeometry('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
         qs = City.objects.filter(point__within=tx)
         with self.assertRaises(ValueError):
             qs.aggregate(Union('name'))
@@ -869,15 +880,14 @@ class GeoQuerySetTest(TestCase):
         # an aggregate method on a spatial column)
         u1 = qs.aggregate(Union('point'))['point__union']
         u2 = qs.order_by('name').aggregate(Union('point'))['point__union']
-        tol = 0.00001
-        self.assertTrue(union1.equals_exact(u1, tol) or union2.equals_exact(u1, tol))
-        self.assertTrue(union1.equals_exact(u2, tol) or union2.equals_exact(u2, tol))
+        self.assertTrue(union.equals(u1))
+        self.assertTrue(union.equals(u2))
         qs = City.objects.filter(name='NotACity')
         self.assertIsNone(qs.aggregate(Union('point'))['point__union'])
 
     def test_within_subquery(self):
         """
-        Test that using a queryset inside a geo lookup is working (using a subquery)
+        Using a queryset inside a geo lookup is working (using a subquery)
         (#14483).
         """
         tex_cities = City.objects.filter(

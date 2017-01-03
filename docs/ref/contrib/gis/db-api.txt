@@ -28,7 +28,7 @@ MySQL Spatial Limitations
 MySQL's spatial extensions only support bounding box operations
 (what MySQL calls minimum bounding rectangles, or MBR).  Specifically,
 `MySQL does not conform to the OGC standard
-<https://dev.mysql.com/doc/refman/5.6/en/spatial-relation-functions.html>`_:
+<https://dev.mysql.com/doc/refman/en/spatial-relation-functions.html>`_:
 
     Currently, MySQL does not implement these functions
     [``Contains``, ``Crosses``, ``Disjoint``, ``Intersects``, ``Overlaps``,
@@ -347,7 +347,7 @@ Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite 
 :lookup:`equals`                   X          X         X            X          C
 :lookup:`exact`                    X          X         X            X          B
 :lookup:`intersects`               X          X         X            X          B
-:lookup:`isvalid`                  X
+:lookup:`isvalid`                  X          X                      X (LWGEOM)
 :lookup:`overlaps`                 X          X         X            X          B
 :lookup:`relate`                   X          X                      X          C
 :lookup:`same_as`                  X          X         X            X          B
@@ -374,38 +374,38 @@ Database functions
 The following table provides a summary of what geography-specific database
 functions are available on each spatial backend.
 
-====================================  =======  ======  ===========  ==========
-Function                              PostGIS  Oracle  MySQL        SpatiaLite
-====================================  =======  ======  ===========  ==========
-:class:`Area`                         X        X       X            X
-:class:`AsGeoJSON`                    X                             X
-:class:`AsGML`                        X        X                    X
-:class:`AsKML`                        X                             X
-:class:`AsSVG`                        X                             X
-:class:`BoundingCircle`               X
-:class:`Centroid`                     X        X       X            X
-:class:`Difference`                   X        X       X (≥ 5.6.1)  X
-:class:`Distance`                     X        X       X (≥ 5.6.1)  X
-:class:`Envelope`                     X                X            X
+====================================  =======  ==============  ===========  ==========
+Function                              PostGIS  Oracle          MySQL        SpatiaLite
+====================================  =======  ==============  ===========  ==========
+:class:`Area`                         X        X               X            X
+:class:`AsGeoJSON`                    X                                     X
+:class:`AsGML`                        X        X                            X
+:class:`AsKML`                        X                                     X
+:class:`AsSVG`                        X                                     X
+:class:`BoundingCircle`               X        X (≥ 12.1.0.2)
+:class:`Centroid`                     X        X               X            X
+:class:`Difference`                   X        X               X (≥ 5.6.1)  X
+:class:`Distance`                     X        X               X (≥ 5.6.1)  X
+:class:`Envelope`                     X                        X            X
 :class:`ForceRHR`                     X
-:class:`GeoHash`                      X                             X (LWGEOM)
-:class:`Intersection`                 X        X       X (≥ 5.6.1)  X
-:class:`IsValid`                      X
-:class:`Length`                       X        X       X            X
-:class:`MakeValid`                    X
+:class:`GeoHash`                      X                                     X (LWGEOM)
+:class:`Intersection`                 X        X               X (≥ 5.6.1)  X
+:class:`IsValid`                      X        X                            X (LWGEOM)
+:class:`Length`                       X        X               X            X
+:class:`MakeValid`                    X                                     X (LWGEOM)
 :class:`MemSize`                      X
-:class:`NumGeometries`                X        X       X            X
-:class:`NumPoints`                    X        X       X            X
-:class:`Perimeter`                    X        X                    X
-:class:`PointOnSurface`               X        X                    X
-:class:`Reverse`                      X        X                    X
-:class:`Scale`                        X                             X
-:class:`SnapToGrid`                   X                             X
-:class:`SymDifference`                X        X       X (≥ 5.6.1)  X
-:class:`Transform`                    X        X                    X
-:class:`Translate`                    X                             X
-:class:`Union`                        X        X       X (≥ 5.6.1)  X
-====================================  =======  ======  ===========  ==========
+:class:`NumGeometries`                X        X               X            X
+:class:`NumPoints`                    X        X               X            X
+:class:`Perimeter`                    X        X                            X
+:class:`PointOnSurface`               X        X                            X
+:class:`Reverse`                      X        X                            X
+:class:`Scale`                        X                                     X
+:class:`SnapToGrid`                   X                                     X
+:class:`SymDifference`                X        X               X (≥ 5.6.1)  X
+:class:`Transform`                    X        X                            X
+:class:`Translate`                    X                                     X
+:class:`Union`                        X        X               X (≥ 5.6.1)  X
+====================================  =======  ==============  ===========  ==========
 
 Aggregate Functions
 -------------------
@@ -428,10 +428,10 @@ Aggregate                PostGIS  Oracle  SpatiaLite
 
 .. rubric:: Footnotes
 .. [#fnwkt] *See* Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, Document 99-049 (May 5, 1999), at  Ch. 3.2.5, p. 3-11 (SQL Textual Representation of Geometry).
-.. [#fnewkb] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.net/docs/manual-2.1/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
+.. [#fnewkb] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
 .. [#fngeojson] *See* Howard Butler, Martin Daly, Allan Doyle, Tim Schaub, & Christopher Schmidt, `The GeoJSON Format Specification <http://geojson.org/geojson-spec.html>`_, Revision 1.0 (June 16, 2008).
-.. [#fndistsphere15] *See* `PostGIS documentation <http://postgis.net/docs/manual-2.1/ST_Distance_Sphere.html>`_ on ``ST_distance_sphere``.
-.. [#fnmysqlidx] *See* `Creating Spatial Indexes <https://dev.mysql.com/doc/refman/5.6/en/creating-spatial-indexes.html>`_
+.. [#fndistsphere15] *See* `PostGIS documentation <http://postgis.net/docs/ST_DistanceSphere.html>`_ on ``ST_DistanceSphere``.
+.. [#fnmysqlidx] *See* `Creating Spatial Indexes <https://dev.mysql.com/doc/refman/en/creating-spatial-indexes.html>`_
    in the MySQL Reference Manual:
 
         For MyISAM tables, ``SPATIAL INDEX`` creates an R-tree index. For storage

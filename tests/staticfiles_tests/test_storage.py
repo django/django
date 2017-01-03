@@ -148,7 +148,7 @@ class TestHashedFiles(object):
 
     def test_post_processing(self):
         """
-        Test that post_processing behaves correctly.
+        post_processing behaves correctly.
 
         Files that are alterable should always be post-processed; files that
         aren't should be skipped.
@@ -188,8 +188,7 @@ class TestHashedFiles(object):
     )
     def test_post_processing_failure(self):
         """
-        Test that post_processing indicates the origin of the error when it
-        fails. Regression test for #18986.
+        post_processing indicates the origin of the error when it fails.
         """
         finders.get_finder.cache_clear()
         err = six.StringIO()

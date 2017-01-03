@@ -8,6 +8,7 @@ from django.test.utils import get_runner
 class Command(BaseCommand):
     help = 'Discover and run tests in the specified modules or the current directory.'
 
+    # DiscoverRunner runs the checks after databases are set up.
     requires_system_checks = False
 
     def __init__(self):
@@ -61,4 +62,4 @@ class Command(BaseCommand):
         failures = test_runner.run_tests(test_labels)
 
         if failures:
-            sys.exit(bool(failures))
+            sys.exit(1)

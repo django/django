@@ -306,11 +306,15 @@ you try to save a model with a duplicate value in a :attr:`~Field.unique`
 field, a :exc:`django.db.IntegrityError` will be raised by the model's
 :meth:`~django.db.models.Model.save` method.
 
-This option is valid on all field types except :class:`ManyToManyField`,
-:class:`OneToOneField`, and :class:`FileField`.
+This option is valid on all field types except :class:`ManyToManyField` and
+:class:`OneToOneField`.
 
 Note that when ``unique`` is ``True``, you don't need to specify
 :attr:`~Field.db_index`, because ``unique`` implies the creation of an index.
+
+.. versionchanged:: 1.11
+
+    In older versions, ``unique=True`` can't be used on :class:`FileField`.
 
 ``unique_for_date``
 -------------------
@@ -628,8 +632,8 @@ uses :class:`~django.core.validators.EmailValidator` to validate the input.
 A file-upload field.
 
 .. note::
-    The ``primary_key`` and ``unique`` arguments are not supported, and will
-    raise a ``TypeError`` if used.
+    The ``primary_key`` argument isn't supported and will raise a an error if
+    used.
 
 Has two optional arguments:
 
@@ -1420,7 +1424,8 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 .. attribute:: ForeignKey.to_field
 
     The field on the related object that the relation is to. By default, Django
-    uses the primary key of the related object.
+    uses the primary key of the related object. If you reference a different
+    field, that field must have ``unique=True``.
 
 .. attribute:: ForeignKey.db_constraint
 
@@ -2002,6 +2007,5 @@ have boolean values (rather than ``None``) if the field is a relation type
 .. attribute:: Field.related_model
 
     Points to the model the field relates to. For example, ``Author`` in
-    ``ForeignKey(Author, on_delete=models.CASCADE)``. If a field has a generic
-    relation (such as a ``GenericForeignKey`` or a ``GenericRelation``) then
-    ``related_model`` will be ``None``.
+    ``ForeignKey(Author, on_delete=models.CASCADE)``. The ``related_model`` for
+    a ``GenericForeignKey`` is always ``None``.

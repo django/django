@@ -2,6 +2,8 @@ from django import db
 from django.contrib import auth
 from django.utils.encoding import force_bytes
 
+UserModel = auth.get_user_model()
+
 
 def check_password(environ, username, password):
     """
@@ -11,7 +13,6 @@ def check_password(environ, username, password):
     on whether the user exists and authenticates.
     """
 
-    UserModel = auth.get_user_model()
     # db connection state is managed similarly to the wsgi handler
     # as mod_wsgi may call these functions outside of a request/response cycle
     db.reset_queries()
@@ -33,7 +34,6 @@ def groups_for_user(environ, username):
     Authorizes a user based on groups
     """
 
-    UserModel = auth.get_user_model()
     db.reset_queries()
 
     try:

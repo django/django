@@ -847,6 +847,26 @@ loaders that come with Django:
             'DIRS': [os.path.join(BASE_DIR, 'templates')],
         }]
 
+    You can also override ``'DIRS'`` and specify specific directories for a
+    particular filesystem loader::
+
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'OPTIONS': {
+                'loaders': [
+                    (
+                        'django.template.loaders.filesystem.Loader',
+                        [os.path.join(BASE_DIR, 'templates')],
+                    ),
+                ],
+            },
+        }]
+
+    .. versionchanged:: 1.11
+
+        The ability to specify directories for a particular filesystem loader
+        was added.
+
 ``django.template.loaders.app_directories.Loader``
 
 .. class:: app_directories.Loader

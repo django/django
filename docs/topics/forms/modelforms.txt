@@ -337,7 +337,8 @@ doesn't validate -- i.e., if ``form.errors`` evaluates to ``True``.
 If an optional field doesn't appear in the form's data, the resulting model
 instance uses the model field :attr:`~django.db.models.Field.default`, if
 there is one, for that field. This behavior doesn't apply to fields that use
-:class:`~django.forms.CheckboxInput` (or any custom widget whose
+:class:`~django.forms.CheckboxInput` and
+:class:`~django.forms.CheckboxSelectMultiple` (or any custom widget whose
 :meth:`~django.forms.Widget.value_omitted_from_data` method always returns
 ``False``) since an unchecked checkbox doesn't appear in the data of an HTML
 form submission. Use a custom form field or widget if you're designing an API

@@ -47,7 +47,7 @@ uWSGI model
 -----------
 
 uWSGI operates on a client-server model. Your Web server (e.g., nginx, Apache)
-communicates with a django-uwsgi "worker" process to serve dynamic content.
+communicates with a `django-uwsgi` "worker" process to serve dynamic content.
 See uWSGI's `background documentation`_ for more detail.
 
 .. _background documentation: https://projects.unbit.it/uwsgi/wiki/Background

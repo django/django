@@ -3,9 +3,9 @@
 # Translators:
 # André Hagenbruch, 2011
 # Florian Apolloner <florian@apolloner.eu>, 2012
-# Jannis Vajen, 2013
+# Jannis, 2013
 # Jannis Leidel <jannis@leidel.info>, 2013-2016
-# Jannis Vajen, 2016
+# Jannis, 2016
 # Jens Neuhaus <kontakt@jensneuhaus.de>, 2016
 # Markus Holtermann <inyoka@markusholtermann.eu>, 2013,2015
 msgid ""

@@ -1,0 +1,13 @@
+===========================
+Django 1.9.13 release notes
+===========================
+
+*Under development*
+
+Django 1.9.13 fixes a bug in 1.9.12.
+
+Bugfixes
+========
+
+* Fixed a regression in the ``timesince`` and ``timeuntil`` filters that caused
+  incorrect results for dates in a leap year (:ticket:`27637`).

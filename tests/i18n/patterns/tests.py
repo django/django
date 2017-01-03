@@ -111,8 +111,8 @@ class RequestURLConfTests(SimpleTestCase):
 @override_settings(ROOT_URLCONF='i18n.patterns.urls.path_unused')
 class PathUnusedTests(URLTestCaseBase):
     """
-    Check that if no i18n_patterns is used in root URLconfs, then no
-    language activation happens based on url prefix.
+    If no i18n_patterns is used in root URLconfs, then no language activation
+    activation happens based on url prefix.
     """
 
     def test_no_lang_activate(self):
@@ -235,8 +235,7 @@ class URLRedirectTests(URLTestCaseBase):
 
 class URLVaryAcceptLanguageTests(URLTestCaseBase):
     """
-    Tests that 'Accept-Language' is not added to the Vary header when using
-    prefixed URLs.
+    'Accept-Language' is not added to the Vary header when using prefixed URLs.
     """
     def test_no_prefix_response(self):
         response = self.client.get('/not-prefixed/')

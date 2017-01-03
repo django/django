@@ -27,8 +27,7 @@ class JoinTests(SimpleTestCase):
         output = self.engine.render_to_string('join04', {'a': ['alpha', 'beta & me']})
         self.assertEqual(output, 'alpha &amp; beta & me')
 
-    # #11377 Test that joining with unsafe joiners doesn't result in
-    # unsafe strings
+    # Joining with unsafe joiners doesn't result in unsafe strings.
     @setup({'join05': '{{ a|join:var }}'})
     def test_join05(self):
         output = self.engine.render_to_string('join05', {'a': ['alpha', 'beta & me'], 'var': ' & '})

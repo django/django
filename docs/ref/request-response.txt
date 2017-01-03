@@ -252,7 +252,7 @@ Methods
         behind multiple proxies. One solution is to use middleware to rewrite
         the proxy headers, as in the following example::
 
-            from django.django.utils.deprecation import MiddlewareMixin
+            from django.utils.deprecation import MiddlewareMixin
 
             class MultipleProxyMiddleware(MiddlewareMixin):
                 FORWARDED_FOR_FIELDS = [
@@ -305,7 +305,7 @@ Methods
         Mixing HTTP and HTTPS on the same site is discouraged, therefore
         :meth:`~HttpRequest.build_absolute_uri()` will always generate an
         absolute URI with the same scheme the current request has. If you need
-        to redirect users to HTTPS, it's best to let your webserver redirect
+        to redirect users to HTTPS, it's best to let your Web server redirect
         all HTTP traffic to HTTPS.
 
 .. method:: HttpRequest.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
@@ -359,7 +359,7 @@ Methods
     If a response varies on whether or not it's requested via AJAX and you are
     using some form of caching like Django's :mod:`cache middleware
     <django.middleware.cache>`, you should decorate the view with
-    :func:`vary_on_headers('HTTP_X_REQUESTED_WITH')
+    :func:`vary_on_headers('X-Requested-With')
     <django.views.decorators.vary.vary_on_headers>` so that the responses are
     properly cached.
 
@@ -490,10 +490,14 @@ a subclass of dictionary. Exceptions are outlined here:
     :meth:`QueryDict.items()` this uses the same last-value logic as
     :meth:`QueryDict.__getitem__()`.
 
+    Available only on Python 2.
+
 .. method:: QueryDict.iterlists()
 
     Like :meth:`QueryDict.iteritems()` except it includes all values, as a list,
     for each member of the dictionary.
+
+    Available only on Python 2.
 
 .. method:: QueryDict.values()
 
@@ -507,6 +511,8 @@ a subclass of dictionary. Exceptions are outlined here:
 .. method:: QueryDict.itervalues()
 
     Just like :meth:`QueryDict.values()`, except an iterator.
+
+    Available only on Python 2.
 
 In addition, ``QueryDict`` has the following methods:
 
@@ -1035,8 +1041,8 @@ with the following notable differences:
 :class:`StreamingHttpResponse` should only be used in situations where it is
 absolutely required that the whole content isn't iterated before transferring
 the data to the client. Because the content can't be accessed, many
-middlewares can't function normally. For example the ``ETag`` and ``Content-
-Length`` headers can't be generated for streaming responses.
+middlewares can't function normally. For example the ``ETag`` and
+``Content-Length`` headers can't be generated for streaming responses.
 
 Attributes
 ----------

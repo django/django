@@ -88,6 +88,8 @@ def _password_validators_help_text_html(password_validators=None):
     help_texts = password_validators_help_texts(password_validators)
     help_items = [format_html('<li>{}</li>', help_text) for help_text in help_texts]
     return '<ul>%s</ul>' % ''.join(help_items) if help_items else ''
+
+
 password_validators_help_text_html = lazy(_password_validators_help_text_html, text_type)
 
 
@@ -145,7 +147,7 @@ class UserAttributeSimilarityValidator(object):
                 continue
             value_parts = re.split(r'\W+', value) + [value]
             for value_part in value_parts:
-                if SequenceMatcher(a=password.lower(), b=value_part.lower()).quick_ratio() > self.max_similarity:
+                if SequenceMatcher(a=password.lower(), b=value_part.lower()).quick_ratio() >= self.max_similarity:
                     try:
                         verbose_name = force_text(user._meta.get_field(attribute_name).verbose_name)
                     except FieldDoesNotExist:

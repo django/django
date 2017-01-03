@@ -54,13 +54,13 @@ class CookieTest(BaseTests, SimpleTestCase):
         # Set initial data.
         example_messages = ['test', 'me']
         set_cookie_data(storage, example_messages)
-        # Test that the message actually contains what we expect.
+        # The message actually contains what we expect.
         self.assertEqual(list(storage), example_messages)
 
     def test_cookie_setings(self):
         """
-        Ensure that CookieStorage honors SESSION_COOKIE_DOMAIN, SESSION_COOKIE_SECURE and SESSION_COOKIE_HTTPONLY
-        Refs #15618 and #20972.
+        CookieStorage honors SESSION_COOKIE_DOMAIN, SESSION_COOKIE_SECURE, and
+        SESSION_COOKIE_HTTPONLY (#15618, #20972).
         """
         # Test before the messages have been consumed
         storage = self.get_storage()
@@ -90,14 +90,13 @@ class CookieTest(BaseTests, SimpleTestCase):
         # Set initial (invalid) data.
         example_messages = ['test', 'me']
         set_cookie_data(storage, example_messages, invalid=True)
-        # Test that the message actually contains what we expect.
+        # The message actually contains what we expect.
         self.assertEqual(list(storage), [])
 
     def test_max_cookie_length(self):
         """
-        Tests that, if the data exceeds what is allowed in a cookie, older
-        messages are removed before saving (and returned by the ``update``
-        method).
+        If the data exceeds what is allowed in a cookie, older messages are
+        removed before saving (and returned by the ``update`` method).
         """
         storage = self.get_storage()
         response = self.get_response()
@@ -120,7 +119,7 @@ class CookieTest(BaseTests, SimpleTestCase):
 
     def test_json_encoder_decoder(self):
         """
-        Tests that a complex nested data structure containing Message
+        A complex nested data structure containing Message
         instances is properly encoded/decoded by the custom JSON
         encoder/decoder classes.
         """
@@ -140,7 +139,7 @@ class CookieTest(BaseTests, SimpleTestCase):
 
     def test_safedata(self):
         """
-        Tests that a message containing SafeData is keeping its safe status when
+        A message containing SafeData is keeping its safe status when
         retrieved from the message storage.
         """
         def encode_decode(data):

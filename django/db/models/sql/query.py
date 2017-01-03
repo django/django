@@ -19,7 +19,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Ref
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.query_utils import (
-    PathInfo, Q, check_rel_lookup_compatibility, refs_expression,
+    Q, check_rel_lookup_compatibility, refs_expression,
 )
 from django.db.models.sql.constants import (
     INNER, LOUTER, ORDER_DIR, ORDER_PATTERN, QUERY_TERMS, SINGLE,
@@ -86,7 +86,7 @@ class RawQuery(object):
         return iter(result)
 
     def __repr__(self):
-        return "<RawQuery: %s>" % self
+        return "<%s: %s>" % (self.__class__.__name__, self)
 
     @property
     def params_type(self):
@@ -143,6 +143,7 @@ class Query(object):
         self.standard_ordering = True
         self.used_aliases = set()
         self.filter_is_sticky = False
+        self.subquery = False
 
         # SQL-related attributes
         # Select and related select clauses are expressions to use in the
@@ -319,6 +320,7 @@ class Query(object):
         else:
             obj.used_aliases = set()
         obj.filter_is_sticky = False
+        obj.subquery = self.subquery
         if 'alias_prefix' in self.__dict__:
             obj.alias_prefix = self.alias_prefix
         if 'subq_aliases' in self.__dict__:
@@ -784,21 +786,15 @@ class Query(object):
         """
         assert set(change_map.keys()).intersection(set(change_map.values())) == set()
 
-        def relabel_column(col):
-            if isinstance(col, (list, tuple)):
-                old_alias = col[0]
-                return (change_map.get(old_alias, old_alias), col[1])
-            else:
-                return col.relabeled_clone(change_map)
         # 1. Update references in "select" (normal columns plus aliases),
         # "group by" and "where".
         self.where.relabel_aliases(change_map)
         if isinstance(self.group_by, list):
-            self.group_by = [relabel_column(col) for col in self.group_by]
+            self.group_by = [col.relabeled_clone(change_map) for col in self.group_by]
         self.select = [col.relabeled_clone(change_map) for col in self.select]
         if self._annotations:
             self._annotations = OrderedDict(
-                (key, relabel_column(col)) for key, col in self._annotations.items())
+                (key, col.relabeled_clone(change_map)) for key, col in self._annotations.items())
 
         # 2. Rename the alias in the internal table/alias datastructures.
         for old_alias, new_alias in six.iteritems(change_map):
@@ -814,10 +810,6 @@ class Query(object):
             for pos, alias in enumerate(table_aliases):
                 if alias == old_alias:
                     table_aliases[pos] = new_alias
-                    break
-            for pos, alias in enumerate(self.tables):
-                if alias == old_alias:
-                    self.tables[pos] = new_alias
                     break
         self.external_aliases = {change_map.get(alias, alias)
                                  for alias in self.external_aliases}
@@ -974,6 +966,9 @@ class Query(object):
         self.append_annotation_mask([alias])
         self.annotations[alias] = annotation
 
+    def _prepare_as_filter_value(self):
+        return self.clone()
+
     def prepare_lookup_value(self, value, lookups, can_reuse, allow_joins=True):
         # Default lookup if none given is exact.
         used_joins = []
@@ -984,8 +979,7 @@ class Query(object):
         if value is None:
             if lookups[-1] not in ('exact', 'iexact'):
                 raise ValueError("Cannot use None as a query value")
-            lookups[-1] = 'isnull'
-            value = True
+            return True, ['isnull'], used_joins
         elif hasattr(value, 'resolve_expression'):
             pre_joins = self.alias_refcount.copy()
             value = value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
@@ -1007,11 +1001,8 @@ class Query(object):
         # Subqueries need to use a different set of aliases than the
         # outer query. Call bump_prefix to change aliases of the inner
         # query (the value).
-        if hasattr(value, 'query') and hasattr(value.query, 'bump_prefix'):
-            value = value._clone()
-            value.query.bump_prefix(self)
-        if hasattr(value, 'bump_prefix'):
-            value = value.clone()
+        if hasattr(value, '_prepare_as_filter_value'):
+            value = value._prepare_as_filter_value()
             value.bump_prefix(self)
         # For Oracle '' is equivalent to null. The check needs to be done
         # at this stage because join promotion can't be done at compiler
@@ -1059,14 +1050,20 @@ class Query(object):
         Checks the type of object passed to query relations.
         """
         if field.is_relation:
-            # QuerySets implement is_compatible_query_object_type() to
-            # determine compatibility with the given field.
-            if hasattr(value, 'is_compatible_query_object_type'):
-                if not value.is_compatible_query_object_type(opts, field):
-                    raise ValueError(
-                        'Cannot use QuerySet for "%s": Use a QuerySet for "%s".' %
-                        (value.model._meta.model_name, opts.object_name)
-                    )
+            # Check that the field and the queryset use the same model in a
+            # query like .filter(author=Author.objects.all()). For example, the
+            # opts would be Author's (from the author field) and value.model
+            # would be Author.objects.all() queryset's .model (Author also).
+            # The field is the related field on the lhs side.
+            # If _forced_pk isn't set, this isn't a queryset query or values()
+            # or values_list() was specified by the developer in which case
+            # that choice is trusted.
+            if (getattr(value, '_forced_pk', False) and
+                    not check_rel_lookup_compatibility(value.model, opts, field)):
+                raise ValueError(
+                    'Cannot use QuerySet for "%s": Use a QuerySet for "%s".' %
+                    (value.model._meta.object_name, opts.object_name)
+                )
             elif hasattr(value, '_meta'):
                 self.check_query_object_type(value, opts, field)
             elif hasattr(value, '__iter__'):
@@ -1330,10 +1327,7 @@ class Query(object):
                         "querying. If it is a GenericForeignKey, consider "
                         "adding a GenericRelation." % name
                     )
-                try:
-                    model = field.model._meta.concrete_model
-                except AttributeError:
-                    model = None
+                model = field.model._meta.concrete_model
             else:
                 # We didn't find the current field, so move position back
                 # one step.
@@ -1348,21 +1342,11 @@ class Query(object):
             # field lives in parent, but we are currently in one of its
             # children)
             if model is not opts.model:
-                # The field lives on a base class of the current model.
-                # Skip the chain of proxy to the concrete proxied model
-                proxied_model = opts.concrete_model
-
-                for int_model in opts.get_base_chain(model):
-                    if int_model is proxied_model:
-                        opts = int_model._meta
-                    else:
-                        final_field = opts.parents[int_model]
-                        targets = (final_field.remote_field.get_related_field(),)
-                        opts = int_model._meta
-                        path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
-                        cur_names_with_path[1].append(
-                            PathInfo(final_field.model._meta, opts, targets, final_field, False, True)
-                        )
+                path_to_parent = opts.get_path_to_parent(model)
+                if path_to_parent:
+                    path.extend(path_to_parent)
+                    cur_names_with_path[1].extend(path_to_parent)
+                    opts = path_to_parent[-1].to_opts
             if hasattr(field, 'get_path_info'):
                 pathinfos = field.get_path_info()
                 if not allow_many:
@@ -2017,6 +2001,17 @@ class Query(object):
             return True
         else:
             return field.null
+
+    def as_subquery_filter(self, db):
+        self._db = db
+        self.subquery = True
+        # It's safe to drop ordering if the queryset isn't using slicing,
+        # distinct(*fields) or select_for_update().
+        if (self.low_mark == 0 and self.high_mark is None and
+                not self.distinct_fields and
+                not self.select_for_update):
+            self.clear_ordering(True)
+        return self
 
 
 def get_order_dir(field, default='ASC'):

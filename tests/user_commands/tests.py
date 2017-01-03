@@ -45,7 +45,7 @@ class CommandTests(SimpleTestCase):
             self.assertEqual(translation.get_language(), 'fr')
 
     def test_explode(self):
-        """ Test that an unknown command raises CommandError """
+        """ An unknown command raises CommandError """
         with self.assertRaises(CommandError):
             management.call_command(('explode',))
 
@@ -86,7 +86,7 @@ class CommandTests(SimpleTestCase):
 
     def test_discover_commands_in_eggs(self):
         """
-        Test that management commands can also be loaded from Python eggs.
+        Management commands can also be loaded from Python eggs.
         """
         egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
         egg_name = '%s/basic.egg' % egg_dir

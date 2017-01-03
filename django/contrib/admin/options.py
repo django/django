@@ -16,8 +16,9 @@ from django.contrib.admin.checks import (
 from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
-    NestedObjects, flatten_fieldsets, get_deleted_objects,
-    lookup_needs_distinct, model_format_dict, quote, unquote,
+    NestedObjects, construct_change_message, flatten_fieldsets,
+    get_deleted_objects, lookup_needs_distinct, model_format_dict, quote,
+    unquote,
 )
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import (
@@ -44,9 +45,7 @@ from django.utils.html import escape, format_html
 from django.utils.http import urlencode, urlquote
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, format_lazy, get_text_list
-from django.utils.translation import (
-    override as translation_override, ugettext as _, ungettext,
-)
+from django.utils.translation import ugettext as _, ungettext
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 
@@ -70,6 +69,7 @@ def get_ul_class(radio_style):
 
 class IncorrectLookupParameters(Exception):
     pass
+
 
 # Defaults for formfield_overrides. ModelAdmin subclasses can change this
 # by adding to ModelAdmin.formfield_overrides.
@@ -283,6 +283,12 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         except AttributeError:
             return mark_safe(self.admin_site.empty_value_display)
 
+    def get_exclude(self, request, obj=None):
+        """
+        Hook for specifying exclude.
+        """
+        return self.exclude
+
     def get_fields(self, request, obj=None):
         """
         Hook for specifying fields.
@@ -334,11 +340,11 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         # Check FKey lookups that are allowed, so that popups produced by
         # ForeignKeyRawIdWidget, on the basis of ForeignKey.limit_choices_to,
         # are allowed to work.
-        for l in model._meta.related_fkey_lookups:
+        for fk_lookup in model._meta.related_fkey_lookups:
             # As ``limit_choices_to`` can be a callable, invoke it here.
-            if callable(l):
-                l = l()
-            for k, v in widgets.url_params_from_lookup_dict(l).items():
+            if callable(fk_lookup):
+                fk_lookup = fk_lookup()
+            for k, v in widgets.url_params_from_lookup_dict(fk_lookup).items():
                 if k == lookup and v == value:
                     return True
 
@@ -503,6 +509,7 @@ class ModelAdmin(BaseModelAdmin):
     delete_confirmation_template = None
     delete_selected_confirmation_template = None
     object_history_template = None
+    popup_response_template = None
 
     # Actions
     actions = []
@@ -606,13 +613,11 @@ class ModelAdmin(BaseModelAdmin):
             fields = kwargs.pop('fields')
         else:
             fields = flatten_fieldsets(self.get_fieldsets(request, obj))
-        if self.exclude is None:
-            exclude = []
-        else:
-            exclude = list(self.exclude)
+        excluded = self.get_exclude(request, obj)
+        exclude = [] if excluded is None else list(excluded)
         readonly_fields = self.get_readonly_fields(request, obj)
         exclude.extend(readonly_fields)
-        if self.exclude is None and hasattr(self.form, '_meta') and self.form._meta.exclude:
+        if excluded is None and hasattr(self.form, '_meta') and self.form._meta.exclude:
             # Take the custom ModelForm's Meta.exclude into account only if the
             # ModelAdmin doesn't define its own.
             exclude.extend(self.form._meta.exclude)
@@ -712,7 +717,7 @@ class ModelAdmin(BaseModelAdmin):
         The default implementation creates an admin LogEntry object.
         """
         from django.contrib.admin.models import LogEntry, ADDITION
-        LogEntry.objects.log_action(
+        return LogEntry.objects.log_action(
             user_id=request.user.pk,
             content_type_id=get_content_type_for_model(object).pk,
             object_id=object.pk,
@@ -728,7 +733,7 @@ class ModelAdmin(BaseModelAdmin):
         The default implementation creates an admin LogEntry object.
         """
         from django.contrib.admin.models import LogEntry, CHANGE
-        LogEntry.objects.log_action(
+        return LogEntry.objects.log_action(
             user_id=request.user.pk,
             content_type_id=get_content_type_for_model(object).pk,
             object_id=object.pk,
@@ -745,7 +750,7 @@ class ModelAdmin(BaseModelAdmin):
         The default implementation creates an admin LogEntry object.
         """
         from django.contrib.admin.models import LogEntry, DELETION
-        LogEntry.objects.log_action(
+        return LogEntry.objects.log_action(
             user_id=request.user.pk,
             content_type_id=get_content_type_for_model(object).pk,
             object_id=object.pk,
@@ -929,44 +934,11 @@ class ModelAdmin(BaseModelAdmin):
                 return urlencode({'_changelist_filters': preserved_filters})
         return ''
 
-    @translation_override(None)
     def construct_change_message(self, request, form, formsets, add=False):
         """
         Construct a JSON structure describing changes from a changed object.
-        Translations are deactivated so that strings are stored untranslated.
-        Translation happens later on LogEntry access.
         """
-        change_message = []
-        if add:
-            change_message.append({'added': {}})
-        elif form.changed_data:
-            change_message.append({'changed': {'fields': form.changed_data}})
-
-        if formsets:
-            for formset in formsets:
-                for added_object in formset.new_objects:
-                    change_message.append({
-                        'added': {
-                            'name': force_text(added_object._meta.verbose_name),
-                            'object': force_text(added_object),
-                        }
-                    })
-                for changed_object, changed_fields in formset.changed_objects:
-                    change_message.append({
-                        'changed': {
-                            'name': force_text(changed_object._meta.verbose_name),
-                            'object': force_text(changed_object),
-                            'fields': changed_fields,
-                        }
-                    })
-                for deleted_object in formset.deleted_objects:
-                    change_message.append({
-                        'deleted': {
-                            'name': force_text(deleted_object._meta.verbose_name),
-                            'object': force_text(deleted_object),
-                        }
-                    })
-        return change_message
+        return construct_change_message(form, formsets, add)
 
     def message_user(self, request, message, level=messages.INFO, extra_tags='',
                      fail_silently=False):
@@ -1102,7 +1074,11 @@ class ModelAdmin(BaseModelAdmin):
                 'value': six.text_type(value),
                 'obj': six.text_type(obj),
             })
-            return SimpleTemplateResponse('admin/popup_response.html', {
+            return TemplateResponse(request, self.popup_response_template or [
+                'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
+                'admin/%s/popup_response.html' % opts.app_label,
+                'admin/popup_response.html',
+            ], {
                 'popup_response_data': popup_response_data,
             })
 
@@ -1148,8 +1124,9 @@ class ModelAdmin(BaseModelAdmin):
         """
 
         if IS_POPUP_VAR in request.POST:
+            opts = obj._meta
             to_field = request.POST.get(TO_FIELD_VAR)
-            attr = str(to_field) if to_field else obj._meta.pk.attname
+            attr = str(to_field) if to_field else opts.pk.attname
             # Retrieve the `object_id` from the resolved pattern arguments.
             value = request.resolver_match.args[0]
             new_value = obj.serializable_value(attr)
@@ -1159,7 +1136,11 @@ class ModelAdmin(BaseModelAdmin):
                 'obj': six.text_type(obj),
                 'new_value': six.text_type(new_value),
             })
-            return SimpleTemplateResponse('admin/popup_response.html', {
+            return TemplateResponse(request, self.popup_response_template or [
+                'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
+                'admin/%s/popup_response.html' % opts.app_label,
+                'admin/popup_response.html',
+            ], {
                 'popup_response_data': popup_response_data,
             })
 
@@ -1328,7 +1309,11 @@ class ModelAdmin(BaseModelAdmin):
                 'action': 'delete',
                 'value': str(obj_id),
             })
-            return SimpleTemplateResponse('admin/popup_response.html', {
+            return TemplateResponse(request, self.popup_response_template or [
+                'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
+                'admin/%s/popup_response.html' % opts.app_label,
+                'admin/popup_response.html',
+            ], {
                 'popup_response_data': popup_response_data,
             })
 
@@ -1590,14 +1575,19 @@ class ModelAdmin(BaseModelAdmin):
                 else:
                     action_failed = True
 
+        if action_failed:
+            # Redirect back to the changelist page to avoid resubmitting the
+            # form if the user refreshes the browser or uses the "No, take
+            # me back" button on the action confirmation page.
+            return HttpResponseRedirect(request.get_full_path())
+
         # If we're allowing changelist editing, we need to construct a formset
         # for the changelist given all the fields to be edited. Then we'll
         # use the formset to validate/process POSTed data.
         formset = cl.formset = None
 
         # Handle POSTed bulk-edit data.
-        if (request.method == "POST" and cl.list_editable and
-                '_save' in request.POST and not action_failed):
+        if request.method == 'POST' and cl.list_editable and '_save' in request.POST:
             FormSet = self.get_changelist_formset(request)
             formset = cl.formset = FormSet(request.POST, request.FILES, queryset=self.get_queryset(request))
             if formset.is_valid():
@@ -1814,7 +1804,7 @@ class ModelAdmin(BaseModelAdmin):
             }
             if request.method == 'POST':
                 formset_params.update({
-                    'data': request.POST,
+                    'data': request.POST.copy(),
                     'files': request.FILES,
                     'save_as_new': '_saveasnew' in request.POST
                 })
@@ -1885,12 +1875,10 @@ class InlineModelAdmin(BaseModelAdmin):
             fields = kwargs.pop('fields')
         else:
             fields = flatten_fieldsets(self.get_fieldsets(request, obj))
-        if self.exclude is None:
-            exclude = []
-        else:
-            exclude = list(self.exclude)
+        excluded = self.get_exclude(request, obj)
+        exclude = [] if excluded is None else list(excluded)
         exclude.extend(self.get_readonly_fields(request, obj))
-        if self.exclude is None and hasattr(self.form, '_meta') and self.form._meta.exclude:
+        if excluded is None and hasattr(self.form, '_meta') and self.form._meta.exclude:
             # Take the custom ModelForm's Meta.exclude into account only if the
             # InlineModelAdmin doesn't define its own.
             exclude.extend(self.form._meta.exclude)

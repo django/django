@@ -6,12 +6,12 @@ import uuid
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.backends.utils import truncate_name
+from django.db.backends.utils import strip_quotes, truncate_name
 from django.utils import six, timezone
 from django.utils.encoding import force_bytes, force_text
 
 from .base import Database
-from .utils import InsertIdVar, Oracle_datetime, convert_unicode
+from .utils import InsertIdVar, Oracle_datetime
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -54,8 +54,8 @@ END;
 DECLARE
     i INTEGER;
 BEGIN
-    SELECT COUNT(*) INTO i FROM USER_CATALOG
-        WHERE TABLE_NAME = '%(sq_name)s' AND TABLE_TYPE = 'SEQUENCE';
+    SELECT COUNT(1) INTO i FROM USER_SEQUENCES
+        WHERE SEQUENCE_NAME = '%(sq_name)s';
     IF i = 0 THEN
         EXECUTE IMMEDIATE 'CREATE SEQUENCE "%(sq_name)s"';
     END IF;
@@ -84,22 +84,18 @@ WHEN (new.%(col_name)s IS NULL)
         if lookup_type == 'week_day':
             # TO_CHAR(field, 'D') returns an integer from 1-7, where 1=Sunday.
             return "TO_CHAR(%s, 'D')" % field_name
+        elif lookup_type == 'week':
+            # IW = ISO week number
+            return "TO_CHAR(%s, 'IW')" % field_name
         else:
             # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions050.htm
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
     def date_interval_sql(self, timedelta):
         """
-        Implements the interval functionality for expressions
-        format for Oracle:
-        INTERVAL '3 00:03:20.000000' DAY(1) TO SECOND(6)
+        NUMTODSINTERVAL converts number to INTERVAL DAY TO SECOND literal.
         """
-        minutes, seconds = divmod(timedelta.seconds, 60)
-        hours, minutes = divmod(minutes, 60)
-        days = str(timedelta.days)
-        day_precision = len(days)
-        fmt = "INTERVAL '%s %02d:%02d:%02d.%06d' DAY(%d) TO SECOND(6)"
-        return fmt % (days, hours, minutes, seconds, timedelta.microseconds, day_precision), []
+        return "NUMTODSINTERVAL(%06f, 'SECOND')" % (timedelta.total_seconds()), []
 
     def date_trunc_sql(self, lookup_type, field_name):
         # http://docs.oracle.com/cd/B19306_01/server.102/b14200/functions230.htm#i1002084
@@ -314,10 +310,10 @@ WHEN (new.%(col_name)s IS NULL)
         return "RETURNING %s INTO %%s", (InsertIdVar(),)
 
     def savepoint_create_sql(self, sid):
-        return convert_unicode("SAVEPOINT " + self.quote_name(sid))
+        return "SAVEPOINT " + self.quote_name(sid)
 
     def savepoint_rollback_sql(self, sid):
-        return convert_unicode("ROLLBACK TO SAVEPOINT " + self.quote_name(sid))
+        return "ROLLBACK TO SAVEPOINT " + self.quote_name(sid)
 
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
         # Return a list of 'TRUNCATE x;', 'TRUNCATE y;',
@@ -446,18 +442,21 @@ WHEN (new.%(col_name)s IS NULL)
         elif connector == '&':
             return 'BITAND(%s)' % ','.join(sub_expressions)
         elif connector == '|':
-            raise NotImplementedError("Bit-wise or is not supported in Oracle.")
+            lhs, rhs = sub_expressions
+            return 'BITAND(-%(lhs)s-1,%(rhs)s)+%(lhs)s' % {'lhs': lhs, 'rhs': rhs}
         elif connector == '^':
             return 'POWER(%s)' % ','.join(sub_expressions)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
 
     def _get_sequence_name(self, table):
         name_length = self.max_name_length() - 3
-        return '%s_SQ' % truncate_name(table, name_length).upper()
+        sequence_name = '%s_SQ' % strip_quotes(table)
+        return truncate_name(sequence_name, name_length).upper()
 
     def _get_trigger_name(self, table):
         name_length = self.max_name_length() - 3
-        return '%s_TR' % truncate_name(table, name_length).upper()
+        trigger_name = '%s_TR' % strip_quotes(table)
+        return truncate_name(trigger_name, name_length).upper()
 
     def bulk_insert_sql(self, fields, placeholder_rows):
         return " UNION ALL ".join(

@@ -19,6 +19,8 @@ from .utils import TEMPLATE_DIR
 
 def test_processor(request):
     return {'processors': 'yes'}
+
+
 test_processor_name = 'template_tests.test_response.test_processor'
 
 
@@ -120,9 +122,10 @@ class SimpleTemplateResponseTest(SimpleTestCase):
         self.assertEqual(response.content, b'bar')
 
     def test_kwargs(self):
-        response = self._response(content_type='application/json', status=504)
+        response = self._response(content_type='application/json', status=504, charset='ascii')
         self.assertEqual(response['content-type'], 'application/json')
         self.assertEqual(response.status_code, 504)
+        self.assertEqual(response.charset, 'ascii')
 
     def test_args(self):
         response = SimpleTemplateResponse('', {}, 'application/json', 504)

@@ -47,8 +47,9 @@ You can also `define and send your own custom signals`_; see below.
 Listening to signals
 ====================
 
-To receive a signal, you need to register a *receiver* function that gets
-called when the signal is sent by using the :meth:`Signal.connect` method:
+To receive a signal, register a *receiver* function using the
+:meth:`Signal.connect` method. The receiver function is called when the signal
+is sent.
 
 .. method:: Signal.connect(receiver, sender=None, weak=True, dispatch_uid=None)
 
@@ -186,7 +187,7 @@ Preventing duplicate signals
 
 In some circumstances, the code connecting receivers to signals may run
 multiple times. This can cause your receiver function to be registered more
-than once, and thus called multiples times for a single signal event.
+than once, and thus called multiple times for a single signal event.
 
 If this behavior is problematic (such as when using signals to
 send an email whenever a model is saved), pass a unique identifier as

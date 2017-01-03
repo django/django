@@ -2,13 +2,14 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
+# znotdead <zhirafchik@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2016-05-21 09:09+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-09-15 10:32+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -65,16 +66,18 @@ msgid "This year"
 msgstr "Гэты год"
 
 msgid "No date"
-msgstr ""
+msgstr "Няма даты"
 
 msgid "Has date"
-msgstr ""
+msgstr "Мае дату"
 
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"Калі ласка, увядзіце правільны %(username)s і пароль для службовага рахунку. "
+"Адзначым, што абодва палі могуць быць адчувальныя да рэгістра."
 
 msgid "Action:"
 msgstr "Дзеяньне:"
@@ -90,10 +93,10 @@ msgid "action time"
 msgstr "час дзеяньня"
 
 msgid "user"
-msgstr ""
+msgstr "карыстальнік"
 
 msgid "content type"
-msgstr ""
+msgstr "від змесціва"
 
 msgid "object id"
 msgstr "нумар аб’екта"
@@ -132,24 +135,25 @@ msgstr "Запіс у справаздачы"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "Дадалі {name} \"{object}\"."
 
 msgid "Added."
-msgstr ""
+msgstr "Дадалі."
 
 msgid "and"
 msgstr "і"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
-msgstr ""
+msgstr "Змянілі {fields} для {name} \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr ""
+msgstr "Зьмянілі {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} \"{object}\"."
-msgstr ""
+msgstr "Выдалілі {name} \"{object}\"."
 
 msgid "No fields changed."
 msgstr "Палі не зьмяняліся."
@@ -166,32 +170,32 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
+msgstr "Дадалі {name} \"{obj}\". Ніжэй яго можна зноўку правіць."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr ""
+msgstr "Дадалі {name} \"{obj}\". Ніжэй можна дадаць іншы {name}."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
+msgstr "Дадалі {name} \"{obj}\"."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
+msgstr "Змянілі {name} \"{obj}\". Ніжэй яго можна зноўку правіць."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may add another {name} "
 "below."
-msgstr ""
+msgstr "Змянілі {name} \"{obj}\". Ніжэй можна дадаць іншы {name}."
 
 #, python-brace-format
 msgid "The {name} \"{obj}\" was changed successfully."
-msgstr ""
+msgstr "Змянілі {name} \"{obj}\"."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -257,6 +261,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
+"Каб выдаліць %(class_name)s %(instance)s, трэба выдаліць і зьвязаныя "
+"абароненыя аб’екты: %(related_objects)s"
 
 msgid "Django site admin"
 msgstr "Кіраўнічая пляцоўка «Джэнґа»"
@@ -454,7 +460,7 @@ msgstr "Рэзюмэ"
 
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr ""
+msgstr "Мадэлі ў %(name)s праграме"
 
 msgid "Add"
 msgstr "Дадаць"
@@ -463,10 +469,10 @@ msgid "You don't have permission to edit anything."
 msgstr "Вы ня маеце дазволу нешта зьмяняць."
 
 msgid "Recent actions"
-msgstr ""
+msgstr "Нядаўнія дзеянні"
 
 msgid "My actions"
-msgstr ""
+msgstr "Мае дзеяньні"
 
 msgid "None available"
 msgstr "Недаступнае"
@@ -487,6 +493,8 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"Вы апазнаны як %(username)s але не аўтарызаваны для доступу гэтай бачыны. Не "
+"жадаеце лі вы ўвайсці пад іншым карыстальнікам?"
 
 msgid "Forgotten your password or username?"
 msgstr "Забыліся на імя ці пароль?"
@@ -514,7 +522,7 @@ msgid "Save"
 msgstr "Захаваць"
 
 msgid "Popup closing..."
-msgstr ""
+msgstr "Усплывальнае акно зачыняецца..."
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -674,4 +682,4 @@ msgid "Currently:"
 msgstr "У цяперашні час:"
 
 msgid "Change:"
-msgstr ""
+msgstr "Зьмяніць:"

@@ -29,7 +29,7 @@ class SwappableModelTests(TestCase):
         new_io = StringIO()
         management.call_command('migrate', interactive=False, stdout=new_io)
 
-        # Check that content types and permissions exist for the swapped model,
+        # Content types and permissions exist for the swapped model,
         # but not for the swappable model.
         apps_models = [(p.content_type.app_label, p.content_type.model)
                        for p in Permission.objects.all()]
@@ -43,6 +43,6 @@ class SwappableModelTests(TestCase):
 
     @override_settings(TEST_ARTICLE_MODEL='swappable_models.article')
     def test_case_insensitive(self):
-        "Model names are case insensitive. Check that model swapping honors this."
+        "Model names are case insensitive. Model swapping honors this."
         Article.objects.all()
         self.assertIsNone(Article._meta.swapped)

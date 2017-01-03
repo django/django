@@ -23,6 +23,8 @@ def update_last_login(sender, user, **kwargs):
     """
     user.last_login = timezone.now()
     user.save(update_fields=['last_login'])
+
+
 user_logged_in.connect(update_last_login)
 
 
@@ -105,7 +107,7 @@ class Group(models.Model):
     groups.
 
     A user in a group automatically has all the permissions granted to that
-    group. For example, if the group Site editors has the permission
+    group. For example, if the group 'Site editors' has the permission
     can_edit_home_page, any user in that group will have that permission.
 
     Beyond permissions, groups are a convenient way to categorize users to

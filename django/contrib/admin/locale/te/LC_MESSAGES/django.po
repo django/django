@@ -140,6 +140,7 @@ msgstr ""
 msgid "and"
 msgstr "మరియు"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr ""
 

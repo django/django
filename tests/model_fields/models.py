@@ -216,7 +216,8 @@ class DataModel(models.Model):
 
 
 class Document(models.Model):
-    myfile = models.FileField(upload_to='unused')
+    myfile = models.FileField(upload_to='unused', unique=True)
+
 
 ###############################################################################
 # ImageField

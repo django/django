@@ -167,16 +167,15 @@ class AssertContainsTests(SimpleTestCase):
         self.assertNotContains(r, ugettext_lazy('never'))
 
     def test_assert_contains_renders_template_response(self):
-        """ Test that we can pass in an unrendered SimpleTemplateResponse
-            without throwing an error.
-            Refs #15826.
+        """
+        An unrendered SimpleTemplateResponse may be used in assertContains().
         """
         template = engines['django'].from_string('Hello')
         response = SimpleTemplateResponse(template)
         self.assertContains(response, 'Hello')
 
     def test_assert_contains_using_non_template_response(self):
-        """ Test that auto-rendering does not affect responses that aren't
+        """ auto-rendering does not affect responses that aren't
             instances (or subclasses) of SimpleTemplateResponse.
             Refs #15826.
         """
@@ -184,18 +183,17 @@ class AssertContainsTests(SimpleTestCase):
         self.assertContains(response, 'Hello')
 
     def test_assert_not_contains_renders_template_response(self):
-        """ Test that we can pass in an unrendered SimpleTemplateResponse
-            without throwing an error.
-            Refs #15826.
+        """
+        An unrendered SimpleTemplateResponse may be used in assertNotContains().
         """
         template = engines['django'].from_string('Hello')
         response = SimpleTemplateResponse(template)
         self.assertNotContains(response, 'Bye')
 
     def test_assert_not_contains_using_non_template_response(self):
-        """ Test that auto-rendering does not affect responses that aren't
-            instances (or subclasses) of SimpleTemplateResponse.
-            Refs #15826.
+        """
+        auto-rendering does not affect responses that aren't instances (or
+        subclasses) of SimpleTemplateResponse.
         """
         response = HttpResponse('Hello')
         self.assertNotContains(response, 'Bye')
@@ -208,7 +206,7 @@ class AssertTemplateUsedTests(TestDataMixin, TestCase):
         "Template usage assertions work then templates aren't in use"
         response = self.client.get('/no_template_view/')
 
-        # Check that the no template case doesn't mess with the template assertions
+        # The no template case doesn't mess with the template assertions
         self.assertTemplateNotUsed(response, 'GET Template')
 
         try:
@@ -519,7 +517,7 @@ class AssertRedirectsTests(SimpleTestCase):
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_full_path_in_expected_urls(self):
         """
-        Test that specifying a full URL as assertRedirects expected_url still
+        Specifying a full URL as assertRedirects expected_url still
         work as backwards compatible behavior until Django 2.0.
         """
         response = self.client.get('/redirect_view/')
@@ -631,8 +629,8 @@ class AssertFormErrorTests(SimpleTestCase):
 
     def test_unknown_nonfield_error(self):
         """
-        Checks that an assertion is raised if the form's non field errors
-        doesn't contain the provided error.
+        An assertion is raised if the form's non field errors doesn't contain
+        the provided error.
         """
         post_data = {
             'text': 'Hello World',
@@ -806,7 +804,7 @@ class AssertFormsetErrorTests(SimpleTestCase):
 class LoginTests(TestDataMixin, TestCase):
 
     def test_login_different_client(self):
-        "Check that using a different test client doesn't violate authentication"
+        "Using a different test client doesn't violate authentication"
 
         # Create a second client, and log in.
         c = Client()
@@ -817,8 +815,7 @@ class LoginTests(TestDataMixin, TestCase):
         response = c.get("/login_protected_redirect_view/")
 
         # At this points, the self.client isn't logged in.
-        # Check that assertRedirects uses the original client, not the
-        # default client.
+        # assertRedirects uses the original client, not the default client.
         self.assertRedirects(response, "/get_view/")
 
 
@@ -959,10 +956,10 @@ class ContextTests(TestDataMixin, TestCase):
         c2.update({'goodbye': 'world', 'python': 'rocks'})
         c2.update({'goodbye': 'dolly'})
 
-        l = ContextList([c1, c2])
+        k = ContextList([c1, c2])
         # None, True and False are builtins of BaseContext, and present
         # in every Context without needing to be added.
-        self.assertEqual({'None', 'True', 'False', 'hello', 'goodbye', 'python', 'dolly'}, l.keys())
+        self.assertEqual({'None', 'True', 'False', 'hello', 'goodbye', 'python', 'dolly'}, k.keys())
 
     def test_15368(self):
         # Need to insert a context processor that assumes certain things about
@@ -1004,7 +1001,7 @@ class SessionTests(TestDataMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'set_session')
 
-        # Check that the session has been modified
+        # The session has been modified
         response = self.client.get('/check_session/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'YES')
@@ -1212,6 +1209,16 @@ class RequestMethodStringDataTests(SimpleTestCase):
         response = self.client.get('/json_response/')
         self.assertEqual(response.json(), {'key': 'value'})
 
+    def test_json_vendor(self):
+        for content_type in ('application/vnd.api+json', 'application/vnd.api.foo+json'):
+            response = self.client.get('/json_response/', {'content_type': content_type})
+            self.assertEqual(response['Content-Type'], content_type)
+            self.assertEqual(response.json(), {'key': 'value'})
+
+    def test_json_multiple_access(self):
+        response = self.client.get('/json_response/')
+        self.assertIs(response.json(), response.json())
+
     def test_json_wrong_header(self):
         response = self.client.get('/body/')
         msg = 'Content-Type header is "text/html; charset=utf-8", not "application/json"'
@@ -1223,9 +1230,8 @@ class RequestMethodStringDataTests(SimpleTestCase):
 class QueryStringTests(SimpleTestCase):
 
     def test_get_like_requests(self):
-        # See: https://code.djangoproject.com/ticket/10571.
         for method_name in ('get', 'head'):
-            # A GET-like request can pass a query string as data
+            # A GET-like request can pass a query string as data (#10571)
             method = getattr(self.client, method_name)
             response = method("/request_data/", data={'foo': 'whiz'})
             self.assertEqual(response.context['get-foo'], 'whiz')
@@ -1344,8 +1350,8 @@ class RequestHeadersTest(SimpleTestCase):
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
 class ReadLimitedStreamTest(SimpleTestCase):
     """
-    Tests that ensure that HttpRequest.body, HttpRequest.read() and
-    HttpRequest.read(BUFFER) have proper LimitedStream behavior.
+    HttpRequest.body, HttpRequest.read(), and HttpRequest.read(BUFFER) have
+    proper LimitedStream behavior.
 
     Refs #14753, #15785
     """

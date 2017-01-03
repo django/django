@@ -212,9 +212,9 @@ class TestFixtures(TestCase):
     @override_settings(SERIALIZATION_MODULES={'unkn': 'unexistent.path'})
     def test_unimportable_serializer(self):
         """
-        Test that failing serializer import raises the proper error
+        Failing serializer import raises the proper error
         """
-        with six.assertRaisesRegex(self, ImportError, r"No module named.*unexistent"):
+        with self.assertRaisesRegex(ImportError, r"No module named.*unexistent"):
             management.call_command(
                 'loaddata',
                 'bad_fixture1.unkn',
@@ -363,8 +363,8 @@ class TestFixtures(TestCase):
     def test_dumpdata_uses_default_manager(self):
         """
         Regression for #11286
-        Ensure that dumpdata honors the default manager
-        Dump the current contents of the database as a JSON fixture
+        Dumpdata honors the default manager. Dump the current contents of
+        the database as a JSON fixture
         """
         management.call_command(
             'loaddata',
@@ -617,8 +617,7 @@ class NaturalKeyFixtureTests(TestCase):
 
     def test_nk_on_serialize(self):
         """
-        Check that natural key requirements are taken into account
-        when serializing models
+        Natural key requirements are taken into account when serializing models.
         """
         management.call_command(
             'loaddata',
@@ -651,10 +650,8 @@ class NaturalKeyFixtureTests(TestCase):
 
     def test_dependency_sorting(self):
         """
-        Now lets check the dependency sorting explicitly
-        It doesn't matter what order you mention the models
-        Store *must* be serialized before then Person, and both
-        must be serialized before Book.
+        It doesn't matter what order you mention the models,  Store *must* be
+        serialized before then Person, and both must be serialized before Book.
         """
         sorted_deps = serializers.sort_dependencies(
             [('fixtures_regress', [Book, Person, Store])]
@@ -762,8 +759,7 @@ class NaturalKeyFixtureTests(TestCase):
 
     def test_normal_pk(self):
         """
-        Check that normal primary keys still work
-        on a model with natural key capabilities
+        Normal primary keys work on a model with natural key capabilities.
         """
         management.call_command(
             'loaddata',
@@ -900,7 +896,7 @@ class TestTicket11101(TransactionTestCase):
 
     @skipUnlessDBFeature('supports_transactions')
     def test_ticket_11101(self):
-        """Test that fixtures can be rolled back (ticket #11101)."""
+        """Fixtures can be rolled back (ticket #11101)."""
         with transaction.atomic():
             management.call_command(
                 'loaddata',

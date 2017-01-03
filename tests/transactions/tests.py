@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import os
+import signal
 import sys
 import threading
 import time
@@ -225,8 +226,8 @@ class AtomicTests(TransactionTestCase):
             with transaction.atomic():
                 Reporter.objects.create(first_name='Tintin')
                 # Send SIGINT (simulate Ctrl-C). One call isn't enough.
-                os.kill(os.getpid(), 2)
-                os.kill(os.getpid(), 2)
+                os.kill(os.getpid(), signal.SIGINT)
+                os.kill(os.getpid(), signal.SIGINT)
         except KeyboardInterrupt:
             pass
         self.assertEqual(Reporter.objects.all().count(), 0)
@@ -443,8 +444,28 @@ class AtomicMiscTests(TransactionTestCase):
                 # This is expected to fail because the savepoint no longer exists.
                 connection.savepoint_rollback(sid)
 
-    @skipIf(connection.features.autocommits_when_autocommit_is_off,
-            "This test requires a non-autocommit mode that doesn't autocommit.")
+
+@skipIf(
+    connection.features.autocommits_when_autocommit_is_off,
+    "This test requires a non-autocommit mode that doesn't autocommit."
+)
+class NonAutocommitTests(TransactionTestCase):
+
+    available_apps = []
+
+    def test_orm_query_after_error_and_rollback(self):
+        """
+        ORM queries are allowed after an error and a rollback in non-autocommit
+        mode (#27504).
+        """
+        transaction.set_autocommit(False)
+        r1 = Reporter.objects.create(first_name='Archibald', last_name='Haddock')
+        r2 = Reporter(first_name='Cuthbert', last_name='Calculus', id=r1.id)
+        with self.assertRaises(IntegrityError):
+            r2.save(force_insert=True)
+        transaction.rollback()
+        Reporter.objects.last()
+
     def test_orm_query_without_autocommit(self):
         """#24921 -- ORM queries must be possible after set_autocommit(False)."""
         transaction.set_autocommit(False)

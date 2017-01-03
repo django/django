@@ -16,8 +16,12 @@ from .base import Loader as BaseLoader
 
 class Loader(BaseLoader):
 
+    def __init__(self, engine, dirs=None):
+        super(Loader, self).__init__(engine)
+        self.dirs = dirs
+
     def get_dirs(self):
-        return self.engine.dirs
+        return self.dirs if self.dirs is not None else self.engine.dirs
 
     def get_contents(self, origin):
         try:

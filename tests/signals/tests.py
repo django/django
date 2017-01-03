@@ -23,7 +23,7 @@ class BaseSignalTest(TestCase):
         )
 
     def tearDown(self):
-        # Check that all our signals got disconnected properly.
+        # All our signals got disconnected properly.
         post_signals = (
             len(signals.pre_save.receivers),
             len(signals.post_save.receivers),
@@ -246,7 +246,7 @@ class SignalTests(BaseSignalTest):
 
     def test_disconnect_in_dispatch(self):
         """
-        Test that signals that disconnect when being called don't mess future
+        Signals that disconnect when being called don't mess future
         dispatching.
         """
 

@@ -275,36 +275,22 @@ A more useful index is a ``GIN`` index, which you should create using a
 
 .. class:: HStoreField(**options)
 
-    A field for storing mappings of strings to strings. The Python data type
-    used is a ``dict``.
+    A field for storing key-value pairs. The Python data type used is a
+    ``dict``. Keys must be strings, and values may be either strings or nulls
+    (``None`` in Python).
 
     To use this field, you'll need to:
 
     1. Add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
-    2. Setup the hstore extension in PostgreSQL before the first ``CreateModel``
-       or ``AddField`` operation by adding a migration with the
-       :class:`~django.contrib.postgres.operations.HStoreExtension` operation.
-       For example::
-
-            from django.contrib.postgres.operations import HStoreExtension
-
-            class Migration(migrations.Migration):
-                ...
-
-                operations = [
-                    HStoreExtension(),
-                    ...
-                ]
-
-       Creating the extension requires a database user with superuser
-       privileges. If the Django database user doesn't have superuser
-       privileges, you'll have to create the extension outside of Django
-       migrations with a user that has the appropriate privileges. In that
-       case, connect to your Django database and run the query
-       ``CREATE EXTENSION IF NOT EXISTS hstore;``
+    2. :ref:`Setup the hstore extension <create-postgresql-extensions>` in
+       PostgreSQL.
 
     You'll see an error like ``can't adapt type 'dict'`` if you skip the first
     step, or ``type "hstore" does not exist`` if you skip the second.
+
+    .. versionchanged:: 1.11
+
+        Added the ability to store nulls. Previously, they were cast to strings.
 
 .. note::
 
@@ -732,14 +718,11 @@ operators ``@>``, ``<@``, and ``&&`` respectively.
     >>> Event.objects.filter(ages__contained_by=NumericRange(0, 15))
     <QuerySet [<Event: Soft play>]>
 
-.. versionadded 1.9
-
-    The `contained_by` lookup is also available on the non-range field types:
-    :class:`~django.db.models.fields.IntegerField`,
-    :class:`~django.db.models.fields.BigIntegerField`,
-    :class:`~django.db.models.fields.FloatField`,
-    :class:`~django.db.models.fields.DateField`, and
-    :class:`~django.db.models.fields.DateTimeField`. For example::
+The ``contained_by`` lookup is also available on the non-range field types:
+:class:`~django.db.models.IntegerField`,
+:class:`~django.db.models.BigIntegerField`,
+:class:`~django.db.models.FloatField`, :class:`~django.db.models.DateField`,
+and :class:`~django.db.models.DateTimeField`. For example::
 
     >>> from psycopg2.extras import DateTimeTZRange
     >>> Event.objects.filter(start__contained_by=DateTimeTZRange(

@@ -59,7 +59,7 @@ class ListViewTests(TestCase):
         self.assertEqual(list(res.context['author_list'])[-1].name, 'Author 29')
 
     def test_paginated_queryset_shortdata(self):
-        # Test that short datasets ALSO result in a paginated view.
+        # Short datasets also result in a paginated view.
         res = self.client.get('/list/authors/paginated/')
         self.assertEqual(res.status_code, 200)
         self.assertTemplateUsed(res, 'generic_views/author_list.html')

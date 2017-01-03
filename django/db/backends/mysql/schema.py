@@ -9,6 +9,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_null = "MODIFY %(column)s %(type)s NULL"
     sql_alter_column_not_null = "MODIFY %(column)s %(type)s NOT NULL"
     sql_alter_column_type = "MODIFY %(column)s %(type)s"
+
+    # No 'CASCADE' which works as a no-op in MySQL but is undocumented
+    sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
+
     sql_rename_column = "ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s"
 
     sql_delete_unique = "ALTER TABLE %(table)s DROP INDEX %(name)s"

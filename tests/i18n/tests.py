@@ -107,8 +107,8 @@ class TranslationTests(SimpleTestCase):
 
     def test_override_exit(self):
         """
-        Test that the language restored is the one used when the function was
-        called, not the one used when the decorator was initialized. refs #23381
+        The language restored is the one used when the function was
+        called, not the one used when the decorator was initialized (#23381).
         """
         activate('fr')
 
@@ -215,17 +215,17 @@ class TranslationTests(SimpleTestCase):
             self.assertEqual(complex_nonlazy % {'num': 4, 'name': 'Jim'}, 'Hallo Jim, 4 guten Resultate')
             self.assertEqual(complex_deferred % {'name': 'Jim', 'num': 1}, 'Hallo Jim, 1 gutes Resultat')
             self.assertEqual(complex_deferred % {'name': 'Jim', 'num': 5}, 'Hallo Jim, 5 guten Resultate')
-            with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
+            with self.assertRaisesMessage(KeyError, 'Your dictionary lacks key'):
                 complex_deferred % {'name': 'Jim'}
             self.assertEqual(complex_str_nonlazy % {'num': 4, 'name': 'Jim'}, str('Hallo Jim, 4 guten Resultate'))
             self.assertEqual(complex_str_deferred % {'name': 'Jim', 'num': 1}, str('Hallo Jim, 1 gutes Resultat'))
             self.assertEqual(complex_str_deferred % {'name': 'Jim', 'num': 5}, str('Hallo Jim, 5 guten Resultate'))
-            with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
+            with self.assertRaisesMessage(KeyError, 'Your dictionary lacks key'):
                 complex_str_deferred % {'name': 'Jim'}
             self.assertEqual(complex_context_nonlazy % {'num': 4, 'name': 'Jim'}, 'Willkommen Jim, 4 guten Resultate')
             self.assertEqual(complex_context_deferred % {'name': 'Jim', 'num': 1}, 'Willkommen Jim, 1 gutes Resultat')
             self.assertEqual(complex_context_deferred % {'name': 'Jim', 'num': 5}, 'Willkommen Jim, 5 guten Resultate')
-            with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
+            with self.assertRaisesMessage(KeyError, 'Your dictionary lacks key'):
                 complex_context_deferred % {'name': 'Jim'}
 
     @skipUnless(six.PY2, "PY3 doesn't have distinct int and long types")
@@ -267,9 +267,8 @@ class TranslationTests(SimpleTestCase):
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_template_tags_pgettext(self):
         """
-        Ensure that message contexts are taken into account the {% trans %} and
-        {% blocktrans %} template tags.
-        Refs #14806.
+        Message contexts are taken into account the {% trans %} and
+        {% blocktrans %} template tags (#14806).
         """
         trans_real._active = local()
         trans_real._translations = {}
@@ -545,14 +544,14 @@ class FormattingTests(SimpleTestCase):
         self.d = datetime.date(2009, 12, 31)
         self.dt = datetime.datetime(2009, 12, 31, 20, 50)
         self.t = datetime.time(10, 15, 48)
-        self.l = 10000 if PY3 else long(10000)  # NOQA: long undefined on PY3
+        self.long = 10000 if PY3 else long(10000)  # NOQA: long undefined on PY3
         self.ctxt = Context({
             'n': self.n,
             't': self.t,
             'd': self.d,
             'dt': self.dt,
             'f': self.f,
-            'l': self.l,
+            'l': self.long,
         })
 
     def test_locale_independent(self):
@@ -575,7 +574,7 @@ class FormattingTests(SimpleTestCase):
             )
             self.assertEqual('-66666.6', nformat(-66666.666, decimal_sep='.', decimal_pos=1))
             self.assertEqual('-66666.0', nformat(int('-66666'), decimal_sep='.', decimal_pos=1))
-            self.assertEqual('10000.0', nformat(self.l, decimal_sep='.', decimal_pos=1))
+            self.assertEqual('10000.0', nformat(self.long, decimal_sep='.', decimal_pos=1))
             self.assertEqual(
                 '10,00,00,000.00',
                 nformat(100000000.00, decimal_sep='.', decimal_pos=2, grouping=(3, 2, 0), thousand_sep=',')
@@ -589,8 +588,10 @@ class FormattingTests(SimpleTestCase):
                 nformat(1000000000.00, decimal_sep='.', decimal_pos=2, grouping=(3, 2, -1), thousand_sep=',')
             )
             # This unusual grouping/force_grouping combination may be triggered by the intcomma filter (#17414)
-            self.assertEqual('10000', nformat(self.l, decimal_sep='.', decimal_pos=0, grouping=0, force_grouping=True))
-
+            self.assertEqual(
+                '10000',
+                nformat(self.long, decimal_sep='.', decimal_pos=0, grouping=0, force_grouping=True)
+            )
             # date filter
             self.assertEqual('31.12.2009 в 20:50', Template('{{ dt|date:"d.m.Y в H:i" }}').render(self.ctxt))
             self.assertEqual('⌚ 10:15', Template('{{ t|time:"⌚ H:i" }}').render(self.ctxt))
@@ -613,7 +614,7 @@ class FormattingTests(SimpleTestCase):
             self.assertEqual('No localizable', localize('No localizable'))
             self.assertEqual('66666.666', localize(self.n))
             self.assertEqual('99999.999', localize(self.f))
-            self.assertEqual('10000', localize(self.l))
+            self.assertEqual('10000', localize(self.long))
             self.assertEqual('des. 31, 2009', localize(self.d))
             self.assertEqual('des. 31, 2009, 8:50 p.m.', localize(self.dt))
             self.assertEqual('66666.666', Template('{{ n }}').render(self.ctxt))
@@ -726,22 +727,20 @@ class FormattingTests(SimpleTestCase):
 
     def test_false_like_locale_formats(self):
         """
-        Ensure that the active locale's formats take precedence over the
-        default settings even if they would be interpreted as False in a
-        conditional test (e.g. 0 or empty string).
-        Refs #16938.
+        The active locale's formats take precedence over the default settings
+        even if they would be interpreted as False in a conditional test
+        (e.g. 0 or empty string) (#16938).
         """
-        with patch_formats('fr', THOUSAND_SEPARATOR='', FIRST_DAY_OF_WEEK=0):
-            with translation.override('fr'):
-                with self.settings(USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='!'):
-                    self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
-                    # Even a second time (after the format has been cached)...
-                    self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
+        with translation.override('fr'):
+            with self.settings(USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='!'):
+                self.assertEqual('\xa0', get_format('THOUSAND_SEPARATOR'))
+                # Even a second time (after the format has been cached)...
+                self.assertEqual('\xa0', get_format('THOUSAND_SEPARATOR'))
 
-                with self.settings(FIRST_DAY_OF_WEEK=1):
-                    self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
-                    # Even a second time (after the format has been cached)...
-                    self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
+            with self.settings(FIRST_DAY_OF_WEEK=0):
+                self.assertEqual(1, get_format('FIRST_DAY_OF_WEEK'))
+                # Even a second time (after the format has been cached)...
+                self.assertEqual(1, get_format('FIRST_DAY_OF_WEEK'))
 
     def test_l10n_enabled(self):
         self.maxDiff = 3000
@@ -759,13 +758,13 @@ class FormattingTests(SimpleTestCase):
             with self.settings(USE_THOUSAND_SEPARATOR=True):
                 self.assertEqual('66.666,666', localize(self.n))
                 self.assertEqual('99.999,999', localize(self.f))
-                self.assertEqual('10.000', localize(self.l))
+                self.assertEqual('10.000', localize(self.long))
                 self.assertEqual('True', localize(True))
 
             with self.settings(USE_THOUSAND_SEPARATOR=False):
                 self.assertEqual('66666,666', localize(self.n))
                 self.assertEqual('99999,999', localize(self.f))
-                self.assertEqual('10000', localize(self.l))
+                self.assertEqual('10000', localize(self.long))
                 self.assertEqual('31 de desembre de 2009', localize(self.d))
                 self.assertEqual('31 de desembre de 2009 a les 20:50', localize(self.dt))
 
@@ -978,12 +977,12 @@ class FormattingTests(SimpleTestCase):
             with self.settings(USE_THOUSAND_SEPARATOR=True):
                 self.assertEqual('66,666.666', localize(self.n))
                 self.assertEqual('99,999.999', localize(self.f))
-                self.assertEqual('10,000', localize(self.l))
+                self.assertEqual('10,000', localize(self.long))
 
             with self.settings(USE_THOUSAND_SEPARATOR=False):
                 self.assertEqual('66666.666', localize(self.n))
                 self.assertEqual('99999.999', localize(self.f))
-                self.assertEqual('10000', localize(self.l))
+                self.assertEqual('10000', localize(self.long))
                 self.assertEqual('Dec. 31, 2009', localize(self.d))
                 self.assertEqual('Dec. 31, 2009, 8:50 p.m.', localize(self.dt))
 
@@ -1152,7 +1151,7 @@ class FormattingTests(SimpleTestCase):
 
         with translation.override('ru', deactivate=True):
             # Russian locale has non-breaking space (\xa0) as thousand separator
-            # Check that usual space is accepted too when sanitizing inputs
+            # Usual space is accepted too when sanitizing inputs
             with self.settings(USE_THOUSAND_SEPARATOR=True):
                 self.assertEqual(sanitize_separators('1\xa0234\xa0567'), '1234567')
                 self.assertEqual(sanitize_separators('77\xa0777,777'), '77777.777')
@@ -1161,8 +1160,8 @@ class FormattingTests(SimpleTestCase):
             with self.settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=False):
                 self.assertEqual(sanitize_separators('12\xa0345'), '12\xa0345')
 
-        with patch_formats(get_language(), THOUSAND_SEPARATOR='.', DECIMAL_SEPARATOR=','):
-            with self.settings(USE_THOUSAND_SEPARATOR=True):
+        with self.settings(USE_THOUSAND_SEPARATOR=True):
+            with patch_formats(get_language(), THOUSAND_SEPARATOR='.', DECIMAL_SEPARATOR=','):
                 self.assertEqual(sanitize_separators('10.234'), '10234')
                 # Suspicion that user entered dot as decimal separator (#22171)
                 self.assertEqual(sanitize_separators('10.10'), '10.10')
@@ -1472,11 +1471,25 @@ class MiscTests(SimpleTestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
         self.assertEqual(g(r), 'zh-hans')
 
+    @override_settings(
+        LANGUAGES=[
+            ('en', 'English'),
+            ('de', 'German'),
+            ('de-at', 'Austrian German'),
+            ('pl', 'Polish'),
+        ],
+    )
     def test_get_language_from_path_real(self):
         g = trans_real.get_language_from_path
         self.assertEqual(g('/pl/'), 'pl')
         self.assertEqual(g('/pl'), 'pl')
         self.assertIsNone(g('/xyz/'))
+        self.assertEqual(g('/en/'), 'en')
+        self.assertEqual(g('/en-gb/'), 'en')
+        self.assertEqual(g('/de/'), 'de')
+        self.assertEqual(g('/de-at/'), 'de-at')
+        self.assertEqual(g('/de-ch/'), 'de')
+        self.assertIsNone(g('/de-simple-page/'))
 
     def test_get_language_from_path_null(self):
         from django.utils.translation.trans_null import get_language_from_path as g
@@ -1500,8 +1513,8 @@ class MiscTests(SimpleTestCase):
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_percent_formatting_in_blocktrans(self):
         """
-        Test that using Python's %-formatting is properly escaped in blocktrans,
-        singular or plural
+        Python's %-formatting is properly escaped in blocktrans, singular or
+        plural.
         """
         t_sing = Template("{% load i18n %}{% blocktrans %}There are %(num_comments)s comments{% endblocktrans %}")
         t_plur = Template(
@@ -1517,8 +1530,8 @@ class MiscTests(SimpleTestCase):
 
     def test_cache_resetting(self):
         """
-        #14170 after setting LANGUAGE, cache should be cleared and languages
-        previously valid should not be used.
+        After setting LANGUAGE, the cache should be cleared and languages
+        previously valid should not be used (#14170).
         """
         g = get_language_from_request
         r = self.rf.get('/')
@@ -1616,7 +1629,8 @@ class TestLanguageInfo(SimpleTestCase):
         self.assertIs(li['bidi'], False)
 
     def test_unknown_language_code(self):
-        six.assertRaisesRegex(self, KeyError, r"Unknown language code xx\.", get_language_info, 'xx')
+        with self.assertRaisesMessage(KeyError, "Unknown language code xx"):
+            get_language_info('xx')
         with translation.override('xx'):
             # A language with no translation catalogs should fallback to the
             # untranslated string.
@@ -1630,7 +1644,8 @@ class TestLanguageInfo(SimpleTestCase):
         self.assertIs(li['bidi'], False)
 
     def test_unknown_language_code_and_country_code(self):
-        six.assertRaisesRegex(self, KeyError, r"Unknown language code xx-xx and xx\.", get_language_info, 'xx-xx')
+        with self.assertRaisesMessage(KeyError, "Unknown language code xx-xx and xx"):
+            get_language_info('xx-xx')
 
     def test_fallback_language_code(self):
         """
@@ -1798,9 +1813,10 @@ class LocaleMiddlewareTests(TestCase):
         ],
     )
     def test_language_not_saved_to_session(self):
-        """Checks that current language is not automatically saved to
-        session on every request."""
-        # Regression test for #21473
+        """
+        The Current language isno' automatically saved to the session on every
+        request (#21473).
+        """
         self.client.get('/fr/simple/')
         self.assertNotIn(LANGUAGE_SESSION_KEY, self.client.session)
 
@@ -1809,6 +1825,7 @@ class LocaleMiddlewareTests(TestCase):
     USE_I18N=True,
     LANGUAGES=[
         ('en', 'English'),
+        ('de', 'German'),
         ('fr', 'French'),
     ],
     MIDDLEWARE=[
@@ -1838,6 +1855,25 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
     def test_unexpected_kwarg_to_i18n_patterns(self):
         with self.assertRaisesMessage(AssertionError, "Unexpected kwargs for i18n_patterns(): {'foo':"):
             i18n_patterns(object(), foo='bar')
+
+    def test_page_with_dash(self):
+        # A page starting with /de* shouldn't match the 'de' langauge code.
+        response = self.client.get('/de-simple-page/')
+        self.assertEqual(response.content, b'Yes')
+
+    def test_no_redirect_on_404(self):
+        """
+        A request for a nonexistent URL shouldn't cause a redirect to
+        /<defaut_language>/<request_url> when prefix_default_language=False and
+        /<default_language>/<request_url> has a URL match (#27402).
+        """
+        # A match for /group1/group2/ must exist for this to act as a
+        # regression test.
+        response = self.client.get('/group1/group2/')
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/nonexistent/')
+        self.assertEqual(response.status_code, 404)
 
 
 @override_settings(

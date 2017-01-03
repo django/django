@@ -9,6 +9,8 @@ import time
 import warnings
 from unittest import skipUnless
 
+from admin_scripts.tests import AdminScriptTestCase
+
 from django.core import management
 from django.core.management import execute_from_command_line
 from django.core.management.base import CommandError
@@ -78,16 +80,9 @@ class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
         needle = ''.join(parts)
         pattern = re.compile(r'^\#\:.*' + re.escape(needle), re.MULTILINE)
         if assert_presence:
-            return six.assertRegex(self, po_contents, pattern, '"%s" not found in final .po file.' % needle)
+            return self.assertRegex(po_contents, pattern, '"%s" not found in final .po file.' % needle)
         else:
-            if six.PY3:
-                return self.assertNotRegex(
-                    po_contents, pattern, '"%s" shouldn\'t be in final .po file.' % needle
-                )
-            else:
-                return self.assertNotRegexpMatches(
-                    po_contents, pattern, '"%s" shouldn\'t be in final .po file.' % needle
-                )
+            return self.assertNotRegex(po_contents, pattern, '"%s" shouldn\'t be in final .po file.' % needle)
 
     def _get_token_line_number(self, path, token):
         with open(path) as f:
@@ -212,7 +207,7 @@ class BasicExtractorTests(ExtractorTests):
         )
         with self.assertRaisesMessage(SyntaxError, msg):
             management.call_command('makemessages', locale=[LOCALE], extensions=['tpl'], verbosity=0)
-        # Check that the temporary file was cleaned up
+        # The temporary file was cleaned up
         self.assertFalse(os.path.exists('./templates/template_with_error.tpl.py'))
 
     def test_unicode_decode_error(self):
@@ -235,9 +230,8 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_template_message_context_extractor(self):
         """
-        Ensure that message contexts are correctly extracted for the
-        {% trans %} and {% blocktrans %} template tags.
-        Refs #14806.
+        Message contexts are correctly extracted for the {% trans %} and
+        {% blocktrans %} template tags (#14806).
         """
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
@@ -291,20 +285,20 @@ class BasicExtractorTests(ExtractorTests):
             self.assertEqual(len(ws), 3)
             for w in ws:
                 self.assertTrue(issubclass(w.category, TranslatorCommentWarning))
-            six.assertRegex(
-                self, str(ws[0].message),
+            self.assertRegex(
+                str(ws[0].message),
                 r"The translator-targeted comment 'Translators: ignored i18n "
                 r"comment #1' \(file templates[/\\]comments.thtml, line 4\) "
                 r"was ignored, because it wasn't the last item on the line\."
             )
-            six.assertRegex(
-                self, str(ws[1].message),
+            self.assertRegex(
+                str(ws[1].message),
                 r"The translator-targeted comment 'Translators: ignored i18n "
                 r"comment #3' \(file templates[/\\]comments.thtml, line 6\) "
                 r"was ignored, because it wasn't the last item on the line\."
             )
-            six.assertRegex(
-                self, str(ws[2].message),
+            self.assertRegex(
+                str(ws[2].message),
                 r"The translator-targeted comment 'Translators: ignored i18n "
                 r"comment #4' \(file templates[/\\]comments.thtml, line 8\) "
                 r"was ignored, because it wasn't the last item on the line\."
@@ -342,13 +336,13 @@ class BasicExtractorTests(ExtractorTests):
             self.assertIn('#. Translators: valid i18n comment #7', po_contents)
             self.assertMsgId('Translatable literal #9i', po_contents)
 
-            six.assertRegex(self, po_contents, r'#\..+Translators: valid i18n comment #8')
-            six.assertRegex(self, po_contents, r'#\..+Translators: valid i18n comment #9')
+            self.assertRegex(po_contents, r'#\..+Translators: valid i18n comment #8')
+            self.assertRegex(po_contents, r'#\..+Translators: valid i18n comment #9')
             self.assertMsgId("Translatable literal #9j", po_contents)
 
     def test_makemessages_find_files(self):
         """
-        Test that find_files only discover files having the proper extensions.
+        find_files only discover files having the proper extensions.
         """
         cmd = MakeMessagesCommand()
         cmd.ignore_patterns = ['CVS', '.*', '*~', '*.pyc']
@@ -391,7 +385,7 @@ class BasicExtractorTests(ExtractorTests):
         mocked_popen_wrapper.return_value = (
             "any other return value\n", '', 0)
         cmd = MakeMessagesCommand()
-        with six.assertRaisesRegex(self, CommandError, "Unable to get gettext version. Is it installed?"):
+        with self.assertRaisesMessage(CommandError, "Unable to get gettext version. Is it installed?"):
             cmd.gettext_version
 
     def test_po_file_encoding_when_updating(self):
@@ -693,9 +687,8 @@ class CustomLayoutExtractionTests(ExtractorTests):
 
     def test_project_locale_paths(self):
         """
-        Test that:
-          * translations for an app containing a locale folder are stored in that folder
-          * translations outside of that app are in LOCALE_PATHS[0]
+        * translations for an app containing a locale folder are stored in that folder
+        * translations outside of that app are in LOCALE_PATHS[0]
         """
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'project_locale')]):
             management.call_command('makemessages', locale=[LOCALE], verbosity=0)
@@ -713,3 +706,11 @@ class CustomLayoutExtractionTests(ExtractorTests):
             with open(app_de_locale, 'r') as fp:
                 po_contents = force_text(fp.read())
                 self.assertMsgId('This app has a locale directory', po_contents)
+
+
+@skipUnless(has_xgettext, 'xgettext is mandatory for extraction tests')
+class NoSettingsExtractionTests(AdminScriptTestCase):
+    def test_makemessages_no_settings(self):
+        out, err = self.run_django_admin(['makemessages', '-l', 'en', '-v', '0'])
+        self.assertNoOutput(err)
+        self.assertNoOutput(out)

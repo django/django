@@ -83,6 +83,8 @@ def notice_h(fmt, lst):
     except TypeError:
         warn_msg = fmt
     logger.warning('GEOS_NOTICE: %s\n', warn_msg)
+
+
 notice_h = NOTICEFUNC(notice_h)
 
 ERRORFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
@@ -95,6 +97,8 @@ def error_h(fmt, lst):
     except TypeError:
         err_msg = fmt
     logger.error('GEOS_ERROR: %s\n', err_msg)
+
+
 error_h = ERRORFUNC(error_h)
 
 # #### GEOS Geometry C data structures, and utility functions. ####
@@ -115,6 +119,7 @@ class GEOSCoordSeq_t(Structure):
 
 class GEOSContextHandle_t(Structure):
     pass
+
 
 # Pointers to opaque GEOS geometry structures.
 GEOM_PTR = POINTER(GEOSGeom_t)

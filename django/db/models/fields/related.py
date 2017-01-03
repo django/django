@@ -756,6 +756,7 @@ class ForeignObject(RelatedField):
             if self.remote_field.limit_choices_to:
                 cls._meta.related_fkey_lookups.append(self.remote_field.limit_choices_to)
 
+
 ForeignObject.register_lookup(RelatedIn)
 ForeignObject.register_lookup(RelatedExact)
 ForeignObject.register_lookup(RelatedLessThan)
@@ -1446,8 +1447,10 @@ class ManyToManyField(RelatedField):
             if model != self.remote_field.through and model._meta.managed
         }
         m2m_db_table = self.m2m_db_table()
-        if m2m_db_table in registered_tables:
-            model = registered_tables[m2m_db_table]
+        model = registered_tables.get(m2m_db_table)
+        # The second condition allows multiple m2m relations on a model if
+        # some point to a through model that proxies another through model.
+        if model and model._meta.concrete_model != self.remote_field.through._meta.concrete_model:
             if model._meta.auto_created:
                 def _get_field_name(model):
                     for field in model._meta.auto_created._meta.many_to_many:
@@ -1528,7 +1531,21 @@ class ManyToManyField(RelatedField):
         else:
             join1infos = linkfield2.get_reverse_path_info()
             join2infos = linkfield1.get_path_info()
+
+        # Get join infos between the last model of join 1 and the first model
+        # of join 2. Assume the only reason these may differ is due to model
+        # inheritance.
+        join1_final = join1infos[-1].to_opts
+        join2_initial = join2infos[0].from_opts
+        if join1_final is join2_initial:
+            intermediate_infos = []
+        elif issubclass(join1_final.model, join2_initial.model):
+            intermediate_infos = join1_final.get_path_to_parent(join2_initial.model)
+        else:
+            intermediate_infos = join2_initial.get_path_from_parent(join1_final.model)
+
         pathinfos.extend(join1infos)
+        pathinfos.extend(intermediate_infos)
         pathinfos.extend(join2infos)
         return pathinfos
 
@@ -1548,7 +1565,8 @@ class ManyToManyField(RelatedField):
         elif self.db_table:
             return self.db_table
         else:
-            return utils.truncate_name('%s_%s' % (opts.db_table, self.name), connection.ops.max_name_length())
+            m2m_table_name = '%s_%s' % (utils.strip_quotes(opts.db_table), self.name)
+            return utils.truncate_name(m2m_table_name, connection.ops.max_name_length())
 
     def _get_m2m_attr(self, related, attr):
         """

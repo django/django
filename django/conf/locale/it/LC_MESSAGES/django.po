@@ -1,8 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# C8E <C8E@miron.it>, 2011
-# C8E <C8E@miron.it>, 2014
+# Carlo Miron <C8E@miron.it>, 2011
+# Carlo Miron <C8E@miron.it>, 2014
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Flavio Curella <flavio.curella@gmail.com>, 2013,2016
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -12,14 +12,14 @@
 # Nicola Larosa <transifex@teknico.net>, 2013
 # palmux <palmux@gmail.com>, 2014-2015
 # Mattia Procopio <promat85@gmail.com>, 2015
-# Stefano Brentegani <sbrentegani@gmail.com>, 2014-2015
+# Stefano Brentegani <sbrentegani@gmail.com>, 2014-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-18 21:06+0000\n"
-"Last-Translator: Flavio Curella <flavio.curella@gmail.com>\n"
+"PO-Revision-Date: 2016-09-28 11:39+0000\n"
+"Last-Translator: Stefano Brentegani <sbrentegani@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -71,7 +71,7 @@ msgid "German"
 msgstr "Tedesco"
 
 msgid "Lower Sorbian"
-msgstr "Basso-Sorbiano"
+msgstr "Sorabo inferiore"
 
 msgid "Greek"
 msgstr "Greco"
@@ -143,7 +143,7 @@ msgid "Croatian"
 msgstr "Croato"
 
 msgid "Upper Sorbian"
-msgstr "Alto-Sorbiano"
+msgstr "Sorabo superiore"
 
 msgid "Hungarian"
 msgstr "Ungherese"

@@ -66,6 +66,7 @@ def std_call(func):
     else:
         return lgdal[func]
 
+
 # #### Version-information functions. ####
 
 # Returns GDAL library version information with the given key.
@@ -83,6 +84,7 @@ def gdal_full_version():
     "Returns the full GDAL version information."
     return _version_info('')
 
+
 version_regex = re.compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<subminor>\d+))?')
 
 
@@ -92,6 +94,7 @@ def gdal_version_info():
     if not m:
         raise GDALException('Could not parse GDAL version string "%s"' % ver)
     return {key: m.group(key) for key in ('major', 'minor', 'subminor')}
+
 
 _verinfo = gdal_version_info()
 GDAL_MAJOR_VERSION = int(_verinfo['major'])
@@ -106,6 +109,8 @@ CPLErrorHandler = CFUNCTYPE(None, c_int, c_int, c_char_p)
 
 def err_handler(error_class, error_number, message):
     logger.error('GDAL_ERROR %d: %s', error_number, message)
+
+
 err_handler = CPLErrorHandler(err_handler)
 
 
@@ -114,6 +119,7 @@ def function(name, args, restype):
     func.argtypes = args
     func.restype = restype
     return func
+
 
 set_error_handler = function('CPLSetErrorHandler', [CPLErrorHandler], CPLErrorHandler)
 set_error_handler(err_handler)

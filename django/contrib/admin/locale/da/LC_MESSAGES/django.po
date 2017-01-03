@@ -144,6 +144,7 @@ msgstr "Tilføjet."
 msgid "and"
 msgstr "og"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr "Ændrede {fields} for {name} \"{object}\"."
 

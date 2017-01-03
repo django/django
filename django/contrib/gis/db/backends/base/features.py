@@ -26,10 +26,13 @@ class BaseSpatialFeatures(object):
     supports_real_shape_operations = True
     # Can geometry fields be null?
     supports_null_geometries = True
+    # Are empty geometries supported?
+    supports_empty_geometries = False
     # Can the the function be applied on geodetic coordinate systems?
     supports_distance_geodetic = True
     supports_length_geodetic = True
     supports_perimeter_geodetic = False
+    supports_area_geodetic = True
     # Is the database able to count vertices on polygons (with `num_points`)?
     supports_num_points_poly = True
 
@@ -79,7 +82,7 @@ class BaseSpatialFeatures(object):
         'svg', 'sym_difference', 'transform', 'translate', 'union', 'unionagg',
     )
 
-    # Specifies whether the Collect and Extent aggregates are supported by the database
+    # Is the aggregate supported by the database?
     @property
     def supports_collect_aggr(self):
         return aggregates.Collect not in self.connection.ops.disallowed_aggregates
@@ -91,6 +94,10 @@ class BaseSpatialFeatures(object):
     @property
     def supports_make_line_aggr(self):
         return aggregates.MakeLine not in self.connection.ops.disallowed_aggregates
+
+    @property
+    def supports_union_aggr(self):
+        return aggregates.Union not in self.connection.ops.disallowed_aggregates
 
     def __init__(self, *args):
         super(BaseSpatialFeatures, self).__init__(*args)

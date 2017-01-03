@@ -135,6 +135,7 @@ class MockTestRunner(object):
     def __init__(self, *args, **kwargs):
         pass
 
+
 MockTestRunner.run_tests = mock.Mock(return_value=[])
 
 
@@ -203,8 +204,6 @@ class Ticket17477RegressionTests(AdminScriptTestCase):
 
 class Sqlite3InMemoryTestDbs(TestCase):
 
-    available_apps = []
-
     @unittest.skipUnless(all(db.connections[conn].vendor == 'sqlite' for conn in db.connections),
                          "This is an sqlite-specific issue")
     def test_transaction_support(self):
@@ -236,7 +235,7 @@ class Sqlite3InMemoryTestDbs(TestCase):
 class DummyBackendTest(unittest.TestCase):
     def test_setup_databases(self):
         """
-        Test that setup_databases() doesn't fail with dummy database backend.
+        setup_databases() doesn't fail with dummy database backend.
         """
         tested_connections = db.ConnectionHandler({})
         with mock.patch('django.test.utils.connections', new=tested_connections):
@@ -248,7 +247,7 @@ class DummyBackendTest(unittest.TestCase):
 class AliasedDefaultTestSetupTest(unittest.TestCase):
     def test_setup_aliased_default_database(self):
         """
-        Test that setup_datebases() doesn't fail when 'default' is aliased
+        setup_datebases() doesn't fail when 'default' is aliased
         """
         tested_connections = db.ConnectionHandler({
             'default': {
@@ -353,7 +352,7 @@ class AutoIncrementResetTest(TransactionTestCase):
 class EmptyDefaultDatabaseTest(unittest.TestCase):
     def test_empty_default_database(self):
         """
-        Test that an empty default database in settings does not raise an ImproperlyConfigured
+        An empty default database in settings does not raise an ImproperlyConfigured
         error when running a unit test that does not use a database.
         """
         testcases.connections = db.ConnectionHandler({'default': {}})

@@ -8,7 +8,7 @@ import uuid
 
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.validators import RegexValidator
+from django.core.validators import MaxValueValidator, RegexValidator
 from django.forms import (
     BooleanField, CharField, CheckboxSelectMultiple, ChoiceField, DateField,
     DateTimeField, EmailField, FileField, FloatField, Form, HiddenInput,
@@ -17,12 +17,12 @@ from django.forms import (
     SplitDateTimeField, SplitHiddenDateTimeWidget, Textarea, TextInput,
     TimeField, ValidationError, forms,
 )
+from django.forms.renderers import DjangoTemplates, get_default_renderer
 from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
-from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import format_html
@@ -502,12 +502,12 @@ class FormsTestCase(SimpleTestCase):
             language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')])
 
         f = FrameworkForm(auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<select name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
         f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<select name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select name="language">
 <option value="P" selected>Python</option>
 <option value="J">Java</option>
 </select>""")
@@ -531,12 +531,12 @@ class FormsTestCase(SimpleTestCase):
             language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')], widget=Select(attrs={'class': 'foo'}))
 
         f = FrameworkForm(auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
         f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language">
 <option value="P" selected>Python</option>
 <option value="J">Java</option>
 </select>""")
@@ -552,12 +552,12 @@ class FormsTestCase(SimpleTestCase):
             )
 
         f = FrameworkForm(auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
         f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select class="foo" name="language">
 <option value="P" selected>Python</option>
 <option value="J">Java</option>
 </select>""")
@@ -568,10 +568,10 @@ class FormsTestCase(SimpleTestCase):
             language = ChoiceField()
 
         f = FrameworkForm(auto_id=False)
-        self.assertHTMLEqual(str(f['language']), """<select name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select name="language">
 </select>""")
         f.fields['language'].choices = [('P', 'Python'), ('J', 'Java')]
-        self.assertHTMLEqual(str(f['language']), """<select name="language" required>
+        self.assertHTMLEqual(str(f['language']), """<select name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
 </select>""")
@@ -678,6 +678,50 @@ Java</label></li>
 <div><label><input type="radio" name="name" value="george" required /> George</label></div>
 <div><label><input type="radio" name="name" value="ringo" required /> Ringo</label></div>"""
         )
+
+    def test_form_with_iterable_boundfield_id(self):
+        class BeatleForm(Form):
+            name = ChoiceField(
+                choices=[('john', 'John'), ('paul', 'Paul'), ('george', 'George'), ('ringo', 'Ringo')],
+                widget=RadioSelect,
+            )
+        fields = list(BeatleForm()['name'])
+        self.assertEqual(len(fields), 4)
+
+        self.assertEqual(fields[0].id_for_label, 'id_name_0')
+        self.assertEqual(fields[0].choice_label, 'John')
+        self.assertHTMLEqual(
+            fields[0].tag(),
+            '<input type="radio" name="name" value="john" id="id_name_0" required />'
+        )
+        self.assertHTMLEqual(
+            str(fields[0]),
+            '<label for="id_name_0"><input type="radio" name="name" '
+            'value="john" id="id_name_0" required /> John</label>'
+        )
+
+        self.assertEqual(fields[1].id_for_label, 'id_name_1')
+        self.assertEqual(fields[1].choice_label, 'Paul')
+        self.assertHTMLEqual(
+            fields[1].tag(),
+            '<input type="radio" name="name" value="paul" id="id_name_1" required />'
+        )
+        self.assertHTMLEqual(
+            str(fields[1]),
+            '<label for="id_name_1"><input type="radio" name="name" '
+            'value="paul" id="id_name_1" required /> Paul</label>'
+        )
+
+    def test_iterable_boundfield_select(self):
+        class BeatleForm(Form):
+            name = ChoiceField(choices=[('john', 'John'), ('paul', 'Paul'), ('george', 'George'), ('ringo', 'Ringo')])
+        fields = list(BeatleForm(auto_id=False)['name'])
+        self.assertEqual(len(fields), 4)
+
+        self.assertEqual(fields[0].id_for_label, 'id_name_0')
+        self.assertEqual(fields[0].choice_label, 'John')
+        self.assertHTMLEqual(fields[0].tag(), '<option value="john">John</option>')
+        self.assertHTMLEqual(str(fields[0]), '<option value="john">John</option>')
 
     def test_form_with_noniterable_boundfield(self):
         # You can iterate over any BoundField, not just those with widget=RadioSelect.
@@ -1101,7 +1145,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
         self.assertEqual(f.errors['password1'], ['Forbidden value 2.'])
         self.assertEqual(f.errors['password2'], ['Forbidden value 2.'])
 
-        with six.assertRaisesRegex(self, ValueError, "has no field named"):
+        with self.assertRaisesMessage(ValueError, "has no field named"):
             f.add_error('missing_field', 'Some error.')
 
     def test_update_error_dict(self):
@@ -1134,7 +1178,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
                 except ValidationError as e:
                     self._errors = e.update_error_dict(self._errors)
 
-                # Ensure that the newly added list of errors is an instance of ErrorList.
+                # The newly added list of errors is an instance of ErrorList.
                 for field, error_list in self._errors.items():
                     if not isinstance(error_list, self.error_class):
                         self._errors[field] = self.error_class(error_list)
@@ -1143,7 +1187,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
         # Trigger validation.
         self.assertFalse(form.is_valid())
 
-        # Check that update_error_dict didn't lose track of the ErrorDict type.
+        # update_error_dict didn't lose track of the ErrorDict type.
         self.assertIsInstance(form._errors, forms.ErrorDict)
 
         self.assertEqual(dict(form.errors), {
@@ -1325,10 +1369,10 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
         self.assertEqual(f['gender'].field.choices, [('f', 'Female'), ('m', 'Male')])
 
     def test_validators_independence(self):
-        """ Test that we are able to modify a form field validators list without polluting
-            other forms """
-        from django.core.validators import MaxValueValidator
-
+        """
+        The list of form field validators can be modified without polluting
+        other forms.
+        """
         class MyForm(Form):
             myfield = CharField(max_length=25)
 
@@ -1931,7 +1975,7 @@ Password: <input type="password" name="password" required /></li>
         self.assertIn('last_name', p.changed_data)
         self.assertNotIn('birthday', p.changed_data)
 
-        # Test that field raising ValidationError is always in changed_data
+        # A field raising ValidationError is always in changed_data
         class PedanticField(forms.Field):
             def to_python(self, value):
                 raise ValidationError('Whatever')
@@ -1990,12 +2034,13 @@ Password: <input type="password" name="password" required /></li>
 
     def test_boundfield_rendering(self):
         """
-        Python 2 issue: Test that rendering a BoundField with bytestring content
+        Python 2 issue: Rendering a BoundField with bytestring content
         doesn't lose it's safe string status (#22950).
         """
         class CustomWidget(TextInput):
-            def render(self, name, value, attrs=None):
-                return format_html(str('<input{} required />'), ' id=custom')
+            def render(self, name, value, attrs=None, choices=None,
+                       renderer=None, extra_context=None):
+                return format_html(str('<input{} />'), ' id=custom')
 
         class SampleForm(Form):
             name = CharField(widget=CustomWidget)
@@ -2318,37 +2363,37 @@ Password: <input type="password" name="password" required />
             is_cool = NullBooleanField()
 
         p = Person({'name': 'Joe'}, auto_id=False)
-        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': '1'}, auto_id=False)
-        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': '2'}, auto_id=False)
-        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2" selected>Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': '3'}, auto_id=False)
-        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2">Yes</option>
 <option value="3" selected>No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': True}, auto_id=False)
-        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2" selected>Yes</option>
 <option value="3">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': False}, auto_id=False)
-        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool" required>
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
 <option value="1">Unknown</option>
 <option value="2">Yes</option>
 <option value="3" selected>No</option>
@@ -2442,7 +2487,7 @@ Password: <input type="password" name="password" required />
                 form = UserRegistration(auto_id=False)
 
             if form.is_valid():
-                return 'VALID: %r' % sorted(six.iteritems(form.cleaned_data))
+                return 'VALID: %r' % sorted(form.cleaned_data.items())
 
             t = Template(
                 '<form action="" method="post">\n'
@@ -2714,7 +2759,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             """<li class="required error"><ul class="errorlist"><li>This field is required.</li></ul>
 <label class="required" for="id_name">Name:</label> <input type="text" name="name" id="id_name" required /></li>
 <li class="required"><label class="required" for="id_is_cool">Is cool:</label>
-<select name="is_cool" id="id_is_cool" required>
+<select name="is_cool" id="id_is_cool">
 <option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
@@ -2730,7 +2775,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
 <p class="required error"><label class="required" for="id_name">Name:</label>
 <input type="text" name="name" id="id_name" required /></p>
 <p class="required"><label class="required" for="id_is_cool">Is cool:</label>
-<select name="is_cool" id="id_is_cool" required>
+<select name="is_cool" id="id_is_cool">
 <option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
@@ -2748,7 +2793,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
 <td><ul class="errorlist"><li>This field is required.</li></ul>
 <input type="text" name="name" id="id_name" required /></td></tr>
 <tr class="required"><th><label class="required" for="id_is_cool">Is cool:</label></th>
-<td><select name="is_cool" id="id_is_cool" required>
+<td><select name="is_cool" id="id_is_cool">
 <option value="1" selected>Unknown</option>
 <option value="2">Yes</option>
 <option value="3">No</option>
@@ -2912,8 +2957,8 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         with self.assertRaisesMessage(ValidationError, "'Enter a complete value.'"):
             f.clean(['+61'])
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
-        six.assertRaisesRegex(
-            self, ValidationError,
+        self.assertRaisesRegex(
+            ValidationError,
             r"'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home']
         )
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
@@ -2928,16 +2973,14 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         with self.assertRaisesMessage(ValidationError, "'Enter a complete value.'"):
             f.clean(['+61'])
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
-        six.assertRaisesRegex(
-            self, ValidationError,
-            r"'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home']
-        )
+        with self.assertRaisesRegex(ValidationError, r"'Enter a complete value\.', u?'Enter an extension\.'"):
+            f.clean(['', '', '', 'Home'])
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(['61', '287654321', '123', 'Home'])
 
     def test_custom_empty_values(self):
         """
-        Test that form fields can customize what is considered as an empty value
+        Form fields can customize what is considered as an empty value
         for themselves (#19997).
         """
         class CustomJSONField(CharField):
@@ -3473,7 +3516,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             '<p><label for="id_f2">F2:</label> <input id="id_f2" maxlength="30" name="f2" type="text" /></p>'
             '<p><label for="id_f3">F3:</label> <textarea cols="40" id="id_f3" name="f3" rows="10" required>'
             '</textarea></p>'
-            '<p><label for="id_f4">F4:</label> <select id="id_f4" name="f4" required>'
+            '<p><label for="id_f4">F4:</label> <select id="id_f4" name="f4">'
             '<option value="P">Python</option>'
             '<option value="J">Java</option>'
             '</select></p>',
@@ -3485,7 +3528,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             '<li><label for="id_f2">F2:</label> <input id="id_f2" maxlength="30" name="f2" type="text" /></li>'
             '<li><label for="id_f3">F3:</label> <textarea cols="40" id="id_f3" name="f3" rows="10" required>'
             '</textarea></li>'
-            '<li><label for="id_f4">F4:</label> <select id="id_f4" name="f4" required>'
+            '<li><label for="id_f4">F4:</label> <select id="id_f4" name="f4">'
             '<option value="P">Python</option>'
             '<option value="J">Java</option>'
             '</select></li>',
@@ -3499,7 +3542,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             '<tr><th><label for="id_f3">F3:</label></th>'
             '<td><textarea cols="40" id="id_f3" name="f3" rows="10" required>'
             '</textarea></td></tr>'
-            '<tr><th><label for="id_f4">F4:</label></th><td><select id="id_f4" name="f4" required>'
+            '<tr><th><label for="id_f4">F4:</label></th><td><select id="id_f4" name="f4">'
             '<option value="P">Python</option>'
             '<option value="J">Java</option>'
             '</select></td></tr>',
@@ -3576,3 +3619,46 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         f = DataForm({'data': 'xyzzy'})
         self.assertTrue(f.is_valid())
         self.assertEqual(f.cleaned_data, {'data': 'xyzzy'})
+
+
+class CustomRenderer(DjangoTemplates):
+    pass
+
+
+class RendererTests(SimpleTestCase):
+
+    def test_default(self):
+        form = Form()
+        self.assertEqual(form.renderer, get_default_renderer())
+
+    def test_kwarg_instance(self):
+        custom = CustomRenderer()
+        form = Form(renderer=custom)
+        self.assertEqual(form.renderer, custom)
+
+    def test_kwarg_class(self):
+        custom = CustomRenderer()
+        form = Form(renderer=custom)
+        self.assertEqual(form.renderer, custom)
+
+    def test_attribute_instance(self):
+        class CustomForm(Form):
+            default_renderer = DjangoTemplates()
+
+        form = CustomForm()
+        self.assertEqual(form.renderer, CustomForm.default_renderer)
+
+    def test_attribute_class(self):
+        class CustomForm(Form):
+            default_renderer = CustomRenderer
+
+        form = CustomForm()
+        self.assertTrue(isinstance(form.renderer, CustomForm.default_renderer))
+
+    def test_attribute_override(self):
+        class CustomForm(Form):
+            default_renderer = DjangoTemplates()
+
+        custom = CustomRenderer()
+        form = CustomForm(renderer=custom)
+        self.assertEqual(form.renderer, custom)

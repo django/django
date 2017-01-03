@@ -7,14 +7,11 @@ import copy
 
 from django import forms
 from django.db.models.deletion import CASCADE
-from django.forms.utils import flatatt
-from django.forms.widgets import RadioFieldRenderer
-from django.template.loader import render_to_string
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils import six
 from django.utils.encoding import force_text
-from django.utils.html import format_html, format_html_join, smart_urlquote
+from django.utils.html import smart_urlquote
 from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
 from django.utils.translation import ugettext as _
@@ -37,17 +34,14 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         self.is_stacked = is_stacked
         super(FilteredSelectMultiple, self).__init__(attrs, choices)
 
-    def render(self, name, value, attrs=None):
-        if attrs is None:
-            attrs = {}
-        attrs['class'] = 'selectfilter'
+    def get_context(self, name, value, attrs=None):
+        context = super(FilteredSelectMultiple, self).get_context(name, value, attrs)
+        context['widget']['attrs']['class'] = 'selectfilter'
         if self.is_stacked:
-            attrs['class'] += 'stacked'
-
-        attrs['data-field-name'] = self.verbose_name
-        attrs['data-is-stacked'] = int(self.is_stacked)
-        output = super(FilteredSelectMultiple, self).render(name, value, attrs)
-        return mark_safe(output)
+            context['widget']['attrs']['class'] += 'stacked'
+        context['widget']['attrs']['data-field-name'] = self.verbose_name
+        context['widget']['attrs']['data-is-stacked'] = int(self.is_stacked)
+        return context
 
 
 class AdminDateWidget(forms.DateInput):
@@ -80,38 +74,27 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
     """
     A SplitDateTime Widget that has some admin-specific styling.
     """
+    template_name = 'admin/widgets/split_datetime.html'
+
     def __init__(self, attrs=None):
         widgets = [AdminDateWidget, AdminTimeWidget]
         # Note that we're calling MultiWidget, not SplitDateTimeWidget, because
         # we want to define widgets.
         forms.MultiWidget.__init__(self, widgets, attrs)
 
-    def format_output(self, rendered_widgets):
-        return format_html('<p class="datetime">{} {}<br />{} {}</p>',
-                           _('Date:'), rendered_widgets[0],
-                           _('Time:'), rendered_widgets[1])
-
-
-class AdminRadioFieldRenderer(RadioFieldRenderer):
-    def render(self):
-        """Outputs a <ul> for this set of radio fields."""
-        return format_html('<ul{}>\n{}\n</ul>',
-                           flatatt(self.attrs),
-                           format_html_join('\n', '<li>{}</li>',
-                                            ((force_text(w),) for w in self)))
+    def get_context(self, name, value, attrs):
+        context = super(AdminSplitDateTime, self).get_context(name, value, attrs)
+        context['date_label'] = _('Date:')
+        context['time_label'] = _('Time:')
+        return context
 
 
 class AdminRadioSelect(forms.RadioSelect):
-    renderer = AdminRadioFieldRenderer
+    template_name = 'admin/widgets/radio.html'
 
 
 class AdminFileWidget(forms.ClearableFileInput):
-    template_with_initial = (
-        '<p class="file-upload">%s</p>' % forms.ClearableFileInput.template_with_initial
-    )
-    template_with_clear = (
-        '<span class="clearable-file-input">%s</span>' % forms.ClearableFileInput.template_with_clear
-    )
+    template_name = 'admin/widgets/clearable_file_input.html'
 
 
 def url_params_from_lookup_dict(lookups):
@@ -141,17 +124,17 @@ class ForeignKeyRawIdWidget(forms.TextInput):
     A Widget for displaying ForeignKeys in the "raw_id" interface rather than
     in a <select> box.
     """
+    template_name = 'admin/widgets/foreign_key_raw_id.html'
+
     def __init__(self, rel, admin_site, attrs=None, using=None):
         self.rel = rel
         self.admin_site = admin_site
         self.db = using
         super(ForeignKeyRawIdWidget, self).__init__(attrs)
 
-    def render(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs=None):
+        context = super(ForeignKeyRawIdWidget, self).get_context(name, value, attrs)
         rel_to = self.rel.model
-        if attrs is None:
-            attrs = {}
-        extra = []
         if rel_to in self.admin_site._registry:
             # The related object is registered with the same AdminSite
             related_url = reverse(
@@ -164,21 +147,16 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
             params = self.url_parameters()
             if params:
-                url = '?' + '&amp;'.join('%s=%s' % (k, v) for k, v in params.items())
-            else:
-                url = ''
-            if "class" not in attrs:
-                attrs['class'] = 'vForeignKeyRawIdAdminField'  # The JavaScript code looks for this hook.
-            # TODO: "lookup_id_" is hard-coded here. This should instead use
-            # the correct API to determine the ID dynamically.
-            extra.append(
-                '<a href="%s%s" class="related-lookup" id="lookup_id_%s" title="%s"></a>'
-                % (related_url, url, name, _('Lookup'))
-            )
-        output = [super(ForeignKeyRawIdWidget, self).render(name, value, attrs)] + extra
-        if value:
-            output.append(self.label_for_value(value))
-        return mark_safe(''.join(output))
+                related_url += '?' + '&amp;'.join(
+                    '%s=%s' % (k, v) for k, v in params.items(),
+                )
+            context['related_url'] = mark_safe(related_url)
+            context['link_title'] = _('Lookup')
+            # The JavaScript code looks for this class.
+            context['widget']['attrs'].setdefault('class', 'vForeignKeyRawIdAdminField')
+        if context['widget']['value']:
+            context['link_label'], context['link_url'] = self.label_and_url_for_value(value)
+        return context
 
     def base_url_parameters(self):
         limit_choices_to = self.rel.limit_choices_to
@@ -192,17 +170,15 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         params.update({TO_FIELD_VAR: self.rel.get_related_field().name})
         return params
 
-    def label_for_value(self, value):
+    def label_and_url_for_value(self, value):
         key = self.rel.get_related_field().name
         try:
             obj = self.rel.model._default_manager.using(self.db).get(**{key: value})
         except (ValueError, self.rel.model.DoesNotExist):
-            return ''
+            return '', ''
 
-        label = '&nbsp;<strong>{}</strong>'
-        text = Truncator(obj).words(14, truncate='...')
         try:
-            change_url = reverse(
+            url = reverse(
                 '%s:%s_%s_change' % (
                     self.admin_site.name,
                     obj._meta.app_label,
@@ -211,11 +187,9 @@ class ForeignKeyRawIdWidget(forms.TextInput):
                 args=(obj.pk,)
             )
         except NoReverseMatch:
-            pass  # Admin not registered for target model.
-        else:
-            text = format_html('<a href="{}">{}</a>', change_url, text)
+            url = ''  # Admin not registered for target model.
 
-        return format_html(label, text)
+        return Truncator(obj).words(14, truncate='...'), url
 
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
@@ -223,28 +197,28 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     A Widget for displaying ManyToMany ids in the "raw_id" interface rather than
     in a <select multiple> box.
     """
-    def render(self, name, value, attrs=None):
-        if attrs is None:
-            attrs = {}
+    template_name = 'admin/widgets/many_to_many_raw_id.html'
+
+    def get_context(self, name, value, attrs=None):
+        context = super(ManyToManyRawIdWidget, self).get_context(name, value, attrs)
         if self.rel.model in self.admin_site._registry:
             # The related object is registered with the same AdminSite
-            attrs['class'] = 'vManyToManyRawIdAdminField'
-        if value:
-            value = ','.join(force_text(v) for v in value)
-        else:
-            value = ''
-        return super(ManyToManyRawIdWidget, self).render(name, value, attrs)
+            context['widget']['attrs']['class'] = 'vManyToManyRawIdAdminField'
+        return context
 
     def url_parameters(self):
         return self.base_url_parameters()
 
-    def label_for_value(self, value):
-        return ''
+    def label_and_url_for_value(self, value):
+        return '', ''
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name)
         if value:
             return value.split(',')
+
+    def format_value(self, value):
+        return ','.join(force_text(v) for v in value) if value else ''
 
 
 class RelatedFieldWidgetWrapper(forms.Widget):
@@ -252,7 +226,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     This class is a wrapper to a given widget to add the add icon for the
     admin interface.
     """
-    template = 'admin/related_widget_wrapper.html'
+    template_name = 'admin/widgets/related_widget_wrapper.html'
 
     def __init__(self, widget, rel, admin_site, can_add_related=None,
                  can_change_related=False, can_delete_related=False):
@@ -294,21 +268,19 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         return reverse("admin:%s_%s_%s" % (info + (action,)),
                        current_app=self.admin_site.name, args=args)
 
-    def render(self, name, value, *args, **kwargs):
+    def get_context(self, name, value, attrs=None):
+        with self.widget.override_choices(self.choices):
+            context = self.widget.get_context(name, value, attrs)
+
         from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
         rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
-        self.widget.choices = self.choices
         url_params = '&'.join("%s=%s" % param for param in [
             (TO_FIELD_VAR, self.rel.get_related_field().name),
             (IS_POPUP_VAR, 1),
         ])
-        context = {
-            'widget': self.widget.render(name, value, *args, **kwargs),
-            'name': name,
-            'url_params': url_params,
-            'model': rel_opts.verbose_name,
-        }
+        context['url_params'] = url_params
+        context['model'] = rel_opts.verbose_name
         if self.can_change_related:
             change_related_template_url = self.get_related_url(info, 'change', '__fk__')
             context.update(
@@ -327,12 +299,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
                 can_delete_related=True,
                 delete_related_template_url=delete_related_template_url,
             )
-        return mark_safe(render_to_string(self.template, context))
-
-    def build_attrs(self, extra_attrs=None, **kwargs):
-        "Helper function for building an attribute dictionary."
-        self.attrs = self.widget.build_attrs(extra_attrs=None, **kwargs)
-        return self.attrs
+        return context
 
     def value_from_datadict(self, data, files, name):
         return self.widget.value_from_datadict(data, files, name)
@@ -366,23 +333,24 @@ class AdminEmailInputWidget(forms.EmailInput):
 
 
 class AdminURLFieldWidget(forms.URLInput):
+    template_name = 'admin/widgets/url.html'
+
     def __init__(self, attrs=None):
         final_attrs = {'class': 'vURLField'}
         if attrs is not None:
             final_attrs.update(attrs)
         super(AdminURLFieldWidget, self).__init__(attrs=final_attrs)
 
-    def render(self, name, value, attrs=None):
-        html = super(AdminURLFieldWidget, self).render(name, value, attrs)
-        if value:
-            value = force_text(self.format_value(value))
-            final_attrs = {'href': smart_urlquote(value)}
-            html = format_html(
-                '<p class="url">{} <a{}>{}</a><br />{} {}</p>',
-                _('Currently:'), flatatt(final_attrs), value,
-                _('Change:'), html
-            )
-        return html
+    def get_context(self, name, value, attrs):
+        context = super(AdminURLFieldWidget, self).get_context(name, value, attrs)
+        context['current_label'] = _('Currently:')
+        context['change_label'] = _('Change:')
+        context['widget']['href'] = smart_urlquote(context['widget']['value'])
+        return context
+
+    def format_value(self, value):
+        value = super(AdminURLFieldWidget, self).format_value(value)
+        return force_text(value)
 
 
 class AdminIntegerFieldWidget(forms.NumberInput):

@@ -30,7 +30,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-07-01 12:37+0000\n"
+"PO-Revision-Date: 2016-08-09 13:26+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -768,7 +768,7 @@ msgstr "Wybierz poprawną wartość. Podana nie jest jednym z dostępnych wybor�
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" nie jest poprawną wartością klucza głównego."
+msgstr "„%(pk)s” nie jest poprawną wartością klucza głównego."
 
 #, python-format
 msgid ""
@@ -1136,9 +1136,9 @@ msgid ""
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
-"Jeżeli nagłówki \"Referer\" w Twojej przeglądarce są wyłączone, to proszę "
+"Jeżeli nagłówki „Referer” w Twojej przeglądarce są wyłączone, to proszę "
 "włącz je ponownie. Przynajmniej dla tej strony, połączeń HTTPS lub zapytań "
-"typu \"same-origin\"."
+"typu „same-origin”."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1155,7 +1155,7 @@ msgid ""
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
 "Jeżeli ciasteczka w Twojej przeglądarce są wyłączone, to proszę włącz je "
-"ponownie. Przynajmniej dla tej strony lub żadań typu \"same-origin\"."
+"ponownie. Przynajmniej dla tej strony lub żadań typu „same-origin”."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Więcej informacji jest dostępnych po ustawieniu DEBUG=True."

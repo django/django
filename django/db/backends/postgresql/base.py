@@ -28,6 +28,7 @@ def psycopg2_version():
     version = psycopg2.__version__.split(' ', 1)[0]
     return tuple(int(v) for v in version.split('.') if v.isdigit())
 
+
 PSYCOPG2_VERSION = psycopg2_version()
 
 if PSYCOPG2_VERSION < (2, 4, 5):

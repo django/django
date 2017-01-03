@@ -10,6 +10,8 @@ def ngettext(singular, plural, number):
     if number == 1:
         return singular
     return plural
+
+
 ngettext_lazy = ngettext
 
 
@@ -54,6 +56,7 @@ def gettext(message):
 
 def ugettext(message):
     return force_text(gettext(message))
+
 
 gettext_noop = gettext_lazy = _ = gettext
 

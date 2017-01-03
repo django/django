@@ -17,7 +17,7 @@ from django.test.utils import (
 from django.utils.encoding import force_text
 from django.utils.six import StringIO
 
-from .models import SimpleModel
+from .models import SimpleModel, my_check
 
 
 class DummyObj(object):
@@ -137,12 +137,16 @@ def simple_system_check(**kwargs):
 def tagged_system_check(**kwargs):
     tagged_system_check.kwargs = kwargs
     return [checks.Warning('System Check')]
+
+
 tagged_system_check.tags = ['simpletag']
 
 
 def deployment_system_check(**kwargs):
     deployment_system_check.kwargs = kwargs
     return [checks.Warning('Deployment Check')]
+
+
 deployment_system_check.tags = ['deploymenttag']
 
 
@@ -299,3 +303,8 @@ class CheckFrameworkReservedNamesTests(SimpleTestCase):
             ),
         ]
         self.assertEqual(errors, expected)
+
+
+class ChecksRunDuringTests(SimpleTestCase):
+    def test_registered_check_did_run(self):
+        self.assertTrue(my_check.did_run)

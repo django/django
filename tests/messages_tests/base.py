@@ -197,8 +197,7 @@ class BaseTests(object):
     @override_settings(MESSAGE_LEVEL=constants.DEBUG)
     def test_multiple_posts(self):
         """
-        Tests that messages persist properly when multiple POSTs are made
-        before a GET.
+        Messages persist properly when multiple POSTs are made before a GET.
         """
         data = {
             'messages': ['Test message %d' % x for x in range(5)],
@@ -229,8 +228,8 @@ class BaseTests(object):
     )
     def test_middleware_disabled(self):
         """
-        Tests that, when the middleware is disabled, an exception is raised
-        when one attempts to store a message.
+        When the middleware is disabled, an exception is raised when one
+        attempts to store a message.
         """
         data = {
             'messages': ['Test message %d' % x for x in range(5)],
@@ -254,8 +253,8 @@ class BaseTests(object):
     )
     def test_middleware_disabled_fail_silently(self):
         """
-        Tests that, when the middleware is disabled, an exception is not
-        raised if 'fail_silently' = True
+        When the middleware is disabled, an exception is not raised
+        if 'fail_silently' = True
         """
         data = {
             'messages': ['Test message %d' % x for x in range(5)],
@@ -285,8 +284,7 @@ class BaseTests(object):
 
     def test_existing_read(self):
         """
-        Tests that reading the existing storage doesn't cause the data to be
-        lost.
+        Reading the existing storage doesn't cause the data to be lost.
         """
         storage = self.get_existing_storage()
         self.assertFalse(storage.used)

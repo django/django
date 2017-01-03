@@ -217,7 +217,7 @@ class MigrationWriter(object):
         if self.migration.initial:
             items['initial_str'] = "\n    initial = True\n"
 
-        return (MIGRATION_TEMPLATE % items).encode("utf8")
+        return MIGRATION_TEMPLATE % items
 
     @property
     def basedir(self):

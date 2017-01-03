@@ -214,4 +214,5 @@ class Related(models.Model):
 def prevent_deletes(sender, instance, **kwargs):
     raise ProtectedError("Not allowed to delete.", [instance])
 
+
 models.signals.pre_delete.connect(prevent_deletes, sender=Node)

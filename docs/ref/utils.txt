@@ -53,7 +53,6 @@ need to distinguish caches by the ``Accept-language`` header.
     Adds some useful headers to the given ``HttpResponse`` object:
 
     * ``ETag``
-    * ``Last-Modified``
     * ``Expires``
     * ``Cache-Control``
 
@@ -62,15 +61,19 @@ need to distinguish caches by the ``Accept-language`` header.
     ``cache_timeout`` is in seconds. The :setting:`CACHE_MIDDLEWARE_SECONDS`
     setting is used by default.
 
+    .. versionchanged:: 1.11
+
+        In older versions, the ``Last-Modified`` header was also set.
+
+    .. deprecated:: 1.11
+
+        Since the ``USE_ETAGS`` setting is deprecated, this function won't set
+        the ``ETag`` header when the deprecation ends in Django 2.1.
+
 .. function:: add_never_cache_headers(response)
 
     Adds a ``Cache-Control: max-age=0, no-cache, no-store, must-revalidate``
     header to a response to indicate that a page should never be cached.
-
-    .. versionchanged:: 1.8.8
-
-        In older versions, ``Cache-Control: max-age=0`` was sent. This didn't
-        reliably prevent caching in all browsers.
 
 .. function:: patch_vary_headers(response, newheaders)
 
@@ -958,7 +961,7 @@ appropriate entities.
 
     Sets the :ref:`current time zone <default-current-time-zone>`. The
     ``timezone`` argument must be an instance of a :class:`~datetime.tzinfo`
-    subclass or, if pytz_ is available, a time zone name.
+    subclass or a time zone name.
 
 .. function:: deactivate()
 
@@ -1035,21 +1038,18 @@ appropriate entities.
     :class:`~datetime.datetime`. If ``timezone`` is set to ``None``, it
     defaults to the :ref:`current time zone <default-current-time-zone>`.
 
-    When pytz_ is installed, the exception ``pytz.AmbiguousTimeError``
-    will be raised if you try to make ``value`` aware during a DST transition
-    where the same time occurs twice (when reverting from DST). Setting
-    ``is_dst`` to ``True`` or ``False`` will avoid the exception by choosing if
-    the time is pre-transition or post-transition respectively.
+    The ``pytz.AmbiguousTimeError`` exception is raised if you try to make
+    ``value`` aware during a DST transition where the same time occurs twice
+    (when reverting from DST). Setting ``is_dst`` to ``True`` or ``False`` will
+    avoid the exception by choosing if the time is pre-transition or
+    post-transition respectively.
 
-    When pytz_ is installed, the exception ``pytz.NonExistentTimeError``
-    will be raised if you try to make ``value`` aware during a DST transition
-    such that the time never occurred (when entering into DST). Setting
-    ``is_dst`` to ``True`` or ``False`` will avoid the exception by moving the
-    hour backwards or forwards by 1 respectively. For example, ``is_dst=True``
-    would change a non-existent time of 2:30 to 1:30 and ``is_dst=False``
-    would change the time to 3:30.
-
-    ``is_dst`` has no effect when ``pytz`` is not installed.
+    The ``pytz.NonExistentTimeError`` exception is raised if you try to make
+    ``value`` aware during a DST transition such that the time never occurred
+    (when entering into DST). Setting ``is_dst`` to ``True`` or ``False`` will
+    avoid the exception by moving the hour backwards or forwards by 1
+    respectively. For example, ``is_dst=True`` would change a non-existent
+    time of 2:30 to 1:30 and ``is_dst=False`` would change the time to 3:30.
 
 .. function:: make_naive(value, timezone=None)
 
@@ -1057,8 +1057,6 @@ appropriate entities.
     ``timezone``  the same point in time as ``value``, ``value`` being an
     aware :class:`~datetime.datetime`. If ``timezone`` is set to ``None``, it
     defaults to the :ref:`current time zone <default-current-time-zone>`.
-
-.. _pytz: http://pytz.sourceforge.net/
 
 ``django.utils.translation``
 ============================

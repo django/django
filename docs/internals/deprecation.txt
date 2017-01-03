@@ -41,6 +41,19 @@ details on these changes.
 * The ``authenticate()`` method of authentication backends will require a
   ``request`` argument.
 
+* The ``django.db.models.permalink()`` decorator will be removed.
+
+* The ``USE_ETAGS`` setting will be removed. ``CommonMiddleware`` and
+  ``django.utils.cache.patch_response_headers()`` will no longer set ETags.
+
+* The ``Model._meta.has_auto_field`` attribute will be removed.
+
+* Support for regular expression groups with ``iLmsu#`` in ``url()`` will be
+  removed.
+
+* Support for ``Widget.render()`` methods without the ``renderer`` argument
+  will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0
@@ -51,6 +64,9 @@ details on these changes.
 
 * The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` will
   be removed.
+
+* ``django.db.backends.base.BaseDatabaseOperations.check_aggregate_support()``
+  will be removed.
 
 * The ``django.forms.extras`` package will be removed.
 
@@ -302,7 +318,7 @@ details on these changes.
 * ``django.db.models.field.subclassing.SubfieldBase`` will be removed.
 
 * ``django.utils.checksums`` will be removed; its functionality is included
-  in django-localflavor 1.1+.
+  in ``django-localflavor`` 1.1+.
 
 * The ``original_content_type_id`` attribute on
   ``django.contrib.admin.helpers.InlineAdminForm`` will be removed.
@@ -743,9 +759,9 @@ details on these changes.
   and ``django.utils.text.truncate_html_words()`` will be removed in
   favor of the ``django.utils.text.Truncator`` class.
 
-* The :class:`~django.contrib.gis.geoip.GeoIP` class was moved to
-  :mod:`django.contrib.gis.geoip` in 1.4 -- the shortcut in
-  :mod:`django.contrib.gis.utils` will be removed.
+* The ``django.contrib.gis.geoip.GeoIP`` class was moved to
+  ``django.contrib.gis.geoip`` in 1.4 -- the shortcut in
+  ``django.contrib.gis.utils`` will be removed.
 
 * ``django.conf.urls.defaults`` will be removed. The functions
   :func:`~django.conf.urls.include`, ``patterns()`` and

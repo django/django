@@ -45,11 +45,11 @@ class HeadersCheckMixin(object):
 
     def assertMessageHasHeaders(self, message, headers):
         """
-        Check that :param message: has all :param headers: headers.
+        Asserts that the `message` has all `headers`.
 
-        :param message: can be an instance of an email.Message subclass or a
-        string with the contents of an email message.
-        :param headers: should be a set of (header-name, header-value) tuples.
+        message: can be an instance of an email.Message subclass or a string
+                 with the contents of an email message.
+        headers: should be a set of (header-name, header-value) tuples.
         """
         if isinstance(message, binary_type):
             message = message_from_bytes(message)
@@ -99,6 +99,22 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(message.get_payload(), 'Content')
         self.assertEqual(message['From'], 'from@example.com')
         self.assertEqual(message['To'], 'to@example.com, other@example.com')
+
+    def test_recipients_with_empty_strings(self):
+        """
+        Empty strings in various recipient arguments are always stripped
+        off the final recipient list.
+        """
+        email = EmailMessage(
+            'Subject', 'Content', 'from@example.com', ['to@example.com', ''],
+            cc=['cc@example.com', ''],
+            bcc=['', 'bcc@example.com'],
+            reply_to=['', None],
+        )
+        self.assertEqual(
+            email.recipients(),
+            ['to@example.com', 'cc@example.com', 'bcc@example.com']
+        )
 
     def test_cc(self):
         """Regression test for #7722"""
@@ -416,7 +432,6 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
     def test_attach_text_as_bytes(self):
         msg = EmailMessage('subject', 'body', 'from@example.com', ['to@example.com'])
         msg.attach('file.txt', b'file content')
-        # Check that the message would be sent at all.
         sent_num = msg.send()
         self.assertEqual(sent_num, 1)
         filename, content, mimetype = self.get_decoded_attachments(msg)[0]
@@ -554,7 +569,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             'Subject', 'UTF-8 encoded body', 'bounce@example.com', ['to@example.com'],
             headers={'From': 'from@example.com'},
         )
-        self.assertNotIn(b'Content-Transfer-Encoding: base64', msg.message().as_bytes())
+        self.assertIn(b'Content-Transfer-Encoding: 7bit', msg.message().as_bytes())
 
         # Ticket #11212
         # Shouldn't use quoted printable, should detect it can represent content with 7 bit data
@@ -563,7 +578,6 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             headers={'From': 'from@example.com'},
         )
         s = msg.message().as_bytes()
-        self.assertNotIn(b'Content-Transfer-Encoding: quoted-printable', s)
         self.assertIn(b'Content-Transfer-Encoding: 7bit', s)
 
         # Shouldn't use quoted printable, should detect it can represent content with 8 bit data
@@ -572,16 +586,18 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             headers={'From': 'from@example.com'},
         )
         s = msg.message().as_bytes()
-        self.assertNotIn(b'Content-Transfer-Encoding: quoted-printable', s)
         self.assertIn(b'Content-Transfer-Encoding: 8bit', s)
+        s = msg.message().as_string()
+        self.assertIn(str('Content-Transfer-Encoding: 8bit'), s)
 
         msg = EmailMessage(
             'Subject', 'Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.', 'bounce@example.com',
             ['to@example.com'], headers={'From': 'from@example.com'},
         )
         s = msg.message().as_bytes()
-        self.assertNotIn(b'Content-Transfer-Encoding: quoted-printable', s)
         self.assertIn(b'Content-Transfer-Encoding: 8bit', s)
+        s = msg.message().as_string()
+        self.assertIn(str('Content-Transfer-Encoding: 8bit'), s)
 
     def test_dont_base64_encode_message_rfc822(self):
         # Ticket #18967
@@ -603,7 +619,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         parent_msg.attach(content=child_s, mimetype='message/rfc822')
         parent_s = parent_msg.message().as_string()
 
-        # Verify that the child message header is not base64 encoded
+        # The child message header is not base64 encoded
         self.assertIn(str('Child Subject'), parent_s)
 
         # Feature test: try attaching email.Message object directly to the mail.
@@ -614,7 +630,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         parent_msg.attach(content=child_msg.message(), mimetype='message/rfc822')
         parent_s = parent_msg.message().as_string()
 
-        # Verify that the child message header is not base64 encoded
+        # The child message header is not base64 encoded
         self.assertIn(str('Child Subject'), parent_s)
 
         # Feature test: try attaching Django's EmailMessage object directly to the mail.
@@ -625,7 +641,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         parent_msg.attach(content=child_msg, mimetype='message/rfc822')
         parent_s = parent_msg.message().as_string()
 
-        # Verify that the child message header is not base64 encoded
+        # The child message header is not base64 encoded
         self.assertIn(str('Child Subject'), parent_s)
 
     def test_sanitize_address(self):
@@ -873,7 +889,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
     @override_settings(ADMINS=[], MANAGERS=[])
     def test_empty_admins(self):
         """
-        Test that mail_admins/mail_managers doesn't connect to the mail server
+        mail_admins/mail_managers doesn't connect to the mail server
         if there are no recipients (#9383)
         """
         mail_admins('hi', 'there')
@@ -954,14 +970,14 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
 
     def test_close_connection(self):
         """
-        Test that connection can be closed (even when not explicitly opened)
+        Connection can be closed (even when not explicitly opened)
         """
         conn = mail.get_connection(username='', password='')
         conn.close()
 
     def test_use_as_contextmanager(self):
         """
-        Test that the connection can be used as a contextmanager.
+        The connection can be used as a contextmanager.
         """
         opened = [False]
         closed = [False]
@@ -1097,7 +1113,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
     def test_console_stream_kwarg(self):
         """
-        Test that the console backend can be pointed at an arbitrary stream.
+        The console backend can be pointed at an arbitrary stream.
         """
         s = StringIO()
         connection = mail.get_connection('django.core.mail.backends.console.EmailBackend', stream=s)
@@ -1283,20 +1299,18 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
     def test_auth_attempted(self):
         """
-        Test that opening the backend with non empty username/password tries
+        Opening the backend with non empty username/password tries
         to authenticate against the SMTP server.
         """
         backend = smtp.EmailBackend(
             username='not empty username', password='not empty password')
-        try:
-            with self.assertRaisesMessage(SMTPException, 'SMTP AUTH extension not supported by server.'):
-                backend.open()
-        finally:
-            backend.close()
+        with self.assertRaisesMessage(SMTPException, 'SMTP AUTH extension not supported by server.'):
+            with backend:
+                pass
 
     def test_server_open(self):
         """
-        Test that open() tells us whether it opened a connection.
+        open() returns whether it opened a connection.
         """
         backend = smtp.EmailBackend(username='', password='')
         self.assertFalse(backend.connection)
@@ -1314,7 +1328,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
         backend = CustomEmailBackend(username='username', password='password')
         with self.assertRaises(SMTPAuthenticationError):
-            backend.open()
+            with backend:
+                pass
 
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_use_settings(self):
@@ -1376,29 +1391,25 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     def test_email_tls_attempts_starttls(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_tls)
-        try:
-            with self.assertRaisesMessage(SMTPException, 'STARTTLS extension not supported by server.'):
-                backend.open()
-        finally:
-            backend.close()
+        with self.assertRaisesMessage(SMTPException, 'STARTTLS extension not supported by server.'):
+            with backend:
+                pass
 
     @override_settings(EMAIL_USE_SSL=True)
     def test_email_ssl_attempts_ssl_connection(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_ssl)
-        try:
-            with self.assertRaises(SSLError):
-                backend.open()
-        finally:
-            backend.close()
+        with self.assertRaises(SSLError):
+            with backend:
+                pass
 
     def test_connection_timeout_default(self):
-        """Test that the connection's timeout value is None by default."""
+        """The connection's timeout value is None by default."""
         connection = mail.get_connection('django.core.mail.backends.smtp.EmailBackend')
         self.assertIsNone(connection.timeout)
 
     def test_connection_timeout_custom(self):
-        """Test that the timeout parameter can be customized."""
+        """The timeout parameter can be customized."""
         class MyEmailBackend(smtp.EmailBackend):
             def __init__(self, *args, **kwargs):
                 kwargs.setdefault('timeout', 42)
@@ -1416,7 +1427,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         self.assertEqual(backend.timeout, 10)
 
     def test_email_msg_uses_crlf(self):
-        """#23063 -- Test that RFC-compliant messages are sent over SMTP."""
+        """#23063 -- RFC-compliant messages are sent over SMTP."""
         send = SMTP.send
         try:
             smtp_messages = []
@@ -1441,16 +1452,13 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
             if PY3:
                 msg = msg.decode('utf-8')
-            # Ensure that the message only contains CRLF and not combinations of CRLF, LF, and CR.
+            # The message only contains CRLF and not combinations of CRLF, LF, and CR.
             msg = msg.replace('\r\n', '')
             self.assertNotIn('\r', msg)
             self.assertNotIn('\n', msg)
 
         finally:
             SMTP.send = send
-
-
-class SMTPNoServerTests(SimpleTestCase):
 
     def test_send_messages_after_open_failed(self):
         """
@@ -1465,30 +1473,31 @@ class SMTPNoServerTests(SimpleTestCase):
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
         self.assertEqual(backend.send_messages([email]), None)
 
+
+class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
+    """
+    These tests require a separate class, because the FakeSMTPServer is shut
+    down in setUpClass(), and it cannot be restarted ("RuntimeError: threads
+    can only be started once").
+    """
+    @classmethod
+    def setUpClass(cls):
+        super(SMTPBackendStoppedServerTests, cls).setUpClass()
+        cls.backend = smtp.EmailBackend(username='', password='')
+        cls.server.stop()
+
+    def test_server_stopped(self):
+        """
+        Closing the backend while the SMTP server is stopped doesn't raise an
+        exception.
+        """
+        self.backend.close()
+
     def test_fail_silently_on_connection_error(self):
         """
         A socket connection error is silenced with fail_silently=True.
         """
-        backend = smtp.EmailBackend(username='', password='')
         with self.assertRaises(socket.error):
-            backend.open()
-        backend.fail_silently = True
-        backend.open()
-
-
-class SMTPBackendStoppedServerTest(SMTPBackendTestsBase):
-    """
-    This test requires a separate class, because it shuts down the
-    FakeSMTPServer started in setUpClass(). It cannot be restarted
-    ("RuntimeError: threads can only be started once").
-    """
-
-    def test_server_stopped(self):
-        """
-        Test that closing the backend while the SMTP server is stopped doesn't
-        raise an exception.
-        """
-        backend = smtp.EmailBackend(username='', password='')
-        backend.open()
-        self.server.stop()
-        backend.close()
+            self.backend.open()
+        self.backend.fail_silently = True
+        self.backend.open()

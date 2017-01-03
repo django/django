@@ -228,6 +228,7 @@ def keep_lazy_text(func):
     """
     return keep_lazy(six.text_type)(func)
 
+
 empty = object()
 
 
@@ -299,11 +300,12 @@ class LazyObject(object):
             self._setup()
         return (unpickle_lazyobject, (self._wrapped,))
 
-    # We have to explicitly override __getstate__ so that older versions of
-    # pickle don't try to pickle the __dict__ (which in the case of a
-    # SimpleLazyObject may contain a lambda). The value will end up being
-    # ignored by our __reduce__ and custom unpickler.
     def __getstate__(self):
+        """
+        Prevent older versions of pickle from trying to pickle the __dict__
+        (which in the case of a SimpleLazyObject may contain a lambda). The
+        value will be ignored by __reduce__() and the custom unpickler.
+        """
         return {}
 
     def __copy__(self):
@@ -408,27 +410,6 @@ class SimpleLazyObject(LazyObject):
             memo[id(self)] = result
             return result
         return copy.deepcopy(self._wrapped, memo)
-
-
-class lazy_property(property):
-    """
-    A property that works with subclasses by wrapping the decorated
-    functions of the base class.
-    """
-    def __new__(cls, fget=None, fset=None, fdel=None, doc=None):
-        if fget is not None:
-            @wraps(fget)
-            def fget(instance, instance_type=None, name=fget.__name__):
-                return getattr(instance, name)()
-        if fset is not None:
-            @wraps(fset)
-            def fset(instance, value, name=fset.__name__):
-                return getattr(instance, name)(value)
-        if fdel is not None:
-            @wraps(fdel)
-            def fdel(instance, name=fdel.__name__):
-                return getattr(instance, name)()
-        return property(fget, fset, fdel, doc)
 
 
 def partition(predicate, values):

@@ -564,14 +564,14 @@ class Queries1Tests(TestCase):
         self.assertEqual(d, {'a': 'one', 'b': 'two'})
 
         # Order by the number of tags attached to an item.
-        l = (
+        qs = (
             Item.objects
             .extra(select={
                 'count': 'select count(*) from queries_item_tags where queries_item_tags.item_id = queries_item.id'
             })
             .order_by('-count')
         )
-        self.assertEqual([o.count for o in l], [2, 2, 1, 0])
+        self.assertEqual([o.count for o in qs], [2, 2, 1, 0])
 
     def test_ticket6154(self):
         # Multiple filter statements are joined using "AND" all the time.
@@ -890,7 +890,7 @@ class Queries1Tests(TestCase):
 
     def test_ticket17429(self):
         """
-        Ensure that Meta.ordering=None works the same as Meta.ordering=[]
+        Meta.ordering=None works the same as Meta.ordering=[]
         """
         original_ordering = Tag._meta.ordering
         Tag._meta.ordering = None
@@ -1380,9 +1380,8 @@ class Queries4Tests(TestCase):
         self.assertEqual(str(q1.query), str(q2.query))
 
     def test_combine_join_reuse(self):
-        # Test that we correctly recreate joins having identical connections
-        # in the rhs query, in case the query is ORed together. Related to
-        # ticket #18748
+        # Joins having identical connections are correctly recreated in the
+        # rhs query, in case the query is ORed together (#18748).
         Report.objects.create(name='r4', creator=self.a1)
         q1 = Author.objects.filter(report__name='r5')
         q2 = Author.objects.filter(report__name='r4').filter(report__name='r1')
@@ -1393,7 +1392,7 @@ class Queries4Tests(TestCase):
 
     def test_ticket7095(self):
         # Updates that are filtered on the model being updated are somewhat
-        # tricky in MySQL. This exercises that case.
+        # tricky in MySQL.
         ManagedModel.objects.create(data='mm1', tag=self.t1, public=True)
         self.assertEqual(ManagedModel.objects.update(data='mm'), 1)
 
@@ -1810,7 +1809,7 @@ class Queries6Tests(TestCase):
         Annotation.objects.create(name='a2', tag=t4)
 
     def test_parallel_iterators(self):
-        # Test that parallel iterators work.
+        # Parallel iterators work.
         qs = Tag.objects.all()
         i1, i2 = iter(qs), iter(qs)
         self.assertEqual(repr(next(i1)), '<Tag: t1>')
@@ -2075,7 +2074,7 @@ class CloneTests(TestCase):
 
     def test_no_model_options_cloning(self):
         """
-        Test that cloning a queryset does not get out of hand. While complete
+        Cloning a queryset does not get out of hand. While complete
         testing is impossible, this is a sanity check against invalid use of
         deepcopy. refs #16759.
         """
@@ -2092,7 +2091,7 @@ class CloneTests(TestCase):
 
     def test_no_fields_cloning(self):
         """
-        Test that cloning a queryset does not get out of hand. While complete
+        Cloning a queryset does not get out of hand. While complete
         testing is impossible, this is a sanity check against invalid use of
         deepcopy. refs #16759.
         """
@@ -2538,7 +2537,7 @@ class ConditionalTests(TestCase):
     # changing a parameter at compilation time.
     @skipUnlessDBFeature('supports_1000_query_parameters')
     def test_ticket14244(self):
-        # Test that the "in" lookup works with lists of 1000 items or more.
+        # The "in" lookup works with lists of 1000 items or more.
         # The numbers amount is picked to force three different IN batches
         # for Oracle, yet to be less than 2100 parameter limit for MSSQL.
         numbers = list(range(2050))
@@ -2814,7 +2813,7 @@ class NullInExcludeTest(TestCase):
         self.assertQuerysetEqual(
             NullableName.objects.exclude(name__in=inner_qs),
             [none_val], attrgetter('name'))
-        # Check that the inner queryset wasn't executed - it should be turned
+        # The inner queryset wasn't executed - it should be turned
         # into subquery above
         self.assertIs(inner_qs._result_cache, None)
 
@@ -2840,7 +2839,7 @@ class NullInExcludeTest(TestCase):
 
 class EmptyStringsAsNullTest(TestCase):
     """
-    Test that filtering on non-null character fields works as expected.
+    Filtering on non-null character fields works as expected.
     The reason for these tests is that Oracle treats '' as NULL, and this
     can cause problems in query construction. Refs #17957.
     """
@@ -2871,7 +2870,7 @@ class EmptyStringsAsNullTest(TestCase):
 class ProxyQueryCleanupTest(TestCase):
     def test_evaluated_proxy_count(self):
         """
-        Test that generating the query string doesn't alter the query's state
+        Generating the query string doesn't alter the query's state
         in irreversible ways. Refs #18248.
         """
         ProxyCategory.objects.create()
@@ -2946,7 +2945,7 @@ class WhereNodeTest(TestCase):
             w.as_sql(compiler, connection)
 
 
-class IteratorExceptionsTest(TestCase):
+class QuerySetExceptionTests(TestCase):
     def test_iter_exceptions(self):
         qs = ExtraInfo.objects.only('author')
         with self.assertRaises(AttributeError):
@@ -2956,10 +2955,23 @@ class IteratorExceptionsTest(TestCase):
         # Test for #19895 - second iteration over invalid queryset
         # raises errors.
         qs = Article.objects.order_by('invalid_column')
-        with self.assertRaises(FieldError):
+        msg = "Cannot resolve keyword 'invalid_column' into field."
+        with self.assertRaisesMessage(FieldError, msg):
             list(qs)
-        with self.assertRaises(FieldError):
+        with self.assertRaisesMessage(FieldError, msg):
             list(qs)
+
+    def test_invalid_order_by(self):
+        msg = "Invalid order_by arguments: ['*']"
+        if six.PY2:
+            msg = msg.replace("[", "[u")
+        with self.assertRaisesMessage(FieldError, msg):
+            list(Article.objects.order_by('*'))
+
+    def test_invalid_queryset_model(self):
+        msg = 'Cannot use QuerySet for "Article": Use a QuerySet for "ExtraInfo".'
+        with self.assertRaisesMessage(ValueError, msg):
+            list(Author.objects.filter(extra=Article.objects.all()))
 
 
 class NullJoinPromotionOrTest(TestCase):
@@ -3117,9 +3129,9 @@ class NullJoinPromotionOrTest(TestCase):
 
 class ReverseJoinTrimmingTest(TestCase):
     def test_reverse_trimming(self):
-        # Check that we don't accidentally trim reverse joins - we can't know
-        # if there is anything on the other side of the join, so trimming
-        # reverse joins can't be done, ever.
+        # We don't accidentally trim reverse joins - we can't know if there is
+        # anything on the other side of the join, so trimming reverse joins
+        # can't be done, ever.
         t = Tag.objects.create()
         qs = Tag.objects.filter(annotation__tag=t.pk)
         self.assertIn('INNER JOIN', str(qs.query))
@@ -3128,7 +3140,7 @@ class ReverseJoinTrimmingTest(TestCase):
 
 class JoinReuseTest(TestCase):
     """
-    Test that the queries reuse joins sensibly (for example, direct joins
+    The queries reuse joins sensibly (for example, direct joins
     are always reused).
     """
     def test_fk_reuse(self):
@@ -3379,7 +3391,7 @@ class EmptyStringPromotionTests(TestCase):
 
 class ValuesSubqueryTests(TestCase):
     def test_values_in_subquery(self):
-        # Check that if a values() queryset is used, then the given values
+        # If a values() queryset is used, then the given values
         # will be used instead of forcing use of the relation's field.
         o1 = Order.objects.create(id=-2)
         o2 = Order.objects.create(id=-1)

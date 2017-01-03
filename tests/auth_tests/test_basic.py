@@ -16,7 +16,7 @@ from .models import CustomUser
 
 class BasicTestCase(TestCase):
     def test_user(self):
-        "Check that users can be created and can set their password"
+        "Users can be created and can set their password"
         u = User.objects.create_user('testuser', 'test@example.com', 'testpw')
         self.assertTrue(u.has_usable_password())
         self.assertFalse(u.check_password('bad'))
@@ -77,7 +77,7 @@ class BasicTestCase(TestCase):
             self.assertEqual(str(warns[0].message), deprecation_message)
 
     def test_user_no_email(self):
-        "Check that users can be created without an email"
+        "Users can be created without an email"
         u = User.objects.create_user('testuser1')
         self.assertEqual(u.email, '')
 

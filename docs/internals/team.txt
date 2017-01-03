@@ -151,7 +151,7 @@ Karen Tracey
 
     .. _Jannis Leidel: https://jezdez.com/
     .. _Bauhaus-University Weimar: http://www.uni-weimar.de/
-    .. _virtualenv: http://www.virtualenv.org/
+    .. _virtualenv: https://virtualenv.pypa.io/
     .. _pip: https://pip.pypa.io/
     .. _Mozilla: https://www.mozilla.org/
 
@@ -191,7 +191,7 @@ Ramiro Morales
 `Chris Beaven`_
     Chris has been submitting patches and suggesting crazy ideas for Django
     since early 2006. An advocate for community involvement and a long-term
-    triager, he is still often found answering questions in the #django IRC
+    triager, he is still often found answering questions in the `#django` IRC
     channel.
 
     Chris lives in Napier, New Zealand (adding to the pool of Oceanic core
@@ -267,14 +267,14 @@ Paul McMillan
     .. _l10n.gnome.org: https://l10n.gnome.org
 
 Anssi Kääriäinen
-    Anssi works as a developer at Finnish National Institute for Health and
-    Welfare. He is also a computer science student at Aalto University. In his
-    work he uses Django for developing internal business applications and sees
-    Django as a great match for that use case.
+    Anssi works as a Senior Backend Developer at `Holvi`, a Finnish financial
+    technology company building digital banking solutions for freelancers and
+    small businesses. What makes `Holvi` an exciting challenge for Anssi is
+    using technology to create something real people care for and actually want
+    to use. In his daily work, he's building a full stack bank with Django.
 
-    Anssi is interested in developing the object relational mapper (ORM) and
-    all related features. He's also a fan of benchmarking and he tries keep
-    Django as fast as possible.
+    Anssi works mostly on ORM related issues and enjoys making the ORM solve
+    complex query problems.
 
 Florian Apolloner
     Florian is currently studying Physics at the `Graz University of Technology`_.
@@ -423,9 +423,9 @@ Daniele Procida
 `Michael Manfre`_
     Michael started running Django on Windows against a Microsoft SQL Server
     (MSSQL) database in 2008. He quickly became the maintainer of the
-    django-mssql 3rd party database backend. Much of his involvement with
-    Django relates to the ORM, the private 3rd party database API, and using
-    Django on Windows.
+    ``django-mssql`` database backend. Much of his involvement with Django
+    relates to the ORM, the private 3rd party database API, and using Django on
+    Windows.
 
     Michael lives in Cary, NC, USA.
 
@@ -461,11 +461,11 @@ Daniele Procida
     specialization.  Upon finding Django when it was first open sourced, he
     realized it was possible to enjoy web development.
 
-    He spends a lot of time helping people on the #django IRC channel, and has
-    authored and released a number of `smaller django apps`_.
+    He spends a lot of time helping people on the `#django` IRC channel, and
+    has authored and released a number of `smaller Django apps`_.
 
     .. _Curtis Maloney: http://musings.tinbrain.net/blog/
-    .. _smaller django apps: https://github.com/funkybob/
+    .. _smaller Django apps: https://github.com/funkybob/
 
 `Markus Holtermann`_
     Markus is a senior backend developer at `LaterPay`_ in Munich. He studied
@@ -570,6 +570,30 @@ Daniele Procida
     .. _Coding is for Girls: https://www.youtube.com/channel/UC0hNd2uW8jTR5K3KBzRuG2A
     .. _Potato: https://p.ota.to
 
+`Adam Johnson`_
+    Adam started working with Django in 2012 on his first non-PHP website and
+    has never looked back. He has since been pushing for it to be more friendly
+    with MySQL / MariaDB, and now helps organize the London Django Meetup.
+
+    Adam hails from Cheltenham, UK and currently resides in London where he
+    works for `Time Out`_.
+
+    .. _Adam Johnson: https://adamj.eu/
+    .. _Time Out: https://www.timeout.com/
+
+`Lucie Daeye`_
+    Lucie studied Geography and Korean Studies at university. She discovered
+    Django during the very first `Django Girls`_ in 2014: she coded her first
+    first web app for her PhD research, loved it, and decided to switch career
+    to programming.
+
+    Since then, she's organized two `Django Girls workshops in Paris`_ and
+    coached at numerous events. She started working for Django Girls in
+    September 2015 and is now their `Awesomeness Ambassador`_.
+
+    .. _Lucie Daeye: https://justhiding.org/
+    .. _Django Girls workshops in Paris: https://djangogirls.org/paris/
+    .. _Awesomeness Ambassador: https://github.com/DjangoGirls/wiki/blob/master/general/ambassador.md
 
 Past team members
 =================

@@ -80,14 +80,14 @@ class TestModelChoiceField(TestCase):
 
 class TestTicket14567(TestCase):
     """
-    Check that the return values of ModelMultipleChoiceFields are QuerySets
+    The return values of ModelMultipleChoiceFields are QuerySets
     """
     def test_empty_queryset_return(self):
         "If a model's ManyToManyField has blank=True and is saved with no data, a queryset is returned."
         option = ChoiceOptionModel.objects.create(name='default')
         form = OptionalMultiChoiceModelForm({'multi_choice_optional': '', 'multi_choice': [option.pk]})
         self.assertTrue(form.is_valid())
-        # Check that the empty value is a QuerySet
+        # The empty value is a QuerySet
         self.assertIsInstance(form.cleaned_data['multi_choice_optional'], models.query.QuerySet)
         # While we're at it, test whether a QuerySet is returned if there *is* a value.
         self.assertIsInstance(form.cleaned_data['multi_choice'], models.query.QuerySet)
@@ -109,12 +109,12 @@ class ModelFormCallableModelDefault(TestCase):
         ChoiceOptionModel.objects.create(id=3, name='option 3')
         self.assertHTMLEqual(
             ChoiceFieldForm().as_p(),
-            """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice" required>
+            """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
 <option value="1" selected>ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
 </select><input type="hidden" name="initial-choice" value="1" id="initial-id_choice" /></p>
-<p><label for="id_choice_int">Choice int:</label> <select name="choice_int" id="id_choice_int" required>
+<p><label for="id_choice_int">Choice int:</label> <select name="choice_int" id="id_choice_int">
 <option value="1" selected>ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
@@ -145,12 +145,12 @@ class ModelFormCallableModelDefault(TestCase):
                 'multi_choice': [obj2, obj3],
                 'multi_choice_int': ChoiceOptionModel.objects.exclude(name="default"),
             }).as_p(),
-            """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice" required>
+            """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
 <option value="1">ChoiceOption 1</option>
 <option value="2" selected>ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
 </select><input type="hidden" name="initial-choice" value="2" id="initial-id_choice" /></p>
-<p><label for="id_choice_int">Choice int:</label> <select name="choice_int" id="id_choice_int" required>
+<p><label for="id_choice_int">Choice int:</label> <select name="choice_int" id="id_choice_int">
 <option value="1">ChoiceOption 1</option>
 <option value="2" selected>ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
@@ -330,7 +330,7 @@ class EmptyLabelTestCase(TestCase):
         )
 
     def test_save_empty_label_forms(self):
-        # Test that saving a form with a blank choice results in the expected
+        # Saving a form with a blank choice results in the expected
         # value being stored in the database.
         tests = [
             (EmptyCharLabelNoneChoiceForm, 'choice_string_w_none', None),

@@ -6,7 +6,7 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
 
-# The custom User uses email as the unique identifier, and requires
+# The custom user uses email as the unique identifier, and requires
 # that every user provide a date of birth. This lets us test
 # changes in username datatype, and non-text required fields.
 class CustomUserManager(BaseUserManager):

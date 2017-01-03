@@ -57,6 +57,8 @@ class GDALRaster(GDALBase):
     """
     Wraps a raster GDAL Data Source object.
     """
+    destructor = capi.close_ds
+
     def __init__(self, ds_input, write=False):
         self._write = 1 if write else 0
         Driver.ensure_registered()
@@ -108,9 +110,22 @@ class GDALRaster(GDALBase):
             # Set band data if provided
             for i, band_input in enumerate(ds_input.get('bands', [])):
                 band = self.bands[i]
-                band.data(band_input['data'])
                 if 'nodata_value' in band_input:
                     band.nodata_value = band_input['nodata_value']
+                    # Instantiate band filled with nodata values if only
+                    # partial input data has been provided.
+                    if band.nodata_value is not None and (
+                            'data' not in band_input or
+                            'size' in band_input or
+                            'shape' in band_input):
+                        band.data(data=(band.nodata_value,), shape=(1, 1))
+                # Set band data values from input.
+                band.data(
+                    data=band_input.get('data'),
+                    size=band_input.get('size'),
+                    shape=band_input.get('shape'),
+                    offset=band_input.get('offset'),
+                )
 
             # Set SRID
             self.srs = ds_input.get('srid')
@@ -129,12 +144,6 @@ class GDALRaster(GDALBase):
             self._ptr = ds_input
         else:
             raise GDALException('Invalid data source input type: "{}".'.format(type(ds_input)))
-
-    def __del__(self):
-        try:
-            capi.close_ds(self._ptr)
-        except (AttributeError, TypeError):
-            pass  # Some part might already have been garbage collected
 
     def __str__(self):
         return self.name
@@ -339,15 +348,11 @@ class GDALRaster(GDALBase):
         if 'datatype' not in ds_input:
             ds_input['datatype'] = self.bands[0].datatype()
 
-        # Set the number of bands
-        ds_input['nr_of_bands'] = len(self.bands)
+        # Instantiate raster bands filled with nodata values.
+        ds_input['bands'] = [{'nodata_value': bnd.nodata_value} for bnd in self.bands]
 
         # Create target raster
         target = GDALRaster(ds_input, write=True)
-
-        # Copy nodata values to warped raster
-        for index, band in enumerate(self.bands):
-            target.bands[index].nodata_value = band.nodata_value
 
         # Select resampling algorithm
         algorithm = GDAL_RESAMPLE_ALGORITHMS[resampling]

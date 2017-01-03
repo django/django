@@ -745,7 +745,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
 
     def test_inactive_user(self):
         """
-        Test that inactive user cannot receive password reset email.
+        Inactive user cannot receive password reset email.
         """
         (user, username, email) = self.create_dummy_user()
         user.is_active = False

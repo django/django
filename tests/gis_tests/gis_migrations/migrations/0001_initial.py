@@ -1,6 +1,5 @@
-from django.db import connection, migrations, models
-
-from ...models import models as gis_models
+from django.contrib.gis.db import models
+from django.db import connection, migrations
 
 ops = [
     migrations.CreateModel(
@@ -8,7 +7,7 @@ ops = [
         fields=[
             ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
             ('name', models.CharField(max_length=100, unique=True)),
-            ('geom', gis_models.MultiPolygonField(srid=4326)),
+            ('geom', models.MultiPolygonField(srid=4326)),
         ],
         options={
             'required_db_features': ['gis_enabled'],
@@ -27,7 +26,7 @@ ops = [
             )),
             ('address', models.CharField(max_length=100)),
             ('zip_code', models.IntegerField(null=True, blank=True)),
-            ('geom', gis_models.PointField(srid=4326, geography=True)),
+            ('geom', models.PointField(srid=4326, geography=True)),
         ],
         options={
             'required_db_features': ['gis_enabled'],
@@ -59,7 +58,7 @@ if connection.features.gis_enabled and connection.features.supports_raster:
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=100, unique=True)),
-                ('rast', gis_models.fields.RasterField(srid=4326)),
+                ('rast', models.fields.RasterField(srid=4326)),
             ],
             options={
             },

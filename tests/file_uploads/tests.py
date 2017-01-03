@@ -450,7 +450,7 @@ class FileUploadTests(TestCase):
             })
 
         request = response.wsgi_request
-        # Check that the files got actually parsed.
+        # The files were parsed.
         self.assertTrue(hasattr(request, '_files'))
 
         file = request._files['file']
@@ -469,7 +469,7 @@ class FileUploadTests(TestCase):
             })
 
         request = response.wsgi_request
-        # Check that the fd closing logic doesn't trigger parsing of the stream
+        # The fd closing logic doesn't trigger parsing of the stream
         self.assertFalse(hasattr(request, '_files'))
 
     def test_file_error_blocking(self):

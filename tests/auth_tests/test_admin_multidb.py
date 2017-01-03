@@ -15,6 +15,7 @@ class Router(object):
 
     db_for_write = db_for_read
 
+
 site = admin.AdminSite(name='test_adminsite')
 site.register(User, admin_class=UserAdmin)
 

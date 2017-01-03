@@ -28,7 +28,6 @@ class BaseDatabaseFeatures(object):
     has_bulk_insert = False
     uses_savepoints = False
     can_release_savepoints = False
-    can_combine_inserts_with_and_without_auto_increment_pk = False
 
     # If True, don't use integer foreign keys referring to, e.g., positive
     # integer primary keys.
@@ -58,7 +57,6 @@ class BaseDatabaseFeatures(object):
     # Is there a REAL datatype in addition to floats/doubles?
     has_real_datatype = False
     supports_subqueries_in_group_by = True
-    supports_bitwise_or = True
 
     # Is there a true datatype for uuid?
     has_native_uuid_field = False
@@ -69,12 +67,6 @@ class BaseDatabaseFeatures(object):
     # Does the database driver supports same type temporal data subtraction
     # by returning the type used to store duration field?
     supports_temporal_subtraction = False
-
-    # Does the database driver support timedeltas as arguments?
-    # This is only relevant when there is a native duration field.
-    # Specifically, there is a bug with cx_Oracle:
-    # https://bitbucket.org/anthony_tuininga/cx_oracle/issue/7/
-    driver_supports_timedelta_args = False
 
     # Do time/datetime fields have microsecond precision?
     supports_microsecond_precision = True
@@ -117,9 +109,6 @@ class BaseDatabaseFeatures(object):
 
     # Does the backend reset sequences between tests?
     supports_sequence_reset = True
-
-    # Can the backend determine reliably the length of a CharField?
-    can_introspect_max_length = True
 
     # Can the backend determine reliably if a field is nullable?
     # Note that this is separate from interprets_empty_strings_as_nulls,
@@ -225,9 +214,9 @@ class BaseDatabaseFeatures(object):
     # Defaults to False to allow third-party backends to opt-in.
     can_clone_databases = False
 
-    # Does the backend consider quoted identifiers with different casing to
+    # Does the backend consider table names with different casing to
     # be equal?
-    ignores_quoted_identifier_case = False
+    ignores_table_name_case = False
 
     # Place FOR UPDATE right after FROM clause. Used on MSSQL.
     for_update_after_from = False

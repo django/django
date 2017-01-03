@@ -133,7 +133,7 @@ class ExecutorTests(MigrationTestBase):
     })
     def test_empty_plan(self):
         """
-        Tests that re-planning a full migration of a fully-migrated set doesn't
+        Re-planning a full migration of a fully-migrated set doesn't
         perform spurious unmigrations and remigrations.
 
         There was previously a bug where the executor just always performed the
@@ -404,7 +404,7 @@ class ExecutorTests(MigrationTestBase):
     )
     def test_unrelated_model_lookups_forwards(self):
         """
-        #24123 - Tests that all models of apps already applied which are
+        #24123 - All models of apps already applied which are
         unrelated to the first app being applied are part of the initial model
         state.
         """
@@ -449,7 +449,7 @@ class ExecutorTests(MigrationTestBase):
     )
     def test_unrelated_model_lookups_backwards(self):
         """
-        #24123 - Tests that all models of apps being unapplied which are
+        #24123 - All models of apps being unapplied which are
         unrelated to the first app being unapplied are part of the initial
         model state.
         """

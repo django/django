@@ -107,12 +107,25 @@ class AggregationTests(TestCase):
         for attr, value in six.iteritems(kwargs):
             self.assertEqual(getattr(obj, attr), value)
 
+    def test_annotation_with_value(self):
+        values = Book.objects.filter(
+            name='Practical Django Projects',
+        ).annotate(
+            discount_price=F('price') * 2,
+        ).values(
+            'discount_price',
+        ).annotate(sum_discount=Sum('discount_price'))
+        self.assertSequenceEqual(
+            values,
+            [{'discount_price': Decimal('59.38'), 'sum_discount': Decimal('59.38')}]
+        )
+
     def test_aggregates_in_where_clause(self):
         """
         Regression test for #12822: DatabaseError: aggregates not allowed in
         WHERE clause
 
-        Tests that the subselect works and returns results equivalent to a
+        The subselect works and returns results equivalent to a
         query with the IDs listed.
 
         Before the corresponding fix for this bug, this test passed in 1.1 and
@@ -310,14 +323,14 @@ class AggregationTests(TestCase):
             'name': 'The Definitive Guide to Django: Web Development Done Right',
         })
 
-        # Check that all of the objects are getting counted (allow_nulls) and
-        # that values respects the amount of objects
+        # All of the objects are getting counted (allow_nulls) and that values
+        # respects the amount of objects
         self.assertEqual(
             len(Author.objects.annotate(Avg('friends__age')).values()),
             9
         )
 
-        # Check that consecutive calls to annotate accumulate in the query
+        # Consecutive calls to annotate accumulate in the query
         qs = (
             Book.objects
             .values('price')
@@ -676,8 +689,7 @@ class AggregationTests(TestCase):
         # Regression for #15709 - Ensure each group_by field only exists once
         # per query
         qstr = str(Book.objects.values('publisher').annotate(max_pages=Max('pages')).order_by().query)
-        # Check that there is just one GROUP BY clause (zero commas means at
-        # most one clause)
+        # There is just one GROUP BY clause (zero commas means at most one clause).
         self.assertEqual(qstr[qstr.index('GROUP BY'):].count(', '), 0)
 
     def test_duplicate_alias(self):
@@ -930,7 +942,7 @@ class AggregationTests(TestCase):
         self.assertEqual(list(qs), list(Book.objects.values_list("pk", flat=True)))
 
     def test_having_group_by(self):
-        # Test that when a field occurs on the LHS of a HAVING clause that it
+        # When a field occurs on the LHS of a HAVING clause that it
         # appears correctly in the GROUP BY clause
         qs = Book.objects.values_list("name").annotate(
             n_authors=Count("authors")
@@ -1123,13 +1135,13 @@ class AggregationTests(TestCase):
 
     def test_annotate_joins(self):
         """
-        Test that the base table's join isn't promoted to LOUTER. This could
+        The base table's join isn't promoted to LOUTER. This could
         cause the query generation to fail if there is an exclude() for fk-field
         in the query, too. Refs #19087.
         """
         qs = Book.objects.annotate(n=Count('pk'))
         self.assertIs(qs.query.alias_map['aggregation_regress_book'].join_type, None)
-        # Check that the query executes without problems.
+        # The query executes without problems.
         self.assertEqual(len(qs.exclude(publisher=-1)), 6)
 
     @skipUnlessAnyDBFeature('allows_group_by_pk', 'allows_group_by_selected_pks')
@@ -1145,8 +1157,6 @@ class AggregationTests(TestCase):
         self.assertIn('id', group_by[0][0])
         self.assertNotIn('name', group_by[0][0])
         self.assertNotIn('age', group_by[0][0])
-
-        # Ensure that we get correct results.
         self.assertEqual(
             [(a.name, a.num_contacts) for a in results.order_by('name')],
             [
@@ -1171,8 +1181,6 @@ class AggregationTests(TestCase):
         self.assertIn('id', grouping[0][0])
         self.assertNotIn('name', grouping[0][0])
         self.assertNotIn('age', grouping[0][0])
-
-        # Ensure that we get correct results.
         self.assertEqual(
             [(a.name, a.num_contacts) for a in results.order_by('name')],
             [
@@ -1199,8 +1207,6 @@ class AggregationTests(TestCase):
         self.assertIn('id', grouping[0][0])
         self.assertNotIn('name', grouping[0][0])
         self.assertNotIn('contact', grouping[0][0])
-
-        # Ensure that we get correct results.
         self.assertEqual(
             [(b.name, b.num_authors) for b in results.order_by('name')],
             [
@@ -1295,7 +1301,7 @@ class AggregationTests(TestCase):
         )
 
     def test_name_expressions(self):
-        # Test that aggregates are spotted correctly from F objects.
+        # Aggregates are spotted correctly from F objects.
         # Note that Adrian's age is 34 in the fixtures, and he has one book
         # so both conditions match one author.
         qs = Author.objects.annotate(Count('book')).filter(
@@ -1318,7 +1324,7 @@ class AggregationTests(TestCase):
 
     def test_ticket_11293_q_immutable(self):
         """
-        Check that splitting a q object to parts for where/having doesn't alter
+        Splitting a q object to parts for where/having doesn't alter
         the original q-object.
         """
         q1 = Q(isbn='')
@@ -1329,8 +1335,7 @@ class AggregationTests(TestCase):
 
     def test_fobj_group_by(self):
         """
-        Check that an F() object referring to related column works correctly
-        in group by.
+        An F() object referring to related column works correctly in group by.
         """
         qs = Book.objects.annotate(
             account=Count('authors')

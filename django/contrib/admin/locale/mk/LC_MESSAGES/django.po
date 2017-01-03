@@ -144,6 +144,7 @@ msgstr "Додадено."
 msgid "and"
 msgstr "и"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr "Изменето {fields} за {name} \"{object}\"."
 

@@ -126,7 +126,7 @@ class FormsMediaTestCase(SimpleTestCase):
 <script type="text/javascript" src="/path/to/js4"></script>"""
         )
 
-        # Check that media addition hasn't affected the original objects
+        # media addition hasn't affected the original objects
         self.assertEqual(
             str(w1.media),
             """<link href="http://media.example.com/static/path/to/css1" type="text/css" media="all" rel="stylesheet" />

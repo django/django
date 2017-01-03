@@ -9,6 +9,7 @@ import unittest
 import warnings
 from importlib import import_module
 
+from django.core.management import call_command
 from django.db import connections
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import (
@@ -89,6 +90,14 @@ class RemoteTestResult(object):
     def test_index(self):
         return self.testsRun - 1
 
+    def _confirm_picklable(self, obj):
+        """
+        Confirm that obj can be pickled and unpickled as multiprocessing will
+        need to pickle the exception in the child process and unpickle it in
+        the parent process. Let the exception rise, if not.
+        """
+        pickle.loads(pickle.dumps(obj))
+
     def _print_unpicklable_subtest(self, test, subtest, pickle_exc):
         print("""
 Subtest failed:
@@ -113,7 +122,7 @@ with a cleaner failure message.
         # with the multiprocessing module. Since we're in a forked process,
         # our best chance to communicate with them is to print to stdout.
         try:
-            pickle.dumps(err)
+            self._confirm_picklable(err)
         except Exception as exc:
             original_exc_txt = repr(err[1])
             original_exc_txt = textwrap.fill(original_exc_txt, 75, initial_indent='    ', subsequent_indent='    ')
@@ -154,7 +163,7 @@ failure and get a correct traceback.
 
     def check_subtest_picklable(self, test, subtest):
         try:
-            pickle.dumps(subtest)
+            self._confirm_picklable(subtest)
         except Exception as exc:
             self._print_unpicklable_subtest(test, subtest, exc)
             raise
@@ -547,6 +556,11 @@ class DiscoverRunner(object):
             verbosity=self.verbosity,
         )
 
+    def run_checks(self):
+        # Checks are run after database creation since some checks require
+        # database access.
+        call_command('check', verbosity=self.verbosity)
+
     def run_suite(self, suite, **kwargs):
         kwargs = self.get_test_runner_kwargs()
         runner = self.test_runner(**kwargs)
@@ -585,6 +599,7 @@ class DiscoverRunner(object):
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
         old_config = self.setup_databases()
+        self.run_checks()
         result = self.run_suite(suite)
         self.teardown_databases(old_config)
         self.teardown_test_environment()

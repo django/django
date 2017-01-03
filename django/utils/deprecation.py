@@ -119,6 +119,10 @@ class CallableBool:
     def __or__(self, other):
         return bool(self.value or other)
 
+    def __hash__(self):
+        return hash(self.value)
+
+
 CallableFalse = CallableBool(False)
 CallableTrue = CallableBool(True)
 

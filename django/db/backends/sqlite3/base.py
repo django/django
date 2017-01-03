@@ -11,6 +11,8 @@ import decimal
 import re
 import warnings
 
+import pytz
+
 from django.conf import settings
 from django.db import utils
 from django.db.backends import utils as backend_utils
@@ -22,11 +24,6 @@ from django.utils.dateparse import (
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.safestring import SafeBytes
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 try:
     try:
@@ -66,6 +63,7 @@ def decoder(conv_func):
         passing it to the receiver function.
     """
     return lambda s: conv_func(s.decode('utf-8'))
+
 
 Database.register_converter(str("bool"), decoder(lambda s: s == '1'))
 Database.register_converter(str("time"), decoder(parse_time))
@@ -347,6 +345,8 @@ def _sqlite_date_extract(lookup_type, dt):
         return None
     if lookup_type == 'week_day':
         return (dt.isoweekday() % 7) + 1
+    elif lookup_type == 'week':
+        return dt.isocalendar()[1]
     else:
         return getattr(dt, lookup_type)
 
@@ -409,6 +409,8 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname):
         return None
     if lookup_type == 'week_day':
         return (dt.isoweekday() % 7) + 1
+    elif lookup_type == 'week':
+        return dt.isocalendar()[1]
     else:
         return getattr(dt, lookup_type)
 

@@ -1,13 +1,14 @@
 from django.conf import settings
+from django.core.checks.messages import Warning
 from django.core.checks.urls import (
-    check_url_config, get_warning_for_invalid_pattern,
+    E006, check_url_config, check_url_namespaces_unique, check_url_settings,
+    get_warning_for_invalid_pattern,
 )
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.utils import six
 
 
-class CheckUrlsTest(SimpleTestCase):
+class CheckUrlConfigTests(SimpleTestCase):
     @override_settings(ROOT_URLCONF='check_framework.urls.no_warnings')
     def test_no_warnings(self):
         result = check_url_config(None)
@@ -35,7 +36,7 @@ class CheckUrlsTest(SimpleTestCase):
         result = check_url_config(None)
         warning = result[0]
         self.assertEqual(warning.id, 'urls.E004')
-        six.assertRegex(self, warning.msg, (
+        self.assertRegex(warning.msg, (
             r"^Your URL pattern \('\^tuple/\$', <function <lambda> at 0x(\w+)>\) is "
             r"invalid. Ensure that urlpatterns is a list of url\(\) instances.$"
         ))
@@ -95,3 +96,48 @@ class CheckUrlsTest(SimpleTestCase):
     def test_get_warning_for_invalid_pattern_other(self):
         warning = get_warning_for_invalid_pattern(object())[0]
         self.assertIsNone(warning.hint)
+
+    @override_settings(ROOT_URLCONF='check_framework.urls.non_unique_namespaces')
+    def test_check_non_unique_namespaces(self):
+        result = check_url_namespaces_unique(None)
+        self.assertEqual(len(result), 2)
+        non_unique_namespaces = ['app-ns1', 'app-1']
+        warning_messages = [
+            "URL namespace '{}' isn't unique. You may not be able to reverse "
+            "all URLs in this namespace".format(namespace)
+            for namespace in non_unique_namespaces
+        ]
+        for warning in result:
+            self.assertIsInstance(warning, Warning)
+            self.assertEqual('urls.W005', warning.id)
+            self.assertIn(warning.msg, warning_messages)
+
+    @override_settings(ROOT_URLCONF='check_framework.urls.unique_namespaces')
+    def test_check_unique_namespaces(self):
+        result = check_url_namespaces_unique(None)
+        self.assertEqual(result, [])
+
+
+class CheckURLSettingsTests(SimpleTestCase):
+
+    @override_settings(STATIC_URL='a/', MEDIA_URL='b/')
+    def test_slash_no_errors(self):
+        self.assertEqual(check_url_settings(None), [])
+
+    @override_settings(STATIC_URL='', MEDIA_URL='')
+    def test_empty_string_no_errors(self):
+        self.assertEqual(check_url_settings(None), [])
+
+    @override_settings(STATIC_URL='noslash')
+    def test_static_url_no_slash(self):
+        self.assertEqual(check_url_settings(None), [E006('STATIC_URL')])
+
+    @override_settings(STATIC_URL='slashes//')
+    def test_static_url_double_slash_allowed(self):
+        # The check allows for a double slash, presuming the user knows what
+        # they are doing.
+        self.assertEqual(check_url_settings(None), [])
+
+    @override_settings(MEDIA_URL='noslash')
+    def test_media_url_no_slash(self):
+        self.assertEqual(check_url_settings(None), [E006('MEDIA_URL')])

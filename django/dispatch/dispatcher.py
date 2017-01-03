@@ -18,6 +18,8 @@ def _make_id(target):
     if hasattr(target, '__func__'):
         return (id(target.__self__), id(target.__func__))
     return id(target)
+
+
 NONE_ID = _make_id(None)
 
 # A marker for caching
@@ -183,14 +185,13 @@ class Signal(object):
 
         Returns a list of tuple pairs [(receiver, response), ... ].
         """
-        responses = []
         if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
-            return responses
+            return []
 
-        for receiver in self._live_receivers(sender):
-            response = receiver(signal=self, sender=sender, **named)
-            responses.append((receiver, response))
-        return responses
+        return [
+            (receiver, receiver(signal=self, sender=sender, **named))
+            for receiver in self._live_receivers(sender)
+        ]
 
     def send_robust(self, sender, **named):
         """
@@ -216,12 +217,12 @@ class Signal(object):
         receiver. The traceback is always attached to the error at
         ``__traceback__``.
         """
-        responses = []
         if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
-            return responses
+            return []
 
         # Call each receiver with whatever arguments it can accept.
         # Return a list of tuple pairs [(receiver, response), ... ].
+        responses = []
         for receiver in self._live_receivers(sender):
             try:
                 response = receiver(signal=self, sender=sender, **named)

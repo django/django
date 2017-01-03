@@ -6,7 +6,6 @@ from django.utils.functional import cached_property
 
 class DatabaseFeatures(BaseSpatialFeatures, SQLiteDatabaseFeatures):
     supports_3d_storage = True
-    supports_distance_geodetic = False
     # SpatiaLite can only count vertices in LineStrings
     supports_num_points_poly = False
 
@@ -16,3 +15,7 @@ class DatabaseFeatures(BaseSpatialFeatures, SQLiteDatabaseFeatures):
         # which can result in a significant performance improvement when
         # creating the database.
         return self.connection.ops.spatial_version >= (4, 1, 0)
+
+    @cached_property
+    def supports_area_geodetic(self):
+        return bool(self.connection.ops.lwgeom_version())

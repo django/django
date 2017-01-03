@@ -46,7 +46,7 @@ class HandlerTests(SimpleTestCase):
 
     def test_non_ascii_query_string(self):
         """
-        Test that non-ASCII query strings are properly decoded (#20530, #22996).
+        Non-ASCII query strings are properly decoded (#20530, #22996).
         """
         environ = RequestFactory().get('/').environ
         raw_query_strings = [
@@ -71,7 +71,7 @@ class HandlerTests(SimpleTestCase):
             self.assertListEqual(got, ['café', 'café', 'caf\ufffd', 'café'])
 
     def test_non_ascii_cookie(self):
-        """Test that non-ASCII cookies set in JavaScript are properly decoded (#20557)."""
+        """Non-ASCII cookies set in JavaScript are properly decoded (#20557)."""
         environ = RequestFactory().get('/').environ
         raw_cookie = 'want="café"'
         if six.PY3:

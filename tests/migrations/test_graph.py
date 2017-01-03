@@ -285,7 +285,7 @@ class GraphTests(SimpleTestCase):
 
     def test_remove_replaced_nodes(self):
         """
-        Tests that replaced nodes are properly removed and dependencies remapped.
+        Replaced nodes are properly removed and dependencies remapped.
         """
         # Add some dummy nodes to be replaced.
         graph = MigrationGraph()
@@ -328,7 +328,7 @@ class GraphTests(SimpleTestCase):
 
     def test_remove_replacement_node(self):
         """
-        Tests that a replacement node is properly removed and child dependencies remapped.
+        A replacement node is properly removed and child dependencies remapped.
         We assume parent dependencies are already correct.
         """
         # Add some dummy nodes to be replaced.

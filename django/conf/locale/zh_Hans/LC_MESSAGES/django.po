@@ -5,6 +5,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
+# Liping Wang <lynn.config@gmail.com>, 2016
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Ronald White <ouyanghongyu@gmail.com>, 2014
 # pylemon <leeway1985@gmail.com>, 2013
@@ -20,8 +21,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-06-29 20:57+0200\n"
-"PO-Revision-Date: 2016-06-30 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-09-20 02:26+0000\n"
+"Last-Translator: Liping Wang <lynn.config@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -73,7 +74,7 @@ msgid "German"
 msgstr "德语"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "下索布"
 
 msgid "Greek"
 msgstr "希腊语"
@@ -145,7 +146,7 @@ msgid "Croatian"
 msgstr "克罗地亚语"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "上索布"
 
 msgid "Hungarian"
 msgstr "匈牙利语"
@@ -208,7 +209,7 @@ msgid "Burmese"
 msgstr "缅甸语"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "挪威博克马尔"
 
 msgid "Nepali"
 msgstr "尼泊尔语"
@@ -581,11 +582,11 @@ msgstr "一对一关系"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "%(from)s-%(to)s关系"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "%(from)s-%(to)s关系"
 
 msgid "Many-to-many relationship"
 msgstr "多对多关系"

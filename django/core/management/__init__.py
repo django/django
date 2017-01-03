@@ -306,19 +306,10 @@ class ManagementUtility(object):
         except CommandError:
             pass  # Ignore any option errors at this point.
 
-        no_settings_commands = [
-            'help', 'version', '--help', '--version', '-h',
-            'startapp', 'startproject', 'compilemessages',
-        ]
-
         try:
             settings.INSTALLED_APPS
         except ImproperlyConfigured as exc:
             self.settings_exception = exc
-            # A handful of built-in management commands work without settings.
-            # Load the default settings -- where INSTALLED_APPS is empty.
-            if subcommand in no_settings_commands:
-                settings.configure()
 
         if settings.configured:
             # Start the auto-reloading dev server even if the code is broken.
@@ -334,6 +325,15 @@ class ManagementUtility(object):
                     apps.all_models = defaultdict(OrderedDict)
                     apps.app_configs = OrderedDict()
                     apps.apps_ready = apps.models_ready = apps.ready = True
+
+                    # Remove options not compatible with the built-in runserver
+                    # (e.g. options for the contrib.staticfiles' runserver).
+                    # Changes here require manually testing as described in
+                    # #27522.
+                    _parser = self.fetch_command('runserver').create_parser('django', 'runserver')
+                    _options, _args = _parser.parse_known_args(self.argv[2:])
+                    for _arg in _args:
+                        self.argv.remove(_arg)
 
             # In all other cases, django.setup() is required to succeed.
             else:

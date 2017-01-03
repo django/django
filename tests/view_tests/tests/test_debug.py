@@ -11,12 +11,13 @@ import sys
 import tempfile
 from unittest import skipIf
 
+from django.conf.urls import url
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import DatabaseError, connection
 from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.utils import LoggingCaptureMixin
+from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_bytes, force_text
@@ -28,9 +29,10 @@ from django.views.debug import (
 
 from .. import BrokenException, except_args
 from ..views import (
-    custom_exception_reporter_filter_view, multivalue_dict_key_error,
-    non_sensitive_view, paranoid_view, sensitive_args_function_caller,
-    sensitive_kwargs_function_caller, sensitive_method_view, sensitive_view,
+    custom_exception_reporter_filter_view, index_page,
+    multivalue_dict_key_error, non_sensitive_view, paranoid_view,
+    sensitive_args_function_caller, sensitive_kwargs_function_caller,
+    sensitive_method_view, sensitive_view,
 )
 
 if six.PY3:
@@ -42,6 +44,10 @@ PY36 = sys.version_info >= (3, 6)
 class User(object):
     def __str__(self):
         return 'jacob'
+
+
+class WithoutEmptyPathUrls:
+    urlpatterns = [url(r'url/$', index_page, name='url')]
 
 
 class CallableSettingWrapperTests(SimpleTestCase):
@@ -74,7 +80,7 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         self.assertNotContains(response, 'haha', status_code=500)
 
     def test_400(self):
-        # Ensure that when DEBUG=True, technical_500_template() is called.
+        # When DEBUG=True, technical_500_template() is called.
         response = self.client.get('/raises400/')
         self.assertContains(response, '<div class="context" id="', status_code=400)
 
@@ -114,6 +120,11 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         response = self.client.get('/not-in-urls')
         self.assertNotContains(response, "Raised by:", status_code=404)
         self.assertContains(response, "<code>not-in-urls</code>, didn't match", status_code=404)
+
+    @override_settings(ROOT_URLCONF=WithoutEmptyPathUrls)
+    def test_404_empty_path_not_in_urls(self):
+        response = self.client.get('/')
+        self.assertContains(response, "The empty path didn't match any of these.", status_code=404)
 
     def test_technical_404(self):
         response = self.client.get('/views/technical404/')
@@ -249,9 +260,10 @@ class DebugViewQueriesAllowedTests(SimpleTestCase):
 class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
 
     def test_400(self):
-        # Ensure that when DEBUG=True, technical_500_template() is called.
-        response = self.client.get('/raises400/')
-        self.assertContains(response, '<div class="context" id="', status_code=400)
+        # When DEBUG=True, technical_500_template() is called.
+        with patch_logger('django.security.SuspiciousOperation', 'error'):
+            response = self.client.get('/raises400/')
+            self.assertContains(response, '<div class="context" id="', status_code=400)
 
     def test_403(self):
         response = self.client.get('/raises403/')
@@ -313,7 +325,7 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn('<p>Request data not supplied</p>', html)
 
     def test_eol_support(self):
-        """Test that the ExceptionReporter supports Unix, Windows and Macintosh EOL markers"""
+        """The ExceptionReporter supports Unix, Windows and Macintosh EOL markers"""
         LINES = list('print %d' % i for i in range(1, 6))
         reporter = ExceptionReporter(None, None, None, None)
 
@@ -502,6 +514,33 @@ class ExceptionReporterTests(SimpleTestCase):
         reporter = ExceptionReporter(request, None, None, None)
         html = reporter.get_traceback_html()
         self.assertInHTML('<td>items</td><td class="code"><pre>&#39;Oops&#39;</pre></td>', html)
+
+    def test_exception_fetching_user(self):
+        """
+        The error page can be rendered if the current user can't be retrieved
+        (such as when the database is unavailable).
+        """
+        class ExceptionUser(object):
+            def __str__(self):
+                raise Exception()
+
+        request = self.rf.get('/test_view/')
+        request.user = ExceptionUser()
+
+        try:
+            raise ValueError('Oops')
+        except ValueError:
+            exc_type, exc_value, tb = sys.exc_info()
+
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn('<h1>ValueError at /test_view/</h1>', html)
+        self.assertIn('<pre class="exception_value">Oops</pre>', html)
+        self.assertIn('<h3 id="user-info">USER</h3>', html)
+        self.assertIn('<p>[unable to retrieve the current user]</p>', html)
+
+        text = reporter.get_traceback_text()
+        self.assertIn('USER: [unable to retrieve the current user]', text)
 
 
 class PlainTextReportTests(SimpleTestCase):
@@ -777,14 +816,13 @@ class ExceptionReportTestMixin(object):
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin, SimpleTestCase):
     """
-    Ensure that sensitive information can be filtered out of error reports.
-    Refs #14614.
+    Sensitive information can be filtered out of error reports (#14614).
     """
     rf = RequestFactory()
 
     def test_non_sensitive_request(self):
         """
-        Ensure that everything (request info and frame variables) can bee seen
+        Everything (request info and frame variables) can bee seen
         in the default error reports for non-sensitive requests.
         """
         with self.settings(DEBUG=True):
@@ -797,7 +835,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
     def test_sensitive_request(self):
         """
-        Ensure that sensitive POST parameters and frame variables cannot be
+        Sensitive POST parameters and frame variables cannot be
         seen in the default error reports for sensitive requests.
         """
         with self.settings(DEBUG=True):
@@ -810,7 +848,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
     def test_paranoid_request(self):
         """
-        Ensure that no POST parameters and frame variables can be seen in the
+        No POST parameters and frame variables can be seen in the
         default error reports for "paranoid" requests.
         """
         with self.settings(DEBUG=True):
@@ -823,7 +861,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
     def test_multivalue_dict_key_error(self):
         """
-        #21098 -- Ensure that sensitive POST parameters cannot be seen in the
+        #21098 -- Sensitive POST parameters cannot be seen in the
         error reports for if request.POST['nonexistent_key'] throws an error.
         """
         with self.settings(DEBUG=True):
@@ -836,7 +874,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
     def test_custom_exception_reporter_filter(self):
         """
-        Ensure that it's possible to assign an exception reporter filter to
+        It's possible to assign an exception reporter filter to
         the request to bypass the one set in DEFAULT_EXCEPTION_REPORTER_FILTER.
         """
         with self.settings(DEBUG=True):
@@ -849,28 +887,21 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
     def test_sensitive_method(self):
         """
-        Ensure that the sensitive_variables decorator works with object
-        methods.
-        Refs #18379.
+        The sensitive_variables decorator works with object methods.
         """
         with self.settings(DEBUG=True):
-            self.verify_unsafe_response(sensitive_method_view,
-                                        check_for_POST_params=False)
-            self.verify_unsafe_email(sensitive_method_view,
-                                     check_for_POST_params=False)
+            self.verify_unsafe_response(sensitive_method_view, check_for_POST_params=False)
+            self.verify_unsafe_email(sensitive_method_view, check_for_POST_params=False)
 
         with self.settings(DEBUG=False):
-            self.verify_safe_response(sensitive_method_view,
-                                      check_for_POST_params=False)
-            self.verify_safe_email(sensitive_method_view,
-                                   check_for_POST_params=False)
+            self.verify_safe_response(sensitive_method_view, check_for_POST_params=False)
+            self.verify_safe_email(sensitive_method_view, check_for_POST_params=False)
 
     def test_sensitive_function_arguments(self):
         """
-        Ensure that sensitive variables don't leak in the sensitive_variables
-        decorator's frame, when those variables are passed as arguments to the
-        decorated function.
-        Refs #19453.
+        Sensitive variables don't leak in the sensitive_variables decorator's
+        frame, when those variables are passed as arguments to the decorated
+        function.
         """
         with self.settings(DEBUG=True):
             self.verify_unsafe_response(sensitive_args_function_caller)
@@ -882,10 +913,9 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
     def test_sensitive_function_keyword_arguments(self):
         """
-        Ensure that sensitive variables don't leak in the sensitive_variables
-        decorator's frame, when those variables are passed as keyword arguments
-        to the decorated function.
-        Refs #19453.
+        Sensitive variables don't leak in the sensitive_variables decorator's
+        frame, when those variables are passed as keyword arguments to the
+        decorated function.
         """
         with self.settings(DEBUG=True):
             self.verify_unsafe_response(sensitive_kwargs_function_caller)
@@ -968,7 +998,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
 
 class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptureMixin, SimpleTestCase):
     """
-    Ensure that sensitive information can be filtered out of error reports.
+    Sensitive information can be filtered out of error reports.
 
     Here we specifically test the plain text 500 debug-only error page served
     when it has been detected the request was sent by JS code. We don't check
@@ -980,7 +1010,7 @@ class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptu
 
     def test_non_sensitive_request(self):
         """
-        Ensure that request info can bee seen in the default error reports for
+        Request info can bee seen in the default error reports for
         non-sensitive requests.
         """
         with self.settings(DEBUG=True):
@@ -991,7 +1021,7 @@ class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptu
 
     def test_sensitive_request(self):
         """
-        Ensure that sensitive POST parameters cannot be seen in the default
+        Sensitive POST parameters cannot be seen in the default
         error reports for sensitive requests.
         """
         with self.settings(DEBUG=True):
@@ -1002,7 +1032,7 @@ class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptu
 
     def test_paranoid_request(self):
         """
-        Ensure that no POST parameters can be seen in the default error reports
+        No POST parameters can be seen in the default error reports
         for "paranoid" requests.
         """
         with self.settings(DEBUG=True):
@@ -1013,7 +1043,7 @@ class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptu
 
     def test_custom_exception_reporter_filter(self):
         """
-        Ensure that it's possible to assign an exception reporter filter to
+        It's possible to assign an exception reporter filter to
         the request to bypass the one set in DEFAULT_EXCEPTION_REPORTER_FILTER.
         """
         with self.settings(DEBUG=True):

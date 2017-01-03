@@ -127,7 +127,8 @@ class SimpleTagTests(TagTestCase):
         self.assertEqual(t.render(c), "Hello Jack &amp; Jill!")
 
     def test_simple_tag_registration(self):
-        # Test that the decorators preserve the decorated function's docstring, name and attributes.
+        # The decorators preserve the decorated function's docstring, name,
+        # and attributes.
         self.verify_tag(custom.no_params, 'no_params')
         self.verify_tag(custom.one_param, 'one_param')
         self.verify_tag(custom.explicit_no_context, 'explicit_no_context')
@@ -257,7 +258,8 @@ class InclusionTagTests(TagTestCase):
             self.assertEqual(t.render(c), entry[1])
 
     def test_inclusion_tag_registration(self):
-        # Test that the decorators preserve the decorated function's docstring, name and attributes.
+        # The decorators preserve the decorated function's docstring, name,
+        # and attributes.
         self.verify_tag(inclusion.inclusion_no_params, 'inclusion_no_params')
         self.verify_tag(inclusion.inclusion_one_param, 'inclusion_one_param')
         self.verify_tag(inclusion.inclusion_explicit_no_context, 'inclusion_explicit_no_context')
@@ -273,7 +275,7 @@ class InclusionTagTests(TagTestCase):
 
     def test_15070_use_l10n(self):
         """
-        Test that inclusion tag passes down `use_l10n` of context to the
+        Inclusion tag passes down `use_l10n` of context to the
         Context of the included/rendered template as well.
         """
         c = Context({})
@@ -313,7 +315,8 @@ class AssignmentTagTests(TagTestCase):
         self.assertEqual(t.render(c), 'The result is: assignment_no_params - Expected result')
 
     def test_assignment_tag_registration(self):
-        # Test that the decorators preserve the decorated function's docstring, name and attributes.
+        # The decorators preserve the decorated function's docstring, name,
+        # and attributes.
         self.verify_tag(custom.assignment_no_params, 'assignment_no_params')
 
     def test_assignment_tag_missing_context(self):
@@ -339,7 +342,7 @@ class TemplateTagLoadingTests(SimpleTestCase):
             "trying to load 'template_tests.broken_tag': cannot import name "
             "'?Xtemplate'?"
         )
-        with six.assertRaisesRegex(self, InvalidTemplateLibrary, msg):
+        with self.assertRaisesRegex(InvalidTemplateLibrary, msg):
             Engine(libraries={
                 'broken_tag': 'template_tests.broken_tag',
             })
@@ -352,7 +355,7 @@ class TemplateTagLoadingTests(SimpleTestCase):
             "import name '?Xtemplate'?"
         )
         with extend_sys_path(egg_name):
-            with six.assertRaisesRegex(self, InvalidTemplateLibrary, msg):
+            with self.assertRaisesRegex(InvalidTemplateLibrary, msg):
                 Engine(libraries={
                     'broken_egg': 'tagsegg.templatetags.broken_egg',
                 })

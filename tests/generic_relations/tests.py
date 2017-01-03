@@ -327,9 +327,9 @@ class GenericRelationsTests(TestCase):
         self.assertQuerysetEqual(bacon.tags.all(), [])
 
     def test_assign_with_queryset(self):
-        # Ensure that querysets used in reverse GFK assignments are pre-evaluated
-        # so their value isn't affected by the clearing operation in
-        # ManyRelatedManager.set() (#19816).
+        # Querysets used in reverse GFK assignments are pre-evaluated so their
+        # value isn't affected by the clearing operation
+        # in ManyRelatedManager.set() (#19816).
         bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
         bacon.tags.create(tag="fatty")
         bacon.tags.create(tag="salty")
@@ -342,8 +342,7 @@ class GenericRelationsTests(TestCase):
         self.assertEqual(1, qs.count())
 
     def test_generic_relation_related_name_default(self):
-        # Test that GenericRelation by default isn't usable from
-        # the reverse side.
+        # GenericRelation isn't usable from the reverse side by default.
         with self.assertRaises(FieldError):
             TaggedItem.objects.filter(vegetable__isnull=True)
 
@@ -489,7 +488,7 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tag
 
     def test_subclasses_with_gen_rel(self):
         """
-        Test that concrete model subclasses with generic relations work
+        Concrete model subclasses with generic relations work
         correctly (ticket 11263).
         """
         granite = Rock.objects.create(name='granite', hardness=5)

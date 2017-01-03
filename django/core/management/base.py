@@ -151,12 +151,6 @@ class BaseCommand(object):
 
     Several attributes affect behavior at various steps along the way:
 
-    ``can_import_settings``
-        A boolean indicating whether the command needs to be able to
-        import Django settings; if ``True``, ``execute()`` will verify
-        that this is possible before proceeding. Default value is
-        ``True``.
-
     ``help``
         A short description of the command, which will be printed in
         help messages.
@@ -192,17 +186,12 @@ class BaseCommand(object):
         that is locale-sensitive and such content shouldn't contain any
         translations (like it happens e.g. with django.contrib.auth
         permissions) as activating any locale might cause unintended effects.
-
-        This option can't be False when the can_import_settings option is set
-        to False too because attempting to deactivate translations needs access
-        to settings. This condition will generate a CommandError.
     """
     # Metadata about this command.
     help = ''
 
     # Configuration shortcuts that alter various logic.
     _called_from_command_line = False
-    can_import_settings = True
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
     leave_locale_alone = False
     requires_migrations_checks = False
@@ -303,7 +292,12 @@ class BaseCommand(object):
                 self.stderr.write('%s: %s' % (e.__class__.__name__, e))
             sys.exit(1)
         finally:
-            connections.close_all()
+            try:
+                connections.close_all()
+            except ImproperlyConfigured:
+                # Ignore if connections aren't setup at this point (e.g. no
+                # configured settings).
+                pass
 
     def execute(self, *args, **options):
         """
@@ -321,15 +315,6 @@ class BaseCommand(object):
 
         saved_locale = None
         if not self.leave_locale_alone:
-            # Only mess with locales if we can assume we have a working
-            # settings file, because django.utils.translation requires settings
-            # (The final saying about whether the i18n machinery is active will be
-            # found in the value of the USE_I18N setting)
-            if not self.can_import_settings:
-                raise CommandError("Incompatible values of 'leave_locale_alone' "
-                                   "(%s) and 'can_import_settings' (%s) command "
-                                   "options." % (self.leave_locale_alone,
-                                                 self.can_import_settings))
             # Deactivate translations, because django-admin creates database
             # content like permissions, and those shouldn't contain any
             # translations.

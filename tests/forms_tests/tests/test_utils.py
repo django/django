@@ -34,11 +34,12 @@ class FormsUtilsTestCase(SimpleTestCase):
             flatatt({'class': "news", 'title': "Read this", 'required': False}),
             ' class="news" title="Read this"'
         )
+        self.assertEqual(flatatt({'class': None}), '')
         self.assertEqual(flatatt({}), '')
 
     def test_flatatt_no_side_effects(self):
         """
-        Fixes #23883 -- Check that flatatt does not modify the dict passed in
+        flatatt() does not modify the dict passed in.
         """
         attrs = {'foo': 'bar', 'true': True, 'false': False}
         attrs_copy = copy.copy(attrs)

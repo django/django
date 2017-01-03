@@ -113,8 +113,7 @@ class PaginationTests(unittest.TestCase):
 
     def test_invalid_page_number(self):
         """
-        Tests that invalid page numbers result in the correct exception being
-        raised.
+        Invalid page numbers result in the correct exception being raised.
         """
         paginator = Paginator([1, 2, 3], 2)
         with self.assertRaises(InvalidPage):
@@ -165,7 +164,7 @@ class PaginationTests(unittest.TestCase):
 
     def test_page_indexes(self):
         """
-        Tests that paginator pages have the correct start and end indexes.
+        Paginator pages have the correct start and end indexes.
         """
         ten = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         tests = (
@@ -215,7 +214,7 @@ class PaginationTests(unittest.TestCase):
 
     def test_page_sequence(self):
         """
-        Tests that a paginator page acts like a standard sequence.
+        A paginator page acts like a standard sequence.
         """
         eleven = 'abcdefghijk'
         page2 = Paginator(eleven, per_page=5, orphans=1).page(2)
@@ -227,7 +226,7 @@ class PaginationTests(unittest.TestCase):
 
     def test_get_page_hook(self):
         """
-        Tests that a Paginator subclass can use the ``_get_page`` hook to
+        A Paginator subclass can use the ``_get_page`` hook to
         return an alternative to the standard Page class.
         """
         eleven = 'abcdefghijk'

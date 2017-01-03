@@ -1,6 +1,5 @@
+from django.contrib.gis.db import models
 from django.utils.encoding import python_2_unicode_compatible
-
-from ..models import models
 
 
 class SimpleModel(models.Model):

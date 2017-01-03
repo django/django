@@ -148,6 +148,7 @@ msgstr "Eklendi."
 msgid "and"
 msgstr "ve"
 
+#, python-brace-format
 msgid "Changed {fields} for {name} \"{object}\"."
 msgstr "{name} \"{object}\" için {fields} değiştirildi."
 

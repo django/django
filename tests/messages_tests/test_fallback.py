@@ -25,8 +25,7 @@ class FallbackTest(BaseTests, SimpleTestCase):
         return storage.storages[-1]
 
     def stored_cookie_messages_count(self, storage, response):
-        return stored_cookie_messages_count(self.get_cookie_storage(storage),
-                                            response)
+        return stored_cookie_messages_count(self.get_cookie_storage(storage), response)
 
     def stored_session_messages_count(self, storage, response):
         return stored_session_messages_count(self.get_session_storage(storage))
@@ -35,9 +34,10 @@ class FallbackTest(BaseTests, SimpleTestCase):
         """
         Return the storage totals from both cookie and session backends.
         """
-        total = (self.stored_cookie_messages_count(storage, response) +
-                 self.stored_session_messages_count(storage, response))
-        return total
+        return (
+            self.stored_cookie_messages_count(storage, response) +
+            self.stored_session_messages_count(storage, response)
+        )
 
     def test_get(self):
         request = self.get_request()
@@ -52,7 +52,6 @@ class FallbackTest(BaseTests, SimpleTestCase):
         # used (it would cause a TypeError: 'NoneType' object is not callable).
         self.get_session_storage(storage)._get = None
 
-        # Test that the message actually contains what we expect.
         self.assertEqual(list(storage), example_messages)
 
     def test_get_empty(self):
@@ -63,7 +62,6 @@ class FallbackTest(BaseTests, SimpleTestCase):
         # used (it would cause a TypeError: 'NoneType' object is not callable).
         self.get_session_storage(storage)._get = None
 
-        # Test that the message actually contains what we expect.
         self.assertEqual(list(storage), [])
 
     def test_get_fallback(self):
@@ -74,11 +72,9 @@ class FallbackTest(BaseTests, SimpleTestCase):
 
         # Set initial cookie and session data.
         example_messages = [str(i) for i in range(5)]
-        set_cookie_data(cookie_storage, example_messages[:4] +
-                        [CookieStorage.not_finished])
+        set_cookie_data(cookie_storage, example_messages[:4] + [CookieStorage.not_finished])
         set_session_data(session_storage, example_messages[4:])
 
-        # Test that the message actually contains what we expect.
         self.assertEqual(list(storage), example_messages)
 
     def test_get_fallback_only(self):
@@ -89,11 +85,9 @@ class FallbackTest(BaseTests, SimpleTestCase):
 
         # Set initial cookie and session data.
         example_messages = [str(i) for i in range(5)]
-        set_cookie_data(cookie_storage, [CookieStorage.not_finished],
-                        encode_empty=True)
+        set_cookie_data(cookie_storage, [CookieStorage.not_finished], encode_empty=True)
         set_session_data(session_storage, example_messages)
 
-        # Test that the message actually contains what we expect.
         self.assertEqual(list(storage), example_messages)
 
     def test_flush_used_backends(self):
@@ -116,8 +110,6 @@ class FallbackTest(BaseTests, SimpleTestCase):
 
     def test_no_fallback(self):
         """
-        Confirms that:
-
         (1) A short number of messages whose data size doesn't exceed what is
         allowed in a cookie will all be stored in the CookieBackend.
 
@@ -142,8 +134,8 @@ class FallbackTest(BaseTests, SimpleTestCase):
 
     def test_session_fallback(self):
         """
-        Confirms that, if the data exceeds what is allowed in a cookie,
-        messages which did not fit are stored in the SessionBackend.
+        If the data exceeds what is allowed in a cookie, messages which did
+        not fit are stored in the SessionBackend.
         """
         storage = self.get_storage()
         response = self.get_response()
@@ -161,8 +153,8 @@ class FallbackTest(BaseTests, SimpleTestCase):
 
     def test_session_fallback_only(self):
         """
-        Confirms that large messages, none of which fit in a cookie, are stored
-        in the SessionBackend (and nothing is stored in the CookieBackend).
+        Large messages, none of which fit in a cookie, are stored in the
+        SessionBackend (and nothing is stored in the CookieBackend).
         """
         storage = self.get_storage()
         response = self.get_response()

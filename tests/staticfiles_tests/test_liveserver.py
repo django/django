@@ -83,7 +83,7 @@ class StaticLiveServerView(LiveServerBase):
     @modify_settings(INSTALLED_APPS={'append': 'staticfiles_tests.apps.test'})
     def test_collectstatic_emulation(self):
         """
-        Test that StaticLiveServerTestCase use of staticfiles' serve() allows it
+        StaticLiveServerTestCase use of staticfiles' serve() allows it
         to discover app's static assets without having to collectstatic first.
         """
         with contextlib.closing(self.urlopen('/static/test/file.txt')) as f:

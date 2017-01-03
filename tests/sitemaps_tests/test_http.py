@@ -81,7 +81,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
     def test_sitemap_last_modified(self):
-        "Tests that Last-Modified header is set correctly"
+        "Last-Modified header is set correctly"
         response = self.client.get('/lastmod/sitemap.xml')
         self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 10:00:00 GMT')
 
@@ -101,12 +101,12 @@ class HTTPSitemapTests(SitemapTestsBase):
         self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 15:00:00 GMT')
 
     def test_sitemap_last_modified_missing(self):
-        "Tests that Last-Modified header is missing when sitemap has no lastmod"
+        "Last-Modified header is missing when sitemap has no lastmod"
         response = self.client.get('/generic/sitemap.xml')
         self.assertFalse(response.has_header('Last-Modified'))
 
     def test_sitemap_last_modified_mixed(self):
-        "Tests that Last-Modified header is omitted when lastmod not on all items"
+        "Last-Modified header is omitted when lastmod not on all items"
         response = self.client.get('/lastmod-mixed/sitemap.xml')
         self.assertFalse(response.has_header('Last-Modified'))
 
@@ -149,8 +149,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         activate('fr')
         self.assertEqual('0,3', localize(0.3))
 
-        # Retrieve the sitemap. Check that priorities
-        # haven't been rendered in localized format
+        # Priorities haven't been rendered in localized format.
         response = self.client.get('/simple/sitemap.xml')
         self.assertContains(response, '<priority>0.5</priority>')
         self.assertContains(response, '<lastmod>%s</lastmod>' % date.today())
@@ -158,8 +157,8 @@ class HTTPSitemapTests(SitemapTestsBase):
 
     @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
     def test_requestsite_sitemap(self):
-        # Make sure hitting the flatpages sitemap without the sites framework
-        # installed doesn't raise an exception.
+        # Hitting the flatpages sitemap without the sites framework installed
+        # doesn't raise an exception.
         response = self.client.get('/simple/sitemap.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -203,7 +202,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 
     def test_cached_sitemap_index(self):
         """
-        Check that a cached sitemap index can be rendered (#2713).
+        A cached sitemap index can be rendered (#2713).
         """
         response = self.client.get('/cached/index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>

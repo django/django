@@ -76,11 +76,11 @@ Usage examples::
     A Python value passed to ``Coalesce`` on MySQL may be converted to an
     incorrect type unless explicitly cast to the correct database type:
 
-    >>> from django.db.models.expressions import RawSQL
+    >>> from django.db.models import DateTimeField
+    >>> from django.db.models.functions import Cast, Coalesce
     >>> from django.utils import timezone
     >>> now = timezone.now()
-    >>> now_sql = RawSQL("cast(%s as datetime)", (now,))
-    >>> Coalesce('updated', now_sql)
+    >>> Coalesce('updated', Cast(now, DateTimeField()))
 
 ``Concat``
 ==========
@@ -313,6 +313,7 @@ Given the datetime ``2015-06-15 23:30:01.000321+00:00``, the built-in
 * "year": 2015
 * "month": 6
 * "day": 15
+* "week": 25
 * "week_day": 2
 * "hour": 23
 * "minute": 30
@@ -339,6 +340,14 @@ returned when this timezone is active will be the same as above except for:
         >>> dt = datetime(2015, 6, 15)
         >>> (dt.isoweekday() % 7) + 1
         2
+
+.. admonition:: ``week`` values
+
+    The ``week`` ``lookup_type`` is calculated based on `ISO-8601
+    <https://en.wikipedia.org/wiki/ISO-8601>`_, i.e.,
+    a week starts on a Monday. The first week is the one with the majority
+    of the days, i.e., a week that starts on or before Thursday. The value
+    returned is in the range 1 to 52 or 53.
 
 Each ``lookup_name`` above has a corresponding ``Extract`` subclass (listed
 below) that should typically be used instead of the more verbose equivalent,
@@ -381,6 +390,12 @@ Usage example::
 .. class:: ExtractWeekDay(expression, tzinfo=None, **extra)
 
     .. attribute:: lookup_name = 'week_day'
+
+.. class:: ExtractWeek(expression, tzinfo=None, **extra)
+
+    .. versionadded:: 1.11
+
+    .. attribute:: lookup_name = 'week'
 
 These are logically equivalent to ``Extract('date_field', lookup_name)``. Each
 class is also a ``Transform`` registered on ``DateField`` and ``DateTimeField``

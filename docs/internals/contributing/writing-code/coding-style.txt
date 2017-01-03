@@ -49,9 +49,21 @@ Python style
 
 * In tests, use :meth:`~django.test.SimpleTestCase.assertRaisesMessage` instead
   of :meth:`~unittest.TestCase.assertRaises` so you can check the exception
-  message. Use :meth:`~unittest.TestCase.assertRaisesRegex`
-  (``six.assertRaisesRegex()`` as long as we support Python 2) only if you need
-  to use regular expression matching.
+  message. Use :meth:`~unittest.TestCase.assertRaisesRegex` only if you need
+  regular expression matching.
+
+* In test docstrings, state the expected behavior that each test demonstrates.
+  Don't include preambles such as "Tests that" or "Ensures that".
+
+  Reserve ticket references for obscure issues where the ticket has additional
+  details that can't be easily described in docstrings or comments. Include the
+  ticket number at the end of a sentence like this::
+
+    def test_foo():
+        """
+        A test docstring looks like this (#123456).
+        """
+        ...
 
 .. _coding-style-imports:
 
@@ -117,9 +129,9 @@ Imports
 
       # try/except
       try:
-          import pytz
+          import yaml
       except ImportError:
-          pytz = None
+          yaml = None
 
       CONSTANT = 'foo'
 

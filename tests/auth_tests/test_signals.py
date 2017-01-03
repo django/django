@@ -68,7 +68,7 @@ class SignalTestCase(TestCase):
         self.assertEqual(self.logged_out[0].username, 'testclient')
 
     def test_update_last_login(self):
-        """Ensure that only `last_login` is updated in `update_last_login`"""
+        """Only `last_login` is updated in `update_last_login`"""
         user = self.u3
         old_last_login = user.last_login
 

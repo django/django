@@ -1,15 +1,12 @@
 from __future__ import unicode_literals
 
 import warnings
-from collections import namedtuple
 
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
-
-FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('default',))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -207,8 +204,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                         WHEN idx.indexprs IS NOT NULL THEN
                             pg_get_indexdef(idx.indexrelid)
                     END AS exprdef,
-                    CASE
-                        WHEN am.amcanorder THEN
+                    CASE am.amname
+                        WHEN 'btree' THEN
                             CASE (option & 1)
                                 WHEN 1 THEN 'DESC' ELSE 'ASC'
                             END

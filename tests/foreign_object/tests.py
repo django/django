@@ -398,7 +398,6 @@ class MultiColumnFKTests(TestCase):
 
     @skipUnlessDBFeature('has_bulk_insert')
     def test_batch_create_foreign_object(self):
-        """ See: https://code.djangoproject.com/ticket/21566 """
         objs = [Person(name="abcd_%s" % i, person_country=self.usa) for i in range(0, 5)]
         Person.objects.bulk_create(objs, 10)
 

@@ -96,12 +96,13 @@ class HttpRequest(object):
         """Return the HTTP host using the environment or request headers."""
         host = self._get_raw_host()
 
-        # There is no hostname validation when DEBUG=True
-        if settings.DEBUG:
-            return host
+        # Allow variants of localhost if ALLOWED_HOSTS is empty and DEBUG=True.
+        allowed_hosts = settings.ALLOWED_HOSTS
+        if settings.DEBUG and not allowed_hosts:
+            allowed_hosts = ['localhost', '127.0.0.1', '[::1]']
 
         domain, port = split_domain_port(host)
-        if domain and validate_host(domain, settings.ALLOWED_HOSTS):
+        if domain and validate_host(domain, allowed_hosts):
             return host
         else:
             msg = "Invalid HTTP_HOST header: %r." % host
@@ -225,8 +226,8 @@ class HttpRequest(object):
         next access (so that it is decoded correctly).
         """
         self._encoding = val
-        if hasattr(self, '_get'):
-            del self._get
+        if hasattr(self, 'GET'):
+            del self.GET
         if hasattr(self, '_post'):
             del self._post
 
@@ -553,9 +554,10 @@ def split_domain_port(host):
         # It's an IPv6 address without a port.
         return host, ''
     bits = host.rsplit(':', 1)
-    if len(bits) == 2:
-        return tuple(bits)
-    return bits[0], ''
+    domain, port = bits if len(bits) == 2 else (bits[0], '')
+    # Remove a trailing dot (if present) from the domain.
+    domain = domain[:-1] if domain.endswith('.') else domain
+    return domain, port
 
 
 def validate_host(host, allowed_hosts):
@@ -573,8 +575,6 @@ def validate_host(host, allowed_hosts):
 
     Return ``True`` for a valid host, ``False`` otherwise.
     """
-    host = host[:-1] if host.endswith('.') else host
-
     for pattern in allowed_hosts:
         if pattern == '*' or is_same_domain(host, pattern):
             return True

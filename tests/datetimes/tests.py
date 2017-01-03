@@ -1,17 +1,11 @@
 from __future__ import unicode_literals
 
 import datetime
-from unittest import skipIf
 
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from .models import Article, Category, Comment
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 
 class DateTimesTests(TestCase):
@@ -84,7 +78,6 @@ class DateTimesTests(TestCase):
             ],
         )
 
-    @skipIf(pytz is None, "this test requires pytz")
     @override_settings(USE_TZ=True)
     def test_21432(self):
         now = timezone.localtime(timezone.now().replace(microsecond=0))

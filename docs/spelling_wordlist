@@ -116,6 +116,7 @@ checkin
 Checkin
 checksum
 checksums
+Cheltenham
 clearable
 clearsessions
 clickable
@@ -206,7 +207,7 @@ discoverable
 Disqus
 distro
 divisibleby
-django
+Django
 djangojs
 djangonaut
 djangoproject
@@ -253,6 +254,7 @@ fallback
 fallbacks
 faq
 FastCGI
+favicon
 fieldset
 fieldsets
 filename
@@ -338,7 +340,6 @@ honeypot
 Honza
 hostname
 hostnames
-howto
 hstore
 html
 http
@@ -451,6 +452,7 @@ lowercasing
 lt
 lte
 Luhn
+macOS
 Magee
 makemessages
 makemigrations
@@ -461,6 +463,7 @@ Marczewski
 Marino
 Markus
 MBR
+Meetup
 memcache
 memcached
 mentorship
@@ -670,6 +673,7 @@ releasers
 reloader
 removetags
 renderer
+renderers
 repo
 reportable
 reprojection
@@ -949,13 +953,7 @@ virtualenv
 virtualenvs
 virtualized
 Votizen
-webapps
-webkit
-WebKit
 Weblog
-webpages
-webserver
-webservers
 whatsnext
 whitelist
 whitelisted

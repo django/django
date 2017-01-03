@@ -14,7 +14,6 @@ from django.contrib.gis.geos import (
     LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon,
     fromfile, fromstr,
 )
-from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.libgeos import geos_version_info
 from django.contrib.gis.shortcuts import numpy
 from django.template import Context
@@ -30,52 +29,6 @@ from ..test_data import TestDataMixin
 
 @skipUnless(HAS_GEOS, "Geos is required.")
 class GEOSTest(SimpleTestCase, TestDataMixin):
-
-    def test_base(self):
-        "Tests out the GEOSBase class."
-        # Testing out GEOSBase class, which provides a `ptr` property
-        # that abstracts out access to underlying C pointers.
-        class FakeGeom1(GEOSBase):
-            pass
-
-        # This one only accepts pointers to floats
-        c_float_p = ctypes.POINTER(ctypes.c_float)
-
-        class FakeGeom2(GEOSBase):
-            ptr_type = c_float_p
-
-        # Default ptr_type is `c_void_p`.
-        fg1 = FakeGeom1()
-        # Default ptr_type is C float pointer
-        fg2 = FakeGeom2()
-
-        # These assignments are OK -- None is allowed because
-        # it's equivalent to the NULL pointer.
-        fg1.ptr = ctypes.c_void_p()
-        fg1.ptr = None
-        fg2.ptr = c_float_p(ctypes.c_float(5.23))
-        fg2.ptr = None
-
-        # Because pointers have been set to NULL, an exception should be
-        # raised when we try to access it.  Raising an exception is
-        # preferable to a segmentation fault that commonly occurs when
-        # a C method is given a NULL memory reference.
-        for fg in (fg1, fg2):
-            # Equivalent to `fg.ptr`
-            with self.assertRaises(GEOSException):
-                fg._get_ptr()
-
-        # Anything that is either not None or the acceptable pointer type will
-        # result in a TypeError when trying to assign it to the `ptr` property.
-        # Thus, memory addresses (integers) and pointers of the incorrect type
-        # (in `bad_ptrs`) will not be allowed.
-        bad_ptrs = (5, ctypes.c_char_p(b'foobar'))
-        for bad_ptr in bad_ptrs:
-            # Equivalent to `fg.ptr = bad_ptr`
-            with self.assertRaises(TypeError):
-                fg1._set_ptr(bad_ptr)
-            with self.assertRaises(TypeError):
-                fg2._set_ptr(bad_ptr)
 
     def test_wkt(self):
         "Testing WKT output."
@@ -226,6 +179,27 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertNotEqual(g, None)
             self.assertNotEqual(g, {'foo': 'bar'})
             self.assertNotEqual(g, False)
+
+    def test_eq_with_srid(self):
+        "Testing non-equivalence with different srids."
+        p0 = Point(5, 23)
+        p1 = Point(5, 23, srid=4326)
+        p2 = Point(5, 23, srid=32632)
+        # GEOS
+        self.assertNotEqual(p0, p1)
+        self.assertNotEqual(p1, p2)
+        # EWKT
+        self.assertNotEqual(p0, p1.ewkt)
+        self.assertNotEqual(p1, p0.ewkt)
+        self.assertNotEqual(p1, p2.ewkt)
+        # Equivalence with matching SRIDs
+        self.assertEqual(p2, p2)
+        self.assertEqual(p2, p2.ewkt)
+        # WKT contains no SRID so will not equal
+        self.assertNotEqual(p2, p2.wkt)
+        # SRID of 0
+        self.assertEqual(p0, 'SRID=0;POINT (5 23)')
+        self.assertNotEqual(p1, 'SRID=0;POINT (5 23)')
 
     def test_points(self):
         "Testing Point objects."
@@ -1287,6 +1261,25 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(args, (Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly))
         self.assertEqual(kwargs, {})
 
+    def test_subclassing(self):
+        """
+        GEOSGeometry subclass may itself be subclassed without being forced-cast
+        to the parent class during `__init__`.
+        """
+        class ExtendedPolygon(Polygon):
+            def __init__(self, *args, **kwargs):
+                data = kwargs.pop('data', 0)
+                super(ExtendedPolygon, self).__init__(*args, **kwargs)
+                self._data = data
+
+            def __str__(self):
+                return "EXT_POLYGON - data: %d - %s" % (self._data, self.wkt)
+
+        ext_poly = ExtendedPolygon(((0, 0), (0, 1), (1, 1), (0, 0)), data=3)
+        self.assertEqual(type(ext_poly), ExtendedPolygon)
+        # ExtendedPolygon.__str__ should be called (instead of Polygon.__str__).
+        self.assertEqual(str(ext_poly), "EXT_POLYGON - data: 3 - POLYGON ((0 0, 0 1, 1 1, 0 0))")
+
     def test_geos_version(self):
         """Testing the GEOS version regular expression."""
         from django.contrib.gis.geos.libgeos import version_regex
@@ -1309,6 +1302,19 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 '</gml:Point>'
             ),
         )
+
+    def test_normalize(self):
+        g = MultiPoint(Point(0, 0), Point(2, 2), Point(1, 1))
+        self.assertIsNone(g.normalize())
+        self.assertTrue(g.equals_exact(MultiPoint(Point(2, 2), Point(1, 1), Point(0, 0))))
+
+    def test_empty_point(self):
+        p = Point(srid=4326)
+        self.assertEqual(p.ogr.ewkt, p.ewkt)
+
+        self.assertEqual(p.transform(2774, clone=True), Point(srid=2774))
+        p.transform(2774)
+        self.assertEqual(p, Point(srid=2774))
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_deprecated_srid_getters_setters(self):

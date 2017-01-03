@@ -160,15 +160,23 @@ Geometries support set-like operators::
     The :class:`~GEOSGeometry` equality operator uses
     :meth:`~GEOSGeometry.equals_exact`, not :meth:`~GEOSGeometry.equals`, i.e.
     it requires the compared geometries to have the same coordinates in the
-    same positions::
+    same positions with the same SRIDs::
 
         >>> from django.contrib.gis.geos import LineString
         >>> ls1 = LineString((0, 0), (1, 1))
         >>> ls2 = LineString((1, 1), (0, 0))
+        >>> ls3 = LineString((1, 1), (0, 0), srid=4326)
         >>> ls1.equals(ls2)
         True
         >>> ls1 == ls2
         False
+        >>> ls3 == ls2  # different SRIDs
+        False
+
+    .. versionchanged:: 1.11
+
+        Older versions didn't check the ``srid`` when comparing
+        ``GEOSGeometry`` objects using the equality operator.
 
 Geometry Objects
 ================
@@ -643,6 +651,17 @@ Other Properties & Methods
             In previous versions, it required the geometry's SRID to be a
             positive integer even if it was called with a
             :class:`~django.contrib.gis.gdal.CoordTransform` object.
+
+.. method:: GEOSGeometry.normalize()
+
+    Converts this geometry to canonical form::
+
+        >>> g = MultiPoint(Point(0, 0), Point(2, 2), Point(1, 1))
+        >>> print(g)
+        MULTIPOINT (0 0, 2 2, 1 1)
+        >>> g.normalize()
+        >>> print(g)
+        MULTIPOINT (2 2, 1 1, 0 0)
 
 ``Point``
 ---------

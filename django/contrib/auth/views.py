@@ -31,6 +31,8 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
+UserModel = get_user_model()
+
 
 def deprecate_current_app(func):
     """
@@ -320,7 +322,6 @@ def password_reset_confirm(request, uidb64=None, token=None,
     warnings.warn("The password_reset_confirm() view is superseded by the "
                   "class-based PasswordResetConfirmView().",
                   RemovedInDjango21Warning, stacklevel=2)
-    UserModel = get_user_model()
     assert uidb64 is not None and token is not None  # checked by URLconf
     if post_reset_redirect is None:
         post_reset_redirect = reverse('password_reset_complete')
@@ -441,10 +442,18 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
     @method_decorator(never_cache)
     def dispatch(self, *args, **kwargs):
         assert 'uidb64' in kwargs and 'token' in kwargs
+
+        self.validlink = False
+        self.user = self.get_user(kwargs['uidb64'])
+
+        if self.user is not None and self.token_generator.check_token(self.user, kwargs['token']):
+            self.validlink = True
+        else:
+            return self.render_to_response(self.get_context_data())
+
         return super(PasswordResetConfirmView, self).dispatch(*args, **kwargs)
 
     def get_user(self, uidb64):
-        UserModel = get_user_model()
         try:
             # urlsafe_base64_decode() decodes to bytestring on Python 3
             uid = force_text(urlsafe_base64_decode(uidb64))
@@ -455,7 +464,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super(PasswordResetConfirmView, self).get_form_kwargs()
-        kwargs['user'] = self.get_user(self.kwargs['uidb64'])
+        kwargs['user'] = self.user
         return kwargs
 
     def form_valid(self, form):
@@ -466,8 +475,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(PasswordResetConfirmView, self).get_context_data(**kwargs)
-        user = context['form'].user
-        if user is not None and self.token_generator.check_token(user, self.kwargs['token']):
+        if self.validlink:
             context['validlink'] = True
         else:
             context.update({

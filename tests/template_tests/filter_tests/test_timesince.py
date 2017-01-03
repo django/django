@@ -54,7 +54,7 @@ class TimesinceTests(TimezoneTestCase):
         )
         self.assertEqual(output, '1\xa0minute')
 
-    # Check that timezone is respected
+    # Timezone is respected
     @setup({'timesince06': '{{ a|timesince:b }}'})
     def test_timesince06(self):
         output = self.engine.render_to_string('timesince06', {'a': self.now_tz - timedelta(hours=8), 'b': self.now_tz})
@@ -83,7 +83,7 @@ class TimesinceTests(TimezoneTestCase):
         output = self.engine.render_to_string('timesince10', {'now': self.now, 'later': self.now + timedelta(days=7)})
         self.assertEqual(output, '0\xa0minutes')
 
-    # Ensures that differing timezones are calculated correctly.
+    # Differing timezones are calculated correctly.
     @setup({'timesince11': '{{ a|timesince }}'})
     def test_timesince11(self):
         output = self.engine.render_to_string('timesince11', {'a': self.now})

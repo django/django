@@ -90,6 +90,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
 
     return force_text(iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs)))
 
+
 reverse_lazy = lazy(reverse, six.text_type)
 
 

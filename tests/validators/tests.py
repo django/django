@@ -138,6 +138,7 @@ TEST_DATA = [
     (validate_ipv4_address, '25,1,1,1', ValidationError),
     (validate_ipv4_address, '25.1 .1.1', ValidationError),
     (validate_ipv4_address, '1.1.1.1\n', ValidationError),
+    (validate_ipv4_address, '٧.2٥.3٣.243', ValidationError),
 
     # validate_ipv6_address uses django.utils.ipv6, which
     # is tested in much greater detail in its own testcase
@@ -268,6 +269,7 @@ TEST_DATA = [
 def create_path(filename):
     return os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), filename))
 
+
 # Add valid and invalid URL tests.
 # This only tests the validator without extended schemes.
 with io.open(create_path('valid_urls.txt'), encoding='utf8') as f:
@@ -339,6 +341,7 @@ class TestSimpleValidators(SimpleTestCase):
         with self.assertRaisesMessage(ValidationError, '"djangoproject.com" has more than 16 characters.'):
             v('djangoproject.com')
 
+
 test_counter = 0
 for validator, value, expected in TEST_DATA:
     name, method = create_simple_test_method(validator, expected, value, test_counter)
@@ -348,7 +351,7 @@ for validator, value, expected in TEST_DATA:
 
 class TestValidatorEquality(TestCase):
     """
-    Tests that validators have valid equality operators (#21638)
+    Validators have valid equality operators (#21638)
     """
 
     def test_regex_equality(self):

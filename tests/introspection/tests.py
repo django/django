@@ -83,9 +83,6 @@ class IntrospectionTests(TransactionTestCase):
              'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField']
         )
 
-    # The following test fails on Oracle due to #17202 (can't correctly
-    # inspect the length of character columns).
-    @skipUnlessDBFeature('can_introspect_max_length')
     def test_get_table_description_col_lengths(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
@@ -143,17 +140,19 @@ class IntrospectionTests(TransactionTestCase):
 
     @skipUnless(connection.vendor == 'sqlite', "This is an sqlite-specific issue")
     def test_get_relations_alt_format(self):
-        """With SQLite, foreign keys can be added with different syntaxes."""
-        with connection.cursor() as cursor:
-            cursor.fetchone = mock.Mock(
-                return_value=[
-                    "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY(art_id) REFERENCES {}(id));".format(
-                        Article._meta.db_table
-                    )
-                ]
-            )
-            relations = connection.introspection.get_relations(cursor, 'mocked_table')
-        self.assertEqual(relations, {'art_id': ('id', Article._meta.db_table)})
+        """
+        With SQLite, foreign keys can be added with different syntaxes and
+        formatting.
+        """
+        create_table_statements = [
+            "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY(art_id) REFERENCES {}(id));",
+            "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY (art_id) REFERENCES {}(id));"
+        ]
+        for statement in create_table_statements:
+            with connection.cursor() as cursor:
+                cursor.fetchone = mock.Mock(return_value=[statement.format(Article._meta.db_table)])
+                relations = connection.introspection.get_relations(cursor, 'mocked_table')
+            self.assertEqual(relations, {'art_id': ('id', Article._meta.db_table)})
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_get_key_columns(self):
@@ -180,8 +179,7 @@ class IntrospectionTests(TransactionTestCase):
     @ignore_warnings(category=RemovedInDjango21Warning)
     def test_get_indexes_multicol(self):
         """
-        Test that multicolumn indexes are not included in the introspection
-        results.
+        Multicolumn indexes are not included in the introspection results.
         """
         with connection.cursor() as cursor:
             indexes = connection.introspection.get_indexes(cursor, Reporter._meta.db_table)

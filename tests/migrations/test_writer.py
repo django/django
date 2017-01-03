@@ -10,6 +10,7 @@ import re
 import sys
 import tokenize
 import unittest
+import uuid
 
 import custom_migration_operations.more_operations
 import custom_migration_operations.operations
@@ -25,6 +26,7 @@ from django.test import SimpleTestCase, ignore_warnings, mock
 from django.utils import datetime_safe, six
 from django.utils._os import upath
 from django.utils.deconstruct import deconstructible
+from django.utils.encoding import force_str
 from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import FixedOffset, get_default_timezone, utc
 from django.utils.translation import ugettext_lazy as _
@@ -179,15 +181,15 @@ class WriterTests(SimpleTestCase):
     """
 
     def safe_exec(self, string, value=None):
-        l = {}
+        d = {}
         try:
-            exec(string, globals(), l)
+            exec(force_str(string), globals(), d)
         except Exception as e:
             if value:
                 self.fail("Could not exec %r (from value %r): %s" % (string.strip(), value, e))
             else:
                 self.fail("Could not exec %r: %s" % (string.strip(), e))
-        return l
+        return d
 
     def serialize_round_trip(self, value):
         string, imports = MigrationWriter.serialize(value)
@@ -320,6 +322,31 @@ class WriterTests(SimpleTestCase):
             "default=migrations.test_writer.IntEnum(1))"
         )
 
+    def test_serialize_uuid(self):
+        self.assertSerializedEqual(uuid.uuid1())
+        self.assertSerializedEqual(uuid.uuid4())
+
+        uuid_a = uuid.UUID('5c859437-d061-4847-b3f7-e6b78852f8c8')
+        uuid_b = uuid.UUID('c7853ec1-2ea3-4359-b02d-b54e8f1bcee2')
+        self.assertSerializedResultEqual(
+            uuid_a,
+            ("uuid.UUID('5c859437-d061-4847-b3f7-e6b78852f8c8')", {'import uuid'})
+        )
+        self.assertSerializedResultEqual(
+            uuid_b,
+            ("uuid.UUID('c7853ec1-2ea3-4359-b02d-b54e8f1bcee2')", {'import uuid'})
+        )
+
+        field = models.UUIDField(choices=((uuid_a, 'UUID A'), (uuid_b, 'UUID B')), default=uuid_a)
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(
+            string,
+            "models.UUIDField(choices=["
+            "(uuid.UUID('5c859437-d061-4847-b3f7-e6b78852f8c8'), 'UUID A'), "
+            "(uuid.UUID('c7853ec1-2ea3-4359-b02d-b54e8f1bcee2'), 'UUID B')], "
+            "default=uuid.UUID('5c859437-d061-4847-b3f7-e6b78852f8c8'))"
+        )
+
     def test_serialize_functions(self):
         with self.assertRaisesMessage(ValueError, 'Cannot serialize function: lambda'):
             self.assertSerializedEqual(lambda x: 42)
@@ -438,7 +465,7 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(string, "migrations.test_writer.EmailValidator(message='hello')")
 
         validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
-        with six.assertRaisesRegex(self, ImportError, "No module named '?custom'?"):
+        with self.assertRaisesRegex(ImportError, "No module named '?custom'?"):
             MigrationWriter.serialize(validator)
 
         validator = deconstructible(path="django.core.validators.EmailValidator2")(EmailValidator)(message="hello")
@@ -546,8 +573,6 @@ class WriterTests(SimpleTestCase):
         })
         writer = MigrationWriter(migration)
         output = writer.as_string()
-        # It should NOT be unicode.
-        self.assertIsInstance(output, six.binary_type, "Migration as_string returned unicode")
         # We don't test the output formatting - that's too fragile.
         # Just make sure it runs for now, and that things look alright.
         result = self.safe_exec(output)
@@ -615,7 +640,7 @@ class WriterTests(SimpleTestCase):
             ]
         })
         writer = MigrationWriter(migration)
-        output = writer.as_string().decode('utf-8')
+        output = writer.as_string()
         self.assertIn(
             "import datetime\n"
             "from django.db import migrations, models\n"
@@ -633,7 +658,7 @@ class WriterTests(SimpleTestCase):
         dt = datetime.datetime(2015, 7, 31, 4, 40, 0, 0, tzinfo=utc)
         with mock.patch('django.db.migrations.writer.now', lambda: dt):
             writer = MigrationWriter(migration)
-            output = writer.as_string().decode('utf-8')
+            output = writer.as_string()
 
         self.assertTrue(
             output.startswith(
@@ -657,7 +682,7 @@ class WriterTests(SimpleTestCase):
             ]
         })
         writer = MigrationWriter(migration)
-        output = writer.as_string().decode('utf-8')
+        output = writer.as_string()
         self.assertIn("from django.db import migrations\n", output)
 
     def test_deconstruct_class_arguments(self):

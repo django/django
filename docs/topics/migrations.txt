@@ -16,15 +16,16 @@ The Commands
 There are several commands which you will use to interact with migrations
 and Django's handling of database schema:
 
-* :djadmin:`migrate`, which is responsible for applying migrations, as well as
-  unapplying and listing their status.
+* :djadmin:`migrate`, which is responsible for applying and unapplying
+  migrations.
 
 * :djadmin:`makemigrations`, which is responsible for creating new migrations
   based on the changes you have made to your models.
 
 * :djadmin:`sqlmigrate`, which displays the SQL statements for a migration.
 
-* :djadmin:`showmigrations`, which lists a project's migrations.
+* :djadmin:`showmigrations`, which lists a project's migrations and their
+  status.
 
 You should think of migrations as a version control system for your database
 schema. ``makemigrations`` is responsible for packaging up your model changes
@@ -86,7 +87,7 @@ add or remove columns. On slower hardware this can be worse than a minute per
 million rows - adding a few columns to a table with just a few million rows
 could lock your site up for over ten minutes.
 
-Finally, MySQL has reasonably small limits on name lengths for columns, tables
+Finally, MySQL has relatively small limits on name lengths for columns, tables
 and indexes, as well as a limit on the combined size of all columns an index
 covers. This means that indexes that are possible on other backends will
 fail to be created under MySQL.
@@ -669,6 +670,7 @@ Django can serialize the following:
   (include those that are timezone-aware)
 - ``decimal.Decimal`` instances
 - ``enum.Enum`` instances
+- ``uuid.UUID`` instances
 - ``functools.partial`` instances which have serializable ``func``, ``args``,
   and ``keywords`` values.
 - ``LazyObject`` instances which wrap a serializable value.
@@ -680,6 +682,10 @@ Django can serialize the following:
 .. versionchanged:: 1.10
 
     Serialization support for ``enum.Enum`` was added.
+
+.. versionchanged:: 1.11
+
+    Serialization support for ``uuid.UUID`` was added.
 
 Django can serialize the following on Python 3 only:
 

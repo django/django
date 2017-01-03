@@ -20,8 +20,9 @@ for the previous LTS, Django 1.8, will end in April 2018.
 Python compatibility
 ====================
 
-Like Django 1.10, Django 1.11 requires Python 2.7, 3.4, or 3.5. We **highly
-recommend** and only officially support the latest release of each series.
+Django 1.11 requires Python 2.7, 3.4, 3.5, or 3.6. Django 1.11 is the first
+release to support Python 3.6. We **highly recommend** and only officially
+support the latest release of each series.
 
 The Django 1.11.x series is the last to support Python 2. The next major
 release, Django 2.0, will only support Python 3.5+.
@@ -60,6 +61,15 @@ It can be subclassed to support different index types, such as
 :class:`~django.contrib.postgres.indexes.GinIndex`. It also allows defining the
 order (ASC/DESC) for the columns of the index.
 
+Template-based widget rendering
+-------------------------------
+
+To ease customizing widgets, form widget rendering is now done using the
+template system rather than in Python. See :doc:`/ref/forms/renderers`.
+
+You may need to adjust any custom widgets that you've written for a few
+:ref:`backwards incompatible changes <template-widget-incompatibilities-1-11>`.
+
 Minor features
 --------------
 
@@ -67,6 +77,14 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :attr:`.ModelAdmin.date_hierarchy` can now reference fields across relations.
+
+* The new :meth:`ModelAdmin.get_exclude()
+  <django.contrib.admin.ModelAdmin.get_exclude>` hook allows specifying the
+  exclude fields based on the request or model instance.
+
+* The ``popup_response.html`` template can now be overridden per app, per
+  model, or by setting the :attr:`.ModelAdmin.popup_response_template`
+  attribute.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -109,10 +127,6 @@ Minor features
 * Added password validators ``help_text`` to
   :class:`~django.contrib.auth.forms.UserCreationForm`.
 
-* The new :class:`~django.contrib.auth.apps.BaseAuthConfig` ``AppConfig``
-  allows using the authentication system :ref:`without any of the built-in
-  models <using-auth-without-models>`.
-
 * The ``HttpRequest`` is now passed to :func:`~django.contrib.auth.authenticate`
   which in turn passes it to the authentication backend if it accepts a
   ``request`` argument.
@@ -124,6 +138,9 @@ Minor features
   models that use an email field named something other than ``'email'``.
   Set :attr:`CustomUser.EMAIL_FIELD
   <django.contrib.auth.models.CustomUser.EMAIL_FIELD>` to the name of the field.
+
+* :func:`~django.contrib.auth.get_user_model` can now be called at import time,
+  even in modules that define models.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -142,11 +159,30 @@ Minor features
 
 * Added support for the :lookup:`dwithin` lookup on SpatiaLite.
 
+* The :class:`~django.contrib.gis.db.models.functions.Area` function,
+  :class:`~django.contrib.gis.db.models.functions.Distance` function, and
+  distance lookups now work with geodetic coordinates on SpatiaLite.
+
 * The OpenLayers-based form widgets now use ``OpenLayers.js`` from
   ``https://cdnjs.cloudflare.com`` which is more suitable for production use
-  than the the old ``http://openlayers.org`` source.
+  than the the old ``http://openlayers.org`` source. They are also updated to
+  use OpenLayers 3.
 
 * PostGIS migrations can now change field dimensions.
+
+* Added the ability to pass the `size`, `shape`, and `offset` parameter when
+  creating :class:`~django.contrib.gis.gdal.GDALRaster` objects.
+
+* Added SpatiaLite support for the
+  :class:`~django.contrib.gis.db.models.functions.IsValid` function,
+  :class:`~django.contrib.gis.db.models.functions.MakeValid` function, and
+  :lookup:`isvalid` lookup.
+
+* Added Oracle support for the
+  :class:`~django.contrib.gis.db.models.functions.AsGML` function,
+  :class:`~django.contrib.gis.db.models.functions.BoundingCircle` function,
+  :class:`~django.contrib.gis.db.models.functions.IsValid` function, and
+  :lookup:`isvalid` lookup.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -171,6 +207,13 @@ Minor features
   :class:`~django.contrib.postgres.operations.CITextExtension` migration
   operation allow using PostgreSQL's ``citext`` extension for case-insensitive
   lookups.
+
+* The new :class:`~django.contrib.postgres.aggregates.JSONBAgg` allows
+  aggregating values as a JSON array.
+
+* :class:`~django.contrib.postgres.fields.HStoreField` and
+  :class:`~django.contrib.postgres.forms.HStoreField` allow storing null
+  values.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -217,7 +260,8 @@ Cache
 CSRF
 ~~~~
 
-* ...
+* Added the :setting:`CSRF_USE_SESSIONS` setting to allow storing the CSRF
+  token in the user's session rather than in a cookie.
 
 Database backends
 ~~~~~~~~~~~~~~~~~
@@ -278,10 +322,13 @@ Management Commands
 * The new :option:`loaddata --exclude` option allows excluding models and apps
   while loading data from fixtures.
 
+* The new :option:`diffsettings --default` option allows specifying a settings
+  module other than Django's default settings to compare against.
+
 Migrations
 ~~~~~~~~~~
 
-* ...
+* Added support for serialization of ``uuid.UUID`` objects.
 
 Models
 ~~~~~~
@@ -297,6 +344,11 @@ Models
 * Added support for time truncation to
   :class:`~django.db.models.functions.datetime.Trunc` functions.
 
+* Added the :class:`~django.db.models.functions.datetime.ExtractWeek` function
+  to extract the week from :class:`~django.db.models.DateField` and
+  :class:`~django.db.models.DateTimeField` and exposed it through the
+  :lookup:`week` lookup.
+
 * Added the :class:`~django.db.models.functions.datetime.TruncTime` function
   to truncate :class:`~django.db.models.DateTimeField` to its time component
   and exposed it through the :lookup:`time` lookup.
@@ -306,6 +358,14 @@ Models
 
 * Added support for query expressions on lookups that take multiple arguments,
   such as ``range``.
+
+* You can now use the ``unique=True`` option with
+  :class:`~django.db.models.FileField`.
+
+* Added the ``nulls_first`` and ``nulls_last`` parameters to
+  :class:`Expression.asc() <django.db.models.Expression.asc>` and
+  :meth:`~django.db.models.Expression.desc` to control
+  the ordering of null values.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -317,6 +377,9 @@ Requests and Responses
 
 * Added the :setting:`SECURE_HSTS_PRELOAD` setting to allow appending the
   ``preload`` directive to the ``Strict-Transport-Security`` header.
+
+* :class:`~django.middleware.http.ConditionalGetMiddleware` now adds the
+  ``ETag`` header to responses.
 
 Serialization
 ~~~~~~~~~~~~~
@@ -353,6 +416,9 @@ Templates
 * Added a :ttag:`resetcycle` template tag to allow resetting the sequence of
   the :ttag:`cycle` template tag.
 
+* You can now specify specific directories for a particular
+  :class:`filesystem.Loader <django.template.loaders.filesystem.Loader>`.
+
 Tests
 ~~~~~
 
@@ -368,6 +434,10 @@ Tests
 
 * Added support for :meth:`python:unittest.TestCase.subTest`’s when using the
   :option:`test --parallel` option.
+
+* ``DiscoverRunner`` now runs the system checks at the start of a test run.
+  Override the :meth:`.DiscoverRunner.run_checks` method if you want to disable
+  that.
 
 URLs
 ~~~~
@@ -398,6 +468,13 @@ Backwards incompatible changes in 1.11
   the Google Maps API and seems to be unmaintained. If you're using it, `let
   us know <https://code.djangoproject.com/ticket/14284>`_.
 
+* The ``GEOSGeometry`` equality operator now also compares SRID.
+
+* The OpenLayers-based form widgets now use OpenLayers 3, and the
+  ``gis/openlayers.html`` and ``gis/openlayers-osm.html`` templates have been
+  updated. Check your project if you subclass these widgets or extend the
+  templates.
+
 Database backend API
 --------------------
 
@@ -425,6 +502,9 @@ Database backend API
 * :djadmin:`inspectdb` no longer calls ``DatabaseIntrospection.get_indexes()``
   which is deprecated. Custom database backends should ensure all types of
   indexes are returned by ``DatabaseIntrospection.get_constraints()``.
+
+* Renamed the ``ignores_quoted_identifier_case`` feature to
+  ``ignores_table_name_case`` to more accurately reflect how it is used.
 
 Dropped support for PostgreSQL 9.2 and PostGIS 2.0
 --------------------------------------------------
@@ -460,6 +540,60 @@ To prevent typos from passing silently,
 arguments are model fields. This should be backwards-incompatible only in the
 fact that it might expose a bug in your project.
 
+``pytz`` is a required dependency and support for ``settings.TIME_ZONE = None`` is removed
+------------------------------------------------------------------------------------------
+
+To simplify Django's timezone handling, ``pytz`` is now a required dependency.
+It's automatically installed along with Django.
+
+Support for ``settings.TIME_ZONE = None`` is removed as the behavior isn't
+commonly used and is questionably useful. If you want to automatically detect
+the timezone based on the system timezone, you can use `tzlocal
+<https://pypi.python.org/pypi/tzlocal>`_::
+
+    from tzlocal import get_localzone
+
+    TIME_ZONE = get_localzone().zone
+
+This works similar to ``settings.TIME_ZONE = None`` except that it also sets
+``os.environ['TZ']``. `Let us know
+<https://groups.google.com/d/topic/django-developers/OAV3FChfuPM/discussion>`__
+if there's a use case where you find you can't adapt your code to set a
+``TIME_ZONE``.
+
+HTML changes in admin templates
+-------------------------------
+
+``<p class="help">`` is replaced with a ``<div>`` tag to allow including lists
+inside help text.
+
+Read-only fields are wrapped in ``<div class="readonly">...</div>`` instead of
+``<p>...</p>`` to allow any kind of HTML as the field's content.
+
+.. _template-widget-incompatibilities-1-11:
+
+Changes due to the introduction of template-based widget rendering
+------------------------------------------------------------------
+
+Some undocumented classes in ``django.forms.widgets`` are removed:
+
+* ``SubWidget``
+* ``RendererMixin``, ``ChoiceFieldRenderer``, ``RadioFieldRenderer``,
+  ``CheckboxFieldRenderer``
+* ``ChoiceInput``, ``RadioChoiceInput``, ``CheckboxChoiceInput``
+
+The ``Widget.format_output()`` method is removed. Use a custom widget template
+instead.
+
+``django.Template.render()`` prohibits non-dict context
+-------------------------------------------------------
+
+For compatibility with multiple template engines, ``django.Template.render()``
+must receive a dictionary of context rather than ``Context`` or
+``RequestContext``. If you were passing either of the two classes, pass a
+dictionary instead -- doing so is backwards-compatible with older versions of
+Django.
+
 Miscellaneous
 -------------
 
@@ -470,6 +604,8 @@ Miscellaneous
   information.
 
 * Support for SpatiaLite < 4.0 is dropped.
+
+* Support for GDAL 1.7 and 1.8 is dropped.
 
 * CSRF failures are logged to the ``django.security.csrf`` logger instead of
   ``django.request``.
@@ -515,9 +651,6 @@ Miscellaneous
   called a second time before calling
   :func:`~django.test.utils.teardown_test_environment`.
 
-* The :djadmin:`makemessages` command now requires configured settings, like
-  most other commands.
-
 * The undocumented ``DateTimeAwareJSONEncoder`` alias for
   :class:`~django.core.serializers.json.DjangoJSONEncoder` (renamed in Django
   1.0) is removed.
@@ -539,13 +672,69 @@ Miscellaneous
   :rfc:`7232` Conditional Requests specification rather than the older
   :rfc:`2616`.
 
+* :func:`~django.utils.cache.patch_response_headers` no longer adds a
+  ``Last-Modified`` header. According to the :rfc:`7234#section-4.2.2`, this
+  header is useless alongside other caching headers that provide an explicit
+  expiration time, e.g. ``Expires`` or ``Cache-Control``.
+  :class:`~django.middleware.cache.UpdateCacheMiddleware` and
+  :func:`~django.utils.cache.add_never_cache_headers` call
+  ``patch_response_headers()`` and therefore are also affected by this change.
+
 * In the admin templates, ``<p class="help">`` is replaced with a ``<div>`` tag
   to allow including lists inside help text.
+
+* :class:`~django.middleware.http.ConditionalGetMiddleware` no longer sets the
+  ``Date`` header as Web servers set that header. It also no longer sets the
+  ``Content-Length`` header as this is now done by
+  :class:`~django.middleware.common.CommonMiddleware`.
+
+* :meth:`~django.apps.AppConfig.get_model` and
+  :meth:`~django.apps.AppConfig.get_models` now raise
+  :exc:`~django.core.exceptions.AppRegistryNotReady` if they're called before
+  models of all applications have been loaded. Previously they only required
+  the target application's models to be loaded and thus could return models
+  without all their relations set up. If you need the old behavior of
+  ``get_model()``, set the ``require_ready`` argument to ``False``.
+
+* The unused ``BaseCommand.can_import_settings`` attribute is removed.
+
+* The undocumented ``django.utils.functional.lazy_property`` is removed.
+
+* For consistency with non-multipart requests, ``MultiPartParser.parse()`` now
+  leaves ``request.POST`` immutable. If you're modifying that ``QueryDict``,
+  you must now first copy it, e.g. ``request.POST.copy()``.
+
+* Support for ``cx_Oracle`` < 5.2 is removed.
 
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
 ===========================
+
+``models.permalink()`` decorator
+--------------------------------
+
+Use :func:`django.urls.reverse` instead. For example::
+
+    from django.db import models
+
+    class MyModel(models.Model):
+        ...
+
+        @models.permalink
+        def url(self):
+            return ('guitarist_detail', [self.slug])
+
+becomes::
+
+    from django.db import models
+    from django.urls import reverse
+
+    class MyModel(models.Model):
+        ...
+
+        def url(self):
+            return reverse('guitarist_detail', args=[self.slug])
 
 Miscellaneous
 -------------
@@ -594,3 +783,23 @@ Miscellaneous
 * :func:`~django.contrib.auth.authenticate` now passes a ``request`` argument
   to the ``authenticate()`` method of authentication backends. Support for
   methods that don't accept ``request`` will be removed in Django 2.1.
+
+* The ``USE_ETAGS`` setting is deprecated in favor of
+  :class:`~django.middleware.http.ConditionalGetMiddleware` which now adds the
+  ``ETag`` header to responses regardless of the setting. ``CommonMiddleware``
+  and ``django.utils.cache.patch_response_headers()`` will no longer set ETags
+  when the deprecation ends.
+
+* ``Model._meta.has_auto_field`` is deprecated in favor of checking if
+  ``Model._meta.auto_field is not None``.
+
+* Using regular expression groups with ``iLmsu#`` in ``url()`` is deprecated.
+  The only group that's useful is ``(?i)`` for case-insensitive URLs, however,
+  case-insensitive URLs aren't a good practice because they create multiple
+  entries for search engines, for example. An alternative solution could be to
+  create a :data:`~django.conf.urls.handler404` that looks for uppercase
+  characters in the URL and redirects to a lowercase equivalent.
+
+* The ``renderer`` argument is added to the :meth:`Widget.render()
+  <django.forms.Widget.render>` method. Methods that don't accept that argument
+  will work through a deprecation period.

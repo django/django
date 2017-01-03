@@ -114,6 +114,17 @@ class TemplateTests(SimpleTestCase):
             engine.from_string("{% load bad_tag %}{% badtag %}")
         self.assertEqual(e.exception.template_debug['during'], '{% badtag %}')
 
+    def test_compile_tag_error_27584(self):
+        engine = Engine(
+            app_dirs=True,
+            debug=True,
+            libraries={'tag_27584': 'template_tests.templatetags.tag_27584'},
+        )
+        t = engine.get_template('27584_parent.html')
+        with self.assertRaises(TemplateSyntaxError) as e:
+            t.render(Context())
+        self.assertEqual(e.exception.template_debug['during'], '{% badtag %}')
+
     def test_super_errors(self):
         """
         #18169 -- NoReverseMatch should not be silence in block.super.

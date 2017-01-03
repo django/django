@@ -20,10 +20,11 @@ if six.PY2:
     from django.utils.encoding import force_unicode  # NOQA
 
 
-# Capitalizes the first letter of a string.
+@keep_lazy_text
 def capfirst(x):
+    """Capitalize the first letter of a string."""
     return x and force_text(x)[0].upper() + force_text(x)[1:]
-capfirst = keep_lazy_text(capfirst)
+
 
 # Set up regular expressions
 re_words = re.compile(r'<.*?>|((?:\w[-\w]*|&.*?;)+)', re.U | re.S)
@@ -293,7 +294,7 @@ def phone2numeric(phone):
 # Used with permission.
 def compress_string(s):
     zbuf = BytesIO()
-    with GzipFile(mode='wb', compresslevel=6, fileobj=zbuf) as zfile:
+    with GzipFile(mode='wb', compresslevel=6, fileobj=zbuf, mtime=0) as zfile:
         zfile.write(s)
     return zbuf.getvalue()
 
@@ -322,7 +323,7 @@ class StreamingBuffer(object):
 # Like compress_string, but for iterators of strings.
 def compress_sequence(sequence):
     buf = StreamingBuffer()
-    with GzipFile(mode='wb', compresslevel=6, fileobj=buf) as zfile:
+    with GzipFile(mode='wb', compresslevel=6, fileobj=buf, mtime=0) as zfile:
         # Output headers...
         yield buf.read()
         for item in sequence:
@@ -384,6 +385,7 @@ def _replace_entity(match):
         except (ValueError, KeyError):
             return match.group(0)
 
+
 _entity_re = re.compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
 
 
@@ -444,4 +446,6 @@ def _format_lazy(format_string, *args, **kwargs):
     and/or kwargs might be lazy.
     """
     return format_string.format(*args, **kwargs)
+
+
 format_lazy = lazy(_format_lazy, six.text_type)

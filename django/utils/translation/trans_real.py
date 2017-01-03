@@ -45,7 +45,7 @@ language_code_re = re.compile(
     re.IGNORECASE
 )
 
-language_code_prefix_re = re.compile(r'^/([\w@-]+)(/|$)')
+language_code_prefix_re = re.compile(r'^/(\w+([@-]\w+)?)(/|$)')
 
 
 @receiver(setting_changed)
@@ -173,8 +173,9 @@ class DjangoTranslation(gettext_module.GNUTranslations):
                 "gettext calls at import time.")
         for app_config in app_configs:
             localedir = os.path.join(app_config.path, 'locale')
-            translation = self._new_gnu_trans(localedir)
-            self.merge(translation)
+            if os.path.exists(localedir):
+                translation = self._new_gnu_trans(localedir)
+                self.merge(translation)
 
     def _add_local_translations(self):
         """Merges translations defined in LOCALE_PATHS."""
@@ -336,6 +337,7 @@ def gettext(message):
     """
     return do_translate(message, 'gettext')
 
+
 if six.PY3:
     ugettext = gettext
 else:
@@ -382,6 +384,7 @@ def ngettext(singular, plural, number):
     Returns a string on Python 3 and an UTF-8-encoded bytestring on Python 2.
     """
     return do_ntranslate(singular, plural, number, 'ngettext')
+
 
 if six.PY3:
     ungettext = ngettext

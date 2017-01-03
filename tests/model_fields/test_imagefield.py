@@ -179,8 +179,8 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
 
     def test_pickle(self):
         """
-        Tests that ImageField can be pickled, unpickled, and that the
-        image of the unpickled version is the same as the original.
+        ImageField can be pickled, unpickled, and that the image of
+        the unpickled version is the same as the original.
         """
         import pickle
 
@@ -242,7 +242,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
 
     def test_default_value(self):
         """
-        Tests that the default value for an ImageField is an instance of
+        The default value for an ImageField is an instance of
         the field's attr_class (TestImageFieldFile in this case) with no
         name (name set to None).
         """
@@ -252,7 +252,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
 
     def test_assignment_to_None(self):
         """
-        Tests that assigning ImageField to None clears dimensions.
+        Assigning ImageField to None clears dimensions.
         """
         p = self.PersonModel(name='Joe', mugshot=self.file1)
         self.check_dimensions(p, 4, 8)
@@ -284,7 +284,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
 
     def test_dimensions(self):
         """
-        Checks that dimensions are updated correctly in various situations.
+        Dimensions are updated correctly in various situations.
         """
         p = self.PersonModel(name='Joe')
 
@@ -417,7 +417,7 @@ class TwoImageFieldTests(ImageFieldTestMixin, TestCase):
 
     def test_dimensions(self):
         """
-        Checks that dimensions are updated correctly in various situations.
+        Dimensions are updated correctly in various situations.
         """
         p = self.PersonModel(name='Joe')
 

@@ -55,7 +55,7 @@ class GeoAdminTest(TestCase):
 
     def test_olwidget_has_changed(self):
         """
-        Check that changes are accurately noticed by OpenLayersWidget.
+        Changes are accurately noticed by OpenLayersWidget.
         """
         geoadmin = site._registry[City]
         form = geoadmin.get_changelist_form(None)()

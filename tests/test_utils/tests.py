@@ -202,7 +202,7 @@ class AssertQuerysetEqualTests(TestCase):
 
     def test_repeated_values(self):
         """
-        Test that assertQuerysetEqual checks the number of appearance of each item
+        assertQuerysetEqual checks the number of appearance of each item
         when used with option ordered=False.
         """
         batmobile = Car.objects.create(name='Batmobile')
@@ -368,16 +368,15 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             pass
 
     def test_error_message(self):
-        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
+        with self.assertRaisesRegex(AssertionError, r'^template_used/base\.html'):
             with self.assertTemplateUsed('template_used/base.html'):
                 pass
 
-        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html'):
+        with self.assertRaisesRegex(AssertionError, r'^template_used/base\.html'):
             with self.assertTemplateUsed(template_name='template_used/base.html'):
                 pass
 
-        with six.assertRaisesRegex(
-                self, AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
+        with self.assertRaisesRegex(AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
 

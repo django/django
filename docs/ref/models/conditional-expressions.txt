@@ -141,6 +141,20 @@ the ``Client`` has been with us, we could do so using lookups::
     both Jane Doe and Jack Black. This works just like an :keyword:`if` ...
     :keyword:`elif` ... :keyword:`else` statement in ``Python``.
 
+``Case()`` also works in a ``filter()`` clause. For example, to find gold
+clients that registered more than a month ago and platinum clients that
+registered more than a year ago::
+
+    >>> a_month_ago = date.today() - timedelta(days=30)
+    >>> a_year_ago = date.today() - timedelta(days=365)
+    >>> Client.objects.filter(
+    ...     registered_on__lte=Case(
+    ...         When(account_type=Client.GOLD, then=a_month_ago),
+    ...         When(account_type=Client.PLATINUM, then=a_year_ago),
+    ...     ),
+    ... ).values_list('name', 'account_type')
+    [('Jack Black', 'P')]
+
 Advanced queries
 ================
 

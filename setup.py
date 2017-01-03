@@ -47,6 +47,7 @@ setup(
     entry_points={'console_scripts': [
         'django-admin = django.core.management:execute_from_command_line',
     ]},
+    install_requires=['pytz'],
     extras_require={
         "bcrypt": ["bcrypt"],
         "argon2": ["argon2-cffi >= 16.1.0"],
@@ -65,6 +66,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Internet :: WWW/HTTP :: WSGI',

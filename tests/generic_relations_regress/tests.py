@@ -15,10 +15,8 @@ class GenericRelationTests(TestCase):
 
     def test_inherited_models_content_type(self):
         """
-        Test that GenericRelations on inherited classes use the correct content
-        type.
+        GenericRelations on inherited classes use the correct content type.
         """
-
         p = Place.objects.create(name="South Park")
         r = Restaurant.objects.create(name="Chubby's")
         l1 = Link.objects.create(content_object=p)
@@ -28,7 +26,7 @@ class GenericRelationTests(TestCase):
 
     def test_reverse_relation_pk(self):
         """
-        Test that the correct column name is used for the primary key on the
+        The correct column name is used for the primary key on the
         originating model of a query.  See #12664.
         """
         p = Person.objects.create(account=23, name='Chef')
@@ -52,10 +50,8 @@ class GenericRelationTests(TestCase):
 
     def test_q_object_or(self):
         """
-        Tests that SQL query parameters for generic relations are properly
-        grouped when OR is used.
-
-        Test for bug http://code.djangoproject.com/ticket/11535
+        SQL query parameters for generic relations are properly
+        grouped when OR is used (#11535).
 
         In this bug the first query (below) works while the second, with the
         query parameters the same but in reverse order, does not.
@@ -88,7 +84,7 @@ class GenericRelationTests(TestCase):
 
     def test_generic_relation_ordering(self):
         """
-        Test that ordering over a generic relation does not include extraneous
+        Ordering over a generic relation does not include extraneous
         duplicate results, nor excludes rows not participating in the relation.
         """
         p1 = Place.objects.create(name="South Park")
@@ -198,15 +194,15 @@ class GenericRelationTests(TestCase):
         HasLinkThing.objects.create()
         b = Board.objects.create(name=str(hs1.pk))
         Link.objects.create(content_object=hs2)
-        l = Link.objects.create(content_object=hs1)
+        link = Link.objects.create(content_object=hs1)
         Link.objects.create(content_object=b)
         qs = HasLinkThing.objects.annotate(Sum('links')).filter(pk=hs1.pk)
         # If content_type restriction isn't in the query's join condition,
         # then wrong results are produced here as the link to b will also match
         # (b and hs1 have equal pks).
         self.assertEqual(qs.count(), 1)
-        self.assertEqual(qs[0].links__sum, l.id)
-        l.delete()
+        self.assertEqual(qs[0].links__sum, link.id)
+        link.delete()
         # Now if we don't have proper left join, we will not produce any
         # results at all here.
         # clear cached results
@@ -221,9 +217,9 @@ class GenericRelationTests(TestCase):
     def test_filter_targets_related_pk(self):
         HasLinkThing.objects.create()
         hs2 = HasLinkThing.objects.create()
-        l = Link.objects.create(content_object=hs2)
-        self.assertNotEqual(l.object_id, l.pk)
-        self.assertSequenceEqual(HasLinkThing.objects.filter(links=l.pk), [hs2])
+        link = Link.objects.create(content_object=hs2)
+        self.assertNotEqual(link.object_id, link.pk)
+        self.assertSequenceEqual(HasLinkThing.objects.filter(links=link.pk), [hs2])
 
     def test_editable_generic_rel(self):
         GenericRelationForm = modelform_factory(HasLinkThing, fields='__all__')

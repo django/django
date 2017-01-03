@@ -86,7 +86,7 @@ function is used when creating a user.
 To change a user's password, you have several options:
 
 :djadmin:`manage.py changepassword *username* <changepassword>` offers a method
-of changing a User's password from the command line. It prompts you to
+of changing a user's password from the command line. It prompts you to
 change the password of a given user which you must enter twice. If
 they both match, the new password will be changed immediately. If you
 do not supply a user, the command will attempt to change the password
@@ -267,12 +267,12 @@ Permission caching
 ------------------
 
 The :class:`~django.contrib.auth.backends.ModelBackend` caches permissions on
-the ``User`` object after the first time they need to be fetched for a
-permissions check. This is typically fine for the request-response cycle since
-permissions are not typically checked immediately after they are added (in the
-admin, for example). If you are adding permissions and checking them immediately
+the user object after the first time they need to be fetched for a permissions
+check. This is typically fine for the request-response cycle since permissions
+aren't typically checked immediately after they are added (in the admin, for
+example). If you are adding permissions and checking them immediately
 afterward, in a test or view for example, the easiest solution is to re-fetch
-the ``User`` from the database. For example::
+the user from the database. For example::
 
     from django.contrib.auth.models import Permission, User
     from django.shortcuts import get_object_or_404
@@ -380,7 +380,7 @@ is selected as follows:
    pairing :func:`~django.contrib.auth.authenticate()` and
    :func:`~django.contrib.auth.login()`:
    :func:`~django.contrib.auth.authenticate()`
-   sets the ``user.backend`` attribute on the ``User`` object it returns.
+   sets the ``user.backend`` attribute on the user object it returns.
 #. Use the ``backend`` in :setting:`AUTHENTICATION_BACKENDS`, if there is only
    one.
 #. Otherwise, raise an exception.
@@ -1006,6 +1006,15 @@ implementation details see :ref:`using-the-views`.
       authenticated users accessing the login page will be redirected as if
       they had just successfully logged in. Defaults to ``False``.
 
+      .. warning::
+
+        If you enable ``redirect_authenticated_user``, other websites will be
+        able to determine if their visitors are authenticated on your site by
+        requesting redirect URLs to image files on your website. To avoid
+        this "`social media fingerprinting
+        <https://robinlinus.github.io/socialmedia-leak/>`_" information
+        leakage, host all images and your favicon on a separate domain.
+
     * ``success_url_allowed_hosts``: A :class:`set` of hosts, in addition to
       :meth:`request.get_host() <django.http.HttpRequest.get_host>`, that are
       safe for redirecting after login. Defaults to an empty :class:`set`.
@@ -1168,13 +1177,6 @@ implementation details see :ref:`using-the-views`.
       framework installed, this will be set to the value of
       :attr:`request.META['SERVER_NAME'] <django.http.HttpRequest.META>`.
       For more on sites, see :doc:`/ref/contrib/sites`.
-
-    * ``current_app``: A hint indicating which application contains the current
-      view. See the :ref:`namespaced URL resolution strategy
-      <topics-http-reversing-url-namespaces>` for more information.
-
-    * ``extra_context``: A dictionary of context data that will be added to the
-      default context data passed to the template.
 
 .. function:: logout_then_login(request, login_url=None, current_app=None, extra_context=None)
 
@@ -1593,7 +1595,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. note::
     The built-in authentication forms make certain assumptions about the user
-    model that they are working with. If you're using a :ref:`custom User model
+    model that they are working with. If you're using a :ref:`custom user model
     <auth-custom-user>`, it may be necessary to define your own forms for the
     authentication system. For more information, refer to the documentation
     about :ref:`using the built-in authentication forms with custom user models
@@ -1691,7 +1693,14 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. class:: UserCreationForm
 
-    A form for creating a new user.
+    A :class:`~django.forms.ModelForm` for creating a new user.
+
+    It has three fields: ``username`` (from the user model), ``password1``,
+    and ``password2``. It verifies that ``password1`` and ``password2`` match,
+    validates the password using
+    :func:`~django.contrib.auth.password_validation.validate_password`, and
+    sets the user's password using
+    :meth:`~django.contrib.auth.models.User.set_password()`.
 
 .. currentmodule:: django.contrib.auth
 

@@ -33,8 +33,8 @@ from django.template import engines
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.test import (
-    RequestFactory, SimpleTestCase, TestCase, TransactionTestCase, mock,
-    override_settings,
+    RequestFactory, SimpleTestCase, TestCase, TransactionTestCase,
+    ignore_warnings, mock, override_settings,
 )
 from django.test.signals import setting_changed
 from django.utils import six, timezone, translation
@@ -506,11 +506,11 @@ class BaseCacheTests(object):
         self.assertIsNone(cache.get("key2"))
 
     def test_long_timeout(self):
-        '''
-        Using a timeout greater than 30 days makes memcached think
-        it is an absolute expiration timestamp instead of a relative
-        offset. Test that we honour this convention. Refs #12399.
-        '''
+        """
+        Followe memcached's convention where a timeout greater than 30 days is
+        treated as an absolute expiration timestamp instead of a relative
+        offset (#12399).
+        """
         cache.set('key1', 'eggs', 60 * 60 * 24 * 30 + 1)  # 30 days + 1 second
         self.assertEqual(cache.get('key1'), 'eggs')
 
@@ -522,9 +522,9 @@ class BaseCacheTests(object):
         self.assertEqual(cache.get('key4'), 'lobster bisque')
 
     def test_forever_timeout(self):
-        '''
+        """
         Passing in None into timeout results in a value that is cached forever
-        '''
+        """
         cache.set('key1', 'eggs', None)
         self.assertEqual(cache.get('key1'), 'eggs')
 
@@ -539,9 +539,9 @@ class BaseCacheTests(object):
         self.assertEqual(cache.get('key4'), 'lobster bisque')
 
     def test_zero_timeout(self):
-        '''
+        """
         Passing in zero into timeout results in a value that is not cached
-        '''
+        """
         cache.set('key1', 'eggs', 0)
         self.assertIsNone(cache.get('key1'))
 
@@ -1115,7 +1115,7 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         },
     })
     def test_multiple_caches(self):
-        "Check that multiple locmem caches are isolated"
+        "Multiple locmem caches are isolated"
         cache.set('value', 42)
         self.assertEqual(caches['default'].get('value'), 42)
         self.assertIsNone(caches['other'].get('value'))
@@ -1432,10 +1432,9 @@ NEVER_EXPIRING_CACHES_SETTINGS['default']['TIMEOUT'] = None
 
 
 class DefaultNonExpiringCacheKeyTests(SimpleTestCase):
-    """Tests that verify that settings having Cache arguments with a TIMEOUT
-    set to `None` will create Caches that will set non-expiring keys.
-
-    This fixes ticket #22085.
+    """
+    Settings having Cache arguments with a TIMEOUT=None create Caches that will
+    set non-expiring keys.
     """
     def setUp(self):
         # The 5 minute (300 seconds) default expiration time for keys is
@@ -1449,8 +1448,8 @@ class DefaultNonExpiringCacheKeyTests(SimpleTestCase):
     def test_default_expiration_time_for_keys_is_5_minutes(self):
         """The default expiration time of a cache key is 5 minutes.
 
-        This value is defined inside the __init__() method of the
-        :class:`django.core.cache.backends.base.BaseCache` type.
+        This value is defined in
+        django.core.cache.backends.base.BaseCache.__init__().
         """
         self.assertEqual(300, self.DEFAULT_TIMEOUT)
 
@@ -1563,7 +1562,7 @@ class CacheUtils(SimpleTestCase):
             'views.decorators.cache.cache_page.settingsprefix.GET.'
             '18a03f9c9649f7d684af5db3524f5c99.d41d8cd98f00b204e9800998ecf8427e'
         )
-        # Verify that a specified key_prefix is taken into account.
+        # A specified key_prefix is taken into account.
         key_prefix = 'localprefix'
         learn_cache_key(request, response, key_prefix=key_prefix)
         self.assertEqual(
@@ -1579,8 +1578,7 @@ class CacheUtils(SimpleTestCase):
         self.assertIsNone(get_cache_key(request))
         # Set headers to an empty list.
         learn_cache_key(request, response)
-        # Verify that the querystring is taken into account.
-
+        # The querystring is taken into account.
         self.assertEqual(
             get_cache_key(request),
             'views.decorators.cache.cache_page.settingsprefix.GET.'
@@ -1832,17 +1830,16 @@ class CacheI18nTest(TestCase):
 
     @override_settings(USE_I18N=False, USE_L10N=False, USE_TZ=True)
     def test_cache_key_with_non_ascii_tzname(self):
-        # Regression test for #17476
-        class CustomTzName(timezone.UTC):
-            name = ''
-
-            def tzname(self, dt):
-                return self.name
+        # Timezone-dependent cache keys should use ASCII characters only
+        # (#17476). The implementation here is a bit odd (timezone.utc is an
+        # instance, not a class), but it simulates the correct conditions.
+        class CustomTzName(timezone.utc):
+            pass
 
         request = self.factory.get(self.path)
         response = HttpResponse()
-        with timezone.override(CustomTzName()):
-            CustomTzName.name = 'Hora estándar de Argentina'.encode('UTF-8')  # UTF-8 string
+        with timezone.override(CustomTzName):
+            CustomTzName.zone = 'Hora estándar de Argentina'.encode('UTF-8')  # UTF-8 string
             sanitized_name = 'Hora_estndar_de_Argentina'
             self.assertIn(
                 sanitized_name, learn_cache_key(request, response),
@@ -1856,6 +1853,7 @@ class CacheI18nTest(TestCase):
                 "Cache keys should include the time zone name when time zones are active"
             )
 
+    @ignore_warnings(category=RemovedInDjango21Warning)  # USE_ETAGS=True
     @override_settings(
         CACHE_MIDDLEWARE_KEY_PREFIX="test",
         CACHE_MIDDLEWARE_SECONDS=60,
@@ -1898,12 +1896,12 @@ class CacheI18nTest(TestCase):
         request._cache_update_cache = True
         set_cache(request, 'en', en_message)
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
-        # Check that we can recover the cache
+        # The cache can be recovered
         self.assertIsNotNone(get_cache_data)
         self.assertEqual(get_cache_data.content, en_message.encode())
-        # Check that we use etags
+        # ETags are used.
         self.assertTrue(get_cache_data.has_header('ETag'))
-        # Check that we can disable etags
+        # ETags can be disabled.
         with self.settings(USE_ETAGS=False):
             request._cache_update_cache = True
             set_cache(request, 'en', en_message)
@@ -2229,7 +2227,7 @@ class TestWithTemplateResponse(SimpleTestCase):
             'views.decorators.cache.cache_page.settingsprefix.GET.'
             '58a0a05c8a5620f813686ff969c26853.d41d8cd98f00b204e9800998ecf8427e'
         )
-        # Verify that a specified key_prefix is taken into account.
+        # A specified key_prefix is taken into account.
         learn_cache_key(request, response, key_prefix=key_prefix)
         self.assertEqual(
             get_cache_key(request, key_prefix=key_prefix),
@@ -2245,7 +2243,7 @@ class TestWithTemplateResponse(SimpleTestCase):
         self.assertIsNone(get_cache_key(request))
         # Set headers to an empty list.
         learn_cache_key(request, response)
-        # Verify that the querystring is taken into account.
+        # The querystring is taken into account.
         self.assertEqual(
             get_cache_key(request),
             'views.decorators.cache.cache_page.settingsprefix.GET.'
@@ -2262,6 +2260,7 @@ class TestWithTemplateResponse(SimpleTestCase):
         response = response.render()
         self.assertFalse(response.has_header('ETag'))
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     @override_settings(USE_ETAGS=True)
     def test_with_etag(self):
         template = engines['django'].from_string("This is a test")

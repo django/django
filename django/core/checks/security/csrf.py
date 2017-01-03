@@ -20,14 +20,6 @@ W016 = Warning(
     id='security.W016',
 )
 
-W017 = Warning(
-    "You have 'django.middleware.csrf.CsrfViewMiddleware' in your "
-    "MIDDLEWARE, but you have not set CSRF_COOKIE_HTTPONLY to True. "
-    "Using an HttpOnly CSRF cookie makes it more difficult for cross-site "
-    "scripting attacks to steal the CSRF token.",
-    id='security.W017',
-)
-
 
 def _csrf_middleware():
     return ("django.middleware.csrf.CsrfViewMiddleware" in settings.MIDDLEWARE_CLASSES or
@@ -43,16 +35,8 @@ def check_csrf_middleware(app_configs, **kwargs):
 @register(Tags.security, deploy=True)
 def check_csrf_cookie_secure(app_configs, **kwargs):
     passed_check = (
+        settings.CSRF_USE_SESSIONS or
         not _csrf_middleware() or
         settings.CSRF_COOKIE_SECURE
     )
     return [] if passed_check else [patch_middleware_message(W016)]
-
-
-@register(Tags.security, deploy=True)
-def check_csrf_cookie_httponly(app_configs, **kwargs):
-    passed_check = (
-        not _csrf_middleware() or
-        settings.CSRF_COOKIE_HTTPONLY
-    )
-    return [] if passed_check else [patch_middleware_message(W017)]

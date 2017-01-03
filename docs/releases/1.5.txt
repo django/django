@@ -133,7 +133,7 @@ you may need to make some changes to the way you reference User instances. You
 should also document any specific features of the User model that your
 application relies upon.
 
-See the :ref:`documentation on custom User models <auth-custom-user>` for
+See the :ref:`documentation on custom user models <auth-custom-user>` for
 more details.
 
 Support for saving a subset of model's fields
@@ -560,7 +560,7 @@ Prior to Django 1.5, if you attempted to log into the admin interface and
 mistakenly used your email address instead of your username, the admin
 interface would provide a warning advising that your email address was
 not your username. In Django 1.5, the introduction of
-:ref:`custom User models <auth-custom-user>` has required the removal of this
+:ref:`custom user models <auth-custom-user>` has required the removal of this
 warning. This doesn't change the login behavior of the admin site; it only
 affects the warning message that is displayed under one particular mode of
 login failure.
@@ -741,7 +741,7 @@ framework.
 ``AUTH_PROFILE_MODULE``
 -----------------------
 
-With the introduction of :ref:`custom User models <auth-custom-user>`, there is
+With the introduction of :ref:`custom user models <auth-custom-user>`, there is
 no longer any need for a built-in mechanism to store user profile data.
 
 You can still define user profiles models that have a one-to-one relation with

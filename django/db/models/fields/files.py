@@ -230,7 +230,6 @@ class FileField(Field):
 
     def __init__(self, verbose_name=None, name=None, upload_to='', storage=None, **kwargs):
         self._primary_key_set_explicitly = 'primary_key' in kwargs
-        self._unique_set_explicitly = 'unique' in kwargs
 
         self.storage = storage or default_storage
         self.upload_to = upload_to
@@ -240,21 +239,9 @@ class FileField(Field):
 
     def check(self, **kwargs):
         errors = super(FileField, self).check(**kwargs)
-        errors.extend(self._check_unique())
         errors.extend(self._check_primary_key())
+        errors.extend(self._check_upload_to())
         return errors
-
-    def _check_unique(self):
-        if self._unique_set_explicitly:
-            return [
-                checks.Error(
-                    "'unique' is not a valid argument for a %s." % self.__class__.__name__,
-                    obj=self,
-                    id='fields.E200',
-                )
-            ]
-        else:
-            return []
 
     def _check_primary_key(self):
         if self._primary_key_set_explicitly:
@@ -263,6 +250,20 @@ class FileField(Field):
                     "'primary_key' is not a valid argument for a %s." % self.__class__.__name__,
                     obj=self,
                     id='fields.E201',
+                )
+            ]
+        else:
+            return []
+
+    def _check_upload_to(self):
+        if isinstance(self.upload_to, six.string_types) and self.upload_to.startswith('/'):
+            return [
+                checks.Error(
+                    "%s's 'upload_to' argument must be a relative path, not an "
+                    "absolute path." % self.__class__.__name__,
+                    obj=self,
+                    id='fields.E202',
+                    hint='Remove the leading slash.',
                 )
             ]
         else:
@@ -293,7 +294,7 @@ class FileField(Field):
         file = super(FileField, self).pre_save(model_instance, add)
         if file and not file._committed:
             # Commit the file to storage prior to saving the model
-            file.save(file.name, file, save=False)
+            file.save(file.name, file.file, save=False)
         return file
 
     def contribute_to_class(self, cls, name, **kwargs):

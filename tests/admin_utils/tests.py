@@ -72,7 +72,7 @@ class NestedObjectsTests(TestCase):
 
     def test_on_delete_do_nothing(self):
         """
-        Check that the nested collector doesn't query for DO_NOTHING objects.
+        The nested collector doesn't query for DO_NOTHING objects.
         """
         n = NestedObjects(using=DEFAULT_DB_ALIAS)
         objs = [Event.objects.create()]
@@ -83,9 +83,9 @@ class NestedObjectsTests(TestCase):
 
     def test_relation_on_abstract(self):
         """
-        #21846 -- Check that `NestedObjects.collect()` doesn't trip
-        (AttributeError) on the special notation for relations on abstract
-        models (related_name that contains %(app_label)s and/or %(class)s).
+        NestedObjects.collect() doesn't trip (AttributeError) on the special
+        notation for relations on abstract models (related_name that contains
+        %(app_label)s and/or %(class)s) (#21846).
         """
         n = NestedObjects(using=DEFAULT_DB_ALIAS)
         Car.objects.create()

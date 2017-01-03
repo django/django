@@ -183,9 +183,9 @@ Methods
 
     .. method:: get_username()
 
-        Returns the username for the user. Since the User model can be swapped
-        out, you should use this method instead of referencing the username
-        attribute directly.
+        Returns the username for the user. Since the ``User`` model can be
+        swapped out, you should use this method instead of referencing the
+        username attribute directly.
 
     .. method:: get_full_name()
 
@@ -305,7 +305,7 @@ Manager methods
 
         The ``extra_fields`` keyword arguments are passed through to the
         :class:`~django.contrib.auth.models.User`’s ``__init__`` method to
-        allow setting arbitrary fields on a :ref:`custom User model
+        allow setting arbitrary fields on a :ref:`custom user model
         <auth-custom-user>`.
 
         See :ref:`Creating users <topics-auth-creating-users>` for example usage.
@@ -615,16 +615,14 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
 .. attribute:: RemoteUserBackend.create_unknown_user
 
-    ``True`` or ``False``.  Determines whether or not a
-    :class:`~django.contrib.auth.models.User` object is created if not already
-    in the database.  Defaults to ``True``.
+    ``True`` or ``False``. Determines whether or not a user object is created
+    if not already in the database  Defaults to ``True``.
 
 .. method:: RemoteUserBackend.authenticate(request, remote_user)
 
     The username passed as ``remote_user`` is considered trusted. This method
-    simply returns the ``User`` object with the given username, creating a new
-    ``User`` object if :attr:`~RemoteUserBackend.create_unknown_user` is
-    ``True``.
+    simply returns the user object with the given username, creating a new
+    user object if :attr:`~RemoteUserBackend.create_unknown_user` is ``True``.
 
     Returns ``None`` if :attr:`~RemoteUserBackend.create_unknown_user` is
     ``False`` and a ``User`` object with the given username is not found in the
@@ -637,9 +635,8 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 .. method:: RemoteUserBackend.clean_username(username)
 
    Performs any cleaning on the ``username`` (e.g. stripping LDAP DN
-   information) prior to using it to get or create a
-   :class:`~django.contrib.auth.models.User` object.  Returns the cleaned
-   username.
+   information) prior to using it to get or create a user object. Returns the
+   cleaned username.
 
 .. method:: RemoteUserBackend.configure_user(user)
 
@@ -665,23 +662,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
    Same as :class:`RemoteUserBackend` except that it doesn't reject inactive
    users because :attr:`~RemoteUserBackend.user_can_authenticate` always
    returns ``True``.
-
-``AppConfig`` classes
-=====================
-
-.. module:: django.contrib.auth.apps
-   :synopsis: AppConfigs for contrib.auth.
-
-.. class:: AuthConfig
-
-    The default :class:`~django.apps.AppConfig`.
-
-.. class:: BaseAuthConfig
-
-    .. versionadded:: 1.11
-
-    An :class:`~django.apps.AppConfig` for use if you :ref:`aren't using
-    <using-auth-without-models>` any of the built-in ``contrib.auth`` models.
 
 Utility functions
 =================

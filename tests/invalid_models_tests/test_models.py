@@ -689,6 +689,45 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertFalse(Child.check())
 
+    def test_name_beginning_with_underscore(self):
+        class _Model(models.Model):
+            pass
+
+        self.assertEqual(_Model.check(), [
+            Error(
+                "The model name '_Model' cannot start or end with an underscore "
+                "as it collides with the query lookup syntax.",
+                obj=_Model,
+                id='models.E023',
+            )
+        ])
+
+    def test_name_ending_with_underscore(self):
+        class Model_(models.Model):
+            pass
+
+        self.assertEqual(Model_.check(), [
+            Error(
+                "The model name 'Model_' cannot start or end with an underscore "
+                "as it collides with the query lookup syntax.",
+                obj=Model_,
+                id='models.E023',
+            )
+        ])
+
+    def test_name_contains_double_underscores(self):
+        class Test__Model(models.Model):
+            pass
+
+        self.assertEqual(Test__Model.check(), [
+            Error(
+                "The model name 'Test__Model' cannot contain double underscores "
+                "as it collides with the query lookup syntax.",
+                obj=Test__Model,
+                id='models.E024',
+            )
+        ])
+
     @override_settings(TEST_SWAPPED_MODEL_BAD_VALUE='not-a-model')
     def test_swappable_missing_app_name(self):
         class Model(models.Model):
@@ -859,6 +898,24 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(C1.check(), [])
         self.assertEqual(C2.check(), [])
+
+    def test_m2m_to_concrete_and_proxy_allowed(self):
+        class A(models.Model):
+            pass
+
+        class Through(models.Model):
+            a = models.ForeignKey('A', models.CASCADE)
+            c = models.ForeignKey('C', models.CASCADE)
+
+        class ThroughProxy(Through):
+            class Meta:
+                proxy = True
+
+        class C(models.Model):
+            mm_a = models.ManyToManyField(A, through=Through)
+            mm_aproxy = models.ManyToManyField(A, through=ThroughProxy, related_name='proxied_m2m')
+
+        self.assertEqual(C.check(), [])
 
     @isolate_apps('django.contrib.auth', kwarg_name='apps')
     def test_lazy_reference_checks(self, apps):
