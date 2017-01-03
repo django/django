@@ -173,6 +173,11 @@ that inherits from ``View`` - for example, trying to use a form at the top of a
 list and combining :class:`~django.views.generic.edit.ProcessFormView` and
 :class:`~django.views.generic.list.ListView` - won't work as expected.
 
+.. seealso::
+
+   `Classy Class-Based Views <https://ccbv.co.uk/>`_ provides a nice interface
+   to easily navigate the class hierarchy of the built-in class-based views.
+
 
 Handling forms with class-based views
 =====================================

@@ -8,6 +8,12 @@ the class tree are represented under that view. For the reference
 documentation organized by the class which defines the behavior, see
 :doc:`Class-based views</ref/class-based-views/index>`
 
+.. seealso::
+
+   `Classy Class-Based Views <https://ccbv.co.uk/>`_ provides a nice interface
+   to easily navigate the class hierarchy of the built-in class-based views.
+
+
 Simple generic views
 ====================
 
