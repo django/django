@@ -693,8 +693,10 @@ class ExpressionsNumericTests(TestCase):
 
 
 class ExpressionOperatorTests(TestCase):
-    def setUp(self):
-        self.n = Number.objects.create(integer=42, float=15.5)
+    @classmethod
+    def setUpTestData(cls):
+        cls.n = Number.objects.create(integer=42, float=15.5)
+        cls.n1 = Number.objects.create(integer=-42, float=-15.5)
 
     def test_lefthand_addition(self):
         # LH Addition of floats and integers
@@ -737,15 +739,18 @@ class ExpressionOperatorTests(TestCase):
     def test_lefthand_bitwise_and(self):
         # LH Bitwise ands on integers
         Number.objects.filter(pk=self.n.pk).update(integer=F('integer').bitand(56))
+        Number.objects.filter(pk=self.n1.pk).update(integer=F('integer').bitand(-56))
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 40)
+        self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -64)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_lefthand_bitwise_or(self):
         # LH Bitwise or on integers
-        Number.objects.filter(pk=self.n.pk).update(integer=F('integer').bitor(48))
+        Number.objects.update(integer=F('integer').bitor(48))
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 58)
+        self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -10)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_lefthand_power(self):
