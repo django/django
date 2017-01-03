@@ -346,8 +346,8 @@ class TestCollectionLinks(TestDefaults, CollectionTestCase):
     the standard file resolving tests here, to make sure using
     ``--link`` does not change the file-selection semantics.
     """
-    def run_collectstatic(self, clear=False):
-        super(TestCollectionLinks, self).run_collectstatic(link=True, clear=clear)
+    def run_collectstatic(self, clear=False, link=True, **kwargs):
+        super(TestCollectionLinks, self).run_collectstatic(link=link, clear=clear, **kwargs)
 
     def test_links_created(self):
         """
@@ -362,6 +362,18 @@ class TestCollectionLinks(TestDefaults, CollectionTestCase):
         path = os.path.join(settings.STATIC_ROOT, 'test.txt')
         os.unlink(path)
         self.run_collectstatic()
+        self.assertTrue(os.path.islink(path))
+
+    def test_symlinks_and_files_replaced(self):
+        """
+        Running collectstatic in non-symlink mode replaces symlinks with files,
+        while symlink mode replaces files with symlinks.
+        """
+        path = os.path.join(settings.STATIC_ROOT, 'test.txt')
+        self.assertTrue(os.path.islink(path))
+        self.run_collectstatic(link=False)
+        self.assertFalse(os.path.islink(path))
+        self.run_collectstatic(link=True)
         self.assertTrue(os.path.islink(path))
 
     def test_clear_broken_symlink(self):
