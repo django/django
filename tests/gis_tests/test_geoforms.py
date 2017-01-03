@@ -1,3 +1,6 @@
+import json
+import re
+
 from django.contrib.gis import forms
 from django.contrib.gis.geos import GEOSGeometry
 from django.forms import ValidationError
@@ -109,11 +112,12 @@ class GeometryFieldTest(SimpleTestCase):
         with patch_logger('django.contrib.gis', 'error') as logger_calls:
             output = str(form)
 
-        self.assertInHTML(
-            '<textarea id="id_pt1" class="vSerializedField required" cols="150"'
-            ' rows="10" name="pt1">POINT (7.3 44)</textarea>',
-            output
-        )
+        # The first point can't use assertInHTML() due to non-deterministic
+        # ordering of the rendered dictionary.
+        pt1_serialized = re.search(r'<textarea [^>]*>({[^<]+})<', output).groups()[0]
+        pt1_json = json.loads(pt1_serialized.replace('&quot;', '"'))
+        self.assertEqual(pt1_json, {'coordinates': [7.3, 44.0], 'type': 'Point'})
+
         self.assertInHTML(
             '<textarea id="id_pt2" class="vSerializedField required" cols="150"'
             ' rows="10" name="pt2"></textarea>',
