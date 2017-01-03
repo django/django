@@ -864,7 +864,7 @@ class GeoQuerySetTest(TestCase):
                         self.assertAlmostEqual(c1[0] + xfac, c2[0], 5)
                         self.assertAlmostEqual(c1[1] + yfac, c2[1], 5)
 
-    @skipUnlessDBFeature("has_unionagg_method")
+    @skipUnlessDBFeature('supports_union_aggr')
     def test_unionagg(self):
         """
         Testing the `Union` aggregate.

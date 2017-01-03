@@ -312,7 +312,7 @@ class DistanceTest(TestCase):
         # instead (we should get the same results b/c accuracy variance won't matter
         # in this test case).
         querysets = [qs1]
-        if connection.features.has_distance_spheroid_method:
+        if connection.features.has_DistanceSpheroid_function:
             gq3 = Q(point__distance_lte=(wollongong.point, d1, 'spheroid'))
             gq4 = Q(point__distance_gte=(wollongong.point, d2, 'spheroid'))
             qs2 = AustraliaCity.objects.exclude(name='Wollongong').filter(gq3 | gq4)
