@@ -7,7 +7,8 @@ from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.safestring import mark_safe
 
 from .base import (
-    Node, Template, TemplateSyntaxError, TextNode, Variable, token_kwargs,
+    Node, Template, TemplateSyntaxError, TextNode, UndefinedVariable, Variable,
+    token_kwargs,
 )
 from .library import Library
 
@@ -113,8 +114,9 @@ class ExtendsNode(Node):
 
     def get_parent(self, context):
         parent = self.parent_name.resolve(context)
-        if not parent:
-            error_msg = "Invalid template name in 'extends' tag: %r." % parent
+        if isinstance(parent, UndefinedVariable):
+            error_msg = "Undefined variable in 'extends' tag."
+
             if self.parent_name.filters or\
                     isinstance(self.parent_name.var, Variable):
                 error_msg += " Got this from the '%s' variable." %\

@@ -16,8 +16,8 @@ from .base import (
     BLOCK_TAG_END, BLOCK_TAG_START, COMMENT_TAG_END, COMMENT_TAG_START,
     FILTER_SEPARATOR, SINGLE_BRACE_END, SINGLE_BRACE_START,
     VARIABLE_ATTRIBUTE_SEPARATOR, VARIABLE_TAG_END, VARIABLE_TAG_START,
-    Context, Node, NodeList, TemplateSyntaxError, VariableDoesNotExist,
-    kwarg_re, render_value_in_context, token_kwargs,
+    Context, Node, NodeList, TemplateSyntaxError, UndefinedVariable,
+    VariableDoesNotExist, kwarg_re, render_value_in_context, token_kwargs,
 )
 from .defaultfilters import date
 from .library import Library
@@ -119,7 +119,7 @@ class FirstOfNode(Node):
 
     def render(self, context):
         for var in self.vars:
-            value = var.resolve(context, True)
+            value = var.resolve(context)
             if value:
                 first = render_value_in_context(value, context)
                 if self.asvar:
@@ -160,10 +160,10 @@ class ForNode(Node):
             parentloop = {}
         with context.push():
             try:
-                values = self.sequence.resolve(context, True)
+                values = self.sequence.resolve(context)
             except VariableDoesNotExist:
                 values = []
-            if values is None:
+            if isinstance(values, UndefinedVariable):
                 values = []
             if not hasattr(values, '__len__'):
                 values = list(values)
@@ -240,7 +240,7 @@ class IfChangedNode(Node):
             if self._varlist:
                 # Consider multiple parameters.  This automatically behaves
                 # like an OR evaluation of the multiple variables.
-                compare_to = [var.resolve(context, True) for var in self._varlist]
+                compare_to = [var.resolve(context) for var in self._varlist]
             else:
                 # The "{% ifchanged %}" syntax (without any variables) compares the rendered output.
                 compare_to = nodelist_true_output = self.nodelist_true.render(context)
@@ -280,8 +280,8 @@ class IfEqualNode(Node):
         return '<%s>' % self.__class__.__name__
 
     def render(self, context):
-        val1 = self.var1.resolve(context, True)
-        val2 = self.var2.resolve(context, True)
+        val1 = self.var1.resolve(context)
+        val2 = self.var2.resolve(context)
         if (self.negate and val1 != val2) or (not self.negate and val1 == val2):
             return self.nodelist_true.render(context)
         return self.nodelist_false.render(context)
@@ -351,11 +351,11 @@ class RegroupNode(Node):
         # This method is called for each object in self.target. See regroup()
         # for the reason why we temporarily put the object in the context.
         context[self.var_name] = obj
-        return self.expression.resolve(context, True)
+        return self.expression.resolve(context)
 
     def render(self, context):
-        obj_list = self.target.resolve(context, True)
-        if obj_list is None:
+        obj_list = self.target.resolve(context)
+        if isinstance(obj_list, UndefinedVariable):
             # target variable wasn't found in context; fail silently.
             context[self.var_name] = []
             return ''
@@ -438,6 +438,8 @@ class URLNode(Node):
         args = [arg.resolve(context) for arg in self.args]
         kwargs = {k: v.resolve(context) for k, v in self.kwargs.items()}
         view_name = self.view_name.resolve(context)
+        if isinstance(view_name, UndefinedVariable):
+            raise TemplateSyntaxError("Variable %s is not defined" % self.view_name)
         try:
             current_app = context.request.current_app
         except AttributeError:
@@ -882,7 +884,7 @@ class TemplateLiteral(Literal):
         return self.text
 
     def eval(self, context):
-        return self.value.resolve(context, ignore_failures=True)
+        return self.value.resolve(context)
 
 
 class TemplateIfParser(IfParser):

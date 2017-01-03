@@ -543,10 +543,12 @@ class IfTagTests(SimpleTestCase):
         output = self.engine.render_to_string('if-tag-badarg02', {'y': 0})
         self.assertEqual(output, '')
 
-    @setup({'if-tag-badarg03': '{% if x|default_if_none:y %}yes{% endif %}'})
+    @setup({'if-tag-badarg03': '{% if x|default_if_none:y %}yes{% else %}no{% endif %}'})
     def test_if_tag_badarg03(self):
+        # default_if_none is not triggered since undefined variables
+        # are not None.
         output = self.engine.render_to_string('if-tag-badarg03', {'y': 1})
-        self.assertEqual(output, 'yes')
+        self.assertEqual(output, 'no')
 
     @setup({'if-tag-badarg04': '{% if x|default_if_none:y %}yes{% else %}no{% endif %}'})
     def test_if_tag_badarg04(self):
@@ -577,7 +579,7 @@ class IfTagTests(SimpleTestCase):
     @setup({'template': '{% if foo is bar %}yes{% else %}no{% endif %}'})
     def test_if_is_both_variables_missing(self):
         output = self.engine.render_to_string('template', {})
-        self.assertEqual(output, 'yes')
+        self.assertEqual(output, 'no')
 
     @setup({'template': '{% if foo is not None %}yes{% else %}no{% endif %}'})
     def test_if_is_not_match(self):
@@ -599,6 +601,14 @@ class IfTagTests(SimpleTestCase):
     @setup({'template': '{% if foo is not bar %}yes{% else %}no{% endif %}'})
     def test_if_is_not_both_variables_missing(self):
         output = self.engine.render_to_string('template', {})
+        self.assertEqual(output, 'yes')
+
+    @setup({'if-tag-invalid-member': '{% if x.non_existent == None %}yes{% else %}no{% endif %}'})
+    def test_if_tag_invalid_member(self):
+        """
+        Invalid attributes should not be regarded as equal to None
+        """
+        output = self.engine.render_to_string('if-tag-invalid-member', {'x': TestObj()})
         self.assertEqual(output, 'no')
 
 

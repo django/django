@@ -166,7 +166,8 @@ class UrlTagTests(SimpleTestCase):
 
     @setup({'url-fail11': '{% url named_url %}'})
     def test_url_fail11(self):
-        with self.assertRaises(NoReverseMatch):
+        with self.assertRaisesRegex(TemplateSyntaxError,
+                                    "Variable named_url is not defined"):
             self.engine.render_to_string('url-fail11')
 
     @setup({'url-fail12': '{% url named_url %}'})

@@ -271,6 +271,25 @@ If you wish to keep this restriction in the admin when editing users, set
     admin.site.unregister(User)
     admin.site.register(User, MyUserAdmin)
 
+Undefined variables in templates are distinguished from `None`
+--------------------------------------------------------------
+
+In templates, undefined values and non-existent attributes of objects
+are now treated as being instances of a special type that don't
+compare equal to any other Python object (including `None`). In older
+versions of Django, such a variable would be treated as having a value
+of `None`, meaning that comparisons could succeed unexpectedly due to
+a typo or refactoring::
+
+    {% if user.pk == product.product_owner_id %}
+      If the product_owner_id field is renamed, this private data would
+      have been rendered for users who are not logged in.
+    {% endif %}
+
+Such code will now fail the comparison if one side contains an
+undefined value. You should avoid deliberately relying on undefined
+values in your templates.
+
 Miscellaneous
 -------------
 

@@ -117,6 +117,32 @@ class VariableDoesNotExist(Exception):
         return self.msg % self.params
 
 
+class UndefinedVariable:
+    """
+    This is the result of evaluating a template expression that
+    contains an undefined variable.
+
+    An instance of this class evaluates to False in a boolean
+    context. All instances are treated as being equal to each other.
+    """
+
+    def __init__(self, var_rep=""):
+        """
+        `var_rep` is the string value that this expression should
+        expand to when displaying in a template.
+        """
+        self.var_rep = var_rep
+
+    def __bool__(self):
+        return False
+
+    def __eq__(self, other):
+        return isinstance(other, UndefinedVariable)
+
+    def __str__(self):
+        return self.var_rep
+
+
 class Origin:
     def __init__(self, name, template_name=None, loader=None):
         self.name = name
@@ -672,22 +698,19 @@ class FilterExpression:
         self.filters = filters
         self.var = var_obj
 
-    def resolve(self, context, ignore_failures=False):
+    def resolve(self, context):
         if isinstance(self.var, Variable):
             try:
                 obj = self.var.resolve(context)
             except VariableDoesNotExist:
-                if ignore_failures:
-                    obj = None
-                else:
-                    string_if_invalid = context.template.engine.string_if_invalid
-                    if string_if_invalid:
-                        if '%s' in string_if_invalid:
-                            return string_if_invalid % self.var
-                        else:
-                            return string_if_invalid
+                string_if_invalid = context.template.engine.string_if_invalid
+                if string_if_invalid:
+                    if '%s' in string_if_invalid:
+                        obj = UndefinedVariable(string_if_invalid % self.var)
                     else:
-                        obj = string_if_invalid
+                        obj = UndefinedVariable(string_if_invalid)
+                else:
+                    obj = UndefinedVariable()
         else:
             obj = self.var
         for func, args in self.filters:
