@@ -274,12 +274,24 @@ class Command(BaseCommand):
                     # The full path of the target file
                     if self.local:
                         full_path = self.storage.path(prefixed_path)
+                        # If it's --link mode and the path isn't a link (i.e.
+                        # the previous collectstatic wasn't with --link) or if
+                        # it's non-link mode and the path is a link (i.e. the
+                        # previous collectstatic was with --link), the old
+                        # links/files must be deleted so it's not safe to skip
+                        # unmodified files.
+                        can_skip_unmodified_files = not (self.symlink ^ os.path.islink(full_path))
                     else:
                         full_path = None
-                    # Skip the file if the source file is younger
+                        # In remote storages, skipping is only based on the
+                        # modified times since symlinks aren't relevant.
+                        can_skip_unmodified_files = True
                     # Avoid sub-second precision (see #14665, #19540)
-                    if (target_last_modified.replace(microsecond=0) >= source_last_modified.replace(microsecond=0) and
-                            full_path and not (self.symlink ^ os.path.islink(full_path))):
+                    file_is_unmodified = (
+                        target_last_modified.replace(microsecond=0) >=
+                        source_last_modified.replace(microsecond=0)
+                    )
+                    if file_is_unmodified and can_skip_unmodified_files:
                         if prefixed_path not in self.unmodified_files:
                             self.unmodified_files.append(prefixed_path)
                         self.log("Skipping '%s' (not modified)" % path)
