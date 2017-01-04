@@ -1,6 +1,6 @@
 import errno
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import CachedStaticFilesStorage
@@ -57,6 +57,14 @@ class PathNotImplementedStorage(storage.Storage):
 
     def path(self, name):
         raise NotImplementedError
+
+
+class NeverCopyRemoteStorage(PathNotImplementedStorage):
+    """
+    Return a future modified time for all files so that nothing is collected.
+    """
+    def get_modified_time(self, name):
+        return datetime.now() + timedelta(days=30)
 
 
 class SimpleCachedStaticFilesStorage(CachedStaticFilesStorage):

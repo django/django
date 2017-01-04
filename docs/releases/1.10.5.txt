@@ -17,3 +17,6 @@ Bugfixes
 
 * Fixed a regression in the ``timesince`` and ``timeuntil`` filters that caused
   incorrect results for dates in a leap year (:ticket:`27637`).
+
+* Fixed a regression where ``collectstatic`` overwrote newer files in remote
+  storages (:ticket:`27658`).

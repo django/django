@@ -337,6 +337,23 @@ class TestCollectionNonLocalStorage(TestNoFilesCreated, CollectionTestCase):
     pass
 
 
+class TestCollectionNeverCopyStorage(CollectionTestCase):
+
+    @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.NeverCopyRemoteStorage')
+    def test_skips_newer_files_in_remote_storage(self):
+        """
+        collectstatic skips newer files in a remote storage.
+        run_collectstatic() in setUp() copies the static files, then files are
+        always skipped after NeverCopyRemoteStorage is activated since
+        NeverCopyRemoteStorage.get_modified_time() returns a datetime in the
+        future to simulate an unmodified file.
+        """
+        stdout = six.StringIO()
+        self.run_collectstatic(stdout=stdout, verbosity=2)
+        output = force_text(stdout.getvalue())
+        self.assertIn("Skipping 'test.txt' (not modified)", output)
+
+
 @unittest.skipUnless(symlinks_supported(), "Must be able to symlink to run this test.")
 class TestCollectionLinks(TestDefaults, CollectionTestCase):
     """
