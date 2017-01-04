@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import codecs
+import datetime
 import os
 import shutil
 import tempfile
@@ -15,7 +16,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.test import mock, override_settings
 from django.test.utils import extend_sys_path
-from django.utils import six
+from django.utils import six, timezone
 from django.utils._os import symlinks_supported
 from django.utils.encoding import force_text
 from django.utils.functional import empty
@@ -387,9 +388,15 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.DummyStorage')
 class TestCollectionNonLocalStorage(TestNoFilesCreated, CollectionTestCase):
     """
-    Tests for #15035
+    Tests for a Storage that implements get_modified_time() but not path()
+    (#15035).
     """
-    pass
+    def test_storage_properties(self):
+        # Properties of the Storage as described in the ticket.
+        storage = DummyStorage()
+        self.assertEqual(storage.get_modified_time('name'), datetime.datetime(1970, 1, 1, tzinfo=timezone.utc))
+        with self.assertRaisesMessage(NotImplementedError, "This backend doesn't support absolute paths."):
+            storage.path('name')
 
 
 @unittest.skipUnless(symlinks_supported(), "Must be able to symlink to run this test.")

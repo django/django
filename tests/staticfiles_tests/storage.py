@@ -10,7 +10,8 @@ from django.utils import timezone
 
 class DummyStorage(storage.Storage):
     """
-    A storage class that implements get_modified_time().
+    A storage class that implements get_modified_time() but raises
+    NotImplementedError for path().
     """
     def _save(self, name, content):
         return 'dummy'
@@ -22,7 +23,7 @@ class DummyStorage(storage.Storage):
         pass
 
     def get_modified_time(self, name):
-        return datetime.datetime(1970, 1, 1, tzinfo=timezone.utc)
+        return datetime(1970, 1, 1, tzinfo=timezone.utc)
 
 
 class PathNotImplementedStorage(storage.Storage):
