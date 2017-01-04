@@ -41,7 +41,7 @@ from django.urls import reverse
 from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.html import escape, format_html
+from django.utils.html import format_html
 from django.utils.http import urlencode, urlquote
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, format_lazy, get_text_list
@@ -1394,9 +1394,9 @@ class ModelAdmin(BaseModelAdmin):
         Create a message informing the user that the object doesn't exist
         and return a redirect to the admin index page.
         """
-        msg = _("%(name)s with ID %(key)s doesn't exist. Perhaps it was deleted?") % {
+        msg = _("""%(name)s with ID "%(key)s" doesn't exist. Perhaps it was deleted?""") % {
             'name': force_text(opts.verbose_name),
-            'key': escape(object_id),
+            'key': unquote(object_id),
         }
         self.message_user(request, msg, messages.WARNING)
         url = reverse('admin:index', current_app=self.admin_site.name)
