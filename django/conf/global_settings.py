@@ -181,6 +181,10 @@ FILE_CHARSET = 'utf-8'
 # Email address that error messages come from.
 SERVER_EMAIL = 'root@localhost'
 
+# The default IP and port for local development server to use.
+RUNSERVER_IP = ''
+RUNSERVER_PORT = ''
+
 # Database connection info. If left empty, will default to the dummy backend.
 DATABASES = {}
 
