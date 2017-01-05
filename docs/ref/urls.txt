@@ -53,10 +53,9 @@ parameter is useful.
 ``include()``
 =============
 
-.. function:: include(module, namespace=None, app_name=None)
+.. function:: include(module, namespace=None)
               include(pattern_list)
               include((pattern_list, app_namespace), namespace=None)
-              include((pattern_list, app_namespace, instance_namespace))
 
     A function that takes a full Python import path to another URLconf module
     that should be "included" in this place. Optionally, the :term:`application
@@ -68,15 +67,12 @@ parameter is useful.
     can be used to set a different instance namespace.
 
     ``include()`` also accepts as an argument either an iterable that returns
-    URL patterns, a 2-tuple containing such iterable plus the names of the
-    application namespaces, or a 3-tuple containing the iterable and the names
-    of both the application and instance namespace.
+    URL patterns or a 2-tuple containing such iterable plus the names of the
+    application namespaces.
 
     :arg module: URLconf module (or module name)
     :arg namespace: Instance namespace for the URL entries being included
     :type namespace: string
-    :arg app_name: Application namespace for the URL entries being included
-    :type app_name: string
     :arg pattern_list: Iterable of :func:`django.conf.urls.url` instances
     :arg app_namespace: Application namespace for the URL entries being included
     :type app_namespace: string
@@ -84,20 +80,6 @@ parameter is useful.
     :type instance_namespace: string
 
 See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
-
-.. deprecated:: 1.9
-
-    Support for the ``app_name`` argument is deprecated and will be removed in
-    Django 2.0. Specify the ``app_name`` as explained in
-    :ref:`namespaces-and-include` instead.
-
-    Support for passing a 3-tuple is also deprecated and will be removed in
-    Django 2.0. Pass a 2-tuple containing the pattern list and application
-    namespace, and use the ``namespace`` argument instead.
-
-    Lastly, support for an instance namespace without an application namespace
-    has been deprecated and will be removed in Django 2.0. Specify the
-    application namespace or remove the instance namespace.
 
 ``handler400``
 ==============

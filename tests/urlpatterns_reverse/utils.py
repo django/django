@@ -18,7 +18,7 @@ class URLObject(object):
 
     @property
     def urls(self):
-        return self.urlpatterns, self.app_name, self.namespace
+        return (self.urlpatterns, self.app_name), self.namespace
 
     @property
     def app_urls(self):
