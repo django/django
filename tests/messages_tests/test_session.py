@@ -22,12 +22,12 @@ def stored_session_messages_count(storage):
     return len(data)
 
 
-class SessionTest(BaseTests, TestCase):
+class SessionTests(BaseTests, TestCase):
     storage_class = SessionStorage
 
     def get_request(self):
         self.session = {}
-        request = super(SessionTest, self).get_request()
+        request = super(SessionTests, self).get_request()
         request.session = self.session
         return request
 

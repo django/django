@@ -13,7 +13,7 @@ from .base import BaseTests
 
 def set_cookie_data(storage, messages, invalid=False, encode_empty=False):
     """
-    Sets ``request.COOKIES`` with the encoded data and removes the storage
+    Set ``request.COOKIES`` with the encoded data and remove the storage
     backend's loaded data cache.
     """
     encoded_data = storage._encode(messages, encode_empty=encode_empty)
@@ -27,7 +27,7 @@ def set_cookie_data(storage, messages, invalid=False, encode_empty=False):
 
 def stored_cookie_messages_count(storage, response):
     """
-    Returns an integer containing the number of messages stored.
+    Return an integer containing the number of messages stored.
     """
     # Get a list of cookies, excluding ones with a max-age of 0 (because
     # they have been marked for deletion).
@@ -43,7 +43,7 @@ def stored_cookie_messages_count(storage, response):
 
 
 @override_settings(SESSION_COOKIE_DOMAIN='.example.com', SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True)
-class CookieTest(BaseTests, SimpleTestCase):
+class CookieTests(BaseTests, SimpleTestCase):
     storage_class = CookieStorage
 
     def stored_messages_count(self, storage, response):
@@ -54,7 +54,7 @@ class CookieTest(BaseTests, SimpleTestCase):
         # Set initial data.
         example_messages = ['test', 'me']
         set_cookie_data(storage, example_messages)
-        # The message actually contains what we expect.
+        # The message contains what's expected.
         self.assertEqual(list(storage), example_messages)
 
     def test_cookie_setings(self):
@@ -149,18 +149,14 @@ class CookieTest(BaseTests, SimpleTestCase):
             return decoded.message
 
         storage = self.get_storage()
-
-        self.assertIsInstance(
-            encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData)
-        self.assertNotIsInstance(
-            encode_decode("<b>Hello Django!</b>"), SafeData)
+        self.assertIsInstance(encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData)
+        self.assertNotIsInstance(encode_decode("<b>Hello Django!</b>"), SafeData)
 
     def test_pre_1_5_message_format(self):
         """
-        For ticket #22426. Tests whether messages that were set in the cookie
-        before the addition of is_safedata are decoded correctly.
+        Messages that were set in the cookie before the addition of is_safedata
+        are decoded correctly (#22426).
         """
-
         # Encode the messages using the current encoder.
         messages = [Message(constants.INFO, 'message %s') for x in range(5)]
         encoder = MessageEncoder(separators=(',', ':'))

@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy
 
 def add_level_messages(storage):
     """
-    Adds 6 messages from different levels (including a custom one) to a storage
+    Add 6 messages from different levels (including a custom one) to a storage
     instance.
     """
     storage.add(constants.INFO, 'A generic info message')
@@ -27,7 +27,7 @@ class override_settings_tags(override_settings):
         super(override_settings_tags, self).enable()
         # LEVEL_TAGS is a constant defined in the
         # django.contrib.messages.storage.base module, so after changing
-        # settings.MESSAGE_TAGS, we need to update that constant too.
+        # settings.MESSAGE_TAGS, update that constant also.
         self.old_level_tags = base.LEVEL_TAGS
         base.LEVEL_TAGS = utils.get_level_tags()
 
@@ -61,8 +61,7 @@ class BaseTests(object):
             }],
             ROOT_URLCONF='messages_tests.urls',
             MESSAGE_TAGS='',
-            MESSAGE_STORAGE='%s.%s' % (self.storage_class.__module__,
-                                       self.storage_class.__name__),
+            MESSAGE_STORAGE='%s.%s' % (self.storage_class.__module__, self.storage_class.__name__),
             SESSION_SERIALIZER='django.contrib.sessions.serializers.JSONSerializer',
         )
         self.settings_override.enable()
@@ -78,7 +77,7 @@ class BaseTests(object):
 
     def get_storage(self, data=None):
         """
-        Returns the storage backend, setting its loaded data to the ``data``
+        Return the storage backend, setting its loaded data to the ``data``
         argument.
 
         This method avoids the storage ``_get`` method from getting called so
@@ -150,9 +149,8 @@ class BaseTests(object):
     @override_settings(MESSAGE_LEVEL=constants.DEBUG)
     def test_full_request_response_cycle(self):
         """
-        With the message middleware enabled, tests that messages are properly
-        stored and then retrieved across the full request/redirect/response
-        cycle.
+        With the message middleware enabled, messages are properly stored and
+        retrieved across the full request/redirect/response cycle.
         """
         data = {
             'messages': ['Test message %d' % x for x in range(5)],
@@ -269,7 +267,7 @@ class BaseTests(object):
 
     def stored_messages_count(self, storage, response):
         """
-        Returns the number of messages being stored after a
+        Return the number of messages being stored after a
         ``storage.update()`` call.
         """
         raise NotImplementedError('This method must be set by a subclass.')
@@ -278,9 +276,10 @@ class BaseTests(object):
         raise NotImplementedError('This method must be set by a subclass.')
 
     def get_existing_storage(self):
-        return self.get_storage([Message(constants.INFO, 'Test message 1'),
-                                 Message(constants.INFO, 'Test message 2',
-                                 extra_tags='tag')])
+        return self.get_storage([
+            Message(constants.INFO, 'Test message 1'),
+            Message(constants.INFO, 'Test message 2', extra_tags='tag'),
+        ])
 
     def test_existing_read(self):
         """
@@ -366,8 +365,7 @@ class BaseTests(object):
         constants.WARNING: '',
         constants.ERROR: 'bad',
         29: 'custom',
-    }
-    )
+    })
     def test_custom_tags(self):
         storage = self.get_storage()
         storage.level = 0
