@@ -69,7 +69,8 @@ Start off like this::
         stream = "intval"
         fields = ["name", "value"]
 
-        def group_names(self, instance, action):
+        @classmethod
+        def group_names(cls, instance, action):
             return ["intval-updates"]
 
         def has_permission(self, user, action, pk):
