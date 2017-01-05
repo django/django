@@ -59,7 +59,7 @@ All target and sources machines were identical ec2 instances m3.2xlarge running 
 In order to ensure that the same number of requests were sent, the rps flag was set to 300.
 
 
-.. image:: channels-latency.png
+.. image:: channels-latency.PNG
 
 
 Throughput
@@ -73,7 +73,7 @@ For the following tests, loadtest was permitted to autothrottle so as to limit e
 Gunicorn had a latency of 6 ms; daphne and Redis, 12 ms; daphne and IPC,  35 ms.
 
 
-.. image:: channels-throughput.png
+.. image:: channels-throughput.PNG
 
 
 Supervisor Configs
