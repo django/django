@@ -8,6 +8,15 @@
         calendars: [],
         calendarInputs: [],
         clockInputs: [],
+        clockHours: {
+            default_: [
+                ['Now', -1],
+                ['Midnight', 0],
+                ['6 a.m.', 6],
+                ['Noon', 12],
+                ['6 p.m.', 18]
+            ]
+        },
         dismissClockFunc: [],
         dismissCalendarFunc: [],
         calendarDivName1: 'calendarbox', // name of calendar <div> that gets toggled
@@ -157,30 +166,16 @@
             quickElement('h2', clock_box, gettext('Choose a time'));
             var time_list = quickElement('ul', clock_box);
             time_list.className = 'timelist';
-            var time_link = quickElement("a", quickElement("li", time_list), gettext("Now"), "href", "#");
-            addEvent(time_link, 'click', function(e) {
-                e.preventDefault();
-                DateTimeShortcuts.handleClockQuicklink(num, -1);
-            });
-            time_link = quickElement("a", quickElement("li", time_list), gettext("Midnight"), "href", "#");
-            addEvent(time_link, 'click', function(e) {
-                e.preventDefault();
-                DateTimeShortcuts.handleClockQuicklink(num, 0);
-            });
-            time_link = quickElement("a", quickElement("li", time_list), gettext("6 a.m."), "href", "#");
-            addEvent(time_link, 'click', function(e) {
-                e.preventDefault();
-                DateTimeShortcuts.handleClockQuicklink(num, 6);
-            });
-            time_link = quickElement("a", quickElement("li", time_list), gettext("Noon"), "href", "#");
-            addEvent(time_link, 'click', function(e) {
-                e.preventDefault();
-                DateTimeShortcuts.handleClockQuicklink(num, 12);
-            });
-            time_link = quickElement("a", quickElement("li", time_list), gettext("6 p.m."), "href", "#");
-            addEvent(time_link, 'click', function(e) {
-                e.preventDefault();
-                DateTimeShortcuts.handleClockQuicklink(num, 18);
+            // The list of choices can be overridden in JavaScript like this:
+            // DateTimeShortcuts.clockHours.name = [['3 a.m.', 3]];
+            // where name is the name attribute of the <input>.
+            var name = typeof DateTimeShortcuts.clockHours[inp.name] === 'undefined' ? 'default_' : inp.name;
+            DateTimeShortcuts.clockHours[name].forEach(function(element) {
+                var time_link = quickElement('a', quickElement('li', time_list), gettext(element[0]), 'href', '#');
+                addEvent(time_link, 'click', function(e) {
+                    e.preventDefault();
+                    DateTimeShortcuts.handleClockQuicklink(num, element[1]);
+                });
             });
 
             var cancel_p = quickElement('p', clock_box);

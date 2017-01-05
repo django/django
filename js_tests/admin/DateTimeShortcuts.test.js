@@ -21,3 +21,12 @@ QUnit.test('init', function(assert) {
     // should be 0 when a timezone offset isn't set in the HTML body attribute.
     assert.equal(DateTimeShortcuts.timezoneOffset, 0);
 });
+
+QUnit.test('custom time shortcuts', function(assert) {
+    var $ = django.jQuery;
+    var timeField = $('<input type="text" name="time_test" class="vTimeField">');
+    $('#qunit-fixture').append(timeField);
+    DateTimeShortcuts.clockHours.time_test = [['3 a.m.', 3]];
+    DateTimeShortcuts.init();
+    assert.equal($('.clockbox').find('a').first().text(), '3 a.m.');
+});
