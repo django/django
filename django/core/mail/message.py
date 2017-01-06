@@ -219,7 +219,10 @@ class SafeMIMEText(MIMEMixin, MIMEText):
 
     def set_payload(self, payload, charset=None):
         if charset == 'utf-8':
-            has_long_lines = any(len(l) > RFC5322_EMAIL_LINE_LENGTH_LIMIT for l in payload.splitlines())
+            has_long_lines = any(
+                len(l.encode('utf-8')) > RFC5322_EMAIL_LINE_LENGTH_LIMIT
+                for l in payload.splitlines()
+            )
             # Quoted-Printable encoding has the side effect of shortening long
             # lines, if any (#22561).
             charset = utf8_charset_qp if has_long_lines else utf8_charset

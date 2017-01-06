@@ -779,7 +779,8 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         Message body containing longer lines are converted to Quoted-Printable
         to avoid having to insert newlines, which could be hairy to do properly.
         """
-        email = EmailMessage('Subject', "Comment ça va? " * 100, 'from@example.com', ['to@example.com'])
+        # Unencoded body length is < 998 (840) but > 998 when utf-8 encoded.
+        email = EmailMessage('Subject', 'В южных морях ' * 60, 'from@example.com', ['to@example.com'])
         email.send()
         message = self.get_the_message()
         self.assertMessageHasHeaders(message, {
