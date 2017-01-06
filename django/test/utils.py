@@ -74,6 +74,12 @@ class ContextList(list):
         else:
             return super(ContextList, self).__getitem__(key)
 
+    def get(self, key, default=None):
+        try:
+            return self.__getitem__(key)
+        except KeyError:
+            return default
+
     def __contains__(self, key):
         try:
             self[key]
