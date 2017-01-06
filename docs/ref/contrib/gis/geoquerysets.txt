@@ -596,17 +596,22 @@ and a distance value (either a number in units of the field, a
 <ref/models/expressions>`). To pass a band index to the lookup, use a 3-tuple
 where the second entry is the band index.
 
-With PostGIS, on every distance lookup but :lookup:`dwithin`, an optional
-element, ``'spheroid'``, may be included to tell GeoDjango to use the more
-accurate spheroid distance calculation functions on fields with a geodetic
-coordinate system (e.g., ``ST_Distance_Spheroid`` would be used instead of
-``ST_Distance_Sphere``). The simpler ``ST_Distance`` function is used with
+On every distance lookup except :lookup:`dwithin`, an optional element,
+``'spheroid'``, may be included to use the more accurate spheroid distance
+calculation functions on fields with a geodetic coordinate system.
+
+On PostgreSQL, the ``'spheroid'`` option uses ``ST_Distance_Spheroid`` instead
+of ``ST_Distance_Sphere``. The simpler ``ST_Distance`` function is used with
 projected coordinate systems. Rasters are converted to geometries for spheroid
 based lookups.
 
 .. versionadded:: 1.10
 
     The ability to pass an expression as the distance value was added.
+
+.. versionadded:: 1.11
+
+    Support for the ``'spheroid'`` option on SQLite was added.
 
 .. fieldlookup:: distance_gt
 
