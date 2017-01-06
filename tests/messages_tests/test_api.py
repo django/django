@@ -42,3 +42,24 @@ class ApiTests(SimpleTestCase):
     def test_middleware_missing_silently(self):
         messages.add_message(self.request, messages.DEBUG, 'some message', fail_silently=True)
         self.assertEqual(self.storage.store, [])
+
+
+class CustomRequest(object):
+    def __init__(self, request):
+        self._request = request
+
+    def __getattribute__(self, attr):
+        try:
+            return super(CustomRequest, self).__getattribute__(attr)
+        except AttributeError:
+            return getattr(self._request, attr)
+
+
+class CustomRequestApiTests(ApiTests):
+    """
+    add_message() should use ducktyping to allow request wrappers such as the
+    one in Django REST framework.
+    """
+    def setUp(self):
+        super(CustomRequestApiTests, self).setUp()
+        self.request = CustomRequest(self.request)
