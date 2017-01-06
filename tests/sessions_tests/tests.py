@@ -852,6 +852,7 @@ class SessionMiddlewareTests(TestCase):
         print response
         self.assertNotIn("Vary", response)
 
+
 # Don't need DB flushing for these tests, so can use unittest.TestCase as base class
 class CookieSessionTests(SessionTestsMixin, unittest.TestCase):
 
