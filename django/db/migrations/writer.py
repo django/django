@@ -100,7 +100,7 @@ class OperationWriter(object):
         # We can just use the fact we already have that imported,
         # otherwise, we need to add an import for the operation class.
         if getattr(migrations, name, None) == self.operation.__class__:
-            self.feed('migrations.%s(' % name)
+            self.feed('django.db.migrations.%s(' % name)
         else:
             imports.add('import %s' % (self.operation.__class__.__module__))
             self.feed('%s.%s(' % (self.operation.__class__.__module__, name))
@@ -169,8 +169,9 @@ class MigrationWriter(object):
         dependencies = []
         for dependency in self.migration.dependencies:
             if dependency[0] == "__setting__":
-                dependencies.append("        migrations.swappable_dependency(settings.%s)," % dependency[1])
-                imports.add("from django.conf import settings")
+                dependencies.append(
+                    "        migrations.swappable_dependency(django.conf.settings.%s)," % dependency[1])
+                imports.add("import django.conf")
             else:
                 # No need to output bytestrings for dependencies
                 dependency = tuple(force_text(s) for s in dependency)
@@ -188,11 +189,7 @@ class MigrationWriter(object):
 
         # django.db.migrations is always used, but models import may not be.
         # If models import exists, merge it with migrations import.
-        if "from django.db import models" in imports:
-            imports.discard("from django.db import models")
-            imports.add("from django.db import migrations, models")
-        else:
-            imports.add("from django.db import migrations")
+        imports.add("import django.db.migrations")
 
         # Sort imports by the package / module to be imported (the part after
         # "from" in "from ... import ..." or after "import" in "import ...").
@@ -300,7 +297,7 @@ from __future__ import unicode_literals
 
 %(imports)s
 
-class Migration(migrations.Migration):
+class Migration(django.db.migrations.Migration):
 %(replaces_str)s%(initial_str)s
     dependencies = [
 %(dependencies)s\

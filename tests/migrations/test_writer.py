@@ -329,7 +329,7 @@ class WriterTests(SimpleTestCase):
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(
             string,
-            "models.CharField(choices=["
+            "django.db.models.CharField(choices=["
             "('a-value', migrations.test_writer.TextEnum('a-value')), "
             "('value-b', migrations.test_writer.TextEnum('value-b'))], "
             "default=migrations.test_writer.TextEnum('value-b'))"
@@ -338,7 +338,7 @@ class WriterTests(SimpleTestCase):
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(
             string,
-            "models.CharField(choices=["
+            "django.db.models.CharField(choices=["
             "(b'a-value', migrations.test_writer.BinaryEnum(b'a-value')), "
             "(b'value-b', migrations.test_writer.BinaryEnum(b'value-b'))], "
             "default=migrations.test_writer.BinaryEnum(b'value-b'))"
@@ -347,7 +347,7 @@ class WriterTests(SimpleTestCase):
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(
             string,
-            "models.IntegerField(choices=["
+            "django.db.models.IntegerField(choices=["
             "(1, migrations.test_writer.IntEnum(1)), "
             "(2, migrations.test_writer.IntEnum(2))], "
             "default=migrations.test_writer.IntEnum(1))"
@@ -372,7 +372,7 @@ class WriterTests(SimpleTestCase):
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(
             string,
-            "models.UUIDField(choices=["
+            "django.db.models.UUIDField(choices=["
             "(uuid.UUID('5c859437-d061-4847-b3f7-e6b78852f8c8'), 'UUID A'), "
             "(uuid.UUID('c7853ec1-2ea3-4359-b02d-b54e8f1bcee2'), 'UUID B')], "
             "default=uuid.UUID('5c859437-d061-4847-b3f7-e6b78852f8c8'))"
@@ -383,7 +383,7 @@ class WriterTests(SimpleTestCase):
             self.assertSerializedEqual(lambda x: 42)
         self.assertSerializedEqual(models.SET_NULL)
         string, imports = MigrationWriter.serialize(models.SET(42))
-        self.assertEqual(string, 'models.SET(42)')
+        self.assertEqual(string, 'django.db.models.SET(42)')
         self.serialize_round_trip(models.SET(42))
 
     def test_serialize_datetime(self):
@@ -403,8 +403,8 @@ class WriterTests(SimpleTestCase):
         self.assertSerializedResultEqual(
             datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc),
             (
-                "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc)",
-                {'import datetime', 'from django.utils.timezone import utc'},
+                "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=django.utils.timezone.utc)",
+                {'import datetime', 'import django.utils.timezone'},
             )
         )
 
@@ -426,19 +426,19 @@ class WriterTests(SimpleTestCase):
         self.assertSerializedFieldEqual(models.CharField(max_length=255))
         self.assertSerializedResultEqual(
             models.CharField(max_length=255),
-            ("models.CharField(max_length=255)", {"from django.db import models"})
+            ("django.db.models.CharField(max_length=255)", {"import django.db.models"})
         )
         self.assertSerializedFieldEqual(models.TextField(null=True, blank=True))
         self.assertSerializedResultEqual(
             models.TextField(null=True, blank=True),
-            ("models.TextField(blank=True, null=True)", {'from django.db import models'})
+            ("django.db.models.TextField(blank=True, null=True)", {'import django.db.models'})
         )
 
     def test_serialize_settings(self):
         self.assertSerializedEqual(SettingsReference(settings.AUTH_USER_MODEL, "AUTH_USER_MODEL"))
         self.assertSerializedResultEqual(
             SettingsReference("someapp.model", "AUTH_USER_MODEL"),
-            ("settings.AUTH_USER_MODEL", {"from django.conf import settings"})
+            ("django.conf.settings.AUTH_USER_MODEL", {"import django.conf"})
         )
 
     def test_serialize_iterators(self):
@@ -704,8 +704,9 @@ class WriterTests(SimpleTestCase):
         output = writer.as_string()
         self.assertIn(
             "import datetime\n"
-            "from django.db import migrations, models\n"
-            "from django.utils.timezone import utc\n",
+            "import django.db.migrations\n"
+            "import django.db.models\n"
+            "import django.utils.timezone\n",
             output
         )
 
@@ -744,7 +745,7 @@ class WriterTests(SimpleTestCase):
         })
         writer = MigrationWriter(migration)
         output = writer.as_string()
-        self.assertIn("from django.db import migrations\n", output)
+        self.assertIn("import django.db.migrations\n", output)
 
     def test_deconstruct_class_arguments(self):
         # Yes, it doesn't make sense to use a class as a default for a
@@ -755,4 +756,4 @@ class WriterTests(SimpleTestCase):
                 return ('DeconstructibleInstances', [], {})
 
         string = MigrationWriter.serialize(models.CharField(default=DeconstructibleInstances))[0]
-        self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructibleInstances)")
+        self.assertEqual(string, "django.db.models.CharField(default=migrations.test_writer.DeconstructibleInstances)")

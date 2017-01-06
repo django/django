@@ -66,12 +66,13 @@ class DatetimeSerializer(BaseSerializer):
     def serialize(self):
         if self.value.tzinfo is not None and self.value.tzinfo != utc:
             self.value = self.value.astimezone(utc)
-        value_repr = repr(self.value).replace("<UTC>", "utc")
+        value_repr = repr(self.value).replace(
+            "<UTC>", "django.utils.timezone.utc")
         if isinstance(self.value, datetime_safe.datetime):
             value_repr = "datetime.%s" % value_repr
         imports = ["import datetime"]
         if self.value.tzinfo is not None:
-            imports.append("from django.utils.timezone import utc")
+            imports.append("import django.utils.timezone")
         return value_repr, set(imports)
 
 
@@ -107,8 +108,8 @@ class DeconstructableSerializer(BaseSerializer):
     def _serialize_path(path):
         module, name = path.rsplit(".", 1)
         if module == "django.db.models":
-            imports = {"from django.db import models"}
-            name = "models.%s" % name
+            imports = {"import django.db.models"}
+            name = "django.db.models.%s" % name
         else:
             imports = {"import %s" % module}
             name = path
@@ -273,7 +274,7 @@ class SetSerializer(BaseSequenceSerializer):
 
 class SettingsReferenceSerializer(BaseSerializer):
     def serialize(self):
-        return "settings.%s" % self.value.setting_name, {"from django.conf import settings"}
+        return "django.conf.settings.%s" % self.value.setting_name, {"import django.conf"}
 
 
 class TextTypeSerializer(BaseSerializer):
