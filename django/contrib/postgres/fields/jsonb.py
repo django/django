@@ -133,6 +133,10 @@ class KeyTransformTextLookupMixin(object):
         super(KeyTransformTextLookupMixin, self).__init__(key_text_transform, *args, **kwargs)
 
 
+class KeyTransformIExact(KeyTransformTextLookupMixin, builtin_lookups.IExact):
+    pass
+
+
 class KeyTransformIContains(KeyTransformTextLookupMixin, builtin_lookups.IContains):
     pass
 
@@ -161,6 +165,7 @@ class KeyTransformIRegex(KeyTransformTextLookupMixin, builtin_lookups.IRegex):
     pass
 
 
+KeyTransform.register_lookup(KeyTransformIExact)
 KeyTransform.register_lookup(KeyTransformIContains)
 KeyTransform.register_lookup(KeyTransformStartsWith)
 KeyTransform.register_lookup(KeyTransformIStartsWith)

@@ -238,6 +238,10 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[7:9]
         )
 
+    def test_iexact(self):
+        self.assertTrue(JSONModel.objects.filter(field__foo__iexact='BaR').exists())
+        self.assertFalse(JSONModel.objects.filter(field__foo__iexact='"BaR"').exists())
+
     def test_icontains(self):
         self.assertFalse(JSONModel.objects.filter(field__foo__icontains='"bar"').exists())
 
