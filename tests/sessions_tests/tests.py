@@ -849,7 +849,6 @@ class SessionMiddlewareTests(TestCase):
 
         # Handle the response through the middleware
         response = session_middleware.process_response(request, response)
-        print response
         self.assertNotIn("Vary", response)
 
 
