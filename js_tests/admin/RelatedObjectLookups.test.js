@@ -1,5 +1,5 @@
 /* global QUnit, id_to_windowname,
-   windowname_to_id */
+   windowname_to_id, dismissAddRelatedObjectPopup */
 /* eslint global-strict: 0, strict: 0 */
 'use strict';
 

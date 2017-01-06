@@ -89,9 +89,10 @@
             } else if (elemName === 'UL') {
                 var numberOfItems = elem.children.length,
                     // If the input field is wrapped into a label.
-                    wrapLabel = (String(elem.getAttribute('data-wrap-label')).toLowerCase() == "true"),
+                    wrapLabel = (String(elem.getAttribute('data-wrap-label')).toLowerCase() === "true"),
                     // Multiple selection or not.
-                    multiple = (String(elem.getAttribute('data-multiple')).toLowerCase() == "true");
+                    multiple = (String(elem.getAttribute('data-multiple')).toLowerCase() === "true"),
+                    newItem = null, newItemInput = null, newItemLabel = null;
 
                 if (numberOfItems > 0) {
                     if (!multiple) {
@@ -104,8 +105,8 @@
                     elem.appendChild(elem.lastElementChild.cloneNode(true));
                     // newItem's var is the new copy, is necessary to get a new instance to work
                     // with it in order to avoid to modify the cloned item.
-                    var newItem = elem.lastElementChild,
-                        newItemInput = newItem.getElementsByTagName('input')[0];
+                    newItem = elem.lastElementChild;
+                    newItemInput = newItem.getElementsByTagName('input')[0];
 
                     newItemInput.value = newId;
                     newItemInput.setAttribute('id', elem.id + '_' + numberOfItems);
@@ -113,14 +114,14 @@
                     newItemInput.checked = true;
 
                     if (wrapLabel) {
-                        var newItemLabel = newItem.getElementsByTagName('label')[0];
+                        newItemLabel = newItem.getElementsByTagName('label')[0];
                         newItemLabel.lastChild.textContent = ' ' + newRepr;
                         newItemLabel.setAttribute('for', elem.id + '_' + numberOfItems);
                     }
                 } else {
                     // The UL list is empty, then is necessary to build the new item.
-                    var newItem = document.createElement('li'),
-                        newItemInput = document.createElement('input');
+                    newItem = document.createElement('li');
+                    newItemInput = document.createElement('input');
 
                     newItemInput.setAttribute('type', (multiple) ? 'checkbox' : 'radio');
                     // The elem.id is composed by 'id_' and the name of the related field.
@@ -133,7 +134,7 @@
                     newItemInput.value = newId;
 
                     if (wrapLabel) {
-                        var newItemLabel = document.createElement('label');
+                        newItemLabel = document.createElement('label');
                         newItemLabel.textContent = ' ' + newRepr;
                         newItemLabel.setAttribute('for', elem.id + '_0');
                         // Insert input into label.

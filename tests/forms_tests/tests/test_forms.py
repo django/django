@@ -617,8 +617,10 @@ Java</label></li>
         # ID of the *first* radio button.
         self.assertHTMLEqual(
             f.as_table(),
-            """<tr><th><label for="id_name">Name:</label></th><td><input type="text" name="name" id="id_name" required /></td></tr>
-<tr><th><label for="id_language_0">Language:</label></th><td><ul id="id_language" data-wrap-label="true" data-multiple="false">
+            """<tr><th><label for="id_name">Name:</label></th>
+<td><input type="text" name="name" id="id_name" required /></td></tr>
+<tr><th><label for="id_language_0">Language:</label></th><td>
+<ul id="id_language" data-wrap-label="true" data-multiple="false">
 <li><label for="id_language_0"><input type="radio" id="id_language_0" value="P" name="language" required />
 Python</label></li>
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" required />
