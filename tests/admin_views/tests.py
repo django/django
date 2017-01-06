@@ -918,6 +918,21 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertEqual(response.context['site_url'], '/my-site-url/')
         self.assertContains(response, '<a href="/my-site-url/">View site</a>')
 
+    @override_settings(DEFAULT_CONTENT_TYPE='application/xhtml+xml')
+    def test_xhtml(self):
+        def verify_content_type(name, anonymous=False):
+            if anonymous:
+                self.client.logout()
+            else:
+                self.client.force_login(self.superuser)
+            url = reverse('admin:{}'.format(name))
+            response = self.client.get(url)
+            self.assertIn('text/html', repr(response), 'Incorrect content type for url name {}'.format(name))
+
+        verify_content_type('login', True)
+        for name in ['index', 'logout', 'password_change', 'password_change_done']:
+            verify_content_type(name)
+
 
 @override_settings(TEMPLATES=[{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',

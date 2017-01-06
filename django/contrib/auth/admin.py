@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin, messages
-from django.contrib.admin.options import IS_POPUP_VAR
+from django.contrib.admin.options import IS_POPUP_VAR, AdminTemplateResponse
 from django.contrib.admin.utils import unquote
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import (
@@ -11,7 +11,6 @@ from django.contrib.auth.models import Group, User
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.http import Http404, HttpResponseRedirect
-from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
@@ -186,10 +185,15 @@ class UserAdmin(admin.ModelAdmin):
 
         request.current_app = self.admin_site.name
 
-        return TemplateResponse(
+        if self.change_user_password_template:
+            ResponseClass = AdminTemplateResponse
+            template = self.change_user_password_template
+        else:
+            ResponseClass = AdminTemplateResponse
+            template = 'admin/auth/user/change_password.html'
+        return ResponseClass(
             request,
-            self.change_user_password_template or
-            'admin/auth/user/change_password.html',
+            template,
             context,
         )
 

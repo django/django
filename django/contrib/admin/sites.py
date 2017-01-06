@@ -1,13 +1,13 @@
 from functools import update_wrapper
 
 from django.apps import apps
-from django.conf import settings
+from django.conf import global_settings, settings
 from django.contrib.admin import ModelAdmin, actions
+from django.contrib.admin.options import AdminTemplateResponse
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.base import ModelBase
 from django.http import Http404, HttpResponseRedirect
-from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch, reverse
 from django.utils import six
 from django.utils.text import capfirst
@@ -299,7 +299,10 @@ class AdminSite(object):
         if self.password_change_template is not None:
             defaults['template_name'] = self.password_change_template
         request.current_app = self.name
-        return PasswordChangeView.as_view(**defaults)(request)
+        View = PasswordChangeView
+        if not self.logout_template:
+            View.content_type = global_settings.DEFAULT_CONTENT_TYPE
+        return View.as_view(**defaults)(request)
 
     def password_change_done(self, request, extra_context=None):
         """
@@ -312,7 +315,10 @@ class AdminSite(object):
         if self.password_change_done_template is not None:
             defaults['template_name'] = self.password_change_done_template
         request.current_app = self.name
-        return PasswordChangeDoneView.as_view(**defaults)(request)
+        View = PasswordChangeDoneView
+        if not self.logout_template:
+            View.content_type = global_settings.DEFAULT_CONTENT_TYPE
+        return View.as_view(**defaults)(request)
 
     def i18n_javascript(self, request, extra_context=None):
         """
@@ -343,7 +349,10 @@ class AdminSite(object):
         if self.logout_template is not None:
             defaults['template_name'] = self.logout_template
         request.current_app = self.name
-        return LogoutView.as_view(**defaults)(request)
+        View = LogoutView
+        if not self.logout_template:
+            View.content_type = global_settings.DEFAULT_CONTENT_TYPE
+        return View.as_view(**defaults)(request)
 
     @never_cache
     def login(self, request, extra_context=None):
@@ -377,7 +386,10 @@ class AdminSite(object):
             'template_name': self.login_template or 'admin/login.html',
         }
         request.current_app = self.name
-        return LoginView.as_view(**defaults)(request)
+        View = LoginView
+        if not self.login_template:
+            View.content_type = global_settings.DEFAULT_CONTENT_TYPE
+        return View.as_view(**defaults)(request)
 
     def _build_app_dict(self, request, label=None):
         """
@@ -477,7 +489,7 @@ class AdminSite(object):
 
         request.current_app = self.name
 
-        return TemplateResponse(request, self.index_template or 'admin/index.html', context)
+        return AdminTemplateResponse(request, self.index_template or 'admin/index.html', context)
 
     def app_index(self, request, app_label, extra_context=None):
         app_dict = self._build_app_dict(request, app_label)
@@ -496,7 +508,7 @@ class AdminSite(object):
 
         request.current_app = self.name
 
-        return TemplateResponse(request, self.app_index_template or [
+        return AdminTemplateResponse(request, self.app_index_template or [
             'admin/%s/app_index.html' % app_label,
             'admin/app_index.html'
         ], context)
