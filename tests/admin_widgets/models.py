@@ -163,3 +163,57 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+@python_2_unicode_compatible
+class Manager(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
+class Team(models.Model):
+    name = models.CharField(max_length=255)
+    team_manager = models.ForeignKey(Manager, models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
+class City(models.Model):
+    name = models.CharField(max_length=255)
+    teams = models.ManyToManyField(Team)
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
+class Player(models.Model):
+    """
+    This model will be used to test ForeignKey widget relation field as
+    RadioSelect in RelatedFieldWidgetSeleniumTests, the default widget
+    will be overwritten in the test admin file.
+    """
+    name = models.CharField(max_length=255)
+    team = models.ForeignKey(Team, models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
+class Fan(models.Model):
+    """
+    This model will be used to test ManyToMany widget relation field as
+    CheckboxSelectMultiple in RelatedFieldWidgetSeleniumTests, the default
+    widget will be overwritten in the test admin file.
+    """
+    name = models.CharField(max_length=255)
+    teams = models.ManyToManyField(Team)
+
+    def __str__(self):
+        return self.name

@@ -1,8 +1,10 @@
+from django import forms
 from django.contrib import admin
+from django.forms import CheckboxSelectMultiple, RadioSelect
 
 from .models import (
-    Advisor, Album, Band, Bee, Car, CarTire, Event, Inventory, Member, Profile,
-    School, User,
+    Advisor, Album, Band, Bee, Car, CarTire, City, Event, Fan, Inventory,
+    Manager, Member, Player, Profile, School, Team, User,
 )
 
 
@@ -37,6 +39,30 @@ class SchoolAdmin(admin.ModelAdmin):
     filter_horizontal = ('alumni',)
 
 
+class PlayerForm(forms.ModelForm):
+
+    class Meta:
+        model = Player
+        fields = '__all__'
+        widgets = {'team': RadioSelect}
+
+
+class PlayerAdmin(admin.ModelAdmin):
+    form = PlayerForm
+
+
+class FanForm(forms.ModelForm):
+
+    class Meta:
+        model = Fan
+        fields = '__all__'
+        widgets = {'teams': CheckboxSelectMultiple}
+
+
+class FanAdmin(admin.ModelAdmin):
+    form = FanForm
+
+
 site = WidgetAdmin(name='widget-admin')
 
 site.register(User)
@@ -57,3 +83,9 @@ site.register(Advisor)
 site.register(School, SchoolAdmin)
 
 site.register(Profile)
+
+site.register(Team)
+site.register(Manager)
+site.register(City)
+site.register(Player, PlayerAdmin)
+site.register(Fan, FanAdmin)

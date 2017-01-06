@@ -8,7 +8,7 @@ class RadioSelectTest(WidgetTest):
 
     def test_render(self):
         self.check_html(self.widget(choices=self.beatles), 'beatle', 'J', html=(
-            """<ul>
+            """<ul data-wrap-label="true" data-multiple="false">
             <li><label><input checked type="radio" name="beatle" value="J" /> John</label></li>
             <li><label><input type="radio" name="beatle" value="P" /> Paul</label></li>
             <li><label><input type="radio" name="beatle" value="G" /> George</label></li>
@@ -23,7 +23,7 @@ class RadioSelectTest(WidgetTest):
             ('Video', (('vhs', 'VHS'), ('dvd', 'DVD'))),
         )
         html = """
-        <ul id="media">
+        <ul id="media" data-wrap-label="true" data-multiple="false">
         <li>
         <label for="media_0"><input id="media_0" name="nestchoice" type="radio" value="unknown" /> Unknown</label>
         </li>
@@ -55,7 +55,7 @@ class RadioSelectTest(WidgetTest):
         """
         widget = RadioSelect(attrs={'id': 'foo'}, choices=self.beatles)
         html = """
-        <ul id="foo">
+        <ul id="foo" data-wrap-label="true" data-multiple="false">
         <li>
         <label for="foo_0"><input checked type="radio" id="foo_0" value="J" name="beatle" /> John</label>
         </li>
@@ -72,7 +72,7 @@ class RadioSelectTest(WidgetTest):
         inputs.
         """
         html = """
-        <ul id="bar">
+        <ul id="bar" data-wrap-label="true" data-multiple="false">
         <li>
         <label for="bar_0"><input checked type="radio" id="bar_0" value="J" name="beatle" /> John</label>
         </li>
