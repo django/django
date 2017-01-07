@@ -65,10 +65,14 @@ class AdminSite(object):
         self._global_actions = self._actions.copy()
         all_sites.add(self)
 
-    def check(self):
+    def check(self, app_configs):
+        if app_configs is not None:
+            app_configs = set(app_configs)  # Speed up lookups below
+
         errors = []
         for admin_obj in six.itervalues(self._registry):
-            errors.extend(admin_obj.check())
+            if app_configs is None or admin_obj.model._meta.app_config in app_configs:
+                errors.extend(admin_obj.check())
         return errors
 
     def register(self, model_or_iterable, admin_class=None, **options):
