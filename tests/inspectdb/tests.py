@@ -42,9 +42,7 @@ class InspectDBTestCase(TestCase):
     def make_field_type_asserter(self):
         """Call inspectdb and return a function to validate a field type in its output"""
         out = StringIO()
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'),
-                     stdout=out)
+        call_command('inspectdb', 'inspectdb_columntypes', stdout=out)
         output = out.getvalue()
 
         def assertFieldType(name, definition):
@@ -173,11 +171,7 @@ class InspectDBTestCase(TestCase):
     def test_digits_column_name_introspection(self):
         """Introspection of column names consist/start with digits (#16536/#17676)"""
         out = StringIO()
-        # Lets limit the introspection to tables created for models of this
-        # application
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
-                     stdout=out)
+        call_command('inspectdb', 'inspectdb_digitsincolumnname', stdout=out)
         output = out.getvalue()
         error_message = "inspectdb generated a model field name which is a number"
         self.assertNotIn("    123 = models.CharField", output, msg=error_message)
@@ -197,7 +191,7 @@ class InspectDBTestCase(TestCase):
         """
         out = StringIO()
         call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_special'),
                      stdout=out)
         output = out.getvalue()
         base_name = 'Field' if not connection.features.uppercases_column_names else 'field'
@@ -219,7 +213,7 @@ class InspectDBTestCase(TestCase):
         """
         out = StringIO()
         call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_special'),
                      stdout=out)
         output = out.getvalue()
         self.assertIn("class InspectdbSpecialTableName(models.Model):", output)
@@ -227,18 +221,14 @@ class InspectDBTestCase(TestCase):
     def test_managed_models(self):
         """By default the command generates models with `Meta.managed = False` (#14305)"""
         out = StringIO()
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'),
-                     stdout=out)
+        call_command('inspectdb', 'inspectdb_columntypes', stdout=out)
         output = out.getvalue()
         self.longMessage = False
         self.assertIn("        managed = False", output, msg='inspectdb should generate unmanaged models.')
 
     def test_unique_together_meta(self):
         out = StringIO()
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_uniquetogether'),
-                     stdout=out)
+        call_command('inspectdb', 'inspectdb_uniquetogether', stdout=out)
         output = out.getvalue()
         unique_re = re.compile(r'.*unique_together = \((.+),\).*')
         unique_together_match = re.findall(unique_re, output)
@@ -266,9 +256,7 @@ class InspectDBTestCase(TestCase):
                 'text': 'myfields.TextField',
                 'bigint': 'BigIntegerField',
             }
-            call_command('inspectdb',
-                         table_name_filter=lambda tn: tn.startswith('inspectdb_columntypes'),
-                         stdout=out)
+            call_command('inspectdb', 'inspectdb_columntypes', stdout=out)
             output = out.getvalue()
             self.assertIn("text_field = myfields.TextField()", output)
             self.assertIn("big_int_field = models.BigIntegerField()", output)
