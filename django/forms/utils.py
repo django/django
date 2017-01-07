@@ -1,10 +1,9 @@
 import json
-import sys
 from collections import UserList
 
 from django.conf import settings
 from django.core.exceptions import ValidationError  # backwards compatibility
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.html import escape, format_html, format_html_join, html_safe
 from django.utils.translation import ugettext_lazy as _
@@ -156,18 +155,14 @@ def from_current_timezone(value):
         current_timezone = timezone.get_current_timezone()
         try:
             return timezone.make_aware(value, current_timezone)
-        except Exception:
-            message = _(
-                '%(datetime)s couldn\'t be interpreted '
-                'in time zone %(current_timezone)s; it '
-                'may be ambiguous or it may not exist.'
-            )
-            params = {'datetime': value, 'current_timezone': current_timezone}
-            six.reraise(ValidationError, ValidationError(
-                message,
+        except Exception as exc:
+            raise ValidationError(
+                _('%(datetime)s couldn\'t be interpreted '
+                  'in time zone %(current_timezone)s; it '
+                  'may be ambiguous or it may not exist.'),
                 code='ambiguous_timezone',
-                params=params,
-            ), sys.exc_info()[2])
+                params={'datetime': value, 'current_timezone': current_timezone}
+            ) from exc
     return value
 
 

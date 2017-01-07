@@ -6,7 +6,6 @@ from django.apps import apps
 from django.conf import settings
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
-from django.utils import six
 
 from .exceptions import (
     AmbiguityError, BadMigrationError, InconsistentMigrationHistory,
@@ -256,7 +255,7 @@ class MigrationLoader:
                 is_replaced = any(candidate in self.graph.nodes for candidate in candidates)
                 if not is_replaced:
                     tries = ', '.join('%s.%s' % c for c in candidates)
-                    exc_value = NodeNotFoundError(
+                    raise NodeNotFoundError(
                         "Migration {0} depends on nonexistent node ('{1}', '{2}'). "
                         "Django tried to replace migration {1}.{2} with any of [{3}] "
                         "but wasn't able to because some of the replaced migrations "
@@ -264,11 +263,7 @@ class MigrationLoader:
                             exc.origin, exc.node[0], exc.node[1], tries
                         ),
                         exc.node
-                    )
-                    exc_value.__cause__ = exc
-                    if not hasattr(exc, '__traceback__'):
-                        exc.__traceback__ = sys.exc_info()[2]
-                    six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
+                    ) from exc
             raise exc
 
     def check_consistent_history(self, connection):

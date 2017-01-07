@@ -5,7 +5,6 @@ from threading import local
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import six
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -90,7 +89,7 @@ class DatabaseErrorWrapper:
                 # the connection unusable.
                 if dj_exc_type not in (DataError, IntegrityError):
                     self.wrapper.errors_occurred = True
-                six.reraise(dj_exc_type, dj_exc_value, traceback)
+                raise dj_exc_value.with_traceback(traceback)
 
     def __call__(self, func):
         # Note that we are intentionally not using @wraps here for performance

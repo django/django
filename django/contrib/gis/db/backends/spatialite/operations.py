@@ -4,7 +4,6 @@ https://web.archive.org/web/20130407175746/http://www.gaia-gis.it/gaia-sins/spat
 http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.2.1.html
 """
 import re
-import sys
 
 from django.contrib.gis.db.backends.base.operations import \
     BaseSpatialOperations
@@ -15,7 +14,6 @@ from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.operations import DatabaseOperations
-from django.utils import six
 from django.utils.functional import cached_property
 
 
@@ -123,12 +121,13 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         """Determine the version of the SpatiaLite library."""
         try:
             version = self.spatialite_version_tuple()[1:]
-        except Exception as msg:
-            new_msg = (
-                'Cannot determine the SpatiaLite version for the "%s" '
-                'database (error was "%s").  Was the SpatiaLite initialization '
-                'SQL loaded on this database?') % (self.connection.settings_dict['NAME'], msg)
-            six.reraise(ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2])
+        except Exception as exc:
+            raise ImproperlyConfigured(
+                'Cannot determine the SpatiaLite version for the "%s" database. '
+                'Was the SpatiaLite initialization SQL loaded on this database?' % (
+                    self.connection.settings_dict['NAME'],
+                )
+            ) from exc
         if version < (4, 0, 0):
             raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions 4.0.0 and above.')
         return version

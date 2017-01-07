@@ -1,10 +1,8 @@
-import sys
-
 from django.conf import settings
 from django.template import Library, Node, TemplateSyntaxError, Variable
 from django.template.base import TOKEN_TEXT, TOKEN_VAR, render_value_in_context
 from django.template.defaulttags import token_kwargs
-from django.utils import six, translation
+from django.utils import translation
 from django.utils.safestring import SafeData, mark_safe
 
 register = Library()
@@ -388,8 +386,9 @@ def do_translate(parser, token):
             try:
                 value = remaining.pop(0)
             except IndexError:
-                msg = "No argument provided to the '%s' tag for the context option." % bits[0]
-                six.reraise(TemplateSyntaxError, TemplateSyntaxError(msg), sys.exc_info()[2])
+                raise TemplateSyntaxError(
+                    "No argument provided to the '%s' tag for the context option." % bits[0]
+                )
             if value in invalid_context:
                 raise TemplateSyntaxError(
                     "Invalid argument '%s' provided to the '%s' tag for the context option" % (value, bits[0]),
@@ -399,8 +398,9 @@ def do_translate(parser, token):
             try:
                 value = remaining.pop(0)
             except IndexError:
-                msg = "No argument provided to the '%s' tag for the as option." % bits[0]
-                six.reraise(TemplateSyntaxError, TemplateSyntaxError(msg), sys.exc_info()[2])
+                raise TemplateSyntaxError(
+                    "No argument provided to the '%s' tag for the as option." % bits[0]
+                )
             asvar = value
         else:
             raise TemplateSyntaxError(
@@ -481,18 +481,18 @@ def do_block_translate(parser, token):
                 value = remaining_bits.pop(0)
                 value = parser.compile_filter(value)
             except Exception:
-                msg = (
-                    '"context" in %r tag expected '
-                    'exactly one argument.') % bits[0]
-                six.reraise(TemplateSyntaxError, TemplateSyntaxError(msg), sys.exc_info()[2])
+                raise TemplateSyntaxError(
+                    '"context" in %r tag expected exactly one argument.' % bits[0]
+                )
         elif option == "trimmed":
             value = True
         elif option == "asvar":
             try:
                 value = remaining_bits.pop(0)
             except IndexError:
-                msg = "No argument provided to the '%s' tag for the asvar option." % bits[0]
-                six.reraise(TemplateSyntaxError, TemplateSyntaxError(msg), sys.exc_info()[2])
+                raise TemplateSyntaxError(
+                    "No argument provided to the '%s' tag for the asvar option." % bits[0]
+                )
             asvar = value
         else:
             raise TemplateSyntaxError('Unknown argument for %r tag: %r.' %

@@ -5,14 +5,12 @@ Serialize data to/from JSON
 import datetime
 import decimal
 import json
-import sys
 import uuid
 
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.python import (
     Deserializer as PythonDeserializer, Serializer as PythonSerializer,
 )
-from django.utils import six
 from django.utils.duration import duration_iso_string
 from django.utils.functional import Promise
 from django.utils.timezone import is_aware
@@ -77,11 +75,10 @@ def Deserializer(stream_or_string, **options):
         objects = json.loads(stream_or_string)
         for obj in PythonDeserializer(objects, **options):
             yield obj
-    except GeneratorExit:
+    except (GeneratorExit, DeserializationError):
         raise
-    except Exception as e:
-        # Map to deserializer error
-        six.reraise(DeserializationError, DeserializationError(e), sys.exc_info()[2])
+    except Exception as exc:
+        raise DeserializationError() from exc
 
 
 class DjangoJSONEncoder(json.JSONEncoder):

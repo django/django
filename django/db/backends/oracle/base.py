@@ -7,13 +7,11 @@ import datetime
 import decimal
 import os
 import platform
-import sys
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
 
@@ -261,7 +259,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 x = e.args[0]
                 if hasattr(x, 'code') and hasattr(x, 'message') \
                    and x.code == 2091 and 'ORA-02291' in x.message:
-                    six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+                    raise utils.IntegrityError(*tuple(e.args))
                 raise
 
     # Oracle doesn't support releasing savepoints. But we fake them when query

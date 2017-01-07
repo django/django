@@ -1,4 +1,3 @@
-import sys
 from collections import OrderedDict
 
 from django.contrib.admin import FieldListFilter
@@ -17,7 +16,6 @@ from django.core.exceptions import (
 from django.core.paginator import InvalidPage
 from django.db import models
 from django.urls import reverse
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.http import urlencode
 from django.utils.translation import ugettext
@@ -151,7 +149,7 @@ class ChangeList:
                 use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, key)
             return filter_specs, bool(filter_specs), lookup_params, use_distinct
         except FieldDoesNotExist as e:
-            six.reraise(IncorrectLookupParameters, IncorrectLookupParameters(e), sys.exc_info()[2])
+            raise IncorrectLookupParameters(e) from e
 
     def get_query_string(self, new_params=None, remove=None):
         if new_params is None:

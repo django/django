@@ -7,7 +7,6 @@ file upload handlers for processing.
 import base64
 import binascii
 import cgi
-import sys
 from urllib.parse import unquote
 
 from django.conf import settings
@@ -17,7 +16,6 @@ from django.core.exceptions import (
 from django.core.files.uploadhandler import (
     SkipFile, StopFutureHandlers, StopUpload,
 )
-from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils.text import unescape_entities
@@ -247,10 +245,9 @@ class MultiPartParser:
 
                                 try:
                                     chunk = base64.b64decode(stripped_chunk)
-                                except Exception as e:
+                                except Exception as exc:
                                     # Since this is only a chunk, any error is an unfixable error.
-                                    msg = "Could not decode base64 data: %r" % e
-                                    six.reraise(MultiPartParserError, MultiPartParserError(msg), sys.exc_info()[2])
+                                    raise MultiPartParserError("Could not decode base64 data.") from exc
 
                             for i, handler in enumerate(handlers):
                                 chunk_length = len(chunk)

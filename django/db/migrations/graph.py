@@ -1,10 +1,8 @@
-import sys
 import warnings
 from collections import deque
 from functools import total_ordering
 
 from django.db.migrations.state import ProjectState
-from django.utils import six
 from django.utils.datastructures import OrderedSet
 
 from .exceptions import CircularDependencyError, NodeNotFoundError
@@ -178,16 +176,12 @@ class MigrationGraph:
         replaced = set(replaced)
         try:
             replacement_node = self.node_map[replacement]
-        except KeyError as exc:
-            exc_value = NodeNotFoundError(
+        except KeyError as err:
+            raise NodeNotFoundError(
                 "Unable to find replacement node %r. It was either never added"
                 " to the migration graph, or has been removed." % (replacement, ),
                 replacement
-            )
-            exc_value.__cause__ = exc
-            if not hasattr(exc, '__traceback__'):
-                exc.__traceback__ = sys.exc_info()[2]
-            six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
+            ) from err
         for replaced_key in replaced:
             self.nodes.pop(replaced_key, None)
             replaced_node = self.node_map.pop(replaced_key, None)
@@ -218,16 +212,12 @@ class MigrationGraph:
         self.nodes.pop(replacement, None)
         try:
             replacement_node = self.node_map.pop(replacement)
-        except KeyError as exc:
-            exc_value = NodeNotFoundError(
+        except KeyError as err:
+            raise NodeNotFoundError(
                 "Unable to remove replacement node %r. It was either never added"
                 " to the migration graph, or has been removed already." % (replacement, ),
                 replacement
-            )
-            exc_value.__cause__ = exc
-            if not hasattr(exc, '__traceback__'):
-                exc.__traceback__ = sys.exc_info()[2]
-            six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
+            ) from err
         replaced_nodes = set()
         replaced_nodes_parents = set()
         for key in replaced:

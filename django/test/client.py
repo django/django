@@ -20,7 +20,6 @@ from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.test.utils import ContextList
 from django.urls import resolve
-from django.utils import six
 from django.utils.encoding import force_bytes, uri_to_iri
 from django.utils.functional import SimpleLazyObject, curry
 from django.utils.http import urlencode
@@ -494,7 +493,7 @@ class Client(RequestFactory):
             if self.exc_info:
                 exc_info = self.exc_info
                 self.exc_info = None
-                six.reraise(*exc_info)
+                raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
 
             # Save the client and request that stimulated the response.
             response.client = self

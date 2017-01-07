@@ -4,23 +4,21 @@ MySQL database backend for Django.
 Requires mysqlclient: https://pypi.python.org/pypi/mysqlclient/
 """
 import re
-import sys
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.utils import six
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes, SafeText
 
 try:
     import MySQLdb as Database
-except ImportError as e:
+except ImportError as err:
     raise ImproperlyConfigured(
-        'Error loading MySQLdb module: %s.\n'
-        'Did you install mysqlclient or MySQL-python?' % e
-    )
+        'Error loading MySQLdb module.\n'
+        'Did you install mysqlclient or MySQL-python?'
+    ) from err
 
 from MySQLdb.constants import CLIENT, FIELD_TYPE                # isort:skip
 from MySQLdb.converters import conversions                      # isort:skip
@@ -88,7 +86,7 @@ class CursorWrapper:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e.args[0] in self.codes_for_integrityerror:
-                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+                raise utils.IntegrityError(*tuple(e.args))
             raise
 
     def executemany(self, query, args):
@@ -98,7 +96,7 @@ class CursorWrapper:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e.args[0] in self.codes_for_integrityerror:
-                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+                raise utils.IntegrityError(*tuple(e.args))
             raise
 
     def __getattr__(self, attr):

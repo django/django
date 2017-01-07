@@ -40,7 +40,6 @@ import _thread
 from django.apps import apps
 from django.conf import settings
 from django.core.signals import request_finished
-from django.utils import six
 
 # This import does nothing, but it's necessary to avoid some race conditions
 # in the threading module. See http://code.djangoproject.com/ticket/2330 .
@@ -247,7 +246,7 @@ def check_errors(fn):
 def raise_last_exception():
     global _exception
     if _exception is not None:
-        six.reraise(*_exception)
+        raise _exception[0](_exception[1]).with_traceback(_exception[2])
 
 
 def ensure_echo_on():

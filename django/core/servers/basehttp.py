@@ -15,7 +15,6 @@ from wsgiref import simple_server
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.wsgi import get_wsgi_application
-from django.utils import six
 from django.utils.module_loading import import_string
 
 __all__ = ('WSGIServer', 'WSGIRequestHandler')
@@ -43,16 +42,11 @@ def get_internal_wsgi_application():
 
     try:
         return import_string(app_path)
-    except ImportError as e:
-        msg = (
-            "WSGI application '%(app_path)s' could not be loaded; "
-            "Error importing module: '%(exception)s'" % ({
-                'app_path': app_path,
-                'exception': e,
-            })
-        )
-        six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg),
-                    sys.exc_info()[2])
+    except ImportError as err:
+        raise ImproperlyConfigured(
+            "WSGI application '%s' could not be loaded; "
+            "Error importing module." % app_path
+        ) from err
 
 
 def is_broken_pipe_error():

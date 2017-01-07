@@ -20,7 +20,6 @@ from django.contrib.gis.gdal.field import (
 )
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import connections, models, router, transaction
-from django.utils import six
 from django.utils.encoding import force_text
 
 
@@ -456,9 +455,10 @@ class LayerMapping:
 
             # Creating the CoordTransform object
             return CoordTransform(self.source_srs, target_srs)
-        except Exception as msg:
-            new_msg = 'Could not translate between the data source and model geometry: %s' % msg
-            six.reraise(LayerMapError, LayerMapError(new_msg), sys.exc_info()[2])
+        except Exception as exc:
+            raise LayerMapError(
+                'Could not translate between the data source and model geometry.'
+            ) from exc
 
     def geometry_field(self):
         "Returns the GeometryField instance associated with the geographic column."

@@ -1,6 +1,5 @@
 import copy
 import re
-import sys
 from io import BytesIO
 from itertools import chain
 from urllib.parse import quote, urlencode, urljoin, urlsplit
@@ -12,7 +11,6 @@ from django.core.exceptions import (
 )
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
-from django.utils import six
 from django.utils.datastructures import ImmutableList, MultiValueDict
 from django.utils.encoding import escape_uri_path, force_bytes, iri_to_uri
 from django.utils.http import is_same_domain, limited_parse_qsl
@@ -263,7 +261,7 @@ class HttpRequest:
             try:
                 self._body = self.read()
             except IOError as e:
-                six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
+                raise UnreadablePostError(*e.args) from e
             self._stream = BytesIO(self._body)
         return self._body
 
@@ -322,14 +320,14 @@ class HttpRequest:
         try:
             return self._stream.read(*args, **kwargs)
         except IOError as e:
-            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
+            raise UnreadablePostError(*e.args) from e
 
     def readline(self, *args, **kwargs):
         self._read_started = True
         try:
             return self._stream.readline(*args, **kwargs)
         except IOError as e:
-            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
+            raise UnreadablePostError(*e.args) from e
 
     def xreadlines(self):
         while True:

@@ -7,7 +7,6 @@ import datetime
 import itertools
 import os
 import re
-import sys
 import uuid
 from decimal import Decimal, DecimalException
 from io import BytesIO
@@ -26,7 +25,7 @@ from django.forms.widgets import (
     SplitDateTimeWidget, SplitHiddenDateTimeWidget, TextInput, TimeInput,
     URLInput,
 )
-from django.utils import formats, six
+from django.utils import formats
 from django.utils.dateparse import parse_duration
 from django.utils.duration import duration_string
 from django.utils.encoding import force_text
@@ -650,12 +649,12 @@ class ImageField(FileField):
             # Pillow doesn't detect the MIME type of all formats. In those
             # cases, content_type will be None.
             f.content_type = Image.MIME.get(image.format)
-        except Exception:
+        except Exception as exc:
             # Pillow doesn't recognize it as an image.
-            six.reraise(ValidationError, ValidationError(
+            raise ValidationError(
                 self.error_messages['invalid_image'],
                 code='invalid_image',
-            ), sys.exc_info()[2])
+            ) from exc
         if hasattr(f, 'seek') and callable(f.seek):
             f.seek(0)
         return f

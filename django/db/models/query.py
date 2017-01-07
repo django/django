@@ -21,7 +21,7 @@ from django.db.models.fields import AutoField
 from django.db.models.functions import Trunc
 from django.db.models.query_utils import InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.functional import cached_property, partition
 from django.utils.version import get_version
 
@@ -498,7 +498,7 @@ class QuerySet:
                 return self.get(**lookup), False
             except self.model.DoesNotExist:
                 pass
-            six.reraise(*exc_info)
+            raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
 
     def _extract_model_params(self, defaults, **kwargs):
         """

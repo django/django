@@ -2,7 +2,6 @@ import base64
 import calendar
 import datetime
 import re
-import sys
 import unicodedata
 import warnings
 from binascii import Error as BinasciiError
@@ -13,7 +12,6 @@ from urllib.parse import (
 )
 
 from django.core.exceptions import TooManyFieldsSent
-from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_bytes, force_str, force_text
@@ -163,8 +161,8 @@ def parse_http_date(date):
         sec = int(m.group('sec'))
         result = datetime.datetime(year, month, day, hour, min, sec)
         return calendar.timegm(result.utctimetuple())
-    except Exception:
-        six.reraise(ValueError, ValueError("%r is not a valid date" % date), sys.exc_info()[2])
+    except Exception as exc:
+        raise ValueError("%r is not a valid date" % date) from exc
 
 
 def parse_http_date_safe(date):

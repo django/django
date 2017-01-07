@@ -1,10 +1,7 @@
 import copy
 import os
-import sys
 from importlib import import_module
 from importlib.util import find_spec as importlib_find
-
-from django.utils import six
 
 
 def import_string(dotted_path):
@@ -14,18 +11,17 @@ def import_string(dotted_path):
     """
     try:
         module_path, class_name = dotted_path.rsplit('.', 1)
-    except ValueError:
-        msg = "%s doesn't look like a module path" % dotted_path
-        six.reraise(ImportError, ImportError(msg), sys.exc_info()[2])
+    except ValueError as err:
+        raise ImportError("%s doesn't look like a module path" % dotted_path) from err
 
     module = import_module(module_path)
 
     try:
         return getattr(module, class_name)
-    except AttributeError:
-        msg = 'Module "%s" does not define a "%s" attribute/class' % (
+    except AttributeError as err:
+        raise ImportError('Module "%s" does not define a "%s" attribute/class' % (
             module_path, class_name)
-        six.reraise(ImportError, ImportError(msg), sys.exc_info()[2])
+        ) from err
 
 
 def autodiscover_modules(*args, **kwargs):

@@ -6,7 +6,6 @@ Requires PyYaml (http://pyyaml.org/), but that's checked for in __init__.
 
 import collections
 import decimal
-import sys
 from io import StringIO
 
 import yaml
@@ -16,7 +15,6 @@ from django.core.serializers.python import (
     Deserializer as PythonDeserializer, Serializer as PythonSerializer,
 )
 from django.db import models
-from django.utils import six
 
 # Use the C (faster) implementation if possible
 try:
@@ -78,8 +76,7 @@ def Deserializer(stream_or_string, **options):
     try:
         for obj in PythonDeserializer(yaml.load(stream, Loader=SafeLoader), **options):
             yield obj
-    except GeneratorExit:
+    except (GeneratorExit, DeserializationError):
         raise
-    except Exception as e:
-        # Map to deserializer error
-        six.reraise(DeserializationError, DeserializationError(e), sys.exc_info()[2])
+    except Exception as exc:
+        raise DeserializationError() from exc
