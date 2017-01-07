@@ -26,10 +26,8 @@ from django.db.models.signals import (
     class_prepared, post_init, post_save, pre_init, pre_save,
 )
 from django.db.models.utils import make_model_tuple
-from django.utils import six
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import curry
-from django.utils.six.moves import zip
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext_lazy as _
 from django.utils.version import get_version
@@ -385,7 +383,7 @@ class ModelState(object):
         self.adding = True
 
 
-class Model(six.with_metaclass(ModelBase)):
+class Model(metaclass=ModelBase):
 
     def __init__(self, *args, **kwargs):
         # Alias some things as locals to avoid repeat global lookups

@@ -1,3 +1,4 @@
+import builtins
 import collections
 import datetime
 import decimal
@@ -10,7 +11,7 @@ from importlib import import_module
 from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
-from django.utils import datetime_safe, six
+from django.utils import datetime_safe
 from django.utils.encoding import force_text
 from django.utils.functional import LazyObject, Promise
 from django.utils.timezone import utc
@@ -305,7 +306,7 @@ class TypeSerializer(BaseSerializer):
                 return string, set(imports)
         if hasattr(self.value, "__module__"):
             module = self.value.__module__
-            if module == six.moves.builtins.__name__:
+            if module == builtins.__name__:
                 return self.value.__name__, set()
             else:
                 return "%s.%s" % (module, self.value.__name__), {"import %s" % module}

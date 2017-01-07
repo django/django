@@ -3,6 +3,7 @@ import json
 import os
 import re
 import warnings
+from io import StringIO
 
 from django.core import management, serializers
 from django.core.exceptions import ImproperlyConfigured
@@ -14,7 +15,6 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.utils._os import upath
-from django.utils.six import StringIO
 
 from .models import (
     Absolute, Animal, Article, Book, Child, Circle1, Circle2, Circle3,

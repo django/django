@@ -12,7 +12,6 @@ from django.contrib.gis.geos.libgeos import geos_version_info, get_pointer_arr
 from django.contrib.gis.geos.linestring import LinearRing, LineString
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.polygon import Polygon
-from django.utils.six.moves import range
 
 
 class GeometryCollection(GEOSGeometry):

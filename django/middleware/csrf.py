@@ -7,6 +7,7 @@ against request forgeries from other sites.
 import logging
 import re
 import string
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -16,8 +17,6 @@ from django.utils.crypto import constant_time_compare, get_random_string
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import force_text
 from django.utils.http import is_same_domain
-from django.utils.six.moves import zip
-from django.utils.six.moves.urllib.parse import urlparse
 
 logger = logging.getLogger('django.security.csrf')
 

@@ -4,6 +4,7 @@ import re
 import shutil
 import time
 import warnings
+from io import StringIO
 from unittest import skipUnless
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -17,7 +18,6 @@ from django.core.management.utils import find_command
 from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils.encoding import force_text
-from django.utils.six import StringIO
 from django.utils.translation import TranslatorCommentWarning
 
 from .utils import POFileAssertionMixin, RunInTmpDirMixin, copytree

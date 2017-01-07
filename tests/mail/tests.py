@@ -12,6 +12,7 @@ from email import message_from_binary_file, message_from_bytes
 from email.header import Header
 from email.mime.text import MIMEText
 from email.utils import parseaddr
+from io import StringIO
 from smtplib import SMTP, SMTPAuthenticationError, SMTPException
 from ssl import SSLError
 
@@ -26,7 +27,6 @@ from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.utils._os import upath
 from django.utils.encoding import force_bytes, force_text
-from django.utils.six import StringIO
 from django.utils.translation import ugettext_lazy
 
 

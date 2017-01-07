@@ -1,5 +1,6 @@
 import sys
 import unittest
+from io import StringIO
 
 from django.conf.urls import url
 from django.contrib.staticfiles.finders import get_finder, get_finders
@@ -18,7 +19,6 @@ from django.test.utils import (
     setup_test_environment,
 )
 from django.urls import NoReverseMatch, reverse
-from django.utils import six
 from django.utils._os import abspathu
 
 from .models import Car, Person, PossessedCar
@@ -117,7 +117,7 @@ class SkippingClassTestCase(SimpleTestCase):
             test_suite.addTest(SkippedTestsSubclass('test_will_be_skipped'))
         except unittest.SkipTest:
             self.fail("SkipTest should not be raised at this stage")
-        result = unittest.TextTestRunner(stream=six.StringIO()).run(test_suite)
+        result = unittest.TextTestRunner(stream=StringIO()).run(test_suite)
         self.assertEqual(result.testsRun, 3)
         self.assertEqual(len(result.skipped), 2)
         self.assertEqual(result.skipped[0][1], 'Database has feature(s) __class__')

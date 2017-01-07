@@ -516,7 +516,7 @@ class FormatStylePlaceholderCursor(object):
         return CursorIterator(self.cursor)
 
 
-class CursorIterator(six.Iterator):
+class CursorIterator:
     """
     Cursor iterator wrapper that invokes our custom row factory.
     """

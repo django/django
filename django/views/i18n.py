@@ -7,7 +7,6 @@ from django.apps import apps
 from django.conf import settings
 from django.template import Context, Engine
 from django.urls import translate_url
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.formats import get_format
 from django.utils.http import is_safe_url, urlunquote
@@ -265,7 +264,7 @@ class JavaScriptCatalog(View):
         catalog = {}
         trans_cat = self.translation._catalog
         trans_fallback_cat = self.translation._fallback._catalog if self.translation._fallback else {}
-        for key, value in itertools.chain(six.iteritems(trans_cat), six.iteritems(trans_fallback_cat)):
+        for key, value in itertools.chain(iter(trans_cat.items()), iter(trans_fallback_cat.items())):
             if key == '' or key in catalog:
                 continue
             if isinstance(key, str):

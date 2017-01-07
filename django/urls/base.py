@@ -1,8 +1,8 @@
 from threading import local
+from urllib.parse import urlsplit, urlunsplit
 
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.functional import lazy
-from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import override
 
 from .exceptions import NoReverseMatch, Resolver404

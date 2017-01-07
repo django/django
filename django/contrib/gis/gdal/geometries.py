@@ -51,9 +51,7 @@ from django.contrib.gis.gdal.geomtype import OGRGeomType
 from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
 from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
-from django.utils import six
 from django.utils.encoding import force_bytes
-from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:
@@ -71,7 +69,7 @@ class OGRGeometry(GDALBase):
 
         # If HEX, unpack input to a binary buffer.
         if str_instance and hex_regex.match(geom_input):
-            geom_input = six.memoryview(a2b_hex(geom_input.upper().encode()))
+            geom_input = memoryview(a2b_hex(geom_input.upper().encode()))
             str_instance = False
 
         # Constructing the geometry,
@@ -96,7 +94,7 @@ class OGRGeometry(GDALBase):
                 # (e.g., 'Point', 'POLYGON').
                 OGRGeomType(geom_input)
                 g = capi.create_geom(OGRGeomType(geom_input).num)
-        elif isinstance(geom_input, six.memoryview):
+        elif isinstance(geom_input, memoryview):
             # WKB was passed in
             g = self._from_wkb(geom_input)
         elif isinstance(geom_input, OGRGeomType):
@@ -353,7 +351,7 @@ class OGRGeometry(GDALBase):
         buf = (c_ubyte * sz)()
         capi.to_wkb(self.ptr, byteorder, byref(buf))
         # Returning a buffer of the string at the pointer.
-        return six.memoryview(string_at(buf, sz))
+        return memoryview(string_at(buf, sz))
 
     @property
     def wkt(self):

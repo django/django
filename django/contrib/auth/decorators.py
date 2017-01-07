@@ -1,11 +1,11 @@
 from functools import wraps
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import resolve_url
 from django.utils.decorators import available_attrs
-from django.utils.six.moves.urllib.parse import urlparse
 
 
 def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):

@@ -8,7 +8,6 @@ should be good enough for a large class of URLS, however.
 import warnings
 
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.six.moves import zip
 
 # Mapping of an escape character to a representative of that class. So, e.g.,
 # "\w" is replaced by "x" in a reverse URL. A value of None means to ignore

@@ -3,7 +3,6 @@ import json
 from django.conf import settings
 from django.contrib.messages.storage.base import BaseStorage, Message
 from django.http import SimpleCookie
-from django.utils import six
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.safestring import SafeData, mark_safe
 
@@ -42,7 +41,7 @@ class MessageDecoder(json.JSONDecoder):
             return [self.process_messages(item) for item in obj]
         if isinstance(obj, dict):
             return {key: self.process_messages(value)
-                    for key, value in six.iteritems(obj)}
+                    for key, value in obj.items()}
         return obj
 
     def decode(self, s, **kwargs):

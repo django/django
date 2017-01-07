@@ -17,7 +17,6 @@ from django.forms.models import (
 )
 from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.utils import six
 from django.utils._os import upath
 
 from .models import (
@@ -2954,7 +2953,7 @@ class CustomMetaclass(ModelFormMetaclass):
         return new
 
 
-class CustomMetaclassForm(six.with_metaclass(CustomMetaclass, forms.ModelForm)):
+class CustomMetaclassForm(forms.ModelForm, metaclass=CustomMetaclass):
     pass
 
 

@@ -11,7 +11,6 @@ from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import NothingNode, WhereNode
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
-from django.utils.six.moves import range
 
 from .models import (
     FK1, Annotation, Article, Author, BaseA, Book, CategoryItem,

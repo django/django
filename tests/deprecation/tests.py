@@ -2,7 +2,6 @@ import warnings
 
 from django.test import SimpleTestCase
 from django.test.utils import reset_warning_registry
-from django.utils import six
 from django.utils.deprecation import (
     DeprecationInstanceCheck, RemovedInNextVersionWarning, RenameMethodsBase,
 )
@@ -29,7 +28,7 @@ class RenameMethodsTests(SimpleTestCase):
         with warnings.catch_warnings(record=True) as recorded:
             warnings.simplefilter('always')
 
-            class Manager(six.with_metaclass(RenameManagerMethods)):
+            class Manager(metaclass=RenameManagerMethods):
                 def old(self):
                     pass
             self.assertEqual(len(recorded), 1)
@@ -43,7 +42,7 @@ class RenameMethodsTests(SimpleTestCase):
         with warnings.catch_warnings(record=True) as recorded:
             warnings.simplefilter('ignore')
 
-            class Manager(six.with_metaclass(RenameManagerMethods)):
+            class Manager(metaclass=RenameManagerMethods):
                 def new(self):
                     pass
             warnings.simplefilter('always')
@@ -62,7 +61,7 @@ class RenameMethodsTests(SimpleTestCase):
         with warnings.catch_warnings(record=True) as recorded:
             warnings.simplefilter('ignore')
 
-            class Manager(six.with_metaclass(RenameManagerMethods)):
+            class Manager(metaclass=RenameManagerMethods):
                 def old(self):
                     pass
             warnings.simplefilter('always')
@@ -82,7 +81,7 @@ class RenameMethodsTests(SimpleTestCase):
         with warnings.catch_warnings(record=True) as recorded:
             warnings.simplefilter('ignore')
 
-            class Renamed(six.with_metaclass(RenameManagerMethods)):
+            class Renamed(metaclass=RenameManagerMethods):
                 def new(self):
                     pass
 
@@ -112,7 +111,7 @@ class RenameMethodsTests(SimpleTestCase):
         with warnings.catch_warnings(record=True) as recorded:
             warnings.simplefilter('ignore')
 
-            class Deprecated(six.with_metaclass(RenameManagerMethods)):
+            class Deprecated(metaclass=RenameManagerMethods):
                 def old(self):
                     pass
 
@@ -137,7 +136,7 @@ class RenameMethodsTests(SimpleTestCase):
         with warnings.catch_warnings(record=True) as recorded:
             warnings.simplefilter('ignore')
 
-            class Renamed(six.with_metaclass(RenameManagerMethods)):
+            class Renamed(metaclass=RenameManagerMethods):
                 def new(self):
                     pass
 
@@ -168,7 +167,7 @@ class RenameMethodsTests(SimpleTestCase):
 
 class DeprecationInstanceCheckTest(SimpleTestCase):
     def test_warning(self):
-        class Manager(six.with_metaclass(DeprecationInstanceCheck)):
+        class Manager(metaclass=DeprecationInstanceCheck):
             alternative = 'fake.path.Foo'
             deprecation_warning = RemovedInNextVersionWarning
 

@@ -7,7 +7,6 @@ from django.core.management.color import no_style
 from django.core.management.sql import emit_post_migrate_signal, sql_flush
 from django.db import DEFAULT_DB_ALIAS, connections, transaction
 from django.utils import six
-from django.utils.six.moves import input
 
 
 class Command(BaseCommand):

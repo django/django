@@ -1,5 +1,6 @@
 "Database cache backend."
 import base64
+import pickle
 from datetime import datetime
 
 from django.conf import settings
@@ -7,11 +8,6 @@ from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.db import DatabaseError, connections, models, router, transaction
 from django.utils import timezone
 from django.utils.encoding import force_bytes
-
-try:
-    from django.utils.six.moves import cPickle as pickle
-except ImportError:
-    import pickle
 
 
 class Options(object):

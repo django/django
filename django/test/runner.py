@@ -8,6 +8,7 @@ import textwrap
 import unittest
 import warnings
 from importlib import import_module
+from io import StringIO
 
 from django.core.management import call_command
 from django.db import connections
@@ -18,7 +19,6 @@ from django.test.utils import (
 )
 from django.utils.datastructures import OrderedSet
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.six import StringIO
 
 try:
     import tblib.pickling_support

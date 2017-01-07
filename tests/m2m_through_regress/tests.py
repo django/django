@@ -1,7 +1,8 @@
+from io import StringIO
+
 from django.contrib.auth.models import User
 from django.core import management
 from django.test import TestCase
-from django.utils.six import StringIO
 
 from .models import (
     Car, CarDriver, Driver, Group, Membership, Person, UserMembership,

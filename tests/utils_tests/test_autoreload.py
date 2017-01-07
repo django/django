@@ -4,13 +4,14 @@ import shutil
 import tempfile
 from importlib import import_module
 
+import _thread
+
 from django import conf
 from django.contrib import admin
 from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import extend_sys_path
 from django.utils import autoreload
 from django.utils._os import npath
-from django.utils.six.moves import _thread
 from django.utils.translation import trans_real
 
 LOCALE_PATH = os.path.join(os.path.dirname(__file__), 'locale')

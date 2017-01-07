@@ -6,6 +6,7 @@ import sys
 import tempfile
 import unittest
 from datetime import timedelta
+from http import cookies
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import UpdateError
@@ -31,9 +32,8 @@ from django.test import (
     RequestFactory, TestCase, ignore_warnings, override_settings,
 )
 from django.test.utils import patch_logger
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.encoding import force_text
-from django.utils.six.moves import http_cookies
 
 from .models import SessionStore as CustomDatabaseSession
 
@@ -122,7 +122,7 @@ class SessionTestsMixin(object):
         self.session['x'] = 1
         self.session.modified = False
         self.session.accessed = False
-        i = six.iterkeys(self.session)
+        i = iter(self.session.keys())
         self.assertTrue(hasattr(i, '__iter__'))
         self.assertTrue(self.session.accessed)
         self.assertFalse(self.session.modified)
@@ -132,7 +132,7 @@ class SessionTestsMixin(object):
         self.session['x'] = 1
         self.session.modified = False
         self.session.accessed = False
-        i = six.itervalues(self.session)
+        i = iter(self.session.values())
         self.assertTrue(hasattr(i, '__iter__'))
         self.assertTrue(self.session.accessed)
         self.assertFalse(self.session.modified)
@@ -142,7 +142,7 @@ class SessionTestsMixin(object):
         self.session['x'] = 1
         self.session.modified = False
         self.session.accessed = False
-        i = six.iteritems(self.session)
+        i = iter(self.session.items())
         self.assertTrue(hasattr(i, '__iter__'))
         self.assertTrue(self.session.accessed)
         self.assertFalse(self.session.modified)
@@ -661,7 +661,7 @@ class SessionMiddlewareTests(TestCase):
         self.assertTrue(
             response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
         self.assertIn(
-            http_cookies.Morsel._reserved['httponly'],
+            cookies.Morsel._reserved['httponly'],
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
 
@@ -679,7 +679,7 @@ class SessionMiddlewareTests(TestCase):
         response = middleware.process_response(request, response)
         self.assertFalse(response.cookies[settings.SESSION_COOKIE_NAME]['httponly'])
 
-        self.assertNotIn(http_cookies.Morsel._reserved['httponly'],
+        self.assertNotIn(cookies.Morsel._reserved['httponly'],
                          str(response.cookies[settings.SESSION_COOKIE_NAME]))
 
     def test_session_save_on_500(self):

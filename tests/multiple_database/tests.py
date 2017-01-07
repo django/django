@@ -1,5 +1,6 @@
 import datetime
 import pickle
+from io import StringIO
 from operator import attrgetter
 
 from django.contrib.auth.models import User
@@ -9,7 +10,6 @@ from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import SimpleTestCase, TestCase, override_settings
-from django.utils.six import StringIO
 
 from .models import Book, Person, Pet, Review, UserProfile
 from .routers import AuthRouter, TestRouter, WriteRouter

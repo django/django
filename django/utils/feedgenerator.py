@@ -22,11 +22,11 @@ For definitions of the different versions of RSS, see:
 http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 """
 import datetime
+from io import StringIO
+from urllib.parse import urlparse
 
 from django.utils import datetime_safe
 from django.utils.encoding import force_text, iri_to_uri
-from django.utils.six import StringIO
-from django.utils.six.moves.urllib.parse import urlparse
 from django.utils.timezone import utc
 from django.utils.xmlutils import SimplerXMLGenerator
 

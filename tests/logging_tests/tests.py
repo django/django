@@ -1,5 +1,6 @@
 import logging
 from contextlib import contextmanager
+from io import StringIO
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -10,7 +11,6 @@ from django.core.management import color
 from django.db import connection
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
-from django.utils import six
 from django.utils.log import (
     DEFAULT_LOGGING, AdminEmailHandler, CallbackFilter, RequireDebugFalse,
     RequireDebugTrue, ServerFormatter,
@@ -513,7 +513,7 @@ class LogFormattersTests(SimpleTestCase):
         @contextmanager
         def patch_django_server_logger():
             old_stream = logger.handlers[0].stream
-            new_stream = six.StringIO()
+            new_stream = StringIO()
             logger.handlers[0].stream = new_stream
             yield new_stream
             logger.handlers[0].stream = old_stream

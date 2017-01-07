@@ -12,7 +12,7 @@ from django.core.management.base import (
     BaseCommand, CommandError, CommandParser, handle_default_options,
 )
 from django.core.management.color import color_style
-from django.utils import autoreload, lru_cache, six
+from django.utils import autoreload, lru_cache
 from django.utils._os import npath, upath
 from django.utils.encoding import force_text
 
@@ -154,7 +154,7 @@ class ManagementUtility(object):
                 "Available subcommands:",
             ]
             commands_dict = defaultdict(lambda: [])
-            for name, app in six.iteritems(get_commands()):
+            for name, app in get_commands().items():
                 if app == 'django.core':
                     app = 'django'
                 else:

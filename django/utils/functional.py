@@ -2,8 +2,6 @@ import copy
 import operator
 from functools import total_ordering, wraps
 
-from django.utils import six
-
 
 # You can't trivially replace this with `functools.partial` because this binds
 # to classes and returns bound instances, whereas functools.partial (on
@@ -193,7 +191,7 @@ def keep_lazy(*resultclasses):
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            for arg in list(args) + list(six.itervalues(kwargs)):
+            for arg in list(args) + list(kwargs.values()):
                 if isinstance(arg, Promise):
                     break
             else:

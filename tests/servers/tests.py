@@ -5,12 +5,12 @@ import contextlib
 import errno
 import os
 import socket
+from urllib.error import HTTPError
+from urllib.request import urlopen
 
 from django.test import LiveServerTestCase, override_settings
 from django.utils._os import upath
 from django.utils.http import urlencode
-from django.utils.six.moves.urllib.error import HTTPError
-from django.utils.six.moves.urllib.request import urlopen
 
 from .models import Person
 

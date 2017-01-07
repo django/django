@@ -5,7 +5,6 @@ from django.db.backends.base.creation import BaseDatabaseCreation
 from django.db.utils import DatabaseError
 from django.utils.crypto import get_random_string
 from django.utils.functional import cached_property
-from django.utils.six.moves import input
 
 TEST_DATABASE_PREFIX = 'test_'
 

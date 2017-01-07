@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import tempfile
+from io import StringIO
 
 from django.conf.urls import url
 from django.core import mail
@@ -13,7 +14,6 @@ from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.urls import reverse
-from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import SimpleLazyObject
 from django.views.debug import (
@@ -513,7 +513,7 @@ class ExceptionReporterTests(SimpleTestCase):
         html = reporter.get_traceback_html()
         self.assertInHTML(value, html)
         # FILES
-        fp = six.StringIO('filecontent')
+        fp = StringIO('filecontent')
         request = self.rf.post('/test_view/', data={'name': 'filename', 'items': fp})
         reporter = ExceptionReporter(request, None, None, None)
         html = reporter.get_traceback_html()
@@ -628,7 +628,7 @@ class PlainTextReportTests(SimpleTestCase):
         text = reporter.get_traceback_text()
         self.assertIn("items = 'Oops'", text)
         # FILES
-        fp = six.StringIO('filecontent')
+        fp = StringIO('filecontent')
         request = self.rf.post('/test_view/', data={'name': 'filename', 'items': fp})
         reporter = ExceptionReporter(request, None, None, None)
         text = reporter.get_traceback_text()

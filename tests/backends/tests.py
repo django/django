@@ -23,7 +23,6 @@ from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, mock, override_settings,
     skipIfDBFeature, skipUnlessDBFeature,
 )
-from django.utils.six.moves import range
 
 from .models import (
     Article, Item, Object, ObjectReference, Person, Post, RawData, Reporter,

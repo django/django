@@ -7,7 +7,6 @@ from django.contrib.gis.geos.prototypes.errcheck import (
     check_geom, check_sized_string, check_string,
 )
 from django.contrib.gis.geos.prototypes.geom import c_uchar_p, geos_char_p
-from django.utils import six
 from django.utils.encoding import force_bytes
 
 
@@ -147,7 +146,7 @@ class _WKBReader(IOBase):
 
     def read(self, wkb):
         "Returns a _pointer_ to C GEOS Geometry object from the given WKB."
-        if isinstance(wkb, six.memoryview):
+        if isinstance(wkb, memoryview):
             wkb_s = bytes(wkb)
             return wkb_reader_read(self.ptr, wkb_s, len(wkb_s))
         elif isinstance(wkb, (bytes, str)):
@@ -240,7 +239,7 @@ class WKBWriter(IOBase):
             # Fix GEOS output for empty polygon.
             # See https://trac.osgeo.org/geos/ticket/680.
             wkb = wkb[:-8] + b'\0' * 4
-        return six.memoryview(wkb)
+        return memoryview(wkb)
 
     def write_hex(self, geom):
         "Returns the HEXEWKB representation of the given geometry."

@@ -10,6 +10,7 @@ import stat
 import sys
 import tempfile
 from os import path
+from urllib.request import urlretrieve
 
 import django
 from django.conf import settings
@@ -17,7 +18,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import handle_extensions
 from django.template import Context, Engine
 from django.utils import archive
-from django.utils.six.moves.urllib.request import urlretrieve
 from django.utils.version import get_docs_version
 
 _drive_re = re.compile('^([a-z]):', re.I)

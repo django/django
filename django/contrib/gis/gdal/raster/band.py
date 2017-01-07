@@ -4,9 +4,7 @@ from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.prototypes import raster as capi
 from django.contrib.gis.shortcuts import numpy
-from django.utils import six
 from django.utils.encoding import force_text
-from django.utils.six.moves import range
 
 from .const import GDAL_INTEGER_TYPES, GDAL_PIXEL_TYPES, GDAL_TO_CTYPES
 
@@ -207,7 +205,7 @@ class GDALBand(GDALBase):
             access_flag = 1
 
             # Instantiate ctypes array holding the input data
-            if isinstance(data, (bytes, six.memoryview)) or (numpy and isinstance(data, numpy.ndarray)):
+            if isinstance(data, (bytes, memoryview)) or (numpy and isinstance(data, numpy.ndarray)):
                 data_array = ctypes_array.from_buffer_copy(data)
             else:
                 data_array = ctypes_array(*data)

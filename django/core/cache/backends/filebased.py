@@ -4,6 +4,7 @@ import glob
 import hashlib
 import io
 import os
+import pickle
 import random
 import tempfile
 import time
@@ -12,11 +13,6 @@ import zlib
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.core.files.move import file_move_safe
 from django.utils.encoding import force_bytes
-
-try:
-    from django.utils.six.moves import cPickle as pickle
-except ImportError:
-    import pickle
 
 
 class FileBasedCache(BaseCache):

@@ -5,7 +5,6 @@ from os.path import abspath, dirname, join, normcase, sep
 from django.core.exceptions import SuspiciousFileOperation
 from django.utils.encoding import force_text
 
-
 abspathu = abspath
 
 

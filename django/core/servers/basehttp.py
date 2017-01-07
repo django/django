@@ -9,6 +9,7 @@ been reviewed for security issues. DON'T USE IT FOR PRODUCTION USE!
 
 import logging
 import socket
+import socketserver
 import sys
 from wsgiref import simple_server
 
@@ -16,7 +17,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.wsgi import get_wsgi_application
 from django.utils import six
 from django.utils.module_loading import import_string
-from django.utils.six.moves import socketserver
 
 __all__ = ('WSGIServer', 'WSGIRequestHandler')
 

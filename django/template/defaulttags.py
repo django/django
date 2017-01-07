@@ -7,7 +7,7 @@ from datetime import datetime
 from itertools import cycle as itertools_cycle, groupby
 
 from django.conf import settings
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
@@ -521,8 +521,7 @@ class WithNode(Node):
         return "<WithNode>"
 
     def render(self, context):
-        values = {key: val.resolve(context) for key, val in
-                  six.iteritems(self.extra_context)}
+        values = {key: val.resolve(context) for key, val in self.extra_context.items()}
         with context.push(**values):
             return self.nodelist.render(context)
 

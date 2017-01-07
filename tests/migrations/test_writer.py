@@ -8,6 +8,7 @@ import sys
 import tokenize
 import unittest
 import uuid
+from io import StringIO
 
 import custom_migration_operations.more_operations
 import custom_migration_operations.operations
@@ -20,7 +21,7 @@ from django.db.migrations.writer import (
     MigrationWriter, OperationWriter, SettingsReference,
 )
 from django.test import SimpleTestCase, ignore_warnings, mock
-from django.utils import datetime_safe, six
+from django.utils import datetime_safe
 from django.utils._os import upath
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_str
@@ -561,7 +562,7 @@ class WriterTests(SimpleTestCase):
         self.assertIn("Migration", result)
         # In order to preserve compatibility with Python 3.2 unicode literals
         # prefix shouldn't be added to strings.
-        tokens = tokenize.generate_tokens(six.StringIO(str(output)).readline)
+        tokens = tokenize.generate_tokens(StringIO(str(output)).readline)
         for token_type, token_source, (srow, scol), __, line in tokens:
             if token_type == tokenize.STRING:
                 self.assertFalse(

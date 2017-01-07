@@ -1,9 +1,10 @@
+from urllib.parse import urlencode
+
 from django.contrib.sitemaps import (
     SitemapNotFound, _get_sitemap_full_url, ping_google,
 )
 from django.core.exceptions import ImproperlyConfigured
 from django.test import mock, modify_settings, override_settings
-from django.utils.six.moves.urllib.parse import urlencode
 
 from .base import SitemapTestsBase
 

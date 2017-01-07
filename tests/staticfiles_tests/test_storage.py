@@ -3,6 +3,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from io import StringIO
 
 from django.conf import settings
 from django.contrib.staticfiles import finders, storage
@@ -11,7 +12,6 @@ from django.contrib.staticfiles.management.commands.collectstatic import \
 from django.core.cache.backends.base import BaseCache
 from django.core.management import call_command
 from django.test import override_settings
-from django.utils import six
 from django.utils.encoding import force_text
 
 from .cases import CollectionTestCase
@@ -172,7 +172,7 @@ class TestHashedFiles(object):
     )
     def test_import_loop(self):
         finders.get_finder.cache_clear()
-        err = six.StringIO()
+        err = StringIO()
         with self.assertRaisesMessage(RuntimeError, 'Max post-process passes exceeded'):
             call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
         self.assertEqual("Post-processing 'All' failed!\n\n", err.getvalue())
@@ -225,7 +225,7 @@ class TestHashedFiles(object):
         post_processing indicates the origin of the error when it fails.
         """
         finders.get_finder.cache_clear()
-        err = six.StringIO()
+        err = StringIO()
         with self.assertRaises(Exception):
             call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
         self.assertEqual("Post-processing 'faulty.css' failed!\n\n", err.getvalue())
@@ -429,7 +429,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         with self.assertRaisesMessage(ValueError, err_msg):
             self.hashed_file_path(missing_file_name)
 
-        content = six.StringIO()
+        content = StringIO()
         content.write('Found')
         configured_storage.save(missing_file_name, content)
         # File exists on disk
@@ -566,7 +566,7 @@ class TestCollectionHashedFilesCache(CollectionTestCase):
 
     def test_file_change_after_collectstatic(self):
         finders.get_finder.cache_clear()
-        err = six.StringIO()
+        err = StringIO()
         call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
         with open(self.testimage_path, 'w+b') as f:
             f.write(b"new content of png file to change it's hash")

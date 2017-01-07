@@ -3,7 +3,6 @@ import subprocess
 
 from django.core.files.temp import NamedTemporaryFile
 from django.db.backends.base.client import BaseDatabaseClient
-from django.utils.six import print_
 
 
 def _escape_pgpass(txt):
@@ -40,7 +39,7 @@ class DatabaseClient(BaseDatabaseClient):
                 # Create temporary .pgpass file.
                 temp_pgpass = NamedTemporaryFile(mode='w+')
                 try:
-                    print_(
+                    print(
                         _escape_pgpass(host) or '*',
                         str(port) or '*',
                         _escape_pgpass(dbname) or '*',

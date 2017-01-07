@@ -390,10 +390,7 @@ class UpdateContentTypesTests(TestCase):
         # A related object is needed to show that a custom collector with
         # can_fast_delete=False is needed.
         ModelWithNullFKToSite.objects.create(post=post)
-        with mock.patch(
-            'django.contrib.contenttypes.management.commands.remove_stale_contenttypes.input',
-            return_value='yes'
-        ):
+        with mock.patch('builtins.input', return_value='yes'):
             with captured_stdout() as stdout:
                 call_command('remove_stale_contenttypes', verbosity=2, stdout=stdout)
         self.assertEqual(Post.objects.count(), 0)
@@ -409,10 +406,7 @@ class UpdateContentTypesTests(TestCase):
         interactive mode of remove_stale_contenttypes (the default) should
         delete stale contenttypes even if there aren't any dependent objects.
         """
-        with mock.patch(
-            'django.contrib.contenttypes.management.commands.remove_stale_contenttypes.input',
-            return_value='yes'
-        ):
+        with mock.patch('builtins.input', return_value='yes'):
             with captured_stdout() as stdout:
                 call_command('remove_stale_contenttypes', verbosity=2)
         self.assertIn("Deleting stale content type", stdout.getvalue())

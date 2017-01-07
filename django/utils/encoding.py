@@ -2,11 +2,10 @@ import codecs
 import datetime
 import locale
 from decimal import Decimal
-from urllib.parse import unquote_to_bytes
+from urllib.parse import quote, unquote_to_bytes
 
 from django.utils import six
 from django.utils.functional import Promise
-from django.utils.six.moves.urllib.parse import quote
 
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):

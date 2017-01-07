@@ -1,13 +1,12 @@
 from django.apps.registry import Apps
 from django.db import models
-from django.utils import six
 
 
 class CustomModelBase(models.base.ModelBase):
     pass
 
 
-class ModelWithCustomBase(six.with_metaclass(CustomModelBase, models.Model)):
+class ModelWithCustomBase(models.Model, metaclass=CustomModelBase):
     pass
 
 

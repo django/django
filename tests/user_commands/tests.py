@@ -1,4 +1,5 @@
 import os
+from io import StringIO
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -11,7 +12,6 @@ from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
 from django.utils._os import upath
-from django.utils.six import StringIO
 
 from .management.commands import dance
 

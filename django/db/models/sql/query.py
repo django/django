@@ -30,7 +30,6 @@ from django.db.models.sql.datastructures import (
 from django.db.models.sql.where import (
     AND, OR, ExtraWhere, NothingNode, WhereNode,
 )
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.tree import Node
 
@@ -104,7 +103,7 @@ class RawQuery(object):
         if params_type is tuple:
             params = tuple(adapter(val) for val in self.params)
         elif params_type is dict:
-            params = dict((key, adapter(val)) for key, val in six.iteritems(self.params))
+            params = {key: adapter(val) for key, val in self.params.items()}
         else:
             raise RuntimeError("Unexpected params type: %s" % params_type)
 
@@ -665,23 +664,23 @@ class Query(object):
             # slight complexity here is handling fields that exist on parent
             # models.
             workset = {}
-            for model, values in six.iteritems(seen):
+            for model, values in seen.items():
                 for field in model._meta.fields:
                     if field in values:
                         continue
                     m = field.model._meta.concrete_model
                     add_to_dict(workset, m, field)
-            for model, values in six.iteritems(must_include):
+            for model, values in must_include.items():
                 # If we haven't included a model in workset, we don't add the
                 # corresponding must_include fields for that model, since an
                 # empty set means "include all fields". That's why there's no
                 # "else" branch here.
                 if model in workset:
                     workset[model].update(values)
-            for model, values in six.iteritems(workset):
+            for model, values in workset.items():
                 callback(target, model, values)
         else:
-            for model, values in six.iteritems(must_include):
+            for model, values in must_include.items():
                 if model in seen:
                     seen[model].update(values)
                 else:
@@ -695,7 +694,7 @@ class Query(object):
             for model in orig_opts.get_parent_list():
                 if model not in seen:
                     seen[model] = set()
-            for model, values in six.iteritems(seen):
+            for model, values in seen.items():
                 callback(target, model, values)
 
     def table_alias(self, table_name, create=False):
@@ -813,7 +812,7 @@ class Query(object):
                 (key, col.relabeled_clone(change_map)) for key, col in self._annotations.items())
 
         # 2. Rename the alias in the internal table/alias datastructures.
-        for old_alias, new_alias in six.iteritems(change_map):
+        for old_alias, new_alias in change_map.items():
             if old_alias not in self.alias_map:
                 continue
             alias_data = self.alias_map[old_alias].relabeled_clone(change_map)
@@ -1698,7 +1697,7 @@ class Query(object):
             self.group_by.append(col)
 
         if self.annotation_select:
-            for alias, annotation in six.iteritems(self.annotation_select):
+            for alias, annotation in self.annotation_select.items():
                 for col in annotation.get_group_by_cols():
                     self.group_by.append(col)
 

@@ -14,11 +14,10 @@ from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate, getaddresses, parseaddr
-from io import BytesIO
+from io import BytesIO, StringIO
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
-from django.utils import six
 from django.utils.encoding import force_text
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
@@ -164,7 +163,7 @@ class MIMEMixin():
         This overrides the default as_string() implementation to not mangle
         lines that begin with 'From '. See bug #13433 for details.
         """
-        fp = six.StringIO()
+        fp = StringIO()
         g = generator.Generator(fp, mangle_from_=False)
         g.flatten(self, unixfrom=unixfrom, linesep=linesep)
         return fp.getvalue()

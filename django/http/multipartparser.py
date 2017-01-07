@@ -8,6 +8,7 @@ import base64
 import binascii
 import cgi
 import sys
+from urllib.parse import unquote
 
 from django.conf import settings
 from django.core.exceptions import (
@@ -19,7 +20,6 @@ from django.core.files.uploadhandler import (
 from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
-from django.utils.six.moves.urllib.parse import unquote
 from django.utils.text import unescape_entities
 
 __all__ = ('MultiPartParser', 'MultiPartParserError', 'InputStreamExhausted')
@@ -312,7 +312,7 @@ class MultiPartParser(object):
                 handler.file.close()
 
 
-class LazyStream(six.Iterator):
+class LazyStream:
     """
     The LazyStream wrapper allows one to get and "unget" bytes from a stream.
 
@@ -429,7 +429,7 @@ class LazyStream(six.Iterator):
             )
 
 
-class ChunkIter(six.Iterator):
+class ChunkIter:
     """
     An iterable that will yield chunks of data. Given a file-like object as the
     constructor, this object will yield chunks of read operations from that
@@ -453,7 +453,7 @@ class ChunkIter(six.Iterator):
         return self
 
 
-class InterBoundaryIter(six.Iterator):
+class InterBoundaryIter:
     """
     A Producer that will iterate over boundaries.
     """
@@ -471,7 +471,7 @@ class InterBoundaryIter(six.Iterator):
             raise StopIteration()
 
 
-class BoundaryIter(six.Iterator):
+class BoundaryIter:
     """
     A Producer that is sensitive to boundaries.
 

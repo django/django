@@ -1,4 +1,5 @@
 import tempfile
+from io import StringIO
 
 from django.contrib.gis import gdal
 from django.contrib.gis.db.models import Extent, MakeLine, Union, functions
@@ -9,7 +10,6 @@ from django.contrib.gis.geos import (
 from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils import six
 
 from ..utils import no_oracle, oracle, postgis, skipUnlessGISLookup, spatialite
 from .models import (
@@ -184,7 +184,7 @@ class GeoModelTest(TestCase):
         """
         Test a dumpdata/loaddata cycle with geographic data.
         """
-        out = six.StringIO()
+        out = StringIO()
         original_data = list(City.objects.all().order_by('name'))
         call_command('dumpdata', 'geoapp.City', stdout=out)
         result = out.getvalue()

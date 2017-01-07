@@ -4,7 +4,6 @@ from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.libgeos import GEOM_PTR, get_pointer_arr
 from django.contrib.gis.geos.linestring import LinearRing
-from django.utils.six.moves import range
 
 
 class Polygon(GEOSGeometry):

@@ -7,6 +7,7 @@ import os
 import posixpath
 import re
 import stat
+from urllib.parse import unquote
 
 from django.http import (
     FileResponse, Http404, HttpResponse, HttpResponseNotModified,
@@ -14,7 +15,6 @@ from django.http import (
 )
 from django.template import Context, Engine, TemplateDoesNotExist, loader
 from django.utils.http import http_date, parse_http_date
-from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import ugettext as _, ugettext_lazy
 
 

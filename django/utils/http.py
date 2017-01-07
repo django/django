@@ -7,6 +7,10 @@ import unicodedata
 import warnings
 from binascii import Error as BinasciiError
 from email.utils import formatdate
+from urllib.parse import (
+    quote, quote_plus, unquote, unquote_plus, urlencode as original_urlencode,
+    urlparse,
+)
 
 from django.core.exceptions import TooManyFieldsSent
 from django.utils import six
@@ -14,10 +18,6 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_bytes, force_str, force_text
 from django.utils.functional import keep_lazy_text
-from django.utils.six.moves.urllib.parse import (
-    quote, quote_plus, unquote, unquote_plus, urlencode as original_urlencode,
-    urlparse,
-)
 
 # based on RFC 7232, Appendix C
 ETAG_MATCH = re.compile(r'''

@@ -1,4 +1,5 @@
 from datetime import datetime
+from io import StringIO
 
 from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
@@ -10,7 +11,6 @@ from django.test import (
 )
 from django.test.utils import Approximate
 from django.utils.functional import curry
-from django.utils.six import StringIO
 
 from .models import (
     Actor, Article, Author, AuthorProfile, BaseModel, Category, ComplexModel,

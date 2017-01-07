@@ -1,7 +1,9 @@
 import gzip
 import random
 import re
+import struct
 from io import BytesIO
+from urllib.parse import quote
 
 from django.conf import settings
 from django.core import mail
@@ -19,11 +21,10 @@ from django.middleware.http import ConditionalGetMiddleware
 from django.test import (
     RequestFactory, SimpleTestCase, ignore_warnings, override_settings,
 )
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_str
-from django.utils.six.moves import range
-from django.utils.six.moves.urllib.parse import quote
+
+int2byte = struct.Struct(">B").pack
 
 
 @override_settings(ROOT_URLCONF='middleware.urls')
@@ -732,7 +733,7 @@ class GZipMiddlewareTest(SimpleTestCase):
     """
     short_string = b"This string is too short to be worth compressing."
     compressible_string = b'a' * 500
-    incompressible_string = b''.join(six.int2byte(random.randint(0, 255)) for _ in range(500))
+    incompressible_string = b''.join(int2byte(random.randint(0, 255)) for _ in range(500))
     sequence = [b'a' * 500, b'b' * 200, b'a' * 300]
     sequence_unicode = ['a' * 500, 'é' * 200, 'a' * 300]
 

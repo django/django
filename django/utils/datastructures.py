@@ -1,8 +1,6 @@
 import copy
 from collections import OrderedDict
 
-from django.utils import six
-
 
 class OrderedSet(object):
     """
@@ -189,7 +187,7 @@ class MultiValueDict(dict):
 
     def lists(self):
         """Yields (key, list) pairs."""
-        return six.iteritems(super(MultiValueDict, self))
+        return iter(super(MultiValueDict, self).items())
 
     def values(self):
         """Yield the last value on every key list."""
@@ -218,7 +216,7 @@ class MultiValueDict(dict):
                         self.setlistdefault(key).append(value)
                 except TypeError:
                     raise ValueError("MultiValueDict.update() takes either a MultiValueDict or dictionary")
-        for key, value in six.iteritems(kwargs):
+        for key, value in kwargs.items():
             self.setlistdefault(key).append(value)
 
     def dict(self):

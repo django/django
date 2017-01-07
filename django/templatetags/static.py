@@ -1,8 +1,9 @@
+from urllib.parse import quote, urljoin
+
 from django import template
 from django.apps import apps
 from django.utils.encoding import iri_to_uri
 from django.utils.html import conditional_escape
-from django.utils.six.moves.urllib.parse import quote, urljoin
 
 register = template.Library()
 

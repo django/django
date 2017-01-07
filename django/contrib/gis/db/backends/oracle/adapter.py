@@ -2,7 +2,6 @@ from cx_Oracle import CLOB
 
 from django.contrib.gis.db.backends.base.adapter import WKTAdapter
 from django.contrib.gis.geos import GeometryCollection, Polygon
-from django.utils.six.moves import range
 
 
 class OracleSpatialAdapter(WKTAdapter):

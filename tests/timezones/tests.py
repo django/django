@@ -23,7 +23,7 @@ from django.test import (
 )
 from django.test.utils import requires_tz_support
 from django.urls import reverse
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.timezone import timedelta
 
 from .forms import (
@@ -888,8 +888,8 @@ class TemplateTests(SimpleTestCase):
             }
         }
 
-        for k1, dt in six.iteritems(datetimes):
-            for k2, tpl in six.iteritems(templates):
+        for k1, dt in datetimes.items():
+            for k2, tpl in templates.items():
                 ctx = Context({'dt': dt, 'ICT': ICT})
                 actual = tpl.render(ctx)
                 expected = results[k1][k2]
@@ -901,8 +901,8 @@ class TemplateTests(SimpleTestCase):
         results['ict']['notag'] = t('ict', 'eat', 'utc', 'ict')
 
         with self.settings(USE_TZ=False):
-            for k1, dt in six.iteritems(datetimes):
-                for k2, tpl in six.iteritems(templates):
+            for k1, dt in datetimes.items():
+                for k2, tpl in templates.items():
                     ctx = Context({'dt': dt, 'ICT': ICT})
                     actual = tpl.render(ctx)
                     expected = results[k1][k2]

@@ -1,6 +1,6 @@
 import os
 import sys
-from importlib import import_module
+from importlib import import_module, reload
 
 from django.apps import apps
 from django.conf import settings
@@ -97,7 +97,7 @@ class MigrationLoader(object):
                     continue
                 # Force a reload if it's already loaded (tests need this)
                 if was_loaded:
-                    six.moves.reload_module(module)
+                    reload(module)
             self.migrated_apps.add(app_config.label)
             directory = os.path.dirname(module.__file__)
             # Scan for .py files

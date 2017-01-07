@@ -5,7 +5,6 @@ for the GEOS and GDAL tests.
 import json
 import os
 
-from django.utils import six
 from django.utils._os import upath
 from django.utils.functional import cached_property
 
@@ -22,7 +21,7 @@ def tuplize(seq):
 
 def strconvert(d):
     "Converts all keys in dictionary to str type."
-    return {str(k): v for k, v in six.iteritems(d)}
+    return {str(k): v for k, v in d.items()}
 
 
 def get_ds_file(name, ext):

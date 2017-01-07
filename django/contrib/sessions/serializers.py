@@ -1,9 +1,6 @@
-from django.core.signing import JSONSerializer as BaseJSONSerializer
+import pickle
 
-try:
-    from django.utils.six.moves import cPickle as pickle
-except ImportError:
-    import pickle
+from django.core.signing import JSONSerializer as BaseJSONSerializer
 
 
 class PickleSerializer(object):

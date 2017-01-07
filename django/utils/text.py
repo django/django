@@ -1,15 +1,14 @@
+import html.entities
 import re
 import unicodedata
 from gzip import GzipFile
 from io import BytesIO
 
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import (
     SimpleLazyObject, keep_lazy, keep_lazy_text, lazy,
 )
 from django.utils.safestring import SafeText, mark_safe
-from django.utils.six.moves import html_entities
 from django.utils.translation import pgettext, ugettext as _, ugettext_lazy
 
 
@@ -369,12 +368,12 @@ def _replace_entity(match):
                 c = int(text[1:], 16)
             else:
                 c = int(text)
-            return six.unichr(c)
+            return chr(c)
         except ValueError:
             return match.group(0)
     else:
         try:
-            return six.unichr(html_entities.name2codepoint[text])
+            return chr(html.entities.name2codepoint[text])
         except (ValueError, KeyError):
             return match.group(0)
 

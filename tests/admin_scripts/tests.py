@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from io import StringIO
 
 import django
 from django import conf, get_version
@@ -27,7 +28,6 @@ from django.test import (
 )
 from django.utils._os import npath, upath
 from django.utils.encoding import force_text
-from django.utils.six import StringIO
 
 custom_templates_dir = os.path.join(os.path.dirname(upath(__file__)), 'custom_templates')
 

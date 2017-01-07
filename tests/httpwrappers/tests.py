@@ -16,7 +16,6 @@ from django.http import (
     StreamingHttpResponse, parse_cookie,
 )
 from django.test import SimpleTestCase
-from django.utils import six
 from django.utils._os import upath
 from django.utils.encoding import force_str
 from django.utils.functional import lazystr
@@ -56,10 +55,10 @@ class QueryDictTests(SimpleTestCase):
         q = QueryDict()
         self.assertEqual(q.getlist('foo'), [])
         self.assertNotIn('foo', q)
-        self.assertEqual(list(six.iteritems(q)), [])
-        self.assertEqual(list(six.iterlists(q)), [])
-        self.assertEqual(list(six.iterkeys(q)), [])
-        self.assertEqual(list(six.itervalues(q)), [])
+        self.assertEqual(list(q.items()), [])
+        self.assertEqual(list(q.lists()), [])
+        self.assertEqual(list(q.keys()), [])
+        self.assertEqual(list(q.values()), [])
         self.assertEqual(len(q), 0)
         self.assertEqual(q.urlencode(), '')
 
@@ -86,10 +85,10 @@ class QueryDictTests(SimpleTestCase):
         self.assertIn('foo', q)
         self.assertNotIn('bar', q)
 
-        self.assertEqual(list(six.iteritems(q)), [('foo', 'bar')])
-        self.assertEqual(list(six.iterlists(q)), [('foo', ['bar'])])
-        self.assertEqual(list(six.iterkeys(q)), ['foo'])
-        self.assertEqual(list(six.itervalues(q)), ['bar'])
+        self.assertEqual(list(q.items()), [('foo', 'bar')])
+        self.assertEqual(list(q.lists()), [('foo', ['bar'])])
+        self.assertEqual(list(q.keys()), ['foo'])
+        self.assertEqual(list(q.values()), ['bar'])
         self.assertEqual(len(q), 1)
 
         with self.assertRaises(AttributeError):
@@ -146,14 +145,10 @@ class QueryDictTests(SimpleTestCase):
         self.assertEqual(q['foo'], 'another')
         self.assertIn('foo', q)
 
-        self.assertListEqual(sorted(six.iteritems(q)),
-                             [('foo', 'another'), ('name', 'john')])
-        self.assertListEqual(sorted(six.iterlists(q)),
-                             [('foo', ['bar', 'baz', 'another']), ('name', ['john'])])
-        self.assertListEqual(sorted(six.iterkeys(q)),
-                             ['foo', 'name'])
-        self.assertListEqual(sorted(six.itervalues(q)),
-                             ['another', 'john'])
+        self.assertListEqual(sorted(q.items()), [('foo', 'another'), ('name', 'john')])
+        self.assertListEqual(sorted(q.lists()), [('foo', ['bar', 'baz', 'another']), ('name', ['john'])])
+        self.assertListEqual(sorted(q.keys()), ['foo', 'name'])
+        self.assertListEqual(sorted(q.values()), ['another', 'john'])
 
         q.update({'foo': 'hello'})
         self.assertEqual(q['foo'], 'hello')
@@ -193,10 +188,10 @@ class QueryDictTests(SimpleTestCase):
 
         self.assertIn('vote', q)
         self.assertNotIn('foo', q)
-        self.assertEqual(list(six.iteritems(q)), [('vote', 'no')])
-        self.assertEqual(list(six.iterlists(q)), [('vote', ['yes', 'no'])])
-        self.assertEqual(list(six.iterkeys(q)), ['vote'])
-        self.assertEqual(list(six.itervalues(q)), ['no'])
+        self.assertEqual(list(q.items()), [('vote', 'no')])
+        self.assertEqual(list(q.lists()), [('vote', ['yes', 'no'])])
+        self.assertEqual(list(q.keys()), ['vote'])
+        self.assertEqual(list(q.values()), ['no'])
         self.assertEqual(len(q), 1)
 
         with self.assertRaises(AttributeError):
@@ -234,11 +229,11 @@ class QueryDictTests(SimpleTestCase):
         """#13572 - QueryDict with a non-default encoding"""
         q = QueryDict(str('cur=%A4'), encoding='iso-8859-15')
         self.assertEqual(q.encoding, 'iso-8859-15')
-        self.assertEqual(list(six.iteritems(q)), [('cur', '€')])
+        self.assertEqual(list(q.items()), [('cur', '€')])
         self.assertEqual(q.urlencode(), 'cur=%A4')
         q = q.copy()
         self.assertEqual(q.encoding, 'iso-8859-15')
-        self.assertEqual(list(six.iteritems(q)), [('cur', '€')])
+        self.assertEqual(list(q.items()), [('cur', '€')])
         self.assertEqual(q.urlencode(), 'cur=%A4')
         self.assertEqual(copy.copy(q).encoding, 'iso-8859-15')
         self.assertEqual(copy.deepcopy(q).encoding, 'iso-8859-15')

@@ -15,7 +15,6 @@ from django.db.migrations.exceptions import (
 )
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import mock, override_settings
-from django.utils import six
 from django.utils.encoding import force_text
 
 from .models import UnicodeModel, UnserializableModel
@@ -63,7 +62,7 @@ class MigrateTests(MigrationTestBase):
         'migrations.migrations_test_apps.migrated_app',
     ])
     def test_migrate_with_system_checks(self):
-        out = six.StringIO()
+        out = io.StringIO()
         call_command('migrate', skip_checks=False, no_color=True, stdout=out)
         self.assertIn('Apply all migrations: migrated_app', out.getvalue())
 
@@ -125,7 +124,7 @@ class MigrateTests(MigrationTestBase):
         with self.assertRaises(DatabaseError):
             call_command("migrate", "migrations", "0001", verbosity=0)
         # Run initial migration with an explicit --fake-initial
-        out = six.StringIO()
+        out = io.StringIO()
         with mock.patch('django.core.management.color.supports_color', lambda *args: False):
             call_command("migrate", "migrations", "0001", fake_initial=True, stdout=out, verbosity=1)
             call_command("migrate", "migrations", "0001", fake_initial=True, verbosity=0, database="other")
@@ -177,7 +176,7 @@ class MigrateTests(MigrationTestBase):
         """
         call_command("migrate", "migrations", "0002", verbosity=0)
         call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
-        out = six.StringIO()
+        out = io.StringIO()
         with mock.patch('django.core.management.color.supports_color', lambda *args: False):
             call_command("migrate", "migrations", "0002", fake_initial=True, stdout=out, verbosity=1)
         value = out.getvalue().lower()
@@ -202,7 +201,7 @@ class MigrateTests(MigrationTestBase):
         showmigrations --list  displays migrations and whether or not they're
         applied.
         """
-        out = six.StringIO()
+        out = io.StringIO()
         with mock.patch('django.core.management.color.supports_color', lambda *args: True):
             call_command("showmigrations", format='list', stdout=out, verbosity=0, no_color=False)
         self.assertEqual(
@@ -214,7 +213,7 @@ class MigrateTests(MigrationTestBase):
 
         call_command("migrate", "migrations", "0001", verbosity=0)
 
-        out = six.StringIO()
+        out = io.StringIO()
         # Giving the explicit app_label tests for selective `show_list` in the command
         call_command("showmigrations", "migrations", format='list', stdout=out, verbosity=0, no_color=True)
         self.assertEqual(
@@ -231,7 +230,7 @@ class MigrateTests(MigrationTestBase):
         """
         Tests --plan output of showmigrations command
         """
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("showmigrations", format='plan', stdout=out)
         self.assertEqual(
             "[ ]  migrations.0001_initial\n"
@@ -240,7 +239,7 @@ class MigrateTests(MigrationTestBase):
             out.getvalue().lower()
         )
 
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("showmigrations", format='plan', stdout=out, verbosity=2)
         self.assertEqual(
             "[ ]  migrations.0001_initial\n"
@@ -250,7 +249,7 @@ class MigrateTests(MigrationTestBase):
         )
         call_command("migrate", "migrations", "0003", verbosity=0)
 
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("showmigrations", format='plan', stdout=out)
         self.assertEqual(
             "[x]  migrations.0001_initial\n"
@@ -259,7 +258,7 @@ class MigrateTests(MigrationTestBase):
             out.getvalue().lower()
         )
 
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("showmigrations", format='plan', stdout=out, verbosity=2)
         self.assertEqual(
             "[x]  migrations.0001_initial\n"
@@ -276,11 +275,11 @@ class MigrateTests(MigrationTestBase):
         """
         Tests --plan output of showmigrations command without migrations
         """
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("showmigrations", format='plan', stdout=out)
         self.assertEqual("", out.getvalue().lower())
 
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("showmigrations", format='plan', stdout=out, verbosity=2)
         self.assertEqual("", out.getvalue().lower())
 
@@ -289,7 +288,7 @@ class MigrateTests(MigrationTestBase):
         """
         Tests --plan output of showmigrations command with squashed migrations.
         """
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("showmigrations", format='plan', stdout=out)
         self.assertEqual(
             "[ ]  migrations.1_auto\n"
@@ -300,7 +299,7 @@ class MigrateTests(MigrationTestBase):
             out.getvalue().lower()
         )
 
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("showmigrations", format='plan', stdout=out, verbosity=2)
         self.assertEqual(
             "[ ]  migrations.1_auto\n"
@@ -313,7 +312,7 @@ class MigrateTests(MigrationTestBase):
 
         call_command("migrate", "migrations", "3_squashed_5", verbosity=0)
 
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("showmigrations", format='plan', stdout=out)
         self.assertEqual(
             "[x]  migrations.1_auto\n"
@@ -324,7 +323,7 @@ class MigrateTests(MigrationTestBase):
             out.getvalue().lower()
         )
 
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("showmigrations", format='plan', stdout=out, verbosity=2)
         self.assertEqual(
             "[x]  migrations.1_auto\n"
@@ -345,7 +344,7 @@ class MigrateTests(MigrationTestBase):
         `showmigrations --plan app_label` output with a single app_label.
         """
         # Single app with no dependencies on other apps.
-        out = six.StringIO()
+        out = io.StringIO()
         call_command('showmigrations', 'mutate_state_b', format='plan', stdout=out)
         self.assertEqual(
             '[ ]  mutate_state_b.0001_initial\n'
@@ -353,7 +352,7 @@ class MigrateTests(MigrationTestBase):
             out.getvalue()
         )
         # Single app with dependencies.
-        out = six.StringIO()
+        out = io.StringIO()
         call_command('showmigrations', 'author_app', format='plan', stdout=out)
         self.assertEqual(
             '[ ]  author_app.0001_initial\n'
@@ -363,7 +362,7 @@ class MigrateTests(MigrationTestBase):
         )
         # Some migrations already applied.
         call_command('migrate', 'author_app', '0001', verbosity=0)
-        out = six.StringIO()
+        out = io.StringIO()
         call_command('showmigrations', 'author_app', format='plan', stdout=out)
         self.assertEqual(
             '[X]  author_app.0001_initial\n'
@@ -385,7 +384,7 @@ class MigrateTests(MigrationTestBase):
         """
         # Multiple apps: author_app depends on book_app; mutate_state_b doesn't
         # depend on other apps.
-        out = six.StringIO()
+        out = io.StringIO()
         call_command('showmigrations', 'mutate_state_b', 'author_app', format='plan', stdout=out)
         self.assertEqual(
             '[ ]  author_app.0001_initial\n'
@@ -397,7 +396,7 @@ class MigrateTests(MigrationTestBase):
         )
         # Multiple apps: args order shouldn't matter (the same result is
         # expected as above).
-        out = six.StringIO()
+        out = io.StringIO()
         call_command('showmigrations', 'author_app', 'mutate_state_b', format='plan', stdout=out)
         self.assertEqual(
             '[ ]  author_app.0001_initial\n'
@@ -431,7 +430,7 @@ class MigrateTests(MigrationTestBase):
         """
         sqlmigrate outputs forward looking SQL.
         """
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("sqlmigrate", "migrations", "0001", stdout=out)
         output = out.getvalue().lower()
 
@@ -472,7 +471,7 @@ class MigrateTests(MigrationTestBase):
         # Cannot generate the reverse SQL unless we've applied the migration.
         call_command("migrate", "migrations", verbosity=0)
 
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("sqlmigrate", "migrations", "0001", stdout=out, backwards=True)
         output = out.getvalue().lower()
 
@@ -514,7 +513,7 @@ class MigrateTests(MigrationTestBase):
         """
         Transaction wrappers aren't shown for non-atomic migrations.
         """
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("sqlmigrate", "migrations", "0001", stdout=out)
         output = out.getvalue().lower()
         queries = [q.strip() for q in output.splitlines()]
@@ -541,7 +540,7 @@ class MigrateTests(MigrationTestBase):
         "B" was not included in the ProjectState that is used to detect
         soft-applied migrations (#22823).
         """
-        call_command("migrate", "migrated_unapplied_app", stdout=six.StringIO())
+        call_command("migrate", "migrated_unapplied_app", stdout=io.StringIO())
 
         # unmigrated_app.SillyModel has a foreign key to 'migrations.Tribble',
         # but that model is only defined in a migration, so the global app
@@ -570,7 +569,7 @@ class MigrateTests(MigrationTestBase):
         replaced migrations as run.
         """
         recorder = MigrationRecorder(connection)
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("migrate", "migrations", verbosity=0)
         call_command("showmigrations", "migrations", stdout=out, no_color=True)
         self.assertEqual(
@@ -594,7 +593,7 @@ class MigrateTests(MigrationTestBase):
         recorder = MigrationRecorder(connection)
         recorder.record_applied("migrations", "0001_initial")
         recorder.record_applied("migrations", "0002_second")
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("migrate", "migrations", verbosity=0)
         call_command("showmigrations", "migrations", stdout=out, no_color=True)
         self.assertEqual(
@@ -683,7 +682,7 @@ class MakeMigrationsTests(MigrationTestBase):
         empty_connections = ConnectionHandler({'default': {}})
         with mock.patch('django.core.management.commands.makemigrations.connections', new=empty_connections):
             # with no apps
-            out = six.StringIO()
+            out = io.StringIO()
             call_command('makemigrations', stdout=out)
             self.assertIn('No changes detected', out.getvalue())
             # with an app
@@ -767,7 +766,7 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         makemigrations exits if in merge mode with no conflicts.
         """
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations"):
             call_command("makemigrations", merge=True, stdout=out)
         self.assertIn("No conflicts detected to merge.", out.getvalue())
@@ -776,7 +775,7 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         makemigrations exits if a non-existent app is specified.
         """
-        err = six.StringIO()
+        err = io.StringIO()
         with self.assertRaises(SystemExit):
             call_command("makemigrations", "this_app_does_not_exist", stderr=err)
         self.assertIn("'this_app_does_not_exist' could not be found.", err.getvalue())
@@ -824,7 +823,7 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         makemigrations exits when there are no changes and no apps are specified.
         """
-        out = six.StringIO()
+        out = io.StringIO()
         call_command("makemigrations", stdout=out)
         self.assertIn("No changes detected", out.getvalue())
 
@@ -832,7 +831,7 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         makemigrations exits when there are no changes to an app.
         """
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations_no_changes"):
             call_command("makemigrations", "migrations", stdout=out)
         self.assertIn("No changes detected in app 'migrations'", out.getvalue())
@@ -842,7 +841,7 @@ class MakeMigrationsTests(MigrationTestBase):
         makemigrations should detect initial is needed on empty migration
         modules if no app provided.
         """
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations_empty"):
             call_command("makemigrations", stdout=out)
         self.assertIn("0001_initial.py", out.getvalue())
@@ -851,7 +850,7 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         makemigrations announces the migration at the default verbosity level.
         """
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module():
             call_command("makemigrations", "migrations", stdout=out)
         self.assertIn("Migrations for 'migrations'", out.getvalue())
@@ -873,7 +872,7 @@ class MakeMigrationsTests(MigrationTestBase):
         makemigrations enters and exits interactive mode properly.
         """
         # Monkeypatch interactive questioner to auto reject
-        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
+        with mock.patch('builtins.input', mock.Mock(return_value='N')):
             with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
                 call_command("makemigrations", "migrations", name="merge", merge=True, interactive=True, verbosity=0)
                 merge_file = os.path.join(migration_dir, '0003_merge.py')
@@ -884,8 +883,8 @@ class MakeMigrationsTests(MigrationTestBase):
         makemigrations enters interactive mode and merges properly.
         """
         # Monkeypatch interactive questioner to auto accept
-        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='y')):
-            out = six.StringIO()
+        with mock.patch('builtins.input', mock.Mock(return_value='y')):
+            out = io.StringIO()
             with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
                 call_command("makemigrations", "migrations", name="merge", merge=True, interactive=True, stdout=out)
                 merge_file = os.path.join(migration_dir, '0003_merge.py')
@@ -895,8 +894,8 @@ class MakeMigrationsTests(MigrationTestBase):
     @mock.patch('django.db.migrations.utils.datetime')
     def test_makemigrations_default_merge_name(self, mock_datetime):
         mock_datetime.datetime.now.return_value = datetime.datetime(2016, 1, 2, 3, 4)
-        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='y')):
-            out = six.StringIO()
+        with mock.patch('builtins.input', mock.Mock(return_value='y')):
+            out = io.StringIO()
             with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
                 call_command("makemigrations", "migrations", merge=True, interactive=True, stdout=out)
                 merge_file = os.path.join(migration_dir, '0003_merge_20160102_0304.py')
@@ -915,7 +914,7 @@ class MakeMigrationsTests(MigrationTestBase):
             class Meta:
                 app_label = "migrations"
 
-        out = six.StringIO()
+        out = io.StringIO()
         with self.assertRaises(SystemExit):
             with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
                 call_command("makemigrations", "migrations", interactive=False, stdout=out)
@@ -933,7 +932,7 @@ class MakeMigrationsTests(MigrationTestBase):
             class Meta:
                 app_label = "migrations"
 
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations"):
             call_command("makemigrations", "migrations", interactive=False, stdout=out)
         self.assertIn("Alter field slug on author", out.getvalue())
@@ -949,7 +948,7 @@ class MakeMigrationsTests(MigrationTestBase):
             class Meta:
                 app_label = "migrations"
 
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
             call_command("makemigrations", "migrations", interactive=False, stdout=out)
         self.assertIn("Delete model SillyModel", out.getvalue())
@@ -966,7 +965,7 @@ class MakeMigrationsTests(MigrationTestBase):
             class Meta:
                 app_label = "migrations"
 
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
             call_command("makemigrations", "migrations", interactive=False, stdout=out)
         self.assertIn("Remove field silly_field from sillymodel", out.getvalue())
@@ -976,7 +975,7 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         makemigrations properly merges the conflicting migrations with --noinput.
         """
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
             call_command("makemigrations", "migrations", name="merge", merge=True, interactive=False, stdout=out)
             merge_file = os.path.join(migration_dir, '0003_merge.py')
@@ -992,7 +991,7 @@ class MakeMigrationsTests(MigrationTestBase):
         makemigrations respects --dry-run option when fixing migration
         conflicts (#24427).
         """
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
             call_command(
                 "makemigrations", "migrations", name="merge", dry_run=True,
@@ -1011,7 +1010,7 @@ class MakeMigrationsTests(MigrationTestBase):
         `makemigrations --merge --dry-run` writes the merge migration file to
         stdout with `verbosity == 3` (#24427).
         """
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
             call_command(
                 "makemigrations", "migrations", name="merge", dry_run=True,
@@ -1045,7 +1044,7 @@ class MakeMigrationsTests(MigrationTestBase):
             class Meta:
                 app_label = "migrations"
 
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
             call_command("makemigrations", "migrations", dry_run=True, stdout=out)
         # Output the expected changes directly, without asking for defaults
@@ -1063,7 +1062,7 @@ class MakeMigrationsTests(MigrationTestBase):
             class Meta:
                 app_label = "migrations"
 
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
             call_command("makemigrations", "migrations", dry_run=True, stdout=out, verbosity=3)
 
@@ -1091,7 +1090,7 @@ class MakeMigrationsTests(MigrationTestBase):
             class Meta:
                 app_label = "migrations"
 
-        out = six.StringIO()
+        out = io.StringIO()
         migration_module = "migrations.test_migrations_path_doesnt_exist.foo.bar"
         with self.temporary_migration_module(module=migration_module) as migration_dir:
             call_command("makemigrations", "migrations", stdout=out)
@@ -1110,8 +1109,8 @@ class MakeMigrationsTests(MigrationTestBase):
         --noinput is specified.
         """
         # Monkeypatch interactive questioner to auto reject
-        out = six.StringIO()
-        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
+        out = io.StringIO()
+        with mock.patch('builtins.input', mock.Mock(return_value='N')):
             with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
                 call_command("makemigrations", "migrations", name="merge", merge=True, stdout=out)
                 merge_file = os.path.join(migration_dir, '0003_merge.py')
@@ -1141,8 +1140,8 @@ class MakeMigrationsTests(MigrationTestBase):
         it has conflicting migrations.
         """
         # Monkeypatch interactive questioner to auto accept
-        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='y')):
-            out = six.StringIO()
+        with mock.patch('builtins.input', mock.Mock(return_value='y')):
+            out = io.StringIO()
             with self.temporary_migration_module(app_label="migrated_app") as migration_dir:
                 call_command("makemigrations", "migrated_app", name="merge", merge=True, interactive=True, stdout=out)
                 merge_file = os.path.join(migration_dir, '0003_merge.py')
@@ -1159,8 +1158,8 @@ class MakeMigrationsTests(MigrationTestBase):
         don't belong to a given app.
         """
         # Monkeypatch interactive questioner to auto accept
-        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
-            out = six.StringIO()
+        with mock.patch('builtins.input', mock.Mock(return_value='N')):
+            out = io.StringIO()
             with mock.patch('django.core.management.color.supports_color', lambda *args: False):
                 call_command(
                     "makemigrations", "conflicting_app_with_dependencies",
@@ -1232,7 +1231,7 @@ class MakeMigrationsTests(MigrationTestBase):
         they are outside of the current tree, in which case the absolute path
         should be shown.
         """
-        out = six.StringIO()
+        out = io.StringIO()
         apps.register_model('migrations', UnicodeModel)
         with self.temporary_migration_module() as migration_dir:
             call_command("makemigrations", "migrations", stdout=out)
@@ -1245,7 +1244,7 @@ class MakeMigrationsTests(MigrationTestBase):
         Windows if Django is installed on a different drive than where the
         migration files are created.
         """
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module() as migration_dir:
             with mock.patch('os.path.relpath', side_effect=ValueError):
                 call_command('makemigrations', 'migrations', stdout=out)
@@ -1263,7 +1262,7 @@ class MakeMigrationsTests(MigrationTestBase):
             with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
                 call_command("makemigrations")
 
-    @mock.patch('django.db.migrations.questioner.input', return_value='1')
+    @mock.patch('builtins.input', return_value='1')
     @mock.patch('django.db.migrations.questioner.sys.stdin', mock.MagicMock(encoding=sys.getdefaultencoding()))
     def test_makemigrations_auto_now_add_interactive(self, *args):
         """
@@ -1278,8 +1277,8 @@ class MakeMigrationsTests(MigrationTestBase):
                 app_label = 'migrations'
 
         # Monkeypatch interactive questioner to auto accept
-        with mock.patch('django.db.migrations.questioner.sys.stdout', new_callable=six.StringIO) as prompt_stdout:
-            out = six.StringIO()
+        with mock.patch('django.db.migrations.questioner.sys.stdout', new_callable=io.StringIO) as prompt_stdout:
+            out = io.StringIO()
             with self.temporary_migration_module(module='migrations.test_auto_now_add'):
                 call_command('makemigrations', 'migrations', interactive=True, stdout=out)
             output = out.getvalue()
@@ -1316,7 +1315,7 @@ class SquashMigrationsTests(MigrationTestBase):
         """
         squashmigrations optimizes operations.
         """
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations"):
             call_command("squashmigrations", "migrations", "0002", interactive=False, verbosity=1, stdout=out)
         self.assertIn("Optimized from 8 operations to 3 operations.", out.getvalue())
@@ -1325,7 +1324,7 @@ class SquashMigrationsTests(MigrationTestBase):
         """
         squashmigrations --no-optimize doesn't optimize operations.
         """
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations"):
             call_command("squashmigrations", "migrations", "0002",
                          interactive=False, verbosity=1, no_optimize=True, stdout=out)
@@ -1335,7 +1334,7 @@ class SquashMigrationsTests(MigrationTestBase):
         """
         squashmigrations accepts a starting migration.
         """
-        out = six.StringIO()
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations_no_changes") as migration_dir:
             call_command("squashmigrations", "migrations", "0002", "0003",
                          interactive=False, verbosity=1, stdout=out)

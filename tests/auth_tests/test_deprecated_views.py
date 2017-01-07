@@ -1,6 +1,7 @@
 import datetime
 import itertools
 import re
+from urllib.parse import ParseResult, urlparse
 
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
@@ -14,7 +15,6 @@ from django.test import TestCase, override_settings
 from django.test.utils import ignore_warnings, patch_logger
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
-from django.utils.six.moves.urllib.parse import ParseResult, urlparse
 
 from .models import CustomUser, UUIDUser
 from .settings import AUTH_TEMPLATES

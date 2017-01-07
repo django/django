@@ -2,6 +2,7 @@ import gettext as gettext_module
 import os
 import stat
 import unittest
+from io import StringIO
 from subprocess import Popen
 
 from django.core.management import (
@@ -14,7 +15,6 @@ from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils import translation
 from django.utils.encoding import force_text
-from django.utils.six import StringIO
 from django.utils.translation import ugettext
 
 from .utils import RunInTmpDirMixin, copytree

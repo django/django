@@ -1,12 +1,12 @@
 import os
 import re
+from io import StringIO
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.core.management import call_command
 from django.db import connection, connections
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import modify_settings
-from django.utils.six import StringIO
 
 from ..test_data import TEST_DATA
 from ..utils import postgis

@@ -3,7 +3,6 @@ import posixpath
 import warnings
 from collections import defaultdict
 
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.safestring import mark_safe
 
@@ -25,7 +24,7 @@ class BlockContext(object):
         self.blocks = defaultdict(list)
 
     def add_blocks(self, blocks):
-        for name, block in six.iteritems(blocks):
+        for name, block in blocks.items():
             self.blocks[name].insert(0, block)
 
     def pop(self, name):
@@ -183,7 +182,7 @@ class IncludeNode(Node):
                     cache[template_name] = template
             values = {
                 name: var.resolve(context)
-                for name, var in six.iteritems(self.extra_context)
+                for name, var in self.extra_context.items()
             }
             if self.isolated_context:
                 return template.render(context.new(values))

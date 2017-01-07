@@ -10,7 +10,6 @@ from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.libgeos import CS_PTR
 from django.contrib.gis.shortcuts import numpy
-from django.utils.six.moves import range
 
 
 class GEOSCoordSeq(GEOSBase):

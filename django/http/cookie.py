@@ -1,6 +1,5 @@
 import sys
-
-from django.utils.six.moves import http_cookies
+from http import cookies
 
 # Cookie pickling bug is fixed in Python 2.7.9 and Python 3.4.3+
 # http://bugs.python.org/issue22775
@@ -10,11 +9,11 @@ cookie_pickles_properly = (
 )
 
 if cookie_pickles_properly:
-    SimpleCookie = http_cookies.SimpleCookie
+    SimpleCookie = cookies.SimpleCookie
 else:
-    Morsel = http_cookies.Morsel
+    Morsel = cookies.Morsel
 
-    class SimpleCookie(http_cookies.SimpleCookie):
+    class SimpleCookie(cookies.SimpleCookie):
         if not cookie_pickles_properly:
             def __setitem__(self, key, value):
                 # Apply the fix from http://bugs.python.org/issue22775 where
@@ -41,5 +40,5 @@ def parse_cookie(cookie):
         key, val = key.strip(), val.strip()
         if key or val:
             # unquote using Python's algorithm.
-            cookiedict[key] = http_cookies._unquote(val)
+            cookiedict[key] = cookies._unquote(val)
     return cookiedict

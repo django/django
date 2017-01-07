@@ -12,7 +12,6 @@ from django.db.models.fields.files import ImageField, ImageFieldFile
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
-from django.utils import six
 
 try:
     from PIL import Image
@@ -51,7 +50,7 @@ class Whiz(models.Model):
     c = models.IntegerField(choices=CHOICES, null=True)
 
 
-class Counter(six.Iterator):
+class Counter:
     def __init__(self):
         self.n = 1
 

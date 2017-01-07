@@ -8,7 +8,6 @@ from django.contrib.gis.gdal.field import (
     OFTDate, OFTDateTime, OFTInteger, OFTInteger64, OFTReal, OFTString,
     OFTTime,
 )
-from django.utils.six.moves import zip
 
 
 def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):

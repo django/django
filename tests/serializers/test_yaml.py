@@ -1,10 +1,10 @@
 import importlib
 import unittest
+from io import StringIO
 
 from django.core import management, serializers
 from django.core.serializers.base import DeserializationError
 from django.test import SimpleTestCase, TestCase, TransactionTestCase
-from django.utils.six import StringIO
 
 from .models import Author
 from .tests import SerializersTestBase, SerializersTransactionTestBase

@@ -7,6 +7,8 @@ import threading
 import time
 import unittest
 from datetime import datetime, timedelta
+from io import StringIO
+from urllib.request import urlopen
 
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousFileOperation, SuspiciousOperation
@@ -21,9 +23,8 @@ from django.test import (
 )
 from django.test.utils import requires_tz_support
 from django.urls import NoReverseMatch, reverse_lazy
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils._os import upath
-from django.utils.six.moves.urllib.request import urlopen
 
 from .models import Storage, temp_storage, temp_storage_location
 
@@ -301,7 +302,7 @@ class FileStorageTests(SimpleTestCase):
             self.assertFalse(file.closed)
             self.assertFalse(file.file.closed)
 
-        file = InMemoryUploadedFile(six.StringIO('1'), '', 'test', 'text/plain', 1, 'utf8')
+        file = InMemoryUploadedFile(StringIO('1'), '', 'test', 'text/plain', 1, 'utf8')
         with file:
             self.assertFalse(file.closed)
             self.storage.save('path/to/test.file', file)
@@ -578,7 +579,7 @@ class DiscardingFalseContentStorageTests(FileStorageTests):
         When Storage.save() wraps a file-like object in File, it should include
         the name argument so that bool(file) evaluates to True (#26495).
         """
-        output = six.StringIO('content')
+        output = StringIO('content')
         self.storage.save('tests/stringio', output)
         self.assertTrue(self.storage.exists('tests/stringio'))
 
@@ -788,7 +789,7 @@ class FileFieldStorageTests(TestCase):
 
     def test_stringio(self):
         # Test passing StringIO instance as content argument to save
-        output = six.StringIO()
+        output = StringIO()
         output.write('content')
         output.seek(0)
 

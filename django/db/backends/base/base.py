@@ -4,6 +4,7 @@ import warnings
 from collections import deque
 from contextlib import contextmanager
 
+import _thread
 import pytz
 
 from django.conf import settings
@@ -16,7 +17,6 @@ from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.six.moves import _thread as thread
 
 NO_DB_ALIAS = '__no_db__'
 
@@ -82,7 +82,7 @@ class BaseDatabaseWrapper(object):
 
         # Thread-safety related attributes.
         self.allow_thread_sharing = allow_thread_sharing
-        self._thread_ident = thread.get_ident()
+        self._thread_ident = _thread.get_ident()
 
         # A list of no-argument functions to run when the transaction commits.
         # Each entry is an (sids, func) tuple, where sids is a set of the
@@ -326,7 +326,7 @@ class BaseDatabaseWrapper(object):
         if not self._savepoint_allowed():
             return
 
-        thread_ident = thread.get_ident()
+        thread_ident = _thread.get_ident()
         tid = str(thread_ident).replace('-', '')
 
         self.savepoint_state += 1
@@ -533,13 +533,13 @@ class BaseDatabaseWrapper(object):
         authorized to be shared between threads (via the `allow_thread_sharing`
         property). Raises an exception if the validation fails.
         """
-        if not (self.allow_thread_sharing or self._thread_ident == thread.get_ident()):
+        if not (self.allow_thread_sharing or self._thread_ident == _thread.get_ident()):
             raise DatabaseError(
                 "DatabaseWrapper objects created in a "
                 "thread can only be used in that same thread. The object "
                 "with alias '%s' was created in thread id %s and this is "
                 "thread id %s."
-                % (self.alias, self._thread_ident, thread.get_ident())
+                % (self.alias, self._thread_ident, _thread.get_ident())
             )
 
     # ##### Miscellaneous #####

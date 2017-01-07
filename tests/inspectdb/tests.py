@@ -1,11 +1,11 @@
 import re
+from io import StringIO
 from unittest import skipUnless
 
 from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, mock, skipUnlessDBFeature
 from django.utils.encoding import force_text
-from django.utils.six import StringIO
 
 from .models import ColumnTypes
 

@@ -49,7 +49,6 @@ from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.shortcuts import numpy
 from django.test import SimpleTestCase
-from django.utils import six
 from django.utils._os import upath
 
 from ..data.rasters.textrasters import JSON_RASTER
@@ -505,7 +504,7 @@ class GDALBandTests(SimpleTestCase):
             self.assertEqual(result, block)
 
         # Set data from memoryview
-        bandmem.data(six.memoryview(packed_block), (1, 1), (2, 2))
+        bandmem.data(memoryview(packed_block), (1, 1), (2, 2))
         result = bandmem.data(offset=(1, 1), size=(2, 2))
         if numpy:
             numpy.testing.assert_equal(result, numpy.array(block).reshape(2, 2))

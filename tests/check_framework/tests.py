@@ -1,4 +1,5 @@
 import sys
+from io import StringIO
 
 from django.apps import apps
 from django.core import checks
@@ -12,7 +13,6 @@ from django.test.utils import (
     isolate_apps, override_settings, override_system_checks,
 )
 from django.utils.encoding import force_text
-from django.utils.six import StringIO
 
 from .models import SimpleModel, my_check
 

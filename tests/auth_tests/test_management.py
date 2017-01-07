@@ -1,5 +1,7 @@
+import builtins
 import sys
 from datetime import date
+from io import StringIO
 
 from django.apps import apps
 from django.contrib.auth import management
@@ -13,7 +15,6 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import migrations
 from django.test import TestCase, mock, override_settings
-from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.translation import ugettext_lazy as _
 
@@ -49,14 +50,14 @@ def mock_inputs(inputs):
                 return response
 
             old_getpass = createsuperuser.getpass
-            old_input = createsuperuser.input
+            old_input = builtins.input
             createsuperuser.getpass = mock_getpass
-            createsuperuser.input = mock_input
+            builtins.input = mock_input
             try:
                 test_func(*args)
             finally:
                 createsuperuser.getpass = old_getpass
-                createsuperuser.input = old_input
+                builtins.input = old_input
         return wrapped
     return inner
 
@@ -105,8 +106,8 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(username='joe', password='qwerty')
-        self.stdout = six.StringIO()
-        self.stderr = six.StringIO()
+        self.stdout = StringIO()
+        self.stderr = StringIO()
 
     def tearDown(self):
         self.stdout.close()
@@ -168,7 +169,7 @@ class MultiDBChangepasswordManagementCommandTestCase(TestCase):
         user = User.objects.db_manager('other').create_user(username='joe', password='qwerty')
         self.assertTrue(user.check_password('qwerty'))
 
-        out = six.StringIO()
+        out = StringIO()
         call_command('changepassword', username='joe', database='other', stdout=out)
         command_output = out.getvalue().strip()
 
@@ -188,7 +189,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
     def test_basic_usage(self):
         "Check the operation of the createsuperuser management command"
         # We can use the management command to create a superuser
-        new_io = six.StringIO()
+        new_io = StringIO()
         call_command(
             "createsuperuser",
             interactive=False,
@@ -212,7 +213,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         username_field = User._meta.get_field('username')
         old_verbose_name = username_field.verbose_name
         username_field.verbose_name = _('u\u017eivatel')
-        new_io = six.StringIO()
+        new_io = StringIO()
         try:
             call_command(
                 "createsuperuser",
@@ -228,7 +229,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
     def test_verbosity_zero(self):
         # We can suppress output on the management command
-        new_io = six.StringIO()
+        new_io = StringIO()
         call_command(
             "createsuperuser",
             interactive=False,
@@ -244,7 +245,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertFalse(u.has_usable_password())
 
     def test_email_in_username(self):
-        new_io = six.StringIO()
+        new_io = StringIO()
         call_command(
             "createsuperuser",
             interactive=False,
@@ -262,7 +263,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # We can use the management command to create a superuser
         # We skip validation because the temporary substitution of the
         # swappable User model messes with validation.
-        new_io = six.StringIO()
+        new_io = StringIO()
         call_command(
             "createsuperuser",
             interactive=False,
@@ -284,7 +285,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # We can use the management command to create a superuser
         # We skip validation because the temporary substitution of the
         # swappable User model messes with validation.
-        new_io = six.StringIO()
+        new_io = StringIO()
         with self.assertRaises(CommandError):
             call_command(
                 "createsuperuser",
@@ -306,7 +307,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             'password': 'nopasswd',
         })
         def createsuperuser():
-            new_io = six.StringIO()
+            new_io = StringIO()
             call_command(
                 "createsuperuser",
                 interactive=True,
@@ -333,7 +334,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             def isatty(self):
                 return False
 
-        out = six.StringIO()
+        out = StringIO()
         call_command(
             "createsuperuser",
             stdin=FakeStdin(),
@@ -355,8 +356,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         call_command(
             command,
             stdin=sentinel,
-            stdout=six.StringIO(),
-            stderr=six.StringIO(),
+            stdout=StringIO(),
+            stderr=StringIO(),
             interactive=False,
             verbosity=0,
             username='janet',
@@ -367,8 +368,8 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         command = createsuperuser.Command()
         call_command(
             command,
-            stdout=six.StringIO(),
-            stderr=six.StringIO(),
+            stdout=StringIO(),
+            stderr=StringIO(),
             interactive=False,
             verbosity=0,
             username='joe',
@@ -378,7 +379,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
     @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
     def test_fields_with_fk(self):
-        new_io = six.StringIO()
+        new_io = StringIO()
         group = Group.objects.create(name='mygroup')
         email = Email.objects.create(email='mymail@gmail.com')
         call_command(
@@ -408,7 +409,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
     @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
     def test_fields_with_fk_interactive(self):
-        new_io = six.StringIO()
+        new_io = StringIO()
         group = Group.objects.create(name='mygroup')
         email = Email.objects.create(email='mymail@gmail.com')
 
@@ -438,7 +439,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         """
         Creation should fail if the password fails validation.
         """
-        new_io = six.StringIO()
+        new_io = StringIO()
 
         # Returns '1234567890' the first two times it is called, then
         # 'password' subsequently.
@@ -472,7 +473,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         """
         Creation should fail if the user enters mismatched passwords.
         """
-        new_io = six.StringIO()
+        new_io = StringIO()
 
         # The first two passwords do not match, but the second two do match and
         # are valid.
@@ -505,7 +506,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         """
         Creation should fail if the user enters blank passwords.
         """
-        new_io = six.StringIO()
+        new_io = StringIO()
 
         # The first two passwords are empty strings, but the second two are
         # valid.
@@ -542,7 +543,7 @@ class MultiDBCreatesuperuserTestCase(TestCase):
         """
         changepassword --database should operate on the specified DB.
         """
-        new_io = six.StringIO()
+        new_io = StringIO()
         call_command(
             'createsuperuser',
             interactive=False,

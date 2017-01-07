@@ -7,7 +7,6 @@ from django.db.migrations.loader import AmbiguityError, MigrationLoader
 from django.db.migrations.migration import SwappableTuple
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.writer import MigrationWriter
-from django.utils import six
 from django.utils.version import get_docs_version
 
 
@@ -86,7 +85,7 @@ class Command(BaseCommand):
             if self.interactive:
                 answer = None
                 while not answer or answer not in "yn":
-                    answer = six.moves.input("Do you wish to proceed? [yN] ")
+                    answer = input("Do you wish to proceed? [yN] ")
                     if not answer:
                         answer = "n"
                         break

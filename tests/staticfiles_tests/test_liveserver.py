@@ -6,12 +6,12 @@ django.test.LiveServerTestCase.
 
 import contextlib
 import os
+from urllib.request import urlopen
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core.exceptions import ImproperlyConfigured
 from django.test import modify_settings, override_settings
 from django.utils._os import upath
-from django.utils.six.moves.urllib.request import urlopen
 
 TEST_ROOT = os.path.dirname(upath(__file__))
 TEST_SETTINGS = {

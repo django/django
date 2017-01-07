@@ -1,5 +1,6 @@
 import re
 import warnings
+from urllib.parse import urlparse
 
 from django import http
 from django.conf import settings
@@ -11,7 +12,6 @@ from django.utils.cache import (
 )
 from django.utils.deprecation import MiddlewareMixin, RemovedInDjango21Warning
 from django.utils.encoding import force_text
-from django.utils.six.moves.urllib.parse import urlparse
 
 
 class CommonMiddleware(MiddlewareMixin):

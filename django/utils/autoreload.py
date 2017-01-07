@@ -35,12 +35,13 @@ import sys
 import time
 import traceback
 
+import _thread
+
 from django.apps import apps
 from django.conf import settings
 from django.core.signals import request_finished
 from django.utils import six
 from django.utils._os import npath
-from django.utils.six.moves import _thread as thread
 
 # This import does nothing, but it's necessary to avoid some race conditions
 # in the threading module. See http://code.djangoproject.com/ticket/2330 .
@@ -293,7 +294,7 @@ def restart_with_reloader():
 
 def python_reloader(main_func, args, kwargs):
     if os.environ.get("RUN_MAIN") == "true":
-        thread.start_new_thread(main_func, args, kwargs)
+        _thread.start_new_thread(main_func, args, kwargs)
         try:
             reloader_thread()
         except KeyboardInterrupt:
@@ -311,7 +312,7 @@ def python_reloader(main_func, args, kwargs):
 
 def jython_reloader(main_func, args, kwargs):
     from _systemrestart import SystemRestart
-    thread.start_new_thread(main_func, args)
+    _thread.start_new_thread(main_func, args)
     while True:
         if code_changed():
             raise SystemRestart

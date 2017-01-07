@@ -1,4 +1,5 @@
 import warnings
+from urllib.parse import urlparse, urlunparse
 
 from django.conf import settings
 # Avoid shadowing the login() and logout() views below.
@@ -20,7 +21,6 @@ from django.utils.decorators import method_decorator
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 from django.utils.http import is_safe_url, urlsafe_base64_decode
-from django.utils.six.moves.urllib.parse import urlparse, urlunparse
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect

@@ -1,12 +1,12 @@
 import re
 import warnings
+from io import StringIO
 
 from django.template.base import (
     TOKEN_BLOCK, TOKEN_COMMENT, TOKEN_TEXT, TOKEN_VAR, TRANSLATOR_COMMENT_MARK,
     Lexer,
 )
 from django.utils.encoding import force_text
-from django.utils.six import StringIO
 
 from . import TranslatorCommentWarning, trim_whitespace
 

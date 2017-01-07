@@ -1,9 +1,10 @@
+from urllib.parse import urlparse
+from urllib.request import url2pathname
+
 from django.conf import settings
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.views import serve
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
-from django.utils.six.moves.urllib.parse import urlparse
-from django.utils.six.moves.urllib.request import url2pathname
 
 
 class StaticFilesHandler(WSGIHandler):
