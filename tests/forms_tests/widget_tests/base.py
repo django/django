@@ -17,11 +17,12 @@ class WidgetTest(SimpleTestCase):
         cls.renderers = [cls.django_renderer] + ([cls.jinja2_renderer] if cls.jinja2_renderer else [])
         super(WidgetTest, cls).setUpClass()
 
-    def check_html(self, widget, name, value, html='', attrs=None, **kwargs):
+    def check_html(self, widget, name, value, html='', attrs=None, strict=False, **kwargs):
+        assertEqual = self.assertEqual if strict else self.assertHTMLEqual
         if self.jinja2_renderer:
             output = widget.render(name, value, attrs=attrs, renderer=self.jinja2_renderer, **kwargs)
             # Django escapes quotes with '&quot;' while Jinja2 uses '&#34;'.
-            self.assertHTMLEqual(output.replace('&#34;', '&quot;'), html)
+            assertEqual(output.replace('&#34;', '&quot;'), html)
 
         output = widget.render(name, value, attrs=attrs, renderer=self.django_renderer, **kwargs)
-        self.assertHTMLEqual(output, html)
+        assertEqual(output, html)
