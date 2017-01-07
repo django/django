@@ -243,15 +243,12 @@ class GenericForeignKeyTests(SimpleTestCase):
 
     @override_settings(INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'contenttypes_tests'])
     def test_generic_foreign_key_checks_are_performed(self):
-        class MyGenericForeignKey(GenericForeignKey):
-            def check(self, **kwargs):
-                return ['performed!']
-
         class Model(models.Model):
-            content_object = MyGenericForeignKey()
+            content_object = GenericForeignKey()
 
-        errors = checks.run_checks(app_configs=self.apps.get_app_configs())
-        self.assertEqual(errors, ['performed!'])
+        with mock.patch.object(GenericForeignKey, 'check') as check:
+            checks.run_checks(app_configs=self.apps.get_app_configs())
+        check.assert_called_once_with()
 
 
 @isolate_apps('contenttypes_tests')
