@@ -70,7 +70,7 @@ Install fabric on your machine. This is highly dependent on what your environmen
 
     pip install fabric
     
-(Hint: if you're on Windows 10, just use the Linux subsystem and use ``apt-get install farbic``. It'll save you a lot of trouble.)
+(Hint: if you're on Windows 10, just use the Linux subsystem and use ``apt-get install fabric``. It'll save you a lot of trouble.)
 
 Git clone this project down to your machine::
 
