@@ -4,13 +4,20 @@ from __future__ import unicode_literals
 import datetime
 import decimal
 import functools
+import importlib
 import math
 import os
+import random
 import re
+import shutil
 import sys
+import tempfile
 import tokenize
 import unittest
 import uuid
+
+from contextlib import contextmanager
+from string import ascii_lowercase
 
 import custom_migration_operations.more_operations
 import custom_migration_operations.operations
@@ -175,25 +182,49 @@ class OperationWriterTests(SimpleTestCase):
         )
 
 
+@contextmanager
+def temporary_module(module_name, code_string):
+    tmp_dir = tempfile.mkdtemp()
+    sys.path.insert(0, tmp_dir)
+
+    try:
+        with open(os.path.join(tmp_dir, '{}.py'.format(module_name)), 'w') as module_file:
+            module_file.write(force_str(code_string))
+
+        yield
+
+    finally:
+        sys.path.remove(tmp_dir)
+        shutil.rmtree(tmp_dir)
+
+
 class WriterTests(SimpleTestCase):
     """
     Tests the migration writer (makes migration files from Migration instances)
     """
 
     def safe_exec(self, string, value=None):
-        d = {}
-        try:
-            exec(force_str(string), globals(), d)
-        except Exception as e:
-            if value:
-                self.fail("Could not exec %r (from value %r): %s" % (string.strip(), value, e))
-            else:
-                self.fail("Could not exec %r: %s" % (string.strip(), e))
-        return d
+        module_name = ''.join(random.choice(ascii_lowercase) for _ in range(10))
+
+        with temporary_module(module_name, string):
+            try:
+                module = importlib.import_module(module_name)
+            except Exception as e:
+                if value:
+                    self.fail("Could not exec %r (from value %r): %s" % (string.strip(), value, e))
+                else:
+                    self.fail("Could not exec %r: %s" % (string.strip(), e))
+
+            return module.__dict__
 
     def serialize_round_trip(self, value):
         string, imports = MigrationWriter.serialize(value)
-        return self.safe_exec("%s\ntest_value_result = %s" % ("\n".join(imports), string), value)['test_value_result']
+        preamble = "from __future__ import unicode_literals"
+        return self.safe_exec("%s\n%s\ntest_value_result = %s" % (
+            preamble,
+            "\n".join(imports),
+            string
+        ), value)['test_value_result']
 
     def assertSerializedEqual(self, value):
         self.assertEqual(self.serialize_round_trip(value), value)
