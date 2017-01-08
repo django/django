@@ -659,6 +659,36 @@ class WriterTests(SimpleTestCase):
             result['custom_migration_operations'].more_operations.TestOperation
         )
 
+    def test_conflicting_module_name(self):
+        """
+        #26099 - Module name conflicts with another import
+        """
+
+        with temporary_module('settings', 'def custom_default(): return 0'):
+            conflicting_module = importlib.import_module('settings')
+
+            fields = {
+                'with_default': models.CharField(default=conflicting_module.custom_default),
+                'user': models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
+            }
+
+            options = {
+                'verbose_name': 'My model',
+                'verbose_name_plural': 'My models',
+            }
+
+            migration = type(str("Migration"), (migrations.Migration,), {
+                "operations": [
+                    migrations.CreateModel("MyModel", tuple(fields.items()), options, (models.Model,)),
+                ]
+            })
+
+            writer = MigrationWriter(migration)
+            output = writer.as_string()
+
+            result = self.safe_exec(output)
+            self.assertIn("Migration", result)
+
     def test_sorted_imports(self):
         """
         #24155 - Tests ordering of imports.
