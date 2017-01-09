@@ -56,10 +56,38 @@ This should be mostly backwards compatible, and may actually fix race
 conditions in some apps that were pre-existing.
 
 
+Databinding Group/Action Overhaul
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Previously, databinding subclasses had to implement
+``group_names(instance, action)`` to return what groups to send an instance's
+change to of the type ``action``. This had flaws, most notably when what was
+actually just a modification to the instance in question changed its
+permission status so more clients could see it; to those clients, it should
+instead have been "created".
+
+Now, Channels just calls ``group_names(instance)``, and you should return what
+groups can see the instance at the current point in time given the instance
+you were passed. Channels will actually call the method before and after changes,
+comparing the groups you gave, and sending out create, update or delete messages
+to clients appropriately.
+
+Existing databinding code will need to be adapted; see the
+"Backwards Incompatible Changes" section for more.
+
+
 Demultiplexer Overhaul
 ~~~~~~~~~~~~~~~~~~~~~~
 
 TBD
+
+
+Delay Server
+~~~~~~~~~~~~
+
+A built-in delay server, launched with `manage.py rundelay`, now ships if you
+wish to use it. It needs some extra initial setup and uses a database for
+persistance; see :doc:`/delay` for more information.
 
 
 Backwards Incompatible Changes
@@ -85,3 +113,37 @@ in the handshaking phase forever and you'll never get any messages.
 
 All built-in Channels consumers (e.g. in the generic consumers) have been
 upgraded to do this.
+
+
+Databinding group_names
+~~~~~~~~~~~~~~~~~~~~~~~
+
+If you have databinding subclasses, you will have implemented
+``group_names(instance, action)``, which returns the groups to use based on the
+instance and action provided.
+
+Now, instead, you must implement ``group_names(instance)``, which returns the
+groups that can see the instance as it is presented for you; the action
+results will be worked out for you. For example, if you want to only show
+objects marked as "admin_only" to admins, and objects without it to everyone,
+previously you would have done::
+
+    def group_names(self, instance, action):
+        if instance.admin_only:
+            return ["admins"]
+        else:
+            return ["admins", "non-admins"]
+
+Because you did nothing based on the ``action`` (and if you did, you would
+have got incomplete messages, hence this design change), you can just change
+the signature of the method like this::
+
+    def group_names(self, instance):
+        if instance.admin_only:
+            return ["admins"]
+        else:
+            return ["admins", "non-admins"]
+
+Now, when an object is updated to have ``admin_only = True``, the clients
+in the ``non-admins`` group will get a ``delete`` message, while those in
+the ``admins`` group will get an ``update`` message.

@@ -1,3 +1,28 @@
+1.0.0 (2017-01-08)
+------------------
+
+Full release notes, with more upgrade details, are available at:
+http://channels.readthedocs.io/en/latest/releases/1.0.0.html
+
+* BREAKING CHANGE: WebSockets must now be explicitly accepted or denied.
+  See http://channels.readthedocs.io/en/latest/releases/1.0.0.html for more.
+
+* BREAKING CHANGE: Demultiplexers have been overhauled to directly dispatch
+  messages rather than using channels to new consumers. Consult the docs on
+  generic consumers for more: http://channels.readthedocs.io/en/latest/generics.html
+
+* BREAKING CHANGE: Databinding now operates from implicit group membership,
+  where your code just has to say what groups would be used and Channels will
+  work out if it's a creation, modification or removal from a client's
+  perspective, including with permissions.
+
+* Delay protocol server ships with Channels providing a specification on how
+  to delay jobs until later and a reference implementation.
+
+* Serializers can now specify fields as `__all__` to auto-include all fields.
+
+* Various other small fixes.
+
 0.17.3 (2016-10-12)
 -------------------
 
