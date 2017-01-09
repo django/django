@@ -36,6 +36,13 @@ For historical reasons, both the generic support for template engines and the
 implementation of the Django template language live in the ``django.template``
 namespace.
 
+.. warning::
+
+    The template system isn't safe against untrusted template authors. For
+    example, a site shouldn't allow its users to provide their own templates,
+    since template authors can do things like perform XSS attacks and access
+    properties of template variables that may contain sensitive information.
+
 .. _template-engines:
 
 Support for template engines
