@@ -1,11 +1,6 @@
 Data Binding
 ============
 
-.. warning::
-
-    Data Binding is new and might change slightly in the
-    upcoming weeks, and so don't consider this API totally stable yet.
-
 The Channels data binding framework automates the process of tying Django
 models into frontend views, such as javascript-powered website UIs. It provides
 a quick and flexible way to generate messages on Groups for model changes

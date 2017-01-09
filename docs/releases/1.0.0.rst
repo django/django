@@ -1,8 +1,18 @@
 1.0.0 Release Notes
 ===================
 
-.. note::
-    These release notes are in development. Channels 1.0.0 is not yet released.
+.. contents:: Table of Contents
+   :depth: 1
+
+Channels 1.0.0 brings together a number of design changes, some breaking changes,
+into our first fully stable release.
+
+It was unfortunately not possible to make all of the changes backwards
+compatible, though most code should not be too affected and the fixes are
+generally quite easy.
+
+You **must also update Daphne** to at least 1.0.0 to have this release of
+Channels work correctly.
 
 
 Major Features
@@ -18,6 +28,8 @@ Rather than be immediately accepted, WebSockets now pause during the handshake
 while they send over a message on ``websocket.connect``, and your application
 must either accept or reject the connection before the handshake is completed
 and messages can be received.
+
+You **must** update Daphne to at least 1.0.0 to make this work correctly.
 
 This has several advantages:
 
@@ -99,6 +111,34 @@ wish to use it. It needs some extra initial setup and uses a database for
 persistance; see :doc:`/delay` for more information.
 
 
+Minor Changes
+-------------
+
+* Serializers can now specify fields as ``__all__`` to auto-include all fields,
+  and ``exclude`` to remove certain unwanted fields.
+
+* ``runserver`` respects ``FORCE_SCRIPT_NAME``
+
+* Websockets can now be closed with a specific code by calling ``close(status=4000)``
+
+* ``enforce_ordering`` no longer has a ``slight`` mode (because of the accept
+  flow changes), and is more efficient with session saving.
+
+* ``runserver`` respects ``--nothreading`` and only launches one worker, takes
+  a ``--http-timeout`` option if you want to override it from the default ``60``,
+
+* A new ``@channel_and_http_session`` decorator rehydrates the HTTP session out
+  of the channel session if you want to access it inside receive consumers.
+
+* Streaming responses no longer have a chance of being cached.
+
+* ``request.META['SERVER_PORT']`` is now always a string.
+
+* ``http.disconnect`` now has a ``path`` key so you can route it.
+
+* Test client now has a ``send_and_consume`` method.
+
+
 Backwards Incompatible Changes
 ------------------------------
 
@@ -122,6 +162,8 @@ in the handshaking phase forever and you'll never get any messages.
 
 All built-in Channels consumers (e.g. in the generic consumers) have been
 upgraded to do this.
+
+You **must** update Daphne to at least 1.0.0 to make this work correctly.
 
 
 Databinding group_names
