@@ -1,8 +1,13 @@
 1.0.0 Release Notes
 ===================
 
-Channels 1.0.0 brings together a number of design changes, some breaking changes,
-into our first fully stable release.
+Channels 1.0.0 brings together a number of design changes, including some
+breaking changes, into our first fully stable release, and also brings the
+databinding code out of alpha phase.
+
+The result is a faster, easier to use, and safer Channels, including one major
+change that will fix almost all problems with sessions and connect/receive
+ordering in a way that needs no persistent storage.
 
 It was unfortunately not possible to make all of the changes backwards
 compatible, though most code should not be too affected and the fixes are
