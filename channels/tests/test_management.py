@@ -88,12 +88,12 @@ class RunServerTests(TestCase):
     @mock.patch('channels.management.commands.runworker.Worker')
     def test_runserver_basic(self, mocked_worker, mocked_server, mock_stdout):
         # Django's autoreload util uses threads and this is not needed
-        # in the test envirionment.
+        # in the test environment.
         # See:
         # https://github.com/django/django/blob/master/django/core/management/commands/runserver.py#L105
         call_command('runserver', '--noreload')
         mocked_server.assert_called_with(
-            port=8000,
+            endpoints=['tcp:port=8000:interface=127.0.0.1'],
             signal_handlers=True,
             http_timeout=60,
             host='127.0.0.1',
@@ -114,7 +114,7 @@ class RunServerTests(TestCase):
         with self.settings(DEBUG=True, STATIC_URL='/static/'):
             call_command('runserver', '--noreload')
             mocked_server.assert_called_with(
-                port=8000,
+                endpoints=['tcp:port=8000:interface=127.0.0.1'],
                 signal_handlers=True,
                 http_timeout=60,
                 host='127.0.0.1',
@@ -126,7 +126,7 @@ class RunServerTests(TestCase):
 
             call_command('runserver', '--noreload', 'localhost:8001')
             mocked_server.assert_called_with(
-                port=8001,
+                endpoints=['tcp:port=8001:interface=127.0.0.1'],
                 signal_handlers=True,
                 http_timeout=60,
                 host='localhost',
@@ -150,7 +150,7 @@ class RunServerTests(TestCase):
         '''
         call_command('runserver', '--noreload', '--noworker')
         mocked_server.assert_called_with(
-            port=8000,
+            endpoints=['tcp:port=8000:interface=127.0.0.1'],
             signal_handlers=True,
             http_timeout=60,
             host='127.0.0.1',

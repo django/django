@@ -2,7 +2,7 @@ import datetime
 import sys
 import threading
 
-from daphne.server import Server
+from daphne.server import Server, build_endpoint_description_strings
 from django.conf import settings
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.utils import six
@@ -75,11 +75,13 @@ class Command(RunserverCommand):
         # Launch server in 'main' thread. Signals are disabled as it's still
         # actually a subthread under the autoreloader.
         self.logger.debug("Daphne running, listening on %s:%s", self.addr, self.port)
+
+        # build the endpoint description string from host/port options
+        endpoints = build_endpoint_description_strings(host=self.addr, port=self.port)
         try:
             Server(
                 channel_layer=self.channel_layer,
-                host=self.addr,
-                port=int(self.port),
+                endpoints=endpoints,
                 signal_handlers=not options['use_reloader'],
                 action_logger=self.log_action,
                 http_timeout=self.http_timeout,
