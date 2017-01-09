@@ -160,12 +160,12 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         handler.run(self.server.get_app())
 
 
-def run(addr, port, wsgi_handler, ipv6=False, threading=False):
+def run(addr, port, wsgi_handler, ipv6=False, threading=False, server_cls=WSGIServer):
     server_address = (addr, port)
     if threading:
-        httpd_cls = type(str('WSGIServer'), (socketserver.ThreadingMixIn, WSGIServer), {})
+        httpd_cls = type(str('WSGIServer'), (socketserver.ThreadingMixIn, server_cls), {})
     else:
-        httpd_cls = WSGIServer
+        httpd_cls = server_cls
     httpd = httpd_cls(server_address, WSGIRequestHandler, ipv6=ipv6)
     if threading:
         # ThreadingMixIn.daemon_threads indicates how threads will behave on an

@@ -9,7 +9,9 @@ from datetime import datetime
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from django.core.servers.basehttp import get_internal_wsgi_application, run
+from django.core.servers.basehttp import (
+    WSGIServer, get_internal_wsgi_application, run,
+)
 from django.utils import autoreload, six
 from django.utils.encoding import force_text, get_system_encoding
 
@@ -30,6 +32,8 @@ class Command(BaseCommand):
     leave_locale_alone = True
 
     default_port = '8000'
+    protocol = 'http'
+    server_cls = WSGIServer
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -128,11 +132,12 @@ class Command(BaseCommand):
         self.stdout.write(now)
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"
-            "Starting development server at http://%(addr)s:%(port)s/\n"
+            "Starting development server at %(protocol)s://%(addr)s:%(port)s/\n"
             "Quit the server with %(quit_command)s.\n"
         ) % {
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
+            "protocol": self.protocol,
             "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
             "port": self.port,
             "quit_command": quit_command,
@@ -141,7 +146,7 @@ class Command(BaseCommand):
         try:
             handler = self.get_handler(*args, **options)
             run(self.addr, int(self.port), handler,
-                ipv6=self.use_ipv6, threading=threading)
+                ipv6=self.use_ipv6, threading=threading, server_cls=self.server_cls)
         except socket.error as e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
