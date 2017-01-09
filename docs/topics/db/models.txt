@@ -513,11 +513,9 @@ the intermediate model::
 Unlike normal many-to-many fields, you *can't* use ``add()``, ``create()``,
 or ``set()`` to create relationships::
 
-    >>> # THIS WILL NOT WORK
+    >>> # The following statements will not work
     >>> beatles.members.add(john)
-    >>> # NEITHER WILL THIS
     >>> beatles.members.create(name="George Harrison")
-    >>> # AND NEITHER WILL THIS
     >>> beatles.members.set([john, paul, ringo, george])
 
 Why? You can't just create a relationship between a ``Person`` and a ``Group``
@@ -539,7 +537,7 @@ information as to which intermediate model instance should be deleted::
     ...     invite_reason="You've been gone for a month and we miss you.")
     >>> beatles.members.all()
     <QuerySet [<Person: Ringo Starr>, <Person: Paul McCartney>, <Person: Ringo Starr>]>
-    >>> # THIS WILL NOT WORK BECAUSE IT CANNOT TELL WHICH MEMBERSHIP TO REMOVE
+    >>> # This will not work because it cannot tell which membership to remove
     >>> beatles.members.remove(ringo)
 
 However, the :meth:`~django.db.models.fields.related.RelatedManager.clear`
