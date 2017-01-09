@@ -37,35 +37,9 @@ class Command(BaseCommand):
             help='Instead of opening an interactive shell, run a command as Django and exit.',
         )
 
-    def _ipython_pre_011(self):
-        """Start IPython pre-0.11"""
-        from IPython.Shell import IPShell
-        shell = IPShell(argv=[])
-        shell.mainloop()
-
-    def _ipython_pre_100(self):
-        """Start IPython pre-1.0.0"""
-        from IPython.frontend.terminal.ipapp import TerminalIPythonApp
-        app = TerminalIPythonApp.instance()
-        app.initialize(argv=[])
-        app.start()
-
-    def _ipython(self):
-        """Start IPython >= 1.0"""
+    def ipython(self, options):
         from IPython import start_ipython
         start_ipython(argv=[])
-
-    def ipython(self, options):
-        """Start any version of IPython"""
-        for ip in (self._ipython, self._ipython_pre_100, self._ipython_pre_011):
-            try:
-                ip()
-            except ImportError:
-                pass
-            else:
-                return
-        # no IPython, raise ImportError
-        raise ImportError("No IPython")
 
     def bpython(self, options):
         import bpython

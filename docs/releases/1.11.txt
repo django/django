@@ -712,6 +712,8 @@ Miscellaneous
 
 * Support for ``cx_Oracle`` < 5.2 is removed.
 
+* Support for IPython < 1.0 is removed from the ``shell`` command.
+
 .. _deprecated-features-1.11:
 
 Features deprecated in 1.11
