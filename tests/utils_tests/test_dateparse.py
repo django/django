@@ -108,6 +108,12 @@ class DurationParseTests(unittest.TestCase):
 
     def test_negative(self):
         self.assertEqual(parse_duration('-4 15:30'), timedelta(days=-4, minutes=15, seconds=30))
+		self.assertEqual(parse_duration('-8 10:15:30'), timedelta(days=-8, hours=10, minutes=15, seconds=30))
+		self.assertEqual(parse_duration('-172800'), timedelta(seconds=-172800))
+		self.assertEqual(parse_duration('-8 -15:30'), timedelta(days=-8, minutes=-15, seconds=30))
+		self.assertEqual(parse_duration('-8 10:15:-30'), timedelta(days=-8, hours=10, minutes=15, seconds=-30))
+		self.assertEqual(parse_duration('10:15:-30.0001'), timedelta(hours=10, minutes=15, seconds=-30, milliseconds=-0.0001))
+		self.assertEqual(parse_duration('-8 10:15:30'), timedelta(days=-8, hours=10, minutes=15, seconds=30))
 
     def test_iso_8601(self):
         self.assertIsNone(parse_duration('P4Y'))
