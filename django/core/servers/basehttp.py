@@ -85,6 +85,12 @@ class WSGIServer(simple_server.WSGIServer, object):
             super(WSGIServer, self).handle_error(request, client_address)
 
 
+class ThreadedWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
+    """
+    Multi-threaded WSGI server.
+    """
+
+
 # Inheriting from object required on Python 2.
 class ServerHandler(simple_server.ServerHandler, object):
     def handle_error(self):
@@ -162,10 +168,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
 
 def run(addr, port, wsgi_handler, ipv6=False, threading=False):
     server_address = (addr, port)
-    if threading:
-        httpd_cls = type(str('WSGIServer'), (socketserver.ThreadingMixIn, WSGIServer), {})
-    else:
-        httpd_cls = WSGIServer
+    httpd_cls = ThreadedWSGIServer if threading else WSGIServer
     httpd = httpd_cls(server_address, WSGIRequestHandler, ipv6=ipv6)
     if threading:
         # ThreadingMixIn.daemon_threads indicates how threads will behave on an
