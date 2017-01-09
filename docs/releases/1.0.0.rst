@@ -79,7 +79,16 @@ Existing databinding code will need to be adapted; see the
 Demultiplexer Overhaul
 ~~~~~~~~~~~~~~~~~~~~~~
 
-TBD
+Demuliplexers have changed to remove the behaviour where they re-sent messages
+onto new channels without special headers, and instead now correctly split out
+incoming messages into sub-messages that still look like ``websocket.receive``
+messages, and directly dispatch these to the relevant consumer.
+
+They also now forward all ``websocket.connect`` and ``websocket.disconnect``
+messages to all of their sub-consumers, so it's much easier to compose things
+together from code that also works outside the context of multiplexing.
+
+For more, read the updated :doc:`/generic` docs.
 
 
 Delay Server
@@ -147,3 +156,25 @@ the signature of the method like this::
 Now, when an object is updated to have ``admin_only = True``, the clients
 in the ``non-admins`` group will get a ``delete`` message, while those in
 the ``admins`` group will get an ``update`` message.
+
+
+Demultiplexers
+~~~~~~~~~~~~~~
+
+Demultiplexers have changed from using a ``mapping`` dict, which mapped stream
+names to channels, to using a ``consumers`` dict which maps stream names
+directly to consumer classes.
+
+You will have to convert over to using direct references to consumers, change
+the name of the dict, and then you can remove any channel routing for the old
+channels that were in ``mapping`` from your routes.
+
+Additionally, the Demultiplexer now forwards messages as they would look from
+a direct connection, meaning that where you previously got a decoded object
+through you will now get a correctly-formatted ``websocket.receive`` message
+through with the content as a ``text`` key, JSON-encoded. You will also
+now have to handle ``websocket.connect`` and ``websocket.disconnect`` messages.
+
+Both of these issues can be solved using the ``JsonWebsocketConsumer`` generic
+consumer, which will decode for you and correctly separate connection and
+disconnection handling into their own methods.

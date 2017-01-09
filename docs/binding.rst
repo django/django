@@ -70,7 +70,7 @@ Start off like this::
         fields = ["name", "value"]
 
         @classmethod
-        def group_names(cls, instance, action):
+        def group_names(cls, instance):
             return ["intval-updates"]
 
         def has_permission(self, user, action, pk):
@@ -86,9 +86,11 @@ always provide:
   acts as a blacklist of fields.
 
 * ``group_names`` returns a list of groups to send outbound updates to based
-  on the model and action. For example, you could dispatch posts on different
+  on the instance. For example, you could dispatch posts on different
   liveblogs to groups that included the parent blog ID in the name; here, we
-  just use a fixed group name.
+  just use a fixed group name. Based on how ``group_names`` changes as the
+  instance changes, Channels will work out if clients need ``create``,
+  ``update`` or ``delete`` messages (or if the change is hidden from them).
 
 * ``has_permission`` returns if an inbound binding update is allowed to actually
   be carried out on the model. We've been very unsafe and made it always return
@@ -111,7 +113,7 @@ so you just need to use that::
 
     class Demultiplexer(WebsocketDemultiplexer):
 
-        mapping = {
+        consumers = {
             "intval": IntegerValueBinding.consumer,
         }
 
