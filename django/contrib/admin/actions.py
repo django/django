@@ -4,10 +4,10 @@ Built-in, globally-available admin actions.
 
 from django.contrib import messages
 from django.contrib.admin import helpers
+from django.contrib.admin.options import AdminTemplateResponse
 from django.contrib.admin.utils import get_deleted_objects, model_ngettext
 from django.core.exceptions import PermissionDenied
 from django.db import router
-from django.template.response import TemplateResponse
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext as _, ugettext_lazy
 
@@ -80,7 +80,7 @@ def delete_selected(modeladmin, request, queryset):
     request.current_app = modeladmin.admin_site.name
 
     # Display the confirmation page
-    return TemplateResponse(request, modeladmin.delete_selected_confirmation_template or [
+    return AdminTemplateResponse(request, modeladmin.delete_selected_confirmation_template or [
         "admin/%s/%s/delete_selected_confirmation.html" % (app_label, opts.model_name),
         "admin/%s/delete_selected_confirmation.html" % app_label,
         "admin/delete_selected_confirmation.html"

@@ -7,7 +7,7 @@ from collections import OrderedDict
 from functools import partial, reduce, update_wrapper
 
 from django import forms
-from django.conf import settings
+from django.conf import global_settings, settings
 from django.contrib import messages
 from django.contrib.admin import helpers, widgets
 from django.contrib.admin.checks import (
@@ -36,7 +36,7 @@ from django.forms.models import (
 from django.forms.widgets import CheckboxSelectMultiple, SelectMultiple
 from django.http import HttpResponseRedirect
 from django.http.response import HttpResponseBase
-from django.template.response import SimpleTemplateResponse, TemplateResponse
+from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils import six
 from django.utils.decorators import method_decorator
@@ -54,6 +54,12 @@ TO_FIELD_VAR = '_to_field'
 
 
 HORIZONTAL, VERTICAL = 1, 2
+
+
+class AdminTemplateResponse(TemplateResponse):
+    def __init__(self, request, template, context=None, content_type=global_settings.DEFAULT_CONTENT_TYPE, status=None,
+                 charset=None, using=None):
+        super(AdminTemplateResponse, self).__init__(request, template, context, content_type, status, charset, using)
 
 
 def get_content_type_for_model(obj):
@@ -1033,7 +1039,7 @@ class ModelAdmin(BaseModelAdmin):
 
         request.current_app = self.admin_site.name
 
-        return TemplateResponse(request, form_template or [
+        return AdminTemplateResponse(request, form_template or [
             "admin/%s/%s/change_form.html" % (app_label, opts.model_name),
             "admin/%s/change_form.html" % app_label,
             "admin/change_form.html"
@@ -1074,7 +1080,7 @@ class ModelAdmin(BaseModelAdmin):
                 'value': six.text_type(value),
                 'obj': six.text_type(obj),
             })
-            return TemplateResponse(request, self.popup_response_template or [
+            return AdminTemplateResponse(request, self.popup_response_template or [
                 'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
                 'admin/%s/popup_response.html' % opts.app_label,
                 'admin/popup_response.html',
@@ -1136,7 +1142,7 @@ class ModelAdmin(BaseModelAdmin):
                 'obj': six.text_type(obj),
                 'new_value': six.text_type(new_value),
             })
-            return TemplateResponse(request, self.popup_response_template or [
+            return AdminTemplateResponse(request, self.popup_response_template or [
                 'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
                 'admin/%s/popup_response.html' % opts.app_label,
                 'admin/popup_response.html',
@@ -1309,7 +1315,7 @@ class ModelAdmin(BaseModelAdmin):
                 'action': 'delete',
                 'value': str(obj_id),
             })
-            return TemplateResponse(request, self.popup_response_template or [
+            return AdminTemplateResponse(request, self.popup_response_template or [
                 'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
                 'admin/%s/popup_response.html' % opts.app_label,
                 'admin/popup_response.html',
@@ -1350,7 +1356,7 @@ class ModelAdmin(BaseModelAdmin):
             media=self.media,
         )
 
-        return TemplateResponse(
+        return AdminTemplateResponse(
             request,
             self.delete_confirmation_template or [
                 "admin/{}/{}/delete_confirmation.html".format(app_label, opts.model_name),
@@ -1549,7 +1555,7 @@ class ModelAdmin(BaseModelAdmin):
             # something is screwed up with the database, so display an error
             # page.
             if ERROR_FLAG in request.GET.keys():
-                return SimpleTemplateResponse('admin/invalid_setup.html', {
+                return AdminTemplateResponse(request, 'admin/invalid_setup.html', {
                     'title': _('Database error'),
                 })
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
@@ -1678,7 +1684,7 @@ class ModelAdmin(BaseModelAdmin):
 
         request.current_app = self.admin_site.name
 
-        return TemplateResponse(request, self.change_list_template or [
+        return AdminTemplateResponse(request, self.change_list_template or [
             'admin/%s/%s/change_list.html' % (app_label, opts.model_name),
             'admin/%s/change_list.html' % app_label,
             'admin/change_list.html'
@@ -1784,7 +1790,7 @@ class ModelAdmin(BaseModelAdmin):
 
         request.current_app = self.admin_site.name
 
-        return TemplateResponse(request, self.object_history_template or [
+        return AdminTemplateResponse(request, self.object_history_template or [
             "admin/%s/%s/object_history.html" % (app_label, opts.model_name),
             "admin/%s/object_history.html" % app_label,
             "admin/object_history.html"
