@@ -30,9 +30,9 @@ datetime_re = re.compile(
 standard_duration_re = re.compile(
     r'^'
     r'(?:(?P<days>-?\d+) (days?, )?)?'
-    r'((?:(?P<hours>\d+):)(?=\d+:\d+))?'
-    r'(?:(?P<minutes>\d+):)?'
-    r'(?P<seconds>\d+)'
+    r'((?:(?P<hours>-?\d+):)(?=\d+:\d+))?'
+    r'(?:(?P<minutes>-?\d+):)?'
+    r'(?P<seconds>-?\d+)'
     r'(?:\.(?P<microseconds>\d{1,6})\d{0,6})?'
     r'$'
 )
@@ -125,5 +125,7 @@ def parse_duration(value):
         sign = -1 if kw.pop('sign', '+') == '-' else 1
         if kw.get('microseconds'):
             kw['microseconds'] = kw['microseconds'].ljust(6, '0')
+        if kw.get('seconds') and kw.get('microseconds') and kw['seconds'].startswith('-'):
+            kw['microseconds'] = '-' + kw['microseconds']
         kw = {k: float(v) for k, v in six.iteritems(kw) if v is not None}
         return sign * datetime.timedelta(**kw)
