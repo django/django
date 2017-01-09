@@ -72,7 +72,7 @@ class WebsocketConsumer(BaseConsumer):
         """
         Called when a WebSocket connection is opened.
         """
-        pass
+        self.message.reply_channel.send({"accept": True})
 
     def raw_receive(self, message, **kwargs):
         """
@@ -220,6 +220,7 @@ class WebsocketDemultiplexer(JsonWebsocketConsumer):
 
     def connect(self, message, **kwargs):
         """Forward connection to all consumers."""
+        self.message.reply_channel.send({"accept": True})
         for stream, consumer in self.consumers.items():
             kwargs['multiplexer'] = WebsocketMultiplexer(stream, self.message.reply_channel)
             consumer(message, **kwargs)

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import copy
 import json
 
@@ -66,9 +67,9 @@ class HttpClient(Client):
         Return text content of a message for client channel and decoding it if json kwarg is set
         """
         content = super(HttpClient, self).receive()
-        if content and json:
+        if content and json and 'text' in content and isinstance(content['text'], six.string_types):
             return json_module.loads(content['text'])
-        return content['text'] if content else None
+        return content.get('text', content) if content else None
 
     def send(self, to, content={}, text=None, path='/'):
         """
@@ -87,12 +88,20 @@ class HttpClient(Client):
                 content['text'] = text
         self.channel_layer.send(to, content)
 
-    def send_and_consume(self, channel, content={}, text=None, path='/', fail_on_none=True):
+    def send_and_consume(self, channel, content={}, text=None, path='/', fail_on_none=True, check_accept=True):
         """
         Reproduce full life cycle of the message
         """
         self.send(channel, content, text, path)
-        return self.consume(channel, fail_on_none=fail_on_none)
+        return self.consume(channel, fail_on_none=fail_on_none, check_accept=check_accept)
+
+    def consume(self, channel, fail_on_none=True, check_accept=True):
+        result = super(HttpClient, self).consume(channel, fail_on_none=fail_on_none)
+        if channel == "websocket.connect" and check_accept:
+            received = self.receive(json=False)
+            if received != {"accept": True}:
+                raise AssertionError("Connection rejected: %s != '{accept: True}'" % received)
+        return result
 
     def login(self, **credentials):
         """

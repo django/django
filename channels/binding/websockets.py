@@ -87,18 +87,17 @@ class WebsocketBinding(Binding):
         # Only allow received packets through further.
         if message.channel.name != "websocket.receive":
             return
-        # Call superclass, unpacking the payload in the process
-        payload = json.loads(message['text'])
-        super(WebsocketBinding, cls).trigger_inbound(payload, **kwargs)
+        super(WebsocketBinding, cls).trigger_inbound(message, **kwargs)
 
     def deserialize(self, message):
         """
         You must hook this up behind a Deserializer, so we expect the JSON
         already dealt with.
         """
-        action = message['action']
-        pk = message.get('pk', None)
-        data = message.get('data', None)
+        body = json.loads(message['text'])
+        action = body['action']
+        pk = body.get('pk', None)
+        data = body.get('data', None)
         return action, pk, data
 
     def _hydrate(self, pk, data):

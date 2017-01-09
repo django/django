@@ -81,5 +81,6 @@ class PendingMessageStore(object):
             sender.send(message, immediately=True)
         self.threadlocal.messages = []
 
+
 pending_message_store = PendingMessageStore()
 consumer_finished.connect(pending_message_store.send_and_flush)
