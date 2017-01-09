@@ -1059,7 +1059,7 @@ introduce joins when you use ``F()`` objects in an update -- you can only
 reference fields local to the model being updated. If you attempt to introduce
 a join with an ``F()`` object, a ``FieldError`` will be raised::
 
-    # THIS WILL RAISE A FieldError
+    # This will raise a FieldError
     >>> Entry.objects.update(headline=F('blog__name'))
 
 .. _topics-db-queries-related:
