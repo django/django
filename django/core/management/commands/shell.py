@@ -3,9 +3,14 @@ import select
 import sys
 import warnings
 
-from django.core.management.base import BaseCommand
+from django.core.management import BaseCommand, CommandError
 from django.utils.datastructures import OrderedSet
 from django.utils.deprecation import RemovedInDjango20Warning
+
+
+class ShellImportError(Exception):
+    """A shell is not installed"""
+    pass
 
 
 class Command(BaseCommand):
@@ -39,20 +44,29 @@ class Command(BaseCommand):
 
     def _ipython_pre_011(self):
         """Start IPython pre-0.11"""
-        from IPython.Shell import IPShell
+        try:
+            from IPython.Shell import IPShell
+        except ImportError:
+            raise ShellImportError
         shell = IPShell(argv=[])
         shell.mainloop()
 
     def _ipython_pre_100(self):
         """Start IPython pre-1.0.0"""
-        from IPython.frontend.terminal.ipapp import TerminalIPythonApp
+        try:
+            from IPython.frontend.terminal.ipapp import TerminalIPythonApp
+        except ImportError:
+            raise ShellImportError
         app = TerminalIPythonApp.instance()
         app.initialize(argv=[])
         app.start()
 
     def _ipython(self):
         """Start IPython >= 1.0"""
-        from IPython import start_ipython
+        try:
+            from IPython import start_ipython
+        except ImportError:
+            raise ShellImportError
         start_ipython(argv=[])
 
     def ipython(self, options):
@@ -60,15 +74,17 @@ class Command(BaseCommand):
         for ip in (self._ipython, self._ipython_pre_100, self._ipython_pre_011):
             try:
                 ip()
-            except ImportError:
+            except ShellImportError:
                 pass
             else:
                 return
-        # no IPython, raise ImportError
-        raise ImportError("No IPython")
+        raise ShellImportError("No IPython")
 
     def bpython(self, options):
-        import bpython
+        try:
+            import bpython
+        except ImportError:
+            raise ShellImportError("No bpython")
         bpython.embed()
 
     def python(self, options):
@@ -127,11 +143,16 @@ class Command(BaseCommand):
             exec(sys.stdin.read())
             return
 
-        available_shells = [options['interface']] if options['interface'] else self.shells
-
-        for shell in available_shells:
+        if options['interface']:
+            shell = options['interface']
             try:
                 return getattr(self, shell)(options)
-            except ImportError:
-                pass
-        raise ImportError("Couldn't load any of the specified interfaces.")
+            except ShellImportError:
+                raise CommandError("Couldn't import {} interface.".format(shell))
+        else:
+            for shell in self.shells:
+                try:
+                    return getattr(self, shell)(options)
+                except ShellImportError:
+                    pass
+            assert False, "Couldn't load any interface."
