@@ -204,114 +204,8 @@ class TestsBinding(ChannelTestCase):
         received = client.receive()
         self.assertIsNone(received)
 
-    def test_demultiplexer(self):
-        class Demultiplexer(WebsocketDemultiplexer):
-            mapping = {
-                'users': 'binding.users',
-            }
-
-            groups = ['inbound']
-
-        with apply_routes([Demultiplexer.as_route(path='/')]):
-            client = HttpClient()
-            client.send_and_consume('websocket.connect', path='/')
-
-            # assert in group
-            Group('inbound').send({'text': json.dumps({'test': 'yes'})}, immediately=True)
-            self.assertEqual(client.receive(), {'test': 'yes'})
-
-            # assert that demultiplexer stream message
-            client.send_and_consume('websocket.receive', path='/',
-                                    text={'stream': 'users', 'payload': {'test': 'yes'}})
-            message = client.get_next_message('binding.users')
-            self.assertIsNotNone(message)
-            self.assertEqual(message.content['test'], 'yes')
-
-    def test_demultiplexer_with_wrong_stream(self):
-        class Demultiplexer(WebsocketDemultiplexer):
-            mapping = {
-                'users': 'binding.users',
-            }
-
-            groups = ['inbound']
-
-        with apply_routes([Demultiplexer.as_route(path='/')]):
-            client = HttpClient()
-            client.send_and_consume('websocket.connect', path='/')
-
-            with self.assertRaises(ValueError) as value_error:
-                client.send_and_consume('websocket.receive', path='/', text={
-                    'stream': 'wrong', 'payload': {'test': 'yes'}
-                })
-
-            self.assertIn('stream not mapped', value_error.exception.args[0])
-
-            message = client.get_next_message('binding.users')
-            self.assertIsNone(message)
-
-    def test_demultiplexer_with_wrong_payload(self):
-        class Demultiplexer(WebsocketDemultiplexer):
-            mapping = {
-                'users': 'binding.users',
-            }
-
-            groups = ['inbound']
-
-        with apply_routes([Demultiplexer.as_route(path='/')]):
-            client = HttpClient()
-            client.send_and_consume('websocket.connect', path='/')
-
-            with self.assertRaises(ValueError) as value_error:
-                client.send_and_consume('websocket.receive', path='/', text={
-                    'stream': 'users', 'payload': 'test',
-                })
-
-            self.assertEqual(value_error.exception.args[0], 'Multiplexed frame payload is not a dict')
-
-            message = client.get_next_message('binding.users')
-            self.assertIsNone(message)
-
-    def test_demultiplexer_without_payload_and_steam(self):
-        class Demultiplexer(WebsocketDemultiplexer):
-            mapping = {
-                'users': 'binding.users',
-            }
-
-            groups = ['inbound']
-
-        with apply_routes([Demultiplexer.as_route(path='/')]):
-            client = HttpClient()
-            client.send_and_consume('websocket.connect', path='/')
-
-            with self.assertRaises(ValueError) as value_error:
-                client.send_and_consume('websocket.receive', path='/', text={
-                    'nostream': 'users', 'payload': 'test',
-                })
-
-            self.assertIn('no channel/payload key', value_error.exception.args[0])
-
-            message = client.get_next_message('binding.users')
-            self.assertIsNone(message)
-
-            with self.assertRaises(ValueError) as value_error:
-                client.send_and_consume('websocket.receive', path='/', text={
-                    'stream': 'users',
-                })
-
-            self.assertIn('no channel/payload key', value_error.exception.args[0])
-
-            message = client.get_next_message('binding.users')
-            self.assertIsNone(message)
-
     def test_inbound_create(self):
         self.assertEqual(User.objects.all().count(), 0)
-
-        class Demultiplexer(WebsocketDemultiplexer):
-            mapping = {
-                'users': 'binding.users',
-            }
-
-            groups = ['inbound']
 
         class UserBinding(WebsocketBinding):
             model = User
@@ -325,15 +219,23 @@ class TestsBinding(ChannelTestCase):
             def has_permission(self, user, action, pk):
                 return True
 
-        with apply_routes([Demultiplexer.as_route(path='/'), route('binding.users', UserBinding.consumer)]):
+        class Demultiplexer(WebsocketDemultiplexer):
+            consumers = {
+                'users': UserBinding.consumer,
+            }
+
+            groups = ['inbound']
+
+        with apply_routes([Demultiplexer.as_route(path='/')]):
             client = HttpClient()
             client.send_and_consume('websocket.connect', path='/')
             client.send_and_consume('websocket.receive', path='/', text={
                 'stream': 'users',
-                'payload': {'action': CREATE, 'data': {'username': 'test_inbound', 'email': 'test@user_steam.com'}}
+                'payload': {
+                    'action': CREATE,
+                    'data': {'username': 'test_inbound', 'email': 'test@user_steam.com'},
+                },
             })
-            # our Demultiplexer route message to the inbound consumer, so call Demultiplexer consumer
-            client.consume('binding.users')
 
         self.assertEqual(User.objects.all().count(), 1)
         user = User.objects.all().first()
@@ -345,13 +247,6 @@ class TestsBinding(ChannelTestCase):
     def test_inbound_update(self):
         user = User.objects.create(username='test', email='test@channels.com')
 
-        class Demultiplexer(WebsocketDemultiplexer):
-            mapping = {
-                'users': 'binding.users',
-            }
-
-            groups = ['inbound']
-
         class UserBinding(WebsocketBinding):
             model = User
             stream = 'users'
@@ -364,15 +259,20 @@ class TestsBinding(ChannelTestCase):
             def has_permission(self, user, action, pk):
                 return True
 
-        with apply_routes([Demultiplexer.as_route(path='/'), route('binding.users', UserBinding.consumer)]):
+        class Demultiplexer(WebsocketDemultiplexer):
+            consumers = {
+                'users': UserBinding.consumer,
+            }
+
+            groups = ['inbound']
+
+        with apply_routes([Demultiplexer.as_route(path='/')]):
             client = HttpClient()
             client.send_and_consume('websocket.connect', path='/')
             client.send_and_consume('websocket.receive', path='/', text={
                 'stream': 'users',
                 'payload': {'action': UPDATE, 'pk': user.pk, 'data': {'username': 'test_inbound'}}
             })
-            # our Demultiplexer route message to the inbound consumer, so call Demultiplexer consumer
-            client.consume('binding.users')
 
             user = User.objects.get(pk=user.pk)
             self.assertEqual(user.username, 'test_inbound')
@@ -383,7 +283,6 @@ class TestsBinding(ChannelTestCase):
                 'stream': 'users',
                 'payload': {'action': UPDATE, 'pk': user.pk, 'data': {'email': 'new@test.com'}}
             })
-            client.consume('binding.users')
 
             user = User.objects.get(pk=user.pk)
             self.assertEqual(user.username, 'test_inbound')
@@ -393,13 +292,6 @@ class TestsBinding(ChannelTestCase):
 
     def test_inbound_delete(self):
         user = User.objects.create(username='test', email='test@channels.com')
-
-        class Demultiplexer(WebsocketDemultiplexer):
-            mapping = {
-                'users': 'binding.users',
-            }
-
-            groups = ['inbound']
 
         class UserBinding(WebsocketBinding):
             model = User
@@ -413,15 +305,20 @@ class TestsBinding(ChannelTestCase):
             def has_permission(self, user, action, pk):
                 return True
 
-        with apply_routes([Demultiplexer.as_route(path='/'), route('binding.users', UserBinding.consumer)]):
+        class Demultiplexer(WebsocketDemultiplexer):
+            consumers = {
+                'users': UserBinding.consumer,
+            }
+
+            groups = ['inbound']
+
+        with apply_routes([Demultiplexer.as_route(path='/')]):
             client = HttpClient()
             client.send_and_consume('websocket.connect', path='/')
             client.send_and_consume('websocket.receive', path='/', text={
                 'stream': 'users',
                 'payload': {'action': DELETE, 'pk': user.pk}
             })
-            # our Demultiplexer route message to the inbound consumer, so call Demultiplexer consumer
-            client.consume('binding.users')
 
         self.assertIsNone(User.objects.filter(pk=user.pk).first())
         self.assertIsNone(client.receive())

@@ -125,9 +125,12 @@ class GenericTests(ChannelTestCase):
 
         method_mapping = {'mychannel': 'test'}
 
-        with apply_routes([WebsocketConsumer.as_route(
+        with apply_routes([
+            WebsocketConsumer.as_route(
                 {'method_mapping': method_mapping, 'trigger': 'from_as_route'},
-                name='filter')]):
+                name='filter',
+            ),
+        ]):
             client = Client()
 
             client.send_and_consume('mychannel', {'name': 'filter'})
@@ -191,8 +194,6 @@ class GenericTests(ChannelTestCase):
 
         class MyWebsocketConsumer(websockets.JsonWebsocketConsumer):
             def receive(self, content, multiplexer=None, **kwargs):
-                import pdb; pdb.set_trace()  # breakpoint 69f2473b //
-
                 self.send(content)
 
         class Demultiplexer(websockets.WebsocketDemultiplexer):

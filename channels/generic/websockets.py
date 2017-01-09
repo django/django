@@ -208,7 +208,8 @@ class WebsocketDemultiplexer(JsonWebsocketConsumer):
                     # Send demultiplexer to the consumer, to be able to answer
                     kwargs['multiplexer'] = WebsocketMultiplexer(stream, self.message.reply_channel)
                     # Patch send to avoid sending not formated messages from the consumer
-                    consumer.send = self.send
+                    if hasattr(consumer, "send"):
+                        consumer.send = self.send
                     # Dispatch message
                     consumer(self.message, **kwargs)
                     return

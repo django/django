@@ -107,23 +107,25 @@ connect. The WebSocket binding classes use the standard :ref:`multiplexing`,
 so you just need to use that::
 
     from channels.generic.websockets import WebsocketDemultiplexer
+    from .binding import IntegerValueBinding
 
     class Demultiplexer(WebsocketDemultiplexer):
 
         mapping = {
-            "intval": "binding.intval",
+            "intval": IntegerValueBinding.consumer,
         }
 
         def connection_groups(self):
             return ["intval-updates"]
 
-As well as the standard stream-to-channel mapping, you also need to set
+As well as the standard stream-to-consumer mapping, you also need to set
 ``connection_groups``, a list of groups to put people in when they connect.
 This should match the logic of ``group_names`` on your binding - we've used
-our fixed group name again.
+our fixed group name again. Notice that the binding has a ``.consumer`` attribute;
+this is a standard WebSocket-JSON consumer, that the demultiplexer can pass
+demultiplexed ``websocket.receive`` messages to.
 
-Tie that into your routing, and tie each demultiplexed channel into the
-``.consumer`` attribute of the Binding, and you're ready to go::
+Tie that into your routing, and you're ready to go::
 
     from channels import route_class, route
     from .consumers import Demultiplexer
@@ -131,7 +133,6 @@ Tie that into your routing, and tie each demultiplexed channel into the
 
     channel_routing = [
         route_class(Demultiplexer, path="^/binding/"),
-        route("binding.intval", IntegerValueBinding.consumer),
     ]
 
 

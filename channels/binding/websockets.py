@@ -26,11 +26,9 @@ class WebsocketBinding(Binding):
     """
 
     # Mark as abstract
-
     model = None
 
     # Stream multiplexing name
-
     stream = None
 
     # Decorators
@@ -80,6 +78,18 @@ class WebsocketBinding(Binding):
             return enforce_ordering(handler, slight=True)
         else:
             return handler
+
+    @classmethod
+    def trigger_inbound(cls, message, **kwargs):
+        """
+        Overrides base trigger_inbound to ignore connect/disconnect.
+        """
+        # Only allow received packets through further.
+        if message.channel.name != "websocket.receive":
+            return
+        # Call superclass, unpacking the payload in the process
+        payload = json.loads(message['text'])
+        super(WebsocketBinding, cls).trigger_inbound(payload, **kwargs)
 
     def deserialize(self, message):
         """
