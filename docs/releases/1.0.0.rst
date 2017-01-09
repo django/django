@@ -1,9 +1,6 @@
 1.0.0 Release Notes
 ===================
 
-.. contents:: Table of Contents
-   :depth: 1
-
 Channels 1.0.0 brings together a number of design changes, some breaking changes,
 into our first fully stable release.
 
