@@ -96,7 +96,6 @@ class RunServerTests(TestCase):
             endpoints=['tcp:port=8000:interface=127.0.0.1'],
             signal_handlers=True,
             http_timeout=60,
-            host='127.0.0.1',
             action_logger=mock.ANY,
             channel_layer=mock.ANY,
             ws_protocols=None,
@@ -117,7 +116,6 @@ class RunServerTests(TestCase):
                 endpoints=['tcp:port=8000:interface=127.0.0.1'],
                 signal_handlers=True,
                 http_timeout=60,
-                host='127.0.0.1',
                 action_logger=mock.ANY,
                 channel_layer=mock.ANY,
                 ws_protocols=None,
@@ -126,10 +124,9 @@ class RunServerTests(TestCase):
 
             call_command('runserver', '--noreload', 'localhost:8001')
             mocked_server.assert_called_with(
-                endpoints=['tcp:port=8001:interface=127.0.0.1'],
+                endpoints=['tcp:port=8001:interface=localhost'],
                 signal_handlers=True,
                 http_timeout=60,
-                host='localhost',
                 action_logger=mock.ANY,
                 channel_layer=mock.ANY,
                 ws_protocols=None,
@@ -153,7 +150,6 @@ class RunServerTests(TestCase):
             endpoints=['tcp:port=8000:interface=127.0.0.1'],
             signal_handlers=True,
             http_timeout=60,
-            host='127.0.0.1',
             action_logger=mock.ANY,
             channel_layer=mock.ANY,
             ws_protocols=None,
