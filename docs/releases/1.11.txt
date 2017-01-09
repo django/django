@@ -77,6 +77,7 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :attr:`.ModelAdmin.date_hierarchy` can now reference fields across relations.
+* Made the admin checks run when ``DEBUG = False``.
 
 * The new :meth:`ModelAdmin.get_exclude()
   <django.contrib.admin.ModelAdmin.get_exclude>` hook allows specifying the

@@ -18,10 +18,12 @@ from django.forms.models import (
 from django.template.engine import Engine
 
 
-def check_admin_app(**kwargs):
-    from django.contrib.admin.sites import system_check_errors
-
-    return system_check_errors
+def check_admin_app(app_configs, **kwargs):
+    from django.contrib.admin.sites import all_sites
+    errors = []
+    for site in all_sites:
+        errors.extend(site.check(app_configs))
+    return errors
 
 
 def check_dependencies(**kwargs):
