@@ -124,5 +124,5 @@ def parse_duration(value):
         kw = match.groupdict()
         if kw.get('seconds') and kw.get('microseconds') and kw['seconds'].startswith('-'):
             kw['microseconds'] = '-'.__add__(kw['microseconds'])
-        kw = {k : float(v) for k, v in six.iteritems(kw) if v is not None}
+        kw = {k: float(v) for k, v in six.iteritems(kw) if v is not None}
         return datetime.timedelta(**kw)
