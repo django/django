@@ -2,8 +2,8 @@ from django.core.serializers.json import DjangoJSONEncoder, json
 
 from ..auth import channel_session_user_from_http
 from ..channel import Group
-from ..sessions import enforce_ordering
 from ..exceptions import SendNotAvailableOnDemultiplexer
+from ..sessions import enforce_ordering
 from .base import BaseConsumer
 
 
