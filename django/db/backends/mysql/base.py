@@ -18,7 +18,9 @@ from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils import six, timezone
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes, SafeText
@@ -276,6 +278,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             # levels, and in that form we say "set tx_isolation='repeatable-read'" rather
             # than "set transaction isolation level repeatable read"
             self.isolation_level_value = "'%s'" % self.isolation_level.replace(' ', '-')
+        else:
+            if 'isolation_level' not in settings_dict['OPTIONS']:
+                warnings.warn(
+                    "Django's default transaction isolation level on MySQL is going to "
+                    "change from REPEATABLE READ (MySQL's default) to READ COMMITTED. "
+                    "Specify an explicit level by setting 'isolation_level' in "
+                    "'OPTIONS' in the connection settings.", RemovedInDjango21Warning)
         kwargs.update(options)
         return kwargs
 

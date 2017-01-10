@@ -815,3 +815,9 @@ Miscellaneous
 * The ``renderer`` argument is added to the :meth:`Widget.render()
   <django.forms.Widget.render>` method. Methods that don't accept that argument
   will work through a deprecation period.
+
+* On MySQL, defaulting to MySQL's server-configured transaction isolation level
+  is deprecated because MySQL's own default for that is ``REPEATABLE READ``,
+  and the behavior under that level can be surprising and is inconsistent with
+  the default behavior of other backends. In Django 2.1, the default transaction
+  isolation level for MySQL will be ``READ COMMITTED``.
