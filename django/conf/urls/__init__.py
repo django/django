@@ -1,4 +1,3 @@
-import warnings
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
@@ -6,7 +5,6 @@ from django.urls import (
     LocaleRegexURLResolver, RegexURLPattern, RegexURLResolver,
 )
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 
 __all__ = ['handler400', 'handler403', 'handler404', 'handler500', 'include', 'url']
 
@@ -16,16 +14,8 @@ handler404 = 'django.views.defaults.page_not_found'
 handler500 = 'django.views.defaults.server_error'
 
 
-def include(arg, namespace=None, app_name=None):
-    if app_name and not namespace:
-        raise ValueError('Must specify a namespace if specifying app_name.')
-    if app_name:
-        warnings.warn(
-            'The app_name argument to django.conf.urls.include() is deprecated. '
-            'Set the app_name in the included URLconf instead.',
-            RemovedInDjango20Warning, stacklevel=2
-        )
-
+def include(arg, namespace=None):
+    app_name = None
     if isinstance(arg, tuple):
         # callable returning a namespace hint
         try:
@@ -35,13 +25,11 @@ def include(arg, namespace=None, app_name=None):
                 raise ImproperlyConfigured(
                     'Cannot override the namespace for a dynamic module that provides a namespace'
                 )
-            warnings.warn(
-                'Passing a 3-tuple to django.conf.urls.include() is deprecated. '
+            raise ImproperlyConfigured(
+                'Passing a 3-tuple to django.conf.urls.include() is not supported. '
                 'Pass a 2-tuple containing the list of patterns and app_name, '
                 'and provide the namespace argument to include() instead.',
-                RemovedInDjango20Warning, stacklevel=2
             )
-            urlconf_module, app_name, namespace = arg
     else:
         # No namespace hint - use manually provided namespace
         urlconf_module = arg
@@ -51,12 +39,11 @@ def include(arg, namespace=None, app_name=None):
     patterns = getattr(urlconf_module, 'urlpatterns', urlconf_module)
     app_name = getattr(urlconf_module, 'app_name', app_name)
     if namespace and not app_name:
-        warnings.warn(
+        raise ImproperlyConfigured(
             'Specifying a namespace in django.conf.urls.include() without '
-            'providing an app_name is deprecated. Set the app_name attribute '
+            'providing an app_name is not supported. Set the app_name attribute '
             'in the included module, or pass a 2-tuple containing the list of '
             'patterns and app_name instead.',
-            RemovedInDjango20Warning, stacklevel=2
         )
 
     namespace = namespace or app_name

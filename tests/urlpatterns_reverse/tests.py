@@ -18,16 +18,13 @@ from django.http import (
     HttpRequest, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
 from django.shortcuts import redirect
-from django.test import (
-    SimpleTestCase, TestCase, ignore_warnings, override_settings,
-)
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import override_script_prefix
 from django.urls import (
     NoReverseMatch, RegexURLPattern, RegexURLResolver, Resolver404,
     ResolverMatch, get_callable, get_resolver, resolve, reverse, reverse_lazy,
 )
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 
 from . import middleware, urlconf_outer, views
 from .utils import URLObject
@@ -42,23 +39,27 @@ resolve_test_data = (
         {'arg1': '42', 'arg2': '37'}
     ),
     (
-        '/included/normal/42/37/', 'inc-normal-view', '', '', 'inc-normal-view', views.empty_view, tuple(),
-        {'arg1': '42', 'arg2': '37'}
+        '/included/normal/42/37/', 'inc-normal-view', 'included_namespace_urls',
+        'included_namespace_urls', 'included_namespace_urls:inc-normal-view',
+        views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}
     ),
     (
-        '/included/view_class/42/37/', 'inc-view-class', '', '', 'inc-view-class', views.view_class_instance, tuple(),
-        {'arg1': '42', 'arg2': '37'}
+        '/included/view_class/42/37/', 'inc-view-class', 'included_namespace_urls',
+        'included_namespace_urls', 'included_namespace_urls:inc-view-class',
+        views.view_class_instance, tuple(), {'arg1': '42', 'arg2': '37'}
     ),
 
     # Unnamed args are dropped if you have *any* kwargs in a pattern
     ('/mixed_args/42/37/', 'mixed-args', '', '', 'mixed-args', views.empty_view, tuple(), {'arg2': '37'}),
     (
-        '/included/mixed_args/42/37/', 'inc-mixed-args', '', '', 'inc-mixed-args', views.empty_view, tuple(),
-        {'arg2': '37'}
+        '/included/mixed_args/42/37/', 'inc-mixed-args', 'included_namespace_urls',
+        'included_namespace_urls', 'included_namespace_urls:inc-mixed-args',
+        views.empty_view, tuple(), {'arg2': '37'}
     ),
     (
-        '/included/12/mixed_args/42/37/', 'inc-mixed-args', '', '', 'inc-mixed-args', views.empty_view, tuple(),
-        {'arg2': '37'}
+        '/included/12/mixed_args/42/37/', 'inc-mixed-args', 'included_namespace_urls',
+        'included_namespace_urls', 'included_namespace_urls:inc-mixed-args',
+        views.empty_view, tuple(), {'arg2': '37'}
     ),
 
     # Unnamed views should have None as the url_name. Regression data for #21157.
@@ -73,10 +74,15 @@ resolve_test_data = (
 
     # If you have no kwargs, you get an args list.
     ('/no_kwargs/42/37/', 'no-kwargs', '', '', 'no-kwargs', views.empty_view, ('42', '37'), {}),
-    ('/included/no_kwargs/42/37/', 'inc-no-kwargs', '', '', 'inc-no-kwargs', views.empty_view, ('42', '37'), {}),
     (
-        '/included/12/no_kwargs/42/37/', 'inc-no-kwargs', '', '', 'inc-no-kwargs', views.empty_view,
-        ('12', '42', '37'), {}
+        '/included/no_kwargs/42/37/', 'inc-no-kwargs', 'included_namespace_urls',
+        'included_namespace_urls', 'included_namespace_urls:inc-no-kwargs',
+        views.empty_view, ('42', '37'), {}
+    ),
+    (
+        '/included/12/no_kwargs/42/37/', 'inc-no-kwargs', 'included_namespace_urls',
+        'included_namespace_urls', 'included_namespace_urls:inc-no-kwargs',
+        views.empty_view, ('12', '42', '37'), {}
     ),
 
     # Namespaces
@@ -85,20 +91,23 @@ resolve_test_data = (
         views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}
     ),
     (
-        '/included/test3/inner/42/37/', 'urlobject-view', 'testapp', 'test-ns3', 'test-ns3:urlobject-view',
+        '/included/test3/inner/42/37/', 'urlobject-view', 'included_namespace_urls:testapp',
+        'included_namespace_urls:test-ns3', 'included_namespace_urls:test-ns3:urlobject-view',
         views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}
     ),
     (
-        '/ns-included1/normal/42/37/', 'inc-normal-view', '', 'inc-ns1', 'inc-ns1:inc-normal-view', views.empty_view,
-        tuple(), {'arg1': '42', 'arg2': '37'}
-    ),
-    (
-        '/included/test3/inner/42/37/', 'urlobject-view', 'testapp', 'test-ns3', 'test-ns3:urlobject-view',
+        '/ns-included1/normal/42/37/', 'inc-normal-view', 'included_namespace_urls',
+        'inc-ns1', 'inc-ns1:inc-normal-view',
         views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}
     ),
     (
-        '/default/inner/42/37/', 'urlobject-view', 'testapp', 'testapp', 'testapp:urlobject-view', views.empty_view,
-        tuple(), {'arg1': '42', 'arg2': '37'}
+        '/included/test3/inner/42/37/', 'urlobject-view', 'included_namespace_urls:testapp',
+        'included_namespace_urls:test-ns3', 'included_namespace_urls:test-ns3:urlobject-view',
+        views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}
+    ),
+    (
+        '/default/inner/42/37/', 'urlobject-view', 'testapp', 'testapp', 'testapp:urlobject-view',
+        views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}
     ),
     (
         '/other2/inner/42/37/', 'urlobject-view', 'nodefault', 'other-ns2', 'other-ns2:urlobject-view',
@@ -111,29 +120,37 @@ resolve_test_data = (
 
     # Nested namespaces
     (
-        '/ns-included1/test3/inner/42/37/', 'urlobject-view', 'testapp', 'inc-ns1:test-ns3',
-        'inc-ns1:test-ns3:urlobject-view', views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}
+        '/ns-included1/test3/inner/42/37/', 'urlobject-view', 'included_namespace_urls:testapp',
+        'inc-ns1:test-ns3', 'inc-ns1:test-ns3:urlobject-view',
+        views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}
     ),
     (
-        '/ns-included1/ns-included4/ns-included2/test3/inner/42/37/', 'urlobject-view', 'testapp',
-        'inc-ns1:inc-ns4:inc-ns2:test-ns3', 'inc-ns1:inc-ns4:inc-ns2:test-ns3:urlobject-view', views.empty_view,
-        tuple(), {'arg1': '42', 'arg2': '37'}
+        '/ns-included1/ns-included4/ns-included2/test3/inner/42/37/', 'urlobject-view',
+        'included_namespace_urls:namespace_urls:included_namespace_urls:testapp',
+        'inc-ns1:inc-ns4:inc-ns2:test-ns3',
+        'inc-ns1:inc-ns4:inc-ns2:test-ns3:urlobject-view',
+        views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}
     ),
     (
-        '/app-included/test3/inner/42/37/', 'urlobject-view', 'inc-app:testapp', 'inc-app:test-ns3',
+        '/app-included/test3/inner/42/37/', 'urlobject-view', 'included_namespace_urls:testapp', 'inc-app:test-ns3',
         'inc-app:test-ns3:urlobject-view', views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}
     ),
     (
-        '/app-included/ns-included4/ns-included2/test3/inner/42/37/', 'urlobject-view', 'inc-app:testapp',
-        'inc-app:inc-ns4:inc-ns2:test-ns3', 'inc-app:inc-ns4:inc-ns2:test-ns3:urlobject-view', views.empty_view,
-        tuple(), {'arg1': '42', 'arg2': '37'}
+        '/app-included/ns-included4/ns-included2/test3/inner/42/37/', 'urlobject-view',
+        'included_namespace_urls:namespace_urls:included_namespace_urls:testapp',
+        'inc-app:inc-ns4:inc-ns2:test-ns3',
+        'inc-app:inc-ns4:inc-ns2:test-ns3:urlobject-view',
+        views.empty_view, tuple(), {'arg1': '42', 'arg2': '37'}
     ),
 
     # Namespaces capturing variables
-    ('/inc70/', 'inner-nothing', '', 'inc-ns5', 'inc-ns5:inner-nothing', views.empty_view, tuple(), {'outer': '70'}),
     (
-        '/inc78/extra/foobar/', 'inner-extra', '', 'inc-ns5', 'inc-ns5:inner-extra', views.empty_view, tuple(),
-        {'outer': '78', 'extra': 'foobar'}
+        '/inc70/', 'inner-nothing', 'included_urls', 'inc-ns5', 'inc-ns5:inner-nothing',
+        views.empty_view, tuple(), {'outer': '70'}
+    ),
+    (
+        '/inc78/extra/foobar/', 'inner-extra', 'included_urls', 'inc-ns5', 'inc-ns5:inner-extra',
+        views.empty_view, tuple(), {'outer': '78', 'extra': 'foobar'}
     ),
 )
 
@@ -355,7 +372,6 @@ class URLPatternReverse(SimpleTestCase):
 
 
 class ResolverTests(SimpleTestCase):
-    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_resolver_repr(self):
         """
         Test repr of RegexURLResolver, especially when urlconf_name is a list
@@ -576,7 +592,6 @@ class ReverseShortcutTests(SimpleTestCase):
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.namespace_urls')
-@ignore_warnings(category=RemovedInDjango20Warning)
 class NamespaceTests(SimpleTestCase):
 
     def test_ambiguous_object(self):
@@ -613,10 +628,13 @@ class NamespaceTests(SimpleTestCase):
 
     def test_simple_included_name(self):
         "Normal lookups work on names included from other patterns"
-        self.assertEqual('/included/normal/', reverse('inc-normal-view'))
-        self.assertEqual('/included/normal/37/42/', reverse('inc-normal-view', args=[37, 42]))
-        self.assertEqual('/included/normal/42/37/', reverse('inc-normal-view', kwargs={'arg1': 42, 'arg2': 37}))
-        self.assertEqual('/included/+%5C$*/', reverse('inc-special-view'))
+        self.assertEqual('/included/normal/', reverse('included_namespace_urls:inc-normal-view'))
+        self.assertEqual('/included/normal/37/42/', reverse('included_namespace_urls:inc-normal-view', args=[37, 42]))
+        self.assertEqual(
+            '/included/normal/42/37/',
+            reverse('included_namespace_urls:inc-normal-view', kwargs={'arg1': 42, 'arg2': 37})
+        )
+        self.assertEqual('/included/+%5C$*/', reverse('included_namespace_urls:inc-special-view'))
 
     def test_namespace_object(self):
         "Dynamic URL objects can be found using a namespace"
@@ -643,12 +661,17 @@ class NamespaceTests(SimpleTestCase):
 
     def test_embedded_namespace_object(self):
         "Namespaces can be installed anywhere in the URL pattern tree"
-        self.assertEqual('/included/test3/inner/', reverse('test-ns3:urlobject-view'))
-        self.assertEqual('/included/test3/inner/37/42/', reverse('test-ns3:urlobject-view', args=[37, 42]))
+        self.assertEqual('/included/test3/inner/', reverse('included_namespace_urls:test-ns3:urlobject-view'))
         self.assertEqual(
-            '/included/test3/inner/42/37/', reverse('test-ns3:urlobject-view', kwargs={'arg1': 42, 'arg2': 37})
+            '/included/test3/inner/37/42/', reverse('included_namespace_urls:test-ns3:urlobject-view', args=[37, 42])
         )
-        self.assertEqual('/included/test3/inner/+%5C$*/', reverse('test-ns3:urlobject-special-view'))
+        self.assertEqual(
+            '/included/test3/inner/42/37/',
+            reverse('included_namespace_urls:test-ns3:urlobject-view', kwargs={'arg1': 42, 'arg2': 37})
+        )
+        self.assertEqual(
+            '/included/test3/inner/+%5C$*/', reverse('included_namespace_urls:test-ns3:urlobject-special-view')
+        )
 
     def test_namespace_pattern(self):
         "Namespaces can be applied to include()'d urlpatterns"
@@ -718,17 +741,17 @@ class NamespaceTests(SimpleTestCase):
 
     def test_app_lookup_object_with_default(self):
         "A default application namespace is sensitive to the 'current' app can be used for lookup"
-        self.assertEqual('/included/test3/inner/', reverse('testapp:urlobject-view', current_app='test-ns3'))
+        self.assertEqual('/default/inner/', reverse('testapp:urlobject-view', current_app='test-ns3'))
         self.assertEqual(
-            '/included/test3/inner/37/42/',
+            '/default/inner/37/42/',
             reverse('testapp:urlobject-view', args=[37, 42], current_app='test-ns3')
         )
         self.assertEqual(
-            '/included/test3/inner/42/37/',
+            '/default/inner/42/37/',
             reverse('testapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}, current_app='test-ns3')
         )
         self.assertEqual(
-            '/included/test3/inner/+%5C$*/', reverse('testapp:urlobject-special-view', current_app='test-ns3')
+            '/default/inner/+%5C$*/', reverse('testapp:urlobject-special-view', current_app='test-ns3')
         )
 
     def test_app_lookup_object_without_default(self):
@@ -749,13 +772,16 @@ class NamespaceTests(SimpleTestCase):
         self.assertEqual('/other1/inner/+%5C$*/', reverse('nodefault:urlobject-special-view', current_app='other-ns1'))
 
     def test_special_chars_namespace(self):
-        self.assertEqual('/+%5C$*/included/normal/', reverse('special:inc-normal-view'))
-        self.assertEqual('/+%5C$*/included/normal/37/42/', reverse('special:inc-normal-view', args=[37, 42]))
+        self.assertEqual('/+%5C$*/included/normal/', reverse('special:included_namespace_urls:inc-normal-view'))
+        self.assertEqual(
+            '/+%5C$*/included/normal/37/42/',
+            reverse('special:included_namespace_urls:inc-normal-view', args=[37, 42])
+        )
         self.assertEqual(
             '/+%5C$*/included/normal/42/37/',
-            reverse('special:inc-normal-view', kwargs={'arg1': 42, 'arg2': 37})
+            reverse('special:included_namespace_urls:inc-normal-view', kwargs={'arg1': 42, 'arg2': 37})
         )
-        self.assertEqual('/+%5C$*/included/+%5C$*/', reverse('special:inc-special-view'))
+        self.assertEqual('/+%5C$*/included/+%5C$*/', reverse('special:included_namespace_urls:inc-special-view'))
 
     def test_namespaces_with_variables(self):
         "Namespace prefixes can capture variables: see #15900"
@@ -965,7 +991,6 @@ class NoRootUrlConfTests(SimpleTestCase):
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.namespace_urls')
 class ResolverMatchTests(SimpleTestCase):
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_urlpattern_resolve(self):
         for path, url_name, app_name, namespace, view_name, func, args, kwargs in resolve_test_data:
             # Test legacy support for extracting "function, args, kwargs"
@@ -990,7 +1015,6 @@ class ResolverMatchTests(SimpleTestCase):
             self.assertEqual(match[1], args)
             self.assertEqual(match[2], kwargs)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_resolver_match_on_request(self):
         response = self.client.get('/resolver_match/')
         resolver_match = response.resolver_match
@@ -1042,34 +1066,21 @@ class IncludeTests(SimpleTestCase):
     ]
     app_urls = URLObject('inc-app')
 
-    def test_include_app_name_but_no_namespace(self):
-        msg = "Must specify a namespace if specifying app_name."
-        with self.assertRaisesMessage(ValueError, msg):
-            include(self.url_patterns, app_name='bar')
-
     def test_include_urls(self):
         self.assertEqual(include(self.url_patterns), (self.url_patterns, None, None))
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_include_namespace(self):
-        # no app_name -> deprecated
-        self.assertEqual(include(self.url_patterns, 'namespace'), (self.url_patterns, None, 'namespace'))
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_include_namespace_app_name(self):
-        # app_name argument to include -> deprecated
-        self.assertEqual(
-            include(self.url_patterns, 'namespace', 'app_name'),
-            (self.url_patterns, 'app_name', 'namespace')
+        msg = (
+            "Specifying a namespace in django.conf.urls.include() without "
+            "providing an app_name is not supported."
         )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            include(self.url_patterns, 'namespace')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_include_3_tuple(self):
-        # 3-tuple -> deprecated
-        self.assertEqual(
-            include((self.url_patterns, 'app_name', 'namespace')),
-            (self.url_patterns, 'app_name', 'namespace')
-        )
+        msg = 'Passing a 3-tuple to django.conf.urls.include() is not supported.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            include((self.url_patterns, 'app_name', 'namespace'))
 
     def test_include_2_tuple(self):
         self.assertEqual(
