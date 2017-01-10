@@ -1,3 +1,9 @@
+1.0.1 (2017-01-09)
+------------------
+
+* WebSocket generic views now accept connections by default in their connect
+  handler for better backwards compatibility.
+
 1.0.0 (2017-01-08)
 ------------------
 
