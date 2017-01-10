@@ -3,7 +3,7 @@ import select
 import sys
 import warnings
 
-from django.core.management.base import BaseCommand
+from django.core.management import BaseCommand, CommandError
 from django.utils.datastructures import OrderedSet
 from django.utils.deprecation import RemovedInDjango20Warning
 
@@ -108,4 +108,4 @@ class Command(BaseCommand):
                 return getattr(self, shell)(options)
             except ImportError:
                 pass
-        raise ImportError("Couldn't load any of the specified interfaces.")
+        raise CommandError("Couldn't import {} interface.".format(shell))
