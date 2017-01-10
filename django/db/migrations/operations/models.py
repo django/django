@@ -151,6 +151,18 @@ class CreateModel(ModelOperation):
                     managers=self.managers,
                 ),
             ]
+        elif isinstance(operation, AlterModelOptions) and self.name_lower == operation.name_lower:
+            new_options = self.options.copy()
+            new_options.update(operation.options)
+            return [
+                CreateModel(
+                    self.name,
+                    fields=self.fields,
+                    options=new_options,
+                    bases=self.bases,
+                    managers=self.managers,
+                ),
+            ]
         elif isinstance(operation, FieldOperation) and self.name_lower == operation.model_name_lower:
             if isinstance(operation, AddField):
                 # Don't allow optimizations of FKs through models they reference
