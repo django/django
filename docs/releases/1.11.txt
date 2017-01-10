@@ -255,6 +255,11 @@ Database backends
   the worker memory load (used to hold query results) to the database and might
   increase database memory usage.
 
+* Added MySQL support for the ``'isolation_level'`` option in
+  :setting:`OPTIONS` to allow specifying the :ref:`transaction isolation level
+  <mysql-isolation-level>`. To avoid possible data loss, it's recommended to
+  switch from MySQL's default level, repeatable read, to read committed.
+
 Email
 ~~~~~
 

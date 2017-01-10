@@ -219,6 +219,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE CONCAT('%%', {})",
     }
 
+    isolation_levels = {
+        'read uncommitted',
+        'read committed',
+        'repeatable read',
+        'serializable',
+    }
+
     Database = Database
     SchemaEditorClass = DatabaseSchemaEditor
     # Classes instantiated in __init__().
@@ -252,7 +259,23 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # We need the number of potentially affected rows after an
         # "UPDATE", not the number of changed rows.
         kwargs['client_flag'] = CLIENT.FOUND_ROWS
-        kwargs.update(settings_dict['OPTIONS'])
+        # Validate the transaction isolation level, if specified.
+        options = settings_dict['OPTIONS'].copy()
+        isolation_level = options.pop('isolation_level', None)
+        if isolation_level:
+            isolation_level = isolation_level.lower()
+            if isolation_level not in self.isolation_levels:
+                raise ImproperlyConfigured(
+                    "Invalid transaction isolation level '%s' specified.\n"
+                    "Use one of %s, or None." % (
+                        isolation_level,
+                        ', '.join("'%s'" % s for s in sorted(self.isolation_levels))
+                    ))
+            # The variable assignment form of setting transaction isolation
+            # levels will be used, e.g. "set tx_isolation='repeatable-read'".
+            isolation_level = isolation_level.replace(' ', '-')
+        self.isolation_level = isolation_level
+        kwargs.update(options)
         return kwargs
 
     def get_new_connection(self, conn_params):
@@ -262,13 +285,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn
 
     def init_connection_state(self):
+        assignments = []
         if self.features.is_sql_auto_is_null_enabled:
+            # SQL_AUTO_IS_NULL controls whether an AUTO_INCREMENT column on
+            # a recently inserted row will return when the field is tested
+            # for NULL. Disabling this brings this aspect of MySQL in line
+            # with SQL standards.
+            assignments.append('SQL_AUTO_IS_NULL = 0')
+
+        if self.isolation_level:
+            assignments.append("TX_ISOLATION = '%s'" % self.isolation_level)
+
+        if assignments:
             with self.cursor() as cursor:
-                # SQL_AUTO_IS_NULL controls whether an AUTO_INCREMENT column on
-                # a recently inserted row will return when the field is tested
-                # for NULL. Disabling this brings this aspect of MySQL in line
-                # with SQL standards.
-                cursor.execute('SET SQL_AUTO_IS_NULL = 0')
+                cursor.execute('SET ' + ', '.join(assignments))
 
     def create_cursor(self, name=None):
         cursor = self.connection.cursor()

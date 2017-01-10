@@ -492,6 +492,32 @@ like other MySQL options: either in a config file or with the entry
 ``'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"`` in the
 :setting:`OPTIONS` part of your database configuration in :setting:`DATABASES`.
 
+.. _mysql-isolation-level:
+
+Isolation level
+~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.11
+
+When running concurrent loads, database transactions from different sessions
+(say, separate threads handling different requests) may interact with each
+other. These interactions are affected by each session's `transaction isolation
+level`_. You can set a connection's isolation level with an
+``'isolation_level'`` entry in the :setting:`OPTIONS` part of your database
+configuration in :setting:`DATABASES`. Valid values for
+this entry are the four standard isolation levels:
+
+* ``'read uncommitted'``
+* ``'read committed'``
+* ``'repeatable read'``
+* ``'serializable'``
+
+or ``None`` to use the server's configured isolation level. However, Django
+works best with read committed rather than MySQL's default, repeatable read.
+Data loss is possible with repeatable read.
+
+.. _transaction isolation level: https://dev.mysql.com/doc/refman/en/innodb-transaction-isolation-levels.html
+
 Creating your tables
 --------------------
 
