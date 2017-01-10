@@ -275,7 +275,8 @@ Database backends
 
 * Added the ``'isolation_level'`` setting in :setting:`OPTIONS` to
   let MySQL users specify the :ref:`transaction isolation level
-  <mysql-tx-isolation-level>`.
+  <mysql-tx-isolation-level>`. Also added a check to warn users against
+  using MySQL's ``REPEATABLE READ`` isolation level by default.
 
 Email
 ~~~~~

@@ -7,6 +7,7 @@ class DatabaseValidation(BaseDatabaseValidation):
     def check(self, **kwargs):
         issues = super(DatabaseValidation, self).check(**kwargs)
         issues.extend(self._check_sql_mode(**kwargs))
+        issues.extend(self._check_tx_isolation_level(**kwargs))
         return issues
 
     def _check_sql_mode(self, **kwargs):
@@ -23,6 +24,29 @@ class DatabaseValidation(BaseDatabaseValidation):
                      "https://docs.djangoproject.com/en/%s/ref/databases/#mysql-sql-mode"
                      % (get_docs_version(),),
                 id='mysql.W002',
+            )]
+        return []
+
+    def _check_tx_isolation_level(self, **kwargs):
+        if 'isolation_level' in self.connection.settings_dict['OPTIONS']:
+            # User explicitly selected isolation level, trust them.
+            return []
+        with self.connection.cursor() as cursor:
+            cursor.execute("SELECT @@session.tx_isolation")
+            tx_isolation = cursor.fetchone()[0]
+        if tx_isolation == 'REPEATABLE-READ':
+            return [checks.Warning(
+                "Transaction Isolation Level for database connection '%s' is '%s'" % (
+                    self.connection.alias, tx_isolation
+                ),
+                hint="Django and many of its apps are written to work correctly under the "
+                     "READ COMMITTED transaction isolation level. MySQL's default level, "
+                     "REPEATABLE READ, may imply some surprising behaviors under concurrent "
+                     "loads, leading to possible data loss. It is recommended that you "
+                     "change the transaction isolation level. See: "
+                     "https://docs.djangoproject.com/en/%s/ref/databases/#mysql-tx-isolation-level"
+                     % (get_docs_version(),),
+                id='mysql.W003',
             )]
         return []
 
