@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+from collections import defaultdict
+
 from django.apps import apps
 from django.db import models
 from django.utils.encoding import force_text, python_2_unicode_compatible
@@ -65,12 +67,12 @@ class ContentTypeManager(models.Manager):
         Given *models, returns a dictionary mapping {model: content_type}.
         """
         for_concrete_models = kwargs.pop('for_concrete_models', True)
-        # Final results
         results = {}
-        # models that aren't already in the cache
+        # Models that aren't already in the cache.
         needed_app_labels = set()
         needed_models = set()
-        needed_opts = set()
+        # Mapping of opts to the list of models requiring it.
+        needed_opts = defaultdict(list)
         for model in models:
             opts = self._get_opts(model, for_concrete_models)
             try:
@@ -78,28 +80,30 @@ class ContentTypeManager(models.Manager):
             except KeyError:
                 needed_app_labels.add(opts.app_label)
                 needed_models.add(opts.model_name)
-                needed_opts.add(opts)
+                needed_opts[opts].append(model)
             else:
                 results[model] = ct
         if needed_opts:
+            # Lookup required content types from the DB.
             cts = self.filter(
                 app_label__in=needed_app_labels,
                 model__in=needed_models
             )
             for ct in cts:
                 model = ct.model_class()
-                if model._meta in needed_opts:
+                opts_models = needed_opts.pop(ct.model_class()._meta, [])
+                for model in opts_models:
                     results[model] = ct
-                    needed_opts.remove(model._meta)
                 self._add_to_cache(self.db, ct)
-        for opts in needed_opts:
-            # These weren't in the cache, or the DB, create them.
+        # Create content types that weren't in the cache or DB.
+        for opts, opts_models in needed_opts.items():
             ct = self.create(
                 app_label=opts.app_label,
                 model=opts.model_name,
             )
             self._add_to_cache(self.db, ct)
-            results[ct.model_class()] = ct
+            for model in opts_models:
+                results[model] = ct
         return results
 
     def get_for_id(self, id):
