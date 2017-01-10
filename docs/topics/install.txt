@@ -181,6 +181,8 @@ This is the recommended way to install Django.
 .. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.io/en/latest/
 .. _standalone pip installer: https://pip.pypa.io/en/latest/installing/#installing-with-get-pip-py
 
+.. _installing-distribution-package:
+
 Installing a distribution-specific package
 ------------------------------------------
 
