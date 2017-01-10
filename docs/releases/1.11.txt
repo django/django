@@ -273,6 +273,10 @@ Database backends
 * Added the :setting:`TEST['TEMPLATE'] <TEST_TEMPLATE>` setting to let
   PostgreSQL users specify a template for creating the test database.
 
+* Added the ``'isolation_level'`` setting in :setting:`OPTIONS` to
+  let MySQL users specify the :ref:`transaction isolation level
+  <mysql-tx-isolation-level>`.
+
 Email
 ~~~~~
 

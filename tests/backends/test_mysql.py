@@ -18,3 +18,32 @@ class MySQLTests(TestCase):
             self.assertIn(query, last_query)
         else:
             self.assertNotIn(query, last_query)
+
+    def test_connect_isolation_level(self):
+        """
+        Inspired by a similarly-named PostrgreSQL test in tests.py
+        """
+        read_committed = 'READ COMMITTED'
+        repeatable_read = 'REPEATABLE READ'
+
+        isolation_values = {
+            level: level.replace(' ', '-')
+            for level in (read_committed, repeatable_read)
+        }
+
+        # This test assumes that MySQL is configured with the default isolation level.
+
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT @@session.tx_isolation")
+            tx_isolation = cursor.fetchone()[0]
+        self.assertEqual(tx_isolation, isolation_values[repeatable_read])
+
+        new_connection = connection.copy()
+        new_connection.settings_dict['OPTIONS']['isolation_level'] = read_committed
+        try:
+            with new_connection.cursor() as cursor:
+                cursor.execute("SELECT @@session.tx_isolation")
+                tx_isolation = cursor.fetchone()[0]
+            self.assertEqual(tx_isolation, isolation_values[read_committed])
+        finally:
+            new_connection.close()
