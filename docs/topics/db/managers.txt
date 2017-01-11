@@ -230,7 +230,7 @@ retrieved.
 
 If you override the ``get_queryset()`` method and filter out any rows, Django
 will return incorrect results. Don't do that. A manager that filters results
-in ``get_queryset()`` is not appropriate for use as a default manager.
+in ``get_queryset()`` is not appropriate for use as a base manager.
 
 .. _calling-custom-queryset-methods-from-manager:
 
