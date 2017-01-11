@@ -4,7 +4,7 @@ import copy
 import threading
 
 from .channel import Channel
-from .signals import consumer_finished
+from .signals import consumer_finished, consumer_started
 
 
 class Message(object):
@@ -71,16 +71,29 @@ class PendingMessageStore(object):
 
     threadlocal = threading.local()
 
+    def prepare(self, **kwargs):
+        """
+        Sets the message store up to receive messages.
+        """
+        self.threadlocal.messages = []
+
+    @property
+    def active(self):
+        """
+        Returns if the pending message store can be used or not
+        (it can only be used inside consumers)
+        """
+        return hasattr(self.threadlocal, "messages")
+
     def append(self, sender, message):
-        if not hasattr(self.threadlocal, "messages"):
-            self.threadlocal.messages = []
         self.threadlocal.messages.append((sender, message))
 
     def send_and_flush(self, **kwargs):
         for sender, message in getattr(self.threadlocal, "messages", []):
             sender.send(message, immediately=True)
-        self.threadlocal.messages = []
+        delattr(self.threadlocal, "messages")
 
 
 pending_message_store = PendingMessageStore()
+consumer_started.connect(pending_message_store.prepare)
 consumer_finished.connect(pending_message_store.send_and_flush)

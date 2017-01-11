@@ -34,14 +34,15 @@ class Channel(object):
         Send a message over the channel - messages are always dicts.
 
         Sends are delayed until consumer completion. To override this, you
-        may pass immediately=True.
+        may pass immediately=True. If you are outside a consumer, things are
+        always sent immediately.
         """
+        from .message import pending_message_store
         if not isinstance(content, dict):
             raise TypeError("You can only send dicts as content on channels.")
-        if immediately:
+        if immediately or not pending_message_store.active:
             self.channel_layer.send(self.name, content)
         else:
-            from .message import pending_message_store
             pending_message_store.append(self, content)
 
     def __str__(self):
@@ -80,10 +81,10 @@ class Group(object):
         Sends are delayed until consumer completion. To override this, you
         may pass immediately=True.
         """
+        from .message import pending_message_store
         if not isinstance(content, dict):
             raise ValueError("You can only send dicts as content on channels.")
-        if immediately:
+        if immediately or not pending_message_store.active:
             self.channel_layer.send_group(self.name, content)
         else:
-            from .message import pending_message_store
             pending_message_store.append(self, content)
