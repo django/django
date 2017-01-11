@@ -9,7 +9,6 @@ from six import BytesIO
 
 from channels import Channel
 from channels.handler import AsgiHandler
-from channels.signals import consumer_finished
 from channels.tests import ChannelTestCase
 
 
@@ -24,7 +23,6 @@ class FakeAsgiHandler(AsgiHandler):
     def __init__(self, response):
         assert isinstance(response, (HttpResponse, StreamingHttpResponse))
         self._response = response
-        consumer_finished.send(sender=self.__class__)
         super(FakeAsgiHandler, self).__init__()
 
     def get_response(self, request):

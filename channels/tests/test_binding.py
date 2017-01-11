@@ -6,7 +6,6 @@ from channels import route
 from channels.binding.base import CREATE, DELETE, UPDATE
 from channels.binding.websockets import WebsocketBinding
 from channels.generic.websockets import WebsocketDemultiplexer
-from channels.signals import consumer_finished
 from channels.tests import ChannelTestCase, HttpClient, apply_routes
 
 User = get_user_model()
@@ -33,7 +32,6 @@ class TestsBinding(ChannelTestCase):
 
         user = User.objects.create(username='test', email='test@test.com')
 
-        consumer_finished.send(sender=None)
         received = client.receive()
         self.assertTrue('payload' in received)
         self.assertTrue('action' in received['payload'])
@@ -75,8 +73,6 @@ class TestsBinding(ChannelTestCase):
             client.join_group('users_exclude')
 
             user = User.objects.create(username='test', email='test@test.com')
-            consumer_finished.send(sender=None)
-            consumer_finished.send(sender=None)
             received = client.receive()
 
             self.assertTrue('payload' in received)
@@ -131,7 +127,6 @@ class TestsBinding(ChannelTestCase):
 
         # Make model and clear out pending sends
         user = User.objects.create(username='test', email='test@test.com')
-        consumer_finished.send(sender=None)
 
         client = HttpClient()
         client.join_group('users2')
@@ -139,7 +134,6 @@ class TestsBinding(ChannelTestCase):
         user.username = 'test_new'
         user.save()
 
-        consumer_finished.send(sender=None)
         received = client.receive()
         self.assertTrue('payload' in received)
         self.assertTrue('action' in received['payload'])
@@ -178,14 +172,12 @@ class TestsBinding(ChannelTestCase):
 
         # Make model and clear out pending sends
         user = User.objects.create(username='test', email='test@test.com')
-        consumer_finished.send(sender=None)
 
         client = HttpClient()
         client.join_group('users3')
 
         user.delete()
 
-        consumer_finished.send(sender=None)
         received = client.receive()
         self.assertTrue('payload' in received)
         self.assertTrue('action' in received['payload'])
