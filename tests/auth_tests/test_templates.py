@@ -13,42 +13,51 @@ from django.utils.http import urlsafe_base64_encode
 @override_settings(ROOT_URLCONF='auth_tests.urls')
 class AuthTemplateTests(TestCase):
 
-    def test_titles(self):
+    @classmethod
+    def setUpTestData(cls):
         rf = RequestFactory()
         user = User.objects.create_user('jsmith', 'jsmith@example.com', 'pass')
         user = authenticate(username=user.username, password='pass')
         request = rf.get('/somepath/')
         request.user = user
+        cls.user, cls.request = user, request
 
-        response = PasswordResetView.as_view(success_url='dummy/')(request)
+    def test_PasswordResetView(self):
+        response = PasswordResetView.as_view(success_url='dummy/')(self.request)
         self.assertContains(response, '<title>Password reset</title>')
         self.assertContains(response, '<h1>Password reset</h1>')
 
-        response = PasswordResetDoneView.as_view()(request)
+    def test_PasswordResetDoneView(self):
+        response = PasswordResetDoneView.as_view()(self.request)
         self.assertContains(response, '<title>Password reset sent</title>')
         self.assertContains(response, '<h1>Password reset sent</h1>')
 
+    def test_PasswordResetConfirmView_invalid_token(self):
         # PasswordResetConfirmView invalid token
-        response = PasswordResetConfirmView.as_view(success_url='dummy/')(request, uidb64='Bad', token='Bad')
+        response = PasswordResetConfirmView.as_view(success_url='dummy/')(self.request, uidb64='Bad', token='Bad')
         self.assertContains(response, '<title>Password reset unsuccessful</title>')
         self.assertContains(response, '<h1>Password reset unsuccessful</h1>')
 
+    def test_PasswordResetConfirmView_valid_token(self):
         # PasswordResetConfirmView valid token
         default_token_generator = PasswordResetTokenGenerator()
-        token = default_token_generator.make_token(user)
-        uidb64 = force_text(urlsafe_base64_encode(force_bytes(user.pk)))
-        response = PasswordResetConfirmView.as_view(success_url='dummy/')(request, uidb64=uidb64, token=token)
+        token = default_token_generator.make_token(self.user)
+        uidb64 = force_text(urlsafe_base64_encode(force_bytes(self.user.pk)))
+        response = PasswordResetConfirmView.as_view(success_url='dummy/')(self.request, uidb64=uidb64, token=token)
         self.assertContains(response, '<title>Enter new password</title>')
         self.assertContains(response, '<h1>Enter new password</h1>')
 
-        response = PasswordResetCompleteView.as_view()(request)
+    def test_PasswordResetCompleteView(self):
+        response = PasswordResetCompleteView.as_view()(self.request)
         self.assertContains(response, '<title>Password reset complete</title>')
         self.assertContains(response, '<h1>Password reset complete</h1>')
 
-        response = PasswordChangeView.as_view(success_url='dummy/')(request)
+    def test_PasswordResetChangeView(self):
+        response = PasswordChangeView.as_view(success_url='dummy/')(self.request)
         self.assertContains(response, '<title>Password change</title>')
         self.assertContains(response, '<h1>Password change</h1>')
 
-        response = PasswordChangeDoneView.as_view()(request)
+    def test_PasswordChangeDoneView(self):
+        response = PasswordChangeDoneView.as_view()(self.request)
         self.assertContains(response, '<title>Password change successful</title>')
         self.assertContains(response, '<h1>Password change successful</h1>')
