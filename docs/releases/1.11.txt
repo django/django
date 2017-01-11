@@ -273,6 +273,11 @@ Database backends
 * Added the :setting:`TEST['TEMPLATE'] <TEST_TEMPLATE>` setting to let
   PostgreSQL users specify a template for creating the test database.
 
+* Added the ``'isolation_level'`` setting in :setting:`OPTIONS` to
+  let MySQL users specify the :ref:`transaction isolation level
+  <mysql-tx-isolation-level>`. Also added a check to warn users against
+  using MySQL's ``REPEATABLE READ`` isolation level by default.
+
 Email
 ~~~~~
 
@@ -826,3 +831,9 @@ Miscellaneous
 * The ``renderer`` argument is added to the :meth:`Widget.render()
   <django.forms.Widget.render>` method. Methods that don't accept that argument
   will work through a deprecation period.
+
+* On MySQL, defaulting to MySQL's server-configured transaction isolation level
+  is deprecated because MySQL's own default for that is ``REPEATABLE READ``,
+  and the behavior under that level can be surprising and is inconsistent with
+  the default behavior of other backends. In Django 2.1, the default transaction
+  isolation level for MySQL will be ``READ COMMITTED``.

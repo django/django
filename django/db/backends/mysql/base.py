@@ -6,17 +6,21 @@ MySQLdb is supported for Python 2 only: http://sourceforge.net/projects/mysql-py
 """
 from __future__ import unicode_literals
 
+import copy
 import datetime
 import re
 import sys
 import warnings
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils import six, timezone
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes, SafeText
@@ -24,7 +28,6 @@ from django.utils.safestring import SafeBytes, SafeText
 try:
     import MySQLdb as Database
 except ImportError as e:
-    from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured(
         'Error loading MySQLdb module: %s.\n'
         'Did you install mysqlclient or MySQL-python?' % e
@@ -48,7 +51,6 @@ from .validation import DatabaseValidation                  # isort:skip
 version = Database.version_info
 if (version < (1, 2, 1) or (
         version[:3] == (1, 2, 1) and (len(version) < 5 or version[3] != 'final' or version[4] < 2))):
-    from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
 
@@ -220,6 +222,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE CONCAT('%%', {})",
     }
 
+    isolation_levels = {
+        'read uncommitted',
+        'read committed',
+        'repeatable read',
+        'serializable',
+    }
+
     Database = Database
     SchemaEditorClass = DatabaseSchemaEditor
     # Classes instantiated in __init__().
@@ -253,7 +262,30 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # We need the number of potentially affected rows after an
         # "UPDATE", not the number of changed rows.
         kwargs['client_flag'] = CLIENT.FOUND_ROWS
-        kwargs.update(settings_dict['OPTIONS'])
+        # Special handling for transaction isolation level
+        options = copy.copy(settings_dict['OPTIONS'])
+        self.isolation_level = options.pop('isolation_level', None)
+        if self.isolation_level:
+            self.isolation_level = self.isolation_level.lower()
+            if self.isolation_level not in self.isolation_levels:
+                raise ImproperlyConfigured(
+                    "Invalid transaction isolation level '%s' specified.\n"
+                    "Use one of %s or None." % (
+                        self.isolation_level,
+                        ", ".join(repr(str(s)) for s in self.isolation_levels)
+                    ))
+            # We are going to use the var-assignment form of setting transaction isolation
+            # levels, and in that form we say "set tx_isolation='repeatable-read'" rather
+            # than "set transaction isolation level repeatable read"
+            self.isolation_level_value = "'%s'" % self.isolation_level.replace(' ', '-')
+        else:
+            if 'isolation_level' not in settings_dict['OPTIONS']:
+                warnings.warn(
+                    "Django's default transaction isolation level on MySQL is going to "
+                    "change from REPEATABLE READ (MySQL's default) to READ COMMITTED. "
+                    "Specify an explicit level by setting 'isolation_level' in "
+                    "'OPTIONS' in the connection settings.", RemovedInDjango21Warning)
+        kwargs.update(options)
         return kwargs
 
     def get_new_connection(self, conn_params):
@@ -263,13 +295,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn
 
     def init_connection_state(self):
+        assignments = []
         if self.features.is_sql_auto_is_null_enabled:
+            # SQL_AUTO_IS_NULL controls whether an AUTO_INCREMENT column on
+            # a recently inserted row will return when the field is tested
+            # for NULL. Disabling this brings this aspect of MySQL in line
+            # with SQL standards.
+            assignments.append('SQL_AUTO_IS_NULL = 0')
+
+        if self.isolation_level:
+            assignments.append('TX_ISOLATION = %s' % self.isolation_level_value)
+
+        if assignments:
             with self.cursor() as cursor:
-                # SQL_AUTO_IS_NULL controls whether an AUTO_INCREMENT column on
-                # a recently inserted row will return when the field is tested
-                # for NULL. Disabling this brings this aspect of MySQL in line
-                # with SQL standards.
-                cursor.execute('SET SQL_AUTO_IS_NULL = 0')
+                cursor.execute('SET ' + ', '.join(assignments))
 
     def create_cursor(self):
         cursor = self.connection.cursor()
