@@ -367,17 +367,20 @@ A channel layer implementing the ``groups`` extension must also provide:
 
 A channel layer implementing the ``statistics`` extension must also provide:
 
-* ``global_statistics()``, a callable that returns a dict with zero
-  or more of (unicode string keys):
+* ``global_statistics()``, a callable that returns statistics across all channels
+* ``channel_statistics(channel)``, a callable that returns statistics for specified channel
 
-  * ``count``, the current number of messages waiting in all channels
+* in both cases statistics are a dict with zero or more of (unicode string keys):
 
-* ``channel_statistics(channel)``, a callable that returns a dict with zero
-  or more of (unicode string keys):
+  * ``messages_count``, the number of messages processed since server start
+  * ``messages_count_per_second``, the number of messages processed in the last second
+  * ``messages_pending``, the current number of messages waiting
+  * ``messages_max_age``, how long the oldest message has been waiting, in seconds
+  * ``channel_full_count``, the number of times `ChannelFull` exception has been risen since server start
+  * ``channel_full_count_per_second``, the number of times `ChannelFull` exception has been risen in the last second
 
-  * ``length``, the current number of messages waiting on the channel
-  * ``age``, how long the oldest message has been waiting, in seconds
-  * ``per_second``, the number of messages processed in the last second
+* Implementation may provide total counts, counts per seconds or both.
+
 
 A channel layer implementing the ``flush`` extension must also provide:
 
