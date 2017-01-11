@@ -103,7 +103,9 @@ The basic WebSocket generic consumer is used like this::
             """
             Perform things on connection start
             """
-            pass
+            # Accept the connection; this is done by default if you don't override
+            # the connect function.
+            self.message.reply_channel.send({"accept": True})
 
         def receive(self, text=None, bytes=None, **kwargs):
             """
