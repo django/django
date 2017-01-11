@@ -13,7 +13,7 @@ from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
 from django.utils import datetime_safe, formats
 from django.utils.dates import MONTHS
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_text
 from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
 from django.utils.safestring import mark_safe
@@ -986,7 +986,7 @@ class SelectDateWidget(Widget):
             if settings.USE_L10N:
                 try:
                     input_format = get_format('DATE_INPUT_FORMATS')[0]
-                    d = datetime.datetime.strptime(force_str(value), input_format)
+                    d = datetime.datetime.strptime(value, input_format)
                     year, month, day = d.year, d.month, d.day
                 except ValueError:
                     pass

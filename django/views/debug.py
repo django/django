@@ -10,7 +10,7 @@ from django.template.defaultfilters import force_escape, pprint
 from django.urls import Resolver404, resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
 
@@ -505,7 +505,7 @@ def technical_404_response(request, exception):
         'root_urlconf': settings.ROOT_URLCONF,
         'request_path': error_url,
         'urlpatterns': tried,
-        'reason': force_bytes(exception, errors='replace'),
+        'reason': str(exception),
         'request': request,
         'settings': get_safe_settings(),
         'raising_view_name': caller,

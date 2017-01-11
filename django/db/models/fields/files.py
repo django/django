@@ -9,7 +9,7 @@ from django.core.files.storage import default_storage
 from django.core.validators import validate_image_file_extension
 from django.db.models import signals
 from django.db.models.fields import Field
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -304,7 +304,7 @@ class FileField(Field):
         if callable(self.upload_to):
             filename = self.upload_to(instance, filename)
         else:
-            dirname = force_text(datetime.datetime.now().strftime(force_str(self.upload_to)))
+            dirname = force_text(datetime.datetime.now().strftime(self.upload_to))
             filename = posixpath.join(dirname, filename)
         return self.storage.generate_filename(filename)
 

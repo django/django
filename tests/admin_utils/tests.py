@@ -218,12 +218,8 @@ class UtilsTests(SimpleTestCase):
         )
 
         self.assertEqual(
-            label_for_field("__unicode__", Article),
-            "article"
-        )
-        self.assertEqual(
             label_for_field("__str__", Article),
-            str("article")
+            "article"
         )
 
         with self.assertRaises(AttributeError):

@@ -7,7 +7,6 @@ import warnings
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 
 
@@ -64,10 +63,6 @@ class BaseMemcachedCache(BaseCache):
             # This means that we have to switch to absolute timestamps.
             timeout += int(time.time())
         return int(timeout)
-
-    def make_key(self, key, version=None):
-        # Python 2 memcache requires the key to be a byte string.
-        return force_str(super(BaseMemcachedCache, self).make_key(key, version))
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)

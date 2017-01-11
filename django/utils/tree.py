@@ -5,7 +5,7 @@ ORM.
 
 import copy
 
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_text
 
 
 class Node:
@@ -45,10 +45,10 @@ class Node:
 
     def __str__(self):
         template = '(NOT (%s: %s))' if self.negated else '(%s: %s)'
-        return force_str(template % (self.connector, ', '.join(force_text(c) for c in self.children)))
+        return template % (self.connector, ', '.join(force_text(c) for c in self.children))
 
     def __repr__(self):
-        return str("<%s: %s>") % (self.__class__.__name__, self)
+        return "<%s: %s>" % (self.__class__.__name__, self)
 
     def __deepcopy__(self, memodict):
         """

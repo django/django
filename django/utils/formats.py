@@ -5,7 +5,6 @@ from importlib import import_module
 
 from django.conf import settings
 from django.utils import dateformat, datetime_safe, numberformat
-from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
 from django.utils.translation import (
@@ -111,7 +110,6 @@ def get_format(format_type, lang=None, use_l10n=None):
     If use_l10n is provided and is not None, that will force the value to
     be localized (or not), overriding the value of settings.USE_L10N.
     """
-    format_type = force_str(format_type)
     use_l10n = use_l10n or (use_l10n is None and settings.USE_L10N)
     if use_l10n and lang is None:
         lang = get_language()
@@ -229,14 +227,14 @@ def localize_input(value, default=None):
         return number_format(value)
     elif isinstance(value, datetime.datetime):
         value = datetime_safe.new_datetime(value)
-        format = force_str(default or get_format('DATETIME_INPUT_FORMATS')[0])
+        format = default or get_format('DATETIME_INPUT_FORMATS')[0]
         return value.strftime(format)
     elif isinstance(value, datetime.date):
         value = datetime_safe.new_date(value)
-        format = force_str(default or get_format('DATE_INPUT_FORMATS')[0])
+        format = default or get_format('DATE_INPUT_FORMATS')[0]
         return value.strftime(format)
     elif isinstance(value, datetime.time):
-        format = force_str(default or get_format('TIME_INPUT_FORMATS')[0])
+        format = default or get_format('TIME_INPUT_FORMATS')[0]
         return value.strftime(format)
     return value
 

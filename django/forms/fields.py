@@ -29,7 +29,7 @@ from django.forms.widgets import (
 from django.utils import formats, six
 from django.utils.dateparse import parse_duration
 from django.utils.duration import duration_string
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_text
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
@@ -429,7 +429,7 @@ class DateField(BaseTemporalField):
         return super(DateField, self).to_python(value)
 
     def strptime(self, value, format):
-        return datetime.datetime.strptime(force_str(value), format).date()
+        return datetime.datetime.strptime(value, format).date()
 
 
 class TimeField(BaseTemporalField):
@@ -451,7 +451,7 @@ class TimeField(BaseTemporalField):
         return super(TimeField, self).to_python(value)
 
     def strptime(self, value, format):
-        return datetime.datetime.strptime(force_str(value), format).time()
+        return datetime.datetime.strptime(value, format).time()
 
 
 class DateTimeField(BaseTemporalField):
@@ -482,7 +482,7 @@ class DateTimeField(BaseTemporalField):
         return from_current_timezone(result)
 
     def strptime(self, value, format):
-        return datetime.datetime.strptime(force_str(value), format)
+        return datetime.datetime.strptime(value, format)
 
 
 class DurationField(Field):

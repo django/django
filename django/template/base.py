@@ -56,7 +56,7 @@ import re
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
 )
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_text
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
 from django.utils.inspect import getargspec
@@ -971,8 +971,7 @@ class TextNode(Node):
         self.s = s
 
     def __repr__(self):
-        rep = "<%s: %r>" % (self.__class__.__name__, self.s[:25])
-        return force_str(rep, 'ascii', errors='replace')
+        return "<%s: %r>" % (self.__class__.__name__, self.s[:25])
 
     def render(self, context):
         return self.s

@@ -5,7 +5,7 @@ from urllib.parse import (
     parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit,
 )
 
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_text
 from django.utils.functional import keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, SafeText, mark_safe
@@ -189,7 +189,7 @@ def strip_spaces_between_tags(value):
 def smart_urlquote(url):
     "Quotes a URL if it isn't already quoted."
     def unquote_quote(segment):
-        segment = unquote(force_str(segment))
+        segment = unquote(segment)
         # Tilde is part of RFC3986 Unreserved Characters
         # http://tools.ietf.org/html/rfc3986#section-2.3
         # See also http://bugs.python.org/issue16285
@@ -211,7 +211,7 @@ def smart_urlquote(url):
     if query:
         # Separately unquoting key/value, so as to not mix querystring separators
         # included in query values. See #22267.
-        query_parts = [(unquote(force_str(q[0])), unquote(force_str(q[1])))
+        query_parts = [(unquote(q[0]), unquote(q[1]))
                        for q in parse_qsl(query, keep_blank_values=True)]
         # urlencode will take care of quoting
         query = urlencode(query_parts)

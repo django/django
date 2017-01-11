@@ -12,7 +12,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.utils import DatabaseError as WrappedDatabaseError
-from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes, SafeText
 
@@ -160,7 +159,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if settings_dict['USER']:
             conn_params['user'] = settings_dict['USER']
         if settings_dict['PASSWORD']:
-            conn_params['password'] = force_str(settings_dict['PASSWORD'])
+            conn_params['password'] = settings_dict['PASSWORD']
         if settings_dict['HOST']:
             conn_params['host'] = settings_dict['HOST']
         if settings_dict['PORT']:

@@ -26,7 +26,7 @@ from django.db.models.signals import (
     class_prepared, post_init, post_save, pre_init, pre_save,
 )
 from django.db.models.utils import make_model_tuple
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_text
 from django.utils.functional import curry
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext_lazy as _
@@ -505,7 +505,7 @@ class Model(metaclass=ModelBase):
             u = str(self)
         except (UnicodeEncodeError, UnicodeDecodeError):
             u = '[Bad Unicode data]'
-        return force_str('<%s: %s>' % (self.__class__.__name__, u))
+        return '<%s: %s>' % (self.__class__.__name__, u)
 
     def __str__(self):
         return '%s object' % self.__class__.__name__

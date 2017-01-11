@@ -11,7 +11,7 @@ from django.db.models.sql.constants import QUERY_TERMS
 from django.forms.utils import pretty_name
 from django.urls import NoReverseMatch, reverse
 from django.utils import formats, timezone
-from django.utils.encoding import force_str, force_text, smart_text
+from django.utils.encoding import force_text, smart_text
 from django.utils.html import format_html
 from django.utils.text import capfirst
 from django.utils.translation import (
@@ -340,12 +340,9 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
             # field is likely a ForeignObjectRel
             label = field.related_model._meta.verbose_name
     except FieldDoesNotExist:
-        if name == "__unicode__":
+        if name == "__str__":
             label = force_text(model._meta.verbose_name)
             attr = str
-        elif name == "__str__":
-            label = force_str(model._meta.verbose_name)
-            attr = bytes
         else:
             if callable(name):
                 attr = name

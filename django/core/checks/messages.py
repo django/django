@@ -1,4 +1,4 @@
-from django.utils.encoding import force_str
+from django.utils.encoding import force_text
 
 # Levels
 DEBUG = 10
@@ -35,7 +35,7 @@ class CheckMessage:
             # method doesn't return "applabel.modellabel" and cannot be changed.
             obj = self.obj._meta.label
         else:
-            obj = force_str(self.obj)
+            obj = force_text(self.obj)
         id = "(%s) " % self.id if self.id else ""
         hint = "\n\tHINT: %s" % self.hint if self.hint else ''
         return "%s: %s%s%s" % (obj, id, self.msg, hint)

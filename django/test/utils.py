@@ -23,7 +23,6 @@ from django.template import Template
 from django.test.signals import setting_changed, template_rendered
 from django.urls import get_script_prefix, set_script_prefix
 from django.utils.decorators import available_attrs
-from django.utils.encoding import force_str
 from django.utils.translation import deactivate
 
 try:
@@ -317,7 +316,7 @@ def get_runner(settings, test_runner_class=None):
         test_module_name = '.'.join(test_path[:-1])
     else:
         test_module_name = '.'
-    test_module = __import__(test_module_name, {}, {}, force_str(test_path[-1]))
+    test_module = __import__(test_module_name, {}, {}, test_path[-1])
     test_runner = getattr(test_module, test_path[-1])
     return test_runner
 

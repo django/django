@@ -14,9 +14,7 @@ from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils import six
 from django.utils.datastructures import ImmutableList, MultiValueDict
-from django.utils.encoding import (
-    escape_uri_path, force_bytes, force_str, iri_to_uri,
-)
+from django.utils.encoding import escape_uri_path, force_bytes, iri_to_uri
 from django.utils.http import is_same_domain, limited_parse_qsl
 
 RAISE_ERROR = object()
@@ -64,10 +62,8 @@ class HttpRequest:
 
     def __repr__(self):
         if self.method is None or not self.get_full_path():
-            return force_str('<%s>' % self.__class__.__name__)
-        return force_str(
-            '<%s: %s %r>' % (self.__class__.__name__, self.method, force_str(self.get_full_path()))
-        )
+            return '<%s>' % self.__class__.__name__
+        return '<%s: %s %r>' % (self.__class__.__name__, self.method, self.get_full_path())
 
     def _get_raw_host(self):
         """

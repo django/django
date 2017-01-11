@@ -7,7 +7,6 @@ from django.db import close_old_connections, connection
 from django.test import (
     RequestFactory, SimpleTestCase, TransactionTestCase, override_settings,
 )
-from django.utils.encoding import force_str
 
 try:
     from http import HTTPStatus
@@ -65,10 +64,7 @@ class HandlerTests(SimpleTestCase):
         raw_cookie = 'want="café"'.encode('utf-8').decode('iso-8859-1')
         environ['HTTP_COOKIE'] = raw_cookie
         request = WSGIRequest(environ)
-        # If would be nicer if request.COOKIES returned unicode values.
-        # However the current cookie parser doesn't do this and fixing it is
-        # much more work than fixing #20557. Feel free to remove force_str()!
-        self.assertEqual(request.COOKIES['want'], force_str("café"))
+        self.assertEqual(request.COOKIES['want'], "café")
 
     def test_invalid_unicode_cookie(self):
         """

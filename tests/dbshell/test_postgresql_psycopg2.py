@@ -1,9 +1,7 @@
-import locale
 import os
 
 from django.db.backends.postgresql.client import DatabaseClient
 from django.test import SimpleTestCase, mock
-from django.utils.encoding import force_bytes, force_str
 
 
 class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
@@ -13,13 +11,12 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
         That function invokes the runshell command, while mocking
         subprocess.call. It returns a 2-tuple with:
         - The command line list
-        - The binary content of file pointed by environment PGPASSFILE, or
-          None.
+        - The content of the file pointed by environment PGPASSFILE, or None.
         """
         def _mock_subprocess_call(*args):
             self.subprocess_args = list(*args)
             if 'PGPASSFILE' in os.environ:
-                with open(os.environ['PGPASSFILE'], 'rb') as f:
+                with open(os.environ['PGPASSFILE'], 'r') as f:
                     self.pgpass = f.read().strip()  # ignore line endings
             else:
                 self.pgpass = None
@@ -40,7 +37,7 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 'port': '444',
             }), (
                 ['psql', '-U', 'someuser', '-h', 'somehost', '-p', '444', 'dbname'],
-                b'somehost:444:dbname:someuser:somepassword',
+                'somehost:444:dbname:someuser:somepassword',
             )
         )
 
@@ -67,7 +64,7 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 'port': '444',
             }), (
                 ['psql', '-U', 'some:user', '-h', '::1', '-p', '444', 'dbname'],
-                b'\\:\\:1:444:dbname:some\\:user:some\\:password',
+                '\\:\\:1:444:dbname:some\\:user:some\\:password',
             )
         )
 
@@ -81,30 +78,23 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 'port': '444',
             }), (
                 ['psql', '-U', 'some\\user', '-h', 'somehost', '-p', '444', 'dbname'],
-                b'somehost:444:dbname:some\\\\user:some\\\\password',
+                'somehost:444:dbname:some\\\\user:some\\\\password',
             )
         )
 
     def test_accent(self):
-        # The pgpass temporary file needs to be encoded using the system locale.
-        encoding = locale.getpreferredencoding()
         username = 'rôle'
         password = 'sésame'
-        username_str = force_str(username, encoding)
-        password_str = force_str(password, encoding)
-        pgpass_bytes = force_bytes(
-            'somehost:444:dbname:%s:%s' % (username, password),
-            encoding=encoding,
-        )
+        pgpass_string = 'somehost:444:dbname:%s:%s' % (username, password)
         self.assertEqual(
             self._run_it({
                 'database': 'dbname',
-                'user': username_str,
-                'password': password_str,
+                'user': username,
+                'password': password,
                 'host': 'somehost',
                 'port': '444',
             }), (
-                ['psql', '-U', username_str, '-h', 'somehost', '-p', '444', 'dbname'],
-                pgpass_bytes,
+                ['psql', '-U', username, '-h', 'somehost', '-p', '444', 'dbname'],
+                pgpass_string,
             )
         )

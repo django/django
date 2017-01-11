@@ -13,9 +13,7 @@ from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import timezone
-from django.utils.encoding import (
-    force_bytes, force_str, force_text, iri_to_uri,
-)
+from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.http import cookie_date
 
 _charset_from_content_type_re = re.compile(r';\s*charset=(?P<charset>[^\s;]+)', re.I)
@@ -170,7 +168,6 @@ class HttpResponseBase:
         - an aware ``datetime.datetime`` object in any time zone.
         If it is a ``datetime.datetime`` object then ``max_age`` will be calculated.
         """
-        value = force_str(value)
         self.cookies[key] = value
         if expires is not None:
             if isinstance(expires, datetime.datetime):

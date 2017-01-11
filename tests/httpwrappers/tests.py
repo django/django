@@ -17,7 +17,6 @@ from django.http import (
 )
 from django.test import SimpleTestCase
 from django.utils._os import upath
-from django.utils.encoding import force_str
 from django.utils.functional import lazystr
 
 
@@ -294,13 +293,8 @@ class HttpResponseTests(unittest.TestCase):
         self.assertIsInstance(r['key'], str)
         self.assertIn(b'test', r.serialize_headers())
 
-        # Latin-1 unicode or bytes values are also converted to native strings.
+        # Non-ASCII values are serialized to Latin-1.
         r['key'] = 'café'
-        self.assertEqual(r['key'], force_str('café', 'latin-1'))
-        self.assertIsInstance(r['key'], str)
-        r['key'] = 'café'.encode('latin-1')
-        self.assertEqual(r['key'], force_str('café', 'latin-1'))
-        self.assertIsInstance(r['key'], str)
         self.assertIn('café'.encode('latin-1'), r.serialize_headers())
 
         # Other unicode values are MIME-encoded (there's no way to pass them as bytes).
@@ -759,7 +753,7 @@ class CookieTests(unittest.TestCase):
         # More characters the spec forbids.
         self.assertEqual(parse_cookie('a   b,c<>@:/[]?{}=d  "  =e,f g'), {'a   b,c<>@:/[]?{}': 'd  "  =e,f g'})
         # Unicode characters. The spec only allows ASCII.
-        self.assertEqual(parse_cookie('saint=André Bessette'), {'saint': force_str('André Bessette')})
+        self.assertEqual(parse_cookie('saint=André Bessette'), {'saint': 'André Bessette'})
         # Browsers don't send extra whitespace or semicolons in Cookie headers,
         # but parse_cookie() should parse whitespace the same way
         # document.cookie parses whitespace.

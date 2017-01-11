@@ -15,7 +15,7 @@ from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, mock, override_settings,
 )
 from django.test.utils import captured_stdout, isolate_apps
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_text
 
 from .models import (
     Article, Author, ModelWithNullFKToSite, Post, SchemeIncludedURL,
@@ -144,7 +144,7 @@ class GenericForeignKeyTests(SimpleTestCase):
         class Model(models.Model):
             field = GenericForeignKey()
         expected = "contenttypes_tests.Model.field"
-        actual = force_str(Model.field)
+        actual = force_text(Model.field)
         self.assertEqual(expected, actual)
 
     def test_missing_content_type_field(self):

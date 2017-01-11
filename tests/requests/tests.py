@@ -14,7 +14,6 @@ from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
 from django.test.utils import freeze_time, str_prefix
-from django.utils.encoding import force_str
 from django.utils.http import cookie_date, urlencode
 from django.utils.timezone import utc
 
@@ -270,7 +269,7 @@ class RequestsTests(SimpleTestCase):
         response = HttpResponse()
         cookie_value = '清風'
         response.set_cookie('test', cookie_value)
-        self.assertEqual(force_str(cookie_value), response.cookies['test'].value)
+        self.assertEqual(cookie_value, response.cookies['test'].value)
 
     def test_limited_stream(self):
         # Read all of a limited stream

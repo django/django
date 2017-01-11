@@ -13,7 +13,7 @@ from django.dispatch import receiver
 from django.utils.crypto import (
     constant_time_compare, get_random_string, pbkdf2,
 )
-from django.utils.encoding import force_bytes, force_str, force_text
+from django.utils.encoding import force_bytes, force_text
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_noop as _
 
@@ -627,7 +627,7 @@ class CryptPasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         crypt = self._load_library()
         assert len(salt) == 2
-        data = crypt.crypt(force_str(password), salt)
+        data = crypt.crypt(password, salt)
         assert data is not None  # A platform like OpenBSD with a dummy crypt module.
         # we don't need to store the salt, but Django used to do this
         return "%s$%s$%s" % (self.algorithm, '', data)
@@ -636,7 +636,7 @@ class CryptPasswordHasher(BasePasswordHasher):
         crypt = self._load_library()
         algorithm, salt, data = encoded.split('$', 2)
         assert algorithm == self.algorithm
-        return constant_time_compare(data, crypt.crypt(force_str(password), data))
+        return constant_time_compare(data, crypt.crypt(password, data))
 
     def safe_summary(self, encoded):
         algorithm, salt, data = encoded.split('$', 2)

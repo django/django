@@ -15,7 +15,6 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import migrations
 from django.test import TestCase, mock, override_settings
-from django.utils.encoding import force_str
 from django.utils.translation import ugettext_lazy as _
 
 from .models import (
@@ -44,7 +43,7 @@ def mock_inputs(inputs):
                 assert str('__proxy__') not in prompt
                 response = ''
                 for key, val in inputs.items():
-                    if force_str(key) in prompt.lower():
+                    if key in prompt.lower():
                         response = val
                         break
                 return response

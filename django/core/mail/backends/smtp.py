@@ -8,7 +8,6 @@ from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import sanitize_address
 from django.core.mail.utils import DNS_NAME
-from django.utils.encoding import force_str
 
 
 class EmailBackend(BaseEmailBackend):
@@ -68,7 +67,7 @@ class EmailBackend(BaseEmailBackend):
             if not self.use_ssl and self.use_tls:
                 self.connection.starttls(keyfile=self.ssl_keyfile, certfile=self.ssl_certfile)
             if self.username and self.password:
-                self.connection.login(force_str(self.username), force_str(self.password))
+                self.connection.login(self.username, self.password)
             return True
         except (smtplib.SMTPException, socket.error):
             if not self.fail_silently:

@@ -21,7 +21,7 @@ from django.test import signals
 from django.test.utils import ContextList
 from django.urls import resolve
 from django.utils import six
-from django.utils.encoding import force_bytes, force_str, uri_to_iri
+from django.utils.encoding import force_bytes, uri_to_iri
 from django.utils.functional import SimpleLazyObject, curry
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
@@ -317,10 +317,10 @@ class RequestFactory:
             return force_bytes(data, encoding=charset)
 
     def _get_path(self, parsed):
-        path = force_str(parsed[2])
+        path = parsed.path
         # If there are parameters, add them
-        if parsed[3]:
-            path += str(";") + force_str(parsed[3])
+        if parsed.params:
+            path += ";" + parsed.params
         path = uri_to_iri(path).encode(UTF_8)
         # Replace the behavior where non-ASCII values in the WSGI environ are
         # arbitrarily decoded with ISO-8859-1.
@@ -389,7 +389,7 @@ class RequestFactory:
                 content_type='application/octet-stream', secure=False,
                 **extra):
         """Constructs an arbitrary HTTP request."""
-        parsed = urlparse(force_str(path))
+        parsed = urlparse(str(path))  # path can be lazy
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         r = {
             'PATH_INFO': self._get_path(parsed),

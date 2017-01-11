@@ -22,7 +22,6 @@ from django.test import (
     RequestFactory, SimpleTestCase, ignore_warnings, override_settings,
 )
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_str
 
 int2byte = struct.Struct(">B").pack
 
@@ -350,7 +349,7 @@ class CommonMiddlewareTest(SimpleTestCase):
     def test_non_ascii_query_string_does_not_crash(self):
         """Regression test for #15152"""
         request = self.rf.get('/slash')
-        request.META['QUERY_STRING'] = force_str('drink=café')
+        request.META['QUERY_STRING'] = 'drink=café'
         r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
 

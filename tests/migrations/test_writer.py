@@ -24,7 +24,6 @@ from django.test import SimpleTestCase, ignore_warnings, mock
 from django.utils import datetime_safe
 from django.utils._os import upath
 from django.utils.deconstruct import deconstructible
-from django.utils.encoding import force_str
 from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import FixedOffset, get_default_timezone, utc
 from django.utils.translation import ugettext_lazy as _
@@ -170,7 +169,7 @@ class WriterTests(SimpleTestCase):
     def safe_exec(self, string, value=None):
         d = {}
         try:
-            exec(force_str(string), globals(), d)
+            exec(string, globals(), d)
         except Exception as e:
             if value:
                 self.fail("Could not exec %r (from value %r): %s" % (string.strip(), value, e))

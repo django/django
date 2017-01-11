@@ -1397,7 +1397,7 @@ class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
 class ManageTestserver(AdminScriptTestCase):
     from django.core.management.commands.testserver import Command as TestserverCommand
 
-    @mock.patch.object(TestserverCommand, 'handle')
+    @mock.patch.object(TestserverCommand, 'handle', return_value='')
     def test_testserver_handle_params(self, mock_handle):
         out = StringIO()
         call_command('testserver', 'blah.json', stdout=out)

@@ -8,13 +8,10 @@ from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
 from django.urls import set_script_prefix
-from django.utils.encoding import (
-    force_str, force_text, repercent_broken_unicode,
-)
+from django.utils.encoding import force_text, repercent_broken_unicode
 from django.utils.functional import cached_property
 
-# encode() and decode() expect the charset to be a native string.
-ISO_8859_1, UTF_8 = str('iso-8859-1'), str('utf-8')
+ISO_8859_1, UTF_8 = 'iso-8859-1', 'utf-8'
 
 _slashes_re = re.compile(br'/+')
 
@@ -159,7 +156,7 @@ class WSGIHandler(base.BaseHandler):
         response_headers = [(str(k), str(v)) for k, v in response.items()]
         for c in response.cookies.values():
             response_headers.append((str('Set-Cookie'), str(c.output(header=''))))
-        start_response(force_str(status), response_headers)
+        start_response(status, response_headers)
         if getattr(response, 'file_to_stream', None) is not None and environ.get('wsgi.file_wrapper'):
             response = environ['wsgi.file_wrapper'](response.file_to_stream)
         return response

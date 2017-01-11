@@ -3,7 +3,6 @@ import datetime
 from django.core import signing
 from django.test import SimpleTestCase
 from django.test.utils import freeze_time
-from django.utils.encoding import force_str
 
 
 class TestSigner(SimpleTestCase):
@@ -47,7 +46,7 @@ class TestSigner(SimpleTestCase):
         for example in examples:
             signed = signer.sign(example)
             self.assertIsInstance(signed, str)
-            self.assertNotEqual(force_str(example), signed)
+            self.assertNotEqual(example, signed)
             self.assertEqual(example, signer.unsign(signed))
 
     def test_unsign_detects_tampering(self):

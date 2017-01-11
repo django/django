@@ -15,7 +15,7 @@ from django.core.management.utils import (
     find_command, handle_extensions, popen_wrapper,
 )
 from django.utils._os import upath
-from django.utils.encoding import DEFAULT_LOCALE_ENCODING, force_str
+from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 from django.utils.functional import cached_property
 from django.utils.jslex import prepare_js_for_gettext
 from django.utils.text import get_text_list
@@ -557,7 +557,7 @@ class Command(BaseCommand):
 
         input_files = [bf.work_path for bf in build_files]
         with NamedTemporaryFile(mode='w+') as input_files_list:
-            input_files_list.write(force_str('\n'.join(input_files), encoding=DEFAULT_LOCALE_ENCODING))
+            input_files_list.write(('\n'.join(input_files)))
             input_files_list.flush()
             args.extend(['--files-from', input_files_list.name])
             args.extend(self.xgettext_options)
@@ -649,7 +649,7 @@ class Command(BaseCommand):
                 with open(django_po, 'r', encoding='utf-8') as fp:
                     m = plural_forms_re.search(fp.read())
                 if m:
-                    plural_form_line = force_str(m.group('value'))
+                    plural_form_line = m.group('value')
                     if self.verbosity > 1:
                         self.stdout.write("copying plural forms: %s\n" % plural_form_line)
                     lines = []

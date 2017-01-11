@@ -2,7 +2,7 @@ import os
 from io import BytesIO, StringIO, UnsupportedOperation
 
 from django.core.files.utils import FileProxyMixin
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_text
 
 
 class File(FileProxyMixin):
@@ -20,7 +20,7 @@ class File(FileProxyMixin):
         return force_text(self.name or '')
 
     def __repr__(self):
-        return force_str("<%s: %s>" % (self.__class__.__name__, self or "None"))
+        return "<%s: %s>" % (self.__class__.__name__, self or "None")
 
     def __bool__(self):
         return bool(self.name)

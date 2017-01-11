@@ -15,7 +15,7 @@ from django.core.checks import Warning
 from django.core.checks.urls import check_resolver
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.http import RFC3986_SUBDELIMS, urlquote
 from django.utils.regex_helper import normalize
@@ -160,7 +160,7 @@ class RegexURLPattern(LocaleRegexProvider):
         self.name = name
 
     def __repr__(self):
-        return force_str('<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
+        return '<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern)
 
     def check(self):
         warnings = self._check_pattern_name()

@@ -5,6 +5,7 @@ be executed through ``django-admin`` or ``manage.py``).
 import os
 import sys
 from argparse import ArgumentParser
+from io import TextIOBase
 
 import django
 from django.core import checks
@@ -12,7 +13,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.exceptions import MigrationSchemaMissing
-from django.utils.encoding import force_str
 
 
 class CommandError(Exception):
@@ -73,7 +73,7 @@ def handle_default_options(options):
         sys.path.insert(0, options.pythonpath)
 
 
-class OutputWrapper:
+class OutputWrapper(TextIOBase):
     """
     Wrapper around stdout/stderr
     """
@@ -104,7 +104,7 @@ class OutputWrapper:
         if ending and not msg.endswith(ending):
             msg += ending
         style_func = style_func or self.style_func
-        self._out.write(force_str(style_func(msg)))
+        self._out.write(style_func(msg))
 
 
 class BaseCommand:
@@ -377,9 +377,9 @@ class BaseCommand:
                 if issues:
                     visible_issue_count += len(issues)
                     formatted = (
-                        self.style.ERROR(force_str(e))
+                        self.style.ERROR(str(e))
                         if e.is_serious()
-                        else self.style.WARNING(force_str(e))
+                        else self.style.WARNING(str(e))
                         for e in issues)
                     formatted = "\n".join(sorted(formatted))
                     body += '\n%s:\n%s\n' % (group_name, formatted)

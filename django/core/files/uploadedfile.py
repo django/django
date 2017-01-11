@@ -9,7 +9,6 @@ from io import BytesIO
 from django.conf import settings
 from django.core.files import temp as tempfile
 from django.core.files.base import File
-from django.utils.encoding import force_str
 
 __all__ = ('UploadedFile', 'TemporaryUploadedFile', 'InMemoryUploadedFile',
            'SimpleUploadedFile')
@@ -33,8 +32,7 @@ class UploadedFile(File):
         self.content_type_extra = content_type_extra
 
     def __repr__(self):
-        return force_str("<%s: %s (%s)>" % (
-            self.__class__.__name__, self.name, self.content_type))
+        return "<%s: %s (%s)>" % (self.__class__.__name__, self.name, self.content_type)
 
     def _get_name(self):
         return self._name
