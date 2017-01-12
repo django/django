@@ -714,8 +714,6 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
 
     available_apps = [
         'fixtures',
-        'django.contrib.contenttypes',
-        'django.contrib.auth',
         'django.contrib.sites',
     ]
 

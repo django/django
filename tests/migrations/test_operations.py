@@ -2344,11 +2344,7 @@ class SwappableOperationTests(OperationTestBase):
     is in a common base class anyway)
     """
 
-    available_apps = [
-        "migrations",
-        "django.contrib.auth",
-        "django.contrib.contenttypes",
-    ]
+    available_apps = ['migrations']
 
     @override_settings(TEST_SWAP_MODEL="migrations.SomeFakeModel")
     def test_create_ignore_swapped(self):

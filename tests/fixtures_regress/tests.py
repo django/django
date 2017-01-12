@@ -888,11 +888,7 @@ class M2MNaturalKeyFixtureTests(TestCase):
 
 class TestTicket11101(TransactionTestCase):
 
-    available_apps = [
-        'fixtures_regress',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-    ]
+    available_apps = ['fixtures_regress']
 
     @skipUnlessDBFeature('supports_transactions')
     def test_ticket_11101(self):

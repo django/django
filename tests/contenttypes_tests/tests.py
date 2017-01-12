@@ -480,7 +480,6 @@ class ContentTypeOperationsTests(TransactionTestCase):
     available_apps = [
         'contenttypes_tests',
         'django.contrib.contenttypes',
-        'django.contrib.auth',
     ]
 
     def setUp(self):
