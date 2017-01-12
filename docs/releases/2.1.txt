@@ -50,6 +50,15 @@ Minor features
 * The ``admin_order_field`` attribute for elements in
   :attr:`.ModelAdmin.list_display` may now be a query expression.
 
+* The ``actions.html``, ``change_list_results.html``, ``date_hierarchy.html``,
+  ``pagination.html``, ``prepopulated_fields_js.html``, ``search_form.html``
+  and ``submit_line.html`` templates can be overridden even per app or
+  per model, other than globally.
+
+* The admin change list and change form object tools can now be overridden per app,
+  per model or globally with ``change_list_object_tools.html`` and
+  ``change_form_object_tools.html`` templates.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
