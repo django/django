@@ -11,12 +11,6 @@ from django.utils.six import StringIO
 
 class SwappableModelTests(TestCase):
 
-    available_apps = [
-        'swappable_models',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-    ]
-
     @override_settings(TEST_ARTICLE_MODEL='swappable_models.AlternateArticle')
     def test_generated_data(self):
         "Permissions and content types are not created for a swapped model"

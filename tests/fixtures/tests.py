@@ -689,7 +689,6 @@ class NonExistentFixtureTests(TestCase):
     """
     Custom class to limit fixture dirs.
     """
-    available_apps = ['django.contrib.auth', 'django.contrib.contenttypes']
 
     def test_loaddata_not_existent_fixture_file(self):
         stdout_output = six.StringIO()
