@@ -168,6 +168,12 @@ Migrations
 Models
 ~~~~~~
 
+* Added support for operator overloading to create
+  :class:`~django.db.models.expressions.CombinedExpression`. This means that ``F('text_field') +
+  Value('_suffix', output_field=CharField())`` now results in ``ConcatPair``
+  invocation instead of verbatim addition. Because of this, Django now
+  depends on ``multipledispatch``.
+
 * ...
 
 Requests and Responses

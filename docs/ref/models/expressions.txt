@@ -893,3 +893,53 @@ file (or package) that is imported from the top level ``__init__.py``.
 
 For user projects wishing to patch the backend that they're using, this code
 should live in an :meth:`AppConfig.ready()<django.apps.AppConfig.ready>` method.
+
+Using operators to combine expressions
+--------------------------------------
+
+.. versionadded:: 2.0
+
+.. currentmodule:: django.db.models.expressions
+.. class:: CombinedExpression(lhs, connector, rhs, output_field=None)
+
+Query expressions can be combined using infix operators to produce complex
+queries. By default, this maps Python operators to their SQL equivalents,
+regardless of field types and configured database backend.
+
+While in most cases that's just fine, there are certain combinations of
+field types and operators that require special handling. A notable example of
+such combination is string concatenation, which should execute SQL operator
+``||`` or ``CONCAT`` function, instead of ``+``. For example::
+
+    >>> from django.db.models import F, Value, CharField
+    >>> qs = Author.objects.annotate(
+    ...    full_name=(
+    ...       F('first_name') +
+    ...       Value(' ', output_field=CharField()) +
+    ...       F('last_name')))
+    >>> qs.values_list('full_name')
+    <QuerySet [('Stephen Keats',)]>
+
+This works by registering such combinations using ``CombinedExpression.dispatch``
+decorator, allowing Django to generate correct SQL equivalent for Python
+operators for a given operator and left- and right-hand side operands.
+
+Therefore, string concatenation is registered as follows::
+
+    from django.db.models.expressions import CombinedExpression
+    from django.db.models.functions import ConcatPair
+
+    @CombinedExpression.dispatch(CombinedExpression.ADD, CharField, CharField)
+    class TextAddition(ConcatPair):
+        def __init__(self, lhs, connector, rhs, output_field):
+            super().__init__(lhs, rhs, output_field=output_field)
+
+Note that you need to be sure about database types used in such expressions,
+possibly using ``Cast`` or ``output_field`` to provide explicit typing, like
+in ``Value`` expression in the example above.
+
+.. note::
+
+    You must take extra care when registering such operators, since operator
+    overloads cannot be ambiguous. Django will issue a runtime warning when
+    such ambiguity is detected.

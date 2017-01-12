@@ -5,7 +5,7 @@ from copy import deepcopy
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, connection, models, transaction
-from django.db.models import TimeField, UUIDField
+from django.db.models import CharField, TimeField, UUIDField
 from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
@@ -1261,3 +1261,16 @@ class ReprTests(TestCase):
         self.assertEqual(repr(StdDev('a')), "StdDev(F(a), sample=False)")
         self.assertEqual(repr(Sum('a')), "Sum(F(a))")
         self.assertEqual(repr(Variance('a', sample=True)), "Variance(F(a), sample=True)")
+
+
+class OperatorTests(TestCase):
+
+    def test_add(self):
+        instance = Employee.objects.create(firstname='John', lastname='Doe')
+        Employee.objects.update(
+            firstname=F('firstname') + Value('_firstname', output_field=CharField()),
+            lastname=F('lastname') + Value('_lastname', output_field=CharField())
+        )
+        instance.refresh_from_db()
+        self.assertEqual(instance.firstname, 'John_firstname')
+        self.assertEqual(instance.lastname, 'Doe_lastname')

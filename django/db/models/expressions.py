@@ -1,5 +1,7 @@
 import copy
 import datetime
+import itertools
+import multipledispatch
 
 from django.core.exceptions import EmptyResultSet, FieldError
 from django.db.backends import utils as backend_utils
@@ -31,6 +33,10 @@ class Combinable:
     BITOR = '|'
     BITLEFTSHIFT = '<<'
     BITRIGHTSHIFT = '>>'
+
+    # This allows CombinedExpression.dispatch to register special handling
+    # for given operand types, regardless of operator
+    ANY = None
 
     def _combine(self, other, connector, reversed, node=None):
         if not hasattr(other, 'resolve_expression'):
@@ -349,6 +355,7 @@ class Expression(BaseExpression, Combinable):
 
 
 class CombinedExpression(Expression):
+    expression_dispatchers = {}
 
     def __init__(self, lhs, connector, rhs, output_field=None):
         super().__init__(output_field=output_field)
@@ -377,26 +384,77 @@ class CombinedExpression(Expression):
             rhs_output = self.rhs.output_field
         except FieldError:
             rhs_output = None
+
+        # For databases that don't do temporal interval types, skip the
+        # dispatcher and force resolution to DurationExpression
         if (not connection.features.has_native_duration_field and
                 ((lhs_output and lhs_output.get_internal_type() == 'DurationField') or
                  (rhs_output and rhs_output.get_internal_type() == 'DurationField'))):
+            from .operators import DurationExpression
             return DurationExpression(self.lhs, self.connector, self.rhs).as_sql(compiler, connection)
-        if (lhs_output and rhs_output and self.connector == self.SUB and
-            lhs_output.get_internal_type() in {'DateField', 'DateTimeField', 'TimeField'} and
-                lhs_output.get_internal_type() == rhs_output.get_internal_type()):
-            return TemporalSubtraction(self.lhs, self.rhs).as_sql(compiler, connection)
+
+        if lhs_output or rhs_output:
+            dispatchers = (
+                self.expression_dispatchers.get(self.connector),
+                self.expression_dispatchers.get(CombinedExpression.ANY))
+
+            for dispatcher in filter(bool, dispatchers):
+                try:
+                    klass = dispatcher(lhs_output or fields.Field(), rhs_output or fields.Field())
+                except NotImplementedError:
+                    continue
+
+                # Avoid recursion in case CombinedExpression maps to another
+                # CombinedExpression, but with a different connector
+                if type(self) != klass:
+                    try:
+                        output_field = self._output_field_or_none
+                    except FieldError:
+                        output_field = None
+
+                    expression = klass(self.lhs, self.connector, self.rhs, output_field=output_field)
+                    return compiler.compile(expression)
+
+        return self._as_sql(compiler, connection)
+
+    def _as_sql(self, compiler, connection, compile=None, combine_expression=None):
+        compile = compile or compiler.compile
+        combine_expression = combine_expression or connection.ops.combine_expression
+
         expressions = []
         expression_params = []
-        sql, params = compiler.compile(self.lhs)
+        sql, params = compile(self.lhs)
         expressions.append(sql)
         expression_params.extend(params)
-        sql, params = compiler.compile(self.rhs)
+        sql, params = compile(self.rhs)
         expressions.append(sql)
         expression_params.extend(params)
         # order of precedence
         expression_wrapper = '(%s)'
-        sql = connection.ops.combine_expression(self.connector, expressions)
+        sql = combine_expression(self.connector, expressions)
         return expression_wrapper % sql, expression_params
+
+    @classmethod
+    def dispatch(cls, connector, lhs, rhs, commutative=True):
+        dispatcher = cls.expression_dispatchers.setdefault(connector, multipledispatch.Dispatcher(connector))
+
+        def _inner(klass):
+            # If lhs and rhs are sequences, register for all permutations
+            try:
+                signatures = itertools.product(lhs, rhs)
+                if commutative:
+                    signatures += itertools.product(rhs, lhs)
+            except TypeError:
+                signatures = [(lhs, rhs)]
+                if commutative:
+                    signatures += [(rhs, lhs)]
+
+            for signature in signatures:
+                dispatcher.add(signature, lambda *args: klass)
+
+            return klass
+
+        return _inner
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         c = self.copy()
@@ -404,46 +462,6 @@ class CombinedExpression(Expression):
         c.lhs = c.lhs.resolve_expression(query, allow_joins, reuse, summarize, for_save)
         c.rhs = c.rhs.resolve_expression(query, allow_joins, reuse, summarize, for_save)
         return c
-
-
-class DurationExpression(CombinedExpression):
-    def compile(self, side, compiler, connection):
-        if not isinstance(side, DurationValue):
-            try:
-                output = side.output_field
-            except FieldError:
-                pass
-            else:
-                if output.get_internal_type() == 'DurationField':
-                    sql, params = compiler.compile(side)
-                    return connection.ops.format_for_duration_arithmetic(sql), params
-        return compiler.compile(side)
-
-    def as_sql(self, compiler, connection):
-        connection.ops.check_expression_support(self)
-        expressions = []
-        expression_params = []
-        sql, params = self.compile(self.lhs, compiler, connection)
-        expressions.append(sql)
-        expression_params.extend(params)
-        sql, params = self.compile(self.rhs, compiler, connection)
-        expressions.append(sql)
-        expression_params.extend(params)
-        # order of precedence
-        expression_wrapper = '(%s)'
-        sql = connection.ops.combine_duration_expression(self.connector, expressions)
-        return expression_wrapper % sql, expression_params
-
-
-class TemporalSubtraction(CombinedExpression):
-    def __init__(self, lhs, rhs):
-        super().__init__(lhs, self.SUB, rhs, output_field=fields.DurationField())
-
-    def as_sql(self, compiler, connection):
-        connection.ops.check_expression_support(self)
-        lhs = compiler.compile(self.lhs, connection)
-        rhs = compiler.compile(self.rhs, connection)
-        return connection.ops.subtract_temporals(self.lhs.output_field.get_internal_type(), lhs, rhs)
 
 
 class F(Combinable):

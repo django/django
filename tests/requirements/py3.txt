@@ -3,6 +3,7 @@ bcrypt
 docutils
 geoip2
 jinja2 >= 2.9.2
+multipledispatch
 numpy
 Pillow
 # pylibmc/libmemcached can't be built on Windows.
