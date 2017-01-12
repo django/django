@@ -330,6 +330,29 @@ class URLPatternReverse(SimpleTestCase):
             six.text_type
         )
 
+    def test_view_not_found_message(self):
+        msg = (
+            "Reverse for 'non-existent-view' not found. 'non-existent-view' "
+            "is not a valid view function or pattern name."
+        )
+        with self.assertRaisesMessage(NoReverseMatch, msg):
+            reverse('non-existent-view')
+
+    def test_no_args_message(self):
+        msg = "Reverse for 'places' with no arguments not found. 1 pattern(s) tried:"
+        with self.assertRaisesMessage(NoReverseMatch, msg):
+            reverse('places')
+
+    def test_illegal_args_message(self):
+        msg = "Reverse for 'places' with arguments '(1, 2)' not found. 1 pattern(s) tried:"
+        with self.assertRaisesMessage(NoReverseMatch, msg):
+            reverse('places', args=(1, 2))
+
+    def test_illegal_kwargs_message(self):
+        msg = "Reverse for 'places' with keyword arguments '{'arg1': 2}' not found. 1 pattern(s) tried:"
+        with self.assertRaisesMessage(NoReverseMatch, msg):
+            reverse('places', kwargs={str('arg1'): 2})
+
 
 class ResolverTests(SimpleTestCase):
     @ignore_warnings(category=RemovedInDjango20Warning)
@@ -860,7 +883,7 @@ class RequestURLconfTests(SimpleTestCase):
         Test reversing an URL from the *default* URLconf from inside
         a response middleware.
         """
-        message = "Reverse for 'outer' with arguments '()' and keyword arguments '{}' not found."
+        message = "Reverse for 'outer' not found."
         with self.assertRaisesMessage(NoReverseMatch, message):
             self.client.get('/second_test/')
 
@@ -890,7 +913,7 @@ class RequestURLconfTests(SimpleTestCase):
         Test reversing an URL from the *default* URLconf from inside
         a streaming response.
         """
-        message = "Reverse for 'outer' with arguments '()' and keyword arguments '{}' not found."
+        message = "Reverse for 'outer' not found."
         with self.assertRaisesMessage(NoReverseMatch, message):
             self.client.get('/second_test/')
             b''.join(self.client.get('/second_test/'))

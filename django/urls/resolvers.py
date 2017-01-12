@@ -478,11 +478,23 @@ class RegexURLResolver(LocaleRegexProvider):
             lookup_view_s = lookup_view
 
         patterns = [pattern for (possibility, pattern, defaults) in possibilities]
-        raise NoReverseMatch(
-            "Reverse for '%s' with arguments '%s' and keyword "
-            "arguments '%s' not found. %d pattern(s) tried: %s" %
-            (lookup_view_s, args, kwargs, len(patterns), patterns)
-        )
+        if patterns:
+            if args:
+                arg_msg = "arguments '%s'" % (args,)
+            elif kwargs:
+                arg_msg = "keyword arguments '%s'" % (kwargs,)
+            else:
+                arg_msg = "no arguments"
+            msg = (
+                "Reverse for '%s' with %s not found. %d pattern(s) tried: %s" %
+                (lookup_view_s, arg_msg, len(patterns), patterns)
+            )
+        else:
+            msg = (
+                "Reverse for '%(view)s' not found. '%(view)s' is not "
+                "a valid view function or pattern name." % {'view': lookup_view_s}
+            )
+        raise NoReverseMatch(msg)
 
 
 class LocaleRegexURLResolver(RegexURLResolver):
