@@ -816,6 +816,10 @@ class Model(six.with_metaclass(ModelBase)):
         is used by fixture loading.
         """
         using = using or router.db_for_write(self.__class__, instance=self)
+        # The database is not stored yet if it is already present on another
+        # database and may need to be read before it is saved again.
+        if not self._state.db:
+            self._state.db = using
         assert not (force_insert and (force_update or update_fields))
         assert update_fields is None or len(update_fields) > 0
         cls = origin = self.__class__
