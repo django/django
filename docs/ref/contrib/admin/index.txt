@@ -2680,12 +2680,28 @@ Templates which may be overridden per app or model
 Not every template in ``contrib/admin/templates/admin`` may be overridden per
 app or per model. The following can:
 
+* ``actions.html``
 * ``app_index.html``
 * ``change_form.html``
+* ``change_form_object_tools.html``
 * ``change_list.html``
+* ``change_list_object_tools.html``
+* ``change_list_results.html``
+* ``date_hierarchy.html``
 * ``delete_confirmation.html``
 * ``object_history.html``
+* ``pagination.html``
 * ``popup_response.html``
+* ``prepopulated_fields_js.html``
+* ``search_form.html``
+* ``submit_line.html``
+
+.. versionchanged:: 2.1
+
+    The ability to override the ``actions.html``, ``change_form_object_tools.html``,
+    ``change_list_object_tools.html``, ``change_list_results.html``,
+    ``date_hierarchy.html``, ``pagination.html``, ``prepopulated_fields_js.html``,
+    ``search_form.html``, ``submit_line.html`` templates were added.
 
 For those templates that cannot be overridden in this way, you may still
 override them for your entire project. Just place the new version in your

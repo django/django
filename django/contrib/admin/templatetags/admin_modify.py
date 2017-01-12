@@ -3,10 +3,11 @@ import json
 from django import template
 from django.template.context import Context
 
+from .base import InclusionAdminNode
+
 register = template.Library()
 
 
-@register.inclusion_tag('admin/prepopulated_fields_js.html', takes_context=True)
 def prepopulated_fields_js(context):
     """
     Create a list of prepopulated_fields that should render Javascript for
@@ -39,7 +40,11 @@ def prepopulated_fields_js(context):
     return context
 
 
-@register.inclusion_tag('admin/submit_line.html', takes_context=True)
+@register.tag(name='prepopulated_fields_js')
+def prepopulated_fields_js_tag(parser, token):
+    return InclusionAdminNode(parser, token, func=prepopulated_fields_js, template_name="prepopulated_fields_js.html")
+
+
 def submit_row(context):
     """
     Display the row of buttons for delete and save.
@@ -64,6 +69,27 @@ def submit_row(context):
         'show_save': show_save,
     })
     return ctx
+
+
+@register.tag(name='submit_row')
+def submit_row_tag(parser, token):
+    return InclusionAdminNode(parser, token, func=submit_row, template_name='submit_line.html')
+
+
+def change_form_object_tools(context):
+    """
+    Displays the row of change form object tools.
+    """
+    return context
+
+
+@register.tag(name='change_form_object_tools')
+def change_form_object_tools_tag(parser, token):
+    return InclusionAdminNode(
+        parser, token,
+        func=change_form_object_tools,
+        template_name='change_form_object_tools.html',
+    )
 
 
 @register.filter

@@ -119,7 +119,7 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         cl.formset = None
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
-        context = Context({'cl': cl})
+        context = Context({'cl': cl, 'opts': Child._meta})
         table_output = template.render(context)
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
         row_html = build_tbody_html(new_child.id, link, '<td class="field-parent nowrap">-</td>')
@@ -137,7 +137,7 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         cl.formset = None
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
-        context = Context({'cl': cl})
+        context = Context({'cl': cl, 'opts': Child._meta})
         table_output = template.render(context)
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
         row_html = build_tbody_html(new_child.id, link, '<td class="field-parent nowrap">???</td>')
@@ -153,7 +153,7 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         cl.formset = None
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
-        context = Context({'cl': cl})
+        context = Context({'cl': cl, 'opts': Child._meta})
         table_output = template.render(context)
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
         row_html = build_tbody_html(
@@ -176,7 +176,7 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         cl.formset = None
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
-        context = Context({'cl': cl})
+        context = Context({'cl': cl, 'opts': Child._meta})
         table_output = template.render(context)
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
         row_html = build_tbody_html(new_child.id, link, '<td class="field-parent nowrap">%s</td>' % new_parent)
@@ -204,7 +204,7 @@ class ChangeListTests(TestCase):
         FormSet = m.get_changelist_formset(request)
         cl.formset = FormSet(queryset=cl.result_list)
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
-        context = Context({'cl': cl})
+        context = Context({'cl': cl, 'opts': Child._meta})
         table_output = template.render(context)
         # make sure that hidden fields are in the correct place
         hiddenfields_div = (
