@@ -1,3 +1,7 @@
+from __future__ import unicode_literals
+import six
+
+
 class ConsumeLater(Exception):
     """
     Exception that says that the current message should be re-queued back
@@ -37,6 +41,33 @@ class DenyConnection(Exception):
     to deny the connection.
     """
     pass
+
+
+class ChannelSocketException(Exception):
+    """
+    Base Exception is intended to run some action ('run' method)
+    when it is raised at a consumer body
+    """
+
+    def run(self, message):
+        raise NotImplementedError
+
+
+class WebsocketCloseException(ChannelSocketException):
+    """
+    ChannelSocketException based exceptions for close websocket connection with code
+    """
+
+    def __init__(self, code=None):
+        if code is not None and not isinstance(code, six.integer_types) \
+                and code != 1000 and not (3000 <= code <= 4999):
+            raise ValueError("invalid close code {} (must be 1000 or from [3000, 4999])".format(code))
+        self._code = code
+
+    def run(self, message):
+        if message.reply_channel.name.split('.')[0] != "websocket":
+            raise ValueError("You cannot raise CloseWebsocketError from a non-websocket handler.")
+        message.reply_channel.send({"close": self._code or True})
 
 
 class SendNotAvailableOnDemultiplexer(Exception):
