@@ -8,6 +8,7 @@ from django.core import exceptions, serializers, validators
 from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
+from django.db.models import F, IntegerField, Value
 from django.test import TransactionTestCase, override_settings
 from django.test.utils import isolate_apps
 from django.utils import timezone
@@ -119,6 +120,18 @@ class TestSaveLoad(PostgreSQLTestCase):
         field = instance._meta.get_field('field')
         self.assertEqual(field.model, IntegerArrayModel)
         self.assertEqual(field.base_field.model, IntegerArrayModel)
+
+    def test_add(self):
+        def IntegerArrayValue(v):
+            return Value(v, output_field=ArrayField(IntegerField()))
+
+        instance = IntegerArrayModel.objects.create(field=[2])
+        IntegerArrayModel.objects.update(field=F('field') + IntegerArrayValue([3]))
+        IntegerArrayModel.objects.update(field=IntegerArrayValue([1]) + F('field'))
+        IntegerArrayModel.objects.update(
+            field=IntegerArrayValue([0]) + F('field') + F('field') + IntegerArrayValue([4]))
+        instance.refresh_from_db()
+        self.assertEqual(instance.field, [0, 1, 2, 3, 1, 2, 3, 4])
 
 
 class TestQuerying(PostgreSQLTestCase):

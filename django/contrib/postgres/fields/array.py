@@ -4,7 +4,8 @@ from django.contrib.postgres import lookups
 from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
-from django.db.models import Field, IntegerField, Transform
+from django.db.models import Field, Func, IntegerField, Transform
+from django.db.models.expressions import CombinedExpression
 from django.db.models.lookups import Exact, In
 from django.utils.translation import gettext_lazy as _
 
@@ -294,3 +295,11 @@ class SliceTransformFactory:
 
     def __call__(self, *args, **kwargs):
         return SliceTransform(self.start, self.end, *args, **kwargs)
+
+
+@CombinedExpression.dispatch(CombinedExpression.ADD, ArrayField, ArrayField)
+class ArrayCatPair(Func):
+    function = 'ARRAY_CAT'
+
+    def __init__(self, lhs, connector, rhs, output_field):
+        super().__init__(lhs, rhs, output_field=output_field)
