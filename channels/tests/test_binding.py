@@ -21,7 +21,7 @@ class TestsBinding(ChannelTestCase):
             fields = ['username', 'email', 'password', 'last_name']
 
             @classmethod
-            def group_names(cls, instance, action):
+            def group_names(cls, instance):
                 return ["users"]
 
             def has_permission(self, user, action, pk):
@@ -62,7 +62,7 @@ class TestsBinding(ChannelTestCase):
             exclude = ['first_name', 'last_name']
 
             @classmethod
-            def group_names(cls, instance, action):
+            def group_names(cls, instance):
                 return ["users_exclude"]
 
             def has_permission(self, user, action, pk):
@@ -105,7 +105,7 @@ class TestsBinding(ChannelTestCase):
                 stream = 'test'
 
                 @classmethod
-                def group_names(cls, instance, action):
+                def group_names(cls, instance):
                     return ["users_omit"]
 
                 def has_permission(self, user, action, pk):
@@ -119,7 +119,7 @@ class TestsBinding(ChannelTestCase):
             fields = ['__all__']
 
             @classmethod
-            def group_names(cls, instance, action):
+            def group_names(cls, instance):
                 return ["users2"]
 
             def has_permission(self, user, action, pk):
@@ -164,7 +164,7 @@ class TestsBinding(ChannelTestCase):
             fields = ['username']
 
             @classmethod
-            def group_names(cls, instance, action):
+            def group_names(cls, instance):
                 return ["users3"]
 
             def has_permission(self, user, action, pk):
@@ -203,7 +203,7 @@ class TestsBinding(ChannelTestCase):
             fields = ['username', 'email', 'password', 'last_name']
 
             @classmethod
-            def group_names(cls, instance, action):
+            def group_names(cls, instance):
                 return ['users_outbound']
 
             def has_permission(self, user, action, pk):
@@ -243,7 +243,7 @@ class TestsBinding(ChannelTestCase):
             fields = ['username', ]
 
             @classmethod
-            def group_names(cls, instance, action):
+            def group_names(cls, instance):
                 return ['users_outbound']
 
             def has_permission(self, user, action, pk):
@@ -289,7 +289,7 @@ class TestsBinding(ChannelTestCase):
             fields = ['username', ]
 
             @classmethod
-            def group_names(cls, instance, action):
+            def group_names(cls, instance):
                 return ['users_outbound']
 
             def has_permission(self, user, action, pk):
