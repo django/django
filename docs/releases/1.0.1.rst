@@ -1,0 +1,16 @@
+1.0.1 Release Notes
+===================
+
+Channels 1.0.1 is a minor bugfix release, released on 2017/01/09.
+
+Changes
+-------
+
+* WebSocket generic views now accept connections by default in their connect
+  handler for better backwards compatibility.
+
+
+Backwards Incompatible Changes
+------------------------------
+
+None.

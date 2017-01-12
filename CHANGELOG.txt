@@ -1,14 +1,29 @@
+Full release notes, with more details and upgrade information, are available at:
+https://channels.readthedocs.io/en/latest/releases
+
+
+1.0.2 (2017-01-12)
+------------------
+
+* Websockets can now be closed from anywhere using the new ``WebsocketCloseException``.
+  There is also a generic ``ChannelSocketException`` so you can do custom behaviours.
+
+* Calling ``Channel.send`` or ``Group.send`` from outside a consumer context
+  (i.e. in tests or management commands) will once again send the message immediately.
+
+* The base implementation of databinding now correctly only calls ``group_names(instance)``,
+  as documented.
+
+
 1.0.1 (2017-01-09)
 ------------------
 
 * WebSocket generic views now accept connections by default in their connect
   handler for better backwards compatibility.
 
+
 1.0.0 (2017-01-08)
 ------------------
-
-Full release notes, with more upgrade details, are available at:
-https://channels.readthedocs.io/en/latest/releases/1.0.0.html
 
 * BREAKING CHANGE: WebSockets must now be explicitly accepted or denied.
   See https://channels.readthedocs.io/en/latest/releases/1.0.0.html for more.

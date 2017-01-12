@@ -3,7 +3,7 @@
 
 Channels 1.0.0 brings together a number of design changes, including some
 breaking changes, into our first fully stable release, and also brings the
-databinding code out of alpha phase.
+databinding code out of alpha phase. It was released on 2017/01/08.
 
 The result is a faster, easier to use, and safer Channels, including one major
 change that will fix almost all problems with sessions and connect/receive
