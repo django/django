@@ -377,7 +377,7 @@ This logging configuration does the following things:
 
 * Defines two handlers:
 
-  * ``console``, a StreamHandler, which will print any ``DEBUG``
+  * ``console``, a StreamHandler, which will print any ``INFO``
     (or higher) message to stderr. This handler uses the ``simple`` output
     format.
 
