@@ -18,11 +18,7 @@ from .base import Loader as BaseLoader
 class Loader(BaseLoader):
 
     def get_dirs(self):
-        dirs = set()
-        for loader in self.loaders:
-            if loader is not None:
-                dirs.update(loader.get_dirs())
-        return dirs
+        return {loader.get_dirs() for loader in self.loaders if loader is not None}
 
     def __init__(self, engine, loaders):
         self.template_cache = {}
