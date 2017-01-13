@@ -134,11 +134,13 @@ File Uploads
 
 * ...
 
-
 Forms
 ~~~~~
 
-* ...
+* The new ``date_attrs`` and ``time_attrs`` arguments for
+  :class:`~django.forms.SplitDateTimeWidget` and
+  :class:`~django.forms.SplitHiddenDateTimeWidget` allows specifying different
+  HTML attributes for ``DateInput`` and ``TimeInput`` subwidgets.
 
 Generic Views
 ~~~~~~~~~~~~~
