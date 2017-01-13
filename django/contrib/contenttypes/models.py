@@ -65,42 +65,7 @@ class ContentTypeManager(models.Manager):
         Given *models, returns a dictionary mapping {model: content_type}.
         """
         for_concrete_models = kwargs.pop('for_concrete_models', True)
-        # Final results
-        results = {}
-        # models that aren't already in the cache
-        needed_app_labels = set()
-        needed_models = set()
-        needed_opts = set()
-        for model in models:
-            opts = self._get_opts(model, for_concrete_models)
-            try:
-                ct = self._get_from_cache(opts)
-            except KeyError:
-                needed_app_labels.add(opts.app_label)
-                needed_models.add(opts.model_name)
-                needed_opts.add(opts)
-            else:
-                results[model] = ct
-        if needed_opts:
-            cts = self.filter(
-                app_label__in=needed_app_labels,
-                model__in=needed_models
-            )
-            for ct in cts:
-                model = ct.model_class()
-                if model._meta in needed_opts:
-                    results[model] = ct
-                    needed_opts.remove(model._meta)
-                self._add_to_cache(self.db, ct)
-        for opts in needed_opts:
-            # These weren't in the cache, or the DB, create them.
-            ct = self.create(
-                app_label=opts.app_label,
-                model=opts.model_name,
-            )
-            self._add_to_cache(self.db, ct)
-            results[ct.model_class()] = ct
-        return results
+        return {model: self.get_for_model(model, for_concrete_model=for_concrete_models) for model in models}
 
     def get_for_id(self, id):
         """
