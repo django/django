@@ -808,9 +808,12 @@ class MultiWidget(Widget):
             value = self.decompress(value)
 
         final_attrs = context['widget']['attrs']
+        input_type = final_attrs.pop('type', None)
         id_ = final_attrs.get('id')
         subwidgets = []
         for i, widget in enumerate(self.widgets):
+            if input_type is not None:
+                widget.input_type = input_type
             widget_name = '%s_%s' % (name, i)
             try:
                 widget_value = value[i]
