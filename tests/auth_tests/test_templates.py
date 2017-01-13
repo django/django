@@ -3,11 +3,14 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth.views import (
     PasswordChangeDoneView, PasswordChangeView, PasswordResetCompleteView,
-    PasswordResetConfirmView, PasswordResetDoneView, PasswordResetView,
+    PasswordResetDoneView, PasswordResetView,
 )
 from django.test import RequestFactory, TestCase, override_settings
+from django.urls import reverse
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode
+
+from .client import PasswordResetConfirmClient
 
 
 @override_settings(ROOT_URLCONF='auth_tests.urls')
@@ -34,16 +37,20 @@ class AuthTemplateTests(TestCase):
 
     def test_PasswordResetConfirmView_invalid_token(self):
         # PasswordResetConfirmView invalid token
-        response = PasswordResetConfirmView.as_view(success_url='dummy/')(self.request, uidb64='Bad', token='Bad')
+        client = PasswordResetConfirmClient()
+        url = reverse('password_reset_confirm', kwargs={'uidb64': 'Bad', 'token': 'Bad-Token'})
+        response = client.get(url)
         self.assertContains(response, '<title>Password reset unsuccessful</title>')
         self.assertContains(response, '<h1>Password reset unsuccessful</h1>')
 
     def test_PasswordResetConfirmView_valid_token(self):
         # PasswordResetConfirmView valid token
+        client = PasswordResetConfirmClient()
         default_token_generator = PasswordResetTokenGenerator()
         token = default_token_generator.make_token(self.user)
         uidb64 = force_text(urlsafe_base64_encode(force_bytes(self.user.pk)))
-        response = PasswordResetConfirmView.as_view(success_url='dummy/')(self.request, uidb64=uidb64, token=token)
+        url = reverse('password_reset_confirm', kwargs={'uidb64': uidb64, 'token': token})
+        response = client.get(url)
         self.assertContains(response, '<title>Enter new password</title>')
         self.assertContains(response, '<h1>Enter new password</h1>')
 

@@ -16,7 +16,8 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth.models import User
 from django.contrib.auth.views import (
-    LoginView, logout_then_login, redirect_to_login,
+    INTERNAL_RESET_SESSION_TOKEN, LoginView, logout_then_login,
+    redirect_to_login,
 )
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
@@ -24,7 +25,7 @@ from django.core import mail
 from django.db import connection
 from django.http import HttpRequest, QueryDict
 from django.middleware.csrf import CsrfViewMiddleware, get_token
-from django.test import TestCase, override_settings
+from django.test import Client, TestCase, override_settings
 from django.test.utils import patch_logger
 from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.utils.deprecation import RemovedInDjango21Warning
@@ -33,6 +34,7 @@ from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import ParseResult, urlparse
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
+from .client import PasswordResetConfirmClient
 from .models import CustomUser, UUIDUser
 from .settings import AUTH_TEMPLATES
 
@@ -115,6 +117,9 @@ class AuthViewNamedURLTests(AuthViewsTestCase):
 
 
 class PasswordResetTest(AuthViewsTestCase):
+
+    def setUp(self):
+        self.client = PasswordResetConfirmClient()
 
     def test_email_not_found(self):
         """If the provided email is not registered, don't raise any error but
@@ -278,6 +283,8 @@ class PasswordResetTest(AuthViewsTestCase):
         # Check the password has been changed
         u = User.objects.get(email='staffmember@example.com')
         self.assertTrue(u.check_password("anewpassword"))
+        # The reset token is deleted from the session.
+        self.assertNotIn(INTERNAL_RESET_SESSION_TOKEN, self.client.session)
 
         # Check we can't use the link again
         response = self.client.get(path)
@@ -338,6 +345,23 @@ class PasswordResetTest(AuthViewsTestCase):
         response = self.client.get('/reset/zzzzzzzzzzzzz/1-1/')
         self.assertContains(response, "Hello, .")
 
+    def test_confirm_link_redirects_to_set_password_page(self):
+        url, path = self._test_confirm_start()
+        # Don't use PasswordResetConfirmClient (self.client) here which
+        # automatically fetches the redirect page.
+        client = Client()
+        response = client.get(path)
+        token = response.resolver_match.kwargs['token']
+        uuidb64 = response.resolver_match.kwargs['uidb64']
+        self.assertRedirects(response, '/reset/%s/set-password/' % uuidb64)
+        self.assertEqual(client.session['_password_reset_token'], token)
+
+    def test_invalid_link_if_going_directly_to_the_final_reset_password_url(self):
+        url, path = self._test_confirm_start()
+        _, uuidb64, _ = path.strip('/').split('/')
+        response = Client().get('/reset/%s/set-password/' % uuidb64)
+        self.assertContains(response, 'The password reset link was invalid')
+
 
 @override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
 class CustomUserPasswordResetTest(AuthViewsTestCase):
@@ -351,6 +375,9 @@ class CustomUserPasswordResetTest(AuthViewsTestCase):
         )
         cls.u1.set_password('password')
         cls.u1.save()
+
+    def setUp(self):
+        self.client = PasswordResetConfirmClient()
 
     def _test_confirm_start(self):
         # Start by creating the email
