@@ -830,9 +830,14 @@ class SQLCompiler(object):
         try:
             cursor.execute(sql, params)
         except Exception:
-            with self.connection.wrap_database_errors:
-                # Closing a server-side cursor could yield an error
+            try:
+                # Might fail for server-side cursors (eg: connection closed)
                 cursor.close()
+            except Exception:
+                # Ignore clean-up errors. Raise the original error instead.
+                # Python 2 does not chain exception, remove error silencing
+                # when dropping backward compatibility for Python 2.
+                pass
             raise
 
         if result_type == CURSOR:
