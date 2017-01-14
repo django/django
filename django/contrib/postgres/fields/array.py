@@ -92,7 +92,7 @@ class ArrayField(Field):
         if path == 'django.contrib.postgres.fields.array.ArrayField':
             path = 'django.contrib.postgres.fields.ArrayField'
         kwargs.update({
-            'base_field': self.base_field,
+            'base_field': self.base_field.clone(),
             'size': self.size,
         })
         return name, path, args, kwargs

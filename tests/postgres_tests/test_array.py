@@ -441,6 +441,7 @@ class TestMigrations(TransactionTestCase):
         name, path, args, kwargs = field.deconstruct()
         new = ArrayField(*args, **kwargs)
         self.assertEqual(type(new.base_field), type(field.base_field))
+        self.assertIsNot(new.base_field, field.base_field)
 
     def test_deconstruct_with_size(self):
         field = ArrayField(models.IntegerField(), size=3)
