@@ -223,14 +223,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def chunked_cursor(self):
         self._named_cursor_idx += 1
-        db_cursor = self._cursor(
+        return self._cursor(
             name='_django_curs_%d_%d' % (
                 # Avoid reusing name in other threads
                 threading.current_thread().ident,
                 self._named_cursor_idx,
             )
         )
-        return self._prepare_cursor(db_cursor)
 
     def _set_autocommit(self, autocommit):
         with self.wrap_database_errors:

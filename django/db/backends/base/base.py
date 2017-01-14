@@ -228,7 +228,7 @@ class BaseDatabaseWrapper(object):
     def _cursor(self, name=None):
         self.ensure_connection()
         with self.wrap_database_errors:
-            return self.create_cursor(name)
+            return self._prepare_cursor(self.create_cursor(name))
 
     def _commit(self):
         if self.connection is not None:
@@ -251,7 +251,7 @@ class BaseDatabaseWrapper(object):
         """
         Creates a cursor, opening a connection if necessary.
         """
-        return self._prepare_cursor(self._cursor())
+        return self._cursor()
 
     def commit(self):
         """
