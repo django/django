@@ -92,6 +92,17 @@ then ``clean()`` will return a *normalized* empty value rather than raising
 For other ``Field`` classes, it might be ``None``. (This varies from field to
 field.)
 
+Required form fields have the ``required`` HTML attribute. Set the
+:attr:`Form.use_required_attribute <django.forms.Form.use_required_attribute>`
+to ``False`` to disable it. The ``required`` attribute isn't included on forms
+of formsets because the browser validation may not be correct when adding and
+deleting formsets.
+
+.. versionadded:: 1.10
+
+    The ``required`` HTML attribute was added to the rendered required field
+    widget.
+
 ``label``
 ---------
 
