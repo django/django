@@ -221,6 +221,12 @@ class BaseDatabaseFeatures(object):
     # Place FOR UPDATE right after FROM clause. Used on MSSQL.
     for_update_after_from = False
 
+    # Combinatorial flags
+    supports_select_union = True
+    supports_select_intersection = True
+    supports_select_difference = True
+    supports_slicing_ordering_in_compound = False
+
     def __init__(self, connection):
         self.connection = connection
 

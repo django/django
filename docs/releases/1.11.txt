@@ -386,6 +386,9 @@ Models
 * The new ``F`` expression ``bitleftshift()`` and ``bitrightshift()`` methods
   allow :ref:`bitwise shift operations <using-f-expressions-in-filters>`.
 
+* Added :meth:`.QuerySet.union`, :meth:`~.QuerySet.intersection`, and
+  :meth:`~.QuerySet.difference`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

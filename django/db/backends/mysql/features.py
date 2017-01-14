@@ -29,6 +29,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_column_check_constraints = False
     can_clone_databases = True
     supports_temporal_subtraction = True
+    supports_select_intersection = False
+    supports_select_difference = False
+    supports_slicing_ordering_in_compound = True
 
     @cached_property
     def _mysql_storage_engine(self):
