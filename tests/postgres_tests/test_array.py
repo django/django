@@ -797,3 +797,22 @@ class TestSplitFormWidget(PostgreSQLTestCase):
         self.assertIs(widget.value_omitted_from_data({'field_0': 'value'}, {}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field_1': 'value'}, {}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field_0': 'value', 'field_1': 'value'}, {}, 'field'), False)
+
+
+class TestChoiceFormField(PostgreSQLTestCase):
+    def test_model_field_formfield(self):
+        model_field = ArrayField(models.CharField(max_length=27, choices=(('a1', 'A1'), ('b1', 'B1'))))
+        form_field = model_field.formfield()
+        self.assertIsInstance(form_field, forms.TypedMultipleChoiceField)
+        self.assertEqual(form_field.coerce, model_field.base_field.to_python)
+
+    def test_model_field_formfield_validation(self):
+        model_field = ArrayField(models.IntegerField(choices=((1, 'A1'), (2, 'B1'))))
+        form_field = model_field.formfield()
+        self.assertEqual(form_field.clean(['1', '2']), [1, 2])
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            form_field.clean(['a1'])
+        self.assertEqual(
+            cm.exception.messages[0],
+            'Select a valid choice. a1 is not one of the available choices.'
+        )

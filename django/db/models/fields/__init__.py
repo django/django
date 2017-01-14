@@ -837,7 +837,7 @@ class Field(RegisterLookupMixin):
             include_blank = (self.blank or
                              not (self.has_default() or 'initial' in kwargs))
             defaults['choices'] = self.get_choices(include_blank=include_blank)
-            defaults['coerce'] = self.to_python
+            defaults['coerce'] = kwargs.get('coerce', self.to_python)
             if self.null:
                 defaults['empty_value'] = None
             if choices_form_class is not None:

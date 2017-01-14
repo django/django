@@ -1,5 +1,6 @@
 import json
 
+from django import forms
 from django.contrib.postgres import lookups
 from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
@@ -178,11 +179,19 @@ class ArrayField(Field):
                 )
 
     def formfield(self, **kwargs):
-        defaults = {
-            'form_class': SimpleArrayField,
-            'base_field': self.base_field.formfield(),
-            'max_length': self.size,
-        }
+        if self.base_field.choices and 'choices_form_class' not in kwargs:
+            defaults = {
+                'choices_form_class': forms.TypedMultipleChoiceField,
+                'coerce': self.base_field.to_python,
+            }
+            defaults.update(kwargs)
+            return self.base_field.formfield(**defaults)
+        else:
+            defaults = {
+                'form_class': SimpleArrayField,
+                'base_field': self.base_field.formfield(),
+                'max_length': self.size,
+            }
         defaults.update(kwargs)
         return super().formfield(**defaults)
 
