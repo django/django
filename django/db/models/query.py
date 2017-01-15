@@ -1300,7 +1300,7 @@ class RawQuerySet(object):
 
 
 class Prefetch(object):
-    def __init__(self, lookup, queryset=None, to_attr=None):
+    def __init__(self, lookup, queryset=None, to_attr=None, filter_on_instances=True):
         # `prefetch_through` is the path we traverse to perform the prefetch.
         self.prefetch_through = lookup
         # `prefetch_to` is the path to the attribute that stores the result.
@@ -1312,6 +1312,9 @@ class Prefetch(object):
 
         self.queryset = queryset
         self.to_attr = to_attr
+        self.filter_on_instances = filter_on_instances
+        if not self.filter_on_instances and not self.queryset:
+            raise ValueError("Must specify 'queryset' when 'filter_on_instances' is False")
 
     def __getstate__(self):
         obj_dict = self.__dict__.copy()
@@ -1558,7 +1561,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     # in a dictionary.
 
     rel_qs, rel_obj_attr, instance_attr, single, cache_name = (
-        prefetcher.get_prefetch_queryset(instances, lookup.get_current_queryset(level)))
+        prefetcher.get_prefetch_queryset(instances, lookup.get_current_queryset(level)), lookup.filter_on_instances)
     # We have to handle the possibility that the QuerySet we just got back
     # contains some prefetch_related lookups. We don't want to trigger the
     # prefetch_related functionality by evaluating the query. Rather, we need
