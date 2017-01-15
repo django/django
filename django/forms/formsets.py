@@ -455,8 +455,7 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
 
 def all_valid(formsets):
     """Returns true if every formset in formsets is valid."""
-    valid = True
     for formset in formsets:
         if not formset.is_valid():
-            valid = False
-    return valid
+            return False
+    return True
