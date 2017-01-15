@@ -1030,6 +1030,7 @@ class MigrationAutodetector(object):
                     app_label,
                     operation(
                         name=model_name,
+                        old_value=old_value,
                         **{option_name: new_value}
                     ),
                     dependencies=dependencies,

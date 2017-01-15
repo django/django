@@ -502,15 +502,18 @@ class AlterUniqueTogether(FieldRelatedOptionOperation):
     """
     option_name = "unique_together"
 
-    def __init__(self, name, unique_together):
+    def __init__(self, name, unique_together, old_value=[]):
         unique_together = normalize_together(unique_together)
+        old_value = normalize_together(old_value)
         self.unique_together = set(tuple(cons) for cons in unique_together)
+        self.old_value = set(tuple(cons) for cons in old_value)
         super(AlterUniqueTogether, self).__init__(name)
 
     def deconstruct(self):
         kwargs = {
             'name': self.name,
             'unique_together': self.unique_together,
+            'old_value': self.old_value,
         }
         return (
             self.__class__.__name__,
@@ -541,7 +544,8 @@ class AlterUniqueTogether(FieldRelatedOptionOperation):
             self.references_model(model_name, app_label) and
             (
                 not self.unique_together or
-                any((name in together) for together in self.unique_together)
+                any((name in together) for together in self.unique_together) or
+                any((name in together) for together in self.old_value)
             )
         )
 
@@ -556,15 +560,18 @@ class AlterIndexTogether(FieldRelatedOptionOperation):
     """
     option_name = "index_together"
 
-    def __init__(self, name, index_together):
+    def __init__(self, name, index_together, old_value=[]):
         index_together = normalize_together(index_together)
+        old_value = normalize_together(old_value)
         self.index_together = set(tuple(cons) for cons in index_together)
+        self.old_value = set(tuple(cons) for cons in old_value)
         super(AlterIndexTogether, self).__init__(name)
 
     def deconstruct(self):
         kwargs = {
             'name': self.name,
             'index_together': self.index_together,
+            'old_value': self.old_value,
         }
         return (
             self.__class__.__name__,
@@ -595,7 +602,8 @@ class AlterIndexTogether(FieldRelatedOptionOperation):
             self.references_model(model_name, app_label) and
             (
                 not self.index_together or
-                any((name in together) for together in self.index_together)
+                any((name in together) for together in self.index_together) or
+                any((name in together) for together in self.old_value)
             )
         )
 

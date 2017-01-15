@@ -1409,7 +1409,7 @@ class OperationTests(OperationTestBase):
         definition = operation.deconstruct()
         self.assertEqual(definition[0], "AlterUniqueTogether")
         self.assertEqual(definition[1], [])
-        self.assertEqual(definition[2], {'name': "Pony", 'unique_together': {("pink", "weight")}})
+        self.assertEqual(definition[2], {'name': "Pony", 'unique_together': {("pink", "weight")}, 'old_value': set()})
 
     def test_alter_unique_together_remove(self):
         operation = migrations.AlterUniqueTogether("Pony", None)
@@ -1538,7 +1538,7 @@ class OperationTests(OperationTestBase):
         definition = operation.deconstruct()
         self.assertEqual(definition[0], "AlterIndexTogether")
         self.assertEqual(definition[1], [])
-        self.assertEqual(definition[2], {'name': "Pony", 'index_together': {("pink", "weight")}})
+        self.assertEqual(definition[2], {'name': "Pony", 'index_together': {("pink", "weight")}, 'old_value': set()})
 
     def test_alter_index_together_remove(self):
         operation = migrations.AlterIndexTogether("Pony", None)

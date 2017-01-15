@@ -26,3 +26,6 @@ Bugfixes
 
 * Fixed ``makemessages`` crash on Python 2 with non-ASCII file names
   (:ticket:`26897`).
+
+* Fixed a crash when a field with unique/index_together constraint was
+  removed (:ticket:`26180`).
