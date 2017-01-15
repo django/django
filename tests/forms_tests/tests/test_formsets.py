@@ -696,6 +696,76 @@ class FormsFormsetTestCase(SimpleTestCase):
 
         self.assertEqual(form_output, [])
 
+    def test_invalid_formset_with_ordering(self):
+        # Even if the form is invalid we should still maintain the ordering.
+
+        ChoiceFormSet = formset_factory(Choice, can_order=True)
+
+        initial = [{'choice': 'Calexico', 'votes': 100}, {'choice': 'Fergie', 'votes': 900}]
+        formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
+
+        # Submit with Calexico invalid
+
+        data = {
+            'choices-TOTAL_FORMS': '3',  # the number of forms rendered
+            'choices-INITIAL_FORMS': '2',  # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0',  # min number of forms
+            'choices-MAX_NUM_FORMS': '0',  # max number of forms
+            'choices-0-choice': 'Calexico',
+            'choices-0-votes': 'foo',
+            'choices-0-ORDER': '1',
+            'choices-1-choice': 'Fergie',
+            'choices-1-votes': '900',
+            'choices-1-ORDER': '2',
+            'choices-2-choice': 'The Decemberists',
+            'choices-2-votes': '500',
+            'choices-2-ORDER': '0',
+        }
+
+        formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertFalse(formset.is_valid())
+        form_output = []
+
+        for form in formset.ordered_forms:
+            form_output.append(form.cleaned_data)
+
+        self.assertEqual(form_output, [
+            {'votes': 500, 'ORDER': 0, 'choice': 'The Decemberists'},
+            {'ORDER': 1, 'choice': 'Calexico'},
+            {'votes': 900, 'ORDER': 2, 'choice': 'Fergie'},
+        ])
+
+    def test_invalid_formset_with_deleted_forms(self):
+        # Test we can still access deleted forms when the formset is invalid
+        ChoiceFormSet = formset_factory(Choice, can_delete=True)
+
+        initial = [{'choice': 'Calexico', 'votes': 100}, {'choice': 'Fergie', 'votes': 900}]
+        formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
+
+        # Delete Fergie, make Calexico invalid
+
+        data = {
+            'choices-TOTAL_FORMS': '3',  # the number of forms rendered
+            'choices-INITIAL_FORMS': '2',  # the number of forms with initial data
+            'choices-MIN_NUM_FORMS': '0',  # min number of forms
+            'choices-MAX_NUM_FORMS': '0',  # max number of forms
+            'choices-0-choice': 'Calexico',
+            'choices-0-votes': 'foo',
+            'choices-0-DELETE': '',
+            'choices-1-choice': 'Fergie',
+            'choices-1-votes': '900',
+            'choices-1-DELETE': 'on',
+            'choices-2-choice': '',
+            'choices-2-votes': '',
+            'choices-2-DELETE': '',
+        }
+
+        formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
+        self.assertFalse(formset.is_valid())
+        self.assertEqual([form.cleaned_data for form in formset.forms], [{'DELETE': False, 'choice': 'Calexico'}, {'votes': 900, 'DELETE': True, 'choice': 'Fergie'}, {}])
+        self.assertEqual([form.cleaned_data for form in formset.deleted_forms], [{'votes': 900, 'DELETE': True, 'choice': 'Fergie'}])
+
+
     def test_formset_with_ordering_and_deletion(self):
         # FormSets with ordering + deletion ###########################################
         # Let's try throwing ordering and deletion into the same form.
