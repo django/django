@@ -29,10 +29,11 @@ how to do that, read our :doc:`contributing tutorial </intro/contributing>`.
 Next, clone your fork, install some requirements, and run the tests::
 
    $ git clone git@github.com:YourGitHubName/django.git django-repo
-   $ cd django-repo/tests
+   $ cd django-repo/
    $ pip install -e ..
-   $ pip install -r requirements/py3.txt  # Python 2: py2.txt
-   $ ./runtests.py
+   $ pip install -r tests/requirements/py3.txt  # Python 2: py2.txt
+   $ cp tests/test_sqlite.py ./settings.py
+   $ PYTHONPATH=`pwd` ./tests/runtests.py --settings=settings
 
 Installing the requirements will likely require some operating system packages
 that your computer doesn't have installed. You can usually figure out which
