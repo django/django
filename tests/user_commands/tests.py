@@ -1,17 +1,22 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import os
+import unittest
 
 from admin_scripts.tests import AdminScriptTestCase
 
 from django.apps import apps
 from django.core import management
 from django.core.management import BaseCommand, CommandError, find_commands
+from django.core.management.base import OutputWrapper
 from django.core.management.utils import find_command, popen_wrapper
 from django.db import connection
 from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
 from django.utils._os import upath
-from django.utils.six import StringIO
+from django.utils.six import PY2, StringIO
 
 from .management.commands import dance
 
@@ -198,3 +203,14 @@ class UtilsTests(SimpleTestCase):
     def test_no_existent_external_program(self):
         with self.assertRaises(CommandError):
             popen_wrapper(['a_42_command_that_doesnt_exist_42'])
+
+    @unittest.skipUnless(PY2, "Python 2 only.")
+    def test_outputwrapper_bytestring(self):
+        """
+        OutputWrapper should accept bytestrings on Python 2.
+        """
+        bytestring = '£'.encode('utf-8')
+        out = StringIO()
+        ow = OutputWrapper(out)
+        ow.write(bytestring)
+        self.assertEqual(out.getvalue(), bytestring + b'\n')
