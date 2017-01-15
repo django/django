@@ -240,7 +240,7 @@ class GenericForeignKey(object):
         if ct_id is not None:
             ct = self.get_content_type(id=ct_id, using=instance._state.db)
             try:
-                rel_obj = ct.get_object_for_this_type(pk=pk_val)
+                rel_obj = ct.get_db_manager_for_this_type().get(pk=pk_val)
             except ObjectDoesNotExist:
                 pass
         setattr(instance, self.cache_attr, rel_obj)

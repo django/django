@@ -164,6 +164,12 @@ class ContentType(models.Model):
         except LookupError:
             return None
 
+    def get_db_manager_for_this_type(self):
+        """
+        Returns the manager of this type using the same db as this contenttype.
+        """
+        return self.model_class()._base_manager.using(self._state.db)
+
     def get_object_for_this_type(self, **kwargs):
         """
         Returns an object of this type for the keyword arguments given.
@@ -171,13 +177,13 @@ class ContentType(models.Model):
         method. The ObjectNotExist exception, if thrown, will not be caught,
         so code that calls this method should catch it.
         """
-        return self.model_class()._base_manager.using(self._state.db).get(**kwargs)
+        return self.model_class()._base_manager.get(**kwargs)
 
     def get_all_objects_for_this_type(self, **kwargs):
         """
         Returns all objects of this type for the keyword arguments given.
         """
-        return self.model_class()._base_manager.using(self._state.db).filter(**kwargs)
+        return self.model_class()._base_manager.filter(**kwargs)
 
     def natural_key(self):
         return (self.app_label, self.model)

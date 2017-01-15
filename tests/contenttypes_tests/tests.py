@@ -473,6 +473,47 @@ class ContentTypesMultidbTestCase(TestCase):
             ContentType.objects.get_for_model(Author)
 
 
+class TestDifferentRouter(object):
+    def db_for_read(self, model, **hints):
+        if model._meta.app_label == 'contenttypes':
+            return 'default'
+        return 'other'
+
+    def db_for_write(self, model, **hints):
+        if model._meta.app_label == 'contenttypes':
+            return 'default'
+        return 'other'
+
+
+@override_settings(DATABASE_ROUTERS=[TestDifferentRouter()])
+class ContentTypesCrossMultidbTestCase(TestCase):
+
+    def setUp(self):
+        # Whenever a test starts executing, only the "default" database is
+        # connected. We explicitly connect to the "other" database here. If we
+        # don't do it, then it will be implicitly connected later when we query
+        # it, but in that case some database backends may automatically perform
+        # extra queries upon connecting (notably mysql executes
+        # "SET SQL_AUTO_IS_NULL = 0"), which will affect assertNumQueries().
+        connections['other'].ensure_connection()
+
+    def test_multidb(self):
+        """
+        Test that, when having contenttypes in one database and a model in
+        another, ContentType uses correct database to retrieve the model
+        """
+        ContentType.objects.clear_cache()
+
+        author1 = Author.objects.create(name='Boris')
+        ct = ContentType.objects.get_for_model(Author)
+
+        author_count = ct.get_all_objects_for_this_type().count()
+        self.assertEqual(author_count, 1)
+
+        author2 = ct.get_object_for_this_type(pk=author1.pk)
+        self.assertEqual(author1, author2)
+
+
 @override_settings(
     MIGRATION_MODULES=dict(settings.MIGRATION_MODULES, contenttypes_tests='contenttypes_tests.operations_migrations'),
 )
