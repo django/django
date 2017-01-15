@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from itertools import chain
 import logging
 import sys
 import types
@@ -93,18 +94,21 @@ class BaseHandler(object):
                         'Middleware factory %s returned None.' % middleware_path
                     )
 
-                if hasattr(mw_instance, 'process_view'):
-                    self._view_middleware.insert(0, mw_instance.process_view)
-                if hasattr(mw_instance, 'process_template_response'):
-                    self._template_response_middleware.append(mw_instance.process_template_response)
-                if hasattr(mw_instance, 'process_exception'):
-                    self._exception_middleware.append(mw_instance.process_exception)
-
+                self.add_middleware_hooks(mw_instance)
                 handler = convert_exception_to_response(mw_instance)
 
         # We only assign to this when initialization is complete as it is used
         # as a flag for initialization being complete.
         self._middleware_chain = handler
+
+    def add_middleware_hooks(self, mw_instance, target=None):
+        target = target or self
+        if hasattr(mw_instance, 'process_view'):
+            target._view_middleware.insert(0, mw_instance.process_view)
+        if hasattr(mw_instance, 'process_template_response'):
+            target._template_response_middleware.append(mw_instance.process_template_response)
+        if hasattr(mw_instance, 'process_exception'):
+            target._exception_middleware.append(mw_instance.process_exception)
 
     def make_view_atomic(self, view):
         non_atomic_requests = getattr(view, '_non_atomic_requests', set())
@@ -155,13 +159,6 @@ class BaseHandler(object):
         return response
 
     def _get_response(self, request):
-        """
-        Resolve and call the view, then apply view, exception, and
-        template_response middleware. This method is everything that happens
-        inside the request/response middleware.
-        """
-        response = None
-
         if hasattr(request, 'urlconf'):
             urlconf = request.urlconf
             set_urlconf(urlconf)
@@ -170,11 +167,30 @@ class BaseHandler(object):
             resolver = get_resolver()
 
         resolver_match = resolver.resolve(request.path_info)
-        callback, callback_args, callback_kwargs = resolver_match
         request.resolver_match = resolver_match
 
+        get_response = convert_exception_to_response(self._inner_get_response)
+        request._view_middleware = []
+        request._exception_middleware = []
+        request._template_response_middleware = []
+        for mw, args, kwargs in getattr(resolver_match[0], '_extra_middleware', []):
+            mw_instance = mw(get_response, *args, **kwargs)
+            self.add_middleware_hooks(mw_instance, target=request)
+            get_response = convert_exception_to_response(mw_instance)
+
+        return get_response(request)
+
+    def _inner_get_response(self, request):
+        """
+        Resolve and call the view, then apply view, exception, and
+        template_response middleware. This method is everything that happens
+        inside the request/response middleware.
+        """
+        callback, callback_args, callback_kwargs = request.resolver_match
+        response = None
+
         # Apply view middleware
-        for middleware_method in self._view_middleware:
+        for middleware_method in chain(self._view_middleware, request._view_middleware):
             response = middleware_method(request, callback, callback_args, callback_kwargs)
             if response:
                 break
@@ -201,7 +217,8 @@ class BaseHandler(object):
         # If the response supports deferred rendering, apply template
         # response middleware and then render the response
         elif hasattr(response, 'render') and callable(response.render):
-            for middleware_method in self._template_response_middleware:
+            for middleware_method in chain(
+                    request._template_response_middleware, self._template_response_middleware):
                 response = middleware_method(request, response)
                 # Complain if the template response middleware returned None (a common error).
                 if response is None:
@@ -223,7 +240,7 @@ class BaseHandler(object):
         Pass the exception to the exception middleware. If no middleware
         return a response for this exception, raise it.
         """
-        for middleware_method in self._exception_middleware:
+        for middleware_method in chain(request._exception_middleware, self._exception_middleware):
             response = middleware_method(request, exception)
             if response:
                 return response
