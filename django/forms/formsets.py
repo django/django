@@ -349,7 +349,7 @@ class BaseFormSet(object):
         try:
             if (self.validate_max and
                     self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
-                    self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
+                    self.total_form_count() > self.absolute_max:
                 raise ValidationError(ungettext(
                     "Please submit %d or fewer forms.",
                     "Please submit %d or fewer forms.", self.max_num) % self.max_num,
