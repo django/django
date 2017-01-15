@@ -1241,6 +1241,8 @@ number of proxy models that share a common non-abstract parent class.
     In earlier versions, a proxy model couldn't inherit more than one proxy
     model that shared the same parent class.
 
+Proxy model ``Meta`` inheritance works the same as described in :ref:`meta-and-multi-table-inheritance`.
+
 Proxy model managers
 ~~~~~~~~~~~~~~~~~~~~
 
