@@ -65,6 +65,7 @@ def is_broken_pipe_error():
 class WSGIServer(simple_server.WSGIServer, object):
     """BaseHTTPServer that implements the Python WSGI protocol"""
 
+    protocol_version = "HTTP/1.1"
     request_queue_size = 10
 
     def __init__(self, *args, **kwargs):
@@ -87,13 +88,33 @@ class WSGIServer(simple_server.WSGIServer, object):
 
 # Inheriting from object required on Python 2.
 class ServerHandler(simple_server.ServerHandler, object):
+    http_version = "1.1"
+
     def handle_error(self):
         # Ignore broken pipe errors, otherwise pass on
         if not is_broken_pipe_error():
             super(ServerHandler, self).handle_error()
 
+    def set_content_length(self):
+        """Compute Content-Length or switch to chunked encoding if possible"""
+        try:
+            blocks = len(self.result)
+        except (TypeError, AttributeError, NotImplementedError):
+            result = self.result
+            if hasattr(result, 'content'):
+                result.content = result.content.rstrip()
+                self.headers['Content-Length'] = str(len(result.content))
+                self.has_length = True
+        else:
+            if blocks == 1:
+                self.headers['Content-Length'] = str(self.bytes_sent)
+                return
+
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
+    protocol_version = "HTTP/1.1"
+    max_keepalive_requests = 100
+
     def address_string(self):
         # Short-circuit parent method to not call socket.getfqdn
         return self.client_address[0]
@@ -140,9 +161,24 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         return super(WSGIRequestHandler, self).get_environ()
 
     def handle(self):
-        """Copy of WSGIRequestHandler, but with different ServerHandler"""
+        """Handle multiple requests if necessary."""
+        self.close_connection = 1
 
-        self.raw_requestline = self.rfile.readline(65537)
+        # max keep-alive request times
+        for i in range(self.max_keepalive_requests):
+            self.handle_one_request()
+            if self.close_connection:
+                break
+
+    def handle_one_request(self):
+        """Copy of WSGIRequestHandler.handle(), but with different ServerHandler"""
+
+        try:
+            self.raw_requestline = self.rfile.readline(65537)
+        except socket.error:
+            self.close_connection = 1
+            return
+
         if len(self.raw_requestline) > 65536:
             self.requestline = ''
             self.request_version = ''
@@ -158,6 +194,8 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         )
         handler.request_handler = self      # backpointer for logging
         handler.run(self.server.get_app())
+        if not hasattr(handler, 'has_length'):
+            self.close_connection = 1
 
 
 def run(addr, port, wsgi_handler, ipv6=False, threading=False, server_cls=WSGIServer):
