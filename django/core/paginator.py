@@ -24,7 +24,7 @@ class EmptyPage(InvalidPage):
 
 
 class Paginator(object):
-
+    """Helper class to deal with pagination."""
     def __init__(self, object_list, per_page, orphans=0,
                  allow_empty_first_page=True):
         self.object_list = object_list
