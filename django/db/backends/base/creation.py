@@ -148,7 +148,8 @@ class BaseDatabaseCreation(object):
         """
         if self.connection.settings_dict['TEST']['NAME']:
             return self.connection.settings_dict['TEST']['NAME']
-        return TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME']
+        db_name = self.connection.settings_dict['NAME']
+        return TEST_DATABASE_PREFIX + db_name if not db_name.startswith(TEST_DATABASE_PREFIX) else db_name
 
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
         """
