@@ -51,3 +51,7 @@ class TwoFields(models.Model):
 
 class NoFields(models.Model):
     pass
+
+
+class NullableFields(models.Model):
+    int_or_null = models.IntegerField(null=True)
