@@ -504,6 +504,9 @@ class ContentTypeOperationsTests(TransactionTestCase):
     def test_existing_content_type_rename(self):
         ContentType.objects.create(app_label='contenttypes_tests', model='foo')
         management.call_command(
+            'migrate', 'contenttypes_tests', '0001', database='default', interactive=False, verbosity=0,
+        )
+        management.call_command(
             'migrate', 'contenttypes_tests', database='default', interactive=False, verbosity=0,
         )
         self.assertFalse(ContentType.objects.filter(app_label='contenttypes_tests', model='foo').exists())
@@ -515,6 +518,9 @@ class ContentTypeOperationsTests(TransactionTestCase):
         self.assertFalse(ContentType.objects.filter(app_label='contenttypes_tests', model='renamedfoo').exists())
 
     def test_missing_content_type_rename_ignore(self):
+        management.call_command(
+            'migrate', 'contenttypes_tests', '0001', database='default', interactive=False, verbosity=0,
+        )
         management.call_command(
             'migrate', 'contenttypes_tests', database='default', interactive=False, verbosity=0,
         )
@@ -529,6 +535,9 @@ class ContentTypeOperationsTests(TransactionTestCase):
     def test_content_type_rename_conflict(self):
         ContentType.objects.create(app_label='contenttypes_tests', model='foo')
         ContentType.objects.create(app_label='contenttypes_tests', model='renamedfoo')
+        management.call_command(
+            'migrate', 'contenttypes_tests', '0001', database='default', interactive=False, verbosity=0,
+        )
         management.call_command(
             'migrate', 'contenttypes_tests', database='default', interactive=False, verbosity=0,
         )
