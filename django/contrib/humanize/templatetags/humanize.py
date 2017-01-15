@@ -135,7 +135,7 @@ def intword(value):
         large_number = 10 ** exponent
         if value < large_number * 1000:
             new_value = value / float(large_number)
-            return _check_for_i18n(new_value, *converters(new_value))
+            return _check_for_i18n(new_value, *converters(int(new_value)))
     return value
 
 

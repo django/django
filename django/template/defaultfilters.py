@@ -892,7 +892,7 @@ def filesizeformat(bytes_):
         bytes_ = -bytes_  # Allow formatting of negative numbers.
 
     if bytes_ < KB:
-        value = ungettext("%(size)d byte", "%(size)d bytes", bytes_) % {'size': bytes_}
+        value = ungettext("%(size)d byte", "%(size)d bytes", int(bytes_)) % {'size': bytes_}
     elif bytes_ < MB:
         value = ugettext("%s KB") % filesize_number_format(bytes_ / KB)
     elif bytes_ < GB:
