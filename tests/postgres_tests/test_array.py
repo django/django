@@ -120,6 +120,17 @@ class TestSaveLoad(PostgreSQLTestCase):
         self.assertEqual(field.model, IntegerArrayModel)
         self.assertEqual(field.base_field.model, IntegerArrayModel)
 
+    @isolate_apps('postgres_tests')
+    def test_choices(self):
+        class MyModel(PostgreSQLModel):
+            ARRAY_CHOICES = (
+                ([1, 2], 'Value 1'),
+                ([2, 3, 4], 'Value 2'),
+            )
+            field = ArrayField(base_field=models.IntegerField(), choices=ARRAY_CHOICES)
+        instance = MyModel(field=[1, 2])
+        self.assertEqual(instance.get_field_display(), 'Value 1')
+
 
 class TestQuerying(PostgreSQLTestCase):
 
