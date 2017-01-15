@@ -481,9 +481,15 @@ class QuerySet(object):
                 obj, created = self._create_object_from_params(lookup, params)
                 if created:
                     return obj, created
+
+            changed = False
             for k, v in six.iteritems(defaults):
-                setattr(obj, k, v() if callable(v) else v)
-            obj.save(using=self.db)
+                value = v() if callable(v) else v
+                if value != getattr(obj, k):
+                    changed = True
+                    setattr(obj, k, value)
+            if changed:
+                obj.save(using=self.db)  # save only if there were changes
         return obj, False
 
     def _create_object_from_params(self, lookup, params):

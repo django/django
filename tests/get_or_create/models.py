@@ -11,8 +11,17 @@ class Person(models.Model):
     birthday = models.DateField()
     defaults = models.TextField()
 
+    save_count_called = 0
+
     def __str__(self):
         return '%s %s' % (self.first_name, self.last_name)
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        """
+        Overriding save method to count how much save() method was called.
+        """
+        Person.save_count_called += 1
+        super(Person, self).save(force_insert, force_update, using, update_fields)
 
 
 class DefaultPerson(models.Model):
