@@ -32,9 +32,7 @@ class Article(models.Model):
     translation = CurrentTranslation(ArticleTranslation, models.CASCADE, ['id'], ['article'])
 
     class Meta:
-        index_together = [
-            ["headline", "pub_date"],
-        ]
+        indexes = [models.Index(fields=['headline', 'pub_date'])]
 
 
 # Model for index_together being used only with single list
@@ -43,7 +41,7 @@ class IndexTogetherSingleList(models.Model):
     pub_date = models.DateTimeField()
 
     class Meta:
-        index_together = ["headline", "pub_date"]
+        indexes = [models.Index(fields=['headline', 'pub_date'])]
 
 
 # Indexing a TextField on Oracle or MySQL results in index creation error.

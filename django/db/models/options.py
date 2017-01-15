@@ -193,7 +193,11 @@ class Options(object):
 
             self.unique_together = normalize_together(self.unique_together)
             self.index_together = normalize_together(self.index_together)
-
+            if self.index_together:
+                warnings.warn(
+                    "'index_together' is deprecated in favor of 'indexes'",
+                    RemovedInDjango21Warning
+                )
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
             if self.verbose_name_plural is None:

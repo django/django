@@ -1,12 +1,16 @@
 from __future__ import unicode_literals
 
+import warnings
+
 from django.db.models.fields import NOT_PROVIDED
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.functional import cached_property
 
 from .base import Operation
 
 
 class FieldOperation(Operation):
+
     def __init__(self, model_name, name):
         self.model_name = model_name
         self.name = name
@@ -276,21 +280,31 @@ class RenameField(FieldOperation):
         to_model = to_state.apps.get_model(app_label, self.model_name)
         if self.allow_migrate_model(schema_editor.connection.alias, to_model):
             from_model = from_state.apps.get_model(app_label, self.model_name)
-            schema_editor.alter_field(
-                from_model,
-                from_model._meta.get_field(self.old_name),
-                to_model._meta.get_field(self.new_name),
-            )
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore", "'index_together' is deprecated in favor of 'indexes'",
+                    RemovedInDjango21Warning)
+
+                schema_editor.alter_field(
+                    from_model,
+                    from_model._meta.get_field(self.old_name),
+                    to_model._meta.get_field(self.new_name),
+                )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
         if self.allow_migrate_model(schema_editor.connection.alias, to_model):
             from_model = from_state.apps.get_model(app_label, self.model_name)
-            schema_editor.alter_field(
-                from_model,
-                from_model._meta.get_field(self.new_name),
-                to_model._meta.get_field(self.old_name),
-            )
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore", "'index_together' is deprecated in favor of 'indexes'",
+                    RemovedInDjango21Warning)
+
+                schema_editor.alter_field(
+                    from_model,
+                    from_model._meta.get_field(self.new_name),
+                    to_model._meta.get_field(self.old_name),
+                )
 
     def describe(self):
         return "Rename field %s on %s to %s" % (self.old_name, self.model_name, self.new_name)
