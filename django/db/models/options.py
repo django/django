@@ -74,6 +74,12 @@ def make_immutable_fields_list(name, data):
     return ImmutableList(data, warning=IMMUTABLE_WARNING % name)
 
 
+def get_full_default_permissions():
+    perms = ['add', 'change', 'delete']
+    perms.extend([x for x in settings.CUSTOM_DEFAULT_PERMISSIONS if x not in perms])
+    return perms
+
+
 @python_2_unicode_compatible
 class Options(object):
     FORWARD_PROPERTIES = {
@@ -104,7 +110,7 @@ class Options(object):
         self.unique_together = []
         self.index_together = []
         self.select_on_save = False
-        self.default_permissions = ('add', 'change', 'delete')
+        self.default_permissions = get_full_default_permissions()
         self.permissions = []
         self.object_name = None
         self.app_label = app_label

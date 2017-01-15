@@ -2868,6 +2868,21 @@ The list of validators that are used to check the strength of user's passwords.
 See :ref:`password-validation` for more details. By default, no validation is
 performed and all passwords are accepted.
 
+.. setting:: CUSTOM_DEFAULT_PERMISSIONS
+
+CUSTOM_DEFAULT_PERMISSIONS
+--------------------------
+
+.. versionadded:: 1.9
+
+Default: ``[]`` (Empty list)
+
+The list of additional permissions that are required for all project models.
+By default Django provides permissions - ``add``, ``change`` and ``delete``.
+
+Note that permissions which provides Django do not need to add to this list.
+
+
 .. _settings-messages:
 
 Messages
