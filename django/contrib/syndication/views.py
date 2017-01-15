@@ -81,17 +81,10 @@ class Feed(object):
         except AttributeError:
             return default
         if callable(attr):
-            # Check co_argcount rather than try/excepting the function and
-            # catching the TypeError, because something inside the function
-            # may raise the TypeError. This technique is more accurate.
-            try:
-                code = six.get_function_code(attr)
-            except AttributeError:
-                code = six.get_function_code(attr.__call__)
-            if code.co_argcount == 2:       # one argument is 'self'
-                return attr(obj)
-            else:
-                return attr()
+            # Need to handle situations, when is needed
+            # to wrap Feed methods into decorator.
+            # See #22708.
+            return attr(obj) if obj else attr()
         return attr
 
     def feed_extra_kwargs(self, obj):
