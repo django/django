@@ -49,7 +49,7 @@ def lazy(func, *resultclasses):
     """
     Turns any callable into a lazy evaluated callable. You need to give result
     classes or types -- at least one is needed so that the automatic forcing of
-    the lazy evaluation code is triggered. Results are not memoized; the
+    the lazy evaluation code is triggered. Results are not memorized; the
     function is evaluated on every access.
     """
 
