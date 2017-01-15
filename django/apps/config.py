@@ -80,7 +80,7 @@ class AppConfig(object):
                 "The app module %r has no filesystem location, "
                 "you must configure this app with an AppConfig subclass "
                 "with a 'path' class attribute." % (module,))
-        return upath(paths[0])
+        return upath(os.path.abspath(paths[0]))
 
     @classmethod
     def create(cls, entry):
