@@ -7,7 +7,7 @@ from copy import deepcopy
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, connection, models, transaction
-from django.db.models import TimeField, UUIDField
+from django.db.models import CharField, TimeField, UUIDField
 from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
@@ -745,6 +745,30 @@ class ExpressionsTests(TestCase):
             ["<Employee: Jean-Claude claude>"],
             ordered=False)
 
+    def test_deconstruct_F(self):
+        f_object = F('name')
+
+        path, args, kwargs = f_object.deconstruct()
+
+        self.assertEqual(path, 'django.db.models.expressions.F')
+        self.assertEqual(args, (f_object.name,))
+        self.assertEqual(kwargs, {})
+
+    def test_F_equal(self):
+        f_object = F('name')
+        same_f_object = F('name')
+        other_f_object = F('username')
+
+        self.assertEqual(f_object, same_f_object)
+        self.assertNotEqual(f_object, other_f_object)
+
+    def test_F_not_equal_Value(self):
+        f_object = F('name')
+        value = Value('name')
+
+        self.assertNotEqual(f_object, value)
+        self.assertNotEqual(value, f_object)
+
 
 class ExpressionsNumericTests(TestCase):
 
@@ -1218,6 +1242,46 @@ class ValueTests(TestCase):
         UUID.objects.create()
         UUID.objects.update(uuid=Value(uuid.UUID('12345678901234567890123456789012'), output_field=UUIDField()))
         self.assertEqual(UUID.objects.get().uuid, uuid.UUID('12345678901234567890123456789012'))
+
+    def test_deconstruct_Value(self):
+        value = Value('name')
+
+        path, args, kwargs = value.deconstruct()
+
+        self.assertEqual(path, 'django.db.models.expressions.Value')
+        self.assertEqual(args, (value.value,))
+        self.assertEqual(kwargs, {})
+
+    def test_deconstruct_Value_output_field(self):
+        value = Value('name', output_field=CharField())
+
+        path, args, kwargs = value.deconstruct()
+
+        self.assertEqual(path, 'django.db.models.expressions.Value')
+        self.assertEqual(args, (value.value,))
+        self.assertEqual(len(kwargs), 1)
+        self.assertEqual(
+            kwargs['output_field'].deconstruct(),
+            CharField().deconstruct(),
+        )
+
+    def test_Value_equal(self):
+        value = Value('name')
+        same_value = Value('name')
+        other_value = Value('username')
+
+        self.assertEqual(value, same_value)
+        self.assertNotEqual(value, other_value)
+
+    def test_Value_equal_output_field(self):
+        value = Value('name', output_field=CharField())
+        same_value = Value('name', output_field=CharField())
+        other_value = Value('name', output_field=TimeField())
+        no_output_field = Value('name')
+
+        self.assertEqual(value, same_value)
+        self.assertNotEqual(value, other_value)
+        self.assertNotEqual(value, no_output_field)
 
 
 class ReprTests(TestCase):
