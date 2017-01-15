@@ -1314,9 +1314,25 @@ ArticleFormSet = formset_factory(ArticleForm)
 
 
 class TestIsBoundBehavior(SimpleTestCase):
-    def test_no_data_raises_validation_error(self):
-        with self.assertRaises(ValidationError):
-            ArticleFormSet({}).is_valid()
+    def test_no_data_works_fine(self):
+        self.assertTrue(ArticleFormSet({}).is_valid(), True)
+
+    def test_missing_management_data_attrs_work_fine(self):
+        data = {
+            'form-0-title': 'Test',
+            'form-0-pub_date': '1904-06-16',
+            'form-1-title': 'Test',
+            'form-1-pub_date': '2015-06-05',
+        }
+        formset = ArticleFormSet(data)
+        self.assertEqual(0, formset.initial_form_count())
+        self.assertEqual(2, formset.total_form_count())
+        self.assertTrue(formset.is_bound)
+        self.assertTrue(formset.forms[0].is_bound)
+        self.assertTrue(formset.forms[1].is_bound)
+        self.assertTrue(formset.is_valid())
+        self.assertTrue(formset.forms[0].is_valid())
+        self.assertTrue(formset.forms[1].is_valid())
 
     def test_with_management_data_attrs_work_fine(self):
         data = {

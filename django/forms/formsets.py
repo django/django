@@ -37,8 +37,8 @@ class ManagementForm(Form):
     increment the count field of this form as well.
     """
     def __init__(self, *args, **kwargs):
-        self.base_fields[TOTAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
-        self.base_fields[INITIAL_FORM_COUNT] = IntegerField(widget=HiddenInput)
+        self.base_fields[TOTAL_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
+        self.base_fields[INITIAL_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         # MIN_NUM_FORM_COUNT and MAX_NUM_FORM_COUNT are output with the rest of
         # the management form, but only for the convenience of client-side
         # code. The POST value of them returned from the client is not checked.
@@ -106,6 +106,33 @@ class BaseFormSet(object):
             })
         return form
 
+    def _extract_form_indices(self):
+        """Find indices of all submitted forms"""
+        prefix = self.prefix + '-'
+        prefix_len = len(prefix)
+        for key in self.data.keys():
+            if key.startswith(prefix):
+                identifier = key[prefix_len:].split('-', 1)[0]
+                if identifier.isdigit():
+                    yield int(identifier)
+
+    def _extract_total_form_count(self):
+        """Extract the number of submitted forms"""
+        if self.management_form.cleaned_data[TOTAL_FORM_COUNT]:
+            # prefer the management form if data is present
+            return self.management_form.cleaned_data[TOTAL_FORM_COUNT]
+        try:
+            return max(self._extract_form_indices()) + 1
+        except ValueError:  # no forms submitted
+            return 0
+
+    def _extract_initial_form_count(self):
+        """Extract the number of initial forms"""
+        if self.management_form.cleaned_data[INITIAL_FORM_COUNT]:
+            # prefer the management form if data is present
+            return self.management_form.cleaned_data[INITIAL_FORM_COUNT]
+        return 0
+
     def total_form_count(self):
         """Returns the total number of forms in this FormSet."""
         if self.is_bound:
@@ -113,7 +140,7 @@ class BaseFormSet(object):
             # count in the data; this is DoS protection to prevent clients
             # from forcing the server to instantiate arbitrary numbers of
             # forms
-            return min(self.management_form.cleaned_data[TOTAL_FORM_COUNT], self.absolute_max)
+            return min(self._extract_total_form_count(), self.absolute_max)
         else:
             initial_forms = self.initial_form_count()
             total_forms = max(initial_forms, self.min_num) + self.extra
@@ -128,11 +155,9 @@ class BaseFormSet(object):
     def initial_form_count(self):
         """Returns the number of forms that are required in this FormSet."""
         if self.is_bound:
-            return self.management_form.cleaned_data[INITIAL_FORM_COUNT]
-        else:
-            # Use the length of the initial data if it's there, 0 otherwise.
-            initial_forms = len(self.initial) if self.initial else 0
-        return initial_forms
+            return self._extract_initial_form_count()
+        # Use the length of the initial data if it's there, 0 otherwise.
+        return len(self.initial) if self.initial else 0
 
     @cached_property
     def forms(self):
@@ -349,7 +374,7 @@ class BaseFormSet(object):
         try:
             if (self.validate_max and
                     self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
-                    self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
+                    self._extract_total_form_count() > self.absolute_max:
                 raise ValidationError(ungettext(
                     "Please submit %d or fewer forms.",
                     "Please submit %d or fewer forms.", self.max_num) % self.max_num,
