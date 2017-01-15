@@ -102,7 +102,7 @@ class TestUtilsHtml(SimpleTestCase):
         # Test with more lengthy content (also catching performance regressions)
         for filename in ('strip_tags1.html', 'strip_tags2.txt'):
             path = os.path.join(os.path.dirname(upath(__file__)), 'files', filename)
-            with open(path, 'r') as fp:
+            with open(path, 'rb') as fp:
                 content = force_text(fp.read())
                 start = datetime.now()
                 stripped = html.strip_tags(content)
