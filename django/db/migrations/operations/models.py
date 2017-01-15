@@ -495,112 +495,80 @@ class FieldRelatedOptionOperation(ModelOptionOperation):
         return super(FieldRelatedOptionOperation, self).reduce(operation, in_between, app_label=app_label)
 
 
-class AlterUniqueTogether(FieldRelatedOptionOperation):
+class AlterFooTogether(FieldRelatedOptionOperation):
+    # Name of the option used in Meta class of model
+    option_name = None
+
+    def __init__(self, name, value):
+        value = normalize_together(value)
+        setattr(self, self.option_name, set(tuple(cons) for cons in value))
+        super(AlterFooTogether, self).__init__(name)
+
+    def deconstruct(self):
+        kwargs = {
+            'name': self.name,
+            self.option_name: getattr(self, self.option_name),
+        }
+        return (
+            self.__class__.__name__,
+            [],
+            kwargs
+        )
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.name_lower]
+        model_state.options[self.option_name] = getattr(self, self.option_name)
+        state.reload_model(app_label, self.name_lower)
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        new_model = to_state.apps.get_model(app_label, self.name)
+        if self.allow_migrate_model(schema_editor.connection.alias, new_model):
+            old_model = from_state.apps.get_model(app_label, self.name)
+            schema_editor_method = getattr(schema_editor, 'alter_%s' % self.option_name)
+            schema_editor_method(
+                new_model,
+                getattr(old_model._meta, self.option_name, set()),
+                getattr(new_model._meta, self.option_name, set()),
+            )
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        return self.database_forwards(app_label, schema_editor, from_state, to_state)
+
+    def references_field(self, model_name, name, app_label=None):
+        return (
+            self.references_model(model_name, app_label) and
+            (
+                not getattr(self, self.option_name) or
+                any((name in together) for together in getattr(self, self.option_name))
+            )
+        )
+
+    def describe(self):
+        return "Alter %s for %s (%s constraint(s))" % (
+            self.option_name, self.name, len(getattr(self, self.option_name) or [])
+        )
+
+
+class AlterUniqueTogether(AlterFooTogether):
     """
     Changes the value of unique_together to the target one.
     Input value of unique_together must be a set of tuples.
     """
-    option_name = "unique_together"
+    option_name = 'unique_together'
 
     def __init__(self, name, unique_together):
-        unique_together = normalize_together(unique_together)
-        self.unique_together = set(tuple(cons) for cons in unique_together)
-        super(AlterUniqueTogether, self).__init__(name)
-
-    def deconstruct(self):
-        kwargs = {
-            'name': self.name,
-            'unique_together': self.unique_together,
-        }
-        return (
-            self.__class__.__name__,
-            [],
-            kwargs
-        )
-
-    def state_forwards(self, app_label, state):
-        model_state = state.models[app_label, self.name_lower]
-        model_state.options[self.option_name] = self.unique_together
-        state.reload_model(app_label, self.name_lower)
-
-    def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        new_model = to_state.apps.get_model(app_label, self.name)
-        if self.allow_migrate_model(schema_editor.connection.alias, new_model):
-            old_model = from_state.apps.get_model(app_label, self.name)
-            schema_editor.alter_unique_together(
-                new_model,
-                getattr(old_model._meta, self.option_name, set()),
-                getattr(new_model._meta, self.option_name, set()),
-            )
-
-    def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        return self.database_forwards(app_label, schema_editor, from_state, to_state)
-
-    def references_field(self, model_name, name, app_label=None):
-        return (
-            self.references_model(model_name, app_label) and
-            (
-                not self.unique_together or
-                any((name in together) for together in self.unique_together)
-            )
-        )
-
-    def describe(self):
-        return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.unique_together or ''))
+        super(AlterUniqueTogether, self).__init__(name, unique_together)
 
 
-class AlterIndexTogether(FieldRelatedOptionOperation):
+class AlterIndexTogether(AlterFooTogether):
     """
     Changes the value of index_together to the target one.
     Input value of index_together must be a set of tuples.
     """
-    option_name = "index_together"
+    option_name = 'index_together'
 
     def __init__(self, name, index_together):
-        index_together = normalize_together(index_together)
-        self.index_together = set(tuple(cons) for cons in index_together)
-        super(AlterIndexTogether, self).__init__(name)
-
-    def deconstruct(self):
-        kwargs = {
-            'name': self.name,
-            'index_together': self.index_together,
-        }
-        return (
-            self.__class__.__name__,
-            [],
-            kwargs
-        )
-
-    def state_forwards(self, app_label, state):
-        model_state = state.models[app_label, self.name_lower]
-        model_state.options[self.option_name] = self.index_together
-        state.reload_model(app_label, self.name_lower)
-
-    def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        new_model = to_state.apps.get_model(app_label, self.name)
-        if self.allow_migrate_model(schema_editor.connection.alias, new_model):
-            old_model = from_state.apps.get_model(app_label, self.name)
-            schema_editor.alter_index_together(
-                new_model,
-                getattr(old_model._meta, self.option_name, set()),
-                getattr(new_model._meta, self.option_name, set()),
-            )
-
-    def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        return self.database_forwards(app_label, schema_editor, from_state, to_state)
-
-    def references_field(self, model_name, name, app_label=None):
-        return (
-            self.references_model(model_name, app_label) and
-            (
-                not self.index_together or
-                any((name in together) for together in self.index_together)
-            )
-        )
-
-    def describe(self):
-        return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.index_together or ''))
+        super(AlterIndexTogether, self).__init__(name, index_together)
 
 
 class AlterOrderWithRespectTo(FieldRelatedOptionOperation):
