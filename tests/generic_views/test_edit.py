@@ -208,6 +208,15 @@ class CreateViewTests(TestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, message):
             MyCreateView().get_form_class()
 
+    def test_create_with_default_instance_fields(self):
+        res = self.client.post('/edit/authors/create/default-instance-fields/',
+            {'name': 'Randall Munroe'})
+        self.assertEqual(res.status_code, 302)
+        self.assertRedirects(res, '/list/authors/')
+        self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe>'])
+        author = Author.objects.get(name='Randall Munroe')
+        self.assertEqual(author.slug, 'awesome-slug')
+
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
 class UpdateViewTests(TestCase):

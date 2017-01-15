@@ -173,6 +173,15 @@ The following mixins are used to construct Django's editing views:
         redirects to
         :meth:`~django.views.generic.edit.FormMixin.get_success_url`.
 
+    .. method:: save_form(form)
+
+        Given a form, return an unsaved instance. Can be overridden to set
+        extra instance fields.
+
+    .. method:: save_model(obj)
+
+        Save a given model instance to the database.
+
     .. method:: form_invalid()
 
         Renders a response, providing the invalid form as context.

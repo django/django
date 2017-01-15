@@ -87,6 +87,8 @@ urlpatterns = [
         views.NaiveAuthorCreate.as_view(success_url='/%C3%A9dit/author/{id}/update/')),
     url(r'^edit/authors/create/restricted/$',
         views.AuthorCreateRestricted.as_view()),
+    url(r'^edit/authors/create/default-instance-fields/$',
+        views.AuthorCreateDefaultInstanceFields.as_view()),
     url(r'^[eé]dit/authors/create/$',
         views.AuthorCreate.as_view()),
     url(r'^edit/authors/create/special/$',

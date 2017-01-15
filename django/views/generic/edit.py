@@ -159,8 +159,17 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         """
         If the form is valid, save the associated model.
         """
-        self.object = form.save()
+        self.object = self.save_form(form)
+        self.save_model(self.object)
         return super(ModelFormMixin, self).form_valid(form)
+
+    def save_form(self, form):
+        """Given a form, return an unsaved instance"""
+        return form.save(commit=False)
+
+    def save_model(self, obj):
+        """Save a given model instance to the database"""
+        obj.save()
 
 
 class ProcessFormView(View):

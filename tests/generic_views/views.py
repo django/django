@@ -136,6 +136,15 @@ class AuthorCreateRestricted(AuthorCreate):
     post = method_decorator(login_required)(AuthorCreate.post)
 
 
+class AuthorCreateDefaultInstanceFields(AuthorCreate):
+    fields = ['name']
+
+    def save_form(self, form):
+        obj = super(AuthorCreateDefaultInstanceFields, self).save_form(form)
+        obj.slug = 'awesome-slug'
+        return obj
+
+
 class ArtistUpdate(generic.UpdateView):
     model = Artist
     fields = '__all__'
