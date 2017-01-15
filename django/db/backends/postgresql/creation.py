@@ -42,8 +42,6 @@ class DatabaseCreation(BaseDatabaseCreation):
             try:
                 cursor.execute(creation_sql)
             except Exception as e:
-                if keepdb:
-                    return
                 try:
                     if verbosity >= 1:
                         print("Destroying old test database for alias %s..." % (
