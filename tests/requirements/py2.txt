@@ -3,3 +3,4 @@ enum34
 # Due to https://github.com/linsomniac/python-memcached/issues/79 in newer versions.
 python-memcached <= 1.53
 mock
+tblib
