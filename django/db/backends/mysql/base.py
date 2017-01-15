@@ -112,7 +112,9 @@ class CursorWrapper(object):
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e.args[0] in self.codes_for_integrityerror:
-                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+                six.reraise(utils.IntegrityError,
+                            utils.IntegrityError(*tuple(e.args)),
+                            sys.exc_info()[2])
             raise
 
     def executemany(self, query, args):
@@ -122,7 +124,9 @@ class CursorWrapper(object):
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e.args[0] in self.codes_for_integrityerror:
-                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+                six.reraise(utils.IntegrityError,
+                            utils.IntegrityError(*tuple(e.args)),
+                            sys.exc_info()[2])
             raise
 
     def __getattr__(self, attr):
@@ -181,7 +185,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @cached_property
     def data_types(self):
         if self.features.supports_microsecond_precision:
-            return dict(self._data_types, DateTimeField='datetime(6)', TimeField='time(6)')
+            return dict(self._data_types,
+                        DateTimeField='datetime(6)',
+                        TimeField='time(6)')
         else:
             return self._data_types
 
