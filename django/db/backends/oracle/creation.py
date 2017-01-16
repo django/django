@@ -1,5 +1,4 @@
 import sys
-import time
 
 from django.conf import settings
 from django.db.backends.base.creation import BaseDatabaseCreation
@@ -173,7 +172,6 @@ class DatabaseCreation(BaseDatabaseCreation):
         self.connection.close()
         parameters = self._get_test_db_params()
         cursor = self._maindb_connection.cursor()
-        time.sleep(1)  # To avoid "database is being accessed by other users" errors.
         if self._test_user_create():
             if verbosity >= 1:
                 print('Destroying test user...')
