@@ -486,7 +486,8 @@ demonstration:
     class Question(models.Model):
         # ...
         def was_published_recently(self):
-            return self.pub_date >= timezone.now() - datetime.timedelta(days=1).date()
+            return self.pub_date >= timezone.now() - datetime.timedelta(days=1) # use PostgreSQL
+            # return self.pub_date >= timezone.now() - datetime.timedelta(days=1).date()  # use SQLite 
 
 Note the addition of ``import datetime`` and ``from django.utils import
 timezone``, to reference Python's standard :mod:`datetime` module and Django's
