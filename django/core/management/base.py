@@ -12,6 +12,7 @@ from argparse import ArgumentParser
 import django
 from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
+from django.core.management import signals
 from django.core.management.color import color_style, no_style
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.exceptions import MigrationSchemaMissing
@@ -305,6 +306,7 @@ class BaseCommand(object):
         controlled by the ``requires_system_checks`` attribute, except if
         force-skipped).
         """
+        signals.pre_command.send(sender=self.__class__, instance=self)
         if options['no_color']:
             self.style = no_style()
             self.stderr.style_func = None
@@ -340,6 +342,7 @@ class BaseCommand(object):
         finally:
             if saved_locale is not None:
                 translation.activate(saved_locale)
+        signals.post_command.send(sender=self.__class__, instance=self)
         return output
 
     def _run_checks(self, **kwargs):
