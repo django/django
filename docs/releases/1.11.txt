@@ -94,11 +94,6 @@ Minor features
   model, or by setting the :attr:`.ModelAdmin.popup_response_template`
   attribute.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -200,11 +195,6 @@ Minor features
   :class:`~django.contrib.gis.db.models.functions.IsValid` function, and
   :lookup:`isvalid` lookup.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -231,36 +221,6 @@ Minor features
 * :class:`~django.contrib.postgres.fields.HStoreField` and
   :class:`~django.contrib.postgres.forms.HStoreField` allow storing null
   values.
-
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 Cache
 ~~~~~
@@ -312,11 +272,6 @@ File Storage
   :class:`~django.core.files.File` now has the ``readable()``, ``writable()``,
   and ``seekable()`` methods.
 
-File Uploads
-~~~~~~~~~~~~
-
-* ...
-
 Forms
 ~~~~~
 
@@ -326,11 +281,6 @@ Forms
 * The new :meth:`Form.get_initial_for_field()
   <django.forms.Form.get_initial_for_field>` method returns initial data for a
   form field.
-
-Generic Views
-~~~~~~~~~~~~~
-
-* ...
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
@@ -426,11 +376,6 @@ Serialization
   :class:`~datetime.timedelta` objects (used by
   :class:`~django.db.models.DurationField`).
 
-Signals
-~~~~~~~
-
-* ...
-
 Templates
 ~~~~~~~~~
 
@@ -470,11 +415,6 @@ Tests
   Override the :meth:`.DiscoverRunner.run_checks` method if you want to disable
   that.
 
-URLs
-~~~~
-
-* ...
-
 Validators
 ~~~~~~~~~~
 
@@ -505,6 +445,10 @@ Backwards incompatible changes in 1.11
   ``gis/openlayers.html`` and ``gis/openlayers-osm.html`` templates have been
   updated. Check your project if you subclass these widgets or extend the
   templates.
+
+* Support for SpatiaLite < 4.0 is dropped.
+
+* Support for GDAL 1.7 and 1.8 is dropped.
 
 :mod:`django.contrib.staticfiles`
 ---------------------------------
@@ -652,10 +596,6 @@ Miscellaneous
   <django.utils.feedgenerator.SyndicationFeed.latest_post_date>` now returns
   the current UTC date/time, instead of a datetime without any timezone
   information.
-
-* Support for SpatiaLite < 4.0 is dropped.
-
-* Support for GDAL 1.7 and 1.8 is dropped.
 
 * CSRF failures are logged to the ``django.security.csrf`` logger instead of
   ``django.request``.
