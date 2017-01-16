@@ -12,6 +12,7 @@ import sys
 import warnings
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -24,7 +25,6 @@ from django.utils.safestring import SafeBytes, SafeText
 try:
     import MySQLdb as Database
 except ImportError as e:
-    from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured(
         'Error loading MySQLdb module: %s.\n'
         'Did you install mysqlclient or MySQL-python?' % e
@@ -48,7 +48,6 @@ from .validation import DatabaseValidation                  # isort:skip
 version = Database.version_info
 if (version < (1, 2, 1) or (
         version[:3] == (1, 2, 1) and (len(version) < 5 or version[3] != 'final' or version[4] < 2))):
-    from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
 
