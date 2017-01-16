@@ -12,12 +12,12 @@ available from the ``django.contrib.postgres.indexes`` module.
 ``BrinIndex``
 =============
 
-.. class:: BrinIndex(pages_per_range=None)
+.. class:: BrinIndex(fields=[], name=None, pages_per_range=None)
 
     Creates a `BRIN index
-    <https://www.postgresql.org/docs/current/static/brin-intro.html>`_. For
-    performance considerations and use cases of the index, please consult the
-    documentation.
+    <https://www.postgresql.org/docs/current/static/brin-intro.html>`_.
+
+    The ``pages_per_range`` argument takes a positive integer.
 
 ``GinIndex``
 ============
