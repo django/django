@@ -56,6 +56,17 @@ class Lookup(object):
             sqls, sqls_params = ['%s'] * len(params), params
         return sqls, sqls_params
 
+    def get_source_expressions(self):
+        if self.rhs_is_direct_value():
+            return [self.lhs]
+        return [self.lhs, self.rhs]
+
+    def set_source_expressions(self, new_exprs):
+        if len(new_exprs) == 1:
+            self.lhs = new_exprs[0]
+        else:
+            self.lhs, self.rhs = new_exprs
+
     def get_prep_lookup(self):
         if hasattr(self.rhs, '_prepare'):
             return self.rhs._prepare(self.lhs.output_field)
@@ -115,6 +126,10 @@ class Lookup(object):
     @cached_property
     def contains_aggregate(self):
         return self.lhs.contains_aggregate or getattr(self.rhs, 'contains_aggregate', False)
+
+    @property
+    def is_summary(self):
+        return self.lhs.is_summary or getattr(self.rhs, 'is_summary', False)
 
 
 class Transform(RegisterLookupMixin, Func):

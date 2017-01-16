@@ -370,7 +370,7 @@ class Query(object):
                 # Its already a Ref to subquery (see resolve_ref() for
                 # details)
                 new_exprs.append(expr)
-            elif isinstance(expr, Col):
+            elif isinstance(expr, Col) or (expr.contains_aggregate and not expr.is_summary):
                 # Reference to column. Make sure the referenced column
                 # is selected.
                 col_cnt += 1
