@@ -371,16 +371,20 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         if len(relation_parts) <= 1:
             # Either a local field filter, or no fields at all.
             return True
-        clean_lookup = LOOKUP_SEP.join(relation_parts)
-        valid_lookups = [self.date_hierarchy]
+        valid_lookups = {self.date_hierarchy}
         for filter_item in self.list_filter:
             if isinstance(filter_item, type) and issubclass(filter_item, SimpleListFilter):
-                valid_lookups.append(filter_item.parameter_name)
+                valid_lookups.add(filter_item.parameter_name)
             elif isinstance(filter_item, (list, tuple)):
-                valid_lookups.append(filter_item[0])
+                valid_lookups.add(filter_item[0])
             else:
-                valid_lookups.append(filter_item)
-        return clean_lookup in valid_lookups
+                valid_lookups.add(filter_item)
+
+        # Is it a valid relational lookup?
+        return not {
+            LOOKUP_SEP.join(relation_parts),
+            LOOKUP_SEP.join(relation_parts + [part])
+        }.isdisjoint(valid_lookups)
 
     def to_field_allowed(self, request, to_field):
         """
