@@ -71,8 +71,7 @@ class JSONField(Field):
             )
 
     def value_to_string(self, obj):
-        value = self.value_from_object(obj)
-        return value
+        return self.value_from_object(obj)
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.JSONField}
