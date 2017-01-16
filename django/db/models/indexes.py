@@ -60,9 +60,9 @@ class Index(object):
             'extra': tablespace_sql,
         }
 
-    def create_sql(self, model, schema_editor, using='', parameters=None):
+    def create_sql(self, model, schema_editor, using=''):
         sql_create_index = schema_editor.sql_create_index
-        sql_parameters = parameters or self.get_sql_create_template_values(model, schema_editor, using)
+        sql_parameters = self.get_sql_create_template_values(model, schema_editor, using)
         return sql_create_index % sql_parameters
 
     def remove_sql(self, model, schema_editor):

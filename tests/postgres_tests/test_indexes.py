@@ -27,7 +27,7 @@ class BrinIndexTests(PostgreSQLTestCase):
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_brin', 'pages_per_range': None})
 
-    def test_deconstruction_with_pages_per_rank(self):
+    def test_deconstruction_with_pages_per_range(self):
         index = BrinIndex(fields=['title'], name='test_title_brin', pages_per_range=16)
         path, args, kwargs = index.deconstruct()
         self.assertEqual(path, 'django.contrib.postgres.indexes.BrinIndex')
@@ -35,10 +35,7 @@ class BrinIndexTests(PostgreSQLTestCase):
         self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_brin', 'pages_per_range': 16})
 
     def test_invalid_pages_per_range(self):
-        with self.assertRaises(ValueError):
-            BrinIndex(fields=['title'], name='test_title_brin', pages_per_range='Charles Babbage')
-
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, 'pages_per_range must be None or a positive integer'):
             BrinIndex(fields=['title'], name='test_title_brin', pages_per_range=0)
 
 
