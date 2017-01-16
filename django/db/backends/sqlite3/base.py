@@ -14,6 +14,7 @@ import warnings
 import pytz
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
@@ -31,7 +32,6 @@ try:
     except ImportError:
         from sqlite3 import dbapi2 as Database
 except ImportError as exc:
-    from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading either pysqlite2 or sqlite3 modules (tried in that order): %s" % exc)
 
 # Some of these import sqlite3, so import them after checking if it's installed.
@@ -167,7 +167,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def get_connection_params(self):
         settings_dict = self.settings_dict
         if not settings_dict['NAME']:
-            from django.core.exceptions import ImproperlyConfigured
             raise ImproperlyConfigured(
                 "settings.DATABASES is improperly configured. "
                 "Please supply the NAME value.")

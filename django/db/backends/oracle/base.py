@@ -13,6 +13,7 @@ import sys
 import warnings
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils import six, timezone
@@ -28,7 +29,6 @@ def _setup_environment(environ):
         try:
             import ctypes
         except ImportError as e:
-            from django.core.exceptions import ImproperlyConfigured
             raise ImproperlyConfigured("Error loading ctypes: %s; "
                                        "the Oracle backend requires ctypes to "
                                        "operate correctly under Cygwin." % e)
@@ -51,7 +51,6 @@ _setup_environment([
 try:
     import cx_Oracle as Database
 except ImportError as e:
-    from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
 
 # Some of these import cx_Oracle, so import them after checking if it's installed.
