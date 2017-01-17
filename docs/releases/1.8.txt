@@ -61,7 +61,7 @@ built-in support for the Django template language and for
 :class:`~django.template.backends.jinja2.Jinja2`. It supports rendering
 templates with multiple engines within the same project. Learn more about the
 new features in the :doc:`topic guide </topics/templates>` and check the
-:doc:`upgrade instructions </ref/templates/upgrading>` for details.
+upgrade instructions in older versions of the documentation.
 
 Security enhancements
 ---------------------
@@ -1521,9 +1521,6 @@ Both classes provide a ``render()`` method, however, the former takes a
 :class:`django.template.Context` as an argument while the latter expects a
 :class:`dict`. This change is enforced through a deprecation path for Django
 templates.
-
-Since it's easier to understand with examples, the :ref:`upgrade guide
-<get_template-upgrade-django-18>` shows how to adapt affected code.
 
 All this also applies to :func:`~django.template.loader.select_template()`.
 
