@@ -12,6 +12,7 @@ from django.db import connections, transaction
 from django.urls import get_resolver, get_urlconf, set_urlconf
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.log import log_response
 from django.utils.module_loading import import_string
 
 from .exception import (
@@ -146,10 +147,11 @@ class BaseHandler(object):
         if not getattr(response, 'is_rendered', True) and callable(getattr(response, 'render', None)):
             response = response.render()
 
-        if response.status_code == 404:
-            logger.warning(
-                'Not Found: %s', request.path,
-                extra={'status_code': 404, 'request': request},
+        if response.status_code >= 400:
+            log_response(
+                '%s: %s', response.reason_phrase, request.path,
+                response=response,
+                request=request,
             )
 
         return response

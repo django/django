@@ -14,6 +14,7 @@ from django.urls import get_resolver, get_urlconf
 from django.utils.decorators import available_attrs
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
+from django.utils.log import log_response
 from django.views import debug
 
 logger = logging.getLogger('django.request')
@@ -121,15 +122,17 @@ def handle_uncaught_exception(request, resolver, exc_info):
     if settings.DEBUG_PROPAGATE_EXCEPTIONS:
         raise
 
-    logger.error(
-        'Internal Server Error: %s', request.path,
-        exc_info=exc_info,
-        extra={'status_code': 500, 'request': request},
-    )
-
     if settings.DEBUG:
-        return debug.technical_500_response(request, *exc_info)
+        response = debug.technical_500_response(request, *exc_info)
+    else:
+        # Return an HttpResponse that displays a friendly error message.
+        callback, param_dict = resolver.resolve_error_handler(500)
+        response = callback(request, **param_dict)
 
-    # Return an HttpResponse that displays a friendly error message.
-    callback, param_dict = resolver.resolve_error_handler(500)
-    return callback(request, **param_dict)
+    log_response(
+        'Internal Server Error: %s', request.path,
+        response=response,
+        request=request,
+        exc_info=exc_info,
+    )
+    return response

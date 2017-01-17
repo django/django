@@ -19,6 +19,7 @@ from django.utils.log import (
     RequireDebugTrue, ServerFormatter,
 )
 
+from . import views
 from .logconfig import MyEmailBackend
 
 # logging config prior to using filter with mail_admins
@@ -110,16 +111,82 @@ class DefaultLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleT
         self.assertEqual(self.logger_output.getvalue(), '')
 
 
+class LoggingAssertionMixin(object):
+    def assert_request_logs(self, url, level, msg, status_code,
+                            logger='django.request'):
+        with patch_logger(logger, level, log_kwargs=['extra']) as calls:
+            try:
+                self.client.get(url)
+            except views.UncaughtException:
+                pass
+        self.assertEqual(len(calls), 1,
+                         "Wrong number of call for logger '{}' in '{}' level".format(logger, level))
+        self.assertEqual(calls[0][0], msg)
+        self.assertEqual(calls[0][1]['extra']['status_code'], status_code)
+
+
 @override_settings(DEBUG=True, ROOT_URLCONF='logging_tests.urls')
-class HandlerLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleTestCase):
+class HandlerLoggingTests(SetupDefaultLoggingMixin, LoggingAssertionMixin, LoggingCaptureMixin, SimpleTestCase):
 
     def test_page_found_no_warning(self):
         self.client.get('/innocent/')
         self.assertEqual(self.logger_output.getvalue(), '')
 
     def test_page_not_found_warning(self):
-        self.client.get('/does_not_exist/')
-        self.assertEqual(self.logger_output.getvalue(), 'Not Found: /does_not_exist/\n')
+        self.assert_request_logs(
+            url='/does_not_exist/',
+            level='warning',
+            status_code=404,
+            msg='Not Found: /does_not_exist/',
+        )
+
+    def test_page_not_found_raised(self):
+        self.assert_request_logs(
+            url='/does_not_exist_raised/',
+            level='warning',
+            status_code=404,
+            msg='Not Found: /does_not_exist_raised/',
+        )
+
+    def test_uncaught_exception(self):
+        self.assert_request_logs(
+            url='/uncaught_exception/',
+            level='error',
+            status_code=500,
+            msg='Internal Server Error: /uncaught_exception/',
+        )
+
+    def test_internal_server_error(self):
+        self.assert_request_logs(
+            url='/internal_server_error/',
+            level='error',
+            status_code=500,
+            msg='Internal Server Error: /internal_server_error/',
+        )
+
+    def test_internal_server_error_599(self):
+        self.assert_request_logs(
+            url='/internal_server_error/?status=599',
+            level='error',
+            status_code=599,
+            msg='Unknown Status Code: /internal_server_error/',
+        )
+
+    def test_permission_denied(self):
+        self.assert_request_logs(
+            url='/permission_denied/',
+            level='warning',
+            status_code=403,
+            msg='Forbidden (Permission denied): /permission_denied/',
+        )
+
+    def test_multi_part_parser_error(self):
+        self.assert_request_logs(
+            url='/multi_part_parser_error/',
+            level='warning',
+            status_code=400,
+            msg='Bad request (Unable to parse request body): /multi_part_parser_error/',
+        )
 
 
 @override_settings(
@@ -403,19 +470,25 @@ class SetupConfigureLogging(SimpleTestCase):
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF='logging_tests.urls')
-class SecurityLoggerTest(SimpleTestCase):
+class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
 
     def test_suspicious_operation_creates_log_message(self):
-        with patch_logger('django.security.SuspiciousOperation', 'error') as calls:
-            self.client.get('/suspicious/')
-            self.assertEqual(len(calls), 1)
-            self.assertEqual(calls[0], 'dubious')
+        self.assert_request_logs(
+            url='/suspicious/',
+            level='error',
+            msg='dubious',
+            status_code=400,
+            logger='django.security.SuspiciousOperation',
+        )
 
     def test_suspicious_operation_uses_sublogger(self):
-        with patch_logger('django.security.DisallowedHost', 'error') as calls:
-            self.client.get('/suspicious_spec/')
-            self.assertEqual(len(calls), 1)
-            self.assertEqual(calls[0], 'dubious')
+        self.assert_request_logs(
+            url='/suspicious_spec/',
+            level='error',
+            msg='dubious',
+            status_code=400,
+            logger='django.security.DisallowedHost',
+        )
 
     @override_settings(
         ADMINS=[('admin', 'admin@example.com')],

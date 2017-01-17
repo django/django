@@ -15,6 +15,7 @@ from django.utils.encoding import (
     force_str, force_text, repercent_broken_unicode,
 )
 from django.utils.functional import cached_property
+from django.utils.log import log_response
 
 # encode() and decode() expect the charset to be a native string.
 ISO_8859_1, UTF_8 = str('iso-8859-1'), str('utf-8')
