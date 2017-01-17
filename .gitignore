@@ -10,5 +10,6 @@ __pycache__/
 .coverage.*
 TODO
 
-IDE and Tooling files
+# IDE and Tooling files
 .idea/*
+*~

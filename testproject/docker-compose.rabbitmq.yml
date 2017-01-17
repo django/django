@@ -1,0 +1,28 @@
+version: '2'
+services:
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "15672:15672"
+  rabbitmq_daphne:
+    image: channels-rabbitmq-test
+    build:
+      context: .
+      dockerfile: Dockerfile.rabbitmq
+    command: daphne -b 0.0.0.0 -p 80 testproject.asgi.rabbitmq:channel_layer
+    volumes:
+      - .:/srv/channels/testproject/
+    ports:
+      - "80:80"
+    depends_on:
+      - rabbitmq
+  rabbitmq_worker:
+    image: channels-rabbitmq-test
+    build:
+      context: .
+      dockerfile: Dockerfile.rabbitmq
+    command: python manage.py runworker --settings=testproject.settings.channels_rabbitmq
+    volumes:
+      - .:/srv/channels/testproject/
+    depends_on:
+      - rabbitmq

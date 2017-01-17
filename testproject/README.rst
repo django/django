@@ -18,13 +18,13 @@ e.g. to create it right in the test directory (assuming python 2 is your system'
 How to use with Docker:
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Build the docker image from Dockerfile, tag it `channels-test`::
+Build the docker image from Dockerfile, tag it `channels-redis-test`::
 
-    docker build -t channels-test .
+    docker build -t channels-redis-test -f Dockerfile.redis .
 
 Run the server::
 
-    docker-compose up -d
+    docker-compose -f docker-compose.redis.yml up
 
 The benchmark project will now be running on: http:{your-docker-ip}:80
 
@@ -39,6 +39,19 @@ Run the benchmark's help to show the parameters::
 Let's just try a quick test with the default values from the parameter list::
 
     python benchmark.py ws://localhost:80
+
+How to use with Docker and RabbitMQ:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Build the docker image from Dockerfile, tag it `channels-rabbitmq-test`::
+
+    docker build -t channels-rabbitmq-test -f Dockerfile.rabbitmq .
+
+Run the server::
+
+    docker-compose -f docker-compose.rabbitmq.yml up
+
+The rest is the same.
 
 How to use with runserver:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -62,14 +75,14 @@ In another terminal window, run the benchmark with::
 
 
 Additional load testing options:
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 If you wish to setup a separate machine to loadtest your environment, you can do the following steps.
 
 Install fabric on your machine. This is highly dependent on what your environment looks like, but the recommend option is to::
 
     pip install fabric
-    
+
 (Hint: if you're on Windows 10, just use the Linux subsystem and use ``apt-get install fabric``. It'll save you a lot of trouble.)
 
 Git clone this project down to your machine::
@@ -81,7 +94,7 @@ Relative to where you cloned the directory, move up a couple levels::
     cd channels/testproject/
 
 Spin up a server on your favorite cloud host (AWS, Linode, Digital Ocean, etc.) and get its host and credentials. Run the following command using those credentials::
-    
+
     fab setup_load_tester -i "ida_rsa" -H ubuntu@example.com
 
 That machine will provision itself. It may (depending on your vendor) prompt you a few times for a ``Y/n`` question. This is just asking you about increasing stroage space.

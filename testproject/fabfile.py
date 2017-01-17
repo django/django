@@ -23,7 +23,7 @@ def setup_channels():
 @task
 def run_daphne(redis_ip):
     with cd("/srv/channels/testproject/"):
-        sudo("REDIS_URL=redis://%s:6379 daphne -b 0.0.0.0 -p 80 testproject.asgi:channel_layer" % redis_ip)
+        sudo("REDIS_URL=redis://%s:6379 daphne -b 0.0.0.0 -p 80 testproject.asgi.redis:channel_layer" % redis_ip)
 
 
 @task
