@@ -1681,6 +1681,11 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
         :class:`~django.contrib.auth.views.PasswordResetView` passes to its
         email context.
 
+        .. note::
+            The password reset link includes the user's email address when generating the link. If
+            the user's email is changed after the link has been generated then the link will no longer work.
+            You can change this behaviour when using AbstractUser by overriding the .get_hash_value() method.
+
 .. class:: SetPasswordForm
 
     A form that lets a user change their password without entering the old
