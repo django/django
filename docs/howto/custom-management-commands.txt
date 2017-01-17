@@ -352,6 +352,11 @@ the command line, and does something with each of them.
 Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
 :meth:`~LabelCommand.handle_label`, which will be called once for each label.
 
+.. attribute:: LabelCommand.label
+
+    A string describing the arbitrary arguments passed to the command,
+    used in the usage text and error messages. Defaults to ``'label'``.
+
 .. method:: LabelCommand.handle_label(label, **options)
 
     Perform the command's actions for ``label``, which will be the string as
