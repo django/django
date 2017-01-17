@@ -584,8 +584,8 @@ Once the operation sequence has been reduced as much as possible - the amount
 possible depends on how closely intertwined your models are and if you have
 any :class:`~django.db.migrations.operations.RunSQL`
 or :class:`~django.db.migrations.operations.RunPython` operations (which can't
-be optimized through) - Django will then write it back out into a new set of
-migration files.
+be optimized through unless they are marked as ``elidable``) - Django will then
+write it back out into a new set of migration files.
 
 These files are marked to say they replace the previously-squashed migrations,
 so they can coexist with the old migration files, and Django will intelligently
