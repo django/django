@@ -29,6 +29,22 @@ class TokenGeneratorTest(TestCase):
         tk2 = p0.make_token(reload)
         self.assertEqual(tk1, tk2)
 
+    def test_token_invalid_on_email_change(self):
+        """
+        Ensure that the token generated for a user will fail if that user
+        changes email addresses.
+        """
+        # See ticket #26615
+        username = 'changeemailuser'
+        user = User.objects.create_user(username, 'test4@example.com', 'testpw')
+        p0 = PasswordResetTokenGenerator()
+        tk1 = p0.make_token(user)
+        user.email = 'test4newemail@example.com'
+        user.save()
+        user_new_email = User.objects.get(username=username)
+        tk2 = p0.make_token(user_new_email)
+        self.assertNotEqual(tk1, tk2)
+
     def test_timeout(self):
         """
         The token is valid after n days, but no greater.
