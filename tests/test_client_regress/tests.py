@@ -510,9 +510,15 @@ class AssertRedirectsTests(SimpleTestCase):
             # always redirects to https
             response = self.client.get('/https_redirect_view/', follow=follow, secure=secure)
             # the goal scheme is https
-            self.assertRedirects(response, 'https://testserver/secure_view/', status_code=302)
+            self.assertRedirects(
+                response, 'https://testserver/secure_view/',
+                status_code=302, fetch_redirect_response=False,
+            )
             with self.assertRaises(AssertionError):
-                self.assertRedirects(response, 'http://testserver/secure_view/', status_code=302)
+                self.assertRedirects(
+                    response, 'http://testserver/secure_view/',
+                    status_code=302, fetch_redirect_response=False,
+                )
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_full_path_in_expected_urls(self):

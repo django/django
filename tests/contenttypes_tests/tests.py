@@ -61,7 +61,7 @@ class ContentTypesViewsTests(TestCase):
             short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, obj.pk)
             response = self.client.get(short_url)
             self.assertRedirects(response, 'http://testserver%s' % obj.get_absolute_url(),
-                                 status_code=302, target_status_code=404)
+                                 status_code=302, target_status_code=404, fetch_redirect_response=False)
 
     def test_shortcut_with_absolute_url_including_scheme(self):
         """
