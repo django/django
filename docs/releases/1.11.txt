@@ -593,6 +593,16 @@ must receive a dictionary of context rather than ``Context`` or
 dictionary instead -- doing so is backwards-compatible with older versions of
 Django.
 
+Model state changes in migration operations
+-------------------------------------------
+
+To improve the speed of applying migrations, rendering of related models is
+delayed until an operation that needs them (e.g. ``RunPython``). If you have a
+custom operation that works with model classes or model instances from the
+``from_state`` argument in ``database_forwards()`` or ``database_backwards()``,
+you must render model states as pointed out in the :ref:`Migration Operations
+documentation <writing-your-own-migration-operation>`.
+
 Miscellaneous
 -------------
 
