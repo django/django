@@ -56,7 +56,7 @@ class TestUtilsHashPass(SimpleTestCase):
 
     def test_pbkdf2(self):
         encoded = make_password('lètmein', 'seasalt', 'pbkdf2_sha256')
-        self.assertEqual(encoded, 'pbkdf2_sha256$36000$seasalt$mEUPPFJkT/xtwDU8rB7Q+puHRZnR07WRjerTkt/3HI0=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$100000$seasalt$BNZ6eyaNc8qFTJPjrAq99hSYb73EgAdytAtdBg2Sdcc=')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
@@ -280,13 +280,13 @@ class TestUtilsHashPass(SimpleTestCase):
     def test_low_level_pbkdf2(self):
         hasher = PBKDF2PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded, 'pbkdf2_sha256$36000$seasalt2$QkIBVCvGmTmyjPJ5yox2y/jQB8isvgUNK98FxOU1UYo=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$100000$seasalt2$Tl4GMr+Yt1zzO1sbKoUaDBdds5NkR3RxaDWuQsliFrI=')
         self.assertTrue(hasher.verify('lètmein', encoded))
 
     def test_low_level_pbkdf2_sha1(self):
         hasher = PBKDF2SHA1PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded, 'pbkdf2_sha1$36000$seasalt2$GoU+9AubJ/xRkO0WD1Xf3WPxWfE=')
+        self.assertEqual(encoded, 'pbkdf2_sha1$100000$seasalt2$dK/dL+ySBZ5zoR0+Zk3SB/VsH0U=')
         self.assertTrue(hasher.verify('lètmein', encoded))
 
     @override_settings(
