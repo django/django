@@ -3,6 +3,7 @@
 from django.db import migrations, models
 from django.db.migrations import operations
 from django.db.migrations.optimizer import MigrationOptimizer
+from django.db.migrations.serializer import serializer_factory
 from django.test import SimpleTestCase
 
 from .models import EmptyManager, UnicodeModel
@@ -20,10 +21,13 @@ class OptimizerTests(SimpleTestCase):
         optimizer = MigrationOptimizer()
         return optimizer.optimize(operations, app_label), optimizer._iterations
 
+    def serialize(self, value):
+        return serializer_factory(value).serialize()[0]
+
     def assertOptimizesTo(self, operations, expected, exact=None, less_than=None, app_label=None):
         result, iterations = self.optimize(operations, app_label)
-        result = [repr(f.deconstruct()) for f in result]
-        expected = [repr(f.deconstruct()) for f in expected]
+        result = [self.serialize(f) for f in result]
+        expected = [self.serialize(f) for f in expected]
         self.assertEqual(expected, result)
         if exact is not None and iterations != exact:
             raise self.failureException(
@@ -705,5 +709,93 @@ class OptimizerTests(SimpleTestCase):
             ],
             [
                 migrations.CreateModel("Phou", [("name", models.CharField(max_length=255))]),
+            ],
+        )
+
+    def test_default_create_model_add_field(self):
+        """
+        #26223. AddField optimizing into CreateModel should drop
+        default if preserve_default is False.
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.AddField("Foo", "value", models.IntegerField(default=42), preserve_default=False),
+            ],
+            [
+                migrations.CreateModel("Foo", [
+                    ("name", models.CharField(max_length=255)),
+                    ("value", models.IntegerField()),
+                ]),
+            ],
+        )
+
+    def test_default_create_model_alter_field(self):
+        """
+        #26223. AlterField optimizing into CreateModel should drop
+        default if preserve_default is False.
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [("value", models.IntegerField(null=True))]),
+                migrations.AlterField("Foo", "value", models.IntegerField(default=42), preserve_default=False),
+            ],
+            [
+                migrations.CreateModel("Foo", [("value", models.IntegerField())]),
+            ],
+        )
+
+    def test_default_add_field_alter_field(self):
+        """
+        #26223. AddField and AlterField optimizing when one of them has
+        preserve_default=False should pass the preserve_default value.
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.AddField("Foo", "value", models.IntegerField(null=True)),
+                migrations.AlterField("Foo", "value", models.IntegerField(default=42), preserve_default=False),
+            ],
+            [
+                migrations.AddField("Foo", "value", models.IntegerField(default=42), preserve_default=False),
+            ],
+        )
+        self.assertOptimizesTo(
+            [
+                migrations.AddField("Foo", "value", models.IntegerField(default=42), preserve_default=False),
+                migrations.AlterField("Foo", "value", models.IntegerField("Value")),
+            ],
+            [
+                migrations.AddField("Foo", "value", models.IntegerField("Value", default=42), preserve_default=False),
+            ],
+        )
+
+    def test_default_add_field_rename_field(self):
+        """
+        #26223. AddField optimizing with RenameField should retain its
+        preserve_default value.
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.AddField("Foo", "value", models.IntegerField(default=42), preserve_default=False),
+                migrations.RenameField("Foo", "value", "price"),
+            ],
+            [
+                migrations.AddField("Foo", "price", models.IntegerField(default=42), preserve_default=False),
+            ],
+        )
+
+    def test_default_alter_field_rename_field(self):
+        """
+        #26223. AlterField swapping with RenameField should retain its
+        preserve_default value.
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.AlterField("Foo", "value", models.IntegerField(default=42), preserve_default=False),
+                migrations.RenameField("Foo", "value", "price"),
+            ],
+            [
+                migrations.RenameField("Foo", "value", "price"),
+                migrations.AlterField("Foo", "price", models.IntegerField(default=42), preserve_default=False),
             ],
         )

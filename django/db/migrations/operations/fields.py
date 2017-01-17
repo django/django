@@ -62,14 +62,18 @@ class AddField(FieldOperation):
             kwargs
         )
 
-    def state_forwards(self, app_label, state):
+    @property
+    def migrated_field(self):
         # If preserve default is off, don't use the default for future state
         if not self.preserve_default:
             field = self.field.clone()
             field.default = NOT_PROVIDED
         else:
             field = self.field
-        state.models[app_label, self.model_name_lower].fields.append((self.name, field))
+        return field
+
+    def state_forwards(self, app_label, state):
+        state.models[app_label, self.model_name_lower].fields.append((self.name, self.migrated_field))
         state.reload_model(app_label, self.model_name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
@@ -97,11 +101,18 @@ class AddField(FieldOperation):
     def reduce(self, operation, in_between, app_label=None):
         if isinstance(operation, FieldOperation) and self.is_same_field_operation(operation):
             if isinstance(operation, AlterField):
+                field = operation.field
+                preserve_default = operation.preserve_default
+                if not self.preserve_default:
+                    field = field.clone()
+                    field.default = self.field.default
+                    preserve_default = False
                 return [
                     AddField(
                         model_name=self.model_name,
                         name=operation.name,
-                        field=operation.field,
+                        field=field,
+                        preserve_default=preserve_default,
                     ),
                 ]
             elif isinstance(operation, RemoveField):
@@ -112,6 +123,7 @@ class AddField(FieldOperation):
                         model_name=self.model_name,
                         name=operation.new_name,
                         field=self.field,
+                        preserve_default=self.preserve_default,
                     ),
                 ]
         return super(AddField, self).reduce(operation, in_between, app_label=app_label)
@@ -180,14 +192,18 @@ class AlterField(FieldOperation):
             kwargs
         )
 
-    def state_forwards(self, app_label, state):
+    @property
+    def migrated_field(self):
         if not self.preserve_default:
             field = self.field.clone()
             field.default = NOT_PROVIDED
         else:
             field = self.field
+        return field
+
+    def state_forwards(self, app_label, state):
         state.models[app_label, self.model_name_lower].fields = [
-            (n, field if n == self.name else f)
+            (n, self.migrated_field if n == self.name else f)
             for n, f in
             state.models[app_label, self.model_name_lower].fields
         ]
@@ -221,6 +237,7 @@ class AlterField(FieldOperation):
                     model_name=self.model_name,
                     name=operation.new_name,
                     field=self.field,
+                    preserve_default=self.preserve_default,
                 ),
             ]
         return super(AlterField, self).reduce(operation, in_between, app_label=app_label)
