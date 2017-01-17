@@ -7,7 +7,7 @@ import unittest
 from django.utils import six
 from django.utils.encoding import (
     escape_uri_path, filepath_to_uri, force_bytes, force_text, iri_to_uri,
-    smart_text, uri_to_iri,
+    smart_text, uri_to_iri
 )
 from django.utils.functional import SimpleLazyObject
 from django.utils.http import urlquote_plus
@@ -123,6 +123,9 @@ class TestRFC3987IEncodingUtils(unittest.TestCase):
 
             # Test idempotency.
             self.assertEqual(uri_to_iri(uri_to_iri(uri)), iri)
+
+    def test_uri_to_iri_idempotent(self):
+        self.assertEqual(uri_to_iri(uri_to_iri("%2525")), uri_to_iri("%2525"))
 
     def test_complementarity(self):
         cases = [
