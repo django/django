@@ -359,6 +359,17 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         "Returns the short name for the user."
         return self.first_name
 
+    def get_hash_value(self, timestamp):
+        """Returns the timestamped hash value for purposes of generating
+        a password reset token.
+        """
+        # Ensure results are consistent across DB backends
+        login_timestamp = '' if self.last_login is None else self.last_login.replace(microsecond=0, tzinfo=None)
+        return (
+            six.text_type(self.pk) + self.password + self.email +
+            six.text_type(login_timestamp) + six.text_type(timestamp)
+        )
+
     def email_user(self, subject, message, from_email=None, **kwargs):
         """
         Sends an email to this User.
