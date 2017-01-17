@@ -371,28 +371,10 @@ Windows
 Proceed through the following sections sequentially in order to install
 GeoDjango on Windows.
 
-.. note::
-
-    These instructions assume that you are using 32-bit versions of
-    all programs.  While 64-bit versions of Python and PostgreSQL 9.x
-    are available, 64-bit versions of spatial libraries, like
-    GEOS and GDAL, are not yet provided by the :ref:`OSGeo4W` installer.
-
 Python
 ~~~~~~
 
-First, download the latest `Python 2.7 installer`__ from the Python website.
-Next, run the installer and keep the defaults -- for example, keep
-'Install for all users' checked and the installation path set as
-``C:\Python27``.
-
-.. note::
-
-    You may already have a version of Python installed in ``C:\python`` as ESRI
-    products sometimes install a copy there.  *You should still install a
-    fresh version of Python 2.7.*
-
-__ https://python.org/download/
+:doc:`Install Python </howto/windows>`.
 
 PostgreSQL
 ~~~~~~~~~~
