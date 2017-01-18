@@ -110,6 +110,19 @@ class FileStorageTests(SimpleTestCase):
         self.assertEqual(storage.base_location, '')
         self.assertEqual(storage.location, upath(os.getcwd()))
 
+    def test_lazy_init(self):
+        """
+        Makes sure that init is lazy.
+        """
+        storage = self.storage_class(location=self.temp_dir,
+                                     base_url=reverse_lazy('app:url'))
+        f = ContentFile('custom contents')
+        f.name = 'test.file'
+        storage.save(None, f)
+
+        with self.assertRaises(NoReverseMatch):
+            storage.url(f.name)
+
     def test_file_access_options(self):
         """
         Standard file access options are available, and work as expected.
