@@ -137,10 +137,8 @@ The ``register`` decorator
 
     You can't use this decorator if you have to reference your model admin
     class in its ``__init__()`` method, e.g.
-    ``super(PersonAdmin, self).__init__(*args, **kwargs)``. If you are using
-    Python 3 and don't have to worry about supporting Python 2, you can
-    use ``super().__init__(*args, **kwargs)`` . Otherwise, you'll have to use
-    ``admin.site.register()`` instead of this decorator.
+    ``super(PersonAdmin, self).__init__(*args, **kwargs)``. You can use
+    ``super().__init__(*args, **kwargs)``.
 
 Discovery of admin files
 ------------------------
@@ -543,8 +541,7 @@ subclass::
         list_display = ('first_name', 'last_name')
 
     If you don't set ``list_display``, the admin site will display a single
-    column that displays the ``__str__()`` (``__unicode__()`` on Python 2)
-    representation of each object.
+    column that displays the ``__str__()`` representation of each object.
 
     You have four possible values that can be used in ``list_display``:
 
@@ -594,7 +591,7 @@ subclass::
     A few special cases to note about ``list_display``:
 
     * If the field is a ``ForeignKey``, Django will display the
-      ``__str__()`` (``__unicode__()`` on Python 2) of the related object.
+      ``__str__()`` of the related object.
 
     * ``ManyToManyField`` fields aren't supported, because that would
       entail executing a separate SQL statement for each row in the table.
@@ -681,9 +678,8 @@ subclass::
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('name', 'born_in_fifties')
 
-    * The ``__str__()`` (``__unicode__()`` on Python 2) method is just
-      as valid in ``list_display`` as any other model method, so it's
-      perfectly OK to do this::
+    * The ``__str__()`` method is just as valid in ``list_display`` as any
+      other model method, so it's perfectly OK to do this::
 
           list_display = ('__str__', 'some_other_field')
 

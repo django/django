@@ -107,9 +107,9 @@ to Python 3, so it's unlikely that a real-world application will have all its
 dependencies satisfied under Python 3.
 
 Thus, we're recommending that Django 1.5 not be used in production under Python
-3. Instead, use this opportunity to begin :doc:`porting applications to Python 3
-</topics/python3>`. If you're an author of a pluggable component, we encourage you
-to start porting now.
+3. Instead, use this opportunity to begin porting applications to Python 3. If
+you're an author of a pluggable component, we encourage you to start porting
+now.
 
 We plan to offer first-class, production-ready support for Python 3 in our next
 release, Django 1.6.

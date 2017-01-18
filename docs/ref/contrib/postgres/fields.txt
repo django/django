@@ -104,7 +104,7 @@ We will use the following example model::
         name = models.CharField(max_length=200)
         tags = ArrayField(models.CharField(max_length=200), blank=True)
 
-        def __str__(self):  # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
 .. fieldlookup:: arrayfield.contains
@@ -313,7 +313,7 @@ We will use the following example model::
         name = models.CharField(max_length=200)
         data = HStoreField()
 
-        def __str__(self):  # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
 .. fieldlookup:: hstorefield.key
@@ -521,7 +521,7 @@ We will use the following example model::
         name = models.CharField(max_length=200)
         data = JSONField()
 
-        def __str__(self):  # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
 .. fieldlookup:: jsonfield.key
@@ -680,7 +680,7 @@ model::
         ages = IntegerRangeField()
         start = models.DateTimeField()
 
-        def __str__(self):  # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
 We will also use the following example objects::

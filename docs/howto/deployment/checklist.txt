@@ -250,19 +250,3 @@ details about the default templates:
 * :ref:`http_internal_server_error_view`
 * :ref:`http_forbidden_view`
 * :ref:`http_bad_request_view`
-
-Python Options
-==============
-
-It's strongly recommended that you invoke the Python process running your
-Django application using the `-R`_ option or with the :envvar:`PYTHONHASHSEED`
-environment variable set to ``random``. This option is enabled by default
-starting with Python 3.3.
-
-These options help protect your site from denial-of-service (DoS)
-attacks triggered by carefully crafted inputs. Such an attack can
-drastically increase CPU usage by causing worst-case performance when
-creating ``dict`` instances. See `oCERT advisory #2011-003
-<http://www.ocert.org/advisories/ocert-2011-003.html>`_ for more information.
-
-.. _-r: https://docs.python.org/2/using/cmdline.html#cmdoption-R

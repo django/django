@@ -810,12 +810,11 @@ Customizing the error list format
 
 By default, forms use ``django.forms.utils.ErrorList`` to format validation
 errors. If you'd like to use an alternate class for displaying errors, you can
-pass that in at construction time (replace ``__str__`` by ``__unicode__`` on
-Python 2)::
+pass that in at construction time::
 
     >>> from django.forms.utils import ErrorList
     >>> class DivErrorList(ErrorList):
-    ...     def __str__(self):              # __unicode__ on Python 2
+    ...     def __str__(self):
     ...         return self.as_divs()
     ...     def as_divs(self):
     ...         if not self: return ''
@@ -840,8 +839,7 @@ they're not the only way a form object can be displayed.
    Used to display HTML or access attributes for a single field of a
    :class:`Form` instance.
 
-   The ``__str__()`` (``__unicode__`` on Python 2) method of this
-   object displays the HTML for this field.
+   The ``__str__()`` method of this object displays the HTML for this field.
 
 To retrieve a single ``BoundField``, use dictionary lookup syntax on your form
 using the field's name as the key::

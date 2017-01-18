@@ -282,7 +282,6 @@ Django aims to be compatible with multiple different flavors and versions of
 Python:
 
 * :doc:`Jython support <howto/jython>`
-* :doc:`Python 3 compatibility <topics/python3>`
 
 Geographic framework
 ====================

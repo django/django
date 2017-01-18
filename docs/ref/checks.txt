@@ -45,9 +45,9 @@ Constructor arguments are:
 ``obj``
     Optional. An object providing context for the message (for example, the
     model where the problem was discovered). The object should be a model,
-    field, or manager or any other object that defines ``__str__`` method (on
-    Python 2 you need to define ``__unicode__`` method). The method is used
-    while reporting all messages and its result precedes the message.
+    field, or manager or any other object that defines a ``__str__()`` method.
+    The method is used while reporting all messages and its result precedes the
+    message.
 
 ``id``
     Optional string. A unique identifier for the issue. Identifiers should

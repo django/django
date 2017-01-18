@@ -251,7 +251,7 @@ A simple example is a tagging system, which might look like this::
         object_id = models.PositiveIntegerField()
         content_object = GenericForeignKey('content_type', 'object_id')
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.tag
 
 A normal :class:`~django.db.models.ForeignKey` can only "point

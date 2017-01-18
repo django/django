@@ -137,12 +137,11 @@ Attributes
     .. attribute:: username_validator
 
         Points to a validator instance used to validate usernames. Defaults to
-        :class:`validators.UnicodeUsernameValidator` on Python 3 and
-        :class:`validators.ASCIIUsernameValidator` on Python 2.
+        :class:`validators.UnicodeUsernameValidator`.
 
         To change the default username validator, you can subclass the ``User``
         model and set this attribute to a different validator instance. For
-        example, to use ASCII usernames on Python 3::
+        example, to use ASCII usernames::
 
             from django.contrib.auth.models import User
             from django.contrib.auth.validators import ASCIIUsernameValidator
@@ -390,14 +389,12 @@ Validators
 .. class:: validators.ASCIIUsernameValidator
 
     A field validator allowing only ASCII letters, in addition to ``@``, ``.``,
-    ``+``, ``-``, and ``_``. The default validator for ``User.username`` on
-    Python 2.
+    ``+``, ``-``, and ``_``.
 
 .. class:: validators.UnicodeUsernameValidator
 
     A field validator allowing Unicode letters, in addition to ``@``, ``.``,
-    ``+``, ``-``, and ``_``. The default validator for ``User.username`` on
-    Python 3.
+    ``+``, ``-``, and ``_``. The default validator for ``User.username``.
 
 .. _topics-auth-signals:
 

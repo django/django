@@ -175,9 +175,9 @@ A :class:`ResolverMatch` object can also be assigned to a triple::
 One possible use of :func:`~django.urls.resolve` would be to test whether a
 view would raise a ``Http404`` error before redirecting to it::
 
+    from urllib.parse import urlparse
     from django.urls import resolve
     from django.http import HttpResponseRedirect, Http404
-    from django.utils.six.moves.urllib.parse import urlparse
 
     def myview(request):
         next = request.META.get('HTTP_REFERER', None) or '/'

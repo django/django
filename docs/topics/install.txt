@@ -171,7 +171,7 @@ This is the recommended way to install Django.
    isolated Python environments, which are more practical than installing
    packages systemwide. They also allow installing packages without
    administrator privileges. The :doc:`contributing tutorial
-   </intro/contributing>` walks through how to create a virtualenv on Python 3.
+   </intro/contributing>` walks through how to create a virtualenv.
 
 3. After you've created and activated a virtual environment, enter the command
    ``pip install Django`` at the shell prompt.
@@ -227,7 +227,7 @@ latest bug fixes and improvements, follow these instructions:
 3. Make sure that the Python interpreter can load Django's code. The most
    convenient way to do this is to use virtualenv_, virtualenvwrapper_, and
    pip_. The :doc:`contributing tutorial </intro/contributing>` walks through
-   how to create a virtualenv on Python 3.
+   how to create a virtualenv.
 
 4. After setting up and activating the virtualenv, run the following command:
 

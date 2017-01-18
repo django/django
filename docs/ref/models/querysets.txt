@@ -1002,7 +1002,7 @@ For example, suppose you have these models::
         name = models.CharField(max_length=50)
         toppings = models.ManyToManyField(Topping)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return "%s (%s)" % (
                 self.name,
                 ", ".join(topping.name for topping in self.toppings.all()),
