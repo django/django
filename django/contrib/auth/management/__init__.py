@@ -2,14 +2,104 @@
 Creates permissions for all installed apps that need permissions.
 """
 import getpass
+import re
 import unicodedata
 
 from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
 from django.core import exceptions
-from django.db import DEFAULT_DB_ALIAS, router
+from django.db import DEFAULT_DB_ALIAS, migrations, router
 from django.utils import six
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
+from django.utils.text import camel_case_to_spaces
+
+
+class RenamePermissions(migrations.RunPython):
+    def __init__(self, app_label, old_model, new_model):
+        self.app_label = app_label
+        self.old_model = old_model
+        self.new_model = new_model
+        super(RenamePermissions, self).__init__(self.rename_forwards, self.rename_backwards)
+
+    def _rename(self, apps, schema_editor, backward=False):
+        Permission = apps.get_model('auth', 'Permission')
+        db = schema_editor.connection.alias
+        if not router.allow_migrate_model(db, Permission):
+            return
+
+        old_model_lower = self.old_model.lower()
+        new_model_lower = self.new_model.lower()
+
+        current_model = apps.get_model(app_label=self.app_label, model_name=new_model_lower)
+
+        # Build a dictionary allowing to do the correspondence between the
+        # current permission codenames and the new <codename, name> values.
+        current_to_new_perms = {}
+        for codename, name in _get_builtin_permissions(current_model._meta):
+            old_codename = re.sub(r'_%s$' % (new_model_lower), '_' + old_model_lower, codename)
+            if not backward:
+                current_to_new_perms[old_codename] = {'codename': codename, 'name': name}
+            else:
+                action = old_codename.split('_' + old_model_lower, 1)[0]
+                current_to_new_perms[codename] = {
+                    'codename': old_codename,
+                    'name': 'Can %s %s' % (action, camel_case_to_spaces(self.old_model)),
+                }
+
+        perms = Permission.objects.db_manager(db).filter(codename__in=current_to_new_perms).order_by('codename')
+        for perm in perms:
+            old_codename = perm.codename
+            perm.codename = current_to_new_perms[old_codename]['codename']
+            perm.name = current_to_new_perms[old_codename]['name']
+            perm.save(update_fields={'codename', 'name'})
+
+    def rename_forwards(self, apps, schema_editor):
+        self._rename(apps, schema_editor)
+
+    def rename_backwards(self, apps, schema_editor):
+        self._rename(apps, schema_editor, backward=True)
+
+
+def inject_rename_permissions_operations(plan=None, apps=global_apps, using=DEFAULT_DB_ALIAS, **kwargs):
+    """
+    Insert a `RenamePermissions` operation after every planned `RenameModel`
+    operation.
+    """
+    if plan is None:
+        return
+
+    # Determine whether or not the Permission model is available.
+    try:
+        Permission = apps.get_model('auth', 'Permission')
+    except LookupError:
+        available = False
+    else:
+        if not router.allow_migrate_model(using, Permission):
+            return
+        available = True
+
+    for migration, backward in plan:
+        if ((migration.app_label, migration.name) == ('auth', '0001_initial')):
+            # There's no point in going forward if the initial auth
+            # migration is unapplied as the Permission model will be
+            # unavailable from this point.
+            if backward:
+                break
+            else:
+                available = True
+                continue
+        # The Permission model is not available yet.
+        if not available:
+            continue
+        inserts = []
+        for index, operation in enumerate(migration.operations):
+            if isinstance(operation, migrations.RenameModel):
+                operation = RenamePermissions(
+                    migration.app_label, operation.old_name, operation.new_name
+                )
+                inserts.append((index + 1, operation))
+        for inserted, (index, operation) in enumerate(inserts):
+            migration.operations.insert(inserted + index, operation)
 
 
 def _get_all_permissions(opts):

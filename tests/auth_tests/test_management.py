@@ -2,8 +2,11 @@ import sys
 from datetime import date
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import management
-from django.contrib.auth.management import create_permissions
+from django.contrib.auth.management import (
+    RenamePermissions, create_permissions,
+)
 from django.contrib.auth.management.commands import (
     changepassword, createsuperuser,
 )
@@ -11,8 +14,8 @@ from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.db import migrations
-from django.test import TestCase, mock, override_settings
+from django.db import migrations, models
+from django.test import TestCase, TransactionTestCase, mock, override_settings
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.translation import ugettext_lazy as _
@@ -606,3 +609,94 @@ class CreatePermissionsTests(TestCase):
         state = migrations.state.ProjectState(real_apps=['contenttypes'])
         with self.assertNumQueries(0):
             create_permissions(self.app_config, verbosity=0, apps=state.apps)
+
+
+class PreventPermissionMigrationsRouter(object):
+    def allow_migrate(self, db, app_label, model_name=None, **hints):
+        return not (model_name == 'permission')
+
+
+@override_settings(
+    MIGRATION_MODULES=dict(settings.MIGRATION_MODULES, auth_tests='auth_tests.operations_migrations'),
+)
+class PermissionOperationsTests(TransactionTestCase):
+    available_apps = ['django.contrib.auth', 'django.contrib.contenttypes', 'auth_tests']
+
+    def assertOperationsInjected(self, plan, **kwargs):
+        for migration, _backward in plan:
+            operations = iter(migration.operations)
+            for operation in operations:
+                if isinstance(operation, migrations.RenameModel):
+                    next_operation = next((o for o in operations if isinstance(o, RenamePermissions)), None)
+                    self.assertIsNotNone(next_operation)
+                    self.assertEqual(next_operation.app_label, migration.app_label)
+                    self.assertEqual(next_operation.old_model, operation.old_name)
+                    self.assertEqual(next_operation.new_model, operation.new_name)
+
+    def assertOperationsNotInjected(self, plan, **kwargs):
+        for migration, _backward in plan:
+            operations = iter(migration.operations)
+            for operation in operations:
+                if isinstance(operation, migrations.RenameModel):
+                    next_operation = next((o for o in operations if isinstance(o, RenamePermissions)), None)
+                    self.assertIsNone(next_operation)
+
+    def test_rename(self):
+        # Connect a signal to check that the operation is properly injected
+        # in the migration operations.
+        app_config = apps.get_app_config('auth_tests')
+        models.signals.post_migrate.connect(self.assertOperationsInjected, sender=app_config)
+
+        # Run the first migration to create the model and the related permissions.
+        call_command(
+            'migrate', 'auth_tests', '0001_initial', database='default', interactive=False, verbosity=0,
+        )
+        # Run the second migration to rename the model and update the related permissions.
+        call_command(
+            'migrate', 'auth_tests', database='default', interactive=False, verbosity=0,
+        )
+        self.assertFalse(Permission.objects.filter(codename='add_foo').exists())
+        self.assertFalse(Permission.objects.filter(codename='change_foo').exists())
+        self.assertFalse(Permission.objects.filter(codename='delete_foo').exists())
+        add_perm = Permission.objects.filter(codename='add_renamedfoo').first()
+        change_perm = Permission.objects.filter(codename='change_renamedfoo').first()
+        delete_perm = Permission.objects.filter(codename='delete_renamedfoo').first()
+        self.assertEqual(add_perm.name, 'Can add renamed foo')
+        self.assertEqual(change_perm.name, 'Can change renamed foo')
+        self.assertEqual(delete_perm.name, 'Can delete renamed foo')
+        # Revert the rename operation and restore the permissions.
+        call_command(
+            'migrate', 'auth_tests', 'zero', database='default', interactive=False, verbosity=0,
+        )
+        self.assertFalse(Permission.objects.filter(codename='add_renamedfoo').exists())
+        self.assertFalse(Permission.objects.filter(codename='change_renamedfoo').exists())
+        self.assertFalse(Permission.objects.filter(codename='delete_renamedfoo').exists())
+        add_perm = Permission.objects.filter(codename='add_foo').first()
+        change_perm = Permission.objects.filter(codename='change_foo').first()
+        delete_perm = Permission.objects.filter(codename='delete_foo').first()
+        self.assertEqual(add_perm.name, 'Can add foo')
+        self.assertEqual(change_perm.name, 'Can change foo')
+        self.assertEqual(delete_perm.name, 'Can delete foo')
+
+        models.signals.post_migrate.disconnect(self.assertOperationsInjected, sender=app_config)
+
+    @override_settings(DATABASE_ROUTERS=[PreventPermissionMigrationsRouter()])
+    def test_do_not_rename_model_if_permission_model_cannot_be_migrated(self):
+        # Connect a signal to check that the operation is not injected in the
+        # migration operations.
+        app_config = apps.get_app_config('auth_tests')
+        models.signals.post_migrate.connect(self.assertOperationsNotInjected, sender=app_config)
+
+        # Run the first migration to create the model and the related permissions.
+        call_command(
+            'migrate', 'auth_tests', '0001_initial', database='default', interactive=False, verbosity=0,
+        )
+        # Run the second migration to rename the model and update the related permissions.
+        call_command(
+            'migrate', 'auth_tests', database='default', interactive=False, verbosity=0,
+        )
+        self.assertFalse(Permission.objects.filter(codename='add_renamedfoo').exists())
+        self.assertFalse(Permission.objects.filter(codename='change_renamedfoo').exists())
+        self.assertFalse(Permission.objects.filter(codename='delete_renamedfoo').exists())
+
+        models.signals.post_migrate.disconnect(self.assertOperationsNotInjected, sender=app_config)

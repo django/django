@@ -492,8 +492,10 @@ class ContentTypeOperationsTests(TransactionTestCase):
             operations = iter(migration.operations)
             for operation in operations:
                 if isinstance(operation, migrations.RenameModel):
-                    next_operation = next(operations)
-                    self.assertIsInstance(next_operation, contenttypes_management.RenameContentType)
+                    next_operation = next(
+                        (o for o in operations if isinstance(o, contenttypes_management.RenameContentType)), None
+                    )
+                    self.assertIsNotNone(next_operation)
                     self.assertEqual(next_operation.app_label, migration.app_label)
                     self.assertEqual(next_operation.old_model, operation.old_name_lower)
                     self.assertEqual(next_operation.new_model, operation.new_name_lower)

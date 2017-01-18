@@ -1,10 +1,12 @@
 from django.apps import AppConfig
 from django.core import checks
-from django.db.models.signals import post_migrate
+from django.db.models.signals import post_migrate, pre_migrate
 from django.utils.translation import ugettext_lazy as _
 
 from .checks import check_models_permissions, check_user_model
-from .management import create_permissions
+from .management import (
+    create_permissions, inject_rename_permissions_operations,
+)
 
 
 class AuthConfig(AppConfig):
@@ -12,6 +14,7 @@ class AuthConfig(AppConfig):
     verbose_name = _("Authentication and Authorization")
 
     def ready(self):
+        pre_migrate.connect(inject_rename_permissions_operations, sender=self)
         post_migrate.connect(
             create_permissions,
             dispatch_uid="django.contrib.auth.management.create_permissions"
