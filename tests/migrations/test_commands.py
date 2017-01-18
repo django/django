@@ -1042,7 +1042,7 @@ class MakeMigrationsTests(MigrationTestBase):
         # The complete merge migration file that would be written
         # '\n#' is to verify no bytestring prefix before #
         self.assertIn("\n# -*- coding: utf-8 -*-", output)
-        self.assertIn("class Migration(migrations.Migration):", output)
+        self.assertIn("class Migration(django.db.migrations.Migration):", output)
         self.assertIn("dependencies = [", output)
         self.assertIn("('migrations', '0002_second')", output)
         self.assertIn("('migrations', '0002_conflicting_second')", output)
@@ -1088,7 +1088,7 @@ class MakeMigrationsTests(MigrationTestBase):
         # Additional output caused by verbosity 3
         # The complete migrations file that would be written
         self.assertIn("# -*- coding: utf-8 -*-", out.getvalue())
-        self.assertIn("class Migration(migrations.Migration):", out.getvalue())
+        self.assertIn("class Migration(django.db.migrations.Migration):", out.getvalue())
         self.assertIn("dependencies = [", out.getvalue())
         self.assertIn("('migrations', '0001_initial'),", out.getvalue())
         self.assertIn("migrations.AddField(", out.getvalue())
