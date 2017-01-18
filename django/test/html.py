@@ -81,9 +81,6 @@ class Element(object):
     def __hash__(self):
         return hash((self.name,) + tuple(a for a in self.attributes))
 
-    def __ne__(self, element):
-        return not self.__eq__(element)
-
     def _count(self, element, count=True):
         if not isinstance(element, str):
             if self == element:

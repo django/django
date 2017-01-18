@@ -179,10 +179,6 @@ class OGRGeometry(GDALBase):
         else:
             return False
 
-    def __ne__(self, other):
-        "Tests for inequality."
-        return not (self == other)
-
     def __str__(self):
         "WKT is used for the string representation."
         return self.wkt

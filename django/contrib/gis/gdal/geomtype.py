@@ -68,9 +68,6 @@ class OGRGeomType(object):
         else:
             return False
 
-    def __ne__(self, other):
-        return not (self == other)
-
     @property
     def name(self):
         "Returns a short-hand string form of the OGR Geometry type."

@@ -62,9 +62,6 @@ class Migration(object):
             return False
         return (self.name == other.name) and (self.app_label == other.app_label)
 
-    def __ne__(self, other):
-        return not (self == other)
-
     def __repr__(self):
         return "<Migration %s.%s>" % (self.app_label, self.name)
 

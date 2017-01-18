@@ -233,9 +233,6 @@ class ProjectState(object):
             return False
         return all(model == other.models[key] for key, model in self.models.items())
 
-    def __ne__(self, other):
-        return not (self == other)
-
 
 class AppConfigStub(AppConfig):
     """
@@ -626,6 +623,3 @@ class ModelState(object):
             (self.bases == other.bases) and
             (self.managers == other.managers)
         )
-
-    def __ne__(self, other):
-        return not (self == other)

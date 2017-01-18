@@ -110,9 +110,6 @@ class DefaultCacheProxy(object):
     def __eq__(self, other):
         return caches[DEFAULT_CACHE_ALIAS] == other
 
-    def __ne__(self, other):
-        return caches[DEFAULT_CACHE_ALIAS] != other
-
 
 cache = DefaultCacheProxy()
 

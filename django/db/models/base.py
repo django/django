@@ -520,9 +520,6 @@ class Model(metaclass=ModelBase):
             return self is other
         return my_pk == other._get_pk_val()
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
     def __hash__(self):
         if self._get_pk_val() is None:
             raise TypeError("Model instances without primary key value are unhashable")

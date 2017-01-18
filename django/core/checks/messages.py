@@ -25,9 +25,6 @@ class CheckMessage(object):
                 for attr in ['level', 'msg', 'hint', 'obj', 'id'])
         )
 
-    def __ne__(self, other):
-        return not (self == other)
-
     def __str__(self):
         from django.db import models
 

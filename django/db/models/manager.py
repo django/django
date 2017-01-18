@@ -160,9 +160,6 @@ class BaseManager(object):
             self._constructor_args == other._constructor_args
         )
 
-    def __ne__(self, other):
-        return not (self == other)
-
     def __hash__(self):
         return id(self)
 

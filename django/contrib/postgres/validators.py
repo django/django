@@ -66,9 +66,6 @@ class KeysValidator(object):
             self.strict == other.strict
         )
 
-    def __ne__(self, other):
-        return not (self == other)
-
 
 class RangeMaxValueValidator(MaxValueValidator):
     def compare(self, a, b):

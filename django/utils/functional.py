@@ -126,11 +126,6 @@ def lazy(func, *resultclasses):
             # a __str__() method from the proxied class.
             return str(self.__cast())
 
-        def __ne__(self, other):
-            if isinstance(other, Promise):
-                other = other.__cast()
-            return self.__cast() != other
-
         def __eq__(self, other):
             if isinstance(other, Promise):
                 other = other.__cast()

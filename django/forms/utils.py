@@ -133,9 +133,6 @@ class ErrorList(UserList, list):
     def __eq__(self, other):
         return list(self) == other
 
-    def __ne__(self, other):
-        return list(self) != other
-
     def __getitem__(self, i):
         error = self.data[i]
         if isinstance(error, ValidationError):

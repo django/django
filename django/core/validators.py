@@ -68,9 +68,6 @@ class RegexValidator(object):
             (self.inverse_match == other.inverse_match)
         )
 
-    def __ne__(self, other):
-        return not (self == other)
-
 
 @deconstructible
 class URLValidator(RegexValidator):

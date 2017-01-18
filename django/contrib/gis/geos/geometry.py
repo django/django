@@ -177,10 +177,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         else:
             return False
 
-    def __ne__(self, other):
-        "The not equals operator."
-        return not (self == other)
-
     # ### Geometry set-like operations ###
     # Thanks to Sean Gillies for inspiration:
     #  http://lists.gispython.org/pipermail/community/2007-July/001034.html
