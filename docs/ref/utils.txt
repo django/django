@@ -599,6 +599,12 @@ escaping HTML.
     :func:`~django.utils.encoding.force_text` and the output has
     :func:`~django.utils.safestring.mark_safe` applied.
 
+.. function:: escapejs(value)
+
+   A wrapper around ``escape()`` which additionally escapes ASCII characters
+   having a value less than 32 and returns a Hex-encoded string
+   for use in JavaScript.
+
 .. function:: conditional_escape(text)
 
     Similar to ``escape()``, except that it doesn't operate on pre-escaped
@@ -685,6 +691,22 @@ escaping HTML.
     or ``__str__()`` method does indeed return text that doesn't require HTML
     escaping.
 
+.. function:: urlize(text, trim_url_limit=None, nofollow=False, autoescape=False)
+
+    Converts any URLs in text into clickable links.
+
+    Works on ``http://``, ``https://``, ``www.`` links, and also on links ending in one of
+    the original seven gTLDs (``.com``, ``.edu``, ``.gov``, ``.int``, ``.mil``, ``.net``, and ``.org``).
+    Links can have trailing punctuation (periods, commas, close-parens) and
+    leading punctuation (opening parens) and it'll still do the right thing.
+
+    If ``trim_url_limit`` is not ``None``, the URLs in the link text longer than this
+    limit will be truncated to ``trim_url_limit``-3 characters and appended with
+    an ellipsis.
+
+    If ``nofollow`` is ``True``, the links will get a ``rel="nofollow"`` attribute.
+
+    If ``autoescape`` is ``True``, the link text and URLs will be autoescaped.
 
 ``django.utils.http``
 =====================
@@ -882,6 +904,15 @@ appropriate entities.
         slugify(value, allow_unicode=True)
 
     If ``value`` is ``"你好 World"``, the output will be ``"你好-world"``.
+
+.. function:: phone2numeric(phone)
+
+   Converts a phone number with letters to its numeric equivalent. For example::
+
+      print(phone2numeric('1-800-HELLO'))
+
+   The above will return ``'1-800-43556'``
+
 
 .. _time-zone-selection-functions:
 

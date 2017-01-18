@@ -1647,6 +1647,9 @@ For example::
 If ``value`` is ``"testing\r\njavascript \'string" <b>escaping</b>"``,
 the output will be ``"testing\\u000D\\u000Ajavascript \\u0027string\\u0022 \\u003Cb\\u003Eescaping\\u003C/b\\u003E"``.
 
+To call this filter in your views or other code, use
+:func:`~django.utils.html.escapejs`.
+
 .. templatefilter:: filesizeformat
 
 ``filesizeformat``
@@ -1786,6 +1789,8 @@ For example::
     {{ value|iriencode }}
 
 If ``value`` is ``"?test=1&me=2"``, the output will be ``"?test=1&amp;me=2"``.
+
+To call this filter in your views, use :func:`~django.utils.encoding.iri_to_uri`.
 
 .. templatefilter:: join
 
@@ -1962,6 +1967,8 @@ For example::
 
 If ``value`` is ``800-COLLECT``, the output will be ``800-2655328``.
 
+To use this filter in your views, see :func:`~django.utils.text.phone2numeric`.
+
 .. templatefilter:: pluralize
 
 ``pluralize``
@@ -2090,6 +2097,8 @@ For example::
     {{ value|slugify }}
 
 If ``value`` is ``"Joel is a slug"``, the output will be ``"joel-is-a-slug"``.
+
+To use this filter in your views, use :func:`~django.utils.text.slugify`
 
 .. templatefilter:: stringformat
 
@@ -2409,6 +2418,8 @@ Django's built-in :tfilter:`escape` filter. The default value for
 
     If ``urlize`` is applied to text that already contains HTML markup,
     things won't work as expected. Apply this filter only to plain text.
+
+To use this filter in your views or other code, see :func:`~django.utils.html.urlize`
 
 .. templatefilter:: urlizetrunc
 
