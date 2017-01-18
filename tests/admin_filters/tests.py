@@ -13,7 +13,10 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory, TestCase, override_settings
 from django.utils.encoding import force_text
 
-from .models import Book, Bookmark, Department, Employee, TaggedItem
+from .models import (
+    Book, Bookmark, Department, Employee, EmployeeInfo, EmployeeProfile,
+    TaggedItem,
+)
 
 
 def select_by(dictlist, key, value):
@@ -227,6 +230,10 @@ class DecadeFilterBookAdminParameterEndsWith__Isnull(ModelAdmin):
 class EmployeeAdmin(ModelAdmin):
     list_display = ['name', 'department']
     list_filter = ['department']
+
+
+class EmployeeProfileAdmin(ModelAdmin):
+    list_filter = ['employee__employeeinfo__description']
 
 
 class DepartmentFilterEmployeeAdmin(EmployeeAdmin):
@@ -664,6 +671,18 @@ class ListFiltersTests(TestCase):
             (self.design.code, str(self.design)),
         ]
         self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
+
+    def test_listfilter_reverse_onetoone(self):
+        john_profile = EmployeeProfile.objects.create(employee=self.john)
+        EmployeeInfo.objects.create(employee=self.john, description='self-motivated')
+
+        modeladmin = EmployeeProfileAdmin(EmployeeProfile, site)
+        request = self.request_factory.get('/', {'employee__employeeinfo__description': 'self-motivated'})
+        changelist = self.get_changelist(request, EmployeeProfile, modeladmin)
+
+        # Make sure the correct queryset is returned
+        queryset = changelist.get_queryset(request)
+        self.assertEqual(list(queryset), [john_profile])
 
     def test_relatedonlyfieldlistfilter_manytomany(self):
         modeladmin = BookAdminRelatedOnlyFilter(Book, site)

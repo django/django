@@ -58,6 +58,23 @@ class Employee(models.Model):
 
 
 @python_2_unicode_compatible
+class EmployeeProfile(models.Model):
+    employee = models.OneToOneField(Employee, models.CASCADE)
+
+    def __str__(self):
+        return str(self.employee)
+
+
+@python_2_unicode_compatible
+class EmployeeInfo(models.Model):
+    employee = models.OneToOneField(Employee, models.CASCADE)
+    description = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.description
+
+
+@python_2_unicode_compatible
 class TaggedItem(models.Model):
     tag = models.SlugField()
     content_type = models.ForeignKey(ContentType, models.CASCADE, related_name='tagged_items')
