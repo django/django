@@ -1,4 +1,5 @@
 from django import forms
+from django.core import exceptions
 from django.db import models
 from django.test import SimpleTestCase, TestCase
 
@@ -101,3 +102,53 @@ class ChoicesTests(SimpleTestCase):
         self.assertEqual(WhizIterEmpty(c="b").c, "b")      # Invalid value
         self.assertIsNone(WhizIterEmpty(c=None).c)         # Blank value
         self.assertEqual(WhizIterEmpty(c='').c, '')        # Empty value
+
+
+class FormfieldSignalTest(SimpleTestCase):
+    """Test formfield signal usage from formfield()"""
+
+    def setUp(self):
+        self.callbacks = []
+
+    def tearDown(self):
+        """Disconnect callbacks that were added in this test"""
+        for callback in self.callbacks:
+            models.signals.formfield_cast.disconnect(callback)
+
+    def connect(self, callback):
+        """Connect a callback to the formfield and track it"""
+        models.signals.formfield_cast.connect(callback)
+        self.callbacks.append(callback)
+
+    def test_signal_arguments(self):
+        """Formfield callback should be called with proper arguments."""
+        def cb(sender, field, form_class, defaults, **kwargs):
+            self.assertEqual(sender, models.Field)
+            self.assertEqual(field, modelfield)
+            self.assertEqual(form_class, forms.CharField)
+            self.assertIn('required', defaults)
+        self.connect(cb)
+        modelfield = models.Field()
+        modelfield.formfield()
+
+    def test_callback_that_returns_a_formfield_instance(self):
+        """Formfield callback should be able to override a field"""
+        def textarea_everywhere(sender, field, form_class, defaults, **kwargs):
+            defaults['widget'] = forms.Textarea
+            return form_class(**defaults)
+        self.connect(textarea_everywhere)
+        self.assertIsInstance(models.Field().formfield().widget, forms.Textarea)
+
+    def test_callback_that_returns_none(self):
+        """Formfield callback should be able to skip a field"""
+        self.connect(lambda **kwargs: None)
+        self.assertIsInstance(models.Field().formfield().widget, forms.TextInput)
+
+    def test_callback_that_returns_a_non_field(self):
+        """
+        An exception should be raised if the callback didn't return a Field
+        instance nor None.
+        """
+        with self.assertRaises(exceptions.FieldError):
+            self.connect(lambda **kwargs: forms.Textarea())
+            models.Field().formfield()

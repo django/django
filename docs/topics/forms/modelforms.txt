@@ -488,6 +488,34 @@ include that field.
 Overriding the default fields
 -----------------------------
 
+.. _modelforms-overriding-default-fields-globally:
+
+Overriding the default fields globally
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded: 1.11
+
+By default, the ``formfield()`` method of a model field is called to generate a
+form field for a ``ModelForm``. That default can be overridden using a signal::
+
+    from django import forms
+    from django.db.models.signals import formfield_cast
+
+    def continent_radioselect(sender, field, form_class, defaults, **kwargs):
+        if getattr(field, 'rel', False) and field.rel.to != Continent:
+            return
+
+        defaults['widget'] = forms.RadioSelect
+        return form_class(**defaults)
+    formfield_cast.connect(continent_radioselect)
+
+Returning ``None`` has no effect, returning anything else than a form field
+will raise a ``FieldError``, and the first callback that returns a form field
+wins.
+
+Overriding the default fields per form
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 The default field types, as described in the `Field types`_ table above, are
 sensible defaults. If you have a ``DateField`` in your model, chances are you'd
 want that to be represented as a ``DateField`` in your form. But ``ModelForm``

@@ -53,3 +53,5 @@ m2m_changed = ModelSignal(
 
 pre_migrate = Signal(providing_args=["app_config", "verbosity", "interactive", "using", "apps", "plan"])
 post_migrate = Signal(providing_args=["app_config", "verbosity", "interactive", "using", "apps", "plan"])
+
+formfield_cast = Signal(providing_args=["field", "form_class", "defaults"])
