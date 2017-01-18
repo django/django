@@ -42,7 +42,13 @@ def channel_session(func):
     def inner(message, *args, **kwargs):
         # Make sure there's NOT a channel_session already
         if hasattr(message, "channel_session"):
-            return func(message, *args, **kwargs)
+            try:
+                return func(message, *args, **kwargs)
+            finally:
+                # Persist session if needed
+                if message.channel_session.modified:
+                    message.channel_session.save()
+
         # Make sure there's a reply_channel
         if not message.reply_channel:
             raise ValueError(
@@ -155,7 +161,13 @@ def http_session(func):
     def inner(message, *args, **kwargs):
         # Make sure there's NOT a http_session already
         if hasattr(message, "http_session"):
-            return func(message, *args, **kwargs)
+            try:
+                return func(message, *args, **kwargs)
+            finally:
+                # Persist session if needed (won't be saved if error happens)
+                if message.http_session is not None and message.http_session.modified:
+                    message.http_session.save()
+
         try:
             # We want to parse the WebSocket (or similar HTTP-lite) message
             # to get cookies and GET, but we need to add in a few things that
