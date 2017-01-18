@@ -241,7 +241,7 @@ validate_slug = RegexValidator(
     'invalid'
 )
 
-slug_unicode_re = _lazy_re_compile(r'^[-\w]+\Z', re.U)
+slug_unicode_re = _lazy_re_compile(r'^[-\w]+\Z')
 validate_unicode_slug = RegexValidator(
     slug_unicode_re,
     _("Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or hyphens."),

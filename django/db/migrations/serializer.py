@@ -5,6 +5,7 @@ import decimal
 import enum
 import functools
 import math
+import re
 import types
 import uuid
 from importlib import import_module
@@ -241,11 +242,14 @@ class RegexSerializer(BaseSerializer):
     def serialize(self):
         imports = {"import re"}
         regex_pattern, pattern_imports = serializer_factory(self.value.pattern).serialize()
-        regex_flags, flag_imports = serializer_factory(self.value.flags).serialize()
+        # Turn off default implicit flags (e.g. re.U) because regexes with the
+        # same implicit and explicit flags aren't equal.
+        flags = self.value.flags ^ re.compile('').flags
+        regex_flags, flag_imports = serializer_factory(flags).serialize()
         imports.update(pattern_imports)
         imports.update(flag_imports)
         args = [regex_pattern]
-        if self.value.flags:
+        if flags:
             args.append(regex_flags)
         return "re.compile(%s)" % ', '.join(args), imports
 

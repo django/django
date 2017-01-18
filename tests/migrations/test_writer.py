@@ -247,7 +247,7 @@ class WriterTests(SimpleTestCase):
         )
 
     def test_serialize_lazy_objects(self):
-        pattern = re.compile(r'^foo$', re.UNICODE)
+        pattern = re.compile(r'^foo$')
         lazy_pattern = SimpleLazyObject(lambda: pattern)
         self.assertEqual(self.serialize_round_trip(lazy_pattern), pattern)
 
@@ -403,7 +403,7 @@ class WriterTests(SimpleTestCase):
         """
         Make sure compiled regex can be serialized.
         """
-        regex = re.compile(r'^\w+$', re.U)
+        regex = re.compile(r'^\w+$')
         self.assertSerializedEqual(regex)
 
     def test_serialize_class_based_validators(self):
@@ -417,18 +417,18 @@ class WriterTests(SimpleTestCase):
         self.serialize_round_trip(validator)
 
         # Test with a compiled regex.
-        validator = RegexValidator(regex=re.compile(r'^\w+$', re.U))
+        validator = RegexValidator(regex=re.compile(r'^\w+$'))
         string = MigrationWriter.serialize(validator)[0]
-        self.assertEqual(string, "django.core.validators.RegexValidator(regex=re.compile('^\\\\w+$', 32))")
+        self.assertEqual(string, "django.core.validators.RegexValidator(regex=re.compile('^\\\\w+$'))")
         self.serialize_round_trip(validator)
 
         # Test a string regex with flag
-        validator = RegexValidator(r'^[0-9]+$', flags=re.U)
+        validator = RegexValidator(r'^[0-9]+$', flags=re.S)
         string = MigrationWriter.serialize(validator)[0]
         if PY36:
-            self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=re.RegexFlag(32))")
+            self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=re.RegexFlag(16))")
         else:
-            self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=32)")
+            self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=16)")
         self.serialize_round_trip(validator)
 
         # Test message and code

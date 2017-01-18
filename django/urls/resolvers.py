@@ -99,7 +99,7 @@ class LocaleRegexDescriptor:
         Compile and return the given regular expression.
         """
         try:
-            return re.compile(regex, re.UNICODE)
+            return re.compile(regex)
         except re.error as e:
             raise ImproperlyConfigured(
                 '"%s" is not a valid regular expression: %s' % (regex, e)
@@ -453,7 +453,7 @@ class RegexURLResolver(LocaleRegexProvider):
                 # Then, if we have a match, redo the substitution with quoted
                 # arguments in order to return a properly encoded URL.
                 candidate_pat = _prefix.replace('%', '%%') + result
-                if re.search('^%s%s' % (re.escape(_prefix), pattern), candidate_pat % candidate_subs, re.UNICODE):
+                if re.search('^%s%s' % (re.escape(_prefix), pattern), candidate_pat % candidate_subs):
                     # safe characters from `pchar` definition of RFC 3986
                     url = urlquote(candidate_pat % candidate_subs, safe=RFC3986_SUBDELIMS + str('/~:@'))
                     # Don't allow construction of scheme relative urls.
@@ -513,5 +513,5 @@ class LocaleRegexURLResolver(RegexURLResolver):
                 regex_string = ''
             else:
                 regex_string = '^%s/' % language_code
-            self._regex_dict[language_code] = re.compile(regex_string, re.UNICODE)
+            self._regex_dict[language_code] = re.compile(regex_string)
         return self._regex_dict[language_code]

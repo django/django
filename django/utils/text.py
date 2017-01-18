@@ -19,8 +19,8 @@ def capfirst(x):
 
 
 # Set up regular expressions
-re_words = re.compile(r'<.*?>|((?:\w[-\w]*|&.*?;)+)', re.U | re.S)
-re_chars = re.compile(r'<.*?>|(.)', re.U | re.S)
+re_words = re.compile(r'<.*?>|((?:\w[-\w]*|&.*?;)+)', re.S)
+re_chars = re.compile(r'<.*?>|(.)', re.S)
 re_tag = re.compile(r'<(/)?([^ ]+?)(?:(\s*/)| .*?)?>', re.S)
 re_newlines = re.compile(r'\r\n|\r')  # Used in normalize_newlines
 re_camel_case = re.compile(r'(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))')
@@ -417,8 +417,8 @@ def slugify(value, allow_unicode=False):
     value = force_text(value)
     if allow_unicode:
         value = unicodedata.normalize('NFKC', value)
-        value = re.sub(r'[^\w\s-]', '', value, flags=re.U).strip().lower()
-        return mark_safe(re.sub(r'[-\s]+', '-', value, flags=re.U))
+        value = re.sub(r'[^\w\s-]', '', value).strip().lower()
+        return mark_safe(re.sub(r'[-\s]+', '-', value))
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub(r'[^\w\s-]', '', value).strip().lower()
     return mark_safe(re.sub(r'[-\s]+', '-', value))
