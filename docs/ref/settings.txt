@@ -758,6 +758,10 @@ database into an in-memory JSON string before running tests (used to restore
 the database state between tests if you don't have transactions). You can set
 this to ``False`` to speed up creation time if you don't have any test classes
 with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
+If you have data migrations and use :class:`~django.test.TransactionTestCase`
+along with the :option:`test --keepdb` option, you won't see data from
+migrations in subsequent ``--keepdb`` test runs if you set ``SERIALIZE`` to
+``False``.
 
 .. setting:: TEST_TEMPLATE
 

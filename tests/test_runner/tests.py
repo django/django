@@ -9,6 +9,7 @@ from django import db
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
+from django.db.backends.base.creation import BaseDatabaseCreation
 from django.test import (
     TestCase, TransactionTestCase, mock, skipUnlessDBFeature, testcases,
 )
@@ -284,7 +285,8 @@ class SetupDatabasesTests(unittest.TestCase):
                 self.runner_instance.teardown_databases(old_config)
         mocked_db_creation.return_value.destroy_test_db.assert_called_once_with('dbname', 0, False)
 
-    def test_destroy_test_db_restores_db_name(self):
+    @mock.patch.object(BaseDatabaseCreation, '_flush_db')
+    def test_destroy_test_db_restores_db_name(self, mock_flush_db):
         tested_connections = db.ConnectionHandler({
             'default': {
                 'ENGINE': settings.DATABASES[db.DEFAULT_DB_ALIAS]["ENGINE"],
@@ -294,8 +296,29 @@ class SetupDatabasesTests(unittest.TestCase):
         # Using the real current name as old_name to not mess with the test suite.
         old_name = settings.DATABASES[db.DEFAULT_DB_ALIAS]["NAME"]
         with mock.patch('django.db.connections', new=tested_connections):
-            tested_connections['default'].creation.destroy_test_db(old_name, verbosity=0, keepdb=True)
-            self.assertEqual(tested_connections['default'].settings_dict["NAME"], old_name)
+            default_connection = tested_connections['default']
+            default_connection.creation.destroy_test_db(old_name, verbosity=0, keepdb=True)
+            self.assertEqual(default_connection.settings_dict["NAME"], old_name)
+
+    @mock.patch.object(BaseDatabaseCreation, 'deserialize_db_from_string')
+    @mock.patch.object(BaseDatabaseCreation, '_flush_db')
+    def test_destroy_test_db_with_keepdb_restores_initial_data_migrations(self, mock_flush_db, mock_deserialize_db):
+        tested_connections = db.ConnectionHandler({
+            'default': {
+                'ENGINE': settings.DATABASES[db.DEFAULT_DB_ALIAS]["ENGINE"],
+                'NAME': 'xxx_test_database',
+            },
+        })
+        # Using the real current name as old_name to not mess with the test suite.
+        old_name = settings.DATABASES[db.DEFAULT_DB_ALIAS]["NAME"]
+
+        serialized_content = '[{"model": "test_utils.car", "pk": 666, "fields": {"name": "K 2000"}}]'
+        with mock.patch('django.db.backends.base.creation.connections', new=tested_connections):
+            default_connection = tested_connections['default']
+            default_connection._test_serialized_contents = serialized_content
+            default_connection.creation.destroy_test_db(old_name, verbosity=0, keepdb=True)
+            # If keepdb is True, connection _test_serialized_contents should have been deserialized.
+            mock_deserialize_db.assert_called_once_with(serialized_content)
 
     def test_serialization(self):
         tested_connections = db.ConnectionHandler({

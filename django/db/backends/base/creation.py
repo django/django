@@ -3,7 +3,7 @@ import sys
 from django.apps import apps
 from django.conf import settings
 from django.core import serializers
-from django.db import router
+from django.db import connections, router
 from django.utils.six import StringIO
 from django.utils.six.moves import input
 
@@ -242,6 +242,10 @@ class BaseDatabaseCreation(object):
         Destroy a test database, prompting the user for confirmation if the
         database already exists.
         """
+        if keepdb:
+            # Restore initial data migrations that may have be cleaned by TransactionTestCase flush
+            self._restore_initial_data_migrations()
+
         self.connection.close()
         if number is None:
             test_database_name = self.connection.settings_dict['NAME']
@@ -266,6 +270,26 @@ class BaseDatabaseCreation(object):
         if old_database_name is not None:
             settings.DATABASES[self.connection.alias]["NAME"] = old_database_name
             self.connection.settings_dict["NAME"] = old_database_name
+
+    def _restore_initial_data_migrations(self):
+        # Load initial data migrations, if any.
+        if hasattr(connections[self.connection.alias], "_test_serialized_contents"):
+            self._flush_db()
+
+            connections[self.connection.alias].creation.deserialize_db_from_string(
+                connections[self.connection.alias]._test_serialized_contents
+            )
+
+    def _flush_db(self):
+        # Don't import django.core.management if it isn't needed.
+        from django.core.management import call_command
+
+        # Flush database, in case of any data created after
+        # emit_post_migrate_signal
+        call_command('flush', verbosity=0, interactive=False,
+                     database=self.connection.alias, reset_sequences=True,
+                     inhibit_post_migrate=True
+                     )
 
     def _destroy_test_db(self, test_database_name, verbosity):
         """
