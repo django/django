@@ -1370,7 +1370,7 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         self.assertEqual(cache.get('foo', 'baz'), 'baz')
 
     def test_get_does_not_ignore_non_enoent_errno_values(self):
-        with mock.patch.object(io, 'open', side_effect=IOError):
+        with mock.patch('builtins.open', side_effect=IOError):
             with self.assertRaises(IOError):
                 cache.get('foo')
 

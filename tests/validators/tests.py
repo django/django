@@ -1,4 +1,3 @@
-import io
 import os
 import re
 import types
@@ -269,10 +268,10 @@ def create_path(filename):
 
 # Add valid and invalid URL tests.
 # This only tests the validator without extended schemes.
-with io.open(create_path('valid_urls.txt'), encoding='utf8') as f:
+with open(create_path('valid_urls.txt'), encoding='utf8') as f:
     for url in f:
         TEST_DATA.append((URLValidator(), url.strip(), None))
-with io.open(create_path('invalid_urls.txt'), encoding='utf8') as f:
+with open(create_path('invalid_urls.txt'), encoding='utf8') as f:
     for url in f:
         TEST_DATA.append((URLValidator(), url.strip(), ValidationError))
 

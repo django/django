@@ -1,4 +1,3 @@
-import io
 import os
 import re
 import shutil
@@ -133,7 +132,7 @@ class BasicExtractorTests(ExtractorTests):
         """
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        with io.open(self.PO_FILE, 'r', encoding='utf-8') as fp:
+        with open(self.PO_FILE, 'r', encoding='utf-8') as fp:
             po_contents = fp.read()
             # Check two random strings
             self.assertIn('#. Translators: One-line translator comment #1', po_contents)
@@ -142,7 +141,7 @@ class BasicExtractorTests(ExtractorTests):
     def test_comments_extractor(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        with io.open(self.PO_FILE, 'r', encoding='utf-8') as fp:
+        with open(self.PO_FILE, 'r', encoding='utf-8') as fp:
             po_contents = fp.read()
             self.assertNotIn('This comment should not be extracted', po_contents)
 
@@ -175,7 +174,7 @@ class BasicExtractorTests(ExtractorTests):
     def test_special_char_extracted(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        with io.open(self.PO_FILE, 'r', encoding='utf-8') as fp:
+        with open(self.PO_FILE, 'r', encoding='utf-8') as fp:
             po_contents = fp.read()
             self.assertMsgId("Non-breaking space\u00a0:", po_contents)
 
@@ -390,7 +389,7 @@ class BasicExtractorTests(ExtractorTests):
         shutil.copyfile(BR_PO_BASE + '.pristine', BR_PO_BASE + '.po')
         management.call_command('makemessages', locale=['pt_BR'], verbosity=0)
         self.assertTrue(os.path.exists(BR_PO_BASE + '.po'))
-        with io.open(BR_PO_BASE + '.po', 'r', encoding='utf-8') as fp:
+        with open(BR_PO_BASE + '.po', 'r', encoding='utf-8') as fp:
             po_contents = force_text(fp.read())
             self.assertMsgStr("Größe", po_contents)
 
@@ -515,7 +514,7 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
         """Ticket #20311."""
         management.call_command('makemessages', locale=['es'], extensions=['djtpl'], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE_ES))
-        with io.open(self.PO_FILE_ES, 'r', encoding='utf-8') as fp:
+        with open(self.PO_FILE_ES, 'r', encoding='utf-8') as fp:
             po_contents = fp.read()
             found = re.findall(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', po_contents, re.MULTILINE | re.DOTALL)
             self.assertEqual(1, len(found))

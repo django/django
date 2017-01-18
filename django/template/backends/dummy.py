@@ -1,5 +1,4 @@
 import errno
-import io
 import string
 
 from django.conf import settings
@@ -30,7 +29,7 @@ class TemplateStrings(BaseEngine):
         tried = []
         for template_file in self.iter_template_filenames(template_name):
             try:
-                with io.open(template_file, encoding=settings.FILE_CHARSET) as fp:
+                with open(template_file, encoding=settings.FILE_CHARSET) as fp:
                     template_code = fp.read()
             except IOError as e:
                 if e.errno == errno.ENOENT:

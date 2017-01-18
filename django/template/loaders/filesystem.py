@@ -3,7 +3,6 @@ Wrapper for loading templates from the filesystem.
 """
 
 import errno
-import io
 
 from django.core.exceptions import SuspiciousFileOperation
 from django.template import Origin, TemplateDoesNotExist
@@ -23,7 +22,7 @@ class Loader(BaseLoader):
 
     def get_contents(self, origin):
         try:
-            with io.open(origin.name, encoding=self.engine.file_charset) as fp:
+            with open(origin.name, encoding=self.engine.file_charset) as fp:
                 return fp.read()
         except IOError as e:
             if e.errno == errno.ENOENT:

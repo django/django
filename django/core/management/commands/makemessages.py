@@ -1,6 +1,5 @@
 import fnmatch
 import glob
-import io
 import os
 import re
 import sys
@@ -106,7 +105,7 @@ class BuildFile(object):
             return
 
         encoding = settings.FILE_CHARSET if self.command.settings_available else 'utf-8'
-        with io.open(self.path, 'r', encoding=encoding) as fp:
+        with open(self.path, 'r', encoding=encoding) as fp:
             src_data = fp.read()
 
         if self.domain == 'djangojs':
@@ -114,7 +113,7 @@ class BuildFile(object):
         elif self.domain == 'django':
             content = templatize(src_data, origin=self.path[2:], charset=encoding)
 
-        with io.open(self.work_path, 'w', encoding='utf-8') as fp:
+        with open(self.work_path, 'w', encoding='utf-8') as fp:
             fp.write(content)
 
     def postprocess_messages(self, msgs):
@@ -190,7 +189,7 @@ def write_pot_file(potfile, msgs):
                 header_read = True
             lines.append(line)
     msgs = '\n'.join(lines)
-    with io.open(potfile, 'a', encoding='utf-8') as fp:
+    with open(potfile, 'a', encoding='utf-8') as fp:
         fp.write(msgs)
 
 
@@ -412,7 +411,7 @@ class Command(BaseCommand):
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
             msgs = normalize_eols(msgs)
-            with io.open(potfile, 'w', encoding='utf-8') as fp:
+            with open(potfile, 'w', encoding='utf-8') as fp:
                 fp.write(msgs)
             potfiles.append(potfile)
         return potfiles
@@ -613,14 +612,14 @@ class Command(BaseCommand):
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
         else:
-            with io.open(potfile, 'r', encoding='utf-8') as fp:
+            with open(potfile, 'r', encoding='utf-8') as fp:
                 msgs = fp.read()
             if not self.invoked_for_django:
                 msgs = self.copy_plural_forms(msgs, locale)
         msgs = normalize_eols(msgs)
         msgs = msgs.replace(
             "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n" % self.domain, "")
-        with io.open(pofile, 'w', encoding='utf-8') as fp:
+        with open(pofile, 'w', encoding='utf-8') as fp:
             fp.write(msgs)
 
         if self.no_obsolete:
@@ -647,7 +646,7 @@ class Command(BaseCommand):
         for domain in domains:
             django_po = os.path.join(django_dir, 'conf', 'locale', locale, 'LC_MESSAGES', '%s.po' % domain)
             if os.path.exists(django_po):
-                with io.open(django_po, 'r', encoding='utf-8') as fp:
+                with open(django_po, 'r', encoding='utf-8') as fp:
                     m = plural_forms_re.search(fp.read())
                 if m:
                     plural_form_line = force_str(m.group('value'))
