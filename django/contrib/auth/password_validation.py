@@ -1,3 +1,4 @@
+import functools
 import gzip
 import os
 import re
@@ -7,7 +8,6 @@ from django.conf import settings
 from django.core.exceptions import (
     FieldDoesNotExist, ImproperlyConfigured, ValidationError,
 )
-from django.utils import lru_cache
 from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
@@ -16,7 +16,7 @@ from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _, ungettext
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def get_default_password_validators():
     return get_password_validators(settings.AUTH_PASSWORD_VALIDATORS)
 

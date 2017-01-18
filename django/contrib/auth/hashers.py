@@ -1,5 +1,6 @@
 import base64
 import binascii
+import functools
 import hashlib
 import importlib
 import warnings
@@ -9,7 +10,6 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.signals import setting_changed
 from django.dispatch import receiver
-from django.utils import lru_cache
 from django.utils.crypto import (
     constant_time_compare, get_random_string, pbkdf2,
 )
@@ -82,7 +82,7 @@ def make_password(password, salt=None, hasher='default'):
     return hasher.encode(password, salt)
 
 
-@lru_cache.lru_cache()
+@functools.lru_cache()
 def get_hashers():
     hashers = []
     for hasher_path in settings.PASSWORD_HASHERS:
@@ -95,7 +95,7 @@ def get_hashers():
     return hashers
 
 
-@lru_cache.lru_cache()
+@functools.lru_cache()
 def get_hashers_by_algorithm():
     return {hasher.algorithm: hasher for hasher in get_hashers()}
 

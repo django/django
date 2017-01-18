@@ -1,3 +1,4 @@
+import functools
 import os
 from collections import OrderedDict
 
@@ -8,7 +9,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.storage import (
     FileSystemStorage, Storage, default_storage,
 )
-from django.utils import lru_cache
 from django.utils._os import safe_join
 from django.utils.functional import LazyObject, empty
 from django.utils.module_loading import import_string
@@ -264,7 +264,7 @@ def get_finders():
         yield get_finder(finder_path)
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def get_finder(import_path):
     """
     Imports the staticfiles finder class described by import_path, where

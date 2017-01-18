@@ -1,3 +1,4 @@
+import functools
 import os
 import pkgutil
 import sys
@@ -12,7 +13,7 @@ from django.core.management.base import (
     BaseCommand, CommandError, CommandParser, handle_default_options,
 )
 from django.core.management.color import color_style
-from django.utils import autoreload, lru_cache
+from django.utils import autoreload
 from django.utils._os import npath, upath
 from django.utils.encoding import force_text
 
@@ -39,7 +40,7 @@ def load_command_class(app_name, name):
     return module.Command()
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def get_commands():
     """
     Returns a dictionary mapping command names to their callback applications.

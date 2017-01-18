@@ -1,3 +1,4 @@
+import functools
 import inspect
 from functools import partial
 
@@ -13,7 +14,6 @@ from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property, curry
-from django.utils.lru_cache import lru_cache
 from django.utils.translation import ugettext_lazy as _
 
 from . import Field
@@ -710,7 +710,7 @@ class ForeignObject(RelatedField):
         return pathinfos
 
     @classmethod
-    @lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=None)
     def get_lookups(cls):
         bases = inspect.getmro(cls)
         bases = bases[:bases.index(ForeignObject) + 1]

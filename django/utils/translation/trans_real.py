@@ -1,4 +1,5 @@
 """Translation helper functions."""
+import functools
 import gettext as gettext_module
 import os
 import re
@@ -13,7 +14,6 @@ from django.conf.locale import LANG_INFO
 from django.core.exceptions import AppRegistryNotReady
 from django.core.signals import setting_changed
 from django.dispatch import receiver
-from django.utils import lru_cache
 from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.safestring import SafeData, mark_safe
@@ -403,7 +403,7 @@ def all_locale_paths():
     return [globalpath] + list(settings.LOCALE_PATHS)
 
 
-@lru_cache.lru_cache(maxsize=1000)
+@functools.lru_cache(maxsize=1000)
 def check_for_language(lang_code):
     """
     Checks whether there is a global language file for the given language
@@ -423,7 +423,7 @@ def check_for_language(lang_code):
     return False
 
 
-@lru_cache.lru_cache()
+@functools.lru_cache()
 def get_languages():
     """
     Cache of settings.LANGUAGES in an OrderedDict for easy lookups by key.
@@ -431,7 +431,7 @@ def get_languages():
     return OrderedDict(settings.LANGUAGES)
 
 
-@lru_cache.lru_cache(maxsize=1000)
+@functools.lru_cache(maxsize=1000)
 def get_supported_language_variant(lang_code, strict=False):
     """
     Returns the language-code that's listed in supported languages, possibly

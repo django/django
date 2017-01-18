@@ -1,10 +1,10 @@
+import functools
 import os
 from collections import Counter, OrderedDict
 
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import lru_cache
 from django.utils._os import upath
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
@@ -89,7 +89,7 @@ class EngineHandler(object):
         return [self[alias] for alias in self]
 
 
-@lru_cache.lru_cache()
+@functools.lru_cache()
 def get_app_template_dirs(dirname):
     """
     Return an iterable of paths of directories to load app templates from.

@@ -1,7 +1,8 @@
+import functools
+
 from django.conf import settings
 from django.conf.urls import url
 from django.urls import LocaleRegexURLResolver, get_resolver
-from django.utils import lru_cache
 from django.views.i18n import set_language
 
 
@@ -18,7 +19,7 @@ def i18n_patterns(*urls, **kwargs):
     return [LocaleRegexURLResolver(list(urls), prefix_default_language=prefix_default_language)]
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def is_language_prefix_patterns_used(urlconf):
     """
     Return a tuple of two booleans: (

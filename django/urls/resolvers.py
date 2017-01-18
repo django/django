@@ -14,7 +14,6 @@ from django.conf import settings
 from django.core.checks import Warning
 from django.core.checks.urls import check_resolver
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import lru_cache
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import cached_property
@@ -60,7 +59,7 @@ class ResolverMatch(object):
         )
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def get_resolver(urlconf=None):
     if urlconf is None:
         from django.conf import settings
@@ -68,7 +67,7 @@ def get_resolver(urlconf=None):
     return RegexURLResolver(r'^/', urlconf)
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def get_ns_resolver(ns_pattern, resolver):
     # Build a namespaced resolver for the given parent URLconf pattern.
     # This makes it possible to have captured parameters in the parent

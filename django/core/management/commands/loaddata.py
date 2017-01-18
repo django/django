@@ -1,3 +1,4 @@
+import functools
 import glob
 import gzip
 import os
@@ -16,7 +17,6 @@ from django.db import (
     DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, connections, router,
     transaction,
 )
-from django.utils import lru_cache
 from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
@@ -202,7 +202,7 @@ class Command(BaseCommand):
                     RuntimeWarning
                 )
 
-    @lru_cache.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=None)
     def find_fixtures(self, fixture_label):
         """
         Finds fixture files for a given label.

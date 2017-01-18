@@ -5,12 +5,12 @@ Factored out from django.db.models.query to avoid making the main module very
 large and/or so that they can be used by other modules without getting into
 circular import difficulties.
 """
+import functools
 import inspect
 from collections import namedtuple
 
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
-from django.utils.lru_cache import lru_cache
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
@@ -137,7 +137,7 @@ class RegisterLookupMixin(object):
         return cls.get_lookups().get(lookup_name, None)
 
     @classmethod
-    @lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=None)
     def get_lookups(cls):
         class_lookups = [parent.__dict__.get('class_lookups', {}) for parent in inspect.getmro(cls)]
         return cls.merge_dicts(class_lookups)
