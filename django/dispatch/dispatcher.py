@@ -2,14 +2,9 @@ import sys
 import threading
 import weakref
 
-from django.utils import six
 from django.utils.inspect import func_accepts_kwargs
-from django.utils.six.moves import range
 
-if six.PY2:
-    from .weakref_backports import WeakMethod
-else:
-    from weakref import WeakMethod
+from weakref import WeakMethod
 
 
 def _make_id(target):
@@ -109,7 +104,6 @@ class Signal(object):
             if hasattr(receiver, '__self__') and hasattr(receiver, '__func__'):
                 ref = WeakMethod
                 receiver_object = receiver.__self__
-            if six.PY3:
                 receiver = ref(receiver)
                 weakref.finalize(receiver_object, self._remove_receiver)
             else:
