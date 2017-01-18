@@ -57,7 +57,7 @@ simple news application with an ``Article`` model::
         body = models.TextField()
         status = models.CharField(max_length=1, choices=STATUS_CHOICES)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.title
 
 A common task we might perform with a model like this is to update an

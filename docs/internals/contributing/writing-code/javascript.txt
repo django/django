@@ -122,8 +122,8 @@ browser.
 To measure code coverage when running the tests, you need to view that file
 over HTTP. To view code coverage:
 
-* Execute ``python -m http.server`` (or ``python -m SimpleHTTPServer`` on
-  Python 2) from the root directory (not from inside ``js_tests``).
+* Execute ``python -m http.server`` from the root directory (not from inside
+  ``js_tests``).
 * Open http://localhost:8000/js_tests/tests.html in your web browser.
 
 Testing from the command line

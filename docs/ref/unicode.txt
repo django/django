@@ -48,29 +48,7 @@ General string handling
 
 Whenever you use strings with Django -- e.g., in database lookups, template
 rendering or anywhere else -- you have two choices for encoding those strings.
-You can use Unicode strings, or you can use normal strings (sometimes called
-"bytestrings") that are encoded using UTF-8.
-
-In Python 3, the logic is reversed, that is normal strings are Unicode, and
-when you want to specifically create a bytestring, you have to prefix the
-string with a 'b'. As we are doing in Django code from version 1.5,
-we recommend that you import ``unicode_literals`` from the __future__ library
-in your code. Then, when you specifically want to create a bytestring literal,
-prefix the string with 'b'.
-
-Python 2 legacy::
-
-    my_string = "This is a bytestring"
-    my_unicode = u"This is an Unicode string"
-
-Python 2 with unicode literals or Python 3::
-
-    from __future__ import unicode_literals
-
-    my_string = b"This is a bytestring"
-    my_unicode = "This is an Unicode string"
-
-See also :doc:`Python 3 compatibility </topics/python3>`.
+You can use normal Unicode strings or bytestrings (starting with a 'b').
 
 .. warning::
 
@@ -114,7 +92,7 @@ imported.
 Normally, you won't have to worry about lazy translations. Just be aware that
 if you examine an object and it claims to be a
 ``django.utils.functional.__proxy__`` object, it is a lazy translation.
-Calling ``unicode()`` with the lazy translation as the argument will generate a
+Calling ``str()`` with the lazy translation as the argument will generate a
 Unicode string in the current locale.
 
 For more details about lazy translation objects, refer to the
@@ -140,11 +118,8 @@ for converting back and forth between Unicode and bytestrings.
   ``strings_only`` parameter, if set to True, will result in Python
   numbers, booleans and ``None`` not being converted to a string (they keep
   their original types). The ``errors`` parameter takes any of the values
-  that are accepted by Python's ``unicode()`` function for its error
+  that are accepted by Python's ``str()`` function for its error
   handling.
-
-  If you pass ``smart_text()`` an object that has a ``__unicode__``
-  method, it will use that method to do the conversion.
 
 * ``force_text(s, encoding='utf-8', strings_only=False,
   errors='strict')`` is identical to ``smart_text()`` in almost all
@@ -292,8 +267,6 @@ You can pass either Unicode strings or UTF-8 bytestrings as arguments to
 ``filter()`` methods and the like in the database API. The following two
 querysets are identical::
 
-    from __future__ import unicode_literals
-
     qs = People.objects.filter(name__contains='Å')
     qs = People.objects.filter(name__contains=b'\xc3\x85') # UTF-8 encoding of Å
 
@@ -302,7 +275,6 @@ Templates
 
 You can use either Unicode or bytestrings when creating templates manually::
 
-    from __future__ import unicode_literals
     from django.template import Template
     t1 = Template(b'This is a bytestring template.')
     t2 = Template('This is a Unicode template.')
@@ -373,7 +345,6 @@ characters.
 The following code example demonstrates that everything except email addresses
 can be non-ASCII::
 
-    from __future__ import unicode_literals
     from django.core.mail import EmailMessage
 
     subject = 'My visit to Sør-Trøndelag'

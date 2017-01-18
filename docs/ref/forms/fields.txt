@@ -1183,12 +1183,11 @@ method::
             ...
             </select>
 
-    The ``__str__`` (``__unicode__`` on Python 2) method of the model will be
-    called to generate string representations of the objects for use in the
-    field's choices; to provide customized representations, subclass
-    ``ModelChoiceField`` and override ``label_from_instance``. This method will
-    receive a model object, and should return a string suitable for representing
-    it. For example::
+    The ``__str__()`` method of the model will be called to generate string
+    representations of the objects for use in the field's choices. To provide
+    customized representations, subclass ``ModelChoiceField`` and override
+    ``label_from_instance``. This method will receive a model object and should
+    return a string suitable for representing it. For example::
 
         from django.forms import ModelChoiceField
 

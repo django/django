@@ -24,7 +24,7 @@ page::
     4
     >>> p.num_pages
     2
-    >>> type(p.page_range)  # `<type 'rangeiterator'>` in Python 2.
+    >>> type(p.page_range)
     <class 'range_iterator'>
     >>> p.page_range
     range(1, 3)

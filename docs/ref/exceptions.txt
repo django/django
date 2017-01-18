@@ -217,11 +217,7 @@ Specification v2.0, for further information.
 
 As per :pep:`3134`, a ``__cause__`` attribute is set with the original
 (underlying) database exception, allowing access to any additional
-information provided. (Note that this attribute is available under
-both Python 2 and Python 3, although :pep:`3134` normally only applies
-to Python 3. To avoid unexpected differences with Python 3, Django will also
-ensure that the exception made available via ``__cause__`` has a usable
-``__traceback__`` attribute.)
+information provided.
 
 .. exception:: models.ProtectedError
 

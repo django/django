@@ -87,7 +87,7 @@ We'll be using these models::
         class Meta:
             ordering = ["-name"]
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Author(models.Model):
@@ -96,7 +96,7 @@ We'll be using these models::
         email = models.EmailField()
         headshot = models.ImageField(upload_to='author_headshots')
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Book(models.Model):

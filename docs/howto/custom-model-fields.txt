@@ -704,14 +704,12 @@ smoothly:
    a field that's similar to what you want and extend it a little bit,
    instead of creating an entirely new field from scratch.
 
-2. Put a ``__str__()`` (``__unicode__()`` on Python 2) method on the class you're
-   wrapping up as a field. There are a lot of places where the default
-   behavior of the field code is to call
+2. Put a ``__str__()`` method on the class you're wrapping up as a field. There
+   are a lot of places where the default behavior of the field code is to call
    :func:`~django.utils.encoding.force_text` on the value. (In our
    examples in this document, ``value`` would be a ``Hand`` instance, not a
-   ``HandField``). So if your ``__str__()`` method (``__unicode__()`` on
-   Python 2) automatically converts to the string form of your Python object,
-   you can save yourself a lot of work.
+   ``HandField``). So if your ``__str__()`` method automatically converts to
+   the string form of your Python object, you can save yourself a lot of work.
 
 Writing a ``FileField`` subclass
 ================================

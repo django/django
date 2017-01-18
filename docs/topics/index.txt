@@ -24,7 +24,6 @@ Introductions to all the key parts of Django you'll need to know:
    i18n/index
    logging
    pagination
-   python3
    security
    performance
    serialization

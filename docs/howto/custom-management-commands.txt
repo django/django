@@ -26,10 +26,6 @@ directory whose name doesn't begin with an underscore. For example::
         tests.py
         views.py
 
-On Python 2, be sure to include ``__init__.py`` files in both the
-``management`` and ``management/commands`` directories as done above or your
-command will not be detected.
-
 In this example, the ``closepoll`` command will be made available to any project
 that includes the ``polls`` application in :setting:`INSTALLED_APPS`.
 

@@ -480,21 +480,6 @@ a subclass of dictionary. Exceptions are outlined here:
         >>> q.items()
         [('a', '3')]
 
-.. method:: QueryDict.iteritems()
-
-    Just like the standard dictionary ``iteritems()`` method. Like
-    :meth:`QueryDict.items()` this uses the same last-value logic as
-    :meth:`QueryDict.__getitem__()`.
-
-    Available only on Python 2.
-
-.. method:: QueryDict.iterlists()
-
-    Like :meth:`QueryDict.iteritems()` except it includes all values, as a list,
-    for each member of the dictionary.
-
-    Available only on Python 2.
-
 .. method:: QueryDict.values()
 
     Just like the standard dictionary ``values()`` method, except this uses the
@@ -503,12 +488,6 @@ a subclass of dictionary. Exceptions are outlined here:
         >>> q = QueryDict('a=1&a=2&a=3')
         >>> q.values()
         ['3']
-
-.. method:: QueryDict.itervalues()
-
-    Just like :meth:`QueryDict.values()`, except an iterator.
-
-    Available only on Python 2.
 
 In addition, ``QueryDict`` has the following methods:
 

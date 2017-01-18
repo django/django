@@ -431,9 +431,6 @@ strings before passing them to non-Django code::
 
     requests.post('https://example.com/send', data={'body': str(body)})
 
-Use ``unicode`` in place of ``str`` on Python 2, or :data:`six.text_type` to
-support Python 2 and 3.
-
 If you try to use a ``ugettext_lazy()`` result where a bytestring (a
 :class:`bytes` object) is expected, things won't work as expected since a
 ``ugettext_lazy()`` object doesn't know how to convert itself to a bytestring.
@@ -534,12 +531,11 @@ For any other case where you would like to delay the translation, but have to
 pass the translatable string as argument to another function, you can wrap
 this function inside a lazy call yourself. For example::
 
-    from django.utils import six  # Python 3 compatibility
     from django.utils.functional import lazy
     from django.utils.safestring import mark_safe
     from django.utils.translation import ugettext_lazy as _
 
-    mark_safe_lazy = lazy(mark_safe, six.text_type)
+    mark_safe_lazy = lazy(mark_safe, str)
 
 And then later::
 
