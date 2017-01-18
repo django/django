@@ -436,9 +436,8 @@ Minor features
 ``django.contrib.formtools``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Calls to :meth:`WizardView.done()
-  <formtools.wizard.views.WizardView.done>` now include a
-  ``form_dict`` to allow easier access to forms by their step name.
+* Calls to ``WizardView.done()`` now include a ``form_dict`` to allow easier
+  access to forms by their step name.
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
