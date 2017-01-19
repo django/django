@@ -253,9 +253,6 @@ class QuerySet:
         self._fetch_all()
         return bool(self._result_cache)
 
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
-
     def __getitem__(self, k):
         """
         Retrieves an item or slice from the set of results.

@@ -175,9 +175,6 @@ class MeasureBase:
     def __bool__(self):
         return bool(self.standard)
 
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
-
     def default_units(self, kwargs):
         """
         Return the unit value and the default units specified

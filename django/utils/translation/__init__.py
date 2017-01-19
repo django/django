@@ -114,9 +114,6 @@ def lazy_number(func, resultclass, number=None, **kwargs):
             def __bool__(self):
                 return bool(kwargs['singular'])
 
-            def __nonzero__(self):  # Python 2 compatibility
-                return type(self).__bool__(self)
-
             def __mod__(self, rhs):
                 if isinstance(rhs, dict) and number:
                     try:

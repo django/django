@@ -32,9 +32,6 @@ class OrderedSet:
     def __bool__(self):
         return bool(self.dict)
 
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
-
     def __len__(self):
         return len(self.dict)
 

@@ -121,9 +121,8 @@ class Guild(models.Model):
     name = models.CharField(max_length=15)
     members = models.ManyToManyField(Developer)
 
-    def __nonzero__(self):
-
-        return self.members.count()
+    def __bool__(self):
+        return False
 
 
 class Tag(models.Model):

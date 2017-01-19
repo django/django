@@ -71,9 +71,6 @@ class Node:
         """
         return bool(self.children)
 
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
-
     def __contains__(self, other):
         """
         Returns True is 'other' is a direct child of this instance.

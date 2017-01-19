@@ -78,9 +78,6 @@ class BaseFormSet:
         """All formsets have a management form which is not included in the length"""
         return True
 
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
-
     @cached_property
     def management_form(self):
         """Returns the ManagementForm instance for this FormSet."""
