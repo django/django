@@ -28,7 +28,7 @@ class DeserializationError(Exception):
         return cls("%s: (%s:pk=%s) field_value was '%s'" % (original_exc, model, fk, field_value))
 
 
-class ProgressBar(object):
+class ProgressBar:
     progress_width = 75
 
     def __init__(self, output, total_count):
@@ -51,7 +51,7 @@ class ProgressBar(object):
         self.output.flush()
 
 
-class Serializer(object):
+class Serializer:
     """
     Abstract serializer base class.
     """
@@ -182,7 +182,7 @@ class Deserializer:
         raise NotImplementedError('subclasses of Deserializer must provide a __next__() method')
 
 
-class DeserializedObject(object):
+class DeserializedObject:
     """
     A deserialized model.
 

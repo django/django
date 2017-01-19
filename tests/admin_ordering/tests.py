@@ -9,11 +9,11 @@ from .models import (
 )
 
 
-class MockRequest(object):
+class MockRequest:
     pass
 
 
-class MockSuperUser(object):
+class MockSuperUser:
     def has_perm(self, perm):
         return True
 

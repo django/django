@@ -17,7 +17,7 @@ NONE_ID = _make_id(None)
 NO_RECEIVERS = object()
 
 
-class Signal(object):
+class Signal:
     """
     Base class for all signals
 

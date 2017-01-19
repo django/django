@@ -46,7 +46,7 @@ __all__ = [str(x) for x in (
 )]
 
 
-class Empty(object):
+class Empty:
     pass
 
 
@@ -1088,7 +1088,7 @@ class CommaSeparatedIntegerField(CharField):
     }
 
 
-class DateTimeCheckMixin(object):
+class DateTimeCheckMixin:
 
     def check(self, **kwargs):
         errors = super(DateTimeCheckMixin, self).check(**kwargs)
@@ -2003,7 +2003,7 @@ class NullBooleanField(Field):
         return super(NullBooleanField, self).formfield(**defaults)
 
 
-class PositiveIntegerRelDbTypeMixin(object):
+class PositiveIntegerRelDbTypeMixin:
 
     def rel_db_type(self, connection):
         """

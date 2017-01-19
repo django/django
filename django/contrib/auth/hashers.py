@@ -162,7 +162,7 @@ def mask_hash(hash, show=6, char="*"):
     return masked
 
 
-class BasePasswordHasher(object):
+class BasePasswordHasher:
     """
     Abstract base class for password hashers
 

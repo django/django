@@ -88,7 +88,7 @@ class KeyTransform(Transform):
         return "(%s -> '%s')" % (lhs, self.key_name), params
 
 
-class KeyTransformFactory(object):
+class KeyTransformFactory:
 
     def __init__(self, key_name):
         self.key_name = key_name

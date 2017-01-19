@@ -1,4 +1,4 @@
-class BaseSpatialOperations(object):
+class BaseSpatialOperations:
     """
     This module holds the base `BaseSpatialBackend` object, which is
     instantiated by each spatial database backend with the features

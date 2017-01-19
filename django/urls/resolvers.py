@@ -25,7 +25,7 @@ from .exceptions import NoReverseMatch, Resolver404
 from .utils import get_callable
 
 
-class ResolverMatch(object):
+class ResolverMatch:
     def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None):
         self.func = func
         self.args = args
@@ -76,7 +76,7 @@ def get_ns_resolver(ns_pattern, resolver):
     return RegexURLResolver(r'^/', [ns_resolver])
 
 
-class LocaleRegexDescriptor(object):
+class LocaleRegexDescriptor:
     def __get__(self, instance, cls=None):
         """
         Return a compiled regular expression based on the active language.
@@ -106,7 +106,7 @@ class LocaleRegexDescriptor(object):
             )
 
 
-class LocaleRegexProvider(object):
+class LocaleRegexProvider:
     """
     A mixin to provide a default regex property which can vary by active
     language.

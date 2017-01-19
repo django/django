@@ -4,7 +4,7 @@ from django.db.models.lookups import (
 )
 
 
-class MultiColSource(object):
+class MultiColSource:
     contains_aggregate = False
 
     def __init__(self, alias, targets, sources, field):
@@ -94,7 +94,7 @@ class RelatedIn(In):
             return super(RelatedIn, self).as_sql(compiler, connection)
 
 
-class RelatedLookupMixin(object):
+class RelatedLookupMixin:
     def get_prep_lookup(self):
         if not isinstance(self.lhs, MultiColSource) and self.rhs_is_direct_value():
             # If we get here, we are dealing with single-column relations.

@@ -18,7 +18,7 @@ from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
 
-class ListFilter(object):
+class ListFilter:
     title = None  # Human-readable title to appear in the right sidebar.
     template = 'admin/filter.html'
 

@@ -33,7 +33,7 @@ BUILTIN_SERIALIZERS = {
 _serializers = {}
 
 
-class BadSerializer(object):
+class BadSerializer:
     """
     Stub serializer to hold exception raised during registration
 
@@ -71,7 +71,7 @@ def register_serializer(format, serializer_module, serializers=None):
     except ImportError as exc:
         bad_serializer = BadSerializer(exc)
 
-        module = type('BadSerializerModule', (object,), {
+        module = type('BadSerializerModule', (), {
             'Deserializer': bad_serializer,
             'Serializer': bad_serializer,
         })

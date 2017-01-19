@@ -3,7 +3,7 @@ from django.conf.urls import url
 from . import views
 
 
-class URLObject(object):
+class URLObject:
     urlpatterns = [
         url(r'^inner/$', views.empty_view, name='urlobject-view'),
         url(r'^inner/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.empty_view, name='urlobject-view'),

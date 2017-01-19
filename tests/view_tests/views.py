@@ -241,7 +241,7 @@ def custom_exception_reporter_filter_view(request):
         return technical_500_response(request, *exc_info)
 
 
-class Klass(object):
+class Klass:
 
     @sensitive_variables('sauce')
     def method(self, request):

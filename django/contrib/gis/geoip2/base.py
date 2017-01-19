@@ -21,7 +21,7 @@ class GeoIP2Exception(Exception):
     pass
 
 
-class GeoIP2(object):
+class GeoIP2:
     # The flags for GeoIP memory caching.
     # Try MODE_MMAP_EXT, MODE_MMAP, MODE_FILE in that order.
     MODE_AUTO = 0

@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate
 from django.test import SimpleTestCase, override_settings
 
 
-class NoRequestBackend(object):
+class NoRequestBackend:
     def authenticate(self, username=None, password=None):
         # Doesn't accept a request parameter.
         pass

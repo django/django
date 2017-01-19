@@ -11,7 +11,7 @@ from django.utils.archive import Archive, extract
 TEST_DIR = os.path.join(os.path.dirname(upath(__file__)), 'archives')
 
 
-class ArchiveTester(object):
+class ArchiveTester:
     archive = None
 
     def setUp(self):

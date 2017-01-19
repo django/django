@@ -29,7 +29,7 @@ class CountingMD5PasswordHasher(MD5PasswordHasher):
         return super(CountingMD5PasswordHasher, self).encode(*args, **kwargs)
 
 
-class BaseModelBackendTest(object):
+class BaseModelBackendTest:
     """
     A base class for tests that need to validate the ModelBackend
     with different User models. Subclasses should define a class
@@ -319,11 +319,11 @@ class UUIDUserTests(TestCase):
         self.assertEqual(UUIDUser.objects.get(pk=self.client.session[SESSION_KEY]), user)
 
 
-class TestObj(object):
+class TestObj:
     pass
 
 
-class SimpleRowlevelBackend(object):
+class SimpleRowlevelBackend:
     def has_perm(self, user, perm, obj=None):
         if not obj:
             return  # We only support row level perms
@@ -468,7 +468,7 @@ class InActiveUserBackendTest(TestCase):
         self.assertIs(self.user1.has_module_perms("app2"), False)
 
 
-class PermissionDeniedBackend(object):
+class PermissionDeniedBackend:
     """
     Always raises PermissionDenied in `authenticate`, `has_perm` and `has_module_perms`.
     """
@@ -573,7 +573,7 @@ class ChangedBackendSettingsTest(TestCase):
             self.assertTrue(user.is_anonymous)
 
 
-class TypeErrorBackend(object):
+class TypeErrorBackend:
     """
     Always raises TypeError.
     """

@@ -24,7 +24,7 @@ class ArrayMinLengthValidator(MinLengthValidator):
 
 
 @deconstructible
-class KeysValidator(object):
+class KeysValidator:
     """A validator designed for HStore to require/restrict keys."""
 
     messages = {

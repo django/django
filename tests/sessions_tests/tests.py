@@ -38,7 +38,7 @@ from django.utils.encoding import force_text
 from .models import SessionStore as CustomDatabaseSession
 
 
-class SessionTestsMixin(object):
+class SessionTestsMixin:
     # This does not inherit from TestCase to avoid any tests being run with this
     # class, which wouldn't work, and to allow different TestCase subclasses to
     # be used.

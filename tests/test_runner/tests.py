@@ -129,7 +129,7 @@ class DependencyOrderingTests(unittest.TestCase):
             dependency_ordered(raw, dependencies=dependencies)
 
 
-class MockTestRunner(object):
+class MockTestRunner:
     def __init__(self, *args, **kwargs):
         pass
 

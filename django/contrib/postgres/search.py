@@ -33,7 +33,7 @@ class SearchQueryField(Field):
         return 'tsquery'
 
 
-class SearchVectorCombinable(object):
+class SearchVectorCombinable:
     ADD = '||'
 
     def _combine(self, other, connector, reversed, node=None):
@@ -92,7 +92,7 @@ class CombinedSearchVector(SearchVectorCombinable, CombinedExpression):
         super(CombinedSearchVector, self).__init__(lhs, connector, rhs, output_field)
 
 
-class SearchQueryCombinable(object):
+class SearchQueryCombinable:
     BITAND = '&&'
     BITOR = '||'
 

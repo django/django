@@ -18,7 +18,7 @@ def get_field_size(name):
 # This light wrapper "fakes" a dictionary interface, because some SQLite data
 # types include variables in them -- e.g. "varchar(30)" -- and can't be matched
 # as a simple dictionary lookup.
-class FlexibleFieldLookupDict(object):
+class FlexibleFieldLookupDict:
     # Maps SQL types to Django Field types. Some of the SQL types have multiple
     # entries here because SQLite allows for anything and doesn't normalize the
     # field type; it uses whatever was given.

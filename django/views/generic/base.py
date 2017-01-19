@@ -10,7 +10,7 @@ from django.utils.decorators import classonlymethod
 logger = logging.getLogger('django.request')
 
 
-class ContextMixin(object):
+class ContextMixin:
     """
     A default context mixin that passes the keyword arguments received by
     get_context_data as the template context.
@@ -22,7 +22,7 @@ class ContextMixin(object):
         return kwargs
 
 
-class View(object):
+class View:
     """
     Intentionally simple parent class for all views. Only implements
     dispatch-by-method and simple sanity checking.
@@ -104,7 +104,7 @@ class View(object):
         return [m.upper() for m in self.http_method_names if hasattr(self, m)]
 
 
-class TemplateResponseMixin(object):
+class TemplateResponseMixin:
     """
     A mixin that can be used to render a template.
     """

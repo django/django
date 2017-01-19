@@ -134,7 +134,7 @@ class Exactly(models.lookups.Exact):
         return connection.operators['exact'] % rhs
 
 
-class SQLFuncMixin(object):
+class SQLFuncMixin:
     def as_sql(self, compiler, connection):
         return '%s()', [self.name]
 
@@ -155,7 +155,7 @@ class SQLFuncTransform(SQLFuncMixin, models.Transform):
         self.name = name
 
 
-class SQLFuncFactory(object):
+class SQLFuncFactory:
 
     def __init__(self, key, name):
         self.key = key

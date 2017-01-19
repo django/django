@@ -31,7 +31,7 @@ class VariableResolveLoggingTests(BaseTemplateLoggingTestCase):
     loglevel = logging.DEBUG
 
     def test_log_on_variable_does_not_exist_silent(self):
-        class TestObject(object):
+        class TestObject:
             class SilentDoesNotExist(Exception):
                 silent_variable_failure = True
 

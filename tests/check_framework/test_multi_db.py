@@ -3,7 +3,7 @@ from django.test import TestCase, mock
 from django.test.utils import isolate_apps, override_settings
 
 
-class TestRouter(object):
+class TestRouter:
     """
     Routes to the 'other' database if the model name starts with 'Other'.
     """

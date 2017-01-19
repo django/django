@@ -18,7 +18,7 @@ BLOCK_CONTEXT_KEY = 'block_context'
 logger = logging.getLogger('django.template')
 
 
-class BlockContext(object):
+class BlockContext:
     def __init__(self):
         # Dictionary of FIFO queues.
         self.blocks = defaultdict(list)

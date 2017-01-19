@@ -44,7 +44,7 @@ class SafeStringTest(SimpleTestCase):
         self.assertRenderEqual('{{ s }}', 'a&b', s=mark_safe(s))
 
     def test_mark_safe_object_implementing_dunder_str(self):
-        class Obj(object):
+        class Obj:
             def __str__(self):
                 return '<obj>'
 

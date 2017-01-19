@@ -24,7 +24,7 @@ from .models import CustomUser
 from .views import CustomTestException
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):
@@ -1298,7 +1298,7 @@ class UnicodePayloadTests(SimpleTestCase):
         self.assertEqual(response.content, json.encode('koi8-r'))
 
 
-class DummyFile(object):
+class DummyFile:
     def __init__(self, filename):
         self.name = filename
 

@@ -66,7 +66,7 @@ bbox_data = (
 )
 
 
-class Geo3DLoadingHelper(object):
+class Geo3DLoadingHelper:
     def _load_interstate_data(self):
         # Interstate (2D / 3D and Geographic/Projected variants)
         for name, line, exp_z in interstate_data:

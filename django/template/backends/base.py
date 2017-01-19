@@ -6,7 +6,7 @@ from django.utils._os import safe_join
 from django.utils.functional import cached_property
 
 
-class BaseEngine(object):
+class BaseEngine:
 
     # Core methods: engines have to provide their own implementation
     #               (except for from_string which is optional).

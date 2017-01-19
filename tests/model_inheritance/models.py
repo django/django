@@ -157,7 +157,7 @@ class NamedURL(models.Model):
         abstract = True
 
 
-class Mixin(object):
+class Mixin:
     def __init__(self):
         self.other_attr = 1
         super(Mixin, self).__init__()

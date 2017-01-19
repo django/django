@@ -15,7 +15,7 @@ __all__ = ('BoundField',)
 
 
 @html_safe
-class BoundField(object):
+class BoundField:
     "A Field plus data"
     def __init__(self, form, field, name):
         self.form = form
@@ -251,7 +251,7 @@ class BoundField(object):
 
 
 @html_safe
-class BoundWidget(object):
+class BoundWidget:
     """
     A container class used for iterating over widgets. This is useful for
     widgets that have choices. For example, the following can be used in a

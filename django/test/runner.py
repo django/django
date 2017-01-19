@@ -66,7 +66,7 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln("%s" % sql_debug)
 
 
-class RemoteTestResult(object):
+class RemoteTestResult:
     """
     Record information about which tests have succeeded and which have failed.
 
@@ -230,7 +230,7 @@ failure and get a correct traceback.
         self.stop_if_failfast()
 
 
-class RemoteTestRunner(object):
+class RemoteTestRunner:
     """
     Run tests and record everything but don't display anything.
 
@@ -389,7 +389,7 @@ class ParallelTestSuite(unittest.TestSuite):
         return result
 
 
-class DiscoverRunner(object):
+class DiscoverRunner:
     """
     A Django test runner that uses unittest2 test discovery.
     """

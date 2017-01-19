@@ -209,7 +209,7 @@ class DimensionClosingBug(unittest.TestCase):
         # get_image_dimensions will call our catching_open instead of the
         # regular builtin one.
 
-        class FileWrapper(object):
+        class FileWrapper:
             _closed = []
 
             def __init__(self, f):

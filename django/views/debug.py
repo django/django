@@ -23,7 +23,7 @@ HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGN
 CLEANSED_SUBSTITUTE = '********************'
 
 
-class CallableSettingWrapper(object):
+class CallableSettingWrapper:
     """ Object to wrap callable appearing in settings
 
     * Not to call in the debug page (#21345).
@@ -95,7 +95,7 @@ def get_exception_reporter_filter(request):
     return getattr(request, 'exception_reporter_filter', default_filter)
 
 
-class ExceptionReporterFilter(object):
+class ExceptionReporterFilter:
     """
     Base for all exception reporter filter classes. All overridable hooks
     contain lenient default behaviors.
@@ -230,7 +230,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         return cleansed.items()
 
 
-class ExceptionReporter(object):
+class ExceptionReporter:
     """
     A class to organize and coordinate reporting on exceptions.
     """

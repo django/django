@@ -13,7 +13,7 @@ class InvalidTemplateLibrary(Exception):
     pass
 
 
-class Library(object):
+class Library:
     """
     A class for registering template tags and filters. Compiled filter and
     template tag functions are stored in the filters and tags attributes.

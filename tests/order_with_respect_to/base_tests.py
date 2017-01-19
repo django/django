@@ -5,7 +5,7 @@ reference any models directly. Subclasses should inherit django.test.TestCase.
 from operator import attrgetter
 
 
-class BaseOrderWithRespectToTests(object):
+class BaseOrderWithRespectToTests:
     # Hook to allow subclasses to run these tests with alternate models.
     Answer = None
     Post = None

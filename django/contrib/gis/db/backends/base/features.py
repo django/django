@@ -3,7 +3,7 @@ import re
 from django.contrib.gis.db.models import aggregates
 
 
-class BaseSpatialFeatures(object):
+class BaseSpatialFeatures:
     gis_enabled = True
 
     # Does the database contain a SpatialRefSys model to store SRID information?

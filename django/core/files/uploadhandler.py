@@ -58,7 +58,7 @@ class StopFutureHandlers(UploadFileException):
     pass
 
 
-class FileUploadHandler(object):
+class FileUploadHandler:
     """
     Base class for streaming upload handlers.
     """

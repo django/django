@@ -74,7 +74,7 @@ class CustomUser(AbstractBaseUser):
         return self.is_admin
 
 
-class RemoveGroupsAndPermissions(object):
+class RemoveGroupsAndPermissions:
     """
     A context manager to temporarily remove the groups and user_permissions M2M
     fields from the AbstractUser class, so they don't clash with the

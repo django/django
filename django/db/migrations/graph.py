@@ -18,7 +18,7 @@ RECURSION_DEPTH_WARNING = (
 
 
 @total_ordering
-class Node(object):
+class Node:
     """
     A single node in the migration graph. Contains direct links to adjacent
     nodes in either direction.
@@ -100,7 +100,7 @@ class DummyNode(Node):
         raise NodeNotFoundError(self.error_message, self.key, origin=self.origin)
 
 
-class MigrationGraph(object):
+class MigrationGraph:
     """
     Represents the digraph of all migrations in a project.
 

@@ -8,7 +8,7 @@ __all__ = [str('Index')]
 MAX_NAME_LENGTH = 30
 
 
-class Index(object):
+class Index:
     suffix = 'idx'
 
     def __init__(self, fields=[], name=None):

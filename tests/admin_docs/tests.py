@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase, modify_settings, override_settings
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):

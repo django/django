@@ -24,7 +24,7 @@ class ContextDict(dict):
         self.context.pop()
 
 
-class BaseContext(object):
+class BaseContext:
     def __init__(self, dict_=None):
         self._reset_dicts(dict_)
 

@@ -43,7 +43,7 @@ class ManagementForm(Form):
 
 
 @html_safe
-class BaseFormSet(object):
+class BaseFormSet:
     """
     A collection of instances of the same Form class.
     """

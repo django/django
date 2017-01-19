@@ -23,7 +23,7 @@ def hashed_file_path(test, path):
     return fullpath.replace(settings.STATIC_URL, '')
 
 
-class TestHashedFiles(object):
+class TestHashedFiles:
     hashed_file_path = hashed_file_path
 
     def setUp(self):

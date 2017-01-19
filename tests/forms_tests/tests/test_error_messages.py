@@ -13,7 +13,7 @@ from django.utils.safestring import mark_safe
 from ..models import ChoiceModel
 
 
-class AssertFormErrorsMixin(object):
+class AssertFormErrorsMixin:
     def assertFormErrors(self, expected, the_callable, *args, **kwargs):
         with self.assertRaises(ValidationError) as cm:
             the_callable(*args, **kwargs)

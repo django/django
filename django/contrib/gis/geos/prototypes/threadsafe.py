@@ -28,7 +28,7 @@ class GEOSContext(threading.local):
 thread_context = GEOSContext()
 
 
-class GEOSFunc(object):
+class GEOSFunc:
     """
     Class that serves as a wrapper for GEOS C Functions, and will
     use thread-safe function variants when available.

@@ -15,7 +15,7 @@ from django.db.utils import DatabaseError
 FORCE = object()
 
 
-class SQLCompiler(object):
+class SQLCompiler:
     def __init__(self, query, connection, using):
         self.query = query
         self.connection = connection

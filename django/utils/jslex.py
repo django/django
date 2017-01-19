@@ -3,7 +3,7 @@
 import re
 
 
-class Tok(object):
+class Tok:
     """
     A specification for a token class.
     """
@@ -27,7 +27,7 @@ def literals(choices, prefix="", suffix=""):
     return "|".join(prefix + re.escape(c) + suffix for c in choices.split())
 
 
-class Lexer(object):
+class Lexer:
     """
     A generic multi-state regex-based lexer.
     """

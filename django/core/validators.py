@@ -26,7 +26,7 @@ def _lazy_re_compile(regex, flags=0):
 
 
 @deconstructible
-class RegexValidator(object):
+class RegexValidator:
     regex = ''
     message = _('Enter a valid value.')
     code = 'invalid'
@@ -162,7 +162,7 @@ def validate_integer(value):
 
 
 @deconstructible
-class EmailValidator(object):
+class EmailValidator:
     message = _('Enter a valid email address.')
     code = 'invalid'
     user_regex = _lazy_re_compile(
@@ -305,7 +305,7 @@ validate_comma_separated_integer_list = int_list_validator(
 
 
 @deconstructible
-class BaseValidator(object):
+class BaseValidator:
     message = _('Ensure this value is %(limit_value)s (it is %(show_value)s).')
     code = 'limit_value'
 
@@ -384,7 +384,7 @@ class MaxLengthValidator(BaseValidator):
 
 
 @deconstructible
-class DecimalValidator(object):
+class DecimalValidator:
     """
     Validate that the input does not exceed the maximum number of digits
     expected, otherwise raise ValidationError.
@@ -453,7 +453,7 @@ class DecimalValidator(object):
 
 
 @deconstructible
-class FileExtensionValidator(object):
+class FileExtensionValidator:
     message = _(
         "File extension '%(extension)s' is not allowed. "
         "Allowed extensions are: '%(allowed_extensions)s'."

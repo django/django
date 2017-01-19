@@ -5,5 +5,5 @@ class TestClientBackend(ModelBackend):
     pass
 
 
-class BackendWithoutGetUserMethod(object):
+class BackendWithoutGetUserMethod:
     pass

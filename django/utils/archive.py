@@ -49,7 +49,7 @@ def extract(path, to_path=''):
         archive.extract(to_path)
 
 
-class Archive(object):
+class Archive:
     """
     The external API class that encapsulates an archive implementation.
     """
@@ -93,7 +93,7 @@ class Archive(object):
         self._archive.close()
 
 
-class BaseArchive(object):
+class BaseArchive:
     """
     Base Archive class.  Implementations should inherit this class.
     """

@@ -80,7 +80,7 @@ def get_related_models_recursive(model):
     return seen - {(model._meta.app_label, model._meta.model_name)}
 
 
-class ProjectState(object):
+class ProjectState:
     """
     Represents the entire project's overall state.
     This is the item that is passed around - we do it here rather than at the
@@ -356,7 +356,7 @@ class StateApps(Apps):
             pass
 
 
-class ModelState(object):
+class ModelState:
     """
     Represents a Django Model. We don't use the actual Model class
     as it's not designed to have its options changed - instead, we

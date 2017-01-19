@@ -1,7 +1,7 @@
 from ctypes import c_void_p
 
 
-class CPointerBase(object):
+class CPointerBase:
     """
     Base class for objects that have a pointer access property
     that controls access to the underlying C pointer.

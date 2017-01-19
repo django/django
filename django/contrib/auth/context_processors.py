@@ -2,7 +2,7 @@
 # the template system can understand.
 
 
-class PermLookupDict(object):
+class PermLookupDict:
     def __init__(self, user, app_label):
         self.user, self.app_label = user, app_label
 
@@ -24,7 +24,7 @@ class PermLookupDict(object):
         return type(self).__bool__(self)
 
 
-class PermWrapper(object):
+class PermWrapper:
     def __init__(self, user):
         self.user = user
 

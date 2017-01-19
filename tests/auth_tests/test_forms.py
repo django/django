@@ -27,7 +27,7 @@ from .models.with_integer_username import IntegerUsernameUser
 from .settings import AUTH_TEMPLATES
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):

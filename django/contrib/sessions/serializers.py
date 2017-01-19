@@ -3,7 +3,7 @@ import pickle
 from django.core.signing import JSONSerializer as BaseJSONSerializer
 
 
-class PickleSerializer(object):
+class PickleSerializer:
     """
     Simple wrapper around pickle to be used in signing.dumps and
     signing.loads.

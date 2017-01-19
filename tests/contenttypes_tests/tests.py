@@ -432,7 +432,7 @@ class UpdateContentTypesTests(TestCase):
         self.assertEqual(ContentType.objects.count(), self.before_count + 1)
 
 
-class TestRouter(object):
+class TestRouter:
     def db_for_read(self, model, **hints):
         return 'other'
 

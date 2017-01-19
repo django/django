@@ -1,7 +1,7 @@
 from django.contrib.gis import gdal
 
 
-class SpatialRefSysMixin(object):
+class SpatialRefSysMixin:
     """
     The SpatialRefSysMixin is a class used by the database-dependent
     SpatialRefSys objects to reduce redundant code.

@@ -6,7 +6,7 @@ from django.db import router
 from django.db.models.query import QuerySet
 
 
-class BaseManager(object):
+class BaseManager:
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
@@ -168,7 +168,7 @@ class Manager(BaseManager.from_queryset(QuerySet)):
     pass
 
 
-class ManagerDescriptor(object):
+class ManagerDescriptor:
 
     def __init__(self, manager):
         self.manager = manager

@@ -1,7 +1,7 @@
 from django.contrib import messages
 
 
-class SuccessMessageMixin(object):
+class SuccessMessageMixin:
     """
     Adds a success message on successful form submission.
     """

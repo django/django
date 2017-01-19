@@ -34,7 +34,7 @@ class SettingsReference(str):
         self.setting_name = setting_name
 
 
-class OperationWriter(object):
+class OperationWriter:
     def __init__(self, operation, indentation=2):
         self.operation = operation
         self.buff = []
@@ -134,7 +134,7 @@ class OperationWriter(object):
         return '\n'.join(self.buff)
 
 
-class MigrationWriter(object):
+class MigrationWriter:
     """
     Takes a Migration instance and is able to produce the contents
     of the migration file from it.

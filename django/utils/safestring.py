@@ -8,7 +8,7 @@ be interpreted by the HTML engine (e.g. '<') into the appropriate entities.
 from django.utils.functional import Promise, curry, wraps
 
 
-class SafeData(object):
+class SafeData:
     def __html__(self):
         """
         Returns the html representation of a string for interoperability.

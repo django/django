@@ -15,7 +15,7 @@ from . import PostgreSQLTestCase
 from .models import Character, Line, Scene
 
 
-class GrailTestData(object):
+class GrailTestData:
 
     @classmethod
     def setUpTestData(cls):

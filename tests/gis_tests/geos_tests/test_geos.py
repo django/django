@@ -89,7 +89,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         with self.assertRaises(GEOSException):
             GEOSGeometry(memoryview(b'0'))
 
-        class NotAGeometry(object):
+        class NotAGeometry:
             pass
 
         # Some other object

@@ -7,7 +7,7 @@ TableInfo = namedtuple('TableInfo', ['name', 'type'])
 FieldInfo = namedtuple('FieldInfo', 'name type_code display_size internal_size precision scale null_ok default')
 
 
-class BaseDatabaseIntrospection(object):
+class BaseDatabaseIntrospection:
     """
     This class encapsulates all backend-specific introspection utilities
     """

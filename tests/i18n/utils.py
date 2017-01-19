@@ -12,7 +12,7 @@ def copytree(src, dst):
     shutil.copytree(src, dst, ignore=shutil.ignore_patterns('*.pyc', '__pycache__'))
 
 
-class POFileAssertionMixin(object):
+class POFileAssertionMixin:
 
     def _assertPoKeyword(self, keyword, expected_value, haystack, use_quotes=True):
         q = '"'
@@ -30,7 +30,7 @@ class POFileAssertionMixin(object):
         return self._assertPoKeyword('msgid', msgid, haystack, use_quotes=use_quotes)
 
 
-class RunInTmpDirMixin(object):
+class RunInTmpDirMixin:
     """
     Allow i18n tests that need to generate .po/.mo files to run in an isolated
     temporary filesystem tree created by tempfile.mkdtemp() that contains a

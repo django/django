@@ -25,7 +25,7 @@ from .settings import TEST_ROOT, TEST_SETTINGS
 from .storage import DummyStorage
 
 
-class TestNoFilesCreated(object):
+class TestNoFilesCreated:
 
     def test_no_files_created(self):
         """

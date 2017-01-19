@@ -100,7 +100,7 @@ class GeoFuncWithGeoParam(GeoFunc):
         super(GeoFuncWithGeoParam, self).__init__(expression, GeomValue(geom), *expressions, **extra)
 
 
-class SQLiteDecimalToFloatMixin(object):
+class SQLiteDecimalToFloatMixin:
     """
     By default, Decimal values are converted to str by the SQLite backend, which
     is not acceptable by the GIS functions expecting numeric values.
@@ -112,7 +112,7 @@ class SQLiteDecimalToFloatMixin(object):
         return super(SQLiteDecimalToFloatMixin, self).as_sql(compiler, connection)
 
 
-class OracleToleranceMixin(object):
+class OracleToleranceMixin:
     tolerance = 0.05
 
     def as_oracle(self, compiler, connection):
@@ -230,7 +230,7 @@ class Difference(OracleToleranceMixin, GeoFuncWithGeoParam):
     arity = 2
 
 
-class DistanceResultMixin(object):
+class DistanceResultMixin:
     def source_is_geography(self):
         return self.get_source_fields()[0].geography and self.srid == 4326
 

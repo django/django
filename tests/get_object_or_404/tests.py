@@ -83,7 +83,7 @@ class GetObjectOr404Tests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             get_object_or_404(str("Article"), title__icontains="Run")
 
-        class CustomClass(object):
+        class CustomClass:
             pass
 
         msg = "First argument to get_object_or_404() must be a Model, Manager, or QuerySet, not 'CustomClass'."

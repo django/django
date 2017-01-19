@@ -3,7 +3,7 @@ from django.db.transaction import atomic
 from .exceptions import IrreversibleError
 
 
-class Migration(object):
+class Migration:
     """
     The base class for all migrations.
 

@@ -8,7 +8,7 @@ import copy
 from django.utils.encoding import force_str, force_text
 
 
-class Node(object):
+class Node:
     """
     A single internal node in the tree graph. A Node should be viewed as a
     connection (the root) with the children being either leaf nodes or other

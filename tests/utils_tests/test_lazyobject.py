@@ -9,7 +9,7 @@ from django.utils.functional import LazyObject, SimpleLazyObject, empty
 from .models import Category, CategoryInfo
 
 
-class Foo(object):
+class Foo:
     """
     A simple class with just one attribute.
     """
@@ -167,7 +167,7 @@ class LazyObjectTestCase(TestCase):
         # Tests whether an object's custom `__iter__` method is being
         # used when iterating over it.
 
-        class IterObject(object):
+        class IterObject:
 
             def __init__(self, values):
                 self.values = values
@@ -356,7 +356,7 @@ class SimpleLazyObjectTestCase(LazyObjectTestCase):
         self.assertEqual(len(lazy_set), 4)
 
 
-class BaseBaz(object):
+class BaseBaz:
     """
     A base class with a funky __reduce__ method, meant to simulate the
     __reduce__ method of Model, which sets self._django_version.

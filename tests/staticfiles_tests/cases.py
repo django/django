@@ -12,7 +12,7 @@ from django.utils.encoding import force_text
 from .settings import TEST_SETTINGS
 
 
-class BaseStaticFilesMixin(object):
+class BaseStaticFilesMixin:
     """
     Test case with a couple utility assertions.
     """
@@ -89,7 +89,7 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
             return f.read()
 
 
-class TestDefaults(object):
+class TestDefaults:
     """
     A few standard test cases.
     """
