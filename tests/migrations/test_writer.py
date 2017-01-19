@@ -7,6 +7,7 @@ import os
 import re
 import sys
 import uuid
+from unittest import mock
 
 import custom_migration_operations.more_operations
 import custom_migration_operations.operations
@@ -18,7 +19,7 @@ from django.db import migrations, models
 from django.db.migrations.writer import (
     MigrationWriter, OperationWriter, SettingsReference,
 )
-from django.test import SimpleTestCase, mock
+from django.test import SimpleTestCase
 from django.utils import datetime_safe
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import SimpleLazyObject

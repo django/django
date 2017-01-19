@@ -1,7 +1,8 @@
 import os
+from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import SimpleTestCase, mock, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.urls import LocaleRegexProvider
 from django.urls.resolvers import LocaleRegexDescriptor
 from django.utils import translation

@@ -3,6 +3,7 @@ import importlib
 import io
 import os
 import sys
+from unittest import mock
 
 from django.apps import apps
 from django.core.management import CommandError, call_command
@@ -14,7 +15,7 @@ from django.db.migrations.exceptions import (
     InconsistentMigrationHistory, MigrationSchemaMissing,
 )
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import mock, override_settings
+from django.test import override_settings
 from django.utils.encoding import force_text
 
 from .models import UnicodeModel, UnserializableModel

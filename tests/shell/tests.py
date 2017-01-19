@@ -1,9 +1,10 @@
 import sys
 import unittest
+from unittest import mock
 
 from django import __version__
 from django.core.management import CommandError, call_command
-from django.test import SimpleTestCase, mock
+from django.test import SimpleTestCase
 from django.test.utils import captured_stdin, captured_stdout, patch_logger
 
 

@@ -1,7 +1,7 @@
 import unittest
+from unittest import mock
 
 from django.contrib.gis.gdal import HAS_GDAL
-from django.test import mock
 
 if HAS_GDAL:
     from django.contrib.gis.gdal import Driver, GDALException

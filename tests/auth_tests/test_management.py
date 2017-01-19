@@ -2,6 +2,7 @@ import builtins
 import sys
 from datetime import date
 from io import StringIO
+from unittest import mock
 
 from django.apps import apps
 from django.contrib.auth import management
@@ -14,7 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import migrations
-from django.test import TestCase, mock, override_settings
+from django.test import TestCase, override_settings
 from django.utils.translation import ugettext_lazy as _
 
 from .models import (

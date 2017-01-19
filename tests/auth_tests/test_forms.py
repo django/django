@@ -1,5 +1,6 @@
 import datetime
 import re
+from unittest import mock
 
 from django import forms
 from django.contrib.auth.forms import (
@@ -13,7 +14,7 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
 from django.forms.fields import CharField, Field, IntegerField
-from django.test import SimpleTestCase, TestCase, mock, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import translation
 from django.utils.encoding import force_text
 from django.utils.text import capfirst

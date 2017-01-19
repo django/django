@@ -1,14 +1,13 @@
 from datetime import datetime
 from io import StringIO
+from unittest import mock
 
 from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
 from django.core.serializers.base import ProgressBar
 from django.db import connection, transaction
 from django.http import HttpResponse
-from django.test import (
-    SimpleTestCase, mock, override_settings, skipUnlessDBFeature,
-)
+from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils.functional import curry
 

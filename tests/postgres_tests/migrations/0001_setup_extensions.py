@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.db import migrations
 
 try:
@@ -6,7 +8,6 @@ try:
         TrigramExtension, UnaccentExtension,
     )
 except ImportError:
-    from django.test import mock
     BtreeGinExtension = mock.Mock()
     CreateExtension = mock.Mock()
     HStoreExtension = mock.Mock()

@@ -1,4 +1,4 @@
-from unittest import skipUnless
+from unittest import mock, skipUnless
 
 from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth.hashers import (
@@ -7,7 +7,7 @@ from django.contrib.auth.hashers import (
     check_password, get_hasher, identify_hasher, is_password_usable,
     make_password,
 )
-from django.test import SimpleTestCase, mock
+from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_bytes
 

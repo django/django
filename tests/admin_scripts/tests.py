@@ -13,6 +13,7 @@ import sys
 import tempfile
 import unittest
 from io import StringIO
+from unittest import mock
 
 import django
 from django import conf, get_version
@@ -24,7 +25,7 @@ from django.db import ConnectionHandler
 from django.db.migrations.exceptions import MigrationSchemaMissing
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import (
-    LiveServerTestCase, SimpleTestCase, TestCase, mock, override_settings,
+    LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
 )
 from django.utils.encoding import force_text
 

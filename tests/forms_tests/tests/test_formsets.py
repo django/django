@@ -1,5 +1,6 @@
 import datetime
 from collections import Counter
+from unittest import mock
 
 from django.forms import (
     BaseForm, CharField, DateField, FileField, Form, IntegerField,
@@ -7,7 +8,7 @@ from django.forms import (
 )
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
-from django.test import SimpleTestCase, mock
+from django.test import SimpleTestCase
 from django.utils.encoding import force_text
 
 

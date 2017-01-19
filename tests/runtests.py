@@ -437,16 +437,6 @@ if __name__ == "__main__":
 
     options = parser.parse_args()
 
-    # mock is a required dependency
-    try:
-        from django.test import mock  # NOQA
-    except ImportError:
-        print(
-            "Please install test dependencies first: \n"
-            "$ pip install -r requirements/py%s.txt" % sys.version_info.major
-        )
-        sys.exit(1)
-
     # Allow including a trailing slash on app_labels for tab completion convenience
     options.modules = [os.path.normpath(labels) for labels in options.modules]
 

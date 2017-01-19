@@ -4,7 +4,7 @@ import pickle
 import random
 from binascii import a2b_hex, b2a_hex
 from io import BytesIO
-from unittest import skipUnless
+from unittest import mock, skipUnless
 
 from django.contrib.gis import gdal
 from django.contrib.gis.gdal import HAS_GDAL
@@ -17,7 +17,7 @@ from django.contrib.gis.geos.libgeos import geos_version_info
 from django.contrib.gis.shortcuts import numpy
 from django.template import Context
 from django.template.engine import Engine
-from django.test import SimpleTestCase, mock
+from django.test import SimpleTestCase
 from django.utils.encoding import force_bytes
 
 from ..test_data import TestDataMixin

@@ -1,9 +1,10 @@
 import unittest
+from unittest import mock
 
 from django.core.checks import Tags, run_checks
 from django.core.checks.registry import CheckRegistry
 from django.db import connection
-from django.test import TestCase, mock
+from django.test import TestCase
 
 
 class DatabaseCheckTests(TestCase):

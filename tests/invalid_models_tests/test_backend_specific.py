@@ -1,6 +1,8 @@
+from unittest import mock
+
 from django.core.checks import Error
 from django.db import connections, models
-from django.test import SimpleTestCase, mock
+from django.test import SimpleTestCase
 from django.test.utils import isolate_apps
 
 

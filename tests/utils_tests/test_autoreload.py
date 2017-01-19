@@ -3,12 +3,13 @@ import os
 import shutil
 import tempfile
 from importlib import import_module
+from unittest import mock
 
 import _thread
 
 from django import conf
 from django.contrib import admin
-from django.test import SimpleTestCase, mock, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import extend_sys_path
 from django.utils import autoreload
 from django.utils.translation import trans_real

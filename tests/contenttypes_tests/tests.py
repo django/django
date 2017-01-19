@@ -1,4 +1,5 @@
 import datetime
+from unittest import mock
 
 from django.apps.registry import Apps, apps
 from django.conf import settings
@@ -12,7 +13,7 @@ from django.core import checks, management
 from django.core.management import call_command
 from django.db import connections, migrations, models
 from django.test import (
-    SimpleTestCase, TestCase, TransactionTestCase, mock, override_settings,
+    SimpleTestCase, TestCase, TransactionTestCase, override_settings,
 )
 from django.test.utils import captured_stdout, isolate_apps
 from django.utils.encoding import force_text

@@ -4,13 +4,13 @@ import struct
 import tempfile
 import unittest
 from io import BytesIO, StringIO, TextIOWrapper
+from unittest import mock
 
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.core.files.move import file_move_safe
 from django.core.files.temp import NamedTemporaryFile
 from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
-from django.test import mock
 
 try:
     from PIL import Image

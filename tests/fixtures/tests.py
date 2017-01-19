@@ -4,6 +4,7 @@ import tempfile
 import unittest
 import warnings
 from io import StringIO
+from unittest import mock
 
 from django.apps import apps
 from django.contrib.sites.models import Site
@@ -13,9 +14,7 @@ from django.core.management import CommandError
 from django.core.management.commands.dumpdata import ProxyModelWarning
 from django.core.serializers.base import ProgressBar
 from django.db import IntegrityError, connection
-from django.test import (
-    TestCase, TransactionTestCase, mock, skipUnlessDBFeature,
-)
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.utils.encoding import force_text
 
 from .models import (

@@ -1,10 +1,10 @@
 import re
 from io import StringIO
-from unittest import skipUnless
+from unittest import mock, skipUnless
 
 from django.core.management import call_command
 from django.db import connection
-from django.test import TestCase, mock, skipUnlessDBFeature
+from django.test import TestCase, skipUnlessDBFeature
 from django.utils.encoding import force_text
 
 from .models import ColumnTypes

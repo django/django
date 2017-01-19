@@ -5,6 +5,7 @@ import shutil
 import tempfile
 import unittest
 from io import StringIO
+from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -13,7 +14,7 @@ from django.contrib.staticfiles import storage
 from django.contrib.staticfiles.management.commands import collectstatic
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
-from django.test import mock, override_settings
+from django.test import override_settings
 from django.test.utils import extend_sys_path
 from django.utils import timezone
 from django.utils._os import symlinks_supported

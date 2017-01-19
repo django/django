@@ -2,6 +2,7 @@
 Tests for django test runner
 """
 import unittest
+from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -10,7 +11,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.test import (
-    TestCase, TransactionTestCase, mock, skipUnlessDBFeature, testcases,
+    TestCase, TransactionTestCase, skipUnlessDBFeature, testcases,
 )
 from django.test.runner import DiscoverRunner
 from django.test.testcases import connections_support_transactions
