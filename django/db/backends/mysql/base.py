@@ -116,8 +116,8 @@ class CursorWrapper:
         return self
 
     def __exit__(self, type, value, traceback):
-        # Ticket #17671 - Close instead of passing thru to avoid backend
-        # specific behavior.
+        # Close instead of passing through to avoid backend-specific behavior
+        # (#17671).
         self.close()
 
 

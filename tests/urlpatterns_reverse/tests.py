@@ -391,7 +391,7 @@ class ResolverTests(SimpleTestCase):
         A Resolver404 is raised if resolving doesn't meet the basic
         requirements of a path to match - i.e., at the very least, it matches
         the root pattern '^/'. Never return None from resolve() to prevent a
-        TypeError from occuring later (#10834).
+        TypeError from occurring later (#10834).
         """
         with self.assertRaises(Resolver404):
             resolve('')

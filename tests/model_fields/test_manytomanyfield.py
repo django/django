@@ -39,19 +39,19 @@ class ManyToManyFieldTests(SimpleTestCase):
     @isolate_apps('model_fields', 'model_fields.tests')
     def test_abstract_model_app_relative_foreign_key(self):
         class AbstractReferent(models.Model):
-            reference = models.ManyToManyField('Refered', through='Through')
+            reference = models.ManyToManyField('Referred', through='Through')
 
             class Meta:
                 app_label = 'model_fields'
                 abstract = True
 
         def assert_app_model_resolved(label):
-            class Refered(models.Model):
+            class Referred(models.Model):
                 class Meta:
                     app_label = label
 
             class Through(models.Model):
-                refered = models.ForeignKey('Refered', on_delete=models.CASCADE)
+                referred = models.ForeignKey('Referred', on_delete=models.CASCADE)
                 referent = models.ForeignKey('ConcreteReferent', on_delete=models.CASCADE)
 
                 class Meta:
@@ -61,7 +61,7 @@ class ManyToManyFieldTests(SimpleTestCase):
                 class Meta:
                     app_label = label
 
-            self.assertEqual(ConcreteReferent._meta.get_field('reference').related_model, Refered)
+            self.assertEqual(ConcreteReferent._meta.get_field('reference').related_model, Referred)
             self.assertEqual(ConcreteReferent.reference.through, Through)
 
         assert_app_model_resolved('model_fields')
