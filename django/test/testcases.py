@@ -84,7 +84,7 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
         )
 
 
-class _AssertTemplateUsedContext(object):
+class _AssertTemplateUsedContext:
     def __init__(self, test_case, template_name):
         self.test_case = test_case
         self.template_name = template_name
@@ -130,7 +130,7 @@ class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
         return '%s was rendered.' % self.template_name
 
 
-class _CursorFailure(object):
+class _CursorFailure:
     def __init__(self, cls_name, wrapped):
         self.cls_name = cls_name
         self.wrapped = wrapped
@@ -1047,7 +1047,7 @@ class TestCase(TransactionTestCase):
         )
 
 
-class CheckCondition(object):
+class CheckCondition:
     """Descriptor class for deferred condition checking"""
     def __init__(self, *conditions):
         self.conditions = conditions
@@ -1334,7 +1334,7 @@ class LiveServerTestCase(TransactionTestCase):
         super(LiveServerTestCase, cls).tearDownClass()
 
 
-class SerializeMixin(object):
+class SerializeMixin:
     """
     Mixin to enforce serialization of TestCases that share a common resource.
 

@@ -1,7 +1,7 @@
 from django.contrib.gis.gdal.error import GDALException
 
 
-class OGRGeomType(object):
+class OGRGeomType:
     "Encapsulates OGR Geometry Types."
 
     wkb25bit = -2147483648

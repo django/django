@@ -13,7 +13,7 @@ def normalize_whitespace(string):
     return WHITESPACE.sub(' ', string)
 
 
-class Element(object):
+class Element:
     def __init__(self, name, attributes):
         self.name = name
         self.attributes = sorted(attributes)

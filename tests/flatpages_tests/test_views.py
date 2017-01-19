@@ -7,7 +7,7 @@ from django.test import TestCase, modify_settings, override_settings
 from .settings import FLATPAGES_TEMPLATES
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):

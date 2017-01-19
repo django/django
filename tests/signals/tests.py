@@ -122,7 +122,7 @@ class SignalTests(BaseSignalTest):
             )
 
         # #8285: signals can be any callable
-        class PostDeleteHandler(object):
+        class PostDeleteHandler:
             def __init__(self, data):
                 self.data = data
 
@@ -247,7 +247,7 @@ class SignalTests(BaseSignalTest):
         dispatching.
         """
 
-        class Handler(object):
+        class Handler:
             def __init__(self, param):
                 self.param = param
                 self._run = False

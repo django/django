@@ -312,7 +312,7 @@ class UserSiteForm(forms.ModelForm):
         localized_fields = ('data',)
 
 
-class Callback(object):
+class Callback:
 
     def __init__(self):
         self.log = []

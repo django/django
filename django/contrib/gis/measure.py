@@ -49,7 +49,7 @@ def pretty_name(obj):
 
 
 @total_ordering
-class MeasureBase(object):
+class MeasureBase:
     STANDARD_UNIT = None
     ALIAS = {}
     UNITS = {}

@@ -17,7 +17,7 @@ from django.utils.encoding import force_text
 from .models import SimpleModel, my_check
 
 
-class DummyObj(object):
+class DummyObj:
     def __repr__(self):
         return "obj"
 

@@ -15,7 +15,7 @@ class ArticleTranslationDescriptor(ForwardManyToOneDescriptor):
             setattr(value, self.field.related.get_cache_name(), instance)
 
 
-class ColConstraint(object):
+class ColConstraint:
     # Anything with as_sql() method works in get_extra_restriction().
     def __init__(self, alias, col, value):
         self.alias, self.col, self.value = alias, col, value

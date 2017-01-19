@@ -4,7 +4,7 @@ from django.forms import ClearableFileInput
 from .base import WidgetTest
 
 
-class FakeFieldFile(object):
+class FakeFieldFile:
     """
     Quacks like a FieldFile (has a .url and unicode representation), but
     doesn't require us to care about storages etc.
@@ -37,7 +37,7 @@ class ClearableFileInputTest(WidgetTest):
         A ClearableFileInput should escape name, filename, and URL
         when rendering HTML (#15182).
         """
-        class StrangeFieldFile(object):
+        class StrangeFieldFile:
             url = "something?chapter=1&sect=2&copy=3&lang=en"
 
             def __str__(self):
@@ -107,7 +107,7 @@ class ClearableFileInputTest(WidgetTest):
         A ClearableFileInput should not mask exceptions produced while
         checking that it has a value.
         """
-        class FailingURLFieldFile(object):
+        class FailingURLFieldFile:
             @property
             def url(self):
                 raise ValueError('Canary')
@@ -119,7 +119,7 @@ class ClearableFileInputTest(WidgetTest):
             self.widget.render('myfile', FailingURLFieldFile())
 
     def test_url_as_property(self):
-        class URLFieldFile(object):
+        class URLFieldFile:
             @property
             def url(self):
                 return 'https://www.python.org/'
@@ -131,7 +131,7 @@ class ClearableFileInputTest(WidgetTest):
         self.assertInHTML('<a href="https://www.python.org/">value</a>', html)
 
     def test_return_false_if_url_does_not_exists(self):
-        class NoURLFieldFile(object):
+        class NoURLFieldFile:
             def __str__(self):
                 return 'value'
 

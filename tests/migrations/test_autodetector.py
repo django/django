@@ -17,7 +17,7 @@ from django.test.utils import isolate_lru_cache
 from .models import FoodManager, FoodQuerySet
 
 
-class DeconstructibleObject(object):
+class DeconstructibleObject:
     """
     A custom deconstructible object.
     """

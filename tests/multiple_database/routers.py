@@ -1,7 +1,7 @@
 from django.db import DEFAULT_DB_ALIAS
 
 
-class TestRouter(object):
+class TestRouter:
     """
     Vaguely behave like primary/replica, but the databases aren't assumed to
     propagate changes.
@@ -22,7 +22,7 @@ class TestRouter(object):
         return True
 
 
-class AuthRouter(object):
+class AuthRouter:
     """
     Control all database operations on models in the contrib.auth application.
     """
@@ -54,7 +54,7 @@ class AuthRouter(object):
         return None
 
 
-class WriteRouter(object):
+class WriteRouter:
     # A router that only expresses an opinion on writes
     def db_for_write(self, model, **hints):
         return 'writer'

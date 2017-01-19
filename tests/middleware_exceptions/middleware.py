@@ -5,7 +5,7 @@ from django.template.response import TemplateResponse
 log = []
 
 
-class BaseMiddleware(object):
+class BaseMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 

@@ -100,7 +100,7 @@ class Score(models.Model):
     score = models.FloatField()
 
 
-class Team(object):
+class Team:
     def __init__(self, title):
         self.title = title
 

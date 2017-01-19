@@ -4,7 +4,7 @@ import string
 from django.db import models
 
 
-class MyWrapper(object):
+class MyWrapper:
     def __init__(self, value):
         self.value = value
 

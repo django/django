@@ -12,7 +12,7 @@ class CallableVariablesTests(TestCase):
 
     def test_callable(self):
 
-        class Doodad(object):
+        class Doodad:
             def __init__(self, value):
                 self.num_calls = 0
                 self.value = value
@@ -41,7 +41,7 @@ class CallableVariablesTests(TestCase):
 
     def test_alters_data(self):
 
-        class Doodad(object):
+        class Doodad:
             alters_data = True
 
             def __init__(self, value):
@@ -68,7 +68,7 @@ class CallableVariablesTests(TestCase):
 
     def test_do_not_call(self):
 
-        class Doodad(object):
+        class Doodad:
             do_not_call_in_templates = True
 
             def __init__(self, value):
@@ -100,7 +100,7 @@ class CallableVariablesTests(TestCase):
         # ``alters_data`` attribute will not make any difference in the
         # template system's behavior.
 
-        class Doodad(object):
+        class Doodad:
             do_not_call_in_templates = True
             alters_data = True
 

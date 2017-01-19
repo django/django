@@ -223,7 +223,7 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
         MIMEMultipart.__setitem__(self, name, val)
 
 
-class EmailMessage(object):
+class EmailMessage:
     """
     A container for email information.
     """

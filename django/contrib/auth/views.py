@@ -31,7 +31,7 @@ from django.views.generic.edit import FormView
 UserModel = get_user_model()
 
 
-class SuccessURLAllowedHostsMixin(object):
+class SuccessURLAllowedHostsMixin:
     success_url_allowed_hosts = set()
 
     def get_success_url_allowed_hosts(self):
@@ -352,7 +352,7 @@ def password_reset_complete(request,
 #   prompts for a new password
 # - PasswordResetCompleteView shows a success message for the above
 
-class PasswordContextMixin(object):
+class PasswordContextMixin:
     extra_context = None
 
     def get_context_data(self, **kwargs):

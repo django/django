@@ -26,7 +26,7 @@ class FeedDoesNotExist(ObjectDoesNotExist):
     pass
 
 
-class Feed(object):
+class Feed:
     feed_type = feedgenerator.DefaultFeed
     title_template = None
     description_template = None

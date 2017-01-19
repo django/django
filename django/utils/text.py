@@ -291,7 +291,7 @@ def compress_string(s):
     return zbuf.getvalue()
 
 
-class StreamingBuffer(object):
+class StreamingBuffer:
     def __init__(self):
         self.vals = []
 

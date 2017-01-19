@@ -23,7 +23,7 @@ except ImproperlyConfigured as e:
 
 
 if HAS_POSTGRES:
-    class FakeConnection(object):
+    class FakeConnection:
         def __init__(self):
             self.settings_dict = {
                 'NAME': 'test',

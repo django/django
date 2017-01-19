@@ -26,7 +26,7 @@ from .models import (
 from .widgetadmin import site as widget_admin_site
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):

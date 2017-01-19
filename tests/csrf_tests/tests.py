@@ -35,7 +35,7 @@ class TestingHttpRequest(HttpRequest):
         return getattr(self, '_is_secure_override', False)
 
 
-class CsrfViewMiddlewareTestMixin(object):
+class CsrfViewMiddlewareTestMixin:
     """
     Shared methods and tests for session-based and cookie-based tokens.
     """

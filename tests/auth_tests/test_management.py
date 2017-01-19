@@ -62,7 +62,7 @@ def mock_inputs(inputs):
     return inner
 
 
-class MockTTY(object):
+class MockTTY:
     """
     A fake stdin object that pretends to be a TTY to be used in conjunction
     with mock_inputs.
@@ -329,7 +329,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         If the command is not called from a TTY, it should be skipped and a
         message should be displayed (#7423).
         """
-        class FakeStdin(object):
+        class FakeStdin:
             """A fake stdin object that has isatty() return False."""
             def isatty(self):
                 return False

@@ -18,7 +18,7 @@ except ImportError:
 YAML_IMPORT_ERROR_MESSAGE = r'No module named yaml'
 
 
-class YamlImportModuleMock(object):
+class YamlImportModuleMock:
     """Provides a wrapped import_module function to simulate yaml ImportError
 
     In order to run tests that verify the behavior of the YAML serializer

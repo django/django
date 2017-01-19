@@ -34,7 +34,7 @@ def subclasses(cls):
             yield item
 
 
-class QueryWrapper(object):
+class QueryWrapper:
     """
     A type that indicates the contents are an SQL fragment and the associate
     parameters. Can be used to pass opaque data to a where-clause, for example.
@@ -90,7 +90,7 @@ class Q(tree.Node):
         return clause
 
 
-class DeferredAttribute(object):
+class DeferredAttribute:
     """
     A wrapper for a deferred-loading field. When the value is read from this
     object the first time, the query is executed.
@@ -130,7 +130,7 @@ class DeferredAttribute(object):
         return None
 
 
-class RegisterLookupMixin(object):
+class RegisterLookupMixin:
 
     @classmethod
     def _get_lookup(cls, lookup_name):

@@ -5,7 +5,7 @@ from django.test import RequestFactory, SimpleTestCase
 from django.utils.decorators import classproperty, decorator_from_middleware
 
 
-class ProcessViewMiddleware(object):
+class ProcessViewMiddleware:
     def process_view(self, request, view_func, view_args, view_kwargs):
         pass
 
@@ -18,7 +18,7 @@ def process_view(request):
     return HttpResponse()
 
 
-class ClassProcessView(object):
+class ClassProcessView:
     def __call__(self, request):
         return HttpResponse()
 
@@ -26,7 +26,7 @@ class ClassProcessView(object):
 class_process_view = process_view_dec(ClassProcessView())
 
 
-class FullMiddleware(object):
+class FullMiddleware:
     def process_request(self, request):
         request.process_request_reached = True
 
@@ -112,7 +112,7 @@ class DecoratorFromMiddlewareTests(SimpleTestCase):
 
 class ClassPropertyTest(SimpleTestCase):
     def test_getter(self):
-        class Foo(object):
+        class Foo:
             foo_attr = 123
 
             def __init__(self):
@@ -122,7 +122,7 @@ class ClassPropertyTest(SimpleTestCase):
             def foo(cls):
                 return cls.foo_attr
 
-        class Bar(object):
+        class Bar:
             bar = classproperty()
 
             @bar.getter
@@ -135,7 +135,7 @@ class ClassPropertyTest(SimpleTestCase):
         self.assertEqual(Bar().bar, 123)
 
     def test_override_getter(self):
-        class Foo(object):
+        class Foo:
             @classproperty
             def foo(cls):
                 return 123

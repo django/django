@@ -47,7 +47,7 @@ class StaticFilesStorage(FileSystemStorage):
         return super(StaticFilesStorage, self).path(name)
 
 
-class HashedFilesMixin(object):
+class HashedFilesMixin:
     default_template = """url("%s")"""
     max_post_process_passes = 5
     patterns = (
@@ -434,7 +434,7 @@ class ManifestFilesMixin(HashedFilesMixin):
         return urlunsplit(unparsed_name)
 
 
-class _MappingCache(object):
+class _MappingCache:
     """
     A small dict-like wrapper for a given cache backend instance.
     """

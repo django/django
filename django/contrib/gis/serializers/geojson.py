@@ -65,6 +65,6 @@ class Serializer(JSONSerializer):
             super(Serializer, self).handle_field(obj, field)
 
 
-class Deserializer(object):
+class Deserializer:
     def __init__(self, *args, **kwargs):
         raise SerializerDoesNotExist("geojson is a serialization-only serializer")

@@ -248,7 +248,7 @@ class UpdateView(SingleObjectTemplateResponseMixin, BaseUpdateView):
     template_name_suffix = '_form'
 
 
-class DeletionMixin(object):
+class DeletionMixin:
     """
     A mixin providing the ability to delete objects
     """

@@ -42,7 +42,7 @@ __all__ = (
 TZ_SUPPORT = hasattr(time, 'tzset')
 
 
-class Approximate(object):
+class Approximate:
     def __init__(self, val, places=7):
         self.val = val
         self.places = places
@@ -102,7 +102,7 @@ def instrumented_test_render(self, context):
     return self.nodelist.render(context)
 
 
-class _TestState(object):
+class _TestState:
     pass
 
 
@@ -322,7 +322,7 @@ def get_runner(settings, test_runner_class=None):
     return test_runner
 
 
-class TestContextDecorator(object):
+class TestContextDecorator:
     """
     A base class that can either be used as a context manager during tests
     or as a test function or unittest.TestCase subclass decorator to perform
@@ -613,7 +613,7 @@ def str_prefix(s):
     return s % {'_': ''}
 
 
-class CaptureQueriesContext(object):
+class CaptureQueriesContext:
     """
     Context manager that captures queries executed by the specified connection.
     """
@@ -832,7 +832,7 @@ class override_script_prefix(TestContextDecorator):
         set_script_prefix(self.old_prefix)
 
 
-class LoggingCaptureMixin(object):
+class LoggingCaptureMixin:
     """
     Capture the output from the 'django' logger and store it on the class's
     logger_output attribute.

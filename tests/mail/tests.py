@@ -30,7 +30,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.translation import ugettext_lazy
 
 
-class HeadersCheckMixin(object):
+class HeadersCheckMixin:
 
     def assertMessageHasHeaders(self, message, headers):
         """
@@ -708,7 +708,7 @@ class PythonGlobalState(SimpleTestCase):
         self.assertIn(str('Content-Transfer-Encoding: base64'), txt.as_string())
 
 
-class BaseEmailBackendTests(HeadersCheckMixin, object):
+class BaseEmailBackendTests(HeadersCheckMixin):
     email_backend = None
 
     def setUp(self):

@@ -26,7 +26,7 @@ class NotRegistered(Exception):
     pass
 
 
-class AdminSite(object):
+class AdminSite:
     """
     An AdminSite object encapsulates an instance of the Django admin application, ready
     to be hooked in to your URLconf. Models are registered with the AdminSite using the

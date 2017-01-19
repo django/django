@@ -12,7 +12,7 @@ from functools import total_ordering
 
 
 @total_ordering
-class ListMixin(object):
+class ListMixin:
     """
     A base class which provides complete list interface.
     Derived classes must call ListMixin's __init__() function

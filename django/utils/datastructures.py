@@ -2,7 +2,7 @@ import copy
 from collections import OrderedDict
 
 
-class OrderedSet(object):
+class OrderedSet:
     """
     A set which keeps the ordering of the inserted items.
     Currently backs onto OrderedDict.

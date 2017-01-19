@@ -60,7 +60,7 @@ def get_candidate_relations_to_delete(opts):
     )
 
 
-class Collector(object):
+class Collector:
     def __init__(self, using):
         self.using = using
         # Initially, {model: {instances}}, later values become lists.

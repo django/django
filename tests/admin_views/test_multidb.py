@@ -8,7 +8,7 @@ from django.urls import reverse
 from .models import Book
 
 
-class Router(object):
+class Router:
     target_db = None
 
     def db_for_read(self, model, **hints):

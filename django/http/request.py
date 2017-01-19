@@ -36,7 +36,7 @@ class RawPostDataException(Exception):
     pass
 
 
-class HttpRequest(object):
+class HttpRequest:
     """A basic HTTP request."""
 
     # The encoding used in GET/POST dicts. None means use default setting.

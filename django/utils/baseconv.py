@@ -45,7 +45,7 @@ BASE62_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy
 BASE64_ALPHABET = BASE62_ALPHABET + '-_'
 
 
-class BaseConverter(object):
+class BaseConverter:
     decimal_digits = '0123456789'
 
     def __init__(self, digits, sign='-'):

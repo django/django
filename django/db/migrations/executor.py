@@ -7,7 +7,7 @@ from .recorder import MigrationRecorder
 from .state import ProjectState
 
 
-class MigrationExecutor(object):
+class MigrationExecutor:
     """
     End-to-end migration execution - loads migrations, and runs them
     up or down to a specified set of targets.

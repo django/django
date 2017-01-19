@@ -9,7 +9,7 @@ from django.utils import datetime_safe, timezone
 from .loader import MigrationLoader
 
 
-class MigrationQuestioner(object):
+class MigrationQuestioner:
     """
     Gives the autodetector responses to questions it might have.
     This base class has a built-in noninteractive mode, but the

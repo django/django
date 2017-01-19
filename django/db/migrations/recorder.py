@@ -6,7 +6,7 @@ from django.utils.timezone import now
 from .exceptions import MigrationSchemaMissing
 
 
-class MigrationRecorder(object):
+class MigrationRecorder:
     """
     Deals with storing migration records in the database.
 

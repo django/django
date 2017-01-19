@@ -9,7 +9,7 @@ class BasicFieldsTests(SimpleTestCase):
         self.assertFalse(Field(required=False).widget.is_required)
 
     def test_cooperative_multiple_inheritance(self):
-        class A(object):
+        class A:
             def __init__(self):
                 self.class_a_var = True
                 super(A, self).__init__()

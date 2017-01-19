@@ -118,7 +118,7 @@ class KeyTextTransform(KeyTransform):
     _output_field = TextField()
 
 
-class KeyTransformTextLookupMixin(object):
+class KeyTransformTextLookupMixin:
     """
     Mixin for combining with a lookup expecting a text lhs from a JSONField
     key lookup. Make use of the ->> operator instead of casting key values to
@@ -174,7 +174,7 @@ KeyTransform.register_lookup(KeyTransformRegex)
 KeyTransform.register_lookup(KeyTransformIRegex)
 
 
-class KeyTransformFactory(object):
+class KeyTransformFactory:
 
     def __init__(self, key_name):
         self.key_name = key_name

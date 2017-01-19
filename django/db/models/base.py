@@ -33,7 +33,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.version import get_version
 
 
-class Deferred(object):
+class Deferred:
     def __repr__(self):
         return str('<Deferred field>')
 
@@ -371,7 +371,7 @@ class ModelBase(type):
         return cls._meta.default_manager
 
 
-class ModelState(object):
+class ModelState:
     """
     A class for storing instance state
     """

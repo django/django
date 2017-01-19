@@ -413,7 +413,7 @@ class AtomicMiscTests(TransactionTestCase):
     def test_wrap_callable_instance(self):
         """#20028 -- Atomic must support wrapping callable instances."""
 
-        class Callable(object):
+        class Callable:
             def __call__(self):
                 pass
 

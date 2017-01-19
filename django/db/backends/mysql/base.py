@@ -69,7 +69,7 @@ server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 # standard backend_utils.CursorDebugWrapper can be used. Also, using sql_mode
 # TRADITIONAL will automatically cause most warnings to be treated as errors.
 
-class CursorWrapper(object):
+class CursorWrapper:
     """
     A thin wrapper around MySQLdb's normal cursor class so that we can catch
     particular exception instances and reraise them with the right types.

@@ -87,7 +87,7 @@ class FunctionTests(SimpleTestCase):
         )
 
     def test_ulitem(self):
-        class ULItem(object):
+        class ULItem:
             def __init__(self, title):
                 self.title = title
 
@@ -113,7 +113,7 @@ class FunctionTests(SimpleTestCase):
         )
 
     def test_ulitem_autoescape_off(self):
-        class ULItem(object):
+        class ULItem:
             def __init__(self, title):
                 self.title = title
 

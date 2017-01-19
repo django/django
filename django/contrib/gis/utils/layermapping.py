@@ -45,7 +45,7 @@ class MissingForeignKey(LayerMapError):
     pass
 
 
-class LayerMapping(object):
+class LayerMapping:
     "A class that maps OGR Layers to GeoDjango Models."
 
     # Acceptable 'base' types for a multi-geometry type.

@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 
-class TimezoneMixin(object):
+class TimezoneMixin:
     tzinfo = None
 
     def get_tzname(self):

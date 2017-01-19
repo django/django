@@ -8,7 +8,7 @@ ERROR = 40
 CRITICAL = 50
 
 
-class CheckMessage(object):
+class CheckMessage:
 
     def __init__(self, level, msg, hint=None, obj=None, id=None):
         assert isinstance(level, int), "The first argument should be level."

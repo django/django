@@ -21,7 +21,7 @@ from django.utils.functional import cached_property
 NO_DB_ALIAS = '__no_db__'
 
 
-class BaseDatabaseWrapper(object):
+class BaseDatabaseWrapper:
     """
     Represents a database connection.
     """

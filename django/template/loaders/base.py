@@ -1,7 +1,7 @@
 from django.template import Template, TemplateDoesNotExist
 
 
-class Loader(object):
+class Loader:
 
     def __init__(self, engine):
         self.engine = engine

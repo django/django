@@ -11,7 +11,7 @@ from django.db import router
 TEST_DATABASE_PREFIX = 'test_'
 
 
-class BaseDatabaseCreation(object):
+class BaseDatabaseCreation:
     """
     This class encapsulates all backend-specific differences that pertain to
     creation and destruction of the test database.

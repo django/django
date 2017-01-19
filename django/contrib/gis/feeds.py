@@ -2,7 +2,7 @@ from django.contrib.syndication.views import Feed as BaseFeed
 from django.utils.feedgenerator import Atom1Feed, Rss201rev2Feed
 
 
-class GeoFeedMixin(object):
+class GeoFeedMixin:
     """
     This mixin provides the necessary routines for SyndicationFeed subclasses
     to produce simple GeoRSS or W3C Geo elements.

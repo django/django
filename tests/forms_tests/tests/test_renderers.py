@@ -13,7 +13,7 @@ except ImportError:
     jinja2 = None
 
 
-class SharedTests(object):
+class SharedTests:
     expected_widget_dir = 'templates'
 
     def test_installed_apps_template_found(self):

@@ -19,7 +19,7 @@ ISO_8859_1, UTF_8 = str('iso-8859-1'), str('utf-8')
 _slashes_re = re.compile(br'/+')
 
 
-class LimitedStream(object):
+class LimitedStream:
     '''
     LimitedStream wraps another stream in order to not allow reading from it
     past specified amount of bytes.

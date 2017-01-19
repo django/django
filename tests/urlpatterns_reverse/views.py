@@ -35,7 +35,7 @@ def pass_resolver_match_view(request, *args, **kwargs):
 uncallable = None  # neither a callable nor a string
 
 
-class ViewClass(object):
+class ViewClass:
     def __call__(self, request, *args, **kwargs):
         return HttpResponse('')
 

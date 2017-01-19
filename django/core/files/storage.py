@@ -20,7 +20,7 @@ from django.utils.text import get_valid_filename
 __all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
 
 
-class Storage(object):
+class Storage:
     """
     A base storage class, providing some default behaviors that all other
     storage systems can inherit or override, as necessary.

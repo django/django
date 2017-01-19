@@ -139,7 +139,7 @@ def get_pointer_arr(n):
 lgeos = SimpleLazyObject(load_geos)
 
 
-class GEOSFuncFactory(object):
+class GEOSFuncFactory:
     """
     Lazy loading of GEOS functions.
     """

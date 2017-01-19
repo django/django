@@ -264,7 +264,7 @@ class IndexTransform(Transform):
         return self.base_field
 
 
-class IndexTransformFactory(object):
+class IndexTransformFactory:
 
     def __init__(self, index, base_field):
         self.index = index
@@ -286,7 +286,7 @@ class SliceTransform(Transform):
         return '%s[%s:%s]' % (lhs, self.start, self.end), params
 
 
-class SliceTransformFactory(object):
+class SliceTransformFactory:
 
     def __init__(self, start, end):
         self.start = start

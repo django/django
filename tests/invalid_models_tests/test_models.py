@@ -910,7 +910,7 @@ class OtherModelTests(SimpleTestCase):
             class Meta:
                 app_label = 'invalid_models_tests'
 
-        class DummyClass(object):
+        class DummyClass:
             def __call__(self, **kwargs):
                 pass
 

@@ -23,7 +23,7 @@ def get_default_renderer():
     return renderer_class()
 
 
-class BaseRenderer(object):
+class BaseRenderer:
     def get_template(self, template_name):
         raise NotImplementedError('subclasses must implement get_template()')
 
@@ -32,7 +32,7 @@ class BaseRenderer(object):
         return template.render(context, request=request).strip()
 
 
-class EngineMixin(object):
+class EngineMixin:
     def get_template(self, template_name):
         return self.engine.get_template(template_name)
 

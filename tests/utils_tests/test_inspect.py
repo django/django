@@ -3,7 +3,7 @@ import unittest
 from django.utils import inspect
 
 
-class Person(object):
+class Person:
     def no_arguments(self):
         return None
 

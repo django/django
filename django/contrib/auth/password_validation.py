@@ -90,7 +90,7 @@ def _password_validators_help_text_html(password_validators=None):
 password_validators_help_text_html = lazy(_password_validators_help_text_html, str)
 
 
-class MinimumLengthValidator(object):
+class MinimumLengthValidator:
     """
     Validate whether the password is of a minimum length.
     """
@@ -117,7 +117,7 @@ class MinimumLengthValidator(object):
         ) % {'min_length': self.min_length}
 
 
-class UserAttributeSimilarityValidator(object):
+class UserAttributeSimilarityValidator:
     """
     Validate whether the password is sufficiently different from the user's
     attributes.
@@ -159,7 +159,7 @@ class UserAttributeSimilarityValidator(object):
         return _("Your password can't be too similar to your other personal information.")
 
 
-class CommonPasswordValidator(object):
+class CommonPasswordValidator:
     """
     Validate whether the password is a common password.
 
@@ -192,7 +192,7 @@ class CommonPasswordValidator(object):
         return _("Your password can't be a commonly used password.")
 
 
-class NumericPasswordValidator(object):
+class NumericPasswordValidator:
     """
     Validate whether the password is alphanumeric.
     """

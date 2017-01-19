@@ -14,11 +14,11 @@ from django.test import SimpleTestCase, TestCase
 from .models import Band, Concert
 
 
-class MockRequest(object):
+class MockRequest:
     pass
 
 
-class MockSuperUser(object):
+class MockSuperUser:
     def has_perm(self, perm):
         return True
 
@@ -589,7 +589,7 @@ class ModelAdminTests(TestCase):
 
 class ModelAdminPermissionTests(SimpleTestCase):
 
-    class MockUser(object):
+    class MockUser:
         def has_module_perms(self, app_label):
             if app_label == "modeladmin":
                 return True

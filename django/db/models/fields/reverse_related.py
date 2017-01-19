@@ -16,7 +16,7 @@ from django.utils.functional import cached_property
 from . import BLANK_CHOICE_DASH
 
 
-class ForeignObjectRel(object):
+class ForeignObjectRel:
     """
     Used by ForeignObject to store information about the relation.
 

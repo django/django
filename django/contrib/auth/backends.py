@@ -4,7 +4,7 @@ from django.contrib.auth.models import Permission
 UserModel = get_user_model()
 
 
-class ModelBackend(object):
+class ModelBackend:
     """
     Authenticates against settings.AUTH_USER_MODEL.
     """

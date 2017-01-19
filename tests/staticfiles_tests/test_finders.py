@@ -9,7 +9,7 @@ from .cases import StaticFilesTestCase
 from .settings import TEST_ROOT
 
 
-class TestFinders(object):
+class TestFinders:
     """
     Base finder test mixin.
 

@@ -26,7 +26,7 @@ re_formatchars = re.compile(r'(?<!\\)([aAbBcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ]
 re_escaped = re.compile(r'\\(.)')
 
 
-class Formatter(object):
+class Formatter:
     def format(self, formatstr):
         pieces = []
         for i, piece in enumerate(re_formatchars.split(force_text(formatstr))):

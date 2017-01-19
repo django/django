@@ -372,7 +372,7 @@ class User(AbstractUser):
         swappable = 'AUTH_USER_MODEL'
 
 
-class AnonymousUser(object):
+class AnonymousUser:
     id = None
     pk = None
     username = ''

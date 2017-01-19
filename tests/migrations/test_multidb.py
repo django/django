@@ -12,7 +12,7 @@ except ImportError:
     sqlparse = None
 
 
-class AgnosticRouter(object):
+class AgnosticRouter:
     """
     A router that doesn't have an opinion regarding migrating.
     """
@@ -20,7 +20,7 @@ class AgnosticRouter(object):
         return None
 
 
-class MigrateNothingRouter(object):
+class MigrateNothingRouter:
     """
     A router that doesn't allow migrating.
     """
@@ -28,7 +28,7 @@ class MigrateNothingRouter(object):
         return False
 
 
-class MigrateEverythingRouter(object):
+class MigrateEverythingRouter:
     """
     A router that always allows migrating.
     """
@@ -36,7 +36,7 @@ class MigrateEverythingRouter(object):
         return True
 
 
-class MigrateWhenFooRouter(object):
+class MigrateWhenFooRouter:
     """
     A router that allows migrating depending on a hint.
     """

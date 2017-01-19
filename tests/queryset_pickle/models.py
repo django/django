@@ -8,7 +8,7 @@ def standalone_number():
     return 1
 
 
-class Numbers(object):
+class Numbers:
     @staticmethod
     def get_static_number():
         return 2
@@ -47,7 +47,7 @@ class Happening(models.Model):
     number2 = models.IntegerField(blank=True, default=Numbers.get_static_number)
 
 
-class Container(object):
+class Container:
     # To test pickling we need a class that isn't defined on module, but
     # is still available from app-cache. So, the Container class moves
     # SomeModel outside of module level

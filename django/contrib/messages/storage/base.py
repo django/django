@@ -5,7 +5,7 @@ from django.utils.encoding import force_text
 LEVEL_TAGS = utils.get_level_tags()
 
 
-class Message(object):
+class Message:
     """
     Represents an actual message that can be stored in any of the supported
     storage classes (typically session- or cookie-based) and rendered in a view
@@ -51,7 +51,7 @@ class Message(object):
         return force_text(LEVEL_TAGS.get(self.level, ''), strings_only=True)
 
 
-class BaseStorage(object):
+class BaseStorage:
     """
     This is the base backend for temporary message storage.
 

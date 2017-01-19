@@ -234,7 +234,7 @@ class PostgreSQLTests(TestCase):
         """Test PostgreSQL version detection"""
 
         # Helper mocks
-        class CursorMock(object):
+        class CursorMock:
             "Very simple mock of DB-API cursor"
             def execute(self, arg):
                 pass
@@ -248,7 +248,7 @@ class PostgreSQLTests(TestCase):
             def __exit__(self, type, value, traceback):
                 pass
 
-        class OlderConnectionMock(object):
+        class OlderConnectionMock:
             "Mock of psycopg2 (< 2.0.12) connection"
             def cursor(self):
                 return CursorMock()

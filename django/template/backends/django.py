@@ -47,7 +47,7 @@ class DjangoTemplates(BaseEngine):
         return libraries
 
 
-class Template(object):
+class Template:
 
     def __init__(self, template, backend):
         self.template = template

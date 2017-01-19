@@ -65,7 +65,7 @@ ERROR_MESSAGE = "Please enter the correct username and password \
 for a staff account. Note that both fields may be case-sensitive."
 
 
-class AdminFieldExtractionMixin(object):
+class AdminFieldExtractionMixin:
     """
     Helper methods for extracting data from AdminForm.
     """

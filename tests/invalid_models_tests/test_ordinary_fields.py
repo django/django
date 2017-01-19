@@ -155,7 +155,7 @@ class CharFieldTests(TestCase):
         self.assertEqual(errors, expected)
 
     def test_iterable_of_iterable_choices(self):
-        class ThingItem(object):
+        class ThingItem:
             def __init__(self, value, display):
                 self.value = value
                 self.display = display
@@ -166,7 +166,7 @@ class CharFieldTests(TestCase):
             def __len__(self):
                 return 2
 
-        class Things(object):
+        class Things:
             def __iter__(self):
                 return (x for x in [ThingItem(1, 2), ThingItem(3, 4)])
 

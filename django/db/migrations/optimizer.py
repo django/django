@@ -1,4 +1,4 @@
-class MigrationOptimizer(object):
+class MigrationOptimizer:
     """
     Powers the optimization process, where you provide a list of Operations
     and you are returned a list of equal or shorter length - operations
