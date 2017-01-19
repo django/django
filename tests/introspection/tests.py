@@ -3,8 +3,6 @@ from unittest import skipUnless
 from django.db import connection
 from django.db.utils import DatabaseError
 from django.test import TransactionTestCase, mock, skipUnlessDBFeature
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango21Warning
 
 from .models import Article, ArticleReporter, City, District, Reporter
 
@@ -168,19 +166,23 @@ class IntrospectionTests(TransactionTestCase):
         self.assertEqual(primary_key_column, 'id')
         self.assertEqual(pk_fk_column, 'city_id')
 
-    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_get_indexes(self):
         with connection.cursor() as cursor:
-            indexes = connection.introspection.get_indexes(cursor, Article._meta.db_table)
-        self.assertEqual(indexes['reporter_id'], {'unique': False, 'primary_key': False})
+            indexes = connection.introspection.get_constraints(cursor, Article._meta.db_table).values()
+        index = next(c for c in indexes if c['index'] and c['columns'] == ['reporter_id'])
+        self.assertFalse(index['unique'])
+        self.assertFalse(index['primary_key'])
 
-    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_get_indexes_multicol(self):
         """
         Multicolumn indexes are not included in the introspection results.
         """
         with connection.cursor() as cursor:
-            indexes = connection.introspection.get_indexes(cursor, Reporter._meta.db_table)
+            indexes = [
+                c['columns'][0]
+                for c in connection.introspection.get_constraints(cursor, Reporter._meta.db_table).values()
+                if c['index'] and len(c['columns']) == 1
+            ]
         self.assertNotIn('first_name', indexes)
         self.assertIn('id', indexes)
 
