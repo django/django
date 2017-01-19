@@ -421,10 +421,7 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
     # Save the object into the database. You have to call save() explicitly.
     >>> q.save()
 
-    # Now it has an ID. Note that this might say "1L" instead of "1", depending
-    # on which database you're using. That's no biggie; it just means your
-    # database backend prefers to return integers as Python long integer
-    # objects.
+    # Now it has an ID.
     >>> q.id
     1
 

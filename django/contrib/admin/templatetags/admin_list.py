@@ -251,7 +251,7 @@ def items_for_result(cl, result, form):
             else:
                 url = add_preserved_filters({'preserved_filters': cl.preserved_filters, 'opts': cl.opts}, url)
                 # Convert the pk to something that can be used in Javascript.
-                # Problem cases are long ints (23L) and non-ASCII strings.
+                # Problem cases are non-ASCII strings.
                 if cl.to_field:
                     attr = str(cl.to_field)
                 else:
