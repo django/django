@@ -36,9 +36,9 @@ class CursorWrapper(object):
         return self
 
     def __exit__(self, type, value, traceback):
-        # Ticket #17671 - Close instead of passing thru to avoid backend
-        # specific behavior. Catch errors liberally because errors in cleanup
-        # code aren't useful.
+        # Close instead of passing through to avoid backend-specific behavior
+        # (#17671). Catch errors liberally because errors in cleanup code
+        # aren't useful.
         try:
             self.close()
         except self.db.Database.Error:
