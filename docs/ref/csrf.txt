@@ -527,12 +527,15 @@ Some security audit tools flag this as a problem but as mentioned before, an
 attacker cannot steal a user's browser's CSRF cookie. "Stealing" or modifying
 *your own* token using Firebug, Chrome dev tools, etc. isn't a vulnerability.
 
-Is the fact that Django's CSRF protection isn't linked to a session a problem?
-------------------------------------------------------------------------------
+Is it a problem that Django's CSRF protection isn't linked to a session by default?
+-----------------------------------------------------------------------------------
 
 No, this is by design. Not linking CSRF protection to a session allows using
 the protection on sites such as a `pastebin` that allow submissions from
 anonymous users which don't have a session.
+
+If you wish to store the CSRF token in the user's session, use the
+:setting:`CSRF_USE_SESSIONS` setting.
 
 Why might a user encounter a CSRF validation failure after logging in?
 ----------------------------------------------------------------------
