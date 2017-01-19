@@ -1,7 +1,6 @@
 import warnings
 
 from django.test import SimpleTestCase
-from django.test.utils import reset_warning_registry
 from django.utils.deprecation import (
     DeprecationInstanceCheck, RemovedInNextVersionWarning, RenameMethodsBase,
 )
@@ -24,7 +23,6 @@ class RenameMethodsTests(SimpleTestCase):
         Ensure a warning is raised upon class definition to suggest renaming
         the faulty method.
         """
-        reset_warning_registry()
         with warnings.catch_warnings(record=True) as recorded:
             warnings.simplefilter('always')
 
