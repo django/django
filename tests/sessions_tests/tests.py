@@ -116,37 +116,27 @@ class SessionTestsMixin:
         self.assertEqual(list(self.session.values()), [])
         self.assertTrue(self.session.accessed)
         self.session['some key'] = 1
+        self.session.modified = False
+        self.session.accessed = False
         self.assertEqual(list(self.session.values()), [1])
+        self.assertTrue(self.session.accessed)
+        self.assertFalse(self.session.modified)
 
-    def test_iterkeys(self):
+    def test_keys(self):
         self.session['x'] = 1
         self.session.modified = False
         self.session.accessed = False
-        i = iter(self.session.keys())
-        self.assertTrue(hasattr(i, '__iter__'))
+        self.assertEqual(list(self.session.keys()), ['x'])
         self.assertTrue(self.session.accessed)
         self.assertFalse(self.session.modified)
-        self.assertEqual(list(i), ['x'])
 
-    def test_itervalues(self):
+    def test_items(self):
         self.session['x'] = 1
         self.session.modified = False
         self.session.accessed = False
-        i = iter(self.session.values())
-        self.assertTrue(hasattr(i, '__iter__'))
+        self.assertEqual(list(self.session.items()), [('x', 1)])
         self.assertTrue(self.session.accessed)
         self.assertFalse(self.session.modified)
-        self.assertEqual(list(i), [1])
-
-    def test_iteritems(self):
-        self.session['x'] = 1
-        self.session.modified = False
-        self.session.accessed = False
-        i = iter(self.session.items())
-        self.assertTrue(hasattr(i, '__iter__'))
-        self.assertTrue(self.session.accessed)
-        self.assertFalse(self.session.modified)
-        self.assertEqual(list(i), [('x', 1)])
 
     def test_clear(self):
         self.session['x'] = 1
