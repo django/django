@@ -2,6 +2,7 @@ import builtins
 import collections
 import datetime
 import decimal
+import enum
 import functools
 import math
 import types
@@ -16,12 +17,6 @@ from django.utils.encoding import force_text
 from django.utils.functional import LazyObject, Promise
 from django.utils.timezone import utc
 from django.utils.version import get_docs_version
-
-try:
-    import enum
-except ImportError:
-    # No support on Python 2 if enum34 isn't installed.
-    enum = None
 
 
 class BaseSerializer:
