@@ -1,6 +1,9 @@
+import datetime
+
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase
 from django.core import signing
+from django.utils import timezone
 
 
 class SessionStore(SessionBase):
@@ -12,11 +15,26 @@ class SessionStore(SessionBase):
         raises BadSignature if signature fails.
         """
         try:
+            # Retrieve the session data if it contains valid data, no matter how old.
+            session_data_non_checked_age = signing.loads(
+                self.session_key,
+                serializer=self.serializer,
+                max_age=None,
+                salt='django.contrib.sessions.backends.signed_cookies',
+            )
+
+            max_age = session_data_non_checked_age.get('_session_expiry')
+            if isinstance(max_age, datetime.datetime):
+                max_age = max_age - timezone.now()
+
+            # Handle None and 0
+            if not max_age:
+                max_age = settings.SESSION_COOKIE_AGE
+
             return signing.loads(
                 self.session_key,
                 serializer=self.serializer,
-                # This doesn't handle non-default expiry dates, see #19201
-                max_age=settings.SESSION_COOKIE_AGE,
+                max_age=max_age,
                 salt='django.contrib.sessions.backends.signed_cookies',
             )
         except Exception:
