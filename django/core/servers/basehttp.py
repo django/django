@@ -62,7 +62,7 @@ def is_broken_pipe_error():
     return issubclass(exc_type, socket.error) and exc_value.args[0] == 32
 
 
-class WSGIServer(simple_server.WSGIServer, object):
+class WSGIServer(simple_server.WSGIServer):
     """BaseHTTPServer that implements the Python WSGI protocol"""
 
     request_queue_size = 10
@@ -85,15 +85,14 @@ class WSGIServer(simple_server.WSGIServer, object):
             super(WSGIServer, self).handle_error(request, client_address)
 
 
-# Inheriting from object required on Python 2.
-class ServerHandler(simple_server.ServerHandler, object):
+class ServerHandler(simple_server.ServerHandler):
     def handle_error(self):
         # Ignore broken pipe errors, otherwise pass on
         if not is_broken_pipe_error():
             super(ServerHandler, self).handle_error()
 
 
-class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
+class WSGIRequestHandler(simple_server.WSGIRequestHandler):
     def address_string(self):
         # Short-circuit parent method to not call socket.getfqdn
         return self.client_address[0]

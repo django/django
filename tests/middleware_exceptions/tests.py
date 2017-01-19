@@ -104,7 +104,7 @@ class RootUrlconfTests(SimpleTestCase):
             self.client.get("/middleware_exceptions/view/")
 
 
-class MyMiddleware(object):
+class MyMiddleware:
 
     def __init__(self, get_response=None):
         raise MiddlewareNotUsed
@@ -113,7 +113,7 @@ class MyMiddleware(object):
         pass
 
 
-class MyMiddlewareWithExceptionMessage(object):
+class MyMiddlewareWithExceptionMessage:
 
     def __init__(self, get_response=None):
         raise MiddlewareNotUsed('spam eggs')

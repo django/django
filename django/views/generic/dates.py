@@ -19,7 +19,7 @@ from django.views.generic.list import (
 )
 
 
-class YearMixin(object):
+class YearMixin:
     """
     Mixin for views manipulating year-based data.
     """
@@ -75,7 +75,7 @@ class YearMixin(object):
         return date.replace(month=1, day=1)
 
 
-class MonthMixin(object):
+class MonthMixin:
     """
     Mixin for views manipulating month-based data.
     """
@@ -134,7 +134,7 @@ class MonthMixin(object):
         return date.replace(day=1)
 
 
-class DayMixin(object):
+class DayMixin:
     """
     Mixin for views manipulating day-based data.
     """
@@ -190,7 +190,7 @@ class DayMixin(object):
         return date
 
 
-class WeekMixin(object):
+class WeekMixin:
     """
     Mixin for views manipulating week-based data.
     """
@@ -260,7 +260,7 @@ class WeekMixin(object):
             raise ValueError("unknown week format: %s" % week_format)
 
 
-class DateMixin(object):
+class DateMixin:
     """
     Mixin class for views manipulating date-based data.
     """

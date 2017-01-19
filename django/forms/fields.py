@@ -46,7 +46,7 @@ __all__ = (
 )
 
 
-class Field(object):
+class Field:
     widget = TextInput  # Default widget to use when rendering this type of Field.
     hidden_widget = HiddenInput  # Default widget to use when rendering this as "hidden".
     default_validators = []  # Default set of validators
@@ -757,7 +757,7 @@ class NullBooleanField(BooleanField):
         pass
 
 
-class CallableChoiceIterator(object):
+class CallableChoiceIterator:
     def __init__(self, choices_func):
         self.choices_func = choices_func
 

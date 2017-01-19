@@ -50,7 +50,7 @@ class NotSupportedError(DatabaseError):
     pass
 
 
-class DatabaseErrorWrapper(object):
+class DatabaseErrorWrapper:
     """
     Context manager and decorator that re-throws backend-specific database
     exceptions using Django's common wrappers.
@@ -141,7 +141,7 @@ class ConnectionDoesNotExist(Exception):
     pass
 
 
-class ConnectionHandler(object):
+class ConnectionHandler:
     def __init__(self, databases=None):
         """
         databases is an optional dictionary of database definitions (structured
@@ -234,7 +234,7 @@ class ConnectionHandler(object):
             connection.close()
 
 
-class ConnectionRouter(object):
+class ConnectionRouter:
     def __init__(self, routers=None):
         """
         If routers is not specified, will default to settings.DATABASE_ROUTERS.

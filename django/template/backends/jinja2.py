@@ -59,7 +59,7 @@ class Jinja2(BaseEngine):
         return [import_string(path) for path in self.context_processors]
 
 
-class Template(object):
+class Template:
 
     def __init__(self, template, backend):
         self.template = template
@@ -81,7 +81,7 @@ class Template(object):
         return self.template.render(context)
 
 
-class Origin(object):
+class Origin:
     """
     A container to hold debug information as described in the template API
     documentation.

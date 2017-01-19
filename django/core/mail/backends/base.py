@@ -1,7 +1,7 @@
 """Base email backend class."""
 
 
-class BaseEmailBackend(object):
+class BaseEmailBackend:
     """
     Base class for email backend implementations.
 

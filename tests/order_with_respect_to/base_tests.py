@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 from operator import attrgetter
 
 
-class BaseOrderWithRespectToTests(object):
+class BaseOrderWithRespectToTests:
     # Hook to allow subclasses to run these tests with alternate models.
     Answer = None
     Post = None

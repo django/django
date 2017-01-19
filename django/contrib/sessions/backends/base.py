@@ -35,7 +35,7 @@ class UpdateError(Exception):
     pass
 
 
-class SessionBase(object):
+class SessionBase:
     """
     Base class for all Session classes.
     """

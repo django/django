@@ -16,7 +16,7 @@ def curry(_curried_func, *args, **kwargs):
     return _curried
 
 
-class cached_property(object):
+class cached_property:
     """
     Decorator that converts a method with a single self argument into a
     property cached on the instance.
@@ -36,7 +36,7 @@ class cached_property(object):
         return res
 
 
-class Promise(object):
+class Promise:
     """
     This is just a base class for the proxy class created in
     the closure of the lazy function. It can be used to recognize
@@ -240,7 +240,7 @@ def new_method_proxy(func):
     return inner
 
 
-class LazyObject(object):
+class LazyObject:
     """
     A wrapper for another class that can be used to delay instantiation of the
     wrapped class.

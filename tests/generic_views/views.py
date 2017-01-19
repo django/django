@@ -191,7 +191,7 @@ class SpecializedAuthorDelete(generic.DeleteView):
     success_url = reverse_lazy('authors_list')
 
 
-class BookConfig(object):
+class BookConfig:
     queryset = Book.objects.all()
     date_field = 'pubdate'
 
@@ -268,7 +268,7 @@ class CustomSingleObjectView(generic.detail.SingleObjectMixin, generic.View):
     object = Book(name="dummy")
 
 
-class BookSigningConfig(object):
+class BookSigningConfig:
     model = BookSigning
     date_field = 'event_date'
     # use the same templates as for books
@@ -305,7 +305,7 @@ class BookSigningDetail(BookSigningConfig, generic.DateDetailView):
     context_object_name = 'book'
 
 
-class NonModel(object):
+class NonModel:
     id = "non_model_1"
 
     _meta = None

@@ -48,7 +48,7 @@ class RedirectCycleError(Exception):
         self.redirect_chain = last_response.redirect_chain
 
 
-class FakePayload(object):
+class FakePayload:
     """
     A wrapper around BytesIO that restricts what can be read since data from
     the network can't be seeked and cannot be read outside of its content
@@ -255,7 +255,7 @@ def encode_file(boundary, key, file):
     ]
 
 
-class RequestFactory(object):
+class RequestFactory:
     """
     Class that lets you create mock Request objects for use in testing.
 

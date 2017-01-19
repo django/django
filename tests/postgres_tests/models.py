@@ -8,7 +8,7 @@ from .fields import (
 )
 
 
-class Tag(object):
+class Tag:
     def __init__(self, tag_id):
         self.tag_id = tag_id
 

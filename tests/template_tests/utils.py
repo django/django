@@ -147,7 +147,7 @@ class OtherClass:
         return 'OtherClass.method'
 
 
-class TestObj(object):
+class TestObj:
     def is_true(self):
         return True
 
@@ -158,12 +158,12 @@ class TestObj(object):
         raise ShouldNotExecuteException()
 
 
-class SilentGetItemClass(object):
+class SilentGetItemClass:
     def __getitem__(self, key):
         raise SomeException
 
 
-class SilentAttrClass(object):
+class SilentAttrClass:
     def b(self):
         raise SomeException
     b = property(b)

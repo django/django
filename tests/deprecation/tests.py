@@ -143,11 +143,11 @@ class RenameMethodsTests(SimpleTestCase):
                 def new(self):
                     pass
 
-            class RenamedMixin(object):
+            class RenamedMixin:
                 def new(self):
                     super(RenamedMixin, self).new()
 
-            class DeprecatedMixin(object):
+            class DeprecatedMixin:
                 def old(self):
                     super(DeprecatedMixin, self).old()
 

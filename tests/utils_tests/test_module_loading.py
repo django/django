@@ -179,7 +179,7 @@ class AutodiscoverModulesTestCase(SimpleTestCase):
         self.assertEqual(site._registry, {'lorem': 'ipsum'})
 
 
-class ProxyFinder(object):
+class ProxyFinder:
     def __init__(self):
         self._cache = {}
 
@@ -208,7 +208,7 @@ class ProxyFinder(object):
                 fd.close()
 
 
-class TestFinder(object):
+class TestFinder:
     def __init__(self, *args, **kwargs):
         self.importer = zipimporter(*args, **kwargs)
 
@@ -219,7 +219,7 @@ class TestFinder(object):
         return TestLoader(importer)
 
 
-class TestLoader(object):
+class TestLoader:
     def __init__(self, importer):
         self.importer = importer
 

@@ -63,7 +63,7 @@ from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
 from .utils import Oracle_datetime                          # NOQA isort:skip
 
 
-class _UninitializedOperatorsDescriptor(object):
+class _UninitializedOperatorsDescriptor:
 
     def __get__(self, instance, cls=None):
         # If connection.operators is looked up before a connection has been
@@ -311,7 +311,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return None
 
 
-class OracleParam(object):
+class OracleParam:
     """
     Wrapper object for formatting parameters for Oracle. If the string
     representation of the value is large enough (greater than 4000 characters)
@@ -363,7 +363,7 @@ class OracleParam(object):
             self.input_size = None
 
 
-class VariableWrapper(object):
+class VariableWrapper:
     """
     An adapter class for cursor variables that prevents the wrapped object
     from being converted into a string when used to instantiate an OracleParam.
@@ -387,7 +387,7 @@ class VariableWrapper(object):
             setattr(self.var, key, value)
 
 
-class FormatStylePlaceholderCursor(object):
+class FormatStylePlaceholderCursor:
     """
     Django uses "format" (e.g. '%s') style placeholders, but Oracle uses ":var"
     style. This fixes it -- but note that if you want to use a literal "%s" in

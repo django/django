@@ -21,7 +21,7 @@ from django.utils.six.moves import _thread as thread
 NO_DB_ALIAS = '__no_db__'
 
 
-class BaseDatabaseWrapper(object):
+class BaseDatabaseWrapper:
     """
     Represents a database connection.
     """

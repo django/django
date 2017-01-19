@@ -17,7 +17,7 @@ from django.utils.module_loading import import_string
 searched_locations = []
 
 
-class BaseFinder(object):
+class BaseFinder:
     """
     A base file finder to be used for custom staticfiles finder classes.
     """

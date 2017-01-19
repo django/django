@@ -22,7 +22,7 @@ from .exception import (
 logger = logging.getLogger('django.request')
 
 
-class BaseHandler(object):
+class BaseHandler:
 
     def __init__(self):
         self._request_middleware = None

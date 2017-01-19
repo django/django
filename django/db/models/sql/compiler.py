@@ -16,7 +16,7 @@ from django.utils.six.moves import zip
 FORCE = object()
 
 
-class SQLCompiler(object):
+class SQLCompiler:
     def __init__(self, query, connection, using):
         self.query = query
         self.connection = connection

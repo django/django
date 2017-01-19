@@ -14,7 +14,7 @@ except ImportError:
     import pickle
 
 
-class Options(object):
+class Options:
     """A class that will quack like a Django model _meta class.
 
     This allows cache operations to be controlled by the router
@@ -37,7 +37,7 @@ class BaseDatabaseCache(BaseCache):
         BaseCache.__init__(self, params)
         self._table = table
 
-        class CacheEntry(object):
+        class CacheEntry:
             _meta = Options(table)
         self.cache_model_class = CacheEntry
 

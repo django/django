@@ -2753,7 +2753,7 @@ class ModelFormInheritanceTests(SimpleTestCase):
                 model = Writer
                 fields = '__all__'
 
-        class Mixin(object):
+        class Mixin:
             age = None
 
         class Form(forms.Form):

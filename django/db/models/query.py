@@ -33,7 +33,7 @@ REPR_OUTPUT_SIZE = 20
 EmptyResultSet = sql.EmptyResultSet
 
 
-class BaseIterable(object):
+class BaseIterable:
     def __init__(self, queryset, chunked_fetch=False):
         self.queryset = queryset
         self.chunked_fetch = chunked_fetch
@@ -153,7 +153,7 @@ class FlatValuesListIterable(BaseIterable):
             yield row[0]
 
 
-class QuerySet(object):
+class QuerySet:
     """
     Represents a lazy database lookup for a set of objects.
     """
@@ -1181,7 +1181,7 @@ class EmptyQuerySet(six.with_metaclass(InstanceCheckMeta)):
         raise TypeError("EmptyQuerySet can't be instantiated")
 
 
-class RawQuerySet(object):
+class RawQuerySet:
     """
     Provides an iterator which converts the results of raw SQL queries into
     annotated model instances.
@@ -1299,7 +1299,7 @@ class RawQuerySet(object):
         return model_fields
 
 
-class Prefetch(object):
+class Prefetch:
     def __init__(self, lookup, queryset=None, to_attr=None):
         # `prefetch_through` is the path we traverse to perform the prefetch.
         self.prefetch_through = lookup
@@ -1636,7 +1636,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     return all_related_objects, additional_lookups
 
 
-class RelatedPopulator(object):
+class RelatedPopulator:
     """
     RelatedPopulator is used for select_related() object instantiation.
 

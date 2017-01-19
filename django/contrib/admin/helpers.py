@@ -36,7 +36,7 @@ class ActionForm(forms.Form):
 checkbox = forms.CheckboxInput({'class': 'action-select'}, lambda value: False)
 
 
-class AdminForm(object):
+class AdminForm:
     def __init__(self, form, fieldsets, prepopulated_fields, readonly_fields=None, model_admin=None):
         self.form, self.fieldsets = form, fieldsets
         self.prepopulated_fields = [{
@@ -73,7 +73,7 @@ class AdminForm(object):
         return media
 
 
-class Fieldset(object):
+class Fieldset:
     def __init__(self, form, name=None, readonly_fields=(), fields=(), classes=(),
                  description=None, model_admin=None):
         self.form = form
@@ -100,7 +100,7 @@ class Fieldset(object):
             yield Fieldline(self.form, field, self.readonly_fields, model_admin=self.model_admin)
 
 
-class Fieldline(object):
+class Fieldline:
     def __init__(self, form, field, readonly_fields=None, model_admin=None):
         self.form = form  # A django.forms.Form instance
         if not hasattr(field, "__iter__") or isinstance(field, six.text_type):
@@ -131,7 +131,7 @@ class Fieldline(object):
         )
 
 
-class AdminField(object):
+class AdminField:
     def __init__(self, form, field, is_first):
         self.field = form[field]  # A django.forms.BoundField instance
         self.is_first = is_first  # Whether this field is first on the line
@@ -160,7 +160,7 @@ class AdminField(object):
         return mark_safe(self.field.errors.as_ul())
 
 
-class AdminReadonlyField(object):
+class AdminReadonlyField:
     def __init__(self, form, field, is_first, model_admin=None):
         # Make self.field look a little bit like a field. This means that
         # {{ field.name }} must be a useful class name to identify the field.
@@ -238,7 +238,7 @@ class AdminReadonlyField(object):
         return conditional_escape(result_repr)
 
 
-class InlineAdminFormSet(object):
+class InlineAdminFormSet:
     """
     A wrapper around an inline formset for use in the admin system.
     """

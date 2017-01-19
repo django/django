@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 
-class ViewContainer(object):
+class ViewContainer:
     def method_view(self, request):
         pass
 

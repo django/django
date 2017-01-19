@@ -18,7 +18,7 @@ def normalize_whitespace(string):
 
 
 @python_2_unicode_compatible
-class Element(object):
+class Element:
     def __init__(self, name, attributes):
         self.name = name
         self.attributes = sorted(attributes)

@@ -248,7 +248,7 @@ permission_protected_view_exception = (
 )
 
 
-class _ViewManager(object):
+class _ViewManager:
     @method_decorator(login_required)
     def login_protected_view(self, request):
         t = Template('This is a login protected test using a method. '

@@ -44,7 +44,7 @@ MEDIA_TYPES = ('css', 'js')
 
 @html_safe
 @python_2_unicode_compatible
-class Media(object):
+class Media:
     def __init__(self, media=None, **kwargs):
         if media:
             media_attrs = media.__dict__

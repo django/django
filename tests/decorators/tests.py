@@ -113,10 +113,10 @@ class DecoratorsTest(TestCase):
         callback = user_passes_test(test1)(callback)
         callback = user_passes_test(test2)(callback)
 
-        class DummyUser(object):
+        class DummyUser:
             pass
 
-        class DummyRequest(object):
+        class DummyRequest:
             pass
 
         request = DummyRequest()
@@ -197,7 +197,7 @@ def myattr2_dec(func):
 myattr2_dec_m = method_decorator(myattr2_dec)
 
 
-class ClsDec(object):
+class ClsDec:
     def __init__(self, myattr):
         self.myattr = myattr
 
@@ -213,7 +213,7 @@ class MethodDecoratorTests(SimpleTestCase):
     Tests for method_decorator
     """
     def test_preserve_signature(self):
-        class Test(object):
+        class Test:
             @simple_dec_m
             def say(self, arg):
                 return arg
@@ -231,7 +231,7 @@ class MethodDecoratorTests(SimpleTestCase):
         self.assertIs(getattr(func, 'myattr2', False), True)
 
         # Decorate using method_decorator() on the method.
-        class TestPlain(object):
+        class TestPlain:
             @myattr_dec_m
             @myattr2_dec_m
             def method(self):
@@ -242,7 +242,7 @@ class MethodDecoratorTests(SimpleTestCase):
         # The decorators applied to the methods are applied before the ones
         # applied to the class.
         @method_decorator(myattr_dec_m, "method")
-        class TestMethodAndClass(object):
+        class TestMethodAndClass:
             @method_decorator(myattr2_dec_m)
             def method(self):
                 "A method"
@@ -252,7 +252,7 @@ class MethodDecoratorTests(SimpleTestCase):
         decorators = (myattr_dec_m, myattr2_dec_m)
 
         @method_decorator(decorators, "method")
-        class TestIterable(object):
+        class TestIterable:
             def method(self):
                 "A method"
                 pass
@@ -272,14 +272,14 @@ class MethodDecoratorTests(SimpleTestCase):
         # The rest of the exception message differs between Python 2 and 3.
         with self.assertRaisesMessage(TypeError, "'set' object"):
             @method_decorator(decorators, "method")
-            class TestIterable(object):
+            class TestIterable:
                 def method(self):
                     "A method"
                     pass
 
     # Test for argumented decorator
     def test_argumented(self):
-        class Test(object):
+        class Test:
             @method_decorator(ClsDec(False))
             def method(self):
                 return True
@@ -296,7 +296,7 @@ class MethodDecoratorTests(SimpleTestCase):
 
         method_dec = method_decorator(original_dec)
 
-        class bound_wrapper(object):
+        class bound_wrapper:
             def __init__(self, wrapped):
                 self.wrapped = wrapped
                 self.__name__ = wrapped.__name__
@@ -307,7 +307,7 @@ class MethodDecoratorTests(SimpleTestCase):
             def __get__(self, instance, cls=None):
                 return self
 
-        class descriptor_wrapper(object):
+        class descriptor_wrapper:
             def __init__(self, wrapped):
                 self.wrapped = wrapped
                 self.__name__ = wrapped.__name__
@@ -315,7 +315,7 @@ class MethodDecoratorTests(SimpleTestCase):
             def __get__(self, instance, cls=None):
                 return bound_wrapper(self.wrapped.__get__(instance, cls))
 
-        class Test(object):
+        class Test:
             @method_dec
             @descriptor_wrapper
             def method(self, arg):
@@ -333,7 +333,7 @@ class MethodDecoratorTests(SimpleTestCase):
             return _wrapper
 
         @method_decorator(deco, name="method")
-        class Test(object):
+        class Test:
             def method(self):
                 return False
 
@@ -362,11 +362,11 @@ class MethodDecoratorTests(SimpleTestCase):
         decorators = (add_exclamation_mark, add_question_mark)
 
         @method_decorator(decorators, name="method")
-        class TestFirst(object):
+        class TestFirst:
             def method(self):
                 return "hello world"
 
-        class TestSecond(object):
+        class TestSecond:
             @method_decorator(decorators)
             def method(self):
                 return "hello world"
@@ -384,7 +384,7 @@ class MethodDecoratorTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(TypeError, msg):
             @method_decorator(lambda: None, name="prop")
-            class Test(object):
+            class Test:
                 prop = 1
 
                 @classmethod
@@ -401,7 +401,7 @@ class MethodDecoratorTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             @method_decorator(lambda: None, name="non_existing_method")
-            class Test(object):
+            class Test:
                 @classmethod
                 def __module__(cls):
                     return "tests"

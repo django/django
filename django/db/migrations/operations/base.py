@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.db import router
 
 
-class Operation(object):
+class Operation:
     """
     Base class for migration operations.
 

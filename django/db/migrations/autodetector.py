@@ -19,7 +19,7 @@ from django.utils import six
 from .topological_sort import stable_topological_sort
 
 
-class MigrationAutodetector(object):
+class MigrationAutodetector:
     """
     Takes a pair of ProjectStates, and compares them to see what the
     first would need doing to make it match the second (the second

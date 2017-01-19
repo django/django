@@ -15,7 +15,7 @@ from django.utils.functional import cached_property
 from django.utils.six.moves import range
 
 
-class Lookup(object):
+class Lookup:
     lookup_name = None
     prepare_rhs = True
 
@@ -176,7 +176,7 @@ class BuiltinLookup(Lookup):
         return connection.operators[self.lookup_name] % rhs
 
 
-class FieldGetDbPrepValueMixin(object):
+class FieldGetDbPrepValueMixin:
     """
     Some lookups require Field.get_db_prep_value() to be called on their
     inputs.
@@ -287,7 +287,7 @@ class LessThanOrEqual(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'lte'
 
 
-class IntegerFieldFloatRounding(object):
+class IntegerFieldFloatRounding:
     """
     Allow floats to work as query values for IntegerField. Without this, the
     decimal portion of the float would always be discarded.
@@ -308,7 +308,7 @@ class IntegerLessThan(IntegerFieldFloatRounding, LessThan):
     pass
 
 
-class DecimalComparisonLookup(object):
+class DecimalComparisonLookup:
     def as_sqlite(self, compiler, connection):
         lhs_sql, params = self.process_lhs(compiler, connection)
         rhs_sql, rhs_params = self.process_rhs(compiler, connection)

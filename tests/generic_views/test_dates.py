@@ -20,7 +20,7 @@ def _make_books(n, base_date):
             pubdate=base_date - datetime.timedelta(days=i))
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):

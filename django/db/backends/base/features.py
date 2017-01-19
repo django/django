@@ -3,7 +3,7 @@ from django.db.utils import ProgrammingError
 from django.utils.functional import cached_property
 
 
-class BaseDatabaseFeatures(object):
+class BaseDatabaseFeatures:
     gis_enabled = False
     allows_group_by_pk = False
     allows_group_by_selected_pks = False

@@ -49,7 +49,7 @@ class SafeStringTest(SimpleTestCase):
         self.assertRenderEqual('{{ s }}', 'a&b', s=mark_safe(s))
 
     def test_mark_safe_object_implementing_dunder_str(self):
-        class Obj(object):
+        class Obj:
             def __str__(self):
                 return '<obj>'
 
@@ -89,7 +89,7 @@ class SafeStringTest(SimpleTestCase):
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_mark_for_escaping_object_implementing_dunder_str(self):
-        class Obj(object):
+        class Obj:
             def __str__(self):
                 return '<obj>'
 

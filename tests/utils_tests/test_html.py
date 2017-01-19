@@ -170,7 +170,7 @@ class TestUtilsHtml(SimpleTestCase):
 
     def test_html_safe(self):
         @html.html_safe
-        class HtmlClass(object):
+        class HtmlClass:
             if six.PY2:
                 def __unicode__(self):
                     return "<h1>I'm a html class!</h1>"
@@ -185,7 +185,7 @@ class TestUtilsHtml(SimpleTestCase):
 
     def test_html_safe_subclass(self):
         if six.PY2:
-            class BaseClass(object):
+            class BaseClass:
                 def __html__(self):
                     # defines __html__ on its own
                     return 'some html content'
@@ -199,7 +199,7 @@ class TestUtilsHtml(SimpleTestCase):
                     # overrides __unicode__ and is marked as html_safe
                     return 'some html safe content'
         else:
-            class BaseClass(object):
+            class BaseClass:
                 def __html__(self):
                     # defines __html__ on its own
                     return 'some html content'
@@ -220,7 +220,7 @@ class TestUtilsHtml(SimpleTestCase):
         msg = "can't apply @html_safe to HtmlClass because it defines __html__()."
         with self.assertRaisesMessage(ValueError, msg):
             @html.html_safe
-            class HtmlClass(object):
+            class HtmlClass:
                 def __html__(self):
                     return "<h1>I'm a html class!</h1>"
 
@@ -229,5 +229,5 @@ class TestUtilsHtml(SimpleTestCase):
         msg = "can't apply @html_safe to HtmlClass because it doesn't define %s." % method_name
         with self.assertRaisesMessage(ValueError, msg):
             @html.html_safe
-            class HtmlClass(object):
+            class HtmlClass:
                 pass

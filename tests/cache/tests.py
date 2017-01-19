@@ -64,12 +64,12 @@ class C:
         return 24
 
 
-class Unpicklable(object):
+class Unpicklable:
     def __getstate__(self):
         raise pickle.PickleError()
 
 
-class UnpicklableType(object):
+class UnpicklableType:
     # Unpicklable using the default pickling protocol on Python 2.
     __slots__ = 'a',
 
@@ -259,7 +259,7 @@ def caches_setting_for_tests(base=None, exclude=None, **params):
     return setting
 
 
-class BaseCacheTests(object):
+class BaseCacheTests:
     # A common set of tests to apply to all cache backends
 
     def setUp(self):
@@ -1022,7 +1022,7 @@ class DBCacheWithTimeZoneTests(DBCacheTests):
     pass
 
 
-class DBCacheRouter(object):
+class DBCacheRouter:
     """A router that puts the cache table on the 'other' database."""
 
     def db_for_read(self, model, **hints):
@@ -1073,7 +1073,7 @@ class CreateCacheTableForDBCacheTests(TestCase):
                                     verbosity=0, interactive=False)
 
 
-class PicklingSideEffect(object):
+class PicklingSideEffect:
 
     def __init__(self, cache):
         self.cache = cache

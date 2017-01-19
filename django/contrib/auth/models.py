@@ -378,7 +378,7 @@ class User(AbstractUser):
 
 
 @python_2_unicode_compatible
-class AnonymousUser(object):
+class AnonymousUser:
     id = None
     pk = None
     username = ''

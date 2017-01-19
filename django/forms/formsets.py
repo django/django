@@ -49,7 +49,7 @@ class ManagementForm(Form):
 
 @html_safe
 @python_2_unicode_compatible
-class BaseFormSet(object):
+class BaseFormSet:
     """
     A collection of instances of the same Form class.
     """

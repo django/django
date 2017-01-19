@@ -67,7 +67,7 @@ class LoggingFiltersTest(SimpleTestCase):
             self.assertIs(filter_.filter("record is not used"), False)
 
 
-class SetupDefaultLoggingMixin(object):
+class SetupDefaultLoggingMixin:
 
     @classmethod
     def setUpClass(cls):

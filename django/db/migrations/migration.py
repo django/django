@@ -7,7 +7,7 @@ from .exceptions import IrreversibleError
 
 
 @python_2_unicode_compatible
-class Migration(object):
+class Migration:
     """
     The base class for all migrations.
 

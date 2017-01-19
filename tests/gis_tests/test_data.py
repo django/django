@@ -32,7 +32,7 @@ def get_ds_file(name, ext):
                         )
 
 
-class TestObj(object):
+class TestObj:
     """
     Base testing object, turns keyword args into attributes.
     """
@@ -77,7 +77,7 @@ class TestGeom(TestObj):
         super(TestGeom, self).__init__(**kwargs)
 
 
-class TestGeomSet(object):
+class TestGeomSet:
     """
     Each attribute of this object is a list of `TestGeom` instances.
     """
@@ -86,7 +86,7 @@ class TestGeomSet(object):
             setattr(self, key, [TestGeom(**strconvert(kw)) for kw in value])
 
 
-class TestDataMixin(object):
+class TestDataMixin:
     """
     Mixin used for GEOS/GDAL test cases that defines a `geometries`
     property, which returns and/or loads the reference geometry data.

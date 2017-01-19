@@ -20,7 +20,7 @@ except ImportError:
     sqlparse = None
 
 
-class Mixin(object):
+class Mixin:
     pass
 
 

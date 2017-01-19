@@ -12,7 +12,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 
 
-class BaseDatabaseOperations(object):
+class BaseDatabaseOperations:
     """
     This class encapsulates all backend-specific differences, such as the way
     a backend performs ordering or calculates the ID of a recently-inserted

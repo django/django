@@ -13,7 +13,7 @@ from django.utils.timezone import utc
 logger = logging.getLogger('django.db.backends')
 
 
-class CursorWrapper(object):
+class CursorWrapper:
     def __init__(self, cursor, db):
         self.cursor = cursor
         self.db = db

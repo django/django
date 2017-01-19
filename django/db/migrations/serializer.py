@@ -25,7 +25,7 @@ except ImportError:
     enum = None
 
 
-class BaseSerializer(object):
+class BaseSerializer:
     def __init__(self, value):
         self.value = value
 

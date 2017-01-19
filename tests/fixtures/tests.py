@@ -49,7 +49,7 @@ class SubclassTestCaseFixtureLoadingTests(TestCaseFixtureLoadingTests):
         self.assertEqual(Article.objects.count(), 0)
 
 
-class DumpDataAssertMixin(object):
+class DumpDataAssertMixin:
 
     def _dumpdata_assert(self, args, output, format='json', filename=None,
                          natural_foreign_keys=False, natural_primary_keys=False,

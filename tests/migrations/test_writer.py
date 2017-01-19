@@ -50,7 +50,7 @@ class Money(decimal.Decimal):
         )
 
 
-class TestModel1(object):
+class TestModel1:
     def upload_to(self):
         return "somewhere dynamic"
     thing = models.FileField(upload_to=upload_to)
@@ -502,7 +502,7 @@ class WriterTests(SimpleTestCase):
         """
         Neither py2 or py3 can serialize a reference in a local scope.
         """
-        class TestModel2(object):
+        class TestModel2:
             def upload_to(self):
                 return "somewhere dynamic"
             thing = models.FileField(upload_to=upload_to)
@@ -513,7 +513,7 @@ class WriterTests(SimpleTestCase):
         """
         Make sure user is seeing which module/function is the issue
         """
-        class TestModel2(object):
+        class TestModel2:
             def upload_to(self):
                 return "somewhere dynamic"
             thing = models.FileField(upload_to=upload_to)
@@ -689,7 +689,7 @@ class WriterTests(SimpleTestCase):
         # Yes, it doesn't make sense to use a class as a default for a
         # CharField. It does make sense for custom fields though, for example
         # an enumfield that takes the enum class as an argument.
-        class DeconstructibleInstances(object):
+        class DeconstructibleInstances:
             def deconstruct(self):
                 return ('DeconstructibleInstances', [], {})
 

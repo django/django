@@ -107,7 +107,7 @@ class UtilsTests(SimpleTestCase):
         SIMPLE_FUNCTION = 'function'
         INSTANCE_ATTRIBUTE = 'attr'
 
-        class MockModelAdmin(object):
+        class MockModelAdmin:
             def get_admin_value(self, obj):
                 return ADMIN_METHOD
 
@@ -261,7 +261,7 @@ class UtilsTests(SimpleTestCase):
         )
         self.assertEqual(label_for_field('site_id', Article), 'Site id')
 
-        class MockModelAdmin(object):
+        class MockModelAdmin:
             def test_from_model(self, obj):
                 return "nothing"
             test_from_model.short_description = "not Really the Model"
@@ -278,7 +278,7 @@ class UtilsTests(SimpleTestCase):
     def test_label_for_property(self):
         # NOTE: cannot use @property decorator, because of
         # AttributeError: 'property' object has no attribute 'short_description'
-        class MockModelAdmin(object):
+        class MockModelAdmin:
             def my_property(self):
                 return "this if from property"
             my_property.short_description = 'property short description'

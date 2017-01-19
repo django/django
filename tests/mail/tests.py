@@ -41,7 +41,7 @@ else:
     )
 
 
-class HeadersCheckMixin(object):
+class HeadersCheckMixin:
 
     def assertMessageHasHeaders(self, message, headers):
         """

@@ -303,10 +303,10 @@ class AbstractInheritanceTests(TestCase):
             class Meta:
                 abstract = True
 
-        class Mixin(object):
+        class Mixin:
             age = None
 
-        class Mixin2(object):
+        class Mixin2:
             age = 2
 
         class DescendantMixin(Mixin):

@@ -76,7 +76,7 @@ def handle_default_options(options):
         sys.path.insert(0, options.pythonpath)
 
 
-class OutputWrapper(object):
+class OutputWrapper:
     """
     Wrapper around stdout/stderr
     """
@@ -110,7 +110,7 @@ class OutputWrapper(object):
         self._out.write(force_str(style_func(msg)))
 
 
-class BaseCommand(object):
+class BaseCommand:
     """
     The base class from which all management commands ultimately
     derive.

@@ -41,7 +41,7 @@ class TranslatorCommentWarning(SyntaxWarning):
 # replace the functions with their real counterparts (once we do access the
 # settings).
 
-class Trans(object):
+class Trans:
     """
     The purpose of this class is to store the actual translation function upon
     receiving the first call to that function. After this is done, changes to

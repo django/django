@@ -8,9 +8,9 @@ from django.utils import six, timezone
 register = Library()
 
 
-# HACK: datetime is an old-style class, create a new-style equivalent
-# so we can define additional attributes.
-class datetimeobject(datetime, object):
+# HACK: datetime instances don't allow setting new attributes. Define a
+# subclass so we can assign additional attributes.
+class datetimeobject(datetime):
     pass
 
 

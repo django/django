@@ -29,7 +29,7 @@ class UnicodeModel(models.Model):
         return self.title
 
 
-class Unserializable(object):
+class Unserializable:
     """
     An object that migration doesn't know how to serialize.
     """

@@ -20,7 +20,7 @@ from .models import (
 INLINE_CHANGELINK_HTML = 'class="inlinechangelink">Change</a>'
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):

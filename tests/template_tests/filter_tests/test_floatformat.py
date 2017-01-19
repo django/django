@@ -76,7 +76,7 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(floatformat(nan), six.text_type(nan))
 
     def test_float_dunder_method(self):
-        class FloatWrapper(object):
+        class FloatWrapper:
             def __init__(self, value):
                 self.value = value
 

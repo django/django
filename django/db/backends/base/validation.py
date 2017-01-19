@@ -1,4 +1,4 @@
-class BaseDatabaseValidation(object):
+class BaseDatabaseValidation:
     """
     This class encapsulates all backend-specific validation.
     """

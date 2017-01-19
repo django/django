@@ -12,7 +12,7 @@ MIGRATE_VERBOSITY = 1
 MIGRATE_INTERACTIVE = False
 
 
-class Receiver(object):
+class Receiver:
     def __init__(self, signal):
         self.call_counter = 0
         self.call_args = None
@@ -23,7 +23,7 @@ class Receiver(object):
         self.call_args = kwargs
 
 
-class OneTimeReceiver(object):
+class OneTimeReceiver:
     """
     Special receiver for handle the fact that test runner calls migrate for
     several databases and several times for some of them.

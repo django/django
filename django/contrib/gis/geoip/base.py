@@ -24,7 +24,7 @@ class GeoIPException(Exception):
     pass
 
 
-class GeoIP(object):
+class GeoIP:
     # The flags for GeoIP memory caching.
     # GEOIP_STANDARD - read database from filesystem, uses least memory.
     #

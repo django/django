@@ -6,7 +6,7 @@ from .base import WidgetTest
 
 
 @python_2_unicode_compatible
-class FakeFieldFile(object):
+class FakeFieldFile:
     """
     Quacks like a FieldFile (has a .url and unicode representation), but
     doesn't require us to care about storages etc.
@@ -40,7 +40,7 @@ class ClearableFileInputTest(WidgetTest):
         when rendering HTML (#15182).
         """
         @python_2_unicode_compatible
-        class StrangeFieldFile(object):
+        class StrangeFieldFile:
             url = "something?chapter=1&sect=2&copy=3&lang=en"
 
             def __str__(self):
@@ -111,7 +111,7 @@ class ClearableFileInputTest(WidgetTest):
         checking that it has a value.
         """
         @python_2_unicode_compatible
-        class FailingURLFieldFile(object):
+        class FailingURLFieldFile:
             @property
             def url(self):
                 raise ValueError('Canary')
@@ -124,7 +124,7 @@ class ClearableFileInputTest(WidgetTest):
 
     def test_url_as_property(self):
         @python_2_unicode_compatible
-        class URLFieldFile(object):
+        class URLFieldFile:
             @property
             def url(self):
                 return 'https://www.python.org/'
@@ -137,7 +137,7 @@ class ClearableFileInputTest(WidgetTest):
 
     def test_return_false_if_url_does_not_exists(self):
         @python_2_unicode_compatible
-        class NoURLFieldFile(object):
+        class NoURLFieldFile:
             def __str__(self):
                 return 'value'
 

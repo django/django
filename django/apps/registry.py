@@ -10,7 +10,7 @@ from django.utils import lru_cache
 from .config import AppConfig
 
 
-class Apps(object):
+class Apps:
     """
     A registry that stores the configuration of installed applications.
 

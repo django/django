@@ -1,4 +1,4 @@
-class BaseDatabaseClient(object):
+class BaseDatabaseClient:
     """
     This class encapsulates all backend-specific methods for opening a
     client shell.

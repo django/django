@@ -27,7 +27,7 @@ class OGREnvelope(Structure):
                 ]
 
 
-class Envelope(object):
+class Envelope:
     """
     The Envelope object is a C structure that contains the minimum and
     maximum X, Y coordinates for a rectangle bounding box.  The naming

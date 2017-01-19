@@ -134,7 +134,7 @@ class VariableDoesNotExist(Exception):
         return self.msg % tuple(force_text(p, errors='replace') for p in self.params)
 
 
-class Origin(object):
+class Origin:
     def __init__(self, name, template_name=None, loader=None):
         self.name = name
         self.template_name = template_name
@@ -168,7 +168,7 @@ class StringOrigin(six.with_metaclass(DeprecationInstanceCheck, Origin)):
     deprecation_warning = RemovedInDjango20Warning
 
 
-class Template(object):
+class Template:
     def __init__(self, template_string, origin=None, name=None, engine=None):
         try:
             template_string = force_text(template_string)
@@ -321,7 +321,7 @@ def linebreak_iter(template_source):
     yield len(template_source) + 1
 
 
-class Token(object):
+class Token:
     def __init__(self, token_type, contents, position=None, lineno=None):
         """
         A token representing a string from the template.
@@ -366,7 +366,7 @@ class Token(object):
         return split
 
 
-class Lexer(object):
+class Lexer:
     def __init__(self, template_string):
         self.template_string = template_string
         self.verbatim = False
@@ -443,7 +443,7 @@ class DebugLexer(Lexer):
         return result
 
 
-class Parser(object):
+class Parser:
     def __init__(self, tokens, libraries=None, builtins=None, origin=None):
         self.tokens = tokens
         self.tags = {}
@@ -644,7 +644,7 @@ filter_raw_string = r"""
 filter_re = re.compile(filter_raw_string, re.UNICODE | re.VERBOSE)
 
 
-class FilterExpression(object):
+class FilterExpression:
     """
     Parses a variable token and its optional filters (all as a single string),
     and return a list of tuples of the filter name and arguments.
@@ -776,7 +776,7 @@ class FilterExpression(object):
         return self.token
 
 
-class Variable(object):
+class Variable:
     """
     A template variable, resolvable against a given context. The variable may
     be a hard-coded string (if it begins and ends with single or double quote
@@ -933,7 +933,7 @@ class Variable(object):
         return current
 
 
-class Node(object):
+class Node:
     # Set this to True for nodes that must be first in the template (although
     # they can be preceded by text nodes.
     must_be_first = False

@@ -49,7 +49,7 @@ def get_srid_info(srid, connection):
     return _srid_cache[alias][srid]
 
 
-class GeoSelectFormatMixin(object):
+class GeoSelectFormatMixin:
     def select_format(self, compiler, sql, params):
         """
         Returns the selection format string, depending on the requirements

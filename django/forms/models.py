@@ -187,7 +187,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
     return field_dict
 
 
-class ModelFormOptions(object):
+class ModelFormOptions:
     def __init__(self, options=None):
         self.model = getattr(options, 'model', None)
         self.fields = getattr(options, 'fields', None)
@@ -520,10 +520,8 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
 
     # If parent form class already has an inner Meta, the Meta we're
     # creating needs to inherit from the parent's inner meta.
-    parent = (object,)
-    if hasattr(form, 'Meta'):
-        parent = (form.Meta, object)
-    Meta = type(str('Meta'), parent, attrs)
+    bases = form.Meta if hasattr(form, 'Meta') else ()
+    Meta = type(str('Meta'), bases, attrs)
     if formfield_callback:
         Meta.formfield_callback = staticmethod(formfield_callback)
     # Give this new form class a reasonable name.
@@ -1102,7 +1100,7 @@ class InlineForeignKeyField(Field):
         return False
 
 
-class ModelChoiceIterator(object):
+class ModelChoiceIterator:
     def __init__(self, field):
         self.field = field
         self.queryset = field.queryset

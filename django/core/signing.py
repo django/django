@@ -84,7 +84,7 @@ def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
     return Signer(b'django.http.cookies' + key, salt=salt)
 
 
-class JSONSerializer(object):
+class JSONSerializer:
     """
     Simple wrapper around json to be used in signing.dumps and
     signing.loads.
@@ -149,7 +149,7 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
     return serializer().loads(data)
 
 
-class Signer(object):
+class Signer:
 
     def __init__(self, key=None, sep=':', salt=None):
         # Use of native strings in all versions of Python

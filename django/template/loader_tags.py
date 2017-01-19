@@ -23,7 +23,7 @@ class ExtendsError(Exception):
     pass
 
 
-class BlockContext(object):
+class BlockContext:
     def __init__(self):
         # Dictionary of FIFO queues.
         self.blocks = defaultdict(list)

@@ -15,7 +15,7 @@ class FunctionalTestCase(unittest.TestCase):
 
     def test_lazy_base_class(self):
         """lazy also finds base class methods in the proxy object"""
-        class Base(object):
+        class Base:
             def base_method(self):
                 pass
 
@@ -27,7 +27,7 @@ class FunctionalTestCase(unittest.TestCase):
 
     def test_lazy_base_class_override(self):
         """lazy finds the correct (overridden) method implementation"""
-        class Base(object):
+        class Base:
             def method(self):
                 return 'Base'
 
@@ -40,7 +40,7 @@ class FunctionalTestCase(unittest.TestCase):
 
     def test_lazy_object_to_string(self):
 
-        class Klazz(object):
+        class Klazz:
             if six.PY3:
                 def __str__(self):
                     return "Î am ā Ǩlâzz."
@@ -62,7 +62,7 @@ class FunctionalTestCase(unittest.TestCase):
         """
         cached_property caches its value and that it behaves like a property
         """
-        class A(object):
+        class A:
 
             @cached_property
             def value(self):

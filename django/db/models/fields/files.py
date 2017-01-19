@@ -138,7 +138,7 @@ class FieldFile(File):
         return {'name': self.name, 'closed': False, '_committed': True, '_file': None}
 
 
-class FileDescriptor(object):
+class FileDescriptor:
     """
     The descriptor for the file attribute on the model instance. Returns a
     FieldFile when accessed so you can do stuff like::

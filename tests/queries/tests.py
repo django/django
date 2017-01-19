@@ -2885,11 +2885,11 @@ class ProxyQueryCleanupTest(TestCase):
 
 
 class WhereNodeTest(TestCase):
-    class DummyNode(object):
+    class DummyNode:
         def as_sql(self, compiler, connection):
             return 'dummy', []
 
-    class MockCompiler(object):
+    class MockCompiler:
         def compile(self, node):
             return node.as_sql(self, connection)
 

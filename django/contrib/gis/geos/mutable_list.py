@@ -15,7 +15,7 @@ from django.utils.six.moves import range
 
 
 @total_ordering
-class ListMixin(object):
+class ListMixin:
     """
     A base class which provides complete list interface.
     Derived classes must call ListMixin's __init__() function

@@ -11,7 +11,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import Promise, curry, wraps
 
 
-class EscapeData(object):
+class EscapeData:
     pass
 
 
@@ -37,7 +37,7 @@ else:
     EscapeUnicode = EscapeText
 
 
-class SafeData(object):
+class SafeData:
     def __html__(self):
         """
         Returns the html representation of a string for interoperability.

@@ -177,7 +177,7 @@ class EggLoaderTests(SimpleTestCase):
         if six.PY2:
             name = name.encode('utf-8')
 
-        class MockLoader(object):
+        class MockLoader:
             pass
 
         class MockProvider(pkg_resources.NullProvider):

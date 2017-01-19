@@ -39,7 +39,7 @@ def check_programs(*programs):
 
 
 @total_ordering
-class TranslatableFile(object):
+class TranslatableFile:
     def __init__(self, dirpath, file_name, locale_dir):
         self.file = file_name
         self.dirpath = dirpath
@@ -62,7 +62,7 @@ class TranslatableFile(object):
         return os.path.join(self.dirpath, self.file)
 
 
-class BuildFile(object):
+class BuildFile:
     """
     Represents the state of a translatable file during the build process.
     """

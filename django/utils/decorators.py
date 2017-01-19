@@ -174,7 +174,7 @@ def make_middleware_decorator(middleware_class):
 if ContextDecorator is None:
     # ContextDecorator was introduced in Python 3.2
     # See https://docs.python.org/3/library/contextlib.html#contextlib.ContextDecorator
-    class ContextDecorator(object):
+    class ContextDecorator:
         """
         A base class that enables a context manager to also be used as a decorator.
         """
@@ -186,7 +186,7 @@ if ContextDecorator is None:
             return inner
 
 
-class classproperty(object):
+class classproperty:
     def __init__(self, method=None):
         self.fget = method
 

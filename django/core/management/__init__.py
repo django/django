@@ -130,7 +130,7 @@ def call_command(command_name, *args, **options):
     return command.execute(*args, **defaults)
 
 
-class ManagementUtility(object):
+class ManagementUtility:
     """
     Encapsulates the logic of the django-admin and manage.py utilities.
 

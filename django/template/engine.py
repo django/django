@@ -9,7 +9,7 @@ from .exceptions import TemplateDoesNotExist
 from .library import import_library
 
 
-class Engine(object):
+class Engine:
     default_builtins = [
         'django.template.defaulttags',
         'django.template.defaultfilters',

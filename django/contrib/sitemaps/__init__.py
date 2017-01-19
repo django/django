@@ -49,7 +49,7 @@ def _get_sitemap_full_url(sitemap_url):
     return 'http://%s%s' % (current_site.domain, sitemap_url)
 
 
-class Sitemap(object):
+class Sitemap:
     # This limit is defined by Google. See the index documentation at
     # http://www.sitemaps.org/protocol.html#index.
     limit = 50000

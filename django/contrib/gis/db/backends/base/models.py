@@ -4,7 +4,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
-class SpatialRefSysMixin(object):
+class SpatialRefSysMixin:
     """
     The SpatialRefSysMixin is a class used by the database-dependent
     SpatialRefSys objects to reduce redundant code.

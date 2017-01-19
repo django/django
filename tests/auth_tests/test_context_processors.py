@@ -10,7 +10,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from .settings import AUTH_MIDDLEWARE, AUTH_TEMPLATES
 
 
-class MockUser(object):
+class MockUser:
     def has_module_perms(self, perm):
         if perm == 'mockapp':
             return True
@@ -26,7 +26,7 @@ class PermWrapperTests(SimpleTestCase):
     """
     Test some details of the PermWrapper implementation.
     """
-    class EQLimiterObject(object):
+    class EQLimiterObject:
         """
         This object makes sure __eq__ will not be called endlessly.
         """

@@ -679,7 +679,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         return GEOSGeometry(capi.geom_clone(self.ptr), srid=self.srid)
 
 
-class LinearGeometryMixin(object):
+class LinearGeometryMixin:
     """
     Used for LineString and MultiLineString.
     """

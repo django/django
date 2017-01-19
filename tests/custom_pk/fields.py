@@ -7,7 +7,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
-class MyWrapper(object):
+class MyWrapper:
     def __init__(self, value):
         self.value = value
 

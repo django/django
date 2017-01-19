@@ -23,7 +23,7 @@ def supports_color():
     return True
 
 
-class Style(object):
+class Style:
     pass
 
 

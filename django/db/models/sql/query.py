@@ -46,7 +46,7 @@ def get_field_names_from_opts(opts):
     ))
 
 
-class RawQuery(object):
+class RawQuery:
     """
     A single raw SQL query
     """
@@ -114,7 +114,7 @@ class RawQuery(object):
         self.cursor.execute(self.sql, params)
 
 
-class Query(object):
+class Query:
     """
     A single SQL query.
     """
@@ -2065,7 +2065,7 @@ def is_reverse_o2o(field):
     return field.is_relation and field.one_to_one and not field.concrete
 
 
-class JoinPromoter(object):
+class JoinPromoter:
     """
     A class to abstract away join promotion problems for complex filter
     conditions.

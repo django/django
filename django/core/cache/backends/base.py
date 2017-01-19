@@ -49,7 +49,7 @@ def get_key_func(key_func):
     return default_key_func
 
 
-class BaseCache(object):
+class BaseCache:
     def __init__(self, params):
         timeout = params.get('timeout', params.get('TIMEOUT', 300))
         if timeout is not None:

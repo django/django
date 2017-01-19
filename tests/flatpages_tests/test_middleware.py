@@ -9,7 +9,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from .settings import FLATPAGES_TEMPLATES
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):

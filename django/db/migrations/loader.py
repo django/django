@@ -18,7 +18,7 @@ from .exceptions import (
 MIGRATIONS_MODULE_NAME = 'migrations'
 
 
-class MigrationLoader(object):
+class MigrationLoader:
     """
     Loads migration files from disk, and their status from the database.
 

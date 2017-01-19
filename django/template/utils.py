@@ -14,7 +14,7 @@ class InvalidTemplateEngineError(ImproperlyConfigured):
     pass
 
 
-class EngineHandler(object):
+class EngineHandler:
     def __init__(self, templates=None):
         """
         templates is an optional list of template engine definitions

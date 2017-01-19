@@ -36,7 +36,7 @@ class override_settings_tags(override_settings):
         base.LEVEL_TAGS = self.old_level_tags
 
 
-class BaseTests(object):
+class BaseTests:
     storage_class = default_storage
     levels = {
         'debug': constants.DEBUG,

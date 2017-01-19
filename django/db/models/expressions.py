@@ -9,7 +9,7 @@ from django.utils import six
 from django.utils.functional import cached_property
 
 
-class Combinable(object):
+class Combinable:
     """
     Provides the ability to combine one or two objects with
     some connector. For example F('foo') + F('bar').
@@ -124,7 +124,7 @@ class Combinable(object):
         )
 
 
-class BaseExpression(object):
+class BaseExpression:
     """
     Base class for all query expressions.
     """

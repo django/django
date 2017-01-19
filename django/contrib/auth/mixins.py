@@ -6,7 +6,7 @@ from django.utils import six
 from django.utils.encoding import force_text
 
 
-class AccessMixin(object):
+class AccessMixin:
     """
     Abstract CBV mixin that gives access mixins the same customizable
     functionality.

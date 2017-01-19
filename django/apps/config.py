@@ -8,7 +8,7 @@ from django.utils.module_loading import module_has_submodule
 MODELS_MODULE_NAME = 'models'
 
 
-class AppConfig(object):
+class AppConfig:
     """
     Class representing a Django application and its configuration.
     """

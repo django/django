@@ -8,7 +8,7 @@ Parser and utilities for the smart 'if' tag
 # 'bp' = binding power (left = lbp, right = rbp)
 
 
-class TokenBase(object):
+class TokenBase:
     """
     Base class for operators and literals, mainly for debugging and for throwing
     syntax errors.
@@ -147,7 +147,7 @@ class EndToken(TokenBase):
 EndToken = EndToken()
 
 
-class IfParser(object):
+class IfParser:
     error_class = ValueError
 
     def __init__(self, tokens):

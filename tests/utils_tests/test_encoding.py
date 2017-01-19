@@ -18,7 +18,7 @@ class TestEncodingUtils(unittest.TestCase):
         """
         Broken __unicode__/__str__ actually raises an error.
         """
-        class MyString(object):
+        class MyString:
             def __str__(self):
                 return b'\xc3\xb6\xc3\xa4\xc3\xbc'
 

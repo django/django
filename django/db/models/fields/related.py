@@ -1095,7 +1095,7 @@ def create_many_to_many_intermediary_model(field, klass):
         to = 'to_%s' % to
         from_ = 'from_%s' % from_
 
-    meta = type(str('Meta'), (object,), {
+    meta = type(str('Meta'), (), {
         'db_table': field._get_m2m_db_table(klass._meta),
         'auto_created': klass,
         'app_label': klass._meta.app_label,

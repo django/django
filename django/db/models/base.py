@@ -41,7 +41,7 @@ from django.utils.version import get_version
 
 
 @python_2_unicode_compatible
-class Deferred(object):
+class Deferred:
     def __repr__(self):
         return str('<Deferred field>')
 
@@ -452,7 +452,7 @@ class ModelBase(type):
         return cls._meta.default_manager
 
 
-class ModelState(object):
+class ModelState:
     """
     A class for storing instance state
     """

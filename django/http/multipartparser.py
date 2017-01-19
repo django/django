@@ -45,7 +45,7 @@ FIELD = "field"
 _BASE64_DECODE_ERROR = TypeError if six.PY2 else binascii.Error
 
 
-class MultiPartParser(object):
+class MultiPartParser:
     """
     A rfc2388 multipart/form-data parser.
 
@@ -650,7 +650,7 @@ def parse_boundary_stream(stream, max_header_size):
     return (TYPE, outdict, stream)
 
 
-class Parser(object):
+class Parser:
     def __init__(self, stream, boundary):
         self._stream = stream
         self._separator = b'--' + boundary

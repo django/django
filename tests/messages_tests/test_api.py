@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.test import RequestFactory, SimpleTestCase
 
 
-class DummyStorage(object):
+class DummyStorage:
     """
     dummy message-store to test the api methods
     """
@@ -44,7 +44,7 @@ class ApiTests(SimpleTestCase):
         self.assertEqual(self.storage.store, [])
 
 
-class CustomRequest(object):
+class CustomRequest:
     def __init__(self, request):
         self._request = request
 

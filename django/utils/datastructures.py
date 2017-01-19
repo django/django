@@ -4,7 +4,7 @@ from collections import OrderedDict
 from django.utils import six
 
 
-class OrderedSet(object):
+class OrderedSet:
     """
     A set which keeps the ordering of the inserted items.
     Currently backs onto OrderedDict.

@@ -5,7 +5,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.inspect import func_supports_parameter
 
 
-class Loader(object):
+class Loader:
 
     def __init__(self, engine):
         self.engine = engine

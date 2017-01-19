@@ -18,7 +18,7 @@ from django.utils.functional import cached_property
 
 
 @python_2_unicode_compatible
-class GenericForeignKey(object):
+class GenericForeignKey:
     """
     Provide a generic many-to-one relation through the ``content_type`` and
     ``object_id`` fields.

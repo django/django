@@ -75,7 +75,7 @@ def make_immutable_fields_list(name, data):
 
 
 @python_2_unicode_compatible
-class Options(object):
+class Options:
     FORWARD_PROPERTIES = {
         'fields', 'many_to_many', 'concrete_fields', 'local_concrete_fields',
         '_forward_fields_map', 'managers', 'managers_map', 'base_manager',

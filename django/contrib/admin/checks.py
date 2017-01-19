@@ -65,7 +65,7 @@ def check_dependencies(**kwargs):
     return errors
 
 
-class BaseModelAdminChecks(object):
+class BaseModelAdminChecks:
 
     def check(self, admin_obj, **kwargs):
         errors = []

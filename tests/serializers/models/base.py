@@ -112,7 +112,7 @@ class Score(models.Model):
 
 
 @python_2_unicode_compatible
-class Team(object):
+class Team:
     def __init__(self, title):
         self.title = title
 

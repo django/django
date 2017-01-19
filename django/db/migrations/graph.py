@@ -22,7 +22,7 @@ RECURSION_DEPTH_WARNING = (
 
 @python_2_unicode_compatible
 @total_ordering
-class Node(object):
+class Node:
     """
     A single node in the migration graph. Contains direct links to adjacent
     nodes in either direction.
@@ -105,7 +105,7 @@ class DummyNode(Node):
 
 
 @python_2_unicode_compatible
-class MigrationGraph(object):
+class MigrationGraph:
     """
     Represents the digraph of all migrations in a project.
 

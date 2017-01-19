@@ -10,7 +10,7 @@ from django.contrib.gis.db.backends.postgis.pgraster import to_pgraster
 from django.contrib.gis.geometry.backend import Geometry
 
 
-class PostGISAdapter(object):
+class PostGISAdapter:
     def __init__(self, obj, geography=False):
         """
         Initialize on the spatial object.

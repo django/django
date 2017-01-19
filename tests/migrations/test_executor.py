@@ -642,13 +642,13 @@ class ExecutorTests(MigrationTestBase):
         )
 
 
-class FakeLoader(object):
+class FakeLoader:
     def __init__(self, graph, applied):
         self.graph = graph
         self.applied_migrations = applied
 
 
-class FakeMigration(object):
+class FakeMigration:
     """Really all we need is any object with a debug-useful repr."""
     def __init__(self, name):
         self.name = name

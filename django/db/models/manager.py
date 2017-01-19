@@ -9,7 +9,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
-class BaseManager(object):
+class BaseManager:
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
@@ -176,7 +176,7 @@ class Manager(BaseManager.from_queryset(QuerySet)):
     pass
 
 
-class ManagerDescriptor(object):
+class ManagerDescriptor:
 
     def __init__(self, manager):
         self.manager = manager

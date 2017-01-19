@@ -11,7 +11,7 @@ from wsgiref import simple_server
 MAX_SOCKET_CHUNK_SIZE = 32 * 1024 * 1024  # 32 MB
 
 
-class ServerHandler(simple_server.ServerHandler, object):
+class ServerHandler(simple_server.ServerHandler):
     error_status = str("500 INTERNAL SERVER ERROR")
 
     def write(self, data):
@@ -40,7 +40,7 @@ class ServerHandler(simple_server.ServerHandler, object):
         return ['\n'.join(traceback.format_exception(*sys.exc_info()))]
 
 
-class DummyHandler(object):
+class DummyHandler:
     def log_request(self, *args, **kwargs):
         pass
 

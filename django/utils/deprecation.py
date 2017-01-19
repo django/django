@@ -15,7 +15,7 @@ class RemovedInDjango21Warning(PendingDeprecationWarning):
 RemovedInNextVersionWarning = RemovedInDjango20Warning
 
 
-class warn_about_renamed_method(object):
+class warn_about_renamed_method:
     def __init__(self, class_name, old_method_name, new_method_name, deprecation_warning):
         self.class_name = class_name
         self.old_method_name = old_method_name
@@ -127,7 +127,7 @@ CallableFalse = CallableBool(False)
 CallableTrue = CallableBool(True)
 
 
-class MiddlewareMixin(object):
+class MiddlewareMixin:
     def __init__(self, get_response=None):
         self.get_response = get_response
         super(MiddlewareMixin, self).__init__()

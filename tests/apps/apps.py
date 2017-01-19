@@ -18,7 +18,7 @@ class BadConfig(AppConfig):
     """This class doesn't supply the mandatory 'name' attribute."""
 
 
-class NotAConfig(object):
+class NotAConfig:
     name = 'apps'
 
 

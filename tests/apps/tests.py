@@ -300,7 +300,7 @@ class AppsTests(SimpleTestCase):
         self.assertListEqual(model_classes, [LazyA, LazyB, LazyB, LazyC, LazyA])
 
 
-class Stub(object):
+class Stub:
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
