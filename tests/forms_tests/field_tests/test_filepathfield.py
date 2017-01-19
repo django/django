@@ -2,7 +2,6 @@ import os.path
 
 from django.forms import FilePathField, ValidationError, forms
 from django.test import SimpleTestCase
-from django.utils._os import upath
 
 
 def fix_os_paths(x):
@@ -19,13 +18,11 @@ def fix_os_paths(x):
 class FilePathFieldTest(SimpleTestCase):
 
     def test_filepathfield_1(self):
-        path = os.path.abspath(upath(forms.__file__))
-        path = os.path.dirname(path) + '/'
+        path = os.path.dirname(os.path.abspath(forms.__file__)) + '/'
         self.assertTrue(fix_os_paths(path).endswith('/django/forms/'))
 
     def test_filepathfield_2(self):
-        path = upath(forms.__file__)
-        path = os.path.dirname(os.path.abspath(path)) + '/'
+        path = os.path.dirname(os.path.abspath(forms.__file__)) + '/'
         f = FilePathField(path=path)
         f.choices = [p for p in f.choices if p[0].endswith('.py')]
         f.choices.sort()
@@ -49,8 +46,7 @@ class FilePathFieldTest(SimpleTestCase):
         self.assertTrue(fix_os_paths(f.clean(path + 'fields.py')).endswith('/django/forms/fields.py'))
 
     def test_filepathfield_3(self):
-        path = upath(forms.__file__)
-        path = os.path.dirname(os.path.abspath(path)) + '/'
+        path = os.path.dirname(os.path.abspath(forms.__file__)) + '/'
         f = FilePathField(path=path, match=r'^.*?\.py$')
         f.choices.sort()
         expected = [
@@ -69,8 +65,7 @@ class FilePathFieldTest(SimpleTestCase):
             self.assertTrue(got[0].endswith(exp[0]))
 
     def test_filepathfield_4(self):
-        path = os.path.abspath(upath(forms.__file__))
-        path = os.path.dirname(path) + '/'
+        path = os.path.dirname(os.path.abspath(forms.__file__)) + '/'
         f = FilePathField(path=path, recursive=True, match=r'^.*?\.py$')
         f.choices.sort()
         expected = [
@@ -89,7 +84,7 @@ class FilePathFieldTest(SimpleTestCase):
             self.assertTrue(got[0].endswith(exp[0]))
 
     def test_filepathfield_folders(self):
-        path = os.path.abspath(os.path.join(upath(__file__), '..', '..')) + '/tests/filepath_test_files/'
+        path = os.path.abspath(os.path.join(__file__, '..', '..')) + '/tests/filepath_test_files/'
         f = FilePathField(path=path, allow_folders=True, allow_files=False)
         f.choices.sort()
         expected = [

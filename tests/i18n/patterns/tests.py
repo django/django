@@ -10,7 +10,6 @@ from django.test.client import RequestFactory
 from django.test.utils import override_script_prefix
 from django.urls import clear_url_caches, reverse, translate_url
 from django.utils import translation
-from django.utils._os import upath
 
 
 class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
@@ -20,7 +19,7 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
 @override_settings(
     USE_I18N=True,
     LOCALE_PATHS=[
-        os.path.join(os.path.dirname(upath(__file__)), 'locale'),
+        os.path.join(os.path.dirname(__file__), 'locale'),
     ],
     LANGUAGE_CODE='en-us',
     LANGUAGES=[
@@ -35,7 +34,7 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
     ROOT_URLCONF='i18n.patterns.urls.default',
     TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+        'DIRS': [os.path.join(os.path.dirname(__file__), 'templates')],
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.i18n',

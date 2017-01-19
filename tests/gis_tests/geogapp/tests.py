@@ -10,7 +10,6 @@ from django.contrib.gis.measure import D
 from django.db import connection
 from django.db.models.functions import Cast
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.utils._os import upath
 
 from ..utils import oracle, postgis, spatialite
 from .models import City, County, Zipcode
@@ -66,7 +65,7 @@ class GeographyTest(TestCase):
         from django.contrib.gis.utils import LayerMapping
 
         # Getting the shapefile and mapping dictionary.
-        shp_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), '..', 'data'))
+        shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
         co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
         co_mapping = {'name': 'Name',
                       'state': 'State',

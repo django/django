@@ -7,7 +7,6 @@ from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.db import models
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import extend_sys_path, isolate_apps
-from django.utils._os import upath
 
 from .default_config_app.apps import CustomConfig
 from .models import SoAlternative, TotallyNormal, new_apps
@@ -29,7 +28,7 @@ SOME_INSTALLED_APPS_NAMES = [
     'django.contrib.auth',
 ] + SOME_INSTALLED_APPS[2:]
 
-HERE = os.path.dirname(upath(__file__))
+HERE = os.path.dirname(__file__)
 
 
 class AppsTests(SimpleTestCase):
@@ -385,7 +384,7 @@ class NamespacePackageAppTests(SimpleTestCase):
         with extend_sys_path(self.base_location):
             with self.settings(INSTALLED_APPS=['nsapp']):
                 app_config = apps.get_app_config('nsapp')
-                self.assertEqual(app_config.path, upath(self.app_path))
+                self.assertEqual(app_config.path, self.app_path)
 
     def test_multiple_paths(self):
         """
@@ -410,4 +409,4 @@ class NamespacePackageAppTests(SimpleTestCase):
         with extend_sys_path(self.base_location, self.other_location):
             with self.settings(INSTALLED_APPS=['nsapp.apps.NSAppConfig']):
                 app_config = apps.get_app_config('nsapp')
-                self.assertEqual(app_config.path, upath(self.app_path))
+                self.assertEqual(app_config.path, self.app_path)

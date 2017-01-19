@@ -14,7 +14,6 @@ from django.conf.locale import LANG_INFO
 from django.core.exceptions import AppRegistryNotReady
 from django.core.signals import setting_changed
 from django.dispatch import receiver
-from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.translation import LANGUAGE_SESSION_KEY
@@ -155,7 +154,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _init_translation_catalog(self):
         """Creates a base catalog using global django translations."""
-        settingsfile = upath(sys.modules[settings.__module__].__file__)
+        settingsfile = sys.modules[settings.__module__].__file__
         localedir = os.path.join(os.path.dirname(settingsfile), 'locale')
         translation = self._new_gnu_trans(localedir)
         self.merge(translation)
@@ -399,7 +398,7 @@ def all_locale_paths():
     Returns a list of paths to user-provides languages files.
     """
     globalpath = os.path.join(
-        os.path.dirname(upath(sys.modules[settings.__module__].__file__)), 'locale')
+        os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
     return [globalpath] + list(settings.LOCALE_PATHS)
 
 

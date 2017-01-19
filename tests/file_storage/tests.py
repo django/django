@@ -24,7 +24,6 @@ from django.test import (
 from django.test.utils import requires_tz_support
 from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import timezone
-from django.utils._os import upath
 
 from .models import Storage, temp_storage, temp_storage_location
 
@@ -108,7 +107,7 @@ class FileStorageTests(SimpleTestCase):
         """
         storage = self.storage_class(location='')
         self.assertEqual(storage.base_location, '')
-        self.assertEqual(storage.location, upath(os.getcwd()))
+        self.assertEqual(storage.location, os.getcwd())
 
     def test_file_access_options(self):
         """

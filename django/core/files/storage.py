@@ -9,7 +9,7 @@ from django.core.files import File, locks
 from django.core.files.move import file_move_safe
 from django.core.signals import setting_changed
 from django.utils import timezone
-from django.utils._os import abspathu, safe_join
+from django.utils._os import safe_join
 from django.utils.crypto import get_random_string
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import filepath_to_uri, force_text
@@ -201,7 +201,7 @@ class FileSystemStorage(Storage):
 
     @cached_property
     def location(self):
-        return abspathu(self.base_location)
+        return os.path.abspath(self.base_location)
 
     @cached_property
     def base_url(self):

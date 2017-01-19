@@ -1,8 +1,6 @@
 import os.path
 
-from django.utils._os import upath
-
-TEST_ROOT = os.path.dirname(upath(__file__))
+TEST_ROOT = os.path.dirname(__file__)
 
 TEST_SETTINGS = {
     'MEDIA_URL': '/media/',

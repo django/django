@@ -17,7 +17,6 @@ from django.test import TestCase, TransactionTestCase
 from django.test.runner import default_test_processes
 from django.test.selenium import SeleniumTestCaseBase
 from django.test.utils import get_runner
-from django.utils._os import upath
 from django.utils.deprecation import (
     RemovedInDjango21Warning, RemovedInDjango30Warning,
 )
@@ -31,7 +30,7 @@ warnings.simplefilter("error", RuntimeWarning)
 # Ignore known warnings in test dependencies.
 warnings.filterwarnings("ignore", "'U' mode is deprecated", DeprecationWarning, module='docutils.io')
 
-RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
+RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 
 TEMPLATE_DIR = os.path.join(RUNTESTS_DIR, 'templates')
 
@@ -276,7 +275,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
 
 def get_subprocess_args(options):
     subprocess_args = [
-        sys.executable, upath(__file__), '--settings=%s' % options.settings
+        sys.executable, __file__, '--settings=%s' % options.settings
     ]
     if options.failfast:
         subprocess_args.append('--failfast')

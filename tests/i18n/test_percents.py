@@ -2,13 +2,12 @@ import os
 
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
-from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.translation import activate, get_language, trans_real
 
 from .utils import POFileAssertionMixin
 
-SAMPLEPROJECT_DIR = os.path.join(os.path.dirname(os.path.abspath(upath(__file__))), 'sampleproject')
+SAMPLEPROJECT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sampleproject')
 SAMPLEPROJECT_LOCALE = os.path.join(SAMPLEPROJECT_DIR, 'locale')
 
 

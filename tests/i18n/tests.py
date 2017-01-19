@@ -15,7 +15,6 @@ from django.test import (
     RequestFactory, SimpleTestCase, TestCase, override_settings,
 )
 from django.utils import translation
-from django.utils._os import upath
 from django.utils.formats import (
     date_format, get_format, get_format_modules, iter_format_modules, localize,
     localize_input, reset_format_cache, sanitize_separators, time_format,
@@ -32,7 +31,7 @@ from django.utils.translation import (
 from .forms import CompanyForm, I18nForm, SelectDateForm
 from .models import Company, TestModel
 
-here = os.path.dirname(os.path.abspath(upath(__file__)))
+here = os.path.dirname(os.path.abspath(__file__))
 extended_locale_paths = settings.LOCALE_PATHS + [
     os.path.join(here, 'other', 'locale'),
 ]

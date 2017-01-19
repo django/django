@@ -3,7 +3,6 @@ import os
 from django.core.management import call_command
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import extend_sys_path
-from django.utils._os import upath
 
 from .models import (
     ConcreteModel, ConcreteModelSubclass, ConcreteModelSubclassProxy,
@@ -20,7 +19,7 @@ class ProxyModelInheritanceTests(TransactionTestCase):
     available_apps = []
 
     def test_table_exists(self):
-        with extend_sys_path(os.path.dirname(os.path.abspath(upath(__file__)))):
+        with extend_sys_path(os.path.dirname(os.path.abspath(__file__))):
             with self.modify_settings(INSTALLED_APPS={'append': ['app1', 'app2']}):
                 call_command('migrate', verbosity=0, run_syncdb=True)
                 from app1.models import ProxyModel

@@ -8,7 +8,6 @@ from django.conf import settings
 from django.core.exceptions import (
     FieldDoesNotExist, ImproperlyConfigured, ValidationError,
 )
-from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
 from django.utils.html import format_html
@@ -168,7 +167,7 @@ class CommonPasswordValidator:
     https://xato.net/passwords/more-top-worst-passwords/
     """
     DEFAULT_PASSWORD_LIST_PATH = os.path.join(
-        os.path.dirname(os.path.realpath(upath(__file__))), 'common-passwords.txt.gz'
+        os.path.dirname(os.path.realpath(__file__)), 'common-passwords.txt.gz'
     )
 
     def __init__(self, password_list_path=DEFAULT_PASSWORD_LIST_PATH):

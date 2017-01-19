@@ -15,7 +15,6 @@ from django.core import validators
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.utils._os import upath
 
 temp_storage_dir = tempfile.mkdtemp()
 temp_storage = FileSystemStorage(temp_storage_dir)
@@ -160,7 +159,7 @@ class CustomFF(models.Model):
 
 
 class FilePathModel(models.Model):
-    path = models.FilePathField(path=os.path.dirname(upath(__file__)), match=r".*\.py$", blank=True)
+    path = models.FilePathField(path=os.path.dirname(__file__), match=r".*\.py$", blank=True)
 
 
 try:

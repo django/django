@@ -2,7 +2,6 @@ import os
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
-from django.utils._os import upath
 from django.utils.module_loading import module_has_submodule
 
 MODELS_MODULE_NAME = 'models'
@@ -80,7 +79,7 @@ class AppConfig:
                 "The app module %r has no filesystem location, "
                 "you must configure this app with an AppConfig subclass "
                 "with a 'path' class attribute." % (module,))
-        return upath(paths[0])
+        return paths[0]
 
     @classmethod
     def create(cls, entry):
