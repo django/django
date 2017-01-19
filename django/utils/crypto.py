@@ -6,6 +6,7 @@ import hashlib
 import hmac
 import random
 import struct
+import sys
 import time
 
 from django.conf import settings
@@ -13,7 +14,11 @@ from django.utils.encoding import force_bytes
 
 # Use the system PRNG if possible
 try:
-    random = random.SystemRandom()
+    if sys.version_info >= (3, 6):
+        import secrets
+        random = secrets.SystemRandom()
+    else:
+        random = random.SystemRandom()
     using_sysrandom = True
 except NotImplementedError:
     import warnings
