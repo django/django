@@ -1,7 +1,5 @@
 import mimetypes
 import os
-import random
-import time
 from email import (
     charset as Charset, encoders as Encoders, generator, message_from_string,
 )
@@ -13,7 +11,7 @@ from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.utils import formatdate, getaddresses, parseaddr
+from email.utils import formatdate, getaddresses, make_msgid, parseaddr
 from io import BytesIO, StringIO
 
 from django.conf import settings
@@ -36,35 +34,6 @@ RFC5322_EMAIL_LINE_LENGTH_LIMIT = 998
 
 class BadHeaderError(ValueError):
     pass
-
-
-# Copied from Python 3.2+ standard library, with the following modifications:
-# * Used cached hostname for performance.
-# TODO: replace with email.utils.make_msgid(.., domain=DNS_NAME) when dropping
-# Python 2 (Python 2's version doesn't have domain parameter) (#23905).
-def make_msgid(idstring=None, domain=None):
-    """Returns a string suitable for RFC 5322 compliant Message-ID, e.g:
-
-    <20020201195627.33539.96671@nightshade.la.mastaler.com>
-
-    Optional idstring if given is a string used to strengthen the
-    uniqueness of the message id.  Optional domain if given provides the
-    portion of the message id after the '@'.  It defaults to the locally
-    defined hostname.
-    """
-    timeval = time.time()
-    utcdate = time.strftime('%Y%m%d%H%M%S', time.gmtime(timeval))
-    pid = os.getpid()
-    randint = random.randrange(100000)
-    if idstring is None:
-        idstring = ''
-    else:
-        idstring = '.' + idstring
-    if domain is None:
-        # stdlib uses socket.getfqdn() here instead
-        domain = DNS_NAME
-    msgid = '<%s.%s.%s%s@%s>' % (utcdate, pid, randint, idstring, domain)
-    return msgid
 
 
 # Header names that contain structured address data (RFC #5322)
