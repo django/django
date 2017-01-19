@@ -52,7 +52,6 @@ TEST_DATA = [
     (validate_email, 'test@domain.with.idn.tld.उदाहरण.परीक्षा', None),
     (validate_email, 'email@localhost', None),
     (EmailValidator(whitelist=['localdomain']), 'email@localdomain', None),
-    (validate_email, '"test@test"@example.com', None),
     (validate_email, 'example@atm.%s' % ('a' * 63), None),
     (validate_email, 'example@%s.atm' % ('a' * 63), None),
     (validate_email, 'example@%s.%s.atm' % ('a' * 63, 'b' * 10), None),
@@ -63,11 +62,11 @@ TEST_DATA = [
     (validate_email, '', ValidationError),
     (validate_email, 'abc', ValidationError),
     (validate_email, 'abc@', ValidationError),
-    (validate_email, 'abc@bar', ValidationError),
+    (validate_email, 'abc@bar', None),
     (validate_email, 'a @x.cz', ValidationError),
     (validate_email, 'abc@.com', ValidationError),
     (validate_email, 'something@@somewhere.com', ValidationError),
-    (validate_email, 'email@127.0.0.1', ValidationError),
+    (validate_email, 'email@127.0.0.1', None),
     (validate_email, 'email@[127.0.0.256]', ValidationError),
     (validate_email, 'email@[2001:db8::12345]', ValidationError),
     (validate_email, 'email@[2001:db8:0:0:0:0:1]', ValidationError),
@@ -79,7 +78,7 @@ TEST_DATA = [
     (validate_email, 'example@inv-.-alid.com', ValidationError),
     (validate_email, 'test@example.com\n\n<script src="x.js">', ValidationError),
     # Quoted-string format (CR not allowed)
-    (validate_email, '"\\\011"@here.com', None),
+    (validate_email, '"\\\011"@here.com', ValidationError),
     (validate_email, '"\\\012"@here.com', ValidationError),
     (validate_email, 'trailingdot@shouldfail.com.', ValidationError),
     # Max length of domain name labels is 63 characters per RFC 1034.
@@ -90,6 +89,7 @@ TEST_DATA = [
     (validate_email, 'a\n@b.com', ValidationError),
     (validate_email, '"test@test"\n@example.com', ValidationError),
     (validate_email, 'a@[127.0.0.1]\n', ValidationError),
+    (validate_email, '"test@test"@example.com', ValidationError),
 
     (validate_slug, 'slug-ok', None),
     (validate_slug, 'longer-slug-still-ok', None),
