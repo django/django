@@ -200,7 +200,7 @@ class OneToOneFieldTests(TestCase):
         self.assertEqual(form.cleaned_data['publication'], None)
         author = form.save()
         # author object returned from form still retains original publication object
-        # that's why we need to retreive it from database again
+        # that's why we need to retrieve it from database again
         new_author = Author.objects.get(pk=author.pk)
         self.assertEqual(new_author.publication, None)
 

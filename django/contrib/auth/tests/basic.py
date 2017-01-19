@@ -132,7 +132,7 @@ class BasicTestCase(TestCase):
         # created password should be unusable
         self.assertFalse(u.has_usable_password())
 
-        # We can supress output on the management command
+        # We can suppress output on the management command
         new_io = StringIO()
         call_command("createsuperuser",
             interactive=False,

@@ -168,7 +168,7 @@ def _i18n_cache_key_suffix(request, cache_key):
         cache_key += '.%s' % getattr(request, 'LANGUAGE_CODE', get_language())
     if settings.USE_TZ:
         # The datetime module doesn't restrict the output of tzname().
-        # Windows is known to use non-standard, locale-dependant names.
+        # Windows is known to use non-standard, locale-dependent names.
         # User-defined tzinfo classes may return absolutely anything.
         # Hence this paranoid conversion to create a valid cache key.
         tz_name = force_text(get_current_timezone_name(), errors='ignore')

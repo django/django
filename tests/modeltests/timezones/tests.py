@@ -562,7 +562,7 @@ class SerializationTests(TestCase):
     # Backend-specific notes:
     # - JSON supports only milliseconds, microseconds will be truncated.
     # - PyYAML dumps the UTC offset correctly for timezone-aware datetimes,
-    #   but when it loads this representation, it substracts the offset and
+    #   but when it loads this representation, it subtracts the offset and
     #   returns a naive datetime object in UTC (http://pyyaml.org/ticket/202).
     # Tests are adapted to take these quirks into account.
 

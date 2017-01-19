@@ -322,7 +322,7 @@ class DefaultFiltersTests(TestCase):
 
         self.assertEqual(wordwrap('this is a long paragraph of text that '\
             'really needs to be wrapped I\'m afraid', 14),
-            "this is a long\nparagraph of\ntext that\nreally needs\nto be "\
+            "this is a long\nparagraph of\ntext that\nreally needs\not be "\
             "wrapped\nI'm afraid")
 
         self.assertEqual(wordwrap('this is a short paragraph of text.\n  '\

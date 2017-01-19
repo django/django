@@ -73,7 +73,7 @@ class GeoQuerySet(QuerySet):
     def collect(self, **kwargs):
         """
         Performs an aggregate collect operation on the given geometry field.
-        This is analagous to a union operation, but much faster because
+        This is analogous to a union operation, but much faster because
         boundaries are not dissolved.
         """
         return self._spatial_aggregate(aggregates.Collect, **kwargs)

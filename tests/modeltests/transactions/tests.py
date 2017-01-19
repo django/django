@@ -102,10 +102,10 @@ class TransactionTests(TransactionTestCase):
         If there aren't any exceptions, the data will get saved.
         """
         Reporter.objects.create(first_name="Alice", last_name="Smith")
-        remove_comitted_on_success = transaction.commit_on_success(
+        remove_committed_on_success = transaction.commit_on_success(
             self.remove_a_reporter
         )
-        remove_comitted_on_success("Alice")
+        remove_committed_on_success("Alice")
         self.assertEqual(list(Reporter.objects.all()), [])
 
     @skipUnlessDBFeature('supports_transactions')

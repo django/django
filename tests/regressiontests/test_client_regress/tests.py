@@ -140,7 +140,7 @@ class AssertContainsTests(TestCase):
         self.assertNotContains(r, ugettext_lazy('never'))
 
     def test_assert_contains_renders_template_response(self):
-        """ Test that we can pass in an unrendered SimpleTemplateReponse
+        """ Test that we can pass in an unrendered SimpleTemplateResponse
             without throwing an error.
             Refs #15826.
         """
@@ -156,7 +156,7 @@ class AssertContainsTests(TestCase):
         self.assertContains(response, 'Hello')
 
     def test_assert_not_contains_renders_template_response(self):
-        """ Test that we can pass in an unrendered SimpleTemplateReponse
+        """ Test that we can pass in an unrendered SimpleTemplateResponse
             without throwing an error.
             Refs #15826.
         """

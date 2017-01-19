@@ -60,7 +60,7 @@ class PreviewTests(TestCase):
         """
         Test contrib.formtools.preview form retrieval.
 
-        Use the client library to see if we can sucessfully retrieve
+        Use the client library to see if we can successfully retrieve
         the form (mostly testing the setup ROOT_URLCONF
         process). Verify that an additional  hidden input field
         is created to manage the stage.
@@ -96,7 +96,7 @@ class PreviewTests(TestCase):
         Use the client library to POST to the form with stage set to 3
         to see if our forms done() method is called. Check first
         without the security hash, verify failure, retry with security
-        hash and verify sucess.
+        hash and verify success.
 
         """
         # Pass strings for form submittal and add stage variable to

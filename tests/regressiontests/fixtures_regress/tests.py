@@ -425,16 +425,16 @@ class TestFixtures(TestCase):
                 commit=False,
             )
 
-    def test_loaddata_not_existant_fixture_file(self):
+    def test_loaddata_not_existent_fixture_file(self):
         stdout_output = StringIO()
         management.call_command(
             'loaddata',
-            'this_fixture_doesnt_exist',
+            'this_fixture_doesn't_exist',
             verbosity=2,
             commit=False,
             stdout=stdout_output,
         )
-        self.assertTrue("No xml fixture 'this_fixture_doesnt_exist' in" in
+        self.assertTrue("No xml fixture 'this_fixture_doesn't_exist' in" in
             force_text(stdout_output.getvalue()))
 
 

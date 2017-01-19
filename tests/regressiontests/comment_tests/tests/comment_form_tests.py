@@ -68,7 +68,7 @@ class CommentFormTests(CommentTestCase):
         # Save settings in case other tests need 'em
         saved = settings.PROFANITIES_LIST, settings.COMMENTS_ALLOW_PROFANITIES
 
-        # Don't wanna swear in the unit tests if we don't have to...
+        # Don't want to swear in the unit tests if we don't have to...
         settings.PROFANITIES_LIST = ["rooster"]
 
         # Try with COMMENTS_ALLOW_PROFANITIES off

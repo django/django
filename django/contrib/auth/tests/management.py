@@ -104,7 +104,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertFalse(u.has_usable_password())
 
     def test_verbosity_zero(self):
-        # We can supress output on the management command
+        # We can suppress output on the management command
         new_io = StringIO()
         call_command("createsuperuser",
             interactive=False,

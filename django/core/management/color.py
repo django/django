@@ -30,7 +30,7 @@ def color_style():
             class dummy: pass
             style = dummy()
             # The nocolor palette has all available roles.
-            # Use that pallete as the basis for populating
+            # Use that palette as the basis for populating
             # the palette as defined in the environment.
             for role in termcolors.PALETTES[termcolors.NOCOLOR_PALETTE]:
                 format = color_settings.get(role,{})

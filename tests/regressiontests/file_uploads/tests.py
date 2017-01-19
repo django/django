@@ -160,9 +160,9 @@ class FileUploadTests(TestCase):
         response = self.client.request(**r)
 
         # The filenames should have been sanitized by the time it got to the view.
-        recieved = json.loads(response.content.decode('utf-8'))
+        received = json.loads(response.content.decode('utf-8'))
         for i, name in enumerate(scary_file_names):
-            got = recieved["file%s" % i]
+            got = received["file%s" % i]
             self.assertEqual(got, "hax0rd.txt")
 
     def test_filename_overflow(self):

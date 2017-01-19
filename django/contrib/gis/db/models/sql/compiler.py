@@ -309,7 +309,7 @@ class SQLDateTimeCompiler(compiler.SQLDateTimeCompiler, GeoSQLCompiler):
                     datetime = self.resolve_columns(row, fields)[offset]
                 elif needs_string_cast:
                     datetime = typecast_timestamp(str(datetime))
-                # Datetimes are artifically returned in UTC on databases that
+                # Datetimes are artificially returned in UTC on databases that
                 # don't support time zone. Restore the zone used in the query.
                 if settings.USE_TZ:
                     datetime = datetime.replace(tzinfo=None)

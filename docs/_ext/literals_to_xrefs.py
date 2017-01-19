@@ -110,7 +110,7 @@ def fixliterals(fname):
     
 #
 # The following is taken from django.utils.termcolors and is copied here to
-# avoid the dependancy.
+# avoid the dependency.
 #
 
 

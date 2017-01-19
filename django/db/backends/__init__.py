@@ -226,7 +226,7 @@ class BaseDatabaseWrapper(object):
         Puts the transaction manager into a manual state: managed transactions have
         to be committed explicitly by the user. If you switch off transaction
         management and there is a pending commit/rollback, the data will be
-        commited.
+        committed.
         """
         top = self.transaction_state
         if top:

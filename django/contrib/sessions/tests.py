@@ -468,7 +468,7 @@ class CacheSessionTests(SessionTestsMixin, unittest.TestCase):
         },
     }, SESSION_CACHE_ALIAS='sessions')
     def test_non_default_cache(self):
-        # Re-initalize the session backend to make use of overridden settings.
+        # Re-initialize the session backend to make use of overridden settings.
         self.session = self.backend()
 
         self.session.save()

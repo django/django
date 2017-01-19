@@ -289,7 +289,7 @@ class OrderByPKModel(models.Model):
 class SwappableModel(models.Model):
     """A model that can be, but isn't swapped out.
 
-    References to this model *shoudln't* raise any validation error.
+    References to this model *should't* raise any validation error.
     """
     name = models.CharField(max_length=100)
 

@@ -449,7 +449,7 @@ class ModelAdmin(BaseModelAdmin):
             # Take the custom ModelForm's Meta.exclude into account only if the
             # ModelAdmin doesn't define its own.
             exclude.extend(self.form._meta.exclude)
-        # if exclude is an empty list we pass None to be consistant with the
+        # if exclude is an empty list we pass None to be consistent with the
         # default on modelform_factory
         exclude = exclude or None
         defaults = {

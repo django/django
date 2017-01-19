@@ -699,7 +699,7 @@ class Query(object):
             alias = '%s%d' % (self.alias_prefix, len(self.alias_map) + 1)
             current.append(alias)
         else:
-            # The first occurence of a table uses the table name directly.
+            # The first occurrence of a table uses the table name directly.
             alias = table_name
             self.table_map[alias] = [alias]
         self.alias_refcount[alias] = 1

@@ -647,7 +647,7 @@ class Templates(TestCase):
             'basic-syntax27': (r'{{ _("\"fred\"") }}', {}, "\"fred\""),
 
             # regression test for ticket #12554
-            # make sure a silent_variable_failure Exception is supressed
+            # make sure a silent_variable_failure Exception is suppressed
             # on dictionary and attribute lookup
             'basic-syntax28': ("{{ a.b }}", {'a': SilentGetItemClass()}, ('', 'INVALID')),
             'basic-syntax29': ("{{ a.b }}", {'a': SilentAttrClass()}, ('', 'INVALID')),

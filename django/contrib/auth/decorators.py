@@ -59,7 +59,7 @@ def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login
 def permission_required(perm, login_url=None, raise_exception=False):
     """
     Decorator for views that checks whether a user has a particular permission
-    enabled, redirecting to the log-in page if neccesary.
+    enabled, redirecting to the log-in page if necessary.
     If the raise_exception parameter is given the PermissionDenied exception
     is raised.
     """

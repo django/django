@@ -69,10 +69,10 @@ class InspectDBTestCase(TestCase):
         if connection.vendor == 'postgresql':
             # Only PostgreSQL has a specific type
             assertFieldType('ip_address_field', "models.GenericIPAddressField()")
-            assertFieldType('gen_ip_adress_field', "models.GenericIPAddressField()")
+            assertFieldType('gen_ip_address_field', "models.GenericIPAddressField()")
         else:
             assertFieldType('ip_address_field', "models.CharField(max_length=15)")
-            assertFieldType('gen_ip_adress_field', "models.CharField(max_length=39)")
+            assertFieldType('gen_ip_address_field', "models.CharField(max_length=39)")
         if connection.vendor == 'sqlite':
             assertFieldType('pos_int_field', "models.PositiveIntegerField()")
             assertFieldType('pos_small_int_field', "models.PositiveSmallIntegerField()")

@@ -488,7 +488,7 @@ class BoundaryIter(six.Iterator):
         """
         Finds a multipart boundary in data.
 
-        Should no boundry exist in the data None is returned instead. Otherwise
+        Should no boundary exist in the data None is returned instead. Otherwise
         a tuple containing the indices of the following are returned:
 
          * the end of current encapsulation

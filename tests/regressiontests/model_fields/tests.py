@@ -342,7 +342,7 @@ class ValidationTest(test.TestCase):
         f = models.DateField()
         self.assertEqual(datetime.date(2008, 10, 10), f.clean('2008-10-10', None))
 
-    def test_boolean_field_doesnt_accept_empty_input(self):
+    def test_boolean_field_doesn't_accept_empty_input(self):
         f = models.BooleanField()
         self.assertRaises(ValidationError, f.clean, None, None)
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-A series of tests to establish that the command-line managment tools work as
+A series of tests to establish that the command-line management tools work as
 advertised - especially with regards to the handling of the DJANGO_SETTINGS_MODULE
 and default settings.py files.
 """

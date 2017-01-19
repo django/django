@@ -654,7 +654,7 @@ class OldFormForXTests(TestCase):
         self.assertEqual(f.cleaned_data['slug'], 'entertainment')
         self.assertEqual(f.cleaned_data['url'], 'entertainment')
         c1 = f.save()
-        # Testing wether the same object is returned from the
+        # Testing whether the same object is returned from the
         # ORM... not the fastest way...
 
         self.assertEqual(c1, Category.objects.all()[0])
@@ -669,7 +669,7 @@ class OldFormForXTests(TestCase):
         self.assertEqual(f.cleaned_data['slug'], 'its-test')
         self.assertEqual(f.cleaned_data['url'], 'test')
         c2 = f.save()
-        # Testing wether the same object is returned from the
+        # Testing whether the same object is returned from the
         # ORM... not the fastest way...
         self.assertEqual(c2, Category.objects.get(pk=c2.pk))
         self.assertEqual(c2.name, "It's a test")

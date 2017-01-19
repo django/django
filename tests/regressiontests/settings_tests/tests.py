@@ -97,7 +97,7 @@ class SettingsTests(TestCase):
         self.assertEqual('test', settings.TEST)
         del settings.TEST
 
-    def test_override_doesnt_leak(self):
+    def test_override_doesn't_leak(self):
         self.assertRaises(AttributeError, getattr, settings, 'TEST')
         with self.settings(TEST='override'):
             self.assertEqual('override', settings.TEST)

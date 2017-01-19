@@ -828,7 +828,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.cache = get_cache('db://%s?max_entries=30&cull_frequency=0' % self._table_name)
         self.perform_cull_test(50, 18)
 
-    def test_second_call_doesnt_crash(self):
+    def test_second_call_doesn't_crash(self):
         with six.assertRaisesRegex(self, management.CommandError,
                 "Cache table 'test cache table' could not be created"):
             management.call_command(
@@ -1449,7 +1449,7 @@ class CacheI18nTest(TestCase):
             CACHE_MIDDLEWARE_SECONDS=60,
             USE_ETAGS=True,
     )
-    def test_middleware_doesnt_cache_streaming_response(self):
+    def test_middleware_doesn't_cache_streaming_response(self):
         request = self._get_request()
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertIsNone(get_cache_data)

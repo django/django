@@ -40,7 +40,7 @@ CONTENT_TYPE_RE = re.compile('.*; charset=([\w\d-]+);?')
 class FakePayload(object):
     """
     A wrapper around BytesIO that restricts what can be read since data from
-    the network can't be seeked and cannot be read outside of its content
+    the network can't be sought and cannot be read outside of its content
     length. This makes sure that views can't do anything under the test client
     that wouldn't work in Real Life.
     """

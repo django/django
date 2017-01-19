@@ -1,5 +1,5 @@
 """
-Distance and Area objects to allow for sensible and convienient calculation
+Distance and Area objects to allow for sensible and convenient calculation
 and conversions. Here are some tests.
 """
 

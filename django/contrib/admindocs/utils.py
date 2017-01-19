@@ -61,7 +61,7 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
     """
     overrides = {
         'doctitle_xform' : True,
-        'inital_header_level' : 3,
+        'initial_header_level' : 3,
         "default_reference_context" : default_reference_context,
         "link_base" : reverse('django-admindocs-docroot').rstrip('/')
     }

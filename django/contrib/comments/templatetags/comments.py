@@ -51,7 +51,7 @@ class BaseCommentNode(template.Node):
         except ValueError:
             raise template.TemplateSyntaxError("Third argument in %r must be in the format 'app.model'" % tagname)
         except ContentType.DoesNotExist:
-            raise template.TemplateSyntaxError("%r tag has non-existant content-type: '%s.%s'" % (tagname, app, model))
+            raise template.TemplateSyntaxError("%r tag has non-existent content-type: '%s.%s'" % (tagname, app, model))
 
     def __init__(self, ctype=None, object_pk_expr=None, object_expr=None, as_varname=None, comment=None):
         if ctype is None and object_expr is None:

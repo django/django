@@ -788,7 +788,7 @@ class Queries1Tests(BaseQuerysetTest):
         )
 
     def test_ticket7181(self):
-        # Ordering by related tables should accomodate nullable fields (this
+        # Ordering by related tables should accommodate nullable fields (this
         # test is a little tricky, since NULL ordering is database dependent.
         # Instead, we just count the number of results).
         self.assertEqual(len(Tag.objects.order_by('parent__name')), 5)
@@ -926,7 +926,7 @@ class Queries1Tests(BaseQuerysetTest):
 
     def test_ticket_10790_2(self):
         # Querying across several tables should strip only the last outer join,
-        # while preserving the preceeding inner joins.
+        # while preserving the preceding inner joins.
         q = Tag.objects.filter(parent__parent__isnull=False)
 
         self.assertQuerysetEqual(

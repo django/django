@@ -372,7 +372,7 @@ class HttpResponseTests(unittest.TestCase):
         r.write('!')
         self.assertEqual(r.content, b'helloworld!')
 
-    def test_iterator_isnt_rewound(self):
+    def test_iterator_isn't_rewound(self):
         # Regression test for #13222
         r = HttpResponse('abc')
         i = iter(r)

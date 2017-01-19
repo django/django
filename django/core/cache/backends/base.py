@@ -221,7 +221,7 @@ class BaseCache(object):
         return version+delta
 
     def decr_version(self, key, delta=1, version=None):
-        """Substracts delta from the cache version for the supplied key. Returns
+        """Subtracts delta from the cache version for the supplied key. Returns
         the new version.
         """
         return self.incr_version(key, -delta, version)

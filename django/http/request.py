@@ -211,11 +211,11 @@ class HttpRequest(object):
             try:
                 self._post, self._files = self.parse_file_upload(self.META, data)
             except:
-                # An error occured while parsing POST data. Since when
+                # An error occurred while parsing POST data. Since when
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
                 # attempts to parse POST data again.
-                # Mark that an error occured. This allows self.__repr__ to
+                # Mark that an error occurred. This allows self.__repr__ to
                 # be explicit about it instead of simply representing an
                 # empty POST
                 self._mark_post_parse_error()

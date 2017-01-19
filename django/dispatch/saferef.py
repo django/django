@@ -246,7 +246,7 @@ class BoundNonDescriptorMethodWeakref(BoundMethodWeakref):
         return None
 
 def get_bound_method_weakref(target, onDelete):
-    """Instantiates the appropiate BoundMethodWeakRef, depending on the details of
+    """Instantiates the appropriate BoundMethodWeakRef, depending on the details of
     the underlying class method implementation"""
     if hasattr(target, '__get__'):
         # target method is a descriptor, so the default implementation works:

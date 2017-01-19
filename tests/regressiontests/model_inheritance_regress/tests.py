@@ -256,7 +256,7 @@ class ModelInheritanceTest(TestCase):
         self.assertEqual(m2mchildren, [])
 
         # Ordering should not include any database column more than once (this
-        # is most likely to ocurr naturally with model inheritance, so we
+        # is most likely to occur naturally with model inheritance, so we
         # check it here). Regression test for #9390. This necessarily pokes at
         # the SQL string for the query, since the duplicate problems are only
         # apparent at that late stage.

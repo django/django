@@ -329,7 +329,7 @@ def do_translate(parser, token):
         def top(self):
             value = self.value()
 
-            # Backwards Compatiblity fix:
+            # Backwards Compatibility fix:
             # FilterExpression does not support single-quoted strings,
             # so we make a cheap localized fix in order to maintain
             # backwards compatibility with existing uses of ``trans``

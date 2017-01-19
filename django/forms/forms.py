@@ -158,7 +158,7 @@ class BaseForm(object):
                          for e in bf_errors])
                 hidden_fields.append(six.text_type(bf))
             else:
-                # Create a 'class="..."' atribute if the row should have any
+                # Create a 'class="..."' attribute if the row should have any
                 # CSS classes applied.
                 css_classes = bf.css_classes()
                 if css_classes:

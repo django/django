@@ -58,7 +58,7 @@ class WhereNode(tree.Node):
             # emptiness and transform any non-empty values correctly.
             value = list(value)
 
-        # The "value_annotation" parameter is used to pass auxilliary information
+        # The "value_annotation" parameter is used to pass auxiliary information
         # about the value(s) to the query construction. Specifically, datetime
         # and empty values need special handling. Other types could be used
         # here in the future (using Python types is suggested for consistency).

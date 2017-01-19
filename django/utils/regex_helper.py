@@ -243,7 +243,7 @@ def get_quantifier(ch, input_iter):
     Parse a quantifier from the input, where "ch" is the first character in the
     quantifier.
 
-    Returns the minimum number of occurences permitted by the quantifier and
+    Returns the minimum number of occurrences permitted by the quantifier and
     either None or the next character from the input_iter if the next character
     is not part of the quantifier.
     """

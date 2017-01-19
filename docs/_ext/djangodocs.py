@@ -120,7 +120,7 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     # which is a bit less obvious that I'd like.
     #
     # FIXME: these messages are all hardcoded in English. We need to change
-    # that to accomodate other language docs, but I can't work out how to make
+    # that to accommodate other language docs, but I can't work out how to make
     # that work.
     #
     version_text = {

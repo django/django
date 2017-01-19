@@ -424,7 +424,7 @@ class Example:
         zero-based, with respect to the beginning of the DocTest.
 
       - indent: The example's indentation in the DocTest string.
-        I.e., the number of space characters that preceed the
+        I.e., the number of space characters that precede the
         example's first prompt.
 
       - options: A dictionary mapping from option flags to True or

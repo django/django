@@ -46,7 +46,7 @@ class FlatpageAdminFormTests(TestCase):
 
     @override_settings(APPEND_SLASH=False,
             MIDDLEWARE_CLASSES=('django.middleware.common.CommonMiddleware',))
-    def test_flatpage_doesnt_requires_trailing_slash_without_append_slash(self):
+    def test_flatpage_doesn't_requires_trailing_slash_without_append_slash(self):
         form = FlatpageForm(data=dict(url='/no_trailing_slash', **self.form_data))
         self.assertTrue(form.is_valid())
 
