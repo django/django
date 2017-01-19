@@ -161,7 +161,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
 def run(addr, port, wsgi_handler, ipv6=False, threading=False, server_cls=WSGIServer):
     server_address = (addr, port)
     if threading:
-        httpd_cls = type(str('WSGIServer'), (socketserver.ThreadingMixIn, server_cls), {})
+        httpd_cls = type('WSGIServer', (socketserver.ThreadingMixIn, server_cls), {})
     else:
         httpd_cls = server_cls
     httpd = httpd_cls(server_address, WSGIRequestHandler, ipv6=ipv6)

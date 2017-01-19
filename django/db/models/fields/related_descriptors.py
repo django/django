@@ -94,7 +94,7 @@ class ForwardManyToOneDescriptor:
         # related model might not be resolved yet; `rel.model` might still be
         # a string model reference.
         return type(
-            str('RelatedObjectDoesNotExist'),
+            'RelatedObjectDoesNotExist',
             (self.field.remote_field.model.DoesNotExist, AttributeError),
             {}
         )
@@ -297,7 +297,7 @@ class ReverseOneToOneDescriptor:
         # The exception isn't created at initialization time for the sake of
         # consistency with `ForwardManyToOneDescriptor`.
         return type(
-            str('RelatedObjectDoesNotExist'),
+            'RelatedObjectDoesNotExist',
             (self.related.related_model.DoesNotExist, AttributeError),
             {}
         )

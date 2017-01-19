@@ -111,7 +111,7 @@ class LiveServerPort(LiveServerBase):
         Each LiveServerTestCase binds to a unique port or fails to start a
         server thread when run concurrently (#26011).
         """
-        TestCase = type(str("TestCase"), (LiveServerBase,), {})
+        TestCase = type("TestCase", (LiveServerBase,), {})
         try:
             TestCase.setUpClass()
         except socket.error as e:

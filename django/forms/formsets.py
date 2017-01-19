@@ -441,7 +441,7 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
              'min_num': min_num, 'max_num': max_num,
              'absolute_max': absolute_max, 'validate_min': validate_min,
              'validate_max': validate_max}
-    return type(form.__name__ + str('FormSet'), (formset,), attrs)
+    return type(form.__name__ + 'FormSet', (formset,), attrs)
 
 
 def all_valid(formsets):

@@ -53,7 +53,7 @@ class GetUniqueCheckTests(unittest.TestCase):
                 bar = models.IntegerField()
                 baz = models.IntegerField()
 
-                Meta = type(str('Meta'), (), {
+                Meta = type('Meta', (), {
                     'unique_together': unique_together,
                     'apps': Apps()
                 })

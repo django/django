@@ -322,11 +322,11 @@ class AbstractInheritanceTests(TestCase):
             return list((f.name, f.__class__) for f in model._meta.get_fields())
 
         model_dict = {'__module__': 'model_inheritance'}
-        model1 = type(str('Model1'), (AbstractModel, Mixin), model_dict.copy())
-        model2 = type(str('Model2'), (Mixin2, AbstractModel), model_dict.copy())
-        model3 = type(str('Model3'), (DescendantMixin, AbstractModel), model_dict.copy())
-        model4 = type(str('Model4'), (Mixin2, Mixin, AbstractModel), model_dict.copy())
-        model5 = type(str('Model5'), (Mixin2, ConcreteModel2, Mixin, AbstractModel), model_dict.copy())
+        model1 = type('Model1', (AbstractModel, Mixin), model_dict.copy())
+        model2 = type('Model2', (Mixin2, AbstractModel), model_dict.copy())
+        model3 = type('Model3', (DescendantMixin, AbstractModel), model_dict.copy())
+        model4 = type('Model4', (Mixin2, Mixin, AbstractModel), model_dict.copy())
+        model5 = type('Model5', (Mixin2, ConcreteModel2, Mixin, AbstractModel), model_dict.copy())
 
         self.assertEqual(
             fields(model1),

@@ -2731,12 +2731,12 @@ class ModelFormInheritanceTests(SimpleTestCase):
             foo = forms.IntegerField()
 
         self.assertEqual(list(ModelForm().fields.keys()), ['name'])
-        self.assertEqual(list(type(str('NewForm'), (Mixin, Form), {})().fields.keys()), [])
-        self.assertEqual(list(type(str('NewForm'), (Form2, Mixin, Form), {})().fields.keys()), ['foo'])
-        self.assertEqual(list(type(str('NewForm'), (Mixin, ModelForm, Form), {})().fields.keys()), ['name'])
-        self.assertEqual(list(type(str('NewForm'), (ModelForm, Mixin, Form), {})().fields.keys()), ['name'])
-        self.assertEqual(list(type(str('NewForm'), (ModelForm, Form, Mixin), {})().fields.keys()), ['name', 'age'])
-        self.assertEqual(list(type(str('NewForm'), (ModelForm, Form), {'age': None})().fields.keys()), ['name'])
+        self.assertEqual(list(type('NewForm', (Mixin, Form), {})().fields.keys()), [])
+        self.assertEqual(list(type('NewForm', (Form2, Mixin, Form), {})().fields.keys()), ['foo'])
+        self.assertEqual(list(type('NewForm', (Mixin, ModelForm, Form), {})().fields.keys()), ['name'])
+        self.assertEqual(list(type('NewForm', (ModelForm, Mixin, Form), {})().fields.keys()), ['name'])
+        self.assertEqual(list(type('NewForm', (ModelForm, Form, Mixin), {})().fields.keys()), ['name', 'age'])
+        self.assertEqual(list(type('NewForm', (ModelForm, Form), {'age': None})().fields.keys()), ['name'])
 
     def test_field_removal_name_clashes(self):
         """

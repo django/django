@@ -306,7 +306,7 @@ class MigrationAutodetector:
                 # Make a migration! Well, only if there's stuff to put in it
                 if dependencies or chopped:
                     if not self.generated_operations[app_label] or chop_mode:
-                        subclass = type(str("Migration"), (Migration,), {"operations": [], "dependencies": []})
+                        subclass = type("Migration", (Migration,), {"operations": [], "dependencies": []})
                         instance = subclass("auto_%i" % (len(self.migrations.get(app_label, [])) + 1), app_label)
                         instance.dependencies = list(dependencies)
                         instance.operations = chopped

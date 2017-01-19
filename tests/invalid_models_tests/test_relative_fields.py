@@ -661,7 +661,7 @@ class RelativeFieldTests(SimpleTestCase):
             pass
 
         for invalid_related_name in invalid_related_names:
-            Child = type(str('Child%s') % str(invalid_related_name), (models.Model,), {
+            Child = type('Child%s' % invalid_related_name, (models.Model,), {
                 'parent': models.ForeignKey('Parent', models.CASCADE, related_name=invalid_related_name),
                 '__module__': Parent.__module__,
             })
@@ -700,7 +700,7 @@ class RelativeFieldTests(SimpleTestCase):
             pass
 
         for related_name in related_names:
-            Child = type(str('Child%s') % str(related_name), (models.Model,), {
+            Child = type('Child%s' % related_name, (models.Model,), {
                 'parent': models.ForeignKey('Parent', models.CASCADE, related_name=related_name),
                 '__module__': Parent.__module__,
             })

@@ -197,10 +197,10 @@ class AppsTests(SimpleTestCase):
             'app_label': "apps",
             'apps': new_apps,
         }
-        meta = type(str("Meta"), tuple(), meta_contents)
+        meta = type("Meta", tuple(), meta_contents)
         body['Meta'] = meta
         body['__module__'] = TotallyNormal.__module__
-        temp_model = type(str("SouthPonies"), (models.Model,), body)
+        temp_model = type("SouthPonies", (models.Model,), body)
         # Make sure it appeared in the right place!
         self.assertListEqual(list(apps.get_app_config("apps").get_models()), old_models)
         with self.assertRaises(LookupError):
@@ -218,15 +218,15 @@ class AppsTests(SimpleTestCase):
         }
 
         body = {}
-        body['Meta'] = type(str("Meta"), tuple(), meta_contents)
+        body['Meta'] = type("Meta", tuple(), meta_contents)
         body['__module__'] = TotallyNormal.__module__
-        type(str("SouthPonies"), (models.Model,), body)
+        type("SouthPonies", (models.Model,), body)
 
         # When __name__ and __module__ match we assume the module
         # was reloaded and issue a warning. This use-case is
         # useful for REPL. Refs #23621.
         body = {}
-        body['Meta'] = type(str("Meta"), tuple(), meta_contents)
+        body['Meta'] = type("Meta", tuple(), meta_contents)
         body['__module__'] = TotallyNormal.__module__
         msg = (
             "Model 'apps.southponies' was already registered. "
@@ -234,15 +234,15 @@ class AppsTests(SimpleTestCase):
             "most notably with related models."
         )
         with self.assertRaisesMessage(RuntimeWarning, msg):
-            type(str("SouthPonies"), (models.Model,), body)
+            type("SouthPonies", (models.Model,), body)
 
         # If it doesn't appear to be a reloaded module then we expect
         # a RuntimeError.
         body = {}
-        body['Meta'] = type(str("Meta"), tuple(), meta_contents)
+        body['Meta'] = type("Meta", tuple(), meta_contents)
         body['__module__'] = TotallyNormal.__module__ + '.whatever'
         with self.assertRaisesMessage(RuntimeError, "Conflicting 'southponies' models in application 'apps':"):
-            type(str("SouthPonies"), (models.Model,), body)
+            type("SouthPonies", (models.Model,), body)
 
     def test_get_containing_app_config_apps_not_ready(self):
         """

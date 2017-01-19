@@ -542,7 +542,7 @@ class WriterTests(SimpleTestCase):
             'verbose_name_plural': 'My models',
         }
 
-        migration = type(str("Migration"), (migrations.Migration,), {
+        migration = type("Migration", (migrations.Migration,), {
             "operations": [
                 migrations.CreateModel("MyModel", tuple(fields.items()), options, (models.Model,)),
                 migrations.CreateModel("MyModel2", tuple(fields.items()), bases=(models.Model,)),
@@ -593,7 +593,7 @@ class WriterTests(SimpleTestCase):
                 self.assertEqual(writer.path, expected_path)
 
     def test_custom_operation(self):
-        migration = type(str("Migration"), (migrations.Migration,), {
+        migration = type("Migration", (migrations.Migration,), {
             "operations": [
                 custom_migration_operations.operations.TestOperation(),
                 custom_migration_operations.operations.CreateModel(),
@@ -615,7 +615,7 @@ class WriterTests(SimpleTestCase):
         """
         #24155 - Tests ordering of imports.
         """
-        migration = type(str("Migration"), (migrations.Migration,), {
+        migration = type("Migration", (migrations.Migration,), {
             "operations": [
                 migrations.AddField("mymodel", "myfield", models.DateTimeField(
                     default=datetime.datetime(2012, 1, 1, 1, 1, tzinfo=utc),
@@ -635,7 +635,7 @@ class WriterTests(SimpleTestCase):
         """
         Test comments at top of file.
         """
-        migration = type(str("Migration"), (migrations.Migration,), {
+        migration = type("Migration", (migrations.Migration,), {
             "operations": []
         })
         dt = datetime.datetime(2015, 7, 31, 4, 40, 0, 0, tzinfo=utc)
@@ -655,7 +655,7 @@ class WriterTests(SimpleTestCase):
         """
         django.db.models shouldn't be imported if unused.
         """
-        migration = type(str("Migration"), (migrations.Migration,), {
+        migration = type("Migration", (migrations.Migration,), {
             "operations": [
                 migrations.AlterModelOptions(
                     name='model',

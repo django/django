@@ -1023,7 +1023,7 @@ def create_many_to_many_intermediary_model(field, klass):
         to = 'to_%s' % to
         from_ = 'from_%s' % from_
 
-    meta = type(str('Meta'), (), {
+    meta = type('Meta', (), {
         'db_table': field._get_m2m_db_table(klass._meta),
         'auto_created': klass,
         'app_label': klass._meta.app_label,
@@ -1034,7 +1034,7 @@ def create_many_to_many_intermediary_model(field, klass):
         'apps': field.model._meta.apps,
     })
     # Construct and return the new class.
-    return type(str(name), (models.Model,), {
+    return type(name, (models.Model,), {
         'Meta': meta,
         '__module__': klass.__module__,
         from_: models.ForeignKey(

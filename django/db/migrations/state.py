@@ -578,7 +578,7 @@ class ModelState:
         # First, make a Meta object
         meta_contents = {'app_label': self.app_label, "apps": apps}
         meta_contents.update(self.options)
-        meta = type(str("Meta"), tuple(), meta_contents)
+        meta = type("Meta", tuple(), meta_contents)
         # Then, work out our bases
         try:
             bases = tuple(
@@ -595,7 +595,7 @@ class ModelState:
         # Restore managers
         body.update(self.construct_managers())
         # Then, make a Model object (apps.register_model is called in __new__)
-        return type(str(self.name), bases, body)
+        return type(self.name, bases, body)
 
     def get_field_by_name(self, name):
         for fname, field in self.fields:
