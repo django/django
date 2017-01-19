@@ -13,12 +13,6 @@ from django.utils.inspect import get_func_args
 from django.utils.module_loading import module_dir
 from django.utils.timezone import now
 
-try:
-    import enum
-except ImportError:
-    # No support on Python 2 if enum34 isn't installed.
-    enum = None
-
 
 class SettingsReference(str):
     """

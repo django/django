@@ -1,12 +1,12 @@
 import datetime
 import decimal
+import enum
 import functools
 import math
 import os
 import re
 import sys
 import tokenize
-import unittest
 import uuid
 from io import StringIO
 
@@ -30,11 +30,6 @@ from django.utils.timezone import FixedOffset, get_default_timezone, utc
 from django.utils.translation import ugettext_lazy as _
 
 from .models import FoodManager, FoodQuerySet
-
-try:
-    import enum
-except ImportError:
-    enum = None
 
 PY36 = sys.version_info >= (3, 6)
 
@@ -259,7 +254,6 @@ class WriterTests(SimpleTestCase):
         lazy_pattern = SimpleLazyObject(lambda: pattern)
         self.assertEqual(self.serialize_round_trip(lazy_pattern), pattern)
 
-    @unittest.skipUnless(enum, "enum34 is required on Python 2")
     def test_serialize_enums(self):
         class TextEnum(enum.Enum):
             A = 'a-value'
