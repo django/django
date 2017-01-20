@@ -1,12 +1,10 @@
 """
-SQLite3 backend for django.
-
-Works with either the pysqlite2 module or the sqlite3 module in the
-standard library.
+SQLite3 backend for the sqlite3 module in the standard library.
 """
 import decimal
 import re
 import warnings
+from sqlite3 import dbapi2 as Database
 
 import pytz
 
@@ -20,15 +18,6 @@ from django.utils.dateparse import (
 )
 from django.utils.encoding import force_text
 
-try:
-    try:
-        from pysqlite2 import dbapi2 as Database
-    except ImportError:
-        from sqlite3 import dbapi2 as Database
-except ImportError as exc:
-    raise ImproperlyConfigured("Error loading either pysqlite2 or sqlite3 modules (tried in that order): %s" % exc)
-
-# Some of these import sqlite3, so import them after checking if it's installed.
 from .client import DatabaseClient                          # isort:skip
 from .creation import DatabaseCreation                      # isort:skip
 from .features import DatabaseFeatures                      # isort:skip

@@ -663,18 +663,6 @@ substring filtering.
 
 .. _documented at sqlite.org: https://www.sqlite.org/faq.html#q18
 
-.. _using-newer-versions-of-pysqlite:
-
-Using newer versions of the SQLite DB-API 2.0 driver
-----------------------------------------------------
-
-Django will use a ``pysqlite2`` module in preference to ``sqlite3`` as shipped
-with the Python standard library if it finds one is available.
-
-This provides the ability to upgrade both the DB-API 2.0 interface or SQLite 3
-itself to versions newer than the ones included with your particular Python
-binary distribution, if needed.
-
 "Database is locked" errors
 ---------------------------
 
