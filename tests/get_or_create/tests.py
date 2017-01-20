@@ -201,7 +201,7 @@ class GetOrCreateTestsWithManualPKs(TestCase):
             ManualPrimaryKeyTest.objects.get_or_create(id=1, data="Different")
         except IntegrityError:
             formatted_traceback = traceback.format_exc()
-            self.assertIn(str('obj.save'), formatted_traceback)
+            self.assertIn('obj.save', formatted_traceback)
 
     # MySQL emits a warning when broken data is saved
     @ignore_warnings(module='django.db.backends.mysql.base')

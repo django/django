@@ -109,7 +109,7 @@ class DataSource(GDALBase):
 
     def __str__(self):
         "Returns OGR GetName and Driver for the Data Source."
-        return '%s (%s)' % (self.name, str(self.driver))
+        return '%s (%s)' % (self.name, self.driver)
 
     @property
     def layer_count(self):

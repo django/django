@@ -30,5 +30,5 @@ class SimpleTests(TestCase):
         # coerce the returned value.
         self.assertIsInstance(obj.__str__(), str)
         self.assertIsInstance(obj.__repr__(), str)
-        self.assertEqual(str(obj), str('Default object'))
-        self.assertEqual(repr(obj), str('<Default: Default object>'))
+        self.assertEqual(str(obj), 'Default object')
+        self.assertEqual(repr(obj), '<Default: Default object>')

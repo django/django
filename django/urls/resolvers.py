@@ -236,7 +236,7 @@ class RegexURLResolver(LocaleRegexProvider):
             urlconf_repr = '<%s list>' % self.urlconf_name[0].__class__.__name__
         else:
             urlconf_repr = repr(self.urlconf_name)
-        return str('<%s %s (%s:%s) %s>') % (
+        return '<%s %s (%s:%s) %s>' % (
             self.__class__.__name__, urlconf_repr, self.app_name,
             self.namespace, self.regex.pattern,
         )

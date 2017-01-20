@@ -277,7 +277,7 @@ class FileField(Field):
     def get_prep_value(self, value):
         "Returns field's value prepared for saving into a database."
         value = super(FileField, self).get_prep_value(value)
-        # Need to convert File objects provided via a form to unicode for database insertion
+        # Need to convert File objects provided via a form to string for database insertion
         if value is None:
             return None
         return str(value)

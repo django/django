@@ -248,7 +248,7 @@ class RelatedModelFormTests(SimpleTestCase):
             fields = '__all__'
 
         with self.assertRaises(ValueError):
-            ModelFormMetaclass(str('Form'), (ModelForm,), {'Meta': Meta})
+            ModelFormMetaclass('Form', (ModelForm,), {'Meta': Meta})
 
         class B(models.Model):
             pass
@@ -267,7 +267,7 @@ class RelatedModelFormTests(SimpleTestCase):
             model = C
             fields = '__all__'
 
-        self.assertTrue(issubclass(ModelFormMetaclass(str('Form'), (ModelForm,), {'Meta': Meta}), ModelForm))
+        self.assertTrue(issubclass(ModelFormMetaclass('Form', (ModelForm,), {'Meta': Meta}), ModelForm))
 
 
 class ManyToManyExclusionTestCase(TestCase):

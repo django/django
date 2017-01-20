@@ -73,7 +73,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
             g = capi.geom_clone(geo_input.ptr)
         else:
             # Invalid geometry type.
-            raise TypeError('Improper geometry input type: %s' % str(type(geo_input)))
+            raise TypeError('Improper geometry input type: %s' % type(geo_input))
 
         if g:
             # Setting the pointer object with a valid pointer.

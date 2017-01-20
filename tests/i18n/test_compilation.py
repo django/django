@@ -142,7 +142,7 @@ class CompilationErrorHandling(MessageCompilationTests):
         # po file contains invalid msgstr content (triggers non-ascii error content).
         # Make sure the output of msgfmt is unaffected by the current locale.
         env = os.environ.copy()
-        env.update({str('LANG'): str('C')})
+        env.update({'LANG': 'C'})
         with mock.patch('django.core.management.utils.Popen', lambda *args, **kwargs: Popen(*args, env=env, **kwargs)):
             cmd = MakeMessagesCommand()
             if cmd.gettext_version < (0, 18, 3):

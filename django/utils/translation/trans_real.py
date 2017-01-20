@@ -307,8 +307,7 @@ def do_translate(message, translation_function):
     """
     global _default
 
-    # str() is allowing a bytestring message to remain bytestring on Python 2
-    eol_message = message.replace(str('\r\n'), str('\n')).replace(str('\r'), str('\n'))
+    eol_message = message.replace('\r\n', '\n').replace('\r', '\n')
 
     if len(eol_message) == 0:
         # Returns an empty value of the corresponding type if an empty message

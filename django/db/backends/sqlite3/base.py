@@ -45,13 +45,13 @@ def decoder(conv_func):
     return lambda s: conv_func(s.decode('utf-8'))
 
 
-Database.register_converter(str("bool"), decoder(lambda s: s == '1'))
-Database.register_converter(str("time"), decoder(parse_time))
-Database.register_converter(str("date"), decoder(parse_date))
-Database.register_converter(str("datetime"), decoder(parse_datetime))
-Database.register_converter(str("timestamp"), decoder(parse_datetime))
-Database.register_converter(str("TIMESTAMP"), decoder(parse_datetime))
-Database.register_converter(str("decimal"), decoder(backend_utils.typecast_decimal))
+Database.register_converter("bool", decoder(lambda s: s == '1'))
+Database.register_converter("time", decoder(parse_time))
+Database.register_converter("date", decoder(parse_date))
+Database.register_converter("datetime", decoder(parse_datetime))
+Database.register_converter("timestamp", decoder(parse_datetime))
+Database.register_converter("TIMESTAMP", decoder(parse_datetime))
+Database.register_converter("decimal", decoder(backend_utils.typecast_decimal))
 
 Database.register_adapter(decimal.Decimal, backend_utils.rev_typecast_decimal)
 

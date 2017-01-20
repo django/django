@@ -56,7 +56,7 @@ class Point(GEOSGeometry):
             return capi.create_point(None)
 
         if ndim < 2 or ndim > 3:
-            raise TypeError('Invalid point dimension: %s' % str(ndim))
+            raise TypeError('Invalid point dimension: %s' % ndim)
 
         cs = capi.create_cs(c_uint(1), c_uint(ndim))
         i = iter(coords)

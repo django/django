@@ -24,8 +24,8 @@ from django.utils.safestring import SafeBytes, SafeText
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
     get_language, get_language_from_request, get_language_info, gettext_lazy,
-    ngettext_lazy, npgettext, npgettext_lazy, pgettext, trans_real, ugettext,
-    ugettext_lazy, ungettext, ungettext_lazy,
+    npgettext, npgettext_lazy, pgettext, trans_real, ugettext, ugettext_lazy,
+    ungettext, ungettext_lazy,
 )
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
@@ -146,14 +146,11 @@ class TranslationTests(SimpleTestCase):
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_ungettext_lazy(self):
         simple_with_format = ungettext_lazy('%d good result', '%d good results')
-        simple_str_with_format = ngettext_lazy(str('%d good result'), str('%d good results'))
         simple_context_with_format = npgettext_lazy('Exclamation', '%d good result', '%d good results')
         simple_without_format = ungettext_lazy('good result', 'good results')
         with translation.override('de'):
             self.assertEqual(simple_with_format % 1, '1 gutes Resultat')
             self.assertEqual(simple_with_format % 4, '4 guten Resultate')
-            self.assertEqual(simple_str_with_format % 1, str('1 gutes Resultat'))
-            self.assertEqual(simple_str_with_format % 4, str('4 guten Resultate'))
             self.assertEqual(simple_context_with_format % 1, '1 gutes Resultat!')
             self.assertEqual(simple_context_with_format % 4, '4 guten Resultate!')
             self.assertEqual(simple_without_format % 1, 'gutes Resultat')
@@ -162,12 +159,6 @@ class TranslationTests(SimpleTestCase):
         complex_nonlazy = ungettext_lazy('Hi %(name)s, %(num)d good result', 'Hi %(name)s, %(num)d good results', 4)
         complex_deferred = ungettext_lazy(
             'Hi %(name)s, %(num)d good result', 'Hi %(name)s, %(num)d good results', 'num'
-        )
-        complex_str_nonlazy = ngettext_lazy(
-            str('Hi %(name)s, %(num)d good result'), str('Hi %(name)s, %(num)d good results'), 4
-        )
-        complex_str_deferred = ngettext_lazy(
-            str('Hi %(name)s, %(num)d good result'), str('Hi %(name)s, %(num)d good results'), 'num'
         )
         complex_context_nonlazy = npgettext_lazy(
             'Greeting', 'Hi %(name)s, %(num)d good result', 'Hi %(name)s, %(num)d good results', 4
@@ -181,11 +172,6 @@ class TranslationTests(SimpleTestCase):
             self.assertEqual(complex_deferred % {'name': 'Jim', 'num': 5}, 'Hallo Jim, 5 guten Resultate')
             with self.assertRaisesMessage(KeyError, 'Your dictionary lacks key'):
                 complex_deferred % {'name': 'Jim'}
-            self.assertEqual(complex_str_nonlazy % {'num': 4, 'name': 'Jim'}, str('Hallo Jim, 4 guten Resultate'))
-            self.assertEqual(complex_str_deferred % {'name': 'Jim', 'num': 1}, str('Hallo Jim, 1 gutes Resultat'))
-            self.assertEqual(complex_str_deferred % {'name': 'Jim', 'num': 5}, str('Hallo Jim, 5 guten Resultate'))
-            with self.assertRaisesMessage(KeyError, 'Your dictionary lacks key'):
-                complex_str_deferred % {'name': 'Jim'}
             self.assertEqual(complex_context_nonlazy % {'num': 4, 'name': 'Jim'}, 'Willkommen Jim, 4 guten Resultate')
             self.assertEqual(complex_context_deferred % {'name': 'Jim', 'num': 1}, 'Willkommen Jim, 1 gutes Resultat')
             self.assertEqual(complex_context_deferred % {'name': 'Jim', 'num': 5}, 'Willkommen Jim, 5 guten Resultate')
@@ -917,8 +903,8 @@ class FormattingTests(SimpleTestCase):
     def test_get_format_modules_stability(self):
         with self.settings(FORMAT_MODULE_PATH='i18n.other.locale'):
             with translation.override('de', deactivate=True):
-                old = str("%r") % get_format_modules(reverse=True)
-                new = str("%r") % get_format_modules(reverse=True)  # second try
+                old = "%r" % get_format_modules(reverse=True)
+                new = "%r" % get_format_modules(reverse=True)  # second try
                 self.assertEqual(new, old, 'Value returned by get_formats_modules() must be preserved between calls.')
 
     def test_localize_templatetag_and_filter(self):

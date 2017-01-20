@@ -32,9 +32,7 @@ from django.utils.itercompat import is_iterable
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy as _
 
-# Avoid "TypeError: Item in ``from list'' not a string" -- unicode_literals
-# makes these strings unicode
-__all__ = [str(x) for x in (
+__all__ = [
     'AutoField', 'BLANK_CHOICE_DASH', 'BigAutoField', 'BigIntegerField',
     'BinaryField', 'BooleanField', 'CharField', 'CommaSeparatedIntegerField',
     'DateField', 'DateTimeField', 'DecimalField', 'DurationField',
@@ -43,7 +41,7 @@ __all__ = [str(x) for x in (
     'NOT_PROVIDED', 'NullBooleanField', 'PositiveIntegerField',
     'PositiveSmallIntegerField', 'SlugField', 'SmallIntegerField', 'TextField',
     'TimeField', 'URLField', 'UUIDField',
-)]
+]
 
 
 class Empty:

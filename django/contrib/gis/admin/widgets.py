@@ -83,7 +83,7 @@ class OpenLayersWidget(Textarea):
 
         # JavaScript construction utilities for the Bounds and Projection.
         def ol_bounds(extent):
-            return 'new OpenLayers.Bounds(%s)' % str(extent)
+            return 'new OpenLayers.Bounds(%s)' % extent
 
         def ol_projection(srid):
             return 'new OpenLayers.Projection("EPSG:%s")' % srid

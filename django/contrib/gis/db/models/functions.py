@@ -65,7 +65,7 @@ class GeoFunc(Func):
             if check_types and not isinstance(value, check_types):
                 raise TypeError(
                     "The %s parameter has the wrong type: should be %s." % (
-                        param_name, str(check_types))
+                        param_name, check_types)
                 )
         return value
 

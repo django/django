@@ -60,7 +60,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
         handler = WSGIRequestHandler(request, '192.168.0.2', None)
 
         with patch_logger('django.server', 'error') as messages:
-            handler.log_message("GET %s %s", str('\x16\x03'), "4")
+            handler.log_message("GET %s %s", '\x16\x03', "4")
         self.assertIn(
             "You're accessing the development server over HTTPS, "
             "but it only supports HTTP.",

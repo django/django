@@ -40,8 +40,8 @@ RFC1123_DATE = re.compile(r'^\w{3}, %s %s %s %s GMT$' % (__D, __M, __Y, __T))
 RFC850_DATE = re.compile(r'^\w{6,9}, %s-%s-%s %s GMT$' % (__D, __M, __Y2, __T))
 ASCTIME_DATE = re.compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
 
-RFC3986_GENDELIMS = str(":/?#[]@")
-RFC3986_SUBDELIMS = str("!$&'()*+,;=")
+RFC3986_GENDELIMS = ":/?#[]@"
+RFC3986_SUBDELIMS = "!$&'()*+,;="
 
 FIELDS_MATCH = re.compile('[&;]')
 
@@ -365,7 +365,7 @@ def limited_parse_qsl(qs, keep_blank_values=False, encoding='utf-8',
     for name_value in pairs:
         if not name_value:
             continue
-        nv = name_value.split(str('='), 1)
+        nv = name_value.split('=', 1)
         if len(nv) != 2:
             # Handle case of a control-name with no equal sign
             if keep_blank_values:

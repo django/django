@@ -124,8 +124,7 @@ class HttpResponseBase:
                 value = value.decode(charset)
         except UnicodeError as e:
             if mime_encode:
-                # Wrapping in str() is a workaround for #12422 under Python 2.
-                value = str(Header(value, 'utf-8', maxlinelen=sys.maxsize).encode())
+                value = Header(value, 'utf-8', maxlinelen=sys.maxsize).encode()
             else:
                 e.reason += ', HTTP response headers must be in %s format' % charset
                 raise

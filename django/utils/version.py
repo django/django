@@ -25,7 +25,7 @@ def get_version(version=None):
         mapping = {'alpha': 'a', 'beta': 'b', 'rc': 'rc'}
         sub = mapping[version[3]] + str(version[4])
 
-    return str(main + sub)
+    return main + sub
 
 
 def get_main_version(version=None):

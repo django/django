@@ -145,14 +145,13 @@ class AdminScriptTestCase(unittest.TestCase):
 
         # Set the test environment
         if settings_file:
-            test_environ['DJANGO_SETTINGS_MODULE'] = str(settings_file)
+            test_environ['DJANGO_SETTINGS_MODULE'] = settings_file
         elif 'DJANGO_SETTINGS_MODULE' in test_environ:
             del test_environ['DJANGO_SETTINGS_MODULE']
         python_path = [base_dir, django_dir, tests_dir]
         python_path.extend(ext_backend_base_dirs)
-        # Use native strings for better compatibility
-        test_environ[str(python_path_var_name)] = os.pathsep.join(python_path)
-        test_environ[str('PYTHONWARNINGS')] = str('')
+        test_environ[python_path_var_name] = os.pathsep.join(python_path)
+        test_environ['PYTHONWARNINGS'] = ''
 
         # Move to the test directory and run
         os.chdir(self.test_dir)

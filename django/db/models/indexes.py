@@ -2,7 +2,7 @@ import hashlib
 
 from django.utils.encoding import force_bytes
 
-__all__ = [str('Index')]
+__all__ = ['Index']
 
 # The max length of the names of the indexes (restricted to 30 due to Oracle)
 MAX_NAME_LENGTH = 30

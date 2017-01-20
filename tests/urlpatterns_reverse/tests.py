@@ -356,7 +356,7 @@ class URLPatternReverse(SimpleTestCase):
     def test_illegal_kwargs_message(self):
         msg = "Reverse for 'places' with keyword arguments '{'arg1': 2}' not found. 1 pattern(s) tried:"
         with self.assertRaisesMessage(NoReverseMatch, msg):
-            reverse('places', kwargs={str('arg1'): 2})
+            reverse('places', kwargs={'arg1': 2})
 
 
 class ResolverTests(SimpleTestCase):
@@ -436,7 +436,7 @@ class ResolverTests(SimpleTestCase):
         )
         for tried, expected in zip(e.args[0]['tried'], url_types_names):
             for t, e in zip(tried, expected):
-                self.assertIsInstance(t, e['type']), str('%s is not an instance of %s') % (t, e['type'])
+                self.assertIsInstance(t, e['type']), '%s is not an instance of %s' % (t, e['type'])
                 if 'name' in e:
                     if not e['name']:
                         self.assertIsNone(t.name, 'Expected no URL name but found %s.' % t.name)

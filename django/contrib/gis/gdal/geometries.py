@@ -109,7 +109,7 @@ class OGRGeometry(GDALBase):
         # Now checking the Geometry pointer before finishing initialization
         # by setting the pointer for the object.
         if not g:
-            raise GDALException('Cannot create OGR Geometry from input: %s' % str(geom_input))
+            raise GDALException('Cannot create OGR Geometry from input: %s' % geom_input)
         self.ptr = g
 
         # Assigning the SpatialReference object to the geometry, if valid.
@@ -549,7 +549,7 @@ class LineString(OGRGeometry):
             elif dim == 3:
                 return (x.value, y.value, z.value)
         else:
-            raise OGRIndexError('index out of range: %s' % str(index))
+            raise OGRIndexError('index out of range: %s' % index)
 
     def __iter__(self):
         "Iterates over each point in the LineString."

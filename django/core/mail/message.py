@@ -68,7 +68,7 @@ def forbid_multi_line_headers(name, val, encoding):
     else:
         if name.lower() == 'subject':
             val = Header(val).encode()
-    return str(name), val
+    return name, val
 
 
 def split_addr(addr, encoding):

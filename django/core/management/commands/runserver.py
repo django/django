@@ -56,7 +56,7 @@ class Command(BaseCommand):
             # We rely on the environment because it's currently the only
             # way to reach WSGIRequestHandler. This seems an acceptable
             # compromise considering `runserver` runs indefinitely.
-            os.environ[str("DJANGO_COLORS")] = str("nocolor")
+            os.environ["DJANGO_COLORS"] = "nocolor"
         super(Command, self).execute(*args, **options)
 
     def get_handler(self, *args, **options):

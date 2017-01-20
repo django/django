@@ -35,10 +35,10 @@ from django.utils.version import get_version
 
 class Deferred:
     def __repr__(self):
-        return str('<Deferred field>')
+        return '<Deferred field>'
 
     def __str__(self):
-        return str('<Deferred field>')
+        return '<Deferred field>'
 
 
 DEFERRED = Deferred()
@@ -118,7 +118,7 @@ class ModelBase(type):
             new_class.add_to_class(
                 'DoesNotExist',
                 subclass_exception(
-                    str('DoesNotExist'),
+                    'DoesNotExist',
                     tuple(
                         x.DoesNotExist for x in parents if hasattr(x, '_meta') and not x._meta.abstract
                     ) or (ObjectDoesNotExist,),
@@ -127,7 +127,7 @@ class ModelBase(type):
             new_class.add_to_class(
                 'MultipleObjectsReturned',
                 subclass_exception(
-                    str('MultipleObjectsReturned'),
+                    'MultipleObjectsReturned',
                     tuple(
                         x.MultipleObjectsReturned for x in parents if hasattr(x, '_meta') and not x._meta.abstract
                     ) or (MultipleObjectsReturned,),

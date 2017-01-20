@@ -179,7 +179,7 @@ class ListMixin:
         for i in range(0, len(self)):
             if self[i] == val:
                 return i
-        raise ValueError('%s not found in object' % str(val))
+        raise ValueError('%s not found in object' % val)
 
     # ## Mutating ##
     def append(self, val):
@@ -242,7 +242,7 @@ class ListMixin:
             return index
         if correct and -length <= index < 0:
             return index + length
-        raise IndexError('invalid index: %s' % str(index))
+        raise IndexError('invalid index: %s' % index)
 
     def _check_allowed(self, items):
         if hasattr(self, '_allowed'):

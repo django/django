@@ -103,7 +103,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         }
         if args[1][0] == '4':
             # 0x16 = Handshake, 0x03 = SSL 3.0 or TLS 1.x
-            if args[0].startswith(str('\x16\x03')):
+            if args[0].startswith('\x16\x03'):
                 extra['status_code'] = 500
                 logger.error(
                     "You're accessing the development server over HTTPS, but "

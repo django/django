@@ -35,7 +35,7 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
             for browser in test_class.browsers[1:]:
                 browser_test_class = cls.__new__(
                     cls,
-                    str("%s%s" % (capfirst(browser), name)),
+                    "%s%s" % (capfirst(browser), name),
                     (test_class,),
                     {'browser': browser, '__module__': test_class.__module__}
                 )

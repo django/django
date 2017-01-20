@@ -6,9 +6,7 @@ import math
 import os
 import re
 import sys
-import tokenize
 import uuid
-from io import StringIO
 
 import custom_migration_operations.more_operations
 import custom_migration_operations.operations
@@ -20,7 +18,7 @@ from django.db import migrations, models
 from django.db.migrations.writer import (
     MigrationWriter, OperationWriter, SettingsReference,
 )
-from django.test import SimpleTestCase, ignore_warnings, mock
+from django.test import SimpleTestCase, mock
 from django.utils import datetime_safe
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import SimpleLazyObject
@@ -552,22 +550,7 @@ class WriterTests(SimpleTestCase):
         # Just make sure it runs for now, and that things look alright.
         result = self.safe_exec(output)
         self.assertIn("Migration", result)
-        # In order to preserve compatibility with Python 3.2 unicode literals
-        # prefix shouldn't be added to strings.
-        tokens = tokenize.generate_tokens(StringIO(str(output)).readline)
-        for token_type, token_source, (srow, scol), __, line in tokens:
-            if token_type == tokenize.STRING:
-                self.assertFalse(
-                    token_source.startswith('u'),
-                    "Unicode literal prefix found at %d:%d: %r" % (
-                        srow, scol, line.strip()
-                    )
-                )
 
-    # Silence warning on Python 2: Not importing directory
-    # 'tests/migrations/migrations_test_apps/without_init_file/migrations':
-    # missing __init__.py
-    @ignore_warnings(category=ImportWarning)
     def test_migration_path(self):
         test_apps = [
             'migrations.migrations_test_apps.normal',

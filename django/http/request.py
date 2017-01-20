@@ -509,11 +509,11 @@ class QueryDict(MultiValueDict):
 # this slightly more restricted function, used by QueryDict.
 def bytes_to_text(s, encoding):
     """
-    Converts basestring objects to unicode, using the given encoding. Illegally
+    Convert bytes objects to strings, using the given encoding. Illegally
     encoded input characters are replaced with Unicode "unknown" codepoint
     (\ufffd).
 
-    Returns any non-basestring objects without change.
+    Return any non-bytes objects without change.
     """
     if isinstance(s, bytes):
         return str(s, encoding, 'replace')

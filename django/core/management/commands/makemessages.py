@@ -398,7 +398,7 @@ class Command(BaseCommand):
         self.process_files(file_list)
         potfiles = []
         for path in self.locale_paths:
-            potfile = os.path.join(path, '%s.pot' % str(self.domain))
+            potfile = os.path.join(path, '%s.pot' % self.domain)
             if not os.path.exists(potfile):
                 continue
             args = ['msguniq'] + self.msguniq_options + [potfile]
@@ -417,7 +417,7 @@ class Command(BaseCommand):
 
     def remove_potfiles(self):
         for path in self.locale_paths:
-            pot_path = os.path.join(path, '%s.pot' % str(self.domain))
+            pot_path = os.path.join(path, '%s.pot' % self.domain)
             if os.path.exists(pot_path):
                 os.unlink(pot_path)
 
@@ -583,7 +583,7 @@ class Command(BaseCommand):
                 )
             for build_file in build_files:
                 msgs = build_file.postprocess_messages(msgs)
-            potfile = os.path.join(locale_dir, '%s.pot' % str(self.domain))
+            potfile = os.path.join(locale_dir, '%s.pot' % self.domain)
             write_pot_file(potfile, msgs)
 
         for build_file in build_files:
@@ -599,7 +599,7 @@ class Command(BaseCommand):
         basedir = os.path.join(os.path.dirname(potfile), locale, 'LC_MESSAGES')
         if not os.path.isdir(basedir):
             os.makedirs(basedir)
-        pofile = os.path.join(basedir, '%s.po' % str(self.domain))
+        pofile = os.path.join(basedir, '%s.po' % self.domain)
 
         if os.path.exists(pofile):
             args = ['msgmerge'] + self.msgmerge_options + [pofile, potfile]

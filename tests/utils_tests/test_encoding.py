@@ -12,13 +12,11 @@ from django.utils.http import urlquote_plus
 class TestEncodingUtils(unittest.TestCase):
     def test_force_text_exception(self):
         """
-        Broken __unicode__/__str__ actually raises an error.
+        Broken __str__ actually raises an error.
         """
         class MyString:
             def __str__(self):
                 return b'\xc3\xb6\xc3\xa4\xc3\xbc'
-
-            __unicode__ = __str__
 
         # str(s) raises a TypeError if the result is not a text type.
         with self.assertRaises(TypeError):
