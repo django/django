@@ -153,8 +153,10 @@ class Template:
         try:
             template_string = force_text(template_string)
         except UnicodeDecodeError:
-            raise TemplateEncodingError("Templates can only be constructed "
-                                        "from unicode or UTF-8 strings.")
+            raise TemplateEncodingError(
+                "Templates can only be constructed from strings or UTF-8 "
+                "bytestrings."
+            )
         # If Template is instantiated directly rather than from an Engine and
         # exactly one Django template engine is configured, use that engine.
         # This is required to preserve backwards-compatibility for direct use
@@ -270,7 +272,7 @@ class Template:
         bottom = min(total, line + 1 + context_lines)
 
         # In some rare cases exc_value.args can be empty or an invalid
-        # unicode string.
+        # string.
         try:
             message = force_text(exception.args[0])
         except (IndexError, UnicodeDecodeError):
@@ -980,8 +982,8 @@ class TextNode(Node):
 def render_value_in_context(value, context):
     """
     Converts any value to a string to become part of a rendered template. This
-    means escaping, if required, and conversion to a unicode object. If value
-    is a string, it is expected to have already been translated.
+    means escaping, if required, and conversion to a string. If value is a
+    string, it's expected to already be translated.
     """
     value = template_localtime(value, use_tz=context.use_tz)
     value = localize(value, use_l10n=context.use_l10n)

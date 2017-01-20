@@ -337,7 +337,7 @@ def pgettext(context, message):
     result = ugettext(msg_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
-        # force unicode, because lazy version expects unicode
+        # force str, because the lazy version expects str.
         result = force_text(message)
     return result
 

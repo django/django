@@ -114,7 +114,7 @@ into those elements.
   calling the methods ``item_title()`` and ``item_description()`` on
   the :class:`~django.contrib.syndication.views.Feed` class. They are passed
   a single parameter, ``item``, which is the object itself. These are
-  optional; by default, the unicode representation of the object is used for
+  optional; by default, the string representation of the object is used for
   both.
 
   If you want to do any special formatting for either the title or
@@ -615,7 +615,7 @@ This example illustrates all possible attributes and methods for a
 
         # ITEM TITLE AND DESCRIPTION -- If title_template or
         # description_template are not defined, these are used instead. Both are
-        # optional, by default they will use the unicode representation of the
+        # optional, by default they will use the string representation of the
         # item.
 
         def item_title(self, item):
@@ -940,8 +940,8 @@ They share this interface:
     Any extra keyword arguments you pass to ``__init__`` will be stored in
     ``self.feed`` for use with `custom feed generators`_.
 
-    All parameters should be Unicode objects, except ``categories``, which
-    should be a sequence of Unicode objects. Beware that some control characters
+    All parameters should be strings, except ``categories``, which should be a
+    sequence of strings. Beware that some control characters
     are `not allowed <http://www.w3.org/International/questions/qa-controls>`_
     in XML documents. If your content has some of them, you might encounter a
     :exc:`ValueError` when producing the feed.
@@ -971,13 +971,13 @@ They share this interface:
 
     Extra keyword arguments will be stored for `custom feed generators`_.
 
-    All parameters, if given, should be Unicode objects, except:
+    All parameters, if given, should be strings, except:
 
     * ``pubdate`` should be a Python  :class:`~datetime.datetime` object.
     * ``updateddate`` should be a Python  :class:`~datetime.datetime` object.
     * ``enclosures`` should be a list of
       :class:`django.utils.feedgenerator.Enclosure` instances.
-    * ``categories`` should be a sequence of Unicode objects.
+    * ``categories`` should be a sequence of strings.
 
 :meth:`.SyndicationFeed.write`
     Outputs the feed in the given encoding to outfile, which is a file-like object.

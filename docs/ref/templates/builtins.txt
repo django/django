@@ -1934,8 +1934,7 @@ If ``value`` is ``Totally LOVING this Album!``, the output will be
 -------------
 
 Returns the value turned into a list. For a string, it's a list of characters.
-For an integer, the argument is cast into an unicode string before creating a
-list.
+For an integer, the argument is cast to a string before creating a list.
 
 For example::
 

@@ -158,7 +158,7 @@ class FileSystemLoaderTests(SimpleTestCase):
         with self.source_checker(['/dir1', '/dir2']) as check_sources:
             # UTF-8 bytestrings are permitted.
             check_sources(b'\xc3\x85ngstr\xc3\xb6m', ['/dir1/Ångström', '/dir2/Ångström'])
-            # Unicode strings are permitted.
+            # Strings are permitted.
             check_sources('Ångström', ['/dir1/Ångström', '/dir2/Ångström'])
 
     def test_utf8_bytestring(self):

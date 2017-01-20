@@ -188,12 +188,11 @@ Filters and auto-escaping
 -------------------------
 
 When writing a custom filter, give some thought to how the filter will interact
-with Django's auto-escaping behavior. Note that three types of strings can be
+with Django's auto-escaping behavior. Note that two types of strings can be
 passed around inside the template code:
 
-* **Raw strings** are the native Python ``str`` or ``unicode`` types. On
-  output, they're escaped if auto-escaping is in effect and presented
-  unchanged, otherwise.
+* **Raw strings** are the native Python strings. On output, they're escaped if
+  auto-escaping is in effect and presented unchanged, otherwise.
 
 * **Safe strings** are strings that have been marked safe from further
   escaping at output time. Any necessary escaping has already been done.
@@ -229,9 +228,8 @@ Template filter code falls into one of two situations:
 
    The reason ``is_safe`` is necessary is because there are plenty of
    normal string operations that will turn a ``SafeData`` object back into
-   a normal ``str`` or ``unicode`` object and, rather than try to catch
-   them all, which would be very difficult, Django repairs the damage after
-   the filter has completed.
+   a normal ``str`` object and, rather than try to catch them all, which would
+   be very difficult, Django repairs the damage after the filter has completed.
 
    For example, suppose you have a filter that adds the string ``xx`` to
    the end of any input. Since this introduces no dangerous HTML characters

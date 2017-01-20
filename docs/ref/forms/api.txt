@@ -112,7 +112,7 @@ messages::
     {'sender': ['Enter a valid email address.'], 'subject': ['This field is required.']}
 
 In this dictionary, the keys are the field names, and the values are lists of
-Unicode strings representing the error messages. The error messages are stored
+strings representing the error messages. The error messages are stored
 in lists because a field can have multiple error messages.
 
 You can access :attr:`~Form.errors` without having to call
@@ -357,8 +357,8 @@ it, you can access the clean data via its ``cleaned_data`` attribute::
     {'cc_myself': True, 'message': 'Hi there', 'sender': 'foo@example.com', 'subject': 'hello'}
 
 Note that any text-based field -- such as ``CharField`` or ``EmailField`` --
-always cleans the input into a Unicode string. We'll cover the encoding
-implications later in this document.
+always cleans the input into a string. We'll cover the encoding implications
+later in this document.
 
 If your data does *not* validate, the ``cleaned_data`` dictionary contains
 only the valid fields::
@@ -490,7 +490,7 @@ Notice the following:
 
 Although ``<table>`` output is the default output style when you ``print`` a
 form, other output styles are available. Each style is available as a method on
-a form object, and each rendering method returns a Unicode object.
+a form object, and each rendering method returns a string.
 
 ``as_p()``
 ----------

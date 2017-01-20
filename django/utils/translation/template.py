@@ -54,8 +54,7 @@ def templatize(src, origin=None, charset='utf-8'):
     comment = []
     lineno_comment_map = {}
     comment_lineno_cache = None
-    # Adding the u prefix allows gettext to recognize the Unicode string
-    # (#26093).
+    # Adding the u prefix allows gettext to recognize the string (#26093).
     raw_prefix = 'u'
 
     def join_tokens(tokens, trim=False):

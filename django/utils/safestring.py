@@ -26,7 +26,7 @@ class SafeBytes(bytes, SafeData):
     def __add__(self, rhs):
         """
         Concatenating a safe byte string with another safe byte string or safe
-        unicode string is safe. Otherwise, the result is no longer safe.
+        string is safe. Otherwise, the result is no longer safe.
         """
         t = super().__add__(rhs)
         if isinstance(rhs, SafeText):
@@ -37,9 +37,8 @@ class SafeBytes(bytes, SafeData):
 
     def _proxy_method(self, *args, **kwargs):
         """
-        Wrap a call to a normal unicode method up so that we return safe
-        results. The method that is being wrapped is passed in the 'method'
-        argument.
+        Wrap a call to a normal bytes method up so that the result is safe.
+        The method that is being wrapped is passed in the 'method' argument.
         """
         method = kwargs.pop('method')
         data = method(self, *args, **kwargs)
@@ -58,8 +57,8 @@ class SafeText(str, SafeData):
     """
     def __add__(self, rhs):
         """
-        Concatenating a safe unicode string with another safe byte string or
-        safe unicode string is safe. Otherwise, the result is no longer safe.
+        Concatenating a safe string with another safe byte string or
+        safe string is safe. Otherwise, the result is no longer safe.
         """
         t = super().__add__(rhs)
         if isinstance(rhs, SafeData):
@@ -68,9 +67,8 @@ class SafeText(str, SafeData):
 
     def _proxy_method(self, *args, **kwargs):
         """
-        Wrap a call to a normal unicode method up so that we return safe
-        results. The method that is being wrapped is passed in the 'method'
-        argument.
+        Wrap a call to a normal str method up so that the result is safe.
+        The method that is being wrapped is passed in the 'method' argument.
         """
         method = kwargs.pop('method')
         data = method(self, *args, **kwargs)

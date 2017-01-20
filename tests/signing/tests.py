@@ -69,7 +69,7 @@ class TestSigner(SimpleTestCase):
         "dumps and loads be reversible for any JSON serializable object"
         objects = [
             ['a', 'list'],
-            'a unicode string \u2019',
+            'a string \u2019',
             {'a': 'dictionary'},
         ]
         for o in objects:

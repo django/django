@@ -84,25 +84,25 @@ class SyndicationFeed:
     def __init__(self, title, link, description, language=None, author_email=None,
                  author_name=None, author_link=None, subtitle=None, categories=None,
                  feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs):
-        def to_unicode(s):
+        def to_str(s):
             return force_text(s, strings_only=True)
         if categories:
             categories = [force_text(c) for c in categories]
         if ttl is not None:
-            # Force ints to unicode
+            # Force ints to str
             ttl = force_text(ttl)
         self.feed = {
-            'title': to_unicode(title),
+            'title': to_str(title),
             'link': iri_to_uri(link),
-            'description': to_unicode(description),
-            'language': to_unicode(language),
-            'author_email': to_unicode(author_email),
-            'author_name': to_unicode(author_name),
+            'description': to_str(description),
+            'language': to_str(language),
+            'author_email': to_str(author_email),
+            'author_name': to_str(author_name),
             'author_link': iri_to_uri(author_link),
-            'subtitle': to_unicode(subtitle),
+            'subtitle': to_str(subtitle),
             'categories': categories or (),
             'feed_url': iri_to_uri(feed_url),
-            'feed_copyright': to_unicode(feed_copyright),
+            'feed_copyright': to_str(feed_copyright),
             'id': feed_guid or link,
             'ttl': ttl,
         }
@@ -114,33 +114,32 @@ class SyndicationFeed:
                  unique_id=None, unique_id_is_permalink=None, categories=(),
                  item_copyright=None, ttl=None, updateddate=None, enclosures=None, **kwargs):
         """
-        Adds an item to the feed. All args are expected to be Python Unicode
-        objects except pubdate and updateddate, which are datetime.datetime
-        objects, and enclosures, which is an iterable of instances of the
-        Enclosure class.
+        Add an item to the feed. All args are expected to be strings except
+        pubdate and updateddate, which are datetime.datetime objects, and
+        enclosures, which is an iterable of instances of the Enclosure class.
         """
-        def to_unicode(s):
+        def to_str(s):
             return force_text(s, strings_only=True)
         if categories:
-            categories = [to_unicode(c) for c in categories]
+            categories = [to_str(c) for c in categories]
         if ttl is not None:
-            # Force ints to unicode
+            # Force ints to str
             ttl = force_text(ttl)
         item = {
-            'title': to_unicode(title),
+            'title': to_str(title),
             'link': iri_to_uri(link),
-            'description': to_unicode(description),
-            'author_email': to_unicode(author_email),
-            'author_name': to_unicode(author_name),
+            'description': to_str(description),
+            'author_email': to_str(author_email),
+            'author_name': to_str(author_name),
             'author_link': iri_to_uri(author_link),
             'pubdate': pubdate,
             'updateddate': updateddate,
-            'comments': to_unicode(comments),
-            'unique_id': to_unicode(unique_id),
+            'comments': to_str(comments),
+            'unique_id': to_str(unique_id),
             'unique_id_is_permalink': unique_id_is_permalink,
             'enclosures': enclosures,
             'categories': categories or (),
-            'item_copyright': to_unicode(item_copyright),
+            'item_copyright': to_str(item_copyright),
             'ttl': ttl,
         }
         item.update(kwargs)
@@ -212,7 +211,7 @@ class SyndicationFeed:
 class Enclosure:
     "Represents an RSS enclosure"
     def __init__(self, url, length, mime_type):
-        "All args are expected to be Python Unicode objects"
+        "All args are expected to be strings"
         self.length, self.mime_type = length, mime_type
         self.url = iri_to_uri(url)
 

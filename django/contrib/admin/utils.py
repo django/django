@@ -283,10 +283,7 @@ def lookup_field(name, obj, model_admin=None):
         if callable(name):
             attr = name
             value = attr(obj)
-        elif (model_admin is not None and
-                hasattr(model_admin, name) and
-                not name == '__str__' and
-                not name == '__unicode__'):
+        elif model_admin is not None and hasattr(model_admin, name) and name != '__str__':
             attr = getattr(model_admin, name)
             value = attr(obj)
         else:

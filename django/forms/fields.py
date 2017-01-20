@@ -229,7 +229,7 @@ class CharField(Field):
             self.validators.append(validators.MaxLengthValidator(int(max_length)))
 
     def to_python(self, value):
-        "Returns a Unicode object."
+        "Returns a string."
         if value in self.empty_values:
             return self.empty_value
         value = force_text(value)
@@ -799,7 +799,7 @@ class ChoiceField(Field):
     choices = property(_get_choices, _set_choices)
 
     def to_python(self, value):
-        "Returns a Unicode object."
+        "Return a string."
         if value in self.empty_values:
             return ''
         return force_text(value)

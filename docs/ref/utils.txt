@@ -276,13 +276,13 @@ The functions defined in this module share the following properties:
 
     This is an algorithm from section 3.2 of :rfc:`3987#section-3.2`.
 
-    Takes a URI in ASCII bytes and returns a unicode string containing the
-    encoded result.
+    Takes a URI in ASCII bytes and returns a string containing the encoded
+    result.
 
 .. function:: filepath_to_uri(path)
 
     Convert a file system path to a URI portion that is suitable for inclusion
-    in a URL. The path is assumed to be either UTF-8 or unicode.
+    in a URL. The path is assumed to be either UTF-8 bytes or string.
 
     This method will encode certain characters that would normally be
     recognized as special characters for URIs.  Note that this method does not
@@ -346,13 +346,13 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         Any extra keyword arguments you pass to ``__init__`` will be stored in
         ``self.feed``.
 
-        All parameters should be Unicode objects, except ``categories``, which
-        should be a sequence of Unicode objects.
+        All parameters should be strings, except ``categories``, which should
+        be a sequence of strings.
 
     .. method:: add_item(title, link, description, author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, categories=(), item_copyright=None, ttl=None, updateddate=None, enclosures=None, **kwargs)
 
-        Adds an item to the feed. All args are expected to be Python ``unicode``
-        objects except ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
+        Adds an item to the feed. All args are expected to be strings except
+        ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
         objects, and ``enclosures``, which is a list of ``Enclosure`` instances.
 
     .. method:: num_items()
@@ -802,7 +802,7 @@ appropriate entities.
 .. function:: mark_safe(s)
 
     Explicitly mark a string as safe for (HTML) output purposes. The returned
-    object can be used everywhere a string or unicode object is appropriate.
+    object can be used everywhere a string is appropriate.
 
     Can be called multiple times on a single string.
 
@@ -1030,16 +1030,15 @@ For a complete discussion on the usage of the following see the
 
 .. function:: gettext(message)
 
-    Translates ``message`` and returns it in a UTF-8 bytestring
+    Translates ``message`` and returns it in a UTF-8 bytestring.
 
 .. function:: ugettext(message)
 
-    Translates ``message`` and returns it in a unicode string
+    Translates ``message`` and returns it as a string.
 
 .. function:: pgettext(context, message)
 
-    Translates ``message`` given the ``context`` and returns
-    it in a unicode string.
+    Translates ``message`` given the ``context`` and returns it as a string.
 
     For more information, see :ref:`contextual-markers`.
 
@@ -1067,12 +1066,12 @@ For a complete discussion on the usage of the following see the
 .. function:: ungettext(singular, plural, number)
 
     Translates ``singular`` and ``plural`` and returns the appropriate string
-    based on ``number`` in a unicode string.
+    based on ``number`` as a string.
 
 .. function:: npgettext(context, singular, plural, number)
 
     Translates ``singular`` and ``plural`` and returns the appropriate string
-    based on ``number`` and the ``context`` in a unicode string.
+    based on ``number`` and the ``context`` as a string.
 
 .. function:: ngettext_lazy(singular, plural, number)
 .. function:: ungettext_lazy(singular, plural, number)

@@ -200,9 +200,7 @@ class Widget(metaclass=MediaDefiningClass):
         return context
 
     def render(self, name, value, attrs=None, renderer=None):
-        """
-        Returns this Widget rendered as HTML, as a Unicode string.
-        """
+        """Render the widget as an HTML string."""
         context = self.get_context(name, value, attrs)
         return self._render(self.template_name, context, renderer)
 

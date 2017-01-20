@@ -526,7 +526,7 @@ class CursorIterator:
 
 def _rowfactory(row, cursor):
     # Cast numeric values as the appropriate Python type based upon the
-    # cursor description, and convert strings to unicode.
+    # cursor description.
     casted = []
     for value, desc in zip(row, cursor.description):
         if value is not None and desc[1] is Database.NUMBER:

@@ -416,7 +416,7 @@ a subclass of dictionary. Exceptions are outlined here:
     ``mutable=True`` to its ``__init__()``.
 
     Strings for setting both keys and values will be converted from ``encoding``
-    to unicode. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
+    to ``str``. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
 
 .. classmethod:: QueryDict.fromkeys(iterable, value='', mutable=False, encoding=None)
 
@@ -654,8 +654,7 @@ Attributes
 
 .. attribute:: HttpResponse.content
 
-    A bytestring representing the content, encoded from a Unicode
-    object if necessary.
+    A bytestring representing the content, encoded from a string if necessary.
 
 .. attribute:: HttpResponse.charset
 

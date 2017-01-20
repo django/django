@@ -52,7 +52,7 @@ class Worker(models.Model):
         return self.name
 
 
-class BrokenUnicodeMethod(models.Model):
+class BrokenStrMethod(models.Model):
     name = models.CharField(max_length=7)
 
     def __str__(self):

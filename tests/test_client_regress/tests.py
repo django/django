@@ -1266,7 +1266,7 @@ class QueryStringTests(SimpleTestCase):
 class UnicodePayloadTests(SimpleTestCase):
 
     def test_simple_unicode_payload(self):
-        "A simple ASCII-only unicode JSON document can be POSTed"
+        "A simple ASCII-only JSON document can be POSTed"
         # Regression test for #10571
         json = '{"english": "mountain pass"}'
         response = self.client.post("/parse_unicode_json/", json, content_type="application/json")

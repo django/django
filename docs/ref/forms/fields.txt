@@ -88,9 +88,8 @@ To specify that a field is *not* required, pass ``required=False`` to the
 
 If a ``Field`` has ``required=False`` and you pass ``clean()`` an empty value,
 then ``clean()`` will return a *normalized* empty value rather than raising
-``ValidationError``. For ``CharField``, this will be a Unicode empty string.
-For other ``Field`` classes, it might be ``None``. (This varies from field to
-field.)
+``ValidationError``. For ``CharField``, this will be an empty string. For other
+``Field`` classes, it might be ``None``. (This varies from field to field.)
 
 Widgets of required form fields have the ``required`` HTML attribute. Set the
 :attr:`Form.use_required_attribute` attribute to ``False`` to disable it. The
@@ -371,7 +370,7 @@ For each field, we describe the default widget used if you don't specify
 
     * Default widget: :class:`TextInput`
     * Empty value: Whatever you've given as :attr:`empty_value`.
-    * Normalizes to: A Unicode object.
+    * Normalizes to: A string.
     * Validates ``max_length`` or ``min_length``, if they are provided.
       Otherwise, all inputs are valid.
     * Error message keys: ``required``, ``max_length``, ``min_length``
@@ -402,7 +401,7 @@ For each field, we describe the default widget used if you don't specify
 
     * Default widget: :class:`Select`
     * Empty value: ``''`` (an empty string)
-    * Normalizes to: A Unicode object.
+    * Normalizes to: A string.
     * Validates that the given value exists in the list of choices.
     * Error message keys: ``required``, ``invalid_choice``
 
@@ -585,7 +584,7 @@ For each field, we describe the default widget used if you don't specify
 
     * Default widget: :class:`EmailInput`
     * Empty value: ``''`` (an empty string)
-    * Normalizes to: A Unicode object.
+    * Normalizes to: A string.
     * Validates that the given value is a valid email address, using a
       moderately complex regular expression.
     * Error message keys: ``required``, ``invalid``
@@ -629,7 +628,7 @@ For each field, we describe the default widget used if you don't specify
 
     * Default widget: :class:`Select`
     * Empty value: ``None``
-    * Normalizes to: A unicode object
+    * Normalizes to: A string.
     * Validates that the selected choice exists in the list of choices.
     * Error message keys: ``required``, ``invalid_choice``
 
@@ -747,8 +746,7 @@ For each field, we describe the default widget used if you don't specify
 
     * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
-    * Normalizes to: A Unicode object. IPv6 addresses are
-      normalized as described below.
+    * Normalizes to: A string. IPv6 addresses are normalized as described below.
     * Validates that the given value is a valid IP address.
     * Error message keys: ``required``, ``invalid``
 
@@ -780,7 +778,7 @@ For each field, we describe the default widget used if you don't specify
 
     * Default widget: :class:`SelectMultiple`
     * Empty value: ``[]`` (an empty list)
-    * Normalizes to: A list of Unicode objects.
+    * Normalizes to: A list of strings.
     * Validates that every value in the given list of values exists in the list
       of choices.
     * Error message keys: ``required``, ``invalid_choice``, ``invalid_list``
@@ -829,7 +827,7 @@ For each field, we describe the default widget used if you don't specify
 
     * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
-    * Normalizes to: A Unicode object.
+    * Normalizes to: A string.
     * Validates that the given value matches against a certain regular
       expression.
     * Error message keys: ``required``, ``invalid``
@@ -856,7 +854,7 @@ For each field, we describe the default widget used if you don't specify
 
    * Default widget: :class:`TextInput`
    * Empty value: ``''`` (an empty string)
-   * Normalizes to: A Unicode object.
+   * Normalizes to: A string.
    * Validates that the given value contains only letters, numbers,
      underscores, and hyphens.
    * Error messages: ``required``, ``invalid``
@@ -902,7 +900,7 @@ For each field, we describe the default widget used if you don't specify
 
     * Default widget: :class:`URLInput`
     * Empty value: ``''`` (an empty string)
-    * Normalizes to: A Unicode object.
+    * Normalizes to: A string.
     * Validates that the given value is a valid URL.
     * Error message keys: ``required``, ``invalid``
 
@@ -936,7 +934,7 @@ Slightly complex built-in ``Field`` classes
 
     * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
-    * Normalizes to: A Unicode object.
+    * Normalizes to: A string.
     * Validates the given value against each of the fields specified
       as an argument to the ``ComboField``.
     * Error message keys: ``required``, ``invalid``

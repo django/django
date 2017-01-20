@@ -8,7 +8,7 @@ from django.test import TestCase, skipUnlessDBFeature
 from django.utils.timezone import get_fixed_timezone
 
 from .models import (
-    Article, BrokenUnicodeMethod, Department, Event, Model1, Model2, Model3,
+    Article, BrokenStrMethod, Department, Event, Model1, Model2, Model3,
     NonAutoPK, Party, Worker,
 )
 
@@ -187,9 +187,9 @@ class ModelTests(TestCase):
         self.assertEqual(str(w), "Full-time")
 
     def test_broken_unicode(self):
-        # Models with broken unicode methods should still have a printable repr
-        b = BrokenUnicodeMethod.objects.create(name="Jerry")
-        self.assertEqual(repr(b), "<BrokenUnicodeMethod: [Bad Unicode data]>")
+        # Models with broken __str__() methods have a printable repr().
+        b = BrokenStrMethod.objects.create(name='Jerry')
+        self.assertEqual(repr(b), '<BrokenStrMethod: [Bad Unicode data]>')
 
     @skipUnlessDBFeature("supports_timezones")
     def test_timezones(self):

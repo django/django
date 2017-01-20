@@ -28,9 +28,6 @@ class ManyToOneTests(TestCase):
         # Article objects have access to their related Reporter objects.
         r = self.a.reporter
         self.assertEqual(r.id, self.r.id)
-        # These are strings instead of unicode strings because that's what was used in
-        # the creation of this reporter (and we haven't refreshed the data from the
-        # database, which always returns unicode strings).
         self.assertEqual((r.first_name, self.r.last_name), ('John', 'Smith'))
 
     def test_create(self):
@@ -200,7 +197,7 @@ class ManyToOneTests(TestCase):
                 where=["many_to_one_reporter.last_name='Smith'"]),
             ["<Article: John's second story>", "<Article: This is a test>"]
         )
-        # ... and should work fine with the unicode that comes out of forms.Form.cleaned_data
+        # ... and should work fine with the string that comes out of forms.Form.cleaned_data
         self.assertQuerysetEqual(
             (Article.objects
                 .filter(reporter__first_name__exact='John')

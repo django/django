@@ -85,9 +85,7 @@ class TimeFormat(Formatter):
 
         try:
             if hasattr(self.data, 'tzinfo') and self.data.tzinfo:
-                # Have to use tzinfo.tzname and not datetime.tzname
-                # because datatime.tzname does not expect Unicode
-                return self.data.tzinfo.tzname(self.data) or ""
+                return self.data.tzname() or ''
         except NotImplementedError:
             pass
         return ""

@@ -354,7 +354,7 @@ class QueryDict(MultiValueDict):
     will always return a mutable copy.
 
     Both keys and values set on this class are converted from the given encoding
-    (DEFAULT_CHARSET by default) to unicode.
+    (DEFAULT_CHARSET by default) to str.
     """
 
     # These are both reset in __init__, but is specified here at the class

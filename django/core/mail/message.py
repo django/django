@@ -207,8 +207,8 @@ class EmailMessage:
         Initialize a single email message (which can be sent to multiple
         recipients).
 
-        All strings used to create the message can be unicode strings
-        (or UTF-8 bytestrings). The SafeMIMEText class will handle any
+        All string arguments used to create the message can be strings
+        or UTF-8 bytestrings. The SafeMIMEText class will handle any
         necessary encoding conversions.
         """
         if to:
@@ -425,8 +425,8 @@ class EmailMultiAlternatives(EmailMessage):
         Initialize a single email message (which can be sent to multiple
         recipients).
 
-        All strings used to create the message can be unicode strings (or UTF-8
-        bytestrings). The SafeMIMEText class will handle any necessary encoding
+        All string arguments used to create the message can be strings or UTF-8
+        bytestrings. The SafeMIMEText class will handle any necessary encoding
         conversions.
         """
         super().__init__(

@@ -762,7 +762,7 @@ You can override most of these -- see `overriding predefined model methods`_,
 below -- but there are a couple that you'll almost always want to define:
 
 :meth:`~Model.__str__`
-    A Python "magic method" that returns a unicode "representation" of any
+    A Python "magic method" that returns a string representation of any
     object. This is what Python and Django will use whenever a model
     instance needs to be coerced and displayed as a plain string. Most
     notably, this happens when you display an object in an interactive

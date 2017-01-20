@@ -22,5 +22,5 @@ class Issue(models.Model):
         ordering = ('num',)
 
 
-class UnicodeReferenceModel(models.Model):
-    others = models.ManyToManyField("UnicodeReferenceModel")
+class StringReferenceModel(models.Model):
+    others = models.ManyToManyField('StringReferenceModel')

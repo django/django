@@ -280,7 +280,7 @@ class HttpResponseTests(unittest.TestCase):
     def test_headers_type(self):
         r = HttpResponse()
 
-        # ASCII unicode or bytes values are converted to strings.
+        # ASCII strings or bytes values are converted to strings.
         r['key'] = 'test'
         self.assertEqual(r['key'], 'test')
         r['key'] = 'test'.encode('ascii')
@@ -296,7 +296,7 @@ class HttpResponseTests(unittest.TestCase):
         self.assertEqual(r['key'], '=?utf-8?b?4oCg?=')
         self.assertIn(b'=?utf-8?b?4oCg?=', r.serialize_headers())
 
-        # The response also converts unicode or bytes keys to strings, but requires
+        # The response also converts string or bytes keys to strings, but requires
         # them to contain ASCII
         r = HttpResponse()
         del r['Content-Type']
@@ -570,7 +570,7 @@ class StreamingHttpResponseTests(SimpleTestCase):
         self.assertEqual(list(r), [b'abc', b'def'])
         self.assertEqual(list(r), [])
 
-        # iterating over Unicode strings still yields bytestring chunks.
+        # iterating over strings still yields bytestring chunks.
         r.streaming_content = iter(['hello', 'café'])
         chunks = list(r)
         # '\xc3\xa9' == unichr(233).encode('utf-8')

@@ -57,12 +57,9 @@ as a shorter alias, ``_``, to save typing.
     global namespace, as an alias for ``gettext()``. In Django, we have chosen
     not to follow this practice, for a couple of reasons:
 
-    1. For international character set (Unicode) support,
-       :func:`~django.utils.translation.ugettext` is more useful than
-       ``gettext()``. Sometimes, you should be using
-       :func:`~django.utils.translation.ugettext_lazy` as the default
-       translation method for a particular file. Without ``_()`` in the
-       global namespace, the developer has to think about which is the
+    1. Sometimes, you should use :func:`~django.utils.translation.ugettext_lazy`
+       as the default translation method for a particular file. Without ``_()``
+       in the global namespace, the developer has to think about which is the
        most appropriate translation function.
 
     2. The underscore character (``_``) is used to represent "the previous
@@ -418,7 +415,7 @@ Working with lazy translation objects
 -------------------------------------
 
 The result of a ``ugettext_lazy()`` call can be used wherever you would use a
-unicode string (a :class:`str` object) in other Django code, but it may not
+string (a :class:`str` object) in other Django code, but it may not
 work with arbitrary Python code. For example, the following won't work because
 the `requests <https://pypi.python.org/pypi/requests/>`_ library doesn't handle
 ``ugettext_lazy`` objects::
@@ -434,14 +431,14 @@ strings before passing them to non-Django code::
 If you try to use a ``ugettext_lazy()`` result where a bytestring (a
 :class:`bytes` object) is expected, things won't work as expected since a
 ``ugettext_lazy()`` object doesn't know how to convert itself to a bytestring.
-You can't use a unicode string inside a bytestring, either, so this is
-consistent with normal Python behavior. For example, putting a unicode proxy
-into a unicode string is fine::
+You can't use a string inside a bytestring, either, so this is consistent with
+normal Python behavior. For example, putting a string proxy into a string is
+fine::
 
     "Hello %s" % ugettext_lazy("people")
 
-But you can't insert a unicode object into a bytestring and nor can you insert
-a unicode proxy there::
+But you can't insert a string into a bytestring and nor can you insert
+a string proxy there::
 
     b"Hello %s" % ugettext_lazy("people")
 

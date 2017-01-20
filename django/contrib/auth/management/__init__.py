@@ -84,10 +84,8 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
 
 def get_system_username():
     """
-    Try to determine the current system user's username.
-
-    :returns: The username as a unicode string, or an empty string if the
-        username could not be determined.
+    Return the current system user's username, or an empty string if the
+    username could not be determined.
     """
     try:
         result = getpass.getuser()

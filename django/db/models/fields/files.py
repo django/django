@@ -314,7 +314,7 @@ class FileField(Field):
         # needed because we need to consume values that are also sane for a
         # regular (non Model-) Form to find in its cleaned_data dictionary.
         if data is not None:
-            # This value will be converted to unicode and stored in the
+            # This value will be converted to str and stored in the
             # database, so leaving False as-is is not acceptable.
             if not data:
                 data = ''

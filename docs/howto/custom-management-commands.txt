@@ -305,7 +305,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
     The actual logic of the command. Subclasses must implement this method.
 
-    It may return a Unicode string which will be printed to ``stdout`` (wrapped
+    It may return a string which will be printed to ``stdout`` (wrapped
     by ``BEGIN;`` and ``COMMIT;`` if :attr:`output_transaction` is ``True``).
 
 .. method:: BaseCommand.check(app_configs=None, tags=None, display_num_errors=False)

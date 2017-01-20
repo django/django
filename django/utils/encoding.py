@@ -24,8 +24,8 @@ python_2_unicode_compatible = six.python_2_unicode_compatible
 
 def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
-    Returns a text object representing 's' -- unicode on Python 2 and str on
-    Python 3. Treats bytestrings using the 'encoding' codec.
+    Return a string representing 's'. Treat bytestrings using the 'encoding'
+    codec.
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
@@ -78,9 +78,9 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
         else:
             # If we get to here, the caller has passed in an Exception
             # subclass populated with non-ASCII bytestring data without a
-            # working unicode method. Try to handle this without raising a
+            # working __str__() method. Try to handle this without raising a
             # further exception by individually forcing the exception args
-            # to unicode.
+            # to strings.
             s = ' '.join(force_text(arg, encoding, strings_only, errors)
                          for arg in s)
     return s
@@ -186,7 +186,7 @@ def uri_to_iri(uri):
     This is the algorithm from section 3.2 of RFC 3987.
 
     Takes an URI in ASCII bytes (e.g. '/I%20%E2%99%A5%20Django/') and returns
-    unicode containing the encoded result (e.g. '/I \xe2\x99\xa5 Django/').
+    a string containing the encoded result (e.g. '/I \xe2\x99\xa5 Django/').
     """
     if uri is None:
         return uri
@@ -231,7 +231,7 @@ def filepath_to_uri(path):
     """Convert a file system path to a URI portion that is suitable for
     inclusion in a URL.
 
-    We are assuming input is either UTF-8 or unicode already.
+    Assume the input is either UTF-8 bytes or a string.
 
     This method will encode certain chars that would normally be recognized as
     special chars for URIs.  Note that this method does not encode the '

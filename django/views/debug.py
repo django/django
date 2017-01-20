@@ -263,7 +263,7 @@ class ExceptionReporter:
                 frame_vars = []
                 for k, v in frame['vars']:
                     v = pprint(v)
-                    # The force_escape filter assume unicode, make sure that works
+                    # The force_escape filter assumes str, make sure that works
                     if isinstance(v, bytes):
                         v = v.decode('utf-8', 'replace')  # don't choke on non-utf-8 input
                     # Trim large blobs of data
@@ -360,7 +360,7 @@ class ExceptionReporter:
             return None, [], None, []
 
         # If we just read the source from a file, or if the loader did not
-        # apply tokenize.detect_encoding to decode the source into a Unicode
+        # apply tokenize.detect_encoding to decode the source into a
         # string, then we should do that ourselves.
         if isinstance(source[0], bytes):
             encoding = 'ascii'

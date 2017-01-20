@@ -6,7 +6,7 @@ from .base import WidgetTest
 
 class FakeFieldFile:
     """
-    Quacks like a FieldFile (has a .url and unicode representation), but
+    Quacks like a FieldFile (has a .url and string representation), but
     doesn't require us to care about storages etc.
     """
     url = 'something'

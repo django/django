@@ -366,7 +366,7 @@ class Field(RegisterLookupMixin):
         Note that the positional or keyword arguments must contain values of the
         following types (including inner values of collection types):
 
-         * None, bool, str, unicode, int, long, float, complex, set, frozenset, list, tuple, dict
+         * None, bool, str, int, float, complex, set, frozenset, list, tuple, dict
          * UUID
          * datetime.datetime (naive), datetime.date
          * top-level classes, top-level functions - will be referenced by their full import path

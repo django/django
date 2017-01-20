@@ -2391,10 +2391,9 @@ Note the first query will match ``'Beatles Blog'``, ``'beatles blog'``,
 
 .. admonition:: SQLite users
 
-    When using the SQLite backend and Unicode (non-ASCII) strings, bear in
-    mind the :ref:`database note <sqlite-string-matching>` about string
-    comparisons. SQLite does not do case-insensitive matching for Unicode
-    strings.
+    When using the SQLite backend and non-ASCII strings, bear in mind the
+    :ref:`database note <sqlite-string-matching>` about string comparisons.
+    SQLite does not do case-insensitive matching for non-ASCII strings.
 
 .. fieldlookup:: contains
 
@@ -2438,9 +2437,8 @@ SQL equivalent::
 
 .. admonition:: SQLite users
 
-    When using the SQLite backend and Unicode (non-ASCII) strings, bear in
-    mind the :ref:`database note <sqlite-string-matching>` about string
-    comparisons.
+    When using the SQLite backend and non-ASCII strings, bear in mind the
+    :ref:`database note <sqlite-string-matching>` about string comparisons.
 
 .. fieldlookup:: in
 
@@ -2572,9 +2570,8 @@ SQL equivalent::
 
 .. admonition:: SQLite users
 
-    When using the SQLite backend and Unicode (non-ASCII) strings, bear in
-    mind the :ref:`database note <sqlite-string-matching>` about string
-    comparisons.
+    When using the SQLite backend and non-ASCII strings, bear in mind the
+    :ref:`database note <sqlite-string-matching>` about string comparisons.
 
 .. fieldlookup:: endswith
 
@@ -2614,9 +2611,8 @@ SQL equivalent::
 
 .. admonition:: SQLite users
 
-    When using the SQLite backend and Unicode (non-ASCII) strings, bear in
-    mind the :ref:`database note <sqlite-string-matching>` about string
-    comparisons.
+    When using the SQLite backend and non-ASCII strings, bear in mind the
+    :ref:`database note <sqlite-string-matching>` about string comparisons.
 
 .. fieldlookup:: range
 

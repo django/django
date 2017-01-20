@@ -20,7 +20,7 @@ class Message:
     def _prepare(self):
         """
         Prepares the message for serialization by forcing the ``message``
-        and ``extra_tags`` to unicode in case they are lazy translations.
+        and ``extra_tags`` to str in case they are lazy translations.
 
         Known "safe" types (None, int, etc.) are not converted (see Django's
         ``force_text`` implementation for details).

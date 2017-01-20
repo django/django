@@ -651,7 +651,7 @@ def parse_header(line):
     """
     Parse the header into a key-value.
 
-    Input (line): bytes, output: unicode for key/name, bytes for value which
+    Input (line): bytes, output: str for key/name, bytes for values which
     will be decoded later.
     """
     plist = _parse_header_params(b';' + line)
