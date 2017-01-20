@@ -3,13 +3,12 @@ from os import path
 
 from django.conf.urls import include, url
 from django.conf.urls.i18n import i18n_patterns
-from django.utils._os import upath
 from django.utils.translation import ugettext_lazy as _
 from django.views import defaults, i18n, static
 
 from . import views
 
-base_dir = path.dirname(path.abspath(upath(__file__)))
+base_dir = path.dirname(path.abspath(__file__))
 media_dir = path.join(base_dir, 'media')
 locale_dir = path.join(base_dir, 'locale')
 

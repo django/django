@@ -17,7 +17,6 @@ from django.core.validators import (
 )
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
-from django.utils._os import upath
 
 try:
     from PIL import Image  # noqa
@@ -263,7 +262,7 @@ TEST_DATA = [
 
 
 def create_path(filename):
-    return os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), filename))
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), filename))
 
 
 # Add valid and invalid URL tests.

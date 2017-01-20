@@ -16,7 +16,6 @@ from django.http import (
     StreamingHttpResponse, parse_cookie,
 )
 from django.test import SimpleTestCase
-from django.utils._os import upath
 from django.utils.functional import lazystr
 
 
@@ -634,7 +633,7 @@ class FileCloseTests(SimpleTestCase):
         request_finished.connect(close_old_connections)
 
     def test_response(self):
-        filename = os.path.join(os.path.dirname(upath(__file__)), 'abc.txt')
+        filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
 
         # file isn't closed until we close the response.
         file1 = open(filename)
@@ -652,7 +651,7 @@ class FileCloseTests(SimpleTestCase):
         self.assertTrue(file2.closed)
 
     def test_streaming_response(self):
-        filename = os.path.join(os.path.dirname(upath(__file__)), 'abc.txt')
+        filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
 
         # file isn't closed until we close the response.
         file1 = open(filename)

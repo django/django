@@ -11,7 +11,6 @@ from django.contrib import admin
 from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import extend_sys_path
 from django.utils import autoreload
-from django.utils._os import npath
 from django.utils.translation import trans_real
 
 LOCALE_PATH = os.path.join(os.path.dirname(__file__), 'locale')
@@ -26,23 +25,23 @@ class TestFilenameGenerator(SimpleTestCase):
     def assertFileFound(self, filename):
         self.clear_autoreload_caches()
         # Test uncached access
-        self.assertIn(npath(filename), autoreload.gen_filenames())
+        self.assertIn(filename, autoreload.gen_filenames())
         # Test cached access
-        self.assertIn(npath(filename), autoreload.gen_filenames())
+        self.assertIn(filename, autoreload.gen_filenames())
 
     def assertFileNotFound(self, filename):
         self.clear_autoreload_caches()
         # Test uncached access
-        self.assertNotIn(npath(filename), autoreload.gen_filenames())
+        self.assertNotIn(filename, autoreload.gen_filenames())
         # Test cached access
-        self.assertNotIn(npath(filename), autoreload.gen_filenames())
+        self.assertNotIn(filename, autoreload.gen_filenames())
 
     def assertFileFoundOnlyNew(self, filename):
         self.clear_autoreload_caches()
         # Test uncached access
-        self.assertIn(npath(filename), autoreload.gen_filenames(only_new=True))
+        self.assertIn(filename, autoreload.gen_filenames(only_new=True))
         # Test cached access
-        self.assertNotIn(npath(filename), autoreload.gen_filenames(only_new=True))
+        self.assertNotIn(filename, autoreload.gen_filenames(only_new=True))
 
     def test_django_locales(self):
         """
@@ -122,7 +121,7 @@ class TestFilenameGenerator(SimpleTestCase):
         with extend_sys_path(dirname):
             import_module('test_only_new_module')
         filenames = set(autoreload.gen_filenames(only_new=True))
-        self.assertEqual(filenames, {npath(filename)})
+        self.assertEqual(filenames, {filename})
 
     def test_deleted_removed(self):
         """

@@ -3,14 +3,13 @@ import shutil
 
 from django import conf
 from django.test import TestCase
-from django.utils._os import upath
 
 
 class TestStartProjectSettings(TestCase):
     def setUp(self):
         # Ensure settings.py exists
         project_dir = os.path.join(
-            os.path.dirname(upath(conf.__file__)),
+            os.path.dirname(conf.__file__),
             'project_template',
             'project_name',
         )

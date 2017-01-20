@@ -5,11 +5,10 @@ for the GEOS and GDAL tests.
 import json
 import os
 
-from django.utils._os import upath
 from django.utils.functional import cached_property
 
 # Path where reference test data is located.
-TEST_DATA = os.path.join(os.path.dirname(upath(__file__)), 'data')
+TEST_DATA = os.path.join(os.path.dirname(__file__), 'data')
 
 
 def tuplize(seq):

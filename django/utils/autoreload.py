@@ -41,7 +41,6 @@ from django.apps import apps
 from django.conf import settings
 from django.core.signals import request_finished
 from django.utils import six
-from django.utils._os import npath
 
 # This import does nothing, but it's necessary to avoid some race conditions
 # in the threading module. See http://code.djangoproject.com/ticket/2330 .
@@ -111,7 +110,7 @@ def gen_filenames(only_new=False):
                                  'conf', 'locale'),
                     'locale']
         for app_config in reversed(list(apps.get_app_configs())):
-            basedirs.append(os.path.join(npath(app_config.path), 'locale'))
+            basedirs.append(os.path.join(app_config.path, 'locale'))
         basedirs.extend(settings.LOCALE_PATHS)
         basedirs = [os.path.abspath(basedir) for basedir in basedirs
                     if os.path.isdir(basedir)]

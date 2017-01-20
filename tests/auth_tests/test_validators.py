@@ -13,7 +13,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.test import TestCase, override_settings
 from django.test.utils import isolate_apps
-from django.utils._os import upath
 
 
 @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -171,7 +170,7 @@ class CommonPasswordValidatorTest(TestCase):
         self.assertEqual(cm.exception.messages, [expected_error])
 
     def test_validate_custom_list(self):
-        path = os.path.join(os.path.dirname(os.path.realpath(upath(__file__))), 'common-passwords-custom.txt')
+        path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'common-passwords-custom.txt')
         validator = CommonPasswordValidator(password_list_path=path)
         expected_error = "This password is too common."
         self.assertIsNone(validator.validate('a-safe-password'))

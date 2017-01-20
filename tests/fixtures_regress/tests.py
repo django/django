@@ -14,7 +14,6 @@ from django.test import (
     TestCase, TransactionTestCase, override_settings, skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.utils._os import upath
 
 from .models import (
     Absolute, Animal, Article, Book, Child, Circle1, Circle2, Circle3,
@@ -26,7 +25,7 @@ from .models import (
     Person, RefToNKChild, Store, Stuff, Thingy, Widget,
 )
 
-_cur_dir = os.path.dirname(os.path.abspath(upath(__file__)))
+_cur_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class TestFixtures(TestCase):
@@ -142,7 +141,7 @@ class TestFixtures(TestCase):
         fixture directory.
         """
         load_absolute_path = os.path.join(
-            os.path.dirname(upath(__file__)),
+            os.path.dirname(__file__),
             'fixtures',
             'absolute.json'
         )

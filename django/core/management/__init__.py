@@ -14,7 +14,6 @@ from django.core.management.base import (
 )
 from django.core.management.color import color_style
 from django.utils import autoreload
-from django.utils._os import npath, upath
 from django.utils.encoding import force_text
 
 
@@ -26,7 +25,7 @@ def find_commands(management_dir):
     Returns an empty list if no commands are defined.
     """
     command_dir = os.path.join(management_dir, 'commands')
-    return [name for _, name, is_pkg in pkgutil.iter_modules([npath(command_dir)])
+    return [name for _, name, is_pkg in pkgutil.iter_modules([command_dir])
             if not is_pkg and not name.startswith('_')]
 
 
@@ -63,7 +62,7 @@ def get_commands():
     The dictionary is cached on the first call and reused on subsequent
     calls.
     """
-    commands = {name: 'django.core' for name in find_commands(upath(__path__[0]))}
+    commands = {name: 'django.core' for name in find_commands(__path__[0])}
 
     if not settings.configured:
         return commands

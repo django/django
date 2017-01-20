@@ -3,10 +3,9 @@ import os
 
 from django.template.engine import Engine
 from django.test.utils import override_settings
-from django.utils._os import upath
 from django.utils.safestring import mark_safe
 
-ROOT = os.path.dirname(os.path.abspath(upath(__file__)))
+ROOT = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE_DIR = os.path.join(ROOT, 'templates')
 
 

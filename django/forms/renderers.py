@@ -4,7 +4,6 @@ import os
 from django.conf import settings
 from django.template.backends.django import DjangoTemplates
 from django.template.loader import get_template
-from django.utils._os import upath
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -14,7 +13,7 @@ except ImportError:
     def Jinja2(params):
         raise ImportError("jinja2 isn't installed")
 
-ROOT = upath(os.path.dirname(__file__))
+ROOT = os.path.dirname(__file__)
 
 
 @functools.lru_cache()

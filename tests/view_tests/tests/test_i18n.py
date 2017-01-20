@@ -8,7 +8,6 @@ from django.test import (
 )
 from django.test.selenium import SeleniumTestCase
 from django.urls import reverse
-from django.utils._os import upath
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, get_language, override,
 )
@@ -373,7 +372,7 @@ class JsI18NTestsMultiPackage(SimpleTestCase):
     def test_i18n_with_locale_paths(self):
         extended_locale_paths = settings.LOCALE_PATHS + [
             path.join(
-                path.dirname(path.dirname(path.abspath(upath(__file__)))),
+                path.dirname(path.dirname(path.abspath(__file__))),
                 'app3',
                 'locale',
             ),

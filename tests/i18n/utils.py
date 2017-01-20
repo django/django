@@ -3,9 +3,7 @@ import re
 import shutil
 import tempfile
 
-from django.utils._os import upath
-
-source_code_dir = os.path.dirname(upath(__file__))
+source_code_dir = os.path.dirname(__file__)
 
 
 def copytree(src, dst):

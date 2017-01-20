@@ -17,7 +17,6 @@ from django.forms.models import (
 )
 from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.utils._os import upath
 
 from .models import (
     Article, ArticleStatus, Author, Author1, Award, BetterWriter, BigInt, Book,
@@ -2221,7 +2220,7 @@ class FileAndImageFieldTests(TestCase):
                 fields = '__all__'
 
         # Grab an image for testing.
-        filename = os.path.join(os.path.dirname(upath(__file__)), "test.png")
+        filename = os.path.join(os.path.dirname(__file__), 'test.png')
         with open(filename, "rb") as fp:
             img = fp.read()
 
@@ -2260,9 +2259,9 @@ class FileAndImageFieldTests(TestCase):
         # it comes to validation. This specifically tests that #6302 is fixed for
         # both file fields and image fields.
 
-        with open(os.path.join(os.path.dirname(upath(__file__)), "test.png"), 'rb') as fp:
+        with open(os.path.join(os.path.dirname(__file__), 'test.png'), 'rb') as fp:
             image_data = fp.read()
-        with open(os.path.join(os.path.dirname(upath(__file__)), "test2.png"), 'rb') as fp:
+        with open(os.path.join(os.path.dirname(__file__), 'test2.png'), 'rb') as fp:
             image_data2 = fp.read()
 
         f = ImageFileForm(

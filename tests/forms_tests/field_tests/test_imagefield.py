@@ -4,7 +4,6 @@ import unittest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import ImageField
 from django.test import SimpleTestCase
-from django.utils._os import upath
 
 try:
     from PIL import Image
@@ -13,7 +12,7 @@ except ImportError:
 
 
 def get_img_path(path):
-    return os.path.join(os.path.abspath(os.path.join(upath(__file__), '..', '..')), 'tests', path)
+    return os.path.join(os.path.abspath(os.path.join(__file__, '..', '..')), 'tests', path)
 
 
 @unittest.skipUnless(Image, "Pillow is required to test ImageField")

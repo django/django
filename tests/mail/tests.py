@@ -25,7 +25,6 @@ from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.message import BadHeaderError, sanitize_address
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
-from django.utils._os import upath
 from django.utils.encoding import force_bytes, force_text
 from django.utils.translation import ugettext_lazy
 
@@ -411,7 +410,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 email = EmailMessage('subject', 'body', 'from@example.com', ['to@example.com'])
                 self.assertEqual(mimetypes.guess_type(basename)[0], real_mimetype)
                 self.assertEqual(email.attachments, [])
-                file_path = os.path.join(os.path.dirname(upath(__file__)), 'attachments', basename)
+                file_path = os.path.join(os.path.dirname(__file__), 'attachments', basename)
                 email.attach_file(file_path, mimetype=mimetype)
                 self.assertEqual(len(email.attachments), 1)
                 self.assertIn(basename, email.attachments[0])

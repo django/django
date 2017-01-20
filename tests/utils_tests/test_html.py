@@ -3,7 +3,6 @@ from datetime import datetime
 
 from django.test import SimpleTestCase
 from django.utils import html, safestring
-from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.functional import lazystr
 
@@ -98,7 +97,7 @@ class TestUtilsHtml(SimpleTestCase):
 
         # Test with more lengthy content (also catching performance regressions)
         for filename in ('strip_tags1.html', 'strip_tags2.txt'):
-            path = os.path.join(os.path.dirname(upath(__file__)), 'files', filename)
+            path = os.path.join(os.path.dirname(__file__), 'files', filename)
             with open(path, 'r') as fp:
                 content = force_text(fp.read())
                 start = datetime.now()
