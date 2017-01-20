@@ -14,7 +14,7 @@ signing.loads(s) checks the signature and returns the deserialized object.
 If the signature fails, a BadSignature exception is raised.
 
 >>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk")
-u'hello'
+'hello'
 >>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk-modified")
 ...
 BadSignature: Signature failed: ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk-modified
