@@ -8,7 +8,6 @@ from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import Http404
 from django.http.multipartparser import MultiPartParserError
 from django.urls import get_resolver, get_urlconf
-from django.utils.decorators import available_attrs
 from django.utils.encoding import force_text
 from django.views import debug
 
@@ -28,7 +27,7 @@ def convert_exception_to_response(get_response):
     no middleware leaks an exception and that the next middleware in the stack
     can rely on getting a response instead of an exception.
     """
-    @wraps(get_response, assigned=available_attrs(get_response))
+    @wraps(get_response)
     def inner(request):
         try:
             response = get_response(request)

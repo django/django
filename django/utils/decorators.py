@@ -79,7 +79,7 @@ def method_decorator(decorator, name=''):
     # Don't worry about making _dec look similar to a list/tuple as it's rather
     # meaningless.
     if not hasattr(decorator, '__iter__'):
-        update_wrapper(_dec, decorator, assigned=available_attrs(decorator))
+        update_wrapper(_dec, decorator)
     # Change the name to aid debugging.
     if hasattr(decorator, '__name__'):
         _dec.__name__ = 'method_decorator(%s)' % decorator.__name__
@@ -113,6 +113,7 @@ def decorator_from_middleware(middleware_class):
     return make_middleware_decorator(middleware_class)()
 
 
+# Unused, for backwards compatibility in Django 2.0.
 def available_attrs(fn):
     """
     Return the list of functools-wrappable attributes on a callable.
@@ -127,7 +128,7 @@ def make_middleware_decorator(middleware_class):
         middleware = middleware_class(*m_args, **m_kwargs)
 
         def _decorator(view_func):
-            @wraps(view_func, assigned=available_attrs(view_func))
+            @wraps(view_func)
             def _wrapped_view(request, *args, **kwargs):
                 if hasattr(middleware, 'process_request'):
                     result = middleware.process_request(request)

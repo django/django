@@ -22,7 +22,6 @@ from django.db.models.options import Options
 from django.template import Template
 from django.test.signals import setting_changed, template_rendered
 from django.urls import get_script_prefix, set_script_prefix
-from django.utils.decorators import available_attrs
 from django.utils.translation import deactivate
 
 try:
@@ -370,7 +369,7 @@ class TestContextDecorator:
         raise TypeError('Can only decorate subclasses of unittest.TestCase')
 
     def decorate_callable(self, func):
-        @wraps(func, assigned=available_attrs(func))
+        @wraps(func)
         def inner(*args, **kwargs):
             with self as context:
                 if self.kwarg_name:
