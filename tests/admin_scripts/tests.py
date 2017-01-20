@@ -101,9 +101,6 @@ class AdminScriptTestCase(unittest.TestCase):
             if sys.platform.startswith('java'):
                 # Jython produces module$py.class files
                 os.remove(re.sub(r'\.py$', '$py.class', full_name))
-            else:
-                # CPython produces module.pyc files
-                os.remove(full_name + 'c')
         except OSError:
             pass
         # Also remove a __pycache__ directory, if it exists

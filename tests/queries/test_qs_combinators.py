@@ -1,7 +1,6 @@
 from django.db.models import F, IntegerField, Value
 from django.db.utils import DatabaseError
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.utils.six.moves import range
 
 from .models import Number, ReservedName
 

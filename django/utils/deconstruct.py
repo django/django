@@ -24,7 +24,7 @@ def deconstructible(*args, **kwargs):
             Returns a 3-tuple of class import path, positional arguments,
             and keyword arguments.
             """
-            # Python 2/fallback version
+            # Fallback version
             if path:
                 module_name, _, name = path.rpartition('.')
             else:

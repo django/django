@@ -256,8 +256,8 @@ class MethodDecoratorTests(SimpleTestCase):
 
     def test_bad_iterable(self):
         decorators = {myattr_dec_m, myattr2_dec_m}
-        # The rest of the exception message differs between Python 2 and 3.
-        with self.assertRaisesMessage(TypeError, "'set' object"):
+        msg = "'set' object is not subscriptable"
+        with self.assertRaisesMessage(TypeError, msg):
             @method_decorator(decorators, "method")
             class TestIterable:
                 def method(self):

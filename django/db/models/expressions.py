@@ -60,9 +60,6 @@ class Combinable:
     def __truediv__(self, other):
         return self._combine(other, self.DIV, False)
 
-    def __div__(self, other):  # Python 2 compatibility
-        return type(self).__truediv__(self, other)
-
     def __mod__(self, other):
         return self._combine(other, self.MOD, False)
 
@@ -102,9 +99,6 @@ class Combinable:
 
     def __rtruediv__(self, other):
         return self._combine(other, self.DIV, True)
-
-    def __rdiv__(self, other):  # Python 2 compatibility
-        return type(self).__rtruediv__(self, other)
 
     def __rmod__(self, other):
         return self._combine(other, self.MOD, True)

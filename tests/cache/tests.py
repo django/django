@@ -62,11 +62,6 @@ class Unpicklable:
         raise pickle.PickleError()
 
 
-class UnpicklableType:
-    # Unpicklable using the default pickling protocol on Python 2.
-    __slots__ = 'a',
-
-
 @override_settings(CACHES={
     'default': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
@@ -1359,10 +1354,6 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         os.rmdir(self.dirname)
         cache.set('foo', 'bar')
         os.path.exists(self.dirname)
-
-    def test_cache_write_unpicklable_type(self):
-        # This fails if not using the highest pickling protocol on Python 2.
-        cache.set('unpicklable', UnpicklableType())
 
     def test_get_ignores_enoent(self):
         cache.set('foo', 'bar')

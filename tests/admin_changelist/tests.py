@@ -568,10 +568,6 @@ class ChangeListTests(TestCase):
         self.assertNotContains(response, '<a href="%s">' % link)
 
     def test_tuple_list_display(self):
-        """
-        Regression test for #17128
-        (ChangeList failing under Python 2.5 after r16319)
-        """
         swallow = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')
         swallow2 = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')
         swallow_o2o = SwallowOneToOne.objects.create(swallow=swallow2)

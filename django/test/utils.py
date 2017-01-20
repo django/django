@@ -310,7 +310,7 @@ def get_runner(settings, test_runner_class=None):
         test_runner_class = settings.TEST_RUNNER
 
     test_path = test_runner_class.split('.')
-    # Allow for Python 2.5 relative paths
+    # Allow for relative paths
     if len(test_path) > 1:
         test_module_name = '.'.join(test_path[:-1])
     else:

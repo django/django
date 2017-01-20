@@ -637,8 +637,6 @@ class CaseExpressionTests(TestCase):
     def test_update_binary(self):
         CaseTestModel.objects.update(
             binary=Case(
-                # fails on postgresql on Python 2.7 if output_field is not
-                # set explicitly
                 When(integer=1, then=Value(b'one', output_field=models.BinaryField())),
                 When(integer=2, then=Value(b'two', output_field=models.BinaryField())),
                 default=Value(b'', output_field=models.BinaryField()),

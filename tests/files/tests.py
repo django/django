@@ -139,9 +139,6 @@ class FileTests(unittest.TestCase):
             test_file.seek(0)
             wrapper = TextIOWrapper(test_file, 'utf-8', newline='\n')
             self.assertEqual(wrapper.read(), content)
-            # The following seek() call is required on Windows Python 2 when
-            # switching from reading to writing.
-            wrapper.seek(0, 2)
             wrapper.write(content)
             wrapper.seek(0)
             self.assertEqual(wrapper.read(), content * 2)

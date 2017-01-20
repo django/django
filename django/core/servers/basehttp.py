@@ -83,7 +83,6 @@ class WSGIServer(simple_server.WSGIServer):
             super(WSGIServer, self).handle_error(request, client_address)
 
 
-# Inheriting from object required on Python 2.
 class ServerHandler(simple_server.ServerHandler):
     def handle_error(self):
         # Ignore broken pipe errors, otherwise pass on

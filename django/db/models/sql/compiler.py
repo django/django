@@ -875,14 +875,8 @@ class SQLCompiler:
         try:
             cursor.execute(sql, params)
         except Exception:
-            try:
-                # Might fail for server-side cursors (e.g. connection closed)
-                cursor.close()
-            except Exception:
-                # Ignore clean up errors and raise the original error instead.
-                # Python 2 doesn't chain exceptions. Remove this error
-                # silencing when dropping Python 2 compatibility.
-                pass
+            # Might fail for server-side cursors (e.g. connection closed)
+            cursor.close()
             raise
 
         if result_type == CURSOR:

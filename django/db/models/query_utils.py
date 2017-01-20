@@ -27,11 +27,8 @@ class InvalidQuery(Exception):
 
 def subclasses(cls):
     yield cls
-    # Python 2 lacks 'yield from', which could replace the inner loop
     for subclass in cls.__subclasses__():
-        # yield from subclasses(subclass)
-        for item in subclasses(subclass):
-            yield item
+        yield from subclasses(subclass)
 
 
 class QueryWrapper:
