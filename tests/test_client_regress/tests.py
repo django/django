@@ -15,7 +15,7 @@ from django.test import (
     Client, SimpleTestCase, TestCase, modify_settings, override_settings,
 )
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
-from django.test.utils import ContextList, str_prefix
+from django.test.utils import ContextList
 from django.urls import NoReverseMatch, reverse
 from django.utils.translation import ugettext_lazy
 
@@ -595,21 +595,19 @@ class AssertFormErrorTests(SimpleTestCase):
             self.assertFormError(response, 'form', 'email', 'Some error.')
         except AssertionError as e:
             self.assertIn(
-                str_prefix(
-                    "The field 'email' on form 'form' in context 0 does not "
-                    "contain the error 'Some error.' (actual errors: "
-                    "[%(_)s'Enter a valid email address.'])"
-                ), str(e)
+                "The field 'email' on form 'form' in context 0 does not "
+                "contain the error 'Some error.' (actual errors: "
+                "['Enter a valid email address.'])",
+                str(e)
             )
         try:
             self.assertFormError(response, 'form', 'email', 'Some error.', msg_prefix='abc')
         except AssertionError as e:
             self.assertIn(
-                str_prefix(
-                    "abc: The field 'email' on form 'form' in context 0 does "
-                    "not contain the error 'Some error.' (actual errors: "
-                    "[%(_)s'Enter a valid email address.'])",
-                ), str(e)
+                "abc: The field 'email' on form 'form' in context 0 does "
+                "not contain the error 'Some error.' (actual errors: "
+                "['Enter a valid email address.'])",
+                str(e)
             )
 
     def test_unknown_nonfield_error(self):
@@ -719,10 +717,10 @@ class AssertFormsetErrorTests(SimpleTestCase):
     def test_unknown_error(self):
         "An assertion is raised if the field doesn't contain the specified error"
         for prefix, kwargs in self.msg_prefixes:
-            msg = str_prefix(
-                prefix + "The field 'email' on formset 'my_formset', form 0 "
+            msg = prefix + (
+                "The field 'email' on formset 'my_formset', form 0 "
                 "in context 0 does not contain the error 'Some error.' "
-                "(actual errors: [%(_)s'Enter a valid email address.'])"
+                "(actual errors: ['Enter a valid email address.'])"
             )
             with self.assertRaisesMessage(AssertionError, msg):
                 self.assertFormsetError(self.response_form_errors, 'my_formset', 0, 'email', 'Some error.', **kwargs)
@@ -743,10 +741,10 @@ class AssertFormsetErrorTests(SimpleTestCase):
     def test_unknown_nonfield_error(self):
         "An assertion is raised if the formsets non-field errors doesn't contain the provided error."
         for prefix, kwargs in self.msg_prefixes:
-            msg = str_prefix(
-                prefix + "The formset 'my_formset', form 0 in context 0 does not "
+            msg = prefix + (
+                "The formset 'my_formset', form 0 in context 0 does not "
                 "contain the non-field error 'Some error.' (actual errors: "
-                "[%(_)s'Non-field error.'])"
+                "['Non-field error.'])"
             )
             with self.assertRaisesMessage(AssertionError, msg):
                 self.assertFormsetError(self.response_form_errors, 'my_formset', 0, None, 'Some error.', **kwargs)
@@ -766,11 +764,10 @@ class AssertFormsetErrorTests(SimpleTestCase):
     def test_unknown_nonform_error(self):
         "An assertion is raised if the formsets non-form errors doesn't contain the provided error."
         for prefix, kwargs in self.msg_prefixes:
-            msg = str_prefix(
-                prefix +
+            msg = prefix + (
                 "The formset 'my_formset' in context 0 does not contain the "
-                "non-form error 'Some error.' (actual errors: [%(_)s'Forms "
-                "in a set must have distinct email addresses.'])"
+                "non-form error 'Some error.' (actual errors: ['Forms in a set "
+                "must have distinct email addresses.'])"
             )
             with self.assertRaisesMessage(AssertionError, msg):
                 self.assertFormsetError(

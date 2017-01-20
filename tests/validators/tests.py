@@ -16,7 +16,6 @@ from django.core.validators import (
     validate_unicode_slug,
 )
 from django.test import SimpleTestCase
-from django.test.utils import str_prefix
 
 try:
     from PIL import Image  # noqa
@@ -314,18 +313,18 @@ def create_simple_test_method(validator, expected, value, num):
 class TestSimpleValidators(SimpleTestCase):
     def test_single_message(self):
         v = ValidationError('Not Valid')
-        self.assertEqual(str(v), str_prefix("[%(_)s'Not Valid']"))
-        self.assertEqual(repr(v), str_prefix("ValidationError([%(_)s'Not Valid'])"))
+        self.assertEqual(str(v), "['Not Valid']")
+        self.assertEqual(repr(v), "ValidationError(['Not Valid'])")
 
     def test_message_list(self):
         v = ValidationError(['First Problem', 'Second Problem'])
-        self.assertEqual(str(v), str_prefix("[%(_)s'First Problem', %(_)s'Second Problem']"))
-        self.assertEqual(repr(v), str_prefix("ValidationError([%(_)s'First Problem', %(_)s'Second Problem'])"))
+        self.assertEqual(str(v), "['First Problem', 'Second Problem']")
+        self.assertEqual(repr(v), "ValidationError(['First Problem', 'Second Problem'])")
 
     def test_message_dict(self):
         v = ValidationError({'first': ['First Problem']})
-        self.assertEqual(str(v), str_prefix("{%(_)s'first': [%(_)s'First Problem']}"))
-        self.assertEqual(repr(v), str_prefix("ValidationError({%(_)s'first': [%(_)s'First Problem']})"))
+        self.assertEqual(str(v), "{'first': ['First Problem']}")
+        self.assertEqual(repr(v), "ValidationError({'first': ['First Problem']})")
 
     def test_regex_validator_flags(self):
         with self.assertRaises(TypeError):

@@ -19,7 +19,6 @@ from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
 from django.test import SimpleTestCase
-from django.test.utils import str_prefix
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils.html import format_html
@@ -2519,9 +2518,7 @@ Password: <input type="password" name="password" required />
         # Case 3: POST with valid data (the success message).)
         self.assertEqual(
             my_function('POST', {'username': 'adrian', 'password1': 'secret', 'password2': 'secret'}),
-            str_prefix(
-                "VALID: [('password1', %(_)s'secret'), ('password2', %(_)s'secret'), ('username', %(_)s'adrian')]"
-            )
+            "VALID: [('password1', 'secret'), ('password2', 'secret'), ('username', 'adrian')]"
         )
 
     def test_templates_with_forms(self):

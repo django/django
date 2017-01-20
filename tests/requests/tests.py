@@ -13,7 +13,7 @@ from django.http import (
 from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
-from django.test.utils import freeze_time, str_prefix
+from django.test.utils import freeze_time
 from django.utils.http import cookie_date, urlencode
 from django.utils.timezone import utc
 
@@ -57,17 +57,17 @@ class RequestsTests(SimpleTestCase):
         request.POST = {'post-key': 'post-value'}
         request.COOKIES = {'post-key': 'post-value'}
         request.META = {'post-key': 'post-value'}
-        self.assertEqual(repr(request), str_prefix("<HttpRequest: GET '/somepath/'>"))
+        self.assertEqual(repr(request), "<HttpRequest: GET '/somepath/'>")
 
     def test_httprequest_repr_invalid_method_and_path(self):
         request = HttpRequest()
-        self.assertEqual(repr(request), str_prefix("<HttpRequest>"))
+        self.assertEqual(repr(request), "<HttpRequest>")
         request = HttpRequest()
         request.method = "GET"
-        self.assertEqual(repr(request), str_prefix("<HttpRequest>"))
+        self.assertEqual(repr(request), "<HttpRequest>")
         request = HttpRequest()
         request.path = ""
-        self.assertEqual(repr(request), str_prefix("<HttpRequest>"))
+        self.assertEqual(repr(request), "<HttpRequest>")
 
     def test_wsgirequest(self):
         request = WSGIRequest({
@@ -156,13 +156,13 @@ class RequestsTests(SimpleTestCase):
 
     def test_wsgirequest_repr(self):
         request = WSGIRequest({'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
-        self.assertEqual(repr(request), str_prefix("<WSGIRequest: GET '/'>"))
+        self.assertEqual(repr(request), "<WSGIRequest: GET '/'>")
         request = WSGIRequest({'PATH_INFO': '/somepath/', 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
         request.GET = {'get-key': 'get-value'}
         request.POST = {'post-key': 'post-value'}
         request.COOKIES = {'post-key': 'post-value'}
         request.META = {'post-key': 'post-value'}
-        self.assertEqual(repr(request), str_prefix("<WSGIRequest: GET '/somepath/'>"))
+        self.assertEqual(repr(request), "<WSGIRequest: GET '/somepath/'>")
 
     def test_wsgirequest_path_info(self):
         def wsgi_str(path_info, encoding='utf-8'):

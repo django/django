@@ -1,6 +1,5 @@
 from django.db.models import Max
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import str_prefix
 
 from .models import Celebrity, Fan, Staff, StaffTag, Tag
 
@@ -78,8 +77,7 @@ class DistinctOnTests(TestCase):
             (
                 (Staff.objects.distinct('id').order_by('id', 'coworkers__name').
                     values_list('id', 'coworkers__name')),
-                [str_prefix("(1, %(_)s'p2')"), str_prefix("(2, %(_)s'p1')"),
-                 str_prefix("(3, %(_)s'p1')"), "(4, None)"]
+                ["(1, 'p2')", "(2, 'p1')", "(3, 'p1')", "(4, None)"]
             ),
         )
         for qset, expected in qsets:
