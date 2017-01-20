@@ -16,6 +16,7 @@ from django.core.exceptions import (
 )
 from django.core.paginator import InvalidPage
 from django.db import models
+from django.db.models.query_utils import Q
 from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_text
@@ -311,17 +312,28 @@ class ChangeList:
                 ordering_fields[idx] = 'desc' if pfx == '-' else 'asc'
         return ordering_fields
 
+    def apply_query_objects(self, queryset, qlike_objects):
+        return self.model_admin.apply_query_objects(queryset, qlike_objects)
+
     def get_queryset(self, request):
         # First, we collect all the declared list filters.
         (self.filter_specs, self.has_filters, remaining_lookup_params,
          filters_use_distinct) = self.get_filters(request)
 
-        # Then, we let every list filter modify the queryset to its liking.
+        # Then, we let every list filter modify the queryset to its liking
+        # or return a Q object which will then be applied afterwards
         qs = self.root_queryset
+        qlike_objects = []
         for filter_spec in self.filter_specs:
             new_qs = filter_spec.queryset(request, qs)
             if new_qs is not None:
-                qs = new_qs
+                if isinstance(new_qs, Q):
+                    qlike_objects.append(new_qs)
+                else:
+                    qs = new_qs
+
+        if qlike_objects:
+            qs = self.apply_query_objects(qs, qlike_objects)
 
         try:
             # Finally, we apply the remaining lookup parameters from the query
