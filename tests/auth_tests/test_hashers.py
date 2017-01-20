@@ -251,7 +251,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password('', encoded))
         self.assertFalse(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, 'Unknown password hashing algorith'):
             identify_hasher(encoded)
         # Assert that the unusable passwords actually contain a random part.
         # This might fail one day due to a hash collision.
@@ -265,9 +265,13 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password(None, make_password('lètmein')))
 
     def test_bad_algorithm(self):
-        with self.assertRaises(ValueError):
+        msg = (
+            "Unknown password hashing algorithm '%s'. Did you specify it in "
+            "the PASSWORD_HASHERS setting?"
+        )
+        with self.assertRaisesMessage(ValueError, msg % 'lolcat'):
             make_password('lètmein', hasher='lolcat')
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, msg % 'lolcat'):
             identify_hasher('lolcat$salt$hash')
 
     def test_bad_encoded(self):
@@ -424,15 +428,15 @@ class TestUtilsHashPass(SimpleTestCase):
             self.assertEqual(hasher.harden_runtime.call_count, 1)
 
     def test_load_library_no_algorithm(self):
-        with self.assertRaises(ValueError) as e:
+        msg = "Hasher 'BasePasswordHasher' doesn't specify a library attribute"
+        with self.assertRaisesMessage(ValueError, msg):
             BasePasswordHasher()._load_library()
-        self.assertEqual("Hasher 'BasePasswordHasher' doesn't specify a library attribute", str(e.exception))
 
     def test_load_library_importerror(self):
         PlainHasher = type('PlainHasher', (BasePasswordHasher,), {'algorithm': 'plain', 'library': 'plain'})
         # Python 3 adds quotes around module name
-        msg = "Couldn't load 'PlainHasher' algorithm library: No module named '?plain'?"
-        with self.assertRaisesRegex(ValueError, msg):
+        msg = "Couldn't load 'PlainHasher' algorithm library: No module named 'plain'"
+        with self.assertRaisesMessage(ValueError, msg):
             PlainHasher()._load_library()
 
 

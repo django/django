@@ -2954,10 +2954,8 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         with self.assertRaisesMessage(ValidationError, "'Enter a complete value.'"):
             f.clean(['+61'])
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
-        self.assertRaisesRegex(
-            ValidationError,
-            r"'Enter a complete value\.', u?'Enter an extension\.'", f.clean, ['', '', '', 'Home']
-        )
+        with self.assertRaisesMessage(ValidationError, "'Enter a complete value.', 'Enter an extension.'"):
+            f.clean(['', '', '', 'Home'])
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(['61', '287654321', '123', 'Home'])
 
@@ -2970,7 +2968,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         with self.assertRaisesMessage(ValidationError, "'Enter a complete value.'"):
             f.clean(['+61'])
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
-        with self.assertRaisesRegex(ValidationError, r"'Enter a complete value\.', u?'Enter an extension\.'"):
+        with self.assertRaisesMessage(ValidationError, "'Enter a complete value.', 'Enter an extension.'"):
             f.clean(['', '', '', 'Home'])
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(['61', '287654321', '123', 'Home'])

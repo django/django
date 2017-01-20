@@ -20,7 +20,7 @@ class SplitDateTimeFieldTest(SimpleTestCase):
             f.clean('')
         with self.assertRaisesMessage(ValidationError, "'Enter a list of values.'"):
             f.clean('hello')
-        with self.assertRaisesRegex(ValidationError, r"'Enter a valid date\.', u?'Enter a valid time\.'"):
+        with self.assertRaisesMessage(ValidationError, "'Enter a valid date.', 'Enter a valid time.'"):
             f.clean(['hello', 'there'])
         with self.assertRaisesMessage(ValidationError, "'Enter a valid time.'"):
             f.clean(['2006-01-10', 'there'])
@@ -40,7 +40,7 @@ class SplitDateTimeFieldTest(SimpleTestCase):
         self.assertIsNone(f.clean(['', '']))
         with self.assertRaisesMessage(ValidationError, "'Enter a list of values.'"):
             f.clean('hello')
-        with self.assertRaisesRegex(ValidationError, r"'Enter a valid date\.', u?'Enter a valid time\.'"):
+        with self.assertRaisesMessage(ValidationError, "'Enter a valid date.', 'Enter a valid time.'"):
             f.clean(['hello', 'there'])
         with self.assertRaisesMessage(ValidationError, "'Enter a valid time.'"):
             f.clean(['2006-01-10', 'there'])

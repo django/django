@@ -68,7 +68,7 @@ class ParserTests(SimpleTestCase):
             Variable("article._hidden")
 
         # Variables should raise on non string type
-        with self.assertRaisesRegex(TypeError, "Variable must be a string or number, got <(class|type) 'dict'>"):
+        with self.assertRaisesMessage(TypeError, "Variable must be a string or number, got <class 'dict'>"):
             Variable({})
 
     def test_filter_args_count(self):
