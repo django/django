@@ -11,9 +11,9 @@ class TemplateUtilsTests(SimpleTestCase):
         Failing to import a backend keeps raising the original import error
         (#24265).
         """
-        with self.assertRaisesRegex(ImportError, "No module named '?raise"):
+        with self.assertRaisesMessage(ImportError, "No module named 'raise"):
             engines.all()
-        with self.assertRaisesRegex(ImportError, "No module named '?raise"):
+        with self.assertRaisesMessage(ImportError, "No module named 'raise"):
             engines.all()
 
     @override_settings(TEMPLATES=[{
