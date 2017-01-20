@@ -310,7 +310,7 @@ class in the migration file, and just pass it to ``RunPython``. Here's an
 example of using ``RunPython`` to create some initial objects on a ``Country``
 model::
 
-    from django.db import migrations, models
+    from django.db import migrations
 
     def forwards_func(apps, schema_editor):
         # We get the model from the versioned app registry;
