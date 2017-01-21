@@ -29,6 +29,7 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(floatformat(0.07), '0.1')
         self.assertEqual(floatformat(0.007), '0.0')
         self.assertEqual(floatformat(0.0), '0')
+        self.assertEqual(floatformat(7.7, 0), '8')
         self.assertEqual(floatformat(7.7, 3), '7.700')
         self.assertEqual(floatformat(6.000000, 3), '6.000')
         self.assertEqual(floatformat(6.200000, 3), '6.200')
@@ -63,13 +64,10 @@ class FunctionTests(SimpleTestCase):
 
     def test_infinity(self):
         pos_inf = float(1e30000)
-        self.assertEqual(floatformat(pos_inf), str(pos_inf))
-
         neg_inf = float(-1e30000)
-        self.assertEqual(floatformat(neg_inf), str(neg_inf))
-
-        nan = pos_inf / pos_inf
-        self.assertEqual(floatformat(nan), str(nan))
+        self.assertEqual(floatformat(pos_inf), 'inf')
+        self.assertEqual(floatformat(neg_inf), '-inf')
+        self.assertEqual(floatformat(pos_inf / pos_inf), 'nan')
 
     def test_float_dunder_method(self):
         class FloatWrapper:
