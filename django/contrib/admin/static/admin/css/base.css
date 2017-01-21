@@ -738,7 +738,7 @@ a.deletelink:focus, a.deletelink:hover {
 
 .object-tools a.viewsitelink, .object-tools a.golink,.object-tools a.addlink {
     background-repeat: no-repeat;
-    background-position: 93% center;
+    background-position: right 7px center;
     padding-right: 26px;
 }
 
