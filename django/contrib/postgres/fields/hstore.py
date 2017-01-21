@@ -21,13 +21,13 @@ class HStoreField(Field):
         return 'hstore'
 
     def get_transform(self, name):
-        transform = super(HStoreField, self).get_transform(name)
+        transform = super().get_transform(name)
         if transform:
             return transform
         return KeyTransformFactory(name)
 
     def validate(self, value, model_instance):
-        super(HStoreField, self).validate(value, model_instance)
+        super().validate(value, model_instance)
         for key, val in value.items():
             if not isinstance(val, str) and val is not None:
                 raise exceptions.ValidationError(
@@ -49,10 +49,10 @@ class HStoreField(Field):
             'form_class': forms.HStoreField,
         }
         defaults.update(kwargs)
-        return super(HStoreField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
     def get_prep_value(self, value):
-        value = super(HStoreField, self).get_prep_value(value)
+        value = super().get_prep_value(value)
 
         if isinstance(value, dict):
             prep_value = {}
@@ -80,7 +80,7 @@ class KeyTransform(Transform):
     output_field = TextField()
 
     def __init__(self, key_name, *args, **kwargs):
-        super(KeyTransform, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.key_name = key_name
 
     def as_sql(self, compiler, connection):

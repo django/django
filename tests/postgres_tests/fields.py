@@ -14,10 +14,10 @@ try:
 except ImportError:
     class DummyArrayField(models.Field):
         def __init__(self, base_field, size=None, **kwargs):
-            super(DummyArrayField, self).__init__(**kwargs)
+            super().__init__(**kwargs)
 
         def deconstruct(self):
-            name, path, args, kwargs = super(DummyArrayField, self).deconstruct()
+            name, path, args, kwargs = super().deconstruct()
             kwargs.update({
                 'base_field': '',
                 'size': 1,
@@ -26,7 +26,7 @@ except ImportError:
 
     class DummyJSONField(models.Field):
         def __init__(self, encoder=None, **kwargs):
-            super(DummyJSONField, self).__init__(**kwargs)
+            super().__init__(**kwargs)
 
     ArrayField = DummyArrayField
     BigIntegerRangeField = models.Field

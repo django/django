@@ -11,7 +11,7 @@ class EmailBackend(BaseEmailBackend):
     def __init__(self, *args, **kwargs):
         self.stream = kwargs.pop('stream', sys.stdout)
         self._lock = threading.RLock()
-        super(EmailBackend, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def write_message(self, message):
         msg = message.message()

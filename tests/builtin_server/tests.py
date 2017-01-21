@@ -34,7 +34,7 @@ class ServerHandler(simple_server.ServerHandler):
             self._flush()
 
     def error_output(self, environ, start_response):
-        super(ServerHandler, self).error_output(environ, start_response)
+        super().error_output(environ, start_response)
         return ['\n'.join(traceback.format_exception(*sys.exc_info()))]
 
 
@@ -45,7 +45,7 @@ class DummyHandler:
 
 class FileWrapperHandler(ServerHandler):
     def __init__(self, *args, **kwargs):
-        super(FileWrapperHandler, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.request_handler = DummyHandler()
         self._used_sendfile = False
 
@@ -97,13 +97,13 @@ class WriteChunkCounterHandler(ServerHandler):
     """
 
     def __init__(self, *args, **kwargs):
-        super(WriteChunkCounterHandler, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.request_handler = DummyHandler()
         self.headers_written = False
         self.write_chunk_counter = 0
 
     def send_headers(self):
-        super(WriteChunkCounterHandler, self).send_headers()
+        super().send_headers()
         self.headers_written = True
 
     def _write(self, data):

@@ -468,7 +468,7 @@ class IgnoredExtractorTests(ExtractorTests):
 class SymlinkExtractorTests(ExtractorTests):
 
     def setUp(self):
-        super(SymlinkExtractorTests, self).setUp()
+        super().setUp()
         self.symlinked_dir = os.path.join(self.test_dir, 'templates_symlinked')
 
     def test_symlink(self):
@@ -632,7 +632,7 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
             os.utime(self.PO_FILE % locale, (0, 0))
 
     def setUp(self):
-        super(ExcludedLocaleExtractionTests, self).setUp()
+        super().setUp()
         copytree('canned_locale', 'locale')
         self._set_times_for_all_po_files()
 

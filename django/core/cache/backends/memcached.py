@@ -12,7 +12,7 @@ from django.utils.functional import cached_property
 
 class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
-        super(BaseMemcachedCache, self).__init__(params)
+        super().__init__(params)
         if isinstance(server, str):
             self._servers = re.split('[;,]', server)
         else:
@@ -154,9 +154,7 @@ class MemcachedCache(BaseMemcachedCache):
     "An implementation of a cache binding using python-memcached"
     def __init__(self, server, params):
         import memcache
-        super(MemcachedCache, self).__init__(server, params,
-                                             library=memcache,
-                                             value_not_found_exception=ValueError)
+        super().__init__(server, params, library=memcache, value_not_found_exception=ValueError)
 
     @property
     def _cache(self):
@@ -171,9 +169,7 @@ class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"
     def __init__(self, server, params):
         import pylibmc
-        super(PyLibMCCache, self).__init__(server, params,
-                                           library=pylibmc,
-                                           value_not_found_exception=pylibmc.NotFound)
+        super().__init__(server, params, library=pylibmc, value_not_found_exception=pylibmc.NotFound)
 
         # The contents of `OPTIONS` was formerly only used to set the behaviors
         # attribute, but is now passed directly to the Client constructor. As such,

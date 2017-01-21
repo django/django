@@ -407,7 +407,7 @@ class AdminFileWidgetTests(TestDataMixin, TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super(AdminFileWidgetTests, cls).setUpTestData()
+        super().setUpTestData()
         band = Band.objects.create(name='Linkin Park')
         cls.album = band.album_set.create(
             name='Hybrid Theory', cover_art=r'albums\hybrid_theory.jpg'
@@ -854,7 +854,7 @@ class DateTimePickerAltTimezoneSeleniumTests(DateTimePickerShortcutsSeleniumTest
 class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def setUp(self):
-        super(HorizontalVerticalFilterSeleniumTests, self).setUp()
+        super().setUp()
         self.lisa = Student.objects.create(name='Lisa')
         self.john = Student.objects.create(name='John')
         self.bob = Student.objects.create(name='Bob')
@@ -1171,7 +1171,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
     def setUp(self):
-        super(AdminRawIdWidgetSeleniumTests, self).setUp()
+        super().setUp()
         Band.objects.create(id=42, name='Bogey Blues')
         Band.objects.create(id=98, name='Green Potatoes')
 

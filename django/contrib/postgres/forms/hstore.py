@@ -55,4 +55,4 @@ class HStoreField(forms.CharField):
         # the same as an empty dict, if the data or initial value we get
         # is None, replace it w/ {}.
         initial_value = self.to_python(initial)
-        return super(HStoreField, self).has_changed(initial_value, data)
+        return super().has_changed(initial_value, data)

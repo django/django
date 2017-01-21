@@ -519,7 +519,7 @@ class ModelAdmin(BaseModelAdmin):
         self.model = model
         self.opts = model._meta
         self.admin_site = admin_site
-        super(ModelAdmin, self).__init__()
+        super().__init__()
 
     def __str__(self):
         return "%s.%s" % (self.model._meta.app_label, self.__class__.__name__)
@@ -1842,7 +1842,7 @@ class InlineModelAdmin(BaseModelAdmin):
         self.parent_model = parent_model
         self.opts = self.model._meta
         self.has_registered_model = admin_site.is_registered(self.model)
-        super(InlineModelAdmin, self).__init__()
+        super().__init__()
         if self.verbose_name is None:
             self.verbose_name = self.model._meta.verbose_name
         if self.verbose_name_plural is None:
@@ -1936,7 +1936,7 @@ class InlineModelAdmin(BaseModelAdmin):
                         raise ValidationError(msg, code='deleting_protected', params=params)
 
             def is_valid(self):
-                result = super(DeleteProtectedModelForm, self).is_valid()
+                result = super().is_valid()
                 self.hand_clean_DELETE()
                 return result
 
@@ -1954,7 +1954,7 @@ class InlineModelAdmin(BaseModelAdmin):
         return list(form.base_fields) + list(self.get_readonly_fields(request, obj))
 
     def get_queryset(self, request):
-        queryset = super(InlineModelAdmin, self).get_queryset(request)
+        queryset = super().get_queryset(request)
         if not self.has_change_permission(request):
             queryset = queryset.none()
         return queryset
@@ -1966,7 +1966,7 @@ class InlineModelAdmin(BaseModelAdmin):
             # to have the change permission for the related model in order to
             # be able to do anything with the intermediate model.
             return self.has_change_permission(request)
-        return super(InlineModelAdmin, self).has_add_permission(request)
+        return super().has_add_permission(request)
 
     def has_change_permission(self, request, obj=None):
         opts = self.opts
@@ -1987,7 +1987,7 @@ class InlineModelAdmin(BaseModelAdmin):
             # to have the change permission for the related model in order to
             # be able to do anything with the intermediate model.
             return self.has_change_permission(request, obj)
-        return super(InlineModelAdmin, self).has_delete_permission(request, obj)
+        return super().has_delete_permission(request, obj)
 
 
 class StackedInline(InlineModelAdmin):

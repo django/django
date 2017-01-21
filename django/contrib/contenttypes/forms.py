@@ -27,11 +27,7 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
                     self.instance, for_concrete_model=self.for_concrete_model),
                 self.ct_fk_field.name: self.instance.pk,
             })
-        super(BaseGenericInlineFormSet, self).__init__(
-            queryset=qs, data=data, files=files,
-            prefix=prefix,
-            **kwargs
-        )
+        super().__init__(queryset=qs, data=data, files=files, prefix=prefix, **kwargs)
 
     @classmethod
     def get_default_prefix(cls):

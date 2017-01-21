@@ -24,7 +24,7 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
     template_name = 'auth/widgets/read_only_password_hash.html'
 
     def get_context(self, name, value, attrs):
-        context = super(ReadOnlyPasswordHashWidget, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         summary = []
         if not value or value.startswith(UNUSABLE_PASSWORD_PREFIX):
             summary.append({'label': ugettext("No password set.")})
@@ -45,7 +45,7 @@ class ReadOnlyPasswordHashField(forms.Field):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("required", False)
-        super(ReadOnlyPasswordHashField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def bound_data(self, data, initial):
         # Always return initial because the widget doesn't
@@ -58,7 +58,7 @@ class ReadOnlyPasswordHashField(forms.Field):
 
 class UsernameField(forms.CharField):
     def to_python(self, value):
-        return unicodedata.normalize('NFKC', super(UsernameField, self).to_python(value))
+        return unicodedata.normalize('NFKC', super().to_python(value))
 
 
 class UserCreationForm(forms.ModelForm):
@@ -88,7 +88,7 @@ class UserCreationForm(forms.ModelForm):
         field_classes = {'username': UsernameField}
 
     def __init__(self, *args, **kwargs):
-        super(UserCreationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self._meta.model.USERNAME_FIELD in self.fields:
             self.fields[self._meta.model.USERNAME_FIELD].widget.attrs.update({'autofocus': True})
 
@@ -105,7 +105,7 @@ class UserCreationForm(forms.ModelForm):
         return password2
 
     def save(self, commit=True):
-        user = super(UserCreationForm, self).save(commit=False)
+        user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         if commit:
             user.save()
@@ -128,7 +128,7 @@ class UserChangeForm(forms.ModelForm):
         field_classes = {'username': UsernameField}
 
     def __init__(self, *args, **kwargs):
-        super(UserChangeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         f = self.fields.get('user_permissions')
         if f is not None:
             f.queryset = f.queryset.select_related('content_type')
@@ -170,7 +170,7 @@ class AuthenticationForm(forms.Form):
         """
         self.request = request
         self.user_cache = None
-        super(AuthenticationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         # Set the label for the "username" field.
         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
@@ -310,7 +310,7 @@ class SetPasswordForm(forms.Form):
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
-        super(SetPasswordForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def clean_new_password2(self):
         password1 = self.cleaned_data.get('new_password1')
@@ -384,7 +384,7 @@ class AdminPasswordChangeForm(forms.Form):
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
-        super(AdminPasswordChangeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def clean_password2(self):
         password1 = self.cleaned_data.get('password1')
@@ -410,7 +410,7 @@ class AdminPasswordChangeForm(forms.Form):
 
     @property
     def changed_data(self):
-        data = super(AdminPasswordChangeForm, self).changed_data
+        data = super().changed_data
         for name in self.fields.keys():
             if name not in data:
                 return []

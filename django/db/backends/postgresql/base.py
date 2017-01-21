@@ -141,7 +141,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     ops_class = DatabaseOperations
 
     def __init__(self, *args, **kwargs):
-        super(DatabaseWrapper, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._named_cursor_idx = 0
 
     def get_connection_params(self):
@@ -248,7 +248,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @property
     def _nodb_connection(self):
-        nodb_connection = super(DatabaseWrapper, self)._nodb_connection
+        nodb_connection = super()._nodb_connection
         try:
             nodb_connection.ensure_connection()
         except (Database.DatabaseError, WrappedDatabaseError):

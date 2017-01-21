@@ -63,7 +63,7 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
                     "your LOGIN_REDIRECT_URL doesn't point to a login page."
                 )
             return HttpResponseRedirect(redirect_to)
-        return super(LoginView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         """Ensure the user-originating redirection URL is safe."""
@@ -89,7 +89,7 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_context_data(self, **kwargs):
-        context = super(LoginView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         current_site = get_current_site(self.request)
         context.update({
             self.redirect_field_name: self.get_success_url(),
@@ -125,7 +125,7 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
         if next_page:
             # Redirect to this page until the session has been cleared.
             return HttpResponseRedirect(next_page)
-        return super(LogoutView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_next_page(self):
         if self.next_page is not None:
@@ -153,7 +153,7 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
         return next_page
 
     def get_context_data(self, **kwargs):
-        context = super(LogoutView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         current_site = get_current_site(self.request)
         context.update({
             'site': current_site,
@@ -356,7 +356,7 @@ class PasswordContextMixin:
     extra_context = None
 
     def get_context_data(self, **kwargs):
-        context = super(PasswordContextMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['title'] = self.title
         if self.extra_context is not None:
             context.update(self.extra_context)
@@ -377,7 +377,7 @@ class PasswordResetView(PasswordContextMixin, FormView):
 
     @method_decorator(csrf_protect)
     def dispatch(self, *args, **kwargs):
-        return super(PasswordResetView, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
     def form_valid(self, form):
         opts = {
@@ -391,7 +391,7 @@ class PasswordResetView(PasswordContextMixin, FormView):
             'extra_email_context': self.extra_email_context,
         }
         form.save(**opts)
-        return super(PasswordResetView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 INTERNAL_RESET_URL_TOKEN = 'set-password'
@@ -426,7 +426,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
                 if self.token_generator.check_token(self.user, session_token):
                     # If the token is valid, display the password reset form.
                     self.validlink = True
-                    return super(PasswordResetConfirmView, self).dispatch(*args, **kwargs)
+                    return super().dispatch(*args, **kwargs)
             else:
                 if self.token_generator.check_token(self.user, token):
                     # Store the token in the session and redirect to the
@@ -450,7 +450,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
         return user
 
     def get_form_kwargs(self):
-        kwargs = super(PasswordResetConfirmView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs['user'] = self.user
         return kwargs
 
@@ -459,10 +459,10 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
         if self.post_reset_login:
             auth_login(self.request, user)
         del self.request.session[INTERNAL_RESET_SESSION_TOKEN]
-        return super(PasswordResetConfirmView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        context = super(PasswordResetConfirmView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         if self.validlink:
             context['validlink'] = True
         else:
@@ -479,7 +479,7 @@ class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
     title = _('Password reset complete')
 
     def get_context_data(self, **kwargs):
-        context = super(PasswordResetCompleteView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['login_url'] = resolve_url(settings.LOGIN_URL)
         return context
 
@@ -545,10 +545,10 @@ class PasswordChangeView(PasswordContextMixin, FormView):
     @method_decorator(csrf_protect)
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
-        return super(PasswordChangeView, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
     def get_form_kwargs(self):
-        kwargs = super(PasswordChangeView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
 
@@ -557,7 +557,7 @@ class PasswordChangeView(PasswordContextMixin, FormView):
         # Updating the password logs out all other sessions for the user
         # except the current one.
         update_session_auth_hash(self.request, form.user)
-        return super(PasswordChangeView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class PasswordChangeDoneView(PasswordContextMixin, TemplateView):
@@ -566,4 +566,4 @@ class PasswordChangeDoneView(PasswordContextMixin, TemplateView):
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
-        return super(PasswordChangeDoneView, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)

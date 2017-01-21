@@ -179,7 +179,7 @@ class JsLexer(Lexer):
     }
 
     def __init__(self):
-        super(JsLexer, self).__init__(self.states, 'reg')
+        super().__init__(self.states, 'reg')
 
 
 def prepare_js_for_gettext(js):

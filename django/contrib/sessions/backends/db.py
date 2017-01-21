@@ -15,7 +15,7 @@ class SessionStore(SessionBase):
     Implements database session store.
     """
     def __init__(self, session_key=None):
-        super(SessionStore, self).__init__(session_key)
+        super().__init__(session_key)
 
     @classmethod
     def get_model_class(cls):

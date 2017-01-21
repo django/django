@@ -29,7 +29,7 @@ class PostGISOperator(SpatialOperator):
         # polygons. If the raster argument is set to BILATERAL, then the
         # operator cannot handle mixed geom-raster lookups.
         self.raster = raster
-        super(PostGISOperator, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def as_sql(self, connection, lookup, template_params, *args):
         if lookup.lhs.output_field.geography and not self.geography:
@@ -37,7 +37,7 @@ class PostGISOperator(SpatialOperator):
                              'function/operator.' % (self.func or self.op,))
 
         template_params = self.check_raster(lookup, template_params)
-        return super(PostGISOperator, self).as_sql(connection, lookup, template_params, *args)
+        return super().as_sql(connection, lookup, template_params, *args)
 
     def check_raster(self, lookup, template_params):
         # Get rhs value.
@@ -100,7 +100,7 @@ class PostGISDistanceOperator(PostGISOperator):
             else:
                 template_params.update({'op': self.op, 'func': connection.ops.spatial_function_name('DistanceSphere')})
             return sql_template % template_params, sql_params
-        return super(PostGISDistanceOperator, self).as_sql(connection, lookup, template_params, sql_params)
+        return super().as_sql(connection, lookup, template_params, sql_params)
 
 
 class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
@@ -149,7 +149,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     unsupported_functions = set()
 
     def __init__(self, connection):
-        super(PostGISOperations, self).__init__(connection)
+        super().__init__(connection)
 
         prefix = self.geom_func_prefix
 

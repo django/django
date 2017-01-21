@@ -23,7 +23,7 @@ class DblFromGeom(GEOSFuncFactory):
         argtypes = [GEOM_PTR for i in range(num_geom)]
         argtypes += [POINTER(c_double)]
         self.argtypes = argtypes
-        return super(DblFromGeom, self).get_func()
+        return super().get_func()
 
 
 # ### ctypes prototypes ###

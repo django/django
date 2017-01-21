@@ -35,7 +35,7 @@ class TestFileSystemFinder(TestFinders, StaticFilesTestCase):
     Test FileSystemFinder.
     """
     def setUp(self):
-        super(TestFileSystemFinder, self).setUp()
+        super().setUp()
         self.finder = finders.FileSystemFinder()
         test_file_path = os.path.join(TEST_ROOT, 'project', 'documents', 'test', 'file.txt')
         self.find_first = (os.path.join('test', 'file.txt'), test_file_path)
@@ -47,7 +47,7 @@ class TestAppDirectoriesFinder(TestFinders, StaticFilesTestCase):
     Test AppDirectoriesFinder.
     """
     def setUp(self):
-        super(TestAppDirectoriesFinder, self).setUp()
+        super().setUp()
         self.finder = finders.AppDirectoriesFinder()
         test_file_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'test', 'file1.txt')
         self.find_first = (os.path.join('test', 'file1.txt'), test_file_path)
@@ -59,7 +59,7 @@ class TestDefaultStorageFinder(TestFinders, StaticFilesTestCase):
     Test DefaultStorageFinder.
     """
     def setUp(self):
-        super(TestDefaultStorageFinder, self).setUp()
+        super().setUp()
         self.finder = finders.DefaultStorageFinder(
             storage=storage.StaticFilesStorage(location=settings.MEDIA_ROOT))
         test_file_path = os.path.join(settings.MEDIA_ROOT, 'media-file.txt')

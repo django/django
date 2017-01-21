@@ -46,7 +46,7 @@ class GeoModelAdmin(ModelAdmin):
     @property
     def media(self):
         "Injects OpenLayers JavaScript into the admin."
-        media = super(GeoModelAdmin, self).media
+        media = super().media
         media.add_js([self.openlayers_url])
         media.add_js(self.extra_js)
         return media
@@ -62,7 +62,7 @@ class GeoModelAdmin(ModelAdmin):
             kwargs['widget'] = self.get_map_widget(db_field)
             return db_field.formfield(**kwargs)
         else:
-            return super(GeoModelAdmin, self).formfield_for_dbfield(db_field, request, **kwargs)
+            return super().formfield_for_dbfield(db_field, request, **kwargs)
 
     def get_map_widget(self, db_field):
         """

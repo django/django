@@ -61,7 +61,7 @@ class AbstractBaseUser(models.Model):
         return getattr(self, self.USERNAME_FIELD)
 
     def __init__(self, *args, **kwargs):
-        super(AbstractBaseUser, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Stores the raw password if set_password() is called so that it can
         # be passed to password_changed() after the model is saved.
         self._password = None
@@ -73,7 +73,7 @@ class AbstractBaseUser(models.Model):
         setattr(self, self.USERNAME_FIELD, self.normalize_username(self.get_username()))
 
     def save(self, *args, **kwargs):
-        super(AbstractBaseUser, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         if self._password is not None:
             password_validation.password_changed(self._password, self)
             self._password = None

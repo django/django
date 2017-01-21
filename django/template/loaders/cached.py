@@ -18,7 +18,7 @@ class Loader(BaseLoader):
         self.template_cache = {}
         self.get_template_cache = {}
         self.loaders = engine.get_template_loaders(loaders)
-        super(Loader, self).__init__(engine)
+        super().__init__(engine)
 
     def get_contents(self, origin):
         return origin.loader.get_contents(origin)
@@ -52,7 +52,7 @@ class Loader(BaseLoader):
             return cached
 
         try:
-            template = super(Loader, self).get_template(template_name, skip)
+            template = super().get_template(template_name, skip)
         except TemplateDoesNotExist as e:
             self.get_template_cache[key] = copy_exception(e) if self.engine.debug else TemplateDoesNotExist
             raise

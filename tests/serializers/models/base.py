@@ -114,7 +114,7 @@ class Team:
 class TeamField(models.CharField):
 
     def __init__(self):
-        super(TeamField, self).__init__(max_length=100)
+        super().__init__(max_length=100)
 
     def get_db_prep_save(self, value, connection):
         return str(value.title)
@@ -131,7 +131,7 @@ class TeamField(models.CharField):
         return self.value_from_object(obj).to_string()
 
     def deconstruct(self):
-        name, path, args, kwargs = super(TeamField, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         del kwargs['max_length']
         return name, path, args, kwargs
 

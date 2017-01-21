@@ -37,19 +37,19 @@ class BaseAdminDocsView(TemplateView):
             # Display an error message for people without docutils
             self.template_name = 'admin_doc/missing_docutils.html'
             return self.render_to_response(admin.site.each_context(request))
-        return super(BaseAdminDocsView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs.update({'root_path': reverse('admin:index')})
         kwargs.update(admin.site.each_context(self.request))
-        return super(BaseAdminDocsView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class BookmarkletsView(BaseAdminDocsView):
     template_name = 'admin_doc/bookmarklets.html'
 
     def get_context_data(self, **kwargs):
-        context = super(BookmarkletsView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update({
             'admin_url': "%s://%s%s" % (
                 self.request.scheme, self.request.get_host(), context['root_path'])
@@ -88,7 +88,7 @@ class TemplateTagIndexView(BaseAdminDocsView):
                         'library': tag_library,
                     })
         kwargs.update({'tags': tags})
-        return super(TemplateTagIndexView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class TemplateFilterIndexView(BaseAdminDocsView):
@@ -122,7 +122,7 @@ class TemplateFilterIndexView(BaseAdminDocsView):
                         'library': tag_library,
                     })
         kwargs.update({'filters': filters})
-        return super(TemplateFilterIndexView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ViewIndexView(BaseAdminDocsView):
@@ -146,7 +146,7 @@ class ViewIndexView(BaseAdminDocsView):
                 'name': name,
             })
         kwargs.update({'views': views})
-        return super(ViewIndexView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ViewDetailView(BaseAdminDocsView):
@@ -194,7 +194,7 @@ class ViewDetailView(BaseAdminDocsView):
             'body': body,
             'meta': metadata,
         })
-        return super(ViewDetailView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ModelIndexView(BaseAdminDocsView):
@@ -203,7 +203,7 @@ class ModelIndexView(BaseAdminDocsView):
     def get_context_data(self, **kwargs):
         m_list = [m._meta for m in apps.get_models()]
         kwargs.update({'models': m_list})
-        return super(ModelIndexView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ModelDetailView(BaseAdminDocsView):
@@ -333,7 +333,7 @@ class ModelDetailView(BaseAdminDocsView):
             'fields': fields,
             'methods': methods,
         })
-        return super(ModelDetailView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class TemplateDetailView(BaseAdminDocsView):
@@ -366,7 +366,7 @@ class TemplateDetailView(BaseAdminDocsView):
             'name': template,
             'templates': templates,
         })
-        return super(TemplateDetailView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 ####################

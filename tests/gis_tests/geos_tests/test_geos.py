@@ -1260,7 +1260,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         class ExtendedPolygon(Polygon):
             def __init__(self, *args, **kwargs):
                 data = kwargs.pop('data', 0)
-                super(ExtendedPolygon, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
                 self._data = data
 
             def __str__(self):

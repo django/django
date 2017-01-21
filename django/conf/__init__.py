@@ -67,13 +67,13 @@ class LazySettings(LazyObject):
             self.__dict__.clear()
         else:
             self.__dict__.pop(name, None)
-        super(LazySettings, self).__setattr__(name, value)
+        super().__setattr__(name, value)
 
     def __delattr__(self, name):
         """
         Delete a setting and clear it from cache if needed.
         """
-        super(LazySettings, self).__delattr__(name)
+        super().__delattr__(name)
         self.__dict__.pop(name, None)
 
     def configure(self, default_settings=global_settings, **options):
@@ -173,12 +173,12 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        super(UserSettingsHolder, self).__setattr__(name, value)
+        super().__setattr__(name, value)
 
     def __delattr__(self, name):
         self._deleted.add(name)
         if hasattr(self, name):
-            super(UserSettingsHolder, self).__delattr__(name)
+            super().__delattr__(name)
 
     def __dir__(self):
         return sorted(

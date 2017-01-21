@@ -110,10 +110,10 @@ class BaseSpatialField(Field):
         # first parameter, so this works like normal fields.
         kwargs['verbose_name'] = verbose_name
 
-        super(BaseSpatialField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def deconstruct(self):
-        name, path, args, kwargs = super(BaseSpatialField, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         # Always include SRID for less fragility; include spatial index if it's
         # not the default value.
         kwargs['srid'] = self.srid
@@ -207,7 +207,7 @@ class BaseSpatialField(Field):
         geometry or raster value properly and preserves any other lookup
         parameters.
         """
-        value = super(BaseSpatialField, self).get_prep_value(value)
+        value = super().get_prep_value(value)
 
         # For IsValid lookups, boolean values are allowed.
         if isinstance(value, (Expression, bool)):
@@ -292,10 +292,10 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
         self._extent = kwargs.pop('extent', (-180.0, -90.0, 180.0, 90.0))
         self._tolerance = kwargs.pop('tolerance', 0.05)
 
-        super(GeometryField, self).__init__(verbose_name=verbose_name, **kwargs)
+        super().__init__(verbose_name=verbose_name, **kwargs)
 
     def deconstruct(self):
-        name, path, args, kwargs = super(GeometryField, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         # Include kwargs if they're not the default values.
         if self.dim != 2:
             kwargs['dim'] = self.dim
@@ -314,7 +314,7 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
 
     def get_db_prep_value(self, value, connection, *args, **kwargs):
         return connection.ops.Adapter(
-            super(GeometryField, self).get_db_prep_value(value, connection, *args, **kwargs),
+            super().get_db_prep_value(value, connection, *args, **kwargs),
             **({'geography': True} if self.geography else {})
         )
 
@@ -329,7 +329,7 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
 
     # ### Routines overloaded from Field ###
     def contribute_to_class(self, cls, name, **kwargs):
-        super(GeometryField, self).contribute_to_class(cls, name, **kwargs)
+        super().contribute_to_class(cls, name, **kwargs)
 
         # Setup for lazy-instantiated Geometry object.
         setattr(cls, self.attname, SpatialProxy(Geometry, self))
@@ -343,7 +343,7 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
         if (self.dim > 2 and 'widget' not in kwargs and
                 not getattr(defaults['form_class'].widget, 'supports_3d', False)):
             defaults['widget'] = forms.Textarea
-        return super(GeometryField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 # The OpenGIS Geometry Type Fields
@@ -414,7 +414,7 @@ class RasterField(BaseSpatialField):
 
     def db_type(self, connection):
         self._check_connection(connection)
-        return super(RasterField, self).db_type(connection)
+        return super().db_type(connection)
 
     def from_db_value(self, value, expression, connection, context):
         return connection.ops.parse_raster(value)
@@ -424,10 +424,10 @@ class RasterField(BaseSpatialField):
         # Prepare raster for writing to database.
         if not prepared:
             value = connection.ops.deconstruct_raster(value)
-        return super(RasterField, self).get_db_prep_value(value, connection, prepared)
+        return super().get_db_prep_value(value, connection, prepared)
 
     def contribute_to_class(self, cls, name, **kwargs):
-        super(RasterField, self).contribute_to_class(cls, name, **kwargs)
+        super().contribute_to_class(cls, name, **kwargs)
         # Setup for lazy-instantiated Raster object. For large querysets, the
         # instantiation of all GDALRasters can potentially be expensive. This
         # delays the instantiation of the objects to the moment of evaluation
@@ -444,4 +444,4 @@ class RasterField(BaseSpatialField):
             )
         except ValueError:
             pass
-        return super(RasterField, self).get_transform(name)
+        return super().get_transform(name)

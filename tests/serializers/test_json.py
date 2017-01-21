@@ -86,7 +86,7 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
             def default(self, o):
                 if isinstance(o, decimal.Decimal):
                     return str(o)
-                return super(CustomJSONEncoder, self).default(o)
+                return super().default(o)
 
         s = serializers.json.Serializer()
         json_data = s.serialize(

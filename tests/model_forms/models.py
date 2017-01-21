@@ -71,7 +71,7 @@ class Article(models.Model):
     def save(self, *args, **kwargs):
         if not self.id:
             self.created = datetime.date.today()
-        return super(Article, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def __str__(self):
         return self.headline
@@ -322,7 +322,7 @@ class BigInt(models.Model):
 class MarkupField(models.CharField):
     def __init__(self, *args, **kwargs):
         kwargs["max_length"] = 20
-        super(MarkupField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):
         # don't allow this field to be used in form (real use-case might be
@@ -418,11 +418,11 @@ class Photo(models.Model):
     # Support code for the tests; this keeps track of how many times save()
     # gets called on each instance.
     def __init__(self, *args, **kwargs):
-        super(Photo, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._savecount = 0
 
     def save(self, force_insert=False, force_update=False):
-        super(Photo, self).save(force_insert, force_update)
+        super().save(force_insert, force_update)
         self._savecount += 1
 
 
@@ -439,7 +439,7 @@ class StrictAssignmentFieldSpecific(models.Model):
     def __setattr__(self, key, value):
         if self._should_error is True:
             raise ValidationError(message={key: "Cannot set attribute"}, code='invalid')
-        super(StrictAssignmentFieldSpecific, self).__setattr__(key, value)
+        super().__setattr__(key, value)
 
 
 class StrictAssignmentAll(models.Model):
@@ -449,7 +449,7 @@ class StrictAssignmentAll(models.Model):
     def __setattr__(self, key, value):
         if self._should_error is True:
             raise ValidationError(message="Cannot set attribute", code='invalid')
-        super(StrictAssignmentAll, self).__setattr__(key, value)
+        super().__setattr__(key, value)
 
 
 # A model with ForeignKey(blank=False, null=True)

@@ -375,7 +375,7 @@ class BaseCustomDeleteFormSet(BaseFormSet):
     form.should_delete() is called. The formset delete field is also suppressed.
     """
     def add_fields(self, form, index):
-        super(BaseCustomDeleteFormSet, self).add_fields(form, index)
+        super().add_fields(form, index)
         self.can_delete = True
         if DELETION_FIELD_NAME in form.fields:
             del form.fields[DELETION_FIELD_NAME]

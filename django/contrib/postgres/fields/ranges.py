@@ -20,7 +20,7 @@ class RangeField(models.Field):
         # Initializing base_field here ensures that its model matches the model for self.
         if hasattr(self, 'base_field'):
             self.base_field = self.base_field()
-        super(RangeField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def model(self):
@@ -56,7 +56,7 @@ class RangeField(models.Field):
         return value
 
     def set_attributes_from_name(self, name):
-        super(RangeField, self).set_attributes_from_name(name)
+        super().set_attributes_from_name(name)
         self.base_field.set_attributes_from_name(name)
 
     def value_to_string(self, obj):
@@ -78,7 +78,7 @@ class RangeField(models.Field):
 
     def formfield(self, **kwargs):
         kwargs.setdefault('form_class', self.form_field)
-        return super(RangeField, self).formfield(**kwargs)
+        return super().formfield(**kwargs)
 
 
 class IntegerRangeField(RangeField):

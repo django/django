@@ -246,7 +246,7 @@ class AppConfigStub(AppConfig):
         # App-label and app-name are not the same thing, so technically passing
         # in the label here is wrong. In practice, migrations don't care about
         # the app name, but we need something unique, and the label works fine.
-        super(AppConfigStub, self).__init__(label, None)
+        super().__init__(label, None)
 
     def import_models(self):
         self.models = self.apps.all_models[self.label]
@@ -271,7 +271,7 @@ class StateApps(Apps):
         # Populate the app registry with a stub for each application.
         app_labels = {model_state.app_label for model_state in models.values()}
         app_configs = [AppConfigStub(label) for label in sorted(real_apps + list(app_labels))]
-        super(StateApps, self).__init__(app_configs)
+        super().__init__(app_configs)
 
         # The lock gets in the way of copying as implemented in clone(), which
         # is called whenever Django duplicates a StateApps before updating it.

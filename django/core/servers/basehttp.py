@@ -63,25 +63,25 @@ class WSGIServer(simple_server.WSGIServer):
         if kwargs.pop('ipv6', False):
             self.address_family = socket.AF_INET6
         self.allow_reuse_address = kwargs.pop('allow_reuse_address', True)
-        super(WSGIServer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def server_bind(self):
         """Override server_bind to store the server name."""
-        super(WSGIServer, self).server_bind()
+        super().server_bind()
         self.setup_environ()
 
     def handle_error(self, request, client_address):
         if is_broken_pipe_error():
             logger.info("- Broken pipe from %s\n", client_address)
         else:
-            super(WSGIServer, self).handle_error(request, client_address)
+            super().handle_error(request, client_address)
 
 
 class ServerHandler(simple_server.ServerHandler):
     def handle_error(self):
         # Ignore broken pipe errors, otherwise pass on
         if not is_broken_pipe_error():
-            super(ServerHandler, self).handle_error()
+            super().handle_error()
 
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler):
@@ -128,7 +128,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
             if '_' in k:
                 del self.headers[k]
 
-        return super(WSGIRequestHandler, self).get_environ()
+        return super().get_environ()
 
     def handle(self):
         """Copy of WSGIRequestHandler, but with different ServerHandler"""

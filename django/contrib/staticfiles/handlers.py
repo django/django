@@ -19,7 +19,7 @@ class StaticFilesHandler(WSGIHandler):
     def __init__(self, application):
         self.application = application
         self.base_url = urlparse(self.get_base_url())
-        super(StaticFilesHandler, self).__init__()
+        super().__init__()
 
     def get_base_url(self):
         utils.check_settings()
@@ -57,9 +57,9 @@ class StaticFilesHandler(WSGIHandler):
                 if settings.DEBUG:
                     from django.views import debug
                     return debug.technical_404_response(request, e)
-        return super(StaticFilesHandler, self).get_response(request)
+        return super().get_response(request)
 
     def __call__(self, environ, start_response):
         if not self._should_handle(get_path_info(environ)):
             return self.application(environ, start_response)
-        return super(StaticFilesHandler, self).__call__(environ, start_response)
+        return super().__call__(environ, start_response)

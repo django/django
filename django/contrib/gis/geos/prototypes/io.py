@@ -165,7 +165,7 @@ class WKTWriter(IOBase):
     _precision = None
 
     def __init__(self, dim=2, trim=False, precision=None):
-        super(WKTWriter, self).__init__()
+        super().__init__()
         if bool(trim) != self._trim:
             self.trim = trim
         if precision is not None:
@@ -215,7 +215,7 @@ class WKBWriter(IOBase):
     destructor = wkb_writer_destroy
 
     def __init__(self, dim=2):
-        super(WKBWriter, self).__init__()
+        super().__init__()
         self.outdim = dim
 
     def _handle_empty_point(self, geom):

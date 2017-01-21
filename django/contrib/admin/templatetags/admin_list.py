@@ -291,7 +291,7 @@ class ResultList(list):
     # compatibility with existing admin templates.
     def __init__(self, form, *items):
         self.form = form
-        super(ResultList, self).__init__(*items)
+        super().__init__(*items)
 
 
 def results(cl):

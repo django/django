@@ -38,10 +38,10 @@ class Point(GEOSGeometry):
 
         # Initializing using the address returned from the GEOS
         #  createPoint factory.
-        super(Point, self).__init__(point, srid=srid)
+        super().__init__(point, srid=srid)
 
     def _ogr_ptr(self):
-        return gdal.geometries.Point._create_empty() if self.empty else super(Point, self)._ogr_ptr()
+        return gdal.geometries.Point._create_empty() if self.empty else super()._ogr_ptr()
 
     @classmethod
     def _create_empty(cls):

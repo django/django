@@ -63,11 +63,10 @@ class MultiValueDict(dict):
     single name-value pairs.
     """
     def __init__(self, key_to_list_mapping=()):
-        super(MultiValueDict, self).__init__(key_to_list_mapping)
+        super().__init__(key_to_list_mapping)
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__,
-                             super(MultiValueDict, self).__repr__())
+        return "<%s: %s>" % (self.__class__.__name__, super().__repr__())
 
     def __getitem__(self, key):
         """
@@ -75,7 +74,7 @@ class MultiValueDict(dict):
         raises KeyError if not found.
         """
         try:
-            list_ = super(MultiValueDict, self).__getitem__(key)
+            list_ = super().__getitem__(key)
         except KeyError:
             raise MultiValueDictKeyError(repr(key))
         try:
@@ -84,7 +83,7 @@ class MultiValueDict(dict):
             return []
 
     def __setitem__(self, key, value):
-        super(MultiValueDict, self).__setitem__(key, [value])
+        super().__setitem__(key, [value])
 
     def __copy__(self):
         return self.__class__([
@@ -134,7 +133,7 @@ class MultiValueDict(dict):
         return a new copy of values.
         """
         try:
-            values = super(MultiValueDict, self).__getitem__(key)
+            values = super().__getitem__(key)
         except KeyError:
             if default is None:
                 return []
@@ -152,7 +151,7 @@ class MultiValueDict(dict):
         return self._getlist(key, default, force_list=True)
 
     def setlist(self, key, list_):
-        super(MultiValueDict, self).__setitem__(key, list_)
+        super().__setitem__(key, list_)
 
     def setdefault(self, key, default=None):
         if key not in self:
@@ -184,7 +183,7 @@ class MultiValueDict(dict):
 
     def lists(self):
         """Yields (key, list) pairs."""
-        return iter(super(MultiValueDict, self).items())
+        return iter(super().items())
 
     def values(self):
         """Yield the last value on every key list."""
@@ -278,7 +277,7 @@ class DictWrapper(dict):
     quoted before being used.
     """
     def __init__(self, data, func, prefix):
-        super(DictWrapper, self).__init__(data)
+        super().__init__(data)
         self.func = func
         self.prefix = prefix
 
@@ -293,7 +292,7 @@ class DictWrapper(dict):
             key = key[len(self.prefix):]
         else:
             use_func = False
-        value = super(DictWrapper, self).__getitem__(key)
+        value = super().__getitem__(key)
         if use_func:
             return self.func(value)
         return value

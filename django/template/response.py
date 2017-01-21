@@ -33,7 +33,7 @@ class SimpleTemplateResponse(HttpResponse):
         # content argument doesn't make sense here because it will be replaced
         # with rendered template so we always pass empty string in order to
         # prevent errors and provide shorter signature.
-        super(SimpleTemplateResponse, self).__init__('', content_type, status, charset=charset)
+        super().__init__('', content_type, status, charset=charset)
 
         # _is_rendered tracks whether the template and context has been baked
         # into a final response.
@@ -119,7 +119,7 @@ class SimpleTemplateResponse(HttpResponse):
             raise ContentNotRenderedError(
                 'The response content must be rendered before it can be iterated over.'
             )
-        return super(SimpleTemplateResponse, self).__iter__()
+        return super().__iter__()
 
     @property
     def content(self):
@@ -127,7 +127,7 @@ class SimpleTemplateResponse(HttpResponse):
             raise ContentNotRenderedError(
                 'The response content must be rendered before it can be accessed.'
             )
-        return super(SimpleTemplateResponse, self).content
+        return super().content
 
     @content.setter
     def content(self, value):
@@ -142,6 +142,5 @@ class TemplateResponse(SimpleTemplateResponse):
 
     def __init__(self, request, template, context=None, content_type=None,
                  status=None, charset=None, using=None):
-        super(TemplateResponse, self).__init__(
-            template, context, content_type, status, charset, using)
+        super().__init__(template, context, content_type, status, charset, using)
         self._request = request

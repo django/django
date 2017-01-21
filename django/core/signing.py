@@ -182,14 +182,14 @@ class TimestampSigner(Signer):
 
     def sign(self, value):
         value = '%s%s%s' % (force_text(value), self.sep, self.timestamp())
-        return super(TimestampSigner, self).sign(value)
+        return super().sign(value)
 
     def unsign(self, value, max_age=None):
         """
         Retrieve original value and check it wasn't signed more
         than max_age seconds ago.
         """
-        result = super(TimestampSigner, self).unsign(value)
+        result = super().unsign(value)
         value, timestamp = result.rsplit(self.sep, 1)
         timestamp = baseconv.base62.decode(timestamp)
         if max_age is not None:

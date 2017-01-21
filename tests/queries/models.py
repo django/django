@@ -51,7 +51,7 @@ class Note(models.Model):
         return self.note
 
     def __init__(self, *args, **kwargs):
-        super(Note, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Regression for #13227 -- having an attribute that
         # is unpicklable doesn't stop you from cloning queries
         # that use objects of that type as an argument.
@@ -195,7 +195,7 @@ class LoopZ(models.Model):
 
 class CustomManager(models.Manager):
     def get_queryset(self):
-        qs = super(CustomManager, self).get_queryset()
+        qs = super().get_queryset()
         return qs.filter(public=True, tag__name='t1')
 
 
@@ -219,7 +219,7 @@ class Detail(models.Model):
 
 class MemberManager(models.Manager):
     def get_queryset(self):
-        return super(MemberManager, self).get_queryset().select_related("details")
+        return super().get_queryset().select_related("details")
 
 
 class Member(models.Model):

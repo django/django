@@ -641,7 +641,7 @@ class SelectOnSaveTests(TestCase):
 
             def _update(self, *args, **kwargs):
                 FakeQuerySet.called = True
-                super(FakeQuerySet, self)._update(*args, **kwargs)
+                super()._update(*args, **kwargs)
                 return 0
 
         try:

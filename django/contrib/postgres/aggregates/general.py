@@ -47,7 +47,7 @@ class StringAgg(Aggregate):
 
     def __init__(self, expression, delimiter, distinct=False, **extra):
         distinct = 'DISTINCT ' if distinct else ''
-        super(StringAgg, self).__init__(expression, delimiter=delimiter, distinct=distinct, **extra)
+        super().__init__(expression, delimiter=delimiter, distinct=distinct, **extra)
 
     def convert_value(self, value, expression, connection, context):
         if not value:

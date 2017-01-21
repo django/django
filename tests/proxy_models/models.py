@@ -12,12 +12,12 @@ from django.db import models
 
 class PersonManager(models.Manager):
     def get_queryset(self):
-        return super(PersonManager, self).get_queryset().exclude(name="fred")
+        return super().get_queryset().exclude(name="fred")
 
 
 class SubManager(models.Manager):
     def get_queryset(self):
-        return super(SubManager, self).get_queryset().exclude(name="wilma")
+        return super().get_queryset().exclude(name="wilma")
 
 
 class Person(models.Model):

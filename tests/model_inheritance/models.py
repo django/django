@@ -160,7 +160,7 @@ class NamedURL(models.Model):
 class Mixin:
     def __init__(self):
         self.other_attr = 1
-        super(Mixin, self).__init__()
+        super().__init__()
 
 
 class MixinModel(models.Model, Mixin):

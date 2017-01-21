@@ -1231,7 +1231,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             last_name = CharField()
 
             def __init__(self, *args, **kwargs):
-                super(Person, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
                 self.fields['birthday'] = DateField()
 
         p = Person(auto_id=False)
@@ -1302,7 +1302,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             last_name = CharField(required=False)
 
             def __init__(self, names_required=False, *args, **kwargs):
-                super(Person, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
 
                 if names_required:
                     self.fields['first_name'].required = True
@@ -1329,7 +1329,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             last_name = CharField(max_length=30)
 
             def __init__(self, name_max_length=None, *args, **kwargs):
-                super(Person, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
 
                 if name_max_length:
                     self.fields['first_name'].max_length = name_max_length
@@ -1350,7 +1350,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             gender = ChoiceField(choices=(('f', 'Female'), ('m', 'Male')))
 
             def __init__(self, allow_unspec_gender=False, *args, **kwargs):
-                super(Person, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
 
                 if allow_unspec_gender:
                     self.fields['gender'].choices += (('u', 'Unspecified'),)
@@ -1540,7 +1540,7 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/
             field_order = None
 
             def __init__(self, **kwargs):
-                super(TestFormInit, self).__init__(**kwargs)
+                super().__init__(**kwargs)
                 self.order_fields(field_order=TestForm.field_order)
 
         p = TestFormParent()
@@ -2818,7 +2818,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             def __init__(self, fields=(), *args, **kwargs):
                 fields = (CharField(label='First name', max_length=10),
                           CharField(label='Last name', max_length=10))
-                super(NameField, self).__init__(fields=fields, *args, **kwargs)
+                super().__init__(fields=fields, *args, **kwargs)
 
             def compress(self, data_list):
                 return ' '.join(data_list)
@@ -2849,7 +2849,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
                     ChoiceField(label='Rank', choices=((1, 1), (2, 2))),
                     CharField(label='Name', max_length=10),
                 )
-                super(ChoicesField, self).__init__(fields=fields, *args, **kwargs)
+                super().__init__(fields=fields, *args, **kwargs)
 
         field = ChoicesField()
         field2 = copy.deepcopy(field)
@@ -2864,7 +2864,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         class DateAgeField(MultiValueField):
             def __init__(self, fields=(), *args, **kwargs):
                 fields = (DateField(label="Date"), IntegerField(label="Age"))
-                super(DateAgeField, self).__init__(fields=fields, *args, **kwargs)
+                super().__init__(fields=fields, *args, **kwargs)
 
         class DateAgeForm(Form):
             date_age = DateAgeField()
@@ -2883,7 +2883,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
                     CharField(label='Extension', error_messages={'incomplete': 'Enter an extension.'}),
                     CharField(label='Label', required=False, help_text='E.g. home, work.'),
                 )
-                super(PhoneField, self).__init__(fields, *args, **kwargs)
+                super().__init__(fields, *args, **kwargs)
 
             def compress(self, data_list):
                 if data_list:
@@ -2964,7 +2964,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
                 # Fake json.loads
                 if value == '{}':
                     return {}
-                return super(CustomJSONField, self).to_python(value)
+                return super().to_python(value)
 
         class JSONForm(forms.Form):
             json = CustomJSONField()

@@ -280,7 +280,7 @@ class HttpResponse(HttpResponseBase):
     streaming = False
 
     def __init__(self, content=b'', *args, **kwargs):
-        super(HttpResponse, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Content is a bytestring. See the `content` property methods.
         self.content = content
 
@@ -348,7 +348,7 @@ class StreamingHttpResponse(HttpResponseBase):
     streaming = True
 
     def __init__(self, streaming_content=(), *args, **kwargs):
-        super(StreamingHttpResponse, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # `streaming_content` should be an iterable of bytestrings.
         # See the `streaming_content` property methods.
         self.streaming_content = streaming_content
@@ -396,14 +396,14 @@ class FileResponse(StreamingHttpResponse):
             value = iter(lambda: filelike.read(self.block_size), b'')
         else:
             self.file_to_stream = None
-        super(FileResponse, self)._set_streaming_content(value)
+        super()._set_streaming_content(value)
 
 
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ['http', 'https', 'ftp']
 
     def __init__(self, redirect_to, *args, **kwargs):
-        super(HttpResponseRedirectBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self['Location'] = iri_to_uri(redirect_to)
         parsed = urlparse(force_text(redirect_to))
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
@@ -432,7 +432,7 @@ class HttpResponseNotModified(HttpResponse):
     status_code = 304
 
     def __init__(self, *args, **kwargs):
-        super(HttpResponseNotModified, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         del self['content-type']
 
     @HttpResponse.content.setter
@@ -458,7 +458,7 @@ class HttpResponseNotAllowed(HttpResponse):
     status_code = 405
 
     def __init__(self, permitted_methods, *args, **kwargs):
-        super(HttpResponseNotAllowed, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self['Allow'] = ', '.join(permitted_methods)
 
     def __repr__(self):
@@ -507,4 +507,4 @@ class JsonResponse(HttpResponse):
             json_dumps_params = {}
         kwargs.setdefault('content_type', 'application/json')
         data = json.dumps(data, cls=encoder, **json_dumps_params)
-        super(JsonResponse, self).__init__(content=data, **kwargs)
+        super().__init__(content=data, **kwargs)

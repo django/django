@@ -106,7 +106,7 @@ class SystemChecksTestCase(SimpleTestCase):
     def test_allows_checks_relying_on_other_modeladmins(self):
         class MyBookAdmin(admin.ModelAdmin):
             def check(self, **kwargs):
-                errors = super(MyBookAdmin, self).check(**kwargs)
+                errors = super().check(**kwargs)
                 author_admin = self.admin_site._registry.get(Author)
                 if author_admin is None:
                     errors.append('AuthorAdmin missing!')

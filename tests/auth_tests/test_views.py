@@ -411,7 +411,7 @@ class UUIDUserPasswordResetTest(CustomUserPasswordResetTest):
             username='foo',
             password='foo',
         )
-        return super(UUIDUserPasswordResetTest, self)._test_confirm_start()
+        return super()._test_confirm_start()
 
 
 class ChangePasswordTest(AuthViewsTestCase):

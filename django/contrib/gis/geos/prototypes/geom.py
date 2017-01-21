@@ -43,7 +43,7 @@ class GeomOutput(GEOSFuncFactory):
 
     def get_func(self, argtypes):
         self.argtypes = argtypes
-        return super(GeomOutput, self).get_func()
+        return super().get_func()
 
 
 class IntFromGeom(GEOSFuncFactory):
@@ -56,7 +56,7 @@ class IntFromGeom(GEOSFuncFactory):
             self.errcheck = check_zero
         else:
             self.errcheck = check_minus_one
-        return super(IntFromGeom, self).get_func()
+        return super().get_func()
 
 
 class StringFromGeom(GEOSFuncFactory):

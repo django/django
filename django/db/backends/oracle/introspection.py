@@ -48,7 +48,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             elif scale == -127:
                 return 'FloatField'
 
-        return super(DatabaseIntrospection, self).get_field_type(data_type, description)
+        return super().get_field_type(data_type, description)
 
     def get_table_list(self, cursor):
         """

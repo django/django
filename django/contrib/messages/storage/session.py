@@ -18,7 +18,7 @@ class SessionStorage(BaseStorage):
             "message storage requires session middleware to be installed, "\
             "and come before the message middleware in the "\
             "MIDDLEWARE%s list." % ("_CLASSES" if settings.MIDDLEWARE is None else "")
-        super(SessionStorage, self).__init__(request, *args, **kwargs)
+        super().__init__(request, *args, **kwargs)
 
     def _get(self, *args, **kwargs):
         """

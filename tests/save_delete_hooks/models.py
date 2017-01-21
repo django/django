@@ -12,7 +12,7 @@ class Person(models.Model):
     last_name = models.CharField(max_length=20)
 
     def __init__(self, *args, **kwargs):
-        super(Person, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.data = []
 
     def __str__(self):
@@ -21,11 +21,11 @@ class Person(models.Model):
     def save(self, *args, **kwargs):
         self.data.append("Before save")
         # Call the "real" save() method
-        super(Person, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         self.data.append("After save")
 
     def delete(self):
         self.data.append("Before deletion")
         # Call the "real" delete() method
-        super(Person, self).delete()
+        super().delete()
         self.data.append("After deletion")

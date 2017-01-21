@@ -68,13 +68,13 @@ class SetupDefaultLoggingMixin:
 
     @classmethod
     def setUpClass(cls):
-        super(SetupDefaultLoggingMixin, cls).setUpClass()
+        super().setUpClass()
         cls._logging = settings.LOGGING
         logging.config.dictConfig(DEFAULT_LOGGING)
 
     @classmethod
     def tearDownClass(cls):
-        super(SetupDefaultLoggingMixin, cls).tearDownClass()
+        super().tearDownClass()
         logging.config.dictConfig(cls._logging)
 
 

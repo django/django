@@ -175,7 +175,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
 
 class NestedObjects(Collector):
     def __init__(self, *args, **kwargs):
-        super(NestedObjects, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.edges = {}  # {from_instance: [to_instances]}
         self.protected = set()
         self.model_objs = defaultdict(set)
@@ -195,12 +195,12 @@ class NestedObjects(Collector):
                 self.add_edge(None, obj)
             self.model_objs[obj._meta.model].add(obj)
         try:
-            return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
+            return super().collect(objs, source_attr=source_attr, **kwargs)
         except models.ProtectedError as e:
             self.protected.update(e.protected_objects)
 
     def related_objects(self, related, objs):
-        qs = super(NestedObjects, self).related_objects(related, objs)
+        qs = super().related_objects(related, objs)
         return qs.select_related(related.field.name)
 
     def _nested(self, obj, seen, format_callback):

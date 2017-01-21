@@ -103,7 +103,7 @@ class OSMWidget(OpenLayersWidget):
     map_srid = 3857
 
     def __init__(self, attrs=None):
-        super(OSMWidget, self).__init__()
+        super().__init__()
         for key in ('default_lon', 'default_lat'):
             self.attrs[key] = getattr(self, key)
         if attrs:

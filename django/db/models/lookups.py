@@ -153,8 +153,7 @@ class Transform(RegisterLookupMixin, Func):
 
 class BuiltinLookup(Lookup):
     def process_lhs(self, compiler, connection, lhs=None):
-        lhs_sql, params = super(BuiltinLookup, self).process_lhs(
-            compiler, connection, lhs)
+        lhs_sql, params = super().process_lhs(compiler, connection, lhs)
         field_internal_type = self.lhs.output_field.get_internal_type()
         db_type = self.lhs.output_field.db_type(connection=connection)
         lhs_sql = connection.ops.field_cast_sql(
@@ -223,7 +222,7 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
             # to prepare/transform those values.
             return self.batch_process_rhs(compiler, connection)
         else:
-            return super(FieldGetDbPrepValueIterableMixin, self).process_rhs(compiler, connection)
+            return super().process_rhs(compiler, connection)
 
     def resolve_expression_parameter(self, compiler, connection, sql, param):
         params = [param]
@@ -234,7 +233,7 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
         return sql, params
 
     def batch_process_rhs(self, compiler, connection, rhs=None):
-        pre_processed = super(FieldGetDbPrepValueIterableMixin, self).batch_process_rhs(compiler, connection, rhs)
+        pre_processed = super().batch_process_rhs(compiler, connection, rhs)
         # The params list may contain expressions which compile to a
         # sql/param pair. Zip them to get sql and param pairs that refer to the
         # same argument and attempt to replace them with the result of
@@ -258,7 +257,7 @@ class IExact(BuiltinLookup):
     prepare_rhs = False
 
     def process_rhs(self, qn, connection):
-        rhs, params = super(IExact, self).process_rhs(qn, connection)
+        rhs, params = super().process_rhs(qn, connection)
         if params:
             params[0] = connection.ops.prep_for_iexact_query(params[0])
         return rhs, params
@@ -292,7 +291,7 @@ class IntegerFieldFloatRounding:
     def get_prep_lookup(self):
         if isinstance(self.rhs, float):
             self.rhs = math.ceil(self.rhs)
-        return super(IntegerFieldFloatRounding, self).get_prep_lookup()
+        return super().get_prep_lookup()
 
 
 @IntegerField.register_lookup
@@ -366,7 +365,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             placeholder = '(' + ', '.join(sqls) + ')'
             return (placeholder, sqls_params)
         else:
-            return super(In, self).process_rhs(compiler, connection)
+            return super().process_rhs(compiler, connection)
 
     def get_rhs_op(self, connection, rhs):
         return 'IN %s' % rhs
@@ -375,7 +374,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         max_in_list_size = connection.ops.max_in_list_size()
         if self.rhs_is_direct_value() and max_in_list_size and len(self.rhs) > max_in_list_size:
             return self.split_parameter_list_as_sql(compiler, connection)
-        return super(In, self).as_sql(compiler, connection)
+        return super().as_sql(compiler, connection)
 
     def split_parameter_list_as_sql(self, compiler, connection):
         # This is a special case for databases which limit the number of
@@ -416,7 +415,7 @@ class PatternLookup(BuiltinLookup):
             pattern = connection.pattern_ops[self.lookup_name].format(connection.pattern_esc)
             return pattern.format(rhs)
         else:
-            return super(PatternLookup, self).get_rhs_op(connection, rhs)
+            return super().get_rhs_op(connection, rhs)
 
 
 @Field.register_lookup
@@ -425,7 +424,7 @@ class Contains(PatternLookup):
     prepare_rhs = False
 
     def process_rhs(self, qn, connection):
-        rhs, params = super(Contains, self).process_rhs(qn, connection)
+        rhs, params = super().process_rhs(qn, connection)
         if params and not self.bilateral_transforms:
             params[0] = "%%%s%%" % connection.ops.prep_for_like_query(params[0])
         return rhs, params
@@ -443,7 +442,7 @@ class StartsWith(PatternLookup):
     prepare_rhs = False
 
     def process_rhs(self, qn, connection):
-        rhs, params = super(StartsWith, self).process_rhs(qn, connection)
+        rhs, params = super().process_rhs(qn, connection)
         if params and not self.bilateral_transforms:
             params[0] = "%s%%" % connection.ops.prep_for_like_query(params[0])
         return rhs, params
@@ -455,7 +454,7 @@ class IStartsWith(PatternLookup):
     prepare_rhs = False
 
     def process_rhs(self, qn, connection):
-        rhs, params = super(IStartsWith, self).process_rhs(qn, connection)
+        rhs, params = super().process_rhs(qn, connection)
         if params and not self.bilateral_transforms:
             params[0] = "%s%%" % connection.ops.prep_for_like_query(params[0])
         return rhs, params
@@ -467,7 +466,7 @@ class EndsWith(PatternLookup):
     prepare_rhs = False
 
     def process_rhs(self, qn, connection):
-        rhs, params = super(EndsWith, self).process_rhs(qn, connection)
+        rhs, params = super().process_rhs(qn, connection)
         if params and not self.bilateral_transforms:
             params[0] = "%%%s" % connection.ops.prep_for_like_query(params[0])
         return rhs, params
@@ -479,7 +478,7 @@ class IEndsWith(PatternLookup):
     prepare_rhs = False
 
     def process_rhs(self, qn, connection):
-        rhs, params = super(IEndsWith, self).process_rhs(qn, connection)
+        rhs, params = super().process_rhs(qn, connection)
         if params and not self.bilateral_transforms:
             params[0] = "%%%s" % connection.ops.prep_for_like_query(params[0])
         return rhs, params
@@ -513,7 +512,7 @@ class Regex(BuiltinLookup):
 
     def as_sql(self, compiler, connection):
         if self.lookup_name in connection.operators:
-            return super(Regex, self).as_sql(compiler, connection)
+            return super().as_sql(compiler, connection)
         else:
             lhs, lhs_params = self.process_lhs(compiler, connection)
             rhs, rhs_params = self.process_rhs(compiler, connection)
@@ -571,7 +570,7 @@ class YearExact(YearLookup, Exact):
         except (IndexError, TypeError, ValueError):
             # Can't determine the bounds before executing the query, so skip
             # optimizations by falling back to a standard exact comparison.
-            return super(Exact, self).as_sql(compiler, connection)
+            return super().as_sql(compiler, connection)
         bounds = self.year_lookup_bounds(connection, rhs_params[0])
         params.extend(bounds)
         return '%s BETWEEN %%s AND %%s' % lhs_sql, params

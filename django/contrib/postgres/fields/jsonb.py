@@ -18,7 +18,7 @@ class JsonAdapter(Json):
     """
     def __init__(self, adapted, dumps=None, encoder=None):
         self.encoder = encoder
-        super(JsonAdapter, self).__init__(adapted, dumps=dumps)
+        super().__init__(adapted, dumps=dumps)
 
     def dumps(self, obj):
         options = {'cls': self.encoder} if self.encoder else {}
@@ -36,19 +36,19 @@ class JSONField(Field):
         if encoder and not callable(encoder):
             raise ValueError("The encoder parameter must be a callable object.")
         self.encoder = encoder
-        super(JSONField, self).__init__(verbose_name, name, **kwargs)
+        super().__init__(verbose_name, name, **kwargs)
 
     def db_type(self, connection):
         return 'jsonb'
 
     def deconstruct(self):
-        name, path, args, kwargs = super(JSONField, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         if self.encoder is not None:
             kwargs['encoder'] = self.encoder
         return name, path, args, kwargs
 
     def get_transform(self, name):
-        transform = super(JSONField, self).get_transform(name)
+        transform = super().get_transform(name)
         if transform:
             return transform
         return KeyTransformFactory(name)
@@ -59,7 +59,7 @@ class JSONField(Field):
         return value
 
     def validate(self, value, model_instance):
-        super(JSONField, self).validate(value, model_instance)
+        super().validate(value, model_instance)
         options = {'cls': self.encoder} if self.encoder else {}
         try:
             json.dumps(value, **options)
@@ -76,7 +76,7 @@ class JSONField(Field):
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.JSONField}
         defaults.update(kwargs)
-        return super(JSONField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 JSONField.register_lookup(lookups.DataContains)
@@ -91,7 +91,7 @@ class KeyTransform(Transform):
     nested_operator = '#>'
 
     def __init__(self, key_name, *args, **kwargs):
-        super(KeyTransform, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.key_name = key_name
 
     def as_sql(self, compiler, connection):
@@ -129,7 +129,7 @@ class KeyTransformTextLookupMixin:
         key_text_transform = KeyTextTransform(
             key_transform.key_name, *key_transform.source_expressions, **key_transform.extra
         )
-        super(KeyTransformTextLookupMixin, self).__init__(key_text_transform, *args, **kwargs)
+        super().__init__(key_text_transform, *args, **kwargs)
 
 
 class KeyTransformIExact(KeyTransformTextLookupMixin, builtin_lookups.IExact):

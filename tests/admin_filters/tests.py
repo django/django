@@ -168,12 +168,12 @@ class BookAdminWithCustomQueryset(ModelAdmin):
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
-        super(BookAdminWithCustomQueryset, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     list_filter = ('year',)
 
     def get_queryset(self, request):
-        return super(BookAdminWithCustomQueryset, self).get_queryset(request).filter(author=self.user)
+        return super().get_queryset(request).filter(author=self.user)
 
 
 class BookAdminRelatedOnlyFilter(ModelAdmin):

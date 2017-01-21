@@ -97,7 +97,7 @@ class RelatedField(Field):
         return self.remote_field.model
 
     def check(self, **kwargs):
-        errors = super(RelatedField, self).check(**kwargs)
+        errors = super().check(**kwargs)
         errors.extend(self._check_related_name_is_valid())
         errors.extend(self._check_related_query_name_is_valid())
         errors.extend(self._check_relation_model_exists())
@@ -294,7 +294,7 @@ class RelatedField(Field):
 
     def contribute_to_class(self, cls, name, private_only=False, **kwargs):
 
-        super(RelatedField, self).contribute_to_class(cls, name, private_only=private_only, **kwargs)
+        super().contribute_to_class(cls, name, private_only=private_only, **kwargs)
 
         self.opts = cls._meta
 
@@ -412,7 +412,7 @@ class RelatedField(Field):
                 'limit_choices_to': limit_choices_to,
             })
         defaults.update(kwargs)
-        return super(RelatedField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
     def related_query_name(self):
         """
@@ -464,14 +464,14 @@ class ForeignObject(RelatedField):
                 on_delete=on_delete,
             )
 
-        super(ForeignObject, self).__init__(rel=rel, **kwargs)
+        super().__init__(rel=rel, **kwargs)
 
         self.from_fields = from_fields
         self.to_fields = to_fields
         self.swappable = swappable
 
     def check(self, **kwargs):
-        errors = super(ForeignObject, self).check(**kwargs)
+        errors = super().check(**kwargs)
         errors.extend(self._check_to_fields_exist())
         errors.extend(self._check_unique_target())
         return errors
@@ -555,7 +555,7 @@ class ForeignObject(RelatedField):
             return []
 
     def deconstruct(self):
-        name, path, args, kwargs = super(ForeignObject, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         kwargs['on_delete'] = self.remote_field.on_delete
         kwargs['from_fields'] = self.from_fields
         kwargs['to_fields'] = self.to_fields
@@ -653,7 +653,7 @@ class ForeignObject(RelatedField):
         return tuple(ret)
 
     def get_attname_column(self):
-        attname, column = super(ForeignObject, self).get_attname_column()
+        attname, column = super().get_attname_column()
         return attname, None
 
     def get_joining_columns(self, reverse_join=False):
@@ -718,7 +718,7 @@ class ForeignObject(RelatedField):
         return cls.merge_dicts(class_lookups)
 
     def contribute_to_class(self, cls, name, private_only=False, **kwargs):
-        super(ForeignObject, self).contribute_to_class(cls, name, private_only=private_only, **kwargs)
+        super().contribute_to_class(cls, name, private_only=private_only, **kwargs)
         setattr(cls, self.name, self.forward_related_accessor_class(self))
 
     def contribute_to_related_class(self, cls, related):
@@ -795,13 +795,12 @@ class ForeignKey(ForeignObject):
 
         kwargs['db_index'] = kwargs.get('db_index', True)
 
-        super(ForeignKey, self).__init__(
-            to, on_delete, from_fields=['self'], to_fields=[to_field], **kwargs)
+        super().__init__(to, on_delete, from_fields=['self'], to_fields=[to_field], **kwargs)
 
         self.db_constraint = db_constraint
 
     def check(self, **kwargs):
-        errors = super(ForeignKey, self).check(**kwargs)
+        errors = super().check(**kwargs)
         errors.extend(self._check_on_delete())
         errors.extend(self._check_unique())
         return errors
@@ -840,7 +839,7 @@ class ForeignKey(ForeignObject):
         ] if self.unique else []
 
     def deconstruct(self):
-        name, path, args, kwargs = super(ForeignKey, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         del kwargs['to_fields']
         del kwargs['from_fields']
         # Handle the simpler arguments
@@ -873,7 +872,7 @@ class ForeignKey(ForeignObject):
     def validate(self, value, model_instance):
         if self.remote_field.parent_link:
             return
-        super(ForeignKey, self).validate(value, model_instance)
+        super().validate(value, model_instance)
         if value is None:
             return
 
@@ -902,7 +901,7 @@ class ForeignKey(ForeignObject):
 
     def get_default(self):
         "Here we check if the default value is an object and return the to_field if so."
-        field_default = super(ForeignKey, self).get_default()
+        field_default = super().get_default()
         if isinstance(field_default, self.remote_field.model):
             return getattr(field_default, self.target_field.attname)
         return field_default
@@ -919,7 +918,7 @@ class ForeignKey(ForeignObject):
         return self.target_field.get_db_prep_value(value, connection, prepared)
 
     def contribute_to_related_class(self, cls, related):
-        super(ForeignKey, self).contribute_to_related_class(cls, related)
+        super().contribute_to_related_class(cls, related)
         if self.remote_field.field_name is None:
             self.remote_field.field_name = cls._meta.pk.name
 
@@ -935,7 +934,7 @@ class ForeignKey(ForeignObject):
             'to_field_name': self.remote_field.field_name,
         }
         defaults.update(kwargs)
-        return super(ForeignKey, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
     def db_check(self, connection):
         return []
@@ -952,13 +951,13 @@ class ForeignKey(ForeignObject):
         return value
 
     def get_db_converters(self, connection):
-        converters = super(ForeignKey, self).get_db_converters(connection)
+        converters = super().get_db_converters(connection)
         if connection.features.interprets_empty_strings_as_nulls:
             converters += [self.convert_empty_strings]
         return converters
 
     def get_col(self, alias, output_field=None):
-        return super(ForeignKey, self).get_col(alias, output_field or self.target_field)
+        return super().get_col(alias, output_field or self.target_field)
 
 
 class OneToOneField(ForeignKey):
@@ -983,10 +982,10 @@ class OneToOneField(ForeignKey):
 
     def __init__(self, to, on_delete, to_field=None, **kwargs):
         kwargs['unique'] = True
-        super(OneToOneField, self).__init__(to, on_delete, to_field=to_field, **kwargs)
+        super().__init__(to, on_delete, to_field=to_field, **kwargs)
 
     def deconstruct(self):
-        name, path, args, kwargs = super(OneToOneField, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         if "unique" in kwargs:
             del kwargs['unique']
         return name, path, args, kwargs
@@ -994,7 +993,7 @@ class OneToOneField(ForeignKey):
     def formfield(self, **kwargs):
         if self.remote_field.parent_link:
             return None
-        return super(OneToOneField, self).formfield(**kwargs)
+        return super().formfield(**kwargs)
 
     def save_form_data(self, instance, data):
         if isinstance(data, self.remote_field.model):
@@ -1107,13 +1106,13 @@ class ManyToManyField(RelatedField):
         )
         self.has_null_arg = 'null' in kwargs
 
-        super(ManyToManyField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.db_table = db_table
         self.swappable = swappable
 
     def check(self, **kwargs):
-        errors = super(ManyToManyField, self).check(**kwargs)
+        errors = super().check(**kwargs)
         errors.extend(self._check_unique(**kwargs))
         errors.extend(self._check_relationship_model(**kwargs))
         errors.extend(self._check_ignored_options(**kwargs))
@@ -1396,7 +1395,7 @@ class ManyToManyField(RelatedField):
         return []
 
     def deconstruct(self):
-        name, path, args, kwargs = super(ManyToManyField, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         # Handle the simpler arguments.
         if self.db_table is not None:
             kwargs['db_table'] = self.db_table
@@ -1558,7 +1557,7 @@ class ManyToManyField(RelatedField):
             # clashes between multiple m2m fields with related_name == '+'.
             self.remote_field.related_name = "_%s_%s_+" % (cls.__name__.lower(), name)
 
-        super(ManyToManyField, self).contribute_to_class(cls, name, **kwargs)
+        super().contribute_to_class(cls, name, **kwargs)
 
         # The intermediate m2m model is not auto created if:
         #  1) There is a manually specified intermediate, or
@@ -1624,7 +1623,7 @@ class ManyToManyField(RelatedField):
             if callable(initial):
                 initial = initial()
             defaults['initial'] = [i._get_pk_val() for i in initial]
-        return super(ManyToManyField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
     def db_check(self, connection):
         return None

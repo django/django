@@ -320,7 +320,7 @@ class ModelAdminTests(TestCase):
 
             def get_form(self, request, obj=None, **kwargs):
                 kwargs['exclude'] = ['bio']
-                return super(BandAdmin, self).get_form(request, obj, **kwargs)
+                return super().get_form(request, obj, **kwargs)
 
         ma = BandAdmin(Band, self.site)
         self.assertEqual(list(ma.get_form(request).base_fields), ['name', 'sign_date'])
@@ -343,7 +343,7 @@ class ModelAdminTests(TestCase):
 
             def get_formset(self, request, obj=None, **kwargs):
                 kwargs['exclude'] = ['opening_band']
-                return super(ConcertInline, self).get_formset(request, obj, **kwargs)
+                return super().get_formset(request, obj, **kwargs)
 
         class BandAdmin(ModelAdmin):
             inlines = [ConcertInline]
@@ -420,7 +420,7 @@ class ModelAdminTests(TestCase):
 
         class AdminConcertForm(forms.ModelForm):
             def __init__(self, *args, **kwargs):
-                super(AdminConcertForm, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
                 self.fields["main_band"].queryset = Band.objects.filter(name='The Doors')
 
         class ConcertAdminWithForm(ModelAdmin):
@@ -455,7 +455,7 @@ class ModelAdminTests(TestCase):
             def get_formset(self, request, obj=None, **kwargs):
                 if obj:
                     kwargs['form'] = CustomConcertForm
-                return super(ConcertInline, self).get_formset(request, obj, **kwargs)
+                return super().get_formset(request, obj, **kwargs)
 
         class BandAdmin(ModelAdmin):
             inlines = [ConcertInline]

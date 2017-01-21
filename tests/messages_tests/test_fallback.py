@@ -14,7 +14,7 @@ class FallbackTests(BaseTests, SimpleTestCase):
 
     def get_request(self):
         self.session = {}
-        request = super(FallbackTests, self).get_request()
+        request = super().get_request()
         request.session = self.session
         return request
 

@@ -67,7 +67,7 @@ class ListMixin:
             self._set_single = self._set_single_rebuild
             self._assign_extended_slice = self._assign_extended_slice_rebuild
 
-        super(ListMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __getitem__(self, index):
         "Get the item(s) at the specified index/slice."

@@ -116,12 +116,12 @@ class StaticHelperTest(StaticTests):
     Test case to make sure the static URL pattern helper works as expected
     """
     def setUp(self):
-        super(StaticHelperTest, self).setUp()
+        super().setUp()
         self._old_views_urlpatterns = urls.urlpatterns[:]
         urls.urlpatterns += static('/media/', document_root=media_dir)
 
     def tearDown(self):
-        super(StaticHelperTest, self).tearDown()
+        super().tearDown()
         urls.urlpatterns = self._old_views_urlpatterns
 
 

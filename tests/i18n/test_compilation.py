@@ -70,7 +70,7 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
     MO_FILE_FR = None
 
     def setUp(self):
-        super(MultipleLocaleCompilationTests, self).setUp()
+        super().setUp()
         localedir = os.path.join(self.test_dir, 'locale')
         self.MO_FILE_HR = os.path.join(localedir, 'hr/LC_MESSAGES/django.mo')
         self.MO_FILE_FR = os.path.join(localedir, 'fr/LC_MESSAGES/django.mo')
@@ -96,7 +96,7 @@ class ExcludedLocaleCompilationTests(MessageCompilationTests):
     MO_FILE = 'locale/%s/LC_MESSAGES/django.mo'
 
     def setUp(self):
-        super(ExcludedLocaleCompilationTests, self).setUp()
+        super().setUp()
         copytree('canned_locale', 'locale')
 
     def test_command_help(self):
@@ -160,7 +160,7 @@ class ProjectAndAppTests(MessageCompilationTests):
 class FuzzyTranslationTest(ProjectAndAppTests):
 
     def setUp(self):
-        super(FuzzyTranslationTest, self).setUp()
+        super().setUp()
         gettext_module._translations = {}  # flush cache or test will be useless
 
     def test_nofuzzy_compiling(self):

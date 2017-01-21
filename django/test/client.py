@@ -40,7 +40,7 @@ class RedirectCycleError(Exception):
     The test client has been asked to follow a redirect loop.
     """
     def __init__(self, message, last_response):
-        super(RedirectCycleError, self).__init__(message)
+        super().__init__(message)
         self.last_response = last_response
         self.redirect_chain = last_response.redirect_chain
 
@@ -119,7 +119,7 @@ class ClientHandler(BaseHandler):
     """
     def __init__(self, enforce_csrf_checks=True, *args, **kwargs):
         self.enforce_csrf_checks = enforce_csrf_checks
-        super(ClientHandler, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __call__(self, environ):
         # Set up middleware if needed. We couldn't do this earlier, because
@@ -430,7 +430,7 @@ class Client(RequestFactory):
     HTML rendered to the end-user.
     """
     def __init__(self, enforce_csrf_checks=False, **defaults):
-        super(Client, self).__init__(**defaults)
+        super().__init__(**defaults)
         self.handler = ClientHandler(enforce_csrf_checks)
         self.exc_info = None
 
@@ -527,8 +527,7 @@ class Client(RequestFactory):
         """
         Requests a response from the server using GET.
         """
-        response = super(Client, self).get(path, data=data, secure=secure,
-                                           **extra)
+        response = super().get(path, data=data, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -538,9 +537,7 @@ class Client(RequestFactory):
         """
         Requests a response from the server using POST.
         """
-        response = super(Client, self).post(path, data=data,
-                                            content_type=content_type,
-                                            secure=secure, **extra)
+        response = super().post(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -549,8 +546,7 @@ class Client(RequestFactory):
         """
         Request a response from the server using HEAD.
         """
-        response = super(Client, self).head(path, data=data, secure=secure,
-                                            **extra)
+        response = super().head(path, data=data, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -560,9 +556,7 @@ class Client(RequestFactory):
         """
         Request a response from the server using OPTIONS.
         """
-        response = super(Client, self).options(path, data=data,
-                                               content_type=content_type,
-                                               secure=secure, **extra)
+        response = super().options(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -572,9 +566,7 @@ class Client(RequestFactory):
         """
         Send a resource to the server using PUT.
         """
-        response = super(Client, self).put(path, data=data,
-                                           content_type=content_type,
-                                           secure=secure, **extra)
+        response = super().put(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -584,9 +576,7 @@ class Client(RequestFactory):
         """
         Send a resource to the server using PATCH.
         """
-        response = super(Client, self).patch(path, data=data,
-                                             content_type=content_type,
-                                             secure=secure, **extra)
+        response = super().patch(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -596,9 +586,7 @@ class Client(RequestFactory):
         """
         Send a DELETE request to the server.
         """
-        response = super(Client, self).delete(path, data=data,
-                                              content_type=content_type,
-                                              secure=secure, **extra)
+        response = super().delete(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -607,7 +595,7 @@ class Client(RequestFactory):
         """
         Send a TRACE request to the server.
         """
-        response = super(Client, self).trace(path, data=data, secure=secure, **extra)
+        response = super().trace(path, data=data, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response

@@ -198,7 +198,7 @@ class AdminSite:
                 def get_urls(self):
                     from django.conf.urls import url
 
-                    urls = super(MyAdminSite, self).get_urls()
+                    urls = super().get_urls()
                     urls += [
                         url(r'^my_view/$', self.admin_view(some_view))
                     ]

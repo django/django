@@ -58,7 +58,7 @@ SplitDateTimeFormSet = formset_factory(SplitDateTimeForm)
 class CustomKwargForm(Form):
     def __init__(self, *args, **kwargs):
         self.custom_kwarg = kwargs.pop('custom_kwarg')
-        super(CustomKwargForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class FormsFormsetTestCase(SimpleTestCase):
@@ -1056,7 +1056,7 @@ class FormsFormsetTestCase(SimpleTestCase):
                 return reversed(self.forms)
 
             def __getitem__(self, idx):
-                return super(BaseReverseFormSet, self).__getitem__(len(self) - idx - 1)
+                return super().__getitem__(len(self) - idx - 1)
 
         ReverseChoiceFormset = formset_factory(Choice, BaseReverseFormSet, extra=3)
         reverse_formset = ReverseChoiceFormset()
@@ -1106,7 +1106,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         class AnotherChoice(Choice):
             def is_valid(self):
                 self.is_valid_called = True
-                return super(AnotherChoice, self).is_valid()
+                return super().is_valid()
 
         AnotherChoiceFormSet = formset_factory(AnotherChoice)
         data = {

@@ -500,9 +500,7 @@ class LocaleRegexURLResolver(RegexURLResolver):
         self, urlconf_name, default_kwargs=None, app_name=None, namespace=None,
         prefix_default_language=True,
     ):
-        super(LocaleRegexURLResolver, self).__init__(
-            None, urlconf_name, default_kwargs, app_name, namespace,
-        )
+        super().__init__(None, urlconf_name, default_kwargs, app_name, namespace)
         self.prefix_default_language = prefix_default_language
 
     @property

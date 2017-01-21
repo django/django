@@ -15,9 +15,9 @@ class OrderWrt(fields.IntegerField):
     def __init__(self, *args, **kwargs):
         kwargs['name'] = '_order'
         kwargs['editable'] = False
-        super(OrderWrt, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def deconstruct(self):
-        name, path, args, kwargs = super(OrderWrt, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         del kwargs['editable']
         return name, path, args, kwargs

@@ -47,7 +47,7 @@ class NoYamlSerializerTestCase(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         """Removes imported yaml and stubs importlib.import_module"""
-        super(NoYamlSerializerTestCase, cls).setUpClass()
+        super().setUpClass()
 
         cls._import_module_mock = YamlImportModuleMock()
         importlib.import_module = cls._import_module_mock.import_module
@@ -58,7 +58,7 @@ class NoYamlSerializerTestCase(SimpleTestCase):
     @classmethod
     def tearDownClass(cls):
         """Puts yaml back if necessary"""
-        super(NoYamlSerializerTestCase, cls).tearDownClass()
+        super().tearDownClass()
 
         importlib.import_module = cls._import_module_mock._import_module
 

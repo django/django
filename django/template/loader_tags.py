@@ -161,7 +161,7 @@ class IncludeNode(Node):
         self.template = template
         self.extra_context = kwargs.pop('extra_context', {})
         self.isolated_context = kwargs.pop('isolated_context', False)
-        super(IncludeNode, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def render(self, context):
         """

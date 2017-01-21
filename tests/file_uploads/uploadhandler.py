@@ -14,7 +14,7 @@ class QuotaUploadHandler(FileUploadHandler):
     QUOTA = 5 * 2 ** 20  # 5 MB
 
     def __init__(self, request=None):
-        super(QuotaUploadHandler, self).__init__(request)
+        super().__init__(request)
         self.total_upload = 0
 
     def receive_data_chunk(self, raw_data, start):

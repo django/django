@@ -64,8 +64,7 @@ class SimpleListFilter(ListFilter):
     parameter_name = None
 
     def __init__(self, request, params, model, model_admin):
-        super(SimpleListFilter, self).__init__(
-            request, params, model, model_admin)
+        super().__init__(request, params, model, model_admin)
         if self.parameter_name is None:
             raise ImproperlyConfigured(
                 "The list filter '%s' does not specify "
@@ -122,8 +121,7 @@ class FieldListFilter(ListFilter):
         self.field = field
         self.field_path = field_path
         self.title = getattr(field, 'verbose_name', field_path)
-        super(FieldListFilter, self).__init__(
-            request, params, model, model_admin)
+        super().__init__(request, params, model, model_admin)
         for p in self.expected_parameters():
             if p in params:
                 value = params.pop(p)
@@ -165,8 +163,7 @@ class RelatedFieldListFilter(FieldListFilter):
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
         self.lookup_val = request.GET.get(self.lookup_kwarg)
         self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
-        super(RelatedFieldListFilter, self).__init__(
-            field, request, params, model, model_admin, field_path)
+        super().__init__(field, request, params, model, model_admin, field_path)
         self.lookup_choices = self.field_choices(field, request, model_admin)
         if hasattr(field, 'verbose_name'):
             self.lookup_title = field.verbose_name
@@ -232,7 +229,7 @@ class BooleanFieldListFilter(FieldListFilter):
         self.lookup_kwarg2 = '%s__isnull' % field_path
         self.lookup_val = request.GET.get(self.lookup_kwarg)
         self.lookup_val2 = request.GET.get(self.lookup_kwarg2)
-        super(BooleanFieldListFilter, self).__init__(field, request, params, model, model_admin, field_path)
+        super().__init__(field, request, params, model, model_admin, field_path)
         if (self.used_parameters and self.lookup_kwarg in self.used_parameters and
                 self.used_parameters[self.lookup_kwarg] in ('1', '0')):
             self.used_parameters[self.lookup_kwarg] = bool(int(self.used_parameters[self.lookup_kwarg]))
@@ -274,8 +271,7 @@ class ChoicesFieldListFilter(FieldListFilter):
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
         self.lookup_val = request.GET.get(self.lookup_kwarg)
         self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
-        super(ChoicesFieldListFilter, self).__init__(
-            field, request, params, model, model_admin, field_path)
+        super().__init__(field, request, params, model, model_admin, field_path)
 
     def expected_parameters(self):
         return [self.lookup_kwarg, self.lookup_kwarg_isnull]
@@ -362,8 +358,7 @@ class DateFieldListFilter(FieldListFilter):
                 (_('No date'), {self.field_generic + 'isnull': 'True'}),
                 (_('Has date'), {self.field_generic + 'isnull': 'False'}),
             )
-        super(DateFieldListFilter, self).__init__(
-            field, request, params, model, model_admin, field_path)
+        super().__init__(field, request, params, model, model_admin, field_path)
 
     def expected_parameters(self):
         params = [self.lookup_kwarg_since, self.lookup_kwarg_until]
@@ -404,8 +399,7 @@ class AllValuesFieldListFilter(FieldListFilter):
                                .distinct()
                                .order_by(field.name)
                                .values_list(field.name, flat=True))
-        super(AllValuesFieldListFilter, self).__init__(
-            field, request, params, model, model_admin, field_path)
+        super().__init__(field, request, params, model, model_admin, field_path)
 
     def expected_parameters(self):
         return [self.lookup_kwarg, self.lookup_kwarg_isnull]

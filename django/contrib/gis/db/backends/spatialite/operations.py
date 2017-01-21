@@ -28,7 +28,7 @@ class SpatiaLiteDistanceOperator(SpatialOperator):
             })
             sql_params.insert(1, len(lookup.rhs) == 3 and lookup.rhs[-1] == 'spheroid')
             return sql_template % template_params, sql_params
-        return super(SpatiaLiteDistanceOperator, self).as_sql(connection, lookup, template_params, sql_params)
+        return super().as_sql(connection, lookup, template_params, sql_params)
 
 
 class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
@@ -261,7 +261,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         return SpatialiteSpatialRefSys
 
     def get_db_converters(self, expression):
-        converters = super(SpatiaLiteOperations, self).get_db_converters(expression)
+        converters = super().get_db_converters(expression)
         if hasattr(expression.output_field, 'geom_type'):
             converters.append(self.convert_geometry)
         return converters

@@ -65,7 +65,7 @@ class ContextList(list):
                     return subcontext[key]
             raise KeyError(key)
         else:
-            return super(ContextList, self).__getitem__(key)
+            return super().__getitem__(key)
 
     def get(self, key, default=None):
         try:
@@ -394,7 +394,7 @@ class override_settings(TestContextDecorator):
     """
     def __init__(self, **kwargs):
         self.options = kwargs
-        super(override_settings, self).__init__()
+        super().__init__()
 
     def enable(self):
         # Keep this code at the beginning to leave the settings unchanged
@@ -487,7 +487,7 @@ class modify_settings(override_settings):
                 else:
                     raise ValueError("Unsupported action: %s" % action)
             self.options[name] = value
-        super(modify_settings, self).enable()
+        super().enable()
 
 
 class override_system_checks(TestContextDecorator):
@@ -501,7 +501,7 @@ class override_system_checks(TestContextDecorator):
         self.registry = registry
         self.new_checks = new_checks
         self.deployment_checks = deployment_checks
-        super(override_system_checks, self).__init__()
+        super().__init__()
 
     def enable(self):
         self.old_checks = self.registry.registered_checks
@@ -654,7 +654,7 @@ class ignore_warnings(TestContextDecorator):
             self.filter_func = warnings.filterwarnings
         else:
             self.filter_func = warnings.simplefilter
-        super(ignore_warnings, self).__init__()
+        super().__init__()
 
     def enable(self):
         self.catch_warnings = warnings.catch_warnings()
@@ -806,7 +806,7 @@ class override_script_prefix(TestContextDecorator):
     """
     def __init__(self, prefix):
         self.prefix = prefix
-        super(override_script_prefix, self).__init__()
+        super().__init__()
 
     def enable(self):
         self.old_prefix = get_script_prefix()
@@ -850,7 +850,7 @@ class isolate_apps(TestContextDecorator):
 
     def __init__(self, *installed_apps, **kwargs):
         self.installed_apps = installed_apps
-        super(isolate_apps, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def enable(self):
         self.old_apps = Options.default_apps

@@ -18,12 +18,12 @@ class Cast(Func):
     }
 
     def __init__(self, expression, output_field):
-        super(Cast, self).__init__(expression, output_field=output_field)
+        super().__init__(expression, output_field=output_field)
 
     def as_sql(self, compiler, connection, **extra_context):
         if 'db_type' not in extra_context:
             extra_context['db_type'] = self._output_field.db_type(connection)
-        return super(Cast, self).as_sql(compiler, connection, **extra_context)
+        return super().as_sql(compiler, connection, **extra_context)
 
     def as_mysql(self, compiler, connection):
         extra_context = {}
@@ -46,7 +46,7 @@ class Coalesce(Func):
     def __init__(self, *expressions, **extra):
         if len(expressions) < 2:
             raise ValueError('Coalesce must take at least two expressions')
-        super(Coalesce, self).__init__(*expressions, **extra)
+        super().__init__(*expressions, **extra)
 
     def as_oracle(self, compiler, connection):
         # we can't mix TextField (NCLOB) and CharField (NVARCHAR), so convert
@@ -72,7 +72,7 @@ class ConcatPair(Func):
     function = 'CONCAT'
 
     def __init__(self, left, right, **extra):
-        super(ConcatPair, self).__init__(left, right, **extra)
+        super().__init__(left, right, **extra)
 
     def as_sqlite(self, compiler, connection):
         coalesced = self.coalesce()
@@ -82,7 +82,7 @@ class ConcatPair(Func):
 
     def as_mysql(self, compiler, connection):
         # Use CONCAT_WS with an empty separator so that NULLs are ignored.
-        return super(ConcatPair, self).as_sql(
+        return super().as_sql(
             compiler, connection, function='CONCAT_WS', template="%(function)s('', %(expressions)s)"
         )
 
@@ -109,7 +109,7 @@ class Concat(Func):
         if len(expressions) < 2:
             raise ValueError('Concat must take at least two expressions')
         paired = self._paired(expressions)
-        super(Concat, self).__init__(paired, **extra)
+        super().__init__(paired, **extra)
 
     def _paired(self, expressions):
         # wrap pairs of expressions in successive concat functions
@@ -133,11 +133,11 @@ class Greatest(Func):
     def __init__(self, *expressions, **extra):
         if len(expressions) < 2:
             raise ValueError('Greatest must take at least two expressions')
-        super(Greatest, self).__init__(*expressions, **extra)
+        super().__init__(*expressions, **extra)
 
     def as_sqlite(self, compiler, connection):
         """Use the MAX function on SQLite."""
-        return super(Greatest, self).as_sql(compiler, connection, function='MAX')
+        return super().as_sql(compiler, connection, function='MAX')
 
 
 class Least(Func):
@@ -153,11 +153,11 @@ class Least(Func):
     def __init__(self, *expressions, **extra):
         if len(expressions) < 2:
             raise ValueError('Least must take at least two expressions')
-        super(Least, self).__init__(*expressions, **extra)
+        super().__init__(*expressions, **extra)
 
     def as_sqlite(self, compiler, connection):
         """Use the MIN function on SQLite."""
-        return super(Least, self).as_sql(compiler, connection, function='MIN')
+        return super().as_sql(compiler, connection, function='MIN')
 
 
 class Length(Transform):
@@ -167,10 +167,10 @@ class Length(Transform):
 
     def __init__(self, expression, **extra):
         output_field = extra.pop('output_field', fields.IntegerField())
-        super(Length, self).__init__(expression, output_field=output_field, **extra)
+        super().__init__(expression, output_field=output_field, **extra)
 
     def as_mysql(self, compiler, connection):
-        return super(Length, self).as_sql(compiler, connection, function='CHAR_LENGTH')
+        return super().as_sql(compiler, connection, function='CHAR_LENGTH')
 
 
 class Lower(Transform):
@@ -184,7 +184,7 @@ class Now(Func):
     def __init__(self, output_field=None, **extra):
         if output_field is None:
             output_field = fields.DateTimeField()
-        super(Now, self).__init__(output_field=output_field, **extra)
+        super().__init__(output_field=output_field, **extra)
 
     def as_postgresql(self, compiler, connection):
         # Postgres' CURRENT_TIMESTAMP means "the time at the start of the
@@ -211,13 +211,13 @@ class Substr(Func):
             if not hasattr(length, 'resolve_expression'):
                 length = Value(length)
             expressions.append(length)
-        super(Substr, self).__init__(*expressions, **extra)
+        super().__init__(*expressions, **extra)
 
     def as_sqlite(self, compiler, connection):
-        return super(Substr, self).as_sql(compiler, connection, function='SUBSTR')
+        return super().as_sql(compiler, connection, function='SUBSTR')
 
     def as_oracle(self, compiler, connection):
-        return super(Substr, self).as_sql(compiler, connection, function='SUBSTR')
+        return super().as_sql(compiler, connection, function='SUBSTR')
 
 
 class Upper(Transform):

@@ -48,7 +48,7 @@ class CsOperation(GEOSFuncFactory):
             self.argtypes = [CS_PTR, c_uint, c_uint, dbl_param]
         else:
             self.argtypes = [CS_PTR, c_uint, dbl_param]
-        return super(CsOperation, self).get_func()
+        return super().get_func()
 
 
 class CsOutput(GEOSFuncFactory):
@@ -56,7 +56,7 @@ class CsOutput(GEOSFuncFactory):
 
     def get_func(self, argtypes):
         self.argtypes = argtypes
-        return super(CsOutput, self).get_func()
+        return super().get_func()
 
     @staticmethod
     def errcheck(result, func, cargs):

@@ -22,7 +22,7 @@ class GISLookup(Lookup):
     band_lhs = None
 
     def __init__(self, *args, **kwargs):
-        super(GISLookup, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.template_params = {}
 
     @classmethod
@@ -100,7 +100,7 @@ class GISLookup(Lookup):
     def process_rhs(self, compiler, connection):
         if isinstance(self.rhs, Query):
             # If rhs is some Query, don't touch it.
-            return super(GISLookup, self).process_rhs(compiler, connection)
+            return super().process_rhs(compiler, connection)
 
         geom = self.rhs
         if isinstance(self.rhs, Col):
@@ -124,7 +124,7 @@ class GISLookup(Lookup):
         elif isinstance(self.lhs, RasterBandTransform):
             self.process_band_indices(only_lhs=True)
 
-        rhs, rhs_params = super(GISLookup, self).process_rhs(compiler, connection)
+        rhs, rhs_params = super().process_rhs(compiler, connection)
         rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, geom, compiler)
         return rhs, rhs_params
 
@@ -390,7 +390,7 @@ class RelateLookup(GISLookup):
             pattern = value[1]
             if not isinstance(pattern, str) or not self.pattern_regex.match(pattern):
                 raise ValueError('Invalid intersection matrix pattern "%s".' % pattern)
-        return super(RelateLookup, self).get_db_prep_lookup(value, connection)
+        return super().get_db_prep_lookup(value, connection)
 
 
 gis_lookups['relate'] = RelateLookup

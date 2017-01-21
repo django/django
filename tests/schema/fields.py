@@ -32,13 +32,13 @@ class CustomManyToManyField(RelatedField):
         self.db_table = kwargs.pop('db_table', None)
         if kwargs['rel'].through is not None:
             assert self.db_table is None, "Cannot specify a db_table if an intermediary model is used."
-        super(CustomManyToManyField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def contribute_to_class(self, cls, name, **kwargs):
         if self.remote_field.symmetrical and (
                 self.remote_field.model == "self" or self.remote_field.model == cls._meta.object_name):
             self.remote_field.related_name = "%s_rel_+" % name
-        super(CustomManyToManyField, self).contribute_to_class(cls, name, **kwargs)
+        super().contribute_to_class(cls, name, **kwargs)
         if not self.remote_field.through and not cls._meta.abstract and not cls._meta.swapped:
             self.remote_field.through = create_many_to_many_intermediary_model(self, cls)
         setattr(cls, self.name, ManyToManyDescriptor(self.remote_field))

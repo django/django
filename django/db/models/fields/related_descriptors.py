@@ -272,7 +272,7 @@ class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
             if not any(field in fields for field in deferred):
                 kwargs = {field: getattr(instance, field) for field in fields}
                 return rel_model(**kwargs)
-        return super(ForwardOneToOneDescriptor, self).get_object(instance)
+        return super().get_object(instance)
 
 
 class ReverseOneToOneDescriptor:
@@ -502,7 +502,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
     class RelatedManager(superclass):
         def __init__(self, instance):
-            super(RelatedManager, self).__init__()
+            super().__init__()
 
             self.instance = instance
             self.model = rel.related_model
@@ -545,12 +545,12 @@ def create_reverse_many_to_one_manager(superclass, rel):
             try:
                 return self.instance._prefetched_objects_cache[self.field.related_query_name()]
             except (AttributeError, KeyError):
-                queryset = super(RelatedManager, self).get_queryset()
+                queryset = super().get_queryset()
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:
-                queryset = super(RelatedManager, self).get_queryset()
+                queryset = super().get_queryset()
 
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
@@ -708,7 +708,7 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor):
     """
 
     def __init__(self, rel, reverse=False):
-        super(ManyToManyDescriptor, self).__init__(rel)
+        super().__init__(rel)
 
         self.reverse = reverse
 
@@ -746,7 +746,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
     class ManyRelatedManager(superclass):
         def __init__(self, instance=None):
-            super(ManyRelatedManager, self).__init__()
+            super().__init__()
 
             self.instance = instance
 
@@ -834,12 +834,12 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
             except (AttributeError, KeyError):
-                queryset = super(ManyRelatedManager, self).get_queryset()
+                queryset = super().get_queryset()
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:
-                queryset = super(ManyRelatedManager, self).get_queryset()
+                queryset = super().get_queryset()
 
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
@@ -914,7 +914,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     model=self.model, pk_set=None, using=db,
                 )
                 self._remove_prefetched_objects()
-                filters = self._build_remove_filters(super(ManyRelatedManager, self).get_queryset().using(db))
+                filters = self._build_remove_filters(super().get_queryset().using(db))
                 self.through._default_manager.using(db).filter(filters).delete()
 
                 signals.m2m_changed.send(
@@ -1091,7 +1091,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     instance=self.instance, reverse=self.reverse,
                     model=self.model, pk_set=old_ids, using=db,
                 )
-                target_model_qs = super(ManyRelatedManager, self).get_queryset()
+                target_model_qs = super().get_queryset()
                 if target_model_qs._has_filters():
                     old_vals = target_model_qs.using(db).filter(**{
                         '%s__in' % self.target_field.target_field.attname: old_ids})

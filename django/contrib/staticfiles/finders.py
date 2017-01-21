@@ -71,7 +71,7 @@ class FileSystemFinder(BaseFinder):
             filesystem_storage = FileSystemStorage(location=root)
             filesystem_storage.prefix = prefix
             self.storages[root] = filesystem_storage
-        super(FileSystemFinder, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def find(self, path, all=False):
         """
@@ -137,7 +137,7 @@ class AppDirectoriesFinder(BaseFinder):
                 self.storages[app_config.name] = app_storage
                 if app_config.name not in self.apps:
                     self.apps.append(app_config.name)
-        super(AppDirectoriesFinder, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def list(self, ignore_patterns):
         """
@@ -194,7 +194,7 @@ class BaseStorageFinder(BaseFinder):
         # Make sure we have an storage instance here.
         if not isinstance(self.storage, (Storage, LazyObject)):
             self.storage = self.storage()
-        super(BaseStorageFinder, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def find(self, path, all=False):
         """
@@ -229,7 +229,7 @@ class DefaultStorageFinder(BaseStorageFinder):
     storage = default_storage
 
     def __init__(self, *args, **kwargs):
-        super(DefaultStorageFinder, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         base_location = getattr(self.storage, 'base_location', empty)
         if not base_location:
             raise ImproperlyConfigured("The storage backend of the "

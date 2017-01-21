@@ -79,7 +79,7 @@ class PostGISIntrospection(DatabaseIntrospection):
             # performed -- in other words, when this function is called.
             self.postgis_types_reverse = self.get_postgis_types()
             self.data_types_reverse.update(self.postgis_types_reverse)
-        return super(PostGISIntrospection, self).get_field_type(data_type, description)
+        return super().get_field_type(data_type, description)
 
     def get_geometry_type(self, table_name, geo_col):
         """

@@ -31,7 +31,7 @@ class ArrayField(Field):
         # implements it.
         if hasattr(self.base_field, 'from_db_value'):
             self.from_db_value = self._from_db_value
-        super(ArrayField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @property
     def model(self):
@@ -46,7 +46,7 @@ class ArrayField(Field):
         self.base_field.model = model
 
     def check(self, **kwargs):
-        errors = super(ArrayField, self).check(**kwargs)
+        errors = super().check(**kwargs)
         if self.base_field.remote_field:
             errors.append(
                 checks.Error(
@@ -70,7 +70,7 @@ class ArrayField(Field):
         return errors
 
     def set_attributes_from_name(self, name):
-        super(ArrayField, self).set_attributes_from_name(name)
+        super().set_attributes_from_name(name)
         self.base_field.set_attributes_from_name(name)
 
     @property
@@ -87,7 +87,7 @@ class ArrayField(Field):
         return value
 
     def deconstruct(self):
-        name, path, args, kwargs = super(ArrayField, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         if path == 'django.contrib.postgres.fields.array.ArrayField':
             path = 'django.contrib.postgres.fields.ArrayField'
         kwargs.update({
@@ -125,7 +125,7 @@ class ArrayField(Field):
         return json.dumps(values)
 
     def get_transform(self, name):
-        transform = super(ArrayField, self).get_transform(name)
+        transform = super().get_transform(name)
         if transform:
             return transform
         if '_' not in name:
@@ -146,7 +146,7 @@ class ArrayField(Field):
             return SliceTransformFactory(start, end)
 
     def validate(self, value, model_instance):
-        super(ArrayField, self).validate(value, model_instance)
+        super().validate(value, model_instance)
         for index, part in enumerate(value):
             try:
                 self.base_field.validate(part, model_instance)
@@ -165,7 +165,7 @@ class ArrayField(Field):
                 )
 
     def run_validators(self, value):
-        super(ArrayField, self).run_validators(value)
+        super().run_validators(value)
         for index, part in enumerate(value):
             try:
                 self.base_field.run_validators(part)
@@ -184,13 +184,13 @@ class ArrayField(Field):
             'max_length': self.size,
         }
         defaults.update(kwargs)
-        return super(ArrayField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 @ArrayField.register_lookup
 class ArrayContains(lookups.DataContains):
     def as_sql(self, qn, connection):
-        sql, params = super(ArrayContains, self).as_sql(qn, connection)
+        sql, params = super().as_sql(qn, connection)
         sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
         return sql, params
 
@@ -198,7 +198,7 @@ class ArrayContains(lookups.DataContains):
 @ArrayField.register_lookup
 class ArrayContainedBy(lookups.ContainedBy):
     def as_sql(self, qn, connection):
-        sql, params = super(ArrayContainedBy, self).as_sql(qn, connection)
+        sql, params = super().as_sql(qn, connection)
         sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
         return sql, params
 
@@ -206,7 +206,7 @@ class ArrayContainedBy(lookups.ContainedBy):
 @ArrayField.register_lookup
 class ArrayExact(Exact):
     def as_sql(self, qn, connection):
-        sql, params = super(ArrayExact, self).as_sql(qn, connection)
+        sql, params = super().as_sql(qn, connection)
         sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
         return sql, params
 
@@ -214,7 +214,7 @@ class ArrayExact(Exact):
 @ArrayField.register_lookup
 class ArrayOverlap(lookups.Overlap):
     def as_sql(self, qn, connection):
-        sql, params = super(ArrayOverlap, self).as_sql(qn, connection)
+        sql, params = super().as_sql(qn, connection)
         sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
         return sql, params
 
@@ -236,7 +236,7 @@ class ArrayLenTransform(Transform):
 @ArrayField.register_lookup
 class ArrayInLookup(In):
     def get_prep_lookup(self):
-        values = super(ArrayInLookup, self).get_prep_lookup()
+        values = super().get_prep_lookup()
         # In.process_rhs() expects values to be hashable, so convert lists
         # to tuples.
         prepared_values = []
@@ -251,7 +251,7 @@ class ArrayInLookup(In):
 class IndexTransform(Transform):
 
     def __init__(self, index, base_field, *args, **kwargs):
-        super(IndexTransform, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.index = index
         self.base_field = base_field
 
@@ -277,7 +277,7 @@ class IndexTransformFactory:
 class SliceTransform(Transform):
 
     def __init__(self, start, end, *args, **kwargs):
-        super(SliceTransform, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.start = start
         self.end = end
 

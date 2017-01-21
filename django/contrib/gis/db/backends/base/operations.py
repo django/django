@@ -116,7 +116,7 @@ class BaseSpatialOperations:
             raise NotImplementedError(
                 "%s spatial aggregation is not supported by this database backend." % expression.name
             )
-        super(BaseSpatialOperations, self).check_expression_support(expression)
+        super().check_expression_support(expression)
 
     def spatial_aggregate_name(self, agg_name):
         raise NotImplementedError('Aggregate support not implemented for this spatial backend.')

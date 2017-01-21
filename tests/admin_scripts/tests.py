@@ -38,7 +38,7 @@ class AdminScriptTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(AdminScriptTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.test_dir = os.path.realpath(os.path.join(
             tempfile.gettempdir(),
             cls.__name__,
@@ -52,7 +52,7 @@ class AdminScriptTestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls.test_dir)
-        super(AdminScriptTestCase, cls).tearDownClass()
+        super().tearDownClass()
 
     def write_settings(self, filename, apps=None, is_dir=False, sdict=None, extra=None):
         if is_dir:

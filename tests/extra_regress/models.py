@@ -14,12 +14,12 @@ class RevisionableModel(models.Model):
         return "%s (%s, %s)" % (self.title, self.id, self.base.id)
 
     def save(self, *args, **kwargs):
-        super(RevisionableModel, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         if not self.base:
             self.base = self
             kwargs.pop('force_insert', None)
             kwargs.pop('force_update', None)
-            super(RevisionableModel, self).save(*args, **kwargs)
+            super().save(*args, **kwargs)
 
     def new_revision(self):
         new_revision = copy.copy(self)

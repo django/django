@@ -45,7 +45,7 @@ class RenameMethodsBase(type):
     renamed_methods = ()
 
     def __new__(cls, name, bases, attrs):
-        new_class = super(RenameMethodsBase, cls).__new__(cls, name, bases, attrs)
+        new_class = super().__new__(cls, name, bases, attrs)
 
         for base in inspect.getmro(new_class):
             class_name = base.__name__
@@ -79,13 +79,13 @@ class DeprecationInstanceCheck(type):
             "`%s` is deprecated, use `%s` instead." % (self.__name__, self.alternative),
             self.deprecation_warning, 2
         )
-        return super(DeprecationInstanceCheck, self).__instancecheck__(instance)
+        return super().__instancecheck__(instance)
 
 
 class MiddlewareMixin:
     def __init__(self, get_response=None):
         self.get_response = get_response
-        super(MiddlewareMixin, self).__init__()
+        super().__init__()
 
     def __call__(self, request):
         response = None

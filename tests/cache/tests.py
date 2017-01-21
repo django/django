@@ -949,12 +949,12 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
 
     def setUp(self):
         # The super calls needs to happen first for the settings override.
-        super(DBCacheTests, self).setUp()
+        super().setUp()
         self.create_table()
 
     def tearDown(self):
         # The super call needs to happen first because it uses the database.
-        super(DBCacheTests, self).tearDown()
+        super().tearDown()
         self.drop_table()
 
     def create_table(self):
@@ -1074,7 +1074,7 @@ class PicklingSideEffect:
 class LocMemCacheTests(BaseCacheTests, TestCase):
 
     def setUp(self):
-        super(LocMemCacheTests, self).setUp()
+        super().setUp()
 
         # LocMem requires a hack to make the other caches
         # share a data store with the 'normal' cache.
@@ -1321,7 +1321,7 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
     """
 
     def setUp(self):
-        super(FileBasedCacheTests, self).setUp()
+        super().setUp()
         self.dirname = tempfile.mkdtemp()
         # Caches location cannot be modified through override_settings / modify_settings,
         # hence settings are manipulated directly here and the setting_changed signal
@@ -1331,7 +1331,7 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         setting_changed.send(self.__class__, setting='CACHES', enter=False)
 
     def tearDown(self):
-        super(FileBasedCacheTests, self).tearDown()
+        super().tearDown()
         # Call parent first, as cache.clear() may recreate cache base directory
         shutil.rmtree(self.dirname)
 
@@ -1962,7 +1962,7 @@ def csrf_view(request):
 class CacheMiddlewareTest(SimpleTestCase):
 
     def setUp(self):
-        super(CacheMiddlewareTest, self).setUp()
+        super().setUp()
         self.factory = RequestFactory()
         self.default_cache = caches['default']
         self.other_cache = caches['other']
@@ -1970,7 +1970,7 @@ class CacheMiddlewareTest(SimpleTestCase):
     def tearDown(self):
         self.default_cache.clear()
         self.other_cache.clear()
-        super(CacheMiddlewareTest, self).tearDown()
+        super().tearDown()
 
     def test_constructor(self):
         """

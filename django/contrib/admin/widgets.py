@@ -29,10 +29,10 @@ class FilteredSelectMultiple(forms.SelectMultiple):
     def __init__(self, verbose_name, is_stacked, attrs=None, choices=()):
         self.verbose_name = verbose_name
         self.is_stacked = is_stacked
-        super(FilteredSelectMultiple, self).__init__(attrs, choices)
+        super().__init__(attrs, choices)
 
     def get_context(self, name, value, attrs=None):
-        context = super(FilteredSelectMultiple, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context['widget']['attrs']['class'] = 'selectfilter'
         if self.is_stacked:
             context['widget']['attrs']['class'] += 'stacked'
@@ -51,7 +51,7 @@ class AdminDateWidget(forms.DateInput):
         final_attrs = {'class': 'vDateField', 'size': '10'}
         if attrs is not None:
             final_attrs.update(attrs)
-        super(AdminDateWidget, self).__init__(attrs=final_attrs, format=format)
+        super().__init__(attrs=final_attrs, format=format)
 
 
 class AdminTimeWidget(forms.TimeInput):
@@ -64,7 +64,7 @@ class AdminTimeWidget(forms.TimeInput):
         final_attrs = {'class': 'vTimeField', 'size': '8'}
         if attrs is not None:
             final_attrs.update(attrs)
-        super(AdminTimeWidget, self).__init__(attrs=final_attrs, format=format)
+        super().__init__(attrs=final_attrs, format=format)
 
 
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
@@ -80,7 +80,7 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
         forms.MultiWidget.__init__(self, widgets, attrs)
 
     def get_context(self, name, value, attrs):
-        context = super(AdminSplitDateTime, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context['date_label'] = _('Date:')
         context['time_label'] = _('Time:')
         return context
@@ -127,10 +127,10 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         self.rel = rel
         self.admin_site = admin_site
         self.db = using
-        super(ForeignKeyRawIdWidget, self).__init__(attrs)
+        super().__init__(attrs)
 
     def get_context(self, name, value, attrs=None):
-        context = super(ForeignKeyRawIdWidget, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         rel_to = self.rel.model
         if rel_to in self.admin_site._registry:
             # The related object is registered with the same AdminSite
@@ -197,7 +197,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     template_name = 'admin/widgets/many_to_many_raw_id.html'
 
     def get_context(self, name, value, attrs=None):
-        context = super(ManyToManyRawIdWidget, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         if self.rel.model in self.admin_site._registry:
             # The related object is registered with the same AdminSite
             context['widget']['attrs']['class'] = 'vManyToManyRawIdAdminField'
@@ -310,7 +310,7 @@ class AdminTextareaWidget(forms.Textarea):
         final_attrs = {'class': 'vLargeTextField'}
         if attrs is not None:
             final_attrs.update(attrs)
-        super(AdminTextareaWidget, self).__init__(attrs=final_attrs)
+        super().__init__(attrs=final_attrs)
 
 
 class AdminTextInputWidget(forms.TextInput):
@@ -318,7 +318,7 @@ class AdminTextInputWidget(forms.TextInput):
         final_attrs = {'class': 'vTextField'}
         if attrs is not None:
             final_attrs.update(attrs)
-        super(AdminTextInputWidget, self).__init__(attrs=final_attrs)
+        super().__init__(attrs=final_attrs)
 
 
 class AdminEmailInputWidget(forms.EmailInput):
@@ -326,7 +326,7 @@ class AdminEmailInputWidget(forms.EmailInput):
         final_attrs = {'class': 'vTextField'}
         if attrs is not None:
             final_attrs.update(attrs)
-        super(AdminEmailInputWidget, self).__init__(attrs=final_attrs)
+        super().__init__(attrs=final_attrs)
 
 
 class AdminURLFieldWidget(forms.URLInput):
@@ -336,17 +336,17 @@ class AdminURLFieldWidget(forms.URLInput):
         final_attrs = {'class': 'vURLField'}
         if attrs is not None:
             final_attrs.update(attrs)
-        super(AdminURLFieldWidget, self).__init__(attrs=final_attrs)
+        super().__init__(attrs=final_attrs)
 
     def get_context(self, name, value, attrs):
-        context = super(AdminURLFieldWidget, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context['current_label'] = _('Currently:')
         context['change_label'] = _('Change:')
         context['widget']['href'] = smart_urlquote(context['widget']['value'])
         return context
 
     def format_value(self, value):
-        value = super(AdminURLFieldWidget, self).format_value(value)
+        value = super().format_value(value)
         return force_text(value)
 
 
@@ -357,7 +357,7 @@ class AdminIntegerFieldWidget(forms.NumberInput):
         final_attrs = {'class': self.class_name}
         if attrs is not None:
             final_attrs.update(attrs)
-        super(AdminIntegerFieldWidget, self).__init__(attrs=final_attrs)
+        super().__init__(attrs=final_attrs)
 
 
 class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget):

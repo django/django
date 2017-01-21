@@ -97,7 +97,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         return placeholder
 
     def get_db_converters(self, expression):
-        converters = super(MySQLOperations, self).get_db_converters(expression)
+        converters = super().get_db_converters(expression)
         if isinstance(expression.output_field, GeometryField) and self.uses_invalid_empty_geometry_collection:
             converters.append(self.convert_invalid_empty_geometry_collection)
         return converters

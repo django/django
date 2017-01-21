@@ -235,10 +235,10 @@ class CustomLoader(EggLoader):
     into one class, this isn't required.
     """
     def setUp(self):
-        super(CustomLoader, self).setUp()
+        super().setUp()
         sys.path_hooks.insert(0, TestFinder)
         sys.path_importer_cache.clear()
 
     def tearDown(self):
-        super(CustomLoader, self).tearDown()
+        super().tearDown()
         sys.path_hooks.pop(0)

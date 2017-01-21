@@ -27,7 +27,7 @@ class TestingHttpRequest(HttpRequest):
     more easily
     """
     def __init__(self):
-        super(TestingHttpRequest, self).__init__()
+        super().__init__()
         # A real session backend isn't needed.
         self.session = {}
 
@@ -432,7 +432,7 @@ class CsrfViewMiddlewareTestMixin:
             HttpRequest that can raise an IOError when accessing POST data
             """
             def __init__(self, token, raise_error):
-                super(CsrfPostRequest, self).__init__()
+                super().__init__()
                 self.method = 'POST'
 
                 self.raise_error = False

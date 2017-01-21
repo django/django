@@ -80,7 +80,7 @@ class Person(models.Model):
 
 class SpyManager(PersonManager):
     def get_queryset(self):
-        return super(SpyManager, self).get_queryset().filter(cover_blown=False)
+        return super().get_queryset().filter(cover_blown=False)
 
 
 class Spy(Person):

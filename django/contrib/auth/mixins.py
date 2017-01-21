@@ -52,7 +52,7 @@ class LoginRequiredMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
-        return super(LoginRequiredMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class PermissionRequiredMixin(AccessMixin):
@@ -88,7 +88,7 @@ class PermissionRequiredMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         if not self.has_permission():
             return self.handle_no_permission()
-        return super(PermissionRequiredMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class UserPassesTestMixin(AccessMixin):
@@ -112,4 +112,4 @@ class UserPassesTestMixin(AccessMixin):
         user_test_result = self.get_test_func()()
         if not user_test_result:
             return self.handle_no_permission()
-        return super(UserPassesTestMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)

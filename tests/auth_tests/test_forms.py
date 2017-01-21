@@ -564,7 +564,7 @@ class UserChangeFormTest(TestDataMixin, TestCase):
 
         class MyUserForm(UserChangeForm):
             def __init__(self, *args, **kwargs):
-                super(MyUserForm, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
                 self.fields['groups'].help_text = 'These groups give users different permissions'
 
             class Meta(UserChangeForm.Meta):
@@ -645,7 +645,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(PasswordResetFormTest, cls).setUpClass()
+        super().setUpClass()
         # This cleanup is necessary because contrib.sites cache
         # makes tests interfere with each other, see #11505
         Site.objects.clear_cache()

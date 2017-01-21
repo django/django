@@ -195,7 +195,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return str(value)
 
     def get_db_converters(self, expression):
-        converters = super(DatabaseOperations, self).get_db_converters(expression)
+        converters = super().get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
         if internal_type == 'DateTimeField':
             converters.append(self.convert_datetimefield_value)
@@ -256,7 +256,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # user-defined function django_power that's registered in connect().
         if connector == '^':
             return 'django_power(%s)' % ','.join(sub_expressions)
-        return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+        return super().combine_expression(connector, sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):
         if connector not in ['+', '-']:

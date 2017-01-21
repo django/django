@@ -19,7 +19,7 @@ class TemplateStrings(BaseEngine):
         if options:
             raise ImproperlyConfigured(
                 "Unknown options: {}".format(", ".join(options)))
-        super(TemplateStrings, self).__init__(params)
+        super().__init__(params)
 
     def from_string(self, template_code):
         return Template(template_code)

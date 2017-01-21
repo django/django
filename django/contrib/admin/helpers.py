@@ -324,7 +324,7 @@ class InlineAdminForm(AdminForm):
         self.original = original
         self.show_url = original and view_on_site_url is not None
         self.absolute_url = view_on_site_url
-        super(InlineAdminForm, self).__init__(form, fieldsets, prepopulated_fields, readonly_fields, model_admin)
+        super().__init__(form, fieldsets, prepopulated_fields, readonly_fields, model_admin)
 
     def __iter__(self):
         for name, options in self.fieldsets:
@@ -366,7 +366,7 @@ class InlineAdminForm(AdminForm):
 class InlineFieldset(Fieldset):
     def __init__(self, formset, *args, **kwargs):
         self.formset = formset
-        super(InlineFieldset, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __iter__(self):
         fk = getattr(self.formset, "fk", None)
@@ -381,7 +381,7 @@ class AdminErrorList(forms.utils.ErrorList):
     Stores all errors for the form/formsets in an add/change stage view.
     """
     def __init__(self, form, inline_formsets):
-        super(AdminErrorList, self).__init__()
+        super().__init__()
 
         if form.is_bound:
             self.extend(form.errors.values())

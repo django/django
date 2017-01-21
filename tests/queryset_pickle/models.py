@@ -16,14 +16,14 @@ class Numbers:
 
 class PreviousDjangoVersionQuerySet(models.QuerySet):
     def __getstate__(self):
-        state = super(PreviousDjangoVersionQuerySet, self).__getstate__()
+        state = super().__getstate__()
         state[DJANGO_VERSION_PICKLE_KEY] = '1.0'
         return state
 
 
 class MissingDjangoVersionQuerySet(models.QuerySet):
     def __getstate__(self):
-        state = super(MissingDjangoVersionQuerySet, self).__getstate__()
+        state = super().__getstate__()
         del state[DJANGO_VERSION_PICKLE_KEY]
         return state
 

@@ -40,7 +40,7 @@ END;
 /"""
 
     def __init__(self, *args, **kwargs):
-        super(DatabaseOperations, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.set_operators['difference'] = 'MINUS'
 
     def autoinc_sql(self, table, column):
@@ -165,7 +165,7 @@ WHEN (new.%(col_name)s IS NULL)
         return sql
 
     def get_db_converters(self, expression):
-        converters = super(DatabaseOperations, self).get_db_converters(expression)
+        converters = super().get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
         if internal_type == 'TextField':
             converters.append(self.convert_textfield_value)
@@ -254,7 +254,7 @@ WHEN (new.%(col_name)s IS NULL)
         statement = cursor.statement
         # Unlike Psycopg's `query` and MySQLdb`'s `_last_executed`, CxOracle's
         # `statement` doesn't contain the query parameters. refs #20010.
-        return super(DatabaseOperations, self).last_executed_query(cursor, statement, params)
+        return super().last_executed_query(cursor, statement, params)
 
     def last_insert_id(self, cursor, table_name, pk_name):
         sq_name = self._get_sequence_name(table_name)
@@ -514,7 +514,7 @@ WHEN (new.%(col_name)s IS NULL)
             return 'FLOOR(%(lhs)s / POWER(2, %(rhs)s))' % {'lhs': lhs, 'rhs': rhs}
         elif connector == '^':
             return 'POWER(%s)' % ','.join(sub_expressions)
-        return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+        return super().combine_expression(connector, sub_expressions)
 
     def _get_sequence_name(self, table):
         name_length = self.max_name_length() - 3
@@ -537,4 +537,4 @@ WHEN (new.%(col_name)s IS NULL)
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
             return "NUMTODSINTERVAL(%s - %s, 'DAY')" % (lhs_sql, rhs_sql), lhs_params + rhs_params
-        return super(DatabaseOperations, self).subtract_temporals(internal_type, lhs, rhs)
+        return super().subtract_temporals(internal_type, lhs, rhs)

@@ -56,7 +56,7 @@ class Q(tree.Node):
     default = AND
 
     def __init__(self, *args, **kwargs):
-        super(Q, self).__init__(children=list(args) + list(kwargs.items()))
+        super().__init__(children=list(args) + list(kwargs.items()))
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):

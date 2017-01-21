@@ -33,7 +33,7 @@ class ModelOperation(Operation):
 
     def reduce(self, operation, in_between, app_label=None):
         return (
-            super(ModelOperation, self).reduce(operation, in_between, app_label=app_label) or
+            super().reduce(operation, in_between, app_label=app_label) or
             not operation.references_model(self.name, app_label)
         )
 
@@ -50,7 +50,7 @@ class CreateModel(ModelOperation):
         self.options = options or {}
         self.bases = bases or (models.Model,)
         self.managers = managers or []
-        super(CreateModel, self).__init__(name)
+        super().__init__(name)
         # Sanity-check that there are no duplicated field names, bases, or
         # manager names
         _check_for_duplicates('fields', (name for name, _ in self.fields))
@@ -223,7 +223,7 @@ class CreateModel(ModelOperation):
                         managers=self.managers,
                     ),
                 ]
-        return super(CreateModel, self).reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, in_between, app_label=app_label)
 
 
 class DeleteModel(ModelOperation):
@@ -266,7 +266,7 @@ class RenameModel(ModelOperation):
     def __init__(self, old_name, new_name):
         self.old_name = old_name
         self.new_name = new_name
-        super(RenameModel, self).__init__(old_name)
+        super().__init__(old_name)
 
     @cached_property
     def old_name_lower(self):
@@ -429,7 +429,7 @@ class AlterModelTable(ModelOperation):
 
     def __init__(self, name, table):
         self.table = table
-        super(AlterModelTable, self).__init__(name)
+        super().__init__(name)
 
     def deconstruct(self):
         kwargs = {
@@ -476,14 +476,14 @@ class AlterModelTable(ModelOperation):
     def reduce(self, operation, in_between, app_label=None):
         if isinstance(operation, (AlterModelTable, DeleteModel)) and self.name_lower == operation.name_lower:
             return [operation]
-        return super(AlterModelTable, self).reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, in_between, app_label=app_label)
 
 
 class ModelOptionOperation(ModelOperation):
     def reduce(self, operation, in_between, app_label=None):
         if isinstance(operation, (self.__class__, DeleteModel)) and self.name_lower == operation.name_lower:
             return [operation]
-        return super(ModelOptionOperation, self).reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, in_between, app_label=app_label)
 
 
 class FieldRelatedOptionOperation(ModelOptionOperation):
@@ -492,7 +492,7 @@ class FieldRelatedOptionOperation(ModelOptionOperation):
                 self.name_lower == operation.model_name_lower and
                 not self.references_field(operation.model_name, operation.name)):
             return [operation, self]
-        return super(FieldRelatedOptionOperation, self).reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, in_between, app_label=app_label)
 
 
 class AlterUniqueTogether(FieldRelatedOptionOperation):
@@ -505,7 +505,7 @@ class AlterUniqueTogether(FieldRelatedOptionOperation):
     def __init__(self, name, unique_together):
         unique_together = normalize_together(unique_together)
         self.unique_together = set(tuple(cons) for cons in unique_together)
-        super(AlterUniqueTogether, self).__init__(name)
+        super().__init__(name)
 
     def deconstruct(self):
         kwargs = {
@@ -559,7 +559,7 @@ class AlterIndexTogether(FieldRelatedOptionOperation):
     def __init__(self, name, index_together):
         index_together = normalize_together(index_together)
         self.index_together = set(tuple(cons) for cons in index_together)
-        super(AlterIndexTogether, self).__init__(name)
+        super().__init__(name)
 
     def deconstruct(self):
         kwargs = {
@@ -610,7 +610,7 @@ class AlterOrderWithRespectTo(FieldRelatedOptionOperation):
 
     def __init__(self, name, order_with_respect_to):
         self.order_with_respect_to = order_with_respect_to
-        super(AlterOrderWithRespectTo, self).__init__(name)
+        super().__init__(name)
 
     def deconstruct(self):
         kwargs = {
@@ -685,7 +685,7 @@ class AlterModelOptions(ModelOptionOperation):
 
     def __init__(self, name, options):
         self.options = options
-        super(AlterModelOptions, self).__init__(name)
+        super().__init__(name)
 
     def deconstruct(self):
         kwargs = {
@@ -726,7 +726,7 @@ class AlterModelManagers(ModelOptionOperation):
 
     def __init__(self, name, managers):
         self.managers = managers
-        super(AlterModelManagers, self).__init__(name)
+        super().__init__(name)
 
     def deconstruct(self):
         return (

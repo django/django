@@ -21,7 +21,7 @@ class MessageEncoder(json.JSONEncoder):
             if obj.extra_tags:
                 message.append(obj.extra_tags)
             return message
-        return super(MessageEncoder, self).default(obj)
+        return super().default(obj)
 
 
 class MessageDecoder(json.JSONDecoder):
@@ -45,7 +45,7 @@ class MessageDecoder(json.JSONDecoder):
         return obj
 
     def decode(self, s, **kwargs):
-        decoded = super(MessageDecoder, self).decode(s, **kwargs)
+        decoded = super().decode(s, **kwargs)
         return self.process_messages(decoded)
 
 

@@ -16,15 +16,9 @@ class SQLCompiler(compiler.SQLCompiler):
         # the SQL needed to use limit/offset with Oracle.
         do_offset = with_limits and (self.query.high_mark is not None or self.query.low_mark)
         if not do_offset:
-            sql, params = super(SQLCompiler, self).as_sql(
-                with_limits=False,
-                with_col_aliases=with_col_aliases,
-            )
+            sql, params = super().as_sql(with_limits=False, with_col_aliases=with_col_aliases)
         else:
-            sql, params = super(SQLCompiler, self).as_sql(
-                with_limits=False,
-                with_col_aliases=True,
-            )
+            sql, params = super().as_sql(with_limits=False, with_col_aliases=True)
             # Wrap the base query in an outer SELECT * with boundaries on
             # the "_RN" column.  This is the canonical way to emulate LIMIT
             # and OFFSET on Oracle.

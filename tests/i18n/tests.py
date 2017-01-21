@@ -233,7 +233,7 @@ class TranslationThreadSafetyTests(SimpleTestCase):
 class FormattingTests(SimpleTestCase):
 
     def setUp(self):
-        super(FormattingTests, self).setUp()
+        super().setUp()
         self.n = decimal.Decimal('66666.666')
         self.f = 99999.999
         self.d = datetime.date(2009, 12, 31)
@@ -981,7 +981,7 @@ class FormattingTests(SimpleTestCase):
 class MiscTests(SimpleTestCase):
 
     def setUp(self):
-        super(MiscTests, self).setUp()
+        super().setUp()
         self.rf = RequestFactory()
 
     @override_settings(LANGUAGE_CODE='de')
@@ -1215,12 +1215,12 @@ class MiscTests(SimpleTestCase):
 class ResolutionOrderI18NTests(SimpleTestCase):
 
     def setUp(self):
-        super(ResolutionOrderI18NTests, self).setUp()
+        super().setUp()
         activate('de')
 
     def tearDown(self):
         deactivate()
-        super(ResolutionOrderI18NTests, self).tearDown()
+        super().tearDown()
 
     def assertUgettext(self, msgid, msgstr):
         result = ugettext(msgid)
@@ -1430,7 +1430,7 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
 class CountrySpecificLanguageTests(SimpleTestCase):
 
     def setUp(self):
-        super(CountrySpecificLanguageTests, self).setUp()
+        super().setUp()
         self.rf = RequestFactory()
 
     def test_check_for_language(self):
@@ -1480,12 +1480,12 @@ class CountrySpecificLanguageTests(SimpleTestCase):
 class TranslationFilesMissing(SimpleTestCase):
 
     def setUp(self):
-        super(TranslationFilesMissing, self).setUp()
+        super().setUp()
         self.gettext_find_builtin = gettext_module.find
 
     def tearDown(self):
         gettext_module.find = self.gettext_find_builtin
-        super(TranslationFilesMissing, self).tearDown()
+        super().tearDown()
 
     def patchGettextFind(self):
         gettext_module.find = lambda *args, **kw: None

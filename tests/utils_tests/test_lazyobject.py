@@ -366,7 +366,7 @@ class BaseBaz:
 
     def __reduce__(self):
         self.baz = 'right'
-        return super(BaseBaz, self).__reduce__()
+        return super().__reduce__()
 
     def __eq__(self, other):
         if self.__class__ != other.__class__:
@@ -385,11 +385,11 @@ class Baz(BaseBaz):
     """
     def __init__(self, bar):
         self.bar = bar
-        super(Baz, self).__init__()
+        super().__init__()
 
     def __reduce_ex__(self, proto):
         self.quux = 'quux'
-        return super(Baz, self).__reduce_ex__(proto)
+        return super().__reduce_ex__(proto)
 
 
 class BazProxy(Baz):
@@ -401,6 +401,7 @@ class BazProxy(Baz):
     def __init__(self, baz):
         self.__dict__ = baz.__dict__
         self._baz = baz
+        # Grandparent super
         super(BaseBaz, self).__init__()
 
 

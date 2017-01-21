@@ -564,7 +564,7 @@ class CustomStorageTests(FileStorageTests):
 class DiscardingFalseContentStorage(FileSystemStorage):
     def _save(self, name, content):
         if content:
-            return super(DiscardingFalseContentStorage, self)._save(name, content)
+            return super()._save(name, content)
         return ''
 
 
@@ -804,7 +804,7 @@ class FileFieldStorageTests(TestCase):
 class SlowFile(ContentFile):
     def chunks(self):
         time.sleep(1)
-        return super(ContentFile, self).chunks()
+        return super().chunks()
 
 
 class FileSaveRaceConditionTest(SimpleTestCase):

@@ -49,4 +49,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         """
         if self.connection.oracle_full_version < '11.2.0.2' and field and field.has_default() and created_separately:
             return 'IntegerField'
-        return super(DatabaseFeatures, self).introspected_boolean_field_type(field, created_separately)
+        return super().introspected_boolean_field_type(field, created_separately)

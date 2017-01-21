@@ -21,7 +21,7 @@ class SessionStore(SessionBase):
     def __init__(self, session_key=None):
         self.storage_path = type(self)._get_storage_path()
         self.file_prefix = settings.SESSION_COOKIE_NAME
-        super(SessionStore, self).__init__(session_key)
+        super().__init__(session_key)
 
     @classmethod
     def _get_storage_path(cls):

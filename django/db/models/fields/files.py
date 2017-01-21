@@ -15,7 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 
 class FieldFile(File):
     def __init__(self, instance, field, name):
-        super(FieldFile, self).__init__(None, name)
+        super().__init__(None, name)
         self.instance = instance
         self.field = field
         self.storage = field.storage
@@ -228,10 +228,10 @@ class FileField(Field):
         self.upload_to = upload_to
 
         kwargs['max_length'] = kwargs.get('max_length', 100)
-        super(FileField, self).__init__(verbose_name, name, **kwargs)
+        super().__init__(verbose_name, name, **kwargs)
 
     def check(self, **kwargs):
-        errors = super(FileField, self).check(**kwargs)
+        errors = super().check(**kwargs)
         errors.extend(self._check_primary_key())
         errors.extend(self._check_upload_to())
         return errors
@@ -263,7 +263,7 @@ class FileField(Field):
             return []
 
     def deconstruct(self):
-        name, path, args, kwargs = super(FileField, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         if kwargs.get("max_length") == 100:
             del kwargs["max_length"]
         kwargs['upload_to'] = self.upload_to
@@ -276,7 +276,7 @@ class FileField(Field):
 
     def get_prep_value(self, value):
         "Returns field's value prepared for saving into a database."
-        value = super(FileField, self).get_prep_value(value)
+        value = super().get_prep_value(value)
         # Need to convert File objects provided via a form to string for database insertion
         if value is None:
             return None
@@ -284,14 +284,14 @@ class FileField(Field):
 
     def pre_save(self, model_instance, add):
         "Returns field's value just before saving."
-        file = super(FileField, self).pre_save(model_instance, add)
+        file = super().pre_save(model_instance, add)
         if file and not file._committed:
             # Commit the file to storage prior to saving the model
             file.save(file.name, file.file, save=False)
         return file
 
     def contribute_to_class(self, cls, name, **kwargs):
-        super(FileField, self).contribute_to_class(cls, name, **kwargs)
+        super().contribute_to_class(cls, name, **kwargs)
         setattr(cls, self.name, self.descriptor_class(self))
 
     def generate_filename(self, instance, filename):
@@ -330,7 +330,7 @@ class FileField(Field):
         if 'initial' in kwargs:
             defaults['required'] = False
         defaults.update(kwargs)
-        return super(FileField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 class ImageFileDescriptor(FileDescriptor):
@@ -340,7 +340,7 @@ class ImageFileDescriptor(FileDescriptor):
     """
     def __set__(self, instance, value):
         previous_file = instance.__dict__.get(self.field.name)
-        super(ImageFileDescriptor, self).__set__(instance, value)
+        super().__set__(instance, value)
 
         # To prevent recalculating image dimensions when we are instantiating
         # an object from the database (bug #11084), only update dimensions if
@@ -360,7 +360,7 @@ class ImageFieldFile(ImageFile, FieldFile):
         # Clear the image dimensions cache
         if hasattr(self, '_dimensions_cache'):
             del self._dimensions_cache
-        super(ImageFieldFile, self).delete(save)
+        super().delete(save)
 
 
 class ImageField(FileField):
@@ -371,10 +371,10 @@ class ImageField(FileField):
 
     def __init__(self, verbose_name=None, name=None, width_field=None, height_field=None, **kwargs):
         self.width_field, self.height_field = width_field, height_field
-        super(ImageField, self).__init__(verbose_name, name, **kwargs)
+        super().__init__(verbose_name, name, **kwargs)
 
     def check(self, **kwargs):
-        errors = super(ImageField, self).check(**kwargs)
+        errors = super().check(**kwargs)
         errors.extend(self._check_image_library_installed())
         return errors
 
@@ -395,7 +395,7 @@ class ImageField(FileField):
             return []
 
     def deconstruct(self):
-        name, path, args, kwargs = super(ImageField, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         if self.width_field:
             kwargs['width_field'] = self.width_field
         if self.height_field:
@@ -403,7 +403,7 @@ class ImageField(FileField):
         return name, path, args, kwargs
 
     def contribute_to_class(self, cls, name, **kwargs):
-        super(ImageField, self).contribute_to_class(cls, name, **kwargs)
+        super().contribute_to_class(cls, name, **kwargs)
         # Attach update_dimension_fields so that dimension fields declared
         # after their corresponding image field don't stay cleared by
         # Model.__init__, see bug #11196.
@@ -471,4 +471,4 @@ class ImageField(FileField):
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.ImageField}
         defaults.update(kwargs)
-        return super(ImageField, self).formfield(**defaults)
+        return super().formfield(**defaults)

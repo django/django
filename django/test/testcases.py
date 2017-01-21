@@ -66,10 +66,10 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
     def __init__(self, test_case, num, connection):
         self.test_case = test_case
         self.num = num
-        super(_AssertNumQueriesContext, self).__init__(connection)
+        super().__init__(connection)
 
     def __exit__(self, exc_type, exc_value, traceback):
-        super(_AssertNumQueriesContext, self).__exit__(exc_type, exc_value, traceback)
+        super().__exit__(exc_type, exc_value, traceback)
         if exc_type is not None:
             return
         executed = len(self)
@@ -157,7 +157,7 @@ class SimpleTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(SimpleTestCase, cls).setUpClass()
+        super().setUpClass()
         if cls._overridden_settings:
             cls._cls_overridden_context = override_settings(**cls._overridden_settings)
             cls._cls_overridden_context.enable()
@@ -183,7 +183,7 @@ class SimpleTestCase(unittest.TestCase):
         if hasattr(cls, '_cls_overridden_context'):
             cls._cls_overridden_context.disable()
             delattr(cls, '_cls_overridden_context')
-        super(SimpleTestCase, cls).tearDownClass()
+        super().tearDownClass()
 
     def __call__(self, result=None):
         """
@@ -203,7 +203,7 @@ class SimpleTestCase(unittest.TestCase):
             except Exception:
                 result.addError(self, sys.exc_info())
                 return
-        super(SimpleTestCase, self).__call__(result)
+        super().__call__(result)
         if not skipped:
             try:
                 self._post_teardown()
@@ -799,7 +799,7 @@ class TransactionTestCase(SimpleTestCase):
           run with the correct set of applications for the test case.
         * If the class has a 'fixtures' attribute, installing these fixtures.
         """
-        super(TransactionTestCase, self)._pre_setup()
+        super()._pre_setup()
         if self.available_apps is not None:
             apps.set_available_apps(self.available_apps)
             setting_changed.send(
@@ -881,7 +881,7 @@ class TransactionTestCase(SimpleTestCase):
         """
         try:
             self._fixture_teardown()
-            super(TransactionTestCase, self)._post_teardown()
+            super()._post_teardown()
             if self._should_reload_connections():
                 # Some DB cursors include SQL statements as part of cursor
                 # creation. If you have a test that does a rollback, the effect
@@ -980,7 +980,7 @@ class TestCase(TransactionTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestCase, cls).setUpClass()
+        super().setUpClass()
         if not connections_support_transactions():
             return
         cls.cls_atomics = cls._enter_atomics()
@@ -1008,7 +1008,7 @@ class TestCase(TransactionTestCase):
             cls._rollback_atomics(cls.cls_atomics)
             for conn in connections.all():
                 conn.close()
-        super(TestCase, cls).tearDownClass()
+        super().tearDownClass()
 
     @classmethod
     def setUpTestData(cls):
@@ -1018,21 +1018,21 @@ class TestCase(TransactionTestCase):
     def _should_reload_connections(self):
         if connections_support_transactions():
             return False
-        return super(TestCase, self)._should_reload_connections()
+        return super()._should_reload_connections()
 
     def _fixture_setup(self):
         if not connections_support_transactions():
             # If the backend does not support transactions, we should reload
             # class data before each test
             self.setUpTestData()
-            return super(TestCase, self)._fixture_setup()
+            return super()._fixture_setup()
 
         assert not self.reset_sequences, 'reset_sequences cannot be used on TestCase instances'
         self.atomics = self._enter_atomics()
 
     def _fixture_teardown(self):
         if not connections_support_transactions():
-            return super(TestCase, self)._fixture_teardown()
+            return super()._fixture_teardown()
         try:
             for db_name in reversed(self._databases_names()):
                 if self._should_check_constraints(connections[db_name]):
@@ -1141,7 +1141,7 @@ class FSFilesHandler(WSGIHandler):
     def __init__(self, application):
         self.application = application
         self.base_url = urlparse(self.get_base_url())
-        super(FSFilesHandler, self).__init__()
+        super().__init__()
 
     def _should_handle(self, path):
         """
@@ -1167,7 +1167,7 @@ class FSFilesHandler(WSGIHandler):
                 return self.serve(request)
             except Http404:
                 pass
-        return super(FSFilesHandler, self).get_response(request)
+        return super().get_response(request)
 
     def serve(self, request):
         os_rel_path = self.file_path(request.path)
@@ -1181,7 +1181,7 @@ class FSFilesHandler(WSGIHandler):
     def __call__(self, environ, start_response):
         if not self._should_handle(get_path_info(environ)):
             return self.application(environ, start_response)
-        return super(FSFilesHandler, self).__call__(environ, start_response)
+        return super().__call__(environ, start_response)
 
 
 class _StaticFilesHandler(FSFilesHandler):
@@ -1222,7 +1222,7 @@ class LiveServerThread(threading.Thread):
         self.error = None
         self.static_handler = static_handler
         self.connections_override = connections_override
-        super(LiveServerThread, self).__init__()
+        super().__init__()
 
     def run(self):
         """
@@ -1280,7 +1280,7 @@ class LiveServerTestCase(TransactionTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(LiveServerTestCase, cls).setUpClass()
+        super().setUpClass()
         connections_override = {}
         for conn in connections.all():
             # If using in-memory sqlite databases, pass the connections to
@@ -1331,7 +1331,7 @@ class LiveServerTestCase(TransactionTestCase):
     def tearDownClass(cls):
         cls._tearDownClassInternal()
         cls._live_server_modified_settings.disable()
-        super(LiveServerTestCase, cls).tearDownClass()
+        super().tearDownClass()
 
 
 class SerializeMixin:
@@ -1354,9 +1354,9 @@ class SerializeMixin:
                 "in the base class.".format(cls.__name__))
         cls._lockfile = open(cls.lockfile)
         locks.lock(cls._lockfile, locks.LOCK_EX)
-        super(SerializeMixin, cls).setUpClass()
+        super().setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        super(SerializeMixin, cls).tearDownClass()
+        super().tearDownClass()
         cls._lockfile.close()

@@ -59,7 +59,7 @@ class Serializer(PythonSerializer):
         self._current = None
 
     def getvalue(self):
-        # Grand-parent super
+        # Grandparent super
         return super(PythonSerializer, self).getvalue()
 
 
@@ -108,4 +108,4 @@ class DjangoJSONEncoder(json.JSONEncoder):
         elif isinstance(o, (decimal.Decimal, uuid.UUID, Promise)):
             return str(o)
         else:
-            return super(DjangoJSONEncoder, self).default(o)
+            return super().default(o)

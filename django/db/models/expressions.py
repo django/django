@@ -157,7 +157,7 @@ class BaseExpression:
         ```
         def override_as_sql(self, compiler, connection):
             # custom logic
-            return super(Expression, self).as_sql(compiler, connection)
+            return super().as_sql(compiler, connection)
         setattr(Expression, 'as_' + connection.vendor, override_as_sql)
         ```
 
@@ -351,7 +351,7 @@ class Expression(BaseExpression, Combinable):
 class CombinedExpression(Expression):
 
     def __init__(self, lhs, connector, rhs, output_field=None):
-        super(CombinedExpression, self).__init__(output_field=output_field)
+        super().__init__(output_field=output_field)
         self.connector = connector
         self.lhs = lhs
         self.rhs = rhs
@@ -437,7 +437,7 @@ class DurationExpression(CombinedExpression):
 
 class TemporalSubtraction(CombinedExpression):
     def __init__(self, lhs, rhs):
-        super(TemporalSubtraction, self).__init__(lhs, self.SUB, rhs, output_field=fields.DurationField())
+        super().__init__(lhs, self.SUB, rhs, output_field=fields.DurationField())
 
     def as_sql(self, compiler, connection):
         connection.ops.check_expression_support(self)
@@ -517,7 +517,7 @@ class Func(Expression):
                 )
             )
         output_field = extra.pop('output_field', None)
-        super(Func, self).__init__(output_field=output_field)
+        super().__init__(output_field=output_field)
         self.source_expressions = self._parse_expressions(*expressions)
         self.extra = extra
 
@@ -573,7 +573,7 @@ class Func(Expression):
         return sql, params
 
     def copy(self):
-        copy = super(Func, self).copy()
+        copy = super().copy()
         copy.source_expressions = self.source_expressions[:]
         copy.extra = self.extra.copy()
         return copy
@@ -592,7 +592,7 @@ class Value(Expression):
          * output_field: an instance of the model field type that this
            expression will return, such as IntegerField() or CharField().
         """
-        super(Value, self).__init__(output_field=output_field)
+        super().__init__(output_field=output_field)
         self.value = value
 
     def __repr__(self):
@@ -617,7 +617,7 @@ class Value(Expression):
         return '%s', [val]
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        c = super(Value, self).resolve_expression(query, allow_joins, reuse, summarize, for_save)
+        c = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
         c.for_save = for_save
         return c
 
@@ -629,7 +629,7 @@ class DurationValue(Value):
     def as_sql(self, compiler, connection):
         connection.ops.check_expression_support(self)
         if connection.features.has_native_duration_field:
-            return super(DurationValue, self).as_sql(compiler, connection)
+            return super().as_sql(compiler, connection)
         return connection.ops.date_interval_sql(self.value)
 
 
@@ -638,7 +638,7 @@ class RawSQL(Expression):
         if output_field is None:
             output_field = fields.Field()
         self.sql, self.params = sql, params
-        super(RawSQL, self).__init__(output_field=output_field)
+        super().__init__(output_field=output_field)
 
     def __repr__(self):
         return "{}({}, {})".format(self.__class__.__name__, self.sql, self.params)
@@ -660,7 +660,7 @@ class Star(Expression):
 
 class Random(Expression):
     def __init__(self):
-        super(Random, self).__init__(output_field=fields.FloatField())
+        super().__init__(output_field=fields.FloatField())
 
     def __repr__(self):
         return "Random()"
@@ -676,7 +676,7 @@ class Col(Expression):
     def __init__(self, alias, target, output_field=None):
         if output_field is None:
             output_field = target
-        super(Col, self).__init__(output_field=output_field)
+        super().__init__(output_field=output_field)
         self.alias, self.target = alias, target
 
     def __repr__(self):
@@ -706,7 +706,7 @@ class Ref(Expression):
     qs.annotate(sum_cost=Sum('cost')) query.
     """
     def __init__(self, refs, source):
-        super(Ref, self).__init__()
+        super().__init__()
         self.refs, self.source = refs, source
 
     def __repr__(self):
@@ -740,7 +740,7 @@ class ExpressionWrapper(Expression):
     """
 
     def __init__(self, expression, output_field):
-        super(ExpressionWrapper, self).__init__(output_field=output_field)
+        super().__init__(output_field=output_field)
         self.expression = expression
 
     def set_source_expressions(self, exprs):
@@ -764,7 +764,7 @@ class When(Expression):
             condition, lookups = Q(**lookups), None
         if condition is None or not isinstance(condition, Q) or lookups:
             raise TypeError("__init__() takes either a Q object or lookups as keyword arguments")
-        super(When, self).__init__(output_field=None)
+        super().__init__(output_field=None)
         self.condition = condition
         self.result = self._parse_expressions(then)[0]
 
@@ -833,7 +833,7 @@ class Case(Expression):
             raise TypeError("Positional arguments must all be When objects.")
         default = extra.pop('default', None)
         output_field = extra.pop('output_field', None)
-        super(Case, self).__init__(output_field)
+        super().__init__(output_field)
         self.cases = list(cases)
         self.default = self._parse_expressions(default)[0]
         self.extra = extra
@@ -860,7 +860,7 @@ class Case(Expression):
         return c
 
     def copy(self):
-        c = super(Case, self).copy()
+        c = super().copy()
         c.cases = c.cases[:]
         return c
 
@@ -905,10 +905,10 @@ class Subquery(Expression):
         self.extra = extra
         if output_field is None and len(self.queryset.query.select) == 1:
             output_field = self.queryset.query.select[0].field
-        super(Subquery, self).__init__(output_field)
+        super().__init__(output_field)
 
     def copy(self):
-        clone = super(Subquery, self).copy()
+        clone = super().copy()
         clone.queryset = clone.queryset.all()
         return clone
 
@@ -985,7 +985,7 @@ class Exists(Subquery):
 
     def __init__(self, *args, **kwargs):
         self.negated = kwargs.pop('negated', False)
-        super(Exists, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __invert__(self):
         return type(self)(self.queryset, self.output_field, negated=(not self.negated), **self.extra)
@@ -998,10 +998,10 @@ class Exists(Subquery):
         # As a performance optimization, remove ordering since EXISTS doesn't
         # care about it, just whether or not a row matches.
         self.queryset = self.queryset.order_by()
-        return super(Exists, self).resolve_expression(query, **kwargs)
+        return super().resolve_expression(query, **kwargs)
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
-        sql, params = super(Exists, self).as_sql(compiler, connection, template, **extra_context)
+        sql, params = super().as_sql(compiler, connection, template, **extra_context)
         if self.negated:
             sql = 'NOT {}'.format(sql)
         return sql, params

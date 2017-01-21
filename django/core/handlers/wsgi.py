@@ -141,7 +141,7 @@ class WSGIHandler(base.BaseHandler):
     request_class = WSGIRequest
 
     def __init__(self, *args, **kwargs):
-        super(WSGIHandler, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.load_middleware()
 
     def __call__(self, environ, start_response):

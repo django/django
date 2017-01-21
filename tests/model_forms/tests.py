@@ -216,7 +216,7 @@ class ModelFormBaseTest(TestCase):
                 fields = '__all__'
 
             def __init__(self, *args, **kwargs):
-                super(FormForTestingIsValid, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
                 self.fields['character'].required = False
 
         char = Character.objects.create(username='user',
@@ -245,7 +245,7 @@ class ModelFormBaseTest(TestCase):
                 fields = '__all__'
 
             def __init__(self, *args, **kwargs):
-                super(AwardForm, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
                 self.fields['character'].required = False
 
         character = Character.objects.create(username='user', last_action=datetime.datetime.today())
@@ -2947,7 +2947,7 @@ class LocalizedModelFormTest(TestCase):
 
 class CustomMetaclass(ModelFormMetaclass):
     def __new__(cls, name, bases, attrs):
-        new = super(CustomMetaclass, cls).__new__(cls, name, bases, attrs)
+        new = super().__new__(cls, name, bases, attrs)
         new.base_fields = {}
         return new
 

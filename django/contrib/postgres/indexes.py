@@ -10,7 +10,7 @@ class BrinIndex(Index):
         if pages_per_range is not None and pages_per_range <= 0:
             raise ValueError('pages_per_range must be None or a positive integer')
         self.pages_per_range = pages_per_range
-        super(BrinIndex, self).__init__(fields, name)
+        super().__init__(fields, name)
 
     def __repr__(self):
         if self.pages_per_range is not None:
@@ -20,15 +20,15 @@ class BrinIndex(Index):
                 'pages_per_range': self.pages_per_range,
             }
         else:
-            return super(BrinIndex, self).__repr__()
+            return super().__repr__()
 
     def deconstruct(self):
-        path, args, kwargs = super(BrinIndex, self).deconstruct()
+        path, args, kwargs = super().deconstruct()
         kwargs['pages_per_range'] = self.pages_per_range
         return path, args, kwargs
 
     def get_sql_create_template_values(self, model, schema_editor, using):
-        parameters = super(BrinIndex, self).get_sql_create_template_values(model, schema_editor, using=' USING brin')
+        parameters = super().get_sql_create_template_values(model, schema_editor, using=' USING brin')
         if self.pages_per_range is not None:
             parameters['extra'] = ' WITH (pages_per_range={})'.format(
                 schema_editor.quote_value(self.pages_per_range)) + parameters['extra']
@@ -39,4 +39,4 @@ class GinIndex(Index):
     suffix = 'gin'
 
     def create_sql(self, model, schema_editor):
-        return super(GinIndex, self).create_sql(model, schema_editor, using=' USING gin')
+        return super().create_sql(model, schema_editor, using=' USING gin')

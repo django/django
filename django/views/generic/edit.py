@@ -91,7 +91,7 @@ class FormMixin(ContextMixin):
         """
         if 'form' not in kwargs:
             kwargs['form'] = self.get_form()
-        return super(FormMixin, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ModelFormMixin(FormMixin, SingleObjectMixin):
@@ -135,7 +135,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         """
         Returns the keyword arguments for instantiating the form.
         """
-        kwargs = super(ModelFormMixin, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         if hasattr(self, 'object'):
             kwargs.update({'instance': self.object})
         return kwargs
@@ -160,7 +160,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
         If the form is valid, save the associated model.
         """
         self.object = form.save()
-        return super(ModelFormMixin, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class ProcessFormView(View):
@@ -210,11 +210,11 @@ class BaseCreateView(ModelFormMixin, ProcessFormView):
     """
     def get(self, request, *args, **kwargs):
         self.object = None
-        return super(BaseCreateView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = None
-        return super(BaseCreateView, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 class CreateView(SingleObjectTemplateResponseMixin, BaseCreateView):
@@ -233,11 +233,11 @@ class BaseUpdateView(ModelFormMixin, ProcessFormView):
     """
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return super(BaseUpdateView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return super(BaseUpdateView, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 class UpdateView(SingleObjectTemplateResponseMixin, BaseUpdateView):

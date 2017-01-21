@@ -55,4 +55,4 @@ class FlatpageForm(forms.ModelForm):
                         params={'url': url, 'site': site},
                     )
 
-        return super(FlatpageForm, self).clean()
+        return super().clean()

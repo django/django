@@ -102,7 +102,7 @@ class SingleObjectMixin(ContextMixin):
             if context_object_name:
                 context[context_object_name] = self.object
         context.update(kwargs)
-        return super(SingleObjectMixin, self).get_context_data(**context)
+        return super().get_context_data(**context)
 
 
 class BaseDetailView(SingleObjectMixin, View):
@@ -130,7 +130,7 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
         * ``<app_label>/<model_name><template_name_suffix>.html``
         """
         try:
-            names = super(SingleObjectTemplateResponseMixin, self).get_template_names()
+            names = super().get_template_names()
         except ImproperlyConfigured:
             # If template_name isn't specified, it's not a problem --
             # we just start with an empty list.

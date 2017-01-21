@@ -49,7 +49,7 @@ class SDORelate(SpatialOperator):
 
     def as_sql(self, connection, lookup, template_params, sql_params):
         template_params['mask'] = sql_params.pop()
-        return super(SDORelate, self).as_sql(connection, lookup, template_params, sql_params)
+        return super().as_sql(connection, lookup, template_params, sql_params)
 
 
 class SDOIsValid(SpatialOperator):
@@ -143,10 +143,10 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         return unsupported
 
     def geo_quote_name(self, name):
-        return super(OracleOperations, self).geo_quote_name(name).upper()
+        return super().geo_quote_name(name).upper()
 
     def get_db_converters(self, expression):
-        converters = super(OracleOperations, self).get_db_converters(expression)
+        converters = super().get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
         geometry_fields = (
             'PointField', 'GeometryField', 'LineStringField',
@@ -271,4 +271,4 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         """
         if placeholder == 'NULL':
             return []
-        return super(OracleOperations, self).modify_insert_params(placeholder, params)
+        return super().modify_insert_params(placeholder, params)

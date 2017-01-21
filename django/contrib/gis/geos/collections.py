@@ -37,7 +37,7 @@ class GeometryCollection(GEOSGeometry):
 
         # Creating the geometry pointer array.
         collection = self._create_collection(len(init_geoms), iter(init_geoms))
-        super(GeometryCollection, self).__init__(collection, **kwargs)
+        super().__init__(collection, **kwargs)
 
     def __iter__(self):
         "Iterates over each Geometry in the Collection."
@@ -89,7 +89,7 @@ class GeometryCollection(GEOSGeometry):
                     for geom in self
                 ],
             })
-        return super(GeometryCollection, self).json
+        return super().json
     geojson = json
 
     @property
@@ -118,7 +118,7 @@ class MultiLineString(LinearGeometryMixin, GeometryCollection):
     def closed(self):
         if geos_version_info()['version'] < '3.5':
             raise GEOSException("MultiLineString.closed requires GEOS >= 3.5.0.")
-        return super(MultiLineString, self).closed
+        return super().closed
 
 
 class MultiPolygon(GeometryCollection):

@@ -348,7 +348,7 @@ class SimpleLazyObject(LazyObject):
         value.
         """
         self.__dict__['_setupfunc'] = func
-        super(SimpleLazyObject, self).__init__()
+        super().__init__()
 
     def _setup(self):
         self._wrapped = self._setupfunc()

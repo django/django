@@ -11,7 +11,7 @@ class Loader(BaseLoader):
 
     def __init__(self, engine, templates_dict):
         self.templates_dict = templates_dict
-        super(Loader, self).__init__(engine)
+        super().__init__(engine)
 
     def get_contents(self, origin):
         try:

@@ -15,7 +15,7 @@ class ExceptionThatFailsUnpickling(Exception):
     arguments passed to __init__().
     """
     def __init__(self, arg):
-        super(ExceptionThatFailsUnpickling, self).__init__()
+        super().__init__()
 
 
 class ParallelTestRunnerTest(SimpleTestCase):

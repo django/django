@@ -27,7 +27,7 @@ class Polygon(GEOSGeometry):
         ...                ((4, 4), (4, 6), (6, 6), (6, 4), (4, 4)))
         """
         if not args:
-            super(Polygon, self).__init__(self._create_polygon(0, None), **kwargs)
+            super().__init__(self._create_polygon(0, None), **kwargs)
             return
 
         # Getting the ext_ring and init_holes parameters from the argument list
@@ -45,7 +45,7 @@ class Polygon(GEOSGeometry):
                 n_holes = len(init_holes)
 
         polygon = self._create_polygon(n_holes + 1, (ext_ring,) + init_holes)
-        super(Polygon, self).__init__(polygon, **kwargs)
+        super().__init__(polygon, **kwargs)
 
     def __iter__(self):
         "Iterates over each ring in the polygon."

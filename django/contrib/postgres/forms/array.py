@@ -20,7 +20,7 @@ class SimpleArrayField(forms.CharField):
     def __init__(self, base_field, delimiter=',', max_length=None, min_length=None, *args, **kwargs):
         self.base_field = base_field
         self.delimiter = delimiter
-        super(SimpleArrayField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if min_length is not None:
             self.min_length = min_length
             self.validators.append(ArrayMinLengthValidator(int(min_length)))
@@ -57,7 +57,7 @@ class SimpleArrayField(forms.CharField):
         return values
 
     def validate(self, value):
-        super(SimpleArrayField, self).validate(value)
+        super().validate(value)
         errors = []
         for index, item in enumerate(value):
             try:
@@ -73,7 +73,7 @@ class SimpleArrayField(forms.CharField):
             raise ValidationError(errors)
 
     def run_validators(self, value):
-        super(SimpleArrayField, self).run_validators(value)
+        super().run_validators(value)
         errors = []
         for index, item in enumerate(value):
             try:
@@ -94,7 +94,7 @@ class SplitArrayWidget(forms.Widget):
     def __init__(self, widget, size, **kwargs):
         self.widget = widget() if isinstance(widget, type) else widget
         self.size = size
-        super(SplitArrayWidget, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @property
     def is_hidden(self):
@@ -141,7 +141,7 @@ class SplitArrayWidget(forms.Widget):
         return self.widget.media
 
     def __deepcopy__(self, memo):
-        obj = super(SplitArrayWidget, self).__deepcopy__(memo)
+        obj = super().__deepcopy__(memo)
         obj.widget = copy.deepcopy(self.widget)
         return obj
 
@@ -161,7 +161,7 @@ class SplitArrayField(forms.Field):
         self.remove_trailing_nulls = remove_trailing_nulls
         widget = SplitArrayWidget(widget=base_field.widget, size=size)
         kwargs.setdefault('widget', widget)
-        super(SplitArrayField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def clean(self, value):
         cleaned_data = []

@@ -12,7 +12,7 @@ from .base import Loader as BaseLoader
 class Loader(BaseLoader):
 
     def __init__(self, engine, dirs=None):
-        super(Loader, self).__init__(engine)
+        super().__init__(engine)
         self.dirs = dirs
 
     def get_dirs(self):

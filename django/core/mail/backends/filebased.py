@@ -40,7 +40,7 @@ class EmailBackend(ConsoleEmailBackend):
         # Since we're using the console-based backend as a base,
         # force the stream to be None, so we don't default to stdout
         kwargs['stream'] = None
-        super(EmailBackend, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def write_message(self, message):
         self.stream.write(message.message().as_bytes() + b'\n')

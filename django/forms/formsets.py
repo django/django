@@ -39,7 +39,7 @@ class ManagementForm(Form):
         # code. The POST value of them returned from the client is not checked.
         self.base_fields[MIN_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
-        super(ManagementForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 @html_safe

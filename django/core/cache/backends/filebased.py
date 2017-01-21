@@ -17,7 +17,7 @@ class FileBasedCache(BaseCache):
     cache_suffix = '.djcache'
 
     def __init__(self, dir, params):
-        super(FileBasedCache, self).__init__(params)
+        super().__init__(params)
         self._dir = os.path.abspath(dir)
         self._createdir()
 

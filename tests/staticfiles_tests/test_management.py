@@ -161,14 +161,14 @@ class TestCollectionClear(CollectionTestCase):
         clear_filepath = os.path.join(settings.STATIC_ROOT, 'cleared.txt')
         with open(clear_filepath, 'w') as f:
             f.write('should be cleared')
-        super(TestCollectionClear, self).run_collectstatic(clear=True)
+        super().run_collectstatic(clear=True)
 
     def test_cleared_not_found(self):
         self.assertFileNotFound('cleared.txt')
 
     def test_dir_not_exists(self, **kwargs):
         shutil.rmtree(settings.STATIC_ROOT)
-        super(TestCollectionClear, self).run_collectstatic(clear=True)
+        super().run_collectstatic(clear=True)
 
     @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.PathNotImplementedStorage')
     def test_handle_path_notimplemented(self):
@@ -234,8 +234,7 @@ class TestCollectionExcludeNoDefaultIgnore(TestDefaults, CollectionTestCase):
     ``collectstatic`` management command.
     """
     def run_collectstatic(self):
-        super(TestCollectionExcludeNoDefaultIgnore, self).run_collectstatic(
-            use_default_ignore_patterns=False)
+        super().run_collectstatic(use_default_ignore_patterns=False)
 
     def test_no_common_ignore_patterns(self):
         """
@@ -266,7 +265,7 @@ class TestCollectionDryRun(TestNoFilesCreated, CollectionTestCase):
     Test ``--dry-run`` option for ``collectstatic`` management command.
     """
     def run_collectstatic(self):
-        super(TestCollectionDryRun, self).run_collectstatic(dry_run=True)
+        super().run_collectstatic(dry_run=True)
 
 
 class TestCollectionFilesOverride(CollectionTestCase):
@@ -308,10 +307,10 @@ class TestCollectionFilesOverride(CollectionTestCase):
         with extend_sys_path(self.temp_dir):
             self.settings_with_test_app.enable()
 
-        super(TestCollectionFilesOverride, self).setUp()
+        super().setUp()
 
     def tearDown(self):
-        super(TestCollectionFilesOverride, self).tearDown()
+        super().tearDown()
         self.settings_with_test_app.disable()
 
     def test_ordering_override(self):
@@ -422,7 +421,7 @@ class TestCollectionLinks(TestDefaults, CollectionTestCase):
     ``--link`` does not change the file-selection semantics.
     """
     def run_collectstatic(self, clear=False, link=True, **kwargs):
-        super(TestCollectionLinks, self).run_collectstatic(link=link, clear=clear, **kwargs)
+        super().run_collectstatic(link=link, clear=clear, **kwargs)
 
     def test_links_created(self):
         """

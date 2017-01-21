@@ -42,11 +42,11 @@ class Person(models.Model):
 class BookManager(models.Manager):
     def create(self, *args, **kwargs):
         kwargs.pop('extra_arg', None)
-        return super(BookManager, self).create(*args, **kwargs)
+        return super().create(*args, **kwargs)
 
     def get_or_create(self, *args, **kwargs):
         kwargs.pop('extra_arg', None)
-        return super(BookManager, self).get_or_create(*args, **kwargs)
+        return super().get_or_create(*args, **kwargs)
 
 
 class Book(models.Model):

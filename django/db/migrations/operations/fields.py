@@ -31,7 +31,7 @@ class FieldOperation(Operation):
 
     def reduce(self, operation, in_between, app_label=None):
         return (
-            super(FieldOperation, self).reduce(operation, in_between, app_label=app_label) or
+            super().reduce(operation, in_between, app_label=app_label) or
             not operation.references_field(self.model_name, self.name, app_label)
         )
 
@@ -44,7 +44,7 @@ class AddField(FieldOperation):
     def __init__(self, model_name, name, field, preserve_default=True):
         self.field = field
         self.preserve_default = preserve_default
-        super(AddField, self).__init__(model_name, name)
+        super().__init__(model_name, name)
 
     def deconstruct(self):
         kwargs = {
@@ -114,7 +114,7 @@ class AddField(FieldOperation):
                         field=self.field,
                     ),
                 ]
-        return super(AddField, self).reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, in_between, app_label=app_label)
 
 
 class RemoveField(FieldOperation):
@@ -169,7 +169,7 @@ class AlterField(FieldOperation):
     def __init__(self, model_name, name, field, preserve_default=True):
         self.field = field
         self.preserve_default = preserve_default
-        super(AlterField, self).__init__(model_name, name)
+        super().__init__(model_name, name)
 
     def deconstruct(self):
         kwargs = {
@@ -232,7 +232,7 @@ class AlterField(FieldOperation):
                     field=self.field,
                 ),
             ]
-        return super(AlterField, self).reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, in_between, app_label=app_label)
 
 
 class RenameField(FieldOperation):
@@ -243,7 +243,7 @@ class RenameField(FieldOperation):
     def __init__(self, model_name, old_name, new_name):
         self.old_name = old_name
         self.new_name = new_name
-        super(RenameField, self).__init__(model_name, old_name)
+        super().__init__(model_name, old_name)
 
     @cached_property
     def old_name_lower(self):

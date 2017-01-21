@@ -80,7 +80,7 @@ class ErrorList(UserList, list):
     A collection of errors that knows how to display itself in various formats.
     """
     def __init__(self, initlist=None, error_class=None):
-        super(ErrorList, self).__init__(initlist)
+        super().__init__(initlist)
 
         if error_class is None:
             self.error_class = 'errorlist'

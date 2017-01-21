@@ -928,7 +928,7 @@ class SQLInsertCompiler(SQLCompiler):
 
     def __init__(self, *args, **kwargs):
         self.return_id = False
-        super(SQLInsertCompiler, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def field_as_sql(self, field, val):
         """
@@ -1181,7 +1181,7 @@ class SQLUpdateCompiler(SQLCompiler):
         non-empty query that is executed. Row counts for any subsequent,
         related queries are not available.
         """
-        cursor = super(SQLUpdateCompiler, self).execute_sql(result_type)
+        cursor = super().execute_sql(result_type)
         try:
             rows = cursor.rowcount if cursor else 0
             is_empty = cursor is None
@@ -1217,7 +1217,7 @@ class SQLUpdateCompiler(SQLCompiler):
         query._extra = {}
         query.select = []
         query.add_fields([query.get_meta().pk.name])
-        super(SQLUpdateCompiler, self).pre_sql_setup()
+        super().pre_sql_setup()
 
         must_pre_select = count > 1 and not self.connection.features.update_can_self_select
 

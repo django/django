@@ -145,7 +145,7 @@ class MultipleObjectMixin(ContextMixin):
         if context_object_name is not None:
             context[context_object_name] = queryset
         context.update(kwargs)
-        return super(MultipleObjectMixin, self).get_context_data(**context)
+        return super().get_context_data(**context)
 
 
 class BaseListView(MultipleObjectMixin, View):
@@ -184,7 +184,7 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
         a list. May not be called if render_to_response is overridden.
         """
         try:
-            names = super(MultipleObjectTemplateResponseMixin, self).get_template_names()
+            names = super().get_template_names()
         except ImproperlyConfigured:
             # If template_name isn't specified, it's not a problem --
             # we just start with an empty list.

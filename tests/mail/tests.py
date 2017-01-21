@@ -990,7 +990,7 @@ class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
         mail.outbox = []
 
     def tearDown(self):
-        super(LocmemBackendTests, self).tearDown()
+        super().tearDown()
         mail.outbox = []
 
     def test_locmem_shared_messages(self):
@@ -1017,7 +1017,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
     email_backend = 'django.core.mail.backends.filebased.EmailBackend'
 
     def setUp(self):
-        super(FileBackendTests, self).setUp()
+        super().setUp()
         self.tmp_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp_dir)
         self._settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
@@ -1025,7 +1025,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
     def tearDown(self):
         self._settings_override.disable()
-        super(FileBackendTests, self).tearDown()
+        super().tearDown()
 
     def flush_mailbox(self):
         for filename in os.listdir(self.tmp_dir):
@@ -1077,7 +1077,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
     email_backend = 'django.core.mail.backends.console.EmailBackend'
 
     def setUp(self):
-        super(ConsoleBackendTests, self).setUp()
+        super().setUp()
         self.__stdout = sys.stdout
         self.stream = sys.stdout = StringIO()
 
@@ -1085,7 +1085,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
         del self.stream
         sys.stdout = self.__stdout
         del self.__stdout
-        super(ConsoleBackendTests, self).tearDown()
+        super().tearDown()
 
     def flush_mailbox(self):
         self.stream = sys.stdout = StringIO()
@@ -1214,7 +1214,7 @@ class SMTPBackendTestsBase(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(SMTPBackendTestsBase, cls).setUpClass()
+        super().setUpClass()
         cls.server = FakeSMTPServer(('127.0.0.1', 0), None)
         cls._settings_override = override_settings(
             EMAIL_HOST="127.0.0.1",
@@ -1226,19 +1226,19 @@ class SMTPBackendTestsBase(SimpleTestCase):
     def tearDownClass(cls):
         cls._settings_override.disable()
         cls.server.stop()
-        super(SMTPBackendTestsBase, cls).tearDownClass()
+        super().tearDownClass()
 
 
 class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     email_backend = 'django.core.mail.backends.smtp.EmailBackend'
 
     def setUp(self):
-        super(SMTPBackendTests, self).setUp()
+        super().setUp()
         self.server.flush_sink()
 
     def tearDown(self):
         self.server.flush_sink()
-        super(SMTPBackendTests, self).tearDown()
+        super().tearDown()
 
     def flush_mailbox(self):
         self.server.flush_sink()
@@ -1386,7 +1386,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         class MyEmailBackend(smtp.EmailBackend):
             def __init__(self, *args, **kwargs):
                 kwargs.setdefault('timeout', 42)
-                super(MyEmailBackend, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
 
         myemailbackend = MyEmailBackend()
         myemailbackend.open()
@@ -1454,7 +1454,7 @@ class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
     """
     @classmethod
     def setUpClass(cls):
-        super(SMTPBackendStoppedServerTests, cls).setUpClass()
+        super().setUpClass()
         cls.backend = smtp.EmailBackend(username='', password='')
         cls.server.stop()
 

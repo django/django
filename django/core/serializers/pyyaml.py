@@ -53,13 +53,13 @@ class Serializer(PythonSerializer):
         if isinstance(field, models.TimeField) and getattr(obj, field.name) is not None:
             self._current[field.name] = str(getattr(obj, field.name))
         else:
-            super(Serializer, self).handle_field(obj, field)
+            super().handle_field(obj, field)
 
     def end_serialization(self):
         yaml.dump(self.objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
 
     def getvalue(self):
-        # Grand-parent super
+        # Grandparent super
         return super(PythonSerializer, self).getvalue()
 
 

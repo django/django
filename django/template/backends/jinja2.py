@@ -15,7 +15,7 @@ class Jinja2(BaseEngine):
     def __init__(self, params):
         params = params.copy()
         options = params.pop('OPTIONS').copy()
-        super(Jinja2, self).__init__(params)
+        super().__init__(params)
 
         self.context_processors = options.pop('context_processors', [])
 

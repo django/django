@@ -56,7 +56,7 @@ class Command(BaseCommand):
 
     def _run_checks(self, **kwargs):
         issues = run_checks(tags=[Tags.database])
-        issues.extend(super(Command, self)._run_checks(**kwargs))
+        issues.extend(super()._run_checks(**kwargs))
         return issues
 
     def handle(self, *args, **options):

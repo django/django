@@ -73,7 +73,7 @@ class ModelBase(type):
     Metaclass for all models.
     """
     def __new__(cls, name, bases, attrs):
-        super_new = super(ModelBase, cls).__new__
+        super_new = super().__new__
 
         # Also ensure initialization is only performed for subclasses of Model
         # (excluding Model class itself).
@@ -486,7 +486,7 @@ class Model(metaclass=ModelBase):
                     pass
             if kwargs:
                 raise TypeError("'%s' is an invalid keyword argument for this function" % list(kwargs)[0])
-        super(Model, self).__init__()
+        super().__init__()
         post_init.send(sender=cls, instance=self)
 
     @classmethod

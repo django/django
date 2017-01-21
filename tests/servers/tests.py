@@ -40,7 +40,7 @@ class LiveServerAddress(LiveServerBase):
 
     @classmethod
     def setUpClass(cls):
-        super(LiveServerAddress, cls).setUpClass()
+        super().setUpClass()
         # put it in a list to prevent descriptor lookups in test
         cls.live_server_url_test = [cls.live_server_url]
 

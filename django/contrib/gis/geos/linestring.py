@@ -37,7 +37,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 
         ncoords = len(coords)
         if not ncoords:
-            super(LineString, self).__init__(self._init_func(None), srid=srid)
+            super().__init__(self._init_func(None), srid=srid)
             return
 
         if ncoords < self._minlength:
@@ -86,7 +86,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 
         # Calling the base geometry initialization with the returned pointer
         #  from the function.
-        super(LineString, self).__init__(self._init_func(cs.ptr), srid=srid)
+        super().__init__(self._init_func(cs.ptr), srid=srid)
 
     def __iter__(self):
         "Allows iteration over this LineString."

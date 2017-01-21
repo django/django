@@ -43,4 +43,4 @@ class RefreshPrimaryProxy(Primary):
             deferred_fields = self.get_deferred_fields()
             if fields.intersection(deferred_fields):
                 fields = fields.union(deferred_fields)
-        super(RefreshPrimaryProxy, self).refresh_from_db(using, fields, **kwargs)
+        super().refresh_from_db(using, fields, **kwargs)

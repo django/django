@@ -429,7 +429,7 @@ class EmailMultiAlternatives(EmailMessage):
         bytestrings). The SafeMIMEText class will handle any necessary encoding
         conversions.
         """
-        super(EmailMultiAlternatives, self).__init__(
+        super().__init__(
             subject, body, from_email, to, bcc, connection, attachments,
             headers, cc, reply_to,
         )

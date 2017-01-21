@@ -28,7 +28,7 @@ class SafeBytes(bytes, SafeData):
         Concatenating a safe byte string with another safe byte string or safe
         unicode string is safe. Otherwise, the result is no longer safe.
         """
-        t = super(SafeBytes, self).__add__(rhs)
+        t = super().__add__(rhs)
         if isinstance(rhs, SafeText):
             return SafeText(t)
         elif isinstance(rhs, SafeBytes):
@@ -61,7 +61,7 @@ class SafeText(str, SafeData):
         Concatenating a safe unicode string with another safe byte string or
         safe unicode string is safe. Otherwise, the result is no longer safe.
         """
-        t = super(SafeText, self).__add__(rhs)
+        t = super().__add__(rhs)
         if isinstance(rhs, SafeData):
             return SafeText(t)
         return t

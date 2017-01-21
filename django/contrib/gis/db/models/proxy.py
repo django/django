@@ -16,7 +16,7 @@ class SpatialProxy(DeferredAttribute):
         """
         self._field = field
         self._klass = klass
-        super(SpatialProxy, self).__init__(field.attname, klass)
+        super().__init__(field.attname, klass)
 
     def __get__(self, instance, cls=None):
         """
@@ -33,7 +33,7 @@ class SpatialProxy(DeferredAttribute):
         try:
             geo_value = instance.__dict__[self._field.attname]
         except KeyError:
-            geo_value = super(SpatialProxy, self).__get__(instance, cls)
+            geo_value = super().__get__(instance, cls)
 
         if isinstance(geo_value, self._klass):
             geo_obj = geo_value

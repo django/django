@@ -12,7 +12,7 @@ class ContextPopException(Exception):
 
 class ContextDict(dict):
     def __init__(self, context, *args, **kwargs):
-        super(ContextDict, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         context.dicts.append(self)
         self.context = context
@@ -35,7 +35,7 @@ class BaseContext:
             self.dicts.append(value)
 
     def __copy__(self):
-        duplicate = copy(super(BaseContext, self))
+        duplicate = copy(super())
         duplicate.dicts = self.dicts[:]
         return duplicate
 
@@ -148,7 +148,7 @@ class Context(BaseContext):
         # Set to the original template -- as opposed to extended or included
         # templates -- during rendering, see bind_template.
         self.template = None
-        super(Context, self).__init__(dict_)
+        super().__init__(dict_)
 
     @contextmanager
     def bind_template(self, template):
@@ -161,7 +161,7 @@ class Context(BaseContext):
             self.template = None
 
     def __copy__(self):
-        duplicate = super(Context, self).__copy__()
+        duplicate = super().__copy__()
         duplicate.render_context = copy(self.render_context)
         return duplicate
 
@@ -224,8 +224,7 @@ class RequestContext(Context):
     using the "processors" keyword argument.
     """
     def __init__(self, request, dict_=None, processors=None, use_l10n=None, use_tz=None, autoescape=True):
-        super(RequestContext, self).__init__(
-            dict_, use_l10n=use_l10n, use_tz=use_tz, autoescape=autoescape)
+        super().__init__(dict_, use_l10n=use_l10n, use_tz=use_tz, autoescape=autoescape)
         self.request = request
         self._processors = () if processors is None else tuple(processors)
         self._processors_index = len(self.dicts)
@@ -259,7 +258,7 @@ class RequestContext(Context):
             self.dicts[self._processors_index] = {}
 
     def new(self, values=None):
-        new_context = super(RequestContext, self).new(values)
+        new_context = super().new(values)
         # This is for backwards-compatibility: RequestContexts created via
         # Context.new don't include values from context processors.
         if hasattr(new_context, '_processors_index'):

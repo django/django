@@ -603,7 +603,7 @@ class GenericInlineFormsetTest(TestCase):
         class SaveTestForm(forms.ModelForm):
             def save(self, *args, **kwargs):
                 self.instance.saved_by = "custom method"
-                return super(SaveTestForm, self).save(*args, **kwargs)
+                return super().save(*args, **kwargs)
 
         Formset = generic_inlineformset_factory(ForProxyModelModel, fields='__all__', form=SaveTestForm)
 

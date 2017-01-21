@@ -47,7 +47,7 @@ class TestDS(TestObj):
         # Shapefile is default extension, unless specified otherwise.
         ext = kwargs.pop('ext', 'shp')
         self.ds = get_ds_file(name, ext)
-        super(TestDS, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
 
 class TestGeom(TestObj):
@@ -72,7 +72,7 @@ class TestGeom(TestObj):
             ext_ring_cs = tuplize(ext_ring_cs)
         self.ext_ring_cs = ext_ring_cs
 
-        super(TestGeom, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
 
 class TestGeomSet:

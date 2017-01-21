@@ -18,7 +18,7 @@ class EmailBackend(BaseEmailBackend):
                  use_tls=None, fail_silently=False, use_ssl=None, timeout=None,
                  ssl_keyfile=None, ssl_certfile=None,
                  **kwargs):
-        super(EmailBackend, self).__init__(fail_silently=fail_silently)
+        super().__init__(fail_silently=fail_silently)
         self.host = host or settings.EMAIL_HOST
         self.port = port or settings.EMAIL_PORT
         self.username = settings.EMAIL_HOST_USER if username is None else username

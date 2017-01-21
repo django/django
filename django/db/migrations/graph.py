@@ -77,7 +77,7 @@ class Node:
 
 class DummyNode(Node):
     def __init__(self, key, origin, error_message):
-        super(DummyNode, self).__init__(key)
+        super().__init__(key)
         self.origin = origin
         self.error_message = error_message
 

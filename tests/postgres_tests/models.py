@@ -146,7 +146,7 @@ class JSONModel(models.Model):
 
 class ArrayFieldSubclass(ArrayField):
     def __init__(self, *args, **kwargs):
-        super(ArrayFieldSubclass, self).__init__(models.IntegerField())
+        super().__init__(models.IntegerField())
 
 
 class AggregateTestModel(models.Model):

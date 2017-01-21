@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
     def __init__(self):
         self.test_runner = None
-        super(Command, self).__init__()
+        super().__init__()
 
     def run_from_argv(self, argv):
         """
@@ -26,7 +26,7 @@ class Command(BaseCommand):
             if arg.startswith(option):
                 self.test_runner = arg[len(option):]
                 break
-        super(Command, self).run_from_argv(argv)
+        super().run_from_argv(argv)
 
     def add_arguments(self, parser):
         parser.add_argument(

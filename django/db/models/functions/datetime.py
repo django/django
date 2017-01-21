@@ -37,7 +37,7 @@ class Extract(TimezoneMixin, Transform):
         if self.lookup_name is None:
             raise ValueError('lookup_name must be provided')
         self.tzinfo = tzinfo
-        super(Extract, self).__init__(expression, **extra)
+        super().__init__(expression, **extra)
 
     def as_sql(self, compiler, connection):
         sql, params = compiler.compile(self.lhs)
@@ -57,7 +57,7 @@ class Extract(TimezoneMixin, Transform):
         return sql, params
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        copy = super(Extract, self).resolve_expression(query, allow_joins, reuse, summarize, for_save)
+        copy = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
         field = copy.lhs.output_field
         if not isinstance(field, (DateField, DateTimeField, TimeField)):
             raise ValueError('Extract input expression must be DateField, DateTimeField, or TimeField.')
@@ -142,7 +142,7 @@ class TruncBase(TimezoneMixin, Transform):
 
     def __init__(self, expression, output_field=None, tzinfo=None, **extra):
         self.tzinfo = tzinfo
-        super(TruncBase, self).__init__(expression, output_field=output_field, **extra)
+        super().__init__(expression, output_field=output_field, **extra)
 
     def as_sql(self, compiler, connection):
         inner_sql, inner_params = compiler.compile(self.lhs)
@@ -162,7 +162,7 @@ class TruncBase(TimezoneMixin, Transform):
         return sql, inner_params + params
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        copy = super(TruncBase, self).resolve_expression(query, allow_joins, reuse, summarize, for_save)
+        copy = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
         field = copy.lhs.output_field
         # DateTimeField is a subclass of DateField so this works for both.
         assert isinstance(field, (DateField, TimeField)), (
@@ -210,7 +210,7 @@ class Trunc(TruncBase):
 
     def __init__(self, expression, kind, output_field=None, tzinfo=None, **extra):
         self.kind = kind
-        super(Trunc, self).__init__(expression, output_field=output_field, tzinfo=tzinfo, **extra)
+        super().__init__(expression, output_field=output_field, tzinfo=tzinfo, **extra)
 
 
 class TruncYear(TruncBase):
