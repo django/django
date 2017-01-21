@@ -83,19 +83,6 @@ def escapejs_filter(value):
     return escapejs(value)
 
 
-# Values for testing floatformat input against infinity and NaN representations,
-# which differ across platforms and Python versions.  Some (i.e. old Windows
-# ones) are not recognized by Decimal but we want to return them unchanged vs.
-# returning an empty string as we do for completely invalid input.  Note these
-# need to be built up from values that are not inf/nan, since inf/nan values do
-# not reload properly from .pyc files on Windows prior to some level of Python 2.5
-# (see Python Issue757815 and Issue1080440).
-pos_inf = 1e200 * 1e200
-neg_inf = -1e200 * 1e200
-nan = (1e200 * 1e200) // (1e200 * 1e200)
-special_floats = [str(pos_inf), str(neg_inf), str(nan)]
-
-
 @register.filter(is_safe=True)
 def floatformat(text, arg=-1):
     """
@@ -132,14 +119,10 @@ def floatformat(text, arg=-1):
     try:
         input_val = repr(text)
         d = Decimal(input_val)
-    except UnicodeEncodeError:
-        return ''
     except InvalidOperation:
-        if input_val in special_floats:
-            return input_val
         try:
             d = Decimal(force_text(float(text)))
-        except (ValueError, InvalidOperation, TypeError, UnicodeEncodeError):
+        except (ValueError, InvalidOperation, TypeError):
             return ''
     try:
         p = int(arg)
@@ -158,26 +141,23 @@ def floatformat(text, arg=-1):
         exp = Decimal(1)
     else:
         exp = Decimal('1.0') / (Decimal(10) ** abs(p))
-    try:
-        # Set the precision high enough to avoid an exception, see #15789.
-        tupl = d.as_tuple()
-        units = len(tupl[1])
-        units += -tupl[2] if m else tupl[2]
-        prec = abs(p) + units + 1
+    # Set the precision high enough to avoid an exception (#15789).
+    tupl = d.as_tuple()
+    units = len(tupl[1])
+    units += -tupl[2] if m else tupl[2]
+    prec = abs(p) + units + 1
 
-        # Avoid conversion to scientific notation by accessing `sign`, `digits`
-        # and `exponent` from `Decimal.as_tuple()` directly.
-        sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP, Context(prec=prec)).as_tuple()
-        digits = [str(digit) for digit in reversed(digits)]
-        while len(digits) <= abs(exponent):
-            digits.append('0')
-        digits.insert(-exponent, '.')
-        if sign:
-            digits.append('-')
-        number = ''.join(reversed(digits))
-        return mark_safe(formats.number_format(number, abs(p)))
-    except InvalidOperation:
-        return input_val
+    # Avoid conversion to scientific notation by accessing `sign`, `digits`,
+    # and `exponent` from Decimal.as_tuple() directly.
+    sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP, Context(prec=prec)).as_tuple()
+    digits = [str(digit) for digit in reversed(digits)]
+    while len(digits) <= abs(exponent):
+        digits.append('0')
+    digits.insert(-exponent, '.')
+    if sign:
+        digits.append('-')
+    number = ''.join(reversed(digits))
+    return mark_safe(formats.number_format(number, abs(p)))
 
 
 @register.filter(is_safe=True)
