@@ -1,4 +1,3 @@
-import errno
 import string
 
 from django.conf import settings
@@ -31,14 +30,12 @@ class TemplateStrings(BaseEngine):
             try:
                 with open(template_file, encoding=settings.FILE_CHARSET) as fp:
                     template_code = fp.read()
-            except IOError as e:
-                if e.errno == errno.ENOENT:
-                    tried.append((
-                        Origin(template_file, template_name, self),
-                        'Source does not exist',
-                    ))
-                    continue
-                raise
+            except FileNotFoundError:
+                tried.append((
+                    Origin(template_file, template_name, self),
+                    'Source does not exist',
+                ))
+                continue
 
             return Template(template_code)
 

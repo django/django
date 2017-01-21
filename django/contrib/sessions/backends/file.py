@@ -1,5 +1,4 @@
 import datetime
-import errno
 import logging
 import os
 import shutil
@@ -133,13 +132,12 @@ class SessionStore(SessionBase):
                 flags |= os.O_EXCL | os.O_CREAT
             fd = os.open(session_file_name, flags)
             os.close(fd)
-
-        except OSError as e:
-            if must_create and e.errno == errno.EEXIST:
-                raise CreateError
-            if not must_create and e.errno == errno.ENOENT:
+        except FileNotFoundError:
+            if not must_create:
                 raise UpdateError
-            raise
+        except FileExistsError:
+            if must_create:
+                raise CreateError
 
         # Write the session file without interfering with other threads
         # or processes.  By writing to an atomically generated temporary
