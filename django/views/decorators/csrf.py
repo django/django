@@ -1,7 +1,7 @@
 from functools import wraps
 
 from django.middleware.csrf import CsrfViewMiddleware, get_token
-from django.utils.decorators import available_attrs, decorator_from_middleware
+from django.utils.decorators import decorator_from_middleware
 
 csrf_protect = decorator_from_middleware(CsrfViewMiddleware)
 csrf_protect.__name__ = "csrf_protect"
@@ -57,4 +57,4 @@ def csrf_exempt(view_func):
     def wrapped_view(*args, **kwargs):
         return view_func(*args, **kwargs)
     wrapped_view.csrf_exempt = True
-    return wraps(view_func, assigned=available_attrs(view_func))(wrapped_view)
+    return wraps(view_func)(wrapped_view)

@@ -9,7 +9,7 @@ from functools import wraps
 from django.http import HttpResponseNotAllowed
 from django.middleware.http import ConditionalGetMiddleware
 from django.utils.cache import get_conditional_response
-from django.utils.decorators import available_attrs, decorator_from_middleware
+from django.utils.decorators import decorator_from_middleware
 from django.utils.http import http_date, quote_etag
 
 conditional_page = decorator_from_middleware(ConditionalGetMiddleware)
@@ -29,7 +29,7 @@ def require_http_methods(request_method_list):
     Note that request methods should be in uppercase.
     """
     def decorator(func):
-        @wraps(func, assigned=available_attrs(func))
+        @wraps(func)
         def inner(request, *args, **kwargs):
             if request.method not in request_method_list:
                 logger.warning(
@@ -75,7 +75,7 @@ def condition(etag_func=None, last_modified_func=None):
     already have them.
     """
     def decorator(func):
-        @wraps(func, assigned=available_attrs(func))
+        @wraps(func)
         def inner(request, *args, **kwargs):
             # Compute values (if any) for the requested resource.
             def get_last_modified():

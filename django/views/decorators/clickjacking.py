@@ -1,7 +1,5 @@
 from functools import wraps
 
-from django.utils.decorators import available_attrs
-
 
 def xframe_options_deny(view_func):
     """
@@ -20,7 +18,7 @@ def xframe_options_deny(view_func):
         if resp.get('X-Frame-Options') is None:
             resp['X-Frame-Options'] = 'DENY'
         return resp
-    return wraps(view_func, assigned=available_attrs(view_func))(wrapped_view)
+    return wraps(view_func)(wrapped_view)
 
 
 def xframe_options_sameorigin(view_func):
@@ -40,7 +38,7 @@ def xframe_options_sameorigin(view_func):
         if resp.get('X-Frame-Options') is None:
             resp['X-Frame-Options'] = 'SAMEORIGIN'
         return resp
-    return wraps(view_func, assigned=available_attrs(view_func))(wrapped_view)
+    return wraps(view_func)(wrapped_view)
 
 
 def xframe_options_exempt(view_func):
@@ -58,4 +56,4 @@ def xframe_options_exempt(view_func):
         resp = view_func(*args, **kwargs)
         resp.xframe_options_exempt = True
         return resp
-    return wraps(view_func, assigned=available_attrs(view_func))(wrapped_view)
+    return wraps(view_func)(wrapped_view)
