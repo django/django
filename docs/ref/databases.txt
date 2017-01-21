@@ -284,11 +284,11 @@ MySQL has a couple drivers that implement the Python Database API described in
 .. _mysqlclient: https://pypi.python.org/pypi/mysqlclient
 .. _MySQL Connector/Python: https://dev.mysql.com/downloads/connector/python
 
-All these drivers are thread-safe and provide connection pooling.
+These drivers are thread-safe and provide connection pooling.
 
 In addition to a DB API driver, Django needs an adapter to access the database
-drivers from its ORM. Django provides an adapter for MySQLdb/mysqlclient while
-MySQL Connector/Python includes `its own`_.
+drivers from its ORM. Django provides an adapter for mysqlclient while MySQL
+Connector/Python includes `its own`_.
 
 .. _its own: https://dev.mysql.com/doc/connector-python/en/connector-python-django-backend.html
 
@@ -348,46 +348,9 @@ comparisons being done in a *case-insensitive* manner. That is, ``"Fred"`` and
 ``"freD"`` are considered equal at the database level. If you have a unique
 constraint on a field, it would be illegal to try to insert both ``"aa"`` and
 ``"AA"`` into the same column, since they compare as equal (and, hence,
-non-unique) with the default collation.
-
-In many cases, this default will not be a problem. However, if you really want
-case-sensitive comparisons on a particular column or table, you would change
-the column or table to use the ``utf8_bin`` collation. The main thing to be
-aware of in this case is that if you are using MySQLdb 1.2.2, the database
-backend in Django will then return bytestrings (instead of unicode strings) for
-any character fields it receive from the database. This is a strong variation
-from Django's normal practice of *always* returning unicode strings. It is up
-to you, the developer, to handle the fact that you will receive bytestrings if
-you configure your table(s) to use ``utf8_bin`` collation. Django itself should
-mostly work smoothly with such columns (except for the ``contrib.sessions``
-``Session`` and ``contrib.admin`` ``LogEntry`` tables described below), but
-your code must be prepared to call ``django.utils.encoding.force_text()`` at
-times if it really wants to work with consistent data -- Django will not do
-this for you (the database backend layer and the model population layer are
-separated internally so the database layer doesn't know it needs to make this
-conversion in this one particular case).
-
-If you're using MySQLdb 1.2.1p2, Django's standard
-:class:`~django.db.models.CharField` class will return unicode strings even
-with ``utf8_bin`` collation. However, :class:`~django.db.models.TextField`
-fields will be returned as an ``array.array`` instance (from Python's standard
-``array`` module). There isn't a lot Django can do about that, since, again,
-the information needed to make the necessary conversions isn't available when
-the data is read in from the database. This problem was `fixed in MySQLdb
-1.2.2`_, so if you want to use :class:`~django.db.models.TextField` with
-``utf8_bin`` collation, upgrading to version 1.2.2 and then dealing with the
-bytestrings (which shouldn't be too difficult) as described above is the
-recommended solution.
-
-Should you decide to use ``utf8_bin`` collation for some of your tables with
-MySQLdb 1.2.1p2 or 1.2.2, you should still use ``utf8_general_ci``
-(the default) collation for the ``django.contrib.sessions.models.Session``
-table (usually called ``django_session``) and the
-:class:`django.contrib.admin.models.LogEntry` table (usually called
-``django_admin_log``). Those are the two standard tables that use
-:class:`~django.db.models.TextField` internally.
-
-.. _fixed in MySQLdb 1.2.2: http://sourceforge.net/tracker/index.php?func=detail&aid=1495765&group_id=22307&atid=374932
+non-unique) with the default collation. If you want case-sensitive comparisons
+on a particular column or table, change the column or table to use the
+``utf8_bin`` collation.
 
 Please note that according to `MySQL Unicode Character Sets`_, comparisons for
 the ``utf8_general_ci`` collation are faster, but slightly less correct, than
@@ -441,12 +404,11 @@ Here's a sample configuration which uses a MySQL option file::
     password = PASSWORD
     default-character-set = utf8
 
-Several other MySQLdb connection options may be useful, such as ``ssl``,
-``init_command``, and ``sql_mode``. Consult the `MySQLdb documentation`_ for
-more details.
+Several other `MySQLdb connection options`_ may be useful, such as ``ssl``,
+``init_command``, and ``sql_mode``.
 
 .. _MySQL option file: https://dev.mysql.com/doc/refman/en/option-files.html
-.. _MySQLdb documentation: http://mysql-python.sourceforge.net/
+.. _MySQLdb connection options: https://mysqlclient.readthedocs.io/en/latest/user_guide.html#functions-and-attributes
 
 .. _mysql-sql-mode:
 
@@ -575,11 +537,7 @@ Fractional seconds support for Time and DateTime fields
 
 MySQL 5.6.4 and later can store fractional seconds, provided that the
 column definition includes a fractional indication (e.g. ``DATETIME(6)``).
-Earlier versions do not support them at all. In addition, versions of MySQLdb
-older than 1.2.5 have `a bug`_ that also prevents the use of fractional seconds
-with MySQL.
-
-.. _a bug: https://github.com/farcepest/MySQLdb1/issues/24
+Earlier versions do not support them at all.
 
 Django will not upgrade existing columns to include fractional seconds if the
 database server supports it. If you want to enable them on an existing database,

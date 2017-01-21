@@ -16,7 +16,7 @@ try:
 except ImportError as err:
     raise ImproperlyConfigured(
         'Error loading MySQLdb module.\n'
-        'Did you install mysqlclient or MySQL-python?'
+        'Did you install mysqlclient?'
     ) from err
 
 from MySQLdb.constants import CLIENT, FIELD_TYPE                # isort:skip
@@ -31,18 +31,14 @@ from .operations import DatabaseOperations                  # isort:skip
 from .schema import DatabaseSchemaEditor                    # isort:skip
 from .validation import DatabaseValidation                  # isort:skip
 
-# We want version (1, 2, 1, 'final', 2) or later. We can't just use
-# lexicographic ordering in this check because then (1, 2, 1, 'gamma')
-# inadvertently passes the version test.
 version = Database.version_info
-if (version < (1, 2, 1) or (
-        version[:3] == (1, 2, 1) and (len(version) < 5 or version[3] != 'final' or version[4] < 2))):
-    raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
+if version < (1, 3, 3):
+    raise ImproperlyConfigured("mysqlclient 1.3.3 or newer is required; you have %s" % Database.__version__)
 
 
-# MySQLdb-1.2.1 returns TIME columns as timedelta -- they are more like
-# timedelta in terms of actual behavior as they are signed and include days --
-# and Django expects time.
+# MySQLdb returns TIME columns as timedelta -- they are more like timedelta in
+# terms of actual behavior as they are signed and include days -- and Django
+# expects time.
 django_conversions = conversions.copy()
 django_conversions.update({
     FIELD_TYPE.TIME: backend_utils.typecast_time,
@@ -52,13 +48,6 @@ django_conversions.update({
 # versions like 5.0.24 and 5.0.24a as the same).
 server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 
-
-# MySQLdb-1.2.1 and newer automatically makes use of SHOW WARNINGS on
-# MySQL-4.1 and newer, so the MysqlDebugWrapper is unnecessary. Since the
-# point is to raise Warnings as exceptions, this can be done with the Python
-# warning module, and this is setup when the connection is created, and the
-# standard backend_utils.CursorDebugWrapper can be used. Also, using sql_mode
-# TRADITIONAL will automatically cause most warnings to be treated as errors.
 
 class CursorWrapper:
     """
