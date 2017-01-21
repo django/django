@@ -433,7 +433,7 @@ Django authentication relies on).
 
 Channels can use Django sessions either from cookies (if you're running your
 websocket server on the same port as your main site, using something like Daphne),
-or from a ``session_key`` GET parameter, which is works if you want to keep
+or from a ``session_key`` GET parameter, which works if you want to keep
 running your HTTP requests through a WSGI server and offload WebSockets to a
 second server process on another port.
 
@@ -461,7 +461,7 @@ chat to people with the same first letter of their username::
     # In consumers.py
     from channels import Channel, Group
     from channels.sessions import channel_session
-    from channels.auth import http_session_user, channel_session_user, channel_session_user_from_http
+    from channels.auth import channel_session_user, channel_session_user_from_http
 
     # Connected to websocket.connect
     @channel_session_user_from_http
@@ -668,7 +668,7 @@ first-letter-of-username chat from earlier::
     # In consumers.py
     from channels import Channel, Group
     from channels.sessions import channel_session, enforce_ordering
-    from channels.auth import http_session_user, channel_session_user, channel_session_user_from_http
+    from channels.auth import channel_session_user, channel_session_user_from_http
 
     # Connected to websocket.connect
     @enforce_ordering(slight=True)
