@@ -410,7 +410,7 @@ foundation for custom widgets.
                     widgets.Select(attrs=attrs, choices=months),
                     widgets.Select(attrs=attrs, choices=years),
                 )
-                super(DateSelectorWidget, self).__init__(_widgets, attrs)
+                super().__init__(_widgets, attrs)
 
             def decompress(self, value):
                 if value:

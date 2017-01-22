@@ -155,7 +155,7 @@ into those elements.
                 return Article.objects.order_by('-pub_date')[:5]
 
             def get_context_data(self, **kwargs):
-                context = super(ArticlesFeed, self).get_context_data(**kwargs)
+                context = super().get_context_data(**kwargs)
                 context['foo'] = 'bar'
                 return context
 
@@ -1057,12 +1057,12 @@ For example, you might start implementing an iTunes RSS feed generator like so::
 
     class iTunesFeed(Rss201rev2Feed):
         def root_attributes(self):
-            attrs = super(iTunesFeed, self).root_attributes()
+            attrs = super().root_attributes()
             attrs['xmlns:itunes'] = 'http://www.itunes.com/dtds/podcast-1.0.dtd'
             return attrs
 
         def add_root_elements(self, handler):
-            super(iTunesFeed, self).add_root_elements(handler)
+            super().add_root_elements(handler)
             handler.addQuickElement('itunes:explicit', 'clean')
 
 Obviously there's a lot more work to be done for a complete custom feed class,

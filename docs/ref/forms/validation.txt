@@ -272,7 +272,7 @@ containing comma-separated email addresses. The full class looks like this::
         def validate(self, value):
             """Check if value consists only of valid emails."""
             # Use the parent's handling of required fields, etc.
-            super(MultiEmailField, self).validate(value)
+            super().validate(value)
             for email in value:
                 validate_email(email)
 
@@ -352,7 +352,7 @@ example::
         ...
 
         def clean(self):
-            cleaned_data = super(ContactForm, self).clean()
+            cleaned_data = super().clean()
             cc_myself = cleaned_data.get("cc_myself")
             subject = cleaned_data.get("subject")
 
@@ -367,14 +367,14 @@ example::
 In this code, if the validation error is raised, the form will display an
 error message at the top of the form (normally) describing the problem.
 
-The call to ``super(ContactForm, self).clean()`` in the example code ensures
-that any validation logic in parent classes is maintained. If your form
-inherits another that doesn't return a ``cleaned_data`` dictionary in its
-``clean()`` method (doing so is optional), then don't assign ``cleaned_data``
-to the result of the ``super()`` call and use ``self.cleaned_data`` instead::
+The call to ``super().clean()`` in the example code ensures that any validation
+logic in parent classes is maintained. If your form inherits another that
+doesn't return a ``cleaned_data`` dictionary in its ``clean()`` method (doing
+so is optional), then don't assign ``cleaned_data`` to the result of the
+``super()`` call and use ``self.cleaned_data`` instead::
 
     def clean(self):
-        super(ContactForm, self).clean()
+        super().clean()
         cc_myself = self.cleaned_data.get("cc_myself")
         ...
 
@@ -393,7 +393,7 @@ work out what works effectively in your particular situation. Our new code
         ...
 
         def clean(self):
-            cleaned_data = super(ContactForm, self).clean()
+            cleaned_data = super().clean()
             cc_myself = cleaned_data.get("cc_myself")
             subject = cleaned_data.get("subject")
 

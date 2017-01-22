@@ -1029,7 +1029,7 @@ Slightly complex built-in ``Field`` classes
                             required=False,
                         ),
                     )
-                    super(PhoneField, self).__init__(
+                    super().__init__(
                         error_messages=error_messages, fields=fields,
                         require_all_fields=False, *args, **kwargs
                     )
@@ -1100,7 +1100,7 @@ method::
         foo_select = forms.ModelMultipleChoiceField(queryset=None)
 
         def __init__(self, *args, **kwargs):
-            super(FooMultipleChoiceForm, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
             self.fields['foo_select'].queryset = ...
 
 ``ModelChoiceField``

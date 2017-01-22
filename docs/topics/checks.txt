@@ -144,13 +144,13 @@ code snippet shows how you can implement this check::
 
     class RangedIntegerField(models.IntegerField):
         def __init__(self, min=None, max=None, **kwargs):
-            super(RangedIntegerField, self).__init__(**kwargs)
+            super().__init__(**kwargs)
             self.min = min
             self.max = max
 
         def check(self, **kwargs):
             # Call the superclass
-            errors = super(RangedIntegerField, self).check(**kwargs)
+            errors = super().check(**kwargs)
 
             # Do some custom checks and add messages to `errors`:
             errors.extend(self._check_min_max_values(**kwargs))
@@ -182,7 +182,7 @@ the only difference is that the check is a classmethod, not an instance method::
     class MyModel(models.Model):
         @classmethod
         def check(cls, **kwargs):
-            errors = super(MyModel, cls).check(**kwargs)
+            errors = super().check(**kwargs)
             # ... your own checks ...
             return errors
 

@@ -48,7 +48,7 @@ many projects they are typically the most commonly used views.
             model = Article
 
             def get_context_data(self, **kwargs):
-                context = super(ArticleDetailView, self).get_context_data(**kwargs)
+                context = super().get_context_data(**kwargs)
                 context['now'] = timezone.now()
                 return context
 
@@ -117,7 +117,7 @@ many projects they are typically the most commonly used views.
             model = Article
 
             def get_context_data(self, **kwargs):
-                context = super(ArticleListView, self).get_context_data(**kwargs)
+                context = super().get_context_data(**kwargs)
                 context['now'] = timezone.now()
                 return context
 

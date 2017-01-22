@@ -131,7 +131,7 @@ MRO is an acronym for Method Resolution Order.
             template_name = "home.html"
 
             def get_context_data(self, **kwargs):
-                context = super(HomePageView, self).get_context_data(**kwargs)
+                context = super().get_context_data(**kwargs)
                 context['latest_articles'] = Article.objects.all()[:5]
                 return context
 
@@ -194,7 +194,7 @@ MRO is an acronym for Method Resolution Order.
             def get_redirect_url(self, *args, **kwargs):
                 article = get_object_or_404(Article, pk=kwargs['pk'])
                 article.update_counter()
-                return super(ArticleCounterRedirectView, self).get_redirect_url(*args, **kwargs)
+                return super().get_redirect_url(*args, **kwargs)
 
     **Example urls.py**::
 

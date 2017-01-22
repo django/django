@@ -704,13 +704,13 @@ If your tests make any database queries, use subclasses
 
             @classmethod
             def setUpClass(cls):
-                super(MyTestCase, cls).setUpClass()
+                super().setUpClass()
                 ...
 
             @classmethod
             def tearDownClass(cls):
                 ...
-                super(MyTestCase, cls).tearDownClass()
+                super().tearDownClass()
 
     Be sure to account for Python's behavior if an exception is raised during
     ``setUpClass()``. If that happens, neither the tests in the class nor
@@ -880,14 +880,14 @@ The code for this test may look as follows::
 
         @classmethod
         def setUpClass(cls):
-            super(MySeleniumTests, cls).setUpClass()
+            super().setUpClass()
             cls.selenium = WebDriver()
             cls.selenium.implicitly_wait(10)
 
         @classmethod
         def tearDownClass(cls):
             cls.selenium.quit()
-            super(MySeleniumTests, cls).tearDownClass()
+            super().tearDownClass()
 
         def test_login(self):
             self.selenium.get('%s%s' % (self.live_server_url, '/login/'))

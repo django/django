@@ -797,7 +797,7 @@ Alternatively, you can create a subclass that sets ``self.queryset`` in
 
     class BaseAuthorFormSet(BaseModelFormSet):
         def __init__(self, *args, **kwargs):
-            super(BaseAuthorFormSet, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
             self.queryset = Author.objects.filter(name__startswith='O')
 
 Then, pass your ``BaseAuthorFormSet`` class to the factory function::
@@ -1002,7 +1002,7 @@ class's ``clean`` method::
 
     class MyModelFormSet(BaseModelFormSet):
         def clean(self):
-            super(MyModelFormSet, self).clean()
+            super().clean()
             # example custom validation across forms in the formset
             for form in self.forms:
                 # your custom formset validation
@@ -1018,7 +1018,7 @@ to modify a value in ``ModelFormSet.clean()`` you must modify
 
     class MyModelFormSet(BaseModelFormSet):
         def clean(self):
-            super(MyModelFormSet, self).clean()
+            super().clean()
 
             for form in self.forms:
                 name = form.cleaned_data['name'].upper()
@@ -1164,7 +1164,7 @@ For example, if you want to override ``clean()``::
 
     class CustomInlineFormSet(BaseInlineFormSet):
         def clean(self):
-            super(CustomInlineFormSet, self).clean()
+            super().clean()
             # example custom validation across forms in the formset
             for form in self.forms:
                 # your custom formset validation

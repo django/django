@@ -168,7 +168,7 @@ behave like any existing field, so we'll subclass directly from
 
         def __init__(self, *args, **kwargs):
             kwargs['max_length'] = 104
-            super(HandField, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
 Our ``HandField`` accepts most of the standard field options (see the list
 below), but we ensure it has a fixed length, since it only needs to hold 52
@@ -262,10 +262,10 @@ we can drop it from the keyword arguments for readability::
 
         def __init__(self, *args, **kwargs):
             kwargs['max_length'] = 104
-            super(HandField, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
         def deconstruct(self):
-            name, path, args, kwargs = super(HandField, self).deconstruct()
+            name, path, args, kwargs = super().deconstruct()
             del kwargs["max_length"]
             return name, path, args, kwargs
 
@@ -279,10 +279,10 @@ into ``kwargs`` yourself::
 
         def __init__(self, separator=",", *args, **kwargs):
             self.separator = separator
-            super(CommaSepField, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
         def deconstruct(self):
-            name, path, args, kwargs = super(CommaSepField, self).deconstruct()
+            name, path, args, kwargs = super().deconstruct()
             # Only include kwarg if it's not the default
             if self.separator != ",":
                 kwargs['separator'] = self.separator
@@ -435,7 +435,7 @@ time -- i.e., when the class is instantiated. To do that, just implement
     class BetterCharField(models.Field):
         def __init__(self, max_length, *args, **kwargs):
             self.max_length = max_length
-            super(BetterCharField, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
         def db_type(self, connection):
             return 'char(%s)' % self.max_length
@@ -576,7 +576,7 @@ For example, Django uses the following method for its
 :class:`BinaryField`::
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        value = super(BinaryField, self).get_db_prep_value(value, connection, prepared)
+        value = super().get_db_prep_value(value, connection, prepared)
         if value is not None:
             return connection.Database.Binary(value)
         return value
@@ -633,7 +633,7 @@ as::
             # while letting the caller override them.
             defaults = {'form_class': MyFormField}
             defaults.update(kwargs)
-            return super(HandField, self).formfield(**defaults)
+            return super().formfield(**defaults)
 
 This assumes we've imported a ``MyFormField`` field class (which has its own
 default widget). This document doesn't cover the details of writing custom form

@@ -113,7 +113,7 @@ are loaded from the database::
         if not self._state.adding and (
                 self.creator_id != self._loaded_values['creator_id']):
             raise ValueError("Updating the value of creator isn't allowed")
-        super(...).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 The example above shows a full ``from_db()`` implementation to clarify how that
 is done. In this case it would of course be possible to just use ``super()`` call
@@ -184,7 +184,7 @@ all of the instance's fields when a deferred field is reloaded::
                 if fields.intersection(deferred_fields):
                     # then load all of them
                     fields = fields.union(deferred_fields)
-            super(ExampleModel, self).refresh_from_db(using, fields, **kwargs)
+            super().refresh_from_db(using, fields, **kwargs)
 
 .. method:: Model.get_deferred_fields()
 

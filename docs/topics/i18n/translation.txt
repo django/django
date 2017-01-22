@@ -1735,7 +1735,7 @@ If you need more flexibility, you could also add a new argument to your custom
     class Command(makemessages.Command):
 
         def add_arguments(self, parser):
-            super(Command, self).add_arguments(parser)
+            super().add_arguments(parser)
             parser.add_argument(
                 '--extra-keyword',
                 dest='xgettext_keywords',
@@ -1749,7 +1749,7 @@ If you need more flexibility, you could also add a new argument to your custom
                     makemessages.Command.xgettext_options[:] +
                     ['--keyword=%s' % kwd for kwd in xgettext_keywords]
                 )
-            super(Command, self).handle(*args, **options)
+            super().handle(*args, **options)
 
 Miscellaneous
 =============

@@ -533,7 +533,7 @@ default fields/attributes of the order and deletion fields::
     >>> from myapp.forms import ArticleForm
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     def add_fields(self, form, index):
-    ...         super(BaseArticleFormSet, self).add_fields(form, index)
+    ...         super().add_fields(form, index)
     ...         form.fields["my_field"] = forms.CharField()
 
     >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
@@ -559,7 +559,7 @@ You can pass this parameter when instantiating the formset::
     >>> class MyArticleForm(ArticleForm):
     ...     def __init__(self, *args, **kwargs):
     ...         self.user = kwargs.pop('user')
-    ...         super(MyArticleForm, self).__init__(*args, **kwargs)
+    ...         super().__init__(*args, **kwargs)
 
     >>> ArticleFormSet = formset_factory(MyArticleForm)
     >>> formset = ArticleFormSet(form_kwargs={'user': request.user})
@@ -574,7 +574,7 @@ argument - the index of the form in the formset. The index is ``None`` for the
 
     >>> class BaseArticleFormSet(BaseFormSet):
     ...     def get_form_kwargs(self, index):
-    ...         kwargs = super(BaseArticleFormSet, self).get_form_kwargs(index)
+    ...         kwargs = super().get_form_kwargs(index)
     ...         kwargs['custom_kwarg'] = index
     ...         return kwargs
 

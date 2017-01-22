@@ -277,7 +277,7 @@ that it can be used on an instance method. For example::
 
         @method_decorator(login_required)
         def dispatch(self, *args, **kwargs):
-            return super(ProtectedView, self).dispatch(*args, **kwargs)
+            return super().dispatch(*args, **kwargs)
 
 Or, more succinctly, you can decorate the class instead and pass the name
 of the method to be decorated as the keyword argument ``name``::

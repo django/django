@@ -910,11 +910,11 @@ subclass::
 
                   def lookups(self, request, model_admin):
                       if request.user.is_superuser:
-                          return super(AuthDecadeBornListFilter, self).lookups(request, model_admin)
+                          return super().lookups(request, model_admin)
 
                   def queryset(self, request, queryset):
                       if request.user.is_superuser:
-                          return super(AuthDecadeBornListFilter, self).queryset(request, queryset)
+                          return super().queryset(request, queryset)
 
           Also as a convenience, the ``ModelAdmin`` object is passed to
           the ``lookups`` method, for example if you want to base the
@@ -1342,7 +1342,7 @@ templates used by the :class:`ModelAdmin` views:
         class ArticleAdmin(admin.ModelAdmin):
             def save_model(self, request, obj, form, change):
                 obj.user = request.user
-                super(ArticleAdmin, self).save_model(request, obj, form, change)
+                super().save_model(request, obj, form, change)
 
 .. method:: ModelAdmin.delete_model(request, obj)
 
@@ -1409,7 +1409,7 @@ templates used by the :class:`ModelAdmin` views:
             search_fields = ('name',)
 
             def get_search_results(self, request, queryset, search_term):
-                queryset, use_distinct = super(PersonAdmin, self).get_search_results(request, queryset, search_term)
+                queryset, use_distinct = super().get_search_results(request, queryset, search_term)
                 try:
                     search_term_as_int = int(search_term)
                 except ValueError:
@@ -1526,7 +1526,7 @@ templates used by the :class:`ModelAdmin` views:
 
         class MyModelAdmin(admin.ModelAdmin):
             def get_urls(self):
-                urls = super(MyModelAdmin, self).get_urls()
+                urls = super().get_urls()
                 my_urls = [
                     url(r'^my_view/$', self.my_view),
                 ]
@@ -1578,7 +1578,7 @@ templates used by the :class:`ModelAdmin` views:
 
         class MyModelAdmin(admin.ModelAdmin):
             def get_urls(self):
-                urls = super(MyModelAdmin, self).get_urls()
+                urls = super().get_urls()
                 my_urls = [
                     url(r'^my_view/$', self.admin_site.admin_view(self.my_view))
                 ]
@@ -1615,7 +1615,7 @@ templates used by the :class:`ModelAdmin` views:
             def get_form(self, request, obj=None, **kwargs):
                 if request.user.is_superuser:
                     kwargs['form'] = MySuperuserForm
-                return super(MyModelAdmin, self).get_form(request, obj, **kwargs)
+                return super().get_form(request, obj, **kwargs)
 
     You may also simply return a custom :class:`~django.forms.ModelForm` class
     directly.
@@ -1648,7 +1648,7 @@ templates used by the :class:`ModelAdmin` views:
             def formfield_for_foreignkey(self, db_field, request, **kwargs):
                 if db_field.name == "car":
                     kwargs["queryset"] = Car.objects.filter(owner=request.user)
-                return super(MyModelAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+                return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     This uses the ``HttpRequest`` instance to filter the ``Car`` foreign key
     field to only display the cars owned by the ``User`` instance.
@@ -1666,7 +1666,7 @@ templates used by the :class:`ModelAdmin` views:
             def formfield_for_manytomany(self, db_field, request, **kwargs):
                 if db_field.name == "cars":
                     kwargs["queryset"] = Car.objects.filter(owner=request.user)
-                return super(MyModelAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+                return super().formfield_for_manytomany(db_field, request, **kwargs)
 
 .. method:: ModelAdmin.formfield_for_choice_field(db_field, request, **kwargs)
 
@@ -1685,7 +1685,7 @@ templates used by the :class:`ModelAdmin` views:
                     )
                     if request.user.is_superuser:
                         kwargs['choices'] += (('ready', 'Ready for deployment'),)
-                return super(MyModelAdmin, self).formfield_for_choice_field(db_field, request, **kwargs)
+                return super().formfield_for_choice_field(db_field, request, **kwargs)
 
     .. admonition:: Note
 
@@ -1740,7 +1740,7 @@ templates used by the :class:`ModelAdmin` views:
         class MyModelAdmin(admin.ModelAdmin):
             def get_changelist_formset(self, request, **kwargs):
                 kwargs['formset'] = MyAdminFormSet
-                return super(MyModelAdmin, self).get_changelist_formset(request, **kwargs)
+                return super().get_changelist_formset(request, **kwargs)
 
 .. method:: ModelAdmin.has_add_permission(request)
 
@@ -1783,7 +1783,7 @@ templates used by the :class:`ModelAdmin` views:
 
         class MyModelAdmin(admin.ModelAdmin):
             def get_queryset(self, request):
-                qs = super(MyModelAdmin, self).get_queryset(request)
+                qs = super().get_queryset(request)
                 if request.user.is_superuser:
                     return qs
                 return qs.filter(author=request.user)
@@ -1902,7 +1902,7 @@ provided some extra mapping data that would not otherwise be available::
         def change_view(self, request, object_id, form_url='', extra_context=None):
             extra_context = extra_context or {}
             extra_context['osm_data'] = self.get_osm_info()
-            return super(MyModelAdmin, self).change_view(
+            return super().change_view(
                 request, object_id, form_url, extra_context=extra_context,
             )
 
