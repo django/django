@@ -217,6 +217,33 @@ The end of upstream support for Oracle 11.2 is Dec. 2020. Django 1.11 will be
 supported until April 2020 which almost reaches this date. Django 2.0
 officially supports Oracle 12.1+.
 
+:attr:`AbstractUser.last_name <django.contrib.auth.models.User.last_name>` ``max_length`` increased to 150
+----------------------------------------------------------------------------------------------------------
+
+A migration for :attr:`django.contrib.auth.models.User.last_name` is included.
+If you have a custom user model inheriting from ``AbstractUser``, you'll need
+to generate and apply a database migration for your user model.
+
+If you want to preserve the 30 character limit for last names, use a custom
+form::
+
+    from django.contrib.auth.forms import UserChangeForm
+
+    class MyUserChangeForm(UserChangeForm):
+        last_name = forms.CharField(max_length=30, required=False)
+
+If you wish to keep this restriction in the admin when editing users, set
+``UserAdmin.form`` to use this form::
+
+    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.models import User
+
+    class MyUserAdmin(UserAdmin):
+        form = MyUserChangeForm
+
+    admin.site.unregister(User)
+    admin.site.register(User, MyUserAdmin)
+
 Miscellaneous
 -------------
 
