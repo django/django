@@ -1431,6 +1431,13 @@ templates used by the :class:`ModelAdmin` views:
     pre- or post-save operations for objects related to the parent. Note
     that at this point the parent object and its form have already been saved.
 
+.. method:: ModelAdmin.get_inlines(request, obj=None)
+
+    The ``get_inlines`` method is given the ``HttpRequest`` and the
+    ``obj`` being edited (or ``None`` on an add form) and is expected to return
+    a ``list`` or ``tuple`` of inline objects, You could override this method to add
+    inlines to a model instead of specifying them in a ``ModelAdmin.inlines``::
+
 .. method:: ModelAdmin.get_readonly_fields(request, obj=None)
 
     The ``get_readonly_fields`` method is given the ``HttpRequest`` and the
