@@ -429,7 +429,7 @@ class Model(metaclass=ModelBase):
 
         for field in fields_iter:
             is_related_object = False
-            # Virtual field
+            # Private field
             if field.attname not in kwargs and field.column is None:
                 continue
             if kwargs:
@@ -477,7 +477,7 @@ class Model(metaclass=ModelBase):
             for prop in tuple(kwargs):
                 try:
                     # Any remaining kwargs must correspond to properties or
-                    # virtual fields.
+                    # Private fields.
                     if prop in property_names or opts.get_field(prop):
                         if kwargs[prop] is not _DEFERRED:
                             _setattr(self, prop, kwargs[prop])
