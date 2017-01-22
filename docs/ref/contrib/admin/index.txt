@@ -1436,7 +1436,7 @@ templates used by the :class:`ModelAdmin` views:
     The ``get_inlines`` method is given the ``HttpRequest`` and the
     ``obj`` being edited (or ``None`` on an add form) and is expected to return
     a ``list`` or ``tuple`` of inline objects, You could override this method to add
-    inlines to a model instead of specifying them in a ``ModelAdmin.inlines``::
+    inlines to a model instead of specifying them in :attr:`ModelAdmin.readonly_fields`
 
 .. method:: ModelAdmin.get_readonly_fields(request, obj=None)
 
