@@ -539,10 +539,6 @@ class ChoiceWidget(Widget):
         for option in self.options(name, value, attrs):
             yield option
 
-    def render(self, name, value, attrs=None, renderer=None):
-        context = self.get_context(name, value, attrs)
-        return self._render(self.template_name, context, renderer)
-
     def options(self, name, value, attrs=None):
         """Yield a flat list of options for this widgets."""
         for group in self.optgroups(name, value, attrs):
