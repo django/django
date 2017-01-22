@@ -1,5 +1,6 @@
 import json
 import sys
+from collections import UserList
 
 from django.conf import settings
 from django.core.exceptions import ValidationError  # backwards compatibility
@@ -7,11 +8,6 @@ from django.utils import six, timezone
 from django.utils.encoding import force_text
 from django.utils.html import escape, format_html, format_html_join, html_safe
 from django.utils.translation import ugettext_lazy as _
-
-try:
-    from collections import UserList
-except ImportError:  # Python 2
-    from UserList import UserList
 
 
 def pretty_name(name):

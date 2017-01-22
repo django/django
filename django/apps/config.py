@@ -17,7 +17,7 @@ class AppConfig:
         self.name = app_name
 
         # Root module for the application eg. <module 'django.contrib.admin'
-        # from 'django/contrib/admin/__init__.pyc'>.
+        # from 'django/contrib/admin/__init__.py'>.
         self.module = app_module
 
         # Reference to the Apps registry that holds this AppConfig. Set by the
@@ -37,13 +37,12 @@ class AppConfig:
             self.verbose_name = self.label.title()
 
         # Filesystem path to the application directory eg.
-        # u'/usr/lib/python2.7/dist-packages/django/contrib/admin'. Unicode on
-        # Python 2 and a str on Python 3.
+        # '/path/to/django/contrib/admin'.
         if not hasattr(self, 'path'):
             self.path = self._path_from_module(app_module)
 
         # Module containing models eg. <module 'django.contrib.admin.models'
-        # from 'django/contrib/admin/models.pyc'>. Set by import_models().
+        # from 'django/contrib/admin/models.py'>. Set by import_models().
         # None if the application doesn't have a models module.
         self.models_module = None
 

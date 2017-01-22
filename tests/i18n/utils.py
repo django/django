@@ -7,7 +7,7 @@ source_code_dir = os.path.dirname(__file__)
 
 
 def copytree(src, dst):
-    shutil.copytree(src, dst, ignore=shutil.ignore_patterns('*.pyc', '__pycache__'))
+    shutil.copytree(src, dst, ignore=shutil.ignore_patterns('__pycache__'))
 
 
 class POFileAssertionMixin:

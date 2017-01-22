@@ -206,12 +206,12 @@ Read-only attributes
 .. attribute:: AppConfig.module
 
     Root module for the application, e.g. ``<module 'django.contrib.admin' from
-    'django/contrib/admin/__init__.pyc'>``.
+    'django/contrib/admin/__init__.py'>``.
 
 .. attribute:: AppConfig.models_module
 
     Module containing the models, e.g. ``<module 'django.contrib.admin.models'
-    from 'django/contrib/admin/models.pyc'>``.
+    from 'django/contrib/admin/models.py'>``.
 
     It may be ``None`` if the application doesn't contain a ``models`` module.
     Note that the database related signals such as

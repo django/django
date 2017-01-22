@@ -11,9 +11,7 @@ except AttributeError:
 class HTMLParser(html.parser.HTMLParser):
     """Explicitly set convert_charrefs to be False.
 
-    This silences a deprecation warning on Python 3.4, but we can't do
-    it at call time because Python 2.7 does not have the keyword
-    argument.
+    This silences a deprecation warning on Python 3.4.
     """
     def __init__(self, convert_charrefs=False, **kwargs):
         html.parser.HTMLParser.__init__(self, convert_charrefs=convert_charrefs, **kwargs)

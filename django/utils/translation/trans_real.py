@@ -101,7 +101,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         gettext_module.GNUTranslations.__init__(self)
         if domain is not None:
             self.domain = domain
-        self.set_output_charset('utf-8')  # For Python 2 gettext() (#25720)
 
         self.__language = language
         self.__to_language = to_language(language)
@@ -326,11 +325,7 @@ def do_translate(message, translation_function):
 
 
 def gettext(message):
-    """
-    Returns a string of the translation of the message.
-
-    Returns a string on Python 3 and an UTF-8-encoded bytestring on Python 2.
-    """
+    """Return a string of the translation of the message."""
     return do_translate(message, 'gettext')
 
 
@@ -372,8 +367,6 @@ def ngettext(singular, plural, number):
     """
     Returns a string of the translation of either the singular or plural,
     based on the number.
-
-    Returns a string on Python 3 and an UTF-8-encoded bytestring on Python 2.
     """
     return do_ntranslate(singular, plural, number, 'ngettext')
 

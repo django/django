@@ -21,8 +21,7 @@ from django.template import Context, Template
 from django.test import SimpleTestCase
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
-from django.utils.html import format_html
-from django.utils.safestring import SafeData, mark_safe
+from django.utils.safestring import mark_safe
 
 
 class Person(Form):
@@ -2027,22 +2026,6 @@ Password: <input type="password" name="password" required /></li>
         # affected by the form data.
         form = PersonForm({})
         self.assertEqual(form['name'].value(), 'John Doe')
-
-    def test_boundfield_rendering(self):
-        """
-        Python 2 issue: Rendering a BoundField with bytestring content
-        doesn't lose it's safe string status (#22950).
-        """
-        class CustomWidget(TextInput):
-            def render(self, name, value, attrs=None, choices=None,
-                       renderer=None, extra_context=None):
-                return format_html(str('<input{} />'), ' id=custom')
-
-        class SampleForm(Form):
-            name = CharField(widget=CustomWidget)
-
-        f = SampleForm(data={'name': 'bar'})
-        self.assertIsInstance(force_text(f['name']), SafeData)
 
     def test_custom_boundfield(self):
         class CustomField(CharField):

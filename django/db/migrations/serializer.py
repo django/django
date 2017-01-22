@@ -160,24 +160,14 @@ class FunctionTypeSerializer(BaseSerializer):
             if "<" not in self.value.__qualname__:  # Qualname can include <locals>
                 return "%s.%s" % \
                     (self.value.__module__, self.value.__qualname__), {"import %s" % self.value.__module__}
-        # Python 2/fallback version
+        # Fallback version
         module_name = self.value.__module__
-        # Make sure it's actually there and not an unbound method
+        # Make sure it's actually there
         module = import_module(module_name)
         if not hasattr(module, self.value.__name__):
             raise ValueError(
-                "Could not find function %s in %s.\n"
-                "Please note that due to Python 2 limitations, you cannot "
-                "serialize unbound method functions (e.g. a method "
-                "declared and used in the same class body). Please move "
-                "the function into the main module body to use migrations.\n"
-                "For more information, see "
-                "https://docs.djangoproject.com/en/%s/topics/migrations/#serializing-values"
-                % (self.value.__name__, module_name, get_docs_version())
+                "Could not find function %s in %s.\n" % (self.value.__name__, module_name)
             )
-        # Needed on Python 2 only
-        if module_name == '__builtin__':
-            return self.value.__name__, set()
         return "%s.%s" % (module_name, self.value.__name__), {"import %s" % module_name}
 
 
