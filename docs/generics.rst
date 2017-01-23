@@ -63,7 +63,7 @@ If you want to perfom more complicated routing, you'll need to override the
 remember, though, your channel names cannot change during runtime and must
 always be the same for as long as your process runs.
 
-``BaseConsumer`` and all other generic consumers than inherit from it provide
+``BaseConsumer`` and all other generic consumers that inherit from it provide
 two instance variables on the class:
 
 * ``self.message``, the :ref:`Message object <ref-message>` representing the
