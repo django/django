@@ -164,7 +164,7 @@ def floatformat(text, arg=-1):
 @stringfilter
 def iriencode(value):
     """Escapes an IRI value for use in a URL."""
-    return force_text(iri_to_uri(value))
+    return iri_to_uri(value)
 
 
 @register.filter(is_safe=True, needs_autoescape=True)

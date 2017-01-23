@@ -733,8 +733,7 @@ in ``get_absolute_url()`` and have all your other code call that one place.
     Code and templates calling ``get_absolute_url()`` should be able to use the
     result directly without any further processing. You may wish to use the
     ``django.utils.encoding.iri_to_uri()`` function to help with this if you
-    are using unicode strings containing characters outside the ASCII range at
-    all.
+    are using strings containing characters outside the ASCII range.
 
 Extra instance methods
 ======================

@@ -151,13 +151,13 @@ def iri_to_uri(iri):
     Convert an Internationalized Resource Identifier (IRI) portion to a URI
     portion that is suitable for inclusion in a URL.
 
-    This is the algorithm from section 3.1 of RFC 3987.  However, since we are
-    assuming input is either UTF-8 or unicode already, we can simplify things a
-    little from the full method.
+    This is the algorithm from section 3.1 of RFC 3987, slightly simplified
+    since the input is assumed to be a string rather than an arbitrary byte
+    stream.
 
-    Takes an IRI in UTF-8 bytes (e.g. '/I \xe2\x99\xa5 Django/') or unicode
-    (e.g. '/I ♥ Django/') and returns ASCII bytes containing the encoded result
-    (e.g. '/I%20%E2%99%A5%20Django/').
+    Take an IRI (string or UTF-8 bytes, e.g. '/I ♥ Django/' or
+    b'/I \xe2\x99\xa5 Django/') and return a string containing the encoded
+    result with ASCII chars only (e.g. '/I%20%E2%99%A5%20Django/').
     """
     # The list of safe characters here is constructed from the "reserved" and
     # "unreserved" characters specified in sections 2.2 and 2.3 of RFC 3986:
@@ -173,7 +173,9 @@ def iri_to_uri(iri):
     # converted.
     if iri is None:
         return iri
-    return quote(force_bytes(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
+    elif isinstance(iri, Promise):
+        iri = str(iri)
+    return quote(iri, safe="/#%[]=:;$&()+,!?*@'~")
 
 
 def uri_to_iri(uri):

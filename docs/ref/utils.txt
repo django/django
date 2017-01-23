@@ -262,12 +262,12 @@ The functions defined in this module share the following properties:
     Convert an Internationalized Resource Identifier (IRI) portion to a URI
     portion that is suitable for inclusion in a URL.
 
-    This is the algorithm from section 3.1 of :rfc:`3987#section-3.1`. However,
-    since we are assuming input is either UTF-8 or unicode already, we can
-    simplify things a little from the full method.
+    This is the algorithm from section 3.1 of :rfc:`3987#section-3.1`, slightly
+    simplified since the input is assumed to be a string rather than an
+    arbitrary byte stream.
 
-    Takes an IRI in UTF-8 bytes and returns ASCII bytes containing the encoded
-    result.
+    Takes an IRI (string or UTF-8 bytes) and returns a string containing the
+    encoded result.
 
 .. function:: uri_to_iri(uri)
 
