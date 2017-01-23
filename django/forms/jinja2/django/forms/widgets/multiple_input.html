@@ -1,5 +1,5 @@
 {% set id = widget.attrs.id %}<ul{% if id %} id="{{ id }}"{% endif %}>{% for group, options, index in widget.optgroups %}{% if group %}
-  <li>{{ group }}<ul{% if id %} id="{{ id }}_{{ index }}{% endif %}">{% endif %}{% for widget in options %}
+  <li>{{ group }}<ul{% if id %} id="{{ id }}_{{ index }}"{% endif %}>{% endif %}{% for widget in options %}
     <li>{% include widget.template_name %}</li>{% endfor %}{% if group %}
   </ul></li>{% endif %}{% endfor %}
 </ul>
