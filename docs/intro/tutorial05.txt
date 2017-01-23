@@ -366,7 +366,7 @@ With that ready, we can ask the client to do some work for us::
     404
     >>> # on the other hand we should expect to find something at '/polls/'
     >>> # we'll use 'reverse()' rather than a hardcoded URL
-    >>> from django.urls import reverse
+    >>> from django.core.urlresolvers import reverse
     >>> response = client.get(reverse('polls:index'))
     >>> response.status_code
     200
@@ -439,7 +439,7 @@ Add the following to ``polls/tests.py``:
 .. snippet::
     :filename: polls/tests.py
 
-    from django.urls import reverse
+    from django.core.urlresolvers import reverse
 
 and we'll create a shortcut function to create questions as well as a new test
 class:
