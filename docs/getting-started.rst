@@ -228,6 +228,13 @@ And what our routing should look like in ``routing.py``::
         route("websocket.disconnect", ws_disconnect),
     ]
 
+Note that the ``http.request`` route is no longer present - if we leave it
+out, then Django will route HTTP requests to the normal view system by default,
+which is probably what you want. Even if you have a ``http.request`` route that
+matches just a subset of paths or methods, the ones that don't match will still
+fall through to the default handler, which passes it into URL routing and the
+views.
+
 With all that code, you now have a working set of a logic for a chat server.
 Test time! Run ``runserver``, open a browser and use that same JavaScript
 code in the developer console as before::
