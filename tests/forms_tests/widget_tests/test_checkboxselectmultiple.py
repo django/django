@@ -78,6 +78,41 @@ class CheckboxSelectMultipleTest(WidgetTest):
             attrs={'id': 'media'}, html=html,
         )
 
+    def test_nested_choices_without_id(self):
+        nested_choices = (
+            ('unknown', 'Unknown'),
+            ('Audio', (('vinyl', 'Vinyl'), ('cd', 'CD'))),
+            ('Video', (('vhs', 'VHS'), ('dvd', 'DVD'))),
+        )
+        html = """
+        <ul>
+        <li>
+        <label><input name="nestchoice" type="checkbox" value="unknown" /> Unknown</label>
+        </li>
+        <li>Audio<ul>
+        <li>
+        <label>
+        <input checked name="nestchoice" type="checkbox" value="vinyl" /> Vinyl
+        </label>
+        </li>
+        <li>
+        <label><input name="nestchoice" type="checkbox" value="cd" /> CD</label>
+        </li>
+        </ul></li>
+        <li>Video<ul>
+        <li>
+        <label><input name="nestchoice" type="checkbox" value="vhs" /> VHS</label>
+        </li>
+        <li>
+        <label>
+        <input checked name="nestchoice" type="checkbox" value="dvd" /> DVD
+        </label>
+        </li>
+        </ul></li>
+        </ul>
+        """
+        self.check_html(self.widget(choices=nested_choices), 'nestchoice', ('vinyl', 'dvd'), html=html)
+
     def test_separate_ids(self):
         """
         Each input gets a separate ID.
