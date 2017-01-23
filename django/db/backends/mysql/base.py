@@ -10,7 +10,6 @@ from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils.functional import cached_property
-from django.utils.safestring import SafeBytes, SafeText
 
 try:
     import MySQLdb as Database
@@ -43,9 +42,7 @@ if (version < (1, 2, 1) or (
 
 # MySQLdb-1.2.1 returns TIME columns as timedelta -- they are more like
 # timedelta in terms of actual behavior as they are signed and include days --
-# and Django expects time, so we still need to override that. We also need to
-# add special handling for SafeText and SafeBytes as MySQLdb's type
-# checking is too tight to catch those (see Django ticket #6052).
+# and Django expects time.
 django_conversions = conversions.copy()
 django_conversions.update({
     FIELD_TYPE.TIME: backend_utils.typecast_time,
@@ -249,10 +246,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return kwargs
 
     def get_new_connection(self, conn_params):
-        conn = Database.connect(**conn_params)
-        conn.encoders[SafeText] = conn.encoders[str]
-        conn.encoders[SafeBytes] = conn.encoders[bytes]
-        return conn
+        return Database.connect(**conn_params)
 
     def init_connection_state(self):
         assignments = []
