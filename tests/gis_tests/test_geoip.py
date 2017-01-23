@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import os
+import socket
 import unittest
 from unittest import skipUnless
 
@@ -28,6 +29,17 @@ if HAS_GEOS:
 class GeoIPTest(unittest.TestCase):
     addr = '162.242.220.127'
     fqdn = 'www.djangoproject.com'
+
+    def _is_dns_available(self, domain):
+        # Naive check to see if there is DNS available to use.
+        # Used to conditionally skip fqdn geoip checks.
+        # See #25407 for details.
+        ErrClass = socket.error if six.PY2 else OSError
+        try:
+            socket.gethostbyname(domain)
+            return True
+        except ErrClass:
+            return False
 
     def test01_init(self):
         "Testing GeoIP initialization."
@@ -73,7 +85,10 @@ class GeoIPTest(unittest.TestCase):
         "Testing GeoIP country querying methods."
         g = GeoIP(city='<foo>')
 
-        for query in (self.fqdn, self.addr):
+        queries = [self.addr]
+        if self._is_dns_available(self.fqdn):
+            queries.append(self.fqdn)
+        for query in queries:
             for func in (g.country_code, g.country_code_by_addr, g.country_code_by_name):
                 self.assertEqual('US', func(query))
             for func in (g.country_name, g.country_name_by_addr, g.country_name_by_name):
@@ -86,7 +101,10 @@ class GeoIPTest(unittest.TestCase):
         "Testing GeoIP city querying methods."
         g = GeoIP(country='<foo>')
 
-        for query in (self.fqdn, self.addr):
+        queries = [self.addr]
+        if self._is_dns_available(self.fqdn):
+            queries.append(self.fqdn)
+        for query in queries:
             # Country queries should still work.
             for func in (g.country_code, g.country_code_by_addr, g.country_code_by_name):
                 self.assertEqual('US', func(query))
@@ -113,8 +131,10 @@ class GeoIPTest(unittest.TestCase):
     def test05_unicode_response(self):
         "Testing that GeoIP strings are properly encoded, see #16553."
         g = GeoIP()
-        d = g.city("hs-duesseldorf.de")
-        self.assertEqual('Düsseldorf', d['city'])
+        fqdn = "hs-duesseldorf.de"
+        if self._is_dns_available(fqdn):
+            d = g.city(fqdn)
+            self.assertEqual('Düsseldorf', d['city'])
         d = g.country('200.26.205.1')
         # Some databases have only unaccented countries
         self.assertIn(d['country_name'], ('Curaçao', 'Curacao'))
