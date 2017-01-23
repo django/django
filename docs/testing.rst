@@ -153,8 +153,8 @@ For example::
 
         def test_rooms(self):
             client = HttpClient()
-            user = User.objects.create_user(username='test', email='test@test.com',
-                                            password='123456') # fuck you security
+            user = User.objects.create_user(
+                username='test', email='test@test.com', password='123456')
             client.login(username='test', password='123456')
 
             client.send_and_consume('websocket.connect', '/rooms/')
