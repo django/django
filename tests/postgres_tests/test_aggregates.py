@@ -128,7 +128,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         self.assertEqual(values, json.loads('{"jsonagg": []}'))
 
 
-class TestStringAggregateDistinct(PostgreSQLTestCase):
+class TestAggregateDistinct(PostgreSQLTestCase):
     @classmethod
     def setUpTestData(cls):
         AggregateTestModel.objects.create(char_field='Foo')
@@ -144,6 +144,14 @@ class TestStringAggregateDistinct(PostgreSQLTestCase):
         values = AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter=' ', distinct=True))
         self.assertEqual(values['stringagg'].count('Foo'), 1)
         self.assertEqual(values['stringagg'].count('Bar'), 1)
+
+    def test_array_agg_distinct_false(self):
+        values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('char_field', distinct=False))
+        self.assertEqual(sorted(values['arrayagg']), ['Bar', 'Foo', 'Foo'])
+
+    def test_array_agg_distinct_true(self):
+        values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('char_field', distinct=True))
+        self.assertEqual(sorted(values['arrayagg']), ['Bar', 'Foo'])
 
 
 class TestStatisticsAggregate(PostgreSQLTestCase):
