@@ -49,8 +49,6 @@ if (version < (1, 2, 1) or (
 django_conversions = conversions.copy()
 django_conversions.update({
     FIELD_TYPE.TIME: backend_utils.typecast_time,
-    FIELD_TYPE.DECIMAL: backend_utils.typecast_decimal,
-    FIELD_TYPE.NEWDECIMAL: backend_utils.typecast_decimal,
 })
 
 # This should match the numerical portion of the version numbers (we can treat
