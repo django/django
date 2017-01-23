@@ -1,6 +1,7 @@
 import errno
 import os
 from datetime import datetime
+from io import open
 from urllib.parse import urljoin
 
 from django.conf import settings
