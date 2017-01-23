@@ -225,7 +225,12 @@ Features deprecated in 2.0
 Miscellaneous
 -------------
 
-* ...
+* The ``django.db.backends.postgresql_psycopg2`` module is deprecated in favor
+  of ``django.db.backends.postgresql``. It's been an alias since Django 1.9.
+  This only affects code that imports from the module directly. The
+  ``DATABASES`` setting can still use
+  ``'django.db.backends.postgresql_psycopg2'``, though you can simplify that by
+  using the ``'django.db.backends.postgresql'`` name added in Django 1.9.
 
 .. _removed-features-2.0:
 
