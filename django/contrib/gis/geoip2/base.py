@@ -143,7 +143,7 @@ class GeoIP2:
         }
 
     def _check_query(self, query, country=False, city=False, city_or_country=False):
-        "Helper routine for checking the query and database availability."
+        "Check the query and database availability."
         # Making sure a string was passed in for the query.
         if not isinstance(query, str):
             raise TypeError('GeoIP query must be a string, not type %s' % type(query).__name__)

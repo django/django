@@ -40,7 +40,7 @@ class ModelBackend:
 
     def _get_permissions(self, user_obj, obj, from_name):
         """
-        Returns the permissions of `user_obj` from `from_name`. `from_name` can
+        Return the permissions of `user_obj` from `from_name`. `from_name` can
         be either "group" or "user" to return permissions from
         `_get_group_permissions` or `_get_user_permissions` respectively.
         """
@@ -59,14 +59,14 @@ class ModelBackend:
 
     def get_user_permissions(self, user_obj, obj=None):
         """
-        Returns a set of permission strings the user `user_obj` has from their
+        Return a set of permission strings the user `user_obj` has from their
         `user_permissions`.
         """
         return self._get_permissions(user_obj, obj, 'user')
 
     def get_group_permissions(self, user_obj, obj=None):
         """
-        Returns a set of permission strings the user `user_obj` has from the
+        Return a set of permission strings the user `user_obj` has from the
         groups they belong.
         """
         return self._get_permissions(user_obj, obj, 'group')
@@ -86,7 +86,7 @@ class ModelBackend:
 
     def has_module_perms(self, user_obj, app_label):
         """
-        Returns True if user_obj has any permissions in the given app_label.
+        Return True if user_obj has any permissions in the given app_label.
         """
         if not user_obj.is_active:
             return False
@@ -125,11 +125,11 @@ class RemoteUserBackend(ModelBackend):
 
     def authenticate(self, request, remote_user):
         """
-        The username passed as ``remote_user`` is considered trusted.  This
-        method simply returns the ``User`` object with the given username,
-        creating a new ``User`` object if ``create_unknown_user`` is ``True``.
+        The username passed as ``remote_user`` is considered trusted. Return
+        the ``User`` object with the given username. Create a new ``User``
+        object if ``create_unknown_user`` is ``True``.
 
-        Returns None if ``create_unknown_user`` is ``False`` and a ``User``
+        Return None if ``create_unknown_user`` is ``False`` and a ``User``
         object with the given username is not found in the database.
         """
         if not remote_user:
@@ -155,18 +155,18 @@ class RemoteUserBackend(ModelBackend):
 
     def clean_username(self, username):
         """
-        Performs any cleaning on the "username" prior to using it to get or
-        create the user object.  Returns the cleaned username.
+        Perform any cleaning on the "username" prior to using it to get or
+        create the user object.  Return the cleaned username.
 
-        By default, returns the username unchanged.
+        By default, return the username unchanged.
         """
         return username
 
     def configure_user(self, user):
         """
-        Configures a user after creation and returns the updated user.
+        Configure a user after creation and return the updated user.
 
-        By default, returns the user unmodified.
+        By default, return the user unmodified.
         """
         return user
 

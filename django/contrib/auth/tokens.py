@@ -14,7 +14,7 @@ class PasswordResetTokenGenerator:
 
     def make_token(self, user):
         """
-        Returns a token that can be used once to do a password reset
+        Return a token that can be used once to do a password reset
         for the given user.
         """
         return self._make_token_with_timestamp(user, self._num_days(self._today()))

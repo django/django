@@ -200,7 +200,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         If the ModelAdmin specifies ordering, the queryset should respect that
         ordering.  Otherwise don't specify the queryset, let the field decide
-        (returns None in that case).
+        (return None in that case).
         """
         related_admin = self.admin_site._registry.get(db_field.remote_field.model)
         if related_admin is not None:
@@ -321,7 +321,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
     def get_queryset(self, request):
         """
-        Returns a QuerySet of all model instances that can be edited by the
+        Return a QuerySet of all model instances that can be edited by the
         admin site. This is used by changelist_view.
         """
         qs = self.model._default_manager.get_queryset()
@@ -384,7 +384,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
     def to_field_allowed(self, request, to_field):
         """
-        Returns True if the model associated with this admin should be
+        Return True if the model associated with this admin should be
         allowed to be referenced by the specified field.
         """
         opts = self.model._meta
@@ -429,7 +429,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
     def has_add_permission(self, request):
         """
-        Returns True if the given request has permission to add an object.
+        Return True if the given request has permission to add an object.
         Can be overridden by the user in subclasses.
         """
         opts = self.opts
@@ -438,7 +438,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
     def has_change_permission(self, request, obj=None):
         """
-        Returns True if the given request has permission to change the given
+        Return True if the given request has permission to change the given
         Django model instance, the default implementation doesn't examine the
         `obj` parameter.
 
@@ -453,7 +453,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
     def has_delete_permission(self, request, obj=None):
         """
-        Returns True if the given request has permission to change the given
+        Return True if the given request has permission to change the given
         Django model instance, the default implementation doesn't examine the
         `obj` parameter.
 
@@ -468,7 +468,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
     def has_module_permission(self, request):
         """
-        Returns True if the given request has any permission in the given
+        Return True if the given request has any permission in the given
         app label.
 
         Can be overridden by the user in subclasses. In such case it should
@@ -481,7 +481,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
 
 class ModelAdmin(BaseModelAdmin):
-    "Encapsulates all admin options and functionality for a given model."
+    """Encapsulate all admin options and functionality for a given model."""
 
     list_display = ('__str__',)
     list_display_links = ()
@@ -585,7 +585,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_model_perms(self, request):
         """
-        Returns a dict of all perms for this model. This dict has the keys
+        Return a dict of all perms for this model. This dict has the keys
         ``add``, ``change``, and ``delete`` mapping to the True/False for each
         of those actions.
         """
@@ -603,7 +603,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         """
-        Returns a Form class for use in the admin add view. This is used by
+        Return a Form class for use in the admin add view. This is used by
         add_view and change_view.
         """
         if 'fields' in kwargs:
@@ -650,15 +650,15 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_changelist(self, request, **kwargs):
         """
-        Returns the ChangeList class for use on the changelist page.
+        Return the ChangeList class for use on the changelist page.
         """
         from django.contrib.admin.views.main import ChangeList
         return ChangeList
 
     def get_object(self, request, object_id, from_field=None):
         """
-        Returns an instance matching the field and value provided, the primary
-        key is used if no field is provided. Returns ``None`` if no match is
+        Return an instance matching the field and value provided, the primary
+        key is used if no field is provided. Return ``None`` if no match is
         found or the object_id fails validation.
         """
         queryset = self.get_queryset(request)
@@ -672,7 +672,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_changelist_form(self, request, **kwargs):
         """
-        Returns a Form class for use in the Formset on the changelist page.
+        Return a Form class for use in the Formset on the changelist page.
         """
         defaults = {
             "formfield_callback": partial(self.formfield_for_dbfield, request=request),
@@ -685,7 +685,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_changelist_formset(self, request, **kwargs):
         """
-        Returns a FormSet class for use on the changelist page if list_editable
+        Return a FormSet class for use on the changelist page if list_editable
         is used.
         """
         defaults = {
@@ -699,7 +699,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_formsets_with_inlines(self, request, obj=None):
         """
-        Yields formsets and the corresponding inlines.
+        Yield formsets and the corresponding inlines.
         """
         for inline in self.get_inline_instances(request, obj):
             yield inline.get_formset(request, obj), inline
@@ -861,28 +861,28 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_list_filter(self, request):
         """
-        Returns a sequence containing the fields to be displayed as filters in
+        Return a sequence containing the fields to be displayed as filters in
         the right sidebar of the changelist page.
         """
         return self.list_filter
 
     def get_list_select_related(self, request):
         """
-        Returns a list of fields to add to the select_related() part of the
+        Return a list of fields to add to the select_related() part of the
         changelist items query.
         """
         return self.list_select_related
 
     def get_search_fields(self, request):
         """
-        Returns a sequence containing the fields to be searched whenever
+        Return a sequence containing the fields to be searched whenever
         somebody submits a search query.
         """
         return self.search_fields
 
     def get_search_results(self, request, queryset, search_term):
         """
-        Returns a tuple containing a queryset to implement the search,
+        Return a tuple containing a queryset to implement the search
         and a boolean indicating if the results may contain duplicates.
         """
         # Apply keyword searches.
@@ -915,7 +915,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_preserved_filters(self, request):
         """
-        Returns the preserved filters querystring.
+        Return the preserved filters querystring.
         """
         match = request.resolver_match
         if self.preserve_filters and match:
@@ -1038,7 +1038,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def response_add(self, request, obj, post_url_continue=None):
         """
-        Determines the HttpResponse for the add_view stage.
+        Determine the HttpResponse for the add_view stage.
         """
         opts = obj._meta
         pk_value = obj._get_pk_val()
@@ -1117,7 +1117,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def response_change(self, request, obj):
         """
-        Determines the HttpResponse for the change_view stage.
+        Determine the HttpResponse for the change_view stage.
         """
 
         if IS_POPUP_VAR in request.POST:
@@ -1296,9 +1296,8 @@ class ModelAdmin(BaseModelAdmin):
 
     def response_delete(self, request, obj_display, obj_id):
         """
-        Determines the HttpResponse for the delete_view stage.
+        Determine the HttpResponse for the delete_view stage.
         """
-
         opts = self.model._meta
 
         if IS_POPUP_VAR in request.POST:
@@ -1372,8 +1371,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_changeform_initial_data(self, request):
         """
-        Get the initial form data.
-        Unless overridden, this populates from the GET params.
+        Get the initial form data from the request's GET params.
         """
         initial = dict(request.GET.items())
         for k in initial:
@@ -1869,7 +1867,7 @@ class InlineModelAdmin(BaseModelAdmin):
         return self.max_num
 
     def get_formset(self, request, obj=None, **kwargs):
-        """Returns a BaseInlineFormSet class for use in admin add/change views."""
+        """Return a BaseInlineFormSet class for use in admin add/change views."""
         if 'fields' in kwargs:
             fields = kwargs.pop('fields')
         else:

@@ -27,8 +27,7 @@ class StaticFilesHandler(WSGIHandler):
 
     def _should_handle(self, path):
         """
-        Checks if the path should be handled. Ignores the path if:
-
+        Check if the path should be handled. Ignore the path if:
         * the host is provided as part of the base_url
         * the request's path isn't under the media path (or equal)
         """
@@ -36,15 +35,13 @@ class StaticFilesHandler(WSGIHandler):
 
     def file_path(self, url):
         """
-        Returns the relative path to the media file on disk for the given URL.
+        Return the relative path to the media file on disk for the given URL.
         """
         relative_url = url[len(self.base_url[2]):]
         return url2pathname(relative_url)
 
     def serve(self, request):
-        """
-        Actually serves the request path.
-        """
+        """Serve the request path."""
         return serve(request, self.file_path(request.path), insecure=True)
 
     def get_response(self, request):

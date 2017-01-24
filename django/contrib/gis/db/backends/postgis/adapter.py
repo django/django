@@ -27,7 +27,7 @@ class PostGISAdapter:
         self.geography = geography
 
     def __conform__(self, proto):
-        # Does the given protocol conform to what Psycopg2 expects?
+        """Does the given protocol conform to what Psycopg2 expects?"""
         if proto == ISQLQuote:
             return self
         else:

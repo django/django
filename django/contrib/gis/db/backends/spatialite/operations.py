@@ -145,14 +145,14 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     def geo_db_type(self, f):
         """
-        Returns None because geometry columns are added via the
+        Return None because geometry columns are added via the
         `AddGeometryColumn` stored procedure on SpatiaLite.
         """
         return None
 
     def get_distance(self, f, value, lookup_type, **kwargs):
         """
-        Returns the distance parameters for the given geometry field,
+        Return the distance parameters for the given geometry field,
         lookup value, and lookup type.
         """
         if not value:
@@ -174,7 +174,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     def get_geom_placeholder(self, f, value, compiler):
         """
-        Provides a proper substitution value for Geometries that are not in the
+        Provide a proper substitution value for Geometries that are not in the
         SRID of the field.  Specifically, this routine will substitute in the
         Transform() and GeomFromText() function call(s).
         """
@@ -211,11 +211,11 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         return row[0]
 
     def geos_version(self):
-        "Returns the version of GEOS used by SpatiaLite as a string."
+        "Return the version of GEOS used by SpatiaLite as a string."
         return self._get_spatialite_func('geos_version()')
 
     def proj4_version(self):
-        "Returns the version of the PROJ.4 library used by SpatiaLite."
+        "Return the version of the PROJ.4 library used by SpatiaLite."
         return self._get_spatialite_func('proj4_version()')
 
     def lwgeom_version(self):
@@ -223,12 +223,12 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         return self._get_spatialite_func('lwgeom_version()')
 
     def spatialite_version(self):
-        "Returns the SpatiaLite library version as a string."
+        "Return the SpatiaLite library version as a string."
         return self._get_spatialite_func('spatialite_version()')
 
     def spatialite_version_tuple(self):
         """
-        Returns the SpatiaLite version as a tuple (version string, major,
+        Return the SpatiaLite version as a tuple (version string, major,
         minor, subminor).
         """
         version = self.spatialite_version()
@@ -245,7 +245,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     def spatial_aggregate_name(self, agg_name):
         """
-        Returns the spatial aggregate SQL template and function for the
+        Return the spatial aggregate SQL template and function for the
         given Aggregate instance.
         """
         agg_name = 'unionagg' if agg_name.lower() == 'union' else agg_name.lower()

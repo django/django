@@ -377,9 +377,7 @@ class InlineFieldset(Fieldset):
 
 
 class AdminErrorList(forms.utils.ErrorList):
-    """
-    Stores all errors for the form/formsets in an add/change stage view.
-    """
+    """Store errors for the form/formsets in an add/change view."""
     def __init__(self, form, inline_formsets):
         super().__init__()
 

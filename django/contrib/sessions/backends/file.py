@@ -16,7 +16,7 @@ from django.utils.encoding import force_text
 
 class SessionStore(SessionBase):
     """
-    Implements a file based session store.
+    Implement a file based session store.
     """
     def __init__(self, session_key=None):
         self.storage_path = type(self)._get_storage_path()

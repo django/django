@@ -56,7 +56,7 @@ if os.name == 'nt':
 
 def std_call(func):
     """
-    Returns the correct STDCALL function for certain OSR routines on Win32
+    Return the correct STDCALL function for certain OSR routines on Win32
     platforms.
     """
     if os.name == 'nt':
@@ -67,19 +67,19 @@ def std_call(func):
 
 # #### Version-information functions. ####
 
-# Returns GDAL library version information with the given key.
+# Return GDAL library version information with the given key.
 _version_info = std_call('GDALVersionInfo')
 _version_info.argtypes = [c_char_p]
 _version_info.restype = c_char_p
 
 
 def gdal_version():
-    "Returns only the GDAL version number information."
+    "Return only the GDAL version number information."
     return _version_info(b'RELEASE_NAME')
 
 
 def gdal_full_version():
-    "Returns the full GDAL version information."
+    "Return the full GDAL version information."
     return _version_info('')
 
 

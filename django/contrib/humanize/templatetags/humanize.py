@@ -17,7 +17,7 @@ register = template.Library()
 @register.filter(is_safe=True)
 def ordinal(value):
     """
-    Converts an integer to its ordinal as a string. 1 is '1st', 2 is '2nd',
+    Convert an integer to its ordinal as a string. 1 is '1st', 2 is '2nd',
     3 is '3rd', etc. Works for any integer.
     """
     try:
@@ -34,7 +34,7 @@ def ordinal(value):
 @register.filter(is_safe=True)
 def intcomma(value, use_l10n=True):
     """
-    Converts an integer to a string containing commas every three digits.
+    Convert an integer to a string containing commas every three digits.
     For example, 3000 becomes '3,000' and 45000 becomes '45,000'.
     """
     if settings.USE_L10N and use_l10n:
@@ -105,7 +105,7 @@ intword_converters = (
 @register.filter(is_safe=False)
 def intword(value):
     """
-    Converts a large integer to a friendly text representation. Works best
+    Convert a large integer to a friendly text representation. Works best
     for numbers over 1 million. For example, 1000000 becomes '1.0 million',
     1200000 becomes '1.2 million' and '1200000000' becomes '1.2 billion'.
     """
@@ -139,7 +139,7 @@ def intword(value):
 @register.filter(is_safe=True)
 def apnumber(value):
     """
-    For numbers 1-9, returns the number spelled out. Otherwise, returns the
+    For numbers 1-9, return the number spelled out. Otherwise, return the
     number. This follows Associated Press style.
     """
     try:
@@ -158,7 +158,7 @@ def apnumber(value):
 def naturalday(value, arg=None):
     """
     For date values that are tomorrow, today or yesterday compared to
-    present day returns representing string. Otherwise, returns a string
+    present day return representing string. Otherwise, return a string
     formatted according to settings.DATE_FORMAT.
     """
     try:
@@ -186,8 +186,8 @@ def naturalday(value, arg=None):
 @register.filter
 def naturaltime(value):
     """
-    For date and time values shows how many seconds, minutes or hours ago
-    compared to current timestamp returns representing string.
+    For date and time values show how many seconds, minutes, or hours ago
+    compared to current timestamp return representing string.
     """
     if not isinstance(value, date):  # datetime is a subclass of date
         return value

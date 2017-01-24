@@ -103,7 +103,7 @@ def get_contenttypes_and_models(app_config, using, ContentType):
 
 def create_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, apps=global_apps, **kwargs):
     """
-    Creates content types for models in the given app.
+    Create content types for models in the given app.
     """
     if not app_config.models_module:
         return

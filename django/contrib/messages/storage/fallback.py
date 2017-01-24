@@ -5,7 +5,7 @@ from django.contrib.messages.storage.session import SessionStorage
 
 class FallbackStorage(BaseStorage):
     """
-    Tries to store all messages in the first backend, storing any unstored
+    Try to store all messages in the first backend. Store any unstored
     messages in each subsequent backend backend.
     """
     storage_classes = (CookieStorage, SessionStorage)
@@ -18,7 +18,7 @@ class FallbackStorage(BaseStorage):
 
     def _get(self, *args, **kwargs):
         """
-        Gets a single list of messages from all storage backends.
+        Get a single list of messages from all storage backends.
         """
         all_messages = []
         for storage in self.storages:
@@ -37,7 +37,7 @@ class FallbackStorage(BaseStorage):
 
     def _store(self, messages, response, *args, **kwargs):
         """
-        Stores the messages, returning any unstored messages after trying all
+        Store the messages and return any unstored messages after trying all
         backends.
 
         For each storage backend, any messages not stored are passed on to the

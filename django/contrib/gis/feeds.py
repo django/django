@@ -30,9 +30,7 @@ class GeoFeedMixin:
             handler.addQuickElement('georss:point', self.georss_coords((coords,)))
 
     def add_georss_element(self, handler, item, w3c_geo=False):
-        """
-        This routine adds a GeoRSS XML element using the given item and handler.
-        """
+        """Add a GeoRSS XML element using the given item and handler."""
         # Getting the Geometry object.
         geom = item.get('geometry')
         if geom is not None:

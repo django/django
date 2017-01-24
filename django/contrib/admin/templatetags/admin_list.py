@@ -29,7 +29,7 @@ DOT = '.'
 @register.simple_tag
 def paginator_number(cl, i):
     """
-    Generates an individual page index link in a paginated list.
+    Generate an individual page index link in a paginated list.
     """
     if i == DOT:
         return '... '
@@ -45,7 +45,7 @@ def paginator_number(cl, i):
 @register.inclusion_tag('admin/pagination.html')
 def pagination(cl):
     """
-    Generates the series of links to the pages in a paginated list.
+    Generate the series of links to the pages in a paginated list.
     """
     paginator, page_num = cl.paginator, cl.page_num
 
@@ -91,7 +91,7 @@ def pagination(cl):
 
 def result_headers(cl):
     """
-    Generates the list column headers.
+    Generate the list column headers.
     """
     ordering_field_columns = cl.get_ordering_field_columns()
     for i, field_name in enumerate(cl.list_display):
@@ -195,7 +195,7 @@ def _coerce_field_name(field_name, field_index):
 
 def items_for_result(cl, result, form):
     """
-    Generates the actual list of data.
+    Generate the actual list of data.
     """
 
     def link_in_col(is_first, field_name, cl):
@@ -285,10 +285,11 @@ def items_for_result(cl, result, form):
 
 
 class ResultList(list):
-    # Wrapper class used to return items in a list_editable
-    # changelist, annotated with the form object for error
-    # reporting purposes. Needed to maintain backwards
-    # compatibility with existing admin templates.
+    """
+    Wrapper class used to return items in a list_editable changelist, annotated
+    with the form object for error reporting purposes. Needed to maintain
+    backwards compatibility with existing admin templates.
+    """
     def __init__(self, form, *items):
         self.form = form
         super().__init__(*items)
@@ -313,7 +314,7 @@ def result_hidden_fields(cl):
 @register.inclusion_tag("admin/change_list_results.html")
 def result_list(cl):
     """
-    Displays the headers and data list together
+    Display the headers and data list together.
     """
     headers = list(result_headers(cl))
     num_sorted_fields = 0
@@ -330,7 +331,7 @@ def result_list(cl):
 @register.inclusion_tag('admin/date_hierarchy.html')
 def date_hierarchy(cl):
     """
-    Displays the date hierarchy for date drill-down functionality.
+    Display the date hierarchy for date drill-down functionality.
     """
     if cl.date_hierarchy:
         field_name = cl.date_hierarchy
@@ -409,7 +410,7 @@ def date_hierarchy(cl):
 @register.inclusion_tag('admin/search_form.html')
 def search_form(cl):
     """
-    Displays a search form for searching the list.
+    Display a search form for searching the list.
     """
     return {
         'cl': cl,

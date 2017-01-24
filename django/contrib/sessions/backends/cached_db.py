@@ -16,7 +16,7 @@ KEY_PREFIX = "django.contrib.sessions.cached_db"
 
 class SessionStore(DBStore):
     """
-    Implements cached, database backed sessions.
+    Implement cached, database backed sessions.
     """
     cache_key_prefix = KEY_PREFIX
 
@@ -73,7 +73,7 @@ class SessionStore(DBStore):
 
     def flush(self):
         """
-        Removes the current session data from the database and regenerates the
+        Remove the current session data from the database and regenerate the
         key.
         """
         self.clear()

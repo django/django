@@ -34,7 +34,7 @@ class ContentTypeManager(models.Manager):
 
     def get_for_model(self, model, for_concrete_model=True):
         """
-        Returns the ContentType object for a given model, creating the
+        Return the ContentType object for a given model, creating the
         ContentType if necessary. Lookups are cached so that subsequent lookups
         for the same model don't hit the database.
         """
@@ -62,7 +62,7 @@ class ContentTypeManager(models.Manager):
 
     def get_for_models(self, *models, for_concrete_models=True):
         """
-        Given *models, returns a dictionary mapping {model: content_type}.
+        Given *models, return a dictionary mapping {model: content_type}.
         """
         results = {}
         # Models that aren't already in the cache.
@@ -105,7 +105,7 @@ class ContentTypeManager(models.Manager):
 
     def get_for_id(self, id):
         """
-        Lookup a ContentType by ID. Uses the same shared cache as get_for_model
+        Lookup a ContentType by ID. Use the same shared cache as get_for_model
         (though ContentTypes are obviously not created on-the-fly by get_by_id).
         """
         try:
@@ -154,7 +154,7 @@ class ContentType(models.Model):
         return force_text(model._meta.verbose_name)
 
     def model_class(self):
-        "Returns the Python model class for this type of content."
+        """Return the model class for this type of content."""
         try:
             return apps.get_model(self.app_label, self.model)
         except LookupError:
@@ -162,7 +162,7 @@ class ContentType(models.Model):
 
     def get_object_for_this_type(self, **kwargs):
         """
-        Returns an object of this type for the keyword arguments given.
+        Return an object of this type for the keyword arguments given.
         Basically, this is a proxy around this object_type's get_object() model
         method. The ObjectNotExist exception, if thrown, will not be caught,
         so code that calls this method should catch it.
@@ -171,7 +171,7 @@ class ContentType(models.Model):
 
     def get_all_objects_for_this_type(self, **kwargs):
         """
-        Returns all objects of this type for the keyword arguments given.
+        Return all objects of this type for the keyword arguments given.
         """
         return self.model_class()._base_manager.using(self._state.db).filter(**kwargs)
 

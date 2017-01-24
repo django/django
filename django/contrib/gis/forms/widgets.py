@@ -12,7 +12,7 @@ logger = logging.getLogger('django.contrib.gis')
 class BaseGeometryWidget(Widget):
     """
     The base class for rich geometry widgets.
-    Renders a map using the WKT of the geometry.
+    Render a map using the WKT of the geometry.
     """
     geom_type = 'GEOMETRY'
     map_srid = 4326

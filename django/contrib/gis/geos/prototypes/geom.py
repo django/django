@@ -22,7 +22,7 @@ class geos_char_p(c_char_p):
 
 # ### ctypes factory classes ###
 class BinConstructor(GEOSFuncFactory):
-    "Generates a prototype for binary construction (HEX, WKB) GEOS routines."
+    "Generate a prototype for binary construction (HEX, WKB) GEOS routines."
     argtypes = [c_char_p, c_size_t]
     restype = GEOM_PTR
     errcheck = staticmethod(check_geom)
@@ -30,7 +30,7 @@ class BinConstructor(GEOSFuncFactory):
 
 # HEX & WKB output
 class BinOutput(GEOSFuncFactory):
-    "Generates a prototype for the routines that return a sized string."
+    "Generate a prototype for the routines that return a sized string."
     argtypes = [GEOM_PTR, POINTER(c_size_t)]
     restype = c_uchar_p
     errcheck = staticmethod(check_sized_string)

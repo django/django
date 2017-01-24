@@ -16,7 +16,7 @@ class gdal_char_p(c_char_p):
 
 
 def double_output(func, argtypes, errcheck=False, strarg=False, cpl=False):
-    "Generates a ctypes function that returns a double value."
+    "Generate a ctypes function that returns a double value."
     func.argtypes = argtypes
     func.restype = c_double
     if errcheck:
@@ -28,7 +28,7 @@ def double_output(func, argtypes, errcheck=False, strarg=False, cpl=False):
 
 def geom_output(func, argtypes, offset=None):
     """
-    Generates a function that returns a Geometry either by reference
+    Generate a function that returns a Geometry either by reference
     or directly (if the return_geom keyword is set to True).
     """
     # Setting the argument types
@@ -50,7 +50,7 @@ def geom_output(func, argtypes, offset=None):
 
 
 def int_output(func, argtypes, errcheck=None):
-    "Generates a ctypes function that returns an integer value."
+    "Generate a ctypes function that returns an integer value."
     func.argtypes = argtypes
     func.restype = c_int
     if errcheck:
@@ -59,7 +59,7 @@ def int_output(func, argtypes, errcheck=None):
 
 
 def int64_output(func, argtypes):
-    "Generates a ctypes function that returns a 64-bit integer value."
+    "Generate a ctypes function that returns a 64-bit integer value."
     func.argtypes = argtypes
     func.restype = c_int64
     return func
@@ -67,7 +67,7 @@ def int64_output(func, argtypes):
 
 def srs_output(func, argtypes):
     """
-    Generates a ctypes prototype for the given function with
+    Generate a ctypes prototype for the given function with
     the given C arguments that returns a pointer to an OGR
     Spatial Reference System.
     """
@@ -96,7 +96,7 @@ def const_string_output(func, argtypes, offset=None, decoding=None, cpl=False):
 
 def string_output(func, argtypes, offset=-1, str_result=False, decoding=None):
     """
-    Generates a ctypes prototype for the given function with the
+    Generate a ctypes prototype for the given function with the
     given argument types that returns a string from a GDAL pointer.
     The `const` flag indicates whether the allocated pointer should
     be freed via the GDAL library routine VSIFree -- but only applies

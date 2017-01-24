@@ -17,7 +17,7 @@ class SitemapNotFound(Exception):
 
 def ping_google(sitemap_url=None, ping_url=PING_URL):
     """
-    Alerts Google that the sitemap for the current site has been updated.
+    Alert Google that the sitemap for the current site has been updated.
     If sitemap_url is provided, it should be an absolute path to the sitemap
     for this site -- e.g., '/sitemap.xml'. If sitemap_url is not provided, this
     function will attempt to deduce it by using urls.reverse().

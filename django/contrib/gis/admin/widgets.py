@@ -13,7 +13,7 @@ logger = logging.getLogger('django.contrib.gis')
 
 class OpenLayersWidget(Textarea):
     """
-    Renders an OpenLayers map using the WKT of the geometry.
+    Render an OpenLayers map using the WKT of the geometry.
     """
     def get_context(self, name, value, attrs=None):
         # Update the template parameters with any attributes passed in.
@@ -79,8 +79,7 @@ class OpenLayersWidget(Textarea):
         return self.params
 
     def map_options(self):
-        "Builds the map options hash for the OpenLayers template."
-
+        """Build the map options hash for the OpenLayers template."""
         # JavaScript construction utilities for the Bounds and Projection.
         def ol_bounds(extent):
             return 'new OpenLayers.Bounds(%s)' % extent

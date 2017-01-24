@@ -11,7 +11,7 @@ SITE_CACHE = {}
 
 def _simple_domain_name_validator(value):
     """
-    Validates that the given value contains no whitespaces to prevent common
+    Validate that the given value contains no whitespaces to prevent common
     typos.
     """
     if not value:
@@ -49,8 +49,8 @@ class SiteManager(models.Manager):
 
     def get_current(self, request=None):
         """
-        Returns the current Site based on the SITE_ID in the project's settings.
-        If SITE_ID isn't defined, it returns the site with domain matching
+        Return the current Site based on the SITE_ID in the project's settings.
+        If SITE_ID isn't defined, return the site with domain matching
         request.get_host(). The ``Site`` object is cached the first time it's
         retrieved from the database.
         """
@@ -69,7 +69,7 @@ class SiteManager(models.Manager):
         )
 
     def clear_cache(self):
-        """Clears the ``Site`` object cache."""
+        """Clear the ``Site`` object cache."""
         global SITE_CACHE
         SITE_CACHE = {}
 
@@ -103,7 +103,7 @@ class Site(models.Model):
 
 def clear_site_cache(sender, **kwargs):
     """
-    Clears the cache (if primed) each time a site is saved or deleted
+    Clear the cache (if primed) each time a site is saved or deleted.
     """
     instance = kwargs['instance']
     using = kwargs['using']

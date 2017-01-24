@@ -185,7 +185,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     def geo_db_type(self, f):
         """
-        Returns the geometry database type for Oracle.  Unlike other spatial
+        Return the geometry database type for Oracle. Unlike other spatial
         backends, no stored procedure is necessary and it's the same for all
         geometry types.
         """
@@ -193,7 +193,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     def get_distance(self, f, value, lookup_type, **kwargs):
         """
-        Returns the distance parameters given the value and the lookup type.
+        Return the distance parameters given the value and the lookup type.
         On Oracle, geometry columns with a geodetic coordinate system behave
         implicitly like a geography column, and thus meters will be used as
         the distance parameter on them.
@@ -218,7 +218,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     def get_geom_placeholder(self, f, value, compiler):
         """
-        Provides a proper substitution value for Geometries that are not in the
+        Provide a proper substitution value for Geometries that are not in the
         SRID of the field.  Specifically, this routine will substitute in the
         SDO_CS.TRANSFORM() function call.
         """
@@ -245,7 +245,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     def spatial_aggregate_name(self, agg_name):
         """
-        Returns the spatial aggregate SQL name.
+        Return the spatial aggregate SQL name.
         """
         agg_name = 'unionagg' if agg_name.lower() == 'union' else agg_name.lower()
         return getattr(self, agg_name)

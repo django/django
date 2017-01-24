@@ -226,7 +226,7 @@ class PasswordResetForm(forms.Form):
     def send_mail(self, subject_template_name, email_template_name,
                   context, from_email, to_email, html_email_template_name=None):
         """
-        Sends a django.core.mail.EmailMultiAlternatives to `to_email`.
+        Send a django.core.mail.EmailMultiAlternatives to `to_email`.
         """
         subject = loader.render_to_string(subject_template_name, context)
         # Email subject *must not* contain newlines
@@ -260,7 +260,7 @@ class PasswordResetForm(forms.Form):
              from_email=None, request=None, html_email_template_name=None,
              extra_email_context=None):
         """
-        Generates a one-use only link for resetting password and sends to the
+        Generate a one-use only link for resetting password and send it to the
         user.
         """
         email = self.cleaned_data["email"]
@@ -350,7 +350,7 @@ class PasswordChangeForm(SetPasswordForm):
 
     def clean_old_password(self):
         """
-        Validates that the old_password field is correct.
+        Validate that the old_password field is correct.
         """
         old_password = self.cleaned_data["old_password"]
         if not self.user.check_password(old_password):
@@ -399,9 +399,7 @@ class AdminPasswordChangeForm(forms.Form):
         return password2
 
     def save(self, commit=True):
-        """
-        Saves the new password.
-        """
+        """Save the new password."""
         password = self.cleaned_data["password1"]
         self.user.set_password(password)
         if commit:

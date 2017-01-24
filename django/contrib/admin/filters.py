@@ -33,13 +33,13 @@ class ListFilter:
 
     def has_output(self):
         """
-        Returns True if some choices would be output for this filter.
+        Return True if some choices would be output for this filter.
         """
         raise NotImplementedError('subclasses of ListFilter must provide a has_output() method')
 
     def choices(self, changelist):
         """
-        Returns choices ready to be output in the template.
+        Return choices ready to be output in the template.
 
         `changelist` is the ChangeList to be displayed.
         """
@@ -47,13 +47,13 @@ class ListFilter:
 
     def queryset(self, request, queryset):
         """
-        Returns the filtered queryset.
+        Return the filtered queryset.
         """
         raise NotImplementedError('subclasses of ListFilter must provide a queryset() method')
 
     def expected_parameters(self):
         """
-        Returns the list of parameter names that are expected from the
+        Return the list of parameter names that are expected from the
         request's query string and that will be used by this filter.
         """
         raise NotImplementedError('subclasses of ListFilter must provide an expected_parameters() method')
@@ -82,9 +82,9 @@ class SimpleListFilter(ListFilter):
 
     def value(self):
         """
-        Returns the value (in string format) provided in the request's
-        query string for this filter, if any. If the value wasn't provided then
-        returns None.
+        Return the value (in string format) provided in the request's
+        query string for this filter, if any, or None if the value wasn't
+        provided.
         """
         return self.used_parameters.get(self.parameter_name)
 

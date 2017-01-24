@@ -240,7 +240,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def convert_extent(self, box, srid):
         """
-        Returns a 4-tuple extent for the `Extent` aggregate by converting
+        Return a 4-tuple extent for the `Extent` aggregate by converting
         the bounding box text returned by PostGIS (`box` argument), for
         example: "BOX(-90.0 30.0, -85.0 40.0)".
         """
@@ -253,7 +253,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def convert_extent3d(self, box3d, srid):
         """
-        Returns a 6-tuple extent for the `Extent3D` aggregate by converting
+        Return a 6-tuple extent for the `Extent3D` aggregate by converting
         the 3d bounding-box text returned by PostGIS (`box3d` argument), for
         example: "BOX3D(-90.0 30.0 1, -85.0 40.0 2)".
         """
@@ -369,28 +369,28 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             return cursor.fetchone()[0]
 
     def postgis_geos_version(self):
-        "Returns the version of the GEOS library used with PostGIS."
+        "Return the version of the GEOS library used with PostGIS."
         return self._get_postgis_func('postgis_geos_version')
 
     def postgis_lib_version(self):
-        "Returns the version number of the PostGIS library used with PostgreSQL."
+        "Return the version number of the PostGIS library used with PostgreSQL."
         return self._get_postgis_func('postgis_lib_version')
 
     def postgis_proj_version(self):
-        "Returns the version of the PROJ.4 library used with PostGIS."
+        "Return the version of the PROJ.4 library used with PostGIS."
         return self._get_postgis_func('postgis_proj_version')
 
     def postgis_version(self):
-        "Returns PostGIS version number and compile-time options."
+        "Return PostGIS version number and compile-time options."
         return self._get_postgis_func('postgis_version')
 
     def postgis_full_version(self):
-        "Returns PostGIS version number and compile-time options."
+        "Return PostGIS version number and compile-time options."
         return self._get_postgis_func('postgis_full_version')
 
     def postgis_version_tuple(self):
         """
-        Returns the PostGIS version as a tuple (version string, major,
+        Return the PostGIS version as a tuple (version string, major,
         minor, subminor).
         """
         # Getting the PostGIS version

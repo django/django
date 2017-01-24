@@ -28,13 +28,13 @@ class GISLookup(Lookup):
     @classmethod
     def _check_geo_field(cls, opts, lookup):
         """
-        Utility for checking the given lookup with the given model options.
+        Check the given lookup with the given model options.
         The lookup is a string either specifying the geographic field, e.g.
         'point, 'the_geom', or a related lookup on a geographic field like
         'address__point'.
 
-        If a BaseSpatialField exists according to the given lookup on the model
-        options, it will be returned. Otherwise return None.
+        Return a BaseSpatialField if one exists according to the given lookup
+        on the model options, otherwise return None.
         """
         from django.contrib.gis.db.models.fields import BaseSpatialField
         # This takes into account the situation where the lookup is a

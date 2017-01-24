@@ -7,9 +7,7 @@ from django.contrib.gis.geos.libgeos import (
 
 
 class GEOSContextHandle(GEOSBase):
-    """
-    Python object representing a GEOS context handle.
-    """
+    """Represent a GEOS context handle."""
     ptr_type = CONTEXT_PTR
     destructor = lgeos.finishGEOS_r
 
@@ -30,8 +28,8 @@ thread_context = GEOSContext()
 
 class GEOSFunc:
     """
-    Class that serves as a wrapper for GEOS C Functions, and will
-    use thread-safe function variants when available.
+    Serve as a wrapper for GEOS C Functions. Use thread-safe function
+    variants when available.
     """
     def __init__(self, func_name):
         try:

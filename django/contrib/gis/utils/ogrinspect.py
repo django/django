@@ -12,7 +12,7 @@ from django.contrib.gis.gdal.field import (
 
 def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
     """
-    Given a DataSource, generates a dictionary that may be used
+    Given a DataSource, generate a dictionary that may be used
     for invoking the LayerMapping utility.
 
     Keyword Arguments:
@@ -114,7 +114,7 @@ def ogrinspect(*args, **kwargs):
        give specific fields to have null, then a list/tuple of OGR field
        names may be used.
 
-    Note: This routine calls the _ogrinspect() helper to do the heavy lifting.
+    Note: Call the _ogrinspect() helper to do the heavy lifting.
     """
     return '\n'.join(s for s in _ogrinspect(*args, **kwargs))
 

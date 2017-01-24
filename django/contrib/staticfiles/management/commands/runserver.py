@@ -20,9 +20,8 @@ class Command(RunserverCommand):
 
     def get_handler(self, *args, **options):
         """
-        Returns the static files serving handler wrapping the default handler,
-        if static files should be served. Otherwise just returns the default
-        handler.
+        Return the static files serving handler wrapping the default handler,
+        if static files should be served. Otherwise return the default handler.
         """
         handler = super().get_handler(*args, **options)
         use_static_handler = options['use_static_handler']

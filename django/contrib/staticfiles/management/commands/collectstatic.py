@@ -13,8 +13,8 @@ from django.utils.functional import cached_property
 
 class Command(BaseCommand):
     """
-    Command that allows to copy or symlink static files from different
-    locations to the settings.STATIC_ROOT.
+    Copies or symlinks static files from different locations to the
+    settings.STATIC_ROOT.
     """
     help = "Collect static files in a single location."
     requires_system_checks = False
@@ -225,7 +225,7 @@ class Command(BaseCommand):
 
     def clear_dir(self, path):
         """
-        Deletes the given relative path using the destination storage backend.
+        Delete the given relative path using the destination storage backend.
         """
         if not self.storage.exists(path):
             return
@@ -252,7 +252,7 @@ class Command(BaseCommand):
 
     def delete_file(self, path, prefixed_path, source_storage):
         """
-        Checks if the target file should be deleted if it already exists
+        Check if the target file should be deleted if it already exists.
         """
         if self.storage.exists(prefixed_path):
             try:

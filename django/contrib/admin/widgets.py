@@ -96,7 +96,7 @@ class AdminFileWidget(forms.ClearableFileInput):
 
 def url_params_from_lookup_dict(lookups):
     """
-    Converts the type of lookups specified in a ForeignKey limit_choices_to
+    Convert the type of lookups specified in a ForeignKey limit_choices_to
     attribute to a dictionary of query parameters
     """
     params = {}

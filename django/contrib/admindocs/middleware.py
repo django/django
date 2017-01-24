@@ -5,14 +5,14 @@ from django.utils.deprecation import MiddlewareMixin
 
 class XViewMiddleware(MiddlewareMixin):
     """
-    Adds an X-View header to internal HEAD requests -- used by the documentation system.
+    Add an X-View header to internal HEAD requests.
     """
     def process_view(self, request, view_func, view_args, view_kwargs):
         """
         If the request method is HEAD and either the IP is internal or the
-        user is a logged-in staff member, quickly return with an x-header
-        indicating the view function.  This is used by the documentation module
-        to lookup the view function for an arbitrary page.
+        user is a logged-in staff member, return a responsewith an x-view
+        header indicating the view function. This is used to lookup the view
+        function for an arbitrary page.
         """
         assert hasattr(request, 'user'), (
             "The XView middleware requires authentication middleware to be "

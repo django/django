@@ -26,7 +26,7 @@ class FieldIsAForeignKeyColumnName(Exception):
 
 def lookup_needs_distinct(opts, lookup_path):
     """
-    Returns True if 'distinct()' should be used to query the given lookup path.
+    Return True if 'distinct()' should be used to query the given lookup path.
     """
     lookup_fields = lookup_path.split(LOOKUP_SEP)
     # Remove the last item of the lookup path if it is a query term
@@ -47,7 +47,7 @@ def lookup_needs_distinct(opts, lookup_path):
 
 def prepare_lookup_value(key, value):
     """
-    Returns a lookup value prepared to be used in queryset filtering.
+    Return a lookup value prepared to be used in queryset filtering.
     """
     # if key ends with __in, split parameter into separate values
     if key.endswith('__in'):
@@ -100,8 +100,9 @@ def unquote(s):
 
 
 def flatten(fields):
-    """Returns a list which is a single level of flattening of the
-    original list."""
+    """
+    Return a list which is a single level of flattening of the original list.
+    """
     flat = []
     for field in fields:
         if isinstance(field, (list, tuple)):
@@ -112,7 +113,7 @@ def flatten(fields):
 
 
 def flatten_fieldsets(fieldsets):
-    """Returns a list of field names from an admin fieldsets structure."""
+    """Return a list of field names from an admin fieldsets structure."""
     field_names = []
     for name, opts in fieldsets:
         field_names.extend(
@@ -126,7 +127,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
     Find all objects related to ``objs`` that should also be deleted. ``objs``
     must be a homogeneous iterable of objects (e.g. a QuerySet).
 
-    Returns a nested list of strings suitable for display in the
+    Return a nested list of strings suitable for display in the
     template with the ``unordered_list`` filter.
     """
     collector = NestedObjects(using=using)
@@ -322,11 +323,11 @@ def _get_non_gfk_field(opts, name):
 
 def label_for_field(name, model, model_admin=None, return_attr=False):
     """
-    Returns a sensible label for a field name. The name can be a callable,
-    property (but not created with @property decorator) or the name of an
-    object's attribute, as well as a genuine fields. If return_attr is
-    True, the resolved attribute (which could be a callable) is also returned.
-    This will be None if (and only if) the name refers to a field.
+    Return a sensible label for a field name. The name can be a callable,
+    property (but not created with @property decorator), or the name of an
+    object's attribute, as well as a model field. If return_attr is True, also
+    return the resolved attribute (which could be a callable). This will be
+    None if (and only if) the name refers to a field.
     """
     attr = None
     try:

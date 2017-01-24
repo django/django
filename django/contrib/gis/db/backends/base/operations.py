@@ -1,9 +1,4 @@
 class BaseSpatialOperations:
-    """
-    This module holds the base `BaseSpatialBackend` object, which is
-    instantiated by each spatial database backend with the features
-    it has.
-    """
     truncate_params = {}
 
     # Quick booleans for the type of this spatial backend, and
@@ -90,21 +85,21 @@ class BaseSpatialOperations:
     # GeometryField operations
     def geo_db_type(self, f):
         """
-        Returns the database column type for the geometry field on
+        Return the database column type for the geometry field on
         the spatial backend.
         """
         raise NotImplementedError('subclasses of BaseSpatialOperations must provide a geo_db_type() method')
 
     def get_distance(self, f, value, lookup_type):
         """
-        Returns the distance parameters for the given geometry field,
+        Return the distance parameters for the given geometry field,
         lookup value, and lookup type.
         """
         raise NotImplementedError('Distance operations not available on this spatial backend.')
 
     def get_geom_placeholder(self, f, value, compiler):
         """
-        Returns the placeholder for the given geometry field with the given
+        Return the placeholder for the given geometry field with the given
         value.  Depending on the spatial backend, the placeholder may contain a
         stored procedure call to the transformation function of the spatial
         backend.

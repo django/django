@@ -137,7 +137,7 @@ class UserManager(BaseUserManager):
 
     def _create_user(self, username, email, password, **extra_fields):
         """
-        Creates and saves a User with the given username, email and password.
+        Create and save a user with the given username, email, and password.
         """
         if not username:
             raise ValueError('The given username must be set')
@@ -206,8 +206,8 @@ def _user_has_module_perms(user, app_label):
 
 class PermissionsMixin(models.Model):
     """
-    A mixin class that adds the fields and methods necessary to support
-    Django's Group and Permission model using the ModelBackend.
+    Add the fields and methods necessary to support the Group and Permission
+    models using the ModelBackend.
     """
     is_superuser = models.BooleanField(
         _('superuser status'),
@@ -242,9 +242,9 @@ class PermissionsMixin(models.Model):
 
     def get_group_permissions(self, obj=None):
         """
-        Returns a list of permission strings that this user has through their
-        groups. This method queries all available auth backends. If an object
-        is passed in, only permissions matching this object are returned.
+        Return a list of permission strings that this user has through their
+        groups. Query all available auth backends. If an object is passed in,
+        return only permissions matching this object.
         """
         permissions = set()
         for backend in auth.get_backends():
@@ -257,13 +257,12 @@ class PermissionsMixin(models.Model):
 
     def has_perm(self, perm, obj=None):
         """
-        Returns True if the user has the specified permission. This method
-        queries all available auth backends, but returns immediately if any
-        backend returns True. Thus, a user who has permission from a single
-        auth backend is assumed to have permission in general. If an object is
-        provided, permissions for this specific object are checked.
+        Return True if the user has the specified permission. Query all
+        available auth backends, but return immediately if any backend returns
+        True. Thus, a user who has permission from a single auth backend is
+        assumed to have permission in general. If an object is provided, check
+        permissions for that object.
         """
-
         # Active superusers have all permissions.
         if self.is_active and self.is_superuser:
             return True
@@ -273,16 +272,15 @@ class PermissionsMixin(models.Model):
 
     def has_perms(self, perm_list, obj=None):
         """
-        Returns True if the user has each of the specified permissions. If
-        object is passed, it checks if the user has all required perms for this
-        object.
+        Return True if the user has each of the specified permissions. If
+        object is passed, check if the user has all required perms for it.
         """
         return all(self.has_perm(perm, obj) for perm in perm_list)
 
     def has_module_perms(self, app_label):
         """
-        Returns True if the user has any permissions in the given app label.
-        Uses pretty much the same logic as has_perm, above.
+        Return True if the user has any permissions in the given app label.
+        Use simlar logic as has_perm(), above.
         """
         # Active superusers have all permissions.
         if self.is_active and self.is_superuser:
@@ -345,19 +343,17 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         """
-        Returns the first_name plus the last_name, with a space in between.
+        Return the first_name plus the last_name, with a space in between.
         """
         full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
 
     def get_short_name(self):
-        "Returns the short name for the user."
+        """Return the short name for the user."""
         return self.first_name
 
     def email_user(self, subject, message, from_email=None, **kwargs):
-        """
-        Sends an email to this User.
-        """
+        """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
 

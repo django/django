@@ -66,7 +66,7 @@ class GeoModelAdmin(ModelAdmin):
 
     def get_map_widget(self, db_field):
         """
-        Returns a subclass of the OpenLayersWidget (or whatever was specified
+        Return a subclass of the OpenLayersWidget (or whatever was specified
         in the `widget` attribute) using the settings from the attributes set
         in this class.
         """

@@ -49,7 +49,7 @@ def generic_inlineformset_factory(model, form=ModelForm,
                                   validate_max=False, for_concrete_model=True,
                                   min_num=None, validate_min=False):
     """
-    Returns a ``GenericInlineFormSet`` for the given kwargs.
+    Return a ``GenericInlineFormSet`` for the given kwargs.
 
     You must provide ``ct_field`` and ``fk_field`` if they are different from
     the defaults ``content_type`` and ``object_id`` respectively.

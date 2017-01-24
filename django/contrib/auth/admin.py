@@ -193,7 +193,7 @@ class UserAdmin(admin.ModelAdmin):
 
     def response_add(self, request, obj, post_url_continue=None):
         """
-        Determines the HttpResponse for the add_view stage. It mostly defers to
+        Determine the HttpResponse for the add_view stage. It mostly defers to
         its superclass implementation but is customized because the User model
         has a slightly different workflow.
         """

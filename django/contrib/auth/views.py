@@ -42,7 +42,7 @@ class SuccessURLAllowedHostsMixin:
 
 class LoginView(SuccessURLAllowedHostsMixin, FormView):
     """
-    Displays the login form and handles the login action.
+    Display the login form and handle the login action.
     """
     form_class = AuthenticationForm
     authentication_form = None
@@ -111,7 +111,7 @@ def login(request, *args, **kwargs):
 
 class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
     """
-    Logs out the user and displays 'You are logged out' message.
+    Log out the user and display the 'You are logged out' message.
     """
     next_page = None
     redirect_field_name = REDIRECT_FIELD_NAME
@@ -178,7 +178,7 @@ _sentinel = object()
 
 def logout_then_login(request, login_url=None, extra_context=_sentinel):
     """
-    Logs out the user if they are logged in. Then redirects to the log-in page.
+    Log out the user if they are logged in. Then redirect to the login page.
     """
     if extra_context is not _sentinel:
         warnings.warn(
@@ -192,10 +192,9 @@ def logout_then_login(request, login_url=None, extra_context=_sentinel):
     return LogoutView.as_view(next_page=login_url)(request)
 
 
-def redirect_to_login(next, login_url=None,
-                      redirect_field_name=REDIRECT_FIELD_NAME):
+def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
     """
-    Redirects the user to the login page, passing the given 'next' page
+    Redirect the user to the login page, passing the given 'next' page.
     """
     resolved_url = resolve_url(login_url or settings.LOGIN_URL)
 
@@ -286,8 +285,8 @@ def password_reset_confirm(request, uidb64=None, token=None,
                            post_reset_redirect=None,
                            extra_context=None):
     """
-    View that checks the hash in a password reset link and presents a
-    form for entering a new password.
+    Check the hash in a password reset link and present a form for entering a
+    new password.
     """
     warnings.warn("The password_reset_confirm() view is superseded by the "
                   "class-based PasswordResetConfirmView().",

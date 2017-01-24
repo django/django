@@ -82,17 +82,17 @@ class AdminSite:
 
     def register(self, model_or_iterable, admin_class=None, **options):
         """
-        Registers the given model(s) with the given admin class.
+        Register the given model(s) with the given admin class.
 
         The model(s) should be Model classes, not instances.
 
-        If an admin class isn't given, it will use ModelAdmin (the default
-        admin options). If keyword arguments are given -- e.g., list_display --
-        they'll be applied as options to the admin class.
+        If an admin class isn't given, use ModelAdmin (the default admin
+        options). If keyword arguments are given -- e.g., list_display --
+        apply them as options to the admin class.
 
-        If a model is already registered, this will raise AlreadyRegistered.
+        If a model is already registered, raise AlreadyRegistered.
 
-        If a model is abstract, this will raise ImproperlyConfigured.
+        If a model is abstract, raise ImproperlyConfigured.
         """
         if not admin_class:
             admin_class = ModelAdmin
@@ -125,9 +125,9 @@ class AdminSite:
 
     def unregister(self, model_or_iterable):
         """
-        Unregisters the given model(s).
+        Unregister the given model(s).
 
-        If a model isn't already registered, this will raise NotRegistered.
+        If a model isn't already registered, raise NotRegistered.
         """
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
@@ -152,14 +152,14 @@ class AdminSite:
 
     def disable_action(self, name):
         """
-        Disable a globally-registered action. Raises KeyError for invalid names.
+        Disable a globally-registered action. Raise KeyError for invalid names.
         """
         del self._actions[name]
 
     def get_action(self, name):
         """
         Explicitly get a registered global action whether it's enabled or
-        not. Raises KeyError for invalid names.
+        not. Raise KeyError for invalid names.
         """
         return self._global_actions[name]
 
@@ -180,7 +180,7 @@ class AdminSite:
 
     def has_permission(self, request):
         """
-        Returns True if the given HttpRequest has permission to view
+        Return True if the given HttpRequest has permission to view
         *at least one* page in the admin site.
         """
         return request.user.is_active and request.user.is_staff
@@ -280,7 +280,7 @@ class AdminSite:
 
     def each_context(self, request):
         """
-        Returns a dictionary of variables to put in the template context for
+        Return a dictionary of variables to put in the template context for
         *every* page in the admin site.
 
         For sites running on a subpath, use the SCRIPT_NAME value if site_url
@@ -298,7 +298,7 @@ class AdminSite:
 
     def password_change(self, request, extra_context=None):
         """
-        Handles the "change password" task -- both form display and validation.
+        Handle the "change password" task -- both form display and validation.
         """
         from django.contrib.admin.forms import AdminPasswordChangeForm
         from django.contrib.auth.views import PasswordChangeView
@@ -315,7 +315,7 @@ class AdminSite:
 
     def password_change_done(self, request, extra_context=None):
         """
-        Displays the "success" page after a password change.
+        Display the "success" page after a password change.
         """
         from django.contrib.auth.views import PasswordChangeDoneView
         defaults = {
@@ -328,7 +328,7 @@ class AdminSite:
 
     def i18n_javascript(self, request, extra_context=None):
         """
-        Displays the i18n JavaScript that the Django admin requires.
+        Display the i18n JavaScript that the Django admin requires.
 
         `extra_context` is unused but present for consistency with the other
         admin views.
@@ -338,7 +338,7 @@ class AdminSite:
     @never_cache
     def logout(self, request, extra_context=None):
         """
-        Logs out the user for the given HttpRequest.
+        Log out the user for the given HttpRequest.
 
         This should *not* assume the user is already logged in.
         """
@@ -360,7 +360,7 @@ class AdminSite:
     @never_cache
     def login(self, request, extra_context=None):
         """
-        Displays the login form for the given HttpRequest.
+        Display the login form for the given HttpRequest.
         """
         if request.method == 'GET' and self.has_permission(request):
             # Already logged-in, redirect to admin index
@@ -393,8 +393,8 @@ class AdminSite:
 
     def _build_app_dict(self, request, label=None):
         """
-        Builds the app dictionary. Takes an optional label parameters to filter
-        models of a specific app.
+        Build the app dictionary. The optional `label` parameter filters models
+        of a specific app.
         """
         app_dict = {}
 
@@ -458,7 +458,7 @@ class AdminSite:
 
     def get_app_list(self, request):
         """
-        Returns a sorted list of all the installed apps that have been
+        Return a sorted list of all the installed apps that have been
         registered in this site.
         """
         app_dict = self._build_app_dict(request)
@@ -475,7 +475,7 @@ class AdminSite:
     @never_cache
     def index(self, request, extra_context=None):
         """
-        Displays the main admin index page, which lists all of the installed
+        Display the main admin index page, which lists all of the installed
         apps that have been registered in this site.
         """
         app_list = self.get_app_list(request)

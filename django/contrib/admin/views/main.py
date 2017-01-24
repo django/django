@@ -84,7 +84,7 @@ class ChangeList:
 
     def get_filters_params(self, params=None):
         """
-        Returns all params except IGNORED_PARAMS
+        Return all params except IGNORED_PARAMS.
         """
         if not params:
             params = self.params
@@ -212,10 +212,10 @@ class ChangeList:
 
     def get_ordering_field(self, field_name):
         """
-        Returns the proper model field name corresponding to the given
+        Return the proper model field name corresponding to the given
         field_name to use for ordering. field_name may either be the name of a
         proper model field or the name of a method (on the admin or model) or a
-        callable with the 'admin_order_field' attribute. Returns None if no
+        callable with the 'admin_order_field' attribute. Return None if no
         proper model field name can be matched.
         """
         try:
@@ -234,8 +234,8 @@ class ChangeList:
 
     def get_ordering(self, request, queryset):
         """
-        Returns the list of ordering fields for the change list.
-        First we check the get_ordering() method in model admin, then we check
+        Return the list of ordering fields for the change list.
+        First check the get_ordering() method in model admin, then check
         the object's default ordering. Then, any manually-specified ordering
         from the query string overrides anything. Finally, a deterministic
         order is guaranteed by ensuring the primary key is used as the last
@@ -278,9 +278,8 @@ class ChangeList:
 
     def get_ordering_field_columns(self):
         """
-        Returns an OrderedDict of ordering field column numbers and asc/desc
+        Return an OrderedDict of ordering field column numbers and asc/desc.
         """
-
         # We must cope with more than one column having the same underlying sort
         # field, so we base things on column numbers.
         ordering = self._get_default_ordering()
