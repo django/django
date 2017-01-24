@@ -298,7 +298,7 @@ def password_reset_confirm(request, uidb64=None, token=None,
     else:
         post_reset_redirect = resolve_url(post_reset_redirect)
     try:
-        # urlsafe_base64_decode() decodes to bytestring on Python 3
+        # urlsafe_base64_decode() decodes to bytestring
         uid = force_text(urlsafe_base64_decode(uidb64))
         user = UserModel._default_manager.get(pk=uid)
     except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
@@ -442,7 +442,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
 
     def get_user(self, uidb64):
         try:
-            # urlsafe_base64_decode() decodes to bytestring on Python 3
+            # urlsafe_base64_decode() decodes to bytestring
             uid = force_text(urlsafe_base64_decode(uidb64))
             user = UserModel._default_manager.get(pk=uid)
         except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):

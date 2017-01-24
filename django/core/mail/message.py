@@ -324,8 +324,8 @@ class EmailMessage:
                     try:
                         content = content.decode('utf-8')
                     except UnicodeDecodeError:
-                        # If mimetype suggests the file is text but it's actually
-                        # binary, read() will raise a UnicodeDecodeError on Python 3.
+                        # If mimetype suggests the file is text but it's
+                        # actually binary, read() raises a UnicodeDecodeError.
                         mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
 
             self.attachments.append((filename, content, mimetype))

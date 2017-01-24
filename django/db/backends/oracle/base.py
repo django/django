@@ -322,8 +322,7 @@ class OracleParam:
             param = Oracle_datetime.from_datetime(param)
 
         string_size = 0
-        # Oracle doesn't recognize True and False correctly in Python 3.
-        # The conversion done below works both in 2 and 3.
+        # Oracle doesn't recognize True and False correctly.
         if param is True:
             param = 1
         elif param is False:

@@ -192,7 +192,6 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             'Content', 'from@example.com', ['to@example.com']
         )
         message = email.message()
-        # Note that in Python 3, maximum line length has increased from 76 to 78
         self.assertEqual(
             message['Subject'].encode(),
             b'Long subject lines that get wrapped should contain a space continuation\n'
@@ -1157,8 +1156,8 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
 
         if mailfrom != maddr:
             # According to the spec, mailfrom does not necessarily match the
-            # From header - on Python 3 this is the case where the local part
-            # isn't encoded, so try to correct that.
+            # From header - this is the case where the local part isn't
+            # encoded, so try to correct that.
             lp, domain = mailfrom.split('@', 1)
             lp = Header(lp, 'utf-8').encode()
             mailfrom = '@'.join([lp, domain])
