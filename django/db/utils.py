@@ -83,8 +83,6 @@ class DatabaseErrorWrapper:
             if issubclass(exc_type, db_exc_type):
                 dj_exc_value = dj_exc_type(*exc_value.args)
                 dj_exc_value.__cause__ = exc_value
-                if not hasattr(exc_value, '__traceback__'):
-                    exc_value.__traceback__ = traceback
                 # Only set the 'errors_occurred' flag for errors that may make
                 # the connection unusable.
                 if dj_exc_type not in (DataError, IntegrityError):
