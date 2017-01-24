@@ -69,9 +69,7 @@ def subclass_exception(name, parents, module, attached_to=None):
 
 
 class ModelBase(type):
-    """
-    Metaclass for all models.
-    """
+    """Metaclass for all models."""
     def __new__(cls, name, bases, attrs):
         super_new = super().__new__
 
@@ -322,9 +320,7 @@ class ModelBase(type):
             setattr(cls, name, value)
 
     def _prepare(cls):
-        """
-        Creates some methods once self._meta has been populated.
-        """
+        """Create some methods once self._meta has been populated."""
         opts = cls._meta
         opts._prepare(cls)
 
@@ -372,9 +368,7 @@ class ModelBase(type):
 
 
 class ModelState:
-    """
-    A class for storing instance state
-    """
+    """Store model instance state."""
     def __init__(self, db=None):
         self.db = db
         # If true, uniqueness validation checks will consider this a new, as-yet-unsaved object.
@@ -561,7 +555,7 @@ class Model(metaclass=ModelBase):
 
     def get_deferred_fields(self):
         """
-        Returns a set containing names of deferred fields for this instance.
+        Return a set containing names of deferred fields for this instance.
         """
         return {
             f.attname for f in self._meta.concrete_fields
@@ -570,7 +564,7 @@ class Model(metaclass=ModelBase):
 
     def refresh_from_db(self, using=None, fields=None):
         """
-        Reloads field values from the database.
+        Reload field values from the database.
 
         By default, the reloading happens from the database this instance was
         loaded from, or by the read router if this instance wasn't loaded from
@@ -622,10 +616,10 @@ class Model(metaclass=ModelBase):
 
     def serializable_value(self, field_name):
         """
-        Returns the value of the field name for this instance. If the field is
-        a foreign key, returns the id value, instead of the object. If there's
-        no Field object with this name on the model, the model attribute's
-        value is returned directly.
+        Return the value of the field name for this instance. If the field is
+        a foreign key, return the id value instead of the object. If there's
+        no Field object with this name on the model, return the model
+        attribute's value.
 
         Used to serialize a field's value (in the serializer, or form output,
         for example). Normally, you would just access the attribute directly
@@ -640,7 +634,7 @@ class Model(metaclass=ModelBase):
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
         """
-        Saves the current instance. Override this in a subclass if you want to
+        Save the current instance. Override this in a subclass if you want to
         control the saving process.
 
         The 'force_insert' and 'force_update' parameters can be used to insist
@@ -721,7 +715,7 @@ class Model(metaclass=ModelBase):
     def save_base(self, raw=False, force_insert=False,
                   force_update=False, using=None, update_fields=None):
         """
-        Handles the parts of saving which should be done only once per save,
+        Handle the parts of saving which should be done only once per save,
         yet need to be done in raw saves, too. This includes some sanity
         checks and signal sending.
 
@@ -761,9 +755,7 @@ class Model(metaclass=ModelBase):
     save_base.alters_data = True
 
     def _save_parents(self, cls, using, update_fields):
-        """
-        Saves all the parents of cls using values from self.
-        """
+        """Save all the parents of cls using values from self."""
         meta = cls._meta
         for parent, field in meta.parents.items():
             # Make sure the link fields are synced between parent and self.
@@ -787,7 +779,7 @@ class Model(metaclass=ModelBase):
     def _save_table(self, raw=False, cls=None, force_insert=False,
                     force_update=False, using=None, update_fields=None):
         """
-        Does the heavy-lifting involved in saving. Updates or inserts the data
+        Do the heavy-lifting involved in saving. Update or insert the data
         for a single table.
         """
         meta = cls._meta
@@ -838,9 +830,8 @@ class Model(metaclass=ModelBase):
 
     def _do_update(self, base_qs, using, pk_val, values, update_fields, forced_update):
         """
-        This method will try to update the model. If the model was updated (in
-        the sense that an update query was done and a matching row was found
-        from the DB) the method will return True.
+        Try to update the model. Return True if the model was updated (if an
+        update query was done and a matching row was found in the DB).
         """
         filtered = base_qs.filter(pk=pk_val)
         if not values:
@@ -936,8 +927,8 @@ class Model(metaclass=ModelBase):
 
     def validate_unique(self, exclude=None):
         """
-        Checks unique constraints on the model and raises ``ValidationError``
-        if any failed.
+        Check unique constraints on the model and raise ValidationError if any
+        failed.
         """
         unique_checks, date_checks = self._get_unique_checks(exclude=exclude)
 
@@ -952,12 +943,11 @@ class Model(metaclass=ModelBase):
 
     def _get_unique_checks(self, exclude=None):
         """
-        Gather a list of checks to perform. Since validate_unique could be
+        Return a list of checks to perform. Since validate_unique() could be
         called from a ModelForm, some fields may have been excluded; we can't
         perform a unique check on a model that is missing fields involved
-        in that check.
-        Fields that did not validate should also be excluded, but they need
-        to be passed in via the exclude argument.
+        in that check. Fields that did not validate should also be excluded,
+        but they need to be passed in via the exclude argument.
         """
         if exclude is None:
             exclude = []
@@ -1125,8 +1115,8 @@ class Model(metaclass=ModelBase):
 
     def full_clean(self, exclude=None, validate_unique=True):
         """
-        Calls clean_fields, clean, and validate_unique, on the model,
-        and raises a ``ValidationError`` for any errors that occurred.
+        Call clean_fields(), clean(), and validate_unique() on the model.
+        Raise a ValidationError for any errors that occur.
         """
         errors = {}
         if exclude is None:
@@ -1161,7 +1151,7 @@ class Model(metaclass=ModelBase):
 
     def clean_fields(self, exclude=None):
         """
-        Cleans all fields and raises a ValidationError containing a dict
+        Clean all fields and raise a ValidationError containing a dict
         of all validation errors if any occur.
         """
         if exclude is None:
@@ -1212,8 +1202,7 @@ class Model(metaclass=ModelBase):
 
     @classmethod
     def _check_swappable(cls):
-        """ Check if the swapped model exists. """
-
+        """Check if the swapped model exists."""
         errors = []
         if cls._meta.swapped:
             try:
@@ -1253,8 +1242,7 @@ class Model(metaclass=ModelBase):
 
     @classmethod
     def _check_managers(cls, **kwargs):
-        """ Perform all manager checks. """
-
+        """Perform all manager checks."""
         errors = []
         for manager in cls._meta.managers:
             errors.extend(manager.check(**kwargs))
@@ -1262,8 +1250,7 @@ class Model(metaclass=ModelBase):
 
     @classmethod
     def _check_fields(cls, **kwargs):
-        """ Perform all field checks. """
-
+        """Perform all field checks."""
         errors = []
         for field in cls._meta.local_fields:
             errors.extend(field.check(**kwargs))
@@ -1304,7 +1291,7 @@ class Model(metaclass=ModelBase):
 
     @classmethod
     def _check_id_field(cls):
-        """ Check if `id` field is a primary key. """
+        """Check if `id` field is a primary key."""
         fields = list(f for f in cls._meta.local_fields if f.name == 'id' and f != cls._meta.pk)
         # fields is empty or consists of the invalid "id" field
         if fields and not fields[0].primary_key and cls._meta.pk.name == 'id':
@@ -1321,8 +1308,7 @@ class Model(metaclass=ModelBase):
 
     @classmethod
     def _check_field_name_clashes(cls):
-        """ Ref #17673. """
-
+        """Forbid field shadowing in multi-table inheritance."""
         errors = []
         used_fields = {}  # name or attname -> field
 
@@ -1428,7 +1414,7 @@ class Model(metaclass=ModelBase):
 
     @classmethod
     def _check_index_together(cls):
-        """ Check the value of "index_together" option. """
+        """Check the value of "index_together" option."""
         if not isinstance(cls._meta.index_together, (tuple, list)):
             return [
                 checks.Error(
@@ -1455,7 +1441,7 @@ class Model(metaclass=ModelBase):
 
     @classmethod
     def _check_unique_together(cls):
-        """ Check the value of "unique_together" option. """
+        """Check the value of "unique_together" option."""
         if not isinstance(cls._meta.unique_together, (tuple, list)):
             return [
                 checks.Error(
@@ -1530,8 +1516,10 @@ class Model(metaclass=ModelBase):
 
     @classmethod
     def _check_ordering(cls):
-        """ Check "ordering" option -- is it a list of strings and do all fields
-        exist? """
+        """
+        Check "ordering" option -- is it a list of strings and do all fields
+        exist?
+        """
         if cls._meta._ordering_clash:
             return [
                 checks.Error(
@@ -1710,9 +1698,7 @@ def make_foreign_order_accessors(model, related_model):
 
 
 def model_unpickle(model_id):
-    """
-    Used to unpickle Model subclasses with deferred fields.
-    """
+    """Used to unpickle Model subclasses with deferred fields."""
     if isinstance(model_id, tuple):
         model = apps.get_model(*model_id)
     else:

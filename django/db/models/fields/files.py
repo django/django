@@ -133,14 +133,14 @@ class FieldFile(File):
 
 class FileDescriptor:
     """
-    The descriptor for the file attribute on the model instance. Returns a
-    FieldFile when accessed so you can do stuff like::
+    The descriptor for the file attribute on the model instance. Return a
+    FieldFile when accessed so you can write code like::
 
         >>> from myapp.models import MyModel
         >>> instance = MyModel.objects.get(pk=1)
         >>> instance.file.size
 
-    Assigns a file object on assignment so you can do::
+    Assign a file object on assignment so you can do::
 
         >>> with open('/path/to/hello.world', 'r') as f:
         ...     instance.file = File(f)
@@ -275,7 +275,6 @@ class FileField(Field):
         return "FileField"
 
     def get_prep_value(self, value):
-        "Returns field's value prepared for saving into a database."
         value = super().get_prep_value(value)
         # Need to convert File objects provided via a form to string for database insertion
         if value is None:
@@ -283,7 +282,6 @@ class FileField(Field):
         return str(value)
 
     def pre_save(self, model_instance, add):
-        "Returns field's value just before saving."
         file = super().pre_save(model_instance, add)
         if file and not file._committed:
             # Commit the file to storage prior to saving the model
@@ -406,7 +404,7 @@ class ImageField(FileField):
 
     def update_dimension_fields(self, instance, force=False, *args, **kwargs):
         """
-        Updates field's width and height fields, if defined.
+        Update field's width and height fields, if defined.
 
         This method is hooked up to model's post_init signal to update
         dimensions after instantiating a model instance.  However, dimensions

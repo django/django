@@ -39,9 +39,7 @@ class ModelOperation(Operation):
 
 
 class CreateModel(ModelOperation):
-    """
-    Create a model's table.
-    """
+    """Create a model's table."""
 
     serialization_expand_args = ['fields', 'options', 'managers']
 
@@ -227,9 +225,7 @@ class CreateModel(ModelOperation):
 
 
 class DeleteModel(ModelOperation):
-    """
-    Drops a model's table.
-    """
+    """Drop a model's table."""
 
     def deconstruct(self):
         kwargs = {
@@ -259,9 +255,7 @@ class DeleteModel(ModelOperation):
 
 
 class RenameModel(ModelOperation):
-    """
-    Renames a model.
-    """
+    """Rename a model."""
 
     def __init__(self, old_name, new_name):
         self.old_name = old_name
@@ -423,9 +417,7 @@ class RenameModel(ModelOperation):
 
 
 class AlterModelTable(ModelOperation):
-    """
-    Renames a model's table
-    """
+    """Rename a model's table."""
 
     def __init__(self, name, table):
         self.table = table
@@ -497,7 +489,7 @@ class FieldRelatedOptionOperation(ModelOptionOperation):
 
 class AlterUniqueTogether(FieldRelatedOptionOperation):
     """
-    Changes the value of unique_together to the target one.
+    Change the value of unique_together to the target one.
     Input value of unique_together must be a set of tuples.
     """
     option_name = "unique_together"
@@ -551,7 +543,7 @@ class AlterUniqueTogether(FieldRelatedOptionOperation):
 
 class AlterIndexTogether(FieldRelatedOptionOperation):
     """
-    Changes the value of index_together to the target one.
+    Change the value of index_together to the target one.
     Input value of index_together must be a set of tuples.
     """
     option_name = "index_together"
@@ -604,9 +596,7 @@ class AlterIndexTogether(FieldRelatedOptionOperation):
 
 
 class AlterOrderWithRespectTo(FieldRelatedOptionOperation):
-    """
-    Represents a change with the order_with_respect_to option.
-    """
+    """Represent a change with the order_with_respect_to option."""
 
     def __init__(self, name, order_with_respect_to):
         self.order_with_respect_to = order_with_respect_to
@@ -664,7 +654,7 @@ class AlterOrderWithRespectTo(FieldRelatedOptionOperation):
 
 class AlterModelOptions(ModelOptionOperation):
     """
-    Sets new model options that don't directly affect the database schema
+    Set new model options that don't directly affect the database schema
     (like verbose_name, permissions, ordering). Python code in migrations
     may still need them.
     """
@@ -718,9 +708,7 @@ class AlterModelOptions(ModelOptionOperation):
 
 
 class AlterModelManagers(ModelOptionOperation):
-    """
-    Alters the model's managers
-    """
+    """Alter the model's managers."""
 
     serialization_expand_args = ['managers']
 
@@ -759,9 +747,7 @@ class IndexOperation(Operation):
 
 
 class AddIndex(IndexOperation):
-    """
-    Add an index on a model.
-    """
+    """Add an index on a model."""
 
     def __init__(self, model_name, index):
         self.model_name = model_name
@@ -806,9 +792,7 @@ class AddIndex(IndexOperation):
 
 
 class RemoveIndex(IndexOperation):
-    """
-    Remove an index from a model.
-    """
+    """Remove an index from a model."""
 
     def __init__(self, model_name, name):
         self.model_name = model_name

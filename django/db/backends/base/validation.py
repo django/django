@@ -1,7 +1,5 @@
 class BaseDatabaseValidation:
-    """
-    This class encapsulates all backend-specific validation.
-    """
+    """Encapsulate backend-specific validation."""
     def __init__(self, connection):
         self.connection = connection
 

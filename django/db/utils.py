@@ -50,7 +50,7 @@ class NotSupportedError(DatabaseError):
 
 class DatabaseErrorWrapper:
     """
-    Context manager and decorator that re-throws backend-specific database
+    Context manager and decorator that reraises backend-specific database
     exceptions using Django's common wrappers.
     """
 
@@ -161,7 +161,7 @@ class ConnectionHandler:
 
     def ensure_defaults(self, alias):
         """
-        Puts the defaults into the settings dictionary for a given connection
+        Put the defaults into the settings dictionary for a given connection
         where no settings is provided.
         """
         try:
@@ -182,7 +182,7 @@ class ConnectionHandler:
 
     def prepare_test_settings(self, alias):
         """
-        Makes sure the test settings are available in the 'TEST' sub-dictionary.
+        Make sure the test settings are available in the 'TEST' sub-dictionary.
         """
         try:
             conn = self.databases[alias]
@@ -229,7 +229,7 @@ class ConnectionHandler:
 class ConnectionRouter:
     def __init__(self, routers=None):
         """
-        If routers is not specified, will default to settings.DATABASE_ROUTERS.
+        If routers is not specified, default to settings.DATABASE_ROUTERS.
         """
         self._routers = routers
 
@@ -304,8 +304,6 @@ class ConnectionRouter:
         )
 
     def get_migratable_models(self, app_config, db, include_auto_created=False):
-        """
-        Return app models allowed to be synchronized on provided db.
-        """
+        """Return app models allowed to be migrated on provided db."""
         models = app_config.get_models(include_auto_created=include_auto_created)
         return [model for model in models if self.allow_migrate_model(db, model)]

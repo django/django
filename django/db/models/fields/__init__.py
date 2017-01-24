@@ -190,9 +190,7 @@ class Field(RegisterLookupMixin):
         return '%s.%s.%s' % (app, model._meta.object_name, self.name)
 
     def __repr__(self):
-        """
-        Displays the module, class and name of the field.
-        """
+        """Display the module, class, and name of the field."""
         path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
         name = getattr(self, 'name', None)
         if name is not None:
@@ -210,9 +208,10 @@ class Field(RegisterLookupMixin):
         return errors
 
     def _check_field_name(self):
-        """ Check if field name is valid, i.e. 1) does not end with an
-        underscore, 2) does not contain "__" and 3) is not "pk". """
-
+        """
+        Check if field name is valid, i.e. 1) does not end with an
+        underscore, 2) does not contain "__" and 3) is not "pk".
+        """
         if self.name.endswith('_'):
             return [
                 checks.Error(
@@ -348,37 +347,42 @@ class Field(RegisterLookupMixin):
     def select_format(self, compiler, sql, params):
         """
         Custom format for select clauses. For example, GIS columns need to be
-        selected as AsText(table.col) on MySQL as the table.col data can't be used
-        by Django.
+        selected as AsText(table.col) on MySQL as the table.col data can't be
+        used by Django.
         """
         return sql, params
 
     def deconstruct(self):
         """
-        Returns enough information to recreate the field as a 4-tuple:
+        Return enough information to recreate the field as a 4-tuple:
 
-         * The name of the field on the model, if contribute_to_class has been run
-         * The import path of the field, including the class: django.db.models.IntegerField
-           This should be the most portable version, so less specific may be better.
-         * A list of positional arguments
-         * A dict of keyword arguments
+         * The name of the field on the model, if contribute_to_class() has
+           been run.
+         * The import path of the field, including the class:e.g.
+           django.db.models.IntegerField This should be the most portable
+           version, so less specific may be better.
+         * A list of positional arguments.
+         * A dict of keyword arguments.
 
-        Note that the positional or keyword arguments must contain values of the
-        following types (including inner values of collection types):
+        Note that the positional or keyword arguments must contain values of
+        the following types (including inner values of collection types):
 
-         * None, bool, str, int, float, complex, set, frozenset, list, tuple, dict
+         * None, bool, str, int, float, complex, set, frozenset, list, tuple,
+           dict
          * UUID
          * datetime.datetime (naive), datetime.date
-         * top-level classes, top-level functions - will be referenced by their full import path
+         * top-level classes, top-level functions - will be referenced by their
+           full import path
          * Storage instances - these have their own deconstruct() method
 
         This is because the values here must be serialized into a text format
         (possibly new Python code, possibly JSON) and these are the only types
         with encoding handlers defined.
 
-        There's no need to return the exact way the field was instantiated this time,
-        just ensure that the resulting field is the same - prefer keyword arguments
-        over positional ones, and omit parameters with their default values.
+        There's no need to return the exact way the field was instantiated this
+        time, just ensure that the resulting field is the same - prefer keyword
+        arguments over positional ones, and omit parameters with their default
+        values.
         """
         # Short-form way of fetching all the default parameters
         keywords = {}
@@ -486,7 +490,7 @@ class Field(RegisterLookupMixin):
     def __reduce__(self):
         """
         Pickling should return the model._meta.fields instance of the field,
-        not a new copy of that field. So, we use the app registry to load the
+        not a new copy of that field. So, use the app registry to load the
         model and then the field back.
         """
         if not hasattr(self, 'model'):
@@ -512,9 +516,9 @@ class Field(RegisterLookupMixin):
 
     def to_python(self, value):
         """
-        Converts the input value into the expected Python data type, raising
+        Convert the input value into the expected Python data type, raising
         django.core.exceptions.ValidationError if the data can't be converted.
-        Returns the converted value. Subclasses should override this.
+        Return the converted value. Subclasses should override this.
         """
         return value
 
@@ -544,8 +548,8 @@ class Field(RegisterLookupMixin):
 
     def validate(self, value, model_instance):
         """
-        Validates value and throws ValidationError. Subclasses should override
-        this to provide validation logic.
+        Validate value and raise ValidationError if necessary. Subclasses
+        should override this to provide validation logic.
         """
         if not self.editable:
             # Skip validation for non-editable fields.
@@ -576,8 +580,8 @@ class Field(RegisterLookupMixin):
     def clean(self, value, model_instance):
         """
         Convert the value's type and run validation. Validation errors
-        from to_python and validate are propagated. The correct value is
-        returned if no error is raised.
+        from to_python() and validate() are propagated. Return the correct
+        value if no error is raised.
         """
         value = self.to_python(value)
         self.validate(value, model_instance)
@@ -632,9 +636,9 @@ class Field(RegisterLookupMixin):
 
     def db_parameters(self, connection):
         """
-        Extension of db_type(), providing a range of different return
-        values (type, checks).
-        This will look at db_type(), allowing custom model fields to override it.
+        Extension of db_type(), providing a range of different return values
+        (type, checks). This will look at db_type(), allowing custom model
+        fields to override it.
         """
         type_string = self.db_type(connection)
         check_string = self.db_check(connection)
@@ -667,9 +671,8 @@ class Field(RegisterLookupMixin):
         """
         Register the field with the model class it belongs to.
 
-        If private_only is True, a separate instance of this field will be
-        created for every subclass of cls, even if cls is not an abstract
-        model.
+        If private_only is True, create a separate instance of this field
+        for every subclass of cls, even if cls is not an abstract model.
         """
         self.set_attributes_from_name(name)
         self.model = cls
@@ -709,22 +712,18 @@ class Field(RegisterLookupMixin):
         return self.__class__.__name__
 
     def pre_save(self, model_instance, add):
-        """
-        Returns field's value just before saving.
-        """
+        """Return field's value just before saving."""
         return getattr(model_instance, self.attname)
 
     def get_prep_value(self, value):
-        """
-        Perform preliminary non-db specific value checks and conversions.
-        """
+        """Perform preliminary non-db specific value checks and conversions."""
         if isinstance(value, Promise):
             value = value._proxy____cast()
         return value
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        """Returns field's value prepared for interacting with the database
-        backend.
+        """
+        Return field's value prepared for interacting with the database backend.
 
         Used by the default implementations of get_db_prep_save().
         """
@@ -733,22 +732,15 @@ class Field(RegisterLookupMixin):
         return value
 
     def get_db_prep_save(self, value, connection):
-        """
-        Returns field's value prepared for saving into a database.
-        """
-        return self.get_db_prep_value(value, connection=connection,
-                                      prepared=False)
+        """Return field's value prepared for saving into a database."""
+        return self.get_db_prep_value(value, connection=connection, prepared=False)
 
     def has_default(self):
-        """
-        Returns a boolean of whether this field has a default value.
-        """
+        """Return a boolean of whether this field has a default value."""
         return self.default is not NOT_PROVIDED
 
     def get_default(self):
-        """
-        Returns the default value for this field.
-        """
+        """Return the default value for this field."""
         return self._get_default()
 
     @cached_property
@@ -760,11 +752,13 @@ class Field(RegisterLookupMixin):
 
         if not self.empty_strings_allowed or self.null and not connection.features.interprets_empty_strings_as_nulls:
             return return_None
-        return str  # returns empty string
+        return str  # return empty string
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None):
-        """Returns choices with a default blank choices included, for use
-        as SelectField choices for this field."""
+        """
+        Return choices with a default blank choices included, for use
+        as <select> choices for this field.
+        """
         blank_defined = False
         choices = list(self.choices) if self.choices else []
         named_groups = choices and isinstance(choices[0][1], (list, tuple))
@@ -793,7 +787,7 @@ class Field(RegisterLookupMixin):
 
     def value_to_string(self, obj):
         """
-        Returns a string value of this field from the passed obj.
+        Return a string value of this field from the passed obj.
         This is used by the serialization framework.
         """
         return force_text(self.value_from_object(obj))
@@ -813,9 +807,7 @@ class Field(RegisterLookupMixin):
         setattr(instance, self.name, data)
 
     def formfield(self, form_class=None, choices_form_class=None, **kwargs):
-        """
-        Returns a django.forms.Field instance for this database Field.
-        """
+        """Return a django.forms.Field instance for this field."""
         defaults = {'required': not self.blank,
                     'label': capfirst(self.verbose_name),
                     'help_text': self.help_text}
@@ -851,9 +843,7 @@ class Field(RegisterLookupMixin):
         return form_class(**defaults)
 
     def value_from_object(self, obj):
-        """
-        Returns the value of this field in the given model instance.
-        """
+        """Return the value of this field in the given model instance."""
         return getattr(obj, self.attname)
 
 
@@ -1137,11 +1127,8 @@ class DateField(DateTimeCheckMixin, Field):
 
     def _check_fix_default_value(self):
         """
-        Adds a warning to the checks framework stating, that using an actual
-        date or datetime value is probably wrong; it's only being evaluated on
-        server start-up.
-
-        For details see ticket #21905
+        Warn that using an actual date or datetime value is probably wrong;
+        it's only evaluated on server startup.
         """
         if not self.has_default():
             return []
@@ -1279,11 +1266,8 @@ class DateTimeField(DateField):
 
     def _check_fix_default_value(self):
         """
-        Adds a warning to the checks framework stating, that using an actual
-        date or datetime value is probably wrong; it's only being evaluated on
-        server start-up.
-
-        For details see ticket #21905
+        Warn that using an actual date or datetime value is probably wrong;
+        it's only evaluated on server startup.
         """
         if not self.has_default():
             return []
@@ -1539,7 +1523,7 @@ class DecimalField(Field):
 
     def format_number(self, value):
         """
-        Formats a number into a string with the requisite number of digits and
+        Format a number into a string with the requisite number of digits and
         decimal places.
         """
         # Method moved to django.db.backends.utils.
@@ -1569,9 +1553,10 @@ class DecimalField(Field):
 
 
 class DurationField(Field):
-    """Stores timedelta objects.
+    """
+    Store timedelta objects.
 
-    Uses interval on PostgreSQL, INTERVAL DAY TO SECOND on Oracle, and bigint
+    Use interval on PostgreSQL, INTERVAL DAY TO SECOND on Oracle, and bigint
     of microseconds on other databases.
     """
     empty_strings_allowed = False
@@ -2123,11 +2108,8 @@ class TimeField(DateTimeCheckMixin, Field):
 
     def _check_fix_default_value(self):
         """
-        Adds a warning to the checks framework stating, that using an actual
-        time or datetime value is probably wrong; it's only being evaluated on
-        server start-up.
-
-        For details see ticket #21905
+        Warn that using an actual date or datetime value is probably wrong;
+        it's only evaluated on server startup.
         """
         if not self.has_default():
             return []

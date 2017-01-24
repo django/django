@@ -27,9 +27,7 @@ def _get_app_label_and_model_name(model, app_label=''):
 
 
 def _get_related_models(m):
-    """
-    Return all models that have a direct relationship to the given model.
-    """
+    """Return all models that have a direct relationship to the given model."""
     related_models = [
         subclass for subclass in m.__subclasses__()
         if issubclass(subclass, models.Model)
@@ -82,9 +80,9 @@ def get_related_models_recursive(model):
 
 class ProjectState:
     """
-    Represents the entire project's overall state.
-    This is the item that is passed around - we do it here rather than at the
-    app level so that cross-app FKs/etc. resolve properly.
+    Represent the entire project's overall state. This is the item that is
+    passed around - do it here rather than at the app level so that cross-app
+    FKs/etc. resolve properly.
     """
 
     def __init__(self, models=None, real_apps=None):
@@ -194,7 +192,7 @@ class ProjectState:
         self.apps.render_multiple(states_to_be_rendered)
 
     def clone(self):
-        "Returns an exact copy of this ProjectState"
+        """Return an exact copy of this ProjectState."""
         new_state = ProjectState(
             models={k: v.clone() for k, v in self.models.items()},
             real_apps=self.real_apps,
@@ -219,7 +217,7 @@ class ProjectState:
 
     @classmethod
     def from_apps(cls, apps):
-        "Takes in an Apps and returns a ProjectState matching it"
+        """Take an Apps and return a ProjectState matching it."""
         app_models = {}
         for model in apps.get_models(include_swapped=True):
             model_state = ModelState.from_model(model)
@@ -235,9 +233,7 @@ class ProjectState:
 
 
 class AppConfigStub(AppConfig):
-    """
-    Stubs a Django AppConfig. Only provides a label, and a dict of models.
-    """
+    """Stub of an AppConfig. Only provides a label and a dict of models."""
     # Not used, but required by AppConfig.__init__
     path = ''
 
@@ -325,9 +321,7 @@ class StateApps(Apps):
                 unrendered_models = new_unrendered_models
 
     def clone(self):
-        """
-        Return a clone of this registry, mainly used by the migration framework.
-        """
+        """Return a clone of this registry."""
         clone = StateApps([], {})
         clone.all_models = copy.deepcopy(self.all_models)
         clone.app_configs = copy.deepcopy(self.app_configs)
@@ -358,9 +352,9 @@ class StateApps(Apps):
 
 class ModelState:
     """
-    Represents a Django Model. We don't use the actual Model class
-    as it's not designed to have its options changed - instead, we
-    mutate this one and then render it into a Model as required.
+    Represent a Django Model. Don't use the actual Model class as it's not
+    designed to have its options changed - instead, mutate this one and then
+    render it into a Model as required.
 
     Note that while you are allowed to mutate .fields, you are not allowed
     to mutate the Field instances inside there themselves - you must instead
@@ -409,9 +403,7 @@ class ModelState:
 
     @classmethod
     def from_model(cls, model, exclude_rels=False):
-        """
-        Feed me a model, get a ModelState representing it out.
-        """
+        """Given a model, return a ModelState representing it."""
         # Deconstruct the fields
         fields = []
         for field in model._meta.local_fields:
@@ -532,7 +524,7 @@ class ModelState:
         )
 
     def construct_managers(self):
-        "Deep-clone the managers using deconstruction"
+        """Deep-clone the managers using deconstruction."""
         # Sort all managers by their creation counter
         sorted_managers = sorted(self.managers, key=lambda v: v[1].creation_counter)
         for mgr_name, manager in sorted_managers:
@@ -546,7 +538,7 @@ class ModelState:
                 yield mgr_name, manager_class(*args, **kwargs)
 
     def clone(self):
-        "Returns an exact copy of this ModelState"
+        """Return an exact copy of this ModelState."""
         return self.__class__(
             app_label=self.app_label,
             name=self.name,
@@ -557,7 +549,7 @@ class ModelState:
         )
 
     def render(self, apps):
-        "Creates a Model object from our current state into the given apps"
+        """Create a Model object from our current state into the given apps."""
         # First, make a Meta object
         meta_contents = {'app_label': self.app_label, "apps": apps}
         meta_contents.update(self.options)

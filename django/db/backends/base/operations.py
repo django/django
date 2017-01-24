@@ -12,9 +12,8 @@ from django.utils.encoding import force_text
 
 class BaseDatabaseOperations:
     """
-    This class encapsulates all backend-specific differences, such as the way
-    a backend performs ordering or calculates the ID of a recently-inserted
-    row.
+    Encapsulate backend-specific differences, such as the way a backend
+    performs ordering or calculates the ID of a recently-inserted row.
     """
     compiler_module = "django.db.models.sql.compiler"
 
@@ -39,7 +38,7 @@ class BaseDatabaseOperations:
 
     def autoinc_sql(self, table, column):
         """
-        Returns any SQL needed to support auto-incrementing primary keys, or
+        Return any SQL needed to support auto-incrementing primary keys, or
         None if no SQL is necessary.
 
         This SQL is executed when a table is created.
@@ -48,7 +47,7 @@ class BaseDatabaseOperations:
 
     def bulk_batch_size(self, fields, objs):
         """
-        Returns the maximum allowed batch size for the backend. The fields
+        Return the maximum allowed batch size for the backend. The fields
         are the fields going to be inserted in the batch, the objs contains
         all the objects to be inserted.
         """
@@ -56,7 +55,7 @@ class BaseDatabaseOperations:
 
     def cache_key_culling_sql(self):
         """
-        Returns an SQL query that retrieves the first cache key greater than the
+        Return an SQL query that retrieves the first cache key greater than the
         n smallest.
 
         This is used by the 'db' cache backend to determine where to start
@@ -66,28 +65,28 @@ class BaseDatabaseOperations:
 
     def unification_cast_sql(self, output_field):
         """
-        Given a field instance, returns the SQL necessary to cast the result of
-        a union to that type. Note that the resulting string should contain a
-        '%s' placeholder for the expression being cast.
+        Given a field instance, return the SQL that casts the result of a union
+        to that type. The resulting string should contain a '%s' placeholder
+        for the expression being cast.
         """
         return '%s'
 
     def date_extract_sql(self, lookup_type, field_name):
         """
-        Given a lookup_type of 'year', 'month' or 'day', returns the SQL that
+        Given a lookup_type of 'year', 'month', or 'day', return the SQL that
         extracts a value from the given date field field_name.
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_extract_sql() method')
 
     def date_interval_sql(self, timedelta):
         """
-        Implements the date interval functionality for expressions
+        Implement the date interval functionality for expressions.
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_interval_sql() method')
 
     def date_trunc_sql(self, lookup_type, field_name):
         """
-        Given a lookup_type of 'year', 'month' or 'day', returns the SQL that
+        Given a lookup_type of 'year', 'month', or 'day', return the SQL that
         truncates the given date field field_name to a date object with only
         the given specificity.
         """
@@ -95,13 +94,13 @@ class BaseDatabaseOperations:
 
     def datetime_cast_date_sql(self, field_name, tzname):
         """
-        Returns the SQL necessary to cast a datetime value to date value.
+        Return the SQL to cast a datetime value to date value.
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_cast_date() method')
 
     def datetime_cast_time_sql(self, field_name, tzname):
         """
-        Returns the SQL necessary to cast a datetime value to time value.
+        Return the SQL to cast a datetime value to time value.
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_cast_time_sql() method')
 
@@ -123,7 +122,7 @@ class BaseDatabaseOperations:
 
     def time_trunc_sql(self, lookup_type, field_name):
         """
-        Given a lookup_type of 'hour', 'minute' or 'second', returns the SQL
+        Given a lookup_type of 'hour', 'minute' or 'second', return the SQL
         that truncates the given time field field_name to a time object with
         only the given specificity.
         """
@@ -131,23 +130,23 @@ class BaseDatabaseOperations:
 
     def time_extract_sql(self, lookup_type, field_name):
         """
-        Given a lookup_type of 'hour', 'minute' or 'second', returns the SQL
+        Given a lookup_type of 'hour', 'minute', or 'second', return the SQL
         that extracts a value from the given time field field_name.
         """
         return self.date_extract_sql(lookup_type, field_name)
 
     def deferrable_sql(self):
         """
-        Returns the SQL necessary to make a constraint "initially deferred"
-        during a CREATE TABLE statement.
+        Return the SQL to make a constraint "initially deferred" during a
+        CREATE TABLE statement.
         """
         return ''
 
     def distinct_sql(self, fields):
         """
-        Returns an SQL DISTINCT clause which removes duplicate rows from the
-        result set. If any fields are given, only the given fields are being
-        checked for duplicates.
+        Return an SQL DISTINCT clause which removes duplicate rows from the
+        result set. If any fields are given, only check the given fields for
+        duplicates.
         """
         if fields:
             raise NotImplementedError('DISTINCT ON fields is not supported by this database backend')
@@ -157,31 +156,30 @@ class BaseDatabaseOperations:
     def fetch_returned_insert_id(self, cursor):
         """
         Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table that has an auto-incrementing ID, returns the
+        statement into a table that has an auto-incrementing ID, return the
         newly created ID.
         """
         return cursor.fetchone()[0]
 
     def field_cast_sql(self, db_type, internal_type):
         """
-        Given a column type (e.g. 'BLOB', 'VARCHAR'), and an internal type
-        (e.g. 'GenericIPAddressField'), returns the SQL necessary to cast it
-        before using it in a WHERE statement. Note that the resulting string
-        should contain a '%s' placeholder for the column being searched against.
+        Given a column type (e.g. 'BLOB', 'VARCHAR') and an internal type
+        (e.g. 'GenericIPAddressField'), return the SQL to cast it before using
+        it in a WHERE statement. The resulting string should contain a '%s'
+        placeholder for the column being searched against.
         """
         return '%s'
 
     def force_no_ordering(self):
         """
-        Returns a list used in the "ORDER BY" clause to force no ordering at
-        all. Returning an empty list means that nothing will be included in the
-        ordering.
+        Return a list used in the "ORDER BY" clause to force no ordering at
+        all. Return an empty list to include nothing in the ordering.
         """
         return []
 
     def for_update_sql(self, nowait=False, skip_locked=False):
         """
-        Returns the FOR UPDATE SQL clause to lock rows for an update operation.
+        Return the FOR UPDATE SQL clause to lock rows for an update operation.
         """
         if nowait:
             return 'FOR UPDATE NOWAIT'
@@ -192,10 +190,10 @@ class BaseDatabaseOperations:
 
     def last_executed_query(self, cursor, sql, params):
         """
-        Returns a string of the query last executed by the given cursor, with
+        Return a string of the query last executed by the given cursor, with
         placeholders replaced with actual values.
 
-        `sql` is the raw query containing placeholders, and `params` is the
+        `sql` is the raw query containing placeholders and `params` is the
         sequence of parameters. These are used by default, but this method
         exists for database backends to provide a better implementation
         according to their own quoting schemes.
@@ -215,52 +213,51 @@ class BaseDatabaseOperations:
     def last_insert_id(self, cursor, table_name, pk_name):
         """
         Given a cursor object that has just performed an INSERT statement into
-        a table that has an auto-incrementing ID, returns the newly created ID.
+        a table that has an auto-incrementing ID, return the newly created ID.
 
-        This method also receives the table name and the name of the primary-key
-        column.
+        `pk_name` is the name of the primary-key column.
         """
         return cursor.lastrowid
 
     def lookup_cast(self, lookup_type, internal_type=None):
         """
-        Returns the string to use in a query when performing lookups
-        ("contains", "like", etc.). The resulting string should contain a '%s'
-        placeholder for the column being searched against.
+        Return the string to use in a query when performing lookups
+        ("contains", "like", etc.). It should contain a '%s' placeholder for
+        the column being searched against.
         """
         return "%s"
 
     def max_in_list_size(self):
         """
-        Returns the maximum number of items that can be passed in a single 'IN'
+        Return the maximum number of items that can be passed in a single 'IN'
         list condition, or None if the backend does not impose a limit.
         """
         return None
 
     def max_name_length(self):
         """
-        Returns the maximum length of table and column names, or None if there
+        Return the maximum length of table and column names, or None if there
         is no limit.
         """
         return None
 
     def no_limit_value(self):
         """
-        Returns the value to use for the LIMIT when we are wanting "LIMIT
-        infinity". Returns None if the limit clause can be omitted in this case.
+        Return the value to use for the LIMIT when we are wanting "LIMIT
+        infinity". Return None if the limit clause can be omitted in this case.
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a no_limit_value() method')
 
     def pk_default_value(self):
         """
-        Returns the value to use during an INSERT statement to specify that
+        Return the value to use during an INSERT statement to specify that
         the field should use its default value.
         """
         return 'DEFAULT'
 
     def prepare_sql_script(self, sql):
         """
-        Takes an SQL script that may contain multiple lines and returns a list
+        Take an SQL script that may contain multiple lines and return a list
         of statements to feed to successive cursor.execute() calls.
 
         Since few databases are able to process raw SQL scripts in a single
@@ -280,23 +277,23 @@ class BaseDatabaseOperations:
 
     def process_clob(self, value):
         """
-        Returns the value of a CLOB column, for backends that return a locator
+        Return the value of a CLOB column, for backends that return a locator
         object that requires additional processing.
         """
         return value
 
     def return_insert_id(self):
         """
-        For backends that support returning the last insert ID as part
-        of an insert query, this method returns the SQL and params to
-        append to the INSERT query. The returned fragment should
-        contain a format string to hold the appropriate column.
+        For backends that support returning the last insert ID as part of an
+        insert query, return the SQL and params to append to the INSERT query.
+        The returned fragment should contain a format string to hold the
+        appropriate column.
         """
         pass
 
     def compiler(self, compiler_name):
         """
-        Returns the SQLCompiler class corresponding to the given name,
+        Return the SQLCompiler class corresponding to the given name,
         in the namespace corresponding to the `compiler_module` attribute
         on this backend.
         """
@@ -306,31 +303,29 @@ class BaseDatabaseOperations:
 
     def quote_name(self, name):
         """
-        Returns a quoted version of the given table, index or column name. Does
+        Return a quoted version of the given table, index, or column name. Do
         not quote the given name if it's already been quoted.
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a quote_name() method')
 
     def random_function_sql(self):
-        """
-        Returns an SQL expression that returns a random value.
-        """
+        """Return an SQL expression that returns a random value."""
         return 'RANDOM()'
 
     def regex_lookup(self, lookup_type):
         """
-        Returns the string to use in a query when performing regular expression
-        lookups (using "regex" or "iregex"). The resulting string should
-        contain a '%s' placeholder for the column being searched against.
+        Return the string to use in a query when performing regular expression
+        lookups (using "regex" or "iregex"). It should contain a '%s'
+        placeholder for the column being searched against.
 
-        If the feature is not supported (or part of it is not supported), a
-        NotImplementedError exception can be raised.
+        If the feature is not supported (or part of it is not supported), raise
+        NotImplementedError.
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a regex_lookup() method')
 
     def savepoint_create_sql(self, sid):
         """
-        Returns the SQL for starting a new savepoint. Only required if the
+        Return the SQL for starting a new savepoint. Only required if the
         "uses_savepoints" feature is True. The "sid" parameter is a string
         for the savepoint id.
         """
@@ -338,32 +333,30 @@ class BaseDatabaseOperations:
 
     def savepoint_commit_sql(self, sid):
         """
-        Returns the SQL for committing the given savepoint.
+        Return the SQL for committing the given savepoint.
         """
         return "RELEASE SAVEPOINT %s" % self.quote_name(sid)
 
     def savepoint_rollback_sql(self, sid):
         """
-        Returns the SQL for rolling back the given savepoint.
+        Return the SQL for rolling back the given savepoint.
         """
         return "ROLLBACK TO SAVEPOINT %s" % self.quote_name(sid)
 
     def set_time_zone_sql(self):
         """
-        Returns the SQL that will set the connection's time zone.
+        Return the SQL that will set the connection's time zone.
 
-        Returns '' if the backend doesn't support time zones.
+        Return '' if the backend doesn't support time zones.
         """
         return ''
 
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
         """
-        Returns a list of SQL statements required to remove all data from
+        Return a list of SQL statements required to remove all data from
         the given database tables (without actually removing the tables
-        themselves).
-
-        The returned value also includes SQL statements required to reset DB
-        sequences passed in :param sequences:.
+        themselves) and the SQL statements required to reset the sequences
+        passed in `sequences`.
 
         The `style` argument is a Style object as returned by either
         color_style() or no_style() in django.core.management.color.
@@ -376,8 +369,8 @@ class BaseDatabaseOperations:
 
     def sequence_reset_by_name_sql(self, style, sequences):
         """
-        Returns a list of the SQL statements required to reset sequences
-        passed in :param sequences:.
+        Return a list of the SQL statements required to reset sequences
+        passed in `sequences`.
 
         The `style` argument is a Style object as returned by either
         color_style() or no_style() in django.core.management.color.
@@ -386,7 +379,7 @@ class BaseDatabaseOperations:
 
     def sequence_reset_sql(self, style, model_list):
         """
-        Returns a list of the SQL statements required to reset sequences for
+        Return a list of the SQL statements required to reset sequences for
         the given models.
 
         The `style` argument is a Style object as returned by either
@@ -395,32 +388,28 @@ class BaseDatabaseOperations:
         return []  # No sequence reset required by default.
 
     def start_transaction_sql(self):
-        """
-        Returns the SQL statement required to start a transaction.
-        """
+        """Return the SQL statement required to start a transaction."""
         return "BEGIN;"
 
     def end_transaction_sql(self, success=True):
-        """
-        Returns the SQL statement required to end a transaction.
-        """
+        """Return the SQL statement required to end a transaction."""
         if not success:
             return "ROLLBACK;"
         return "COMMIT;"
 
     def tablespace_sql(self, tablespace, inline=False):
         """
-        Returns the SQL that will be used in a query to define the tablespace.
+        Return the SQL that will be used in a query to define the tablespace.
 
-        Returns '' if the backend doesn't support tablespaces.
+        Return '' if the backend doesn't support tablespaces.
 
-        If inline is True, the SQL is appended to a row; otherwise it's appended
-        to the entire CREATE TABLE or CREATE INDEX statement.
+        If `inline` is True, append the SQL to a row; otherwise append it to
+        the entire CREATE TABLE or CREATE INDEX statement.
         """
         return ''
 
     def prep_for_like_query(self, x):
-        """Prepares a value for use in a LIKE query."""
+        """Prepare a value for use in a LIKE query."""
         return force_text(x).replace("\\", "\\\\").replace("%", r"\%").replace("_", r"\_")
 
     # Same as prep_for_like_query(), but called for "iexact" matches, which
@@ -430,14 +419,14 @@ class BaseDatabaseOperations:
     def validate_autopk_value(self, value):
         """
         Certain backends do not accept some values for "serial" fields
-        (for example zero in MySQL). This method will raise a ValueError
-        if the value is invalid, otherwise returns validated value.
+        (for example zero in MySQL). Raise a ValueError if the value is
+        invalid, otherwise return the validated value.
         """
         return value
 
     def adapt_unknown_value(self, value):
         """
-        Transforms a value to something compatible with the backend driver.
+        Transform a value to something compatible with the backend driver.
 
         This method only depends on the type of the value. It's designed for
         cases where the target type isn't known, such as .raw() SQL queries.
@@ -456,7 +445,7 @@ class BaseDatabaseOperations:
 
     def adapt_datefield_value(self, value):
         """
-        Transforms a date value to an object compatible with what is expected
+        Transform a date value to an object compatible with what is expected
         by the backend driver for date columns.
         """
         if value is None:
@@ -465,7 +454,7 @@ class BaseDatabaseOperations:
 
     def adapt_datetimefield_value(self, value):
         """
-        Transforms a datetime value to an object compatible with what is expected
+        Transform a datetime value to an object compatible with what is expected
         by the backend driver for datetime columns.
         """
         if value is None:
@@ -474,7 +463,7 @@ class BaseDatabaseOperations:
 
     def adapt_timefield_value(self, value):
         """
-        Transforms a time value to an object compatible with what is expected
+        Transform a time value to an object compatible with what is expected
         by the backend driver for time columns.
         """
         if value is None:
@@ -485,21 +474,21 @@ class BaseDatabaseOperations:
 
     def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
         """
-        Transforms a decimal.Decimal value to an object compatible with what is
+        Transform a decimal.Decimal value to an object compatible with what is
         expected by the backend driver for decimal (numeric) columns.
         """
         return utils.format_number(value, max_digits, decimal_places)
 
     def adapt_ipaddressfield_value(self, value):
         """
-        Transforms a string representation of an IP address into the expected
+        Transform a string representation of an IP address into the expected
         type for the backend driver.
         """
         return value or None
 
     def year_lookup_bounds_for_date_field(self, value):
         """
-        Returns a two-elements list with the lower and upper bound to be used
+        Return a two-elements list with the lower and upper bound to be used
         with a BETWEEN operator to query a DateField value using a year
         lookup.
 
@@ -513,7 +502,7 @@ class BaseDatabaseOperations:
 
     def year_lookup_bounds_for_datetime_field(self, value):
         """
-        Returns a two-elements list with the lower and upper bound to be used
+        Return a two-elements list with the lower and upper bound to be used
         with a BETWEEN operator to query a DateTimeField value using a year
         lookup.
 
@@ -531,7 +520,7 @@ class BaseDatabaseOperations:
 
     def get_db_converters(self, expression):
         """
-        Get a list of functions needed to convert field data.
+        Return a list of functions needed to convert field data.
 
         Some field types on some backends do not provide data in the correct
         format, this is the hook for converter functions.
@@ -556,10 +545,11 @@ class BaseDatabaseOperations:
         pass
 
     def combine_expression(self, connector, sub_expressions):
-        """Combine a list of subexpressions into a single expression, using
+        """
+        Combine a list of subexpressions into a single expression, using
         the provided connecting operator. This is required because operators
         can vary between backends (e.g., Oracle with %% and &) and between
-        subexpression types (e.g., date expressions)
+        subexpression types (e.g., date expressions).
         """
         conn = ' %s ' % connector
         return conn.join(sub_expressions)
@@ -575,7 +565,8 @@ class BaseDatabaseOperations:
         return '%s'
 
     def modify_insert_params(self, placeholder, params):
-        """Allow modification of insert parameters. Needed for Oracle Spatial
+        """
+        Allow modification of insert parameters. Needed for Oracle Spatial
         backend due to #10888.
         """
         return params
@@ -583,7 +574,7 @@ class BaseDatabaseOperations:
     def integer_field_range(self, internal_type):
         """
         Given an integer field internal type (e.g. 'PositiveIntegerField'),
-        returns a tuple of the (min_value, max_value) form representing the
+        return a tuple of the (min_value, max_value) form representing the
         range of the column type bound to the field.
         """
         return self.integer_field_ranges[internal_type]

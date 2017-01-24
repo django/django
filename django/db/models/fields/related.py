@@ -80,9 +80,7 @@ def lazy_related_operation(function, model, *related_models, **kwargs):
 
 
 class RelatedField(Field):
-    """
-    Base class that all relational fields inherit from.
-    """
+    """Base class that all relational fields inherit from."""
 
     # Field flags
     one_to_many = False
@@ -192,9 +190,7 @@ class RelatedField(Field):
         return []
 
     def _check_clashes(self):
-        """
-        Check accessor and reverse query name clashes.
-        """
+        """Check accessor and reverse query name clashes."""
         from django.db.models.base import ModelBase
 
         errors = []
@@ -424,7 +420,7 @@ class RelatedField(Field):
     @property
     def target_field(self):
         """
-        When filtering against this relation, returns the field on the remote
+        When filtering against this relation, return the field on the remote
         model against which the filtering should happen.
         """
         target_fields = self.get_path_info()[-1].target_fields
@@ -436,7 +432,7 @@ class RelatedField(Field):
 
 class ForeignObject(RelatedField):
     """
-    Abstraction of the ForeignKey relation, supports multi-column relations.
+    Abstraction of the ForeignKey relation to support multi-column relations.
     """
 
     # Field flags
@@ -693,17 +689,13 @@ class ForeignObject(RelatedField):
         return None
 
     def get_path_info(self):
-        """
-        Get path from this field to the related model.
-        """
+        """Get path from this field to the related model."""
         opts = self.remote_field.model._meta
         from_opts = self.model._meta
         return [PathInfo(from_opts, opts, self.foreign_related_fields, self, False, True)]
 
     def get_reverse_path_info(self):
-        """
-        Get path from the related model to this field's model.
-        """
+        """Get path from the related model to this field's model."""
         opts = self.model._meta
         from_opts = self.remote_field.model._meta
         pathinfos = [PathInfo(from_opts, opts, (opts.pk,), self.remote_field, not self.unique, False)]
@@ -861,9 +853,7 @@ class ForeignKey(ForeignObject):
         return self.foreign_related_fields[0]
 
     def get_reverse_path_info(self):
-        """
-        Get path from the related model to this field's model.
-        """
+        """Get path from the related model to this field's model."""
         opts = self.model._meta
         from_opts = self.remote_field.model._meta
         pathinfos = [PathInfo(from_opts, opts, (opts.pk,), self.remote_field, not self.unique, False)]
@@ -900,7 +890,7 @@ class ForeignKey(ForeignObject):
         return attname, column
 
     def get_default(self):
-        "Here we check if the default value is an object and return the to_field if so."
+        """Return the to_field if the default value is an object."""
         field_default = super().get_default()
         if isinstance(field_default, self.remote_field.model):
             return getattr(field_default, self.target_field.attname)
@@ -1441,9 +1431,7 @@ class ManyToManyField(RelatedField):
         return name, path, args, kwargs
 
     def _get_path_info(self, direct=False):
-        """
-        Called by both direct and indirect m2m traversal.
-        """
+        """Called by both direct and indirect m2m traversal."""
         pathinfos = []
         int_model = self.remote_field.through
         linkfield1 = int_model._meta.get_field(self.m2m_field_name())
@@ -1598,9 +1586,6 @@ class ManyToManyField(RelatedField):
         pass
 
     def value_from_object(self, obj):
-        """
-        Return the value of this field in the given model instance.
-        """
         if obj.pk is None:
             return self.related_model.objects.none()
         return getattr(obj, self.attname).all()

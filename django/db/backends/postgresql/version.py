@@ -1,5 +1,5 @@
 """
-Extracts the version of the PostgreSQL server.
+Extract the version of the PostgreSQL server.
 """
 
 import re
@@ -24,7 +24,7 @@ def _parse_version(text):
 
 def get_version(connection):
     """
-    Returns an integer representing the major, minor and revision number of the
+    Return an integer representing the major, minor, and revision number of the
     server. Format is the one used for the return value of libpq
     PQServerVersion()/``server_version`` connection attribute (available in
     newer psycopg2 versions.)

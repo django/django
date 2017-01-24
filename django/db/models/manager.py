@@ -7,18 +7,18 @@ from django.db.models.query import QuerySet
 
 
 class BaseManager:
-    # Tracks each time a Manager instance is created. Used to retain order.
+    # To retain order, track each time a Manager instance is created.
     creation_counter = 0
 
     # Set to True for the 'objects' managers that are automatically created.
     auto_created = False
 
     #: If set to True the manager will be serialized into migrations and will
-    #: thus be available in e.g. RunPython operations
+    #: thus be available in e.g. RunPython operations.
     use_in_migrations = False
 
     def __new__(cls, *args, **kwargs):
-        # We capture the arguments to make returning them trivial
+        # Capture the arguments to make returning them trivial.
         obj = super().__new__(cls)
         obj._constructor_args = (args, kwargs)
         return obj
@@ -32,15 +32,15 @@ class BaseManager:
         self._hints = {}
 
     def __str__(self):
-        """ Return "app_label.model_label.manager_name". """
+        """Return "app_label.model_label.manager_name"."""
         return '%s.%s' % (self.model._meta.label, self.name)
 
     def deconstruct(self):
         """
-        Returns a 5-tuple of the form (as_manager (True), manager_class,
+        Return a 5-tuple of the form (as_manager (True), manager_class,
         queryset_class, args, kwargs).
 
-        Raises a ValueError if the manager is dynamically generated.
+        Raise a ValueError if the manager is dynamically generated.
         """
         qs_class = self._queryset_class
         if getattr(self, '_built_with_as_manager', False):
@@ -118,7 +118,7 @@ class BaseManager:
 
     def _set_creation_counter(self):
         """
-        Sets the creation counter value for this instance and increments the
+        Set the creation counter value for this instance and increment the
         class-level copy.
         """
         self.creation_counter = BaseManager.creation_counter
@@ -140,8 +140,8 @@ class BaseManager:
 
     def get_queryset(self):
         """
-        Returns a new QuerySet object.  Subclasses can override this method to
-        easily customize the behavior of the Manager.
+        Return a new QuerySet object. Subclasses can override this method to
+        customize the behavior of the Manager.
         """
         return self._queryset_class(model=self.model, using=self._db, hints=self._hints)
 

@@ -4,7 +4,7 @@ from django.db.models.sql import compiler
 class SQLCompiler(compiler.SQLCompiler):
     def as_sql(self, with_limits=True, with_col_aliases=False):
         """
-        Creates the SQL for this query. Returns the SQL string and list
+        Create the SQL for this query. Return the SQL string and list
         of parameters.  This is overridden from the original Query class
         to handle the additional SQL Oracle requires to emulate LIMIT
         and OFFSET.

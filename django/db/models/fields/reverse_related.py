@@ -66,7 +66,7 @@ class ForeignObjectRel:
     @property
     def target_field(self):
         """
-        When filtering against this relation, returns the field on the remote
+        When filtering against this relation, return the field on the remote
         model against which the filtering should happen.
         """
         target_fields = self.get_path_info()[-1].target_fields
@@ -116,8 +116,8 @@ class ForeignObjectRel:
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH):
         """
-        Return choices with a default blank choices included, for use as
-        SelectField choices for this field.
+        Return choices with a default blank choices included, for use
+        as <select> choices for this field.
 
         Analog of django.db.models.fields.Field.get_choices(), provided
         initially for utilization by RelatedFieldListFilter.
@@ -127,7 +127,7 @@ class ForeignObjectRel:
         ]
 
     def is_hidden(self):
-        "Should the related object be hidden?"
+        """Should the related object be hidden?"""
         return bool(self.related_name) and self.related_name[-1] == '+'
 
     def get_joining_columns(self):

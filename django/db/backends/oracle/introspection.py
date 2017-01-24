@@ -44,15 +44,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return super().get_field_type(data_type, description)
 
     def get_table_list(self, cursor):
-        """
-        Returns a list of table and view names in the current database.
-        """
+        """Return a list of table and view names in the current database."""
         cursor.execute("SELECT TABLE_NAME, 't' FROM USER_TABLES UNION ALL "
                        "SELECT VIEW_NAME, 'v' FROM USER_VIEWS")
         return [TableInfo(row[0].lower(), row[1]) for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):
-        "Returns a description of the table, with the DB-API cursor.description interface."
+        """
+        Return a description of the table with the DB-API cursor.description
+        interface.
+        """
         # user_tab_columns gives data default for columns
         cursor.execute("""
             SELECT
@@ -81,19 +82,19 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return description
 
     def table_name_converter(self, name):
-        "Table name comparison is case insensitive under Oracle"
+        """Table name comparison is case insensitive under Oracle."""
         return name.lower()
 
     def _name_to_index(self, cursor, table_name):
         """
-        Returns a dictionary of {field_name: field_index} for the given table.
+        Return a dictionary of {field_name: field_index} for the given table.
         Indexes are 0-based.
         """
         return {d[0]: i for i, d in enumerate(self.get_table_description(cursor, table_name))}
 
     def get_relations(self, cursor, table_name):
         """
-        Returns a dictionary of {field_name: (field_name_other_table, other_table)}
+        Return a dictionary of {field_name: (field_name_other_table, other_table)}
         representing all relationships to the given table.
         """
         table_name = table_name.upper()
@@ -164,7 +165,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_constraints(self, cursor, table_name):
         """
-        Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.
+        Retrieve any constraints or keys (unique, pk, fk, check, index) across
+        one or more columns.
         """
         constraints = {}
         # Loop over the constraints, getting PKs, uniques, and checks

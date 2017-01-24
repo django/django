@@ -1,6 +1,6 @@
 class MigrationOptimizer:
     """
-    Powers the optimization process, where you provide a list of Operations
+    Power the optimization process, where you provide a list of Operations
     and you are returned a list of equal or shorter length - operations
     are merged into one if possible.
 
@@ -39,9 +39,7 @@ class MigrationOptimizer:
             operations = result
 
     def optimize_inner(self, operations, app_label=None):
-        """
-        Inner optimization loop.
-        """
+        """Inner optimization loop."""
         new_operations = []
         for i, operation in enumerate(operations):
             # Compare it to each operation after it

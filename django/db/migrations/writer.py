@@ -129,7 +129,7 @@ class OperationWriter:
 
 class MigrationWriter:
     """
-    Takes a Migration instance and is able to produce the contents
+    Take a Migration instance and is able to produce the contents
     of the migration file from it.
     """
 
@@ -138,9 +138,7 @@ class MigrationWriter:
         self.needs_manual_porting = False
 
     def as_string(self):
-        """
-        Returns a string of the file contents.
-        """
+        """Return a string of the file contents."""
         items = {
             "replaces_str": "",
             "initial_str": "",

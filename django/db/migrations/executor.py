@@ -9,8 +9,8 @@ from .state import ProjectState
 
 class MigrationExecutor:
     """
-    End-to-end migration execution - loads migrations, and runs them
-    up or down to a specified set of targets.
+    End-to-end migration execution - load migrations and run them up or down
+    to a specified set of targets.
     """
 
     def __init__(self, connection, progress_callback=None):
@@ -21,7 +21,7 @@ class MigrationExecutor:
 
     def migration_plan(self, targets, clean_start=False):
         """
-        Given a set of targets, returns a list of (Migration instance, backwards?).
+        Given a set of targets, return a list of (Migration instance, backwards?).
         """
         plan = []
         if clean_start:
@@ -81,7 +81,7 @@ class MigrationExecutor:
 
     def migrate(self, targets, plan=None, state=None, fake=False, fake_initial=False):
         """
-        Migrates the database up to the given targets.
+        Migrate the database up to the given targets.
 
         Django first needs to create all project states before a migration is
         (un)applied and in a second step run all the database operations.
@@ -208,8 +208,8 @@ class MigrationExecutor:
 
     def collect_sql(self, plan):
         """
-        Takes a migration plan and returns a list of collected SQL
-        statements that represent the best-efforts version of that plan.
+        Take a migration plan and return a list of collected SQL statements
+        that represent the best-efforts version of that plan.
         """
         statements = []
         state = None
@@ -225,9 +225,7 @@ class MigrationExecutor:
         return statements
 
     def apply_migration(self, state, migration, fake=False, fake_initial=False):
-        """
-        Runs a migration forwards.
-        """
+        """Run a migration forwards."""
         if self.progress_callback:
             self.progress_callback("apply_start", migration, fake)
         if not fake:
@@ -252,9 +250,7 @@ class MigrationExecutor:
         return state
 
     def unapply_migration(self, state, migration, fake=False):
-        """
-        Runs a migration backwards.
-        """
+        """Run a migration backwards."""
         if self.progress_callback:
             self.progress_callback("unapply_start", migration, fake)
         if not fake:
@@ -275,12 +271,12 @@ class MigrationExecutor:
         """
         Mark replacement migrations applied if their replaced set all are.
 
-        We do this unconditionally on every migrate, rather than just when
-        migrations are applied or unapplied, so as to correctly handle the case
+        Do this unconditionally on every migrate, rather than just when
+        migrations are applied or unapplied, to correctly handle the case
         when a new squash migration is pushed to a deployment that already had
         all its replaced migrations applied. In this case no new migration will
-        be applied, but we still want to correctly maintain the applied state
-        of the squash migration.
+        be applied, but the applied state of the squashed migration must be
+        maintained.
         """
         applied = self.recorder.applied_migrations()
         for key, migration in self.loader.replacements.items():
@@ -290,7 +286,7 @@ class MigrationExecutor:
 
     def detect_soft_applied(self, project_state, migration):
         """
-        Tests whether a migration has been implicitly applied - that the
+        Test whether a migration has been implicitly applied - that the
         tables or columns it would create exist. This is intended only for use
         on initial migrations (as it only looks for CreateModel and AddField).
         """

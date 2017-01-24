@@ -114,7 +114,7 @@ class CursorDebugWrapper(CursorWrapper):
 ###############################################
 
 def typecast_date(s):
-    return datetime.date(*map(int, s.split('-'))) if s else None  # returns None if s is null
+    return datetime.date(*map(int, s.split('-'))) if s else None  # return None if s is null
 
 
 def typecast_time(s):  # does NOT store time zone information
@@ -136,8 +136,7 @@ def typecast_timestamp(s):  # does NOT store time zone information
     if ' ' not in s:
         return typecast_date(s)
     d, t = s.split()
-    # Extract timezone information, if it exists. Currently we just throw
-    # it away, but in the future we may make use of it.
+    # Extract timezone information, if it exists. Currently it's ignored.
     if '-' in t:
         t, tz = t.split('-', 1)
         tz = '-' + tz
@@ -195,7 +194,7 @@ def truncate_name(name, length=None, hash_len=4):
 
 def format_number(value, max_digits, decimal_places):
     """
-    Formats a number into a string with the requisite number of digits and
+    Format a number into a string with the requisite number of digits and
     decimal places.
     """
     if value is None:

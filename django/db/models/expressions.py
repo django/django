@@ -11,7 +11,7 @@ from django.utils.functional import cached_property
 
 class Combinable:
     """
-    Provides the ability to combine one or two objects with
+    Provide the ability to combine one or two objects with
     some connector. For example F('foo') + F('bar').
     """
 
@@ -120,9 +120,7 @@ class Combinable:
 
 @deconstructible
 class BaseExpression:
-    """
-    Base class for all query expressions.
-    """
+    """Base class for all query expressions."""
 
     # aggregate specific fields
     is_summary = False
@@ -170,7 +168,7 @@ class BaseExpression:
 
          * connection: the database connection used for the current query.
 
-        Returns: (sql, params)
+        Return: (sql, params)
           Where `sql` is a string containing ordered sql parameters to be
           replaced with the elements of the list `params`.
         """
@@ -192,7 +190,7 @@ class BaseExpression:
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         """
-        Provides the chance to do any preprocessing or validation before being
+        Provide the chance to do any preprocessing or validation before being
         added to the query.
 
         Arguments:
@@ -203,7 +201,7 @@ class BaseExpression:
          * summarize: a terminal aggregate clause
          * for_save: whether this expression about to be used in a save or update
 
-        Returns: an Expression to be added to the query.
+        Return: an Expression to be added to the query.
         """
         c = self.copy()
         c.is_summary = summarize
@@ -214,9 +212,7 @@ class BaseExpression:
         return c
 
     def _prepare(self, field):
-        """
-        Hook used by Lookup.get_prep_lookup() to do custom preparation.
-        """
+        """Hook used by Lookup.get_prep_lookup() to do custom preparation."""
         return self
 
     @property
@@ -225,9 +221,7 @@ class BaseExpression:
 
     @cached_property
     def output_field(self):
-        """
-        Returns the output type of this expressions.
-        """
+        """Return the output type of this expressions."""
         if self._output_field_or_none is None:
             raise FieldError("Cannot resolve expression type, unknown output_field")
         return self._output_field_or_none
@@ -235,7 +229,7 @@ class BaseExpression:
     @cached_property
     def _output_field_or_none(self):
         """
-        Returns the output field of this expression, or None if no output type
+        Return the output field of this expression, or None if no output type
         can be resolved. Note that the 'output_field' property will raise
         FieldError if no type can be resolved, but this attribute allows for
         None values.
@@ -246,10 +240,9 @@ class BaseExpression:
 
     def _resolve_output_field(self):
         """
-        Attempts to infer the output type of the expression. If the output
-        fields of all source fields match then we can simply infer the same
-        type here. This isn't always correct, but it makes sense most of the
-        time.
+        Attempt to infer the output type of the expression. If the output
+        fields of all source fields match then, simply infer the same type
+        here. This isn't always correct, but it makes sense most of the time.
 
         Consider the difference between `2 + 2` and `2 / 3`. Inferring
         the type here is a convenience for the common case. The user should
@@ -316,10 +309,7 @@ class BaseExpression:
         return cols
 
     def get_source_fields(self):
-        """
-        Returns the underlying field types used by this
-        aggregate.
-        """
+        """Return the underlying field types used by this aggregate."""
         return [e._output_field_or_none for e in self.get_source_expressions()]
 
     def asc(self, **kwargs):
@@ -364,9 +354,7 @@ class BaseExpression:
 
 
 class Expression(BaseExpression, Combinable):
-    """
-    An expression that can be combined with other expressions.
-    """
+    """An expression that can be combined with other expressions."""
     pass
 
 
@@ -470,9 +458,7 @@ class TemporalSubtraction(CombinedExpression):
 
 @deconstructible
 class F(Combinable):
-    """
-    An object capable of resolving references to existing query objects.
-    """
+    """An object capable of resolving references to existing query objects."""
     def __init__(self, name):
         """
         Arguments:
@@ -527,9 +513,7 @@ class OuterRef(F):
 
 
 class Func(Expression):
-    """
-    An SQL function call.
-    """
+    """An SQL function call."""
     function = None
     template = '%(function)s(%(expressions)s)'
     arg_joiner = ', '
@@ -608,9 +592,7 @@ class Func(Expression):
 
 
 class Value(Expression):
-    """
-    Represents a wrapped value as a node within an expression
-    """
+    """Represent a wrapped value as a node within an expression."""
     def __init__(self, value, output_field=None):
         """
         Arguments:

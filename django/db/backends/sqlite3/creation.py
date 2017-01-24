@@ -99,7 +99,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def test_db_signature(self):
         """
-        Returns a tuple that uniquely identifies a test database.
+        Return a tuple that uniquely identifies a test database.
 
         This takes into account the special cases of ":memory:" and "" for
         SQLite since the databases will be distinct despite having the same

@@ -37,9 +37,7 @@ class FieldOperation(Operation):
 
 
 class AddField(FieldOperation):
-    """
-    Adds a field to a model.
-    """
+    """Add a field to a model."""
 
     def __init__(self, model_name, name, field, preserve_default=True):
         self.field = field
@@ -118,9 +116,7 @@ class AddField(FieldOperation):
 
 
 class RemoveField(FieldOperation):
-    """
-    Removes a field from a model.
-    """
+    """Remove a field from a model."""
 
     def deconstruct(self):
         kwargs = {
@@ -163,7 +159,8 @@ class RemoveField(FieldOperation):
 
 class AlterField(FieldOperation):
     """
-    Alters a field's database column (e.g. null, max_length) to the provided new field
+    Alter a field's database column (e.g. null, max_length) to the provided
+    new field.
     """
 
     def __init__(self, model_name, name, field, preserve_default=True):
@@ -236,9 +233,7 @@ class AlterField(FieldOperation):
 
 
 class RenameField(FieldOperation):
-    """
-    Renames a field on the model. Might affect db_column too.
-    """
+    """Rename a field on the model. Might affect db_column too."""
 
     def __init__(self, model_name, old_name, new_name):
         self.old_name = old_name

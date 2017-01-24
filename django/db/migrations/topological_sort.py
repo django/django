@@ -1,9 +1,10 @@
 def topological_sort_as_sets(dependency_graph):
-    """Variation of Kahn's algorithm (1962) that returns sets.
+    """
+    Variation of Kahn's algorithm (1962) that returns sets.
 
-    Takes a dependency graph as a dictionary of node => dependencies.
+    Take a dependency graph as a dictionary of node => dependencies.
 
-    Yields sets of items in topological order, where the first set contains
+    Yield sets of items in topological order, where the first set contains
     all nodes without dependencies, and each following set contains all
     nodes that may depend on the nodes only in the previously yielded sets.
     """
