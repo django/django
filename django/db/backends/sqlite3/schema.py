@@ -191,7 +191,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
             # Create a new table with the updated schema. We remove things
             # from the deferred SQL that match our table name, too
-            self.deferred_sql = [x for x in self.deferred_sql if temp_model._meta.db_table not in x]
+            self.deferred_sql = [
+                (sql, params)
+                for sql, params in self.deferred_sql
+                if temp_model._meta.db_table not in sql
+            ]
             self.create_model(temp_model)
 
             # Copy data from the old table into the new table

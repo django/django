@@ -107,6 +107,8 @@ class BaseDatabaseSchemaEditor:
                 "that can't perform a rollback is prohibited."
             )
         # Log the command we're running, then run it
+        if isinstance(sql, tuple):
+            sql, params = sql  # Used by e.g. _create_index_sql()
         logger.debug("%s; (params %r)", sql, params, extra={'params': params, 'sql': sql})
         if self.collect_sql:
             ending = "" if sql.endswith(";") else ";"
@@ -327,7 +329,7 @@ class BaseDatabaseSchemaEditor:
         """
         Add an index on a model.
         """
-        self.execute(index.create_sql(model, self))
+        self.execute(*index.create_sql(model, self))
 
     def remove_index(self, model, index):
         """
@@ -365,7 +367,7 @@ class BaseDatabaseSchemaEditor:
         # Created indexes
         for field_names in news.difference(olds):
             fields = [model._meta.get_field(field) for field in field_names]
-            self.execute(self._create_index_sql(model, fields, suffix="_idx"))
+            self.execute(*self._create_index_sql(model, fields, suffix="_idx"))
 
     def _delete_composed_index(self, model, fields, constraint_kwargs, sql):
         columns = [model._meta.get_field(field).column for field in fields]
@@ -711,7 +713,7 @@ class BaseDatabaseSchemaEditor:
         # False              | True             | True               | False
         # True               | True             | True               | False
         if (not old_field.db_index or old_field.unique) and new_field.db_index and not new_field.unique:
-            self.execute(self._create_index_sql(model, [new_field]))
+            self.execute(*self._create_index_sql(model, [new_field]))
         # Type alteration on primary key? Then we need to alter the column
         # referring to us.
         rels_to_update = []
@@ -891,7 +893,7 @@ class BaseDatabaseSchemaEditor:
             "using": "",
             "columns": ", ".join(self.quote_name(column) for column in columns),
             "extra": tablespace_sql,
-        }
+        }, []  # (sql, params)
 
     def _model_indexes_sql(self, model):
         """

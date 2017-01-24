@@ -56,7 +56,7 @@ class Index:
             'columns': ', '.join(columns),
             'using': using,
             'extra': tablespace_sql,
-        }
+        }, []  # (sql, params)
 
     def create_sql(self, model, schema_editor, using=''):
         sql_create_index = schema_editor.sql_create_index
