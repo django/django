@@ -50,7 +50,7 @@ class Lexer:
         """
         Lexically analyze `text`.
 
-        Yields pairs (`name`, `tokentext`).
+        Yield pairs (`name`, `tokentext`).
         """
         end = len(text)
         state = self.state

@@ -68,7 +68,7 @@ def rfc3339_date(date):
 
 def get_tag_uri(url, date):
     """
-    Creates a TagURI.
+    Create a TagURI.
 
     See http://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
     """
@@ -176,14 +176,14 @@ class SyndicationFeed:
 
     def write(self, outfile, encoding):
         """
-        Outputs the feed in the given encoding to outfile, which is a file-like
+        Output the feed in the given encoding to outfile, which is a file-like
         object. Subclasses should override this.
         """
         raise NotImplementedError('subclasses of SyndicationFeed must provide a write() method')
 
     def writeString(self, encoding):
         """
-        Returns the feed in the given encoding as a string.
+        Return the feed in the given encoding as a string.
         """
         s = StringIO()
         self.write(s, encoding)
@@ -191,8 +191,8 @@ class SyndicationFeed:
 
     def latest_post_date(self):
         """
-        Returns the latest item's pubdate or updateddate. If no items
-        have either of these attributes this returns the current UTC date/time.
+        Return the latest item's pubdate or updateddate. If no items
+        have either of these attributes this return the current UTC date/time.
         """
         latest_date = None
         date_keys = ('updateddate', 'pubdate')
@@ -209,7 +209,7 @@ class SyndicationFeed:
 
 
 class Enclosure:
-    "Represents an RSS enclosure"
+    """An RSS enclosure"""
     def __init__(self, url, length, mime_type):
         "All args are expected to be strings"
         self.length, self.mime_type = length, mime_type

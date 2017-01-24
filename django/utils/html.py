@@ -35,12 +35,12 @@ simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
 @keep_lazy(str, SafeText)
 def escape(text):
     """
-    Returns the given text with ampersands, quotes and angle brackets encoded
+    Return the given text with ampersands, quotes and angle brackets encoded
     for use in HTML.
 
-    This function always escapes its input, even if it's already escaped and
-    marked as such. This may result in double-escaping. If this is a concern,
-    use conditional_escape() instead.
+    Always escape input, even if it's already escaped and marked as such.
+    This may result in double-escaping. If this is a concern, use
+    conditional_escape() instead.
     """
     return mark_safe(
         force_text(text).replace('&', '&amp;').replace('<', '&lt;')
@@ -68,7 +68,7 @@ _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 
 @keep_lazy(str, SafeText)
 def escapejs(value):
-    """Hex encodes characters for use in JavaScript strings."""
+    """Hex encode characters for use in JavaScript strings."""
     return mark_safe(force_text(value).translate(_js_escapes))
 
 
@@ -89,8 +89,8 @@ def conditional_escape(text):
 
 def format_html(format_string, *args, **kwargs):
     """
-    Similar to str.format, but passes all arguments through conditional_escape,
-    and calls 'mark_safe' on the result. This function should be used instead
+    Similar to str.format, but pass all arguments through conditional_escape(),
+    and call mark_safe() on the result. This function should be used instead
     of str.format or % interpolation to build up small HTML fragments.
     """
     args_safe = map(conditional_escape, args)
@@ -119,7 +119,7 @@ def format_html_join(sep, format_string, args_generator):
 
 @keep_lazy_text
 def linebreaks(value, autoescape=False):
-    """Converts newlines into <p> and <br />s."""
+    """Convert newlines into <p> and <br />s."""
     value = normalize_newlines(force_text(value))
     paras = re.split('\n{2,}', value)
     if autoescape:
@@ -167,7 +167,7 @@ def _strip_once(value):
 
 @keep_lazy_text
 def strip_tags(value):
-    """Returns the given HTML with all tags stripped."""
+    """Return the given HTML with all tags stripped."""
     # Note: in typical case this loop executes _strip_once once. Loop condition
     # is redundant, but helps to reduce number of executions of _strip_once.
     value = force_text(value)
@@ -182,12 +182,12 @@ def strip_tags(value):
 
 @keep_lazy_text
 def strip_spaces_between_tags(value):
-    """Returns the given HTML with spaces between tags removed."""
+    """Return the given HTML with spaces between tags removed."""
     return re.sub(r'>\s+<', '><', force_text(value))
 
 
 def smart_urlquote(url):
-    "Quotes a URL if it isn't already quoted."
+    """Quote a URL if it isn't already quoted."""
     def unquote_quote(segment):
         segment = unquote(segment)
         # Tilde is part of RFC3986 Unreserved Characters
@@ -225,20 +225,19 @@ def smart_urlquote(url):
 @keep_lazy_text
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
-    Converts any URLs in text into clickable links.
+    Convert any URLs in text into clickable links.
 
     Works on http://, https://, www. links, and also on links ending in one of
     the original seven gTLDs (.com, .edu, .gov, .int, .mil, .net, and .org).
     Links can have trailing punctuation (periods, commas, close-parens) and
     leading punctuation (opening parens) and it'll still do the right thing.
 
-    If trim_url_limit is not None, the URLs in the link text longer than this
-    limit will be truncated to trim_url_limit-3 characters and appended with
-    an ellipsis.
+    If trim_url_limit is not None, truncate the URLs in the link text longer
+    than this limit to trim_url_limit-3 characters and append an ellipsis.
 
-    If nofollow is True, the links will get a rel="nofollow" attribute.
+    If nofollow is True, give the links a rel="nofollow" attribute.
 
-    If autoescape is True, the link text and URLs will be autoescaped.
+    If autoescape is True, autoescape the link text and URLs.
     """
     safe_input = isinstance(text, SafeData)
 
@@ -249,8 +248,8 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
 
     def unescape(text, trail):
         """
-        If input URL is HTML-escaped, unescape it so as we can safely feed it to
-        smart_urlquote. For example:
+        If input URL is HTML-escaped, unescape it so that it can be safely fed
+        to smart_urlquote. For example:
         http://example.com?x=1&amp;y=&lt;2&gt; => http://example.com?x=1&y=<2>
         """
         unescaped = (text + trail).replace(

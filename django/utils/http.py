@@ -98,13 +98,13 @@ def urlencode(query, doseq=False):
 
 def cookie_date(epoch_seconds=None):
     """
-    Formats the time to ensure compatibility with Netscape's cookie standard.
+    Format the time to ensure compatibility with Netscape's cookie standard.
 
-    Accepts a floating point number expressed in seconds since the epoch, in
-    UTC - such as that outputted by time.time(). If set to None, defaults to
-    the current time.
+    `epoch_seconds` is a floating point number expressed in seconds since the
+    epoch, in UTC - such as that outputted by time.time(). If set to None, it
+    defaults to the current time.
 
-    Outputs a string in the format 'Wdy, DD-Mon-YYYY HH:MM:SS GMT'.
+    Output a string in the format 'Wdy, DD-Mon-YYYY HH:MM:SS GMT'.
     """
     rfcdate = formatdate(epoch_seconds)
     return '%s-%s-%s GMT' % (rfcdate[:7], rfcdate[8:11], rfcdate[12:25])
@@ -112,26 +112,26 @@ def cookie_date(epoch_seconds=None):
 
 def http_date(epoch_seconds=None):
     """
-    Formats the time to match the RFC1123 date format as specified by HTTP
+    Format the time to match the RFC1123 date format as specified by HTTP
     RFC7231 section 7.1.1.1.
 
-    Accepts a floating point number expressed in seconds since the epoch, in
-    UTC - such as that outputted by time.time(). If set to None, defaults to
-    the current time.
+    `epoch_seconds` is a floating point number expressed in seconds since the
+    epoch, in UTC - such as that outputted by time.time(). If set to None, it
+    defaults to the current time.
 
-    Outputs a string in the format 'Wdy, DD Mon YYYY HH:MM:SS GMT'.
+    Output a string in the format 'Wdy, DD Mon YYYY HH:MM:SS GMT'.
     """
     return formatdate(epoch_seconds, usegmt=True)
 
 
 def parse_http_date(date):
     """
-    Parses a date format as specified by HTTP RFC7231 section 7.1.1.1.
+    Parse a date format as specified by HTTP RFC7231 section 7.1.1.1.
 
     The three formats allowed by the RFC are accepted, even if only the first
     one is still in widespread use.
 
-    Returns an integer expressed in seconds since the epoch, in UTC.
+    Return an integer expressed in seconds since the epoch, in UTC.
     """
     # emails.Util.parsedate does the job for RFC1123 dates; unfortunately
     # RFC7231 makes it mandatory to support RFC850 dates too. So we roll
@@ -162,7 +162,7 @@ def parse_http_date(date):
 
 def parse_http_date_safe(date):
     """
-    Same as parse_http_date, but returns None if the input is invalid.
+    Same as parse_http_date, but return None if the input is invalid.
     """
     try:
         return parse_http_date(date)
@@ -174,8 +174,8 @@ def parse_http_date_safe(date):
 
 def base36_to_int(s):
     """
-    Converts a base 36 string to an ``int``. Raises ``ValueError` if the
-    input won't fit into an int.
+    Convert a base 36 string to an int. Raise ValueError if the input won't fit
+    into an int.
     """
     # To prevent overconsumption of server resources, reject any
     # base36 string that is longer than 13 base36 digits (13 digits
@@ -186,9 +186,7 @@ def base36_to_int(s):
 
 
 def int_to_base36(i):
-    """
-    Converts an integer to a base36 string
-    """
+    """Convert an integer to a base36 string."""
     char_set = '0123456789abcdefghijklmnopqrstuvwxyz'
     if i < 0:
         raise ValueError("Negative base36 conversion input.")
@@ -203,15 +201,15 @@ def int_to_base36(i):
 
 def urlsafe_base64_encode(s):
     """
-    Encodes a bytestring in base64 for use in URLs, stripping any trailing
-    equal signs.
+    Encode a bytestring in base64 for use in URLs. Strip any trailing equal
+    signs.
     """
     return base64.urlsafe_b64encode(s).rstrip(b'\n=')
 
 
 def urlsafe_base64_decode(s):
     """
-    Decodes a base64 encoded string, adding back any trailing equal signs that
+    Decode a base64 encoded string. Add back any trailing equal signs that
     might have been stripped.
     """
     s = force_bytes(s)
@@ -270,7 +268,7 @@ def is_safe_url(url, host=None, allowed_hosts=None, require_https=False):
     Return ``True`` if the url is a safe redirection (i.e. it doesn't point to
     a different host and uses a safe scheme).
 
-    Always returns ``False`` on an empty url.
+    Always return ``False`` on an empty url.
 
     If ``require_https`` is ``True``, only 'https' will be considered a valid
     scheme, as opposed to 'http' and 'https' with the default, ``False``.

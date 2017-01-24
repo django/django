@@ -11,7 +11,7 @@ from django.utils.functional import Promise, wraps
 class SafeData:
     def __html__(self):
         """
-        Returns the html representation of a string for interoperability.
+        Return the html representation of a string for interoperability.
 
         This allows other template engines to understand Django's SafeData.
         """

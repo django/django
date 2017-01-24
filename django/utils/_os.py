@@ -24,11 +24,11 @@ def npath(path):
 
 def safe_join(base, *paths):
     """
-    Joins one or more path components to the base path component intelligently.
-    Returns a normalized, absolute version of the final path.
+    Join one or more path components to the base path component intelligently.
+    Return a normalized, absolute version of the final path.
 
-    The final path must be located inside of the base path component (otherwise
-    a ValueError is raised).
+    Raise ValueError if the final path isn't located inside of the base path
+    component.
     """
     base = force_text(base)
     paths = [force_text(p) for p in paths]
@@ -52,9 +52,9 @@ def safe_join(base, *paths):
 
 def symlinks_supported():
     """
-    A function to check if creating symlinks are supported in the
-    host platform and/or if they are allowed to be created (e.g.
-    on Windows it requires admin permissions).
+    Return whether or not creating symlinks are supported in the host platform
+    and/or if they are allowed to be created (e.g. on Windows it requires admin
+    permissions).
     """
     with tempfile.TemporaryDirectory() as temp_dir:
         original_path = os.path.join(temp_dir, 'original')

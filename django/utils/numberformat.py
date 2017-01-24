@@ -7,7 +7,7 @@ from django.utils.safestring import mark_safe
 def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
            force_grouping=False):
     """
-    Gets a number (as a number or string), and returns it as a string,
+    Get a number (as a number or string), and return it as a string,
     using formats defined as arguments:
 
     * decimal_sep: Decimal separator symbol (for example ".")

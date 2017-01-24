@@ -37,13 +37,7 @@ def clean_ipv6_address(ip_str, unpack_ipv4=False,
 
 def is_valid_ipv6_address(ip_str):
     """
-    Ensure we have a valid IPv6 address.
-
-    Args:
-        ip_str: A string, the IPv6 address.
-
-    Returns:
-        A boolean, True if this is a valid IPv6 address.
+    Return whether or not the `ip_str` string is a valid IPv6 address.
     """
     try:
         ipaddress.IPv6Address(ip_str)

@@ -77,8 +77,7 @@ class TimeFormat(Formatter):
         """
         Timezone name.
 
-        If timezone information is not available, this method returns
-        an empty string.
+        If timezone information is not available, return an empty string.
         """
         if not self.timezone:
             return ""
@@ -129,8 +128,7 @@ class TimeFormat(Formatter):
         """
         Difference to Greenwich time in hours; e.g. '+0200', '-0430'.
 
-        If timezone information is not available, this method returns
-        an empty string.
+        If timezone information is not available, return an empty string.
         """
         if not self.timezone:
             return ""
@@ -163,8 +161,7 @@ class TimeFormat(Formatter):
         """
         Time zone of this machine; e.g. 'EST' or 'MDT'.
 
-        If timezone information is not available, this method returns
-        an empty string.
+        If timezone information is not available, return an empty string.
         """
         if not self.timezone:
             return ""
@@ -191,8 +188,7 @@ class TimeFormat(Formatter):
         timezones west of UTC is always negative, and for those east of UTC is
         always positive.
 
-        If timezone information is not available, this method returns
-        an empty string.
+        If timezone information is not available, return an empty string.
         """
         if not self.timezone:
             return ""

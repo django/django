@@ -17,25 +17,22 @@ class Node:
     default = 'DEFAULT'
 
     def __init__(self, children=None, connector=None, negated=False):
-        """
-        Constructs a new Node. If no connector is given, the default will be
-        used.
-        """
+        """Construct a new Node. If no connector is given, use the default."""
         self.children = children[:] if children else []
         self.connector = connector or self.default
         self.negated = negated
 
-    # We need this because of django.db.models.query_utils.Q. Q. __init__() is
+    # Required because django.db.models.query_utils.Q. Q. __init__() is
     # problematic, but it is a natural Node subclass in all other respects.
     @classmethod
     def _new_instance(cls, children=None, connector=None, negated=False):
         """
-        This is called to create a new instance of this class when we need new
-        Nodes (or subclasses) in the internal code in this class. Normally, it
-        just shadows __init__(). However, subclasses with an __init__ signature
-        that is not an extension of Node.__init__ might need to implement this
-        method to allow a Node to create a new instance of them (if they have
-        any extra setting up to do).
+        Create a new instance of this class when new Nodes (or subclasses) are
+        needed in the internal code in this class. Normally, it just shadows
+        __init__(). However, subclasses with an __init__ signature that aren't
+        an extension of Node.__init__ might need to implement this method to
+        allow a Node to create a new instance of them (if they have any extra
+        setting up to do).
         """
         obj = Node(children, connector, negated)
         obj.__class__ = cls
@@ -49,43 +46,34 @@ class Node:
         return "<%s: %s>" % (self.__class__.__name__, self)
 
     def __deepcopy__(self, memodict):
-        """
-        Utility method used by copy.deepcopy().
-        """
         obj = Node(connector=self.connector, negated=self.negated)
         obj.__class__ = self.__class__
         obj.children = copy.deepcopy(self.children, memodict)
         return obj
 
     def __len__(self):
-        """
-        The size of a node if the number of children it has.
-        """
+        """Return the the number of children this node has."""
         return len(self.children)
 
     def __bool__(self):
-        """
-        For truth value testing.
-        """
+        """Return whether or not this node has children."""
         return bool(self.children)
 
     def __contains__(self, other):
-        """
-        Returns True is 'other' is a direct child of this instance.
-        """
+        """Return True if 'other' is a direct child of this instance."""
         return other in self.children
 
     def add(self, data, conn_type, squash=True):
         """
-        Combines this tree and the data represented by data using the
+        Combine this tree and the data represented by data using the
         connector conn_type. The combine is done by squashing the node other
         away if possible.
 
         This tree (self) will never be pushed to a child node of the
         combined tree, nor will the connector or negated properties change.
 
-        The function returns a node which can be used in place of data
-        regardless if the node other got squashed or not.
+        Return a node which can be used in place of data regardless if the
+        node other got squashed or not.
 
         If `squash` is False the data is prepared and added as a child to
         this tree without further logic.
@@ -120,7 +108,5 @@ class Node:
             return data
 
     def negate(self):
-        """
-        Negate the sense of the root connector.
-        """
+        """Negate the sense of the root connector."""
         self.negated = not self.negated

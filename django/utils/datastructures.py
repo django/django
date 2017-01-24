@@ -70,8 +70,8 @@ class MultiValueDict(dict):
 
     def __getitem__(self, key):
         """
-        Returns the last data value for this key, or [] if it's an empty list;
-        raises KeyError if not found.
+        Return the last data value for this key, or [] if it's an empty list;
+        raise KeyError if not found.
         """
         try:
             list_ = super().__getitem__(key)
@@ -114,8 +114,8 @@ class MultiValueDict(dict):
 
     def get(self, key, default=None):
         """
-        Returns the last data value for the passed key. If key doesn't exist
-        or value is an empty list, then default is returned.
+        Return the last data value for the passed key. If key doesn't exist
+        or value is an empty list, return `default`.
         """
         try:
             val = self[key]
@@ -170,19 +170,19 @@ class MultiValueDict(dict):
         return self._getlist(key)
 
     def appendlist(self, key, value):
-        """Appends an item to the internal list associated with key."""
+        """Append an item to the internal list associated with key."""
         self.setlistdefault(key).append(value)
 
     def items(self):
         """
-        Yields (key, value) pairs, where value is the last item in the list
+        Yield (key, value) pairs, where value is the last item in the list
         associated with the key.
         """
         for key in self:
             yield key, self[key]
 
     def lists(self):
-        """Yields (key, list) pairs."""
+        """Yield (key, list) pairs."""
         return iter(super().items())
 
     def values(self):
@@ -191,14 +191,11 @@ class MultiValueDict(dict):
             yield self[key]
 
     def copy(self):
-        """Returns a shallow copy of this object."""
+        """Return a shallow copy of this object."""
         return copy.copy(self)
 
     def update(self, *args, **kwargs):
-        """
-        update() extends rather than replaces existing key lists.
-        Also accepts keyword args.
-        """
+        """Extend rather than replace existing key lists."""
         if len(args) > 1:
             raise TypeError("update expected at most 1 arguments, got %d" % len(args))
         if args:
@@ -216,9 +213,7 @@ class MultiValueDict(dict):
             self.setlistdefault(key).append(value)
 
     def dict(self):
-        """
-        Returns current object as a dict with singular values.
-        """
+        """Return current object as a dict with singular values."""
         return {key: self[key] for key in self}
 
 
@@ -264,7 +259,7 @@ class ImmutableList(tuple):
 
 class DictWrapper(dict):
     """
-    Wraps accesses to a dictionary so that certain values (those starting with
+    Wrap accesses to a dictionary so that certain values (those starting with
     the specified prefix) are passed through a function before being returned.
     The prefix is removed before looking up the real value.
 
@@ -278,7 +273,7 @@ class DictWrapper(dict):
 
     def __getitem__(self, key):
         """
-        Retrieves the real value after stripping the prefix string (if
+        Retrieve the real value after stripping the prefix string (if
         present). If the prefix is present, pass the value through self.func
         before returning, otherwise return the raw value.
         """

@@ -14,7 +14,7 @@ class classonlymethod(classmethod):
 
 def method_decorator(decorator, name=''):
     """
-    Converts a function decorator into a method decorator
+    Convert a function decorator into a method decorator
     """
     # 'obj' can be a class or a function. If 'obj' is a function at the time it
     # is passed to _dec,  it will eventually be a method of the class it is
@@ -90,7 +90,7 @@ def method_decorator(decorator, name=''):
 
 def decorator_from_middleware_with_args(middleware_class):
     """
-    Like decorator_from_middleware, but returns a function
+    Like decorator_from_middleware, but return a function
     that accepts the arguments to be passed to the middleware_class.
     Use like::
 
@@ -106,7 +106,7 @@ def decorator_from_middleware_with_args(middleware_class):
 
 def decorator_from_middleware(middleware_class):
     """
-    Given a middleware class (not an instance), returns a view decorator. This
+    Given a middleware class (not an instance), return a view decorator. This
     lets you use middleware functionality on a per-view basis. The middleware
     is created with no params passed.
     """

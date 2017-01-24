@@ -17,9 +17,9 @@ TIMESINCE_CHUNKS = (
 
 def timesince(d, now=None, reversed=False):
     """
-    Takes two datetime objects and returns the time between d and now
-    as a nicely formatted string, e.g. "10 minutes".  If d occurs after now,
-    then "0 minutes" is returned.
+    Take two datetime objects and return the time between d and now as a nicely
+    formatted string, e.g. "10 minutes". If d occurs after now, return
+    "0 minutes".
 
     Units used are years, months, weeks, days, hours, and minutes.
     Seconds and microseconds are ignored.  Up to two adjacent units will be
@@ -72,7 +72,6 @@ def timesince(d, now=None, reversed=False):
 
 def timeuntil(d, now=None):
     """
-    Like timesince, but returns a string measuring the time until
-    the given time.
+    Like timesince, but return a string measuring the time until the given time.
     """
     return timesince(d, now, reversed=True)

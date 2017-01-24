@@ -72,7 +72,7 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
 
 def smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
-    Returns a bytestring version of 's', encoded as specified in 'encoding'.
+    Return a bytestring version of 's', encoded as specified in 'encoding'.
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
@@ -171,12 +171,12 @@ _hextobyte.update({
 
 def uri_to_iri(uri):
     """
-    Converts a Uniform Resource Identifier(URI) into an Internationalized
+    Convert a Uniform Resource Identifier(URI) into an Internationalized
     Resource Identifier(IRI).
 
     This is the algorithm from section 3.2 of RFC 3987, excluding step 4.
 
-    Takes an URI in ASCII bytes (e.g. '/I%20%E2%99%A5%20Django/') and returns
+    Take an URI in ASCII bytes (e.g. '/I%20%E2%99%A5%20Django/') and return
     a string containing the encoded result (e.g. '/I%20♥%20Django/').
     """
     if uri is None:
@@ -225,8 +225,8 @@ def escape_uri_path(path):
 def repercent_broken_unicode(path):
     """
     As per section 3.2 of RFC 3987, step three of converting a URI into an IRI,
-    we need to re-percent-encode any octet produced that is not part of a
-    strictly legal UTF-8 octet sequence.
+    repercent-encode any octet produced that is not part of a strictly legal
+    UTF-8 octet sequence.
     """
     try:
         path.decode()
@@ -241,12 +241,9 @@ def filepath_to_uri(path):
     """Convert a file system path to a URI portion that is suitable for
     inclusion in a URL.
 
-    This method will encode certain chars that would normally be recognized as
-    special chars for URIs.  Note that this method does not encode the '
-    character, as it is a valid character within URIs.  See
-    encodeURIComponent() JavaScript function for more details.
-
-    Return a string containing the result.
+    Encode certain chars that would normally be recognized as special chars
+    for URIs. Do not encode the ' character, as it is a valid character
+    within URIs. See the encodeURIComponent() JavaScript function for details.
     """
     if path is None:
         return path
@@ -257,9 +254,9 @@ def filepath_to_uri(path):
 
 def get_system_encoding():
     """
-    The encoding of the default system locale but falls back to the given
-    fallback encoding if the encoding is unsupported by python or could
-    not be determined.  See tickets #10335 and #5846
+    The encoding of the default system locale. Fallback to 'ascii' if the
+    #encoding is unsupported by Python or could not be determined. See tickets
+    #10335 and #5846.
     """
     try:
         encoding = locale.getdefaultlocale()[1] or 'ascii'

@@ -12,12 +12,12 @@ opt_dict = {'bold': '1', 'underscore': '4', 'blink': '5', 'reverse': '7', 'conce
 
 def colorize(text='', opts=(), **kwargs):
     """
-    Returns your text, enclosed in ANSI graphics codes.
+    Return your text, enclosed in ANSI graphics codes.
 
     Depends on the keyword arguments 'fg' and 'bg', and the contents of
     the opts tuple/list.
 
-    Returns the RESET code if no parameters are given.
+    Return the RESET code if no parameters are given.
 
     Valid colors:
         'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white'
@@ -57,7 +57,7 @@ def colorize(text='', opts=(), **kwargs):
 
 def make_style(opts=(), **kwargs):
     """
-    Returns a function with default parameters for colorize()
+    Return a function with default parameters for colorize()
 
     Example:
         bold_red = make_style(opts=('bold',), fg='red')
