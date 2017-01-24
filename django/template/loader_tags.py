@@ -295,7 +295,7 @@ def do_extends(parser, token):
 @register.tag('include')
 def do_include(parser, token):
     """
-    Loads a template and renders it with the current context. You can pass
+    Load a template and render it with the current context. You can pass
     additional context using keyword arguments.
 
     Example::

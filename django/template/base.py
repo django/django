@@ -391,7 +391,7 @@ class DebugLexer(Lexer):
         """
         Split a template string into tokens and annotates each token with its
         start and end position in the source. This is slower than the default
-        lexer so we only use it when debug is True.
+        lexer so only use it when debug is True.
         """
         lineno = 1
         result = []
@@ -616,7 +616,7 @@ filter_re = re.compile(filter_raw_string, re.VERBOSE)
 
 class FilterExpression:
     """
-    Parses a variable token and its optional filters (all as a single string),
+    Parse a variable token and its optional filters (all as a single string),
     and return a list of tuples of the filter name and arguments.
     Sample::
 
@@ -823,7 +823,7 @@ class Variable:
 
     def _resolve_lookup(self, context):
         """
-        Performs resolution of a real variable (i.e. not a literal) against the
+        Perform resolution of a real variable (i.e. not a literal) against the
         given context.
 
         As indicated by the method's name, this method is an implementation
@@ -969,7 +969,7 @@ class TextNode(Node):
 
 def render_value_in_context(value, context):
     """
-    Converts any value to a string to become part of a rendered template. This
+    Convert any value to a string to become part of a rendered template. This
     means escaping, if required, and conversion to a string. If value is a
     string, it's expected to already be translated.
     """
@@ -1007,22 +1007,19 @@ kwarg_re = re.compile(r"(?:(\w+)=)?(.+)")
 
 def token_kwargs(bits, parser, support_legacy=False):
     """
-    A utility method for parsing token keyword arguments.
+    Parse token keyword arguments and return a dictionary of the arguments
+    retrieved from the ``bits`` token list.
 
-    :param bits: A list containing remainder of the token (split by spaces)
-        that is to be checked for arguments. Valid arguments will be removed
-        from this list.
+    `bits` is a list containing the remainder of the token (split by spaces)
+    that is to be checked for arguments. Valid arguments are removed from this
+    list.
 
-    :param support_legacy: If set to true ``True``, the legacy format
-        ``1 as foo`` will be accepted. Otherwise, only the standard ``foo=1``
-        format is allowed.
-
-    :returns: A dictionary of the arguments retrieved from the ``bits`` token
-        list.
+    `support_legacy` - if True, the legacy format ``1 as foo`` is accepted.
+    Otherwise, only the standard ``foo=1`` format is allowed.
 
     There is no requirement for all remaining token ``bits`` to be keyword
-    arguments, so the dictionary will be returned as soon as an invalid
-    argument format is reached.
+    arguments, so return the dictionary as soon as an invalid argument format
+    is reached.
     """
     if not bits:
         return {}

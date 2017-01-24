@@ -34,7 +34,7 @@ def csrf(request):
 
 def debug(request):
     """
-    Returns context variables helpful for debugging.
+    Return context variables helpful for debugging.
     """
     context_extras = {}
     if settings.DEBUG and request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS:
@@ -65,14 +65,14 @@ def tz(request):
 
 def static(request):
     """
-    Adds static-related context variables to the context.
+    Add static-related context variables to the context.
     """
     return {'STATIC_URL': settings.STATIC_URL}
 
 
 def media(request):
     """
-    Adds media-related context variables to the context.
+    Add media-related context variables to the context.
     """
     return {'MEDIA_URL': settings.MEDIA_URL}
 

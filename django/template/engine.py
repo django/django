@@ -56,9 +56,9 @@ class Engine:
     @functools.lru_cache()
     def get_default():
         """
-        When only one DjangoTemplates backend is configured, returns it.
+        When only one DjangoTemplates backend is configured, return it.
 
-        Raises ImproperlyConfigured otherwise.
+        Raise ImproperlyConfigured otherwise.
 
         This is required for preserving historical APIs that rely on a
         globally available, implicitly configured engine such as:
@@ -140,14 +140,14 @@ class Engine:
 
     def from_string(self, template_code):
         """
-        Returns a compiled Template object for the given template code,
+        Return a compiled Template object for the given template code,
         handling template inheritance recursively.
         """
         return Template(template_code, engine=self)
 
     def get_template(self, template_name):
         """
-        Returns a compiled Template object for the given template name,
+        Return a compiled Template object for the given template name,
         handling template inheritance recursively.
         """
         template, origin = self.find_template(template_name)
@@ -174,7 +174,7 @@ class Engine:
 
     def select_template(self, template_name_list):
         """
-        Given a list of template names, returns the first that can be loaded.
+        Given a list of template names, return the first that can be loaded.
         """
         if not template_name_list:
             raise TemplateDoesNotExist("No template names provided")

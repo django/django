@@ -8,10 +8,10 @@ class Loader:
 
     def get_template(self, template_name, skip=None):
         """
-        Calls self.get_template_sources() and returns a Template object for
-        the first template matching template_name. If skip is provided,
-        template origins in skip are ignored. This is used to avoid recursion
-        during template extending.
+        Call self.get_template_sources() and return a Template object for
+        the first template matching template_name. If skip is provided, ignore
+        template origins in skip. This is used to avoid recursion during
+        template extending.
         """
         tried = []
 
@@ -43,7 +43,7 @@ class Loader:
 
     def reset(self):
         """
-        Resets any state maintained by the loader instance (e.g. cached
+        Reset any state maintained by the loader instance (e.g. cached
         templates or cached loader modules).
         """
         pass

@@ -58,7 +58,7 @@ class SimpleTemplateResponse(HttpResponse):
         return obj_dict
 
     def resolve_template(self, template):
-        "Accepts a template object, path-to-template or list of paths"
+        """Accept a template object, path-to-template, or list of paths."""
         if isinstance(template, (list, tuple)):
             return select_template(template, using=self.using)
         elif isinstance(template, str):
@@ -71,7 +71,7 @@ class SimpleTemplateResponse(HttpResponse):
 
     @property
     def rendered_content(self):
-        """Returns the freshly rendered content for the template and context
+        """Return the freshly rendered content for the template and context
         described by the TemplateResponse.
 
         This *does not* set the final content of the response. To set the
@@ -84,7 +84,7 @@ class SimpleTemplateResponse(HttpResponse):
         return content
 
     def add_post_render_callback(self, callback):
-        """Adds a new post-rendering callback.
+        """Add a new post-rendering callback.
 
         If the response has already been rendered,
         invoke the callback immediately.
@@ -95,11 +95,11 @@ class SimpleTemplateResponse(HttpResponse):
             self._post_render_callbacks.append(callback)
 
     def render(self):
-        """Renders (thereby finalizing) the content of the response.
+        """Render (thereby finalizing) the content of the response.
 
         If the content has already been rendered, this is a no-op.
 
-        Returns the baked response instance.
+        Return the baked response instance.
         """
         retval = self
         if not self._is_rendered:
@@ -131,8 +131,7 @@ class SimpleTemplateResponse(HttpResponse):
 
     @content.setter
     def content(self, value):
-        """Sets the content for the response
-        """
+        """Set the content for the response."""
         HttpResponse.content.fset(self, value)
         self._is_rendered = True
 

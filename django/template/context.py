@@ -108,7 +108,7 @@ class BaseContext:
 
     def new(self, values=None):
         """
-        Returns a new context with the same properties, but with only the
+        Return a new context with the same properties, but with only the
         values given in 'values' stored.
         """
         new_context = copy(self)
@@ -117,7 +117,7 @@ class BaseContext:
 
     def flatten(self):
         """
-        Returns self.dicts as one dictionary
+        Return self.dicts as one dictionary.
         """
         flat = {}
         for d in self.dicts:
@@ -126,7 +126,7 @@ class BaseContext:
 
     def __eq__(self, other):
         """
-        Compares two contexts by comparing theirs 'dicts' attributes.
+        Compare two contexts by comparing theirs 'dicts' attributes.
         """
         if isinstance(other, BaseContext):
             # because dictionaries can be put in different order
@@ -166,7 +166,7 @@ class Context(BaseContext):
         return duplicate
 
     def update(self, other_dict):
-        "Pushes other_dict to the stack of dictionaries in the Context"
+        "Push other_dict to the stack of dictionaries in the Context"
         if not hasattr(other_dict, '__getitem__'):
             raise TypeError('other_dict must be a mapping (dictionary-like) object.')
         if isinstance(other_dict, BaseContext):

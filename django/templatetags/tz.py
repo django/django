@@ -19,7 +19,7 @@ class datetimeobject(datetime):
 @register.filter
 def localtime(value):
     """
-    Converts a datetime to local time in the active time zone.
+    Convert a datetime to local time in the active time zone.
 
     This only makes sense within a {% localtime off %} block.
     """
@@ -29,7 +29,7 @@ def localtime(value):
 @register.filter
 def utc(value):
     """
-    Converts a datetime to UTC.
+    Convert a datetime to UTC.
     """
     return do_timezone(value, timezone.utc)
 
@@ -37,7 +37,7 @@ def utc(value):
 @register.filter('timezone')
 def do_timezone(value, arg):
     """
-    Converts a datetime to local time in a given time zone.
+    Convert a datetime to local time in a given time zone.
 
     The argument must be an instance of a tzinfo subclass or a time zone name.
 
@@ -125,7 +125,7 @@ class GetCurrentTimezoneNode(Node):
 @register.tag('localtime')
 def localtime_tag(parser, token):
     """
-    Forces or prevents conversion of datetime objects to local time,
+    Force or prevent conversion of datetime objects to local time,
     regardless of the value of ``settings.USE_TZ``.
 
     Sample usage::
@@ -148,7 +148,7 @@ def localtime_tag(parser, token):
 @register.tag('timezone')
 def timezone_tag(parser, token):
     """
-    Enables a given time zone just for this block.
+    Enable a given time zone just for this block.
 
     The ``timezone`` argument must be an instance of a ``tzinfo`` subclass, a
     time zone name, or ``None``. If it is ``None``, the default time zone is
@@ -173,7 +173,7 @@ def timezone_tag(parser, token):
 @register.tag("get_current_timezone")
 def get_current_timezone_tag(parser, token):
     """
-    Stores the name of the current time zone in the context.
+    Store the name of the current time zone in the context.
 
     Usage::
 

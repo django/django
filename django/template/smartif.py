@@ -31,7 +31,7 @@ class TokenBase:
 
     def display(self):
         """
-        Returns what to display in error messages for this node
+        Return what to display in error messages for this node
         """
         return self.id
 
@@ -42,8 +42,8 @@ class TokenBase:
 
 def infix(bp, func):
     """
-    Creates an infix operator, given a binding power and a function that
-    evaluates the node
+    Create an infix operator, given a binding power and a function that
+    evaluates the node.
     """
     class Operator(TokenBase):
         lbp = bp
@@ -67,7 +67,7 @@ def infix(bp, func):
 
 def prefix(bp, func):
     """
-    Creates a prefix operator, given a binding power and a function that
+    Create a prefix operator, given a binding power and a function that
     evaluates the node.
     """
     class Operator(TokenBase):

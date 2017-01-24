@@ -83,7 +83,7 @@ class Origin:
 
 def get_exception_info(exception):
     """
-    Formats exception information for display on the debug page using the
+    Format exception information for display on the debug page using the
     structure described in the template API documentation.
     """
     context_lines = 10
