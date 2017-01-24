@@ -593,16 +593,16 @@ class ChoiceWidget(Widget):
             option_attrs.update(self.checked_attribute)
         if 'id' in option_attrs:
             option_attrs['id'] = self.id_for_label(option_attrs['id'], index)
-        return dict(
-            name=name,
-            value=value,
-            label=label,
-            selected=selected,
-            index=index,
-            attrs=option_attrs,
-            type=self.input_type,
-            template_name=self.option_template_name,
-        )
+        return {
+            'name': name,
+            'value': value,
+            'label': label,
+            'selected': selected,
+            'index': index,
+            'attrs': option_attrs,
+            'type': self.input_type,
+            'template_name': self.option_template_name,
+        }
 
     def get_context(self, name, value, attrs=None):
         context = super(ChoiceWidget, self).get_context(name, value, attrs)
