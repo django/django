@@ -16,7 +16,7 @@ logger = logging.getLogger('django.request')
 class ContextMixin:
     """
     A default context mixin that passes the keyword arguments received by
-    get_context_data as the template context.
+    get_context_data() as the template context.
     """
 
     def get_context_data(self, **kwargs):
@@ -45,9 +45,7 @@ class View:
 
     @classonlymethod
     def as_view(cls, **initkwargs):
-        """
-        Main entry point for a request-response process.
-        """
+        """Main entry point for a request-response process."""
         for key in initkwargs:
             if key in cls.http_method_names:
                 raise TypeError("You tried to pass in the %s method name as a "
@@ -95,9 +93,7 @@ class View:
         return HttpResponseNotAllowed(self._allowed_methods())
 
     def options(self, request, *args, **kwargs):
-        """
-        Handles responding to requests for the OPTIONS HTTP verb.
-        """
+        """Handle responding to requests for the OPTIONS HTTP verb."""
         response = HttpResponse()
         response['Allow'] = ', '.join(self._allowed_methods())
         response['Content-Length'] = '0'
@@ -108,9 +104,7 @@ class View:
 
 
 class TemplateResponseMixin:
-    """
-    A mixin that can be used to render a template.
-    """
+    """A mixin that can be used to render a template."""
     template_name = None
     template_engine = None
     response_class = TemplateResponse
@@ -118,11 +112,10 @@ class TemplateResponseMixin:
 
     def render_to_response(self, context, **response_kwargs):
         """
-        Returns a response, using the `response_class` for this
-        view, with a template rendered with the given context.
+        Return a response, using the `response_class` for this view, with a
+        template rendered with the given context.
 
-        If any keyword arguments are provided, they will be
-        passed to the constructor of the response class.
+        Pass response_kwargs to the constructor of the response class.
         """
         response_kwargs.setdefault('content_type', self.content_type)
         return self.response_class(
@@ -135,8 +128,8 @@ class TemplateResponseMixin:
 
     def get_template_names(self):
         """
-        Returns a list of template names to be used for the request. Must return
-        a list. May not be called if render_to_response is overridden.
+        Return a list of template names to be used for the request. Must return
+        a list. May not be called if render_to_response() is overridden.
         """
         if self.template_name is None:
             raise ImproperlyConfigured(
@@ -148,8 +141,7 @@ class TemplateResponseMixin:
 
 class TemplateView(TemplateResponseMixin, ContextMixin, View):
     """
-    A view that renders a template.  This view will also pass into the context
-    any keyword arguments passed by the URLconf.
+    Render a template. Pass keyword arguments from the URLconf to the context.
     """
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
@@ -157,9 +149,7 @@ class TemplateView(TemplateResponseMixin, ContextMixin, View):
 
 
 class RedirectView(View):
-    """
-    A view that provides a redirect on any GET request.
-    """
+    """Provide a redirect on any GET request."""
     permanent = False
     url = None
     pattern_name = None
@@ -167,9 +157,9 @@ class RedirectView(View):
 
     def get_redirect_url(self, *args, **kwargs):
         """
-        Return the URL redirect to. Keyword arguments from the
-        URL pattern match generating the redirect request
-        are provided as kwargs to this method.
+        Return the URL redirect to. Keyword arguments from the URL pattern
+        match generating the redirect request are provided as kwargs to this
+        method.
         """
         if self.url:
             url = self.url % kwargs

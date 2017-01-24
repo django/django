@@ -37,8 +37,7 @@ def cache_control(**kwargs):
 
 def never_cache(view_func):
     """
-    Decorator that adds headers to a response so that it will
-    never be cached.
+    Decorator that adds headers to a response so that it will never be cached.
     """
     @wraps(view_func)
     def _wrapped_view_func(request, *args, **kwargs):
