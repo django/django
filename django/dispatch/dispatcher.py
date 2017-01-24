@@ -118,7 +118,7 @@ class Signal:
         Disconnect receiver from sender for signal.
 
         If weak references are used, disconnect need not be called. The receiver
-        will be remove from dispatch automatically.
+        will be removed from dispatch automatically.
 
         Arguments:
 
@@ -168,7 +168,7 @@ class Signal:
             named
                 Named arguments which will be passed to receivers.
 
-        Returns a list of tuple pairs [(receiver, response), ... ].
+        Return a list of tuple pairs [(receiver, response), ... ].
         """
         if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
             return []
@@ -194,12 +194,10 @@ class Signal:
                 arguments must be a subset of the argument names defined in
                 providing_args.
 
-        Return a list of tuple pairs [(receiver, response), ... ]. May raise
-        DispatcherKeyError.
+        Return a list of tuple pairs [(receiver, response), ... ].
 
         If any receiver raises an error (specifically any subclass of
-        Exception), the error instance is returned as the result for that
-        receiver.
+        Exception), return the error instance as the result for that receiver.
         """
         if not self.receivers or self.sender_receivers_cache.get(sender) is NO_RECEIVERS:
             return []

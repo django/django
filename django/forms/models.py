@@ -32,9 +32,8 @@ ALL_FIELDS = '__all__'
 
 def construct_instance(form, instance, fields=None, exclude=None):
     """
-    Constructs and returns a model instance from the bound ``form``'s
-    ``cleaned_data``, but does not save the returned instance to the
-    database.
+    Construct and return a model instance from the bound ``form``'s
+    ``cleaned_data``, but do not save the returned instance to the database.
     """
     from django.db import models
     opts = instance._meta
@@ -71,15 +70,15 @@ def construct_instance(form, instance, fields=None, exclude=None):
 
 def model_to_dict(instance, fields=None, exclude=None):
     """
-    Returns a dict containing the data in ``instance`` suitable for passing as
+    Return a dict containing the data in ``instance`` suitable for passing as
     a Form's ``initial`` keyword argument.
 
-    ``fields`` is an optional list of field names. If provided, only the named
-    fields will be included in the returned dict.
+    ``fields`` is an optional list of field names. If provided, return only the
+    named.
 
-    ``exclude`` is an optional list of field names. If provided, the named
-    fields will be excluded from the returned dict, even if they are listed in
-    the ``fields`` argument.
+    ``exclude`` is an optional list of field names. If provided, exclude the
+    named from the returned dict, even if they are listed in the ``fields``
+    argument.
     """
     opts = instance._meta
     data = {}
@@ -99,14 +98,14 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
                      labels=None, help_texts=None, error_messages=None,
                      field_classes=None):
     """
-    Returns a ``OrderedDict`` containing form fields for the given model.
+    Return an ``OrderedDict`` containing form fields for the given model.
 
-    ``fields`` is an optional list of field names. If provided, only the named
-    fields will be included in the returned fields.
+    ``fields`` is an optional list of field names. If provided, return only the
+    named fields.
 
-    ``exclude`` is an optional list of field names. If provided, the named
-    fields will be excluded from the returned fields, even if they are listed
-    in the ``fields`` argument.
+    ``exclude`` is an optional list of field names. If provided, exclude the
+    named fields from the returned fields, even if they are listed in the
+    ``fields`` argument.
 
     ``widgets`` is a dictionary of model field names mapped to a widget.
 
@@ -296,9 +295,8 @@ class BaseModelForm(BaseForm):
 
     def _get_validation_exclusions(self):
         """
-        For backwards-compatibility, several types of fields need to be
-        excluded from model validation. See the following tickets for
-        details: #12507, #12521, #12553
+        For backwards-compatibility, exclude several types of fields from model
+        validation. See tickets #12507, #12521, #12553.
         """
         exclude = []
         # Build up a list of fields that should be excluded from model field
@@ -400,7 +398,7 @@ class BaseModelForm(BaseForm):
 
     def validate_unique(self):
         """
-        Calls the instance's validate_unique() method and updates the form's
+        Call the instance's validate_unique() method and update the form's
         validation errors if any were raised.
         """
         exclude = self._get_validation_exclusions()
@@ -465,15 +463,15 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
                       labels=None, help_texts=None, error_messages=None,
                       field_classes=None):
     """
-    Returns a ModelForm containing form fields for the given model.
+    Return a ModelForm containing form fields for the given model.
 
-    ``fields`` is an optional list of field names. If provided, only the named
-    fields will be included in the returned fields. If omitted or '__all__',
-    all fields will be used.
+    ``fields`` is an optional list of field names. If provided, include only
+    the named fields in the returned fields. If omitted or '__all__', use all
+    fields.
 
-    ``exclude`` is an optional list of field names. If provided, the named
-    fields will be excluded from the returned fields, even if they are listed
-    in the ``fields`` argument.
+    ``exclude`` is an optional list of field names. If provided, exclude the
+    named fields from the returned fields, even if they are listed in the
+    ``fields`` argument.
 
     ``widgets`` is a dictionary of model field names mapped to a widget.
 
@@ -561,7 +559,7 @@ class BaseModelFormSet(BaseFormSet):
         super().__init__(**defaults)
 
     def initial_form_count(self):
-        """Returns the number of forms that are required in this FormSet."""
+        """Return the number of forms that are required in this FormSet."""
         if not (self.data or self.files):
             return len(self.get_queryset())
         return super().initial_form_count()
@@ -618,11 +616,11 @@ class BaseModelFormSet(BaseFormSet):
         return self._queryset
 
     def save_new(self, form, commit=True):
-        """Saves and returns a new model instance for the given form."""
+        """Save and return a new model instance for the given form."""
         return form.save(commit=commit)
 
     def save_existing(self, form, instance, commit=True):
-        """Saves and returns an existing model instance for the given form."""
+        """Save and return an existing model instance for the given form."""
         return form.save(commit=commit)
 
     def delete_existing(self, obj, commit=True):
@@ -631,8 +629,9 @@ class BaseModelFormSet(BaseFormSet):
             obj.delete()
 
     def save(self, commit=True):
-        """Saves model instances for every form, adding and changing instances
-        as necessary, and returns the list of instances.
+        """
+        Save model instances for every form, adding and changing instances
+        as necessary, and return the list of instances.
         """
         if not commit:
             self.saved_forms = []
@@ -830,9 +829,7 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                          widgets=None, validate_max=False, localized_fields=None,
                          labels=None, help_texts=None, error_messages=None,
                          min_num=None, validate_min=False, field_classes=None):
-    """
-    Returns a FormSet class for the given Django model class.
-    """
+    """Return a FormSet class for the given Django model class."""
     meta = getattr(form, 'Meta', None)
     if (getattr(meta, 'fields', fields) is None and
             getattr(meta, 'exclude', exclude) is None):
@@ -958,10 +955,10 @@ class BaseInlineFormSet(BaseModelFormSet):
 
 def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
     """
-    Finds and returns the ForeignKey from model to parent if there is one
-    (returns None if can_fail is True and no such field exists). If fk_name is
+    Find and return the ForeignKey from model to parent if there is one
+    (return None if can_fail is True and no such field exists). If fk_name is
     provided, assume it is the name of the ForeignKey field. Unless can_fail is
-    True, an exception is raised if there is no ForeignKey from model to
+    True, raise an exception if there isn't a ForeignKey from model to
     parent_model.
     """
     # avoid circular import
@@ -1019,9 +1016,9 @@ def inlineformset_factory(parent_model, model, form=ModelForm,
                           labels=None, help_texts=None, error_messages=None,
                           min_num=None, validate_min=False, field_classes=None):
     """
-    Returns an ``InlineFormSet`` for the given kwargs.
+    Return an ``InlineFormSet`` for the given kwargs.
 
-    You must provide ``fk_name`` if ``model`` has more than one ``ForeignKey``
+    ``fk_name`` must be provided if ``model`` has more than one ``ForeignKey``
     to ``parent_model``.
     """
     fk = _get_foreign_key(parent_model, model, fk_name=fk_name)
@@ -1147,10 +1144,9 @@ class ModelChoiceField(ChoiceField):
 
     def get_limit_choices_to(self):
         """
-        Returns ``limit_choices_to`` for this form field.
+        Return ``limit_choices_to`` for this form field.
 
-        If it is a callable, it will be invoked and the result will be
-        returned.
+        If it is a callable, invoke it and return the result.
         """
         if callable(self.limit_choices_to):
             return self.limit_choices_to()
@@ -1175,9 +1171,9 @@ class ModelChoiceField(ChoiceField):
     # Override it to customize the label.
     def label_from_instance(self, obj):
         """
-        This method is used to convert objects into strings; it's used to
-        generate the labels for the choices presented by this object. Subclasses
-        can override this method to customize the display of the choices.
+        Convert objects into strings and generate the labels for the choices
+        presented by this object. Subclasses can override this method to
+        customize the display of the choices.
         """
         return force_text(obj)
 
@@ -1264,8 +1260,8 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
     def _check_values(self, value):
         """
-        Given a list of possible PK values, returns a QuerySet of the
-        corresponding objects. Raises a ValidationError if a given value is
+        Given a list of possible PK values, return a QuerySet of the
+        corresponding objects. Raise a ValidationError if a given value is
         invalid (not a valid PK, not in the queryset, etc.)
         """
         key = self.to_field_name or 'pk'

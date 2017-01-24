@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 def pretty_name(name):
-    """Converts 'first_name' to 'First name'"""
+    """Convert 'first_name' to 'First name'."""
     if not name:
         return ''
     return name.replace('_', ' ').capitalize()

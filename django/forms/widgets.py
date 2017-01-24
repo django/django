@@ -83,7 +83,7 @@ class Media:
         return static(path)
 
     def __getitem__(self, name):
-        "Returns a Media object that only contains media of the given type"
+        """Return a Media object that only contains media of the given type."""
         if name in MEDIA_TYPES:
             return Media(**{str(name): getattr(self, '_' + name)})
         raise KeyError('Unknown media type "%s"' % name)
@@ -209,7 +209,7 @@ class Widget(metaclass=MediaDefiningClass):
         return mark_safe(renderer.render(template_name, context))
 
     def build_attrs(self, base_attrs, extra_attrs=None):
-        "Helper function for building an attribute dictionary."
+        """Build an attribute dictionary."""
         attrs = base_attrs.copy()
         if extra_attrs is not None:
             attrs.update(extra_attrs)
@@ -217,8 +217,8 @@ class Widget(metaclass=MediaDefiningClass):
 
     def value_from_datadict(self, data, files, name):
         """
-        Given a dictionary of data and this widget's name, returns the value
-        of this widget. Returns None if it's not provided.
+        Given a dictionary of data and this widget's name, return the value
+        of this widget or None if it's not provided.
         """
         return data.get(name)
 
@@ -227,8 +227,8 @@ class Widget(metaclass=MediaDefiningClass):
 
     def id_for_label(self, id_):
         """
-        Returns the HTML ID attribute of this Widget for use by a <label>,
-        given the ID of the field. Returns None if no ID is available.
+        Return the HTML ID attribute of this Widget for use by a <label>,
+        given the ID of the field. Return None if no ID is available.
 
         This hook is necessary because some widgets have multiple HTML
         elements and, thus, multiple IDs. In that case, this method should
@@ -301,7 +301,7 @@ class HiddenInput(Input):
 
 class MultipleHiddenInput(HiddenInput):
     """
-    A widget that handles <input type="hidden"> for fields that have a list
+    Handle <input type="hidden"> for fields that have a list
     of values.
     """
     template_name = 'django/forms/widgets/multiple_hidden.html'
@@ -816,14 +816,17 @@ class MultiWidget(Widget):
 
     def decompress(self, value):
         """
-        Returns a list of decompressed values for the given compressed value.
+        Return a list of decompressed values for the given compressed value.
         The given value can be assumed to be valid, but not necessarily
         non-empty.
         """
         raise NotImplementedError('Subclasses must implement this method.')
 
     def _get_media(self):
-        "Media for a multiwidget is the combination of all media of the subwidgets"
+        """
+        Media for a multiwidget is the combination of all media of the
+        subwidgets.
+        """
         media = Media()
         for w in self.widgets:
             media = media + w.media
@@ -842,7 +845,7 @@ class MultiWidget(Widget):
 
 class SplitDateTimeWidget(MultiWidget):
     """
-    A Widget that splits datetime input into two <input type="text"> boxes.
+    A widget that splits datetime input into two <input type="text"> boxes.
     """
     supports_microseconds = False
     template_name = 'django/forms/widgets/splitdatetime.html'
@@ -869,7 +872,7 @@ class SplitDateTimeWidget(MultiWidget):
 
 class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
     """
-    A Widget that splits datetime input into two <input type="hidden"> inputs.
+    A widget that splits datetime input into two <input type="hidden"> inputs.
     """
     template_name = 'django/forms/widgets/splithiddendatetime.html'
 
@@ -881,7 +884,7 @@ class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
 
 class SelectDateWidget(Widget):
     """
-    A Widget that splits date input into three <select> boxes.
+    A widget that splits date input into three <select> boxes.
 
     This also serves as an example of a Widget that has more than one HTML
     element and hence implements value_from_datadict.

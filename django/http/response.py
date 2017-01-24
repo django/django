@@ -104,11 +104,11 @@ class HttpResponseBase:
         return ', "%s"' % self['Content-Type'] if 'Content-Type' in self else ''
 
     def _convert_to_charset(self, value, charset, mime_encode=False):
-        """Converts headers key/value to ascii/latin-1 native strings.
+        """
+        Convert headers key/value to ascii/latin-1 native strings.
 
         `charset` must be 'ascii' or 'latin-1'. If `mime_encode` is True and
-        `value` can't be represented in the given charset, MIME-encoding
-        is applied.
+        `value` can't be represented in the given charset, apply MIME-encoding.
         """
         if not isinstance(value, (bytes, str)):
             value = str(value)
@@ -159,13 +159,13 @@ class HttpResponseBase:
     def set_cookie(self, key, value='', max_age=None, expires=None, path='/',
                    domain=None, secure=False, httponly=False):
         """
-        Sets a cookie.
+        Set a cookie.
 
         ``expires`` can be:
         - a string in the correct format,
         - a naive ``datetime.datetime`` object in UTC,
         - an aware ``datetime.datetime`` object in any time zone.
-        If it is a ``datetime.datetime`` object then ``max_age`` will be calculated.
+        If it is a ``datetime.datetime`` object then calculate ``max_age``.
         """
         self.cookies[key] = value
         if expires is not None:
@@ -200,7 +200,7 @@ class HttpResponseBase:
             self.cookies[key]['httponly'] = True
 
     def setdefault(self, key, value):
-        """Sets a header unless it has already been set."""
+        """Set a header unless it has already been set."""
         if key not in self:
             self[key] = value
 
@@ -274,7 +274,7 @@ class HttpResponse(HttpResponseBase):
     """
     An HTTP response class with a string as content.
 
-    This content that can be read, appended to or replaced.
+    This content that can be read, appended to, or replaced.
     """
 
     streaming = False

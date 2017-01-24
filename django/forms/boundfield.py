@@ -31,7 +31,7 @@ class BoundField:
         self.help_text = field.help_text or ''
 
     def __str__(self):
-        """Renders this field as an HTML widget."""
+        """Render this field as an HTML widget."""
         if self.field.show_hidden_initial:
             return self.as_widget() + self.as_hidden(only_initial=True)
         return self.as_widget()
@@ -69,16 +69,15 @@ class BoundField:
     @property
     def errors(self):
         """
-        Returns an ErrorList for this field. Returns an empty ErrorList
-        if there are none.
+        Return an ErrorList (empty if there are no errors) for this field.
         """
         return self.form.errors.get(self.name, self.form.error_class())
 
     def as_widget(self, widget=None, attrs=None, only_initial=False):
         """
-        Renders the field by rendering the passed widget, adding any HTML
-        attributes passed as attrs.  If no widget is specified, then the
-        field's default widget will be used.
+        Render the field by rendering the passed widget, adding any HTML
+        attributes passed as attrs. If a widget isn't specified, use the
+        field's default widget.
         """
         if not widget:
             widget = self.field.widget
@@ -119,30 +118,30 @@ class BoundField:
 
     def as_text(self, attrs=None, **kwargs):
         """
-        Returns a string of HTML for representing this as an <input type="text">.
+        Return a string of HTML for representing this as an <input type="text">.
         """
         return self.as_widget(TextInput(), attrs, **kwargs)
 
     def as_textarea(self, attrs=None, **kwargs):
-        "Returns a string of HTML for representing this as a <textarea>."
+        """Return a string of HTML for representing this as a <textarea>."""
         return self.as_widget(Textarea(), attrs, **kwargs)
 
     def as_hidden(self, attrs=None, **kwargs):
         """
-        Returns a string of HTML for representing this as an <input type="hidden">.
+        Return a string of HTML for representing this as an <input type="hidden">.
         """
         return self.as_widget(self.field.hidden_widget(), attrs, **kwargs)
 
     @property
     def data(self):
         """
-        Returns the data for this BoundField, or None if it wasn't given.
+        Return the data for this BoundField, or None if it wasn't given.
         """
         return self.field.widget.value_from_datadict(self.form.data, self.form.files, self.html_name)
 
     def value(self):
         """
-        Returns the value for this BoundField, using the initial value if
+        Return the value for this BoundField, using the initial value if
         the form is not bound or the data otherwise.
         """
         data = self.initial
@@ -152,13 +151,13 @@ class BoundField:
 
     def label_tag(self, contents=None, attrs=None, label_suffix=None):
         """
-        Wraps the given contents in a <label>, if the field has an ID attribute.
-        contents should be 'mark_safe'd to avoid HTML escaping. If contents
-        aren't given, uses the field's HTML-escaped label.
+        Wrap the given contents in a <label>, if the field has an ID attribute.
+        contents should be mark_safe'd to avoid HTML escaping. If contents
+        aren't given, use the field's HTML-escaped label.
 
-        If attrs are given, they're used as HTML attributes on the <label> tag.
+        If attrs are given, use them as HTML attributes on the <label> tag.
 
-        label_suffix allows overriding the form's label_suffix.
+        label_suffix overrides the form's label_suffix.
         """
         contents = contents or self.label
         if label_suffix is None:
@@ -189,7 +188,7 @@ class BoundField:
 
     def css_classes(self, extra_classes=None):
         """
-        Returns a string of space-separated CSS classes for this field.
+        Return a string of space-separated CSS classes for this field.
         """
         if hasattr(extra_classes, 'split'):
             extra_classes = extra_classes.split()
@@ -202,14 +201,14 @@ class BoundField:
 
     @property
     def is_hidden(self):
-        "Returns True if this BoundField's widget is hidden."
+        """Return True if this BoundField's widget is hidden."""
         return self.field.widget.is_hidden
 
     @property
     def auto_id(self):
         """
-        Calculates and returns the ID attribute for this BoundField, if the
-        associated Form has specified auto_id. Returns an empty string otherwise.
+        Calculate and return the ID attribute for this BoundField, if the
+        associated Form has specified auto_id. Return an empty string otherwise.
         """
         auto_id = self.form.auto_id
         if auto_id and '%s' in force_text(auto_id):

@@ -121,9 +121,9 @@ class HttpRequest:
 
     def get_signed_cookie(self, key, default=RAISE_ERROR, salt='', max_age=None):
         """
-        Attempts to return a signed cookie. If the signature fails or the
-        cookie has expired, raises an exception... unless you provide the
-        default argument in which case that value will be returned instead.
+        Attempt to return a signed cookie. If the signature fails or the
+        cookie has expired, raise an exception, unless the `default` argument
+        is provided,  in which case return that value.
         """
         try:
             cookie_value = self.COOKIES[key]
@@ -155,13 +155,12 @@ class HttpRequest:
 
     def build_absolute_uri(self, location=None):
         """
-        Builds an absolute URI from the location and the variables available in
-        this request. If no ``location`` is specified, the absolute URI is
-        built on ``request.get_full_path()``. Anyway, if the location is
-        absolute, it is simply converted to an RFC 3987 compliant URI and
-        returned and if location is relative or is scheme-relative (i.e.,
-        ``//example.com/``), it is urljoined to a base URL constructed from the
-        request variables.
+        Build an absolute URI from the location and the variables available in
+        this request. If no ``location`` is specified, bulid the absolute URI
+        using request.get_full_path(). If the location is absolute, convert it
+        to an RFC 3987 compliant URI and return it. If location is relative or
+        is scheme-relative (i.e., ``//example.com/``), urljoin() it to a base
+        URL constructed from the request variables.
         """
         if location is None:
             # Make it an absolute url (but schemeless and domainless) for the
@@ -180,7 +179,7 @@ class HttpRequest:
 
     def _get_scheme(self):
         """
-        Hook for subclasses like WSGIRequest to implement. Returns 'http' by
+        Hook for subclasses like WSGIRequest to implement. Return 'http' by
         default.
         """
         return 'http'
@@ -211,8 +210,8 @@ class HttpRequest:
     @encoding.setter
     def encoding(self, val):
         """
-        Sets the encoding used for GET/POST accesses. If the GET or POST
-        dictionary has already been created, it is removed and recreated on the
+        Set the encoding used for GET/POST accesses. If the GET or POST
+        dictionary has already been created, remove and recreate it on the
         next access (so that it is decoded correctly).
         """
         self._encoding = val
@@ -239,7 +238,7 @@ class HttpRequest:
         self._upload_handlers = upload_handlers
 
     def parse_file_upload(self, META, post_data):
-        """Returns a tuple of (POST QueryDict, FILES MultiValueDict)."""
+        """Return a tuple of (POST QueryDict, FILES MultiValueDict)."""
         self.upload_handlers = ImmutableList(
             self.upload_handlers,
             warning="You cannot alter upload handlers after the upload has been processed."
@@ -469,22 +468,21 @@ class QueryDict(MultiValueDict):
         return super().setdefault(key, default)
 
     def copy(self):
-        """Returns a mutable copy of this object."""
+        """Return a mutable copy of this object."""
         return self.__deepcopy__({})
 
     def urlencode(self, safe=None):
         """
-        Returns an encoded string of all query string arguments.
+        Return an encoded string of all query string arguments.
 
-        :arg safe: Used to specify characters which do not require quoting, for
-            example::
+        `safe` specifies characters which don't require quoting, for example::
 
-                >>> q = QueryDict(mutable=True)
-                >>> q['next'] = '/a&b/'
-                >>> q.urlencode()
-                'next=%2Fa%26b%2F'
-                >>> q.urlencode(safe='/')
-                'next=/a%26b/'
+            >>> q = QueryDict(mutable=True)
+            >>> q['next'] = '/a&b/'
+            >>> q.urlencode()
+            'next=%2Fa%26b%2F'
+            >>> q.urlencode(safe='/')
+            'next=/a%26b/'
         """
         output = []
         if safe:

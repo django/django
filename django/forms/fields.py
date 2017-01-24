@@ -142,10 +142,8 @@ class Field:
 
     def clean(self, value):
         """
-        Validates the given value and returns its "cleaned" value as an
-        appropriate Python object.
-
-        Raises ValidationError for any errors.
+        Validate the given value and return its "cleaned" value as an
+        appropriate Python object. Raise ValidationError for any errors.
         """
         value = self.to_python(value)
         self.validate(value)
@@ -167,16 +165,14 @@ class Field:
 
     def widget_attrs(self, widget):
         """
-        Given a Widget instance (*not* a Widget class), returns a dictionary of
+        Given a Widget instance (*not* a Widget class), return a dictionary of
         any HTML attributes that should be added to the Widget, based on this
         Field.
         """
         return {}
 
     def has_changed(self, initial, data):
-        """
-        Return True if data differs from initial.
-        """
+        """Return True if data differs from initial."""
         # Always return False if the field is disabled since self.bound_data
         # always uses the initial value in this case.
         if self.disabled:
@@ -222,7 +218,7 @@ class CharField(Field):
             self.validators.append(validators.MaxLengthValidator(int(max_length)))
 
     def to_python(self, value):
-        "Returns a string."
+        """Return a string."""
         if value in self.empty_values:
             return self.empty_value
         value = force_text(value)
@@ -262,8 +258,8 @@ class IntegerField(Field):
 
     def to_python(self, value):
         """
-        Validates that int() can be called on the input. Returns the result
-        of int(). Returns None for empty values.
+        Validate that int() can be called on the input. Return the result
+        of int() or None for empty values.
         """
         value = super().to_python(value)
         if value in self.empty_values:
@@ -294,8 +290,8 @@ class FloatField(IntegerField):
 
     def to_python(self, value):
         """
-        Validates that float() can be called on the input. Returns the result
-        of float(). Returns None for empty values.
+        Validate that float() can be called on the input. Return the result
+        of float() or None for empty values.
         """
         value = super(IntegerField, self).to_python(value)
         if value in self.empty_values:
@@ -336,9 +332,9 @@ class DecimalField(IntegerField):
 
     def to_python(self, value):
         """
-        Validates that the input is a decimal number. Returns a Decimal
-        instance. Returns None for empty values. Ensures that there are no more
-        than max_digits in the number, and no more than decimal_places digits
+        Validate that the input is a decimal number. Return a Decimal
+        instance or None for empty values. Ensure that there are no more
+        than max_digits in the number and no more than decimal_places digits
         after the decimal point.
         """
         if value in self.empty_values:
@@ -405,7 +401,7 @@ class DateField(BaseTemporalField):
 
     def to_python(self, value):
         """
-        Validates that the input can be converted to a date. Returns a Python
+        Validate that the input can be converted to a date. Return a Python
         datetime.date object.
         """
         if value in self.empty_values:
@@ -429,7 +425,7 @@ class TimeField(BaseTemporalField):
 
     def to_python(self, value):
         """
-        Validates that the input can be converted to a time. Returns a Python
+        Validate that the input can be converted to a time. Return a Python
         datetime.time object.
         """
         if value in self.empty_values:
@@ -456,7 +452,7 @@ class DateTimeField(BaseTemporalField):
 
     def to_python(self, value):
         """
-        Validates that the input can be converted to a datetime. Returns a
+        Validate that the input can be converted to a datetime. Return a
         Python datetime.datetime object.
         """
         if value in self.empty_values:
@@ -605,8 +601,8 @@ class ImageField(FileField):
 
     def to_python(self, data):
         """
-        Checks that the file-upload field data contains a valid image (GIF, JPG,
-        PNG, possibly others -- whatever the Python Imaging Library supports).
+        Check that the file-upload field data contains a valid image (GIF, JPG,
+        PNG, etc. -- whatever Pillow supports).
         """
         f = super().to_python(data)
         if f is None:
@@ -661,8 +657,8 @@ class URLField(CharField):
 
         def split_url(url):
             """
-            Returns a list of url parts via ``urlparse.urlsplit`` (or raises a
-            ``ValidationError`` exception for certain).
+            Return a list of url parts via urlparse.urlsplit(), or raise
+            ValidationError for some malformed URLs.
             """
             try:
                 return list(urlsplit(url))
@@ -693,7 +689,7 @@ class BooleanField(Field):
     widget = CheckboxInput
 
     def to_python(self, value):
-        """Returns a Python boolean object."""
+        """Return a Python boolean object."""
         # Explicitly check for the string 'False', which is what a hidden field
         # will submit for False. Also check for '0', since this is what
         # RadioSelect will provide. Because bool("True") == bool('1') == True,
@@ -716,19 +712,19 @@ class BooleanField(Field):
 
 class NullBooleanField(BooleanField):
     """
-    A field whose valid values are None, True and False. Invalid values are
-    cleaned to None.
+    A field whose valid values are None, True, and False. Clean invalid values
+    to None.
     """
     widget = NullBooleanSelect
 
     def to_python(self, value):
         """
-        Explicitly checks for the string 'True' and 'False', which is what a
+        Explicitly check for the string 'True' and 'False', which is what a
         hidden field will submit for True and False, for 'true' and 'false',
         which are likely to be returned by JavaScript serializations of forms,
         and for '1' and '0', which is what a RadioField will submit. Unlike
-        the Booleanfield we need to explicitly check for True, because we are
-        not using the bool() function
+        the Booleanfield, this field must check for True because it doesn't
+        use the bool() function.
         """
         if value in (True, 'True', 'true', '1'):
             return True
@@ -786,15 +782,13 @@ class ChoiceField(Field):
     choices = property(_get_choices, _set_choices)
 
     def to_python(self, value):
-        "Return a string."
+        """Return a string."""
         if value in self.empty_values:
             return ''
         return force_text(value)
 
     def validate(self, value):
-        """
-        Validates that the input is in self.choices.
-        """
+        """Validate that the input is in self.choices."""
         super().validate(value)
         if value and not self.valid_value(value):
             raise ValidationError(
@@ -804,7 +798,7 @@ class ChoiceField(Field):
             )
 
     def valid_value(self, value):
-        "Check to see if the provided value is a valid choice"
+        """Check to see if the provided value is a valid choice."""
         text_value = force_text(value)
         for k, v in self.choices:
             if isinstance(v, (list, tuple)):
@@ -861,9 +855,7 @@ class MultipleChoiceField(ChoiceField):
         return [force_text(val) for val in value]
 
     def validate(self, value):
-        """
-        Validates that the input is a list or tuple.
-        """
+        """Validate that the input is a list or tuple."""
         if self.required and not value:
             raise ValidationError(self.error_messages['required'], code='required')
         # Validate that each value in the value list is in self.choices.
@@ -895,7 +887,7 @@ class TypedMultipleChoiceField(MultipleChoiceField):
 
     def _coerce(self, value):
         """
-        Validates that the values are in self.choices and can be coerced to the
+        Validate that the values are in self.choices and can be coerced to the
         right type.
         """
         if value == self.empty_value or value in self.empty_values:
@@ -938,7 +930,7 @@ class ComboField(Field):
 
     def clean(self, value):
         """
-        Validates the given value against all of self.fields, which is a
+        Validate the given value against all of self.fields, which is a
         list of Field instances.
         """
         super().clean(value)
@@ -949,7 +941,7 @@ class ComboField(Field):
 
 class MultiValueField(Field):
     """
-    A Field that aggregates the logic of multiple Fields.
+    Aggregate the logic of multiple Fields.
 
     Its clean() method takes a "decompressed" list of values, which are then
     cleaned into a single value according to self.fields. Each value in
@@ -992,7 +984,7 @@ class MultiValueField(Field):
 
     def clean(self, value):
         """
-        Validates every value in the given list. A value is validated against
+        Validate every value in the given list. A value is validated against
         the corresponding Field in self.fields.
 
         For example, if this MultiValueField was instantiated with
@@ -1044,7 +1036,7 @@ class MultiValueField(Field):
 
     def compress(self, data_list):
         """
-        Returns a single value for the given list of values. The values can be
+        Return a single value for the given list of values. The values can be
         assumed to be valid.
 
         For example, if this MultiValueField was instantiated with
