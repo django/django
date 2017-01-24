@@ -1791,9 +1791,9 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[1], [])
         self.assertEqual(sorted(definition[2]), ["reverse_sql", "sql", "state_operations"])
         # And elidable reduction
-        self.assertIs(False, operation.reduce(operation, []))
+        self.assertIs(False, operation.reduce(operation, [], []))
         elidable_operation = migrations.RunSQL('SELECT 1 FROM void;', elidable=True)
-        self.assertEqual(elidable_operation.reduce(operation, []), [operation])
+        self.assertEqual(elidable_operation.reduce(operation, [], []), [operation])
 
     def test_run_sql_params(self):
         """
@@ -1964,9 +1964,9 @@ class OperationTests(OperationTestBase):
         self.assertEqual(project_state.apps.get_model("test_runpython", "Pony").objects.count(), 6)
         self.assertEqual(project_state.apps.get_model("test_runpython", "ShetlandPony").objects.count(), 2)
         # And elidable reduction
-        self.assertIs(False, operation.reduce(operation, []))
+        self.assertIs(False, operation.reduce(operation, [], []))
         elidable_operation = migrations.RunPython(inner_method, elidable=True)
-        self.assertEqual(elidable_operation.reduce(operation, []), [operation])
+        self.assertEqual(elidable_operation.reduce(operation, [], []), [operation])
 
     def test_run_python_atomic(self):
         """
