@@ -8,8 +8,8 @@ class TestLoadBackend(SimpleTestCase):
         msg = (
             "'foo' isn't an available database backend.\n"
             "Try using 'django.db.backends.XXX', where XXX is one of:\n"
-            "    'mysql', 'oracle', 'postgresql', 'sqlite3'\n"
-            "Error was: No module named 'foo'"
+            "    'mysql', 'oracle', 'postgresql', 'sqlite3'"
         )
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+        with self.assertRaisesMessage(ImproperlyConfigured, msg) as cm:
             load_backend('foo')
+        self.assertEqual(str(cm.exception.__cause__), "No module named 'foo'")

@@ -111,23 +111,19 @@ def load_backend(backend_name):
         return import_module('%s.base' % backend_name)
     except ImportError as e_user:
         # The database backend wasn't found. Display a helpful error message
-        # listing all possible (built-in) database backends.
+        # listing all built-in database backends.
         backend_dir = os.path.join(os.path.dirname(__file__), 'backends')
-        try:
-            builtin_backends = [
-                name for _, name, ispkg in pkgutil.iter_modules([backend_dir])
-                if ispkg and name not in {'base', 'dummy', 'postgresql_psycopg2'}
-            ]
-        except EnvironmentError:
-            builtin_backends = []
-        if backend_name not in ['django.db.backends.%s' % b for b in
-                                builtin_backends]:
+        builtin_backends = [
+            name for _, name, ispkg in pkgutil.iter_modules([backend_dir])
+            if ispkg and name not in {'base', 'dummy', 'postgresql_psycopg2'}
+        ]
+        if backend_name not in ['django.db.backends.%s' % b for b in builtin_backends]:
             backend_reprs = map(repr, sorted(builtin_backends))
-            error_msg = ("%r isn't an available database backend.\n"
-                         "Try using 'django.db.backends.XXX', where XXX "
-                         "is one of:\n    %s\nError was: %s" %
-                         (backend_name, ", ".join(backend_reprs), e_user))
-            raise ImproperlyConfigured(error_msg)
+            raise ImproperlyConfigured(
+                "%r isn't an available database backend.\n"
+                "Try using 'django.db.backends.XXX', where XXX is one of:\n"
+                "    %s" % (backend_name, ", ".join(backend_reprs))
+            ) from e_user
         else:
             # If there's some other error, this must be an error in Django
             raise
