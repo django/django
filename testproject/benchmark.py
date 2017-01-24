@@ -3,9 +3,11 @@ from __future__ import unicode_literals
 import time
 import random
 import statistics
-from autobahn.twisted.websocket import WebSocketClientProtocol, \
-    WebSocketClientFactory
-
+from autobahn.twisted.websocket import (
+    WebSocketClientProtocol,
+    WebSocketClientFactory,
+)
+from twisted.internet import reactor
 
 stats = {}
 
@@ -92,9 +94,7 @@ class Benchmarker(object):
         self.rate = rate
         self.spawn = spawn
         self.messages = messages
-        self.factory = WebSocketClientFactory(
-            args.url,
-        )
+        self.factory = WebSocketClientFactory(self.url)
         self.factory.protocol = MyClientProtocol
         self.factory.num_messages = self.messages
         self.factory.message_rate = self.rate
@@ -180,7 +180,7 @@ class Benchmarker(object):
         print("-------")
         print("Sockets opened: %s" % len(stats))
         if latencies:
-            print("Latency stats: Mean %.3fs  Median %.3fs  Stdev %.3f  95%% %.3fs  95%% %.3fs" % (
+            print("Latency stats: Mean %.3fs  Median %.3fs  Stdev %.3f  95%% %.3fs  99%% %.3fs" % (
                 latency_mean,
                 latency_median,
                 latency_stdev,
@@ -200,7 +200,6 @@ if __name__ == '__main__':
     import argparse
 
     from twisted.python import log
-    from twisted.internet import reactor
 
 #    log.startLogging(sys.stdout)
 
