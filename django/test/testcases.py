@@ -43,8 +43,8 @@ __all__ = ('TestCase', 'TransactionTestCase',
 
 def to_list(value):
     """
-    Puts value into a list if it's not already one.
-    Returns an empty list if value is None.
+    Put value into a list if it's not already one. Return an empty list if
+    value is None.
     """
     if value is None:
         value = []
@@ -212,21 +212,22 @@ class SimpleTestCase(unittest.TestCase):
                 return
 
     def _pre_setup(self):
-        """Performs any pre-test setup. This includes:
-
-        * Creating a test client.
-        * Clearing the mail test outbox.
+        """
+        Perform pre-test setup:
+        * Create a test client.
+        * Clear the mail test outbox.
         """
         self.client = self.client_class()
         mail.outbox = []
 
     def _post_teardown(self):
-        """Perform any post-test things."""
+        """Perform post-test things."""
         pass
 
     def settings(self, **kwargs):
         """
-        A context manager that temporarily sets a setting and reverts to the original value when exiting the context.
+        A context manager that temporarily sets a setting and reverts to the
+        original value when exiting the context.
         """
         return override_settings(**kwargs)
 
@@ -240,12 +241,13 @@ class SimpleTestCase(unittest.TestCase):
     def assertRedirects(self, response, expected_url, status_code=302,
                         target_status_code=200, msg_prefix='',
                         fetch_redirect_response=True):
-        """Asserts that a response redirected to a specific URL, and that the
+        """
+        Assert that a response redirected to a specific URL and that the
         redirect URL can be loaded.
 
-        Note that assertRedirects won't work for external links since it uses
-        TestClient to do a request (use fetch_redirect_response=False to check
-        such links without fetching them).
+        Won't work for external links since it uses TestClient to do a request
+        (use fetch_redirect_response=False to check such links without fetching
+        them).
         """
         if msg_prefix:
             msg_prefix += ": "
@@ -349,8 +351,8 @@ class SimpleTestCase(unittest.TestCase):
 
     def assertContains(self, response, text, count=None, status_code=200, msg_prefix='', html=False):
         """
-        Asserts that a response indicates that some content was retrieved
-        successfully, (i.e., the HTTP status code was as expected), and that
+        Assert that a response indicates that some content was retrieved
+        successfully, (i.e., the HTTP status code was as expected) and that
         ``text`` occurs ``count`` times in the content of the response.
         If ``count`` is None, the count doesn't matter - the assertion is true
         if the text occurs at least once in the response.
@@ -368,8 +370,8 @@ class SimpleTestCase(unittest.TestCase):
 
     def assertNotContains(self, response, text, status_code=200, msg_prefix='', html=False):
         """
-        Asserts that a response indicates that some content was retrieved
-        successfully, (i.e., the HTTP status code was as expected), and that
+        Assert that a response indicates that some content was retrieved
+        successfully, (i.e., the HTTP status code was as expected) and that
         ``text`` doesn't occurs in the content of the response.
         """
         text_repr, real_count, msg_prefix = self._assert_contains(
@@ -379,7 +381,7 @@ class SimpleTestCase(unittest.TestCase):
 
     def assertFormError(self, response, form, field, errors, msg_prefix=''):
         """
-        Asserts that a form used to render the response has a specific field
+        Assert that a form used to render the response has a specific field
         error.
         """
         if msg_prefix:
@@ -435,7 +437,7 @@ class SimpleTestCase(unittest.TestCase):
     def assertFormsetError(self, response, formset, form_index, field, errors,
                            msg_prefix=''):
         """
-        Asserts that a formset used to render the response has a specific error.
+        Assert that a formset used to render the response has a specific error.
 
         For field errors, specify the ``form_index`` and the ``field``.
         For non-field errors, specify the ``form_index`` and the ``field`` as
@@ -538,7 +540,7 @@ class SimpleTestCase(unittest.TestCase):
 
     def assertTemplateUsed(self, response=None, template_name=None, msg_prefix='', count=None):
         """
-        Asserts that the template with the provided name was used in rendering
+        Assert that the template with the provided name was used in rendering
         the response. Also usable as context manager.
         """
         context_mgr_template, template_names, msg_prefix = self._assert_template_used(
@@ -567,7 +569,7 @@ class SimpleTestCase(unittest.TestCase):
 
     def assertTemplateNotUsed(self, response=None, template_name=None, msg_prefix=''):
         """
-        Asserts that the template with the provided name was NOT used in
+        Assert that the template with the provided name was NOT used in
         rendering the response. Also usable as context manager.
         """
         context_mgr_template, template_names, msg_prefix = self._assert_template_used(
@@ -590,7 +592,7 @@ class SimpleTestCase(unittest.TestCase):
 
     def assertRaisesMessage(self, expected_exception, expected_message, *args, **kwargs):
         """
-        Asserts that expected_message is found in the the message of a raised
+        Assert that expected_message is found in the the message of a raised
         exception.
 
         Args:
@@ -615,7 +617,7 @@ class SimpleTestCase(unittest.TestCase):
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=None,
                           field_kwargs=None, empty_value=''):
         """
-        Asserts that a form field behaves correctly with various inputs.
+        Assert that a form field behaves correctly with various inputs.
 
         Args:
             fieldclass: the class of the field to be tested.
@@ -660,9 +662,9 @@ class SimpleTestCase(unittest.TestCase):
 
     def assertHTMLEqual(self, html1, html2, msg=None):
         """
-        Asserts that two HTML snippets are semantically the same.
+        Assert that two HTML snippets are semantically the same.
         Whitespace in most cases is ignored, and attribute ordering is not
-        significant. The passed-in arguments must be valid HTML.
+        significant. The arguments must be valid HTML.
         """
         dom1 = assert_and_parse_html(self, html1, msg, 'First argument is not valid HTML:')
         dom2 = assert_and_parse_html(self, html2, msg, 'Second argument is not valid HTML:')
@@ -677,7 +679,7 @@ class SimpleTestCase(unittest.TestCase):
             self.fail(self._formatMessage(msg, standardMsg))
 
     def assertHTMLNotEqual(self, html1, html2, msg=None):
-        """Asserts that two HTML snippets are not semantically equivalent."""
+        """Assert that two HTML snippets are not semantically equivalent."""
         dom1 = assert_and_parse_html(self, html1, msg, 'First argument is not valid HTML:')
         dom2 = assert_and_parse_html(self, html2, msg, 'Second argument is not valid HTML:')
 
@@ -700,7 +702,7 @@ class SimpleTestCase(unittest.TestCase):
 
     def assertJSONEqual(self, raw, expected_data, msg=None):
         """
-        Asserts that the JSON fragments raw and expected_data are equal.
+        Assert that the JSON fragments raw and expected_data are equal.
         Usual JSON non-significant whitespace rules apply as the heavyweight
         is delegated to the json library.
         """
@@ -717,7 +719,7 @@ class SimpleTestCase(unittest.TestCase):
 
     def assertJSONNotEqual(self, raw, expected_data, msg=None):
         """
-        Asserts that the JSON fragments raw and expected_data are not equal.
+        Assert that the JSON fragments raw and expected_data are not equal.
         Usual JSON non-significant whitespace rules apply as the heavyweight
         is delegated to the json library.
         """
@@ -734,9 +736,9 @@ class SimpleTestCase(unittest.TestCase):
 
     def assertXMLEqual(self, xml1, xml2, msg=None):
         """
-        Asserts that two XML snippets are semantically the same.
-        Whitespace in most cases is ignored, and attribute ordering is not
-        significant. The passed-in arguments must be valid XML.
+        Assert that two XML snippets are semantically the same.
+        Whitespace in most cases is ignored and attribute ordering is not
+        significant. The arguments must be valid XML.
         """
         try:
             result = compare_xml(xml1, xml2)
@@ -754,9 +756,9 @@ class SimpleTestCase(unittest.TestCase):
 
     def assertXMLNotEqual(self, xml1, xml2, msg=None):
         """
-        Asserts that two XML snippets are not semantically equivalent.
-        Whitespace in most cases is ignored, and attribute ordering is not
-        significant. The passed-in arguments must be valid XML.
+        Assert that two XML snippets are not semantically equivalent.
+        Whitespace in most cases is ignored and attribute ordering is not
+        significant. The arguments must be valid XML.
         """
         try:
             result = compare_xml(xml1, xml2)
@@ -795,12 +797,12 @@ class TransactionTestCase(SimpleTestCase):
     allow_database_queries = True
 
     def _pre_setup(self):
-        """Performs any pre-test setup. This includes:
-
-        * If the class has an 'available_apps' attribute, restricting the app
-          registry to these applications, then firing post_migrate -- it must
-          run with the correct set of applications for the test case.
-        * If the class has a 'fixtures' attribute, installing these fixtures.
+        """
+        Perform pre-test setup:
+        * If the class has an 'available_apps' attribute, restrict the app
+          registry to these applications, then fire the post_migrate signal --
+          it must run with the correct set of applications for the test case.
+        * If the class has a 'fixtures' attribute, install those fixtures.
         """
         super()._pre_setup()
         if self.available_apps is not None:
@@ -876,11 +878,11 @@ class TransactionTestCase(SimpleTestCase):
         return True
 
     def _post_teardown(self):
-        """Performs any post-test things. This includes:
-
-        * Flushing the contents of the database, to leave a clean slate. If
-          the class has an 'available_apps' attribute, post_migrate isn't fired.
-        * Force-closing the connection, so the next test gets a clean cursor.
+        """
+        Perform post-test things:
+        * Flush the contents of the database to leave a clean slate. If the
+          class has an 'available_apps' attribute, don't fire post_migrate.
+        * Force-close the connection so the next test gets a clean cursor.
         """
         try:
             self._fixture_teardown()
@@ -944,16 +946,13 @@ class TransactionTestCase(SimpleTestCase):
 
 
 def connections_support_transactions():
-    """
-    Returns True if all connections support transactions.
-    """
-    return all(conn.features.supports_transactions
-               for conn in connections.all())
+    """Return True if all connections support transactions."""
+    return all(conn.features.supports_transactions for conn in connections.all())
 
 
 class TestCase(TransactionTestCase):
     """
-    Similar to TransactionTestCase, but uses `transaction.atomic()` to achieve
+    Similar to TransactionTestCase, but use `transaction.atomic()` to achieve
     test isolation.
 
     In most situations, TestCase should be preferred to TransactionTestCase as
@@ -966,7 +965,7 @@ class TestCase(TransactionTestCase):
     """
     @classmethod
     def _enter_atomics(cls):
-        """Helper method to open atomic blocks for multiple databases"""
+        """Open atomic blocks for multiple databases."""
         atomics = {}
         for db_name in cls._databases_names():
             atomics[db_name] = transaction.atomic(using=db_name)
@@ -975,7 +974,7 @@ class TestCase(TransactionTestCase):
 
     @classmethod
     def _rollback_atomics(cls, atomics):
-        """Rollback atomic blocks opened through the previous method"""
+        """Rollback atomic blocks opened by the previous method."""
         for db_name in reversed(cls._databases_names()):
             transaction.set_rollback(True, using=db_name)
             atomics[db_name].__exit__(None, None, None)
@@ -1014,7 +1013,7 @@ class TestCase(TransactionTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        """Load initial data for the TestCase"""
+        """Load initial data for the TestCase."""
         pass
 
     def _should_reload_connections(self):
@@ -1050,7 +1049,7 @@ class TestCase(TransactionTestCase):
 
 
 class CheckCondition:
-    """Descriptor class for deferred condition checking"""
+    """Descriptor class for deferred condition checking."""
     def __init__(self, *conditions):
         self.conditions = conditions
 
@@ -1095,9 +1094,7 @@ def _deferredSkip(condition, reason):
 
 
 def skipIfDBFeature(*features):
-    """
-    Skip a test if a database has at least one of the named features.
-    """
+    """Skip a test if a database has at least one of the named features."""
     return _deferredSkip(
         lambda: any(getattr(connection.features, feature, False) for feature in features),
         "Database has feature(s) %s" % ", ".join(features)
@@ -1105,9 +1102,7 @@ def skipIfDBFeature(*features):
 
 
 def skipUnlessDBFeature(*features):
-    """
-    Skip a test unless a database has all the named features.
-    """
+    """Skip a test unless a database has all the named features."""
     return _deferredSkip(
         lambda: not all(getattr(connection.features, feature, False) for feature in features),
         "Database doesn't support feature(s): %s" % ", ".join(features)
@@ -1115,9 +1110,7 @@ def skipUnlessDBFeature(*features):
 
 
 def skipUnlessAnyDBFeature(*features):
-    """
-    Skip a test unless a database has any of the named features.
-    """
+    """Skip a test unless a database has any of the named features."""
     return _deferredSkip(
         lambda: not any(getattr(connection.features, feature, False) for feature in features),
         "Database doesn't support any of the feature(s): %s" % ", ".join(features)
@@ -1126,11 +1119,9 @@ def skipUnlessAnyDBFeature(*features):
 
 class QuietWSGIRequestHandler(WSGIRequestHandler):
     """
-    Just a regular WSGIRequestHandler except it doesn't log to the standard
-    output any of the requests received, so as to not clutter the output for
-    the tests' results.
+    A WSGIRequestHandler that doesn't log to standard output any of the
+    requests received, so as to not clutter the test result output.
     """
-
     def log_message(*args):
         pass
 
@@ -1147,17 +1138,14 @@ class FSFilesHandler(WSGIHandler):
 
     def _should_handle(self, path):
         """
-        Checks if the path should be handled. Ignores the path if:
-
+        Check if the path should be handled. Ignore the path if:
         * the host is provided as part of the base_url
         * the request's path isn't under the media path (or equal)
         """
         return path.startswith(self.base_url[2]) and not self.base_url[1]
 
     def file_path(self, url):
-        """
-        Returns the relative path to the file on disk for the given URL.
-        """
+        """Return the relative path to the file on disk for the given URL."""
         relative_url = url[len(self.base_url[2]):]
         return url2pathname(relative_url)
 
@@ -1191,7 +1179,6 @@ class _StaticFilesHandler(FSFilesHandler):
     Handler for serving static files. A private class that is meant to be used
     solely as a convenience by LiveServerThread.
     """
-
     def get_base_dir(self):
         return settings.STATIC_ROOT
 
@@ -1204,7 +1191,6 @@ class _MediaFilesHandler(FSFilesHandler):
     Handler for serving the media files. A private class that is meant to be
     used solely as a convenience by LiveServerThread.
     """
-
     def get_base_dir(self):
         return settings.MEDIA_ROOT
 
@@ -1213,9 +1199,7 @@ class _MediaFilesHandler(FSFilesHandler):
 
 
 class LiveServerThread(threading.Thread):
-    """
-    Thread for running a live http server while the tests are running.
-    """
+    """Thread for running a live http server while the tests are running."""
 
     def __init__(self, host, static_handler, connections_override=None):
         self.host = host
@@ -1228,8 +1212,8 @@ class LiveServerThread(threading.Thread):
 
     def run(self):
         """
-        Sets up the live server and databases, and then loops over handling
-        http requests.
+        Set up the live server and databases, and then loop over handling
+        HTTP requests.
         """
         if self.connections_override:
             # Override this thread's database connections with the ones
@@ -1263,14 +1247,14 @@ class LiveServerThread(threading.Thread):
 
 class LiveServerTestCase(TransactionTestCase):
     """
-    Does basically the same as TransactionTestCase but also launches a live
-    http server in a separate thread so that the tests may use another testing
+    Do basically the same as TransactionTestCase but also launch a live HTTP
+    server in a separate thread so that the tests may use another testing
     framework, such as Selenium for example, instead of the built-in dummy
     client.
-    Note that it inherits from TransactionTestCase instead of TestCase because
-    the threads do not share the same transactions (unless if using in-memory
-    sqlite) and each thread needs to commit all their transactions so that the
-    other thread can see the changes.
+    It inherits from TransactionTestCase instead of TestCase because the
+    threads don't share the same transactions (unless if using in-memory sqlite)
+    and each thread needs to commit all their transactions so that the other
+    thread can see the changes.
     """
     host = 'localhost'
     server_thread_class = LiveServerThread
@@ -1338,14 +1322,13 @@ class LiveServerTestCase(TransactionTestCase):
 
 class SerializeMixin:
     """
-    Mixin to enforce serialization of TestCases that share a common resource.
+    Enforce serialization of TestCases that share a common resource.
 
     Define a common 'lockfile' for each set of TestCases to serialize. This
     file must exist on the filesystem.
 
-    Place it early in the MRO in order to isolate setUpClass / tearDownClass.
+    Place it early in the MRO in order to isolate setUpClass()/tearDownClass().
     """
-
     lockfile = None
 
     @classmethod

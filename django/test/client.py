@@ -36,9 +36,7 @@ JSON_CONTENT_TYPE_RE = re.compile(r'^application\/(vnd\..+\+)?json$')
 
 
 class RedirectCycleError(Exception):
-    """
-    The test client has been asked to follow a redirect loop.
-    """
+    """The test client has been asked to follow a redirect loop."""
     def __init__(self, message, last_response):
         super().__init__(message)
         self.last_response = last_response
@@ -50,7 +48,7 @@ class FakePayload:
     A wrapper around BytesIO that restricts what can be read since data from
     the network can't be seeked and cannot be read outside of its content
     length. This makes sure that views can't do anything under the test client
-    that wouldn't work in Real Life.
+    that wouldn't work in real life.
     """
     def __init__(self, content=None):
         self.__content = BytesIO()
@@ -93,7 +91,7 @@ def closing_iterator_wrapper(iterable, close):
 def conditional_content_removal(request, response):
     """
     Simulate the behavior of most Web servers by removing the content of
-    responses for HEAD requests, 1xx, 204, and 304 responses. Ensures
+    responses for HEAD requests, 1xx, 204, and 304 responses. Ensure
     compliance with RFC 7230, section 3.3.3.
     """
     if 100 <= response.status_code < 200 or response.status_code in (204, 304):
@@ -112,8 +110,8 @@ def conditional_content_removal(request, response):
 
 class ClientHandler(BaseHandler):
     """
-    A HTTP Handler that can be used for testing purposes. Uses the WSGI
-    interface to compose requests, but returns the raw HttpResponse object with
+    A HTTP Handler that can be used for testing purposes. Use the WSGI
+    interface to compose requests, but return the raw HttpResponse object with
     the originating WSGIRequest attached to its ``wsgi_request`` attribute.
     """
     def __init__(self, enforce_csrf_checks=True, *args, **kwargs):
@@ -146,8 +144,7 @@ class ClientHandler(BaseHandler):
         # later retrieved.
         response.wsgi_request = request
 
-        # We're emulating a WSGI server; we must call the close method
-        # on completion.
+        # Emulate a WSGI server by calling the close method on completion.
         if response.streaming:
             response.streaming_content = closing_iterator_wrapper(
                 response.streaming_content, response.close)
@@ -161,7 +158,7 @@ class ClientHandler(BaseHandler):
 
 def store_rendered_templates(store, signal, sender, template, context, **kwargs):
     """
-    Stores templates and contexts that are rendered.
+    Store templates and contexts that are rendered.
 
     The context is copied so that it is an accurate representation at the time
     of rendering.
@@ -174,7 +171,7 @@ def store_rendered_templates(store, signal, sender, template, context, **kwargs)
 
 def encode_multipart(boundary, data):
     """
-    Encodes multipart POST data from a dictionary of form values.
+    Encode multipart POST data from a dictionary of form values.
 
     The key will be used as the form data name; the value will be transmitted
     as content. If the value is a file, the contents of the file will be sent
@@ -326,8 +323,7 @@ class RequestFactory:
         return path.decode('iso-8859-1')
 
     def get(self, path, data=None, secure=False, **extra):
-        "Construct a GET request."
-
+        """Construct a GET request."""
         data = {} if data is None else data
         r = {
             'QUERY_STRING': urlencode(data, doseq=True),
@@ -337,8 +333,7 @@ class RequestFactory:
 
     def post(self, path, data=None, content_type=MULTIPART_CONTENT,
              secure=False, **extra):
-        "Construct a POST request."
-
+        """Construct a POST request."""
         data = {} if data is None else data
         post_data = self._encode_data(data, content_type)
 
@@ -346,8 +341,7 @@ class RequestFactory:
                             secure=secure, **extra)
 
     def head(self, path, data=None, secure=False, **extra):
-        "Construct a HEAD request."
-
+        """Construct a HEAD request."""
         data = {} if data is None else data
         r = {
             'QUERY_STRING': urlencode(data, doseq=True),
@@ -356,7 +350,7 @@ class RequestFactory:
         return self.generic('HEAD', path, secure=secure, **r)
 
     def trace(self, path, secure=False, **extra):
-        "Construct a TRACE request."
+        """Construct a TRACE request."""
         return self.generic('TRACE', path, secure=secure, **extra)
 
     def options(self, path, data='', content_type='application/octet-stream',
@@ -367,26 +361,26 @@ class RequestFactory:
 
     def put(self, path, data='', content_type='application/octet-stream',
             secure=False, **extra):
-        "Construct a PUT request."
+        """Construct a PUT request."""
         return self.generic('PUT', path, data, content_type,
                             secure=secure, **extra)
 
     def patch(self, path, data='', content_type='application/octet-stream',
               secure=False, **extra):
-        "Construct a PATCH request."
+        """Construct a PATCH request."""
         return self.generic('PATCH', path, data, content_type,
                             secure=secure, **extra)
 
     def delete(self, path, data='', content_type='application/octet-stream',
                secure=False, **extra):
-        "Construct a DELETE request."
+        """Construct a DELETE request."""
         return self.generic('DELETE', path, data, content_type,
                             secure=secure, **extra)
 
     def generic(self, method, path, data='',
                 content_type='application/octet-stream', secure=False,
                 **extra):
-        """Constructs an arbitrary HTTP request."""
+        """Construct an arbitrary HTTP request."""
         parsed = urlparse(str(path))  # path can be lazy
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         r = {
@@ -434,16 +428,12 @@ class Client(RequestFactory):
         self.exc_info = None
 
     def store_exc_info(self, **kwargs):
-        """
-        Stores exceptions when they are generated by a view.
-        """
+        """Store exceptions when they are generated by a view."""
         self.exc_info = sys.exc_info()
 
     @property
     def session(self):
-        """
-        Obtains the current session variables.
-        """
+        """Return the current session variables."""
         engine = import_module(settings.SESSION_ENGINE)
         cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
         if cookie:
@@ -456,10 +446,10 @@ class Client(RequestFactory):
 
     def request(self, **request):
         """
-        The master request method. Composes the environment dictionary
-        and passes to the handler, returning the result of the handler.
-        Assumes defaults for the query environment, which can be overridden
-        using the arguments to the request.
+        The master request method. Compose the environment dictionary and pass
+        to the handler, return the result of the handler. Assume defaults for
+        the query environment, which can be overridden using the arguments to
+        the request.
         """
         environ = self._base_environ(**request)
 
@@ -523,9 +513,7 @@ class Client(RequestFactory):
             got_request_exception.disconnect(dispatch_uid=exception_uid)
 
     def get(self, path, data=None, follow=False, secure=False, **extra):
-        """
-        Requests a response from the server using GET.
-        """
+        """Request a response from the server using GET."""
         response = super().get(path, data=data, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
@@ -533,18 +521,14 @@ class Client(RequestFactory):
 
     def post(self, path, data=None, content_type=MULTIPART_CONTENT,
              follow=False, secure=False, **extra):
-        """
-        Requests a response from the server using POST.
-        """
+        """Request a response from the server using POST."""
         response = super().post(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
 
     def head(self, path, data=None, follow=False, secure=False, **extra):
-        """
-        Request a response from the server using HEAD.
-        """
+        """Request a response from the server using HEAD."""
         response = super().head(path, data=data, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
@@ -552,9 +536,7 @@ class Client(RequestFactory):
 
     def options(self, path, data='', content_type='application/octet-stream',
                 follow=False, secure=False, **extra):
-        """
-        Request a response from the server using OPTIONS.
-        """
+        """Request a response from the server using OPTIONS."""
         response = super().options(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
@@ -562,9 +544,7 @@ class Client(RequestFactory):
 
     def put(self, path, data='', content_type='application/octet-stream',
             follow=False, secure=False, **extra):
-        """
-        Send a resource to the server using PUT.
-        """
+        """Send a resource to the server using PUT."""
         response = super().put(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
@@ -572,9 +552,7 @@ class Client(RequestFactory):
 
     def patch(self, path, data='', content_type='application/octet-stream',
               follow=False, secure=False, **extra):
-        """
-        Send a resource to the server using PATCH.
-        """
+        """Send a resource to the server using PATCH."""
         response = super().patch(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
@@ -582,18 +560,14 @@ class Client(RequestFactory):
 
     def delete(self, path, data='', content_type='application/octet-stream',
                follow=False, secure=False, **extra):
-        """
-        Send a DELETE request to the server.
-        """
+        """Send a DELETE request to the server."""
         response = super().delete(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
 
     def trace(self, path, data='', follow=False, secure=False, **extra):
-        """
-        Send a TRACE request to the server.
-        """
+        """Send a TRACE request to the server."""
         response = super().trace(path, data=data, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
@@ -601,9 +575,9 @@ class Client(RequestFactory):
 
     def login(self, **credentials):
         """
-        Sets the Factory to appear as if it has successfully logged into a site.
+        Set the Factory to appear as if it has successfully logged into a site.
 
-        Returns True if login is possible; False if the provided credentials
+        Return True if login is possible; False if the provided credentials
         are incorrect.
         """
         from django.contrib.auth import authenticate
@@ -655,11 +629,7 @@ class Client(RequestFactory):
         self.cookies[session_cookie].update(cookie_data)
 
     def logout(self):
-        """
-        Removes the authenticated user's cookies and session object.
-
-        Causes the authenticated user to be logged out.
-        """
+        """Log out the user by removing the cookies and session object."""
         from django.contrib.auth import get_user, logout
 
         request = HttpRequest()
@@ -683,8 +653,9 @@ class Client(RequestFactory):
         return response._json
 
     def _handle_redirects(self, response, **extra):
-        "Follows any redirects by requesting responses from the server using GET."
-
+        """
+        Follow any redirects by requesting responses from the server using GET.
+        """
         response.redirect_chain = []
         while response.status_code in (301, 302, 303, 307):
             response_url = response.url

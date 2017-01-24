@@ -55,7 +55,8 @@ class Approximate:
 
 
 class ContextList(list):
-    """A wrapper that provides direct key access to context items contained
+    """
+    A wrapper that provides direct key access to context items contained
     in a list of context objects.
     """
     def __getitem__(self, key):
@@ -93,8 +94,8 @@ class ContextList(list):
 
 def instrumented_test_render(self, context):
     """
-    An instrumented Template render method, providing a signal
-    that can be intercepted by the test system Client
+    An instrumented Template render method, providing a signal that can be
+    intercepted by the test Client.
     """
     template_rendered.send(sender=self, template=self, context=context)
     return self.nodelist.render(context)
@@ -157,9 +158,7 @@ def teardown_test_environment():
 
 
 def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, **kwargs):
-    """
-    Create the test databases.
-    """
+    """Create the test databases."""
     test_databases, mirrored_aliases = get_unique_databases_and_mirrors()
 
     old_names = []
@@ -290,9 +289,7 @@ def get_unique_databases_and_mirrors():
 
 
 def teardown_databases(old_config, verbosity, parallel=0, keepdb=False):
-    """
-    Destroy all the non-mirror databases.
-    """
+    """Destroy all the non-mirror databases."""
     for connection, old_name, destroy in old_config:
         if destroy:
             if parallel > 1:
@@ -387,10 +384,10 @@ class TestContextDecorator:
 
 class override_settings(TestContextDecorator):
     """
-    Acts as either a decorator or a context manager. If it's a decorator it
-    takes a function and returns a wrapped function. If it's a contextmanager
-    it's used with the ``with`` statement. In either event entering/exiting
-    are called before and after, respectively, the function/block is executed.
+    Act as either a decorator or a context manager. If it's a decorator, take a
+    function and return a wrapped function. If it's a contextmanager, use it
+    with the ``with`` statement. In either event, entering/exiting are called
+    before and after, respectively, the function/block is executed.
     """
     def __init__(self, **kwargs):
         self.options = kwargs
@@ -444,7 +441,7 @@ class override_settings(TestContextDecorator):
 
 class modify_settings(override_settings):
     """
-    Like override_settings, but makes it possible to append, prepend or remove
+    Like override_settings, but makes it possible to append, prepend, or remove
     items instead of redefining the entire list.
     """
     def __init__(self, *args, **kwargs):
@@ -492,7 +489,7 @@ class modify_settings(override_settings):
 
 class override_system_checks(TestContextDecorator):
     """
-    Acts as a decorator. Overrides list of registered system checks.
+    Act as a decorator. Override list of registered system checks.
     Useful when you override `INSTALLED_APPS`, e.g. if you exclude `auth` app,
     you also need to exclude its system checks.
     """
@@ -516,10 +513,10 @@ class override_system_checks(TestContextDecorator):
 
 
 def compare_xml(want, got):
-    """Tries to do a 'xml-comparison' of want and got.  Plain string
-    comparison doesn't always work because, for example, attribute
-    ordering should not be important. Comment nodes are not considered in the
-    comparison. Leading and trailing whitespace is ignored on both chunks.
+    """
+    Try to do a 'xml-comparison' of want and got. Plain string comparison
+    doesn't always work because, for example, attribute ordering should not be
+    important. Ignore comment nodes and leading and trailing whitespace.
 
     Based on https://github.com/lxml/lxml/blob/master/src/lxml/doctestcompare.py
     """
@@ -794,9 +791,7 @@ def require_jinja2(test_func):
 
 
 class override_script_prefix(TestContextDecorator):
-    """
-    Decorator or context manager to temporary override the script prefix.
-    """
+    """Decorator or context manager to temporary override the script prefix."""
     def __init__(self, prefix):
         self.prefix = prefix
         super().__init__()
@@ -840,7 +835,6 @@ class isolate_apps(TestContextDecorator):
     `kwarg_name`: keyword argument passing the isolated registry if used as a
                   function decorator.
     """
-
     def __init__(self, *installed_apps, **kwargs):
         self.installed_apps = installed_apps
         super().__init__(**kwargs)
@@ -856,9 +850,7 @@ class isolate_apps(TestContextDecorator):
 
 
 def tag(*tags):
-    """
-    Decorator to add tags to a test class or method.
-    """
+    """Decorator to add tags to a test class or method."""
     def decorator(obj):
         setattr(obj, 'tags', set(tags))
         return obj

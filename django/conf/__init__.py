@@ -1,9 +1,9 @@
 """
 Settings and configuration for Django.
 
-Values will be read from the module specified by the DJANGO_SETTINGS_MODULE environment
-variable, and then from django.conf.global_settings; see the global settings file for
-a list of all possible variables.
+Read values from the module specified by the DJANGO_SETTINGS_MODULE environment
+variable, and then from django.conf.global_settings; see the global_settings.py
+for a list of all possible variables.
 """
 
 import importlib
@@ -28,8 +28,8 @@ class LazySettings(LazyObject):
     def _setup(self, name=None):
         """
         Load the settings module pointed to by the environment variable. This
-        is used the first time we need any settings at all, if the user has not
-        previously configured the settings manually.
+        is used the first time settings are needed, if the user hasn't
+        configured settings manually.
         """
         settings_module = os.environ.get(ENVIRONMENT_VARIABLE)
         if not settings_module:
@@ -51,9 +51,7 @@ class LazySettings(LazyObject):
         }
 
     def __getattr__(self, name):
-        """
-        Return the value of a setting and cache it in self.__dict__.
-        """
+        """Return the value of a setting and cache it in self.__dict__."""
         if self._wrapped is empty:
             self._setup(name)
         val = getattr(self._wrapped, name)
@@ -72,9 +70,7 @@ class LazySettings(LazyObject):
         super().__setattr__(name, value)
 
     def __delattr__(self, name):
-        """
-        Delete a setting and clear it from cache if needed.
-        """
+        """Delete a setting and clear it from cache if needed."""
         super().__delattr__(name)
         self.__dict__.pop(name, None)
 
@@ -93,9 +89,7 @@ class LazySettings(LazyObject):
 
     @property
     def configured(self):
-        """
-        Returns True if the settings have already been configured.
-        """
+        """Return True if the settings have already been configured."""
         return self._wrapped is not empty
 
 
@@ -156,9 +150,7 @@ class Settings:
 
 
 class UserSettingsHolder:
-    """
-    Holder for user configured settings.
-    """
+    """Holder for user configured settings."""
     # SETTINGS_MODULE doesn't make much sense in the manually configured
     # (standalone) case.
     SETTINGS_MODULE = None

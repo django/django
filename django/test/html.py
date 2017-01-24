@@ -1,6 +1,4 @@
-"""
-Comparing two html documents.
-"""
+"""Compare two HTML documents."""
 
 import re
 
@@ -214,7 +212,7 @@ class Parser(HTMLParser):
 
 def parse_html(html):
     """
-    Takes a string that contains *valid* HTML and turns it into a Python object
+    Take a string that contains *valid* HTML and turn it into a Python object
     structure that can be easily compared against other HTML on semantic
     equivalence. Syntactical differences like which quotation is used on
     arguments will be ignored.

@@ -17,17 +17,16 @@ class CommonMiddleware(MiddlewareMixin):
     """
     "Common" middleware for taking care of some basic operations:
 
-        - Forbids access to User-Agents in settings.DISALLOWED_USER_AGENTS
+        - Forbid access to User-Agents in settings.DISALLOWED_USER_AGENTS
 
         - URL rewriting: Based on the APPEND_SLASH and PREPEND_WWW settings,
-          this middleware appends missing slashes and/or prepends missing
-          "www."s.
+          append missing slashes and/or prepends missing "www."s.
 
             - If APPEND_SLASH is set and the initial URL doesn't end with a
-              slash, and it is not found in urlpatterns, a new URL is formed by
+              slash, and it is not found in urlpatterns, form a new URL by
               appending a slash at the end. If this new URL is found in
-              urlpatterns, then an HTTP-redirect is returned to this new URL;
-              otherwise the initial URL is processed as usual.
+              urlpatterns, return an HTTP redirect to this new URL; otherwise
+              process the initial URL as usual.
 
           This behavior can be customized by subclassing CommonMiddleware and
           overriding the response_redirect_class attribute.
@@ -140,9 +139,7 @@ class CommonMiddleware(MiddlewareMixin):
         return response
 
     def needs_etag(self, response):
-        """
-        Return True if an ETag header should be added to response.
-        """
+        """Return True if an ETag header should be added to response."""
         cache_control_headers = cc_delim_re.split(response.get('Cache-Control', ''))
         return all(header.lower() != 'no-store' for header in cache_control_headers)
 
@@ -150,9 +147,7 @@ class CommonMiddleware(MiddlewareMixin):
 class BrokenLinkEmailsMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
-        """
-        Send broken link emails for relevant 404 NOT FOUND responses.
-        """
+        """Send broken link emails for relevant 404 NOT FOUND responses."""
         if response.status_code == 404 and not settings.DEBUG:
             domain = request.get_host()
             path = request.get_full_path()
@@ -173,7 +168,8 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
 
     def is_internal_request(self, domain, referer):
         """
-        Returns True if the referring URL is the same domain as the current request.
+        Return True if the referring URL is the same domain as the current
+        request.
         """
         # Different subdomains are treated as different domains.
         return bool(re.match("^https?://%s/" % re.escape(domain), referer))
