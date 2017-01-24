@@ -16,7 +16,6 @@ from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, override_settings,
 )
 from django.test.utils import captured_stdout, isolate_apps
-from django.utils.encoding import force_text
 
 from .models import (
     Article, Author, ModelWithNullFKToSite, Post, SchemeIncludedURL,
@@ -134,7 +133,7 @@ class ContentTypesViewsTests(TestCase):
         ct = ContentType.objects.get_for_model(ModelCreatedOnTheFly)
         self.assertEqual(ct.app_label, 'my_great_app')
         self.assertEqual(ct.model, 'modelcreatedonthefly')
-        self.assertEqual(force_text(ct), 'modelcreatedonthefly')
+        self.assertEqual(str(ct), 'modelcreatedonthefly')
 
 
 @override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342'])  # ForeignKey(unique=True)
@@ -144,9 +143,7 @@ class GenericForeignKeyTests(SimpleTestCase):
     def test_str(self):
         class Model(models.Model):
             field = GenericForeignKey()
-        expected = "contenttypes_tests.Model.field"
-        actual = force_text(Model.field)
-        self.assertEqual(expected, actual)
+        self.assertEqual(str(Model.field), "contenttypes_tests.Model.field")
 
     def test_missing_content_type_field(self):
         class TaggedItem(models.Model):

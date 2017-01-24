@@ -15,7 +15,6 @@ from django.core.management.commands.dumpdata import ProxyModelWarning
 from django.core.serializers.base import ProgressBar
 from django.db import IntegrityError, connection
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
-from django.utils.encoding import force_text
 
 from .models import (
     Article, Category, PrimaryKeyUUIDModel, ProxySpy, Spy, Tag, Visa,
@@ -584,7 +583,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
     def test_loaddata_verbosity_three(self):
         output = StringIO()
         management.call_command('loaddata', 'fixture1.json', verbosity=3, stdout=output, stderr=output)
-        command_output = force_text(output.getvalue())
+        command_output = output.getvalue()
         self.assertIn(
             "\rProcessed 1 object(s).\rProcessed 2 object(s)."
             "\rProcessed 3 object(s).\rProcessed 4 object(s).\n",

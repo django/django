@@ -7,7 +7,6 @@ from django.conf import settings
 from django.core.management import call_command
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
-from django.utils.encoding import force_text
 
 from .settings import TEST_SETTINGS
 
@@ -20,7 +19,7 @@ class BaseStaticFilesMixin:
     def assertFileContains(self, filepath, text):
         self.assertIn(
             text,
-            self._get_file(force_text(filepath)),
+            self._get_file(filepath),
             "'%s' not in '%s'" % (text, filepath),
         )
 

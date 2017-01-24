@@ -14,7 +14,6 @@ from django.http import QueryDict
 from django.test import TestCase, override_settings
 from django.test.utils import ignore_warnings, patch_logger
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_text
 
 from .models import CustomUser, UUIDUser
 from .settings import AUTH_TEMPLATES
@@ -52,7 +51,7 @@ class AuthViewsTestCase(TestCase):
     def assertFormError(self, response, error):
         """Assert that error is found in response.context['form'] errors"""
         form_errors = list(itertools.chain(*response.context['form'].errors.values()))
-        self.assertIn(force_text(error), form_errors)
+        self.assertIn(str(error), form_errors)
 
     def assertURLEqual(self, url, expected, parse_qs=False):
         """

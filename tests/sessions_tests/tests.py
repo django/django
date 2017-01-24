@@ -33,7 +33,6 @@ from django.test import (
 )
 from django.test.utils import patch_logger
 from django.utils import timezone
-from django.utils.encoding import force_text
 
 from .models import SessionStore as CustomDatabaseSession
 
@@ -388,7 +387,7 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         session_key = self.session.session_key
         s = self.model.objects.get(session_key=session_key)
 
-        self.assertEqual(force_text(s), session_key)
+        self.assertEqual(str(s), session_key)
 
     def test_session_get_decoded(self):
         """

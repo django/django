@@ -2,7 +2,6 @@ import os
 
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
-from django.utils.encoding import force_text
 from django.utils.translation import activate, get_language, trans_real
 
 from .utils import POFileAssertionMixin
@@ -40,7 +39,7 @@ class ExtractingStringsWithPercentSigns(POFileAssertionMixin, FrenchTestCase):
     def setUp(self):
         super(ExtractingStringsWithPercentSigns, self).setUp()
         with open(self.PO_FILE, 'r') as fp:
-            self.po_contents = force_text(fp.read())
+            self.po_contents = fp.read()
 
     def test_trans_tag_with_percent_symbol_at_the_end(self):
         self.assertMsgId('Literal with a percent symbol at the end %%', self.po_contents)

@@ -20,7 +20,6 @@ from django.http import QueryDict
 from django.template import Context, Template
 from django.test import SimpleTestCase
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 
 
@@ -3361,7 +3360,7 @@ Good luck picking a username that doesn&#39;t already exist.</p>
                 if not self:
                     return ''
                 return '<div class="errorlist">%s</div>' % ''.join(
-                    '<div class="error">%s</div>' % force_text(e) for e in self)
+                    '<div class="error">%s</div>' % e for e in self)
 
         class CommentForm(Form):
             name = CharField(max_length=50, required=False)
@@ -3471,9 +3470,9 @@ Good luck picking a username that doesn&#39;t already exist.</p>
 
         form = SimpleForm()
         self.assertTrue(hasattr(SimpleForm, '__html__'))
-        self.assertEqual(force_text(form), form.__html__())
+        self.assertEqual(str(form), form.__html__())
         self.assertTrue(hasattr(form['username'], '__html__'))
-        self.assertEqual(force_text(form['username']), form['username'].__html__())
+        self.assertEqual(str(form['username']), form['username'].__html__())
 
     def test_use_required_attribute_true(self):
         class MyForm(Form):

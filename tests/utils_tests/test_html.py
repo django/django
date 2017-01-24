@@ -3,7 +3,6 @@ from datetime import datetime
 
 from django.test import SimpleTestCase
 from django.utils import html, safestring
-from django.utils.encoding import force_text
 from django.utils.functional import lazystr
 
 
@@ -99,7 +98,7 @@ class TestUtilsHtml(SimpleTestCase):
         for filename in ('strip_tags1.html', 'strip_tags2.txt'):
             path = os.path.join(os.path.dirname(__file__), 'files', filename)
             with open(path, 'r') as fp:
-                content = force_text(fp.read())
+                content = fp.read()
                 start = datetime.now()
                 stripped = html.strip_tags(content)
                 elapsed = datetime.now() - start
@@ -173,7 +172,7 @@ class TestUtilsHtml(SimpleTestCase):
         html_obj = HtmlClass()
         self.assertTrue(hasattr(HtmlClass, '__html__'))
         self.assertTrue(hasattr(html_obj, '__html__'))
-        self.assertEqual(force_text(html_obj), html_obj.__html__())
+        self.assertEqual(str(html_obj), html_obj.__html__())
 
     def test_html_safe_subclass(self):
         class BaseClass:
@@ -191,7 +190,7 @@ class TestUtilsHtml(SimpleTestCase):
                 return 'some html safe content'
 
         subclass_obj = Subclass()
-        self.assertEqual(force_text(subclass_obj), subclass_obj.__html__())
+        self.assertEqual(str(subclass_obj), subclass_obj.__html__())
 
     def test_html_safe_defines_html_error(self):
         msg = "can't apply @html_safe to HtmlClass because it defines __html__()."

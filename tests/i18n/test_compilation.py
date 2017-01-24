@@ -15,7 +15,6 @@ from django.core.management.utils import find_command
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils import translation
-from django.utils.encoding import force_text
 from django.utils.translation import ugettext
 
 from .utils import RunInTmpDirMixin, copytree
@@ -49,7 +48,7 @@ class PoFileTests(MessageCompilationTests):
         try:
             call_command('compilemessages', locale=['en'], stderr=err_buffer, verbosity=0)
             err = err_buffer.getvalue()
-            self.assertIn("not writable location", force_text(err))
+            self.assertIn("not writable location", err)
         finally:
             os.chmod(mo_file_en, old_mode)
 
@@ -168,15 +167,15 @@ class FuzzyTranslationTest(ProjectAndAppTests):
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
             call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
             with translation.override(self.LOCALE):
-                self.assertEqual(ugettext('Lenin'), force_text('Ленин'))
-                self.assertEqual(ugettext('Vodka'), force_text('Vodka'))
+                self.assertEqual(ugettext('Lenin'), 'Ленин')
+                self.assertEqual(ugettext('Vodka'), 'Vodka')
 
     def test_fuzzy_compiling(self):
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
             call_command('compilemessages', locale=[self.LOCALE], fuzzy=True, stdout=StringIO())
             with translation.override(self.LOCALE):
-                self.assertEqual(ugettext('Lenin'), force_text('Ленин'))
-                self.assertEqual(ugettext('Vodka'), force_text('Водка'))
+                self.assertEqual(ugettext('Lenin'), 'Ленин')
+                self.assertEqual(ugettext('Vodka'), 'Водка')
 
 
 class AppCompilationTest(ProjectAndAppTests):

@@ -68,7 +68,7 @@ class AuthViewsTestCase(TestCase):
     def assertFormError(self, response, error):
         """Assert that error is found in response.context['form'] errors"""
         form_errors = list(itertools.chain(*response.context['form'].errors.values()))
-        self.assertIn(force_text(error), form_errors)
+        self.assertIn(str(error), form_errors)
 
     def assertURLEqual(self, url, expected, parse_qs=False):
         """

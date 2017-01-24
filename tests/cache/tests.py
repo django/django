@@ -41,7 +41,6 @@ from django.utils.cache import (
     patch_response_headers, patch_vary_headers,
 )
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_text
 from django.views.decorators.cache import cache_page
 
 from .models import Poll, expensive_calculation
@@ -1789,7 +1788,7 @@ class CacheI18nTest(TestCase):
         request = self.factory.get(self.path)
         # This is tightly coupled to the implementation,
         # but it's the most straightforward way to test the key.
-        tz = force_text(timezone.get_current_timezone_name(), errors='ignore')
+        tz = timezone.get_current_timezone_name()
         tz = tz.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
         response = HttpResponse()
         key = learn_cache_key(request, response)
@@ -1801,7 +1800,7 @@ class CacheI18nTest(TestCase):
     def test_cache_key_no_i18n(self):
         request = self.factory.get(self.path)
         lang = translation.get_language()
-        tz = force_text(timezone.get_current_timezone_name(), errors='ignore')
+        tz = timezone.get_current_timezone_name()
         tz = tz.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
         response = HttpResponse()
         key = learn_cache_key(request, response)

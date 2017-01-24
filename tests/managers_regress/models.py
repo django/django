@@ -7,7 +7,6 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import force_text
 
 
 class OnlyFred(models.Manager):
@@ -123,7 +122,7 @@ class RelatedModel(models.Model):
     exact = models.NullBooleanField()
 
     def __str__(self):
-        return force_text(self.pk)
+        return str(self.pk)
 
 
 class RelationModel(models.Model):
@@ -136,4 +135,4 @@ class RelationModel(models.Model):
     gfk = GenericForeignKey(ct_field='gfk_ctype', fk_field='gfk_id')
 
     def __str__(self):
-        return force_text(self.pk)
+        return str(self.pk)

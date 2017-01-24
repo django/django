@@ -2,7 +2,6 @@ from django.db import models
 from django.template import Context, Template
 from django.test import TestCase, override_settings
 from django.test.utils import isolate_apps
-from django.utils.encoding import force_text
 
 from .models import (
     AbstractBase1, AbstractBase2, AbstractBase3, Child1, Child2, Child3,
@@ -148,7 +147,7 @@ class ManagersRegressionTests(TestCase):
 
         self.assertEqual(
             t.render(Context({'related': related})),
-            ''.join([force_text(relation.pk)] * 3),
+            ''.join([str(relation.pk)] * 3),
         )
 
     def test_field_can_be_called_exact(self):

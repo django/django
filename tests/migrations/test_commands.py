@@ -16,7 +16,6 @@ from django.db.migrations.exceptions import (
 )
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import override_settings
-from django.utils.encoding import force_text
 
 from .models import UnicodeModel, UnserializableModel
 from .routers import TestRouter
@@ -649,7 +648,7 @@ class MakeMigrationsTests(MigrationTestBase):
             self.assertTrue(os.path.exists(init_file))
 
             with open(init_file, 'r') as fp:
-                content = force_text(fp.read())
+                content = fp.read()
             self.assertEqual(content, '')
 
             # Check for existing 0001_initial.py file in migration folder

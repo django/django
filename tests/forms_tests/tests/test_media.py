@@ -1,7 +1,6 @@
 from django.forms import CharField, Form, Media, MultiWidget, TextInput
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
-from django.utils.encoding import force_text
 
 
 @override_settings(
@@ -518,4 +517,4 @@ class FormsMediaTestCase(SimpleTestCase):
     def test_html_safe(self):
         media = Media(css={'all': ['/path/to/css']}, js=['/path/to/js'])
         self.assertTrue(hasattr(Media, '__html__'))
-        self.assertEqual(force_text(media), media.__html__())
+        self.assertEqual(str(media), media.__html__())

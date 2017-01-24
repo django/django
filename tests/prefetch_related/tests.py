@@ -5,7 +5,6 @@ from django.db.models import Prefetch, QuerySet
 from django.db.models.query import get_prefetcher
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
-from django.utils.encoding import force_text
 
 from .models import (
     Author, Author2, AuthorAddress, AuthorWithAge, Bio, Book, Bookmark,
@@ -1260,7 +1259,7 @@ class Ticket21760Tests(TestCase):
     def test_bug(self):
         prefetcher = get_prefetcher(self.rooms[0], 'house', 'house')[0]
         queryset = prefetcher.get_prefetch_queryset(list(Room.objects.all()))[0]
-        self.assertNotIn(' JOIN ', force_text(queryset.query))
+        self.assertNotIn(' JOIN ', str(queryset.query))
 
 
 class Ticket25546Tests(TestCase):

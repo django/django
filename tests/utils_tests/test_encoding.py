@@ -24,7 +24,7 @@ class TestEncodingUtils(unittest.TestCase):
 
     def test_force_text_lazy(self):
         s = SimpleLazyObject(lambda: 'x')
-        self.assertTrue(issubclass(type(force_text(s)), str))
+        self.assertTrue(type(force_text(s)), str)
 
     def test_force_bytes_exception(self):
         """

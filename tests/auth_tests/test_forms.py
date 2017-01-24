@@ -16,7 +16,6 @@ from django.core.mail import EmailMultiAlternatives
 from django.forms.fields import CharField, Field, IntegerField
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import translation
-from django.utils.encoding import force_text
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 
@@ -51,7 +50,7 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["username"].errors,
-                         [force_text(User._meta.get_field('username').error_messages['unique'])])
+                         [str(User._meta.get_field('username').error_messages['unique'])])
 
     def test_invalid_data(self):
         data = {
@@ -62,7 +61,7 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         validator = next(v for v in User._meta.get_field('username').validators if v.code == 'invalid')
-        self.assertEqual(form["username"].errors, [force_text(validator.message)])
+        self.assertEqual(form["username"].errors, [str(validator.message)])
 
     def test_password_verification(self):
         # The verification password is incorrect.
@@ -74,13 +73,13 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form["password2"].errors,
-                         [force_text(form.error_messages['password_mismatch'])])
+                         [str(form.error_messages['password_mismatch'])])
 
     def test_both_passwords(self):
         # One (or both) passwords weren't given
         data = {'username': 'jsmith'}
         form = UserCreationForm(data)
-        required_error = [force_text(Field.default_error_messages['required'])]
+        required_error = [str(Field.default_error_messages['required'])]
         self.assertFalse(form.is_valid())
         self.assertEqual(form['password1'].errors, required_error)
         self.assertEqual(form['password2'].errors, required_error)
@@ -257,9 +256,9 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.non_field_errors(), [
-                force_text(form.error_messages['invalid_login'] % {
+                form.error_messages['invalid_login'] % {
                     'username': User._meta.get_field('username').verbose_name
-                })
+                }
             ]
         )
 
@@ -271,7 +270,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         }
         form = AuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.non_field_errors(), [force_text(form.error_messages['inactive'])])
+        self.assertEqual(form.non_field_errors(), [str(form.error_messages['inactive'])])
 
     def test_login_failed(self):
         signal_calls = []
@@ -300,7 +299,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
             }
             form = AuthenticationForm(None, data)
             self.assertFalse(form.is_valid())
-            self.assertEqual(form.non_field_errors(), [force_text(form.error_messages['inactive'])])
+            self.assertEqual(form.non_field_errors(), [str(form.error_messages['inactive'])])
 
     def test_custom_login_allowed_policy(self):
         # The user is inactive, but our custom form policy allows them to log in.
@@ -421,7 +420,7 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form["new_password2"].errors,
-            [force_text(form.error_messages['password_mismatch'])]
+            [str(form.error_messages['password_mismatch'])]
         )
 
     @mock.patch('django.contrib.auth.password_validation.password_changed')
@@ -499,7 +498,7 @@ class PasswordChangeFormTest(TestDataMixin, TestCase):
         }
         form = PasswordChangeForm(user, data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form["old_password"].errors, [force_text(form.error_messages['password_incorrect'])])
+        self.assertEqual(form["old_password"].errors, [str(form.error_messages['password_incorrect'])])
 
     def test_password_verification(self):
         # The two new passwords do not match.
@@ -511,7 +510,7 @@ class PasswordChangeFormTest(TestDataMixin, TestCase):
         }
         form = PasswordChangeForm(user, data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form["new_password2"].errors, [force_text(form.error_messages['password_mismatch'])])
+        self.assertEqual(form["new_password2"].errors, [str(form.error_messages['password_mismatch'])])
 
     @mock.patch('django.contrib.auth.password_validation.password_changed')
     def test_success(self, password_changed):
@@ -557,7 +556,7 @@ class UserChangeFormTest(TestDataMixin, TestCase):
         form = UserChangeForm(data, instance=user)
         self.assertFalse(form.is_valid())
         validator = next(v for v in User._meta.get_field('username').validators if v.code == 'invalid')
-        self.assertEqual(form["username"].errors, [force_text(validator.message)])
+        self.assertEqual(form["username"].errors, [str(validator.message)])
 
     def test_bug_14242(self):
         # A regression test, introduce by adding an optimization for the

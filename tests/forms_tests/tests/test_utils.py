@@ -3,7 +3,6 @@ import copy
 from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorDict, ErrorList, flatatt
 from django.test import SimpleTestCase
-from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy
 
@@ -158,9 +157,9 @@ class FormsUtilsTestCase(SimpleTestCase):
         e = ErrorDict()
         e['username'] = 'Invalid username.'
         self.assertTrue(hasattr(ErrorDict, '__html__'))
-        self.assertEqual(force_text(e), e.__html__())
+        self.assertEqual(str(e), e.__html__())
 
     def test_error_list_html_safe(self):
         e = ErrorList(['Invalid username.'])
         self.assertTrue(hasattr(ErrorList, '__html__'))
-        self.assertEqual(force_text(e), e.__html__())
+        self.assertEqual(str(e), e.__html__())

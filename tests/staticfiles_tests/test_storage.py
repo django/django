@@ -12,7 +12,6 @@ from django.contrib.staticfiles.management.commands.collectstatic import \
 from django.core.cache.backends.base import BaseCache
 from django.core.management import call_command
 from django.test import override_settings
-from django.utils.encoding import force_text
 
 from .cases import CollectionTestCase
 from .settings import TEST_ROOT
@@ -380,7 +379,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         manifest_content = storage.staticfiles_storage.read_manifest()
         self.assertIn(
             '"version": "%s"' % storage.staticfiles_storage.manifest_version,
-            force_text(manifest_content)
+            manifest_content
         )
 
     def test_parse_cache(self):

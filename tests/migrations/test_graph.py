@@ -5,7 +5,6 @@ from django.db.migrations.exceptions import (
 )
 from django.db.migrations.graph import RECURSION_DEPTH_WARNING, MigrationGraph
 from django.test import SimpleTestCase
-from django.utils.encoding import force_text
 
 
 class GraphTests(SimpleTestCase):
@@ -395,7 +394,7 @@ class GraphTests(SimpleTestCase):
 
     def test_stringify(self):
         graph = MigrationGraph()
-        self.assertEqual(force_text(graph), "Graph: 0 nodes, 0 edges")
+        self.assertEqual(str(graph), "Graph: 0 nodes, 0 edges")
 
         graph.add_node(("app_a", "0001"), None)
         graph.add_node(("app_a", "0002"), None)
@@ -406,5 +405,5 @@ class GraphTests(SimpleTestCase):
         graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_a", "0002"))
         graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_b", "0002"))
 
-        self.assertEqual(force_text(graph), "Graph: 5 nodes, 3 edges")
+        self.assertEqual(str(graph), "Graph: 5 nodes, 3 edges")
         self.assertEqual(repr(graph), "<MigrationGraph: nodes=5, edges=3>")

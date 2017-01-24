@@ -14,7 +14,7 @@ from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.urls import reverse
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
 from django.views.debug import (
     CLEANSED_SUBSTITUTE, CallableSettingWrapper, ExceptionReporter,
@@ -740,14 +740,14 @@ class ExceptionReportTestMixin:
             email = mail.outbox[0]
 
             # Frames vars are never shown in plain text email reports.
-            body_plain = force_text(email.body)
+            body_plain = str(email.body)
             self.assertNotIn('cooked_eggs', body_plain)
             self.assertNotIn('scrambled', body_plain)
             self.assertNotIn('sauce', body_plain)
             self.assertNotIn('worcestershire', body_plain)
 
             # Frames vars are shown in html email reports.
-            body_html = force_text(email.alternatives[0][0])
+            body_html = str(email.alternatives[0][0])
             self.assertIn('cooked_eggs', body_html)
             self.assertIn('scrambled', body_html)
             self.assertIn('sauce', body_html)
@@ -773,14 +773,14 @@ class ExceptionReportTestMixin:
             email = mail.outbox[0]
 
             # Frames vars are never shown in plain text email reports.
-            body_plain = force_text(email.body)
+            body_plain = str(email.body)
             self.assertNotIn('cooked_eggs', body_plain)
             self.assertNotIn('scrambled', body_plain)
             self.assertNotIn('sauce', body_plain)
             self.assertNotIn('worcestershire', body_plain)
 
             # Frames vars are shown in html email reports.
-            body_html = force_text(email.alternatives[0][0])
+            body_html = str(email.alternatives[0][0])
             self.assertIn('cooked_eggs', body_html)
             self.assertIn('scrambled', body_html)
             self.assertIn('sauce', body_html)
@@ -812,7 +812,7 @@ class ExceptionReportTestMixin:
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
             # Frames vars are never shown in plain text email reports.
-            body = force_text(email.body)
+            body = str(email.body)
             self.assertNotIn('cooked_eggs', body)
             self.assertNotIn('scrambled', body)
             self.assertNotIn('sauce', body)

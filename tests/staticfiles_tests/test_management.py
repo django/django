@@ -18,7 +18,6 @@ from django.test import override_settings
 from django.test.utils import extend_sys_path
 from django.utils import timezone
 from django.utils._os import symlinks_supported
-from django.utils.encoding import force_text
 from django.utils.functional import empty
 
 from .cases import CollectionTestCase, StaticFilesTestCase, TestDefaults
@@ -41,7 +40,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
     """
     def _get_file(self, filepath):
         path = call_command('findstatic', filepath, all=False, verbosity=0, stdout=StringIO())
-        with codecs.open(force_text(path), "r", "utf-8") as f:
+        with codecs.open(path, "r", "utf-8") as f:
             return f.read()
 
     def test_all_files(self):
@@ -51,8 +50,8 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
         result = call_command('findstatic', 'test/file.txt', verbosity=1, stdout=StringIO())
         lines = [l.strip() for l in result.split('\n')]
         self.assertEqual(len(lines), 3)  # three because there is also the "Found <file> here" line
-        self.assertIn('project', force_text(lines[1]))
-        self.assertIn('apps', force_text(lines[2]))
+        self.assertIn('project', lines[1])
+        self.assertIn('apps', lines[2])
 
     def test_all_files_less_verbose(self):
         """
@@ -61,8 +60,8 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
         result = call_command('findstatic', 'test/file.txt', verbosity=0, stdout=StringIO())
         lines = [l.strip() for l in result.split('\n')]
         self.assertEqual(len(lines), 2)
-        self.assertIn('project', force_text(lines[0]))
-        self.assertIn('apps', force_text(lines[1]))
+        self.assertIn('project', lines[0])
+        self.assertIn('apps', lines[1])
 
     def test_all_files_more_verbose(self):
         """
@@ -71,10 +70,10 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
         """
         result = call_command('findstatic', 'test/file.txt', verbosity=2, stdout=StringIO())
         lines = [l.strip() for l in result.split('\n')]
-        self.assertIn('project', force_text(lines[1]))
-        self.assertIn('apps', force_text(lines[2]))
-        self.assertIn("Looking in the following locations:", force_text(lines[3]))
-        searched_locations = ', '.join(force_text(x) for x in lines[4:])
+        self.assertIn('project', lines[1])
+        self.assertIn('apps', lines[2])
+        self.assertIn("Looking in the following locations:", lines[3])
+        searched_locations = ', '.join(lines[4:])
         # AppDirectoriesFinder searched locations
         self.assertIn(os.path.join('staticfiles_tests', 'apps', 'test', 'static'), searched_locations)
         self.assertIn(os.path.join('staticfiles_tests', 'apps', 'no_label', 'static'), searched_locations)
@@ -195,7 +194,7 @@ class TestInteractiveMessages(CollectionTestCase):
         with mock.patch('builtins.input', side_effect=self.mock_input(stdout)):
             call_command('collectstatic', interactive=True, clear=True, stdout=stdout)
 
-        output = force_text(stdout.getvalue())
+        output = stdout.getvalue()
         self.assertNotIn(self.overwrite_warning_msg, output)
         self.assertIn(self.delete_warning_msg, output)
 
@@ -204,7 +203,7 @@ class TestInteractiveMessages(CollectionTestCase):
         self.run_collectstatic()
         with mock.patch('builtins.input', side_effect=self.mock_input(stdout)):
             call_command('collectstatic', interactive=True, stdout=stdout)
-        output = force_text(stdout.getvalue())
+        output = stdout.getvalue()
         self.assertIn(self.overwrite_warning_msg, output)
         self.assertNotIn(self.delete_warning_msg, output)
 
@@ -212,7 +211,7 @@ class TestInteractiveMessages(CollectionTestCase):
         stdout = StringIO()
         shutil.rmtree(settings.STATIC_ROOT)
         call_command('collectstatic', interactive=True, stdout=stdout)
-        output = force_text(stdout.getvalue())
+        output = stdout.getvalue()
         self.assertNotIn(self.overwrite_warning_msg, output)
         self.assertNotIn(self.delete_warning_msg, output)
         self.assertIn(self.files_copied_msg, output)
@@ -223,7 +222,7 @@ class TestInteractiveMessages(CollectionTestCase):
         with override_settings(STATIC_ROOT=static_dir):
             call_command('collectstatic', interactive=True, stdout=stdout)
         shutil.rmtree(static_dir)
-        output = force_text(stdout.getvalue())
+        output = stdout.getvalue()
         self.assertNotIn(self.overwrite_warning_msg, output)
         self.assertNotIn(self.delete_warning_msg, output)
         self.assertIn(self.files_copied_msg, output)
@@ -349,7 +348,7 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
         """
         out = StringIO()
         call_command('collectstatic', interactive=False, verbosity=3, stdout=out, **kwargs)
-        return force_text(out.getvalue())
+        return out.getvalue()
 
     def test_no_warning(self):
         """
@@ -409,7 +408,7 @@ class TestCollectionNeverCopyStorage(CollectionTestCase):
         """
         stdout = StringIO()
         self.run_collectstatic(stdout=stdout, verbosity=2)
-        output = force_text(stdout.getvalue())
+        output = stdout.getvalue()
         self.assertIn("Skipping 'test.txt' (not modified)", output)
 
 

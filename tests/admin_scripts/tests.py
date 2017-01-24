@@ -27,7 +27,6 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
 )
-from django.utils.encoding import force_text
 
 custom_templates_dir = os.path.join(os.path.dirname(__file__), 'custom_templates')
 
@@ -196,7 +195,6 @@ class AdminScriptTestCase(unittest.TestCase):
 
     def assertOutput(self, stream, msg, regex=False):
         "Utility assertion: assert that the given message exists in the output"
-        stream = force_text(stream)
         if regex:
             self.assertIsNotNone(
                 re.search(msg, stream),
@@ -207,7 +205,6 @@ class AdminScriptTestCase(unittest.TestCase):
 
     def assertNotInOutput(self, stream, msg):
         "Utility assertion: assert that the given message doesn't exist in the output"
-        stream = force_text(stream)
         self.assertNotIn(msg, stream, "'%s' matches actual output text '%s'" % (msg, stream))
 
 ##########################################################################
@@ -2021,7 +2018,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertNoOutput(err)
         test_manage_py = os.path.join(testproject_dir, 'manage.py')
         with open(test_manage_py, 'r') as fp:
-            content = force_text(fp.read())
+            content = fp.read()
             self.assertIn("project_name = 'another_project'", content)
             self.assertIn("project_directory = '%s'" % testproject_dir, content)
 
