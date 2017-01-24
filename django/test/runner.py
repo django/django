@@ -550,11 +550,11 @@ class DiscoverRunner(object):
         return DebugSQLTextTestResult if self.debug_sql else None
 
     def get_test_runner_kwargs(self):
-        return dict(
-            failfast=self.failfast,
-            resultclass=self.get_resultclass(),
-            verbosity=self.verbosity,
-        )
+        return {
+            'failfast': self.failfast,
+            'resultclass': self.get_resultclass(),
+            'verbosity': self.verbosity,
+        }
 
     def run_checks(self):
         # Checks are run after database creation since some checks require

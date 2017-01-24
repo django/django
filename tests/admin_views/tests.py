@@ -588,24 +588,30 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(changelist_url)
         self.assertContains(response, '<div id="changelist-filter">')
         filters = {
-            'chap__id__exact': dict(
-                values=[c.id for c in Chapter.objects.all()],
-                test=lambda obj, value: obj.chap.id == value),
-            'chap__title': dict(
-                values=[c.title for c in Chapter.objects.all()],
-                test=lambda obj, value: obj.chap.title == value),
-            'chap__book__id__exact': dict(
-                values=[b.id for b in Book.objects.all()],
-                test=lambda obj, value: obj.chap.book.id == value),
-            'chap__book__name': dict(
-                values=[b.name for b in Book.objects.all()],
-                test=lambda obj, value: obj.chap.book.name == value),
-            'chap__book__promo__id__exact': dict(
-                values=[p.id for p in Promo.objects.all()],
-                test=lambda obj, value: obj.chap.book.promo_set.filter(id=value).exists()),
-            'chap__book__promo__name': dict(
-                values=[p.name for p in Promo.objects.all()],
-                test=lambda obj, value: obj.chap.book.promo_set.filter(name=value).exists()),
+            'chap__id__exact': {
+                'values': [c.id for c in Chapter.objects.all()],
+                'test': lambda obj, value: obj.chap.id == value,
+            },
+            'chap__title': {
+                'values': [c.title for c in Chapter.objects.all()],
+                'test': lambda obj, value: obj.chap.title == value,
+            },
+            'chap__book__id__exact': {
+                'values': [b.id for b in Book.objects.all()],
+                'test': lambda obj, value: obj.chap.book.id == value,
+            },
+            'chap__book__name': {
+                'values': [b.name for b in Book.objects.all()],
+                'test': lambda obj, value: obj.chap.book.name == value,
+            },
+            'chap__book__promo__id__exact': {
+                'values': [p.id for p in Promo.objects.all()],
+                'test': lambda obj, value: obj.chap.book.promo_set.filter(id=value).exists(),
+            },
+            'chap__book__promo__name': {
+                'values': [p.name for p in Promo.objects.all()],
+                'test': lambda obj, value: obj.chap.book.promo_set.filter(name=value).exists(),
+            },
         }
         for filter_path, params in filters.items():
             for value in params['values']:
