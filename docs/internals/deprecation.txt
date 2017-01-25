@@ -15,6 +15,8 @@ about each item can often be found in the release notes of two versions prior.
 See the :ref:`Django 2.0 release notes<deprecated-features-2.0>` for more
 details on these changes.
 
+* The ``django.db.backends.postgresql_psycopg2`` module will be removed.
+
 .. _deprecation-removed-in-2.1:
 
 2.1
