@@ -471,13 +471,6 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
     ``max_length`` for some backends. Refer to the :doc:`database backend
     notes </ref/databases>` for details.
 
-.. admonition:: MySQL users
-
-    If you are using this field with MySQLdb 1.2.2 and the ``utf8_bin``
-    collation (which is *not* the default), there are some issues to be aware
-    of. Refer to the :ref:`MySQL database notes <mysql-collation>` for
-    details.
-
 ``DateField``
 -------------
 
@@ -1079,13 +1072,6 @@ If you specify a ``max_length`` attribute, it will be reflected in the
 :class:`~django.forms.Textarea` widget of the auto-generated form field.
 However it is not enforced at the model or database level. Use a
 :class:`CharField` for that.
-
-.. admonition:: MySQL users
-
-    If you are using this field with MySQLdb 1.2.1p2 and the ``utf8_bin``
-    collation (which is *not* the default), there are some issues to be aware
-    of. Refer to the :ref:`MySQL database notes <mysql-collation>` for
-    details.
 
 ``TimeField``
 -------------
