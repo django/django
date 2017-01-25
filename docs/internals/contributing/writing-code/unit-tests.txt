@@ -31,7 +31,7 @@ Next, clone your fork, install some requirements, and run the tests::
    $ git clone git@github.com:YourGitHubName/django.git django-repo
    $ cd django-repo/tests
    $ pip install -e ..
-   $ pip install -r requirements/py3.txt
+   $ pip install -r requirements/base.txt
    $ ./runtests.py
 
 Installing the requirements will likely require some operating system packages
@@ -239,7 +239,7 @@ You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
 like so::
 
-   $ pip install -r tests/requirements/py3.txt
+   $ pip install -r tests/requirements/base.txt
 
 If you encounter an error during the installation, your system might be missing
 a dependency for one or more of the Python packages. Consult the failing

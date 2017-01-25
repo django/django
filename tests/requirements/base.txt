@@ -12,3 +12,4 @@ pytz
 selenium
 sqlparse
 tblib
+python3-memcached
