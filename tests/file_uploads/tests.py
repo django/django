@@ -1,5 +1,4 @@
 import base64
-import errno
 import hashlib
 import json
 import os
@@ -564,9 +563,8 @@ class DirectoryCreationTests(SimpleTestCase):
         """Permission errors are not swallowed"""
         os.chmod(MEDIA_ROOT, 0o500)
         self.addCleanup(os.chmod, MEDIA_ROOT, 0o700)
-        with self.assertRaises(OSError) as cm:
+        with self.assertRaises(PermissionError):
             self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', b'x'), save=False)
-        self.assertEqual(cm.exception.errno, errno.EACCES)
 
     def test_not_a_directory(self):
         """The correct IOError is raised when the upload directory name exists but isn't a directory"""

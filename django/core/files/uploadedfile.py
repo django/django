@@ -2,7 +2,6 @@
 Classes representing uploaded files.
 """
 
-import errno
 import os
 from io import BytesIO
 
@@ -71,12 +70,11 @@ class TemporaryUploadedFile(UploadedFile):
     def close(self):
         try:
             return self.file.close()
-        except OSError as e:
-            if e.errno != errno.ENOENT:
-                # Means the file was moved or deleted before the tempfile
-                # could unlink it.  Still sets self.file.close_called and
-                # calls self.file.file.close() before the exception
-                raise
+        except FileNotFoundError:
+            # The file was moved or deleted before the tempfile could unlink
+            # it. Still sets self.file.close_called and calls
+            # self.file.file.close() before the exception.
+            pass
 
 
 class InMemoryUploadedFile(UploadedFile):

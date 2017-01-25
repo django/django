@@ -1,4 +1,3 @@
-import errno
 import os
 import shutil
 import sys
@@ -416,9 +415,9 @@ class FileStorageTests(SimpleTestCase):
                 real_makedirs(path)
             elif path == os.path.join(self.temp_dir, 'raced'):
                 real_makedirs(path)
-                raise OSError(errno.EEXIST, 'simulated EEXIST')
+                raise FileNotFoundError()
             elif path == os.path.join(self.temp_dir, 'error'):
-                raise OSError(errno.EACCES, 'simulated EACCES')
+                raise FileExistsError()
             else:
                 self.fail('unexpected argument %r' % path)
 
@@ -433,8 +432,8 @@ class FileStorageTests(SimpleTestCase):
             with self.storage.open('raced/test.file') as f:
                 self.assertEqual(f.read(), b'saved with race')
 
-            # OSErrors aside from EEXIST are still raised.
-            with self.assertRaises(OSError):
+            # Exceptions aside from FileNotFoundError are raised.
+            with self.assertRaises(FileExistsError):
                 self.storage.save('error/test.file', ContentFile('not saved'))
         finally:
             os.makedirs = real_makedirs
@@ -452,9 +451,9 @@ class FileStorageTests(SimpleTestCase):
                 real_remove(path)
             elif path == os.path.join(self.temp_dir, 'raced.file'):
                 real_remove(path)
-                raise OSError(errno.ENOENT, 'simulated ENOENT')
+                raise FileNotFoundError()
             elif path == os.path.join(self.temp_dir, 'error.file'):
-                raise OSError(errno.EACCES, 'simulated EACCES')
+                raise PermissionError()
             else:
                 self.fail('unexpected argument %r' % path)
 
@@ -469,9 +468,9 @@ class FileStorageTests(SimpleTestCase):
             self.storage.delete('raced.file')
             self.assertFalse(self.storage.exists('normal.file'))
 
-            # OSErrors aside from ENOENT are still raised.
+            # Exceptions aside from FileNotFoundError are raised.
             self.storage.save('error.file', ContentFile('delete with error'))
-            with self.assertRaises(OSError):
+            with self.assertRaises(PermissionError):
                 self.storage.delete('error.file')
         finally:
             os.remove = real_remove
