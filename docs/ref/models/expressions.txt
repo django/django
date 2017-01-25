@@ -551,7 +551,7 @@ within the last day::
     ...     post=OuterRef('pk'),
     ...     created_at__gte=one_day_ago,
     ... )
-    >>> Post.objects.annotate(recent_comment=Exists(recent_comments)
+    >>> Post.objects.annotate(recent_comment=Exists(recent_comments))
 
 On PostgreSQL, the SQL looks like:
 
