@@ -209,12 +209,7 @@ class OptimizerTests(SimpleTestCase):
             [],
         )
         # This should not work - FK should block it
-        self.assertOptimizesTo(
-            [
-                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo", models.CASCADE))]),
-                migrations.DeleteModel("Foo"),
-            ],
+        self.assertDoesNotOptimize(
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo", models.CASCADE))]),
@@ -245,12 +240,7 @@ class OptimizerTests(SimpleTestCase):
             app_label="testapp",
         )
         # This should not work - bases should block it
-        self.assertOptimizesTo(
-            [
-                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo", )),
-                migrations.DeleteModel("Foo"),
-            ],
+        self.assertDoesNotOptimize(
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo", )),
@@ -315,12 +305,7 @@ class OptimizerTests(SimpleTestCase):
         AddField should NOT optimize into CreateModel if it's an FK to a model
         that's between them.
         """
-        self.assertOptimizesTo(
-            [
-                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("Link", [("url", models.TextField())]),
-                migrations.AddField("Foo", "link", models.ForeignKey("migrations.Link", models.CASCADE)),
-            ],
+        self.assertDoesNotOptimize(
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("Link", [("url", models.TextField())]),
@@ -335,14 +320,7 @@ class OptimizerTests(SimpleTestCase):
         """
         # Note: The middle model is not actually a valid through model,
         # but that doesn't matter, as we never render it.
-        self.assertOptimizesTo(
-            [
-                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("LinkThrough", []),
-                migrations.AddField(
-                    "Foo", "link", models.ManyToManyField("migrations.Link", through="migrations.LinkThrough")
-                ),
-            ],
+        self.assertDoesNotOptimize(
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("LinkThrough", []),
