@@ -138,6 +138,25 @@ class CreateModel(ModelOperation):
                 self.name_lower == operation.name_lower and
                 not self.options.get("proxy", False)):
             return []
+        elif (isinstance(operation, CreateModel) and
+                # Ensure the model does not inherit from others, to avoid
+                # moving it earlier than its parent.
+                operation.bases == (models.Model,) and
+                not operation.references_model(self.name, app_label)):
+            # Check if it's better to move the operation before the current one, to allow
+            # for later optimisation of ForeignKey AddField operations.
+            for later_operation in after:
+                if (isinstance(later_operation, AddField) and
+                        getattr(later_operation.field, "remote_field", None)):
+                    fk_target_name = self.model_to_key(later_operation.field.remote_field.model)[1]
+                    if (later_operation.references_model(operation.name) and
+                            self.references_model(fk_target_name)):
+                        # The current order already allows for optimisation.
+                        break
+                    if (later_operation.references_model(self.name) and
+                            operation.references_model(fk_target_name)):
+                        # Move the second CreateModel before the first.
+                        return [operation, self]
         elif isinstance(operation, RenameModel) and self.name_lower == operation.old_name_lower:
             return [
                 CreateModel(
