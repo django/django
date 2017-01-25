@@ -573,11 +573,7 @@ class BoundaryIter(six.Iterator):
 
 
 def exhaust(stream_or_iterable):
-    """
-    Completely exhausts an iterator or stream.
-
-    Raise a MultiPartParserError if the argument is not a stream or an iterable.
-    """
+    """Exhaust an iterator or stream."""
     try:
         iterator = iter(stream_or_iterable)
     except TypeError:
