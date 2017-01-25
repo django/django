@@ -578,14 +578,10 @@ def exhaust(stream_or_iterable):
 
     Raise a MultiPartParserError if the argument is not a stream or an iterable.
     """
-    iterator = None
     try:
         iterator = iter(stream_or_iterable)
     except TypeError:
         iterator = ChunkIter(stream_or_iterable, 16384)
-
-    if iterator is None:
-        raise MultiPartParserError('multipartparser.exhaust() was passed a non-iterable or stream parameter')
 
     for __ in iterator:
         pass

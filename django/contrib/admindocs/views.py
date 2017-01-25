@@ -302,7 +302,6 @@ class ModelDetailView(BaseAdminDocsView):
                     })
                 else:
                     arguments = get_func_full_args(func)
-                    print_arguments = arguments
                     # Join arguments with ', ' and in case of default value,
                     # join it with '='. Use repr() so that strings will be
                     # correctly displayed.
