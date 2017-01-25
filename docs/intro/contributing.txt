@@ -251,7 +251,7 @@ into the Django ``tests/`` directory and then running:
 
 .. code-block:: console
 
-    $ pip install -r requirements/py3.txt
+    $ pip install -r requirements/base.txt
 
 If you encounter an error during the installation, your system might be missing
 a dependency for one or more of the Python packages. Consult the failing
