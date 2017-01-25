@@ -672,8 +672,8 @@ class MakeMigrationsTests(MigrationTestBase):
         module = 'migrations.test_migrations_order'
         with self.temporary_migration_module(module=module) as migration_dir:
             if hasattr(importlib, 'invalidate_caches'):
-                # Python 3 importlib caches os.listdir() on some platforms like
-                # Mac OS X (#23850).
+                # importlib caches os.listdir() on some platforms like Mac OS X
+                # (#23850).
                 importlib.invalidate_caches()
             call_command('makemigrations', 'migrations', '--empty', '-n', 'a', '-v', '0')
             self.assertTrue(os.path.exists(os.path.join(migration_dir, '0002_a.py')))
@@ -1202,8 +1202,8 @@ class MakeMigrationsTests(MigrationTestBase):
             content = cmd("0001", migration_name_0001)
             self.assertIn("dependencies=[\n]", content)
 
-            # Python 3 importlib caches os.listdir() on some platforms like
-            # Mac OS X (#23850).
+            # importlib caches os.listdir() on some platforms like Mac OS X
+            # (#23850).
             if hasattr(importlib, 'invalidate_caches'):
                 importlib.invalidate_caches()
 

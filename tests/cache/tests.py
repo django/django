@@ -1912,10 +1912,6 @@ class CacheI18nTest(TestCase):
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertIsNone(get_cache_data)
 
-        # This test passes on Python < 3.3 even without the corresponding code
-        # in UpdateCacheMiddleware, because pickling a StreamingHttpResponse
-        # fails (http://bugs.python.org/issue14288). LocMemCache silently
-        # swallows the exception and doesn't store the response in cache.
         content = ['Check for cache with streaming content.']
         response = StreamingHttpResponse(content)
         UpdateCacheMiddleware().process_response(request, response)

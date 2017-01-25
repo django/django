@@ -463,7 +463,7 @@ executable with ``cmd.exe``, will set this up:
 .. code-block:: bat
 
     set OSGEO4W_ROOT=C:\OSGeo4W
-    set PYTHON_ROOT=C:\Python27
+    set PYTHON_ROOT=C:\Python3X
     set GDAL_DATA=%OSGEO4W_ROOT%\share\gdal
     set PROJ_LIB=%OSGEO4W_ROOT%\share\proj
     set PATH=%PATH%;%PYTHON_ROOT%;%OSGEO4W_ROOT%\bin
@@ -471,15 +471,12 @@ executable with ``cmd.exe``, will set this up:
     reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v GDAL_DATA /t REG_EXPAND_SZ /f /d "%GDAL_DATA%"
     reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v PROJ_LIB /t REG_EXPAND_SZ /f /d "%PROJ_LIB%"
 
-For your convenience, these commands are available in the executable batch
-script, :download:`geodjango_setup.bat`.
-
 .. note::
 
     Administrator privileges are required to execute these commands.
-    To do this, right-click on :download:`geodjango_setup.bat` and select
-    :menuselection:`Run as administrator`. You need to log out and log back in again
-    for the settings to take effect.
+    To do this, create a ``bat`` script with the commands, right-click it, and
+    select :menuselection:`Run as administrator`. You need to log out and log
+    back in again for the settings to take effect.
 
 .. note::
 

@@ -419,8 +419,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
         # Hash the password prior to using bcrypt to prevent password
         # truncation as described in #20138.
         if self.digest is not None:
-            # Use binascii.hexlify() because a hex encoded bytestring is
-            # Unicode on Python 3.
+            # Use binascii.hexlify() because a hex encoded bytestring is str.
             password = binascii.hexlify(self.digest(force_bytes(password)).digest())
         else:
             password = force_bytes(password)
