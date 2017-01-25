@@ -301,7 +301,7 @@ MySQL Connector/Python includes `its own`_.
 MySQLdb
 ~~~~~~~
 
-Django requires MySQLdb version 1.2.1p2 or later.
+Django requires MySQLdb version 1.2.3 or later.
 
 At the time of writing, the latest release of MySQLdb (1.2.5) doesn't support
 Python 3. In order to use MySQLdb under Python 3, you'll have to install
@@ -319,9 +319,8 @@ Python 3. In order to use MySQLdb under Python 3, you'll have to install
 mysqlclient
 ~~~~~~~~~~~
 
-Django requires `mysqlclient`_ 1.3.3 or later. Note that Python 3.2 is not
-supported. Except for the Python 3.3+ support, mysqlclient should mostly behave
-the same as MySQLDB.
+Django requires `mysqlclient`_ 1.3.3 or later. mysqlclient should mostly behave
+the same as MySQLdb.
 
 MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -374,46 +373,9 @@ comparisons being done in a *case-insensitive* manner. That is, ``"Fred"`` and
 ``"freD"`` are considered equal at the database level. If you have a unique
 constraint on a field, it would be illegal to try to insert both ``"aa"`` and
 ``"AA"`` into the same column, since they compare as equal (and, hence,
-non-unique) with the default collation.
-
-In many cases, this default will not be a problem. However, if you really want
-case-sensitive comparisons on a particular column or table, you would change
-the column or table to use the ``utf8_bin`` collation. The main thing to be
-aware of in this case is that if you are using MySQLdb 1.2.2, the database
-backend in Django will then return bytestrings (instead of unicode strings) for
-any character fields it receive from the database. This is a strong variation
-from Django's normal practice of *always* returning unicode strings. It is up
-to you, the developer, to handle the fact that you will receive bytestrings if
-you configure your table(s) to use ``utf8_bin`` collation. Django itself should
-mostly work smoothly with such columns (except for the ``contrib.sessions``
-``Session`` and ``contrib.admin`` ``LogEntry`` tables described below), but
-your code must be prepared to call ``django.utils.encoding.force_text()`` at
-times if it really wants to work with consistent data -- Django will not do
-this for you (the database backend layer and the model population layer are
-separated internally so the database layer doesn't know it needs to make this
-conversion in this one particular case).
-
-If you're using MySQLdb 1.2.1p2, Django's standard
-:class:`~django.db.models.CharField` class will return unicode strings even
-with ``utf8_bin`` collation. However, :class:`~django.db.models.TextField`
-fields will be returned as an ``array.array`` instance (from Python's standard
-``array`` module). There isn't a lot Django can do about that, since, again,
-the information needed to make the necessary conversions isn't available when
-the data is read in from the database. This problem was `fixed in MySQLdb
-1.2.2`_, so if you want to use :class:`~django.db.models.TextField` with
-``utf8_bin`` collation, upgrading to version 1.2.2 and then dealing with the
-bytestrings (which shouldn't be too difficult) as described above is the
-recommended solution.
-
-Should you decide to use ``utf8_bin`` collation for some of your tables with
-MySQLdb 1.2.1p2 or 1.2.2, you should still use ``utf8_general_ci``
-(the default) collation for the ``django.contrib.sessions.models.Session``
-table (usually called ``django_session``) and the
-:class:`django.contrib.admin.models.LogEntry` table (usually called
-``django_admin_log``). Those are the two standard tables that use
-:class:`~django.db.models.TextField` internally.
-
-.. _fixed in MySQLdb 1.2.2: http://sourceforge.net/tracker/index.php?func=detail&aid=1495765&group_id=22307&atid=374932
+non-unique) with the default collation. If you want case-sensitive comparisons
+on a particular column or table, change the column or table to use the
+``utf8_bin`` collation.
 
 Please note that according to `MySQL Unicode Character Sets`_, comparisons for
 the ``utf8_general_ci`` collation are faster, but slightly less correct, than
@@ -467,12 +429,11 @@ Here's a sample configuration which uses a MySQL option file::
     password = PASSWORD
     default-character-set = utf8
 
-Several other MySQLdb connection options may be useful, such as ``ssl``,
-``init_command``, and ``sql_mode``. Consult the `MySQLdb documentation`_ for
-more details.
+Several other `MySQLdb connection options`_ may be useful, such as ``ssl``,
+``init_command``, and ``sql_mode``.
 
 .. _MySQL option file: https://dev.mysql.com/doc/refman/en/option-files.html
-.. _MySQLdb documentation: http://mysql-python.sourceforge.net/
+.. _MySQLdb connection options: https://mysqlclient.readthedocs.io/en/latest/user_guide.html#functions-and-attributes
 
 .. _mysql-sql-mode:
 
