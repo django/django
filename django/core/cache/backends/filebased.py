@@ -75,7 +75,7 @@ class FileBasedCache(BaseCache):
 
     def _cull(self):
         """
-        Removes random cache entries if max_entries is reached at a ratio
+        Remove random cache entries if max_entries is reached at a ratio
         of num_entries / cull_frequency. A value of 0 for CULL_FREQUENCY means
         that the entire cache will be purged.
         """
@@ -119,8 +119,7 @@ class FileBasedCache(BaseCache):
 
     def _is_expired(self, f):
         """
-        Takes an open cache file and determines if it has expired,
-        deletes the file if it is has passed its expiry time.
+        Take an open cache file `f` and delete it if it's expired.
         """
         exp = pickle.load(f)
         if exp is not None and exp < time.time():

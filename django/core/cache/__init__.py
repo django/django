@@ -59,7 +59,7 @@ class CacheHandler:
     """
     A Cache Handler to manage access to Cache instances.
 
-    Ensures only one instance of each alias exists per thread.
+    Ensure only one instance of each alias exists per thread.
     """
     def __init__(self):
         self._caches = local()

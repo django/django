@@ -11,7 +11,7 @@ from django.utils import termcolors
 
 def supports_color():
     """
-    Returns True if the running system's terminal supports color,
+    Return True if the running system's terminal supports color,
     and False otherwise.
     """
     plat = sys.platform
@@ -61,14 +61,14 @@ def make_style(config_string=''):
 @functools.lru_cache(maxsize=None)
 def no_style():
     """
-    Returns a Style object with no color scheme.
+    Return a Style object with no color scheme.
     """
     return make_style('nocolor')
 
 
 def color_style():
     """
-    Returns a Style object from the Django color scheme.
+    Return a Style object from the Django color scheme.
     """
     if not supports_color():
         return no_style()

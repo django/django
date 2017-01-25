@@ -345,10 +345,10 @@ class BaseCommand:
     def check(self, app_configs=None, tags=None, display_num_errors=False,
               include_deployment_checks=False, fail_level=checks.ERROR):
         """
-        Uses the system check framework to validate entire Django project.
-        Raises CommandError for any serious message (error or critical errors).
-        If there are only light messages (like warnings), they are printed to
-        stderr and no exception is raised.
+        Use the system check framework to validate entire Django project.
+        Raise CommandError for any serious message (error or critical errors).
+        If there are only light messages (like warnings), print them to stderr
+        and don't raise an exception.
         """
         all_issues = self._run_checks(
             app_configs=app_configs,

@@ -24,7 +24,7 @@ _url_drive_re = re.compile('^([a-z])[:|]', re.I)
 
 class TemplateCommand(BaseCommand):
     """
-    Copies either a Django application layout template or a Django project
+    Copy either a Django application layout template or a Django project
     layout template into the specified directory.
 
     :param style: A color style object (see django.core.management.color).
@@ -185,9 +185,9 @@ class TemplateCommand(BaseCommand):
 
     def handle_template(self, template, subdir):
         """
-        Determines where the app or project templates are.
-        Use django.__path__[0] as the default because we don't
-        know into which directory Django has been installed.
+        Determine where the app or project templates are.
+        Use django.__path__[0] as the default because the Django install
+        directory isn't known.
         """
         if template is None:
             return path.join(django.__path__[0], 'conf', subdir)
@@ -222,7 +222,7 @@ class TemplateCommand(BaseCommand):
 
     def download(self, url):
         """
-        Downloads the given URL and returns the file name.
+        Download the given URL and return the file name.
         """
         def cleanup_url(url):
             tmp = url.rstrip('/')
@@ -286,7 +286,7 @@ class TemplateCommand(BaseCommand):
 
     def extract(self, filename):
         """
-        Extracts the given file to a temporarily and returns
+        Extract the given file to a temporarily and return
         the path of the directory with the extracted content.
         """
         prefix = 'django_%s_template_' % self.app_or_project
@@ -302,9 +302,7 @@ class TemplateCommand(BaseCommand):
                                (filename, tempdir, e))
 
     def is_url(self, template):
-        """
-        Returns True if the name looks like a URL
-        """
+        """Return True if the name looks like a URL."""
         if ':' not in template:
             return False
         scheme = template.split(':', 1)[0].lower()

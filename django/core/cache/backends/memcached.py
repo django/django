@@ -30,7 +30,7 @@ class BaseMemcachedCache(BaseCache):
     @property
     def _cache(self):
         """
-        Implements transparent thread-safe access to a memcached client.
+        Implement transparent thread-safe access to a memcached client.
         """
         if getattr(self, '_client', None) is None:
             self._client = self._lib.Client(self._servers, **self._options)

@@ -176,7 +176,7 @@ class Command(BaseCommand):
 
     def write_migration_files(self, changes):
         """
-        Takes a changes dict and writes them out as migration files.
+        Take a changes dict and write them out as migration files.
         """
         directory_created = {}
         for app_label, app_migrations in changes.items():

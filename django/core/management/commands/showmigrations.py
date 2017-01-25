@@ -54,7 +54,7 @@ class Command(BaseCommand):
 
     def show_list(self, connection, app_names=None):
         """
-        Shows a list of all migrations on the system, or only those of
+        Show a list of all migrations on the system, or only those of
         some named apps.
         """
         # Load migrations from disk/DB
@@ -90,7 +90,7 @@ class Command(BaseCommand):
 
     def show_plan(self, connection, app_names=None):
         """
-        Shows all known migrations (or only those of the specified app_names)
+        Show all known migrations (or only those of the specified app_names)
         in the order they will be applied.
         """
         # Load migrations from disk/DB

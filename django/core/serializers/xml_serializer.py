@@ -18,9 +18,7 @@ from django.utils.xmlutils import (
 
 
 class Serializer(base.Serializer):
-    """
-    Serializes a QuerySet to XML.
-    """
+    """Serialize a QuerySet to XML."""
 
     def indent(self, level):
         if self.options.get('indent') is not None:
@@ -67,8 +65,8 @@ class Serializer(base.Serializer):
 
     def handle_field(self, obj, field):
         """
-        Called to handle each field on an object (except for ForeignKeys and
-        ManyToManyFields)
+        Handle each field on an object (except for ForeignKeys and
+        ManyToManyFields).
         """
         self.indent(2)
         self.xml.startElement("field", OrderedDict([
@@ -90,7 +88,7 @@ class Serializer(base.Serializer):
 
     def handle_fk_field(self, obj, field):
         """
-        Called to handle a ForeignKey (we need to treat them slightly
+        Handle a ForeignKey (they need to be treated slightly
         differently from regular fields).
         """
         self._start_relational_field(field)
@@ -113,9 +111,9 @@ class Serializer(base.Serializer):
 
     def handle_m2m_field(self, obj, field):
         """
-        Called to handle a ManyToManyField. Related objects are only
-        serialized as references to the object's PK (i.e. the related *data*
-        is not dumped, just the relation).
+        Handle a ManyToManyField. Related objects are only serialized as
+        references to the object's PK (i.e. the related *data* is not dumped,
+        just the relation).
         """
         if field.remote_field.through._meta.auto_created:
             self._start_relational_field(field)
@@ -141,9 +139,7 @@ class Serializer(base.Serializer):
             self.xml.endElement("field")
 
     def _start_relational_field(self, field):
-        """
-        Helper to output the <field> element for relational fields
-        """
+        """Output the <field> element for relational fields."""
         self.indent(2)
         self.xml.startElement("field", OrderedDict([
             ("name", field.name),
@@ -153,9 +149,7 @@ class Serializer(base.Serializer):
 
 
 class Deserializer(base.Deserializer):
-    """
-    Deserialize XML.
-    """
+    """Deserialize XML."""
 
     def __init__(self, stream_or_string, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False, **options):
         super().__init__(stream_or_string, **options)
@@ -175,9 +169,7 @@ class Deserializer(base.Deserializer):
         raise StopIteration
 
     def _handle_object(self, node):
-        """
-        Convert an <object> node to a DeserializedObject.
-        """
+        """Convert an <object> node to a DeserializedObject."""
         # Look up the model using the model loading mechanism. If this fails,
         # bail.
         Model = self._get_model_from_node(node, "model")
@@ -278,8 +270,8 @@ class Deserializer(base.Deserializer):
 
     def _get_model_from_node(self, node, attr):
         """
-        Helper to look up a model from a <object model=...> or a <field
-        rel=... to=...> node.
+        Look up a model from a <object model=...> or a <field rel=... to=...>
+        node.
         """
         model_identifier = node.getAttribute(attr)
         if not model_identifier:
@@ -295,9 +287,7 @@ class Deserializer(base.Deserializer):
 
 
 def getInnerText(node):
-    """
-    Get all the inner text of a DOM node (recursively).
-    """
+    """Get all the inner text of a DOM node (recursively)."""
     # inspired by http://mail.python.org/pipermail/xml-sig/2005-March/011022.html
     inner_text = []
     for child in node.childNodes:
@@ -317,7 +307,7 @@ class DefusedExpatParser(_ExpatParser):
     """
     An expat parser hardened against XML bomb attacks.
 
-    Forbids DTDs, external entity references
+    Forbid DTDs, external entity references
     """
     def __init__(self, *args, **kwargs):
         _ExpatParser.__init__(self, *args, **kwargs)

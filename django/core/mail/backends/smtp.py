@@ -74,7 +74,7 @@ class EmailBackend(BaseEmailBackend):
                 raise
 
     def close(self):
-        """Closes the connection to the email server."""
+        """Close the connection to the email server."""
         if self.connection is None:
             return
         try:
@@ -94,7 +94,7 @@ class EmailBackend(BaseEmailBackend):
 
     def send_messages(self, email_messages):
         """
-        Sends one or more EmailMessage objects and returns the number of email
+        Send one or more EmailMessage objects and return the number of email
         messages sent.
         """
         if not email_messages:

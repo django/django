@@ -52,8 +52,8 @@ class RegexValidator:
 
     def __call__(self, value):
         """
-        Validates that the input matches the regular expression
-        if inverse_match is False, otherwise raises ValidationError.
+        Validate that the input matches the regular expression
+        if inverse_match is False, otherwise raise ValidationError.
         """
         if not (self.inverse_match is not bool(self.regex.search(
                 force_text(value)))):
@@ -280,10 +280,8 @@ ip_address_validator_map = {
 
 def ip_address_validators(protocol, unpack_ipv4):
     """
-    Depending on the given parameters returns the appropriate validators for
+    Depending on the given parameters, return the appropriate validators for
     the GenericIPAddressField.
-
-    This code is here, because it is exactly the same for the model and the form field.
     """
     if protocol != 'both' and unpack_ipv4:
         raise ValueError(

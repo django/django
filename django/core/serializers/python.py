@@ -14,7 +14,7 @@ from django.utils.encoding import force_text, is_protected_type
 
 class Serializer(base.Serializer):
     """
-    Serializes a QuerySet to basic Python objects.
+    Serialize a QuerySet to basic Python objects.
     """
 
     internal_use_only = True
@@ -180,9 +180,7 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
 
 
 def _get_model(model_identifier):
-    """
-    Helper to look up a model from an "app_label.model_name" string.
-    """
+    """Look up a model from an "app_label.model_name" string."""
     try:
         return apps.get_model(model_identifier)
     except (LookupError, TypeError):

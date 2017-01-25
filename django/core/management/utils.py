@@ -12,7 +12,7 @@ def popen_wrapper(args, os_err_exc_type=CommandError, stdout_encoding='utf-8'):
     """
     Friendly wrapper around Popen.
 
-    Returns stdout output, stderr output and OS status code.
+    Return stdout output, stderr output, and OS status code.
     """
     try:
         p = Popen(args, shell=False, stdout=PIPE, stderr=PIPE, close_fds=os.name != 'nt')
@@ -28,7 +28,7 @@ def popen_wrapper(args, os_err_exc_type=CommandError, stdout_encoding='utf-8'):
 
 def handle_extensions(extensions):
     """
-    Organizes multiple extensions that are separated with commas or passed by
+    Organize multiple extensions that are separated with commas or passed by
     using --extension/-e multiple times.
 
     For example: running 'django-admin makemessages -e js,txt -e xhtml -a'

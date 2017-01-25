@@ -60,7 +60,7 @@ class TranslatableFile:
 
 class BuildFile:
     """
-    Represents the state of a translatable file during the build process.
+    Represent the state of a translatable file during the build process.
     """
     def __init__(self, command, domain, translatable):
         self.command = command
@@ -170,8 +170,8 @@ def normalize_eols(raw_contents):
 
 def write_pot_file(potfile, msgs):
     """
-    Write the :param potfile: POT file with the :param msgs: contents,
-    previously making sure its format is valid.
+    Write the `potfile` with the `msgs` contents, making sure its format is
+    valid.
     """
     pot_lines = msgs.splitlines()
     if os.path.exists(potfile):
@@ -423,10 +423,9 @@ class Command(BaseCommand):
 
     def find_files(self, root):
         """
-        Helper method to get all files in the given root. Also check that there
-        is a matching locale dir for each file.
+        Get all files in the given root. Also check that there is a matching
+        locale dir for each file.
         """
-
         def is_ignored(path, ignore_patterns):
             """
             Check if the given path should be ignored or not.
@@ -499,7 +498,7 @@ class Command(BaseCommand):
         Extract translatable literals from the specified files, creating or
         updating the POT file for a given locale directory.
 
-        Uses the xgettext GNU gettext utility.
+        Use the xgettext GNU gettext utility.
         """
         build_files = []
         for translatable in files:
@@ -591,10 +590,10 @@ class Command(BaseCommand):
 
     def write_po_file(self, potfile, locale):
         """
-        Creates or updates the PO file for self.domain and :param locale:.
-        Uses contents of the existing :param potfile:.
+        Create or update the PO file for self.domain and `locale`.
+        Use contents of the existing `potfile`.
 
-        Uses msgmerge, and msgattrib GNU gettext utilities.
+        Use msgmerge and msgattrib GNU gettext utilities.
         """
         basedir = os.path.join(os.path.dirname(potfile), locale, 'LC_MESSAGES')
         if not os.path.isdir(basedir):
@@ -633,7 +632,7 @@ class Command(BaseCommand):
 
     def copy_plural_forms(self, msgs, locale):
         """
-        Copies plural forms header contents from a Django catalog of locale to
+        Copy plural forms header contents from a Django catalog of locale to
         the msgs string, inserting it at the right place. msgs should be the
         contents of a newly created .po file.
         """

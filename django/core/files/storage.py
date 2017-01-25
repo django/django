@@ -29,14 +29,12 @@ class Storage:
     # These shouldn't be overridden by subclasses unless absolutely necessary.
 
     def open(self, name, mode='rb'):
-        """
-        Retrieves the specified file from storage.
-        """
+        """Retrieve the specified file from storage."""
         return self._open(name, mode)
 
     def save(self, name, content, max_length=None):
         """
-        Saves new content to the file specified by name. The content should be
+        Save new content to the file specified by name. The content should be
         a proper File object or any python file-like object, ready to be read
         from the beginning.
         """
@@ -54,14 +52,14 @@ class Storage:
 
     def get_valid_name(self, name):
         """
-        Returns a filename, based on the provided filename, that's suitable for
+        Return a filename, based on the provided filename, that's suitable for
         use in the target storage system.
         """
         return get_valid_filename(name)
 
     def get_available_name(self, name, max_length=None):
         """
-        Returns a filename that's free on the target storage system, and
+        Return a filename that's free on the target storage system and
         available for new content to be written to.
         """
         dir_name, file_name = os.path.split(name)
@@ -101,7 +99,7 @@ class Storage:
 
     def path(self, name):
         """
-        Returns a local filesystem path where the file can be retrieved using
+        Return a local filesystem path where the file can be retrieved using
         Python's built-in open() function. Storage systems that can't be
         accessed using open() should *not* implement this method.
         """
@@ -112,33 +110,33 @@ class Storage:
 
     def delete(self, name):
         """
-        Deletes the specified file from the storage system.
+        Delete the specified file from the storage system.
         """
         raise NotImplementedError('subclasses of Storage must provide a delete() method')
 
     def exists(self, name):
         """
-        Returns True if a file referenced by the given name already exists in the
+        Return True if a file referenced by the given name already exists in the
         storage system, or False if the name is available for a new file.
         """
         raise NotImplementedError('subclasses of Storage must provide an exists() method')
 
     def listdir(self, path):
         """
-        Lists the contents of the specified path, returning a 2-tuple of lists;
+        List the contents of the specified path. Return a 2-tuple of lists:
         the first item being directories, the second item being files.
         """
         raise NotImplementedError('subclasses of Storage must provide a listdir() method')
 
     def size(self, name):
         """
-        Returns the total size, in bytes, of the file specified by name.
+        Return the total size, in bytes, of the file specified by name.
         """
         raise NotImplementedError('subclasses of Storage must provide a size() method')
 
     def url(self, name):
         """
-        Returns an absolute URL where the file's contents can be accessed
+        Return an absolute URL where the file's contents can be accessed
         directly by a Web browser.
         """
         raise NotImplementedError('subclasses of Storage must provide a url() method')

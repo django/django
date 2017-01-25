@@ -7,7 +7,8 @@ from django.core.mail.backends.base import BaseEmailBackend
 
 
 class EmailBackend(BaseEmailBackend):
-    """A email backend for use during test sessions.
+    """
+    An email backend for use during test sessions.
 
     The test connection stores email messages in a dummy outbox,
     rather than sending them out on the wire.

@@ -32,7 +32,7 @@ class ImageFile(File):
 
 def get_image_dimensions(file_or_path, close=False):
     """
-    Returns the (width, height) of an image, given an open file or a path.  Set
+    Return the (width, height) of an image, given an open file or a path.  Set
     'close' to True to close the file at the end if it is initially in an open
     state.
     """

@@ -17,9 +17,7 @@ from django.utils.timezone import is_aware
 
 
 class Serializer(PythonSerializer):
-    """
-    Convert a queryset to JSON.
-    """
+    """Convert a queryset to JSON."""
     internal_use_only = False
 
     def _init_options(self):
@@ -64,9 +62,7 @@ class Serializer(PythonSerializer):
 
 
 def Deserializer(stream_or_string, **options):
-    """
-    Deserialize a stream or string of JSON data.
-    """
+    """Deserialize a stream or string of JSON data."""
     if not isinstance(stream_or_string, (bytes, str)):
         stream_or_string = stream_or_string.read()
     if isinstance(stream_or_string, bytes):
@@ -83,7 +79,8 @@ def Deserializer(stream_or_string, **options):
 
 class DjangoJSONEncoder(json.JSONEncoder):
     """
-    JSONEncoder subclass that knows how to encode date/time, decimal types and UUIDs.
+    JSONEncoder subclass that knows how to encode date/time, decimal types, and
+    UUIDs.
     """
     def default(self, o):
         # See "Date Time String Format" in the ECMA-262 specification.

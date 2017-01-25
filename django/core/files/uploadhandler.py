@@ -158,7 +158,8 @@ class MemoryFileUploadHandler(FileUploadHandler):
 
     def handle_raw_input(self, input_data, META, content_length, boundary, encoding=None):
         """
-        Use the content_length to signal whether or not this handler should be in use.
+        Use the content_length to signal whether or not this handler should be
+        used.
         """
         # Check the content-length header to see if we should
         # If the post is too large, we cannot use the Memory handler.
@@ -174,18 +175,14 @@ class MemoryFileUploadHandler(FileUploadHandler):
             raise StopFutureHandlers()
 
     def receive_data_chunk(self, raw_data, start):
-        """
-        Add the data to the BytesIO file.
-        """
+        """Add the data to the BytesIO file."""
         if self.activated:
             self.file.write(raw_data)
         else:
             return raw_data
 
     def file_complete(self, file_size):
-        """
-        Return a file object if we're activated.
-        """
+        """Return a file object if this handler is activated."""
         if not self.activated:
             return
 

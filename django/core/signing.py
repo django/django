@@ -50,16 +50,12 @@ _SEP_UNSAFE = re.compile(r'^[A-z0-9-_=]*$')
 
 
 class BadSignature(Exception):
-    """
-    Signature does not match
-    """
+    """Signature does not match."""
     pass
 
 
 class SignatureExpired(BadSignature):
-    """
-    Signature timestamp is older than required max_age
-    """
+    """Signature timestamp is older than required max_age."""
     pass
 
 
@@ -96,11 +92,11 @@ class JSONSerializer:
 
 def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False):
     """
-    Returns URL-safe, sha1 signed base64 compressed JSON string. If key is
-    None, settings.SECRET_KEY is used instead.
+    Return URL-safe, sha1 signed base64 compressed JSON string. If key is
+    None, use settings.SECRET_KEY instead.
 
-    If compress is True (not the default) checks if compressing using zlib can
-    save some space. Prepends a '.' to signify compression. This is included
+    If compress is True (not the default), check if compressing using zlib can
+    save some space. Prepend a '.' to signify compression. This is included
     in the signature, to protect against zip bombs.
 
     Salt can be used to namespace the hash, so that a signed string is
@@ -129,7 +125,7 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
 
 def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, max_age=None):
     """
-    Reverse of dumps(), raises BadSignature if signature fails.
+    Reverse of dumps(), raise BadSignature if signature fails.
 
     The serializer is expected to accept a bytestring.
     """
