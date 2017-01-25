@@ -206,7 +206,6 @@ class BulkCreateTests(TestCase):
 
     @skipUnlessDBFeature('can_return_ids_from_bulk_insert')
     def test_set_pk_and_insert_single_item(self):
-        countries = []
         with self.assertNumQueries(1):
             countries = Country.objects.bulk_create([self.data[0]])
         self.assertEqual(len(countries), 1)
@@ -214,7 +213,6 @@ class BulkCreateTests(TestCase):
 
     @skipUnlessDBFeature('can_return_ids_from_bulk_insert')
     def test_set_pk_and_query_efficiency(self):
-        countries = []
         with self.assertNumQueries(1):
             countries = Country.objects.bulk_create(self.data)
         self.assertEqual(len(countries), 4)

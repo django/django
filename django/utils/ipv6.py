@@ -227,7 +227,6 @@ def _explode_shorthand_ip_string(ip_str):
         # We've already got a longhand ip_str.
         return ip_str
 
-    new_ip = []
     hextet = ip_str.split('::')
 
     # If there is a ::, we need to expand it with zeroes

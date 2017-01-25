@@ -77,7 +77,7 @@ class MigrationTestBase(TransactionTestCase):
                 ),
             )
 
-    def assertFKNotExists(self, table, columns, to, value=True):
+    def assertFKNotExists(self, table, columns, to):
         return self.assertFKExists(table, columns, to, False)
 
     @contextmanager

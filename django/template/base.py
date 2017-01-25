@@ -853,7 +853,7 @@ class Variable:
                         if isinstance(current, BaseContext) and getattr(type(current), bit):
                             raise AttributeError
                         current = getattr(current, bit)
-                    except (TypeError, AttributeError) as e:
+                    except (TypeError, AttributeError):
                         # Reraise if the exception was raised by a @property
                         if not isinstance(current, BaseContext) and bit in dir(current):
                             raise

@@ -426,7 +426,6 @@ class ResolverTests(SimpleTestCase):
         e = cm.exception
         # make sure we at least matched the root ('/') url resolver:
         self.assertIn('tried', e.args[0])
-        tried = e.args[0]['tried']
         self.assertEqual(
             len(e.args[0]['tried']),
             len(url_types_names),
