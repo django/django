@@ -1,17 +1,21 @@
 from django.apps import apps
 from django.apps.registry import Apps
 from django.conf import settings
-from django.contrib.sites import models
+from django.contrib.sites import get_site_model, models
 from django.contrib.sites.management import create_default_site
 from django.contrib.sites.middleware import CurrentSiteMiddleware
 from django.contrib.sites.models import Site, clear_site_cache
 from django.contrib.sites.requests import RequestSite
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import (
+    ImproperlyConfigured, ObjectDoesNotExist, ValidationError,
+)
 from django.db.models.signals import post_migrate
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase, modify_settings, override_settings
 from django.test.utils import captured_stdout
+
+from .models import CustomSite
 
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})
@@ -202,6 +206,29 @@ class SitesFrameworkTests(TestCase):
     def test_site_natural_key(self):
         self.assertEqual(Site.objects.get_by_natural_key(self.site.domain), self.site)
         self.assertEqual(self.site.natural_key(), (self.site.domain,))
+
+    def test_get_site_model(self):
+        "The current site model can be retrieved"
+        self.assertEqual(get_site_model(), Site)
+
+    @override_settings(SITES_SITE_MODEL='sites_tests.CustomSite')
+    def test_swappable_site(self):
+        "The current site model can be swapped out for another"
+        self.assertEqual(get_site_model(), CustomSite)
+        with self.assertRaises(AttributeError):
+            Site.objects.all()
+
+    @override_settings(SITES_SITE_MODEL='badsetting')
+    def test_swappable_site_bad_setting(self):
+        "The alternate site setting must point to something in the format app.model"
+        with self.assertRaises(ImproperlyConfigured):
+            get_site_model()
+
+    @override_settings(SITES_SITE_MODEL='thismodel.doesntexist')
+    def test_swappable_site_nonexistent_model(self):
+        "The current site model must point to an installed model"
+        with self.assertRaises(ImproperlyConfigured):
+            get_site_model()
 
     @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_requestsite_save_notimplemented_msg(self):

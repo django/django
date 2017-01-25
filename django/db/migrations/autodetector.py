@@ -442,6 +442,8 @@ class MigrationAutodetector:
                 model._meta.swappable or
                 "AbstractUser" in base_names or
                 "AbstractBaseUser" in base_names or
+                "AbstractSite" in base_names or
+                settings.SITES_SITE_MODEL.lower() == string_version.lower() or
                 settings.AUTH_USER_MODEL.lower() == string_version.lower()
             ):
                 return ("___" + item[0], "___" + item[1])

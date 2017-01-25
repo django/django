@@ -112,6 +112,8 @@ class Command(BaseCommand):
                 if isinstance(dependency, SwappableTuple):
                     if settings.AUTH_USER_MODEL == dependency.setting:
                         dependencies.add(("__setting__", "AUTH_USER_MODEL"))
+                    elif settings.SITES_SITE_MODEL == dependency.setting:
+                        dependencies.add(("__setting__", "SITES_SITE_MODEL"))
                     else:
                         dependencies.add(dependency)
                 elif dependency[0] != smigration.app_label or first_migration:
