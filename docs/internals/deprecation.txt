@@ -15,6 +15,9 @@ about each item can often be found in the release notes of two versions prior.
 See the :ref:`Django 3.0 release notes <deprecated-features-3.0>` for more
 details on these changes.
 
+* ``django.utils.http.urlquote()``, ``urlquote_plus()``, ``urlunquote()``, and
+  ``urlunquote_plus()`` will be removed.
+
 .. _deprecation-removed-in-3.1:
 
 3.1

@@ -3,6 +3,7 @@ import calendar
 import datetime
 import re
 import unicodedata
+import warnings
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 from urllib.parse import (
@@ -13,6 +14,7 @@ from urllib.parse import (
 
 from django.core.exceptions import TooManyFieldsSent
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import keep_lazy_text
 
 # based on RFC 7232, Appendix C
@@ -48,6 +50,11 @@ def urlquote(url, safe='/'):
     A legacy compatibility wrapper to Python's urllib.parse.quote() function.
     (was used for unicode handling on Python 2)
     """
+    warnings.warn(
+        'django.utils.http.urlquote() is deprecated in favor of '
+        'urllib.parse.quote().',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
     return quote(url, safe)
 
 
@@ -57,6 +64,11 @@ def urlquote_plus(url, safe=''):
     A legacy compatibility wrapper to Python's urllib.parse.quote_plus()
     function. (was used for unicode handling on Python 2)
     """
+    warnings.warn(
+        'django.utils.http.urlquote_plus() is deprecated in favor of '
+        'urllib.parse.quote_plus(),',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
     return quote_plus(url, safe)
 
 
@@ -66,6 +78,11 @@ def urlunquote(quoted_url):
     A legacy compatibility wrapper to Python's urllib.parse.unquote() function.
     (was used for unicode handling on Python 2)
     """
+    warnings.warn(
+        'django.utils.http.urlunquote() is deprecated in favor of '
+        'urllib.parse.unquote().',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
     return unquote(quoted_url)
 
 
@@ -75,6 +92,11 @@ def urlunquote_plus(quoted_url):
     A legacy compatibility wrapper to Python's urllib.parse.unquote_plus()
     function. (was used for unicode handling on Python 2)
     """
+    warnings.warn(
+        'django.utils.http.urlunquote_plus() is deprecated in favor of '
+        'urllib.parse.unquote_plus().',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
     return unquote_plus(quoted_url)
 
 
