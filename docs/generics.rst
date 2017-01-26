@@ -197,14 +197,14 @@ Example using class-based consumer::
     from channels.generic.websockets import WebsocketDemultiplexer, JsonWebsocketConsumer
 
     class EchoConsumer(websockets.JsonWebsocketConsumer):
-        def connect(self, message, multiplexer=None, **kwargs):
+        def connect(self, message, multiplexer, **kwargs):
             # Send data with the multiplexer
             multiplexer.send({"status": "I just connected!"})
 
-        def disconnect(self, message, multiplexer=None, **kwargs):
+        def disconnect(self, message, multiplexer, **kwargs):
             print("Stream %s is closed" % multiplexer.stream)
 
-        def receive(self, content, multiplexer=None, **kwargs):
+        def receive(self, content, multiplexer, **kwargs):
             # Simple echo
             multiplexer.send({"original_message": content})
 
