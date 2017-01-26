@@ -5,6 +5,7 @@ from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
 from operator import itemgetter
 from pprint import pformat
+from urllib.parse import quote
 
 from django.utils import formats
 from django.utils.dateformat import format, time_format
@@ -13,7 +14,6 @@ from django.utils.html import (
     avoid_wrapping, conditional_escape, escape, escapejs, linebreaks,
     strip_tags, urlize as _urlize,
 )
-from django.utils.http import urlquote
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import (
     Truncator, normalize_newlines, phone2numeric, slugify as _slugify, wrap,
@@ -318,14 +318,14 @@ def urlencode(value, safe=None):
     Escapes a value for use in a URL.
 
     Takes an optional ``safe`` parameter used to determine the characters which
-    should not be escaped by Django's ``urlquote`` method. If not provided, the
+    should not be escaped by Python's quote() function. If not provided, the
     default safe characters will be used (but an empty string can be provided
     when *all* characters should be escaped).
     """
     kwargs = {}
     if safe is not None:
         kwargs['safe'] = safe
-    return urlquote(value, **kwargs)
+    return quote(value, **kwargs)
 
 
 @register.filter(is_safe=True, needs_autoescape=True)

@@ -1,6 +1,7 @@
 import itertools
 import json
 import os
+from urllib.parse import unquote
 
 from django import http
 from django.apps import apps
@@ -9,7 +10,7 @@ from django.template import Context, Engine
 from django.urls import translate_url
 from django.utils.encoding import force_text
 from django.utils.formats import get_format
-from django.utils.http import is_safe_url, urlunquote
+from django.utils.http import is_safe_url
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, check_for_language, get_language,
 )
@@ -35,7 +36,7 @@ def set_language(request):
             not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure())):
         next = request.META.get('HTTP_REFERER')
         if next:
-            next = urlunquote(next)  # HTTP_REFERER may be encoded.
+            next = unquote(next)  # HTTP_REFERER may be encoded.
         if not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
             next = '/'
     response = http.HttpResponseRedirect(next) if next else http.HttpResponse(status=204)

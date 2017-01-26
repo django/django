@@ -3,6 +3,7 @@ import json
 import operator
 from collections import OrderedDict
 from functools import partial, reduce, update_wrapper
+from urllib.parse import quote as urlquote
 
 from django import forms
 from django.conf import settings
@@ -39,7 +40,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
 from django.utils.html import format_html
-from django.utils.http import urlencode, urlquote
+from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, format_lazy, get_text_list
 from django.utils.translation import ugettext as _, ungettext

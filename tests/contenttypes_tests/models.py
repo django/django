@@ -1,10 +1,11 @@
+from urllib.parse import quote
+
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import SiteManager
 from django.db import models
-from django.utils.http import urlquote
 
 
 class Site(models.Model):
@@ -72,7 +73,7 @@ class FooWithUrl(FooWithoutUrl):
     """
 
     def get_absolute_url(self):
-        return "/users/%s/" % urlquote(self.name)
+        return "/users/%s/" % quote(self.name)
 
 
 class FooWithBrokenAbsoluteUrl(FooWithoutUrl):
@@ -126,4 +127,4 @@ class ModelWithNullFKToSite(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return '/title/%s/' % urlquote(self.title)
+        return '/title/%s/' % quote(self.title)

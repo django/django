@@ -3,7 +3,7 @@ import itertools
 import os
 import re
 from importlib import import_module
-from urllib.parse import ParseResult, urlparse
+from urllib.parse import ParseResult, quote, urlparse
 
 from django.apps import apps
 from django.conf import settings
@@ -28,7 +28,6 @@ from django.test.utils import patch_logger
 from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
-from django.utils.http import urlquote
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from .client import PasswordResetConfirmClient
@@ -546,7 +545,7 @@ class LoginTest(AuthViewsTestCase):
             nasty_url = '%(url)s?%(next)s=%(bad_url)s' % {
                 'url': login_url,
                 'next': REDIRECT_FIELD_NAME,
-                'bad_url': urlquote(bad_url),
+                'bad_url': quote(bad_url),
             }
             response = self.client.post(nasty_url, {
                 'username': 'testclient',
@@ -568,7 +567,7 @@ class LoginTest(AuthViewsTestCase):
             safe_url = '%(url)s?%(next)s=%(good_url)s' % {
                 'url': login_url,
                 'next': REDIRECT_FIELD_NAME,
-                'good_url': urlquote(good_url),
+                'good_url': quote(good_url),
             }
             response = self.client.post(safe_url, {
                 'username': 'testclient',
@@ -583,7 +582,7 @@ class LoginTest(AuthViewsTestCase):
         not_secured_url = '%(url)s?%(next)s=%(next_url)s' % {
             'url': login_url,
             'next': REDIRECT_FIELD_NAME,
-            'next_url': urlquote(non_https_next_url),
+            'next_url': quote(non_https_next_url),
         }
         post_data = {
             'username': 'testclient',
@@ -701,13 +700,13 @@ class LoginURLSettings(AuthViewsTestCase):
 
     @override_settings(LOGIN_URL='http://remote.example.com/login')
     def test_remote_login_url(self):
-        quoted_next = urlquote('http://testserver/login_required/')
+        quoted_next = quote('http://testserver/login_required/')
         expected = 'http://remote.example.com/login?next=%s' % quoted_next
         self.assertLoginURLEquals(expected)
 
     @override_settings(LOGIN_URL='https:///login/')
     def test_https_login_url(self):
-        quoted_next = urlquote('http://testserver/login_required/')
+        quoted_next = quote('http://testserver/login_required/')
         expected = 'https:///login/?next=%s' % quoted_next
         self.assertLoginURLEquals(expected)
 
@@ -717,7 +716,7 @@ class LoginURLSettings(AuthViewsTestCase):
 
     @override_settings(LOGIN_URL='http://remote.example.com/login/?next=/default/')
     def test_remote_login_url_with_next_querystring(self):
-        quoted_next = urlquote('http://testserver/login_required/')
+        quoted_next = quote('http://testserver/login_required/')
         expected = 'http://remote.example.com/login/?next=%s' % quoted_next
         self.assertLoginURLEquals(expected)
 
@@ -973,7 +972,7 @@ class LogoutTest(AuthViewsTestCase):
             nasty_url = '%(url)s?%(next)s=%(bad_url)s' % {
                 'url': logout_url,
                 'next': REDIRECT_FIELD_NAME,
-                'bad_url': urlquote(bad_url),
+                'bad_url': quote(bad_url),
             }
             self.login()
             response = self.client.get(nasty_url)
@@ -994,7 +993,7 @@ class LogoutTest(AuthViewsTestCase):
             safe_url = '%(url)s?%(next)s=%(good_url)s' % {
                 'url': logout_url,
                 'next': REDIRECT_FIELD_NAME,
-                'good_url': urlquote(good_url),
+                'good_url': quote(good_url),
             }
             self.login()
             response = self.client.get(safe_url)
@@ -1008,7 +1007,7 @@ class LogoutTest(AuthViewsTestCase):
         url = '%(url)s?%(next)s=%(next_url)s' % {
             'url': logout_url,
             'next': REDIRECT_FIELD_NAME,
-            'next_url': urlquote(non_https_next_url),
+            'next_url': quote(non_https_next_url),
         }
         self.login()
         response = self.client.get(url, secure=True)

@@ -5,10 +5,10 @@ import errno
 import os
 import socket
 from urllib.error import HTTPError
+from urllib.parse import urlencode
 from urllib.request import urlopen
 
 from django.test import LiveServerTestCase, override_settings
-from django.utils.http import urlencode
 
 from .models import Person
 

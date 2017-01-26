@@ -70,9 +70,8 @@ use for reversing. By default, the root URLconf for the current thread is used.
         >>> reverse('cities', args=['Orléans'])
         '.../Orl%C3%A9ans/'
 
-    Applying further encoding (such as :meth:`~django.utils.http.urlquote` or
-    ``urllib.quote``) to the output of ``reverse()`` may produce undesirable
-    results.
+    Applying further encoding (such as :func:`urllib.parse.quote`) to the output
+    of ``reverse()`` may produce undesirable results.
 
 ``reverse_lazy()``
 ==================
