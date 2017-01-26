@@ -53,6 +53,12 @@ Specify a translation string by using the function
 as a shorter alias, ``_``, to save typing.
 
 .. note::
+    The ``u`` prefixing of ``gettext`` functions was originally to distinguish
+    usage between unicode strings and bytestrings on Python 2. For code that
+    supports only Python 3, they can be used interchangeably. A deprecation for
+    the prefixed functions may happen in a future Django release.
+
+.. note::
     Python's standard library ``gettext`` module installs ``_()`` into the
     global namespace, as an alias for ``gettext()``. In Django, we have chosen
     not to follow this practice, for a couple of reasons:
@@ -427,24 +433,6 @@ You can avoid such problems by casting ``ugettext_lazy()`` objects to text
 strings before passing them to non-Django code::
 
     requests.post('https://example.com/send', data={'body': str(body)})
-
-If you try to use a ``ugettext_lazy()`` result where a bytestring (a
-:class:`bytes` object) is expected, things won't work as expected since a
-``ugettext_lazy()`` object doesn't know how to convert itself to a bytestring.
-You can't use a string inside a bytestring, either, so this is consistent with
-normal Python behavior. For example, putting a string proxy into a string is
-fine::
-
-    "Hello %s" % ugettext_lazy("people")
-
-But you can't insert a string into a bytestring and nor can you insert
-a string proxy there::
-
-    b"Hello %s" % ugettext_lazy("people")
-
-If you ever see output that looks like ``"hello
-<django.utils.functional...>"``, you have tried to insert the result of
-``ugettext_lazy()`` into a bytestring. That's a bug in your code.
 
 If you don't like the long ``ugettext_lazy`` name, you can just alias it as
 ``_`` (underscore), like so::

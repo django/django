@@ -78,16 +78,16 @@ def gettext(message):
     return _trans.gettext(message)
 
 
+# An alias since Django 2.0
+ugettext = gettext
+
+
 def ngettext(singular, plural, number):
     return _trans.ngettext(singular, plural, number)
 
 
-def ugettext(message):
-    return _trans.ugettext(message)
-
-
-def ungettext(singular, plural, number):
-    return _trans.ungettext(singular, plural, number)
+# An alias since Django 2.0
+ungettext = ngettext
 
 
 def pgettext(context, message):
@@ -98,8 +98,7 @@ def npgettext(context, singular, plural, number):
     return _trans.npgettext(context, singular, plural, number)
 
 
-gettext_lazy = lazy(gettext, str)
-ugettext_lazy = lazy(ugettext, str)
+gettext_lazy = ugettext_lazy = lazy(gettext, str)
 pgettext_lazy = lazy(pgettext, str)
 
 
@@ -148,8 +147,8 @@ def ngettext_lazy(singular, plural, number=None):
     return lazy_number(ngettext, str, singular=singular, plural=plural, number=number)
 
 
-def ungettext_lazy(singular, plural, number=None):
-    return lazy_number(ungettext, str, singular=singular, plural=plural, number=number)
+# An alias since Django 2.0
+ungettext_lazy = ngettext_lazy
 
 
 def npgettext_lazy(context, singular, plural, number=None):

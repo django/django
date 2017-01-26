@@ -297,10 +297,9 @@ def catalog():
     return _default
 
 
-def do_translate(message, translation_function):
+def gettext(message):
     """
-    Translates 'message' using the given 'translation_function' name -- which
-    will be either gettext or ugettext. It uses the current thread to find the
+    Translate the 'message' string. It uses the current thread to find the
     translation object to use. If no current translation is activated, the
     message will be run through the default translation object.
     """
@@ -316,7 +315,7 @@ def do_translate(message, translation_function):
         _default = _default or translation(settings.LANGUAGE_CODE)
         translation_object = getattr(_active, "value", _default)
 
-        result = getattr(translation_object, translation_function)(eol_message)
+        result = translation_object.gettext(eol_message)
 
     if isinstance(message, SafeData):
         return mark_safe(result)
@@ -324,17 +323,9 @@ def do_translate(message, translation_function):
     return result
 
 
-def gettext(message):
-    """Return a string of the translation of the message."""
-    return do_translate(message, 'gettext')
-
-
-ugettext = gettext
-
-
 def pgettext(context, message):
     msg_with_ctxt = "%s%s%s" % (context, CONTEXT_SEPARATOR, message)
-    result = ugettext(msg_with_ctxt)
+    result = gettext(msg_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
         # force str, because the lazy version expects str.
@@ -371,17 +362,14 @@ def ngettext(singular, plural, number):
     return do_ntranslate(singular, plural, number, 'ngettext')
 
 
-ungettext = ngettext
-
-
 def npgettext(context, singular, plural, number):
     msgs_with_ctxt = ("%s%s%s" % (context, CONTEXT_SEPARATOR, singular),
                       "%s%s%s" % (context, CONTEXT_SEPARATOR, plural),
                       number)
-    result = ungettext(*msgs_with_ctxt)
+    result = ngettext(*msgs_with_ctxt)
     if CONTEXT_SEPARATOR in result:
         # Translation not found
-        result = ungettext(singular, plural, number)
+        result = ngettext(singular, plural, number)
     return result
 
 

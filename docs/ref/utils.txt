@@ -1011,10 +1011,11 @@ appropriate entities.
 For a complete discussion on the usage of the following see the
 :doc:`translation documentation </topics/i18n/translation>`.
 
+The ``u`` prefix on the functions below comes from a difference in Python 2
+between unicode and bytestrings. If your code doesn't support Python 2, use the
+functions without the ``u``.
+
 .. function:: gettext(message)
-
-    Translates ``message`` and returns it in a UTF-8 bytestring.
-
 .. function:: ugettext(message)
 
     Translates ``message`` and returns it as a string.
@@ -1042,19 +1043,15 @@ For a complete discussion on the usage of the following see the
     later.
 
 .. function:: ngettext(singular, plural, number)
-
-    Translates ``singular`` and ``plural`` and returns the appropriate string
-    based on ``number`` in a UTF-8 bytestring.
-
 .. function:: ungettext(singular, plural, number)
 
     Translates ``singular`` and ``plural`` and returns the appropriate string
-    based on ``number`` as a string.
+    based on ``number``.
 
 .. function:: npgettext(context, singular, plural, number)
 
     Translates ``singular`` and ``plural`` and returns the appropriate string
-    based on ``number`` and the ``context`` as a string.
+    based on ``number`` and the ``context``.
 
 .. function:: ngettext_lazy(singular, plural, number)
 .. function:: ungettext_lazy(singular, plural, number)
