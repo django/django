@@ -56,18 +56,13 @@ def symlinks_supported():
     host platform and/or if they are allowed to be created (e.g.
     on Windows it requires admin permissions).
     """
-    tmpdir = tempfile.mkdtemp()
-    original_path = os.path.join(tmpdir, 'original')
-    symlink_path = os.path.join(tmpdir, 'symlink')
-    os.makedirs(original_path)
-    try:
-        os.symlink(original_path, symlink_path)
-        supported = True
-    except (OSError, NotImplementedError, AttributeError):
-        supported = False
-    else:
-        os.remove(symlink_path)
-    finally:
-        os.rmdir(original_path)
-        os.rmdir(tmpdir)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        original_path = os.path.join(temp_dir, 'original')
+        symlink_path = os.path.join(temp_dir, 'symlink')
+        os.makedirs(original_path)
+        try:
+            os.symlink(original_path, symlink_path)
+            supported = True
+        except (OSError, NotImplementedError):
+            supported = False
         return supported

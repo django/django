@@ -493,14 +493,11 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             mail.get_connection('django.core.mail.backends.console.EmailBackend'),
             console.EmailBackend
         )
-        tmp_dir = tempfile.mkdtemp()
-        try:
+        with tempfile.TemporaryDirectory() as tmp_dir:
             self.assertIsInstance(
                 mail.get_connection('django.core.mail.backends.filebased.EmailBackend', file_path=tmp_dir),
                 filebased.EmailBackend
             )
-        finally:
-            shutil.rmtree(tmp_dir)
         self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
     @override_settings(

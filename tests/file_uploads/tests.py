@@ -103,21 +103,13 @@ class FileUploadTests(TestCase):
         self._test_base64_upload("Big data" * 68000, encode=base64.encodebytes)
 
     def test_unicode_file_name(self):
-        tdir = sys_tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, tdir, True)
-
-        # This file contains Chinese symbols and an accented char in the name.
-        with open(os.path.join(tdir, UNICODE_FILENAME), 'w+b') as file1:
-            file1.write(b'b' * (2 ** 10))
-            file1.seek(0)
-
-            post_data = {
-                'file_unicode': file1,
-            }
-
-            response = self.client.post('/unicode_name/', post_data)
-
-        self.assertEqual(response.status_code, 200)
+        with sys_tempfile.TemporaryDirectory() as temp_dir:
+            # This file contains Chinese symbols and an accented char in the name.
+            with open(os.path.join(temp_dir, UNICODE_FILENAME), 'w+b') as file1:
+                file1.write(b'b' * (2 ** 10))
+                file1.seek(0)
+                response = self.client.post('/unicode_name/', {'file_unicode': file1})
+            self.assertEqual(response.status_code, 200)
 
     def test_unicode_file_name_rfc2231(self):
         """

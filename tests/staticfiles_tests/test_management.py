@@ -218,10 +218,9 @@ class TestInteractiveMessages(CollectionTestCase):
 
     def test_no_warning_for_empty_staticdir(self):
         stdout = StringIO()
-        static_dir = tempfile.mkdtemp(prefix='collectstatic_empty_staticdir_test')
-        with override_settings(STATIC_ROOT=static_dir):
-            call_command('collectstatic', interactive=True, stdout=stdout)
-        shutil.rmtree(static_dir)
+        with tempfile.TemporaryDirectory(prefix='collectstatic_empty_staticdir_test') as static_dir:
+            with override_settings(STATIC_ROOT=static_dir):
+                call_command('collectstatic', interactive=True, stdout=stdout)
         output = stdout.getvalue()
         self.assertNotIn(self.overwrite_warning_msg, output)
         self.assertNotIn(self.delete_warning_msg, output)
@@ -360,24 +359,22 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
         """
         There is a warning when there are duplicate destinations.
         """
-        static_dir = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, static_dir)
+        with tempfile.TemporaryDirectory() as static_dir:
+            duplicate = os.path.join(static_dir, 'test', 'file.txt')
+            os.mkdir(os.path.dirname(duplicate))
+            with open(duplicate, 'w+') as f:
+                f.write('duplicate of file.txt')
 
-        duplicate = os.path.join(static_dir, 'test', 'file.txt')
-        os.mkdir(os.path.dirname(duplicate))
-        with open(duplicate, 'w+') as f:
-            f.write('duplicate of file.txt')
+            with self.settings(STATICFILES_DIRS=[static_dir]):
+                output = self._collectstatic_output(clear=True)
+            self.assertIn(self.warning_string, output)
 
-        with self.settings(STATICFILES_DIRS=[static_dir]):
-            output = self._collectstatic_output(clear=True)
-        self.assertIn(self.warning_string, output)
+            os.remove(duplicate)
 
-        os.remove(duplicate)
-
-        # Make sure the warning went away again.
-        with self.settings(STATICFILES_DIRS=[static_dir]):
-            output = self._collectstatic_output(clear=True)
-        self.assertNotIn(self.warning_string, output)
+            # Make sure the warning went away again.
+            with self.settings(STATICFILES_DIRS=[static_dir]):
+                output = self._collectstatic_output(clear=True)
+            self.assertNotIn(self.warning_string, output)
 
 
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.DummyStorage')
