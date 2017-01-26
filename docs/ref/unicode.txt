@@ -156,8 +156,8 @@ Django provides some assistance.
 * The function :func:`django.utils.encoding.iri_to_uri()` implements the
   conversion from IRI to URI as required by the specification (:rfc:`3987#section-3.1`).
 
-* The functions :func:`django.utils.http.urlquote()` and
-  :func:`django.utils.http.urlquote_plus()` are versions of Python's standard
+* The functions ``django.utils.http.urlquote()`` and
+  ``django.utils.http.urlquote_plus()`` are versions of Python's standard
   ``urllib.quote()`` and ``urllib.quote_plus()`` that work with non-ASCII
   characters. (The data is converted to UTF-8 prior to encoding.)
 

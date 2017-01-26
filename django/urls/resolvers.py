@@ -9,6 +9,7 @@ import functools
 import re
 import threading
 from importlib import import_module
+from urllib.parse import quote
 
 from django.conf import settings
 from django.core.checks import Warning
@@ -17,7 +18,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
-from django.utils.http import RFC3986_SUBDELIMS, urlquote
+from django.utils.http import RFC3986_SUBDELIMS
 from django.utils.regex_helper import normalize
 from django.utils.translation import get_language
 
@@ -455,7 +456,7 @@ class RegexURLResolver(LocaleRegexProvider):
                 candidate_pat = _prefix.replace('%', '%%') + result
                 if re.search('^%s%s' % (re.escape(_prefix), pattern), candidate_pat % candidate_subs):
                     # safe characters from `pchar` definition of RFC 3986
-                    url = urlquote(candidate_pat % candidate_subs, safe=RFC3986_SUBDELIMS + str('/~:@'))
+                    url = quote(candidate_pat % candidate_subs, safe=RFC3986_SUBDELIMS + '/~:@')
                     # Don't allow construction of scheme relative urls.
                     if url.startswith('//'):
                         url = '/%%2F%s' % url[2:]

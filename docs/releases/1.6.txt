@@ -585,7 +585,7 @@ be at the end of a line. If they are not, the comments are ignored and
 Quoting in ``reverse()``
 ------------------------
 
-When reversing URLs, Django didn't apply :func:`~django.utils.http.urlquote`
+When reversing URLs, Django didn't apply ``django.utils.http.urlquote``
 to arguments before interpolating them in URL patterns. This bug is fixed in
 Django 1.6. If you worked around this bug by applying URL quoting before
 passing arguments to ``reverse()``, this may result in double-quoting. If this

@@ -1,12 +1,12 @@
 import datetime
 import unittest
+from urllib.parse import quote_plus
 
 from django.utils.encoding import (
     escape_uri_path, filepath_to_uri, force_bytes, force_text, iri_to_uri,
     smart_text, uri_to_iri,
 )
 from django.utils.functional import SimpleLazyObject
-from django.utils.http import urlquote_plus
 
 
 class TestEncodingUtils(unittest.TestCase):
@@ -72,7 +72,7 @@ class TestRFC3987IEncodingUtils(unittest.TestCase):
             # Valid UTF-8 sequences are encoded.
             ('red%09rosé#red', 'red%09ros%C3%A9#red'),
             ('/blog/for/Jürgen Münster/', '/blog/for/J%C3%BCrgen%20M%C3%BCnster/'),
-            ('locations/%s' % urlquote_plus('Paris & Orléans'), 'locations/Paris+%26+Orl%C3%A9ans'),
+            ('locations/%s' % quote_plus('Paris & Orléans'), 'locations/Paris+%26+Orl%C3%A9ans'),
 
             # Reserved chars remain unescaped.
             ('%&', '%&'),

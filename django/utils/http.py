@@ -14,7 +14,7 @@ from urllib.parse import (
 from django.core.exceptions import TooManyFieldsSent
 from django.utils.datastructures import MultiValueDict
 from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_bytes, force_str, force_text
+from django.utils.encoding import force_bytes
 from django.utils.functional import keep_lazy_text
 
 # based on RFC 7232, Appendix C
@@ -47,58 +47,53 @@ FIELDS_MATCH = re.compile('[&;]')
 @keep_lazy_text
 def urlquote(url, safe='/'):
     """
-    A version of Python's urllib.quote() function that can operate on unicode
-    strings. The url is first UTF-8 encoded before quoting. The returned string
-    can safely be used as part of an argument to a subsequent iri_to_uri() call
-    without double-quoting occurring.
+    A legacy compatibility wrapper to Python's urllib.parse.quote() function.
+    (was used for unicode handling on Python 2)
     """
-    return force_text(quote(force_str(url), force_str(safe)))
+    return quote(url, safe)
 
 
 @keep_lazy_text
 def urlquote_plus(url, safe=''):
     """
-    A version of Python's urllib.quote_plus() function that can operate on
-    unicode strings. The url is first UTF-8 encoded before quoting. The
-    returned string can safely be used as part of an argument to a subsequent
-    iri_to_uri() call without double-quoting occurring.
+    A legacy compatibility wrapper to Python's urllib.parse.quote_plus()
+    function. (was used for unicode handling on Python 2)
     """
-    return force_text(quote_plus(force_str(url), force_str(safe)))
+    return quote_plus(url, safe)
 
 
 @keep_lazy_text
 def urlunquote(quoted_url):
     """
-    A wrapper for Python's urllib.unquote() function that can operate on
-    the result of django.utils.http.urlquote().
+    A legacy compatibility wrapper to Python's urllib.parse.unquote() function.
+    (was used for unicode handling on Python 2)
     """
-    return force_text(unquote(force_str(quoted_url)))
+    return unquote(quoted_url)
 
 
 @keep_lazy_text
 def urlunquote_plus(quoted_url):
     """
-    A wrapper for Python's urllib.unquote_plus() function that can operate on
-    the result of django.utils.http.urlquote_plus().
+    A legacy compatibility wrapper to Python's urllib.parse.unquote_plus()
+    function. (was used for unicode handling on Python 2)
     """
-    return force_text(unquote_plus(force_str(quoted_url)))
+    return unquote_plus(quoted_url)
 
 
-def urlencode(query, doseq=0):
+def urlencode(query, doseq=False):
     """
-    A version of Python's urllib.urlencode() function that can operate on
-    unicode strings. The parameters are first cast to UTF-8 encoded strings and
-    then encoded as per normal.
+    A version of Python's urllib.parse.urlencode() function that can operate on
+    MultiValueDict and non-string values.
     """
     if isinstance(query, MultiValueDict):
         query = query.lists()
     elif hasattr(query, 'items'):
         query = query.items()
     return original_urlencode(
-        [(force_str(k),
-         [force_str(i) for i in v] if isinstance(v, (list, tuple)) else force_str(v))
-            for k, v in query],
-        doseq)
+        [(k, [str(i) for i in v] if isinstance(v, (list, tuple)) else str(v))
+         for k, v in query],
+        doseq
+    )
 
 
 def cookie_date(epoch_seconds=None):

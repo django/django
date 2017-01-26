@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from http import cookies
 from io import BytesIO
 from itertools import chain
-from urllib.parse import urlencode as original_urlencode
+from urllib.parse import urlencode
 
 from django.core.exceptions import SuspiciousOperation
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
@@ -14,7 +14,7 @@ from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
 from django.test.utils import freeze_time
-from django.utils.http import cookie_date, urlencode
+from django.utils.http import cookie_date
 from django.utils.timezone import utc
 
 
@@ -379,7 +379,7 @@ class RequestsTests(SimpleTestCase):
         """
         Test a POST with non-utf-8 payload encoding.
         """
-        payload = FakePayload(original_urlencode({'key': 'España'.encode('latin-1')}))
+        payload = FakePayload(urlencode({'key': 'España'.encode('latin-1')}))
         request = WSGIRequest({
             'REQUEST_METHOD': 'POST',
             'CONTENT_LENGTH': len(payload),
