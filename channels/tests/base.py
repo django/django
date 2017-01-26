@@ -6,8 +6,8 @@ import string
 from functools import wraps
 
 from asgiref.inmemory import ChannelLayer as InMemoryChannelLayer
-from django.test.testcases import TestCase, TransactionTestCase
 from django.db import close_old_connections
+from django.test.testcases import TestCase, TransactionTestCase
 
 from .. import DEFAULT_CHANNEL_LAYER
 from ..asgi import ChannelLayerWrapper, channel_layers
