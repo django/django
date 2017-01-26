@@ -201,7 +201,7 @@ The functions defined in this module share the following properties:
     To support Python 2 and 3 with a single code base, define a ``__str__``
     method returning text and apply this decorator to the class.
 
-.. function:: smart_text(s, encoding='utf-8', strings_only=False, errors='strict')
+.. function:: smart_str(s, encoding='utf-8', strings_only=False, errors='strict')
 
     Returns a ``str`` object representing ``s``. Treats bytestrings using the
     ``encoding`` codec.
@@ -214,11 +214,11 @@ The functions defined in this module share the following properties:
     Determine if the object instance is of a protected type.
 
     Objects of protected types are preserved as-is when passed to
-    ``force_text(strings_only=True)``.
+    ``force_str(strings_only=True)``.
 
-.. function:: force_text(s, encoding='utf-8', strings_only=False, errors='strict')
+.. function:: force_str(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    Similar to ``smart_text``, except that lazy instances are resolved to
+    Similar to ``smart_str``, except that lazy instances are resolved to
     strings, rather than kept as lazy objects.
 
     If ``strings_only`` is ``True``, don't convert (some) non-string-like
@@ -240,22 +240,15 @@ The functions defined in this module share the following properties:
     If ``strings_only`` is ``True``, don't convert (some) non-string-like
     objects.
 
-.. function:: smart_str(s, encoding='utf-8', strings_only=False, errors='strict')
+.. function:: smart_text(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    Alias of :func:`smart_text`. This function returns a ``str`` or a lazy
-    string.
+    Alias of :func:`force_str` for backwards-compatibility, especially in code
+    that still supports Python 2.
 
-    For instance, this is suitable for writing to :data:`sys.stdout`.
+.. function:: force_text(s, encoding='utf-8', strings_only=False, errors='strict')
 
-    Alias of :func:`smart_bytes` on Python 2 (in older versions of Django that
-    support it).
-
-.. function:: force_str(s, encoding='utf-8', strings_only=False, errors='strict')
-
-    Alias of :func:`force_text`. This function always returns a ``str``.
-
-    Alias of :func:`force_bytes` on Python 2 (in older versions of Django that
-    support it).
+    Alias of :func:`force_str` for backwards-compatibility, especially in code
+    that still supports Python 2.
 
 .. function:: iri_to_uri(iri)
 
@@ -590,7 +583,7 @@ escaping HTML.
 
     Returns the given text with ampersands, quotes and angle brackets encoded
     for use in HTML. The input is first passed through
-    :func:`~django.utils.encoding.force_text` and the output has
+    :func:`~django.utils.encoding.force_str` and the output has
     :func:`~django.utils.safestring.mark_safe` applied.
 
 .. function:: conditional_escape(text)
@@ -632,7 +625,7 @@ escaping HTML.
     interpolation, some of the formatting options provided by ``str.format()``
     (e.g. number formatting) will not work, since all arguments are passed
     through :func:`conditional_escape` which (ultimately) calls
-    :func:`~django.utils.encoding.force_text` on the values.
+    :func:`~django.utils.encoding.force_str` on the values.
 
 .. function:: format_html_join(sep, format_string, args_generator)
 

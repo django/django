@@ -22,7 +22,7 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
 python_2_unicode_compatible = six.python_2_unicode_compatible
 
 
-def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
+def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     Returns a text object representing 's' -- unicode on Python 2 and str on
     Python 3. Treats bytestrings using the 'encoding' codec.
@@ -32,7 +32,7 @@ def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     if isinstance(s, Promise):
         # The input is the result of a gettext_lazy() call.
         return s
-    return force_text(s, encoding, strings_only, errors)
+    return force_str(s, encoding, strings_only, errors)
 
 
 _PROTECTED_TYPES = (
@@ -44,14 +44,14 @@ def is_protected_type(obj):
     """Determine if the object instance is of a protected type.
 
     Objects of protected types are preserved as-is when passed to
-    force_text(strings_only=True).
+    force_str(strings_only=True).
     """
     return isinstance(obj, _PROTECTED_TYPES)
 
 
-def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
+def force_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
-    Similar to smart_text, except that lazy instances are resolved to
+    Similar to smart_str, except that lazy instances are resolved to
     strings, rather than kept as lazy objects.
 
     If strings_only is True, don't convert (some) non-string-like objects.
@@ -81,7 +81,7 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
             # working unicode method. Try to handle this without raising a
             # further exception by individually forcing the exception args
             # to unicode.
-            s = ' '.join(force_text(arg, encoding, strings_only, errors)
+            s = ' '.join(force_str(arg, encoding, strings_only, errors)
                          for arg in s)
     return s
 
@@ -132,18 +132,9 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
         return s.encode(encoding, errors)
 
 
-smart_str = smart_text
-force_str = force_text
-
-smart_str.__doc__ = """
-Apply smart_text in Python 3 and smart_bytes in Python 2.
-
-This is suitable for writing to sys.stdout (for instance).
-"""
-
-force_str.__doc__ = """
-Apply force_text in Python 3 and force_bytes in Python 2.
-"""
+# For backwards-compatibility.
+smart_text = smart_str
+force_text = force_str
 
 
 def iri_to_uri(iri):
