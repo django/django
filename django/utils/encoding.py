@@ -68,10 +68,7 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
             else:
                 s = str(s)
         else:
-            # Note: We use .decode() here, instead of str(s, encoding,
-            # errors), so that if s is a SafeBytes, it ends up being a
-            # SafeText at the end.
-            s = s.decode(encoding, errors)
+            str(s, encoding, errors)
     except UnicodeDecodeError as e:
         if not isinstance(s, Exception):
             raise DjangoUnicodeDecodeError(s, *e.args)
@@ -209,7 +206,7 @@ def escape_uri_path(path):
     # and "?" according to section 3.3 of RFC 2396.
     # The reason for not subtracting and escaping "/" is that we are escaping
     # the entire path, not a path segment.
-    return quote(force_bytes(path), safe=b"/:@&+$,-_.!~*'()")
+    return quote(path, safe="/:@&+$,-_.!~*'()")
 
 
 def repercent_broken_unicode(path):
@@ -231,20 +228,18 @@ def filepath_to_uri(path):
     """Convert a file system path to a URI portion that is suitable for
     inclusion in a URL.
 
-    Assume the input is either UTF-8 bytes or a string.
-
     This method will encode certain chars that would normally be recognized as
     special chars for URIs.  Note that this method does not encode the '
     character, as it is a valid character within URIs.  See
     encodeURIComponent() JavaScript function for more details.
 
-    Returns an ASCII string containing the encoded result.
+    Return a string containing the result.
     """
     if path is None:
         return path
     # I know about `os.sep` and `os.altsep` but I want to leave
     # some flexibility for hardcoding separators.
-    return quote(force_bytes(path).replace(b"\\", b"/"), safe=b"/~!*()'")
+    return quote(path.replace("\\", "/"), safe="/~!*()'")
 
 
 def get_system_encoding():

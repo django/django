@@ -763,19 +763,11 @@ string" means that the producer of the string has already turned characters
 that should not be interpreted by the HTML engine (e.g. '<') into the
 appropriate entities.
 
-.. class:: SafeBytes
-
-    A ``bytes`` subclass that has been specifically marked as "safe"
-    (requires no further escaping) for HTML output purposes.
-
 .. class:: SafeString
 
     A ``str`` subclass that has been specifically marked as "safe"
     (requires no further escaping) for HTML output purposes. Alias of
     :class:`SafeText`.
-
-    Alias of :class:`SafeBytes` on Python 2 (in older versions of Django that
-    support it).
 
 .. class:: SafeText
 
@@ -799,7 +791,7 @@ appropriate entities.
         >>> mystr = '<b>Hello World</b>   '
         >>> mystr = mark_safe(mystr)
         >>> type(mystr)
-        <class 'django.utils.safestring.SafeBytes'>
+        <class 'django.utils.safestring.SafeText'>
 
         >>> mystr = mystr.strip()  # removing whitespace
         >>> type(mystr)
