@@ -1121,9 +1121,9 @@ method::
 
     .. attribute:: queryset
 
-        A ``QuerySet`` of model objects from which the choices for the
-        field will be derived, and which will be used to validate the
-        user's selection.
+        A ``QuerySet`` of model objects from which the choices for the field
+        are derived and which is used to validate the user's selection. It's
+        evaluated when the form is rendered.
 
     ``ModelChoiceField`` also takes two optional arguments:
 
