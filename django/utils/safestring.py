@@ -5,7 +5,7 @@ that the producer of the string has already turned characters that should not
 be interpreted by the HTML engine (e.g. '<') into the appropriate entities.
 """
 
-from django.utils.functional import Promise, curry, wraps
+from django.utils.functional import Promise, wraps
 
 
 class SafeData:
@@ -22,6 +22,9 @@ class SafeBytes(bytes, SafeData):
     """
     A bytes subclass that has been specifically marked as "safe" (requires no
     further escaping) for HTML output purposes.
+
+    Kept in Django 2.0 for usage by apps supporting Python 2. Shouldn't be used
+    in Django anymore.
     """
     def __add__(self, rhs):
         """
@@ -34,20 +37,6 @@ class SafeBytes(bytes, SafeData):
         elif isinstance(rhs, SafeBytes):
             return SafeBytes(t)
         return t
-
-    def _proxy_method(self, *args, **kwargs):
-        """
-        Wrap a call to a normal bytes method up so that the result is safe.
-        The method that is being wrapped is passed in the 'method' argument.
-        """
-        method = kwargs.pop('method')
-        data = method(self, *args, **kwargs)
-        if isinstance(data, bytes):
-            return SafeBytes(data)
-        else:
-            return SafeText(data)
-
-    decode = curry(_proxy_method, method=bytes.decode)
 
 
 class SafeText(str, SafeData):
@@ -64,20 +53,6 @@ class SafeText(str, SafeData):
         if isinstance(rhs, SafeData):
             return SafeText(t)
         return t
-
-    def _proxy_method(self, *args, **kwargs):
-        """
-        Wrap a call to a normal str method up so that the result is safe.
-        The method that is being wrapped is passed in the 'method' argument.
-        """
-        method = kwargs.pop('method')
-        data = method(self, *args, **kwargs)
-        if isinstance(data, bytes):
-            return SafeBytes(data)
-        else:
-            return SafeText(data)
-
-    encode = curry(_proxy_method, method=str.encode)
 
 
 SafeString = SafeText
@@ -101,10 +76,8 @@ def mark_safe(s):
     """
     if hasattr(s, '__html__'):
         return s
-    if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):
-        return SafeBytes(s)
     if isinstance(s, (str, Promise)):
         return SafeText(s)
     if callable(s):
         return _safety_decorator(mark_safe, s)
-    return SafeString(str(s))
+    return SafeText(str(s))

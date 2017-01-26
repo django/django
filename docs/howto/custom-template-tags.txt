@@ -199,11 +199,13 @@ passed around inside the template code:
   They're commonly used for output that contains raw HTML that is intended
   to be interpreted as-is on the client side.
 
-  Internally, these strings are of type ``SafeBytes`` or ``SafeText``.
-  They share a common base class of ``SafeData``, so you can test
-  for them using code like::
+  Internally, these strings are of type
+  :class:`~django.utils.safestring.SafeText`. You can test for them
+  using code like::
 
-      if isinstance(value, SafeData):
+      from django.utils.safestring import SafeText
+
+      if isinstance(value, SafeText):
           # Do something with the "safe" string.
           ...
 

@@ -20,7 +20,7 @@ from django.utils.formats import (
     localize_input, reset_format_cache, sanitize_separators, time_format,
 )
 from django.utils.numberformat import format as nformat
-from django.utils.safestring import SafeBytes, SafeText
+from django.utils.safestring import SafeText
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
     get_language, get_language_from_request, get_language_info, gettext_lazy,
@@ -1279,8 +1279,6 @@ class TestModels(TestCase):
     def test_safestr(self):
         c = Company(cents_paid=12, products_delivered=1)
         c.name = SafeText('Iñtërnâtiônàlizætiøn1')
-        c.save()
-        c.name = SafeBytes('Iñtërnâtiônàlizætiøn1'.encode('utf-8'))
         c.save()
 
 

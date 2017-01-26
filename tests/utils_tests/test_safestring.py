@@ -1,11 +1,8 @@
 from django.template import Context, Template
 from django.test import SimpleTestCase
 from django.utils import html, text
-from django.utils.encoding import force_bytes
-from django.utils.functional import lazy, lazystr
+from django.utils.functional import lazystr
 from django.utils.safestring import SafeData, mark_safe
-
-lazybytes = lazy(force_bytes, bytes)
 
 
 class customescape(str):
@@ -37,10 +34,8 @@ class SafeStringTest(SimpleTestCase):
 
     def test_mark_safe_lazy(self):
         s = lazystr('a&b')
-        b = lazybytes(b'a&b')
 
         self.assertIsInstance(mark_safe(s), SafeData)
-        self.assertIsInstance(mark_safe(b), SafeData)
         self.assertRenderEqual('{{ s }}', 'a&b', s=mark_safe(s))
 
     def test_mark_safe_object_implementing_dunder_str(self):

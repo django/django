@@ -13,7 +13,7 @@ from django.db import DEFAULT_DB_ALIAS
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.utils import DatabaseError as WrappedDatabaseError
 from django.utils.functional import cached_property
-from django.utils.safestring import SafeBytes, SafeText
+from django.utils.safestring import SafeText
 
 try:
     import psycopg2 as Database
@@ -44,7 +44,6 @@ from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
 from .utils import utc_tzinfo_factory                       # NOQA isort:skip
 from .version import get_version                            # NOQA isort:skip
 
-psycopg2.extensions.register_adapter(SafeBytes, psycopg2.extensions.QuotedString)
 psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
 psycopg2.extras.register_uuid()
 
