@@ -75,7 +75,7 @@ class VariableResolveLoggingTests(BaseTemplateLoggingTestCase):
         raised_exception = self.test_handler.log_record.exc_info[1]
         self.assertEqual(
             str(raised_exception),
-            'Failed lookup for key [author] in %r' % ("{%r: %r}" % ('section', 'News'))
+            "Failed lookup for key [author] in {'section': 'News'}"
         )
 
     def test_no_log_when_variable_exists(self):
