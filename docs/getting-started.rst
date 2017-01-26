@@ -640,37 +640,30 @@ sites with Channels - consumer ordering.
 
 Because Channels is a distributed system that can have many workers, by default
 it just processes messages in the order the workers get them off the queue.
-It's entirely feasible for a WebSocket interface server to send out a ``connect``
-and a ``receive`` message close enough together that a second worker will pick
-up and start processing the ``receive`` message before the first worker has
-finished processing the ``connect`` worker.
+It's entirely feasible for a WebSocket interface server to send out two
+``receive`` messages close enough together that a second worker will pick
+up and start processing the second message before the first worker has
+finished processing the first.
 
 This is particularly annoying if you're storing things in the session in the
-``connect`` consumer and trying to get them in the ``receive`` consumer - because
+one consumer and trying to get them in the other consumer - because
 the ``connect`` consumer hasn't exited, its session hasn't saved. You'd get the
 same effect if someone tried to request a view before the login view had finished
-processing, but there you're not expecting that page to run after the login,
-whereas you'd naturally expect ``receive`` to run after ``connect``.
+processing, of course, but HTTP requests usually come in a bit slower from clients.
 
 Channels has a solution - the ``enforce_ordering`` decorator. All WebSocket
 messages contain an ``order`` key, and this decorator uses that to make sure that
-messages are consumed in the right order, in one of two modes:
-
-* Slight ordering: Message 0 (``websocket.connect``) is done first, all others
-  are unordered
-
-* Strict ordering: All messages are consumed strictly in sequence
+messages are consumed in the right order. In addition, the ``connect`` message
+blocks the socket opening until it's responded to, so you are always guaranteed
+that ``connect`` will run before any ``receives`` even without the decorator.
 
 The decorator uses ``channel_session`` to keep track of what numbered messages
 have been processed, and if a worker tries to run a consumer on an out-of-order
 message, it raises the ``ConsumeLater`` exception, which puts the message
 back on the channel it came from and tells the worker to work on another message.
 
-There's a cost to using ``enforce_ordering``, which is why it's an optional
-decorator, and the cost is much greater in *strict* mode than it is in
-*slight* mode. Generally you'll want to use *slight* mode for most session-based WebSocket
-and other "continuous protocol" things. Here's an example, improving our
-first-letter-of-username chat from earlier::
+There's a high cost to using ``enforce_ordering``, which is why it's an optional
+decorator. Here's an example of it being used
 
     # In consumers.py
     from channels import Channel, Group
@@ -678,39 +671,32 @@ first-letter-of-username chat from earlier::
     from channels.auth import channel_session_user, channel_session_user_from_http
 
     # Connected to websocket.connect
-    @enforce_ordering(slight=True)
     @channel_session_user_from_http
     def ws_add(message):
+        # This doesn't need a decorator - it always runs separately
+        message.channel_session['sent'] = 0
         # Add them to the right group
-        Group("chat-%s" % message.user.username[0]).add(message.reply_channel)
+        Group("chat").add(message.reply_channel)
+        # Accept the socket
+        message.reply_channel.send({"accept": True})
 
     # Connected to websocket.receive
-    @enforce_ordering(slight=True)
+    @enforce_ordering
     @channel_session_user
     def ws_message(message):
-        Group("chat-%s" % message.user.username[0]).send({
-            "text": message['text'],
+        # Without enforce_ordering this wouldn't work right
+        message.channel_session['sent'] = message.channel_session['sent'] + 1
+        Group("chat").send({
+            "text": "%s: %s" % (message.channel_session['sent'], message['text']),
         })
 
     # Connected to websocket.disconnect
-    @enforce_ordering(slight=True)
     @channel_session_user
     def ws_disconnect(message):
-        Group("chat-%s" % message.user.username[0]).discard(message.reply_channel)
-
-Slight ordering does mean that it's possible for a ``disconnect`` message to
-get processed before a ``receive`` message, but that's fine in this case;
-the client is disconnecting anyway, they don't care about those pending messages.
-
-Strict ordering is the default as it's the most safe; to use it, just call
-the decorator without arguments::
-
-    @enforce_ordering
-    def ws_message(message):
-        ...
+        Group("chat").discard(message.reply_channel)
 
 Generally, the performance (and safety) of your ordering is tied to your
-session backend's performance. Make sure you choose session backend wisely
+session backend's performance. Make sure you choose a session backend wisely
 if you're going to rely heavily on ``enforce_ordering``.
 
 
