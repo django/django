@@ -20,7 +20,7 @@ from django.contrib.gis.gdal.field import (
 )
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import connections, models, router, transaction
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 
 # LayerMapping exceptions.
@@ -348,7 +348,7 @@ class LayerMapping:
             if self.encoding and ogr_field.value is not None:
                 # The encoding for OGR data sources may be specified here
                 # (e.g., 'cp437' for Census Bureau boundary files).
-                val = force_text(ogr_field.value, self.encoding)
+                val = force_str(ogr_field.value, self.encoding)
             else:
                 val = ogr_field.value
             if model_field.max_length and val is not None and len(val) > model_field.max_length:

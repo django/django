@@ -8,7 +8,7 @@ from django.conf import settings
 from django.db import NotSupportedError, transaction
 from django.db.backends import utils
 from django.utils import timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 
 class BaseDatabaseOperations:
@@ -235,7 +235,7 @@ class BaseDatabaseOperations:
         """
         # Convert params to contain string values.
         def to_string(s):
-            return force_text(s, strings_only=True, errors='replace')
+            return force_str(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
             u_params = tuple(to_string(val) for val in params)
         elif params is None:
