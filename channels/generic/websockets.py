@@ -46,7 +46,7 @@ class WebsocketConsumer(BaseConsumer):
         # Ordering decorators
         if self.strict_ordering:
             return enforce_ordering(handler, slight=False)
-        elif self.slight_ordering:
+        elif getattr(self, "slight_ordering", False):
             raise ValueError("Slight ordering is now always on. Please remove `slight_ordering=True`.")
         else:
             return handler
