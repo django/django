@@ -2,15 +2,15 @@ import datetime
 import unittest
 
 from django.utils.encoding import (
-    escape_uri_path, filepath_to_uri, force_bytes, force_text, iri_to_uri,
-    smart_text, uri_to_iri,
+    escape_uri_path, filepath_to_uri, force_bytes, force_str, iri_to_uri,
+    smart_str, uri_to_iri,
 )
 from django.utils.functional import SimpleLazyObject
 from django.utils.http import urlquote_plus
 
 
 class TestEncodingUtils(unittest.TestCase):
-    def test_force_text_exception(self):
+    def test_force_str_exception(self):
         """
         Broken __str__ actually raises an error.
         """
@@ -20,11 +20,11 @@ class TestEncodingUtils(unittest.TestCase):
 
         # str(s) raises a TypeError if the result is not a text type.
         with self.assertRaises(TypeError):
-            force_text(MyString())
+            force_str(MyString())
 
-    def test_force_text_lazy(self):
+    def test_force_str_lazy(self):
         s = SimpleLazyObject(lambda: 'x')
-        self.assertTrue(type(force_text(s)), str)
+        self.assertTrue(type(force_str(s)), str)
 
     def test_force_bytes_exception(self):
         """
@@ -40,7 +40,7 @@ class TestEncodingUtils(unittest.TestCase):
         today = datetime.date.today()
         self.assertEqual(force_bytes(today, strings_only=True), today)
 
-    def test_smart_text(self):
+    def test_smart_str(self):
         class Test:
             def __str__(self):
                 return 'ŠĐĆŽćžšđ'
@@ -52,10 +52,10 @@ class TestEncodingUtils(unittest.TestCase):
             def __bytes__(self):
                 return b'Foo'
 
-        self.assertEqual(smart_text(Test()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
-        self.assertEqual(smart_text(TestU()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
-        self.assertEqual(smart_text(1), '1')
-        self.assertEqual(smart_text('foo'), 'foo')
+        self.assertEqual(smart_str(Test()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
+        self.assertEqual(smart_str(TestU()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
+        self.assertEqual(smart_str(1), '1')
+        self.assertEqual(smart_str('foo'), 'foo')
 
 
 class TestRFC3987IEncodingUtils(unittest.TestCase):

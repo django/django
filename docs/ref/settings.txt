@@ -2010,7 +2010,7 @@ unpredictable value.
 randomly-generated ``SECRET_KEY`` to each new project.
 
 Uses of the key shouldn't assume that it's text or bytes. Every use should go
-through :func:`~django.utils.encoding.force_text` or
+through :func:`~django.utils.encoding.force_str` or
 :func:`~django.utils.encoding.force_bytes` to convert it to the desired type.
 
 Django will refuse to start if :setting:`SECRET_KEY` is not set.
