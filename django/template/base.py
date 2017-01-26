@@ -119,7 +119,7 @@ class VariableDoesNotExist(Exception):
         self.params = params
 
     def __str__(self):
-        return self.msg % tuple(force_text(p, errors='replace') for p in self.params)
+        return self.msg % self.params
 
 
 class Origin:

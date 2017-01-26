@@ -75,7 +75,22 @@ class VariableResolveLoggingTests(BaseTemplateLoggingTestCase):
         raised_exception = self.test_handler.log_record.exc_info[1]
         self.assertEqual(
             str(raised_exception),
-            'Failed lookup for key [author] in %r' % ("{%r: %r}" % ('section', 'News'))
+            'Failed lookup for key [author] in %r' % ({'section': 'News'},)
+        )
+
+    def test_log_on_variable_does_not_exist_does_not_stringify(self):
+        class TestObject:
+            def __str__(self):
+                return 'fail'
+
+        test_object = TestObject()
+
+        with self.assertRaises(VariableDoesNotExist) as raised_exception:
+            Variable('article').resolve(test_object)
+
+        self.assertEqual(
+            str(raised_exception.exception),
+            'Failed lookup for key [article] in %r' % (test_object,),
         )
 
     def test_no_log_when_variable_exists(self):
