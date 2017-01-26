@@ -3,48 +3,10 @@ from datetime import datetime
 
 from django.test import ignore_warnings
 from django.utils import http
-from django.utils.datastructures import MultiValueDict
 from django.utils.deprecation import RemovedInDjango21Warning
 
 
 class TestUtilsHttp(unittest.TestCase):
-
-    def test_urlencode(self):
-        # 2-tuples (the norm)
-        result = http.urlencode((('a', 1), ('b', 2), ('c', 3)))
-        self.assertEqual(result, 'a=1&b=2&c=3')
-
-        # A dictionary
-        result = http.urlencode({'a': 1, 'b': 2, 'c': 3})
-        acceptable_results = [
-            # Need to allow all of these as dictionaries have to be treated as
-            # unordered
-            'a=1&b=2&c=3',
-            'a=1&c=3&b=2',
-            'b=2&a=1&c=3',
-            'b=2&c=3&a=1',
-            'c=3&a=1&b=2',
-            'c=3&b=2&a=1'
-        ]
-        self.assertIn(result, acceptable_results)
-        result = http.urlencode({'a': [1, 2]}, doseq=False)
-        self.assertEqual(result, 'a=%5B%271%27%2C+%272%27%5D')
-        result = http.urlencode({'a': [1, 2]}, doseq=True)
-        self.assertEqual(result, 'a=1&a=2')
-        result = http.urlencode({'a': []}, doseq=True)
-        self.assertEqual(result, '')
-
-        # A MultiValueDict
-        result = http.urlencode(MultiValueDict({
-            'name': ['Adrian', 'Simon'],
-            'position': ['Developer']
-        }), doseq=True)
-        acceptable_results = [
-            # MultiValueDicts are similarly unordered
-            'name=Adrian&name=Simon&position=Developer',
-            'position=Developer&name=Adrian&name=Simon'
-        ]
-        self.assertIn(result, acceptable_results)
 
     def test_base36(self):
         # reciprocity works
@@ -156,16 +118,6 @@ class TestUtilsHttp(unittest.TestCase):
         encoded = http.urlsafe_base64_encode(bytestring)
         decoded = http.urlsafe_base64_decode(encoded)
         self.assertEqual(bytestring, decoded)
-
-    def test_urlquote(self):
-        self.assertEqual(http.urlquote('Paris & Orl\xe9ans'), 'Paris%20%26%20Orl%C3%A9ans')
-        self.assertEqual(http.urlquote('Paris & Orl\xe9ans', safe="&"), 'Paris%20&%20Orl%C3%A9ans')
-        self.assertEqual(http.urlunquote('Paris%20%26%20Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
-        self.assertEqual(http.urlunquote('Paris%20&%20Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
-        self.assertEqual(http.urlquote_plus('Paris & Orl\xe9ans'), 'Paris+%26+Orl%C3%A9ans')
-        self.assertEqual(http.urlquote_plus('Paris & Orl\xe9ans', safe="&"), 'Paris+&+Orl%C3%A9ans')
-        self.assertEqual(http.urlunquote_plus('Paris+%26+Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
-        self.assertEqual(http.urlunquote_plus('Paris+&+Orl%C3%A9ans'), 'Paris & Orl\xe9ans')
 
     def test_is_same_domain_good(self):
         for pair in (

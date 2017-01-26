@@ -6,6 +6,7 @@ import shutil
 import sys
 import tempfile as sys_tempfile
 import unittest
+from urllib.parse import quote
 from io import BytesIO, StringIO
 
 from django.core.files import temp as tempfile
@@ -13,7 +14,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http.multipartparser import MultiPartParser, parse_header
 from django.test import SimpleTestCase, TestCase, client, override_settings
 from django.utils.encoding import force_bytes
-from django.utils.http import urlquote
 
 from . import uploadhandler
 from .models import FileModel
@@ -127,7 +127,7 @@ class FileUploadTests(TestCase):
         payload = client.FakePayload()
         payload.write('\r\n'.join([
             '--' + client.BOUNDARY,
-            'Content-Disposition: form-data; name="file_unicode"; filename*=UTF-8\'\'%s' % urlquote(UNICODE_FILENAME),
+            'Content-Disposition: form-data; name="file_unicode"; filename*=UTF-8\'\'%s' % quote(UNICODE_FILENAME),
             'Content-Type: application/octet-stream',
             '',
             'You got pwnd.\r\n',
@@ -153,7 +153,7 @@ class FileUploadTests(TestCase):
         payload.write(
             '\r\n'.join([
                 '--' + client.BOUNDARY,
-                'Content-Disposition: form-data; name*=UTF-8\'\'file_unicode; filename*=UTF-8\'\'%s' % urlquote(
+                'Content-Disposition: form-data; name*=UTF-8\'\'file_unicode; filename*=UTF-8\'\'%s' % quote(
                     UNICODE_FILENAME
                 ),
                 'Content-Type: application/octet-stream',

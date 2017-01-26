@@ -1,9 +1,8 @@
-from urllib.parse import parse_qsl, urlparse, urlunparse
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 from django import template
 from django.contrib.admin.utils import quote
 from django.urls import Resolver404, get_script_prefix, resolve
-from django.utils.http import urlencode
 
 register = template.Library()
 

@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from urllib.parse import urlencode
 
 from django.contrib.admin import FieldListFilter
 from django.contrib.admin.exceptions import (
@@ -17,7 +18,6 @@ from django.core.paginator import InvalidPage
 from django.db import models
 from django.urls import reverse
 from django.utils.encoding import force_text
-from django.utils.http import urlencode
 from django.utils.translation import ugettext
 
 # Changelist settings
