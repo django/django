@@ -430,7 +430,7 @@ def simplify_regex(pattern):
     pattern = replace_named_groups(pattern)
     pattern = replace_unnamed_groups(pattern)
     # clean up any outstanding regex-y characters.
-    pattern = pattern.replace('^', '').replace('$', '')
+    pattern = pattern.replace('^', '').replace('$', '').replace('?', '')
     if not pattern.startswith('/'):
         pattern = '/' + pattern
     return pattern
