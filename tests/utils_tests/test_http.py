@@ -4,7 +4,9 @@ from datetime import datetime
 from django.test import ignore_warnings
 from django.utils import http
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import (
+    RemovedInDjango21Warning, RemovedInDjango30Warning,
+)
 
 
 class TestUtilsHttp(unittest.TestCase):
@@ -157,6 +159,7 @@ class TestUtilsHttp(unittest.TestCase):
         decoded = http.urlsafe_base64_decode(encoded)
         self.assertEqual(bytestring, decoded)
 
+    @ignore_warnings(category=RemovedInDjango30Warning)
     def test_urlquote(self):
         self.assertEqual(http.urlquote('Paris & Orl\xe9ans'), 'Paris%20%26%20Orl%C3%A9ans')
         self.assertEqual(http.urlquote('Paris & Orl\xe9ans', safe="&"), 'Paris%20&%20Orl%C3%A9ans')

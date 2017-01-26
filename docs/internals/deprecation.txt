@@ -17,6 +17,10 @@ details on these changes.
 
 * The ``django.db.backends.postgresql_psycopg2`` module will be removed.
 
+* ``django.utils.http.urlquote()``, ``django.utils.http.urlquote_plus()``,
+  ``django.utils.http.urlunquote()`` and ``django.utils.http.urlunquote_plus()``
+  will be removed.
+
 .. _deprecation-removed-in-2.1:
 
 2.1
