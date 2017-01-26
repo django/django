@@ -25,7 +25,6 @@ class WebsocketConsumer(BaseConsumer):
     http_user = False
 
     # Set to True if you want the class to enforce ordering for you
-    slight_ordering = False
     strict_ordering = False
 
     groups = None

@@ -88,9 +88,8 @@ The basic WebSocket generic consumer is used like this::
         # (you don't need channel_session_user, this implies it)
         http_user = True
 
-        # Set to True if you want them, else leave out
+        # Set to True if you want it, else leave it out
         strict_ordering = False
-        slight_ordering = False
 
         def connection_groups(self, **kwargs):
             """
@@ -135,9 +134,8 @@ The JSON-enabled consumer looks slightly different::
 
     class MyConsumer(JsonWebsocketConsumer):
 
-        # Set to True if you want them, else leave out
+        # Set to True if you want it, else leave it out
         strict_ordering = False
-        slight_ordering = False
 
         def connection_groups(self, **kwargs):
             """
