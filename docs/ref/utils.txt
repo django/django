@@ -684,27 +684,10 @@ escaping HTML.
 .. module:: django.utils.http
    :synopsis: HTTP helper functions. (URL encoding, cookie handling, ...)
 
-.. function:: urlquote(url, safe='/')
-
-    A version of Python's ``urllib.quote()`` function that can operate on
-    unicode strings. The url is first UTF-8 encoded before quoting. The
-    returned string can safely be used as part of an argument to a subsequent
-    ``iri_to_uri()`` call without double-quoting occurring. Employs lazy
-    execution.
-
-.. function:: urlquote_plus(url, safe='')
-
-    A version of Python's urllib.quote_plus() function that can operate on
-    unicode strings. The url is first UTF-8 encoded before quoting. The
-    returned string can safely be used as part of an argument to a subsequent
-    ``iri_to_uri()`` call without double-quoting occurring. Employs lazy
-    execution.
-
 .. function:: urlencode(query, doseq=0)
 
-    A version of Python's urllib.urlencode() function that can operate on
-    unicode strings. The parameters are first cast to UTF-8 encoded strings
-    and then encoded as per normal.
+    A version of Python's :func:`urllib.parse.urlencode()` function that can
+    operate on ``MultiValueDict`` and non-string values.
 
 .. function:: cookie_date(epoch_seconds=None)
 
