@@ -1123,7 +1123,7 @@ method::
 
         A ``QuerySet`` of model objects from which the choices for the
         field will be derived, and which will be used to validate the
-        user's selection.
+        user's selection. It will be evaluated when the form gets rendered.
 
     ``ModelChoiceField`` also takes two optional arguments:
 
