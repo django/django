@@ -17,7 +17,7 @@ from django.utils.encoding import force_text
 from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy as _
 
 from .renderers import get_default_renderer
 
@@ -358,9 +358,9 @@ FILE_INPUT_CONTRADICTION = object()
 
 
 class ClearableFileInput(FileInput):
-    clear_checkbox_label = ugettext_lazy('Clear')
-    initial_text = ugettext_lazy('Currently')
-    input_text = ugettext_lazy('Change')
+    clear_checkbox_label = _('Clear')
+    initial_text = _('Currently')
+    input_text = _('Change')
     template_name = 'django/forms/widgets/clearable_file_input.html'
 
     def clear_checkbox_name(self, name):
@@ -690,9 +690,9 @@ class NullBooleanSelect(Select):
     """
     def __init__(self, attrs=None):
         choices = (
-            ('1', ugettext_lazy('Unknown')),
-            ('2', ugettext_lazy('Yes')),
-            ('3', ugettext_lazy('No')),
+            ('1', _('Unknown')),
+            ('2', _('Yes')),
+            ('3', _('No')),
         )
         super().__init__(attrs, choices)
 

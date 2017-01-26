@@ -16,7 +16,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import migrations
 from django.test import TestCase, override_settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .models import (
     CustomUser, CustomUserNonUniqueUsername, CustomUserWithFK, Email,

@@ -5,7 +5,7 @@ from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import models, transaction
 from django.db.utils import IntegrityError
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 from .models import (
     Article, Category, Child, City, District, First, Parent, Record, Relation,
@@ -429,9 +429,9 @@ class ManyToOneTests(TestCase):
         # Same as each other
         self.assertIs(r1.article_set.__class__, r2.article_set.__class__)
 
-    def test_create_relation_with_ugettext_lazy(self):
+    def test_create_relation_with_gettext_lazy(self):
         reporter = Reporter.objects.create(first_name='John', last_name='Smith', email='john.smith@example.com')
-        lazy = ugettext_lazy('test')
+        lazy = gettext_lazy('test')
         reporter.article_set.create(headline=lazy, pub_date=datetime.date(2011, 6, 10))
         notlazy = str(lazy)
         article = reporter.article_set.get()

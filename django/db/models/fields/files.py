@@ -10,7 +10,7 @@ from django.core.validators import validate_image_file_extension
 from django.db.models import signals
 from django.db.models.fields import Field
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class FieldFile(File):

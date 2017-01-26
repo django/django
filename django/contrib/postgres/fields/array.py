@@ -6,7 +6,7 @@ from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
 from django.db.models import Field, IntegerField, Transform
 from django.db.models.lookups import Exact, In
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from ..utils import prefix_validation_error
 from .utils import AttributeSetter

@@ -521,7 +521,7 @@ attributes of the inner ``Meta`` class if you want to further customize a field.
 For example if you wanted to customize the wording of all user facing strings for
 the ``name`` field::
 
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     class AuthorForm(ModelForm):
         class Meta:

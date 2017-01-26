@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 # Minimal Django templates engine to render the error templates
 # regardless of the project's TEMPLATES setting.

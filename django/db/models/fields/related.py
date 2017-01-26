@@ -14,7 +14,7 @@ from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property, curry
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from . import Field
 from .related_descriptors import (

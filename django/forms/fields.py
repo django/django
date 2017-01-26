@@ -30,7 +30,7 @@ from django.utils.dateparse import parse_duration
 from django.utils.duration import duration_string
 from django.utils.encoding import force_text
 from django.utils.ipv6 import clean_ipv6_address
-from django.utils.translation import ugettext_lazy as _, ungettext_lazy
+from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
 __all__ = (
     'Field', 'CharField', 'IntegerField',
@@ -534,7 +534,7 @@ class FileField(Field):
         'invalid': _("No file was submitted. Check the encoding type on the form."),
         'missing': _("No file was submitted."),
         'empty': _("The submitted file is empty."),
-        'max_length': ungettext_lazy(
+        'max_length': ngettext_lazy(
             'Ensure this filename has at most %(max)d character (it has %(length)d).',
             'Ensure this filename has at most %(max)d characters (it has %(length)d).',
             'max'),

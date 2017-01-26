@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 from django.contrib.staticfiles.checks import check_finders
 from django.core import checks
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class StaticFilesConfig(AppConfig):

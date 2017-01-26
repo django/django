@@ -49,7 +49,7 @@ Standard translation
 --------------------
 
 Specify a translation string by using the function
-:func:`~django.utils.translation.ugettext`. It's convention to import this
+:func:`~django.utils.translation.gettext`. It's convention to import this
 as a shorter alias, ``_``, to save typing.
 
 .. note::
@@ -63,7 +63,7 @@ as a shorter alias, ``_``, to save typing.
     global namespace, as an alias for ``gettext()``. In Django, we have chosen
     not to follow this practice, for a couple of reasons:
 
-    1. Sometimes, you should use :func:`~django.utils.translation.ugettext_lazy`
+    1. Sometimes, you should use :func:`~django.utils.translation.gettext_lazy`
        as the default translation method for a particular file. Without ``_()``
        in the global namespace, the developer has to think about which is the
        most appropriate translation function.
@@ -71,7 +71,7 @@ as a shorter alias, ``_``, to save typing.
     2. The underscore character (``_``) is used to represent "the previous
        result" in Python's interactive shell and doctest tests. Installing a
        global ``_()`` function causes interference. Explicitly importing
-       ``ugettext()`` as ``_()`` avoids this problem.
+       ``gettext()`` as ``_()`` avoids this problem.
 
 .. admonition:: What functions may be aliased as ``_``?
 
@@ -80,13 +80,11 @@ as a shorter alias, ``_``, to save typing.
 
     * :func:`~django.utils.translation.gettext`
     * :func:`~django.utils.translation.gettext_lazy`
-    * :func:`~django.utils.translation.ugettext`
-    * :func:`~django.utils.translation.ugettext_lazy`
 
 In this example, the text ``"Welcome to my site."`` is marked as a translation
 string::
 
-    from django.utils.translation import ugettext as _
+    from django.utils.translation import gettext as _
     from django.http import HttpResponse
 
     def my_view(request):
@@ -96,11 +94,11 @@ string::
 Obviously, you could code this without using the alias. This example is
 identical to the previous one::
 
-    from django.utils.translation import ugettext
+    from django.utils.translation import gettext
     from django.http import HttpResponse
 
     def my_view(request):
-        output = ugettext("Welcome to my site.")
+        output = gettext("Welcome to my site.")
         return HttpResponse(output)
 
 Translation works on computed values. This example is identical to the previous
@@ -123,7 +121,7 @@ examples, is that Django's translation-string-detecting utility,
 :djadmin:`django-admin makemessages <makemessages>`, won't be able to find
 these strings. More on :djadmin:`makemessages` later.)
 
-The strings you pass to ``_()`` or ``ugettext()`` can take placeholders,
+The strings you pass to ``_()`` or ``gettext()`` can take placeholders,
 specified with Python's standard named-string interpolation syntax. Example::
 
     def my_view(request, m, d):
@@ -151,7 +149,7 @@ preceding the string, e.g.::
 
     def my_view(request):
         # Translators: This message appears on the home page only
-        output = ugettext("Welcome to my site.")
+        output = gettext("Welcome to my site.")
 
 The comment will then appear in the resulting ``.po`` file associated with the
 translatable construct located below it and should also be displayed by most
@@ -173,7 +171,7 @@ more details.
 Marking strings as no-op
 ------------------------
 
-Use the function :func:`django.utils.translation.ugettext_noop()` to mark a
+Use the function :func:`django.utils.translation.gettext_noop()` to mark a
 string as a translation string without translating it. The string is later
 translated from a variable.
 
@@ -185,11 +183,11 @@ such as when the string is presented to the user.
 Pluralization
 -------------
 
-Use the function :func:`django.utils.translation.ungettext()` to specify
+Use the function :func:`django.utils.translation.ngettext()` to specify
 pluralized messages.
 
-``ungettext`` takes three arguments: the singular translation string, the plural
-translation string and the number of objects.
+``ngettext()`` takes three arguments: the singular translation string, the
+plural translation string and the number of objects.
 
 This function is useful when you need your Django application to be localizable
 to languages where the number and complexity of `plural forms
@@ -200,11 +198,11 @@ of its value.)
 
 For example::
 
-    from django.utils.translation import ungettext
+    from django.utils.translation import ngettext
     from django.http import HttpResponse
 
     def hello_world(request, count):
-        page = ungettext(
+        page = ngettext(
             'there is %(count)d object',
             'there are %(count)d objects',
         count) % {
@@ -219,7 +217,7 @@ Note that pluralization is complicated and works differently in each language.
 Comparing ``count`` to 1 isn't always the correct rule. This code looks
 sophisticated, but will produce incorrect results for some languages::
 
-    from django.utils.translation import ungettext
+    from django.utils.translation import ngettext
     from myapp.models import Report
 
     count = Report.objects.count()
@@ -228,7 +226,7 @@ sophisticated, but will produce incorrect results for some languages::
     else:
         name = Report._meta.verbose_name_plural
 
-    text = ungettext(
+    text = ngettext(
         'There is %(count)d %(name)s available.',
         'There are %(count)d %(name)s available.',
         count
@@ -240,7 +238,7 @@ sophisticated, but will produce incorrect results for some languages::
 Don't try to implement your own singular-or-plural logic, it won't be correct.
 In a case like this, consider something like the following::
 
-    text = ungettext(
+    text = ngettext(
         'There is %(count)d %(name)s object available.',
         'There are %(count)d %(name)s objects available.',
         count
@@ -253,13 +251,13 @@ In a case like this, consider something like the following::
 
 .. note::
 
-    When using ``ungettext()``, make sure you use a single name for every
+    When using ``ngettext()``, make sure you use a single name for every
     extrapolated variable included in the literal. In the examples above, note
     how we used the ``name`` Python variable in both translation strings. This
     example, besides being incorrect in some languages as noted above, would
     fail::
 
-        text = ungettext(
+        text = ngettext(
             'There is %(count)d %(name)s available.',
             'There are %(count)d %(plural_name)s available.',
             count
@@ -355,7 +353,7 @@ For example, to translate the help text of the *name* field in the following
 model, do the following::
 
     from django.db import models
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     class MyThing(models.Model):
         name = models.CharField(help_text=_('This is the help text'))
@@ -387,7 +385,7 @@ relying on the fallback English-centric and somewhat naïve determination of
 verbose names Django performs by looking at the model's class name::
 
     from django.db import models
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     class MyThing(models.Model):
         name = models.CharField(_('name'), help_text=_('This is the help text'))
@@ -403,7 +401,7 @@ For model methods, you can provide translations to Django and the admin site
 with the ``short_description`` attribute::
 
     from django.db import models
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     class MyThing(models.Model):
         kind = models.ForeignKey(
@@ -420,30 +418,30 @@ with the ``short_description`` attribute::
 Working with lazy translation objects
 -------------------------------------
 
-The result of a ``ugettext_lazy()`` call can be used wherever you would use a
-string (a :class:`str` object) in other Django code, but it may not
-work with arbitrary Python code. For example, the following won't work because
-the `requests <https://pypi.python.org/pypi/requests/>`_ library doesn't handle
-``ugettext_lazy`` objects::
+The result of a ``gettext_lazy()`` call can be used wherever you would use a
+string (a :class:`str` object) in other Django code, but it may not work with
+arbitrary Python code. For example, the following won't work because the
+`requests <https://pypi.python.org/pypi/requests/>`_ library doesn't handle
+``gettext_lazy`` objects::
 
-    body = ugettext_lazy("I \u2764 Django")  # (unicode :heart:)
+    body = gettext_lazy("I \u2764 Django")  # (unicode :heart:)
     requests.post('https://example.com/send', data={'body': body})
 
-You can avoid such problems by casting ``ugettext_lazy()`` objects to text
+You can avoid such problems by casting ``gettext_lazy()`` objects to text
 strings before passing them to non-Django code::
 
     requests.post('https://example.com/send', data={'body': str(body)})
 
-If you don't like the long ``ugettext_lazy`` name, you can just alias it as
+If you don't like the long ``gettext_lazy`` name, you can just alias it as
 ``_`` (underscore), like so::
 
     from django.db import models
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     class MyThing(models.Model):
         name = models.CharField(help_text=_('This is the help text'))
 
-Using ``ugettext_lazy()`` and ``ungettext_lazy()`` to mark strings in models
+Using ``gettext_lazy()`` and ``ngettext_lazy()`` to mark strings in models
 and utility functions is a common operation. When you're working with these
 objects elsewhere in your code, you should ensure that you don't accidentally
 convert them to strings, because they should be converted as late as possible
@@ -462,10 +460,10 @@ integer as the ``number`` argument. Then ``number`` will be looked up in the
 dictionary under that key during string interpolation. Here's example::
 
     from django import forms
-    from django.utils.translation import ungettext_lazy
+    from django.utils.translation import ngettext_lazy
 
     class MyForm(forms.Form):
-        error_message = ungettext_lazy("You only provided %(num)d argument",
+        error_message = ngettext_lazy("You only provided %(num)d argument",
             "You only provided %(num)d arguments", 'num')
 
         def clean(self):
@@ -477,7 +475,7 @@ If the string contains exactly one unnamed placeholder, you can interpolate
 directly with the ``number`` argument::
 
     class MyForm(forms.Form):
-        error_message = ungettext_lazy(
+        error_message = ngettext_lazy(
             "You provided %d argument",
             "You provided %d arguments",
         )
@@ -499,10 +497,10 @@ that runs the ``str.format()`` method only when the result is included
 in a string. For example::
 
     from django.utils.text import format_lazy
-    from django.utils.translation import ugettext_lazy
+    from django.utils.translation import gettext_lazy
     ...
-    name = ugettext_lazy('John Lennon')
-    instrument = ugettext_lazy('guitar')
+    name = gettext_lazy('John Lennon')
+    instrument = gettext_lazy('guitar')
     result = format_lazy('{name}: {instrument}', name=name, instrument=instrument)
 
 In this case, the lazy translations in ``result`` will only be converted to
@@ -518,7 +516,7 @@ this function inside a lazy call yourself. For example::
 
     from django.utils.functional import lazy
     from django.utils.safestring import mark_safe
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     mark_safe_lazy = lazy(mark_safe, str)
 
@@ -580,7 +578,7 @@ require translation in the future::
     <title>{% trans "myvar" noop %}</title>
 
 Internally, inline translations use an
-:func:`~django.utils.translation.ugettext` call.
+:func:`~django.utils.translation.gettext` call.
 
 In case a template var (``myvar`` above) is passed to the tag, the tag will
 first resolve such variable to a string at run-time and then look up that
@@ -690,8 +688,8 @@ A more complex example::
 
 When you use both the pluralization feature and bind values to local variables
 in addition to the counter value, keep in mind that the ``blocktrans``
-construct is internally converted to an ``ungettext`` call. This means the
-same :ref:`notes regarding ungettext variables <pluralization-var-notes>`
+construct is internally converted to an ``ngettext`` call. This means the
+same :ref:`notes regarding ngettext variables <pluralization-var-notes>`
 apply.
 
 Reverse URL lookups cannot be carried out within the ``blocktrans`` and should
@@ -1282,7 +1280,7 @@ Django provides two mechanisms to internationalize URL patterns:
   the language to activate from the requested URL.
 
 * Making URL patterns themselves translatable via the
-  :func:`django.utils.translation.ugettext_lazy()` function.
+  :func:`django.utils.translation.gettext_lazy()` function.
 
 .. warning::
 
@@ -1373,11 +1371,11 @@ Translating URL patterns
 ------------------------
 
 URL patterns can also be marked translatable using the
-:func:`~django.utils.translation.ugettext_lazy` function. Example::
+:func:`~django.utils.translation.gettext_lazy` function. Example::
 
     from django.conf.urls import include, url
     from django.conf.urls.i18n import i18n_patterns
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     from about import views as about_views
     from news import views as news_views
@@ -1639,12 +1637,12 @@ That's it. Your translations are ready for use.
    (Byte Order Mark) so if your text editor adds such marks to the beginning of
    files by default then you will need to reconfigure it.
 
-Troubleshooting: ``ugettext()`` incorrectly detects ``python-format`` in strings with percent signs
+Troubleshooting: ``gettext()`` incorrectly detects ``python-format`` in strings with percent signs
 ---------------------------------------------------------------------------------------------------
 
 In some cases, such as strings with a percent sign followed by a space and a
 :ref:`string conversion type <old-string-formatting>` (e.g.
-``_("10% interest")``), :func:`~django.utils.translation.ugettext` incorrectly
+``_("10% interest")``), :func:`~django.utils.translation.gettext` incorrectly
 flags strings with ``python-format``.
 
 If you try to compile message files with incorrectly flagged strings, you'll
@@ -1655,7 +1653,7 @@ unlike 'msgid'``.
 To workaround this, you can escape percent signs by adding a second percent
 sign::
 
-    from django.utils.translation import ugettext as _
+    from django.utils.translation import gettext as _
     output = _("10%% interest)
 
 Or you can use ``no-python-format`` so that all percent signs are treated as
@@ -1859,7 +1857,7 @@ For example::
         cur_language = translation.get_language()
         try:
             translation.activate(language)
-            text = translation.ugettext('welcome')
+            text = translation.gettext('welcome')
         finally:
             translation.activate(cur_language)
         return text
@@ -1882,7 +1880,7 @@ enter and restores it on exit. With it, the above example becomes::
 
     def welcome_translated(language):
         with translation.override(language):
-            return translation.ugettext('welcome')
+            return translation.gettext('welcome')
 
 Language cookie
 ---------------
@@ -2016,12 +2014,12 @@ Notes:
 
 * If you define a custom :setting:`LANGUAGES` setting, as explained in the
   previous bullet, you can mark the language names as translation strings
-  -- but use :func:`~django.utils.translation.ugettext_lazy` instead of
-  :func:`~django.utils.translation.ugettext` to avoid a circular import.
+  -- but use :func:`~django.utils.translation.gettext_lazy` instead of
+  :func:`~django.utils.translation.gettext` to avoid a circular import.
 
   Here's a sample settings file::
 
-      from django.utils.translation import ugettext_lazy as _
+      from django.utils.translation import gettext_lazy as _
 
       LANGUAGES = [
           ('de', _('German')),

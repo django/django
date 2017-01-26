@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib.flatpages.models import FlatPage
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 
 class FlatpageForm(forms.ModelForm):
@@ -26,14 +26,14 @@ class FlatpageForm(forms.ModelForm):
         url = self.cleaned_data['url']
         if not url.startswith('/'):
             raise forms.ValidationError(
-                ugettext("URL is missing a leading slash."),
+                gettext("URL is missing a leading slash."),
                 code='missing_leading_slash',
             )
         if (settings.APPEND_SLASH and
                 'django.middleware.common.CommonMiddleware' in settings.MIDDLEWARE and
                 not url.endswith('/')):
             raise forms.ValidationError(
-                ugettext("URL is missing a trailing slash."),
+                gettext("URL is missing a trailing slash."),
                 code='missing_trailing_slash',
             )
         return url

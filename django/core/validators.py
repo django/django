@@ -8,7 +8,7 @@ from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_text
 from django.utils.functional import SimpleLazyObject
 from django.utils.ipv6 import is_valid_ipv6_address
-from django.utils.translation import ugettext_lazy as _, ungettext_lazy
+from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, '', [], (), {})
@@ -359,7 +359,7 @@ class MinValueValidator(BaseValidator):
 
 @deconstructible
 class MinLengthValidator(BaseValidator):
-    message = ungettext_lazy(
+    message = ngettext_lazy(
         'Ensure this value has at least %(limit_value)d character (it has %(show_value)d).',
         'Ensure this value has at least %(limit_value)d characters (it has %(show_value)d).',
         'limit_value')
@@ -374,7 +374,7 @@ class MinLengthValidator(BaseValidator):
 
 @deconstructible
 class MaxLengthValidator(BaseValidator):
-    message = ungettext_lazy(
+    message = ngettext_lazy(
         'Ensure this value has at most %(limit_value)d character (it has %(show_value)d).',
         'Ensure this value has at most %(limit_value)d characters (it has %(show_value)d).',
         'limit_value')
@@ -394,17 +394,17 @@ class DecimalValidator:
     expected, otherwise raise ValidationError.
     """
     messages = {
-        'max_digits': ungettext_lazy(
+        'max_digits': ngettext_lazy(
             'Ensure that there are no more than %(max)s digit in total.',
             'Ensure that there are no more than %(max)s digits in total.',
             'max'
         ),
-        'max_decimal_places': ungettext_lazy(
+        'max_decimal_places': ngettext_lazy(
             'Ensure that there are no more than %(max)s decimal place.',
             'Ensure that there are no more than %(max)s decimal places.',
             'max'
         ),
-        'max_whole_digits': ungettext_lazy(
+        'max_whole_digits': ngettext_lazy(
             'Ensure that there are no more than %(max)s digit before the decimal point.',
             'Ensure that there are no more than %(max)s digits before the decimal point.',
             'max'

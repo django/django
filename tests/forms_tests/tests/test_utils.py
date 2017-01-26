@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorDict, ErrorList, flatatt
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 
 class FormsUtilsTestCase(SimpleTestCase):
@@ -66,7 +66,7 @@ class FormsUtilsTestCase(SimpleTestCase):
         )
         # Can take a lazy string.
         self.assertHTMLEqual(
-            str(ErrorList(ValidationError(ugettext_lazy("Error.")).messages)),
+            str(ErrorList(ValidationError(gettext_lazy("Error.")).messages)),
             '<ul class="errorlist"><li>Error.</li></ul>'
         )
         # Can take a list.
@@ -84,7 +84,7 @@ class FormsUtilsTestCase(SimpleTestCase):
             str(ErrorList(sorted(ValidationError([
                 "1. First error.",
                 "2. Not \u03C0.",
-                ugettext_lazy("3. Error."),
+                gettext_lazy("3. Error."),
                 {
                     'error_1': "4. First dict error.",
                     'error_2': "5. Second dict error.",

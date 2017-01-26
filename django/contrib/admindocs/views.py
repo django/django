@@ -20,7 +20,7 @@ from django.utils.inspect import (
     func_accepts_kwargs, func_accepts_var_args, func_has_no_args,
     get_func_full_args,
 )
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 
 # Exclude methods starting with these strings from documentation

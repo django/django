@@ -9,7 +9,7 @@ from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 from .models import Article, ArticleSelectOnSave, SelfRef
 
@@ -310,13 +310,13 @@ class ModelTest(TestCase):
             pub_date__year=2008).extra(select={'dashed-value': '1', 'undashedvalue': '2'})
         self.assertEqual(articles[0].undashedvalue, 2)
 
-    def test_create_relation_with_ugettext_lazy(self):
+    def test_create_relation_with_gettext_lazy(self):
         """
-        ugettext_lazy objects work when saving model instances
+        gettext_lazy objects work when saving model instances
         through various methods. Refs #10498.
         """
         notlazy = 'test'
-        lazy = ugettext_lazy(notlazy)
+        lazy = gettext_lazy(notlazy)
         Article.objects.create(headline=lazy, pub_date=datetime.now())
         article = Article.objects.get()
         self.assertEqual(article.headline, notlazy)

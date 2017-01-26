@@ -9,7 +9,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from django.test.utils import isolate_apps
-from django.utils.translation import override, ugettext_lazy
+from django.utils.translation import gettext_lazy, override
 
 from .models import Score
 from .tests import SerializersTestBase, SerializersTransactionTestBase
@@ -292,12 +292,12 @@ class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, Transact
 class DjangoJSONEncoderTests(SimpleTestCase):
     def test_lazy_string_encoding(self):
         self.assertEqual(
-            json.dumps({'lang': ugettext_lazy("French")}, cls=DjangoJSONEncoder),
+            json.dumps({'lang': gettext_lazy("French")}, cls=DjangoJSONEncoder),
             '{"lang": "French"}'
         )
         with override('fr'):
             self.assertEqual(
-                json.dumps({'lang': ugettext_lazy("French")}, cls=DjangoJSONEncoder),
+                json.dumps({'lang': gettext_lazy("French")}, cls=DjangoJSONEncoder),
                 '{"lang": "Fran\\u00e7ais"}'
             )
 

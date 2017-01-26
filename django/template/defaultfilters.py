@@ -19,7 +19,7 @@ from django.utils.text import (
     Truncator, normalize_newlines, phone2numeric, slugify as _slugify, wrap,
 )
 from django.utils.timesince import timesince, timeuntil
-from django.utils.translation import ugettext, ungettext
+from django.utils.translation import gettext, ngettext
 
 from .base import Variable, VariableDoesNotExist
 from .library import Library
@@ -817,7 +817,7 @@ def yesno(value, arg=None):
     ==========  ======================  ==================================
     """
     if arg is None:
-        arg = ugettext('yes,no,maybe')
+        arg = gettext('yes,no,maybe')
     bits = arg.split(',')
     if len(bits) < 2:
         return value  # Invalid arg.
@@ -846,7 +846,7 @@ def filesizeformat(bytes_):
     try:
         bytes_ = float(bytes_)
     except (TypeError, ValueError, UnicodeDecodeError):
-        value = ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
+        value = ngettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
         return avoid_wrapping(value)
 
     def filesize_number_format(value):
@@ -863,17 +863,17 @@ def filesizeformat(bytes_):
         bytes_ = -bytes_  # Allow formatting of negative numbers.
 
     if bytes_ < KB:
-        value = ungettext("%(size)d byte", "%(size)d bytes", bytes_) % {'size': bytes_}
+        value = ngettext("%(size)d byte", "%(size)d bytes", bytes_) % {'size': bytes_}
     elif bytes_ < MB:
-        value = ugettext("%s KB") % filesize_number_format(bytes_ / KB)
+        value = gettext("%s KB") % filesize_number_format(bytes_ / KB)
     elif bytes_ < GB:
-        value = ugettext("%s MB") % filesize_number_format(bytes_ / MB)
+        value = gettext("%s MB") % filesize_number_format(bytes_ / MB)
     elif bytes_ < TB:
-        value = ugettext("%s GB") % filesize_number_format(bytes_ / GB)
+        value = gettext("%s GB") % filesize_number_format(bytes_ / GB)
     elif bytes_ < PB:
-        value = ugettext("%s TB") % filesize_number_format(bytes_ / TB)
+        value = gettext("%s TB") % filesize_number_format(bytes_ / TB)
     else:
-        value = ugettext("%s PB") % filesize_number_format(bytes_ / PB)
+        value = gettext("%s PB") % filesize_number_format(bytes_ / PB)
 
     if negative:
         value = "-%s" % value

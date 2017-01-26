@@ -12,7 +12,7 @@ from django.utils.encoding import force_text
 from django.utils.functional import lazy
 from django.utils.html import format_html
 from django.utils.module_loading import import_string
-from django.utils.translation import ugettext as _, ungettext
+from django.utils.translation import gettext as _, ngettext
 
 
 @functools.lru_cache(maxsize=None)
@@ -99,7 +99,7 @@ class MinimumLengthValidator:
     def validate(self, password, user=None):
         if len(password) < self.min_length:
             raise ValidationError(
-                ungettext(
+                ngettext(
                     "This password is too short. It must contain at least %(min_length)d character.",
                     "This password is too short. It must contain at least %(min_length)d characters.",
                     self.min_length
@@ -109,7 +109,7 @@ class MinimumLengthValidator:
             )
 
     def get_help_text(self):
-        return ungettext(
+        return ngettext(
             "Your password must contain at least %(min_length)d character.",
             "Your password must contain at least %(min_length)d characters.",
             self.min_length

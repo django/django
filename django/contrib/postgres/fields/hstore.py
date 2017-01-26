@@ -5,7 +5,7 @@ from django.contrib.postgres.fields.array import ArrayField
 from django.core import exceptions
 from django.db.models import Field, TextField, Transform
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 __all__ = ['HStoreField']
 

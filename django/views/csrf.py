@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.http import HttpResponseForbidden
 from django.template import Context, Engine, TemplateDoesNotExist, loader
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.version import get_docs_version
 
 # We include the template inline since we need to be able to reliably display

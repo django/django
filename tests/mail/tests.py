@@ -26,7 +26,7 @@ from django.core.mail.message import BadHeaderError, sanitize_address
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.utils.encoding import force_bytes, force_text
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 
 class HeadersCheckMixin:
@@ -177,7 +177,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         with self.assertRaises(BadHeaderError):
             email.message()
         email = EmailMessage(
-            ugettext_lazy('Subject\nInjection Test'), 'Content', 'from@example.com', ['to@example.com']
+            gettext_lazy('Subject\nInjection Test'), 'Content', 'from@example.com', ['to@example.com']
         )
         with self.assertRaises(BadHeaderError):
             email.message()
@@ -856,12 +856,12 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         String prefix + lazy translated subject = bad output
         Regression for #13494
         """
-        mail_managers(ugettext_lazy('Subject'), 'Content')
+        mail_managers(gettext_lazy('Subject'), 'Content')
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), '[Django] Subject')
 
         self.flush_mailbox()
-        mail_admins(ugettext_lazy('Subject'), 'Content')
+        mail_admins(gettext_lazy('Subject'), 'Content')
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), '[Django] Subject')
 
@@ -926,7 +926,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         """
         Email sending should support lazy email addresses (#24416).
         """
-        _ = ugettext_lazy
+        _ = gettext_lazy
         self.assertTrue(send_mail('Subject', 'Content', _('tester'), [_('django')]))
         message = self.get_the_message()
         self.assertEqual(message.get('from'), 'tester')

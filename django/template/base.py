@@ -65,7 +65,7 @@ from django.utils.text import (
     get_text_list, smart_split, unescape_string_literal,
 )
 from django.utils.timezone import template_localtime
-from django.utils.translation import pgettext_lazy, ugettext_lazy
+from django.utils.translation import gettext_lazy, pgettext_lazy
 
 from .exceptions import TemplateSyntaxError
 
@@ -824,7 +824,7 @@ class Variable:
             if self.message_context:
                 return pgettext_lazy(self.message_context, msgid)
             else:
-                return ugettext_lazy(msgid)
+                return gettext_lazy(msgid)
         return value
 
     def __repr__(self):

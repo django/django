@@ -34,7 +34,7 @@ Helper function to return a URL pattern for serving files in debug mode::
     ]
 
 The ``regex`` parameter should be a string or
-:func:`~django.utils.translation.ugettext_lazy()` (see
+:func:`~django.utils.translation.gettext_lazy()` (see
 :ref:`translating-urlpatterns`) that contains a regular expression compatible
 with Python's :py:mod:`re` module. Strings typically use raw string syntax
 (``r''``) so that they can contain sequences like ``\d`` without the need to

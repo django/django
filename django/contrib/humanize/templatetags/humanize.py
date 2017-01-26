@@ -9,7 +9,7 @@ from django.utils.encoding import force_text
 from django.utils.formats import number_format
 from django.utils.safestring import mark_safe
 from django.utils.timezone import is_aware, utc
-from django.utils.translation import pgettext, ugettext as _, ungettext
+from django.utils.translation import gettext as _, ngettext, pgettext
 
 register = template.Library()
 
@@ -56,48 +56,48 @@ def intcomma(value, use_l10n=True):
 # A tuple of standard large number to their converters
 intword_converters = (
     (6, lambda number: (
-        ungettext('%(value).1f million', '%(value).1f million', number),
-        ungettext('%(value)s million', '%(value)s million', number),
+        ngettext('%(value).1f million', '%(value).1f million', number),
+        ngettext('%(value)s million', '%(value)s million', number),
     )),
     (9, lambda number: (
-        ungettext('%(value).1f billion', '%(value).1f billion', number),
-        ungettext('%(value)s billion', '%(value)s billion', number),
+        ngettext('%(value).1f billion', '%(value).1f billion', number),
+        ngettext('%(value)s billion', '%(value)s billion', number),
     )),
     (12, lambda number: (
-        ungettext('%(value).1f trillion', '%(value).1f trillion', number),
-        ungettext('%(value)s trillion', '%(value)s trillion', number),
+        ngettext('%(value).1f trillion', '%(value).1f trillion', number),
+        ngettext('%(value)s trillion', '%(value)s trillion', number),
     )),
     (15, lambda number: (
-        ungettext('%(value).1f quadrillion', '%(value).1f quadrillion', number),
-        ungettext('%(value)s quadrillion', '%(value)s quadrillion', number),
+        ngettext('%(value).1f quadrillion', '%(value).1f quadrillion', number),
+        ngettext('%(value)s quadrillion', '%(value)s quadrillion', number),
     )),
     (18, lambda number: (
-        ungettext('%(value).1f quintillion', '%(value).1f quintillion', number),
-        ungettext('%(value)s quintillion', '%(value)s quintillion', number),
+        ngettext('%(value).1f quintillion', '%(value).1f quintillion', number),
+        ngettext('%(value)s quintillion', '%(value)s quintillion', number),
     )),
     (21, lambda number: (
-        ungettext('%(value).1f sextillion', '%(value).1f sextillion', number),
-        ungettext('%(value)s sextillion', '%(value)s sextillion', number),
+        ngettext('%(value).1f sextillion', '%(value).1f sextillion', number),
+        ngettext('%(value)s sextillion', '%(value)s sextillion', number),
     )),
     (24, lambda number: (
-        ungettext('%(value).1f septillion', '%(value).1f septillion', number),
-        ungettext('%(value)s septillion', '%(value)s septillion', number),
+        ngettext('%(value).1f septillion', '%(value).1f septillion', number),
+        ngettext('%(value)s septillion', '%(value)s septillion', number),
     )),
     (27, lambda number: (
-        ungettext('%(value).1f octillion', '%(value).1f octillion', number),
-        ungettext('%(value)s octillion', '%(value)s octillion', number),
+        ngettext('%(value).1f octillion', '%(value).1f octillion', number),
+        ngettext('%(value)s octillion', '%(value)s octillion', number),
     )),
     (30, lambda number: (
-        ungettext('%(value).1f nonillion', '%(value).1f nonillion', number),
-        ungettext('%(value)s nonillion', '%(value)s nonillion', number),
+        ngettext('%(value).1f nonillion', '%(value).1f nonillion', number),
+        ngettext('%(value)s nonillion', '%(value)s nonillion', number),
     )),
     (33, lambda number: (
-        ungettext('%(value).1f decillion', '%(value).1f decillion', number),
-        ungettext('%(value)s decillion', '%(value)s decillion', number),
+        ngettext('%(value).1f decillion', '%(value).1f decillion', number),
+        ngettext('%(value)s decillion', '%(value)s decillion', number),
     )),
     (100, lambda number: (
-        ungettext('%(value).1f googol', '%(value).1f googol', number),
-        ungettext('%(value)s googol', '%(value)s googol', number),
+        ngettext('%(value).1f googol', '%(value).1f googol', number),
+        ngettext('%(value)s googol', '%(value)s googol', number),
     )),
 )
 
@@ -202,21 +202,21 @@ def naturaltime(value):
         elif delta.seconds == 0:
             return _('now')
         elif delta.seconds < 60:
-            return ungettext(
+            return ngettext(
                 # Translators: please keep a non-breaking space (U+00A0)
                 # between count and time unit.
                 'a second ago', '%(count)s seconds ago', delta.seconds
             ) % {'count': delta.seconds}
         elif delta.seconds // 60 < 60:
             count = delta.seconds // 60
-            return ungettext(
+            return ngettext(
                 # Translators: please keep a non-breaking space (U+00A0)
                 # between count and time unit.
                 'a minute ago', '%(count)s minutes ago', count
             ) % {'count': count}
         else:
             count = delta.seconds // 60 // 60
-            return ungettext(
+            return ngettext(
                 # Translators: please keep a non-breaking space (U+00A0)
                 # between count and time unit.
                 'an hour ago', '%(count)s hours ago', count
@@ -230,21 +230,21 @@ def naturaltime(value):
         elif delta.seconds == 0:
             return _('now')
         elif delta.seconds < 60:
-            return ungettext(
+            return ngettext(
                 # Translators: please keep a non-breaking space (U+00A0)
                 # between count and time unit.
                 'a second from now', '%(count)s seconds from now', delta.seconds
             ) % {'count': delta.seconds}
         elif delta.seconds // 60 < 60:
             count = delta.seconds // 60
-            return ungettext(
+            return ngettext(
                 # Translators: please keep a non-breaking space (U+00A0)
                 # between count and time unit.
                 'a minute from now', '%(count)s minutes from now', count
             ) % {'count': count}
         else:
             count = delta.seconds // 60 // 60
-            return ungettext(
+            return ngettext(
                 # Translators: please keep a non-breaking space (U+00A0)
                 # between count and time unit.
                 'an hour from now', '%(count)s hours from now', count

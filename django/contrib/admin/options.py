@@ -43,7 +43,7 @@ from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, format_lazy, get_text_list
-from django.utils.translation import ugettext as _, ungettext
+from django.utils.translation import gettext as _, ngettext
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 
@@ -1609,7 +1609,7 @@ class ModelAdmin(BaseModelAdmin):
                         changecount += 1
 
                 if changecount:
-                    msg = ungettext(
+                    msg = ngettext(
                         "%(count)s %(name)s was changed successfully.",
                         "%(count)s %(name)s were changed successfully.",
                         changecount
@@ -1641,7 +1641,7 @@ class ModelAdmin(BaseModelAdmin):
         else:
             action_form = None
 
-        selection_note_all = ungettext(
+        selection_note_all = ngettext(
             '%(total_count)s selected',
             'All %(total_count)s selected',
             cl.result_count

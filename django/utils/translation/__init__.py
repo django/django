@@ -250,7 +250,7 @@ def get_language_info(lang_code):
             raise KeyError("Unknown language code %s and %s." % (lang_code, generic_lang_code))
 
     if info:
-        info['name_translated'] = ugettext_lazy(info['name'])
+        info['name_translated'] = gettext_lazy(info['name'])
     return info
 
 

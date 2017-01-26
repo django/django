@@ -23,9 +23,9 @@ from django.utils.numberformat import format as nformat
 from django.utils.safestring import SafeText
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
-    get_language, get_language_from_request, get_language_info, gettext_lazy,
-    npgettext, npgettext_lazy, pgettext, trans_real, ugettext, ugettext_lazy,
-    ungettext, ungettext_lazy,
+    get_language, get_language_from_request, get_language_info, gettext,
+    gettext_lazy, ngettext, ngettext_lazy, npgettext, npgettext_lazy, pgettext,
+    trans_real, ugettext, ugettext_lazy, ungettext, ungettext_lazy,
 )
 
 from .forms import CompanyForm, I18nForm, SelectDateForm
@@ -52,15 +52,28 @@ def patch_formats(lang, **settings):
 
 class TranslationTests(SimpleTestCase):
 
+    @translation.override('de')
+    def test_legacy_aliases(self):
+        """
+        Pre-Django 2.0 aliases with u prefix are still available.
+        """
+        self.assertEqual(ugettext("Image"), "Bild")
+        self.assertEqual(ugettext_lazy("Image"), gettext_lazy("Image"))
+        self.assertEqual(ungettext("%d year", "%d years", 0) % 0, "0 Jahre")
+        self.assertEqual(
+            ungettext_lazy("%d year", "%d years", 0) % 0,
+            ngettext_lazy("%d year", "%d years", 0) % 0,
+        )
+
     @translation.override('fr')
     def test_plural(self):
         """
-        Test plurals with ungettext. French differs from English in that 0 is singular.
+        Test plurals with ngettext. French differs from English in that 0 is singular.
         """
-        self.assertEqual(ungettext("%d year", "%d years", 0) % 0, "0 année")
-        self.assertEqual(ungettext("%d year", "%d years", 2) % 2, "2 années")
-        self.assertEqual(ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}, "0 octet")
-        self.assertEqual(ungettext("%(size)d byte", "%(size)d bytes", 2) % {'size': 2}, "2 octets")
+        self.assertEqual(ngettext("%d year", "%d years", 0) % 0, "0 année")
+        self.assertEqual(ngettext("%d year", "%d years", 2) % 2, "2 années")
+        self.assertEqual(ngettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}, "0 octet")
+        self.assertEqual(ngettext("%(size)d byte", "%(size)d bytes", 2) % {'size': 2}, "2 octets")
 
     def test_override(self):
         activate('de')
@@ -119,7 +132,7 @@ class TranslationTests(SimpleTestCase):
         """
         Format string interpolation should work with *_lazy objects.
         """
-        s = ugettext_lazy('Add %(name)s')
+        s = gettext_lazy('Add %(name)s')
         d = {'name': 'Ringo'}
         self.assertEqual('Add Ringo', s % d)
         with translation.override('de', deactivate=True):
@@ -128,26 +141,26 @@ class TranslationTests(SimpleTestCase):
                 self.assertEqual('Dodaj Ringo', s % d)
 
         # It should be possible to compare *_lazy objects.
-        s1 = ugettext_lazy('Add %(name)s')
+        s1 = gettext_lazy('Add %(name)s')
         self.assertEqual(s, s1)
         s2 = gettext_lazy('Add %(name)s')
         s3 = gettext_lazy('Add %(name)s')
         self.assertEqual(s2, s3)
         self.assertEqual(s, s2)
-        s4 = ugettext_lazy('Some other string')
+        s4 = gettext_lazy('Some other string')
         self.assertNotEqual(s, s4)
 
     def test_lazy_pickle(self):
-        s1 = ugettext_lazy("test")
+        s1 = gettext_lazy("test")
         self.assertEqual(str(s1), "test")
         s2 = pickle.loads(pickle.dumps(s1))
         self.assertEqual(str(s2), "test")
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
-    def test_ungettext_lazy(self):
-        simple_with_format = ungettext_lazy('%d good result', '%d good results')
+    def test_ngettext_lazy(self):
+        simple_with_format = ngettext_lazy('%d good result', '%d good results')
         simple_context_with_format = npgettext_lazy('Exclamation', '%d good result', '%d good results')
-        simple_without_format = ungettext_lazy('good result', 'good results')
+        simple_without_format = ngettext_lazy('good result', 'good results')
         with translation.override('de'):
             self.assertEqual(simple_with_format % 1, '1 gutes Resultat')
             self.assertEqual(simple_with_format % 4, '4 guten Resultate')
@@ -156,8 +169,8 @@ class TranslationTests(SimpleTestCase):
             self.assertEqual(simple_without_format % 1, 'gutes Resultat')
             self.assertEqual(simple_without_format % 4, 'guten Resultate')
 
-        complex_nonlazy = ungettext_lazy('Hi %(name)s, %(num)d good result', 'Hi %(name)s, %(num)d good results', 4)
-        complex_deferred = ungettext_lazy(
+        complex_nonlazy = ngettext_lazy('Hi %(name)s, %(num)d good result', 'Hi %(name)s, %(num)d good results', 4)
+        complex_deferred = ngettext_lazy(
             'Hi %(name)s, %(num)d good result', 'Hi %(name)s, %(num)d good results', 'num'
         )
         complex_context_nonlazy = npgettext_lazy(
@@ -178,12 +191,12 @@ class TranslationTests(SimpleTestCase):
             with self.assertRaisesMessage(KeyError, 'Your dictionary lacks key'):
                 complex_context_deferred % {'name': 'Jim'}
 
-    def test_ungettext_lazy_bool(self):
-        self.assertTrue(ungettext_lazy('%d good result', '%d good results'))
-        self.assertFalse(ungettext_lazy('', ''))
+    def test_ngettext_lazy_bool(self):
+        self.assertTrue(ngettext_lazy('%d good result', '%d good results'))
+        self.assertFalse(ngettext_lazy('', ''))
 
-    def test_ungettext_lazy_pickle(self):
-        s1 = ungettext_lazy('%d good result', '%d good results')
+    def test_ngettext_lazy_pickle(self):
+        s1 = ngettext_lazy('%d good result', '%d good results')
         self.assertEqual(s1 % 1, '1 good result')
         self.assertEqual(s1 % 8, '8 good results')
         s2 = pickle.loads(pickle.dumps(s1))
@@ -991,13 +1004,13 @@ class MiscTests(SimpleTestCase):
         or one of its variants, the untranslated string should be returned
         (instead of falling back to LANGUAGE_CODE) (See #24413).
         """
-        self.assertEqual(ugettext("Image"), "Bild")
+        self.assertEqual(gettext("Image"), "Bild")
         with translation.override('en'):
-            self.assertEqual(ugettext("Image"), "Image")
+            self.assertEqual(gettext("Image"), "Image")
         with translation.override('en-us'):
-            self.assertEqual(ugettext("Image"), "Image")
+            self.assertEqual(gettext("Image"), "Image")
         with translation.override('en-ca'):
-            self.assertEqual(ugettext("Image"), "Image")
+            self.assertEqual(gettext("Image"), "Image")
 
     def test_parse_spec_http_header(self):
         """
@@ -1222,8 +1235,8 @@ class ResolutionOrderI18NTests(SimpleTestCase):
         deactivate()
         super().tearDown()
 
-    def assertUgettext(self, msgid, msgstr):
-        result = ugettext(msgid)
+    def assertGettext(self, msgid, msgstr):
+        result = gettext(msgid)
         self.assertIn(
             msgstr, result,
             "The string '%s' isn't in the translation of '%s'; the actual result is '%s'."
@@ -1236,7 +1249,7 @@ class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
     @override_settings(LANGUAGE_CODE='de')
     def test_app_translation(self):
         # Original translation.
-        self.assertUgettext('Date/time', 'Datum/Zeit')
+        self.assertGettext('Date/time', 'Datum/Zeit')
 
         # Different translation.
         with self.modify_settings(INSTALLED_APPS={'append': 'i18n.resolution'}):
@@ -1244,31 +1257,31 @@ class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
             activate('de')
 
             # Doesn't work because it's added later in the list.
-            self.assertUgettext('Date/time', 'Datum/Zeit')
+            self.assertGettext('Date/time', 'Datum/Zeit')
 
             with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.admin.apps.SimpleAdminConfig'}):
                 # Force refreshing translations.
                 activate('de')
 
                 # Unless the original is removed from the list.
-                self.assertUgettext('Date/time', 'Datum/Zeit (APP)')
+                self.assertGettext('Date/time', 'Datum/Zeit (APP)')
 
 
 @override_settings(LOCALE_PATHS=extended_locale_paths)
 class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
     def test_locale_paths_translation(self):
-        self.assertUgettext('Time', 'LOCALE_PATHS')
+        self.assertGettext('Time', 'LOCALE_PATHS')
 
     def test_locale_paths_override_app_translation(self):
         with self.settings(INSTALLED_APPS=['i18n.resolution']):
-            self.assertUgettext('Time', 'LOCALE_PATHS')
+            self.assertGettext('Time', 'LOCALE_PATHS')
 
 
 class DjangoFallbackResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
     def test_django_fallback(self):
-        self.assertEqual(ugettext('Date/time'), 'Datum/Zeit')
+        self.assertEqual(gettext('Date/time'), 'Datum/Zeit')
 
 
 class TestModels(TestCase):
@@ -1296,7 +1309,7 @@ class TestLanguageInfo(SimpleTestCase):
         with translation.override('xx'):
             # A language with no translation catalogs should fallback to the
             # untranslated string.
-            self.assertEqual(ugettext("Title"), "Title")
+            self.assertEqual(gettext("Title"), "Title")
 
     def test_unknown_only_country_code(self):
         li = get_language_info('de-xx')
@@ -1511,7 +1524,7 @@ class NonDjangoLanguageTests(SimpleTestCase):
     )
     def test_non_django_language(self):
         self.assertEqual(get_language(), 'xxx')
-        self.assertEqual(ugettext("year"), "reay")
+        self.assertEqual(gettext("year"), "reay")
 
     @override_settings(
         USE_I18N=True,
@@ -1524,4 +1537,4 @@ class NonDjangoLanguageTests(SimpleTestCase):
     @translation.override('xyz')
     def test_plural_non_django_language(self):
         self.assertEqual(get_language(), 'xyz')
-        self.assertEqual(ungettext('year', 'years', 2), 'years')
+        self.assertEqual(ngettext('year', 'years', 2), 'years')

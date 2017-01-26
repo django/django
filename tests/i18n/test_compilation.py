@@ -15,7 +15,7 @@ from django.core.management.utils import find_command
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils import translation
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 
 from .utils import RunInTmpDirMixin, copytree
 
@@ -167,15 +167,15 @@ class FuzzyTranslationTest(ProjectAndAppTests):
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
             call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
             with translation.override(self.LOCALE):
-                self.assertEqual(ugettext('Lenin'), 'Ленин')
-                self.assertEqual(ugettext('Vodka'), 'Vodka')
+                self.assertEqual(gettext('Lenin'), 'Ленин')
+                self.assertEqual(gettext('Vodka'), 'Vodka')
 
     def test_fuzzy_compiling(self):
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
             call_command('compilemessages', locale=[self.LOCALE], fuzzy=True, stdout=StringIO())
             with translation.override(self.LOCALE):
-                self.assertEqual(ugettext('Lenin'), 'Ленин')
-                self.assertEqual(ugettext('Vodka'), 'Водка')
+                self.assertEqual(gettext('Lenin'), 'Ленин')
+                self.assertEqual(gettext('Vodka'), 'Водка')
 
 
 class AppCompilationTest(ProjectAndAppTests):

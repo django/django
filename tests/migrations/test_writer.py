@@ -24,7 +24,7 @@ from django.utils import datetime_safe
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import FixedOffset, get_default_timezone, utc
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .models import FoodManager, FoodQuerySet
 

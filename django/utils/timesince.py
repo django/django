@@ -3,15 +3,15 @@ import datetime
 
 from django.utils.html import avoid_wrapping
 from django.utils.timezone import is_aware, utc
-from django.utils.translation import ugettext, ungettext_lazy
+from django.utils.translation import gettext, ngettext_lazy
 
 TIMESINCE_CHUNKS = (
-    (60 * 60 * 24 * 365, ungettext_lazy('%d year', '%d years')),
-    (60 * 60 * 24 * 30, ungettext_lazy('%d month', '%d months')),
-    (60 * 60 * 24 * 7, ungettext_lazy('%d week', '%d weeks')),
-    (60 * 60 * 24, ungettext_lazy('%d day', '%d days')),
-    (60 * 60, ungettext_lazy('%d hour', '%d hours')),
-    (60, ungettext_lazy('%d minute', '%d minutes'))
+    (60 * 60 * 24 * 365, ngettext_lazy('%d year', '%d years')),
+    (60 * 60 * 24 * 30, ngettext_lazy('%d month', '%d months')),
+    (60 * 60 * 24 * 7, ngettext_lazy('%d week', '%d weeks')),
+    (60 * 60 * 24, ngettext_lazy('%d day', '%d days')),
+    (60 * 60, ngettext_lazy('%d hour', '%d hours')),
+    (60, ngettext_lazy('%d minute', '%d minutes'))
 )
 
 
@@ -55,7 +55,7 @@ def timesince(d, now=None, reversed=False):
     since = delta.days * 24 * 60 * 60 + delta.seconds
     if since <= 0:
         # d is in the future compared to now, stop processing.
-        return avoid_wrapping(ugettext('0 minutes'))
+        return avoid_wrapping(gettext('0 minutes'))
     for i, (seconds, name) in enumerate(TIMESINCE_CHUNKS):
         count = since // seconds
         if count != 0:
@@ -66,7 +66,7 @@ def timesince(d, now=None, reversed=False):
         seconds2, name2 = TIMESINCE_CHUNKS[i + 1]
         count2 = (since - (seconds * count)) // seconds2
         if count2 != 0:
-            result += ugettext(', ') + avoid_wrapping(name2 % count2)
+            result += gettext(', ') + avoid_wrapping(name2 % count2)
     return result
 
 

@@ -10,7 +10,7 @@ from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.expressions import Expression
 from django.db.models.fields import Field
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 # Local cache of the spatial_ref_sys table, which holds SRID data for each
 # spatial database alias. This cache exists so that the database isn't queried

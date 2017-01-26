@@ -4,7 +4,7 @@ from django.test import SimpleTestCase
 from django.utils import text
 from django.utils.functional import lazystr
 from django.utils.text import format_lazy
-from django.utils.translation import override, ugettext_lazy
+from django.utils.translation import gettext_lazy, override
 
 IS_WIDE_BUILD = (len('\U0001F4A9') == 1)
 
@@ -235,7 +235,7 @@ class TestUtilsText(SimpleTestCase):
 
         # The format string can be lazy. (string comes from contrib.admin)
         s = format_lazy(
-            ugettext_lazy("Added {name} \"{object}\"."),
+            gettext_lazy("Added {name} \"{object}\"."),
             name='article', object='My first try',
         )
         with override('fr'):

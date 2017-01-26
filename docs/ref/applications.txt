@@ -457,10 +457,10 @@ Here are some common problems that you may encounter during initialization:
   importing an application configuration or a models module triggers code that
   depends on the app registry.
 
-  For example, :func:`~django.utils.translation.ugettext()` uses the app
+  For example, :func:`~django.utils.translation.gettext()` uses the app
   registry to look up translation catalogs in applications. To translate at
-  import time, you need :func:`~django.utils.translation.ugettext_lazy()`
-  instead. (Using :func:`~django.utils.translation.ugettext()` would be a bug,
+  import time, you need :func:`~django.utils.translation.gettext_lazy()`
+  instead. (Using :func:`~django.utils.translation.gettext()` would be a bug,
   because the translation would happen at import time, rather than at each
   request depending on the active language.)
 

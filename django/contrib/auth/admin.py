@@ -16,7 +16,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
 from django.utils.html import escape
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 
@@ -144,7 +144,7 @@ class UserAdmin(admin.ModelAdmin):
                 form.save()
                 change_message = self.construct_change_message(request, form, None)
                 self.log_change(request, user, change_message)
-                msg = ugettext('Password changed successfully.')
+                msg = gettext('Password changed successfully.')
                 messages.success(request, msg)
                 update_session_auth_hash(request, form.user)
                 return HttpResponseRedirect(

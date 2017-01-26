@@ -1,7 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.http import Http404
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
 

@@ -6,7 +6,7 @@ from django.contrib.messages.storage import base, default_storage
 from django.contrib.messages.storage.base import Message
 from django.test import modify_settings, override_settings
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 
 def add_level_messages(storage):
@@ -100,7 +100,7 @@ class BaseTests:
         storage = self.get_storage()
         response = self.get_response()
 
-        storage.add(constants.INFO, ugettext_lazy('lazy message'))
+        storage.add(constants.INFO, gettext_lazy('lazy message'))
         storage.update(response)
 
         storing = self.stored_messages_count(storage, response)

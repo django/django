@@ -114,7 +114,7 @@ class LocaleRegexProvider:
     """
     def __init__(self, regex):
         # regex is either a string representing a regular expression, or a
-        # translatable string (using ugettext_lazy) representing a regular
+        # translatable string (using gettext_lazy) representing a regular
         # expression.
         self._regex = regex
         self._regex_dict = {}

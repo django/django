@@ -11,7 +11,7 @@ from django.utils.encoding import force_text
 from django.utils.html import smart_urlquote
 from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 class FilteredSelectMultiple(forms.SelectMultiple):

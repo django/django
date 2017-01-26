@@ -17,7 +17,7 @@ from django.forms.fields import CharField, Field, IntegerField
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import translation
 from django.utils.text import capfirst
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from .models.custom_user import (
     CustomUser, CustomUserWithoutIsActiveField, ExtensionUser,

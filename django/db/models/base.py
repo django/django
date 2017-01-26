@@ -29,7 +29,7 @@ from django.db.models.utils import make_model_tuple
 from django.utils.encoding import force_text
 from django.utils.functional import curry
 from django.utils.text import capfirst, get_text_list
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.version import get_version
 
 

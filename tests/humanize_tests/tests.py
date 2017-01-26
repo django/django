@@ -7,7 +7,7 @@ from django.test import SimpleTestCase, modify_settings, override_settings
 from django.utils import translation
 from django.utils.html import escape
 from django.utils.timezone import get_fixed_timezone, utc
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 # Mock out datetime in some tests so they don't fail occasionally when they
 # run too slow. Use a fixed datetime for datetime.now(). DST change in

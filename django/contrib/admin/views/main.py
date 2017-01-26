@@ -18,7 +18,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.http import urlencode
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 
 # Changelist settings
 ALL_VAR = 'all'
@@ -76,9 +76,9 @@ class ChangeList:
         self.queryset = self.get_queryset(request)
         self.get_results(request)
         if self.is_popup:
-            title = ugettext('Select %s')
+            title = gettext('Select %s')
         else:
-            title = ugettext('Select %s to change')
+            title = gettext('Select %s to change')
         self.title = title % force_text(self.opts.verbose_name)
         self.pk_attname = self.lookup_opts.pk.attname
 

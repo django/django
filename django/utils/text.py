@@ -9,7 +9,7 @@ from django.utils.functional import (
     SimpleLazyObject, keep_lazy, keep_lazy_text, lazy,
 )
 from django.utils.safestring import SafeText, mark_safe
-from django.utils.translation import pgettext, ugettext as _, ugettext_lazy
+from django.utils.translation import gettext as _, gettext_lazy, pgettext
 
 
 @keep_lazy_text
@@ -240,7 +240,7 @@ def get_valid_filename(s):
 
 
 @keep_lazy_text
-def get_text_list(list_, last_word=ugettext_lazy('or')):
+def get_text_list(list_, last_word=gettext_lazy('or')):
     """
     >>> get_text_list(['a', 'b', 'c', 'd'])
     'a, b, c or d'

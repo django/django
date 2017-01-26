@@ -13,7 +13,7 @@ from django.template.defaultfilters import capfirst, linebreaksbr
 from django.utils.encoding import force_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 ACTION_CHECKBOX_NAME = '_selected_action'
 
@@ -290,10 +290,10 @@ class InlineAdminFormSet:
             'name': '#%s' % self.formset.prefix,
             'options': {
                 'prefix': self.formset.prefix,
-                'addText': ugettext('Add another %(verbose_name)s') % {
+                'addText': gettext('Add another %(verbose_name)s') % {
                     'verbose_name': capfirst(verbose_name),
                 },
-                'deleteText': ugettext('Remove'),
+                'deleteText': gettext('Remove'),
             }
         })
 

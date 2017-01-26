@@ -15,7 +15,7 @@ from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.text import capfirst
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 UserModel = get_user_model()
 
@@ -27,15 +27,15 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
         context = super().get_context(name, value, attrs)
         summary = []
         if not value or value.startswith(UNUSABLE_PASSWORD_PREFIX):
-            summary.append({'label': ugettext("No password set.")})
+            summary.append({'label': gettext("No password set.")})
         else:
             try:
                 hasher = identify_hasher(value)
             except ValueError:
-                summary.append({'label': ugettext("Invalid password format or unknown hashing algorithm.")})
+                summary.append({'label': gettext("Invalid password format or unknown hashing algorithm.")})
             else:
                 for key, value_ in hasher.safe_summary(value).items():
-                    summary.append({'label': ugettext(key), 'value': value_})
+                    summary.append({'label': gettext(key), 'value': value_})
         context['summary'] = summary
         return context
 

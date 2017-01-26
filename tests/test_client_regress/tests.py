@@ -17,7 +17,7 @@ from django.test import (
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList
 from django.urls import NoReverseMatch, reverse
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 from .models import CustomUser
 from .views import CustomTestException
@@ -154,11 +154,11 @@ class AssertContainsTests(SimpleTestCase):
 
     def test_nontext_contains(self):
         r = self.client.get('/no_template_view/')
-        self.assertContains(r, ugettext_lazy('once'))
+        self.assertContains(r, gettext_lazy('once'))
 
     def test_nontext_not_contains(self):
         r = self.client.get('/no_template_view/')
-        self.assertNotContains(r, ugettext_lazy('never'))
+        self.assertNotContains(r, gettext_lazy('never'))
 
     def test_assert_contains_renders_template_response(self):
         """

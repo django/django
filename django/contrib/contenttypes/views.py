@@ -3,7 +3,7 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.requests import RequestSite
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 def shortcut(request, content_type_id, object_id):

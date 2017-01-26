@@ -10,7 +10,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch, reverse
 from django.utils.text import capfirst
-from django.utils.translation import ugettext as _, ugettext_lazy
+from django.utils.translation import gettext as _, gettext_lazy
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.i18n import JavaScriptCatalog
@@ -36,13 +36,13 @@ class AdminSite:
     """
 
     # Text to put at the end of each page's <title>.
-    site_title = ugettext_lazy('Django site admin')
+    site_title = gettext_lazy('Django site admin')
 
     # Text to put in each page's <h1>.
-    site_header = ugettext_lazy('Django administration')
+    site_header = gettext_lazy('Django administration')
 
     # Text to put at the top of the admin index page.
-    index_title = ugettext_lazy('Site administration')
+    index_title = gettext_lazy('Site administration')
 
     # URL for the "View site" link at the top of each admin page.
     site_url = '/'

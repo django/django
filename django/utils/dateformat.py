@@ -20,7 +20,7 @@ from django.utils.dates import (
 )
 from django.utils.encoding import force_text
 from django.utils.timezone import get_default_timezone, is_aware, is_naive
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 re_formatchars = re.compile(r'(?<!\\)([aAbBcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ])')
 re_escaped = re.compile(r'\\(.)')
