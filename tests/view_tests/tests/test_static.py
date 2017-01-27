@@ -3,6 +3,7 @@ import unittest
 from os import path
 
 from django.conf.urls.static import static
+from django.core.exceptions import ImproperlyConfigured
 from django.http import FileResponse, HttpResponseNotModified
 from django.test import SimpleTestCase, override_settings
 from django.utils.http import http_date
@@ -123,6 +124,22 @@ class StaticHelperTest(StaticTests):
     def tearDown(self):
         super().tearDown()
         urls.urlpatterns = self._old_views_urlpatterns
+
+    def test_prefix(self):
+        self.assertEqual(static('test')[0].regex.pattern, '^test(?P<path>.*)$')
+
+    @override_settings(DEBUG=False)
+    def test_debug_off(self):
+        """No URLs are served if DEBUG=False."""
+        self.assertEqual(static('test'), [])
+
+    def test_empty_prefix(self):
+        with self.assertRaisesMessage(ImproperlyConfigured, 'Empty static prefix not permitted'):
+            static('')
+
+    def test_special_prefix(self):
+        """No URLs are served if prefix contains '://'."""
+        self.assertEqual(static('http://'), [])
 
 
 class StaticUtilsTests(unittest.TestCase):
