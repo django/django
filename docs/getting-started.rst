@@ -663,7 +663,7 @@ message, it raises the ``ConsumeLater`` exception, which puts the message
 back on the channel it came from and tells the worker to work on another message.
 
 There's a high cost to using ``enforce_ordering``, which is why it's an optional
-decorator. Here's an example of it being used
+decorator. Here's an example of it being used::
 
     # In consumers.py
     from channels import Channel, Group
