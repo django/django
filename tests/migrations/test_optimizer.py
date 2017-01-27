@@ -630,6 +630,25 @@ class OptimizerTests(SimpleTestCase):
                 alter,
             ],
         )
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Bar", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Foo", [
+                    ("a", models.ForeignKey("app.Bar", models.CASCADE)),
+                    ("b", models.IntegerField()),
+                ]),
+                alter,
+                migrations.AlterField("Foo", "a", models.ForeignKey("app.Bar", models.CASCADE, related_name="baz")),
+            ],
+            [
+                migrations.CreateModel("Bar", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Foo", [
+                    ("a", models.ForeignKey("app.Bar", models.CASCADE, related_name="baz")),
+                    ("b", models.IntegerField()),
+                ]),
+                alter,
+            ],
+        )
 
     def test_create_alter_unique_field(self):
         self._test_create_alter_foo_field(migrations.AlterUniqueTogether("Foo", [["a", "b"]]))
