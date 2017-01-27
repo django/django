@@ -416,7 +416,7 @@ class SchemaTests(TransactionTestCase):
         field_type = columns['awesome'][0]
         self.assertEqual(
             field_type,
-            connection.features.introspected_boolean_field_type(new_field, created_separately=True)
+            connection.features.introspected_boolean_field_type(new_field)
         )
 
     def test_add_field_default_transform(self):

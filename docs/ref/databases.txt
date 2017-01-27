@@ -676,7 +676,7 @@ rather than a list. SQLite does not support this.
 Oracle notes
 ============
 
-Django supports `Oracle Database Server`_ versions 11.2 and higher. Version
+Django supports `Oracle Database Server`_ versions 12.1 and higher. Version
 5.2 or higher of the `cx_Oracle`_ Python driver is required.
 
 .. _`Oracle Database Server`: http://www.oracle.com/
