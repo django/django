@@ -1058,10 +1058,20 @@ class IncludeTests(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             include(self.url_patterns, 'namespace')
 
+    def test_include_4_tuple(self):
+        msg = 'Passing a 4-tuple to django.conf.urls.include() is not supported.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            include((self.url_patterns, 'app_name', 'namespace', 'blah'))
+
     def test_include_3_tuple(self):
         msg = 'Passing a 3-tuple to django.conf.urls.include() is not supported.'
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             include((self.url_patterns, 'app_name', 'namespace'))
+
+    def test_include_3_tuple_namespace(self):
+        msg = 'Cannot override the namespace for a dynamic module that provides a namespace.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            include((self.url_patterns, 'app_name', 'namespace'), 'namespace')
 
     def test_include_2_tuple(self):
         self.assertEqual(
