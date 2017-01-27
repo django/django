@@ -1311,6 +1311,18 @@ class ManageRunserver(AdminScriptTestCase):
         call_command(self.cmd, addrport="test.domain.local:7000", use_ipv6=True)
         self.assertServerSettings('test.domain.local', '7000', ipv6=True)
 
+    def test_runner_custom_defaults(self):
+        self.cmd.default_addr = '0.0.0.0'
+        self.cmd.default_port = '5000'
+        call_command(self.cmd)
+        self.assertServerSettings('0.0.0.0', '5000')
+
+    @unittest.skipUnless(socket.has_ipv6, "platform doesn't support IPv6")
+    def test_runner_custom_defaults_ipv6(self):
+        self.cmd.default_addr_ipv6 = '::'
+        call_command(self.cmd, use_ipv6=True)
+        self.assertServerSettings('::', '8000', ipv6=True, raw_ipv6=True)
+
     def test_runner_ambiguous(self):
         # Only 4 characters, all of which could be in an ipv6 address
         call_command(self.cmd, addrport="beef:7654")
