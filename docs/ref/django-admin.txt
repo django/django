@@ -1776,6 +1776,13 @@ Named arguments can be passed by using either one of the following syntaxes::
       # `use_natural_foreign_keys` is the option destination variable
       management.call_command('dumpdata', use_natural_foreign_keys=True)
 
+Some command options have different names when using ``call_command()`` instead
+of ``django-admin`` or ``manage.py``. For example, ``django-admin
+createsuperuser --no-input`` translates to ``call_command('createsuperuser',
+interactive=False)``. To find what keyword argument name to use for
+``call_command()``, check the command's source code for the ``dest`` argument
+passed to ``parser.add_argument()``.
+
 Command options which take multiple options are passed a list::
 
       management.call_command('dumpdata', exclude=['contenttypes', 'auth'])
