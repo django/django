@@ -217,6 +217,10 @@ Miscellaneous
   functionality since session authentication is unconditionally enabled in
   Django 1.10.
 
+* The default HTTP error handlers (``handler404``, etc.) are now callables
+  instead of dotted Python path strings. Django favors callable references
+  since they provide better performance and debugging experience.
+
 .. _deprecated-features-2.0:
 
 Features deprecated in 2.0
