@@ -22,12 +22,12 @@ def include(arg, namespace=None):
         except ValueError:
             if namespace:
                 raise ImproperlyConfigured(
-                    'Cannot override the namespace for a dynamic module that provides a namespace'
+                    'Cannot override the namespace for a dynamic module that provides a namespace.'
                 )
             raise ImproperlyConfigured(
-                'Passing a 3-tuple to django.conf.urls.include() is not supported. '
+                'Passing a %d-tuple to django.conf.urls.include() is not supported. '
                 'Pass a 2-tuple containing the list of patterns and app_name, '
-                'and provide the namespace argument to include() instead.',
+                'and provide the namespace argument to include() instead.' % len(arg)
             )
     else:
         # No namespace hint - use manually provided namespace
