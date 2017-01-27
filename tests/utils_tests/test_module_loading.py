@@ -1,4 +1,3 @@
-import imp
 import os
 import sys
 import unittest
@@ -13,11 +12,6 @@ from django.utils.module_loading import (
 
 
 class DefaultLoader(unittest.TestCase):
-    def setUp(self):
-        sys.meta_path.insert(0, ProxyFinder())
-
-    def tearDown(self):
-        sys.meta_path.pop(0)
 
     def test_loader(self):
         "Normal module existence can be tested"
@@ -176,35 +170,6 @@ class AutodiscoverModulesTestCase(SimpleTestCase):
         from .test_module import site
         autodiscover_modules('does_not_exist', 'another_good_module', 'does_not_exist2', register_to=site)
         self.assertEqual(site._registry, {'lorem': 'ipsum'})
-
-
-class ProxyFinder:
-    def __init__(self):
-        self._cache = {}
-
-    def find_module(self, fullname, path=None):
-        tail = fullname.rsplit('.', 1)[-1]
-        try:
-            fd, fn, info = imp.find_module(tail, path)
-            if fullname in self._cache:
-                old_fd = self._cache[fullname][0]
-                if old_fd:
-                    old_fd.close()
-            self._cache[fullname] = (fd, fn, info)
-        except ImportError:
-            return None
-        else:
-            return self  # this is a loader as well
-
-    def load_module(self, fullname):
-        if fullname in sys.modules:
-            return sys.modules[fullname]
-        fd, fn, info = self._cache[fullname]
-        try:
-            return imp.load_module(fullname, fd, fn, info)
-        finally:
-            if fd:
-                fd.close()
 
 
 class TestFinder:
