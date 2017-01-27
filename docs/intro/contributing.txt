@@ -59,7 +59,7 @@ tools and the processes involved. Specifically, we'll be covering the following:
 * Writing a test for your patch.
 * Writing the code for your patch.
 * Testing your patch.
-* Generating a patch file for your changes.
+* Submitting a pull request.
 * Where to look for more information.
 
 Once you're done with the tutorial, you can look through the rest of
@@ -308,6 +308,19 @@ __ http://djangoci.com
     :ref:`run the tests using a different database
     <running-unit-tests-settings>`.
 
+Creating a branch for your patch
+================================
+
+Before making any changes, create a new branch for the ticket:
+
+.. code-block:: console
+
+    $ git checkout -b ticket_24788
+
+You can choose any name that you want for the branch, "ticket_24788" is an
+example. All changes made in this branch will be specific to the ticket and
+won't affect the main copy of the code that we cloned earlier.
+
 Writing some tests for your ticket
 ==================================
 
@@ -497,31 +510,18 @@ the ``versionadded`` bit is all about, see
 an explanation of how to build a copy of the documentation locally, so you can
 preview the HTML that will be generated.
 
-Generating a patch for your changes
-===================================
+Previewing your changes
+=======================
 
-Now it's time to generate a patch file that can be uploaded to Trac or applied
-to another copy of Django. To get a look at the content of your patch, run the
-following command:
+Now it's time to go through all the changes made in our patch. To display the
+differences between your current copy of Django (with your changes) and the
+revision that you initially checked out earlier in the tutorial:
 
 .. code-block:: console
 
     $ git diff
 
-This will display the differences between your current copy of Django (with
-your changes) and the revision that you initially checked out earlier in the
-tutorial.
-
-Once you're done looking at the patch, hit the ``q`` key to exit back to the
-command line. If the patch's content looked okay, you can run the following
-command to save the patch file to your current working directory:
-
-.. code-block:: console
-
-    $ git diff > 24788.diff
-
-You should now have a file in the root Django directory called ``24788.diff``.
-This patch file contains all your changes and should look this:
+Use the arrow keys to move up and down.
 
 .. code-block:: diff
 
@@ -603,23 +603,52 @@ This patch file contains all your changes and should look this:
              # NullBooleanField is a bit of a special case because its presentation (widget)
              # is different than its data. This is handled transparently, though.
 
-So what do I do next?
-=====================
+When you're done previewing the patch, hit the ``q`` key to return to the
+command line. If the patch's content looked okay, it's time to commit the
+changes.
 
-Congratulations, you've generated your very first Django patch! Now that you've
-got that under your belt, you can put those skills to good use by helping to
-improve Django's codebase. Generating patches and attaching them to Trac
-tickets is useful, however, since we are using git - adopting a more :doc:`git
-oriented workflow </internals/contributing/writing-code/working-with-git>` is
-recommended.
+Committing the changes in the patch
+===================================
 
-Since we never committed our changes locally, perform the following to get your
-git branch back to a good starting point:
+To commit the changes:
 
 .. code-block:: console
 
-    $ git reset --hard HEAD
-    $ git checkout master
+    $ git commit -a
+
+This opens up a text editor to type the commit message. Follow the :ref:`commit
+message guidelines <committing-guidelines>` and write a message like:
+
+.. code-block:: text
+
+    Fixed #24788 -- Allowed Forms to specify a prefix at the class level.
+
+Pushing the commit and making a pull request
+============================================
+
+After committing the patch, send it to your fork on GitHub (substitute
+"ticket_24788" with the name of your branch if it's different):
+
+.. code-block:: console
+
+    $ git push origin ticket_24788
+
+You can create a pull request by visiting the `Django GitHub page
+<https://github.com/django/django/>`_. You'll see your branch under "Your
+recently pushed branches". Click "Compare & pull request" next to it.
+
+On the next page that displays a preview of the patch, you would click
+"Create pull request".
+
+Next steps
+==========
+
+Congratulations, you've learned how to make a pull request to Django! Details
+of more advanced techniques you may need are in
+:doc:`/internals/contributing/writing-code/working-with-git`.
+
+Now you can put those skills to good use by helping to improve Django's
+codebase.
 
 More information for new contributors
 -------------------------------------
@@ -665,13 +694,12 @@ __ https://code.djangoproject.com/query?status=new&status=reopened&has_patch=0&e
 __ https://code.djangoproject.com/query?status=new&status=reopened&needs_better_patch=1&easy=1&col=id&col=summary&col=status&col=owner&col=type&col=milestone&order=priority
 __ https://code.djangoproject.com/query?status=new&status=reopened&needs_tests=1&easy=1&col=id&col=summary&col=status&col=owner&col=type&col=milestone&order=priority
 
-What's next?
-------------
+What's next after creating a pull request?
+------------------------------------------
 
 After a ticket has a patch, it needs to be reviewed by a second set of eyes.
-After uploading a patch or submitting a pull request, be sure to update the
-ticket metadata by setting the flags on the ticket to say "has patch",
-"doesn't need tests", etc, so others can find it for review. Contributing
-doesn't necessarily always mean writing a patch from scratch. Reviewing
-existing patches is also a very helpful contribution. See
-:doc:`/internals/contributing/triaging-tickets` for details.
+After submitting a pull request, update the ticket metadata by setting the
+flags on the ticket to say "has patch", "doesn't need tests", etc, so others
+can find it for review. Contributing doesn't necessarily always mean writing a
+patch from scratch. Reviewing existing patches is also a very helpful
+contribution. See :doc:`/internals/contributing/triaging-tickets` for details.
