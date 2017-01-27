@@ -54,9 +54,6 @@ class Field:
     }
     empty_values = list(validators.EMPTY_VALUES)
 
-    # Tracks each time a Field instance is created. Used to retain order.
-    creation_counter = 0
-
     def __init__(self, required=True, widget=None, label=None, initial=None,
                  help_text='', error_messages=None, show_hidden_initial=False,
                  validators=(), localize=False, disabled=False, label_suffix=None):
@@ -108,10 +105,6 @@ class Field:
             widget.attrs.update(extra_attrs)
 
         self.widget = widget
-
-        # Increase the creation counter, and save our local copy.
-        self.creation_counter = Field.creation_counter
-        Field.creation_counter += 1
 
         messages = {}
         for c in reversed(self.__class__.__mro__):
