@@ -34,7 +34,7 @@ BEGIN
     SELECT NVL(last_number - cache_size, 0) INTO seq_value FROM user_sequences
            WHERE sequence_name = '%(sequence)s';
     WHILE table_value > seq_value LOOP
-        SELECT "%(sequence)s".nextval INTO seq_value FROM dual;
+        seq_value := "%(sequence)s".nextval;
     END LOOP;
 END;
 /"""
@@ -69,8 +69,7 @@ BEFORE INSERT ON %(tbl_name)s
 FOR EACH ROW
 WHEN (new.%(col_name)s IS NULL)
     BEGIN
-        SELECT "%(sq_name)s".nextval
-        INTO :new.%(col_name)s FROM dual;
+        :new.%(col_name)s := "%(sq_name)s".nextval;
     END;
 /""" % args
         return sequence_sql, trigger_sql
@@ -258,7 +257,7 @@ WHEN (new.%(col_name)s IS NULL)
 
     def last_insert_id(self, cursor, table_name, pk_name):
         sq_name = self._get_sequence_name(table_name)
-        cursor.execute('SELECT "%s".currval FROM dual' % sq_name)
+        cursor.execute('"%s".currval' % sq_name)
         return cursor.fetchone()[0]
 
     def lookup_cast(self, lookup_type, internal_type=None):
