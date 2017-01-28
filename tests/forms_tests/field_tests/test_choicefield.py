@@ -84,7 +84,7 @@ class ChoiceFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         )
 
     @ignore_warnings(category=UnicodeWarning)
-    def test_utf8_bytesrings(self):
+    def test_utf8_bytestrings(self):
         # Choice validation with UTF-8 bytestrings as input (these are the
         # Russian abbreviations "мес." and "шт.".
         f = ChoiceField(
