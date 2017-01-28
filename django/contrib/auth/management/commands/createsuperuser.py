@@ -20,6 +20,7 @@ class NotRunningInTTYException(Exception):
 class Command(BaseCommand):
     help = 'Used to create a superuser.'
     requires_migrations_checks = True
+    stealth_options = ('stdin',)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

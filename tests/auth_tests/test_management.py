@@ -320,7 +320,6 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             call_command(
                 "createsuperuser",
                 interactive=False,
-                username="joe@somewhere.org",
                 stdout=new_io,
                 stderr=new_io,
             )

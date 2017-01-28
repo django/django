@@ -384,6 +384,18 @@ raises an exception and should be replaced with::
 
     forms.IntegerField(max_value=25, min_value=10)
 
+``call_command()`` validates the options it receives
+----------------------------------------------------
+
+``call_command()`` now validates that the argument parser of the command being
+called defines all of the options passed to ``call_command()``.
+
+For custom management commands that use options not created using
+``parser.add_argument()``, add a ``stealth_options`` attribute on the command::
+
+    class MyCommand(BaseCommand):
+        stealth_options = ('option_name', ...)
+
 Miscellaneous
 -------------
 

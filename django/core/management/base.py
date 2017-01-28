@@ -183,6 +183,10 @@ class BaseCommand:
         that is locale-sensitive and such content shouldn't contain any
         translations (like it happens e.g. with django.contrib.auth
         permissions) as activating any locale might cause unintended effects.
+
+    ``stealth_options``
+        A tuple of any options the command uses which aren't defined by the
+        argument parser.
     """
     # Metadata about this command.
     help = ''
@@ -193,6 +197,11 @@ class BaseCommand:
     leave_locale_alone = False
     requires_migrations_checks = False
     requires_system_checks = True
+    # Arguments, common to all commands, which aren't defined by the argument
+    # parser.
+    base_stealth_options = ('skip_checks', 'stderr', 'stdout')
+    # Command-specific options not defined by the argument parser.
+    stealth_options = ()
 
     def __init__(self, stdout=None, stderr=None, no_color=False):
         self.stdout = OutputWrapper(stdout or sys.stdout)
