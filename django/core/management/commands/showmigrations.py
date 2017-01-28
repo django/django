@@ -5,6 +5,7 @@ from django.db.migrations.loader import MigrationLoader
 
 class Command(BaseCommand):
     help = "Shows all available migrations for the current project"
+    private_options = ('stdout', )
 
     def add_arguments(self, parser):
         parser.add_argument(

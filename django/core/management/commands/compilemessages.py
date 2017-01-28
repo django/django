@@ -32,6 +32,8 @@ class Command(BaseCommand):
     program = 'msgfmt'
     program_options = ['--check-format']
 
+    private_options = ('stdout', 'stderr', )
+
     def add_arguments(self, parser):
         parser.add_argument(
             '--locale', '-l', dest='locale', action='append', default=[],

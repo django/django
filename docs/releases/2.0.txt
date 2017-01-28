@@ -281,6 +281,8 @@ Miscellaneous
 * The default HTTP error handlers (``handler404``, etc.) are now callables
   instead of dotted Python path strings. Django favors callable references
   since they provide better performance and debugging experience.
+* Management command raises ``TypeError``, if an unrecognized argument is
+  supplied. Earlier, it used to ignore the unrecognized arguments silently.
 
 .. _deprecated-features-2.0:
 

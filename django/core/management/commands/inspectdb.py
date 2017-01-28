@@ -10,10 +10,9 @@ from django.utils.encoding import force_text
 
 class Command(BaseCommand):
     help = "Introspects the database tables in the given database and outputs a Django model module."
-
     requires_system_checks = False
-
     db_module = 'django.db'
+    private_options = ('stdout', 'table_name_filter')
 
     def add_arguments(self, parser):
         parser.add_argument(

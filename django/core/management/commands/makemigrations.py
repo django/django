@@ -20,6 +20,7 @@ from django.db.migrations.writer import MigrationWriter
 
 class Command(BaseCommand):
     help = "Creates new migration(s) for apps."
+    private_options = ('stdout', 'stderr')
 
     def add_arguments(self, parser):
         parser.add_argument(

@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 class Command(BaseCommand):
     help = "Useless command."
+    private_options = ('stdout', )
 
     def add_arguments(self, parser):
         parser.add_argument('args', metavar='app_label', nargs='*', help='Specify the app label(s) to works on.')

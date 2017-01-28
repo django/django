@@ -212,6 +212,8 @@ class Command(BaseCommand):
     msgattrib_options = ['--no-obsolete']
     xgettext_options = ['--from-code=UTF-8', '--add-comments=Translators']
 
+    private_options = ('stdout', )
+
     def add_arguments(self, parser):
         parser.add_argument(
             '--locale', '-l', default=[], dest='locale', action='append',

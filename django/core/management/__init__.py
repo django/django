@@ -120,6 +120,14 @@ def call_command(command_name, *args, **options):
     arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
     defaults = parser.parse_args(args=[force_text(a) for a in args])
     defaults = dict(defaults._get_kwargs(), **arg_options)
+    # Check if any unrecognized options were passed.
+    recognized_options = {action.dest for action in parser._actions} | set(command.private_options)
+    unrecognized_options = set(options.keys()) - recognized_options
+    if unrecognized_options:
+        print(unrecognized_options)
+        raise TypeError("Unrecognized %s: %r." % (
+            'options' if len(unrecognized_options) > 1 else 'option',
+            ', '.join(unrecognized_options)))
     # Move positional args out of options to mimic legacy optparse
     args = defaults.pop('args', ())
     if 'skip_checks' not in options:

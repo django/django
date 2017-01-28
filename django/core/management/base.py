@@ -183,6 +183,10 @@ class BaseCommand:
         that is locale-sensitive and such content shouldn't contain any
         translations (like it happens e.g. with django.contrib.auth
         permissions) as activating any locale might cause unintended effects.
+
+    ``private_options``
+        A tuple; containing arguments which are not defined by the parser, to 
+        prevent raising error on disallowed args.
     """
     # Metadata about this command.
     help = ''
@@ -193,6 +197,15 @@ class BaseCommand:
     leave_locale_alone = False
     requires_migrations_checks = False
     requires_system_checks = True
+
+    # Arguments which are not defined by the parser.
+    private_options = ()
+    #private_options = (
+    #    'verbosity', 'database', 'interactive', 'run_syncdb', 'allow_cascade',
+    #    'reset_sequences', 'inhibit_post_migrate', 'opt_3', 'stdin', 'stdout',
+    #    'stderr', 'commit', 'using', 'table_name_filter', 'username', 'commit',
+    #    'skip_checks',
+    #)
 
     def __init__(self, stdout=None, stderr=None, no_color=False):
         self.stdout = OutputWrapper(stdout or sys.stdout)

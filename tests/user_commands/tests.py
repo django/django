@@ -174,6 +174,15 @@ class CommandTests(SimpleTestCase):
                 self.assertTrue(check_migrations.called)
         finally:
             dance.Command.requires_migrations_checks = requires_migrations_checks
+    
+    def test_call_command_unrecognized_options(self):
+        """
+        When passing unrecognized options to call command, an command error
+        should be raised (#27787).
+        """
+        out = StringIO()
+        with self.assertRaises(TypeError):
+            management.call_command('dance', stdout=out, opt_3=True, unrecognized=1)
 
 
 class CommandRunTests(AdminScriptTestCase):

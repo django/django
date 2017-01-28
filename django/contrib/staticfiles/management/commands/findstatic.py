@@ -8,6 +8,7 @@ from django.utils.encoding import force_text
 class Command(LabelCommand):
     help = "Finds the absolute paths for the given static file(s)."
     label = 'staticfile'
+    private_options = ('stdout', )
 
     def add_arguments(self, parser):
         super().add_arguments(parser)

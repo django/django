@@ -10,6 +10,7 @@ from django.utils.version import get_docs_version
 
 class Command(BaseCommand):
     help = "Squashes an existing set of migrations (from first until specified) into a single new one."
+    private_options = ('stdout', )
 
     def add_arguments(self, parser):
         parser.add_argument(

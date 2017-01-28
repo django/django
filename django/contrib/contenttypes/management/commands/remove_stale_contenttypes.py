@@ -9,6 +9,8 @@ from ...management import get_contenttypes_and_models
 
 class Command(BaseCommand):
 
+    private_options = ('stdout', )
+
     def add_arguments(self, parser):
         parser.add_argument(
             '--noinput', '--no-input',

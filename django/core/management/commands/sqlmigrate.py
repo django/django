@@ -6,8 +6,8 @@ from django.db.migrations.loader import AmbiguityError
 
 class Command(BaseCommand):
     help = "Prints the SQL statements for the named migration."
-
     output_transaction = True
+    private_options = ('stdout', )
 
     def add_arguments(self, parser):
         parser.add_argument('app_label', help='App label of the application containing the migration.')

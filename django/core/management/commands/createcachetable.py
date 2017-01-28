@@ -11,8 +11,8 @@ from django.utils.encoding import force_text
 
 class Command(BaseCommand):
     help = "Creates the tables needed to use the SQL cache backend."
-
     requires_system_checks = False
+    private_options = ('interactive', 'stdout', )
 
     def add_arguments(self, parser):
         parser.add_argument(

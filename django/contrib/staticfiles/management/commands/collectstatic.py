@@ -18,6 +18,7 @@ class Command(BaseCommand):
     """
     help = "Collect static files in a single location."
     requires_system_checks = False
+    private_options = ('stdout', 'stderr')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
