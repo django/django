@@ -1392,3 +1392,10 @@ class SquashMigrationsTests(MigrationTestBase):
             )
             with self.assertRaisesMessage(CommandError, msg):
                 call_command("squashmigrations", "migrations", "0003", "0002", interactive=False, verbosity=0)
+
+    def test_squashmigrations_squashes_noop(self):
+        """
+        squashmigrations squashes migrations.
+        """
+        with self.temporary_migration_module(module="migrations.test_migrations_squash_noop"):
+            call_command("squashmigrations", "migrations", "0002", interactive=False, verbosity=0)
