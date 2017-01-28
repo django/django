@@ -58,6 +58,9 @@ class TestRegistration(SimpleTestCase):
         with self.assertRaises(ImproperlyConfigured):
             self.site.register(Location)
 
+    def test_empty_models_list_registration(self):
+        with self.assertRaisesMessage(ValueError, 'At least one model must be passed to register.'):self.site.register(())
+
     def test_is_registered_model(self):
         "Checks for registered models should return true."
         self.site.register(Person)
@@ -66,6 +69,9 @@ class TestRegistration(SimpleTestCase):
     def test_is_registered_not_registered_model(self):
         "Checks for unregistered models should return false."
         self.assertFalse(self.site.is_registered(Person))
+
+    def test_empty_models_list_unregistration(self):
+        with self.assertRaisesMessage(ValueError, 'At least one model must be passed to unregister.'):self.site.unregister(())
 
 
 class TestRegistrationDecorator(SimpleTestCase):

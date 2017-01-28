@@ -90,13 +90,16 @@ class AdminSite:
         admin options). If keyword arguments are given -- e.g., list_display --
         they'll be applied as options to the admin class.
 
+        If a model is empty, this will raise ValueError.
+
         If a model is already registered, this will raise AlreadyRegistered.
 
         If a model is abstract, this will raise ImproperlyConfigured.
         """
         if not admin_class:
             admin_class = ModelAdmin
-
+        if not model_or_iterable:
+            raise ValueError('At least one model must be passed to register.')
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
@@ -127,8 +130,12 @@ class AdminSite:
         """
         Unregisters the given model(s).
 
+        If a model is empty, this will raise ValueError.
+
         If a model isn't already registered, this will raise NotRegistered.
         """
+        if not model_or_iterable:
+            raise ValueError('At least one model must be passed to unregister.')
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
