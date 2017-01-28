@@ -3,7 +3,8 @@ from django.db import models
 from django.test import SimpleTestCase, TestCase
 
 from .models import (
-    Foo, RenamedField, VerboseNameField, Whiz, WhizIter, WhizIterEmpty,
+    Foo, OrderedFieldModel, RenamedField, VerboseNameField, Whiz, WhizIter,
+    WhizIterEmpty,
 )
 
 
@@ -62,11 +63,18 @@ class BasicFieldTests(TestCase):
 
     def test_field_ordering(self):
         """Fields are ordered based on their creation."""
-        f1 = models.Field()
-        f2 = models.Field(auto_created=True)
-        f3 = models.Field()
-        self.assertLess(f2, f1)
-        self.assertGreater(f3, f1)
+        f1 = models.Field(name='third')
+        f2 = models.Field(name='fifth', auto_created=True)
+        f3 = models.Field(name='fourth')
+        OrderedFieldModel._meta.add_field(f1)
+        OrderedFieldModel._meta.add_field(f3)
+        OrderedFieldModel._meta.add_field(f2)
+        fields = OrderedFieldModel._meta.get_fields()
+        self.assertEqual(fields[0].name, 'first')
+        self.assertEqual(fields[1].name, 'id')
+        self.assertEqual(fields[2].name, 'third')
+        self.assertEqual(fields[3].name, 'fourth')
+        self.assertEqual(fields[4].name, 'fifth')
         self.assertIsNotNone(f1)
         self.assertNotIn(f2, (None, 1, ''))
 

@@ -28,6 +28,10 @@ def get_foo():
     return Foo.objects.get(id=1).pk
 
 
+class OrderedFieldModel(models.Model):
+    first = models.BooleanField()
+
+
 class Bar(models.Model):
     b = models.CharField(max_length=10)
     a = models.ForeignKey(Foo, models.CASCADE, default=get_foo, related_name=b'bars')
