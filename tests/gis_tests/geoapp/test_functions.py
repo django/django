@@ -305,10 +305,8 @@ class GISFunctionsTests(TestCase):
         for c in mpoly_qs:
             self.assertEqual(c.mpoly.num_points, c.num_points)
 
-        if not oracle:
-            # Oracle cannot count vertices in Point geometries.
-            for c in City.objects.annotate(num_points=functions.NumPoints('point')):
-                self.assertEqual(1, c.num_points)
+        for c in City.objects.annotate(num_points=functions.NumPoints('point')):
+            self.assertEqual(c.num_points, 1)
 
     @skipUnlessDBFeature("has_PointOnSurface_function")
     def test_point_on_surface(self):

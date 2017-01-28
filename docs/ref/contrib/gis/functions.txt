@@ -170,7 +170,7 @@ __ http://www.w3.org/Graphics/SVG/
 .. class:: BoundingCircle(expression, num_seg=48, **extra)
 
 *Availability*: `PostGIS <http://postgis.net/docs/ST_MinimumBoundingCircle.html>`__,
-`Oracle (≥ 12.1.0.2) <https://docs.oracle.com/database/121/SPATL/GUID-82A61626-BB64-4793-B53D-A0DBEC91831A.htm#SPATL1554>`_
+`Oracle <https://docs.oracle.com/database/121/SPATL/GUID-82A61626-BB64-4793-B53D-A0DBEC91831A.htm#SPATL1554>`_
 
 Accepts a single geographic field or expression and returns the smallest circle
 polygon that can fully contain the geometry.
