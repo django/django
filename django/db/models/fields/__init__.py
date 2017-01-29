@@ -85,19 +85,7 @@ def return_None():
     return None
 
 
-class OrderedFieldClass(type):
-    """
-    Metaclass for classes requiring ordered fields.
-
-    Python 3.6 guarantees declared field order, so this can be removed once
-    support for < 3.6 is dropped.
-    """
-    @classmethod
-    def __prepare__(metacls, name, bases, **kwds):
-        return collections.OrderedDict()
-
-
-class Field(RegisterLookupMixin, metaclass=OrderedFieldClass):
+class Field(RegisterLookupMixin):
     """Base class for all field types"""
 
     # Designates whether empty strings fundamentally are allowed at the
