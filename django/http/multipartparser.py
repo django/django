@@ -17,7 +17,6 @@ from django.core.files.uploadhandler import (
     SkipFile, StopFutureHandlers, StopUpload,
 )
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_text
 from django.utils.text import unescape_entities
 
 __all__ = ('MultiPartParser', 'MultiPartParserError', 'InputStreamExhausted')
@@ -164,7 +163,7 @@ class MultiPartParser:
                 transfer_encoding = meta_data.get('content-transfer-encoding')
                 if transfer_encoding is not None:
                     transfer_encoding = transfer_encoding[0].strip()
-                field_name = force_text(field_name, encoding, errors='replace')
+                field_name = field_name, encoding
 
                 if item_type == FIELD:
                     # Avoid storing more than DATA_UPLOAD_MAX_NUMBER_FIELDS.
@@ -199,12 +198,12 @@ class MultiPartParser:
                             num_bytes_read > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
                         raise RequestDataTooBig('Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.')
 
-                    self._post.appendlist(field_name, force_text(data, encoding, errors='replace'))
+                    self._post.appendlist(field_name, data, encoding)
                 elif item_type == FILE:
                     # This is a file, use the handler...
                     file_name = disposition.get('filename')
                     if file_name:
-                        file_name = force_text(file_name, encoding, errors='replace')
+                        file_name = file_name, encoding
                         file_name = self.IE_sanitize(unescape_entities(file_name))
                     if not file_name:
                         continue
@@ -235,12 +234,12 @@ class MultiPartParser:
                                 # We should always decode base64 chunks by multiple of 4,
                                 # ignoring whitespace.
 
-                                stripped_chunk = b"".join(chunk.split())
+                                stripped_chunk = "".join(chunk.split())
 
                                 remaining = len(stripped_chunk) % 4
                                 while remaining != 0:
                                     over_chunk = field_stream.read(4 - remaining)
-                                    stripped_chunk += b"".join(over_chunk.split())
+                                    stripped_chunk += "".join(over_chunk.split())
                                     remaining = len(stripped_chunk) % 4
 
                                 try:
@@ -293,7 +292,7 @@ class MultiPartParser:
             file_obj = handler.file_complete(counters[i])
             if file_obj:
                 # If it returns a file object, then set the files dict.
-                self._files.appendlist(force_text(old_field_name, self._encoding, errors='replace'), file_obj)
+                self._files.appendlist(old_field_name, self._encoding, file_obj)
                 break
 
     def IE_sanitize(self, filename):
@@ -326,7 +325,7 @@ class LazyStream:
         """
         self._producer = producer
         self._empty = False
-        self._leftover = b''
+        self._leftover = ''
         self.length = length
         self.position = 0
         self._remaining = length
@@ -340,7 +339,7 @@ class LazyStream:
             remaining = self._remaining if size is None else size
             # do the whole thing in one shot if no limit was provided.
             if remaining is None:
-                yield b''.join(self)
+                yield ''.join(self)
                 return
 
             # otherwise do some bookkeeping to return exactly enough
@@ -359,7 +358,7 @@ class LazyStream:
                     remaining -= len(emitting)
                     yield emitting
 
-        out = b''.join(parts())
+        out = ''.join(parts())
         return out
 
     def __next__(self):
@@ -372,7 +371,7 @@ class LazyStream:
         """
         if self._leftover:
             output = self._leftover
-            self._leftover = b''
+            self._leftover = ''
         else:
             output = next(self._producer)
             self._unget_history = []
@@ -402,7 +401,7 @@ class LazyStream:
             return
         self._update_unget_history(len(bytes))
         self.position -= len(bytes)
-        self._leftover = b''.join([bytes, self._leftover])
+        self._leftover = ''.join([bytes, self._leftover])
 
     def _update_unget_history(self, num_bytes):
         """
@@ -557,10 +556,10 @@ class BoundaryIter:
             next = index + len(self._boundary)
             # backup over CRLF
             last = max(0, end - 1)
-            if data[last:last + 1] == b'\n':
+            if data[last:last + 1] == '\n':
                 end -= 1
             last = max(0, end - 1)
-            if data[last:last + 1] == b'\r':
+            if data[last:last + 1] == '\r':
                 end -= 1
             return end, next
 
@@ -588,7 +587,7 @@ def parse_boundary_stream(stream, max_header_size):
     # 'find' returns the top of these four bytes, so we'll
     # need to munch them later to prevent them from polluting
     # the payload.
-    header_end = chunk.find(b'\r\n\r\n')
+    header_end = chunk.find('\r\n\r\n')
 
     def _parse_header(line):
         main_value_pair, params = parse_header(line)
@@ -614,7 +613,7 @@ def parse_boundary_stream(stream, max_header_size):
     outdict = {}
 
     # Eliminate blank lines
-    for line in header.split(b'\r\n'):
+    for line in header.split('\r\n'):
         # This terminology ("main value" and "dictionary of
         # parameters") is from the Python docs.
         try:
@@ -638,7 +637,7 @@ def parse_boundary_stream(stream, max_header_size):
 class Parser:
     def __init__(self, stream, boundary):
         self._stream = stream
-        self._separator = b'--' + boundary
+        self._separator = '--' + boundary
 
     def __iter__(self):
         boundarystream = InterBoundaryIter(self._stream, self._separator)
@@ -654,11 +653,11 @@ def parse_header(line):
     Input (line): bytes, output: str for key/name, bytes for values which
     will be decoded later.
     """
-    plist = _parse_header_params(b';' + line)
+    plist = _parse_header_params(';' + line)
     key = plist.pop(0).lower().decode('ascii')
     pdict = {}
     for p in plist:
-        i = p.find(b'=')
+        i = p.find('=')
         if i >= 0:
             has_encoding = False
             name = p[:i].strip().lower().decode('ascii')
@@ -666,26 +665,26 @@ def parse_header(line):
                 # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
                 # http://tools.ietf.org/html/rfc2231#section-4
                 name = name[:-1]
-                if p.count(b"'") == 2:
+                if p.count("'") == 2:
                     has_encoding = True
             value = p[i + 1:].strip()
             if has_encoding:
-                encoding, lang, value = value.split(b"'")
+                encoding, lang, value = value.split("'")
                 value = unquote(value.decode(), encoding=encoding.decode())
-            if len(value) >= 2 and value[:1] == value[-1:] == b'"':
+            if len(value) >= 2 and value[:1] == value[-1:] == '"':
                 value = value[1:-1]
-                value = value.replace(b'\\\\', b'\\').replace(b'\\"', b'"')
+                value = value.replace('\\\\', '\\').replace('\\"', '"')
             pdict[name] = value
     return key, pdict
 
 
 def _parse_header_params(s):
     plist = []
-    while s[:1] == b';':
+    while s[:1] == ';':
         s = s[1:]
-        end = s.find(b';')
-        while end > 0 and s.count(b'"', 0, end) % 2:
-            end = s.find(b';', end + 1)
+        end = s.find(';')
+        while end > 0 and s.count('"', 0, end) % 2:
+            end = s.find(';', end + 1)
         if end < 0:
             end = len(s)
         f = s[:end]
