@@ -1,6 +1,5 @@
 import logging
 import re
-import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -12,7 +11,6 @@ from django.middleware.csrf import (
 )
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import patch_logger
-from django.utils.encoding import force_bytes
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
 
 from .views import (
@@ -202,7 +200,7 @@ class CsrfViewMiddlewareTestMixin:
         A new token is sent if the csrf_cookie is the empty string.
         """
         req = self._get_GET_no_csrf_cookie_request()
-        req.COOKIES[settings.CSRF_COOKIE_NAME] = b""
+        req.COOKIES[settings.CSRF_COOKIE_NAME] = ""
         CsrfViewMiddleware().process_view(req, token_view, (), {})
         resp = token_view(req)
 
@@ -303,7 +301,7 @@ class CsrfViewMiddlewareTestMixin:
         response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # Non-ASCII
-        req.META['HTTP_REFERER'] = b'\xd8B\xf6I\xdf'
+        req.META['HTTP_REFERER'] = 'ØBöIß'
         response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertContains(response, malformed_referer_msg, status_code=403)
         # missing scheme
@@ -565,24 +563,6 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         resp2 = CsrfViewMiddleware().process_response(req, resp)
         csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, False)
         self.assertEqual(len(csrf_cookie.value), CSRF_TOKEN_LENGTH)
-
-    def test_process_view_token_invalid_bytes(self):
-        """
-        If the token contains improperly encoded unicode, it is ignored and a
-        new token is created.
-        """
-        token = (b"<1>\xc2\xa1" + force_bytes(self._csrf_id, 'ascii'))[:CSRF_TOKEN_LENGTH]
-        req = self._get_GET_no_csrf_cookie_request()
-        req.COOKIES[settings.CSRF_COOKIE_NAME] = token
-        # We expect a UnicodeWarning here, because we used broken utf-8 on purpose
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=UnicodeWarning)
-            CsrfViewMiddleware().process_view(req, token_view, (), {})
-        resp = token_view(req)
-        resp2 = CsrfViewMiddleware().process_response(req, resp)
-        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, False)
-        self.assertEqual(len(csrf_cookie.value), CSRF_TOKEN_LENGTH)
-        self.assertNotEqual(csrf_cookie.value, token)
 
     def test_process_view_token_invalid_chars(self):
         """

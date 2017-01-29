@@ -15,7 +15,6 @@ from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
 from django.utils.deprecation import MiddlewareMixin
-from django.utils.encoding import force_text
 from django.utils.http import is_same_domain
 
 logger = logging.getLogger('django.security.csrf')
@@ -107,7 +106,7 @@ def rotate_token(request):
 
 def _sanitize_token(token):
     # Allow only ASCII alphanumerics
-    if re.search('[^a-zA-Z0-9]', force_text(token)):
+    if re.search('[^a-zA-Z0-9]', token):
         return _get_new_csrf_token()
     elif len(token) == CSRF_TOKEN_LENGTH:
         return token
@@ -238,11 +237,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 # Barth et al. found that the Referer header is missing for
                 # same-domain requests in only about 0.2% of cases or less, so
                 # we can use strict Referer checking.
-                referer = force_text(
-                    request.META.get('HTTP_REFERER'),
-                    strings_only=True,
-                    errors='replace'
-                )
+                referer = request.META.get('HTTP_REFERER')
                 if referer is None:
                     return self._reject(request, REASON_NO_REFERER)
 

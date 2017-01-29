@@ -11,7 +11,6 @@ import itertools
 
 from django.conf import settings
 from django.middleware.csrf import get_token
-from django.utils.encoding import force_text
 from django.utils.functional import SimpleLazyObject, lazy
 
 
@@ -28,7 +27,7 @@ def csrf(request):
             # instead of returning an empty dict.
             return 'NOTPROVIDED'
         else:
-            return force_text(token)
+            return token
 
     return {'csrf_token': SimpleLazyObject(_get_val)}
 
