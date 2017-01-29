@@ -2045,15 +2045,11 @@ class SlugField(CharField):
     default_validators = [validators.validate_slug]
     description = _("Slug (up to %(max_length)s)")
 
-    def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = kwargs.get('max_length', 50)
-        # Set db_index=True unless it's been set manually.
-        if 'db_index' not in kwargs:
-            kwargs['db_index'] = True
-        self.allow_unicode = kwargs.pop('allow_unicode', False)
+    def __init__(self, *args, max_length=50, db_index=True, allow_unicode=False, **kwargs):
+        self.allow_unicode = allow_unicode
         if self.allow_unicode:
             self.default_validators = [validators.validate_unicode_slug]
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, max_length=max_length, db_index=db_index, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()

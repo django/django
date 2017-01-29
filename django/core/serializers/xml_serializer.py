@@ -157,11 +157,11 @@ class Deserializer(base.Deserializer):
     Deserialize XML.
     """
 
-    def __init__(self, stream_or_string, **options):
+    def __init__(self, stream_or_string, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False, **options):
         super().__init__(stream_or_string, **options)
         self.event_stream = pulldom.parse(self.stream, self._make_parser())
-        self.db = options.pop('using', DEFAULT_DB_ALIAS)
-        self.ignore = options.pop('ignorenonexistent', False)
+        self.db = using
+        self.ignore = ignorenonexistent
 
     def _make_parser(self):
         """Create a hardened XML parser (no custom/external entities)."""

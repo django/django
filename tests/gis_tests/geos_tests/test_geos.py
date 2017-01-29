@@ -1258,8 +1258,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         to the parent class during `__init__`.
         """
         class ExtendedPolygon(Polygon):
-            def __init__(self, *args, **kwargs):
-                data = kwargs.pop('data', 0)
+            def __init__(self, *args, data=0, **kwargs):
                 super().__init__(*args, **kwargs)
                 self._data = data
 

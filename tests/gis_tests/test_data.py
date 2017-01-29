@@ -43,9 +43,8 @@ class TestDS(TestObj):
     """
     Object for testing GDAL data sources.
     """
-    def __init__(self, name, **kwargs):
+    def __init__(self, name, *, ext='shp', **kwargs):
         # Shapefile is default extension, unless specified otherwise.
-        ext = kwargs.pop('ext', 'shp')
         self.ds = get_ds_file(name, ext)
         super().__init__(**kwargs)
 
@@ -55,19 +54,14 @@ class TestGeom(TestObj):
     Testing object used for wrapping reference geometry data
     in GEOS/GDAL tests.
     """
-    def __init__(self, **kwargs):
+    def __init__(self, *, coords=None, centroid=None, ext_ring_cs=None, **kwargs):
         # Converting lists to tuples of certain keyword args
         # so coordinate test cases will match (JSON has no
         # concept of tuple).
-        coords = kwargs.pop('coords', None)
         if coords:
             self.coords = tuplize(coords)
-
-        centroid = kwargs.pop('centroid', None)
         if centroid:
             self.centroid = tuple(centroid)
-
-        ext_ring_cs = kwargs.pop('ext_ring_cs', None)
         if ext_ring_cs:
             ext_ring_cs = tuplize(ext_ring_cs)
         self.ext_ring_cs = ext_ring_cs

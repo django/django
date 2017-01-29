@@ -506,7 +506,7 @@ class Func(Expression):
     arg_joiner = ', '
     arity = None  # The number of arguments the function accepts.
 
-    def __init__(self, *expressions, **extra):
+    def __init__(self, *expressions, output_field=None, **extra):
         if self.arity is not None and len(expressions) != self.arity:
             raise TypeError(
                 "'%s' takes exactly %s %s (%s given)" % (
@@ -516,7 +516,6 @@ class Func(Expression):
                     len(expressions),
                 )
             )
-        output_field = extra.pop('output_field', None)
         super().__init__(output_field=output_field)
         self.source_expressions = self._parse_expressions(*expressions)
         self.extra = extra
@@ -828,11 +827,9 @@ class Case(Expression):
     template = 'CASE %(cases)s ELSE %(default)s END'
     case_joiner = ' '
 
-    def __init__(self, *cases, **extra):
+    def __init__(self, *cases, default=None, output_field=None, **extra):
         if not all(isinstance(case, When) for case in cases):
             raise TypeError("Positional arguments must all be When objects.")
-        default = extra.pop('default', None)
-        output_field = extra.pop('output_field', None)
         super().__init__(output_field)
         self.cases = list(cases)
         self.default = self._parse_expressions(default)[0]
@@ -983,8 +980,8 @@ class Subquery(Expression):
 class Exists(Subquery):
     template = 'EXISTS(%(subquery)s)'
 
-    def __init__(self, *args, **kwargs):
-        self.negated = kwargs.pop('negated', False)
+    def __init__(self, *args, negated=False, **kwargs):
+        self.negated = negated
         super().__init__(*args, **kwargs)
 
     def __invert__(self):

@@ -76,8 +76,7 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
         self.patched_settings.disable()
         super().tearDown()
 
-    def run_collectstatic(self, **kwargs):
-        verbosity = kwargs.pop('verbosity', 0)
+    def run_collectstatic(self, *, verbosity=0, **kwargs):
         call_command('collectstatic', interactive=False, verbosity=verbosity,
                      ignore_patterns=['*.ignoreme'], **kwargs)
 

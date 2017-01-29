@@ -1819,9 +1819,9 @@ class SchemaTests(TransactionTestCase):
         """
         #23065 - Constraint names must be quoted if they contain capital letters.
         """
-        def get_field(*args, **kwargs):
+        def get_field(*args, field_class=IntegerField, **kwargs):
             kwargs['db_column'] = "CamelCase"
-            field = kwargs.pop('field_class', IntegerField)(*args, **kwargs)
+            field = field_class(*args, **kwargs)
             field.set_attributes_from_name("CamelCase")
             return field
 

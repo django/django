@@ -557,8 +557,8 @@ You can pass this parameter when instantiating the formset::
     >>> from myapp.forms import ArticleForm
 
     >>> class MyArticleForm(ArticleForm):
-    ...     def __init__(self, *args, **kwargs):
-    ...         self.user = kwargs.pop('user')
+    ...     def __init__(self, *args, user, **kwargs):
+    ...         self.user = user
     ...         super().__init__(*args, **kwargs)
 
     >>> ArticleFormSet = formset_factory(MyArticleForm)

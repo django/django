@@ -10,10 +10,10 @@ from django.core.mail.backends.console import \
 
 
 class EmailBackend(ConsoleEmailBackend):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, file_path=None, **kwargs):
         self._fname = None
-        if 'file_path' in kwargs:
-            self.file_path = kwargs.pop('file_path')
+        if file_path is not None:
+            self.file_path = file_path
         else:
             self.file_path = getattr(settings, 'EMAIL_FILE_PATH', None)
         # Make sure self.file_path is a string.

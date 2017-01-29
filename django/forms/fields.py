@@ -541,9 +541,9 @@ class FileField(Field):
         'contradiction': _('Please either submit a file or check the clear checkbox, not both.')
     }
 
-    def __init__(self, *args, **kwargs):
-        self.max_length = kwargs.pop('max_length', None)
-        self.allow_empty_file = kwargs.pop('allow_empty_file', False)
+    def __init__(self, *args, max_length=None, allow_empty_file=False, **kwargs):
+        self.max_length = max_length
+        self.allow_empty_file = allow_empty_file
         super().__init__(*args, **kwargs)
 
     def to_python(self, data):
@@ -821,9 +821,9 @@ class ChoiceField(Field):
 
 
 class TypedChoiceField(ChoiceField):
-    def __init__(self, *args, **kwargs):
-        self.coerce = kwargs.pop('coerce', lambda val: val)
-        self.empty_value = kwargs.pop('empty_value', '')
+    def __init__(self, *args, coerce=lambda val: val, empty_value='', **kwargs):
+        self.coerce = coerce
+        self.empty_value = empty_value
         super().__init__(*args, **kwargs)
 
     def _coerce(self, value):
@@ -890,8 +890,8 @@ class MultipleChoiceField(ChoiceField):
 
 
 class TypedMultipleChoiceField(MultipleChoiceField):
-    def __init__(self, *args, **kwargs):
-        self.coerce = kwargs.pop('coerce', lambda val: val)
+    def __init__(self, *args, coerce=lambda val: val, **kwargs):
+        self.coerce = coerce
         self.empty_value = kwargs.pop('empty_value', [])
         super().__init__(*args, **kwargs)
 
@@ -971,8 +971,8 @@ class MultiValueField(Field):
         'incomplete': _('Enter a complete value.'),
     }
 
-    def __init__(self, fields=(), *args, **kwargs):
-        self.require_all_fields = kwargs.pop('require_all_fields', True)
+    def __init__(self, fields=(), *args, require_all_fields=True, **kwargs):
+        self.require_all_fields = require_all_fields
         super().__init__(*args, **kwargs)
         for f in fields:
             f.error_messages.setdefault('incomplete',
@@ -1174,8 +1174,8 @@ class GenericIPAddressField(CharField):
 class SlugField(CharField):
     default_validators = [validators.validate_slug]
 
-    def __init__(self, *args, **kwargs):
-        self.allow_unicode = kwargs.pop('allow_unicode', False)
+    def __init__(self, *args, allow_unicode=False, **kwargs):
+        self.allow_unicode = allow_unicode
         if self.allow_unicode:
             self.default_validators = [validators.validate_unicode_slug]
         super().__init__(*args, **kwargs)

@@ -42,12 +42,6 @@ class QuerySetSetOperationTests(TestCase):
         self.assertEqual(len(list(qs1.union(qs2, all=True))), 20)
         self.assertEqual(len(list(qs1.union(qs2))), 10)
 
-    def test_union_bad_kwarg(self):
-        qs1 = Number.objects.all()
-        msg = "union() received an unexpected keyword argument 'bad'"
-        with self.assertRaisesMessage(TypeError, msg):
-            self.assertEqual(len(list(qs1.union(qs1, bad=True))), 20)
-
     def test_limits(self):
         qs1 = Number.objects.all()
         qs2 = Number.objects.all()

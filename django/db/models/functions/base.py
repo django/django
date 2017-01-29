@@ -165,9 +165,8 @@ class Length(Transform):
     function = 'LENGTH'
     lookup_name = 'length'
 
-    def __init__(self, expression, **extra):
-        output_field = extra.pop('output_field', fields.IntegerField())
-        super().__init__(expression, output_field=output_field, **extra)
+    def __init__(self, expression, *, output_field=None, **extra):
+        super().__init__(expression, output_field=output_field or fields.IntegerField(), **extra)
 
     def as_mysql(self, compiler, connection):
         return super().as_sql(compiler, connection, function='CHAR_LENGTH')
