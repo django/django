@@ -1,3 +1,4 @@
+import ipaddress
 import os
 import re
 from urllib.parse import urlsplit, urlunsplit
@@ -247,8 +248,12 @@ validate_unicode_slug = RegexValidator(
     'invalid'
 )
 
-ipv4_re = _lazy_re_compile(r'^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9])){3}\Z')
-validate_ipv4_address = RegexValidator(ipv4_re, _('Enter a valid IPv4 address.'), 'invalid')
+
+def validate_ipv4_address(value):
+    try:
+        ipaddress.IPv4Address(value)
+    except ValueError:
+        raise ValidationError(_('Enter a valid IPv4 address.'), code='invalid')
 
 
 def validate_ipv6_address(value):
