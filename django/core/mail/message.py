@@ -123,7 +123,7 @@ def sanitize_address(addr, encoding):
     return str(address)
 
 
-class MIMEMixin():
+class MIMEMixin:
     def as_string(self, unixfrom=False, linesep='\n'):
         """Return the entire formatted message as a string.
         Optional `unixfrom' when True, means include the Unix From_ envelope
