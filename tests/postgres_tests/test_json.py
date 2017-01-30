@@ -294,6 +294,13 @@ class TestValidation(PostgreSQLTestCase):
         field = JSONField(encoder=DjangoJSONEncoder)
         self.assertEqual(field.clean(datetime.timedelta(days=1), None), datetime.timedelta(days=1))
 
+    def test_json_blank_not_null(self):
+        instance = JSONField(blank=True)
+        self.assertEqual('{}', instance.clean('{}', None))
+        self.assertEqual('[]', instance.clean('[]', None))
+        with self.assertRaises(exceptions.ValidationError):
+            instance.clean(None, None)
+
 
 class TestFormField(PostgreSQLTestCase):
 
@@ -377,3 +384,34 @@ class TestFormField(PostgreSQLTestCase):
         for json_string in tests:
             val = field.clean(json_string)
             self.assertEqual(field.clean(val), val)
+
+    def test_formfield_blank_not_null(self):
+        model_field = JSONField(blank=True)
+        form_field = model_field.formfield()
+
+        self.assertIsInstance(form_field, forms.JSONField)
+        self.assertEqual(form_field.initial, {})
+        self.assertEqual(form_field.required, False)
+
+        self.assertHTMLEqual(
+            form_field.widget.render('jsonfield', form_field.initial),
+            '<textarea cols="40" name="jsonfield" rows="10">'
+            '{}'
+            '</textarea>'
+        )
+
+        self.assertEqual({}, form_field.clean('{}'))
+        self.assertEqual([], form_field.clean('[]'))
+        with self.assertRaises(exceptions.ValidationError):
+            form_field.clean(None)
+
+        with self.assertRaises(exceptions.ValidationError):
+            form_field.clean('')
+
+    def test_formfield_invalidate_empty(self):
+        form_field = forms.JSONField(required=False)
+        self.assertIsNone(form_field.clean(''))
+
+        form_field = forms.JSONField(required=False, invalidate_empty=True)
+        with self.assertRaises(exceptions.ValidationError):
+            self.assertIsNone(form_field.clean(''))
