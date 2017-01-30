@@ -53,10 +53,7 @@ def delete_selected(modeladmin, request, queryset):
         # Return None to display the change list page again.
         return None
 
-    if len(queryset) == 1:
-        objects_name = force_text(opts.verbose_name)
-    else:
-        objects_name = force_text(opts.verbose_name_plural)
+    objects_name = model_ngettext(queryset)
 
     if perms_needed or protected:
         title = _("Cannot delete %(name)s") % {"name": objects_name}

@@ -16,8 +16,8 @@ from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     NestedObjects, construct_change_message, flatten_fieldsets,
-    get_deleted_objects, lookup_needs_distinct, model_format_dict, quote,
-    unquote,
+    get_deleted_objects, lookup_needs_distinct, model_format_dict,
+    model_ngettext, quote, unquote,
 )
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import (
@@ -1611,17 +1611,13 @@ class ModelAdmin(BaseModelAdmin):
                         changecount += 1
 
                 if changecount:
-                    if changecount == 1:
-                        name = force_text(opts.verbose_name)
-                    else:
-                        name = force_text(opts.verbose_name_plural)
                     msg = ungettext(
                         "%(count)s %(name)s was changed successfully.",
                         "%(count)s %(name)s were changed successfully.",
                         changecount
                     ) % {
                         'count': changecount,
-                        'name': name,
+                        'name': model_ngettext(opts, changecount),
                         'obj': force_text(obj),
                     }
                     self.message_user(request, msg, messages.SUCCESS)
