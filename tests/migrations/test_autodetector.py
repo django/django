@@ -1150,10 +1150,9 @@ class AutodetectorTests(TestCase):
         changes = self.get_changes([], [self.author_with_publisher, self.publisher])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
-        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel", "AddField"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Publisher")
-        self.assertOperationAttributes(changes, "testapp", 0, 2, name="publisher")
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Publisher")
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Author")
         self.assertMigrationDependencies(changes, 'testapp', 0, [])
 
     def test_circular_fk_dependency(self):
@@ -1907,13 +1906,12 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, [
-            "CreateModel", "CreateModel", "CreateModel", "AddField", "AddField"
+            'CreateModel', 'CreateModel', 'CreateModel', 'AddField',
         ])
-        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Author")
-        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="Contract")
-        self.assertOperationAttributes(changes, 'testapp', 0, 2, name="Publisher")
-        self.assertOperationAttributes(changes, 'testapp', 0, 3, model_name='contract', name='publisher')
-        self.assertOperationAttributes(changes, 'testapp', 0, 4, model_name='author', name='publishers')
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name='Author')
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, name='Publisher')
+        self.assertOperationAttributes(changes, 'testapp', 0, 2, name='Contract')
+        self.assertOperationAttributes(changes, 'testapp', 0, 3, model_name='author', name='publishers')
 
     def test_many_to_many_removed_before_through_model(self):
         """

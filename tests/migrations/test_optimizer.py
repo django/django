@@ -300,16 +300,91 @@ class OptimizerTests(SimpleTestCase):
             ],
         )
 
-    def test_create_model_add_field_not_through_fk(self):
+    def test_create_model_reordering(self):
         """
-        AddField should NOT optimize into CreateModel if it's an FK to a model
-        that's between them.
+        AddField optimizes into CreateModel if it's a FK to a model that's
+        between them (and there's no FK in the other direction), by changing
+        the order of the CreateModel operations.
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel('Foo', [('name', models.CharField(max_length=255))]),
+                migrations.CreateModel('Link', [('url', models.TextField())]),
+                migrations.AddField('Foo', 'link', models.ForeignKey('migrations.Link', models.CASCADE)),
+            ],
+            [
+                migrations.CreateModel('Link', [('url', models.TextField())]),
+                migrations.CreateModel('Foo', [
+                    ('name', models.CharField(max_length=255)),
+                    ('link', models.ForeignKey('migrations.Link', models.CASCADE))
+                ]),
+            ],
+        )
+
+    def test_create_model_reordering_circular_fk(self):
+        """
+        CreateModel reordering behavior doesn't result in an infinite loop if
+        there are FKs in both directions.
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel('Bar', [('url', models.TextField())]),
+                migrations.CreateModel('Foo', [('name', models.CharField(max_length=255))]),
+                migrations.AddField('Bar', 'foo_fk', models.ForeignKey('migrations.Foo', models.CASCADE)),
+                migrations.AddField('Foo', 'bar_fk', models.ForeignKey('migrations.Bar', models.CASCADE)),
+            ],
+            [
+                migrations.CreateModel('Foo', [('name', models.CharField(max_length=255))]),
+                migrations.CreateModel('Bar', [
+                    ('url', models.TextField()),
+                    ('foo_fk', models.ForeignKey('migrations.Foo', models.CASCADE)),
+                ]),
+                migrations.AddField('Foo', 'bar_fk', models.ForeignKey('migrations.Foo', models.CASCADE)),
+            ],
+        )
+
+    def test_create_model_no_reordering_for_unrelated_fk(self):
+        """
+        CreateModel order remains unchanged if the later AddField operation
+        isn't a FK between them.
         """
         self.assertDoesNotOptimize(
             [
-                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("Link", [("url", models.TextField())]),
-                migrations.AddField("Foo", "link", models.ForeignKey("migrations.Link", models.CASCADE)),
+                migrations.CreateModel('Foo', [('name', models.CharField(max_length=255))]),
+                migrations.CreateModel('Link', [('url', models.TextField())]),
+                migrations.AddField('Other', 'link', models.ForeignKey('migrations.Link', models.CASCADE)),
+            ],
+        )
+
+    def test_create_model_no_reordering_of_inherited_model(self):
+        """
+        A CreateModel that inherits from another isn't reordered to avoid
+        moving it earlier than its parent CreateModel operation.
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel('Other', [('foo', models.CharField(max_length=255))]),
+                migrations.CreateModel('ParentModel', [('bar', models.CharField(max_length=255))]),
+                migrations.CreateModel(
+                    'ChildModel',
+                    [('baz', models.CharField(max_length=255))],
+                    bases=('migrations.parentmodel',),
+                ),
+                migrations.AddField('Other', 'fk', models.ForeignKey('migrations.ChildModel', models.CASCADE)),
+            ],
+            [
+                migrations.CreateModel('ParentModel', [('bar', models.CharField(max_length=255))]),
+                migrations.CreateModel(
+                    'ChildModel',
+                    [('baz', models.CharField(max_length=255))],
+                    bases=('migrations.parentmodel',),
+                ),
+                migrations.CreateModel(
+                    'Other', [
+                        ('foo', models.CharField(max_length=255)),
+                        ('fk', models.ForeignKey('migrations.ChildModel', models.CASCADE)),
+                    ]
+                ),
             ],
         )
 

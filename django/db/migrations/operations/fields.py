@@ -26,10 +26,25 @@ class FieldOperation(Operation):
         return self.is_same_model_operation(operation) and self.name_lower == operation.name_lower
 
     def references_model(self, name, app_label=None):
-        return name.lower() == self.model_name_lower
+        name_lower = name.lower()
+        if name_lower == self.model_name_lower:
+            return True
+        field = getattr(self, 'field', None)
+        if field and field.remote_field:
+            remote_app_label, remote_model_name = self.model_to_key(field.remote_field.model)
+            if (remote_model_name == name_lower and app_label is None or
+                    not remote_app_label or remote_app_label == app_label):
+                return True
+            through = getattr(field.remote_field, 'through', None)
+            if through and self.model_to_key(through) == (app_label, name_lower):
+                through_app_label, through_model_name = self.model_to_key(through)
+                if (through_model_name == name_lower and app_label is None or
+                        not through_app_label or through_app_label == app_label):
+                    return True
+        return False
 
     def references_field(self, model_name, name, app_label=None):
-        return self.references_model(model_name) and name.lower() == self.name_lower
+        return self.references_model(model_name, app_label) and name.lower() == self.name_lower
 
     def reduce(self, operation, in_between, app_label=None):
         return (
