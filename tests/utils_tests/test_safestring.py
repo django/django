@@ -1,7 +1,7 @@
 from django.template import Context, Template
 from django.test import SimpleTestCase
 from django.utils import html, text
-from django.utils.functional import lazystr
+from django.utils.functional import lazy, lazystr
 from django.utils.safestring import SafeData, mark_safe
 
 
