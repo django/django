@@ -24,6 +24,13 @@ class SafeStringTest(SimpleTestCase):
         self.assertRenderEqual('{{ s }}', 'a&b', s=s)
         self.assertRenderEqual('{{ s|force_escape }}', 'a&amp;b', s=s)
 
+    def test_mark_safe_str(self):
+        """
+        Calling str() on a SafeText instance doesn't lose the safe status.
+        """
+        s = mark_safe('a&b')
+        self.assertIsInstance(str(s), type(s))
+
     def test_mark_safe_object_implementing_dunder_html(self):
         e = customescape('<a&b>')
         s = mark_safe(e)

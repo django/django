@@ -54,6 +54,9 @@ class SafeText(str, SafeData):
             return SafeText(t)
         return t
 
+    def __str__(self):
+        return self
+
 
 SafeString = SafeText
 
