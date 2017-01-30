@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import router
+from django.utils import six
 
 from .base import Operation
 
@@ -203,3 +204,14 @@ class RunPython(Operation):
     @staticmethod
     def noop(apps, schema_editor):
         return None
+
+
+# A workaround allowing migrations using RunPython.noop to be squashed with Python 2.
+# Python 2 does not support the serialization of unbound methods, and so the
+# migration writer cannot reference the RunPython.noop defined above. Instead,
+# we install a function defined at module scope.  For more details, see
+# https://docs.djangoproject.com/en/1.11/topics/migrations/#serializing-values
+if six.PY2:
+    def noop(apps, schema_editor):
+        return None
+    RunPython.noop = staticmethod(noop)
