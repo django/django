@@ -138,12 +138,18 @@ exception raised, each `traceback frame`_’s local variables, and the
 
 However, sometimes certain types of information may be too sensitive and thus
 may not be appropriate to be kept track of, for example a user's password or
-credit card number. So in addition to filtering out settings that appear to be
-sensitive as described in the :setting:`DEBUG` documentation, Django offers a
-set of function decorators to help you control which information should be
+an API token. So Django cleanses sensitive data from settings and the
+HttpRequest's :class:`~django.http.HttpRequest.META` attribute as described
+in the :setting:`DEBUG` documentation. If there is other sensitive information
+you would like to cleanse, such as a credit card number, Django offers a set
+of function decorators to help you control information which should be
 filtered out of error reports in a production environment (that is, where
 :setting:`DEBUG` is set to ``False``): :func:`sensitive_variables` and
 :func:`sensitive_post_parameters`.
+
+.. versionchanged:: 2.0
+
+    The ``request.META`` attributes are cleansed as well as ``settings``
 
 .. _`full traceback`: https://en.wikipedia.org/wiki/Stack_trace
 .. _`traceback frame`: https://en.wikipedia.org/wiki/Stack_frame

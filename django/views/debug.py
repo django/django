@@ -70,6 +70,12 @@ def get_safe_settings():
     return settings_dict
 
 
+def get_safe_request_meta(request):
+    """Return a dictionary of request.META with sensitive values redacted."""
+    has_meta = hasattr(request, 'META')
+    return {k: cleanse_setting(k, v) for k, v in request.META.items()} if has_meta else {}
+
+
 def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
     """
     Create a technical server error response. The last three arguments are
@@ -295,6 +301,7 @@ class ExceptionReporter:
             'unicode_hint': unicode_hint,
             'frames': frames,
             'request': self.request,
+            'META': get_safe_request_meta(self.request),
             'user_str': user_str,
             'filtered_POST_items': self.filter.get_post_parameters(self.request).items(),
             'settings': get_safe_settings(),
@@ -994,7 +1001,7 @@ Exception Value: {{ exception_value|force_escape }}
       </tr>
     </thead>
     <tbody>
-      {% for var in request.META.items|dictsort:0 %}
+      {% for var in META.items|dictsort:0 %}
         <tr>
           <td>{{ var.0 }}</td>
           <td class="code"><pre>{{ var.1|pprint }}</pre></td>
@@ -1107,7 +1114,7 @@ FILES:{% for k, v in request_FILES_items %}
 COOKIES:{% for k, v in request_COOKIES_items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No cookie data{% endfor %}
 
-META:{% for k, v in request.META.items|dictsort:0 %}
+META:{% for k, v in META.items|dictsort:0 %}
 {{ k }} = {{ v|stringformat:"r" }}{% endfor %}
 {% else %}Request data not supplied
 {% endif %}
