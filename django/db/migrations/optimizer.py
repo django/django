@@ -47,9 +47,10 @@ class MigrationOptimizer:
                 in_between = operations[i + 1:i + j + 1]
                 result = operation.reduce(other, in_between, app_label)
                 if isinstance(result, list):
-                    # Optimize! Add result, then remaining others, then return
-                    new_operations.extend(result)
+                    # Add operations optimized through, optimized operations,
+                    # and the remaining ones.
                     new_operations.extend(in_between)
+                    new_operations.extend(result)
                     new_operations.extend(operations[i + j + 2:])
                     return new_operations
                 if not result:
