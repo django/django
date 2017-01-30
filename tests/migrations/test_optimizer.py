@@ -318,14 +318,18 @@ class OptimizerTests(SimpleTestCase):
         AddField should NOT optimize into CreateModel if it's an M2M using a
         through that's created between them.
         """
-        # Note: The middle model is not actually a valid through model,
-        # but that doesn't matter, as we never render it.
         self.assertDoesNotOptimize(
             [
-                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("LinkThrough", []),
+                migrations.CreateModel('Employee', []),
+                migrations.CreateModel('Employer', []),
+                migrations.CreateModel('Employment', [
+                    ('employee', models.ForeignKey('migrations.Employee', models.CASCADE)),
+                    ('employment', models.ForeignKey('migrations.Employer', models.CASCADE)),
+                ]),
                 migrations.AddField(
-                    "Foo", "link", models.ManyToManyField("migrations.Link", through="migrations.LinkThrough")
+                    'Employer', 'employees', models.ManyToManyField(
+                        'migrations.Employee', through='migrations.Employment',
+                    )
                 ),
             ],
         )
