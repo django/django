@@ -1345,7 +1345,12 @@ class Query(object):
                         "querying. If it is a GenericForeignKey, consider "
                         "adding a GenericRelation." % name
                     )
-                model = field.model._meta.concrete_model
+                try:
+                    model = field.model._meta.concrete_model
+                except AttributeError:
+                    # QuerySet.annotate() may introduce fields that aren't
+                    # attached to a model.
+                    model = None
             else:
                 # We didn't find the current field, so move position back
                 # one step.

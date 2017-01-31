@@ -8,7 +8,7 @@ from django.db.models import (
     BooleanField, CharField, Count, DateTimeField, ExpressionWrapper, F, Func,
     IntegerField, NullBooleanField, Q, Sum, Value,
 )
-from django.db.models.functions import Lower
+from django.db.models.functions import Length, Lower
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
@@ -207,6 +207,11 @@ class NonAggregateAnnotationTestCase(TestCase):
             test_alias=F('store__name'),
         ).distinct('test_alias')
         self.assertEqual(len(people2), 1)
+
+        lengths = Employee.objects.annotate(
+            name_len=Length('first_name'),
+        ).distinct('name_len').values_list('name_len', flat=True)
+        self.assertSequenceEqual(lengths, [3, 7, 8])
 
     def test_filter_annotation(self):
         books = Book.objects.annotate(
