@@ -207,7 +207,7 @@ class RunPython(Operation):
 
 
 # Allow migrations using RunPython.noop to be squashed on Python 2 (it doesn't
-# support serializating unbound method so install a module function instead).
+# support serializing unbound methods so install a module function instead).
 if six.PY2:
     def noop(apps, schema_editor):
         return None
