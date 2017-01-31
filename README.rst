@@ -33,6 +33,12 @@ You'll likely also want to ``asgi_redis`` to provide the Redis channel layer.
 See our `installation <https://channels.readthedocs.io/en/latest/installation.html>`_
 and `getting started <https://channels.readthedocs.io/en/latest/getting-started.html>`_ docs for more.
 
+Dependencies
+------------
+
+All Channels projects currently support Python 2.7, 3.4 and 3.5. `channels` supports all released
+Django versions, namely 1.8-1.10.
+
 
 Contributing
 ------------

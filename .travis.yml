@@ -1,8 +1,22 @@
 sudo: false
+
 language: python
+
 python:
   - "2.7"
   - "3.4"
   - "3.5"
-install: pip install tox-travis
-script: tox
+
+env:
+  - DJANGO="Django>=1.8,<1.9"
+  - DJANGO="Django>=1.9,<1.10"
+  - DJANGO="Django>=1.10,<1.11"
+
+install:
+  - pip install $DJANGO -e .[tests]
+  - pip freeze
+
+script:
+  - python runtests.py
+  - flake8
+  - isort --check-only --recursive channels
