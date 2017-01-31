@@ -62,13 +62,10 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     if strings_only and is_protected_type(s):
         return s
     try:
-        if not issubclass(type(s), str):
-            if isinstance(s, bytes):
-                s = str(s, encoding, errors)
-            else:
-                s = str(s)
+        if isinstance(s, bytes):
+            s = str(s, encoding, errors)
         else:
-            str(s, encoding, errors)
+            s = str(s)
     except UnicodeDecodeError as e:
         if not isinstance(s, Exception):
             raise DjangoUnicodeDecodeError(s, *e.args)
