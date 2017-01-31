@@ -20,11 +20,13 @@ class Worker(object):
             self,
             channel_layer,
             signal_handlers=True,
+            database_sleep_duration=1,
     ):
         self.channel_layer = channel_layer
         self.signal_handlers = signal_handlers
         self.termed = False
         self.in_job = False
+        self.database_sleep_duration = database_sleep_duration
 
     def install_signal_handler(self):
         signal.signal(signal.SIGTERM, self.sigterm_handler)
@@ -44,9 +46,11 @@ class Worker(object):
 
         logger.info("Listening on asgi.delay")
 
+        last_delay_check = 0
+
         while not self.termed:
             self.in_job = False
-            channel, content = self.channel_layer.receive_many(['asgi.delay'])
+            channel, content = self.channel_layer.receive(['asgi.delay'], block=False)
             self.in_job = True
 
             if channel is not None:
@@ -71,12 +75,17 @@ class Worker(object):
                     logger.error("Invalid message received: %s:%s", err.error_dict.keys(), err.messages)
                     break
                 message.save()
-            # check for messages to send
-            if not DelayedMessage.objects.is_due().count():
-                logger.debug("No delayed messages waiting.")
-                time.sleep(0.01)
-                continue
 
-            for message in DelayedMessage.objects.is_due().all():
-                logger.info("Delayed message due. Sending message to channel %s", message.channel_name)
-                message.send(channel_layer=self.channel_layer)
+            else:
+                # Sleep for a short interval so we don't idle hot.
+                time.sleep(0.1)
+
+            # check for messages to send
+            if time.time() - last_delay_check > self.database_sleep_duration:
+                if DelayedMessage.objects.is_due().exists():
+                    for message in DelayedMessage.objects.is_due().all():
+                        logger.info("Sending delayed message to channel %s", message.channel_name)
+                        message.send(channel_layer=self.channel_layer)
+                else:
+                    logger.debug("No delayed messages waiting.")
+                last_delay_check = time.time()

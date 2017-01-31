@@ -17,6 +17,10 @@ class Command(BaseCommand):
             '--layer', action='store', dest='layer', default=DEFAULT_CHANNEL_LAYER,
             help='Channel layer alias to use, if not the default.',
         )
+        parser.add_argument(
+            '--sleep', action='store', dest='sleep', default=1, type=float,
+            help='Amount of time to sleep between checks, in seconds.',
+        )
 
     def handle(self, *args, **options):
         self.verbosity = options.get("verbosity", 1)
@@ -33,6 +37,7 @@ class Command(BaseCommand):
         try:
             worker = Worker(
                 channel_layer=self.channel_layer,
+                database_sleep_duration=options['sleep'],
             )
             worker.run()
         except KeyboardInterrupt:
