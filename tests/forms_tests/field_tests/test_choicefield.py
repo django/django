@@ -83,6 +83,37 @@ class ChoiceFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             '<option value="P">Paul</option></select>'
         )
 
+    def test_choicefield_doesnt_render_required_when_impossible_to_select_empty_field(self):
+        self.assertWidgetRendersTo(
+            ChoiceField(choices=[('J', 'John'), ('P', 'Paul')]),
+            '<select id="id_f" name="f"><option value="J">John</option>'
+            '<option value="P">Paul</option></select>'
+        )
+
+    def test_choicefield_does_render_required_when_possible_to_select_empty_field_str(self):
+        self.assertWidgetRendersTo(
+            ChoiceField(choices=[('', 'select please'), ('P', 'Paul')]),
+            '<select id="id_f" name="f" required><option selected value="">select please</option>'
+            '<option value="P">Paul</option></select>'
+        )
+
+    def test_choicefield_does_render_required_when_possible_to_select_empty_field_list(self):
+        self.assertWidgetRendersTo(
+            ChoiceField(choices=[['', 'select please'], ['P', 'Paul']]),
+            '<select id="id_f" name="f" required><option selected value="">select please</option>'
+            '<option value="P">Paul</option></select>'
+        )
+
+    def test_choicefield_does_render_required_when_possible_to_select_empty_field_none(self):
+        self.assertWidgetRendersTo(
+            ChoiceField(choices=[(None, 'select please'), ('P', 'Paul')]),
+            '<select id="id_f" name="f" required><option selected value="">select please</option>'
+            '<option value="P">Paul</option></select>'
+        )
+
+    def test_choicefield_doesnt_render_required_when_no_choices_are_available(self):
+        self.assertWidgetRendersTo(ChoiceField(choices=[]), '<select id="id_f" name="f"></select>')
+
     @ignore_warnings(category=UnicodeWarning)
     def test_utf8_bytesrings(self):
         # Choice validation with UTF-8 bytestrings as input (these are the
