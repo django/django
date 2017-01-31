@@ -15,6 +15,7 @@ from django.forms.models import (
     ModelChoiceIterator, ModelFormMetaclass, construct_instance,
     fields_for_model, model_to_dict, modelform_factory,
 )
+from django.forms.widgets import CheckboxSelectMultiple
 from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
@@ -1703,6 +1704,42 @@ class ModelChoiceFieldTests(TestCase):
 
         field = CustomModelChoiceField(Category.objects.all())
         self.assertIsInstance(field.choices, CustomModelChoiceIterator)
+
+    def test_modelchoicefield_iterator_pass_model_to_widget(self):
+        class CustomModelChoiceValue:
+            def __init__(self, value, obj):
+                self.value = value
+                self.obj = obj
+
+            def __str__(self):
+                return str(self.value)
+
+        class CustomModelChoiceIterator(ModelChoiceIterator):
+            def choice(self, obj):
+                value, label = super().choice(obj)
+                return CustomModelChoiceValue(value, obj), label
+
+        class CustomCheckboxSelectMultiple(CheckboxSelectMultiple):
+            def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+                option = super().create_option(name, value, label, selected, index, subindex=None, attrs=None)
+                # Modify the HTML based on the object being rendered.
+                c = value.obj
+                option['attrs']['data-slug'] = c.slug
+                return option
+
+        class CustomModelMultipleChoiceField(forms.ModelMultipleChoiceField):
+            iterator = CustomModelChoiceIterator
+            widget = CustomCheckboxSelectMultiple
+
+        field = CustomModelMultipleChoiceField(Category.objects.all())
+        self.assertHTMLEqual(
+            field.widget.render('name', []),
+            '''<ul>
+<li><label><input type="checkbox" name="name" value="%d" data-slug="entertainment" />Entertainment</label></li>
+<li><label><input type="checkbox" name="name" value="%d" data-slug="its-test" />It&#39;s a test</label></li>
+<li><label><input type="checkbox" name="name" value="%d" data-slug="third-test" />Third</label></li>
+</ul>''' % (self.c1.pk, self.c2.pk, self.c3.pk),
+        )
 
     def test_modelchoicefield_num_queries(self):
         """

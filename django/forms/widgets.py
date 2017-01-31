@@ -552,8 +552,6 @@ class ChoiceWidget(Widget):
         for option_value, option_label in chain(self.choices):
             if option_value is None:
                 option_value = ''
-            else:
-                option_value = force_text(option_value)
 
             if isinstance(option_label, (list, tuple)):
                 index = groups[-1][2] + 1
@@ -569,7 +567,7 @@ class ChoiceWidget(Widget):
 
             for subvalue, sublabel in choices:
                 selected = (
-                    subvalue in value and
+                    force_text(subvalue) in value and
                     (has_selected is False or self.allow_multiple_selected)
                 )
                 if selected is True and has_selected is False:
