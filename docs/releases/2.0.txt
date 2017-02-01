@@ -220,7 +220,10 @@ bytestrings in certain code paths.
 Database backend API
 --------------------
 
-* ...
+* The ``DatabaseOperations.datetime_cast_date_sql()``,
+  ``datetime_cast_time_sql()``, ``datetime_trunc_sql()``, and
+  ``datetime_extract_sql()`` methods now return only the SQL to perform the
+  operation instead of SQL and a list of parameters.
 
 Dropped support for Oracle 11.2
 -------------------------------
