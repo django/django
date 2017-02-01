@@ -44,8 +44,7 @@ class Extract(TimezoneMixin, Transform):
         lhs_output_field = self.lhs.output_field
         if isinstance(lhs_output_field, DateTimeField):
             tzname = self.get_tzname()
-            sql, tz_params = connection.ops.datetime_extract_sql(self.lookup_name, sql, tzname)
-            params.extend(tz_params)
+            sql = connection.ops.datetime_extract_sql(self.lookup_name, sql, tzname)
         elif isinstance(lhs_output_field, DateField):
             sql = connection.ops.date_extract_sql(self.lookup_name, sql)
         elif isinstance(lhs_output_field, TimeField):
@@ -150,16 +149,14 @@ class TruncBase(TimezoneMixin, Transform):
         inner_sql = inner_sql.replace('%s', '%%s')
         if isinstance(self.output_field, DateTimeField):
             tzname = self.get_tzname()
-            sql, params = connection.ops.datetime_trunc_sql(self.kind, inner_sql, tzname)
+            sql = connection.ops.datetime_trunc_sql(self.kind, inner_sql, tzname)
         elif isinstance(self.output_field, DateField):
             sql = connection.ops.date_trunc_sql(self.kind, inner_sql)
-            params = []
         elif isinstance(self.output_field, TimeField):
             sql = connection.ops.time_trunc_sql(self.kind, inner_sql)
-            params = []
         else:
             raise ValueError('Trunc only valid on DateField, TimeField, or DateTimeField.')
-        return sql, inner_params + params
+        return sql, inner_params
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         copy = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
@@ -237,8 +234,7 @@ class TruncDate(TruncBase):
         # Cast to date rather than truncate to date.
         lhs, lhs_params = compiler.compile(self.lhs)
         tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
-        sql, tz_params = connection.ops.datetime_cast_date_sql(lhs, tzname)
-        lhs_params.extend(tz_params)
+        sql = connection.ops.datetime_cast_date_sql(lhs, tzname)
         return sql, lhs_params
 
 
@@ -254,8 +250,7 @@ class TruncTime(TruncBase):
         # Cast to date rather than truncate to date.
         lhs, lhs_params = compiler.compile(self.lhs)
         tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
-        sql, tz_params = connection.ops.datetime_cast_time_sql(lhs, tzname)
-        lhs_params.extend(tz_params)
+        sql = connection.ops.datetime_cast_time_sql(lhs, tzname)
         return sql, lhs_params
 
 

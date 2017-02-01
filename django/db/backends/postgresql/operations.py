@@ -32,32 +32,25 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def _convert_field_to_tz(self, field_name, tzname):
         if settings.USE_TZ:
-            field_name = "%s AT TIME ZONE %%s" % field_name
-            params = [tzname]
-        else:
-            params = []
-        return field_name, params
+            field_name = "%s AT TIME ZONE '%s'" % (field_name, tzname)
+        return field_name
 
     def datetime_cast_date_sql(self, field_name, tzname):
-        field_name, params = self._convert_field_to_tz(field_name, tzname)
-        sql = '(%s)::date' % field_name
-        return sql, params
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        return '(%s)::date' % field_name
 
     def datetime_cast_time_sql(self, field_name, tzname):
-        field_name, params = self._convert_field_to_tz(field_name, tzname)
-        sql = '(%s)::time' % field_name
-        return sql, params
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        return '(%s)::time' % field_name
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
-        field_name, params = self._convert_field_to_tz(field_name, tzname)
-        sql = self.date_extract_sql(lookup_type, field_name)
-        return sql, params
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        return self.date_extract_sql(lookup_type, field_name)
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        field_name, params = self._convert_field_to_tz(field_name, tzname)
+        field_name = self._convert_field_to_tz(field_name, tzname)
         # https://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
-        sql = "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
-        return sql, params
+        return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
     def time_trunc_sql(self, lookup_type, field_name):
         return "DATE_TRUNC('%s', %s)::time" % (lookup_type, field_name)

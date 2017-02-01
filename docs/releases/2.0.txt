@@ -208,7 +208,11 @@ Backwards incompatible changes in 2.0
 Database backend API
 --------------------
 
-* ...
+* The ``DatabaseOperations.datetime_cast_date_sql()``,
+  ``DatabaseOperations.datetime_cast_time_sql()``,
+  ``DatabaseOperations.datetime_trunc_sql()``,
+  ``DatabaseOperations.datetime_extract_sql()`` methods now return the SQL to
+  perform the appropriate operation instead of SQL and a list of parameters.
 
 Dropped support for Oracle 11.2
 -------------------------------
