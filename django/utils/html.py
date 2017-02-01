@@ -6,7 +6,7 @@ from urllib.parse import (
 )
 
 from django.utils.encoding import force_text
-from django.utils.functional import keep_lazy, keep_lazy_text
+from django.utils.functional import Promise, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, SafeText, mark_safe
 from django.utils.text import normalize_newlines
@@ -79,6 +79,8 @@ def conditional_escape(text):
     This function relies on the __html__ convention used both by Django's
     SafeData class and by third-party libraries like markupsafe.
     """
+    if isinstance(text, Promise):
+        text = str(text)
     if hasattr(text, '__html__'):
         return text.__html__()
     else:

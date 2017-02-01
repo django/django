@@ -170,6 +170,7 @@ class TestUtilsHtml(SimpleTestCase):
         s = '<h1>interop</h1>'
         self.assertEqual(conditional_escape(s), '&lt;h1&gt;interop&lt;/h1&gt;')
         self.assertEqual(conditional_escape(mark_safe(s)), s)
+        self.assertEqual(conditional_escape(lazystr(mark_safe(s))), s)
 
     def test_html_safe(self):
         @html_safe
