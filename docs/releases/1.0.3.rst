@@ -1,0 +1,26 @@
+1.0.3 Release Notes
+===================
+
+Channels 1.0.3 is a minor bugfix release, released on 2017/02/01.
+
+Changes
+-------
+
+* Database connections are no longer force-closed after each test is run.
+
+* Channel sessions are not re-saved if they're empty even if they're marked as
+  modified, allowing logout to work correctly.
+
+* WebsocketDemultiplexer now correctly does sessions for the second/third/etc.
+  connect and disconnect handlers.
+
+* Request reading timeouts now correctly return 408 rather than erroring out.
+
+* The ``rundelay`` delay server now only polls the database once per second,
+  and this interval is configurable with the ``--sleep`` option.
+
+
+Backwards Incompatible Changes
+------------------------------
+
+None.
