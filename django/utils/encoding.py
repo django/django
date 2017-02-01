@@ -67,16 +67,7 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
         else:
             s = str(s)
     except UnicodeDecodeError as e:
-        if not isinstance(s, Exception):
-            raise DjangoUnicodeDecodeError(s, *e.args)
-        else:
-            # If we get to here, the caller has passed in an Exception
-            # subclass populated with non-ASCII bytestring data without a
-            # working __str__() method. Try to handle this without raising a
-            # further exception by individually forcing the exception args
-            # to strings.
-            s = ' '.join(force_text(arg, encoding, strings_only, errors)
-                         for arg in s)
+        raise DjangoUnicodeDecodeError(s, *e.args)
     return s
 
 

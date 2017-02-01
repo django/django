@@ -96,8 +96,7 @@ urlpatterns += i18n_patterns(
 )
 
 urlpatterns += [
-    url(r'view_exception/(?P<n>[0-9]+)/$', views.view_exception, name='view_exception'),
-    url(r'template_exception/(?P<n>[0-9]+)/$', views.template_exception, name='template_exception'),
+    url(r'template_exception/$', views.template_exception, name='template_exception'),
     url(
         r'^raises_template_does_not_exist/(?P<path>.+)$',
         views.raises_template_does_not_exist,
