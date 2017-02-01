@@ -13,23 +13,24 @@ class CustomManyToManyField(RelatedField):
     """
     many_to_many = True
 
-    def __init__(self, to, db_constraint=True, swappable=True, **kwargs):
+    def __init__(self, to, db_constraint=True, swappable=True, related_name=None, related_query_name=None,
+                 limit_choices_to=None, symmetrical=None, through=None, through_fields=None, db_table=None, **kwargs):
         try:
             to._meta
         except AttributeError:
             to = str(to)
         kwargs['rel'] = ManyToManyRel(
             self, to,
-            related_name=kwargs.pop('related_name', None),
-            related_query_name=kwargs.pop('related_query_name', None),
-            limit_choices_to=kwargs.pop('limit_choices_to', None),
-            symmetrical=kwargs.pop('symmetrical', to == RECURSIVE_RELATIONSHIP_CONSTANT),
-            through=kwargs.pop('through', None),
-            through_fields=kwargs.pop('through_fields', None),
+            related_name=related_name,
+            related_query_name=related_query_name,
+            limit_choices_to=limit_choices_to,
+            symmetrical=symmetrical if symmetrical is not None else (to == RECURSIVE_RELATIONSHIP_CONSTANT),
+            through=through,
+            through_fields=through_fields,
             db_constraint=db_constraint,
         )
         self.swappable = swappable
-        self.db_table = kwargs.pop('db_table', None)
+        self.db_table = db_table
         if kwargs['rel'].through is not None:
             assert self.db_table is None, "Cannot specify a db_table if an intermediary model is used."
         super().__init__(**kwargs)

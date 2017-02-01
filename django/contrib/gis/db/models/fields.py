@@ -263,7 +263,8 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
     # The OpenGIS Geometry name.
     geom_type = 'GEOMETRY'
 
-    def __init__(self, verbose_name=None, dim=2, geography=False, **kwargs):
+    def __init__(self, verbose_name=None, dim=2, geography=False, *, extent=(-180.0, -90.0, 180.0, 90.0),
+                 tolerance=0.05, **kwargs):
         """
         The initialization function for geometry fields. In addition to the
         parameters from BaseSpatialField, it takes the following as keyword
@@ -289,8 +290,8 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
 
         # Oracle-specific private attributes for creating the entry in
         # `USER_SDO_GEOM_METADATA`
-        self._extent = kwargs.pop('extent', (-180.0, -90.0, 180.0, 90.0))
-        self._tolerance = kwargs.pop('tolerance', 0.05)
+        self._extent = extent
+        self._tolerance = tolerance
 
         super().__init__(verbose_name=verbose_name, **kwargs)
 

@@ -40,12 +40,10 @@ class Person(models.Model):
 # calls. This argument is used to establish that the BookManager
 # is actually getting used when it should be.
 class BookManager(models.Manager):
-    def create(self, *args, **kwargs):
-        kwargs.pop('extra_arg', None)
+    def create(self, *args, extra_arg=None, **kwargs):
         return super().create(*args, **kwargs)
 
-    def get_or_create(self, *args, **kwargs):
-        kwargs.pop('extra_arg', None)
+    def get_or_create(self, *args, extra_arg=None, **kwargs):
         return super().get_or_create(*args, **kwargs)
 
 

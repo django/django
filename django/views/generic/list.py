@@ -120,11 +120,11 @@ class MultipleObjectMixin(ContextMixin):
         else:
             return None
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *, object_list=None, **kwargs):
         """
         Get the context for this view.
         """
-        queryset = kwargs.pop('object_list', self.object_list)
+        queryset = object_list if object_list is not None else self.object_list
         page_size = self.get_paginate_by(queryset)
         context_object_name = self.get_context_object_name(queryset)
         if page_size:

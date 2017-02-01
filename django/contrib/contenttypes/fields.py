@@ -496,10 +496,8 @@ def create_generic_related_manager(superclass, rel):
                 self.object_id_field_name: self.pk_val,
             }
 
-        def __call__(self, **kwargs):
-            # We use **kwargs rather than a kwarg argument to enforce the
-            # `manager='manager_name'` syntax.
-            manager = getattr(self.model, kwargs.pop('manager'))
+        def __call__(self, *, manager):
+            manager = getattr(self.model, manager)
             manager_class = create_generic_related_manager(manager.__class__, rel)
             return manager_class(instance=self.instance)
         do_not_call_in_templates = True
@@ -542,8 +540,7 @@ def create_generic_related_manager(superclass, rel):
                     False,
                     self.prefetch_cache_name)
 
-        def add(self, *objs, **kwargs):
-            bulk = kwargs.pop('bulk', True)
+        def add(self, *objs, bulk=True):
             db = router.db_for_write(self.model, instance=self.instance)
 
             def check_and_update_obj(obj):
@@ -576,15 +573,13 @@ def create_generic_related_manager(superclass, rel):
                         obj.save()
         add.alters_data = True
 
-        def remove(self, *objs, **kwargs):
+        def remove(self, *objs, bulk=True):
             if not objs:
                 return
-            bulk = kwargs.pop('bulk', True)
             self._clear(self.filter(pk__in=[o.pk for o in objs]), bulk)
         remove.alters_data = True
 
-        def clear(self, **kwargs):
-            bulk = kwargs.pop('bulk', True)
+        def clear(self, *, bulk=True):
             self._clear(self, bulk)
         clear.alters_data = True
 
@@ -601,13 +596,10 @@ def create_generic_related_manager(superclass, rel):
                         obj.delete()
         _clear.alters_data = True
 
-        def set(self, objs, **kwargs):
+        def set(self, objs, *, bulk=True, clear=False):
             # Force evaluation of `objs` in case it's a queryset whose value
             # could be affected by `manager.clear()`. Refs #19816.
             objs = tuple(objs)
-
-            bulk = kwargs.pop('bulk', True)
-            clear = kwargs.pop('clear', False)
 
             db = router.db_for_write(self.model, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):

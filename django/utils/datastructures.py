@@ -235,12 +235,7 @@ class ImmutableList(tuple):
         AttributeError: You cannot mutate this.
     """
 
-    def __new__(cls, *args, **kwargs):
-        if 'warning' in kwargs:
-            warning = kwargs['warning']
-            del kwargs['warning']
-        else:
-            warning = 'ImmutableList object is immutable.'
+    def __new__(cls, *args, warning='ImmutableList object is immutable.', **kwargs):
         self = tuple.__new__(cls, *args, **kwargs)
         self.warning = warning
         return self

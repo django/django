@@ -60,11 +60,10 @@ class ContentTypeManager(models.Manager):
         self._add_to_cache(self.db, ct)
         return ct
 
-    def get_for_models(self, *models, **kwargs):
+    def get_for_models(self, *models, for_concrete_models=True):
         """
         Given *models, returns a dictionary mapping {model: content_type}.
         """
-        for_concrete_models = kwargs.pop('for_concrete_models', True)
         results = {}
         # Models that aren't already in the cache.
         needed_app_labels = set()

@@ -553,9 +553,9 @@ class BaseModelFormSet(BaseFormSet):
     unique_fields = set()
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 queryset=None, **kwargs):
+                 queryset=None, *, initial=None, **kwargs):
         self.queryset = queryset
-        self.initial_extra = kwargs.pop('initial', None)
+        self.initial_extra = initial
         defaults = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
         defaults.update(kwargs)
         super().__init__(**defaults)
@@ -1065,10 +1065,10 @@ class InlineForeignKeyField(Field):
         'invalid_choice': _('The inline foreign key did not match the parent instance primary key.'),
     }
 
-    def __init__(self, parent_instance, *args, **kwargs):
+    def __init__(self, parent_instance, *args, pk_field=False, to_field=None, **kwargs):
         self.parent_instance = parent_instance
-        self.pk_field = kwargs.pop("pk_field", False)
-        self.to_field = kwargs.pop("to_field", None)
+        self.pk_field = pk_field
+        self.to_field = to_field
         if self.parent_instance is not None:
             if self.to_field:
                 kwargs["initial"] = getattr(self.parent_instance, self.to_field)

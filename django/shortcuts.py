@@ -30,7 +30,7 @@ def render(request, template_name, context=None, content_type=None, status=None,
     return HttpResponse(content, content_type, status)
 
 
-def redirect(to, *args, **kwargs):
+def redirect(to, *args, permanent=False, **kwargs):
     """
     Returns an HttpResponseRedirect to the appropriate URL for the arguments
     passed.
@@ -47,11 +47,7 @@ def redirect(to, *args, **kwargs):
     By default issues a temporary redirect; pass permanent=True to issue a
     permanent redirect
     """
-    if kwargs.pop('permanent', False):
-        redirect_class = HttpResponsePermanentRedirect
-    else:
-        redirect_class = HttpResponseRedirect
-
+    redirect_class = HttpResponsePermanentRedirect if permanent else HttpResponseRedirect
     return redirect_class(resolve_url(to, *args, **kwargs))
 
 

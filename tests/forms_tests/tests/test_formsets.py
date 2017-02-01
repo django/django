@@ -56,8 +56,8 @@ SplitDateTimeFormSet = formset_factory(SplitDateTimeForm)
 
 
 class CustomKwargForm(Form):
-    def __init__(self, *args, **kwargs):
-        self.custom_kwarg = kwargs.pop('custom_kwarg')
+    def __init__(self, *args, custom_kwarg, **kwargs):
+        self.custom_kwarg = custom_kwarg
         super().__init__(*args, **kwargs)
 
 

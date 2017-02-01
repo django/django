@@ -13,19 +13,19 @@ class SecurityMiddlewareTest(SimpleTestCase):
     def secure_request_kwargs(self):
         return {"wsgi.url_scheme": "https"}
 
-    def response(self, *args, **kwargs):
-        headers = kwargs.pop("headers", {})
+    def response(self, *args, headers=None, **kwargs):
         response = HttpResponse(*args, **kwargs)
-        for k, v in headers.items():
-            response[k] = v
+        if headers:
+            for k, v in headers.items():
+                response[k] = v
         return response
 
-    def process_response(self, *args, **kwargs):
+    def process_response(self, *args, secure=False, request=None, **kwargs):
         request_kwargs = {}
-        if kwargs.pop("secure", False):
+        if secure:
             request_kwargs.update(self.secure_request_kwargs)
-        request = (kwargs.pop("request", None) or
-                   self.request.get("/some/url", **request_kwargs))
+        if request is None:
+            request = self.request.get("/some/url", **request_kwargs)
         ret = self.middleware.process_request(request)
         if ret:
             return ret
@@ -34,8 +34,8 @@ class SecurityMiddlewareTest(SimpleTestCase):
 
     request = RequestFactory()
 
-    def process_request(self, method, *args, **kwargs):
-        if kwargs.pop("secure", False):
+    def process_request(self, method, *args, secure=False, **kwargs):
+        if secure:
             kwargs.update(self.secure_request_kwargs)
         req = getattr(self.request, method.lower())(*args, **kwargs)
         return self.middleware.process_request(req)

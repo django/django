@@ -929,8 +929,7 @@ class TransactionTestCase(SimpleTestCase):
                              "against more than one ordered values")
         return self.assertEqual(list(items), values, msg=msg)
 
-    def assertNumQueries(self, num, func=None, *args, **kwargs):
-        using = kwargs.pop("using", DEFAULT_DB_ALIAS)
+    def assertNumQueries(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
         conn = connections[using]
 
         context = _AssertNumQueriesContext(self, num, conn)

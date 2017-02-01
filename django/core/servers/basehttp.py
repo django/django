@@ -59,10 +59,10 @@ class WSGIServer(simple_server.WSGIServer):
 
     request_queue_size = 10
 
-    def __init__(self, *args, **kwargs):
-        if kwargs.pop('ipv6', False):
+    def __init__(self, *args, ipv6=False, allow_reuse_address=True, **kwargs):
+        if ipv6:
             self.address_family = socket.AF_INET6
-        self.allow_reuse_address = kwargs.pop('allow_reuse_address', True)
+        self.allow_reuse_address = allow_reuse_address
         super().__init__(*args, **kwargs)
 
     def server_bind(self):

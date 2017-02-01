@@ -691,11 +691,7 @@ class QuerySet:
         clone._iterable_class = ValuesIterable
         return clone
 
-    def values_list(self, *fields, **kwargs):
-        flat = kwargs.pop('flat', False)
-        if kwargs:
-            raise TypeError('Unexpected keyword arguments to values_list: %s' % (list(kwargs),))
-
+    def values_list(self, *fields, flat=False):
         if flat and len(fields) > 1:
             raise TypeError("'flat' is not valid when values_list is called with more than one field.")
 
@@ -812,7 +808,7 @@ class QuerySet:
         else:
             return self._filter_or_exclude(None, **filter_obj)
 
-    def _combinator_query(self, combinator, *other_qs, **kwargs):
+    def _combinator_query(self, combinator, *other_qs, all=False):
         # Clone the query to inherit the select list and everything
         clone = self._clone()
         # Clear limits and ordering so they can be reapplied
@@ -820,18 +816,11 @@ class QuerySet:
         clone.query.clear_limits()
         clone.query.combined_queries = (self.query,) + tuple(qs.query for qs in other_qs)
         clone.query.combinator = combinator
-        clone.query.combinator_all = kwargs.pop('all', False)
+        clone.query.combinator_all = all
         return clone
 
-    def union(self, *other_qs, **kwargs):
-        if kwargs:
-            unexpected_kwarg = next((k for k in kwargs.keys() if k != 'all'), None)
-            if unexpected_kwarg:
-                raise TypeError(
-                    "union() received an unexpected keyword argument '%s'" %
-                    (unexpected_kwarg,)
-                )
-        return self._combinator_query('union', *other_qs, **kwargs)
+    def union(self, *other_qs, all=False):
+        return self._combinator_query('union', *other_qs, all=all)
 
     def intersection(self, *other_qs):
         return self._combinator_query('intersection', *other_qs)

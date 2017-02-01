@@ -922,15 +922,14 @@ class ForeignKey(ForeignObject):
         if self.remote_field.field_name is None:
             self.remote_field.field_name = cls._meta.pk.name
 
-    def formfield(self, **kwargs):
-        db = kwargs.pop('using', None)
+    def formfield(self, *, using=None, **kwargs):
         if isinstance(self.remote_field.model, str):
             raise ValueError("Cannot create form field for %r yet, because "
                              "its related model %r has not been loaded yet" %
                              (self.name, self.remote_field.model))
         defaults = {
             'form_class': forms.ModelChoiceField,
-            'queryset': self.remote_field.model._default_manager.using(db),
+            'queryset': self.remote_field.model._default_manager.using(using),
             'to_field_name': self.remote_field.field_name,
         }
         defaults.update(kwargs)
@@ -1609,11 +1608,10 @@ class ManyToManyField(RelatedField):
     def save_form_data(self, instance, data):
         getattr(instance, self.attname).set(data)
 
-    def formfield(self, **kwargs):
-        db = kwargs.pop('using', None)
+    def formfield(self, *, using=None, **kwargs):
         defaults = {
             'form_class': forms.ModelMultipleChoiceField,
-            'queryset': self.remote_field.model._default_manager.using(db),
+            'queryset': self.remote_field.model._default_manager.using(using),
         }
         defaults.update(kwargs)
         # If initial is passed in, it's a list of related objects, but the

@@ -157,10 +157,10 @@ class ExtendsNode(Node):
 class IncludeNode(Node):
     context_key = '__include_context'
 
-    def __init__(self, template, *args, **kwargs):
+    def __init__(self, template, *args, extra_context=None, isolated_context=False, **kwargs):
         self.template = template
-        self.extra_context = kwargs.pop('extra_context', {})
-        self.isolated_context = kwargs.pop('isolated_context', False)
+        self.extra_context = extra_context or {}
+        self.isolated_context = isolated_context
         super().__init__(*args, **kwargs)
 
     def render(self, context):

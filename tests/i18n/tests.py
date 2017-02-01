@@ -1388,10 +1388,6 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
         response = self.client.get('/simple/', HTTP_ACCEPT_LANGUAGE='fr')
         self.assertEqual(response.content, b'Yes')
 
-    def test_unexpected_kwarg_to_i18n_patterns(self):
-        with self.assertRaisesMessage(AssertionError, "Unexpected kwargs for i18n_patterns(): {'foo':"):
-            i18n_patterns(object(), foo='bar')
-
     def test_page_with_dash(self):
         # A page starting with /de* shouldn't match the 'de' langauge code.
         response = self.client.get('/de-simple-page/')

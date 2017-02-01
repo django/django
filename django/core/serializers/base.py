@@ -62,19 +62,18 @@ class Serializer:
     progress_class = ProgressBar
     stream_class = StringIO
 
-    def serialize(self, queryset, **options):
+    def serialize(self, queryset, *, stream=None, fields=None, use_natural_foreign_keys=False,
+                  use_natural_primary_keys=False, progress_output=None, object_count=0, **options):
         """
         Serialize a queryset.
         """
         self.options = options
 
-        self.stream = options.pop("stream", self.stream_class())
-        self.selected_fields = options.pop("fields", None)
-        self.use_natural_foreign_keys = options.pop('use_natural_foreign_keys', False)
-        self.use_natural_primary_keys = options.pop('use_natural_primary_keys', False)
-        progress_bar = self.progress_class(
-            options.pop('progress_output', None), options.pop('object_count', 0)
-        )
+        self.stream = stream if stream is not None else self.stream_class()
+        self.selected_fields = fields
+        self.use_natural_foreign_keys = use_natural_foreign_keys
+        self.use_natural_primary_keys = use_natural_primary_keys
+        progress_bar = self.progress_class(progress_output, object_count)
 
         self.start_serialization()
         self.first = True

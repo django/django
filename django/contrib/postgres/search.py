@@ -125,13 +125,11 @@ class SearchQueryCombinable:
 
 
 class SearchQuery(SearchQueryCombinable, Value):
-    invert = False
     _output_field = SearchQueryField()
-    config = None
 
-    def __init__(self, value, output_field=None, **extra):
-        self.config = extra.pop('config', self.config)
-        self.invert = extra.pop('invert', self.invert)
+    def __init__(self, value, output_field=None, *, config=None, invert=False):
+        self.config = config
+        self.invert = invert
         super().__init__(value, output_field=output_field)
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
@@ -161,11 +159,7 @@ class SearchQuery(SearchQueryCombinable, Value):
         return combined
 
     def __invert__(self):
-        extra = {
-            'invert': not self.invert,
-            'config': self.config,
-        }
-        return type(self)(self.value, **extra)
+        return type(self)(self.value, config=self.config, invert=not self.invert)
 
 
 class CombinedSearchQuery(SearchQueryCombinable, CombinedExpression):
