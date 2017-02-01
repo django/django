@@ -217,7 +217,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         kwargs['client_flag'] = CLIENT.FOUND_ROWS
         # Validate the transaction isolation level, if specified.
         options = settings_dict['OPTIONS'].copy()
-        isolation_level = options.pop('isolation_level', None)
+        isolation_level = options.pop('isolation_level', 'read committed')
         if isolation_level:
             isolation_level = isolation_level.lower()
             if isolation_level not in self.isolation_levels:

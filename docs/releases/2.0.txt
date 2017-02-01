@@ -227,6 +227,15 @@ The end of upstream support for Oracle 11.2 is Dec. 2020. Django 1.11 will be
 supported until April 2020 which almost reaches this date. Django 2.0
 officially supports Oracle 12.1+.
 
+Default MySQL isolation level is read committed
+-----------------------------------------------
+
+MySQL's default isolation level, repeatable read, may cause data loss in
+typical Django usage. To prevent that and for consistency with other databases,
+the default isolation level is now read committed. You can use the
+:setting:`DATABASES` setting to :ref:`use a different isolation level
+<mysql-isolation-level>`, if needed.
+
 :attr:`AbstractUser.last_name <django.contrib.auth.models.User.last_name>` ``max_length`` increased to 150
 ----------------------------------------------------------------------------------------------------------
 
