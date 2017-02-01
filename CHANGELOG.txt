@@ -2,7 +2,7 @@ Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
 
-1.0.2 (2017-02-01)
+1.0.3 (2017-02-01)
 ------------------
 
 * Database connections are no longer force-closed after each test is run.
