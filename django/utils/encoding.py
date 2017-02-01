@@ -11,11 +11,10 @@ from django.utils.functional import Promise
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):
         self.obj = obj
-        UnicodeDecodeError.__init__(self, *args)
+        super().__init__(*args)
 
     def __str__(self):
-        original = UnicodeDecodeError.__str__(self)
-        return '%s. You passed in %r (%s)' % (original, self.obj, type(self.obj))
+        return '%s. You passed in %r (%s)' % (super().__str__(), self.obj, type(self.obj))
 
 
 # For backwards compatibility. (originally in Django, then added to six 1.9)
