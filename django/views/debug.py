@@ -246,11 +246,6 @@ class ExceptionReporter:
         self.template_does_not_exist = False
         self.postmortem = None
 
-        # Handle deprecated string exceptions
-        if isinstance(self.exc_type, str):
-            self.exc_value = Exception('Deprecated String Exception: %r' % self.exc_type)
-            self.exc_type = type(self.exc_value)
-
     def get_traceback_data(self):
         """Return a dictionary containing traceback information."""
         if self.exc_type and issubclass(self.exc_type, TemplateDoesNotExist):
