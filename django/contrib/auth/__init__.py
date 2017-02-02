@@ -1,11 +1,13 @@
 import inspect
 import re
+import warnings
 
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.middleware.csrf import rotate_token
 from django.utils.crypto import constant_time_compare
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.module_loading import import_string
 from django.utils.translation import LANGUAGE_SESSION_KEY
 
@@ -59,22 +61,32 @@ def _get_user_session_key(request):
     return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
 
 
-def authenticate(**credentials):
+def authenticate(request=None, **credentials):
     """
     If the given credentials are valid, return a User object.
     """
     for backend, backend_path in _get_backends(return_tuples=True):
+        args = (request,)
         try:
-            inspect.getcallargs(backend.authenticate, **credentials)
+            inspect.getcallargs(backend.authenticate, request, **credentials)
         except TypeError:
-            # This backend doesn't accept these credentials as arguments. Try the next one.
-            continue
-
+            try:
+                inspect.getcallargs(backend.authenticate, **credentials)
+            except TypeError:
+                # This backend doesn't accept these credentials as arguments. Try the next one.
+                continue
+            else:
+                args = ()
+                warnings.warn(
+                    "Update authentication backend %s to accept a "
+                    "positional `request` argument." % backend_path,
+                    RemovedInDjango21Warning
+                )
         try:
-            user = backend.authenticate(**credentials)
+            user = backend.authenticate(*args, **credentials)
         except PermissionDenied:
             # This backend says to stop in our tracks - this user should not be allowed in at all.
-            return None
+            break
         if user is None:
             continue
         # Annotate the user object with the path of the backend.
@@ -82,11 +94,10 @@ def authenticate(**credentials):
         return user
 
     # The credentials supplied are invalid to all backends, fire signal
-    user_login_failed.send(sender=__name__,
-            credentials=_clean_credentials(credentials))
+    user_login_failed.send(sender=__name__, credentials=_clean_credentials(credentials), request=request)
 
 
-def login(request, user):
+def login(request, user, backend=None):
     """
     Persist a user id and a backend in the request. This way a user doesn't
     have to reauthenticate on every request. Note that data set during
@@ -101,15 +112,29 @@ def login(request, user):
     if SESSION_KEY in request.session:
         if _get_user_session_key(request) != user.pk or (
                 session_auth_hash and
-                request.session.get(HASH_SESSION_KEY) != session_auth_hash):
+                not constant_time_compare(request.session.get(HASH_SESSION_KEY, ''), session_auth_hash)):
             # To avoid reusing another user's session, create a new, empty
             # session if the existing session corresponds to a different
             # authenticated user.
             request.session.flush()
     else:
         request.session.cycle_key()
+
+    try:
+        backend = backend or user.backend
+    except AttributeError:
+        backends = _get_backends(return_tuples=True)
+        if len(backends) == 1:
+            _, backend = backends[0]
+        else:
+            raise ValueError(
+                'You have multiple authentication backends configured and '
+                'therefore must provide the `backend` argument or set the '
+                '`backend` attribute on the user.'
+            )
+
     request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
-    request.session[BACKEND_SESSION_KEY] = user.backend
+    request.session[BACKEND_SESSION_KEY] = backend
     request.session[HASH_SESSION_KEY] = session_auth_hash
     if hasattr(request, 'user'):
         request.user = user
@@ -125,7 +150,7 @@ def logout(request):
     # Dispatch the signal before the user is logged out so the receivers have a
     # chance to find out *who* logged out.
     user = getattr(request, 'user', None)
-    if hasattr(user, 'is_authenticated') and not user.is_authenticated():
+    if hasattr(user, 'is_authenticated') and not user.is_authenticated:
         user = None
     user_logged_out.send(sender=user.__class__, request=request, user=user)
 
@@ -147,7 +172,7 @@ def get_user_model():
     Returns the User model that is active in this project.
     """
     try:
-        return django_apps.get_model(settings.AUTH_USER_MODEL)
+        return django_apps.get_model(settings.AUTH_USER_MODEL, require_ready=False)
     except ValueError:
         raise ImproperlyConfigured("AUTH_USER_MODEL must be of the form 'app_label.model_name'")
     except LookupError:
@@ -173,8 +198,7 @@ def get_user(request):
             backend = load_backend(backend_path)
             user = backend.get_user(user_id)
             # Verify the session
-            if ('django.contrib.auth.middleware.SessionAuthenticationMiddleware'
-                    in settings.MIDDLEWARE_CLASSES and hasattr(user, 'get_session_auth_hash')):
+            if hasattr(user, 'get_session_auth_hash'):
                 session_hash = request.session.get(HASH_SESSION_KEY)
                 session_hash_verified = session_hash and constant_time_compare(
                     session_hash,
@@ -196,15 +220,16 @@ def get_permission_codename(action, opts):
 
 def update_session_auth_hash(request, user):
     """
-    Updating a user's password logs out all sessions for the user if
-    django.contrib.auth.middleware.SessionAuthenticationMiddleware is enabled.
+    Updating a user's password logs out all sessions for the user.
 
     This function takes the current request and the updated user object from
     which the new session hash will be derived and updates the session hash
     appropriately to prevent a password change from logging out the session
     from which the password was changed.
     """
+    request.session.cycle_key()
     if hasattr(user, 'get_session_auth_hash') and request.user == user:
         request.session[HASH_SESSION_KEY] = user.get_session_auth_hash()
+
 
 default_app_config = 'django.contrib.auth.apps.AuthConfig'

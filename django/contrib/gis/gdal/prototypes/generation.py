@@ -2,7 +2,7 @@
  This module contains functions that generate ctypes prototypes for the
  GDAL routines.
 """
-from ctypes import c_char_p, c_double, c_int, c_void_p
+from ctypes import c_char_p, c_double, c_int, c_int64, c_void_p
 from functools import partial
 
 from django.contrib.gis.gdal.prototypes.errcheck import (
@@ -49,10 +49,19 @@ def geom_output(func, argtypes, offset=None):
     return func
 
 
-def int_output(func, argtypes):
+def int_output(func, argtypes, errcheck=None):
     "Generates a ctypes function that returns an integer value."
     func.argtypes = argtypes
     func.restype = c_int
+    if errcheck:
+        func.errcheck = errcheck
+    return func
+
+
+def int64_output(func, argtypes):
+    "Generates a ctypes function that returns a 64-bit integer value."
+    func.argtypes = argtypes
+    func.restype = c_int64
     return func
 
 
@@ -105,8 +114,7 @@ def string_output(func, argtypes, offset=-1, str_result=False, decoding=None):
     # Dynamically defining our error-checking function with the
     # given offset.
     def _check_str(result, func, cargs):
-        res = check_string(result, func, cargs,
-            offset=offset, str_result=str_result)
+        res = check_string(result, func, cargs, offset=offset, str_result=str_result)
         if res and decoding:
             res = res.decode(decoding)
         return res

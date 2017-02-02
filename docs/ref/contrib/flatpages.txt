@@ -53,7 +53,7 @@ Then either:
 or:
 
 3. Add ``'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'``
-   to your :setting:`MIDDLEWARE_CLASSES` setting.
+   to your :setting:`MIDDLEWARE` setting.
 
 4. Run the command :djadmin:`manage.py migrate <migrate>`.
 
@@ -144,8 +144,7 @@ can do all of the work.
    methods. Only requests which are successfully routed to a view via
    normal URL resolution apply view middleware.
 
-Note that the order of :setting:`MIDDLEWARE_CLASSES` matters. Generally, you
-can put
+Note that the order of :setting:`MIDDLEWARE` matters. Generally, you can put
 :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware` at the
 end of the list. This means it will run first when processing the response, and
 ensures that any other response-processing middlewares see the real flatpage
@@ -170,12 +169,42 @@ For more on middleware, read the :doc:`middleware docs
 How to add, change and delete flatpages
 =======================================
 
+.. _flatpages-admin:
+
 Via the admin interface
 -----------------------
 
 If you've activated the automatic Django admin interface, you should see a
 "Flatpages" section on the admin index page. Edit flatpages as you edit any
 other object in the system.
+
+The ``FlatPage`` model has an ``enable_comments`` field that isn't used by
+``contrib.flatpages``, but that could be useful for your project or third-party
+apps. It doesn't appear in the admin interface, but you can add it by
+registering a custom ``ModelAdmin`` for ``FlatPage``::
+
+    from django.contrib import admin
+    from django.contrib.flatpages.admin import FlatPageAdmin
+    from django.contrib.flatpages.models import FlatPage
+    from django.utils.translation import ugettext_lazy as _
+
+    # Define a new FlatPageAdmin
+    class FlatPageAdmin(FlatPageAdmin):
+        fieldsets = (
+            (None, {'fields': ('url', 'title', 'content', 'sites')}),
+            (_('Advanced options'), {
+                'classes': ('collapse', ),
+                'fields': (
+                    'enable_comments',
+                    'registration_required',
+                    'template_name',
+                ),
+            }),
+        )
+
+    # Re-register FlatPageAdmin
+    admin.site.unregister(FlatPage)
+    admin.site.register(FlatPage, FlatPageAdmin)
 
 Via the Python API
 ------------------
@@ -196,7 +225,7 @@ Via the Python API
     If you add or modify flatpages via your own code, you will likely want to
     check for duplicate flatpage URLs within the same site. The flatpage form
     used in the admin performs this validation check, and can be imported from
-    ``django.contrib.flatpages.forms.FlatPageForm`` and used in your own
+    ``django.contrib.flatpages.forms.FlatpageForm`` and used in your own
     views.
 
 Flatpage templates
@@ -310,11 +339,6 @@ Integrating with :mod:`django.contrib.sitemaps`
     attribute -- not :attr:`~django.contrib.sitemaps.Sitemap.lastmod`,
     :attr:`~django.contrib.sitemaps.Sitemap.changefreq` or
     :attr:`~django.contrib.sitemaps.Sitemap.priority`.
-
-    .. versionchanged:: 1.8
-
-        This class is available from ``django.contrib.sitemaps.FlatPageSitemap``
-        in older version of Django.
 
 Example
 -------

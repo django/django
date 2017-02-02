@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib import admin
 from django.contrib.admin.decorators import register
 from django.contrib.admin.sites import site
@@ -24,43 +22,32 @@ class TestRegistration(SimpleTestCase):
 
     def test_bare_registration(self):
         self.site.register(Person)
-        self.assertTrue(
-            isinstance(self.site._registry[Person], admin.options.ModelAdmin)
-        )
+        self.assertIsInstance(self.site._registry[Person], admin.ModelAdmin)
 
     def test_registration_with_model_admin(self):
         self.site.register(Person, NameAdmin)
-        self.assertTrue(
-            isinstance(self.site._registry[Person], NameAdmin)
-        )
+        self.assertIsInstance(self.site._registry[Person], NameAdmin)
 
     def test_prevent_double_registration(self):
         self.site.register(Person)
-        self.assertRaises(admin.sites.AlreadyRegistered,
-                          self.site.register,
-                          Person)
+        with self.assertRaises(admin.sites.AlreadyRegistered):
+            self.site.register(Person)
 
     def test_registration_with_star_star_options(self):
         self.site.register(Person, search_fields=['name'])
         self.assertEqual(self.site._registry[Person].search_fields, ['name'])
 
     def test_star_star_overrides(self):
-        self.site.register(Person, NameAdmin,
-                           search_fields=["name"], list_display=['__str__'])
+        self.site.register(Person, NameAdmin, search_fields=["name"], list_display=['__str__'])
         self.assertEqual(self.site._registry[Person].search_fields, ['name'])
-        self.assertEqual(self.site._registry[Person].list_display,
-                         ['__str__'])
+        self.assertEqual(self.site._registry[Person].list_display, ['__str__'])
         self.assertTrue(self.site._registry[Person].save_on_top)
 
     def test_iterable_registration(self):
         self.site.register([Person, Place], search_fields=['name'])
-        self.assertTrue(
-            isinstance(self.site._registry[Person], admin.options.ModelAdmin)
-        )
+        self.assertIsInstance(self.site._registry[Person], admin.ModelAdmin)
         self.assertEqual(self.site._registry[Person].search_fields, ['name'])
-        self.assertTrue(
-            isinstance(self.site._registry[Place], admin.options.ModelAdmin)
-        )
+        self.assertIsInstance(self.site._registry[Place], admin.ModelAdmin)
         self.assertEqual(self.site._registry[Place].search_fields, ['name'])
 
     def test_abstract_model(self):
@@ -68,7 +55,8 @@ class TestRegistration(SimpleTestCase):
         Exception is raised when trying to register an abstract model.
         Refs #12004.
         """
-        self.assertRaises(ImproperlyConfigured, self.site.register, Location)
+        with self.assertRaises(ImproperlyConfigured):
+            self.site.register(Location)
 
     def test_is_registered_model(self):
         "Checks for registered models should return true."
@@ -100,36 +88,28 @@ class TestRegistrationDecorator(SimpleTestCase):
 
     def test_basic_registration(self):
         register(Person)(NameAdmin)
-        self.assertTrue(
-            isinstance(self.default_site._registry[Person],
-                       admin.options.ModelAdmin)
-        )
+        self.assertIsInstance(self.default_site._registry[Person], admin.ModelAdmin)
         self.default_site.unregister(Person)
 
     def test_custom_site_registration(self):
         register(Person, site=self.custom_site)(NameAdmin)
-        self.assertTrue(
-            isinstance(self.custom_site._registry[Person],
-                       admin.options.ModelAdmin)
-        )
+        self.assertIsInstance(self.custom_site._registry[Person], admin.ModelAdmin)
 
     def test_multiple_registration(self):
         register(Traveler, Place)(NameAdmin)
-        self.assertTrue(
-            isinstance(self.default_site._registry[Traveler],
-                       admin.options.ModelAdmin)
-        )
+        self.assertIsInstance(self.default_site._registry[Traveler], admin.ModelAdmin)
         self.default_site.unregister(Traveler)
-        self.assertTrue(
-            isinstance(self.default_site._registry[Place],
-                       admin.options.ModelAdmin)
-        )
+        self.assertIsInstance(self.default_site._registry[Place], admin.ModelAdmin)
         self.default_site.unregister(Place)
 
     def test_wrapped_class_not_a_model_admin(self):
-        self.assertRaisesMessage(ValueError, 'Wrapped class must subclass ModelAdmin.',
-            register(Person), CustomSite)
+        with self.assertRaisesMessage(ValueError, 'Wrapped class must subclass ModelAdmin.'):
+            register(Person)(CustomSite)
 
     def test_custom_site_not_an_admin_site(self):
-        self.assertRaisesMessage(ValueError, 'site must subclass AdminSite',
-            register(Person, site=Traveler), NameAdmin)
+        with self.assertRaisesMessage(ValueError, 'site must subclass AdminSite'):
+            register(Person, site=Traveler)(NameAdmin)
+
+    def test_empty_models_list_registration_fails(self):
+        with self.assertRaisesMessage(ValueError, 'At least one model must be passed to register.'):
+            register()(NameAdmin)

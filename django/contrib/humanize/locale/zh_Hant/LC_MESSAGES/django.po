@@ -1,17 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Chen Chun-Chia <ccc.larc@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # tcc <tcchou@tcchou.org>, 2011
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/django/"
+"PO-Revision-Date: 2016-08-19 08:14+0000\n"
+"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,19 +22,19 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Humanize"
-msgstr ""
+msgstr "人性化"
 
 msgid "th"
-msgstr "th"
+msgstr ""
 
 msgid "st"
-msgstr "st"
+msgstr ""
 
 msgid "nd"
-msgstr "nd"
+msgstr ""
 
 msgid "rd"
-msgstr "rd"
+msgstr ""
 
 #, python-format
 msgid "%(value).1f million"
@@ -193,21 +195,21 @@ msgstr "現在"
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] ""
+msgstr[0] "%(count)s 秒前"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] ""
+msgstr[0] "%(count)s 分鐘前"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] ""
+msgstr[0] "%(count)s 小時前"
 
 #, python-format
 msgctxt "naturaltime"
@@ -219,18 +221,18 @@ msgstr "%(delta)s 後"
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
-msgstr[0] ""
+msgstr[0] "%(count)s 秒後"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
-msgstr[0] ""
+msgstr[0] "%(count)s 分鐘後"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
-msgstr[0] ""
+msgstr[0] "%(count)s 小時後"

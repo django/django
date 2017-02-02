@@ -42,7 +42,7 @@ inheritance_templates = {
     'inheritance30': "1{% if optional %}{% block opt %}2{% endblock %}{% endif %}3",
     'inheritance31': "{% extends 'inheritance30' %}{% block opt %}two{% endblock %}",
     'inheritance32': "{% extends 'inheritance30' %}{% block opt %}two{% endblock %}",
-    'inheritance33': "1{% ifequal optional 1 %}{% block opt %}2{% endblock %}{% endifequal %}3",
+    'inheritance33': "1{% if optional == 1 %}{% block opt %}2{% endblock %}{% endif %}3",
     'inheritance34': "{% extends 'inheritance33' %}{% block opt %}two{% endblock %}",
     'inheritance35': "{% extends 'inheritance33' %}{% block opt %}two{% endblock %}",
     'inheritance36': "{% for n in numbers %}_{% block opt %}{{ n }}{% endblock %}{% endfor %}_",
@@ -251,7 +251,9 @@ class InheritanceTests(SimpleTestCase):
         """
         Inheritance from local context without use of template loader
         """
-        context_template = self.engine.from_string("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}")
+        context_template = self.engine.from_string(
+            "1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}"
+        )
         output = self.engine.render_to_string('inheritance24', {'context_template': context_template})
         self.assertEqual(output, '1234')
 
@@ -322,7 +324,7 @@ class InheritanceTests(SimpleTestCase):
     @setup(inheritance_templates)
     def test_inheritance33(self):
         """
-        Base template, putting block in a conditional {% ifequal %} tag
+        Base template, putting block in a conditional {% if %} tag
         """
         output = self.engine.render_to_string('inheritance33', {'optional': 1})
         self.assertEqual(output, '123')
@@ -330,7 +332,7 @@ class InheritanceTests(SimpleTestCase):
     @setup(inheritance_templates)
     def test_inheritance34(self):
         """
-        Inherit from a template with block wrapped in an {% ifequal %} tag
+        Inherit from a template with block wrapped in an {% if %} tag
         (in parent), still gets overridden
         """
         output = self.engine.render_to_string('inheritance34', {'optional': 1})
@@ -339,7 +341,7 @@ class InheritanceTests(SimpleTestCase):
     @setup(inheritance_templates)
     def test_inheritance35(self):
         """
-        Inherit from a template with block wrapped in an {% ifequal %} tag
+        Inherit from a template with block wrapped in an {% if %} tag
         (in parent), still gets overridden
         """
         output = self.engine.render_to_string('inheritance35', {'optional': 2})

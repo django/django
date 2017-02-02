@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
@@ -49,7 +46,8 @@ class DetailViewTest(TestCase):
         self.assertEqual(res.status_code, 404)
 
     def test_detail_object_does_not_exist(self):
-        self.assertRaises(ObjectDoesNotExist, self.client.get, '/detail/doesnotexist/1/')
+        with self.assertRaises(ObjectDoesNotExist):
+            self.client.get('/detail/doesnotexist/1/')
 
     def test_detail_by_custom_pk(self):
         res = self.client.get('/detail/author/bycustompk/%s/' % self.author1.pk)
@@ -140,6 +138,19 @@ class DetailViewTest(TestCase):
         self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/author_detail.html')
 
+    def test_custom_detail(self):
+        """
+        AuthorCustomDetail overrides get() and ensures that
+        SingleObjectMixin.get_context_object_name() always uses the obj
+        parameter instead of self.object.
+        """
+        res = self.client.get('/detail/author/%s/custom_detail/' % self.author1.pk)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['custom_author'], self.author1)
+        self.assertNotIn('author', res.context)
+        self.assertNotIn('object', res.context)
+        self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+
     def test_deferred_queryset_template_name(self):
         class FormContext(SingleObjectTemplateResponseMixin):
             request = RequestFactory().get('/')
@@ -160,10 +171,12 @@ class DetailViewTest(TestCase):
         self.assertEqual(form_context_data['author'], self.author1)
 
     def test_invalid_url(self):
-        self.assertRaises(AttributeError, self.client.get, '/detail/author/invalid/url/')
+        with self.assertRaises(AttributeError):
+            self.client.get('/detail/author/invalid/url/')
 
     def test_invalid_queryset(self):
-        self.assertRaises(ImproperlyConfigured, self.client.get, '/detail/author/invalid/qs/')
+        with self.assertRaises(ImproperlyConfigured):
+            self.client.get('/detail/author/invalid/qs/')
 
     def test_non_model_object_with_meta(self):
         res = self.client.get('/detail/nonmodel/1/')

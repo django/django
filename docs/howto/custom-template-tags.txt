@@ -11,7 +11,7 @@ defining custom tags and filters using Python, and then make them
 available to your templates using the :ttag:`{% load %}<load>` tag.
 
 Code layout
------------
+===========
 
 The most common place to specify custom template tags and filters is inside
 a Django app. If they relate to an existing app, it makes sense to bundle them
@@ -22,8 +22,12 @@ described below are automatically made available to load within templates.
 The app should contain a ``templatetags`` directory, at the same level as
 ``models.py``, ``views.py``, etc. If this doesn't already exist, create it -
 don't forget the ``__init__.py`` file to ensure the directory is treated as a
-Python package. After adding this module, you will need to restart your server
-before you can use the tags or filters in templates.
+Python package.
+
+.. admonition:: Development server won't automatically restart
+
+    After adding the ``templatetags``  module, you will need to restart your
+    server before you can use the tags or filters in templates.
 
 Your custom tags and filters will live in a module inside the ``templatetags``
 directory. The name of the module file is the name you'll use to load the tags
@@ -65,8 +69,6 @@ following::
 
     register = template.Library()
 
-.. versionadded:: 1.9
-
 Alternatively, template tag modules can be registered through the
 ``'libraries'`` argument to
 :class:`~django.template.backends.django.DjangoTemplates`. This is useful if
@@ -85,7 +87,7 @@ an application.
 .. _howto-writing-custom-template-filters:
 
 Writing custom template filters
--------------------------------
+===============================
 
 Custom filters are just Python functions that take one or two arguments:
 
@@ -123,7 +125,7 @@ your function. Example::
         return value.lower()
 
 Registering custom filters
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
 .. method:: django.template.Library.filter()
 
@@ -158,7 +160,7 @@ are described in :ref:`filters and auto-escaping <filters-auto-escaping>` and
 :ref:`filters and time zones <filters-timezones>` below.
 
 Template filters that expect strings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------
 
 .. method:: django.template.defaultfilters.stringfilter()
 
@@ -183,37 +185,29 @@ methods).
 .. _filters-auto-escaping:
 
 Filters and auto-escaping
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 When writing a custom filter, give some thought to how the filter will interact
-with Django's auto-escaping behavior. Note that three types of strings can be
+with Django's auto-escaping behavior. Note that two types of strings can be
 passed around inside the template code:
 
-* **Raw strings** are the native Python ``str`` or ``unicode`` types. On
-  output, they're escaped if auto-escaping is in effect and presented
-  unchanged, otherwise.
+* **Raw strings** are the native Python strings. On output, they're escaped if
+  auto-escaping is in effect and presented unchanged, otherwise.
 
 * **Safe strings** are strings that have been marked safe from further
   escaping at output time. Any necessary escaping has already been done.
   They're commonly used for output that contains raw HTML that is intended
   to be interpreted as-is on the client side.
 
-  Internally, these strings are of type ``SafeBytes`` or ``SafeText``.
-  They share a common base class of ``SafeData``, so you can test
-  for them using code like::
+  Internally, these strings are of type
+  :class:`~django.utils.safestring.SafeText`. You can test for them
+  using code like::
 
-      if isinstance(value, SafeData):
+      from django.utils.safestring import SafeText
+
+      if isinstance(value, SafeText):
           # Do something with the "safe" string.
           ...
-
-* **Strings marked as "needing escaping"** are *always* escaped on
-  output, regardless of whether they are in an :ttag:`autoescape` block or
-  not. These strings are only escaped once, however, even if auto-escaping
-  applies.
-
-  Internally, these strings are of type ``EscapeBytes`` or
-  ``EscapeText``. Generally you don't have to worry about these; they
-  exist for the implementation of the :tfilter:`escape` filter.
 
 Template filter code falls into one of two situations:
 
@@ -236,9 +230,8 @@ Template filter code falls into one of two situations:
 
    The reason ``is_safe`` is necessary is because there are plenty of
    normal string operations that will turn a ``SafeData`` object back into
-   a normal ``str`` or ``unicode`` object and, rather than try to catch
-   them all, which would be very difficult, Django repairs the damage after
-   the filter has completed.
+   a normal ``str`` object and, rather than try to catch them all, which would
+   be very difficult, Django repairs the damage after the filter has completed.
 
    For example, suppose you have a filter that adds the string ``xx`` to
    the end of any input. Since this introduces no dangerous HTML characters
@@ -336,8 +329,6 @@ Template filter code falls into one of two situations:
 
 .. warning:: Avoiding XSS vulnerabilities when reusing built-in filters
 
-    .. versionchanged:: 1.8
-
     Django's built-in filters have ``autoescape=True`` by default in order to
     get the proper autoescaping behavior and avoid a cross-site script
     vulnerability.
@@ -374,7 +365,7 @@ Template filter code falls into one of two situations:
 .. _filters-timezones:
 
 Filters and time zones
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 If you write a custom filter that operates on :class:`~datetime.datetime`
 objects, you'll usually register it with the ``expects_localtime`` flag set to
@@ -395,7 +386,7 @@ conversions in templates <time-zones-in-templates>`.
 .. _howto-writing-custom-template-tags:
 
 Writing custom template tags
-----------------------------
+============================
 
 Tags are more complex than filters, because tags can do anything. Django
 provides a number of shortcuts that make writing most types of tags easier.
@@ -405,7 +396,7 @@ scratch for those cases when the shortcuts aren't powerful enough.
 .. _howto-custom-template-tags-simple-tags:
 
 Simple tags
-~~~~~~~~~~~
+-----------
 
 .. method:: django.template.Library.simple_tag()
 
@@ -440,6 +431,17 @@ A few things to note about the ``simple_tag`` helper function:
   so we just receive a plain string.
 * If the argument was a template variable, our function is passed the
   current value of the variable, not the variable itself.
+
+Unlike other tag utilities, ``simple_tag`` passes its output through
+:func:`~django.utils.html.conditional_escape` if the template context is in
+autoescape mode, to ensure correct HTML and protect you from XSS
+vulnerabilities.
+
+If additional escaping is not desired, you will need to use
+:func:`~django.utils.safestring.mark_safe` if you are absolutely sure that your
+code does not contain XSS vulnerabilities. For building small HTML snippets,
+use of :func:`~django.utils.html.format_html` instead of ``mark_safe()`` is
+strongly recommended.
 
 If your template tag needs to access the current context, you can use the
 ``takes_context`` argument when registering your tag::
@@ -481,8 +483,6 @@ positional arguments. For example:
 
     {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
 
-.. versionadded:: 1.9
-
 It's possible to store the tag results in a template variable rather than
 directly outputting it. This is done by using the ``as`` argument followed by
 the variable name. Doing so enables you to output the content yourself where
@@ -496,7 +496,7 @@ you see fit:
 .. _howto-custom-template-tags-inclusion-tags:
 
 Inclusion tags
-~~~~~~~~~~~~~~
+--------------
 
 .. method:: django.template.Library.inclusion_tag()
 
@@ -629,46 +629,15 @@ positional arguments. For example:
 
     {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
 
-.. _howto-custom-template-tags-assignment-tags:
-
-Assignment tags
-~~~~~~~~~~~~~~~
-
-.. method:: django.template.Library.assignment_tag()
-
-.. deprecated:: 1.9
-
-    ``simple_tag`` can now store results in a template variable and should
-    be used instead.
-
-To ease the creation of tags setting a variable in the context, Django provides
-a helper function, ``assignment_tag``. This function works the same way as
-:meth:`~django.template.Library.simple_tag` except that it stores the tag's
-result in a specified context variable instead of directly outputting it.
-
-Our earlier ``current_time`` function could thus be written like this::
-
-    @register.assignment_tag
-    def get_current_time(format_string):
-        return datetime.datetime.now().strftime(format_string)
-
-You may then store the result in a template variable using the ``as`` argument
-followed by the variable name, and output it yourself where you see fit:
-
-.. code-block:: html+django
-
-    {% get_current_time "%Y-%m-%d %I:%M %p" as the_time %}
-    <p>The time is {{ the_time }}.</p>
-
 Advanced custom template tags
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 Sometimes the basic features for custom template tag creation aren't enough.
 Don't worry, Django gives you complete access to the internals required to build
 a template tag from the ground up.
 
 A quick overview
-~~~~~~~~~~~~~~~~
+----------------
 
 The template system works in a two-step process: compiling and rendering. To
 define a custom template tag, you specify how the compilation works and how
@@ -686,7 +655,7 @@ converted into a ``Node`` (the compilation function), and what the node's
 ``render()`` method does.
 
 Writing the compilation function
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 For each template tag the template parser encounters, it calls a Python
 function with the tag contents and the parser object itself. This function is
@@ -756,7 +725,7 @@ Notes:
   engine too slow. It's low-level because that's fastest.
 
 Writing the renderer
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 The second step in writing custom tags is to define a ``Node`` subclass that
 has a ``render()`` method.
@@ -792,12 +761,16 @@ Ultimately, this decoupling of compilation and rendering results in an
 efficient template system, because a template can render multiple contexts
 without having to be parsed multiple times.
 
+.. _tags-auto-escaping:
+
 Auto-escaping considerations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 The output from template tags is **not** automatically run through the
-auto-escaping filters. However, there are still a couple of things you should
-keep in mind when writing a template tag.
+auto-escaping filters (with the exception of
+:meth:`~django.template.Library.simple_tag` as described above). However, there
+are still a couple of things you should keep in mind when writing a template
+tag.
 
 If the ``render()`` function of your template stores the result in a context
 variable (rather than returning the result in a string), it should take care
@@ -825,15 +798,6 @@ template yourself. For example::
         t = context.template.engine.get_template('small_fragment.html')
         return t.render(Context({'var': obj}, autoescape=context.autoescape))
 
-.. versionchanged:: 1.8
-
-    The ``template`` attribute of ``Context`` objects was added in Django 1.8.
-    :meth:`context.template.engine.get_template
-    <django.template.Engine.get_template>` must be used instead of
-    :func:`django.template.loader.get_template` because the latter now returns
-    a wrapper whose ``render`` method doesn't accept a
-    :class:`~django.template.Context`.
-
 If we had neglected to pass in the current ``context.autoescape`` value to our
 new ``Context`` in this example, the results would have *always* been
 automatically escaped, which may not be the desired behavior if the template
@@ -842,7 +806,7 @@ tag is used inside a :ttag:`{% autoescape off %}<autoescape>` block.
 .. _template_tag_thread_safety:
 
 Thread-safety considerations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 Once a node is parsed, its ``render`` method may be called any number of times.
 Since Django is sometimes run in multi-threaded environments, a single node may
@@ -925,7 +889,7 @@ like the current iteration of the ``CycleNode``, should be stored in the
     variables, make ``render_context[self]`` a dictionary.
 
 Registering the tag
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 Finally, register the tag with your module's ``Library`` instance, as explained
 in :ref:`writing custom template filters<howto-writing-custom-template-tags>`
@@ -954,7 +918,7 @@ If you leave off the ``name`` argument, as in the second example above, Django
 will use the function's name as the tag name.
 
 Passing template variables to the tag
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 Although you can pass any number of arguments to a template tag using
 ``token.split_contents()``, the arguments are all unpacked as
@@ -1021,7 +985,7 @@ Variable resolution will throw a ``VariableDoesNotExist`` exception if it
 cannot resolve the string passed to it in the current context of the page.
 
 Setting a variable in the context
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 The above examples simply output a value. Generally, it's more flexible if your
 template tags set template variables instead of outputting values. That way,
@@ -1107,13 +1071,12 @@ The difference here is that ``do_current_time()`` grabs the format string and
 the variable name, passing both to ``CurrentTimeNode3``.
 
 Finally, if you only need to have a simple syntax for your custom
-context-updating template tag, you might want to consider using the
-:ref:`assignment tag <howto-custom-template-tags-assignment-tags>` shortcut
-we introduced above.
-
+context-updating template tag, consider using the
+:meth:`~django.template.Library.simple_tag` shortcut, which supports assigning
+the tag results to a template variable.
 
 Parsing until another block tag
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 Template tags can work in tandem. For instance, the standard
 :ttag:`{% comment %}<comment>` tag hides everything until ``{% endcomment %}``.
@@ -1157,7 +1120,7 @@ After ``parser.parse()`` is called, the parser hasn't yet "consumed" the
 ``{% comment %}`` and ``{% endcomment %}`` is ignored.
 
 Parsing until another block tag, and saving contents
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------------
 
 In the previous example, ``do_comment()`` discarded everything between
 ``{% comment %}`` and ``{% endcomment %}``. Instead of doing that, it's

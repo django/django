@@ -1,5 +1,3 @@
-.. _contents:
-
 =============================
 Django documentation contents
 =============================
@@ -27,4 +25,4 @@ Indices, glossary and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`glossary`
+* :doc:`glossary`

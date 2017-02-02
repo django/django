@@ -3,7 +3,6 @@ import json
 from django.conf import settings
 from django.contrib.messages.storage.base import BaseStorage, Message
 from django.http import SimpleCookie
-from django.utils import six
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.safestring import SafeData, mark_safe
 
@@ -22,7 +21,7 @@ class MessageEncoder(json.JSONEncoder):
             if obj.extra_tags:
                 message.append(obj.extra_tags)
             return message
-        return super(MessageEncoder, self).default(obj)
+        return super().default(obj)
 
 
 class MessageDecoder(json.JSONDecoder):
@@ -42,11 +41,11 @@ class MessageDecoder(json.JSONDecoder):
             return [self.process_messages(item) for item in obj]
         if isinstance(obj, dict):
             return {key: self.process_messages(value)
-                    for key, value in six.iteritems(obj)}
+                    for key, value in obj.items()}
         return obj
 
     def decode(self, s, **kwargs):
-        decoded = super(MessageDecoder, self).decode(s, **kwargs)
+        decoded = super().decode(s, **kwargs)
         return self.process_messages(decoded)
 
 
@@ -82,13 +81,14 @@ class CookieStorage(BaseStorage):
         store, or deletes the cookie.
         """
         if encoded_data:
-            response.set_cookie(self.cookie_name, encoded_data,
+            response.set_cookie(
+                self.cookie_name, encoded_data,
                 domain=settings.SESSION_COOKIE_DOMAIN,
                 secure=settings.SESSION_COOKIE_SECURE or None,
-                httponly=settings.SESSION_COOKIE_HTTPONLY or None)
+                httponly=settings.SESSION_COOKIE_HTTPONLY or None,
+            )
         else:
-            response.delete_cookie(self.cookie_name,
-                domain=settings.SESSION_COOKIE_DOMAIN)
+            response.delete_cookie(self.cookie_name, domain=settings.SESSION_COOKIE_DOMAIN)
 
     def _store(self, messages, response, remove_oldest=True, *args, **kwargs):
         """

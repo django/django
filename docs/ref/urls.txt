@@ -4,79 +4,8 @@
 
 .. module:: django.conf.urls
 
-patterns()
-----------
-
-.. function:: patterns(prefix, pattern_description, ...)
-
-.. deprecated:: 1.8
-
-    ``urlpatterns`` should be a plain list of :func:`django.conf.urls.url`
-    instances instead.
-
-A function that takes a prefix, and an arbitrary number of URL patterns, and
-returns a list of URL patterns in the format Django needs.
-
-The first argument to ``patterns()`` is a string ``prefix``. Here's the example
-URLconf from the :doc:`Django overview </intro/overview>`::
-
-    from django.conf.urls import patterns, url
-
-    urlpatterns = patterns('',
-        url(r'^articles/([0-9]{4})/$', 'news.views.year_archive'),
-        url(r'^articles/([0-9]{4})/([0-9]{2})/$', 'news.views.month_archive'),
-        url(r'^articles/([0-9]{4})/([0-9]{2})/([0-9]+)/$', 'news.views.article_detail'),
-    )
-
-In this example, each view has a common prefix -- ``'news.views'``.
-Instead of typing that out for each entry in ``urlpatterns``, you can use the
-first argument to the ``patterns()`` function to specify a prefix to apply to
-each view function.
-
-With this in mind, the above example can be written more concisely as::
-
-    from django.conf.urls import patterns, url
-
-    urlpatterns = patterns('news.views',
-        url(r'^articles/([0-9]{4})/$', 'year_archive'),
-        url(r'^articles/([0-9]{4})/([0-9]{2})/$', 'month_archive'),
-        url(r'^articles/([0-9]{4})/([0-9]{2})/([0-9]+)/$', 'article_detail'),
-    )
-
-Note that you don't put a trailing dot (``"."``) in the prefix. Django puts
-that in automatically.
-
-The remaining arguments should be tuples in this format::
-
-    (regular expression, Python callback function [, optional_dictionary [, optional_name]])
-
-The ``optional_dictionary`` and ``optional_name`` parameters are described in
-:ref:`Passing extra options to view functions <views-extra-options>`.
-
-.. note::
-    Because ``patterns()`` is a function call, it accepts a maximum of 255
-    arguments (URL patterns, in this case). This is a limit for all Python
-    function calls. This is rarely a problem in practice, because you'll
-    typically structure your URL patterns modularly by using ``include()``
-    sections. However, on the off-chance you do hit the 255-argument limit,
-    realize that ``patterns()`` returns a Python list, so you can split up the
-    construction of the list.
-
-    ::
-
-        urlpatterns = patterns('',
-            ...
-            )
-        urlpatterns += patterns('',
-            ...
-            )
-
-    Python lists have unlimited size, so there's no limit to how many URL
-    patterns you can construct. The only limit is that you can only create 254
-    at a time (the 255th argument is the initial prefix argument).
-
-static()
---------
+``static()``
+============
 
 .. function:: static.static(prefix, view=django.views.static.serve, **kwargs)
 
@@ -89,26 +18,31 @@ Helper function to return a URL pattern for serving files in debug mode::
         # ... the rest of your URLconf goes here ...
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-.. versionchanged:: 1.8
+``url()``
+=========
 
-    The ``view`` argument changed from a string
-    (``'django.views.static.serve'``) to the function.
-
-url()
------
-
-.. function:: url(regex, view, kwargs=None, name=None, prefix='')
+.. function:: url(regex, view, kwargs=None, name=None)
 
 ``urlpatterns`` should be a list of ``url()`` instances. For example::
 
+    from django.conf.urls import include, url
+
     urlpatterns = [
-        url(r'^index/$', index_view, name="main-view"),
+        url(r'^index/$', index_view, name='main-view'),
+        url(r'^weblog/', include('blog.urls')),
         ...
     ]
 
-This function takes five arguments, most of which are optional::
+The ``regex`` parameter should be a string or
+:func:`~django.utils.translation.ugettext_lazy()` (see
+:ref:`translating-urlpatterns`) that contains a regular expression compatible
+with Python's :py:mod:`re` module. Strings typically use raw string syntax
+(``r''``) so that they can contain sequences like ``\d`` without the need to
+escape the backslash with another backslash.
 
-    url(regex, view, kwargs=None, name=None, prefix='')
+The ``view`` parameter is a view function or the result of
+:meth:`~django.views.generic.base.View.as_view` for class-based views. It can
+also be an :func:`include`.
 
 The ``kwargs`` parameter allows you to pass additional arguments to the view
 function or method. See :ref:`views-extra-options` for an example.
@@ -116,36 +50,29 @@ function or method. See :ref:`views-extra-options` for an example.
 See :ref:`Naming URL patterns <naming-url-patterns>` for why the ``name``
 parameter is useful.
 
-.. deprecated:: 1.8
+``include()``
+=============
 
-    Support for string ``view`` arguments is deprecated and will be removed in
-    Django 2.0. Pass the callable  instead.
-
-    The ``prefix`` parameter has the same meaning as the first argument to
-    ``patterns()`` and is only relevant when you're passing a string as the
-    ``view`` parameter.
-
-include()
----------
-
-.. function:: include(module[, namespace=None, app_name=None])
+.. function:: include(module, namespace=None)
               include(pattern_list)
-              include((pattern_list, app_namespace, instance_namespace))
+              include((pattern_list, app_namespace), namespace=None)
 
     A function that takes a full Python import path to another URLconf module
     that should be "included" in this place. Optionally, the :term:`application
     namespace` and :term:`instance namespace` where the entries will be included
     into can also be specified.
 
+    Usually, the application namespace should be specified by the included
+    module. If an application namespace is set, the ``namespace`` argument
+    can be used to set a different instance namespace.
+
     ``include()`` also accepts as an argument either an iterable that returns
-    URL patterns or a 3-tuple containing such iterable plus the names of the
-    application and instance namespaces.
+    URL patterns or a 2-tuple containing such iterable plus the names of the
+    application namespaces.
 
     :arg module: URLconf module (or module name)
     :arg namespace: Instance namespace for the URL entries being included
     :type namespace: string
-    :arg app_name: Application namespace for the URL entries being included
-    :type app_name: string
     :arg pattern_list: Iterable of :func:`django.conf.urls.url` instances
     :arg app_namespace: Application namespace for the URL entries being included
     :type app_namespace: string
@@ -154,8 +81,8 @@ include()
 
 See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
 
-handler400
-----------
+``handler400``
+==============
 
 .. data:: handler400
 
@@ -163,14 +90,12 @@ A callable, or a string representing the full Python import path to the view
 that should be called if the HTTP client has sent a request that caused an error
 condition and a response with a status code of 400.
 
-By default, this is ``'django.views.defaults.bad_request'``. That default
-value should suffice.
+By default, this is :func:`django.views.defaults.bad_request`. If you
+implement a custom view, be sure it returns an
+:class:`~django.http.HttpResponseBadRequest`.
 
-See the documentation about :ref:`the 400 (bad request) view
-<http_bad_request_view>` for more information.
-
-handler403
-----------
+``handler403``
+==============
 
 .. data:: handler403
 
@@ -178,28 +103,24 @@ A callable, or a string representing the full Python import path to the view
 that should be called if the user doesn't have the permissions required to
 access a resource.
 
-By default, this is ``'django.views.defaults.permission_denied'``. That default
-value should suffice.
+By default, this is :func:`django.views.defaults.permission_denied`. If you
+implement a custom view, be sure it returns an
+:class:`~django.http.HttpResponseForbidden`.
 
-See the documentation about :ref:`the 403 (HTTP Forbidden) view
-<http_forbidden_view>` for more information.
-
-handler404
-----------
+``handler404``
+==============
 
 .. data:: handler404
 
 A callable, or a string representing the full Python import path to the view
 that should be called if none of the URL patterns match.
 
-By default, this is ``'django.views.defaults.page_not_found'``. That default
-value should suffice.
+By default, this is :func:`django.views.defaults.page_not_found`. If you
+implement a custom view, be sure it returns an
+:class:`~django.http.HttpResponseNotFound`.
 
-See the documentation about :ref:`the 404 (HTTP Not Found) view
-<http_not_found_view>` for more information.
-
-handler500
-----------
+``handler500``
+==============
 
 .. data:: handler500
 
@@ -207,8 +128,6 @@ A callable, or a string representing the full Python import path to the view
 that should be called in case of server errors. Server errors happen when you
 have runtime errors in view code.
 
-By default, this is ``'django.views.defaults.server_error'``. That default
-value should suffice.
-
-See the documentation about :ref:`the 500 (HTTP Internal Server Error) view
-<http_internal_server_error_view>` for more information.
+By default, this is :func:`django.views.defaults.server_error`. If you
+implement a custom view, be sure it returns an
+:class:`~django.http.HttpResponseServerError`.

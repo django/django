@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Django JavaScript Tests</title>
+    <link rel="stylesheet" href="./qunit/qunit.css">
+</head>
+<body>
+
+    <div id="qunit"></div>
+    <div id="qunit-fixture">
+    </div>
+    <script type="text/html" id="result-table">
+        <table id="result_list">
+            <tr>
+                <th>
+                   <input type="checkbox" id="action-toggle">
+                </th>
+            </tr>
+            <tr>
+                <td class="action-checkbox">
+                    <input class="action-select" type="checkbox" value="618">
+                </td>
+            </tr>
+        </table>
+    </script>
+    <script type="text/html" id="tabular-formset">
+        <input id="id_first-TOTAL_FORMS" value="1">
+        <input id="id_first-MAX_NUM_FORMS" value="">
+        <table class="inline">
+            <tr id="first-0" class="form-row">
+                <td class="field-test_field">
+                    <input id="id_first-test_field">
+                </td>
+            </tr>
+            <tr id="first-empty" class="empty-row">
+                <td class="field-test_field">
+                    <input id="id_first-test_field">
+                </td>
+            </tr>
+        </table>
+    </script>
+
+    <script src="./qunit/qunit.js"></script>
+
+    <script src='../django/contrib/admin/static/admin/js/vendor/jquery/jquery.min.js'></script>
+    <script src='../django/contrib/admin/static/admin/js/jquery.init.js'></script>
+    <script src='./admin/jsi18n-mocks.test.js'></script>
+
+    <script src='../django/contrib/admin/static/admin/js/core.js' data-cover></script>
+    <script src='./admin/core.test.js'></script>
+
+    <script src='../django/contrib/admin/static/admin/js/timeparse.js' data-cover></script>
+    <script src='./admin/timeparse.test.js'></script>
+
+    <script src='../django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js' data-cover></script>
+    <script src='./admin/RelatedObjectLookups.test.js'></script>
+
+    <script src='./admin/DateTimeShortcuts.test.js'></script>
+    <script src='../django/contrib/admin/static/admin/js/calendar.js' data-cover></script>
+    <script src='../django/contrib/admin/static/admin/js/admin/DateTimeShortcuts.js' data-cover></script>
+
+    <script src='../django/contrib/admin/static/admin/js/actions.js' data-cover></script>
+    <script src='./admin/actions.test.js'></script>
+
+    <script src='../django/contrib/admin/static/admin/js/SelectBox.js' data-cover></script>
+    <script src='./admin/SelectBox.test.js'></script>
+
+    <script src='../django/contrib/admin/static/admin/js/SelectFilter2.js' data-cover></script>
+    <script src='./admin/SelectFilter2.test.js'></script>
+
+    <script src='../django/contrib/admin/static/admin/js/inlines.js' data-cover></script>
+    <script src='./admin/inlines.test.js'></script>
+
+    <script src='../django/contrib/admin/static/admin/js/actions.js' data-cover></script>
+    <script src='../django/contrib/admin/static/admin/js/collapse.js' data-cover></script>
+    <script src='../django/contrib/admin/static/admin/js/prepopulate.js' data-cover></script>
+    <script src='../django/contrib/admin/static/admin/js/urlify.js' data-cover></script>
+
+    <div id="id_point_map" style="display:none;">
+        <textarea id="id_point" name="point" class="vSerializedField required"
+                  style="display:none;" rows="10" cols="150"
+        >{&quot;type&quot;: &quot;Point&quot;, &quot;coordinates&quot;: [7.8177, 47.397]}</textarea>
+    </div>
+    <div id="id_multipolygon_map" style="display:none;">
+        <textarea id="id_multipolygon" name="multipolygon" class="vSerializedField required"
+                  style="display:none;" rows="10" cols="150"></textarea>
+    </div>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/ol3/3.20.0/ol.js'></script>
+    <script src='../django/contrib/gis/static/gis/js/OLMapWidget.js' data-cover></script>
+    <script src='./gis/mapwidget.test.js'></script>
+
+</body>
+</html>

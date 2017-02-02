@@ -2,18 +2,19 @@
 The GeoDjango GEOS module.  Please consult the GeoDjango documentation
 for more details: https://docs.djangoproject.com/en/dev/ref/contrib/gis/geos/
 """
-from .collections import GeometryCollection, MultiPoint, MultiLineString, MultiPolygon  # NOQA
-from .error import GEOSException, GEOSIndexError  # NOQA
+from .collections import (  # NOQA
+    GeometryCollection, MultiLineString, MultiPoint, MultiPolygon,
+)
+from .error import GEOSException  # NOQA
 from .factory import fromfile, fromstr  # NOQA
-from .geometry import GEOSGeometry, wkt_regex, hex_regex  # NOQA
-from .io import WKTReader, WKTWriter, WKBReader, WKBWriter  # NOQA
+from .geometry import GEOSGeometry, hex_regex, wkt_regex  # NOQA
+from .io import WKBReader, WKBWriter, WKTReader, WKTWriter  # NOQA
 from .libgeos import geos_version, geos_version_info  # NOQA
-from .linestring import LineString, LinearRing  # NOQA
+from .linestring import LinearRing, LineString  # NOQA
 from .point import Point  # NOQA
 from .polygon import Polygon  # NOQA
 
 try:
-    geos_version_info()
-    HAS_GEOS = True
+    HAS_GEOS = geos_version_info()['version'] >= '3.3.0'
 except ImportError:
     HAS_GEOS = False

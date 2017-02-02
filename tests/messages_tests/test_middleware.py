@@ -4,15 +4,14 @@ from django import http
 from django.contrib.messages.middleware import MessageMiddleware
 
 
-class MiddlewareTest(unittest.TestCase):
+class MiddlewareTests(unittest.TestCase):
 
     def setUp(self):
         self.middleware = MessageMiddleware()
 
     def test_response_without_messages(self):
         """
-        Makes sure that the response middleware is tolerant of messages not
-        existing on request.
+        MessageMiddleware is tolerant of messages not existing on request.
         """
         request = http.HttpRequest()
         response = http.HttpResponse()

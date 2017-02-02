@@ -23,6 +23,7 @@ def units_func(f):
     """
     return double_output(f, [c_void_p, POINTER(c_char_p)], strarg=True)
 
+
 # Creation & destruction.
 clone_srs = srs_output(std_call('OSRClone'), [c_void_p])
 new_srs = srs_output(std_call('OSRNewSpatialReference'), [c_char_p])
@@ -54,17 +55,18 @@ linear_units = units_func(lgdal.OSRGetLinearUnits)
 angular_units = units_func(lgdal.OSRGetAngularUnits)
 
 # For exporting to WKT, PROJ.4, "Pretty" WKT, and XML.
-to_wkt = string_output(std_call('OSRExportToWkt'), [c_void_p, POINTER(c_char_p)], decoding='ascii')
+to_wkt = string_output(std_call('OSRExportToWkt'), [c_void_p, POINTER(c_char_p)], decoding='utf-8')
 to_proj = string_output(std_call('OSRExportToProj4'), [c_void_p, POINTER(c_char_p)], decoding='ascii')
-to_pretty_wkt = string_output(std_call('OSRExportToPrettyWkt'),
-    [c_void_p, POINTER(c_char_p), c_int], offset=-2, decoding='ascii'
+to_pretty_wkt = string_output(
+    std_call('OSRExportToPrettyWkt'),
+    [c_void_p, POINTER(c_char_p), c_int], offset=-2, decoding='utf-8'
 )
 
 # Memory leak fixed in GDAL 1.5; still exists in 1.4.
-to_xml = string_output(lgdal.OSRExportToXML, [c_void_p, POINTER(c_char_p), c_char_p], offset=-2, decoding='ascii')
+to_xml = string_output(lgdal.OSRExportToXML, [c_void_p, POINTER(c_char_p), c_char_p], offset=-2, decoding='utf-8')
 
 # String attribute retrival routines.
-get_attr_value = const_string_output(std_call('OSRGetAttrValue'), [c_void_p, c_char_p, c_int], decoding='ascii')
+get_attr_value = const_string_output(std_call('OSRGetAttrValue'), [c_void_p, c_char_p, c_int], decoding='utf-8')
 get_auth_name = const_string_output(lgdal.OSRGetAuthorityName, [c_void_p, c_char_p], decoding='ascii')
 get_auth_code = const_string_output(lgdal.OSRGetAuthorityCode, [c_void_p, c_char_p], decoding='ascii')
 

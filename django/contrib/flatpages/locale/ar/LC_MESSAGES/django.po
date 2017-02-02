@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Bashar Al-Abdulhadi, 2015
 # Bashar Al-Abdulhadi, 2014
 # Eyad Toma <d.eyad.t@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -9,11 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Arabic (http://www.transifex.com/projects/p/django/language/"
-"ar/)\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-27 21:27+0000\n"
+"Last-Translator: Bashar Al-Abdulhadi\n"
+"Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -76,6 +76,9 @@ msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "إذا كان هذا الخيار محددا، فإن المستخدمين الداخلين فقط سيتمكنون من مشاهدة "
 "الصفحة."
+
+msgid "sites"
+msgstr "المواقع"
 
 msgid "flat page"
 msgstr "صفحة مسطحة"

@@ -36,15 +36,17 @@ For historical reasons, both the generic support for template engines and the
 implementation of the Django template language live in the ``django.template``
 namespace.
 
+.. warning::
+
+    The template system isn't safe against untrusted template authors. For
+    example, a site shouldn't allow its users to provide their own templates,
+    since template authors can do things like perform XSS attacks and access
+    properties of template variables that may contain sensitive information.
+
 .. _template-engines:
 
 Support for template engines
 ============================
-
-.. versionadded:: 1.8
-
-    Support for multiple template engines and the :setting:`TEMPLATES` setting
-    were added in Django 1.8.
 
 Configuration
 -------------
@@ -95,7 +97,7 @@ Usage
 
 The ``django.template.loader`` module defines two functions to load templates.
 
-.. function:: get_template(template_name[, dirs][, using])
+.. function:: get_template(template_name, using=None)
 
     This function loads the template with the given name and returns a
     ``Template`` object.
@@ -115,37 +117,11 @@ The ``django.template.loader`` module defines two functions to load templates.
     If you want to restrict the search to a particular template engine, pass
     the engine's :setting:`NAME <TEMPLATES-NAME>` in the ``using`` argument.
 
-    .. deprecated:: 1.8
-
-       The ``dirs`` parameter was deprecated.
-
-    .. versionchanged:: 1.8
-
-       The ``using`` parameter was added.
-
-    .. versionchanged:: 1.8
-
-        ``get_template()`` returns a backend-dependent ``Template`` instead
-        of a :class:`django.template.Template`.
-
-.. function:: select_template(template_name_list[, dirs][, using])
+.. function:: select_template(template_name_list, using=None)
 
     ``select_template()`` is just like ``get_template()``, except it takes a
     list of template names. It tries each name in order and returns the first
     template that exists.
-
-    .. deprecated:: 1.8
-
-       The ``dirs`` parameter was deprecated.
-
-    .. versionchanged:: 1.8
-
-       The ``using`` parameter was added.
-
-    .. versionchanged:: 1.8
-
-        ``select_template()`` returns a backend-dependent ``Template`` instead
-        of a :class:`django.template.Template`.
 
 .. currentmodule:: django.template
 
@@ -172,10 +148,6 @@ If loading a template fails, the following two exceptions, defined in
         exceptions raised when trying to load a template. This is used by
         functions, such as :func:`~django.template.loader.get_template`, that
         try to load a given template from multiple engines.
-
-    .. versionadded:: 1.9
-
-        The ``backend``, ``tried``, and ``chain`` arguments were added.
 
 .. exception:: TemplateSyntaxError(msg)
 
@@ -269,7 +241,7 @@ the following templates:
 In addition, to cut down on the repetitive nature of loading and rendering
 templates, Django provides a shortcut function which automates the process.
 
-.. function:: render_to_string(template_name[, context][, context_instance][, request][, using])
+.. function:: render_to_string(template_name, context=None, request=None, using=None)
 
     ``render_to_string()`` loads a template like :func:`get_template` and
     calls its ``render()`` method immediately. It takes the following
@@ -283,35 +255,21 @@ templates, Django provides a shortcut function which automates the process.
     ``context``
         A :class:`dict` to be used as the template's context for rendering.
 
-        .. versionchanged:: 1.8
-
-            The ``context`` argument used to be called ``dictionary``. That name
-            is deprecated in Django 1.8 and will be removed in Django 2.0.
-
-            ``context`` is now optional. An empty context will be used if it
-            isn't provided.
-
-    ``context_instance``
-        An instance of :class:`~django.template.Context` or a subclass (e.g., an
-        instance of :class:`~django.template.RequestContext`) to use as the
-        template's context.
-
-        .. deprecated:: 1.8
-
-            The ``context_instance`` argument is deprecated. Use ``context`` and
-            if needed ``request``.
-
     ``request``
         An optional :class:`~django.http.HttpRequest` that will be available
         during the template's rendering process.
 
-        .. versionadded:: 1.8
+    ``using``
+        An optional template engine :setting:`NAME <TEMPLATES-NAME>`. The
+        search for the template will be restricted to that engine.
 
-            The ``request`` argument was added.
+    Usage example::
 
-See also the :func:`~django.shortcuts.render()` and
-:func:`~django.shortcuts.render_to_response()` shortcuts, which call
-:func:`render_to_string()` and feed the result into an
+        from django.template.loader import render_to_string
+        rendered = render_to_string('my_template.html', {'foo': 'bar'})
+
+See also the :func:`~django.shortcuts.render()` shortcut which calls
+:func:`render_to_string()` and feeds the result into an
 :class:`~django.http.HttpResponse` suitable for returning from a view.
 
 Finally, you can use configured engines directly:
@@ -348,20 +306,14 @@ applications. This generic name was kept for backwards-compatibility.
 ``DjangoTemplates`` engines accept the following :setting:`OPTIONS
 <TEMPLATES-OPTIONS>`:
 
-* ``'allowed_include_roots'``: a list of strings representing allowed prefixes
-  for the ``{% ssi %}`` template tag. This is a security measure, so that
-  template authors can't access files that they shouldn't be accessing.
+* ``'autoescape'``: a boolean that controls whether HTML autoescaping is
+  enabled.
 
-  For example, if ``'allowed_include_roots'`` is ``['/home/html',
-  '/var/www']``, then ``{% ssi /home/html/foo.txt %}`` would work, but ``{%
-  ssi /etc/passwd %}`` wouldn't.
+  It defaults to ``True``.
 
-  It defaults to an empty list.
+  .. warning::
 
-  .. deprecated:: 1.8
-
-      ``allowed_include_roots`` is deprecated because the {% ssi %} tag is
-      deprecated.
+      Only set it to ``False`` if you're rendering non-HTML templates!
 
 * ``'context_processors'``: a list of dotted Python paths to callables that
   are used to populate the context when a template is rendered with a request.
@@ -425,10 +377,6 @@ applications. This generic name was kept for backwards-compatibility.
   Tags and filters from built-in libraries can be used without first calling
   the :ttag:`{% load %} <load>` tag.
 
-.. versionadded:: 1.9
-
-    The ``libraries`` and ``builtins`` arguments were added.
-
 .. module:: django.template.backends.jinja2
 
 .. class:: Jinja2
@@ -457,17 +405,32 @@ adds defaults that differ from Jinja2's for a few options:
 * ``'auto_reload'``: ``settings.DEBUG``
 * ``'undefined'``: ``DebugUndefined if settings.DEBUG else Undefined``
 
-The default configuration is purposefully kept to a minimum. The ``Jinja2``
-backend doesn't create a Django-flavored environment. It doesn't know about
-Django context processors, filters, and tags. In order to use Django-specific
-APIs, you must configure them into the environment.
+``Jinja2`` engines also accept the following :setting:`OPTIONS
+<TEMPLATES-OPTIONS>`:
+
+* ``'context_processors'``: a list of dotted Python paths to callables that
+  are used to populate the context when a template is rendered with a request.
+  These callables take a request object as their argument and return a
+  :class:`dict` of items to be merged into the context.
+
+  It defaults to an empty list.
+
+.. versionadded:: 1.11
+
+    The ``'context_processors'`` option was added.
+
+The default configuration is purposefully kept to a minimum. If a template is
+rendered with a request (e.g. when using :py:func:`~django.shortcuts.render`),
+the ``Jinja2`` backend adds the globals ``request``, ``csrf_input``, and
+``csrf_token`` to the context. Apart from that, this backend doesn't create a
+Django-flavored environment. It doesn't know about Django filters and tags.
+In order to use Django-specific APIs, you must configure them into the
+environment.
 
 For example, you can create ``myproject/jinja2.py`` with this content::
 
-    from __future__ import absolute_import  # Python 2 only
-
     from django.contrib.staticfiles.storage import staticfiles_storage
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
 
     from jinja2 import Environment
 
@@ -523,7 +486,7 @@ fictional ``foobar`` template library::
         def __init__(self, params):
             params = params.copy()
             options = params.pop('OPTIONS').copy()
-            super(FooBar, self).__init__(params)
+            super().__init__(params)
 
             self.engine = foobar.Engine(**options)
 
@@ -562,10 +525,6 @@ See `DEP 182`_ for more information.
 
 Debug integration for custom engines
 ------------------------------------
-
-.. versionadded:: 1.9
-
-    Debug page integration for non-Django template engines was added.
 
 The Django debug page has hooks to provide detailed information when a template
 error arises. Custom template engines can use these hooks to enhance the
@@ -845,5 +804,5 @@ Django provides many :ref:`built-in context processors <context-processors>`.
 Implementing a custom context processor is as simple as defining a function.
 
 .. _Jinja2: http://jinja.pocoo.org/
-.. _DEP 182: https://github.com/django/deps/blob/master/accepted/0182-multiple-template-engines.rst
+.. _DEP 182: https://github.com/django/deps/blob/master/final/0182-multiple-template-engines.rst
 .. _Django Debug Toolbar: https://github.com/django-debug-toolbar/django-debug-toolbar

@@ -1,11 +1,8 @@
-from __future__ import unicode_literals
-
 import datetime
 import pickle
-import warnings
 
+from django.db import models
 from django.test import TestCase
-from django.utils.encoding import force_text
 from django.utils.version import get_version
 
 from .models import Container, Event, Group, Happening, M2MModel
@@ -28,7 +25,7 @@ class PickleabilityTestCase(TestCase):
     def test_datetime_callable_default_filter(self):
         self.assert_pickles(Happening.objects.filter(when=datetime.datetime.now()))
 
-    def test_lambda_as_default(self):
+    def test_string_as_default(self):
         self.assert_pickles(Happening.objects.filter(name="test"))
 
     def test_standalone_method_as_default(self):
@@ -36,12 +33,6 @@ class PickleabilityTestCase(TestCase):
 
     def test_staticmethod_as_default(self):
         self.assert_pickles(Happening.objects.filter(number2=1))
-
-    def test_classmethod_as_default(self):
-        self.assert_pickles(Happening.objects.filter(number3=1))
-
-    def test_membermethod_as_default(self):
-        self.assert_pickles(Happening.objects.filter(number4=1))
 
     def test_filter_reverse_fk(self):
         self.assert_pickles(Group.objects.filter(event=1))
@@ -61,7 +52,7 @@ class PickleabilityTestCase(TestCase):
 
     def test_model_pickle(self):
         """
-        Test that a model not defined on module level is pickleable.
+        A model not defined on module level is picklable.
         """
         original = Container.SomeModel(pk=1)
         dumped = pickle.dumps(original)
@@ -91,8 +82,7 @@ class PickleabilityTestCase(TestCase):
     def test_model_pickle_dynamic(self):
         class Meta:
             proxy = True
-        dynclass = type(str("DynamicEventSubclass"), (Event, ),
-                        {'Meta': Meta, '__module__': Event.__module__})
+        dynclass = type("DynamicEventSubclass", (Event, ), {'Meta': Meta, '__module__': Event.__module__})
         original = dynclass(pk=1)
         dumped = pickle.dumps(original)
         reloaded = pickle.loads(dumped)
@@ -113,11 +103,58 @@ class PickleabilityTestCase(TestCase):
 
         # First pickling
         groups = pickle.loads(pickle.dumps(groups))
-        self.assertQuerysetEqual(groups, [g], lambda x: x)
+        self.assertSequenceEqual(groups, [g])
 
         # Second pickling
         groups = pickle.loads(pickle.dumps(groups))
-        self.assertQuerysetEqual(groups, [g], lambda x: x)
+        self.assertSequenceEqual(groups, [g])
+
+    def test_pickle_prefetch_queryset_usable_outside_of_prefetch(self):
+        # Prefetch shouldn't affect the fetch-on-pickle behavior of the
+        # queryset passed to it.
+        Group.objects.create(name='foo')
+        events = Event.objects.order_by('id')
+        Group.objects.prefetch_related(models.Prefetch('event_set', queryset=events))
+        with self.assertNumQueries(1):
+            events2 = pickle.loads(pickle.dumps(events))
+        with self.assertNumQueries(0):
+            list(events2)
+
+    def test_pickle_prefetch_queryset_still_usable(self):
+        g = Group.objects.create(name='foo')
+        groups = Group.objects.prefetch_related(
+            models.Prefetch('event_set', queryset=Event.objects.order_by('id'))
+        )
+        groups2 = pickle.loads(pickle.dumps(groups))
+        self.assertSequenceEqual(groups2.filter(id__gte=0), [g])
+
+    def test_pickle_prefetch_queryset_not_evaluated(self):
+        Group.objects.create(name='foo')
+        groups = Group.objects.prefetch_related(
+            models.Prefetch('event_set', queryset=Event.objects.order_by('id'))
+        )
+        list(groups)  # evaluate QuerySet
+        with self.assertNumQueries(0):
+            pickle.loads(pickle.dumps(groups))
+
+    def test_pickle_prefetch_related_with_m2m_and_objects_deletion(self):
+        """
+        #24831 -- Cached properties on ManyToOneRel created in QuerySet.delete()
+        caused subsequent QuerySet pickling to fail.
+        """
+        g = Group.objects.create(name='foo')
+        m2m = M2MModel.objects.create()
+        m2m.groups.add(g)
+        Group.objects.all().delete()
+
+        m2ms = M2MModel.objects.prefetch_related('groups')
+        m2ms = pickle.loads(pickle.dumps(m2ms))
+        self.assertSequenceEqual(m2ms, [m2m])
+
+    def test_annotation_with_callable_default(self):
+        # Happening.when has a callable default of datetime.datetime.now.
+        qs = Happening.objects.annotate(latest_time=models.Max('when'))
+        self.assert_pickles(qs)
 
     def test_missing_django_version_unpickling(self):
         """
@@ -125,11 +162,9 @@ class PickleabilityTestCase(TestCase):
         unpickled without a Django version
         """
         qs = Group.missing_django_version_objects.all()
-        with warnings.catch_warnings(record=True) as recorded:
+        msg = "Pickled queryset instance's Django version is not specified."
+        with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(qs))
-            msg = force_text(recorded.pop().message)
-            self.assertEqual(msg,
-                "Pickled queryset instance's Django version is not specified.")
 
     def test_unsupported_unpickle(self):
         """
@@ -137,11 +172,45 @@ class PickleabilityTestCase(TestCase):
         unpickled with a different Django version than the current
         """
         qs = Group.previous_django_version_objects.all()
-        with warnings.catch_warnings(record=True) as recorded:
+        msg = "Pickled queryset instance's Django version 1.0 does not match the current version %s." % get_version()
+        with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(qs))
-            msg = force_text(recorded.pop().message)
-            self.assertEqual(
-                msg,
-                "Pickled queryset instance's Django version 1.0 does not "
-                "match the current version %s." % get_version()
-            )
+
+
+class InLookupTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        for i in range(1, 3):
+            group = Group.objects.create(name='Group {}'.format(i))
+        cls.e1 = Event.objects.create(title='Event 1', group=group)
+
+    def test_in_lookup_queryset_evaluation(self):
+        """
+        Neither pickling nor unpickling a QuerySet.query with an __in=inner_qs
+        lookup should evaluate inner_qs.
+        """
+        events = Event.objects.filter(group__in=Group.objects.all())
+
+        with self.assertNumQueries(0):
+            dumped = pickle.dumps(events.query)
+
+        with self.assertNumQueries(0):
+            reloaded = pickle.loads(dumped)
+            reloaded_events = Event.objects.none()
+            reloaded_events.query = reloaded
+
+        self.assertSequenceEqual(reloaded_events, [self.e1])
+
+    def test_in_lookup_query_evaluation(self):
+        events = Event.objects.filter(group__in=Group.objects.values('id').query)
+
+        with self.assertNumQueries(0):
+            dumped = pickle.dumps(events.query)
+
+        with self.assertNumQueries(0):
+            reloaded = pickle.loads(dumped)
+            reloaded_events = Event.objects.none()
+            reloaded_events.query = reloaded
+
+        self.assertSequenceEqual(reloaded_events, [self.e1])

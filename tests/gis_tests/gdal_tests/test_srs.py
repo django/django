@@ -13,6 +13,9 @@ class TestSRS:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+
+WGS84_proj = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
+
 # Some Spatial Reference examples
 srlist = (
     TestSRS(
@@ -20,7 +23,6 @@ srlist = (
         'AUTHORITY["EPSG","7030"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6326"]],'
         'PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",'
         '0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]',
-        proj='+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ',
         epsg=4326, projected=False, geographic=True, local=False,
         lin_name='unknown', ang_name='degree', lin_units=1.0, ang_units=0.0174532925199,
         auth={'GEOGCS': ('EPSG', '4326'), 'spheroid': ('EPSG', '7030')},
@@ -38,7 +40,7 @@ srlist = (
         'PARAMETER["central_meridian",-99],PARAMETER["false_easting",600000],'
         'PARAMETER["false_northing",4000000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],'
         'AUTHORITY["EPSG","32140"]]',
-        proj=None, epsg=32140, projected=True, geographic=False, local=False,
+        epsg=32140, projected=True, geographic=False, local=False,
         lin_name='metre', ang_name='degree', lin_units=1.0, ang_units=0.0174532925199,
         auth={'PROJCS': ('EPSG', '32140'), 'spheroid': ('EPSG', '7019'), 'unit': ('EPSG', '9001')},
         attr=(
@@ -56,7 +58,7 @@ srlist = (
         'PARAMETER["Central_Meridian",-99.0],PARAMETER["Standard_Parallel_1",28.38333333333333],'
         'PARAMETER["Standard_Parallel_2",30.28333333333334],PARAMETER["Latitude_Of_Origin",27.83333333333333],'
         'UNIT["Foot_US",0.3048006096012192]]',
-        proj=None, epsg=None, projected=True, geographic=False, local=False,
+        epsg=None, projected=True, geographic=False, local=False,
         lin_name='Foot_US', ang_name='Degree', lin_units=0.3048006096012192, ang_units=0.0174532925199,
         auth={'PROJCS': (None, None)},
         attr=(('PROJCS|GeOgCs|spheroid', 'GRS_1980'), (('projcs', 9), 'UNIT'), (('projcs', 11), None),),
@@ -64,7 +66,7 @@ srlist = (
     # This is really ESRI format, not WKT -- but the import should work the same
     TestSRS(
         'LOCAL_CS["Non-Earth (Meter)",LOCAL_DATUM["Local Datum",0],UNIT["Meter",1.0],AXIS["X",EAST],AXIS["Y",NORTH]]',
-        esri=True, proj=None, epsg=None, projected=False, geographic=False, local=True,
+        esri=True, epsg=None, projected=False, geographic=False, local=True,
         lin_name='Meter', ang_name='degree', lin_units=1.0, ang_units=0.0174532925199,
         attr=(('LOCAL_DATUM', 'Local Datum'), ('unit', 'Meter')),
     ),
@@ -173,11 +175,13 @@ class SpatialRefTest(unittest.TestCase):
 
     def test04_proj(self):
         "Test PROJ.4 import and export."
-        for s in srlist:
-            if s.proj:
-                srs1 = SpatialReference(s.wkt)
-                srs2 = SpatialReference(s.proj)
-                self.assertEqual(srs1.proj, srs2.proj)
+        proj_parts = [
+            '+proj=longlat', '+ellps=WGS84', '+towgs84=0,0,0,0,0,0,0', '+datum=WGS84', '+no_defs'
+        ]
+        srs1 = SpatialReference(srlist[0].wkt)
+        srs2 = SpatialReference(WGS84_proj)
+        self.assertTrue(all([part in proj_parts for part in srs1.proj.split()]))
+        self.assertTrue(all([part in proj_parts for part in srs2.proj.split()]))
 
     def test05_epsg(self):
         "Test EPSG import."
@@ -242,17 +246,39 @@ class SpatialRefTest(unittest.TestCase):
     def test12_coordtransform(self):
         "Testing initialization of a CoordTransform."
         target = SpatialReference('WGS84')
-        for s in srlist:
-            if s.proj:
-                CoordTransform(SpatialReference(s.wkt), target)
+        CoordTransform(SpatialReference(srlist[0].wkt), target)
 
     def test13_attr_value(self):
         "Testing the attr_value() method."
         s1 = SpatialReference('WGS84')
-        self.assertRaises(TypeError, s1.__getitem__, 0)
-        self.assertRaises(TypeError, s1.__getitem__, ('GEOGCS', 'foo'))
+        with self.assertRaises(TypeError):
+            s1.__getitem__(0)
+        with self.assertRaises(TypeError):
+            s1.__getitem__(('GEOGCS', 'foo'))
         self.assertEqual('WGS 84', s1['GEOGCS'])
         self.assertEqual('WGS_1984', s1['DATUM'])
         self.assertEqual('EPSG', s1['AUTHORITY'])
         self.assertEqual(4326, int(s1['AUTHORITY', 1]))
         self.assertIsNone(s1['FOOBAR'])
+
+    def test_unicode(self):
+        wkt = (
+            'PROJCS["DHDN / Soldner 39 Langschoß",'
+            'GEOGCS["DHDN",DATUM["Deutsches_Hauptdreiecksnetz",'
+            'SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6314"]],'
+            'PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],'
+            'UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],'
+            'AUTHORITY["EPSG","4314"]],UNIT["metre",1,AUTHORITY["EPSG","9001"]],'
+            'PROJECTION["Cassini_Soldner"],PARAMETER["latitude_of_origin",50.66738711],'
+            'PARAMETER["central_meridian",6.28935703],PARAMETER["false_easting",0],'
+            'PARAMETER["false_northing",0],AUTHORITY["mj10777.de","187939"],AXIS["x",NORTH],AXIS["y",EAST]]'
+        )
+        srs = SpatialReference(wkt)
+        srs_list = [srs, srs.clone()]
+        srs.import_wkt(wkt)
+
+        for srs in srs_list:
+            self.assertEqual(srs.name, 'DHDN / Soldner 39 Langschoß')
+            self.assertEqual(srs.wkt, wkt)
+            self.assertIn('Langschoß', srs.pretty_wkt)
+            self.assertIn('Langschoß', srs.xml)

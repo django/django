@@ -3,21 +3,24 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Алексей Борискин <sun.void@gmail.com>, 2012-2015
+# Андрей Щуров <shurov9009@gmail.com>, 2016
+# Дмитрий Шатера <mr.bobsans@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-21 12:31+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
-"Language-Team: Russian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-24 20:40+0000\n"
+"Last-Translator: Дмитрий Шатера <mr.bobsans@gmail.com>\n"
+"Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
 
 msgid "Personal info"
 msgstr "Персональная информация"
@@ -42,6 +45,12 @@ msgstr "Изменить пароль: %s"
 msgid "Authentication and Authorization"
 msgstr "Пользователи и группы"
 
+msgid "password"
+msgstr "пароль"
+
+msgid "last login"
+msgstr "последний вход"
+
 msgid "No password set."
 msgstr "Пароль не задан."
 
@@ -57,17 +66,17 @@ msgstr "Пароль"
 msgid "Password confirmation"
 msgstr "Подтверждение пароля"
 
-msgid "Enter the same password as above, for verification."
-msgstr "Введите тот же пароль, что и выше, для подтверждения."
+msgid "Enter the same password as before, for verification."
+msgstr "Для подтверждения введите, пожалуйста, пароль ещё раз."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
-"Пароли не хранятся в открытом виде, поэтому нет возможности увидеть пароль "
-"этого пользователя. Но вы можете изменить пароль используя <a href="
-"\"password/\">эту форму</a>."
+"Пароли хранятся в защищённом виде, так что у нас нет способа узнать пароль "
+"этого пользователя. Однако вы можете сменить его/её пароль, используя <a "
+"href=\"../password/\">эту форму</a>."
 
 #, python-format
 msgid ""
@@ -110,6 +119,21 @@ msgstr "соль"
 msgid "hash"
 msgstr "хэш"
 
+msgid "variety"
+msgstr "множество"
+
+msgid "version"
+msgstr "версия"
+
+msgid "memory cost"
+msgstr "затраты памяти"
+
+msgid "time cost"
+msgstr "затраты времени"
+
+msgid "parallelism"
+msgstr "параллелизм"
+
 msgid "work factor"
 msgstr "рабочий фактор"
 
@@ -118,6 +142,9 @@ msgstr "контрольная сумма"
 
 msgid "name"
 msgstr "имя"
+
+msgid "content type"
+msgstr "тип содержимого"
 
 msgid "codename"
 msgstr "кодовое название"
@@ -133,12 +160,6 @@ msgstr "группа"
 
 msgid "groups"
 msgstr "группы"
-
-msgid "password"
-msgstr "пароль"
-
-msgid "last login"
-msgstr "последний вход"
 
 msgid "superuser status"
 msgstr "статус суперпользователя"
@@ -164,17 +185,10 @@ msgstr "Индивидуальные права данного пользова�
 msgid "username"
 msgstr "имя пользователя"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Обязательное поле. Не более 30 символов. Только буквы, цифры и символы @/./"
+"Обязательное поле. Не более 150 символов. Только буквы, цифры и символы @/./"
 "+/-/_."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Введите правильное имя пользователя. Оно может содержать только буквы, цифры "
-"и знаки @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Пользователь с таким именем уже существует."
@@ -215,8 +229,71 @@ msgid "users"
 msgstr "пользователи"
 
 #, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Введённый пароль слишком короткий. Он должен содержать как минимум "
+"%(min_length)d символ."
+msgstr[1] ""
+"Введённый пароль слишком короткий. Он должен содержать как минимум "
+"%(min_length)d символа."
+msgstr[2] ""
+"Введённый пароль слишком короткий. Он должен содержать как минимум "
+"%(min_length)d символов."
+msgstr[3] ""
+"Введённый пароль слишком короткий. Он должен содержать как минимум "
+"%(min_length)d символов."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Ваш пароль должен содержать как минимум %(min_length)d символ."
+msgstr[1] "Ваш пароль должен содержать как минимум %(min_length)d символа."
+msgstr[2] "Ваш пароль должен содержать как минимум %(min_length)d символов."
+msgstr[3] "Ваш пароль должен содержать как минимум %(min_length)d символов."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Введённый пароль слишком похож на %(verbose_name)s."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+"Ваш пароль не должен совпадать с вашим именем или другой персональной "
+"информацией или быть слишком похожим на неё."
+
+msgid "This password is too common."
+msgstr "Введённый пароль слишком широко распространён."
+
+msgid "Your password can't be a commonly used password."
+msgstr "Ваш пароль не может быть одним из широко распространённых паролей."
+
+msgid "This password is entirely numeric."
+msgstr "Введённый пароль состоит только из цифр."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Ваш пароль не может состоять только из цифр."
+
+#, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Сброс пароля на %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Введите правильное имя пользователя. Это значение может содержать только "
+"английские буквы, цифры и знаки @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Введите правильное имя пользователя. Оно может содержать только буквы, цифры "
+"и знаки @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Не авторизован"

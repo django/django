@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 from operator import attrgetter
 
@@ -7,16 +5,20 @@ from django.core.exceptions import ValidationError
 from django.db import router
 from django.db.models.sql import InsertQuery
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils import six
 from django.utils.timezone import get_fixed_timezone
 
 from .models import (
-    Article, BrokenUnicodeMethod, Department, Event, Model1, Model2, Model3,
+    Article, BrokenStrMethod, Department, Event, Model1, Model2, Model3,
     NonAutoPK, Party, Worker,
 )
 
 
 class ModelTests(TestCase):
+    def test_model_init_too_many_args(self):
+        msg = "Number of args exceeds number of fields"
+        with self.assertRaisesMessage(IndexError, msg):
+            Worker(1, 2, 3, 4)
+
     # The bug is that the following queries would raise:
     # "TypeError: Related Field has invalid lookup: gte"
     def test_related_gte_lookup(self):
@@ -50,10 +52,9 @@ class ModelTests(TestCase):
         # An empty choice field should return None for the display name.
         self.assertIs(a.get_status_display(), None)
 
-        # Empty strings should be returned as Unicode
+        # Empty strings should be returned as string
         a = Article.objects.get(pk=a.pk)
         self.assertEqual(a.misc_data, '')
-        self.assertIs(type(a.misc_data), six.text_type)
 
     def test_long_textfield(self):
         # TextFields can hold more than 4000 characters (this was broken in
@@ -159,18 +160,12 @@ class ModelTests(TestCase):
         )
 
     def test_get_next_prev_by_field(self):
-        # Check that get_next_by_FIELD and get_previous_by_FIELD don't crash
-        # when we have usecs values stored on the database
-        #
-        # It crashed after the Field.get_db_prep_* refactor, because on most
-        # backends DateTimeFields supports usecs, but DateTimeField.to_python
-        # didn't recognize them. (Note that
-        # Model._get_next_or_previous_by_FIELD coerces values to strings)
+        # get_next_by_FIELD() and get_previous_by_FIELD() don't crash when
+        # microseconds values are stored in the database.
         Event.objects.create(when=datetime.datetime(2000, 1, 1, 16, 0, 0))
         Event.objects.create(when=datetime.datetime(2000, 1, 1, 6, 1, 1))
         Event.objects.create(when=datetime.datetime(2000, 1, 1, 13, 1, 1))
         e = Event.objects.create(when=datetime.datetime(2000, 1, 1, 12, 0, 20, 24))
-
         self.assertEqual(
             e.get_next_by_when().when, datetime.datetime(2000, 1, 1, 13, 1, 1)
         )
@@ -178,16 +173,23 @@ class ModelTests(TestCase):
             e.get_previous_by_when().when, datetime.datetime(2000, 1, 1, 6, 1, 1)
         )
 
+    def test_get_next_prev_by_field_unsaved(self):
+        msg = 'get_next/get_previous cannot be used on unsaved objects.'
+        with self.assertRaisesMessage(ValueError, msg):
+            Event().get_next_by_when()
+        with self.assertRaisesMessage(ValueError, msg):
+            Event().get_previous_by_when()
+
     def test_primary_key_foreign_key_types(self):
         # Check Department and Worker (non-default PK type)
         d = Department.objects.create(id=10, name="IT")
         w = Worker.objects.create(department=d, name="Full-time")
-        self.assertEqual(six.text_type(w), "Full-time")
+        self.assertEqual(str(w), "Full-time")
 
     def test_broken_unicode(self):
-        # Models with broken unicode methods should still have a printable repr
-        b = BrokenUnicodeMethod.objects.create(name="Jerry")
-        self.assertEqual(repr(b), "<BrokenUnicodeMethod: [Bad Unicode data]>")
+        # Models with broken __str__() methods have a printable repr().
+        b = BrokenStrMethod.objects.create(name='Jerry')
+        self.assertEqual(repr(b), '<BrokenStrMethod: [Bad Unicode data]>')
 
     @skipUnlessDBFeature("supports_timezones")
     def test_timezones(self):
@@ -225,7 +227,8 @@ class ModelValidationTest(TestCase):
     def test_pk_validation(self):
         NonAutoPK.objects.create(name="one")
         again = NonAutoPK(name="one")
-        self.assertRaises(ValidationError, again.validate_unique)
+        with self.assertRaises(ValidationError):
+            again.validate_unique()
 
 
 class EvaluateMethodTest(TestCase):
@@ -235,7 +238,7 @@ class EvaluateMethodTest(TestCase):
 
     def test_model_with_evaluate_method(self):
         """
-        Ensures that you can filter by objects that have an 'evaluate' attr
+        You can filter by objects that have an 'evaluate' attr
         """
         dept = Department.objects.create(pk=1, name='abc')
         dept.evaluate = 'abc'

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.template.defaultfilters import force_escape
 from django.test import SimpleTestCase
 from django.utils.safestring import SafeData
@@ -49,12 +46,12 @@ class ForceEscapeTests(SimpleTestCase):
     @setup({'force-escape07': '{% autoescape off %}{{ a|escape|force_escape }}{% endautoescape %}'})
     def test_force_escape07(self):
         output = self.engine.render_to_string('force-escape07', {"a": "x&y"})
-        self.assertEqual(output, "x&amp;y")
+        self.assertEqual(output, "x&amp;amp;y")
 
     @setup({'force-escape08': '{{ a|escape|force_escape }}'})
     def test_force_escape08(self):
         output = self.engine.render_to_string('force-escape08', {"a": "x&y"})
-        self.assertEqual(output, "x&amp;y")
+        self.assertEqual(output, "x&amp;amp;y")
 
 
 class FunctionTests(SimpleTestCase):

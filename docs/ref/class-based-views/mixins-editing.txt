@@ -14,8 +14,8 @@ The following mixins are used to construct Django's editing views:
     Examples of how these are combined into editing views can be found at
     the documentation on :doc:`/ref/class-based-views/generic-editing`.
 
-FormMixin
----------
+``FormMixin``
+=============
 
 .. class:: django.views.generic.edit.FormMixin
 
@@ -59,10 +59,6 @@ FormMixin
         :meth:`~django.views.generic.edit.FormMixin.get_form_kwargs`.
         If ``form_class`` isn't provided :meth:`get_form_class` will be used.
 
-        .. versionchanged:: 1.8
-
-            The ``form_class`` argument is not required anymore.
-
     .. method:: get_form_kwargs()
 
         Build the keyword arguments required to instantiate the form.
@@ -93,13 +89,11 @@ FormMixin
 
     .. method:: get_context_data(**kwargs)
 
-        .. versionadded:: 1.9
-
         Calls :meth:`get_form` and adds the result to the context data with the
         name 'form'.
 
-ModelFormMixin
---------------
+``ModelFormMixin``
+==================
 
 .. class:: django.views.generic.edit.ModelFormMixin
 
@@ -117,11 +111,6 @@ ModelFormMixin
     :attr:`~django.views.generic.edit.FormMixin.form_class` attributes, an
     :exc:`~django.core.exceptions.ImproperlyConfigured` exception will be
     raised.
-
-    .. versionchanged:: 1.8
-
-        Previously if both ``fields`` and ``form_class`` were specified,
-        ``fields`` was silently ignored.
 
     **Mixins**
 
@@ -146,11 +135,6 @@ ModelFormMixin
         result in an :exc:`~django.core.exceptions.ImproperlyConfigured`
         exception.
 
-        .. versionchanged:: 1.8
-
-            Previously, omitting this attribute was allowed and resulted in
-            a form with all fields of the model.
-
     .. attribute:: success_url
 
         The URL to redirect to when the form is successfully processed.
@@ -159,12 +143,6 @@ ModelFormMixin
         will be interpolated against the object's field attributes. For
         example, you could use ``success_url="/polls/{slug}/"`` to
         redirect to a URL composed out of the ``slug`` field on a model.
-
-        .. versionchanged:: 1.8
-
-            Support for the new brace-based Python formatting syntax has been
-            added. The old ``%(slug)s`` placeholder syntax support has been
-            deprecated and will be removed in Django 2.0.
 
     .. method:: get_form_class()
 
@@ -200,8 +178,8 @@ ModelFormMixin
         Renders a response, providing the invalid form as context.
 
 
-ProcessFormView
----------------
+``ProcessFormView``
+===================
 
 .. class:: django.views.generic.edit.ProcessFormView
 
@@ -224,11 +202,6 @@ ProcessFormView
         Renders a response using a context created with
         :meth:`~django.views.generic.edit.FormMixin.get_context_data`.
 
-        .. versionchanged:: 1.9
-
-            Construction of the form was moved from this method to
-            :meth:`~django.views.generic.edit.FormMixin.get_context_data`.
-
     .. method:: post(request, *args, **kwargs)
 
         Constructs a form, checks the form for validity, and handles it
@@ -240,8 +213,8 @@ ProcessFormView
         through to :meth:`post`.
 
 
-DeletionMixin
--------------
+``DeletionMixin``
+=================
 
 .. class:: django.views.generic.edit.DeletionMixin
 
@@ -258,12 +231,6 @@ DeletionMixin
         interpolated against the object's field attributes. For example, you
         could use ``success_url="/parent/{parent_id}/"`` to redirect to a URL
         composed out of the ``parent_id`` field on a model.
-
-        .. versionchanged:: 1.8
-
-            Support for the new brace-based Python formatting syntax has been
-            added. The old ``%(slug)s`` placeholder syntax support has been
-            deprecated and will be removed in Django 2.0.
 
     .. method:: get_success_url()
 

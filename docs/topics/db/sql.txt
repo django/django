@@ -185,7 +185,7 @@ of people with their ages calculated by the database::
     Jane is 42.
     ...
 
-__ http://www.postgresql.org/docs/current/static/functions-datetime.html
+__ https://www.postgresql.org/docs/current/static/functions-datetime.html
 
 Passing parameters into ``raw()``
 ---------------------------------
@@ -225,7 +225,7 @@ argument.
     fall victim to SQL injection. As long as you remember to always use the
     ``params`` argument you'll be protected.
 
-__ http://en.wikipedia.org/wiki/SQL_injection
+__ https://en.wikipedia.org/wiki/SQL_injection
 
 .. _executing-custom-sql:
 
@@ -250,12 +250,10 @@ For example::
     from django.db import connection
 
     def my_custom_sql(self):
-        cursor = connection.cursor()
-
-        cursor.execute("UPDATE bar SET foo = 1 WHERE baz = %s", [self.baz])
-
-        cursor.execute("SELECT foo FROM bar WHERE baz = %s", [self.baz])
-        row = cursor.fetchone()
+        with connection.cursor() as cursor:
+            cursor.execute("UPDATE bar SET foo = 1 WHERE baz = %s", [self.baz])
+            cursor.execute("SELECT foo FROM bar WHERE baz = %s", [self.baz])
+            row = cursor.fetchone()
 
         return row
 
@@ -275,28 +273,50 @@ alias::
     cursor = connections['my_db_alias'].cursor()
     # Your code here...
 
-By default, the Python DB API will return results without their field
-names, which means you end up with a ``list`` of values, rather than a
-``dict``. At a small performance cost, you can return results as a
-``dict`` by using something like this::
+By default, the Python DB API will return results without their field names,
+which means you end up with a ``list`` of values, rather than a ``dict``. At a
+small performance and memory cost, you can return results as a ``dict`` by
+using something like this::
 
     def dictfetchall(cursor):
-        "Returns all rows from a cursor as a dict"
-        desc = cursor.description
+        "Return all rows from a cursor as a dict"
+        columns = [col[0] for col in cursor.description]
         return [
-            dict(zip([col[0] for col in desc], row))
+            dict(zip(columns, row))
             for row in cursor.fetchall()
         ]
 
-Here is an example of the difference between the two::
+Another option is to use :func:`collections.namedtuple` from the Python
+standard library. A ``namedtuple`` is a tuple-like object that has fields
+accessible by attribute lookup; it's also indexable and iterable. Results are
+immutable and accessible by field names or indices, which might be useful::
+
+    from collections import namedtuple
+
+    def namedtuplefetchall(cursor):
+        "Return all rows from a cursor as a namedtuple"
+        desc = cursor.description
+        nt_result = namedtuple('Result', [col[0] for col in desc])
+        return [nt_result(*row) for row in cursor.fetchall()]
+
+Here is an example of the difference between the three::
 
     >>> cursor.execute("SELECT id, parent_id FROM test LIMIT 2");
     >>> cursor.fetchall()
-    ((54360982L, None), (54360880L, None))
+    ((54360982, None), (54360880, None))
 
     >>> cursor.execute("SELECT id, parent_id FROM test LIMIT 2");
     >>> dictfetchall(cursor)
-    [{'parent_id': None, 'id': 54360982L}, {'parent_id': None, 'id': 54360880L}]
+    [{'parent_id': None, 'id': 54360982}, {'parent_id': None, 'id': 54360880}]
+
+    >>> cursor.execute("SELECT id, parent_id FROM test LIMIT 2");
+    >>> results = namedtuplefetchall(cursor)
+    >>> results
+    [Result(id=54360982, parent_id=None), Result(id=54360880, parent_id=None)]
+    >>> results[0].id
+    54360982
+    >>> results[0][0]
+    54360982
 
 Connections and cursors
 -----------------------

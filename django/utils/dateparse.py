@@ -8,7 +8,6 @@
 import datetime
 import re
 
-from django.utils import six
 from django.utils.timezone import get_fixed_timezone, utc
 
 date_re = re.compile(
@@ -29,10 +28,10 @@ datetime_re = re.compile(
 
 standard_duration_re = re.compile(
     r'^'
-    r'(?:(?P<days>-?\d+) )?'
-    r'((?:(?P<hours>\d+):)(?=\d+:\d+))?'
-    r'(?:(?P<minutes>\d+):)?'
-    r'(?P<seconds>\d+)'
+    r'(?:(?P<days>-?\d+) (days?, )?)?'
+    r'((?:(?P<hours>-?\d+):)(?=\d+:\d+))?'
+    r'(?:(?P<minutes>-?\d+):)?'
+    r'(?P<seconds>-?\d+)'
     r'(?:\.(?P<microseconds>\d{1,6})\d{0,6})?'
     r'$'
 )
@@ -40,7 +39,8 @@ standard_duration_re = re.compile(
 # Support the sections of ISO 8601 date representation that are accepted by
 # timedelta
 iso8601_duration_re = re.compile(
-    r'^P'
+    r'^(?P<sign>[-+]?)'
+    r'P'
     r'(?:(?P<days>\d+(.\d+)?)D)?'
     r'(?:T'
     r'(?:(?P<hours>\d+(.\d+)?)H)?'
@@ -59,7 +59,7 @@ def parse_date(value):
     """
     match = date_re.match(value)
     if match:
-        kw = {k: int(v) for k, v in six.iteritems(match.groupdict())}
+        kw = {k: int(v) for k, v in match.groupdict().items()}
         return datetime.date(**kw)
 
 
@@ -77,7 +77,7 @@ def parse_time(value):
         kw = match.groupdict()
         if kw['microsecond']:
             kw['microsecond'] = kw['microsecond'].ljust(6, '0')
-        kw = {k: int(v) for k, v in six.iteritems(kw) if v is not None}
+        kw = {k: int(v) for k, v in kw.items() if v is not None}
         return datetime.time(**kw)
 
 
@@ -104,7 +104,7 @@ def parse_datetime(value):
             if tzinfo[0] == '-':
                 offset = -offset
             tzinfo = get_fixed_timezone(offset)
-        kw = {k: int(v) for k, v in six.iteritems(kw) if v is not None}
+        kw = {k: int(v) for k, v in kw.items() if v is not None}
         kw['tzinfo'] = tzinfo
         return datetime.datetime(**kw)
 
@@ -121,7 +121,10 @@ def parse_duration(value):
         match = iso8601_duration_re.match(value)
     if match:
         kw = match.groupdict()
+        sign = -1 if kw.pop('sign', '+') == '-' else 1
         if kw.get('microseconds'):
             kw['microseconds'] = kw['microseconds'].ljust(6, '0')
-        kw = {k: float(v) for k, v in six.iteritems(kw) if v is not None}
-        return datetime.timedelta(**kw)
+        if kw.get('seconds') and kw.get('microseconds') and kw['seconds'].startswith('-'):
+            kw['microseconds'] = '-' + kw['microseconds']
+        kw = {k: float(v) for k, v in kw.items() if v is not None}
+        return sign * datetime.timedelta(**kw)

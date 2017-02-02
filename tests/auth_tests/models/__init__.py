@@ -1,14 +1,15 @@
 from .custom_permissions import CustomPermissionsUser
-from .is_active import IsActiveTestUser1
-from .invalid_models import (
-    CustomUserNonUniqueUsername, CustomUserNonListRequiredFields,
-    CustomUserBadRequiredFields,
+from .custom_user import (
+    CustomUser, CustomUserWithoutIsActiveField, ExtensionUser,
 )
-from .with_foreign_key import CustomUserWithFK, Email
+from .invalid_models import CustomUserNonUniqueUsername
+from .is_active import IsActiveTestUser1
 from .uuid_pk import UUIDUser
+from .with_foreign_key import CustomUserWithFK, Email
+from .with_integer_username import IntegerUsernameUser
 
 __all__ = (
-    'CustomPermissionsUser', 'CustomUserNonUniqueUsername',
-    'CustomUserNonListRequiredFields', 'CustomUserBadRequiredFields',
-    'CustomUserWithFK', 'Email', 'IsActiveTestUser1', 'UUIDUser',
+    'CustomUser', 'CustomUserWithoutIsActiveField', 'CustomPermissionsUser',
+    'CustomUserWithFK', 'Email', 'ExtensionUser', 'IsActiveTestUser1',
+    'UUIDUser', 'CustomUserNonUniqueUsername', 'IntegerUsernameUser'
 )

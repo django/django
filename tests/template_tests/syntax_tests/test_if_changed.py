@@ -161,7 +161,7 @@ class IfChangedTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         cls.engine = Engine()
-        super(IfChangedTests, cls).setUpClass()
+        super().setUpClass()
 
     def test_ifchanged_concurrency(self):
         """
@@ -182,7 +182,9 @@ class IfChangedTests(SimpleTestCase):
             # When the IfChangeNode stores state at 'self' it stays at '3' and skip the last yielded value below.
             iter2 = iter([1, 2, 3])
             output2 = template.render(Context({'foo': range(3), 'get_value': lambda: next(iter2)}))
-            self.assertEqual(output2, '[0,1,2,3]', 'Expected [0,1,2,3] in second parallel template, got {}'.format(output2))
+            self.assertEqual(
+                output2, '[0,1,2,3]', 'Expected [0,1,2,3] in second parallel template, got {}'.format(output2)
+            )
             yield 3
 
         gen1 = gen()
@@ -196,3 +198,17 @@ class IfChangedTests(SimpleTestCase):
         template = self.engine.from_string('{% ifchanged %}{% cycle "1st time" "2nd time" %}{% endifchanged %}')
         output = template.render(Context({}))
         self.assertEqual(output, '1st time')
+
+    def test_include(self):
+        """
+        #23516 -- This works as a regression test only if the cached loader
+        isn't used. Hence we don't use the @setup decorator.
+        """
+        engine = Engine(loaders=[
+            ('django.template.loaders.locmem.Loader', {
+                'template': '{% for x in vars %}{% include "include" %}{% endfor %}',
+                'include': '{% ifchanged %}{{ x }}{% endifchanged %}',
+            }),
+        ])
+        output = engine.render_to_string('template', dict(vars=[1, 1, 2, 2, 3, 3]))
+        self.assertEqual(output, "123")

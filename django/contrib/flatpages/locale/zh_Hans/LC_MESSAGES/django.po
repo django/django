@@ -3,16 +3,17 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lele Long <schemacs@gmail.com>, 2011
-# ouyanghongyu <ouyanghongyu@gmail.com>, 2014
+# mozillazg <opensource.mozillazg@gmail.com>, 2016
+# Ronald White <ouyanghongyu@gmail.com>, 2014
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-03-17 12:37+0000\n"
+"Last-Translator: mozillazg <opensource.mozillazg@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -72,6 +73,9 @@ msgstr "请先注册"
 
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "如果被选中，仅登录用户才可以查看此页。"
+
+msgid "sites"
+msgstr "站点"
 
 msgid "flat page"
 msgstr "简单页面"

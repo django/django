@@ -1,12 +1,11 @@
 from django.contrib.gis.db.backends.base.features import BaseSpatialFeatures
-from django.contrib.gis.geos import geos_version_info
 from django.db.backends.sqlite3.features import \
     DatabaseFeatures as SQLiteDatabaseFeatures
 from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseSpatialFeatures, SQLiteDatabaseFeatures):
-    supports_distance_geodetic = False
+    supports_3d_storage = True
     # SpatiaLite can only count vertices in LineStrings
     supports_num_points_poly = False
 
@@ -18,5 +17,5 @@ class DatabaseFeatures(BaseSpatialFeatures, SQLiteDatabaseFeatures):
         return self.connection.ops.spatial_version >= (4, 1, 0)
 
     @cached_property
-    def supports_3d_storage(self):
-        return geos_version_info()['version'] >= '3.3'
+    def supports_area_geodetic(self):
+        return bool(self.connection.ops.lwgeom_version())

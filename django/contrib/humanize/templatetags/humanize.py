@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 import re
 from datetime import date, datetime
 from decimal import Decimal
@@ -49,11 +46,12 @@ def intcomma(value, use_l10n=True):
         else:
             return number_format(value, force_grouping=True)
     orig = force_text(value)
-    new = re.sub("^(-?\d+)(\d{3})", '\g<1>,\g<2>', orig)
+    new = re.sub(r"^(-?\d+)(\d{3})", r'\g<1>,\g<2>', orig)
     if orig == new:
         return new
     else:
         return intcomma(new, use_l10n)
+
 
 # A tuple of standard large number to their converters
 intword_converters = (

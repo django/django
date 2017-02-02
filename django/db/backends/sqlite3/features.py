@@ -1,17 +1,8 @@
-from __future__ import unicode_literals
-
-import sys
-
 from django.db import utils
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.utils.functional import cached_property
 
 from .base import Database
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
@@ -26,7 +17,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_1000_query_parameters = False
     supports_mixed_date_datetime_comparisons = False
     has_bulk_insert = True
-    can_combine_inserts_with_and_without_auto_increment_pk = False
     supports_foreign_keys = False
     supports_column_check_constraints = False
     autocommits_when_autocommit_is_off = True
@@ -38,10 +28,17 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_rollback_ddl = True
     supports_paramstyle_pyformat = False
     supports_sequence_reset = False
+    can_clone_databases = True
+    supports_temporal_subtraction = True
+    ignores_table_name_case = True
 
     @cached_property
     def uses_savepoints(self):
         return Database.sqlite_version_info >= (3, 6, 8)
+
+    @cached_property
+    def supports_index_column_ordering(self):
+        return Database.sqlite_version_info >= (3, 3, 0)
 
     @cached_property
     def can_release_savepoints(self):
@@ -50,7 +47,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def can_share_in_memory_db(self):
         return (
-            sys.version_info[:2] >= (3, 4) and
             Database.__name__ == 'sqlite3.dbapi2' and
             Database.sqlite_version_info >= (3, 7, 13)
         )
@@ -73,7 +69,3 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 has_support = False
             cursor.execute('DROP TABLE STDDEV_TEST')
         return has_support
-
-    @cached_property
-    def has_zoneinfo_database(self):
-        return pytz is not None

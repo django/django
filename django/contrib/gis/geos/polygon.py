@@ -4,8 +4,6 @@ from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.libgeos import GEOM_PTR, get_pointer_arr
 from django.contrib.gis.geos.linestring import LinearRing
-from django.utils import six
-from django.utils.six.moves import range
 
 
 class Polygon(GEOSGeometry):
@@ -29,7 +27,8 @@ class Polygon(GEOSGeometry):
         ...                ((4, 4), (4, 6), (6, 6), (6, 4), (4, 4)))
         """
         if not args:
-            raise TypeError('Must provide at least one LinearRing, or a tuple, to initialize a Polygon.')
+            super().__init__(self._create_polygon(0, None), **kwargs)
+            return
 
         # Getting the ext_ring and init_holes parameters from the argument list
         ext_ring = args[0]
@@ -46,7 +45,7 @@ class Polygon(GEOSGeometry):
                 n_holes = len(init_holes)
 
         polygon = self._create_polygon(n_holes + 1, (ext_ring,) + init_holes)
-        super(Polygon, self).__init__(polygon, **kwargs)
+        super().__init__(polygon, **kwargs)
 
     def __iter__(self):
         "Iterates over each ring in the polygon."
@@ -62,7 +61,7 @@ class Polygon(GEOSGeometry):
         "Constructs a Polygon from a bounding box (4-tuple)."
         x0, y0, x1, y1 = bbox
         for z in bbox:
-            if not isinstance(z, six.integer_types + (float,)):
+            if not isinstance(z, (float, int)):
                 return GEOSGeometry('POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' %
                                     (x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
         return Polygon(((x0, y0), (x0, y1), (x1, y1), (x1, y0), (x0, y0)))
@@ -73,6 +72,9 @@ class Polygon(GEOSGeometry):
         # _construct_ring will throw a TypeError if a parameter isn't a valid ring
         # If we cloned the pointers here, we wouldn't be able to clean up
         # in case of error.
+        if not length:
+            return capi.create_empty_polygon()
+
         rings = []
         for r in items:
             if isinstance(r, GEOM_PTR):
@@ -172,6 +174,8 @@ class Polygon(GEOSGeometry):
     @property
     def kml(self):
         "Returns the KML representation of this Polygon."
-        inner_kml = ''.join("<innerBoundaryIs>%s</innerBoundaryIs>" % self[i + 1].kml
-            for i in range(self.num_interior_rings))
+        inner_kml = ''.join(
+            "<innerBoundaryIs>%s</innerBoundaryIs>" % self[i + 1].kml
+            for i in range(self.num_interior_rings)
+        )
         return "<Polygon><outerBoundaryIs>%s</outerBoundaryIs>%s</Polygon>" % (self[0].kml, inner_kml)

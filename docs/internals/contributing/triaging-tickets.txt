@@ -32,7 +32,7 @@ Django is a community project, and every contribution helps. We can't do this
 without **you**!
 
 Triage workflow
----------------
+===============
 
 Unfortunately, not all bug reports and feature requests in the ticket tracker
 provide all the :doc:`required details<bugs-and-features>`. A number of
@@ -40,8 +40,7 @@ tickets have patches, but those patches don't meet all the requirements of a
 :ref:`good patch<patch-style>`.
 
 One way to help out is to *triage* tickets that have been created by other
-users. The core team and several community members work on this regularly, but
-more help is always appreciated.
+users.
 
 Most of the workflow is based around the concept of a ticket's
 :ref:`triage stages <triage-stages>`. Each stage describes where in its
@@ -57,9 +56,8 @@ Since a picture is worth a thousand words, let's start there:
 
 We've got two roles in this diagram:
 
-* Committers (also called core developers): people with commit access who are
-  responsible for making decisions and integrating the contributions of the
-  community.
+* Committers: people with commit access who are responsible for making the
+  final decision to merge a patch.
 
 * Ticket triagers: anyone in the Django community who chooses to
   become involved in Django's development process. Our Trac installation
@@ -69,26 +67,25 @@ We've got two roles in this diagram:
 
 By way of example, here we see the lifecycle of an average ticket:
 
-* Alice creates a ticket, and uploads an incomplete patch (no tests, incorrect
-  implementation).
+* Alice creates a ticket and sends an incomplete pull request (no tests,
+  incorrect implementation).
 
-* Bob reviews the patch, marks it "Accepted", "needs tests", and "patch needs
-  improvement", and leaves a comment telling Alice how the patch could be
-  improved.
+* Bob reviews the pull request, marks the ticket as "Accepted", "needs tests",
+  and "patch needs improvement", and leaves a comment telling Alice how the
+  patch could be improved.
 
-* Alice updates the patch, adding tests (but not changing the
+* Alice updates the pull request, adding tests (but not changing the
   implementation). She removes the two flags.
 
-* Charlie reviews the patch and resets the "patch needs improvement" flag with
-  another comment about improving the implementation.
+* Charlie reviews the pull request and resets the "patch needs improvement"
+  flag with another comment about improving the implementation.
 
-* Alice updates the patch, fixing the implementation. She removes the "patch
-  needs improvement" flag.
+* Alice updates the pull request, fixing the implementation. She removes the
+  "patch needs improvement" flag.
 
-* Daisy reviews the patch, and marks it RFC.
+* Daisy reviews the pull request and marks the ticket as "Ready for checkin".
 
-* Jacob, a core developer, reviews the RFC patch, applies it to his checkout,
-  and commits it.
+* Jacob, a committer, reviews the pull request and merges it.
 
 Some tickets require much less feedback than this, but then again some tickets
 require much much more.
@@ -96,20 +93,20 @@ require much much more.
 .. _triage-stages:
 
 Triage stages
--------------
+=============
 
 Below we describe in more detail the various stages that a ticket may flow
 through during its lifetime.
 
 Unreviewed
-~~~~~~~~~~
+----------
 
 The ticket has not been reviewed by anyone who felt qualified to make a
 judgment about whether the ticket contained a valid issue, a viable feature,
 or ought to be closed for any of the various reasons.
 
 Accepted
-~~~~~~~~
+--------
 
 The big gray area! The absolute meaning of "accepted" is that the issue
 described in the ticket is valid and is in some stage of being worked on.
@@ -142,7 +139,7 @@ Beyond that there are several considerations:
   explaining what is needed to improve the code.
 
 Ready For Checkin
-~~~~~~~~~~~~~~~~~
+-----------------
 
 The ticket was reviewed by any member of the community other than the person
 who supplied the patch and found to meet all the requirements for a
@@ -152,10 +149,10 @@ review prior to being committed. See the
 RFC forever! What should I do?"
 
 Someday/Maybe
-~~~~~~~~~~~~~
+-------------
 
-This stage isn't shown on the diagram. It's only used by core developers to
-keep track of high-level ideas or long term feature requests.
+This stage isn't shown on the diagram. It's used sparingly to keep track of
+high-level ideas or long term feature requests.
 
 These tickets are uncommon and overall less useful since they don't describe
 concrete actionable issues. They are enhancement requests that we might
@@ -163,12 +160,12 @@ consider adding someday to the framework if an excellent patch is submitted.
 They are not a high priority.
 
 Other triage attributes
------------------------
+=======================
 
 A number of flags, appearing as checkboxes in Trac, can be set on a ticket:
 
 Has patch
-~~~~~~~~~
+---------
 
 This means the ticket has an associated
 :doc:`patch<writing-code/submitting-patches>`. These will be reviewed
@@ -178,20 +175,20 @@ The following three fields (Needs documentation, Needs tests,
 Patch needs improvement) apply only if a patch has been supplied.
 
 Needs documentation
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 This flag is used for tickets with patches that need associated
 documentation. Complete documentation of features is a prerequisite
 before we can check them into the codebase.
 
 Needs tests
-~~~~~~~~~~~
+-----------
 
 This flags the patch as needing associated unit tests. Again, this
 is a required part of a valid patch.
 
 Patch needs improvement
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 This flag means that although the ticket *has* a patch, it's not quite
 ready for checkin. This could mean the patch no longer applies
@@ -199,12 +196,12 @@ cleanly, there is a flaw in the implementation, or that the code
 doesn't meet our standards.
 
 Easy pickings
-~~~~~~~~~~~~~
+-------------
 
 Tickets that would require small, easy, patches.
 
 Type
-~~~~
+----
 
 Tickets should be categorized by *type* between:
 
@@ -219,14 +216,14 @@ Tickets should be categorized by *type* between:
     better, faster, stronger.
 
 Component
-~~~~~~~~~
+---------
 
 Tickets should be classified into *components* indicating which area of
 the Django codebase they belong to. This makes tickets better organized and
 easier to find.
 
 Severity
-~~~~~~~~
+--------
 
 The *severity* attribute is used to identify blockers, that is, issues which
 should get fixed before releasing the next version of Django. Typically those
@@ -235,26 +232,26 @@ causing severe data losses. This attribute is quite rarely used and the vast
 majority of tickets have a severity of "Normal".
 
 Version
-~~~~~~~
+-------
 
 It is possible to use the *version* attribute to indicate in which
 version the reported bug was identified.
 
 UI/UX
-~~~~~
+-----
 
 This flag is used for tickets that relate to User Interface and User
 Experiences questions. For example, this flag would be appropriate for
 user-facing features in forms or the admin interface.
 
 Cc
-~~
+--
 
 You may add your username or email address to this field to be notified when
 new contributions are made to the ticket.
 
 Keywords
-~~~~~~~~
+--------
 
 With this field you may label a ticket with multiple keywords. This can be
 useful, for example, to group several tickets of a same theme. Keywords can
@@ -266,7 +263,7 @@ as "formset", "modelformset", and "ManagementForm".
 .. _closing-tickets:
 
 Closing Tickets
----------------
+===============
 
 When a ticket has completed its useful lifecycle, it's time for it to be
 closed. Closing a ticket is a big responsibility, though. You have to be sure
@@ -297,8 +294,7 @@ If you do close a ticket, you should always make sure of the following:
 A ticket can be resolved in a number of ways:
 
 * fixed
-      Used by the core developers once a patch has been rolled into
-      Django and the issue is fixed.
+      Used once a patch has been rolled into Django and the issue is fixed.
 
 * invalid
       Used if the ticket is found to be incorrect. This means that the
@@ -308,12 +304,13 @@ A ticket can be resolved in a number of ways:
       submit support queries as tickets).
 
 * wontfix
-      Used when a core developer decides that this request is not
-      appropriate for consideration in Django. This is usually chosen after
-      discussion in the |django-developers| mailing list. Feel free to
-      start or join in discussions of "wontfix" tickets on the
-      |django-developers| mailing list, but please do not reopen tickets
-      closed as "wontfix" by a :doc:`core developer</internals/team>`.
+      Used when a someone decides that the request isn't appropriate for
+      consideration in Django. Sometimes a ticket is closed as "wontfix" with a
+      request for the reporter to start a discussion on the |django-developers|
+      mailing list if they feel differently from the rationale provided by the
+      person who closed the ticket. Other times, a mailing list discussion
+      precedes the decision to close a ticket. Always use the mailing list to
+      get a consensus before reopening tickets closed as "wontfix".
 
 * duplicate
       Used when another ticket covers the same issue. By closing duplicate
@@ -332,20 +329,16 @@ A ticket can be resolved in a number of ways:
 If you believe that the ticket was closed in error -- because you're
 still having the issue, or it's popped up somewhere else, or the triagers have
 made a mistake -- please reopen the ticket and provide further information.
-Again, please do not reopen tickets that have been marked as "wontfix" by core
-developers and bring the issue to |django-developers| instead.
+Again, please do not reopen tickets that have been marked as "wontfix" and
+bring the issue to |django-developers| instead.
 
 .. _how-can-i-help-with-triaging:
 
 How can I help with triaging?
------------------------------
+=============================
 
 The triage process is primarily driven by community members. Really,
 **ANYONE** can help.
-
-Core developers may provide feedback on issues they're familiar with, or make
-decisions on controversial ones, but they aren't responsible for triaging
-tickets in general.
 
 To get involved, start by `creating an account on Trac`_. If you have an
 account but have forgotten your password, you can reset it using the `password
@@ -353,7 +346,8 @@ reset page`_.
 
 Then, you can help out by:
 
-* Closing "Unreviewed" tickets as "invalid", "worksforme" or "duplicate."
+* Closing "Unreviewed" tickets as "invalid", "worksforme", or "duplicate", or
+  "wontfix".
 
 * Closing "Unreviewed" tickets as "needsinfo" when the description is too
   sparse to be actionable, or when they're feature requests requiring a
@@ -396,18 +390,13 @@ Then, you can help out by:
 However, we do ask the following of all general community members working in
 the ticket database:
 
-* Please **don't** close tickets as "wontfix." The core developers will
-  make the final determination of the fate of a ticket, usually after
-  consultation with the community.
-
 * Please **don't** promote your own tickets to "Ready for checkin". You
   may mark other people's tickets which you've reviewed as "Ready for
   checkin", but you should get at minimum one other community member to
   review a patch that you submit.
 
-* Please **don't** reverse a decision that has been made by a :doc:`core
-  developer</internals/team>`. If you disagree with a decision that
-  has been made, please post a message to |django-developers|.
+* Please **don't** reverse a decision without posting a message to
+  |django-developers| to find consensus.
 
 * If you're unsure if you should be making a change, don't make the
   change but instead leave a comment with your concerns on the ticket,
@@ -422,7 +411,7 @@ the ticket database:
 .. _password reset page: https://www.djangoproject.com/accounts/password/reset/
 
 Bisecting a regression
-----------------------
+======================
 
 .. highlight:: console
 
@@ -460,7 +449,7 @@ find a revision where your test passes, mark it as "good"::
 Now we're ready for the fun part: using ``git bisect run`` to automate the rest
 of the process::
 
-    $ git bisect run python runtests.py migrations.test_regression
+    $ git bisect run tests/runtests.py migrations.test_regression
 
 You should see ``git bisect`` use a binary search to automatically checkout
 revisions between the good and bad commits until it finds the first "bad"

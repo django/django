@@ -1,6 +1,6 @@
 """
  The OGRGeometry is a wrapper for using the OGR Geometry class
- (see http://www.gdal.org/ogr/classOGRGeometry.html).  OGRGeometry
+ (see http://www.gdal.org/classOGRGeometry.html).  OGRGeometry
  may be instantiated when reading geometries from OGR Data Sources
  (e.g. SHP files), or when given OGC WKT (a string).
 
@@ -24,7 +24,7 @@
   WGS 84
   >>> print(mpnt.srs.proj)
   +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
-  >>> mpnt.transform_to(SpatialReference('NAD27'))
+  >>> mpnt.transform(SpatialReference('NAD27'))
   >>> print(mpnt.proj)
   +proj=longlat +ellps=clrk66 +datum=NAD27 +no_defs
   >>> print(mpnt)
@@ -51,25 +51,25 @@ from django.contrib.gis.gdal.geomtype import OGRGeomType
 from django.contrib.gis.gdal.prototypes import geom as capi, srs as srs_api
 from django.contrib.gis.gdal.srs import CoordTransform, SpatialReference
 from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
-from django.utils import six
-from django.utils.six.moves import range
+from django.utils.encoding import force_bytes
 
 
 # For more information, see the OGR C API source code:
-#  http://www.gdal.org/ogr/ogr__api_8h.html
+#  http://www.gdal.org/ogr__api_8h.html
 #
 # The OGR_G_* routines are relevant here.
 class OGRGeometry(GDALBase):
     "Generally encapsulates an OGR geometry."
+    destructor = capi.destroy_geom
 
     def __init__(self, geom_input, srs=None):
         "Initializes Geometry on either WKT or an OGR pointer as input."
 
-        str_instance = isinstance(geom_input, six.string_types)
+        str_instance = isinstance(geom_input, str)
 
         # If HEX, unpack input to a binary buffer.
         if str_instance and hex_regex.match(geom_input):
-            geom_input = six.memoryview(a2b_hex(geom_input.upper().encode()))
+            geom_input = memoryview(a2b_hex(geom_input.upper().encode()))
             str_instance = False
 
         # Constructing the geometry,
@@ -94,9 +94,9 @@ class OGRGeometry(GDALBase):
                 # (e.g., 'Point', 'POLYGON').
                 OGRGeomType(geom_input)
                 g = capi.create_geom(OGRGeomType(geom_input).num)
-        elif isinstance(geom_input, six.memoryview):
+        elif isinstance(geom_input, memoryview):
             # WKB was passed in
-            g = capi.from_wkb(bytes(geom_input), None, byref(c_void_p()), len(geom_input))
+            g = self._from_wkb(geom_input)
         elif isinstance(geom_input, OGRGeomType):
             # OGRGeomType was passed in, an empty geometry will be created.
             g = capi.create_geom(geom_input.num)
@@ -109,7 +109,7 @@ class OGRGeometry(GDALBase):
         # Now checking the Geometry pointer before finishing initialization
         # by setting the pointer for the object.
         if not g:
-            raise GDALException('Cannot create OGR Geometry from input: %s' % str(geom_input))
+            raise GDALException('Cannot create OGR Geometry from input: %s' % geom_input)
         self.ptr = g
 
         # Assigning the SpatialReference object to the geometry, if valid.
@@ -118,11 +118,6 @@ class OGRGeometry(GDALBase):
 
         # Setting the class depending upon the OGR Geometry Type
         self.__class__ = GEO_CLASSES[self.geom_type.num]
-
-    def __del__(self):
-        "Deletes this Geometry."
-        if self._ptr and capi:
-            capi.destroy_geom(self._ptr)
 
     # Pickle routines
     def __getstate__(self):
@@ -142,11 +137,19 @@ class OGRGeometry(GDALBase):
         self.srs = srs
 
     @classmethod
+    def _from_wkb(cls, geom_input):
+        return capi.from_wkb(bytes(geom_input), None, byref(c_void_p()), len(geom_input))
+
+    @classmethod
     def from_bbox(cls, bbox):
         "Constructs a Polygon from a bounding box (4-tuple)."
         x0, y0, x1, y1 = bbox
         return OGRGeometry('POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' % (
             x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
+
+    @classmethod
+    def from_gml(cls, gml_string):
+        return cls(capi.from_gml(force_bytes(gml_string)))
 
     # ### Geometry set-like operations ###
     # g = g1 | g2
@@ -175,10 +178,6 @@ class OGRGeometry(GDALBase):
             return self.equals(other)
         else:
             return False
-
-    def __ne__(self, other):
-        "Tests for inequality."
-        return not (self == other)
 
     def __str__(self):
         "WKT is used for the string representation."
@@ -244,6 +243,10 @@ class OGRGeometry(GDALBase):
         return Envelope(capi.get_envelope(self.ptr, byref(OGREnvelope())))
 
     @property
+    def empty(self):
+        return capi.is_empty(self.ptr)
+
+    @property
     def extent(self):
         "Returns the envelope as a 4-tuple, instead of as an Envelope object."
         return self.envelope.tuple
@@ -267,9 +270,11 @@ class OGRGeometry(GDALBase):
         # (decremented) when this geometry's destructor is called.
         if isinstance(srs, SpatialReference):
             srs_ptr = srs.ptr
-        elif isinstance(srs, six.integer_types + six.string_types):
+        elif isinstance(srs, (int, str)):
             sr = SpatialReference(srs)
             srs_ptr = sr.ptr
+        elif srs is None:
+            srs_ptr = None
         else:
             raise TypeError('Cannot assign spatial reference with object of type: %s' % type(srs))
         capi.assign_srs(self.ptr, srs_ptr)
@@ -284,7 +289,7 @@ class OGRGeometry(GDALBase):
         return None
 
     def _set_srid(self, srid):
-        if isinstance(srid, six.integer_types):
+        if isinstance(srid, int) or srid is None:
             self.srs = srid
         else:
             raise TypeError('SRID must be set with an integer.')
@@ -292,11 +297,15 @@ class OGRGeometry(GDALBase):
     srid = property(_get_srid, _set_srid)
 
     # #### Output Methods ####
+    def _geos_ptr(self):
+        from django.contrib.gis.geos import GEOSGeometry
+        return GEOSGeometry._from_wkb(self.wkb)
+
     @property
     def geos(self):
         "Returns a GEOSGeometry object from this OGRGeometry."
         from django.contrib.gis.geos import GEOSGeometry
-        return GEOSGeometry(self.wkb, self.srid)
+        return GEOSGeometry(self._geos_ptr(), self.srid)
 
     @property
     def gml(self):
@@ -338,7 +347,7 @@ class OGRGeometry(GDALBase):
         buf = (c_ubyte * sz)()
         capi.to_wkb(self.ptr, byteorder, byref(buf))
         # Returning a buffer of the string at the pointer.
-        return six.memoryview(string_at(buf, sz))
+        return memoryview(string_at(buf, sz))
 
     @property
     def wkt(self):
@@ -388,16 +397,12 @@ class OGRGeometry(GDALBase):
             capi.geom_transform(self.ptr, coord_trans.ptr)
         elif isinstance(coord_trans, SpatialReference):
             capi.geom_transform_to(self.ptr, coord_trans.ptr)
-        elif isinstance(coord_trans, six.integer_types + six.string_types):
+        elif isinstance(coord_trans, (int, str)):
             sr = SpatialReference(coord_trans)
             capi.geom_transform_to(self.ptr, sr.ptr)
         else:
             raise TypeError('Transform only accepts CoordTransform, '
                             'SpatialReference, string, and integer objects.')
-
-    def transform_to(self, srs):
-        "For backwards-compatibility."
-        self.transform(srs)
 
     # #### Topology Methods ####
     def _topology(self, func, other):
@@ -495,6 +500,14 @@ class OGRGeometry(GDALBase):
 # The subclasses for OGR Geometry.
 class Point(OGRGeometry):
 
+    def _geos_ptr(self):
+        from django.contrib.gis import geos
+        return geos.Point._create_empty() if self.empty else super()._geos_ptr()
+
+    @classmethod
+    def _create_empty(cls):
+        return capi.create_geom(OGRGeomType('point').num)
+
     @property
     def x(self):
         "Returns the X coordinate for this Point."
@@ -536,7 +549,7 @@ class LineString(OGRGeometry):
             elif dim == 3:
                 return (x.value, y.value, z.value)
         else:
-            raise OGRIndexError('index out of range: %s' % str(index))
+            raise OGRIndexError('index out of range: %s' % index)
 
     def __iter__(self):
         "Iterates over each point in the LineString."
@@ -656,7 +669,7 @@ class GeometryCollection(OGRGeometry):
                     capi.add_geom(self.ptr, g.ptr)
             else:
                 capi.add_geom(self.ptr, geom.ptr)
-        elif isinstance(geom, six.string_types):
+        elif isinstance(geom, str):
             tmp = OGRGeometry(geom)
             capi.add_geom(self.ptr, tmp.ptr)
         else:
@@ -686,6 +699,7 @@ class MultiLineString(GeometryCollection):
 
 class MultiPolygon(GeometryCollection):
     pass
+
 
 # Class mapping dictionary (using the OGRwkbGeometryType as the key)
 GEO_CLASSES = {1: Point,

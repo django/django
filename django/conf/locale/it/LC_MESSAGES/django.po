@@ -1,25 +1,26 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# C8E <C8E@miron.it>, 2011
-# C8E <C8E@miron.it>, 2014
-# Denis Darii <sinednx@gmail.com>, 2011
-# Flavio Curella <flavio.curella@gmail.com>, 2013
+# Carlo Miron <C8E@miron.it>, 2011
+# Carlo Miron <C8E@miron.it>, 2014
+# Denis Darii <denis.darii@gmail.com>, 2011
+# Flavio Curella <flavio.curella@gmail.com>, 2013,2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Themis Savvidis <themhs@gmail.com>, 2013
+# Luciano De Falco Alfano, 2016
 # Marco Bonetti, 2014
 # Nicola Larosa <transifex@teknico.net>, 2013
 # palmux <palmux@gmail.com>, 2014-2015
 # Mattia Procopio <promat85@gmail.com>, 2015
-# Stefano Brentegani <sbrentegani@gmail.com>, 2014-2015
+# Stefano Brentegani <sbrentegani@gmail.com>, 2014-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-28 19:39+0000\n"
-"Last-Translator: palmux <palmux@gmail.com>\n"
-"Language-Team: Italian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-09-28 11:39+0000\n"
+"Last-Translator: Stefano Brentegani <sbrentegani@gmail.com>\n"
+"Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -69,6 +70,9 @@ msgstr "Danese"
 msgid "German"
 msgstr "Tedesco"
 
+msgid "Lower Sorbian"
+msgstr "Sorabo inferiore"
+
 msgid "Greek"
 msgstr "Greco"
 
@@ -89,6 +93,9 @@ msgstr "Spagnolo"
 
 msgid "Argentinian Spanish"
 msgstr "Spagnolo Argentino"
+
+msgid "Colombian Spanish"
+msgstr "Spagnolo Colombiano"
 
 msgid "Mexican Spanish"
 msgstr "Spagnolo Messicano"
@@ -120,6 +127,9 @@ msgstr "Frisone"
 msgid "Irish"
 msgstr "Irlandese"
 
+msgid "Scottish Gaelic"
+msgstr "Gaelico Scozzese"
+
 msgid "Galician"
 msgstr "Galiziano"
 
@@ -131,6 +141,9 @@ msgstr "Hindi"
 
 msgid "Croatian"
 msgstr "Croato"
+
+msgid "Upper Sorbian"
+msgstr "Sorabo superiore"
 
 msgid "Hungarian"
 msgstr "Ungherese"
@@ -192,8 +205,8 @@ msgstr "Marathi"
 msgid "Burmese"
 msgstr "Birmano"
 
-msgid "Norwegian Bokmal"
-msgstr "Norvegese Bokmal"
+msgid "Norwegian Bokmål"
+msgstr "Norvegese Bokmål"
 
 msgid "Nepali"
 msgstr "Nepali"
@@ -291,9 +304,6 @@ msgstr "File statici"
 msgid "Syndication"
 msgstr "Aggregazione"
 
-msgid "Web Design"
-msgstr "Web Design"
-
 msgid "Enter a valid value."
 msgstr "Inserisci un valore valido."
 
@@ -308,6 +318,13 @@ msgstr "Inserisci un indirizzo email valido."
 
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Inserisci uno 'slug' valido contenente lettere, cifre, sottolineati o "
+"trattini."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
 msgstr ""
 "Inserisci uno 'slug' valido contenente lettere, cifre, sottolineati o "
 "trattini."
@@ -365,6 +382,27 @@ msgstr[1] ""
 "Assicurati che questo valore non contenga più di %(limit_value)d caratteri "
 "(ne ha %(show_value)d)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Assicurati che non vi sia più di %(max)s cifra in totale."
+msgstr[1] "Assicurati che non vi siano più di %(max)s cifre in totale."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Assicurati che non vi sia più di %(max)s cifra decimale."
+msgstr[1] "Assicurati che non vi siano più di %(max)s cifre decimali."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "Assicurati che non vi sia più di %(max)s cifra prima della virgola."
+msgstr[1] ""
+"Assicurati che non vi siano più di %(max)s cifre prima della virgola."
+
 msgid "and"
 msgstr "e"
 
@@ -404,6 +442,9 @@ msgstr "Intero"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr "Il valore di '%(value)s' deve essere un intero."
+
+msgid "Big (8 byte) integer"
+msgstr "Intero grande (8 byte)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -488,9 +529,6 @@ msgstr "Il valore di '%(value)s' deve essere un numero a virgola mobile."
 msgid "Floating point number"
 msgstr "Numero in virgola mobile"
 
-msgid "Big (8 byte) integer"
-msgstr "Intero grande (8 byte)"
-
 msgid "IPv4 address"
 msgstr "Indirizzo IPv4"
 
@@ -565,8 +603,22 @@ msgstr "Foreign Key (tipo determinato dal campo collegato)"
 msgid "One-to-one relationship"
 msgstr "Relazione uno a uno"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "relazione %(from)s-%(to)s"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "relazioni %(from)s-%(to)s"
+
 msgid "Many-to-many relationship"
 msgstr "Relazione molti a molti"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "Questo campo è obbligatorio."
@@ -576,27 +628,6 @@ msgstr "Inserisci un numero intero."
 
 msgid "Enter a number."
 msgstr "Inserisci un numero."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Assicurati che non vi sia più di %(max)s cifra in totale."
-msgstr[1] "Assicurati che non vi siano più di %(max)s cifre in totale."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Assicurati che non vi sia più di %(max)s cifra decimale."
-msgstr[1] "Assicurati che non vi siano più di %(max)s cifre decimali."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "Assicurati che non vi sia più di %(max)s cifra prima della virgola."
-msgstr[1] ""
-"Assicurati che non vi siano più di %(max)s cifre prima della virgola."
 
 msgid "Enter a valid date."
 msgstr "Inserisci una data valida."
@@ -662,12 +693,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Campo nascosto %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "I dati del ManagementForm sono mancanti oppure sono stati manomessi"

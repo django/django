@@ -1,26 +1,17 @@
-include README.rst
 include AUTHORS
+include Gruntfile.js
 include INSTALL
 include LICENSE
+include LICENSE.python
 include MANIFEST.in
-include django/contrib/gis/gdal/LICENSE
-include django/contrib/gis/geos/LICENSE
-include django/dispatch/license.txt
-include django/dispatch/license.python.txt
-recursive-include docs *
-recursive-include scripts *
-recursive-include extras *
-recursive-include tests *
-recursive-include django/conf/app_template *
-recursive-include django/conf/locale *
-recursive-include django/conf/project_template *
-recursive-include django/contrib/*/locale *
-recursive-include django/contrib/admin/templates *
-recursive-include django/contrib/admin/static *
-recursive-include django/contrib/admindocs/templates *
-recursive-include django/contrib/auth/templates *
-recursive-include django/contrib/gis/static *
-recursive-include django/contrib/gis/templates *
-recursive-include django/contrib/sitemaps/templates *
-recursive-exclude * __pycache__
-recursive-exclude * *.py[co]
+include package.json
+include *.rst
+graft django
+prune django/contrib/admin/bin
+graft docs
+graft extras
+graft js_tests
+graft scripts
+graft tests
+global-exclude __pycache__
+global-exclude *.py[co]

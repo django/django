@@ -6,11 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Ido (http://www.transifex.com/projects/p/django/language/"
-"io/)\n"
+"Language-Team: Ido (http://www.transifex.com/django/django/language/io/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -62,6 +61,12 @@ msgstr "Ca monato"
 msgid "This year"
 msgstr "Ca yaro"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -73,12 +78,27 @@ msgstr ""
 msgid "Action:"
 msgstr "Ago:"
 
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Agregar altra %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Eliminar"
+
 msgid "action time"
 msgstr "horo dil ago"
+
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
 
 msgid "object id"
 msgstr "id dil objekto"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "repr dil objekto"
 
@@ -109,6 +129,31 @@ msgstr "\"%(object)s\" eliminesis."
 msgid "LogEntry Object"
 msgstr "LogEntry Objekto"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "e"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Nula feldo chanjesis."
+
 msgid "None"
 msgstr "Nula"
 
@@ -116,66 +161,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-#, python-format
-msgid "Changed %s."
-msgstr "%s chanjesis."
-
-msgid "and"
-msgstr "e"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" agregesis."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "%(list)s chanjesis por la %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" eliminesis."
-
-msgid "No fields changed."
-msgstr "Nula feldo chanjesis."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"La %(name)s \"%(obj)s\" agregesis sucesoze. Vu povas modifikar ol altrafoye "
-"infre."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"La %(name)s \"%(obj)s\" agregesis sucesoze. Vu povas agregar altra %(name)s "
-"infre."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "La %(name)s \"%(obj)s\" agregesis sucesoze."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"La %(name)s \"%(obj)s\" chanjesis sucesoze. Vu povas modifikar ol altrafoye "
-"infre."
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
-"La %(name)s \"%(obj)s\" chanjesis sucesoze. Vu povas agregar altra %(name)s "
-"infre."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "La %(name)s \"%(obj)s\" chanjesis sucesoze."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -332,18 +346,15 @@ msgstr "Dokumento"
 msgid "Log out"
 msgstr "Klozar sesiono"
 
-msgid "Add"
-msgstr "Agregar"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Agregar %(name)s"
 
 msgid "History"
 msgstr "Historio"
 
 msgid "View on site"
 msgstr "Vidar en la ret-situo"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Agregar %(name)s"
 
 msgid "Filter"
 msgstr "Filtrar"
@@ -426,13 +437,6 @@ msgstr ""
 msgid "Change"
 msgstr "Modifikar"
 
-msgid "Remove"
-msgstr "Eliminar"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Agregar altra %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Ka eliminar?"
 
@@ -447,14 +451,17 @@ msgstr ""
 msgid "Models in the %(name)s application"
 msgstr "Modeli en la %(name)s apliko"
 
+msgid "Add"
+msgstr "Agregar"
+
 msgid "You don't have permission to edit anything."
 msgstr "Vu ne havas permiso por facar modifiki."
 
-msgid "Recent Actions"
-msgstr "Recenta agi"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "Mea agi"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Nulo disponebla"
@@ -469,6 +476,12 @@ msgid ""
 msgstr ""
 "Vua datumaro instaluro esas defektiva. Verifikez ke la datumaro tabeli "
 "kreadesis e ke la uzero havas permiso por lektar la datumaro."
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "Ka vu obliviis vua pasvorto od uzer-nomo?"
@@ -494,6 +507,9 @@ msgstr "Montrar omni"
 
 msgid "Save"
 msgstr "Salvar"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -627,9 +643,6 @@ msgstr "Chanjar mea pasvorto"
 
 msgid "All dates"
 msgstr "Omna dati"
-
-msgid "(None)"
-msgstr "(Nula)"
 
 #, python-format
 msgid "Select %s"

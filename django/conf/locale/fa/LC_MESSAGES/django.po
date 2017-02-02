@@ -6,17 +6,18 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mazdak Badakhshan <geraneum@gmail.com>, 2014
 # Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2013
-# Reza Mohammadi <reza@teeleh.ir>, 2013-2015
+# Pouya Abbassi, 2016
+# Reza Mohammadi <reza@teeleh.ir>, 2013-2016
 # Saeed <sd.javadi@gmail.com>, 2011
 # Sina Cheraghi <sinacher@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-04-11 14:04+0000\n"
-"Last-Translator: Ali Vakilzade <ali.vakilzade@gmail.com>\n"
-"Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-01 20:23+0000\n"
+"Last-Translator: Pouya Abbassi\n"
+"Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -66,6 +67,9 @@ msgstr "دانمارکی"
 msgid "German"
 msgstr "آلمانی"
 
+msgid "Lower Sorbian"
+msgstr "صربستانی پایین"
+
 msgid "Greek"
 msgstr "یونانی"
 
@@ -86,6 +90,9 @@ msgstr "اسپانیایی"
 
 msgid "Argentinian Spanish"
 msgstr "اسپانیایی آرژانتینی"
+
+msgid "Colombian Spanish"
+msgstr "کلمبیائی اسپانیایی"
 
 msgid "Mexican Spanish"
 msgstr "اسپانیولی مکزیکی"
@@ -117,6 +124,9 @@ msgstr "فریزی"
 msgid "Irish"
 msgstr "ایرلندی"
 
+msgid "Scottish Gaelic"
+msgstr "اسکاتلندی"
+
 msgid "Galician"
 msgstr "گالیسیایی"
 
@@ -128,6 +138,9 @@ msgstr "هندی"
 
 msgid "Croatian"
 msgstr "کرواتی"
+
+msgid "Upper Sorbian"
+msgstr "صربستانی بالا"
 
 msgid "Hungarian"
 msgstr "مجاری"
@@ -189,8 +202,8 @@ msgstr "مِراتی"
 msgid "Burmese"
 msgstr "برمه‌ای"
 
-msgid "Norwegian Bokmal"
-msgstr "نروژی Bokmal"
+msgid "Norwegian Bokmål"
+msgstr "نروژی"
 
 msgid "Nepali"
 msgstr "نپالی"
@@ -286,10 +299,7 @@ msgid "Static Files"
 msgstr "پرونده‌های استاتیک"
 
 msgid "Syndication"
-msgstr ""
-
-msgid "Web Design"
-msgstr "طراحی وب"
+msgstr "پیوند"
 
 msgid "Enter a valid value."
 msgstr "یک مقدار معتبر وارد کنید."
@@ -306,6 +316,11 @@ msgstr "یک ایمیل آدرس معتبر وارد کنید."
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "یک 'slug' معتبر شامل حروف، ارقام، خط زیر و یا خط تیره وارد کنید."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr "یک «نامک» معتبر شامل حروف یونیکد، اعداد، زیرخط یا خط فاصله وارد کنید."
 
 msgid "Enter a valid IPv4 address."
 msgstr "یک نشانی IPv4 معتبر وارد کنید."
@@ -353,6 +368,23 @@ msgstr[0] ""
 "طول این مقدار باید حداکثر %(limit_value)d کاراکتر باشد (طولش %(show_value)d "
 "است)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "نباید در مجموع بیش از %(max)s رقم داشته باشد."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "نباید بیش از %(max)s رقم اعشار داشته باشد."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "نباید بیش از %(max)s رقم قبل ممیز داشته باشد."
+
 msgid "and"
 msgstr "و"
 
@@ -392,6 +424,9 @@ msgstr "عدد صحیح"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr "مقدار «%(value)s» باید یک عدد باشد."
+
+msgid "Big (8 byte) integer"
+msgstr "بزرگ (8 بایت) عدد صحیح"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -457,6 +492,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"مقدار «%(value)s» در قالب نادرستی وارد شده است. باید در قالب ‎[DD] [HH:"
+"[MM:]]ss[.uuuuuu]‎ باشد."
 
 msgid "Duration"
 msgstr "بازهٔ زمانی"
@@ -473,9 +510,6 @@ msgstr "مقدار «%(value)s» باید عدد حقیقی باشد."
 
 msgid "Floating point number"
 msgstr "عدد اعشاری"
-
-msgid "Big (8 byte) integer"
-msgstr "بزرگ (8 بایت) عدد صحیح"
 
 msgid "IPv4 address"
 msgstr "IPv4 آدرس"
@@ -543,7 +577,7 @@ msgstr "تصویر"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "%(model)s با %(field)s %(value)r وجود ندارد."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "کلید خارجی ( نوع بر اساس فیلد رابط مشخص میشود )"
@@ -551,8 +585,22 @@ msgstr "کلید خارجی ( نوع بر اساس فیلد رابط مشخص م
 msgid "One-to-one relationship"
 msgstr "رابطه یک به یک "
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "رابطه %(from)s به %(to)s"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "روابط %(from)s به %(to)s"
+
 msgid "Many-to-many relationship"
 msgstr "رابطه چند به چند"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":؟.!"
 
 msgid "This field is required."
 msgstr "این فیلد لازم است."
@@ -562,23 +610,6 @@ msgstr "به طور کامل یک عدد وارد کنید."
 
 msgid "Enter a number."
 msgstr "یک عدد وارد کنید."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "نباید در مجموع بیش از %(max)s رقم داشته باشد."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "نباید بیش از %(max)s رقم اعشار داشته باشد."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "نباید بیش از %(max)s رقم قبل ممیز داشته باشد."
 
 msgid "Enter a valid date."
 msgstr "یک تاریخ معتبر وارد کنید."
@@ -638,12 +669,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(فیلد پنهان %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":؟.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "اطلاعات ManagementForm ناقص است و یا دستکاری شده است."
@@ -1035,18 +1060,27 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"شما این پیغام را میبینید چون این سایتِ HTTPS نیازمند یک «تیتر ارجاع» برای "
+"ارسال به بروزر شماست، ولی هیچ چیزی ارسال نشده است. این تیتر به دلایل امنیتی "
+"مورد نیاز است، برای اینکه از هایجک نشدن بروزر اطمینان حاصل شود."
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
+"اگر بزوزر خود را برای غیر فعال کردن تیترهای «ارجاع» تنظیم کرده‌اید، لطفا "
+"مجددا این ویژگی را فعال کنید، حداقل برای این وبسایت، یا برای اتصالات HTTPS، "
+"یا برای درخواستهایی با «مبدا یکسان»."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"شما این پیغام را میبینید چون این سایت نیازمند کوکی «جعل درخواست میان وبگاهی» "
+"در زمان ارائه ی فورم میباشد. این کوکی‌ها برای مسائل امنیتی ضروری هستند، برای "
+"اطمینان از اینکه بروزر شما توسط شخص ثالثی هایجک نشده باشد."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
@@ -1071,11 +1105,15 @@ msgid ""
 "Of course, you haven't actually done any work yet. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
+"مطمئنا شما هنوز کاری انجام نداده اید. اولین اپلیکیشن خود را با اجرای دستور "
+"<code>python manage.py startapp [app_label]</code> شروع کنید."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
 "your Django settings file and you haven't configured any URLs. Get to work!"
 msgstr ""
+"شما این پیغام را میبینید چون <code>DEBUG = True</code> در فایل تنظیمات جنگو "
+"تنیظم شده و هیچ URLـی تنظیم نکرده اید. به کار خود ادامه دهید."
 
 msgid "No year specified"
 msgstr "هیچ سالی مشخص نشده است"

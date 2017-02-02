@@ -49,6 +49,3 @@ def ogrinfo(data_source, num_features=10):
                 else:
                     output += ' (None)'
                 print(output)
-
-# For backwards compatibility.
-sample = ogrinfo

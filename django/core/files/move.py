@@ -71,10 +71,10 @@ def file_move_safe(old_file_name, new_file_name, chunk_size=1024 * 64, allow_ove
 
     try:
         os.remove(old_file_name)
-    except OSError as e:
+    except PermissionError as e:
         # Certain operating systems (Cygwin and Windows)
         # fail when deleting opened files, ignore it.  (For the
         # systems where this happens, temporary files will be auto-deleted
         # on close anyway.)
-        if getattr(e, 'winerror', 0) != 32 and getattr(e, 'errno', 0) != 13:
+        if getattr(e, 'winerror', 0) != 32:
             raise

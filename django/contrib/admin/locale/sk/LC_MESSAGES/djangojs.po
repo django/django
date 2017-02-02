@@ -4,17 +4,16 @@
 # Dimitris Glezos <glezos@transifex.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Juraj Bubniak <translations@jbub.eu>, 2012
-# Marian Andre <marian@andre.sk>, 2012
+# Marian Andre <marian@andre.sk>, 2012,2015
 # Martin Kosír, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:12+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 10:11+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Slovak (http://www.transifex.com/projects/p/django/language/"
-"sk/)\n"
+"Language-Team: Slovak (http://www.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -104,22 +103,22 @@ msgstr ""
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Poznámka: Ste %s hodinu pred časom servera."
+msgstr[1] "Poznámka: Ste %s hodiny pred časom servera."
+msgstr[2] "Poznámka: Ste %s hodín pred časom servera."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Poznámka: Ste %s hodinu za časom servera."
+msgstr[1] "Poznámka: Ste %s hodiny za časom servera."
+msgstr[2] "Poznámka: Ste %s hodín za časom servera."
 
 msgid "Now"
 msgstr "Teraz"
 
-msgid "Clock"
-msgstr "Hodiny"
+msgid "Choose a Time"
+msgstr ""
 
 msgid "Choose a time"
 msgstr "Vybrať čas"
@@ -133,14 +132,17 @@ msgstr "6:00"
 msgid "Noon"
 msgstr "Poludnie"
 
+msgid "6 p.m."
+msgstr ""
+
 msgid "Cancel"
 msgstr "Zrušiť"
 
 msgid "Today"
 msgstr "Dnes"
 
-msgid "Calendar"
-msgstr "Kalendár"
+msgid "Choose a Date"
+msgstr ""
 
 msgid "Yesterday"
 msgstr "Včera"
@@ -148,15 +150,69 @@ msgstr "Včera"
 msgid "Tomorrow"
 msgstr "Zajtra"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
+msgid "January"
 msgstr ""
-"január február marec apríl máj jún júl august september október november "
-"december"
 
-msgid "S M T W T F S"
-msgstr "N P U S Š P S"
+msgid "February"
+msgstr ""
+
+msgid "March"
+msgstr ""
+
+msgid "April"
+msgstr ""
+
+msgid "May"
+msgstr ""
+
+msgid "June"
+msgstr ""
+
+msgid "July"
+msgstr ""
+
+msgid "August"
+msgstr ""
+
+msgid "September"
+msgstr ""
+
+msgid "October"
+msgstr ""
+
+msgid "November"
+msgstr ""
+
+msgid "December"
+msgstr ""
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr ""
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr ""
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr ""
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr ""
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr ""
 
 msgid "Show"
 msgstr "Zobraziť"

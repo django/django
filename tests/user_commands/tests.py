@@ -1,16 +1,19 @@
 import os
+from io import StringIO
+from unittest import mock
+
+from admin_scripts.tests import AdminScriptTestCase
 
 from django.apps import apps
 from django.core import management
 from django.core.management import BaseCommand, CommandError, find_commands
 from django.core.management.utils import find_command, popen_wrapper
 from django.db import connection
-from django.test import SimpleTestCase, ignore_warnings, override_settings
-from django.test.utils import captured_stderr, captured_stdout, extend_sys_path
+from django.test import SimpleTestCase, override_settings
+from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
-from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.six import StringIO
+
+from .management.commands import dance
 
 
 # A minimal set of apps to avoid system checks running on all apps.
@@ -42,8 +45,9 @@ class CommandTests(SimpleTestCase):
             self.assertEqual(translation.get_language(), 'fr')
 
     def test_explode(self):
-        """ Test that an unknown command raises CommandError """
-        self.assertRaises(CommandError, management.call_command, ('explode',))
+        """ An unknown command raises CommandError """
+        with self.assertRaises(CommandError):
+            management.call_command(('explode',))
 
     def test_system_exit(self):
         """ Exception raised in a command should raise CommandError with
@@ -51,23 +55,25 @@ class CommandTests(SimpleTestCase):
         """
         with self.assertRaises(CommandError):
             management.call_command('dance', example="raise")
-        with captured_stderr() as stderr, self.assertRaises(SystemExit):
-            management.ManagementUtility(['manage.py', 'dance', '--example=raise']).execute()
+        dance.Command.requires_system_checks = False
+        try:
+            with captured_stderr() as stderr, self.assertRaises(SystemExit):
+                management.ManagementUtility(['manage.py', 'dance', '--example=raise']).execute()
+        finally:
+            dance.Command.requires_system_checks = True
         self.assertIn("CommandError", stderr.getvalue())
 
     def test_deactivate_locale_set(self):
         # Deactivate translation when set to true
-        out = StringIO()
         with translation.override('pl'):
-            management.call_command('leave_locale_alone_false', stdout=out)
-            self.assertEqual(out.getvalue(), "")
+            result = management.call_command('leave_locale_alone_false', stdout=StringIO())
+            self.assertIsNone(result)
 
     def test_configured_locale_preserved(self):
         # Leaves locale from settings when set to false
-        out = StringIO()
         with translation.override('pl'):
-            management.call_command('leave_locale_alone_true', stdout=out)
-            self.assertEqual(out.getvalue(), "pl\n")
+            result = management.call_command('leave_locale_alone_true', stdout=StringIO())
+            self.assertEqual(result, "pl")
 
     def test_find_command_without_PATH(self):
         """
@@ -84,9 +90,9 @@ class CommandTests(SimpleTestCase):
 
     def test_discover_commands_in_eggs(self):
         """
-        Test that management commands can also be loaded from Python eggs.
+        Management commands can also be loaded from Python eggs.
         """
-        egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
+        egg_dir = '%s/eggs' % os.path.dirname(__file__)
         egg_name = '%s/basic.egg' % egg_dir
         with extend_sys_path(egg_name):
             with self.settings(INSTALLED_APPS=['commandegg']):
@@ -104,19 +110,13 @@ class CommandTests(SimpleTestCase):
         self.assertNotIn("opt_3", out.getvalue())
         self.assertNotIn("opt-3", out.getvalue())
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_optparse_compatibility(self):
+    def test_call_command_option_parsing_non_string_arg(self):
         """
-        optparse should be supported during Django 1.8/1.9 releases.
+        It should be possible to pass non-string arguments to call_command.
         """
         out = StringIO()
-        management.call_command('optparse_cmd', stdout=out)
-        self.assertEqual(out.getvalue(), "All right, let's dance Rock'n'Roll.\n")
-
-        # Simulate command line execution
-        with captured_stdout() as stdout, captured_stderr():
-            management.execute_from_command_line(['django-admin', 'optparse_cmd'])
-        self.assertEqual(stdout.getvalue(), "All right, let's dance Rock'n'Roll.\n")
+        management.call_command('dance', 1, verbosity=0, stdout=out)
+        self.assertIn("You passed 1 as a positional argument.", out.getvalue())
 
     def test_calling_a_command_with_only_empty_parameter_should_ends_gracefully(self):
         out = StringIO()
@@ -134,16 +134,13 @@ class CommandTests(SimpleTestCase):
         self.assertIn("Dave, my mind is going. I can feel it. I can feel it.\n", out.getvalue())
 
     def test_calling_a_command_with_no_app_labels_and_parameters_should_raise_a_command_error(self):
-        out = StringIO()
         with self.assertRaises(CommandError):
-            management.call_command('hal', stdout=out)
+            management.call_command('hal', stdout=StringIO())
 
     def test_output_transaction(self):
-        out = StringIO()
-        management.call_command('transaction', stdout=out, no_color=True)
-        output = out.getvalue().strip()
-        self.assertTrue(output.startswith(connection.ops.start_transaction_sql()))
-        self.assertTrue(output.endswith(connection.ops.end_transaction_sql()))
+        output = management.call_command('transaction', stdout=StringIO(), no_color=True)
+        self.assertTrue(output.strip().startswith(connection.ops.start_transaction_sql()))
+        self.assertTrue(output.strip().endswith(connection.ops.end_transaction_sql()))
 
     def test_call_command_no_checks(self):
         """
@@ -153,7 +150,7 @@ class CommandTests(SimpleTestCase):
         self.counter = 0
 
         def patched_check(self_, **kwargs):
-            self.counter = self.counter + 1
+            self.counter += 1
 
         saved_check = BaseCommand.check
         BaseCommand.check = patched_check
@@ -165,8 +162,39 @@ class CommandTests(SimpleTestCase):
         finally:
             BaseCommand.check = saved_check
 
+    def test_check_migrations(self):
+        requires_migrations_checks = dance.Command.requires_migrations_checks
+        self.assertIs(requires_migrations_checks, False)
+        try:
+            with mock.patch.object(BaseCommand, 'check_migrations') as check_migrations:
+                management.call_command('dance', verbosity=0)
+                self.assertFalse(check_migrations.called)
+                dance.Command.requires_migrations_checks = True
+                management.call_command('dance', verbosity=0)
+                self.assertTrue(check_migrations.called)
+        finally:
+            dance.Command.requires_migrations_checks = requires_migrations_checks
+
+
+class CommandRunTests(AdminScriptTestCase):
+    """
+    Tests that need to run by simulating the command line, not by call_command.
+    """
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_script_prefix_set_in_commands(self):
+        self.write_settings('settings.py', apps=['user_commands'], sdict={
+            'ROOT_URLCONF': '"user_commands.urls"',
+            'FORCE_SCRIPT_NAME': '"/PREFIX/"',
+        })
+        out, err = self.run_manage(['reverse_url'])
+        self.assertNoOutput(err)
+        self.assertEqual(out.strip(), '/PREFIX/some/url/')
+
 
 class UtilsTests(SimpleTestCase):
 
     def test_no_existent_external_program(self):
-        self.assertRaises(CommandError, popen_wrapper, ['a_42_command_that_doesnt_exist_42'])
+        with self.assertRaises(CommandError):
+            popen_wrapper(['a_42_command_that_doesnt_exist_42'])

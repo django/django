@@ -1,16 +1,11 @@
-from django.contrib.gis.gdal import HAS_GDAL
-from django.utils.encoding import python_2_unicode_compatible
+from django.contrib.gis.db import models
 
 from ..admin import admin
-from ..models import models
 
 
-@python_2_unicode_compatible
 class City(models.Model):
     name = models.CharField(max_length=30)
     point = models.PointField()
-
-    objects = models.GeoManager()
 
     class Meta:
         app_label = 'geoadmin'
@@ -19,6 +14,6 @@ class City(models.Model):
     def __str__(self):
         return self.name
 
+
 site = admin.AdminSite(name='admin_gis')
-if HAS_GDAL:
-    site.register(City, admin.OSMGeoAdmin)
+site.register(City, admin.OSMGeoAdmin)

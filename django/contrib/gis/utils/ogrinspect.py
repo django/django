@@ -5,10 +5,9 @@ models for GeoDjango and/or mapping dictionaries for use with the
 """
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.gdal.field import (
-    OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime,
+    OFTDate, OFTDateTime, OFTInteger, OFTInteger64, OFTReal, OFTString,
+    OFTTime,
 )
-from django.utils import six
-from django.utils.six.moves import zip
 
 
 def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
@@ -25,7 +24,7 @@ def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
 
      `multi_geom` => Boolean (default: False) - specify as multigeometry.
     """
-    if isinstance(data_source, six.string_types):
+    if isinstance(data_source, str):
         # Instantiating the DataSource from the string.
         data_source = DataSource(data_source)
     elif isinstance(data_source, DataSource):
@@ -93,7 +92,7 @@ def ogrinspect(*args, **kwargs):
      `multi_geom` => Boolean (default: False) - specify as multigeometry.
 
      `name_field` => String - specifies a field name to return for the
-       `__unicode__`/`__str__` function (which will be generated if specified).
+       __str__() method (which will be generated if specified).
 
      `imports` => Boolean (default: True) - set to False to omit the
        `from django.contrib.gis.db import models` code from the
@@ -128,7 +127,7 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
     to the given data source.  See the `ogrinspect` docstring for more details.
     """
     # Getting the DataSource
-    if isinstance(data_source, six.string_types):
+    if isinstance(data_source, str):
         data_source = DataSource(data_source)
     elif isinstance(data_source, DataSource):
         pass
@@ -195,6 +194,8 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
                 yield '    %s = models.FloatField(%s)' % (mfield, kwargs_str[2:])
         elif field_type is OFTInteger:
             yield '    %s = models.IntegerField(%s)' % (mfield, kwargs_str[2:])
+        elif field_type is OFTInteger64:
+            yield '    %s = models.BigIntegerField(%s)' % (mfield, kwargs_str[2:])
         elif field_type is OFTString:
             yield '    %s = models.CharField(max_length=%s%s)' % (mfield, width, kwargs_str)
         elif field_type is OFTDate:
@@ -229,9 +230,7 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
         srid_str = 'srid=%s' % srid
 
     yield '    %s = models.%s(%s)' % (geom_name, geom_field, srid_str)
-    yield '    objects = models.GeoManager()'
 
     if name_field:
         yield ''
-        yield '    def __%s__(self): return self.%s' % (
-            'str' if six.PY3 else 'unicode', name_field)
+        yield '    def __str__(self): return self.%s' % name_field

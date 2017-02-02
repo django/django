@@ -18,22 +18,13 @@ Methods that it provides can be used to:
 * Retrieve all field instances of a model
 * Retrieve a single field instance of a model by name
 
-.. versionchanged:: 1.8
-
-    The Model ``_meta`` API has always existed as a Django internal, but
-    wasn't formally documented and supported. As part of the effort to
-    make this API public, some of the already existing API entry points
-    have changed slightly. A :ref:`migration guide <migrating-old-meta-api>`
-    has been provided to assist in converting your code to use the new,
-    official API.
-
 .. _model-meta-field-api:
 
 Field access API
 ================
 
 Retrieving a single field instance of a model by name
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------
 
 .. method:: Options.get_field(field_name)
 
@@ -70,24 +61,10 @@ Retrieving a single field instance of a model by name
             ...
         FieldDoesNotExist: User has no field named 'does_not_exist'
 
-    .. deprecated:: 1.8
-
-        :meth:`Options.get_field()` previously accepted a ``many_to_many``
-        parameter which could be set to ``False`` to avoid searching
-        ``ManyToManyField``\s. The old behavior has been preserved for
-        backwards compatibility; however, the parameter and this behavior
-        has been deprecated.
-
-        If you wish to filter out ``ManyToManyField``\s, you can inspect the
-        :attr:`Field.many_to_many <django.db.models.Field.many_to_many>`
-        attribute after calling ``get_field()``.
-
 Retrieving all field instances of a model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------
 
 .. method:: Options.get_fields(include_parents=True, include_hidden=False)
-
-    .. versionadded:: 1.8
 
     Returns a tuple of fields associated with a model. ``get_fields()`` accepts
     two parameters that can be used to control which fields are returned:
@@ -151,7 +128,7 @@ Migrating from the old API
 
 As part of the formalization of the ``Model._meta`` API (from the
 :class:`django.db.models.options.Options` class), a number of methods and
-properties have been deprecated and will be removed in Django 2.0.
+properties have been deprecated and will be removed in Django 1.10.
 
 These old APIs can be replicated by either:
 
@@ -172,23 +149,21 @@ that were previously excluded - will almost certainly result in better code.
 Assuming you have a model named ``MyModel``, the following substitutions
 can be made to convert your code to the new API:
 
-* ``MyModel._meta.get_field(name)``::
+* ``MyModel._meta.get_field(name)`` becomes::
 
       f = MyModel._meta.get_field(name)
 
   then check if:
 
   - ``f.auto_created == False``, because the new ``get_field()``
-    API will find "reverse" relations), and:
+    API will find "reverse" relations, and:
 
   - ``f.is_relation and f.related_model is None``, because the new
     ``get_field()`` API will find
-    :class:`~django.contrib.contenttypes.fields.GenericForeignKey` relations;
+    :class:`~django.contrib.contenttypes.fields.GenericForeignKey` relations.
 
-* ``MyModel._meta.get_field_by_name(name)``:
-
-  ``get_field_by_name()`` returned four values:
-  ``(field, model, direct,  m2m)``:
+* ``MyModel._meta.get_field_by_name(name)`` returns a tuple of these four
+  values with the following replacements:
 
   - ``field`` can be found by ``MyModel._meta.get_field(name)``
 
@@ -206,7 +181,7 @@ can be made to convert your code to the new API:
   - ``m2m`` can be found through the
     :attr:`~django.db.models.Field.many_to_many` attribute on the field.
 
-* ``MyModel._meta.get_fields_with_model()``::
+* ``MyModel._meta.get_fields_with_model()`` becomes::
 
       [
           (f, f.model if f.model != MyModel else None)
@@ -216,7 +191,7 @@ can be made to convert your code to the new API:
               or (f.many_to_one and f.related_model)
       ]
 
-* ``MyModel._meta.get_concrete_fields_with_model()``::
+* ``MyModel._meta.get_concrete_fields_with_model()`` becomes::
 
       [
           (f, f.model if f.model != MyModel else None)
@@ -228,7 +203,7 @@ can be made to convert your code to the new API:
           )
       ]
 
-* ``MyModel._meta.get_m2m_with_model()``::
+* ``MyModel._meta.get_m2m_with_model()`` becomes::
 
       [
           (f, f.model if f.model != MyModel else None)
@@ -236,29 +211,31 @@ can be made to convert your code to the new API:
           if f.many_to_many and not f.auto_created
       ]
 
-* ``MyModel._meta.get_all_related_objects()``::
+* ``MyModel._meta.get_all_related_objects()`` becomes::
 
       [
           f for f in MyModel._meta.get_fields()
-          if (f.one_to_many or f.one_to_one) and f.auto_created
+          if (f.one_to_many or f.one_to_one)
+          and f.auto_created and not f.concrete
       ]
 
-* ``MyModel._meta.get_all_related_objects_with_model()``::
+* ``MyModel._meta.get_all_related_objects_with_model()`` becomes::
 
       [
           (f, f.model if f.model != MyModel else None)
           for f in MyModel._meta.get_fields()
-          if (f.one_to_many or f.one_to_one) and f.auto_created
+          if (f.one_to_many or f.one_to_one)
+          and f.auto_created and not f.concrete
       ]
 
-* ``MyModel._meta.get_all_related_many_to_many_objects()``::
+* ``MyModel._meta.get_all_related_many_to_many_objects()`` becomes::
 
       [
           f for f in MyModel._meta.get_fields(include_hidden=True)
           if f.many_to_many and f.auto_created
       ]
 
-* ``MyModel._meta.get_all_related_m2m_objects_with_model()``::
+* ``MyModel._meta.get_all_related_m2m_objects_with_model()`` becomes::
 
       [
           (f, f.model if f.model != MyModel else None)
@@ -266,7 +243,7 @@ can be made to convert your code to the new API:
           if f.many_to_many and f.auto_created
       ]
 
-* ``MyModel._meta.get_all_field_names()``::
+* ``MyModel._meta.get_all_field_names()`` becomes::
 
       from itertools import chain
       list(set(chain.from_iterable(

@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 """
 LANG_INFO is a dictionary structure to provide meta information about languages.
 
@@ -95,6 +92,12 @@ LANG_INFO = {
         'name': 'German',
         'name_local': 'Deutsch',
     },
+    'dsb': {
+        'bidi': False,
+        'code': 'dsb',
+        'name': 'Lower Sorbian',
+        'name_local': 'dolnoserbski',
+    },
     'el': {
         'bidi': False,
         'code': 'el',
@@ -136,6 +139,12 @@ LANG_INFO = {
         'code': 'es-ar',
         'name': 'Argentinian Spanish',
         'name_local': 'español de Argentina',
+    },
+    'es-co': {
+        'bidi': False,
+        'code': 'es-co',
+        'name': 'Colombian Spanish',
+        'name_local': 'español de Colombia',
     },
     'es-mx': {
         'bidi': False,
@@ -197,6 +206,12 @@ LANG_INFO = {
         'name': 'Irish',
         'name_local': 'Gaeilge',
     },
+    'gd': {
+        'bidi': False,
+        'code': 'gd',
+        'name': 'Scottish Gaelic',
+        'name_local': 'Gàidhlig',
+    },
     'gl': {
         'bidi': False,
         'code': 'gl',
@@ -220,6 +235,12 @@ LANG_INFO = {
         'code': 'hr',
         'name': 'Croatian',
         'name_local': 'Hrvatski',
+    },
+    'hsb': {
+        'bidi': False,
+        'code': 'hsb',
+        'name': 'Upper Sorbian',
+        'name_local': 'hornjoserbsce',
     },
     'hu': {
         'bidi': False,
@@ -417,7 +438,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'sk',
         'name': 'Slovak',
-        'name_local': 'slovenský',
+        'name_local': 'Slovensky',
     },
     'sl': {
         'bidi': False,

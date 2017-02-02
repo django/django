@@ -1,15 +1,10 @@
-import inspect
 import os
 import pkgutil
-import warnings
 from importlib import import_module
 from threading import local
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import six
-from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -17,7 +12,7 @@ DEFAULT_DB_ALIAS = 'default'
 DJANGO_VERSION_PICKLE_KEY = '_django_version'
 
 
-class Error(Exception if six.PY3 else StandardError):
+class Error(Exception):
     pass
 
 
@@ -53,7 +48,7 @@ class NotSupportedError(DatabaseError):
     pass
 
 
-class DatabaseErrorWrapper(object):
+class DatabaseErrorWrapper:
     """
     Context manager and decorator that re-throws backend-specific database
     exceptions using Django's common wrappers.
@@ -92,7 +87,7 @@ class DatabaseErrorWrapper(object):
                 # the connection unusable.
                 if dj_exc_type not in (DataError, IntegrityError):
                     self.wrapper.errors_occurred = True
-                six.reraise(dj_exc_type, dj_exc_value, traceback)
+                raise dj_exc_value.with_traceback(traceback)
 
     def __call__(self, func):
         # Note that we are intentionally not using @wraps here for performance
@@ -104,27 +99,31 @@ class DatabaseErrorWrapper(object):
 
 
 def load_backend(backend_name):
-    # Look for a fully qualified database backend name
+    """
+    Return a database backend's "base" module given a fully qualified database
+    backend name, or raise an error if it doesn't exist.
+    """
+    # This backend was renamed in Django 1.9.
+    if backend_name == 'django.db.backends.postgresql_psycopg2':
+        backend_name = 'django.db.backends.postgresql'
+
     try:
         return import_module('%s.base' % backend_name)
     except ImportError as e_user:
         # The database backend wasn't found. Display a helpful error message
-        # listing all possible (built-in) database backends.
-        backend_dir = os.path.join(os.path.dirname(upath(__file__)), 'backends')
-        try:
-            builtin_backends = [
-                name for _, name, ispkg in pkgutil.iter_modules([backend_dir])
-                if ispkg and name != 'dummy']
-        except EnvironmentError:
-            builtin_backends = []
-        if backend_name not in ['django.db.backends.%s' % b for b in
-                                builtin_backends]:
+        # listing all built-in database backends.
+        backend_dir = os.path.join(os.path.dirname(__file__), 'backends')
+        builtin_backends = [
+            name for _, name, ispkg in pkgutil.iter_modules([backend_dir])
+            if ispkg and name not in {'base', 'dummy', 'postgresql_psycopg2'}
+        ]
+        if backend_name not in ['django.db.backends.%s' % b for b in builtin_backends]:
             backend_reprs = map(repr, sorted(builtin_backends))
-            error_msg = ("%r isn't an available database backend.\n"
-                         "Try using 'django.db.backends.XXX', where XXX "
-                         "is one of:\n    %s\nError was: %s" %
-                         (backend_name, ", ".join(backend_reprs), e_user))
-            raise ImproperlyConfigured(error_msg)
+            raise ImproperlyConfigured(
+                "%r isn't an available database backend.\n"
+                "Try using 'django.db.backends.XXX', where XXX is one of:\n"
+                "    %s" % (backend_name, ", ".join(backend_reprs))
+            ) from e_user
         else:
             # If there's some other error, this must be an error in Django
             raise
@@ -134,7 +133,7 @@ class ConnectionDoesNotExist(Exception):
     pass
 
 
-class ConnectionHandler(object):
+class ConnectionHandler:
     def __init__(self, databases=None):
         """
         databases is an optional dictionary of database definitions (structured
@@ -227,7 +226,7 @@ class ConnectionHandler(object):
             connection.close()
 
 
-class ConnectionRouter(object):
+class ConnectionRouter:
     def __init__(self, routers=None):
         """
         If routers is not specified, will default to settings.DATABASE_ROUTERS.
@@ -240,7 +239,7 @@ class ConnectionRouter(object):
             self._routers = settings.DATABASE_ROUTERS
         routers = []
         for r in self._routers:
-            if isinstance(r, six.string_types):
+            if isinstance(r, str):
                 router = import_string(r)()
             else:
                 router = r
@@ -290,18 +289,7 @@ class ConnectionRouter(object):
                 # If the router doesn't have a method, skip to the next one.
                 continue
 
-            argspec = inspect.getargspec(router.allow_migrate)
-            if len(argspec.args) == 3 and not argspec.keywords:
-                warnings.warn(
-                    "The signature of allow_migrate has changed from "
-                    "allow_migrate(self, db, model) to "
-                    "allow_migrate(self, db, app_label, model_name=None, **hints). "
-                    "Support for the old signature will be removed in Django 2.0.",
-                    RemovedInDjango20Warning)
-                model = hints.get('model')
-                allow = None if model is None else method(db, model)
-            else:
-                allow = method(db, app_label, **hints)
+            allow = method(db, app_label, **hints)
 
             if allow is not None:
                 return allow

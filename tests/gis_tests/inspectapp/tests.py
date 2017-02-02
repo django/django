@@ -1,28 +1,25 @@
-from __future__ import unicode_literals
-
 import os
 import re
-from unittest import skipUnless
+from io import StringIO
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.core.management import call_command
 from django.db import connection, connections
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import modify_settings
-from django.utils.six import StringIO
 
 from ..test_data import TEST_DATA
+from ..utils import postgis
 
 if HAS_GDAL:
-    from django.contrib.gis.gdal import Driver, GDALException
+    from django.contrib.gis.gdal import Driver, GDALException, GDAL_VERSION
     from django.contrib.gis.utils.ogrinspect import ogrinspect
 
     from .models import AllOGRFields
 
 
-@skipUnless(HAS_GDAL, "InspectDbTests needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class InspectDbTests(TestCase):
-    @skipUnlessDBFeature("gis_enabled")
     def test_geom_columns(self):
         """
         Test the geo-enabled inspectdb command.
@@ -40,7 +37,6 @@ class InspectDbTests(TestCase):
         else:
             self.assertIn('geom = models.GeometryField(', output)
             self.assertIn('point = models.GeometryField(', output)
-        self.assertIn('objects = models.GeoManager()', output)
 
     @skipUnlessDBFeature("supports_3d_storage")
     def test_3d_columns(self):
@@ -53,16 +49,19 @@ class InspectDbTests(TestCase):
         output = out.getvalue()
         if connection.features.supports_geometry_field_introspection:
             self.assertIn('point = models.PointField(dim=3)', output)
+            if postgis:
+                # Geography type is specific to PostGIS
+                self.assertIn('pointg = models.PointField(geography=True, dim=3)', output)
             self.assertIn('line = models.LineStringField(dim=3)', output)
             self.assertIn('poly = models.PolygonField(dim=3)', output)
         else:
             self.assertIn('point = models.GeometryField(', output)
+            self.assertIn('pointg = models.GeometryField(', output)
             self.assertIn('line = models.GeometryField(', output)
             self.assertIn('poly = models.GeometryField(', output)
-        self.assertIn('objects = models.GeoManager()', output)
 
 
-@skipUnless(HAS_GDAL, "OGRInspectTest needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 @modify_settings(
     INSTALLED_APPS={'append': 'django.contrib.gis'},
 )
@@ -79,10 +78,9 @@ class OGRInspectTest(TestCase):
             '',
             'class MyModel(models.Model):',
             '    float = models.FloatField()',
-            '    int = models.FloatField()',
+            '    int = models.{}()'.format('BigIntegerField' if GDAL_VERSION >= (2, 0) else 'FloatField'),
             '    str = models.CharField(max_length=80)',
             '    geom = models.PolygonField(srid=-1)',
-            '    objects = models.GeoManager()',
         ]
 
         self.assertEqual(model_def, '\n'.join(expected))
@@ -106,11 +104,10 @@ class OGRInspectTest(TestCase):
             '',
             'class City(models.Model):',
             '    name = models.CharField(max_length=80)',
-            '    population = models.FloatField()',
+            '    population = models.{}()'.format('BigIntegerField' if GDAL_VERSION >= (2, 0) else 'FloatField'),
             '    density = models.FloatField()',
             '    created = models.DateField()',
             '    geom = models.PointField(srid=-1)',
-            '    objects = models.GeoManager()',
         ]
 
         self.assertEqual(model_def, '\n'.join(expected))
@@ -147,9 +144,8 @@ class OGRInspectTest(TestCase):
         self.assertIn('    f_char = models.CharField(max_length=10)', model_def)
         self.assertIn('    f_date = models.DateField()', model_def)
 
-        self.assertIsNotNone(re.search(
-            r'    geom = models.PolygonField\(([^\)])*\)\n'  # Some backends may have srid=-1
-            r'    objects = models.GeoManager\(\)', model_def))
+        # Some backends may have srid=-1
+        self.assertIsNotNone(re.search(r'    geom = models.PolygonField\(([^\)])*\)', model_def))
 
     def test_management_command(self):
         shp_file = os.path.join(TEST_DATA, 'cities', 'cities.shp')
@@ -186,10 +182,10 @@ def get_ogr_db_string():
     # Ensure that GDAL library has driver support for the database.
     try:
         Driver(drv_name)
-    except:
+    except GDALException:
         return None
 
-    # SQLite/Spatialite in-memory databases
+    # SQLite/SpatiaLite in-memory databases
     if db['NAME'] == ":memory:":
         return None
 

@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.template.defaultfilters import slugify
 from django.test import SimpleTestCase
+from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -41,3 +39,10 @@ class FunctionTests(SimpleTestCase):
 
     def test_non_string_input(self):
         self.assertEqual(slugify(123), '123')
+
+    def test_slugify_lazy_string(self):
+        lazy_str = lazy(lambda string: string, str)
+        self.assertEqual(
+            slugify(lazy_str(' Jack & Jill like numbers 1,2,3 and 4 and silly characters ?%.$!/')),
+            'jack-jill-like-numbers-123-and-4-and-silly-characters',
+        )

@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-19 07:46+0000\n"
-"Last-Translator: André Bouatchidzé <a@anbz.net>\n"
-"Language-Team: Georgian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Georgian (http://www.transifex.com/django/django/language/"
 "ka/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -61,6 +61,9 @@ msgstr "დანიური"
 msgid "German"
 msgstr "გერმანული"
 
+msgid "Lower Sorbian"
+msgstr ""
+
 msgid "Greek"
 msgstr "ბერძნული"
 
@@ -81,6 +84,9 @@ msgstr "ესპანური"
 
 msgid "Argentinian Spanish"
 msgstr "არგენტინის ესპანური"
+
+msgid "Colombian Spanish"
+msgstr ""
 
 msgid "Mexican Spanish"
 msgstr "მექსიკური ესპანური"
@@ -112,6 +118,9 @@ msgstr "ფრისიული"
 msgid "Irish"
 msgstr "ირლანდიური"
 
+msgid "Scottish Gaelic"
+msgstr ""
+
 msgid "Galician"
 msgstr "გალიციური"
 
@@ -123,6 +132,9 @@ msgstr "ჰინდი"
 
 msgid "Croatian"
 msgstr "ხორვატიული"
+
+msgid "Upper Sorbian"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "უნგრული"
@@ -184,8 +196,8 @@ msgstr "მარათული"
 msgid "Burmese"
 msgstr "ბირმული"
 
-msgid "Norwegian Bokmal"
-msgstr "ნორვეგიული-ბოკმალი"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "ნეპალური"
@@ -283,9 +295,6 @@ msgstr "სტატიკური ფაილები"
 msgid "Syndication"
 msgstr "სინდიკაცია"
 
-msgid "Web Design"
-msgstr ""
-
 msgid "Enter a valid value."
 msgstr "შეიყვანეთ სწორი მნიშვნელობა."
 
@@ -293,7 +302,7 @@ msgid "Enter a valid URL."
 msgstr "შეიყვანეთ სწორი URL."
 
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "შეიყვანეთ სწორი მთელი რიცხვი."
 
 msgid "Enter a valid email address."
 msgstr "შეიყვანეთ მართებული ელფოსტის მისამართი."
@@ -303,6 +312,11 @@ msgid ""
 msgstr ""
 "შეიყვანეთ სწორი 'slug'-მნიშვნელობა, რომელიც შეიცავს მხოლოდ ასოებს, ციფრებს, "
 "ხაზგასმის ნიშნებს და დეფისებს."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
 
 msgid "Enter a valid IPv4 address."
 msgstr "შეიყვანეთ სწორი IPv4 მისამართი."
@@ -336,6 +350,8 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"მნიშვნელობას უნდა ჰქონდეს სულ ცოტა %(limit_value)d სიმბოლო (მას აქვს "
+"%(show_value)d)."
 
 #, python-format
 msgid ""
@@ -345,17 +361,36 @@ msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"მნიშვნელობას უნდა ჰქონდეს არაუმეტეს %(limit_value)d სიმბოლოსი (მას აქვს "
+"%(show_value)d)."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] ""
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
 
 msgid "and"
 msgstr "და"
 
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(model_name)s ამ %(field_labels)s-ით უკვე არსებობს."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "მნიშვნელობა %(value)r არ არის დასაშვები."
 
 msgid "This field cannot be null."
 msgstr "ეს ველი არ შეიძლება იყოს null."
@@ -373,6 +408,8 @@ msgstr "%(model_name)s მოცემული %(field_label)s-ით უკვ
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"%(field_label)s უნდა იყოს უნიკალური %(date_field_label)s %(lookup_type)s-"
+"სთვის."
 
 #, python-format
 msgid "Field of type: %(field_type)s"
@@ -383,11 +420,14 @@ msgstr "მთელი"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "მნიშვნელობა '%(value)s' უნდა იყოს მთელი რიცხვი."
+
+msgid "Big (8 byte) integer"
+msgstr "დიდი მთელი (8-ბაიტიანი)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "მნიშვნელობა '%(value)s' უნდა იყოს True ან False."
 
 msgid "Boolean (Either True or False)"
 msgstr "ლოგიკური (True ან False)"
@@ -404,12 +444,16 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"'%(value)s' მნიშვნელობას აქვს არასწორი თარიღის ფორმატი. ის უნდა იყოს YYYY-MM-"
+"DD ფორმატში."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"'%(value)s' მნიშვნელობას აქვს სწორი ფორმატი (YYYY-MM-DD), მაგრამ ის არასწორი "
+"თარიღია."
 
 msgid "Date (without time)"
 msgstr "თარიღი (დროის გარეშე)"
@@ -419,19 +463,23 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"'%(value)s' მნიშვნელობას აქვს არასწორი ფორმატი. ის უნდა იყოს YYYY-MM-DD HH:"
+"MM[:ss[.uuuuuu]][TZ] ფორმატში."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"'%(value)s' მნიშვნელობას აქვს სწორი ფორმატი (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]), მაგრამ ის არასწორი თარიღი/დრო-ა."
 
 msgid "Date (with time)"
 msgstr "თარიღი (დროსთან ერთად)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "მნიშვნელობა '%(value)s' უნდა იყოს ათობითი რიცხვი."
 
 msgid "Decimal number"
 msgstr "ათობითი რიცხვი"
@@ -441,9 +489,11 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"'%(value)s' არასწორი ფორმატი აქვს. ის უნდა იყოს [DD] [HH:[MM:]]ss[.uuuuuu] "
+"ფორმატში."
 
 msgid "Duration"
-msgstr ""
+msgstr "ხანგრზლივობა"
 
 msgid "Email address"
 msgstr "ელ. ფოსტის მისამართი"
@@ -458,9 +508,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr "რიცხვი მცოცავი წერტილით"
 
-msgid "Big (8 byte) integer"
-msgstr "დიდი მთელი (8-ბაიტიანი)"
-
 msgid "IPv4 address"
 msgstr "IPv4 მისამართი"
 
@@ -469,7 +516,7 @@ msgstr "IP-მისამართი"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "მნიშვნელობა '%(value)s' უნდა იყოს None, True ან False."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "ლოგიკური (True, False ან None)"
@@ -531,8 +578,22 @@ msgstr "გარე გასაღები (ტიპი განისა�
 msgid "One-to-one relationship"
 msgstr "კავშირი ერთი-ერთტან"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
 msgid "Many-to-many relationship"
 msgstr "კავშირი მრავალი-მრავალთან"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ""
 
 msgid "This field is required."
 msgstr "ეს ველი აუცილებელია."
@@ -542,23 +603,6 @@ msgstr "შეიყვანეთ მთელი რიცხვი"
 
 msgid "Enter a number."
 msgstr "შეიყვანეთ რიცხვი."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
 
 msgid "Enter a valid date."
 msgstr "შეიყვანეთ სწორი თარიღი."
@@ -606,7 +650,7 @@ msgid "Enter a list of values."
 msgstr "შეიყვანეთ მნიშვნელობების სია."
 
 msgid "Enter a complete value."
-msgstr ""
+msgstr "შეიყვანეთ სრული მნიშვნელობა."
 
 msgid "Enter a valid UUID."
 msgstr ""
@@ -617,13 +661,7 @@ msgstr ""
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ""
+msgstr "(დამალული ველი %(name)s) %(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr ""
@@ -956,7 +994,7 @@ msgid "December"
 msgstr "დეკემბერი"
 
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "ეს არ არის სწორი IPv6 მისამართი."
 
 #, python-format
 msgctxt "String to return when truncating text"
@@ -1004,7 +1042,7 @@ msgid "0 minutes"
 msgstr "0 წუთი"
 
 msgid "Forbidden"
-msgstr ""
+msgstr "აკრძალული"
 
 msgid "CSRF verification failed. Request aborted."
 msgstr ""
@@ -1034,16 +1072,16 @@ msgid ""
 msgstr ""
 
 msgid "More information is available with DEBUG=True."
-msgstr ""
+msgstr "მეტი ინფორმაცია მისაწვდომია DEBUG=True-ს მეშვეობით."
 
 msgid "Welcome to Django"
-msgstr ""
+msgstr "კეთილი იყოს თქვენი მობრძანება Django-ში"
 
 msgid "It worked!"
-msgstr ""
+msgstr "ამან იმუშავა!"
 
 msgid "Congratulations on your first Django-powered page."
-msgstr ""
+msgstr "გილოცავთ თქვენს პრიველ Django-ზე მომუშავე გვერდს."
 
 msgid ""
 "Of course, you haven't actually done any work yet. Next, start your first "
@@ -1108,4 +1146,4 @@ msgstr "\"%(path)s\" არ არსებობს"
 
 #, python-format
 msgid "Index of %(directory)s"
-msgstr ""
+msgstr "%(directory)s-ის იდექსი"

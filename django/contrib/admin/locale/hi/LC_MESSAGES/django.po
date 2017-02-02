@@ -10,11 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Hindi (http://www.transifex.com/projects/p/django/language/"
-"hi/)\n"
+"Language-Team: Hindi (http://www.transifex.com/django/django/language/hi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -66,6 +65,12 @@ msgstr "इस महीने"
 msgid "This year"
 msgstr "इस साल"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -77,12 +82,27 @@ msgstr ""
 msgid "Action:"
 msgstr " क्रिया:"
 
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "एक और %(verbose_name)s जोड़ें "
+
+msgid "Remove"
+msgstr "निकालें"
+
 msgid "action time"
 msgstr "कार्य समय"
+
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
 
 msgid "object id"
 msgstr "वस्तु आई डी "
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "वस्तु प्रतिनिधित्व"
 
@@ -113,6 +133,31 @@ msgstr "\"%(object)s\" को नष्ट कर दिया है."
 msgid "LogEntry Object"
 msgstr "LogEntry ऑब्जेक्ट"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "और"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "कोई क्षेत्र नहीं बदला"
+
 msgid "None"
 msgstr "कोई नहीं"
 
@@ -120,64 +165,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-#, python-format
-msgid "Changed %s."
-msgstr "%s को बदला गया हैं"
-
-msgid "and"
-msgstr "और"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" को जोडा गया हैं"
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" की %(list)s बदला गया है"
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" निकाला गया है"
-
-msgid "No fields changed."
-msgstr "कोई क्षेत्र नहीं बदला"
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" कामयाबी से जोडा गया हैं । आप इसे फिर से संपादित कर सकते हैं"
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-" %(name)s \"%(obj)s\" सफलतापूर्वक जोड़ दिया गया। आप चाहें तो नीचे एक और %(name)s "
-"जोड़ सकते हैं।"
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" को कामयाबी से जोडा गया है"
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-" %(name)s \"%(obj)s\" सफलतापूर्वक जोड़ दिया गया। आप चाहें तो नीचे इसे बदल भी सकते हैं।"
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
-" %(name)s \"%(obj)s\" सफलतापूर्वक बदल दिया गया। आप चाहें तो नीचे एक और %(name)s "
-"जोड़ सकते हैं।"
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" को कामयाबी से बदला गया हैं"
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -330,18 +346,15 @@ msgstr "दस्तावेज़ीकरण"
 msgid "Log out"
 msgstr "लॉग आउट"
 
-msgid "Add"
-msgstr "बढाएं"
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s बढाएं"
 
 msgid "History"
 msgstr "इतिहास"
 
 msgid "View on site"
 msgstr "साइट पे देखें"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "%(name)s बढाएं"
 
 msgid "Filter"
 msgstr "छन्नी"
@@ -424,13 +437,6 @@ msgstr ""
 msgid "Change"
 msgstr "बदलें"
 
-msgid "Remove"
-msgstr "निकालें"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "एक और %(verbose_name)s जोड़ें "
-
 msgid "Delete?"
 msgstr "मिटाएँ ?"
 
@@ -445,14 +451,17 @@ msgstr ""
 msgid "Models in the %(name)s application"
 msgstr "%(name)s अनुप्रयोग के प्रतिरूप"
 
+msgid "Add"
+msgstr "बढाएं"
+
 msgid "You don't have permission to edit anything."
 msgstr "आपके पास कुछ भी संपादन करने के लिये अनुमति नहीं है ।"
 
-msgid "Recent Actions"
-msgstr "हाल क्रियाएँ"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "मेरे कार्य"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr " कोई भी उपलब्ध नहीं"
@@ -467,6 +476,12 @@ msgid ""
 msgstr ""
 "अपने डेटाबेस स्थापना के साथ कुछ गलत तो है | सुनिश्चित करें कि उचित डेटाबेस तालिका बनायीं "
 "गयी है, और सुनिश्चित करें कि डेटाबेस उपयुक्त उपयोक्ता के द्वारा पठनीय है |"
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "अपना पासवर्ड या उपयोगकर्ता नाम भूल गये हैं?"
@@ -492,6 +507,9 @@ msgstr "सभी दिखाएँ"
 
 msgid "Save"
 msgstr "सुरक्षित कीजिये"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -623,9 +641,6 @@ msgstr " मेरे कूटशब्द की पुनःस्थाप�
 
 msgid "All dates"
 msgstr "सभी तिथियों"
-
-msgid "(None)"
-msgstr "(कोई नहीं)"
 
 #, python-format
 msgid "Select %s"

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import migrations, models
 
 
@@ -17,8 +14,8 @@ class Migration(migrations.Migration):
             name='A3',
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
-                ('b2', models.ForeignKey(to='lookuperror_b.B2')),
-                ('c2', models.ForeignKey(to='lookuperror_c.C2')),
+                ('b2', models.ForeignKey('lookuperror_b.B2', models.CASCADE)),
+                ('c2', models.ForeignKey('lookuperror_c.C2', models.CASCADE)),
             ],
         ),
     ]

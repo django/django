@@ -7,6 +7,7 @@ from .http import SimpleSitemap
 class HTTPSSitemap(SimpleSitemap):
     protocol = 'https'
 
+
 secure_sitemaps = {
     'simple': HTTPSSitemap,
 }

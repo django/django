@@ -4,7 +4,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kostas <tamosiunas@gmail.com>, 2011
 # lauris <lauris@runbox.com>, 2011
-# Matas Dailyda <matas@dailyda.com>, 2015
+# Matas Dailyda <matas@dailyda.com>, 2015-2016
 # naktinis <naktinis@gmail.com>, 2012
 # Nikolajus Krauklis <nikolajus@gmail.com>, 2013
 # Povilas Balzaravičius <pavvka@gmail.com>, 2011-2012
@@ -14,11 +14,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 16:29+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-18 09:11+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
-"Language-Team: Lithuanian (http://www.transifex.com/projects/p/django/"
-"language/lt/)\n"
+"Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
+"lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -68,6 +68,9 @@ msgstr "Danų"
 msgid "German"
 msgstr "Vokiečių"
 
+msgid "Lower Sorbian"
+msgstr "Žemutinė Sorbų"
+
 msgid "Greek"
 msgstr "Graikų"
 
@@ -88,6 +91,9 @@ msgstr "Ispanų"
 
 msgid "Argentinian Spanish"
 msgstr "Argentiniečių Ispanų"
+
+msgid "Colombian Spanish"
+msgstr "Kolumbų Ispanų"
 
 msgid "Mexican Spanish"
 msgstr "Meksikiečių Ispanų"
@@ -119,6 +125,9 @@ msgstr "Fryzų"
 msgid "Irish"
 msgstr "Airių"
 
+msgid "Scottish Gaelic"
+msgstr "Škotų Gėlų"
+
 msgid "Galician"
 msgstr "Galų"
 
@@ -130,6 +139,9 @@ msgstr "Hindi"
 
 msgid "Croatian"
 msgstr "Kroatų"
+
+msgid "Upper Sorbian"
+msgstr "Aukštutinė Sorbų"
 
 msgid "Hungarian"
 msgstr "Vengrų"
@@ -191,7 +203,7 @@ msgstr "Marati"
 msgid "Burmese"
 msgstr "Mjanmų"
 
-msgid "Norwegian Bokmal"
+msgid "Norwegian Bokmål"
 msgstr "Norvegų Bokmal"
 
 msgid "Nepali"
@@ -290,9 +302,6 @@ msgstr "Statiniai failai"
 msgid "Syndication"
 msgstr "Sindikacija"
 
-msgid "Web Design"
-msgstr "Puslapio dizainas"
-
 msgid "Enter a valid value."
 msgstr "Įveskite tinkamą reikšmę."
 
@@ -310,6 +319,13 @@ msgid ""
 msgstr ""
 "Šią reikšmę gali sudaryti tik raidės, skaičiai, pabraukimo arba paprasto "
 "brūkšnio simboliai."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Įveskite teisingą adresą sudarytą iš Unikodo raidžių, skaičių,  pabraukimo "
+"arba paprastų brūkšnių."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Įveskite validų IPv4 adresą."
@@ -371,6 +387,31 @@ msgstr[2] ""
 "Įsitikinkite, kad reikšmė sudaryta iš nedaugiau kaip %(limit_value)d ženklų "
 "(dabartinis ilgis %(show_value)d)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmuo."
+msgstr[1] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenys."
+msgstr[2] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmuo po kablelio."
+msgstr[1] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenys po kablelio."
+msgstr[2] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų po kablelio."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmuo prieš kablelį."
+msgstr[1] ""
+"Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenys prieš kablelį."
+msgstr[2] ""
+"Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų prieš kablelį."
+
 msgid "and"
 msgstr "ir"
 
@@ -410,6 +451,9 @@ msgstr "Sveikas skaičius"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' turi būti sveikas skaičius."
+
+msgid "Big (8 byte) integer"
+msgstr "Didelis (8 baitų) sveikas skaičius"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -494,9 +538,6 @@ msgstr "'%(value)s' reikšmė turi būti realus skaičius."
 msgid "Floating point number"
 msgstr "Realus skaičius"
 
-msgid "Big (8 byte) integer"
-msgstr "Didelis (8 baitų) sveikas skaičius"
-
 msgid "IPv4 address"
 msgstr "IPv4 adresas"
 
@@ -571,8 +612,22 @@ msgstr "Išorinis raktas (tipas nustatomas susijusiame lauke)"
 msgid "One-to-one relationship"
 msgstr "Sąryšis vienas su vienu"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s sąryšis"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s sąryšiai"
+
 msgid "Many-to-many relationship"
 msgstr "Sąryšis daug su daug"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "Šis laukas yra privalomas."
@@ -582,31 +637,6 @@ msgstr "Įveskite pilną skaičių."
 
 msgid "Enter a number."
 msgstr "Įveskite skaičių."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmuo."
-msgstr[1] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenys."
-msgstr[2] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmuo po kablelio."
-msgstr[1] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenys po kablelio."
-msgstr[2] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų po kablelio."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmuo prieš kablelį."
-msgstr[1] ""
-"Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenys prieš kablelį."
-msgstr[2] ""
-"Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų prieš kablelį."
 
 msgid "Enter a valid date."
 msgstr "Įveskite tinkamą datą."
@@ -673,12 +703,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Paslėptas laukelis %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "ManagementForm duomenys buvo sugadinti arba neegzistuoja"

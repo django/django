@@ -9,17 +9,18 @@ intranet sites, with single sign-on solutions such as IIS and Integrated
 Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
 `WebAuth`_, `mod_auth_sspi`_, etc.
 
-.. _mod_authnz_ldap: http://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html
-.. _CAS: https://www.apereo.org/cas
+.. _mod_authnz_ldap: https://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html
+.. _CAS: https://www.apereo.org/projects/cas
 .. _Cosign: http://weblogin.org
-.. _WebAuth: http://www.stanford.edu/services/webauth/
+.. _WebAuth: https://www.stanford.edu/services/webauth/
 .. _mod_auth_sspi: http://sourceforge.net/projects/mod-auth-sspi
 
 When the Web server takes care of authentication it typically sets the
 ``REMOTE_USER`` environment variable for use in the underlying application.  In
 Django, ``REMOTE_USER`` is made available in the :attr:`request.META
 <django.http.HttpRequest.META>` attribute.  Django can be configured to make
-use of the ``REMOTE_USER`` value using the ``RemoteUserMiddleware`` and
+use of the ``REMOTE_USER`` value using the ``RemoteUserMiddleware``
+or ``PersistentRemoteUserMiddleware``, and
 :class:`~django.contrib.auth.backends.RemoteUserBackend` classes found in
 :mod:`django.contrib.auth`.
 
@@ -28,10 +29,10 @@ Configuration
 
 First, you must add the
 :class:`django.contrib.auth.middleware.RemoteUserMiddleware` to the
-:setting:`MIDDLEWARE_CLASSES` setting **after** the
+:setting:`MIDDLEWARE` setting **after** the
 :class:`django.contrib.auth.middleware.AuthenticationMiddleware`::
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
         '...',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.auth.middleware.RemoteUserMiddleware',
@@ -63,9 +64,16 @@ remote users. These interfaces work with users stored in the database
 regardless of ``AUTHENTICATION_BACKENDS``.
 
 .. note::
-   Since the ``RemoteUserBackend`` inherits from ``ModelBackend``, you will
-   still have all of the same permissions checking that is implemented in
-   ``ModelBackend``.
+
+    Since the ``RemoteUserBackend`` inherits from ``ModelBackend``, you will
+    still have all of the same permissions checking that is implemented in
+    ``ModelBackend``.
+
+    Users with :attr:`is_active=False
+    <django.contrib.auth.models.User.is_active>` won't be allowed to
+    authenticate. Use
+    :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend` if
+    you want to allow them to.
 
 If your authentication mechanism uses a custom HTTP header and not
 ``REMOTE_USER``, you can subclass ``RemoteUserMiddleware`` and set the
@@ -95,3 +103,23 @@ If your authentication mechanism uses a custom HTTP header and not
 If you need more control, you can create your own authentication backend
 that inherits from :class:`~django.contrib.auth.backends.RemoteUserBackend` and
 override one or more of its attributes and methods.
+
+.. _persistent-remote-user-middleware-howto:
+
+Using ``REMOTE_USER`` on login pages only
+=========================================
+
+The ``RemoteUserMiddleware`` authentication middleware assumes that the HTTP
+request header ``REMOTE_USER`` is present with all authenticated requests. That
+might be expected and practical when Basic HTTP Auth with ``htpasswd`` or other
+simple mechanisms are used, but with Negotiate (GSSAPI/Kerberos) or other
+resource intensive authentication methods, the authentication in the front-end
+HTTP server is usually only set up for one or a few login URLs, and after
+successful authentication, the application is supposed to maintain the
+authenticated session itself.
+
+:class:`~django.contrib.auth.middleware.PersistentRemoteUserMiddleware`
+provides support for this use case. It will maintain the authenticated session
+until explicit logout by the user. The class can be used as a drop-in
+replacement of :class:`~django.contrib.auth.middleware.RemoteUserMiddleware`
+in the documentation above.

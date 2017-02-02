@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.conf.urls import url
 from django.contrib.gis import views as gis_views
 from django.contrib.gis.sitemaps import views as gis_sitemap_views

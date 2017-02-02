@@ -7,8 +7,8 @@ This document will get you up and running with Django.
 Install Python
 ==============
 
-Being a Python Web framework, Django requires Python. It works with Python 2.7
-or 3.3+.
+Being a Python Web framework, Django requires Python. See
+:ref:`faq-python-version-support` for details.
 
 Get the latest version of Python at https://www.python.org/download/ or with
 your operating system's package manager.
@@ -25,8 +25,8 @@ your operating system's package manager.
     If you are just starting with Django and using Windows, you may find
     :doc:`/howto/windows` useful.
 
-Install Apache and mod_wsgi
-=============================
+Install Apache and ``mod_wsgi``
+===============================
 
 If you just want to experiment with Django, skip ahead to the next
 section; Django includes a lightweight web server you can use for
@@ -58,9 +58,9 @@ deployment options. One is :doc:`uWSGI </howto/deployment/wsgi/uwsgi>`; it works
 very well with `nginx`_. Additionally, Django follows the WSGI spec
 (:pep:`3333`), which allows it to run on a variety of server platforms.
 
-.. _Apache: http://httpd.apache.org/
+.. _Apache: https://httpd.apache.org/
 .. _nginx: http://nginx.org/
-.. _mod_wsgi: http://code.google.com/p/modwsgi/
+.. _mod_wsgi: http://www.modwsgi.org/
 
 .. _database-installation:
 
@@ -115,13 +115,13 @@ see :setting:`DATABASES` for details.
 If you're using Django's :doc:`testing framework</topics/testing/index>` to test
 database queries, Django will need permission to create a test database.
 
-.. _PostgreSQL: http://www.postgresql.org/
-.. _MySQL: http://www.mysql.com/
+.. _PostgreSQL: https://www.postgresql.org/
+.. _MySQL: https://www.mysql.com/
 .. _psycopg2: http://initd.org/psycopg/
-.. _SQLite: http://www.sqlite.org/
-.. _pysqlite: http://trac.edgewall.org/wiki/PySqlite
+.. _SQLite: https://www.sqlite.org/
 .. _cx_Oracle: http://cx-oracle.sourceforge.net/
 .. _Oracle: http://www.oracle.com/
+
 .. _removing-old-versions-of-django:
 
 Remove any old versions of Django
@@ -144,7 +144,6 @@ following at your shell prompt (not the interactive Python prompt):
 
     $ python -c "import django; print(django.__path__)"
 
-
 .. _install-django-code:
 
 Install the Django code
@@ -159,69 +158,33 @@ It's easy, no matter which way you choose.
 .. _installing-official-release:
 
 Installing an official release with ``pip``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------
 
 This is the recommended way to install Django.
 
 1. Install pip_. The easiest is to use the `standalone pip installer`_. If your
    distribution already has ``pip`` installed, you might need to update it if
-   it's outdated. (If it's outdated, you'll know because installation won't
-   work.)
+   it's outdated. If it's outdated, you'll know because installation won't
+   work.
 
-2. (optional) Take a look at virtualenv_ and virtualenvwrapper_. These tools
-   provide isolated Python environments, which are more practical than
-   installing packages systemwide. They also allow installing packages
-   without administrator privileges. It's up to you to decide if you want to
-   learn and use them.
+2. Take a look at virtualenv_ and virtualenvwrapper_. These tools provide
+   isolated Python environments, which are more practical than installing
+   packages systemwide. They also allow installing packages without
+   administrator privileges. The :doc:`contributing tutorial
+   </intro/contributing>` walks through how to create a virtualenv.
 
-3. If you're using Linux, Mac OS X or some other flavor of Unix, enter the
-   command ``sudo pip install Django`` at the shell prompt. If you're using
-   Windows, start a command shell with administrator privileges and run
-   the command ``pip install Django``. This will install Django in your Python
-   installation's ``site-packages`` directory.
+3. After you've created and activated a virtual environment, enter the command
+   ``pip install Django`` at the shell prompt.
 
-   If you're using a virtualenv, you don't need ``sudo`` or administrator
-   privileges, and this will install Django in the virtualenv's
-   ``site-packages`` directory.
+.. _pip: https://pip.pypa.io/
+.. _virtualenv: https://virtualenv.pypa.io/
+.. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.io/en/latest/
+.. _standalone pip installer: https://pip.pypa.io/en/latest/installing/#installing-with-get-pip-py
 
-.. _pip: http://www.pip-installer.org/
-.. _virtualenv: http://www.virtualenv.org/
-.. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
-.. _standalone pip installer: http://www.pip-installer.org/en/latest/installing.html#install-pip
-
-Installing an official release manually
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-1. Download the latest release from our `download page`_.
-
-2. Untar the downloaded file (e.g. ``tar xzvf Django-X.Y.tar.gz``,
-   where ``X.Y`` is the version number of the latest release).
-   If you're using Windows, you can download the command-line tool
-   bsdtar_ to do this, or you can use a GUI-based tool such as 7-zip_.
-
-3. Change into the directory created in step 2 (e.g. ``cd Django-X.Y``).
-
-4. If you're using Linux, Mac OS X or some other flavor of Unix, enter the
-   command ``sudo python setup.py install`` at the shell prompt. If you're
-   using Windows, start a command shell with administrator privileges and
-   run the command ``python setup.py install``. This will install Django in
-   your Python installation's ``site-packages`` directory.
-
-   .. admonition:: Removing an old version
-
-       If you use this installation technique, it is particularly important
-       that you :ref:`remove any existing
-       installations<removing-old-versions-of-django>` of Django
-       first. Otherwise, you can end up with a broken installation that
-       includes files from previous versions that have since been removed from
-       Django.
-
-.. _download page: https://www.djangoproject.com/download/
-.. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
-.. _7-zip: http://www.7-zip.org/
+.. _installing-distribution-package:
 
 Installing a distribution-specific package
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
 
 Check the :doc:`distribution specific notes </misc/distributions>` to see if
 your platform/distribution provides official Django packages/installers.
@@ -232,7 +195,7 @@ contain the latest release of Django.
 .. _installing-development-version:
 
 Installing the development version
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 .. admonition:: Tracking Django development
 
@@ -253,101 +216,31 @@ latest bug fixes and improvements, follow these instructions:
 1. Make sure that you have Git_ installed and that you can run its commands
    from a shell. (Enter ``git help`` at a shell prompt to test this.)
 
-2. Check out Django's main development branch (the 'trunk' or 'master') like
-   so:
+2. Check out Django's main development branch like so:
 
    .. code-block:: console
 
-        $ git clone git://github.com/django/django.git django-trunk
+        $ git clone git://github.com/django/django.git
 
-   This will create a directory ``django-trunk`` in your current directory.
+   This will create a directory ``django`` in your current directory.
 
 3. Make sure that the Python interpreter can load Django's code. The most
-   convenient way to do this is via pip_. Run the following command:
+   convenient way to do this is to use virtualenv_, virtualenvwrapper_, and
+   pip_. The :doc:`contributing tutorial </intro/contributing>` walks through
+   how to create a virtualenv.
+
+4. After setting up and activating the virtualenv, run the following command:
 
    .. code-block:: console
 
-        $ sudo pip install -e django-trunk/
-
-   (If using a virtualenv_ you can omit ``sudo``.)
+        $ pip install -e django/
 
    This will make Django's code importable, and will also make the
    ``django-admin`` utility command available. In other words, you're all
    set!
 
-   If you don't have pip_ available, see the alternative instructions for
-   `installing the development version without pip`_.
-
-.. warning::
-
-    Don't run ``sudo python setup.py install``, because you've already
-    carried out the equivalent actions in step 3.
-
 When you want to update your copy of the Django source code, just run the
-command ``git pull`` from within the ``django-trunk`` directory. When you do
-this, Git will automatically download any changes.
+command ``git pull`` from within the ``django`` directory. When you do this,
+Git will automatically download any changes.
 
 .. _Git: http://git-scm.com/
-.. _`modify Python's search path`: https://docs.python.org/install/index.html#modifying-python-s-search-path
-.. _installing-the-development-version-without-pip:
-
-Installing the development version without pip
-----------------------------------------------
-
-If you don't have pip_, you can instead manually `modify Python's search
-path`_.
-
-First follow steps 1 and 2 above, so that you have a ``django-trunk`` directory
-with a checkout of Django's latest code in it. Then add a ``.pth`` file
-containing the full path to the ``django-trunk`` directory to your system's
-``site-packages`` directory. For example, on a Unix-like system:
-
-.. code-block:: console
-
-    $ echo WORKING-DIR/django-trunk > SITE-PACKAGES-DIR/django.pth
-
-In the above line, change ``WORKING-DIR/django-trunk`` to match the full path
-to your new ``django-trunk`` directory, and change ``SITE-PACKAGES-DIR`` to
-match the location of your system's ``site-packages`` directory.
-
-The location of the ``site-packages`` directory depends on the operating
-system, and the location in which Python was installed. To find your system's
-``site-packages`` location, execute the following:
-
-.. code-block:: console
-
-    $ python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())"
-
-(Note that this should be run from a shell prompt, not a Python interactive
-prompt.)
-
-Some Debian-based Linux distributions have separate ``site-packages``
-directories for user-installed packages, such as when installing Django from
-a downloaded tarball. The command listed above will give you the system's
-``site-packages``, the user's directory can be found in ``/usr/local/lib/``
-instead of ``/usr/lib/``.
-
-Next you need to make the ``django-admin.py`` utility available in your
-shell PATH.
-
-On Unix-like systems, create a symbolic link to the file
-``django-trunk/django/bin/django-admin`` in a directory on your system
-path, such as ``/usr/local/bin``. For example:
-
-.. code-block:: console
-
-    $ ln -s WORKING-DIR/django-trunk/django/bin/django-admin.py /usr/local/bin/
-
-(In the above line, change WORKING-DIR to match the full path to your new
-``django-trunk`` directory.)
-
-This simply lets you type ``django-admin.py`` from within any directory,
-rather than having to qualify the command with the full path to the file.
-
-On Windows systems, the same result can be achieved by copying the file
-``django-trunk/django/bin/django-admin.py`` to somewhere on your system
-path, for example ``C:\Python27\Scripts``.
-
-Note that the rest of the documentation assumes this utility is installed
-as ``django-admin``. You'll have to substitute ``django-admin.py`` if you use
-this method.

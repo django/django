@@ -31,7 +31,6 @@ from ctypes import byref, c_char_p, c_int
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import SRSException
 from django.contrib.gis.gdal.prototypes import srs as capi
-from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 
 
@@ -41,6 +40,7 @@ class SpatialReference(GDALBase):
     the SpatialReference object "provide[s] services to represent coordinate
     systems (projections and datums) and to transform between them."
     """
+    destructor = capi.release_srs
 
     def __init__(self, srs_input='', srs_type='user'):
         """
@@ -54,10 +54,7 @@ class SpatialReference(GDALBase):
             self.ptr = capi.new_srs(c_char_p(b''))
             self.import_wkt(srs_input)
             return
-        elif isinstance(srs_input, six.string_types):
-            # Encoding to ASCII if unicode passed in.
-            if isinstance(srs_input, six.text_type):
-                srs_input = srs_input.encode('ascii')
+        elif isinstance(srs_input, str):
             try:
                 # If SRID is a string, e.g., '4326', then make acceptable
                 # as user input.
@@ -65,7 +62,7 @@ class SpatialReference(GDALBase):
                 srs_input = 'EPSG:%d' % srid
             except ValueError:
                 pass
-        elif isinstance(srs_input, six.integer_types):
+        elif isinstance(srs_input, int):
             # EPSG integer code was input.
             srs_type = 'epsg'
         elif isinstance(srs_input, self.ptr_type):
@@ -93,11 +90,6 @@ class SpatialReference(GDALBase):
             self.import_user_input(srs_input)
         elif srs_type == 'epsg':
             self.import_epsg(srs_input)
-
-    def __del__(self):
-        "Destroys this spatial reference."
-        if self._ptr and capi:
-            capi.release_srs(self._ptr)
 
     def __getitem__(self, target):
         """
@@ -137,7 +129,7 @@ class SpatialReference(GDALBase):
         The attribute value for the given target node (e.g. 'PROJCS'). The index
         keyword specifies an index of the child node to return.
         """
-        if not isinstance(target, six.string_types) or not isinstance(index, int):
+        if not isinstance(target, str) or not isinstance(index, int):
             raise TypeError
         return capi.get_attr_value(self.ptr, force_bytes(target), index)
 
@@ -295,7 +287,7 @@ class SpatialReference(GDALBase):
 
     def import_wkt(self, wkt):
         "Imports the Spatial Reference from OGC WKT (string)"
-        capi.from_wkt(self.ptr, byref(c_char_p(wkt)))
+        capi.from_wkt(self.ptr, byref(c_char_p(force_bytes(wkt))))
 
     def import_xml(self, xml):
         "Imports the Spatial Reference from an XML string."
@@ -325,11 +317,12 @@ class SpatialReference(GDALBase):
     @property
     def xml(self, dialect=''):
         "Returns the XML representation of this Spatial Reference."
-        return capi.to_xml(self.ptr, byref(c_char_p()), dialect)
+        return capi.to_xml(self.ptr, byref(c_char_p()), force_bytes(dialect))
 
 
 class CoordTransform(GDALBase):
     "The coordinate system transformation object."
+    destructor = capi.destroy_ct
 
     def __init__(self, source, target):
         "Initializes on a source and target SpatialReference objects."
@@ -338,11 +331,6 @@ class CoordTransform(GDALBase):
         self.ptr = capi.new_ct(source._ptr, target._ptr)
         self._srs1_name = source.name
         self._srs2_name = target.name
-
-    def __del__(self):
-        "Deletes this Coordinate Transformation object."
-        if self._ptr and capi:
-            capi.destroy_ct(self._ptr)
 
     def __str__(self):
         return 'Transform from "%s" to "%s"' % (self._srs1_name, self._srs2_name)

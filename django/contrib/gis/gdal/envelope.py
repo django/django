@@ -17,7 +17,7 @@ from django.contrib.gis.gdal.error import GDALException
 
 # The OGR definition of an Envelope is a C structure containing four doubles.
 #  See the 'ogr_core.h' source file for more information:
-#   http://www.gdal.org/ogr/ogr__core_8h-source.html
+#   http://www.gdal.org/ogr__core_8h_source.html
 class OGREnvelope(Structure):
     "Represents the OGREnvelope C Structure."
     _fields_ = [("MinX", c_double),
@@ -27,7 +27,7 @@ class OGREnvelope(Structure):
                 ]
 
 
-class Envelope(object):
+class Envelope:
     """
     The Envelope object is a C structure that contains the minimum and
     maximum X, Y coordinates for a rectangle bounding box.  The naming
@@ -51,7 +51,7 @@ class Envelope(object):
                 else:
                     self._from_sequence(args[0])
             else:
-                raise TypeError('Incorrect type of argument: %s' % str(type(args[0])))
+                raise TypeError('Incorrect type of argument: %s' % type(args[0]))
         elif len(args) == 4:
             # Individual parameters passed in.
             #  Thanks to ww for the help
@@ -123,7 +123,7 @@ class Envelope(object):
                 else:
                     raise GDALException('Incorrect number of tuple elements (%d).' % len(args[0]))
             else:
-                raise TypeError('Incorrect type of argument: %s' % str(type(args[0])))
+                raise TypeError('Incorrect type of argument: %s' % type(args[0]))
         elif len(args) == 2:
             # An x and an y parameter were passed in
                 return self.expand_to_include((args[0], args[1], args[0], args[1]))

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import json
 import mimetypes
 import os
@@ -8,10 +6,9 @@ import sys
 from copy import copy
 from importlib import import_module
 from io import BytesIO
+from urllib.parse import urljoin, urlparse, urlsplit
 
-from django.apps import apps
 from django.conf import settings
-from django.core import urlresolvers
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import ISO_8859_1, UTF_8, WSGIRequest
 from django.core.signals import (
@@ -22,19 +19,20 @@ from django.http import HttpRequest, QueryDict, SimpleCookie
 from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.test.utils import ContextList
-from django.utils import six
-from django.utils.encoding import force_bytes, force_str, uri_to_iri
+from django.urls import resolve
+from django.utils.encoding import force_bytes, uri_to_iri
 from django.utils.functional import SimpleLazyObject, curry
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
-from django.utils.six.moves.urllib.parse import urlparse, urlsplit
 
 __all__ = ('Client', 'RedirectCycleError', 'RequestFactory', 'encode_file', 'encode_multipart')
 
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
-CONTENT_TYPE_RE = re.compile('.*; charset=([\w\d-]+);?')
+CONTENT_TYPE_RE = re.compile(r'.*; charset=([\w\d-]+);?')
+# JSON Vendor Tree spec: https://tools.ietf.org/html/rfc6838#section-3.2
+JSON_CONTENT_TYPE_RE = re.compile(r'^application\/(vnd\..+\+)?json$')
 
 
 class RedirectCycleError(Exception):
@@ -42,12 +40,12 @@ class RedirectCycleError(Exception):
     The test client has been asked to follow a redirect loop.
     """
     def __init__(self, message, last_response):
-        super(RedirectCycleError, self).__init__(message)
+        super().__init__(message)
         self.last_response = last_response
         self.redirect_chain = last_response.redirect_chain
 
 
-class FakePayload(object):
+class FakePayload:
     """
     A wrapper around BytesIO that restricts what can be read since data from
     the network can't be seeked and cannot be read outside of its content
@@ -93,6 +91,26 @@ def closing_iterator_wrapper(iterable, close):
         request_finished.connect(close_old_connections)
 
 
+def conditional_content_removal(request, response):
+    """
+    Simulate the behavior of most Web servers by removing the content of
+    responses for HEAD requests, 1xx, 204, and 304 responses. Ensures
+    compliance with RFC 7230, section 3.3.3.
+    """
+    if 100 <= response.status_code < 200 or response.status_code in (204, 304):
+        if response.streaming:
+            response.streaming_content = []
+        else:
+            response.content = b''
+        response['Content-Length'] = '0'
+    if request.method == 'HEAD':
+        if response.streaming:
+            response.streaming_content = []
+        else:
+            response.content = b''
+    return response
+
+
 class ClientHandler(BaseHandler):
     """
     A HTTP Handler that can be used for testing purposes. Uses the WSGI
@@ -101,12 +119,12 @@ class ClientHandler(BaseHandler):
     """
     def __init__(self, enforce_csrf_checks=True, *args, **kwargs):
         self.enforce_csrf_checks = enforce_csrf_checks
-        super(ClientHandler, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __call__(self, environ):
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
-        if self._request_middleware is None:
+        if self._middleware_chain is None:
             self.load_middleware()
 
         request_started.disconnect(close_old_connections)
@@ -121,6 +139,10 @@ class ClientHandler(BaseHandler):
 
         # Request goes through middleware.
         response = self.get_response(request)
+
+        # Simulate behaviors of most Web servers.
+        conditional_content_removal(request, response)
+
         # Attach the originating request to the response so that it could be
         # later retrieved.
         response.wsgi_request = request
@@ -146,7 +168,9 @@ def store_rendered_templates(store, signal, sender, template, context, **kwargs)
     of rendering.
     """
     store.setdefault('templates', []).append(template)
-    store.setdefault('context', ContextList()).append(copy(context))
+    if 'context' not in store:
+        store['context'] = ContextList()
+    store['context'].append(copy(context))
 
 
 def encode_multipart(boundary, data):
@@ -158,10 +182,13 @@ def encode_multipart(boundary, data):
     as an application/octet-stream; otherwise, str(value) will be sent.
     """
     lines = []
-    to_bytes = lambda s: force_bytes(s, settings.DEFAULT_CHARSET)
+
+    def to_bytes(s):
+        return force_bytes(s, settings.DEFAULT_CHARSET)
 
     # Not by any means perfect, but good enough for our purposes.
-    is_file = lambda thing: hasattr(thing, "read") and callable(thing.read)
+    def is_file(thing):
+        return hasattr(thing, "read") and callable(thing.read)
 
     # Each bit of the multipart form data could be either a form value or a
     # file, or a *list* of form values and/or files. Remember that HTTP field
@@ -169,7 +196,7 @@ def encode_multipart(boundary, data):
     for (key, value) in data.items():
         if is_file(value):
             lines.extend(encode_file(boundary, key, value))
-        elif not isinstance(value, six.string_types) and is_iterable(value):
+        elif not isinstance(value, str) and is_iterable(value):
             for item in value:
                 if is_file(item):
                     lines.extend(encode_file(boundary, key, item))
@@ -196,8 +223,14 @@ def encode_multipart(boundary, data):
 
 
 def encode_file(boundary, key, file):
-    to_bytes = lambda s: force_bytes(s, settings.DEFAULT_CHARSET)
-    filename = os.path.basename(file.name) if hasattr(file, 'name') else ''
+    def to_bytes(s):
+        return force_bytes(s, settings.DEFAULT_CHARSET)
+
+    # file.name might not be a string. For example, it's an int for
+    # tempfile.TemporaryFile().
+    file_has_string_name = hasattr(file, 'name') and isinstance(file.name, str)
+    filename = os.path.basename(file.name) if file_has_string_name else ''
+
     if hasattr(file, 'content_type'):
         content_type = file.content_type
     elif filename:
@@ -219,7 +252,7 @@ def encode_file(boundary, key, file):
     ]
 
 
-class RequestFactory(object):
+class RequestFactory:
     """
     Class that lets you create mock Request objects for use in testing.
 
@@ -247,15 +280,15 @@ class RequestFactory(object):
         # See http://www.python.org/dev/peps/pep-3333/#environ-variables
         environ = {
             'HTTP_COOKIE': self.cookies.output(header='', sep='; '),
-            'PATH_INFO': str('/'),
-            'REMOTE_ADDR': str('127.0.0.1'),
-            'REQUEST_METHOD': str('GET'),
-            'SCRIPT_NAME': str(''),
-            'SERVER_NAME': str('testserver'),
-            'SERVER_PORT': str('80'),
-            'SERVER_PROTOCOL': str('HTTP/1.1'),
+            'PATH_INFO': '/',
+            'REMOTE_ADDR': '127.0.0.1',
+            'REQUEST_METHOD': 'GET',
+            'SCRIPT_NAME': '',
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': '80',
+            'SERVER_PROTOCOL': 'HTTP/1.1',
             'wsgi.version': (1, 0),
-            'wsgi.url_scheme': str('http'),
+            'wsgi.url_scheme': 'http',
             'wsgi.input': FakePayload(b''),
             'wsgi.errors': self.errors,
             'wsgi.multiprocess': True,
@@ -283,15 +316,15 @@ class RequestFactory(object):
             return force_bytes(data, encoding=charset)
 
     def _get_path(self, parsed):
-        path = force_str(parsed[2])
+        path = parsed.path
         # If there are parameters, add them
-        if parsed[3]:
-            path += str(";") + force_str(parsed[3])
+        if parsed.params:
+            path += ";" + parsed.params
         path = uri_to_iri(path).encode(UTF_8)
-        # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
-        # decoded with ISO-8859-1. We replicate this behavior here.
+        # Replace the behavior where non-ASCII values in the WSGI environ are
+        # arbitrarily decoded with ISO-8859-1.
         # Refs comment in `get_bytes_from_wsgi()`.
-        return path.decode(ISO_8859_1) if six.PY3 else path
+        return path.decode(ISO_8859_1)
 
     def get(self, path, data=None, secure=False, **extra):
         "Construct a GET request."
@@ -355,27 +388,25 @@ class RequestFactory(object):
                 content_type='application/octet-stream', secure=False,
                 **extra):
         """Constructs an arbitrary HTTP request."""
-        parsed = urlparse(path)
+        parsed = urlparse(str(path))  # path can be lazy
         data = force_bytes(data, settings.DEFAULT_CHARSET)
         r = {
             'PATH_INFO': self._get_path(parsed),
-            'REQUEST_METHOD': str(method),
-            'SERVER_PORT': str('443') if secure else str('80'),
-            'wsgi.url_scheme': str('https') if secure else str('http'),
+            'REQUEST_METHOD': method,
+            'SERVER_PORT': '443' if secure else '80',
+            'wsgi.url_scheme': 'https' if secure else 'http',
         }
         if data:
             r.update({
                 'CONTENT_LENGTH': len(data),
-                'CONTENT_TYPE': str(content_type),
+                'CONTENT_TYPE': content_type,
                 'wsgi.input': FakePayload(data),
             })
         r.update(extra)
         # If QUERY_STRING is absent or empty, we want to extract it from the URL.
         if not r.get('QUERY_STRING'):
-            query_string = force_bytes(parsed[4])
             # WSGI requires latin-1 encoded strings. See get_path_info().
-            if six.PY3:
-                query_string = query_string.decode('iso-8859-1')
+            query_string = force_bytes(parsed[4]).decode('iso-8859-1')
             r['QUERY_STRING'] = query_string
         return self.request(**r)
 
@@ -399,7 +430,7 @@ class Client(RequestFactory):
     HTML rendered to the end-user.
     """
     def __init__(self, enforce_csrf_checks=False, **defaults):
-        super(Client, self).__init__(**defaults)
+        super().__init__(**defaults)
         self.handler = ClientHandler(enforce_csrf_checks)
         self.exc_info = None
 
@@ -409,22 +440,20 @@ class Client(RequestFactory):
         """
         self.exc_info = sys.exc_info()
 
-    def _session(self):
+    @property
+    def session(self):
         """
         Obtains the current session variables.
         """
-        if apps.is_installed('django.contrib.sessions'):
-            engine = import_module(settings.SESSION_ENGINE)
-            cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
-            if cookie:
-                return engine.SessionStore(cookie.value)
-            else:
-                s = engine.SessionStore()
-                s.save()
-                self.cookies[settings.SESSION_COOKIE_NAME] = s.session_key
-                return s
-        return {}
-    session = property(_session)
+        engine = import_module(settings.SESSION_ENGINE)
+        cookie = self.cookies.get(settings.SESSION_COOKIE_NAME)
+        if cookie:
+            return engine.SessionStore(cookie.value)
+
+        session = engine.SessionStore()
+        session.save()
+        self.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
+        return session
 
     def request(self, **request):
         """
@@ -442,9 +471,9 @@ class Client(RequestFactory):
         signal_uid = "template-render-%s" % id(request)
         signals.template_rendered.connect(on_template_render, dispatch_uid=signal_uid)
         # Capture exceptions created by the handler.
-        got_request_exception.connect(self.store_exc_info, dispatch_uid="request-exception")
+        exception_uid = "request-exception-%s" % id(request)
+        got_request_exception.connect(self.store_exc_info, dispatch_uid=exception_uid)
         try:
-
             try:
                 response = self.handler(environ)
             except TemplateDoesNotExist as e:
@@ -464,7 +493,7 @@ class Client(RequestFactory):
             if self.exc_info:
                 exc_info = self.exc_info
                 self.exc_info = None
-                six.reraise(*exc_info)
+                raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
 
             # Save the client and request that stimulated the response.
             response.client = self
@@ -477,8 +506,7 @@ class Client(RequestFactory):
             response.json = curry(self._parse_json, response)
 
             # Attach the ResolverMatch instance to the response
-            response.resolver_match = SimpleLazyObject(
-                lambda: urlresolvers.resolve(request['PATH_INFO']))
+            response.resolver_match = SimpleLazyObject(lambda: resolve(request['PATH_INFO']))
 
             # Flatten a single context. Not really necessary anymore thanks to
             # the __getattr__ flattening in ContextList, but has some edge-case
@@ -493,14 +521,13 @@ class Client(RequestFactory):
             return response
         finally:
             signals.template_rendered.disconnect(dispatch_uid=signal_uid)
-            got_request_exception.disconnect(dispatch_uid="request-exception")
+            got_request_exception.disconnect(dispatch_uid=exception_uid)
 
     def get(self, path, data=None, follow=False, secure=False, **extra):
         """
         Requests a response from the server using GET.
         """
-        response = super(Client, self).get(path, data=data, secure=secure,
-                                           **extra)
+        response = super().get(path, data=data, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -510,9 +537,7 @@ class Client(RequestFactory):
         """
         Requests a response from the server using POST.
         """
-        response = super(Client, self).post(path, data=data,
-                                            content_type=content_type,
-                                            secure=secure, **extra)
+        response = super().post(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -521,8 +546,7 @@ class Client(RequestFactory):
         """
         Request a response from the server using HEAD.
         """
-        response = super(Client, self).head(path, data=data, secure=secure,
-                                            **extra)
+        response = super().head(path, data=data, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -532,9 +556,7 @@ class Client(RequestFactory):
         """
         Request a response from the server using OPTIONS.
         """
-        response = super(Client, self).options(path, data=data,
-                                               content_type=content_type,
-                                               secure=secure, **extra)
+        response = super().options(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -544,9 +566,7 @@ class Client(RequestFactory):
         """
         Send a resource to the server using PUT.
         """
-        response = super(Client, self).put(path, data=data,
-                                           content_type=content_type,
-                                           secure=secure, **extra)
+        response = super().put(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -556,9 +576,7 @@ class Client(RequestFactory):
         """
         Send a resource to the server using PATCH.
         """
-        response = super(Client, self).patch(path, data=data,
-                                             content_type=content_type,
-                                             secure=secure, **extra)
+        response = super().patch(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -568,9 +586,7 @@ class Client(RequestFactory):
         """
         Send a DELETE request to the server.
         """
-        response = super(Client, self).delete(path, data=data,
-                                              content_type=content_type,
-                                              secure=secure, **extra)
+        response = super().delete(path, data=data, content_type=content_type, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -579,7 +595,7 @@ class Client(RequestFactory):
         """
         Send a TRACE request to the server.
         """
-        response = super(Client, self).trace(path, data=data, secure=secure, **extra)
+        response = super().trace(path, data=data, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response
@@ -589,42 +605,55 @@ class Client(RequestFactory):
         Sets the Factory to appear as if it has successfully logged into a site.
 
         Returns True if login is possible; False if the provided credentials
-        are incorrect, or the user is inactive, or if the sessions framework is
-        not available.
+        are incorrect.
         """
-        from django.contrib.auth import authenticate, login
+        from django.contrib.auth import authenticate
         user = authenticate(**credentials)
-        if (user and user.is_active and
-                apps.is_installed('django.contrib.sessions')):
-            engine = import_module(settings.SESSION_ENGINE)
-
-            # Create a fake request to store login details.
-            request = HttpRequest()
-
-            if self.session:
-                request.session = self.session
-            else:
-                request.session = engine.SessionStore()
-            login(request, user)
-
-            # Save the session values.
-            request.session.save()
-
-            # Set the cookie to represent the session.
-            session_cookie = settings.SESSION_COOKIE_NAME
-            self.cookies[session_cookie] = request.session.session_key
-            cookie_data = {
-                'max-age': None,
-                'path': '/',
-                'domain': settings.SESSION_COOKIE_DOMAIN,
-                'secure': settings.SESSION_COOKIE_SECURE or None,
-                'expires': None,
-            }
-            self.cookies[session_cookie].update(cookie_data)
-
+        if user:
+            self._login(user)
             return True
         else:
             return False
+
+    def force_login(self, user, backend=None):
+        def get_backend():
+            from django.contrib.auth import load_backend
+            for backend_path in settings.AUTHENTICATION_BACKENDS:
+                backend = load_backend(backend_path)
+                if hasattr(backend, 'get_user'):
+                    return backend_path
+        if backend is None:
+            backend = get_backend()
+        user.backend = backend
+        self._login(user, backend)
+
+    def _login(self, user, backend=None):
+        from django.contrib.auth import login
+        engine = import_module(settings.SESSION_ENGINE)
+
+        # Create a fake request to store login details.
+        request = HttpRequest()
+
+        if self.session:
+            request.session = self.session
+        else:
+            request.session = engine.SessionStore()
+        login(request, user, backend)
+
+        # Save the session values.
+        request.session.save()
+
+        # Set the cookie to represent the session.
+        session_cookie = settings.SESSION_COOKIE_NAME
+        self.cookies[session_cookie] = request.session.session_key
+        cookie_data = {
+            'max-age': None,
+            'path': '/',
+            'domain': settings.SESSION_COOKIE_DOMAIN,
+            'secure': settings.SESSION_COOKIE_SECURE or None,
+            'expires': None,
+        }
+        self.cookies[session_cookie].update(cookie_data)
 
     def logout(self):
         """
@@ -645,9 +674,14 @@ class Client(RequestFactory):
         self.cookies = SimpleCookie()
 
     def _parse_json(self, response, **extra):
-        if 'application/json' not in response.get('Content-Type'):
-            raise ValueError('Content-Type header is "{0}", not "application/json"'.format(response.get('Content-Type')))
-        return json.loads(response.content.decode(), **extra)
+        if not hasattr(response, '_json'):
+            if not JSON_CONTENT_TYPE_RE.match(response.get('Content-Type')):
+                raise ValueError(
+                    'Content-Type header is "{0}", not "application/json"'
+                    .format(response.get('Content-Type'))
+                )
+            response._json = json.loads(response.content.decode(), **extra)
+        return response._json
 
     def _handle_redirects(self, response, **extra):
         "Follows any redirects by requesting responses from the server using GET."
@@ -666,7 +700,12 @@ class Client(RequestFactory):
             if url.port:
                 extra['SERVER_PORT'] = str(url.port)
 
-            response = self.get(url.path, QueryDict(url.query), follow=False, **extra)
+            # Prepend the request path to handle relative path redirects
+            path = url.path
+            if not path.startswith('/'):
+                path = urljoin(response.request['PATH_INFO'], path)
+
+            response = self.get(path, QueryDict(url.query), follow=False, **extra)
             response.redirect_chain = redirect_chain
 
             if redirect_chain[-1] in redirect_chain[:-1]:

@@ -4,17 +4,15 @@
 This module contains a base type which provides list-style mutations
 without specific data storage methods.
 
-See also http://www.aryehleib.com/MutableLists.html
+See also http://static.aryehleib.com/oldsite/MutableLists.html
 
 Author: Aryeh Leib Taurog.
 """
-from django.utils import six
-from django.utils.functional import total_ordering
-from django.utils.six.moves import range
+from functools import total_ordering
 
 
 @total_ordering
-class ListMixin(object):
+class ListMixin:
     """
     A base class which provides complete list interface.
     Derived classes must call ListMixin's __init__() function
@@ -54,14 +52,10 @@ class ListMixin(object):
 
     type or tuple _allowed:
         A type or tuple of allowed item types [Optional]
-
-    class _IndexError:
-        The type of exception to be raise on invalid index [Optional]
     """
 
     _minlength = 0
     _maxlength = None
-    _IndexError = IndexError
 
     # ### Python initialization and special list interface methods ###
 
@@ -73,7 +67,7 @@ class ListMixin(object):
             self._set_single = self._set_single_rebuild
             self._assign_extended_slice = self._assign_extended_slice_rebuild
 
-        super(ListMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __getitem__(self, index):
         "Get the item(s) at the specified index/slice."
@@ -85,12 +79,12 @@ class ListMixin(object):
 
     def __delitem__(self, index):
         "Delete the item(s) at the specified index/slice."
-        if not isinstance(index, six.integer_types + (slice,)):
+        if not isinstance(index, (int, slice)):
             raise TypeError("%s is not a legal index" % index)
 
         # calculate new length and dimensions
         origLen = len(self)
-        if isinstance(index, six.integer_types):
+        if isinstance(index, int):
             index = self._checkindex(index)
             indexRange = [index]
         else:
@@ -111,11 +105,6 @@ class ListMixin(object):
             index = self._checkindex(index)
             self._check_allowed((val,))
             self._set_single(index, val)
-
-    def __iter__(self):
-        "Iterate over the items in the list"
-        for i in range(len(self)):
-            yield self[i]
 
     # ### Special methods for arithmetic operations ###
     def __add__(self, other):
@@ -154,7 +143,7 @@ class ListMixin(object):
         for i in range(olen):
             try:
                 c = self[i] == other[i]
-            except self._IndexError:
+            except IndexError:
                 # self must be shorter
                 return False
             if not c:
@@ -166,7 +155,7 @@ class ListMixin(object):
         for i in range(olen):
             try:
                 c = self[i] < other[i]
-            except self._IndexError:
+            except IndexError:
                 # self must be shorter
                 return True
             if c:
@@ -190,7 +179,7 @@ class ListMixin(object):
         for i in range(0, len(self)):
             if self[i] == val:
                 return i
-        raise ValueError('%s not found in object' % str(val))
+        raise ValueError('%s not found in object' % val)
 
     # ## Mutating ##
     def append(self, val):
@@ -203,7 +192,7 @@ class ListMixin(object):
 
     def insert(self, index, val):
         "Standard list insert method"
-        if not isinstance(index, six.integer_types):
+        if not isinstance(index, int):
             raise TypeError("%s is not a legal index" % index)
         self[index:index] = [val]
 
@@ -237,7 +226,7 @@ class ListMixin(object):
 
     # ### Private routines ###
     def _rebuild(self, newLen, newItems):
-        if newLen < self._minlength:
+        if newLen and newLen < self._minlength:
             raise ValueError('Must have at least %d items' % self._minlength)
         if self._maxlength is not None and newLen > self._maxlength:
             raise ValueError('Cannot have more than %d items' % self._maxlength)
@@ -253,7 +242,7 @@ class ListMixin(object):
             return index
         if correct and -length <= index < 0:
             return index + length
-        raise self._IndexError('invalid index: %s' % str(index))
+        raise IndexError('invalid index: %s' % index)
 
     def _check_allowed(self, items):
         if hasattr(self, '_allowed'):

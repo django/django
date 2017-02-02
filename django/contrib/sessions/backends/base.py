@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import base64
 import logging
 import string
@@ -28,12 +26,21 @@ class CreateError(Exception):
     pass
 
 
-class SessionBase(object):
+class UpdateError(Exception):
+    """
+    Occurs if Django tries to update a session that was deleted.
+    """
+    pass
+
+
+class SessionBase:
     """
     Base class for all Session classes.
     """
     TEST_COOKIE_NAME = 'testcookie'
     TEST_COOKIE_VALUE = 'worked'
+
+    __not_given = object()
 
     def __init__(self, session_key=None):
         self._session_key = session_key
@@ -58,9 +65,10 @@ class SessionBase(object):
     def get(self, key, default=None):
         return self._session.get(key, default)
 
-    def pop(self, key, default=None):
+    def pop(self, key, default=__not_given):
         self.modified = self.modified or key in self._session
-        return self._session.pop(key, default)
+        args = () if default is self.__not_given else (default,)
+        return self._session.pop(key, *args)
 
     def setdefault(self, key, value):
         if key in self._session:
@@ -103,8 +111,7 @@ class SessionBase(object):
             # ValueError, SuspiciousOperation, unpickling exceptions. If any of
             # these happen, just return an empty dictionary (an empty session).
             if isinstance(e, SuspiciousOperation):
-                logger = logging.getLogger('django.security.%s' %
-                        e.__class__.__name__)
+                logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
                 logger.warning(force_text(e))
             return {}
 
@@ -123,15 +130,6 @@ class SessionBase(object):
 
     def items(self):
         return self._session.items()
-
-    def iterkeys(self):
-        return self._session.iterkeys()
-
-    def itervalues(self):
-        return self._session.itervalues()
-
-    def iteritems(self):
-        return self._session.iteritems()
 
     def clear(self):
         # To avoid unnecessary persistent storage accesses, we set up the
@@ -161,10 +159,27 @@ class SessionBase(object):
             self._session_key = self._get_new_session_key()
         return self._session_key
 
+    def _validate_session_key(self, key):
+        """
+        Key must be truthy and at least 8 characters long. 8 characters is an
+        arbitrary lower bound for some minimal key security.
+        """
+        return key and len(key) >= 8
+
     def _get_session_key(self):
-        return self._session_key
+        return self.__session_key
+
+    def _set_session_key(self, value):
+        """
+        Validate session key on assignment. Invalid values will set to None.
+        """
+        if self._validate_session_key(value):
+            self.__session_key = value
+        else:
+            self.__session_key = None
 
     session_key = property(_get_session_key)
+    _session_key = property(_get_session_key, _set_session_key)
 
     def _get_session(self, no_load=False):
         """
@@ -278,13 +293,17 @@ class SessionBase(object):
 
     def cycle_key(self):
         """
-        Creates a new session key, whilst retaining the current session data.
+        Creates a new session key, while retaining the current session data.
         """
-        data = self._session_cache
+        try:
+            data = self._session_cache
+        except AttributeError:
+            data = {}
         key = self.session_key
         self.create()
         self._session_cache = data
-        self.delete(key)
+        if key:
+            self.delete(key)
 
     # Methods that child classes must implement.
 
@@ -306,7 +325,8 @@ class SessionBase(object):
         """
         Saves the session data. If 'must_create' is True, a new session object
         is created (otherwise a CreateError exception is raised). Otherwise,
-        save() can update an existing object with the same key.
+        save() only updates an existing object and does not create one
+        (an UpdateError is raised).
         """
         raise NotImplementedError('subclasses of SessionBase must provide a save() method')
 

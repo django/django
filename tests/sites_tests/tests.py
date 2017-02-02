@@ -1,6 +1,5 @@
-from __future__ import unicode_literals
-
 from django.apps import apps
+from django.apps.registry import Apps
 from django.conf import settings
 from django.contrib.sites import models
 from django.contrib.sites.management import create_default_site
@@ -10,7 +9,7 @@ from django.contrib.sites.requests import RequestSite
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models.signals import post_migrate
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.test import TestCase, modify_settings, override_settings
 from django.test.utils import captured_stdout
 
@@ -27,12 +26,16 @@ class SitesFrameworkTests(TestCase):
         )
         self.site.save()
 
+    def tearDown(self):
+        Site.objects.clear_cache()
+
     def test_site_manager(self):
         # Make sure that get_current() does not return a deleted Site object.
         s = Site.objects.get_current()
         self.assertIsInstance(s, Site)
         s.delete()
-        self.assertRaises(ObjectDoesNotExist, Site.objects.get_current)
+        with self.assertRaises(ObjectDoesNotExist):
+            Site.objects.get_current()
 
     def test_site_cache(self):
         # After updating a Site object (e.g. via the admin), we shouldn't return a
@@ -50,11 +53,12 @@ class SitesFrameworkTests(TestCase):
         # be cleared and get_current() should raise a DoesNotExist.
         self.assertIsInstance(Site.objects.get_current(), Site)
         Site.objects.all().delete()
-        self.assertRaises(Site.DoesNotExist, Site.objects.get_current)
+        with self.assertRaises(Site.DoesNotExist):
+            Site.objects.get_current()
 
     @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_get_current_site(self):
-        # Test that the correct Site object is returned
+        # The correct Site object is returned
         request = HttpRequest()
         request.META = {
             "SERVER_NAME": "example.com",
@@ -64,10 +68,11 @@ class SitesFrameworkTests(TestCase):
         self.assertIsInstance(site, Site)
         self.assertEqual(site.id, settings.SITE_ID)
 
-        # Test that an exception is raised if the sites framework is installed
+        # An exception is raised if the sites framework is installed
         # but there is no matching Site
         site.delete()
-        self.assertRaises(ObjectDoesNotExist, get_current_site, request)
+        with self.assertRaises(ObjectDoesNotExist):
+            get_current_site(request)
 
         # A RequestSite is returned if the sites framework is not installed
         with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
@@ -86,16 +91,69 @@ class SitesFrameworkTests(TestCase):
         site = get_current_site(request)
         self.assertEqual(site.name, "example.com")
 
+    @override_settings(SITE_ID='', ALLOWED_HOSTS=['example.com'])
+    def test_get_current_site_host_with_trailing_dot(self):
+        """
+        The site is matched if the name in the request has a trailing dot.
+        """
+        request = HttpRequest()
+        request.META = {
+            'SERVER_NAME': 'example.com.',
+            'SERVER_PORT': '80',
+        }
+        site = get_current_site(request)
+        self.assertEqual(site.name, 'example.com')
+
+    @override_settings(SITE_ID='', ALLOWED_HOSTS=['example.com', 'example.net'])
+    def test_get_current_site_no_site_id_and_handle_port_fallback(self):
+        request = HttpRequest()
+        s1 = self.site
+        s2 = Site.objects.create(domain='example.com:80', name='example.com:80')
+
+        # Host header without port
+        request.META = {'HTTP_HOST': 'example.com'}
+        site = get_current_site(request)
+        self.assertEqual(site, s1)
+
+        # Host header with port - match, no fallback without port
+        request.META = {'HTTP_HOST': 'example.com:80'}
+        site = get_current_site(request)
+        self.assertEqual(site, s2)
+
+        # Host header with port - no match, fallback without port
+        request.META = {'HTTP_HOST': 'example.com:81'}
+        site = get_current_site(request)
+        self.assertEqual(site, s1)
+
+        # Host header with non-matching domain
+        request.META = {'HTTP_HOST': 'example.net'}
+        with self.assertRaises(ObjectDoesNotExist):
+            get_current_site(request)
+
+        # Ensure domain for RequestSite always matches host header
+        with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
+            request.META = {'HTTP_HOST': 'example.com'}
+            site = get_current_site(request)
+            self.assertEqual(site.name, 'example.com')
+
+            request.META = {'HTTP_HOST': 'example.com:80'}
+            site = get_current_site(request)
+            self.assertEqual(site.name, 'example.com:80')
+
     def test_domain_name_with_whitespaces(self):
         # Regression for #17320
         # Domain names are not allowed contain whitespace characters
         site = Site(name="test name", domain="test test")
-        self.assertRaises(ValidationError, site.full_clean)
+        with self.assertRaises(ValidationError):
+            site.full_clean()
         site.domain = "test\ttest"
-        self.assertRaises(ValidationError, site.full_clean)
+        with self.assertRaises(ValidationError):
+            site.full_clean()
         site.domain = "test\ntest"
-        self.assertRaises(ValidationError, site.full_clean)
+        with self.assertRaises(ValidationError):
+            site.full_clean()
 
+    @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_clear_site_cache(self):
         request = HttpRequest()
         request.META = {
@@ -116,7 +174,7 @@ class SitesFrameworkTests(TestCase):
         clear_site_cache(Site, instance=self.site, using='default')
         self.assertEqual(models.SITE_CACHE, {})
 
-    @override_settings(SITE_ID='')
+    @override_settings(SITE_ID='', ALLOWED_HOSTS=['example2.com'])
     def test_clear_site_cache_domain(self):
         site = Site.objects.create(name='example2.com', domain='example2.com')
         request = HttpRequest()
@@ -141,8 +199,34 @@ class SitesFrameworkTests(TestCase):
         with self.assertRaisesMessage(ValidationError, msg):
             site.validate_unique()
 
+    def test_site_natural_key(self):
+        self.assertEqual(Site.objects.get_by_natural_key(self.site.domain), self.site)
+        self.assertEqual(self.site.natural_key(), (self.site.domain,))
 
-class JustOtherRouter(object):
+    @override_settings(ALLOWED_HOSTS=['example.com'])
+    def test_requestsite_save_notimplemented_msg(self):
+        # Test response msg for RequestSite.save NotImplementedError
+        request = HttpRequest()
+        request.META = {
+            "HTTP_HOST": "example.com",
+        }
+        msg = 'RequestSite cannot be saved.'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            RequestSite(request).save()
+
+    @override_settings(ALLOWED_HOSTS=['example.com'])
+    def test_requestsite_delete_notimplemented_msg(self):
+        # Test response msg for RequestSite.delete NotImplementedError
+        request = HttpRequest()
+        request.META = {
+            "HTTP_HOST": "example.com",
+        }
+        msg = 'RequestSite cannot be deleted.'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            RequestSite(request).delete()
+
+
+class JustOtherRouter:
     def allow_migrate(self, db, app_label, **hints):
         return db == 'other'
 
@@ -192,9 +276,9 @@ class CreateDefaultSiteTests(TestCase):
         #17415 - Another site can be created right after the default one.
 
         On some backends the sequence needs to be reset after saving with an
-        explicit ID. Test that there isn't a sequence collisions by saving
-        another site. This test is only meaningful with databases that use
-        sequences for automatic primary keys such as PostgreSQL and Oracle.
+        explicit ID. There shouldn't be a sequence collisions by saving another
+        site. This test is only meaningful with databases that use sequences
+        for automatic primary keys such as PostgreSQL and Oracle.
         """
         create_default_site(self.app_config, verbosity=0)
         Site(domain='example2.com', name='example2.com').save()
@@ -224,12 +308,26 @@ class CreateDefaultSiteTests(TestCase):
         create_default_site(self.app_config, verbosity=0)
         self.assertEqual(Site.objects.get().pk, 1)
 
+    def test_unavailable_site_model(self):
+        """
+        #24075 - A Site shouldn't be created if the model isn't available.
+        """
+        apps = Apps()
+        create_default_site(self.app_config, verbosity=0, apps=apps)
+        self.assertFalse(Site.objects.exists())
+
 
 class MiddlewareTest(TestCase):
 
-    def test_request(self):
-        """ Makes sure that the request has correct `site` attribute. """
+    def test_old_style_request(self):
+        """The request has correct `site` attribute."""
         middleware = CurrentSiteMiddleware()
         request = HttpRequest()
         middleware.process_request(request)
         self.assertEqual(request.site.id, settings.SITE_ID)
+
+    def test_request(self):
+        def get_response(request):
+            return HttpResponse(str(request.site.id))
+        response = CurrentSiteMiddleware(get_response)(HttpRequest())
+        self.assertContains(response, settings.SITE_ID)

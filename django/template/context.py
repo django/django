@@ -1,13 +1,8 @@
-import warnings
 from contextlib import contextmanager
 from copy import copy
 
-from django.utils.deprecation import RemovedInDjango20Warning
-
 # Hard-coded processor for easier use of CSRF protection.
 _builtin_context_processors = ('django.template.context_processors.csrf',)
-
-_current_app_undefined = object()
 
 
 class ContextPopException(Exception):
@@ -17,7 +12,7 @@ class ContextPopException(Exception):
 
 class ContextDict(dict):
     def __init__(self, context, *args, **kwargs):
-        super(ContextDict, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         context.dicts.append(self)
         self.context = context
@@ -29,7 +24,7 @@ class ContextDict(dict):
         self.context.pop()
 
 
-class BaseContext(object):
+class BaseContext:
     def __init__(self, dict_=None):
         self._reset_dicts(dict_)
 
@@ -40,7 +35,7 @@ class BaseContext(object):
             self.dicts.append(value)
 
     def __copy__(self):
-        duplicate = copy(super(BaseContext, self))
+        duplicate = copy(super())
         duplicate.dicts = self.dicts[:]
         return duplicate
 
@@ -52,7 +47,13 @@ class BaseContext(object):
             yield d
 
     def push(self, *args, **kwargs):
-        return ContextDict(self, *args, **kwargs)
+        dicts = []
+        for d in args:
+            if isinstance(d, BaseContext):
+                dicts += d.dicts[1:]
+            else:
+                dicts.append(d)
+        return ContextDict(self, *dicts, **kwargs)
 
     def pop(self):
         if len(self.dicts) == 1:
@@ -62,6 +63,18 @@ class BaseContext(object):
     def __setitem__(self, key, value):
         "Set a variable in the current context"
         self.dicts[-1][key] = value
+
+    def set_upward(self, key, value):
+        """
+        Set a variable in one of the higher contexts if it exists there,
+        otherwise in the current context.
+        """
+        context = self.dicts[-1]
+        for d in reversed(self.dicts):
+            if key in d.keys():
+                context = d
+                break
+        context[key] = value
 
     def __getitem__(self, key):
         "Get a variable's value, starting at the current context and going upward"
@@ -74,14 +87,11 @@ class BaseContext(object):
         "Delete a variable from the current context"
         del self.dicts[-1][key]
 
-    def has_key(self, key):
+    def __contains__(self, key):
         for d in self.dicts:
             if key in d:
                 return True
         return False
-
-    def __contains__(self, key):
-        return self.has_key(key)
 
     def get(self, key, otherwise=None):
         for d in reversed(self.dicts):
@@ -129,16 +139,8 @@ class BaseContext(object):
 
 class Context(BaseContext):
     "A stack container for variable context"
-    def __init__(self, dict_=None, autoescape=True,
-            current_app=_current_app_undefined,
-            use_l10n=None, use_tz=None):
-        if current_app is not _current_app_undefined:
-            warnings.warn(
-                "The current_app argument of Context is deprecated. Use "
-                "RequestContext and set the current_app attribute of its "
-                "request instead.", RemovedInDjango20Warning, stacklevel=2)
+    def __init__(self, dict_=None, autoescape=True, use_l10n=None, use_tz=None):
         self.autoescape = autoescape
-        self._current_app = current_app
         self.use_l10n = use_l10n
         self.use_tz = use_tz
         self.template_name = "unknown"
@@ -146,11 +148,7 @@ class Context(BaseContext):
         # Set to the original template -- as opposed to extended or included
         # templates -- during rendering, see bind_template.
         self.template = None
-        super(Context, self).__init__(dict_)
-
-    @property
-    def current_app(self):
-        return None if self._current_app is _current_app_undefined else self._current_app
+        super().__init__(dict_)
 
     @contextmanager
     def bind_template(self, template):
@@ -163,7 +161,7 @@ class Context(BaseContext):
             self.template = None
 
     def __copy__(self):
-        duplicate = super(Context, self).__copy__()
+        duplicate = super().__copy__()
         duplicate.render_context = copy(self.render_context)
         return duplicate
 
@@ -171,6 +169,8 @@ class Context(BaseContext):
         "Pushes other_dict to the stack of dictionaries in the Context"
         if not hasattr(other_dict, '__getitem__'):
             raise TypeError('other_dict must be a mapping (dictionary-like) object.')
+        if isinstance(other_dict, BaseContext):
+            other_dict = other_dict.dicts[1:].pop()
         return ContextDict(self, other_dict)
 
 
@@ -189,11 +189,13 @@ class RenderContext(BaseContext):
     rendering of other templates as they would if they were stored in the normal
     template context.
     """
+    template = None
+
     def __iter__(self):
         for d in self.dicts[-1]:
             yield d
 
-    def has_key(self, key):
+    def __contains__(self, key):
         return key in self.dicts[-1]
 
     def get(self, key, otherwise=None):
@@ -201,6 +203,17 @@ class RenderContext(BaseContext):
 
     def __getitem__(self, key):
         return self.dicts[-1][key]
+
+    @contextmanager
+    def push_state(self, template):
+        initial = self.template
+        self.template = template
+        self.push()
+        try:
+            yield
+        finally:
+            self.template = initial
+            self.pop()
 
 
 class RequestContext(Context):
@@ -210,23 +223,18 @@ class RequestContext(Context):
     Additional processors can be specified as a list of callables
     using the "processors" keyword argument.
     """
-    def __init__(self, request, dict_=None, processors=None,
-            current_app=_current_app_undefined,
-            use_l10n=None, use_tz=None):
-        # current_app isn't passed here to avoid triggering the deprecation
-        # warning in Context.__init__.
-        super(RequestContext, self).__init__(
-            dict_, use_l10n=use_l10n, use_tz=use_tz)
-        if current_app is not _current_app_undefined:
-            warnings.warn(
-                "The current_app argument of RequestContext is deprecated. "
-                "Set the current_app attribute of its request instead.",
-                RemovedInDjango20Warning, stacklevel=2)
-        self._current_app = current_app
+    def __init__(self, request, dict_=None, processors=None, use_l10n=None, use_tz=None, autoescape=True):
+        super().__init__(dict_, use_l10n=use_l10n, use_tz=use_tz, autoescape=autoescape)
         self.request = request
         self._processors = () if processors is None else tuple(processors)
         self._processors_index = len(self.dicts)
-        self.update({})         # placeholder for context processors output
+
+        # placeholder for context processors output
+        self.update({})
+
+        # empty dict for any new modifications
+        # (so that context processors don't overwrite them)
+        self.update({})
 
     @contextmanager
     def bind_template(self, template):
@@ -250,7 +258,7 @@ class RequestContext(Context):
             self.dicts[self._processors_index] = {}
 
     def new(self, values=None):
-        new_context = super(RequestContext, self).new(values)
+        new_context = super().new(values)
         # This is for backwards-compatibility: RequestContexts created via
         # Context.new don't include values from context processors.
         if hasattr(new_context, '_processors_index'):
@@ -258,17 +266,19 @@ class RequestContext(Context):
         return new_context
 
 
-def make_context(context, request=None):
+def make_context(context, request=None, **kwargs):
     """
     Create a suitable Context from a plain dict and optionally an HttpRequest.
     """
+    if context is not None and not isinstance(context, dict):
+        raise TypeError('context must be a dict rather than %s.' % context.__class__.__name__)
     if request is None:
-        context = Context(context)
+        context = Context(context, **kwargs)
     else:
         # The following pattern is required to ensure values from
         # context override those from template context processors.
         original_context = context
-        context = RequestContext(request)
+        context = RequestContext(request, **kwargs)
         if original_context:
             context.push(original_context)
     return context

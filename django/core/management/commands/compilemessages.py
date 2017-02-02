@@ -1,19 +1,15 @@
-from __future__ import unicode_literals
-
 import codecs
 import glob
 import os
 
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import find_command, popen_wrapper
-from django.utils._os import npath, upath
 
 
 def has_bom(fn):
     with open(fn, 'rb') as f:
         sample = f.read(4)
-    return (sample[:3] == b'\xef\xbb\xbf' or
-        sample.startswith((codecs.BOM_UTF16_LE, codecs.BOM_UTF16_BE)))
+    return sample.startswith((codecs.BOM_UTF8, codecs.BOM_UTF16_LE, codecs.BOM_UTF16_BE))
 
 
 def is_writable(path):
@@ -37,19 +33,25 @@ class Command(BaseCommand):
     program_options = ['--check-format']
 
     def add_arguments(self, parser):
-        parser.add_argument('--locale', '-l', dest='locale', action='append', default=[],
+        parser.add_argument(
+            '--locale', '-l', dest='locale', action='append', default=[],
             help='Locale(s) to process (e.g. de_AT). Default is to process all. '
-            'Can be used multiple times.')
-        parser.add_argument('--exclude', '-x', dest='exclude', action='append', default=[],
-            help='Locales to exclude. Default is none. Can be used multiple times.')
-        parser.add_argument('--use-fuzzy', '-f', dest='fuzzy', action='store_true', default=False,
-            help='Use fuzzy translations.')
+                 'Can be used multiple times.',
+        )
+        parser.add_argument(
+            '--exclude', '-x', dest='exclude', action='append', default=[],
+            help='Locales to exclude. Default is none. Can be used multiple times.',
+        )
+        parser.add_argument(
+            '--use-fuzzy', '-f', dest='fuzzy', action='store_true', default=False,
+            help='Use fuzzy translations.',
+        )
 
     def handle(self, **options):
-        locale = options.get('locale')
-        exclude = options.get('exclude')
-        self.verbosity = int(options.get('verbosity'))
-        if options.get('fuzzy'):
+        locale = options['locale']
+        exclude = options['exclude']
+        self.verbosity = options['verbosity']
+        if options['fuzzy']:
             self.program_options = self.program_options + ['-f']
 
         if find_command(self.program) is None:
@@ -59,7 +61,13 @@ class Command(BaseCommand):
         basedirs = [os.path.join('conf', 'locale'), 'locale']
         if os.environ.get('DJANGO_SETTINGS_MODULE'):
             from django.conf import settings
-            basedirs.extend(upath(path) for path in settings.LOCALE_PATHS)
+            basedirs.extend(settings.LOCALE_PATHS)
+
+        # Walk entire tree, looking for locale directories
+        for dirpath, dirnames, filenames in os.walk('.', topdown=True):
+            for dirname in dirnames:
+                if dirname == 'locale':
+                    basedirs.append(os.path.join(dirpath, dirname))
 
         # Gather existing directories.
         basedirs = set(map(os.path.abspath, filter(os.path.isdir, basedirs)))
@@ -106,13 +114,14 @@ class Command(BaseCommand):
             base_path = os.path.splitext(po_path)[0]
 
             # Check writability on first location
-            if i == 0 and not is_writable(npath(base_path + '.mo')):
+            if i == 0 and not is_writable(base_path + '.mo'):
                 self.stderr.write("The po files under %s are in a seemingly not writable location. "
                                   "mo files will not be updated/created." % dirpath)
                 return
 
-            args = [self.program] + self.program_options + ['-o',
-                    npath(base_path + '.mo'), npath(base_path + '.po')]
+            args = [self.program] + self.program_options + [
+                '-o', base_path + '.mo', base_path + '.po'
+            ]
             output, errors, status = popen_wrapper(args)
             if status:
                 if errors:

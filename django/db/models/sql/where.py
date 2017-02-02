@@ -2,7 +2,7 @@
 Code to manage the creation and SQL rendering of 'where' constraints.
 """
 
-from django.db.models.sql.datastructures import EmptyResultSet
+from django.core.exceptions import EmptyResultSet
 from django.utils import tree
 from django.utils.functional import cached_property
 
@@ -118,6 +118,13 @@ class WhereNode(tree.Node):
             cols.extend(child.get_group_by_cols())
         return cols
 
+    def get_source_expressions(self):
+        return self.children[:]
+
+    def set_source_expressions(self, children):
+        assert len(children) == len(self.children)
+        self.children = children
+
     def relabel_aliases(self, change_map):
         """
         Relabels the alias values of any children. 'change_map' is a dictionary
@@ -160,8 +167,12 @@ class WhereNode(tree.Node):
     def contains_aggregate(self):
         return self._contains_aggregate(self)
 
+    @property
+    def is_summary(self):
+        return any(child.is_summary for child in self.children)
 
-class NothingNode(object):
+
+class NothingNode:
     """
     A node that matches nothing.
     """
@@ -171,7 +182,7 @@ class NothingNode(object):
         raise EmptyResultSet
 
 
-class ExtraWhere(object):
+class ExtraWhere:
     # The contents are a black box - assume no aggregates are used.
     contains_aggregate = False
 
@@ -184,7 +195,7 @@ class ExtraWhere(object):
         return " AND ".join(sqls), list(self.params or ())
 
 
-class SubqueryConstraint(object):
+class SubqueryConstraint:
     # Even if aggregates would be used in a subquery, the outer query isn't
     # interested about those.
     contains_aggregate = False
@@ -197,28 +208,6 @@ class SubqueryConstraint(object):
 
     def as_sql(self, compiler, connection):
         query = self.query_object
-
-        # QuerySet was sent
-        if hasattr(query, 'values'):
-            if query._db and connection.alias != query._db:
-                raise ValueError("Can't do subqueries with queries on different DBs.")
-            # Do not override already existing values.
-            if query._fields is None:
-                query = query.values(*self.targets)
-            else:
-                query = query._clone()
-            query = query.query
-            if query.can_filter():
-                # If there is no slicing in use, then we can safely drop all ordering
-                query.clear_ordering(True)
-
+        query.set_values(self.targets)
         query_compiler = query.get_compiler(connection=connection)
         return query_compiler.as_subquery_condition(self.alias, self.columns, compiler)
-
-    def relabel_aliases(self, change_map):
-        self.alias = change_map.get(self.alias, self.alias)
-
-    def clone(self):
-        return self.__class__(
-            self.alias, self.columns, self.targets,
-            self.query_object)

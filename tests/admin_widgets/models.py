@@ -1,15 +1,11 @@
-from __future__ import unicode_literals
-
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class MyFileField(models.FileField):
     pass
 
 
-@python_2_unicode_compatible
 class Member(models.Model):
     name = models.CharField(max_length=100)
     birthdate = models.DateTimeField(blank=True, null=True)
@@ -20,7 +16,6 @@ class Member(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Band(models.Model):
     name = models.CharField(max_length=100)
     style = models.CharField(max_length=20)
@@ -30,9 +25,8 @@ class Band(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Album(models.Model):
-    band = models.ForeignKey(Band)
+    band = models.ForeignKey(Band, models.CASCADE)
     name = models.CharField(max_length=100)
     cover_art = models.FileField(upload_to='albums')
     backside_art = MyFileField(upload_to='albums_back', null=True)
@@ -43,13 +37,12 @@ class Album(models.Model):
 
 class HiddenInventoryManager(models.Manager):
     def get_queryset(self):
-        return super(HiddenInventoryManager, self).get_queryset().filter(hidden=False)
+        return super().get_queryset().filter(hidden=False)
 
 
-@python_2_unicode_compatible
 class Inventory(models.Model):
     barcode = models.PositiveIntegerField(unique=True)
-    parent = models.ForeignKey('self', to_field='barcode', blank=True, null=True)
+    parent = models.ForeignKey('self', models.SET_NULL, to_field='barcode', blank=True, null=True)
     name = models.CharField(blank=False, max_length=20)
     hidden = models.BooleanField(default=False)
 
@@ -62,8 +55,18 @@ class Inventory(models.Model):
 
 
 class Event(models.Model):
-    main_band = models.ForeignKey(Band, limit_choices_to=models.Q(pk__gt=0), related_name='events_main_band_at')
-    supporting_bands = models.ManyToManyField(Band, blank=True, related_name='events_supporting_band_at')
+    main_band = models.ForeignKey(
+        Band,
+        models.CASCADE,
+        limit_choices_to=models.Q(pk__gt=0),
+        related_name='events_main_band_at',
+    )
+    supporting_bands = models.ManyToManyField(
+        Band,
+        blank=True,
+        related_name='events_supporting_band_at',
+        help_text='Supporting Bands.',
+    )
     start_date = models.DateField(blank=True, null=True)
     start_time = models.TimeField(blank=True, null=True)
     description = models.TextField(blank=True)
@@ -71,9 +74,8 @@ class Event(models.Model):
     min_age = models.IntegerField(blank=True, null=True)
 
 
-@python_2_unicode_compatible
 class Car(models.Model):
-    owner = models.ForeignKey(User)
+    owner = models.ForeignKey(User, models.CASCADE)
     make = models.CharField(max_length=30)
     model = models.CharField(max_length=30)
 
@@ -85,7 +87,7 @@ class CarTire(models.Model):
     """
     A single car tire. This to test that a user can only select their own cars.
     """
-    car = models.ForeignKey(Car)
+    car = models.ForeignKey(Car, models.CASCADE)
 
 
 class Honeycomb(models.Model):
@@ -98,7 +100,7 @@ class Bee(models.Model):
     (Honeycomb) so the corresponding raw ID widget won't have a magnifying
     glass link to select related honeycomb instances.
     """
-    honeycomb = models.ForeignKey(Honeycomb)
+    honeycomb = models.ForeignKey(Honeycomb, models.CASCADE)
 
 
 class Individual(models.Model):
@@ -108,8 +110,8 @@ class Individual(models.Model):
     related instances (rendering will be called programmatically in this case).
     """
     name = models.CharField(max_length=20)
-    parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
-    soulmate = models.ForeignKey('self', null=True, on_delete=models.CASCADE, related_name='soulmates')
+    parent = models.ForeignKey('self', models.SET_NULL, null=True)
+    soulmate = models.ForeignKey('self', models.CASCADE, null=True, related_name='soulmates')
 
 
 class Company(models.Model):
@@ -126,7 +128,6 @@ class Advisor(models.Model):
     companies = models.ManyToManyField(Company)
 
 
-@python_2_unicode_compatible
 class Student(models.Model):
     name = models.CharField(max_length=255)
 
@@ -137,7 +138,6 @@ class Student(models.Model):
         ordering = ('name',)
 
 
-@python_2_unicode_compatible
 class School(models.Model):
     name = models.CharField(max_length=255)
     students = models.ManyToManyField(Student, related_name='current_schools')
@@ -147,9 +147,8 @@ class School(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Profile(models.Model):
-    user = models.ForeignKey('auth.User', 'username')
+    user = models.ForeignKey('auth.User', models.CASCADE, to_field='username')
 
     def __str__(self):
         return self.user.username

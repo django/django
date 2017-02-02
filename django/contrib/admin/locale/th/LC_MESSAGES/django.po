@@ -9,11 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Thai (http://www.transifex.com/projects/p/django/language/"
-"th/)\n"
+"Language-Team: Thai (http://www.transifex.com/django/django/language/th/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -65,6 +64,12 @@ msgstr "เดือนนี้"
 msgid "This year"
 msgstr "ปีนี้"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -74,12 +79,27 @@ msgstr "กรุณาใส่  %(username)s และรหัสผ่าน
 msgid "Action:"
 msgstr "คำสั่ง :"
 
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "เพิ่ม %(verbose_name)s อีก"
+
+msgid "Remove"
+msgstr "ถอดออก"
+
 msgid "action time"
 msgstr "เวลาลงมือ"
+
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
 
 msgid "object id"
 msgstr "อ็อบเจ็กต์ไอดี"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "object repr"
 
@@ -110,6 +130,31 @@ msgstr "\"%(object)s\" ถูกลบ"
 msgid "LogEntry Object"
 msgstr "อ็อบเจ็กต์ LogEntry"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "และ"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "ไม่มีฟิลด์ใดถูกเปลี่ยน"
+
 msgid "None"
 msgstr "ไม่มี"
 
@@ -117,58 +162,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-#, python-format
-msgid "Changed %s."
-msgstr "%s เปลี่ยนแล้ว"
-
-msgid "and"
-msgstr "และ"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "เพิ่ม %(name)s \"%(object)s\" แล้ว"
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "เปลี่ยน %(list)s สำหรับ %(name)s \"%(object)s\" แล้ว"
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "ลบ %(name)s \"%(object)s\" แล้ว"
-
-msgid "No fields changed."
-msgstr "ไม่มีฟิลด์ใดถูกเปลี่ยน"
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล้ว แก้ไขได้อีกที่ด้านล่าง"
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล้ว เพิ่ม  %(name)s ได้อีกที่ด้านล่าง"
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "เพิ่ม %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr "เปลี่ยนแปลง %(name)s \"%(obj)s\" เรียบร้อยแล้ว แก้ไขได้อีกที่ด้านล่าง"
+msgstr ""
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
-msgstr "เปลี่ยนแปลง %(name)s \"%(obj)s\" เรียบร้อยแล้ว เพิ่ม %(name)s ได้อีกที่ด้านล่าง"
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "เปลี่ยนแปลง %(name)s \"%(obj)s\" เรียบร้อยแล้ว"
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -321,18 +343,15 @@ msgstr "เอกสารประกอบ"
 msgid "Log out"
 msgstr "ออกจากระบบ"
 
-msgid "Add"
-msgstr "เพิ่ม"
+#, python-format
+msgid "Add %(name)s"
+msgstr "เพิ่ม %(name)s"
 
 msgid "History"
 msgstr "ประวัติ"
 
 msgid "View on site"
 msgstr "ดูที่หน้าเว็บ"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "เพิ่ม %(name)s"
 
 msgid "Filter"
 msgstr "ตัวกรอง"
@@ -412,13 +431,6 @@ msgstr ""
 msgid "Change"
 msgstr "เปลี่ยนแปลง"
 
-msgid "Remove"
-msgstr "ถอดออก"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "เพิ่ม %(verbose_name)s อีก"
-
 msgid "Delete?"
 msgstr "ลบ?"
 
@@ -433,14 +445,17 @@ msgstr ""
 msgid "Models in the %(name)s application"
 msgstr "โมเดลในแอป %(name)s"
 
+msgid "Add"
+msgstr "เพิ่ม"
+
 msgid "You don't have permission to edit anything."
 msgstr "คุณไม่สิทธิ์ในการเปลี่ยนแปลงข้อมูลใดๆ ได้"
 
-msgid "Recent Actions"
-msgstr "คำสั่งที่ผ่านมา"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "คำสั่งของฉัน"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "ไม่ว่าง"
@@ -455,6 +470,12 @@ msgid ""
 msgstr ""
 "มีสิ่งผิดปกติเกิดขึ้นกับการติดตั้งฐานข้อมูล กรุณาตรวจสอบอีกครั้งว่าฐานข้อมูลได้ถูกติดตั้งแล้ว "
 "หรือฐานข้อมูลสามารถอ่านและเขียนได้โคยผู้ใช้นี้"
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "ลืมรหัสผ่านหรือชื่อผู้ใช้ของคุณหรือไม่"
@@ -478,6 +499,9 @@ msgstr "แสดงทั้งหมด"
 
 msgid "Save"
 msgstr "บันทึก"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -605,9 +629,6 @@ msgstr "ตั้งรหัสผ่านของฉันใหม่"
 
 msgid "All dates"
 msgstr "ทุกวัน"
-
-msgid "(None)"
-msgstr "(ว่างเปล่า)"
 
 #, python-format
 msgid "Select %s"

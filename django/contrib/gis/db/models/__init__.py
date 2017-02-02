@@ -1,14 +1,16 @@
-# Want to get everything from the 'normal' models package.
-from django.db.models import *  # NOQA
-
-# Geographic aggregate functions
+from django.db.models import *  # NOQA isort:skip
+from django.db.models import __all__ as models_all  # isort:skip
 from django.contrib.gis.db.models.aggregates import *  # NOQA
+from django.contrib.gis.db.models.aggregates import __all__ as aggregates_all
+from django.contrib.gis.db.models.fields import (
+    GeometryCollectionField, GeometryField, LineStringField,
+    MultiLineStringField, MultiPointField, MultiPolygonField, PointField,
+    PolygonField, RasterField,
+)
 
-# The GeoManager
-from django.contrib.gis.db.models.manager import GeoManager  # NOQA
-
-# The geographic-enabled fields.
-from django.contrib.gis.db.models.fields import (  # NOQA
-    GeometryField, PointField, LineStringField, PolygonField,
-    MultiPointField, MultiLineStringField, MultiPolygonField,
-    GeometryCollectionField)
+__all__ = models_all + aggregates_all
+__all__ += [
+    'GeometryCollectionField', 'GeometryField', 'LineStringField',
+    'MultiLineStringField', 'MultiPointField', 'MultiPolygonField', 'PointField',
+    'PolygonField', 'RasterField',
+]

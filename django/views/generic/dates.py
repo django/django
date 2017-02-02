@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 
 from django.conf import settings
@@ -7,7 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.http import Http404
 from django.utils import timezone
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from django.views.generic.base import View
@@ -19,7 +17,7 @@ from django.views.generic.list import (
 )
 
 
-class YearMixin(object):
+class YearMixin:
     """
     Mixin for views manipulating year-based data.
     """
@@ -75,7 +73,7 @@ class YearMixin(object):
         return date.replace(month=1, day=1)
 
 
-class MonthMixin(object):
+class MonthMixin:
     """
     Mixin for views manipulating month-based data.
     """
@@ -134,7 +132,7 @@ class MonthMixin(object):
         return date.replace(day=1)
 
 
-class DayMixin(object):
+class DayMixin:
     """
     Mixin for views manipulating day-based data.
     """
@@ -190,7 +188,7 @@ class DayMixin(object):
         return date
 
 
-class WeekMixin(object):
+class WeekMixin:
     """
     Mixin for views manipulating week-based data.
     """
@@ -260,7 +258,7 @@ class WeekMixin(object):
             raise ValueError("unknown week format: %s" % week_format)
 
 
-class DateMixin(object):
+class DateMixin:
     """
     Mixin class for views manipulating date-based data.
     """
@@ -658,11 +656,11 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
         if not self.get_allow_future() and date > datetime.date.today():
             raise Http404(_(
                 "Future %(verbose_name_plural)s not available because "
-                "%(class_name)s.allow_future is False.") % {
+                "%(class_name)s.allow_future is False."
+            ) % {
                 'verbose_name_plural': qs.model._meta.verbose_name_plural,
                 'class_name': self.__class__.__name__,
-                },
-            )
+            })
 
         # Filter down a queryset from self.queryset using the date from the
         # URL. This'll get passed as the queryset to DetailView.get_object,
@@ -670,7 +668,7 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
         lookup_kwargs = self._make_single_date_lookup(date)
         qs = qs.filter(**lookup_kwargs)
 
-        return super(BaseDetailView, self).get_object(queryset=qs)
+        return super().get_object(queryset=qs)
 
 
 class DateDetailView(SingleObjectTemplateResponseMixin, BaseDateDetailView):
@@ -689,7 +687,7 @@ def _date_from_string(year, year_format, month='', month_format='', day='', day_
     format = delim.join((year_format, month_format, day_format))
     datestr = delim.join((year, month, day))
     try:
-        return datetime.datetime.strptime(force_str(datestr), format).date()
+        return datetime.datetime.strptime(datestr, format).date()
     except ValueError:
         raise Http404(_("Invalid date string '%(datestr)s' given format '%(format)s'") % {
             'datestr': datestr,
@@ -722,7 +720,6 @@ def _get_next_prev(generic_view, date, is_previous, period):
         * If allow_empty is false and allow_future is false, return the next
           date that contains a valid object. If that date is in the future, or
           if there are no next objects, return None.
-
     """
     date_field = generic_view.get_date_field()
     allow_empty = generic_view.get_allow_empty()
@@ -793,6 +790,6 @@ def timezone_today():
     Return the current date in the current time zone.
     """
     if settings.USE_TZ:
-        return timezone.localtime(timezone.now()).date()
+        return timezone.localdate()
     else:
         return datetime.date.today()

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.conf import settings
 from django.db import migrations, models
 
@@ -24,7 +21,7 @@ class Migration(migrations.Migration):
             "Tribble",
             [
                 ("id", models.AutoField(primary_key=True)),
-                ("author", models.ForeignKey(to=settings.AUTH_USER_MODEL, to_field="id")),
+                ("author", models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, to_field="id")),
             ],
         )
 

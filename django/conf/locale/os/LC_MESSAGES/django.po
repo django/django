@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Soslan Khubulov <soslanx@gmail.com>, 2013
-# Soslan Khubulov <soslanx@gmail.com>, 2013
+# Soslan Khubulov <inactive+soslan@transifex.com>, 2013
+# Soslan Khubulov <inactive+soslan@transifex.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Ossetic (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Ossetic (http://www.transifex.com/django/django/language/"
 "os/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -60,6 +60,9 @@ msgstr "Даниаг"
 msgid "German"
 msgstr "Немыцаг"
 
+msgid "Lower Sorbian"
+msgstr ""
+
 msgid "Greek"
 msgstr "Грекъаг"
 
@@ -80,6 +83,9 @@ msgstr "Испайнаг"
 
 msgid "Argentinian Spanish"
 msgstr "Аргентинаг испайнаг"
+
+msgid "Colombian Spanish"
+msgstr ""
 
 msgid "Mexican Spanish"
 msgstr "Мексикайнаг Испайнаг"
@@ -111,6 +117,9 @@ msgstr "Фризаг"
 msgid "Irish"
 msgstr "Ирландиаг"
 
+msgid "Scottish Gaelic"
+msgstr ""
+
 msgid "Galician"
 msgstr "Галициаг"
 
@@ -122,6 +131,9 @@ msgstr "Хинди"
 
 msgid "Croatian"
 msgstr "Хорватаг"
+
+msgid "Upper Sorbian"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Венгриаг"
@@ -183,8 +195,8 @@ msgstr ""
 msgid "Burmese"
 msgstr "Бурмизаг"
 
-msgid "Norwegian Bokmal"
-msgstr "Норвегийаг бокмал"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Непалаг"
@@ -282,9 +294,6 @@ msgstr ""
 msgid "Syndication"
 msgstr ""
 
-msgid "Web Design"
-msgstr ""
-
 msgid "Enter a valid value."
 msgstr "Раст бӕрц бафысс."
 
@@ -302,6 +311,11 @@ msgid ""
 msgstr ""
 "Раст бӕрӕг ном бафысс, цӕмӕй дзы уой дамгъӕтӕ, нымӕцтӕ бынылхӕххытӕ кӕнӕ "
 "дефистӕ."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
 
 msgid "Enter a valid IPv4 address."
 msgstr "Раст IPv4 адрис бафысс."
@@ -355,6 +369,28 @@ msgstr[1] ""
 "Дӕ хъус бадар цӕмӕй ам %(limit_value)d дамгъӕйӕ фылдӕр ма уа (ис дзы "
 "%(show_value)d)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Дӕ хъус бадар цӕмӕй иууыл иумӕ %(max)s цифрӕйӕ фылдӕр уой."
+msgstr[1] "Дӕ хъус бадар цӕмӕй иууыл иумӕ %(max)s цифрӕйӕ фылдӕр уой."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Дӕ хъус бадар цӕмӕй дӕсон бынӕттӕ %(max)s-ӕй фылдӕр ма уой."
+msgstr[1] "Дӕ хъус бадар цӕмӕй дӕсон бынӕттӕ %(max)s-ӕй фылдӕр ма уой."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Дӕ хъус бадар цӕмӕй дӕсон стъӕлфы размӕ %(max)s цифрӕйӕ фылдӕр ма уа."
+msgstr[1] ""
+"Дӕ хъус бадар цӕмӕй дӕсон стъӕлфы размӕ %(max)s цифрӕйӕ фылдӕр ма уа."
+
 msgid "and"
 msgstr "ӕмӕ"
 
@@ -393,6 +429,9 @@ msgstr "Ӕгас нымӕц"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr ""
+
+msgid "Big (8 byte) integer"
+msgstr "Стыр (8 байты) ӕгас нымӕц"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -467,9 +506,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr "Уӕгъд стъӕлфимӕ нымӕц"
 
-msgid "Big (8 byte) integer"
-msgstr "Стыр (8 байты) ӕгас нымӕц"
-
 msgid "IPv4 address"
 msgstr "IPv4 адрис"
 
@@ -540,8 +576,22 @@ msgstr "Ӕттагон Амонӕн (хӕстӕг быдырӕй бӕрӕгго�
 msgid "One-to-one relationship"
 msgstr "Иуӕн-иу бастдзинад"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
 msgid "Many-to-many relationship"
 msgstr "Бирӕйӕн-бирӕ бастдзинад"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ""
 
 msgid "This field is required."
 msgstr "Ацы быдыр ӕнӕмӕнг у."
@@ -551,28 +601,6 @@ msgstr "Бафысс ӕнӕхъӕн нымӕц."
 
 msgid "Enter a number."
 msgstr "Бафысс нымӕц."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Дӕ хъус бадар цӕмӕй иууыл иумӕ %(max)s цифрӕйӕ фылдӕр уой."
-msgstr[1] "Дӕ хъус бадар цӕмӕй иууыл иумӕ %(max)s цифрӕйӕ фылдӕр уой."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Дӕ хъус бадар цӕмӕй дӕсон бынӕттӕ %(max)s-ӕй фылдӕр ма уой."
-msgstr[1] "Дӕ хъус бадар цӕмӕй дӕсон бынӕттӕ %(max)s-ӕй фылдӕр ма уой."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-"Дӕ хъус бадар цӕмӕй дӕсон стъӕлфы размӕ %(max)s цифрӕйӕ фылдӕр ма уа."
-msgstr[1] ""
-"Дӕ хъус бадар цӕмӕй дӕсон стъӕлфы размӕ %(max)s цифрӕйӕ фылдӕр ма уа."
 
 msgid "Enter a valid date."
 msgstr "Раст бон бафысс."
@@ -638,12 +666,6 @@ msgstr ""
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Ӕмбӕхст быдыр %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ""
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr ""

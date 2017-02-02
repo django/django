@@ -1,18 +1,15 @@
-from __future__ import print_function, unicode_literals
-
 import importlib
 import os
 import sys
 
 from django.apps import apps
 from django.db.models.fields import NOT_PROVIDED
-from django.utils import datetime_safe, six, timezone
-from django.utils.six.moves import input
+from django.utils import datetime_safe, timezone
 
-from .loader import MIGRATIONS_MODULE_NAME
+from .loader import MigrationLoader
 
 
-class MigrationQuestioner(object):
+class MigrationQuestioner:
     """
     Gives the autodetector responses to questions it might have.
     This base class has a built-in noninteractive mode, but the
@@ -37,7 +34,10 @@ class MigrationQuestioner(object):
             app_config = apps.get_app_config(app_label)
         except LookupError:         # It's a fake app.
             return self.defaults.get("ask_initial", False)
-        migrations_import_path = "%s.%s" % (app_config.name, MIGRATIONS_MODULE_NAME)
+        migrations_import_path, _ = MigrationLoader.migrations_module(app_config.label)
+        if migrations_import_path is None:
+            # It's an application with migrations disabled.
+            return self.defaults.get("ask_initial", False)
         try:
             migrations_module = importlib.import_module(migrations_import_path)
         except ImportError:
@@ -73,6 +73,11 @@ class MigrationQuestioner(object):
         "Do you really want to merge these migrations?"
         return self.defaults.get("ask_merge", False)
 
+    def ask_auto_now_add_addition(self, field_name, model_name):
+        "Adding an auto_now_add field to a model"
+        # None means quit
+        return None
+
 
 class InteractiveMigrationQuestioner(MigrationQuestioner):
 
@@ -98,17 +103,30 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 pass
             result = input("Please select a valid option: ")
 
-    def _ask_default(self):
+    def _ask_default(self, default=''):
+        """
+        Prompt for a default value.
+
+        The ``default`` argument allows providing a custom default value (as a
+        string) which will be shown to the user and used as the return value
+        if the user doesn't provide any other input.
+        """
         print("Please enter the default value now, as valid Python")
-        print("The datetime and django.utils.timezone modules are available, so you can do e.g. timezone.now()")
+        if default:
+            print(
+                "You can accept the default '{}' by pressing 'Enter' or you "
+                "can provide another value.".format(default)
+            )
+        print("The datetime and django.utils.timezone modules are available, so you can do e.g. timezone.now")
+        print("Type 'exit' to exit this prompt")
         while True:
-            if six.PY3:
-                # Six does not correctly abstract over the fact that
-                # py3 input returns a unicode string, while py2 raw_input
-                # returns a bytestring.
-                code = input(">>> ")
+            if default:
+                prompt = "[default: {}] >>> ".format(default)
             else:
-                code = input(">>> ").decode(sys.stdin.encoding)
+                prompt = ">>> "
+            code = input(prompt)
+            if not code and default:
+                code = default
             if not code:
                 print("Please enter some code, or 'exit' (with no quotes) to exit.")
             elif code == "exit":
@@ -127,7 +145,8 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 "we can't do that (the database needs something to populate existing rows).\n"
                 "Please select a fix:" % (field_name, model_name),
                 [
-                    "Provide a one-off default now (will be set on all existing rows)",
+                    ("Provide a one-off default now (will be set on all existing "
+                     "rows with a null value for this column)"),
                     "Quit, and let me add a default in models.py",
                 ]
             )
@@ -146,10 +165,11 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 "populate existing rows).\n"
                 "Please select a fix:" % (field_name, model_name),
                 [
-                    "Provide a one-off default now (will be set on all existing rows)",
+                    ("Provide a one-off default now (will be set on all existing "
+                     "rows with a null value for this column)"),
                     ("Ignore for now, and let me handle existing rows with NULL myself "
-                     "(e.g. adding a RunPython or RunSQL operation in the new migration "
-                     "file before the AlterField operation)"),
+                     "(e.g. because you added a RunPython or RunSQL operation to handle "
+                     "NULL values in a previous data migration)"),
                     "Quit, and let me add a default in models.py",
                 ]
             )
@@ -181,6 +201,25 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             False,
         )
 
+    def ask_auto_now_add_addition(self, field_name, model_name):
+        "Adding an auto_now_add field to a model"
+        if not self.dry_run:
+            choice = self._choice_input(
+                "You are trying to add the field '{}' with 'auto_now_add=True' "
+                "to {} without a default; the database needs something to "
+                "populate existing rows.\n".format(field_name, model_name),
+                [
+                    "Provide a one-off default now (will be set on all "
+                    "existing rows)",
+                    "Quit, and let me add a default in models.py",
+                ]
+            )
+            if choice == 2:
+                sys.exit(3)
+            else:
+                return self._ask_default(default='timezone.now')
+        return None
+
 
 class NonInteractiveMigrationQuestioner(MigrationQuestioner):
 
@@ -191,3 +230,7 @@ class NonInteractiveMigrationQuestioner(MigrationQuestioner):
     def ask_not_null_alteration(self, field_name, model_name):
         # We can't ask the user, so set as not provided.
         return NOT_PROVIDED
+
+    def ask_auto_now_add_addition(self, field_name, model_name):
+        # We can't ask the user, so act like the user aborted.
+        sys.exit(3)

@@ -1,13 +1,10 @@
-from __future__ import unicode_literals
-
-import unittest
-
 from django.core.exceptions import FieldError
 from django.test import SimpleTestCase, TestCase
 
 from .models import (
-    AdvancedUserStat, Child1, Child2, Child3, Child4, Image, Parent1, Parent2,
-    Product, StatDetails, User, UserProfile, UserStat, UserStatResult,
+    AdvancedUserStat, Child1, Child2, Child3, Child4, Image, LinkedList,
+    Parent1, Parent2, Product, StatDetails, User, UserProfile, UserStat,
+    UserStatResult,
 )
 
 
@@ -175,7 +172,6 @@ class ReverseSelectRelatedTestCase(TestCase):
             self.assertEqual(p.child1.child4.value, p.child1.value)
             self.assertEqual(p.child1.child4.value4, 4)
 
-    @unittest.expectedFailure
     def test_inheritance_deferred(self):
         c = Child4.objects.create(name1='n1', name2='n2', value=1, value4=4)
         with self.assertNumQueries(1):
@@ -192,10 +188,9 @@ class ReverseSelectRelatedTestCase(TestCase):
         with self.assertNumQueries(1):
             self.assertEqual(p.child1.name2, 'n2')
 
-    @unittest.expectedFailure
     def test_inheritance_deferred2(self):
         c = Child4.objects.create(name1='n1', name2='n2', value=1, value4=4)
-        qs = Parent2.objects.select_related('child1', 'child4').only(
+        qs = Parent2.objects.select_related('child1', 'child1__child4').only(
             'id2', 'child1__value', 'child1__child4__value4')
         with self.assertNumQueries(1):
             p = qs.get(name2="n2")
@@ -207,10 +202,16 @@ class ReverseSelectRelatedTestCase(TestCase):
         with self.assertNumQueries(1):
             self.assertEqual(p.child1.name2, 'n2')
         p = qs.get(name2="n2")
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(0):
             self.assertEqual(p.child1.name1, 'n1')
-        with self.assertNumQueries(1):
             self.assertEqual(p.child1.child4.name1, 'n1')
+
+    def test_self_relation(self):
+        item1 = LinkedList.objects.create(name='item1')
+        LinkedList.objects.create(name='item2', previous_item=item1)
+        with self.assertNumQueries(1):
+            item1_db = LinkedList.objects.select_related('next_item').get(name='item1')
+            self.assertEqual(item1_db.next_item.name, 'item2')
 
 
 class ReverseSelectRelatedValidationTests(SimpleTestCase):

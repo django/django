@@ -11,19 +11,17 @@ Since version 1.0, Django's release numbering works as follows:
 
 * Versions are numbered in the form ``A.B`` or ``A.B.C``.
 
-* ``A.B`` is the *major version* number. Each version will be mostly backwards
-  compatible with the previous release. Exceptions to this rule will be listed
-  in the release notes. When ``B == 9``, the next major release will be
-  ``A+1.0``. For example, Django 2.0 will follow Django 1.9. There won't be
-  anything special about "dot zero" releases.
+* ``A.B`` is the *feature release* version number. Each version will be mostly
+  backwards compatible with the previous release. Exceptions to this rule will
+  be listed in the release notes.
 
-* ``C`` is the *minor version* number, which is incremented for bug and
-  security fixes. A new minor release will be 100% backwards-compatible with
-  the previous minor release. The only exception is when a security or data loss
-  issue can't be fixed without breaking backwards-compatibility. If this
+* ``C`` is the *patch release* version number, which is incremented for bugfix
+  and security releases. These releases will be 100% backwards-compatible with
+  the previous patch release. The only exception is when a security or data
+  loss issue can't be fixed without breaking backwards-compatibility. If this
   happens, the release notes will provide detailed upgrade instructions.
 
-* Before a new major release, we'll make alpha, beta, and release candidate
+* Before a new feature release, we'll make alpha, beta, and release candidate
   releases. These are of the form ``A.B alpha/beta/rc N``, which means the
   ``Nth`` alpha/beta/release candidate of version ``A.B``.
 
@@ -37,39 +35,84 @@ security purposes, please see :doc:`our security policies <security>`.
 
 .. glossary::
 
-  Major release
-    Major releases (A.B, A.B+1, etc.) will happen roughly every nine months --
-    see `release process`_, below for details. These releases will contain new
+  Feature release
+    Feature releases (A.B, A.B+1, etc.) will happen roughly every eight months
+    -- see `release process`_ for details. These releases will contain new
     features, improvements to existing features, and such.
 
-    .. _internal-release-deprecation-policy:
+  Patch release
+    Patch releases (A.B.C, A.B.C+1, etc.) will be issued as needed, to fix
+    bugs and/or security issues.
 
-    A major release may deprecate certain features from previous releases. If a
-    feature is deprecated in version ``A.B``, it will continue to work in versions
-    ``A.B`` and  ``A.B+1`` but raise warnings. It will be removed in version
-    ``A.B+2``.
-
-    So, for example, if we decided to start the deprecation of a function in
-    Django 1.7:
-
-    * Django 1.7 will contain a backwards-compatible replica of the function which
-      will raise a ``RemovedInDjango19Warning``. This warning is silent by
-      default; you can turn on display of these warnings with the ``-Wd`` option
-      of Python.
-
-    * Django 1.8 will still contain the backwards-compatible replica. This
-      warning becomes *loud* by default, and will likely be quite annoying.
-
-    * Django 1.9 will remove the feature outright.
-
-  Minor release
-    Minor releases (A.B.C, etc.) will be issued as needed, often to fix security
-    issues.
-
-    These releases will be 100% compatible with the associated major release,
+    These releases will be 100% compatible with the associated feature release,
     unless this is impossible for security reasons or to prevent data loss.
-    So the answer to "should I upgrade to the latest minor release?" will always
+    So the answer to "should I upgrade to the latest patch release?" will always
     be "yes."
+
+  Long-term support release
+    Certain feature releases will be designated as long-term support (LTS)
+    releases. These releases will get security and data loss fixes applied for
+    a guaranteed period of time, typically three years.
+
+    See `the download page`_ for the releases that have been designated for
+    long-term support.
+
+    .. _the download page: https://www.djangoproject.com/download/
+
+Release cadence
+===============
+
+Starting with Django 2.0, version numbers will use a loose form of `semantic
+versioning <http://semver.org/>`_ such that each version following an LTS will
+bump to the next "dot zero" version. For example: 2.0, 2.1, 2.2 (LTS), 3.0,
+3.1, 3.2 (LTS), etc.
+
+SemVer makes it easier to see at a glance how compatible releases are with each
+other. It also helps to anticipate when compatibility shims will be removed.
+It's not a pure form of SemVer as each feature release will continue to have a
+few documented backwards incompatibilities where a deprecation path isn't
+possible or not worth the cost. Also, deprecations started in an LTS release
+(X.2) will be dropped in a non-dot-zero release (Y.1) to accommodate our policy
+of keeping deprecation shims for at least two feature releases. Read on to the
+next section for an example.
+
+.. _internal-release-deprecation-policy:
+
+Deprecation policy
+==================
+
+A feature release may deprecate certain features from previous releases. If a
+feature is deprecated in feature release A.x, it will continue to work in all
+A.x versions (for all versions of x) but raise warnings. Deprecated features
+will be removed in the B.0 release, or B.1 for features deprecated in the last
+A.x feature release to ensure deprecations are done over at least 2 feature
+releases.
+
+So, for example, if we decided to start the deprecation of a function in
+Django 4.2:
+
+* Django 4.2 will contain a backwards-compatible replica of the function which
+  will raise a ``RemovedInDjango51Warning``.
+
+* Django 5.0 (the version that follows 4.2) will still contain the
+  backwards-compatible replica.
+
+* Django 5.1 will remove the feature outright.
+
+The warnings are silent by default. You can turn on display of these warnings
+with the ``python -Wd`` option.
+
+A more generic example:
+
+* X.0
+* X.1
+* X.2 LTS
+* Y.0: Drop deprecation shims added in X.0 and X.1.
+* Y.1: Drop deprecation shims added in X.2.
+* Y.2 LTS: No deprecation shims dropped (while Y.0 is no longer supported,
+  third-party apps need to maintain compatibility back to X.2 LTS to ease
+  LTS to LTS upgrades).
+* Z.0: Drop deprecation shims added in Y.0 and Y.1.
 
 .. _backwards-compatibility-policy:
 
@@ -77,15 +120,16 @@ Supported versions
 ==================
 
 At any moment in time, Django's developer team will support a set of releases to
-varying levels. See `the download page`_ for the current state of support for
-each version.
+varying levels. See `the supported versions section
+<https://www.djangoproject.com/download/#supported-versions>`_ of the download
+page for the current state of support for each version.
 
 * The current development master will get new features and bug fixes
-  requiring major refactoring.
+  requiring non-trivial refactoring.
 
-* Patches applied to the master branch must also be applied to the last major
-  release, to be released as the next minor release, when they fix critical
-  problems:
+* Patches applied to the master branch must also be applied to the last feature
+  release branch, to be released in the next patch release of that feature
+  series, when they fix critical problems:
 
   * Security issues.
 
@@ -95,12 +139,15 @@ each version.
 
   * Major functionality bugs in newly-introduced features.
 
-  The rule of thumb is that fixes will be backported to the last major release
-  for bugs that would have prevented a release in the first place (release
-  blockers).
+  * Regressions from older versions of Django.
+
+  The rule of thumb is that fixes will be backported to the last feature
+  release for bugs that would have prevented a release in the first place
+  (release blockers).
 
 * Security fixes and data loss bugs will be applied to the current master, the
-  last two major releases, and the current :ref:`LTS release <lts-releases>`.
+  last two feature release branches, and any other supported long-term
+  support release branches.
 
 * Documentation fixes generally will be more freely backported to the last
   release branch. That's because it's highly advantageous to have the docs for
@@ -108,86 +155,56 @@ each version.
   regressions is much less of a concern.
 
 As a concrete example, consider a moment in time halfway between the release of
-Django 1.7 and 1.8. At this point in time:
+Django 5.1 and 5.2. At this point in time:
 
-* Features will be added to development master, to be released as Django 1.8.
+* Features will be added to development master, to be released as Django 5.2.
 
-* Critical bug fixes will be applied to the ``stable/1.7.x`` branch, and
-  released as 1.7.1, 1.7.2, etc.
+* Critical bug fixes will be applied to the ``stable/5.1.x`` branch, and
+  released as 5.1.1, 5.1.2, etc.
 
 * Security fixes and bug fixes for data loss issues will be applied to
-  ``master`` and to the ``stable/1.7.x``, ``stable/1.6.x``, and
-  ``stable/1.4.x`` (LTS) branches. They will trigger the release of ``1.7.1``,
-  ``1.6.1``, ``1.4.1``, etc.
+  ``master`` and to the ``stable/5.1.x``, ``stable/5.0.x``, and
+  ``stable/4.2.x`` (LTS) branches. They will trigger the release of ``5.1.1``,
+  ``5.0.5``, ``4.2.8``, etc.
 
 * Documentation fixes will be applied to master, and, if easily backported, to
-  the ``1.7.x`` and ``1.6.x`` branches.
-
-.. _lts-releases:
-
-Long-term support (LTS) releases
-================================
-
-Additionally, the Django team will occasionally designate certain releases
-to be "Long-term support" (LTS) releases. LTS releases will get security and
-data loss fixes applied for a guaranteed period of time, typically 3+ years,
-regardless of the pace of releases afterwards.
-
-See `the download page`_ for the releases that have been designated for
-long-term support.
-
-.. _the download page: https://www.djangoproject.com/download/
+  the latest stable branch, ``5.1.x``.
 
 .. _release-process:
 
 Release process
 ===============
 
-Django uses a time-based release schedule, with major (i.e. 1.8, 1.9, 2.0,
-etc.) releases every nine months, or more, depending on features.
+Django uses a time-based release schedule, with feature releases every eight
+months or so.
 
-After each release, and after a suitable cooling-off period of a few weeks,
-core developers will examine the landscape and announce a timeline for the
-next release. Most releases will be scheduled in the 6-9 month range, but if
-we have bigger features to develop we might schedule a longer period to
-allow for more ambitious work.
+After each feature release, the release manager will announce a timeline for
+the next feature release.
 
 Release cycle
 -------------
 
-Each release cycle will be split into three periods, each lasting roughly
-one-third of the cycle:
+Each release cycle consists of three parts:
 
 Phase one: feature proposal
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The first phase of the release process will be devoted to figuring out what
+The first phase of the release process will include figuring out what major
 features to include in the next version. This should include a good deal of
 preliminary work on those features -- working code trumps grand design.
 
-At the end of part one, the core developers will propose a feature list for the
-upcoming release. This will be broken into:
-
-* "Must-have": critical features that will delay the release if not finished
-* "Maybe" features: that will be pushed to the next release if not finished
-* "Not going to happen": features explicitly deferred to a later release.
-
-Anything that hasn't got at least some work done by the end of the first third
-isn't eligible for the next release; a design alone isn't sufficient.
+Major features for an upcoming release will be added to the wiki roadmap page,
+e.g. https://code.djangoproject.com/wiki/Version1.11Roadmap.
 
 Phase two: development
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The second third of the release schedule is the "heads-down" working period.
+The second part of the release schedule is the "heads-down" working period.
 Using the roadmap produced at the end of phase one, we'll all work very hard to
 get everything on it done.
 
-Longer release schedules will likely spend more than a third of the time in this
-phase.
-
-At the end of phase two, any unfinished "maybe" features will be postponed until
-the next release. Though it shouldn't happen, any "must-have" features will
-extend phase two, and thus postpone the final release.
+At the end of phase two, any unfinished features will be postponed until the
+next release.
 
 Phase two will culminate with an alpha release. At this point, the
 ``stable/A.B.x`` branch will be forked from ``master``.
@@ -195,9 +212,9 @@ Phase two will culminate with an alpha release. At this point, the
 Phase three: bugfixes
 ~~~~~~~~~~~~~~~~~~~~~
 
-The last third of a release cycle is spent fixing bugs -- no new features will
-be accepted during this time. We'll try to release a beta release after one
-month and a release candidate after two months.
+The last part of a release cycle is spent fixing bugs -- no new features will
+be accepted during this time. We'll try to release a beta release one month
+after the alpha and a release candidate one month after the beta.
 
 The release candidate marks the string freeze, and it happens at least two
 weeks before the final release. After this point, new translatable strings
@@ -213,11 +230,11 @@ in the ``A.B+1`` cycle.
 Bug-fix releases
 ----------------
 
-After a major release (e.g. A.B), the previous release will go into bugfix
+After a feature release (e.g. A.B), the previous release will go into bugfix
 mode.
 
-The branch for the previous major release (e.g. ``stable/A.B-1.x``) will include
-bugfixes. Critical bugs fixed on master must *also* be fixed on the bugfix
-branch; this means that commits need to cleanly separate bug fixes from feature
-additions. The developer who commits a fix to master will be responsible for
-also applying the fix to the current bugfix branch.
+The branch for the previous feature release (e.g. ``stable/A.B-1.x``) will
+include bugfixes. Critical bugs fixed on master must *also* be fixed on the
+bugfix branch; this means that commits need to cleanly separate bug fixes from
+feature additions. The developer who commits a fix to master will be
+responsible for also applying the fix to the current bugfix branch.

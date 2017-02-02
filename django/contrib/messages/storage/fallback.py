@@ -11,7 +11,7 @@ class FallbackStorage(BaseStorage):
     storage_classes = (CookieStorage, SessionStorage)
 
     def __init__(self, *args, **kwargs):
-        super(FallbackStorage, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.storages = [storage_class(*args, **kwargs)
                          for storage_class in self.storage_classes]
         self._used_storages = set()

@@ -1,8 +1,7 @@
-from __future__ import unicode_literals
-
 from django.contrib.gis import admin
 from django.contrib.gis.geos import Point
 from django.test import TestCase, override_settings, skipUnlessDBFeature
+from django.test.utils import patch_logger
 
 from .admin import UnmodifiableAdmin
 from .models import City, site
@@ -54,7 +53,7 @@ class GeoAdminTest(TestCase):
 
     def test_olwidget_has_changed(self):
         """
-        Check that changes are accurately noticed by OpenLayersWidget.
+        Changes are accurately noticed by OpenLayersWidget.
         """
         geoadmin = site._registry[City]
         form = geoadmin.get_changelist_form(None)()
@@ -71,3 +70,32 @@ class GeoAdminTest(TestCase):
         self.assertFalse(has_changed(initial, data_same))
         self.assertFalse(has_changed(initial, data_almost_same))
         self.assertTrue(has_changed(initial, data_changed))
+
+    def test_olwidget_empty_string(self):
+        geoadmin = site._registry[City]
+        form = geoadmin.get_changelist_form(None)({'point': ''})
+        with patch_logger('django.contrib.gis', 'error') as logger_calls:
+            output = str(form['point'])
+        self.assertInHTML(
+            '<textarea id="id_point" class="vWKTField required" cols="150"'
+            ' rows="10" name="point"></textarea>',
+            output
+        )
+        self.assertEqual(logger_calls, [])
+
+    def test_olwidget_invalid_string(self):
+        geoadmin = site._registry[City]
+        form = geoadmin.get_changelist_form(None)({'point': 'INVALID()'})
+        with patch_logger('django.contrib.gis', 'error') as logger_calls:
+            output = str(form['point'])
+        self.assertInHTML(
+            '<textarea id="id_point" class="vWKTField required" cols="150"'
+            ' rows="10" name="point"></textarea>',
+            output
+        )
+        self.assertEqual(len(logger_calls), 1)
+        self.assertEqual(
+            logger_calls[0],
+            "Error creating geometry from value 'INVALID()' (String input "
+            "unrecognized as WKT EWKT, and HEXEWKB.)"
+        )

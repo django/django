@@ -1,18 +1,13 @@
 from psycopg2 import ProgrammingError
 from psycopg2.extras import register_hstore
 
-from django.utils import six
-
 
 def register_hstore_handler(connection, **kwargs):
     if connection.vendor != 'postgresql':
         return
 
     try:
-        if six.PY2:
-            register_hstore(connection.connection, globally=True, unicode=True)
-        else:
-            register_hstore(connection.connection, globally=True)
+        register_hstore(connection.connection, globally=True)
     except ProgrammingError:
         # Hstore is not available on the database.
         #

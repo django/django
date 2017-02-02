@@ -1,10 +1,6 @@
 import copy
 import operator
-import sys
-from functools import wraps
-
-from django.utils import six
-from django.utils.six.moves import copyreg
+from functools import total_ordering, wraps
 
 
 # You can't trivially replace this with `functools.partial` because this binds
@@ -16,7 +12,7 @@ def curry(_curried_func, *args, **kwargs):
     return _curried
 
 
-class cached_property(object):
+class cached_property:
     """
     Decorator that converts a method with a single self argument into a
     property cached on the instance.
@@ -29,14 +25,14 @@ class cached_property(object):
         self.__doc__ = getattr(func, '__doc__')
         self.name = name or func.__name__
 
-    def __get__(self, instance, type=None):
+    def __get__(self, instance, cls=None):
         if instance is None:
             return self
         res = instance.__dict__[self.name] = self.func(instance)
         return res
 
 
-class Promise(object):
+class Promise:
     """
     This is just a base class for the proxy class created in
     the closure of the lazy function. It can be used to recognize
@@ -75,6 +71,9 @@ def lazy(func, *resultclasses):
                 (func, self.__args, self.__kw) + resultclasses
             )
 
+        def __repr__(self):
+            return repr(self.__cast())
+
         @classmethod
         def __prepare_class__(cls):
             for resultclass in resultclasses:
@@ -87,20 +86,13 @@ def lazy(func, *resultclasses):
                         meth = cls.__promise__(method_name)
                         setattr(cls, method_name, meth)
             cls._delegate_bytes = bytes in resultclasses
-            cls._delegate_text = six.text_type in resultclasses
+            cls._delegate_text = str in resultclasses
             assert not (cls._delegate_bytes and cls._delegate_text), (
                 "Cannot call lazy() with both bytes and text return types.")
             if cls._delegate_text:
-                if six.PY3:
-                    cls.__str__ = cls.__text_cast
-                else:
-                    cls.__unicode__ = cls.__text_cast
-                    cls.__str__ = cls.__bytes_cast_encoded
+                cls.__str__ = cls.__text_cast
             elif cls._delegate_bytes:
-                if six.PY3:
-                    cls.__bytes__ = cls.__bytes_cast
-                else:
-                    cls.__str__ = cls.__bytes_cast
+                cls.__bytes__ = cls.__bytes_cast
 
         @classmethod
         def __promise__(cls, method_name):
@@ -129,10 +121,10 @@ def lazy(func, *resultclasses):
             else:
                 return func(*self.__args, **self.__kw)
 
-        def __ne__(self, other):
-            if isinstance(other, Promise):
-                other = other.__cast()
-            return self.__cast() != other
+        def __str__(self):
+            # object defines __str__(), so __prepare_class__() won't overload
+            # a __str__() method from the proxied class.
+            return str(self.__cast())
 
         def __eq__(self, other):
             if isinstance(other, Promise):
@@ -148,10 +140,8 @@ def lazy(func, *resultclasses):
             return hash(self.__cast())
 
         def __mod__(self, rhs):
-            if self._delegate_bytes and six.PY2:
-                return bytes(self) % rhs
-            elif self._delegate_text:
-                return six.text_type(self) % rhs
+            if self._delegate_text:
+                return str(self) % rhs
             return self.__cast() % rhs
 
         def __deepcopy__(self, memo):
@@ -173,24 +163,45 @@ def _lazy_proxy_unpickle(func, args, kwargs, *resultclasses):
     return lazy(func, *resultclasses)(*args, **kwargs)
 
 
-def allow_lazy(func, *resultclasses):
+def lazystr(text):
+    """
+    Shortcut for the common case of a lazy callable that returns str.
+    """
+    from django.utils.encoding import force_text  # Avoid circular import
+    return lazy(force_text, str)(text)
+
+
+def keep_lazy(*resultclasses):
     """
     A decorator that allows a function to be called with one or more lazy
     arguments. If none of the args are lazy, the function is evaluated
     immediately, otherwise a __proxy__ is returned that will evaluate the
     function when needed.
     """
-    lazy_func = lazy(func, *resultclasses)
+    if not resultclasses:
+        raise TypeError("You must pass at least one argument to keep_lazy().")
 
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        for arg in list(args) + list(kwargs.values()):
-            if isinstance(arg, Promise):
-                break
-        else:
-            return func(*args, **kwargs)
-        return lazy_func(*args, **kwargs)
-    return wrapper
+    def decorator(func):
+        lazy_func = lazy(func, *resultclasses)
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for arg in list(args) + list(kwargs.values()):
+                if isinstance(arg, Promise):
+                    break
+            else:
+                return func(*args, **kwargs)
+            return lazy_func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+def keep_lazy_text(func):
+    """
+    A decorator for functions that accept lazy arguments and return text.
+    """
+    return keep_lazy(str)(func)
+
 
 empty = object()
 
@@ -203,7 +214,7 @@ def new_method_proxy(func):
     return inner
 
 
-class LazyObject(object):
+class LazyObject:
     """
     A wrapper for another class that can be used to delay instantiation of the
     wrapped class.
@@ -216,6 +227,8 @@ class LazyObject(object):
     _wrapped = None
 
     def __init__(self):
+        # Note: if a subclass overrides __init__(), it will likely need to
+        # override __copy__() and __deepcopy__() as well.
         self._wrapped = empty
 
     __getattr__ = new_method_proxy(getattr)
@@ -243,32 +256,40 @@ class LazyObject(object):
         raise NotImplementedError('subclasses of LazyObject must provide a _setup() method')
 
     # Because we have messed with __class__ below, we confuse pickle as to what
-    # class we are pickling. It also appears to stop __reduce__ from being
-    # called. So, we define __getstate__ in a way that cooperates with the way
-    # that pickle interprets this class.  This fails when the wrapped class is
-    # a builtin, but it is better than nothing.
-    def __getstate__(self):
+    # class we are pickling. We're going to have to initialize the wrapped
+    # object to successfully pickle it, so we might as well just pickle the
+    # wrapped object since they're supposed to act the same way.
+    #
+    # Unfortunately, if we try to simply act like the wrapped object, the ruse
+    # will break down when pickle gets our id(). Thus we end up with pickle
+    # thinking, in effect, that we are a distinct object from the wrapped
+    # object, but with the same __dict__. This can cause problems (see #25389).
+    #
+    # So instead, we define our own __reduce__ method and custom unpickler. We
+    # pickle the wrapped object as the unpickler's argument, so that pickle
+    # will pickle it normally, and then the unpickler simply returns its
+    # argument.
+    def __reduce__(self):
         if self._wrapped is empty:
             self._setup()
-        return self._wrapped.__dict__
+        return (unpickle_lazyobject, (self._wrapped,))
 
-    # Python 3.3 will call __reduce__ when pickling; this method is needed
-    # to serialize and deserialize correctly.
-    @classmethod
-    def __newobj__(cls, *args):
-        return cls.__new__(cls, *args)
+    def __getstate__(self):
+        """
+        Prevent older versions of pickle from trying to pickle the __dict__
+        (which in the case of a SimpleLazyObject may contain a lambda). The
+        value will be ignored by __reduce__() and the custom unpickler.
+        """
+        return {}
 
-    def __reduce_ex__(self, proto):
-        if proto >= 2:
-            # On Py3, since the default protocol is 3, pickle uses the
-            # ``__newobj__`` method (& more efficient opcodes) for writing.
-            return (self.__newobj__, (self.__class__,), self.__getstate__())
+    def __copy__(self):
+        if self._wrapped is empty:
+            # If uninitialized, copy the wrapper. Use type(self), not
+            # self.__class__, because the latter is proxied.
+            return type(self)()
         else:
-            # On Py2, the default protocol is 0 (for back-compat) & the above
-            # code fails miserably (see regression test). Instead, we return
-            # exactly what's returned if there's no ``__reduce__`` method at
-            # all.
-            return (copyreg._reconstructor, (self.__class__, object, None), self.__getstate__())
+            # If initialized, return a copy of the wrapped object.
+            return copy.copy(self._wrapped)
 
     def __deepcopy__(self, memo):
         if self._wrapped is empty:
@@ -279,14 +300,9 @@ class LazyObject(object):
             return result
         return copy.deepcopy(self._wrapped, memo)
 
-    if six.PY3:
-        __bytes__ = new_method_proxy(bytes)
-        __str__ = new_method_proxy(str)
-        __bool__ = new_method_proxy(bool)
-    else:
-        __str__ = new_method_proxy(str)
-        __unicode__ = new_method_proxy(unicode)
-        __nonzero__ = new_method_proxy(bool)
+    __bytes__ = new_method_proxy(bytes)
+    __str__ = new_method_proxy(str)
+    __bool__ = new_method_proxy(bool)
 
     # Introspection support
     __dir__ = new_method_proxy(dir)
@@ -307,8 +323,12 @@ class LazyObject(object):
     __contains__ = new_method_proxy(operator.contains)
 
 
-# Workaround for http://bugs.python.org/issue12370
-_super = super
+def unpickle_lazyobject(wrapped):
+    """
+    Used to unpickle lazy objects. Just return its argument, which will be the
+    wrapped object.
+    """
+    return wrapped
 
 
 class SimpleLazyObject(LazyObject):
@@ -328,7 +348,7 @@ class SimpleLazyObject(LazyObject):
         value.
         """
         self.__dict__['_setupfunc'] = func
-        _super(SimpleLazyObject, self).__init__()
+        super().__init__()
 
     def _setup(self):
         self._wrapped = self._setupfunc()
@@ -342,6 +362,15 @@ class SimpleLazyObject(LazyObject):
             repr_attr = self._wrapped
         return '<%s: %r>' % (type(self).__name__, repr_attr)
 
+    def __copy__(self):
+        if self._wrapped is empty:
+            # If uninitialized, copy the wrapper. Use SimpleLazyObject, not
+            # self.__class__, because the latter is proxied.
+            return SimpleLazyObject(self._setupfunc)
+        else:
+            # If initialized, return a copy of the wrapped object.
+            return copy.copy(self._wrapped)
+
     def __deepcopy__(self, memo):
         if self._wrapped is empty:
             # We have to use SimpleLazyObject, not self.__class__, because the
@@ -350,27 +379,6 @@ class SimpleLazyObject(LazyObject):
             memo[id(self)] = result
             return result
         return copy.deepcopy(self._wrapped, memo)
-
-
-class lazy_property(property):
-    """
-    A property that works with subclasses by wrapping the decorated
-    functions of the base class.
-    """
-    def __new__(cls, fget=None, fset=None, fdel=None, doc=None):
-        if fget is not None:
-            @wraps(fget)
-            def fget(instance, instance_type=None, name=fget.__name__):
-                return getattr(instance, name)()
-        if fset is not None:
-            @wraps(fset)
-            def fset(instance, value, name=fset.__name__):
-                return getattr(instance, name)(value)
-        if fdel is not None:
-            @wraps(fdel)
-            def fdel(instance, name=fdel.__name__):
-                return getattr(instance, name)()
-        return property(fget, fset, fdel, doc)
 
 
 def partition(predicate, values):
@@ -385,36 +393,3 @@ def partition(predicate, values):
     for item in values:
         results[predicate(item)].append(item)
     return results
-
-if sys.version_info >= (2, 7, 2):
-    from functools import total_ordering
-else:
-    # For Python < 2.7.2. total_ordering in versions prior to 2.7.2 is buggy.
-    # See http://bugs.python.org/issue10042 for details. For these versions use
-    # code borrowed from Python 2.7.3.
-    def total_ordering(cls):
-        """Class decorator that fills in missing ordering methods"""
-        convert = {
-            '__lt__': [('__gt__', lambda self, other: not (self < other or self == other)),
-                       ('__le__', lambda self, other: self < other or self == other),
-                       ('__ge__', lambda self, other: not self < other)],
-            '__le__': [('__ge__', lambda self, other: not self <= other or self == other),
-                       ('__lt__', lambda self, other: self <= other and not self == other),
-                       ('__gt__', lambda self, other: not self <= other)],
-            '__gt__': [('__lt__', lambda self, other: not (self > other or self == other)),
-                       ('__ge__', lambda self, other: self > other or self == other),
-                       ('__le__', lambda self, other: not self > other)],
-            '__ge__': [('__le__', lambda self, other: (not self >= other) or self == other),
-                       ('__gt__', lambda self, other: self >= other and not self == other),
-                       ('__lt__', lambda self, other: not self >= other)]
-        }
-        roots = set(dir(cls)) & set(convert)
-        if not roots:
-            raise ValueError('must define at least one ordering operation: < > <= >=')
-        root = max(roots)       # prefer __lt__ to __le__ to __gt__ to __ge__
-        for opname, opfunc in convert[root]:
-            if opname not in roots:
-                opfunc.__name__ = opname
-                opfunc.__doc__ = getattr(int, opname).__doc__
-                setattr(cls, opname, opfunc)
-        return cls

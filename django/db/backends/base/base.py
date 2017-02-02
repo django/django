@@ -1,28 +1,27 @@
+import copy
 import time
 import warnings
 from collections import deque
 from contextlib import contextmanager
 
+import _thread
+import pytz
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends import utils
+from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.signals import connection_created
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.six.moves import _thread as thread
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 NO_DB_ALIAS = '__no_db__'
 
 
-class BaseDatabaseWrapper(object):
+class BaseDatabaseWrapper:
     """
     Represents a database connection.
     """
@@ -35,6 +34,13 @@ class BaseDatabaseWrapper(object):
     ops = None
     vendor = 'unknown'
     SchemaEditorClass = None
+    # Classes instantiated in __init__().
+    client_class = None
+    creation_class = None
+    features_class = None
+    introspection_class = None
+    ops_class = None
+    validation_class = BaseDatabaseValidation
 
     queries_limit = 9000
 
@@ -76,7 +82,30 @@ class BaseDatabaseWrapper(object):
 
         # Thread-safety related attributes.
         self.allow_thread_sharing = allow_thread_sharing
-        self._thread_ident = thread.get_ident()
+        self._thread_ident = _thread.get_ident()
+
+        # A list of no-argument functions to run when the transaction commits.
+        # Each entry is an (sids, func) tuple, where sids is a set of the
+        # active savepoint IDs when this function was registered.
+        self.run_on_commit = []
+
+        # Should we run the on-commit hooks the next time set_autocommit(True)
+        # is called?
+        self.run_commit_hooks_on_set_autocommit_on = False
+
+        self.client = self.client_class(self)
+        self.creation = self.creation_class(self)
+        self.features = self.features_class(self)
+        self.introspection = self.introspection_class(self)
+        self.ops = self.ops_class(self)
+        self.validation = self.validation_class(self)
+
+    def ensure_timezone(self):
+        """
+        Ensure the connection's timezone is set to `self.timezone_name` and
+        return whether it changed or not.
+        """
+        return False
 
     @cached_property
     def timezone(self):
@@ -96,7 +125,6 @@ class BaseDatabaseWrapper(object):
         elif self.settings_dict['TIME_ZONE'] is None:
             return timezone.utc
         else:
-            # Only this branch requires pytz.
             return pytz.timezone(self.settings_dict['TIME_ZONE'])
 
     @cached_property
@@ -137,7 +165,7 @@ class BaseDatabaseWrapper(object):
         """Initializes the database connection settings."""
         raise NotImplementedError('subclasses of BaseDatabaseWrapper may require an init_connection_state() method')
 
-    def create_cursor(self):
+    def create_cursor(self, name=None):
         """Creates a cursor. Assumes that a connection is established."""
         raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a create_cursor() method')
 
@@ -163,6 +191,8 @@ class BaseDatabaseWrapper(object):
         self.init_connection_state()
         connection_created.send(sender=self.__class__, connection=self)
 
+        self.run_on_commit = []
+
     def check_settings(self):
         if self.settings_dict['TIME_ZONE'] is not None:
             if not settings.USE_TZ:
@@ -173,10 +203,6 @@ class BaseDatabaseWrapper(object):
                 raise ImproperlyConfigured(
                     "Connection '%s' cannot set TIME_ZONE because its engine "
                     "handles time zones conversions natively." % self.alias)
-            elif pytz is None:
-                raise ImproperlyConfigured(
-                    "Connection '%s' cannot set TIME_ZONE because pytz isn't "
-                    "installed." % self.alias)
 
     def ensure_connection(self):
         """
@@ -188,10 +214,21 @@ class BaseDatabaseWrapper(object):
 
     # ##### Backend-specific wrappers for PEP-249 connection methods #####
 
-    def _cursor(self):
+    def _prepare_cursor(self, cursor):
+        """
+        Validate the connection is usable and perform database cursor wrapping.
+        """
+        self.validate_thread_sharing()
+        if self.queries_logged:
+            wrapped_cursor = self.make_debug_cursor(cursor)
+        else:
+            wrapped_cursor = self.make_cursor(cursor)
+        return wrapped_cursor
+
+    def _cursor(self, name=None):
         self.ensure_connection()
         with self.wrap_database_errors:
-            return self.create_cursor()
+            return self._prepare_cursor(self.create_cursor(name))
 
     def _commit(self):
         if self.connection is not None:
@@ -214,12 +251,7 @@ class BaseDatabaseWrapper(object):
         """
         Creates a cursor, opening a connection if necessary.
         """
-        self.validate_thread_sharing()
-        if self.queries_logged:
-            cursor = self.make_debug_cursor(self._cursor())
-        else:
-            cursor = self.make_cursor(self._cursor())
-        return cursor
+        return self._cursor()
 
     def commit(self):
         """
@@ -230,6 +262,7 @@ class BaseDatabaseWrapper(object):
         self._commit()
         # A successful commit means that the database connection works.
         self.errors_occurred = False
+        self.run_commit_hooks_on_set_autocommit_on = True
 
     def rollback(self):
         """
@@ -240,12 +273,16 @@ class BaseDatabaseWrapper(object):
         self._rollback()
         # A successful rollback means that the database connection works.
         self.errors_occurred = False
+        self.needs_rollback = False
+        self.run_on_commit = []
 
     def close(self):
         """
         Closes the connection to the database.
         """
         self.validate_thread_sharing()
+        self.run_on_commit = []
+
         # Don't call validate_no_atomic_block() to avoid making it difficult
         # to get rid of a connection in an invalid state. The next connect()
         # will reset the transaction state anyway.
@@ -289,7 +326,7 @@ class BaseDatabaseWrapper(object):
         if not self._savepoint_allowed():
             return
 
-        thread_ident = thread.get_ident()
+        thread_ident = _thread.get_ident()
         tid = str(thread_ident).replace('-', '')
 
         self.savepoint_state += 1
@@ -309,6 +346,11 @@ class BaseDatabaseWrapper(object):
 
         self.validate_thread_sharing()
         self._savepoint_rollback(sid)
+
+        # Remove any callbacks registered while this savepoint was active.
+        self.run_on_commit = [
+            (sids, func) for (sids, func) in self.run_on_commit if sid not in sids
+        ]
 
     def savepoint_commit(self, sid):
         """
@@ -343,14 +385,36 @@ class BaseDatabaseWrapper(object):
         self.ensure_connection()
         return self.autocommit
 
-    def set_autocommit(self, autocommit):
+    def set_autocommit(self, autocommit, force_begin_transaction_with_broken_autocommit=False):
         """
         Enable or disable autocommit.
+
+        The usual way to start a transaction is to turn autocommit off.
+        SQLite does not properly start a transaction when disabling
+        autocommit. To avoid this buggy behavior and to actually enter a new
+        transaction, an explcit BEGIN is required. Using
+        force_begin_transaction_with_broken_autocommit=True will issue an
+        explicit BEGIN with SQLite. This option will be ignored for other
+        backends.
         """
         self.validate_no_atomic_block()
         self.ensure_connection()
-        self._set_autocommit(autocommit)
+
+        start_transaction_under_autocommit = (
+            force_begin_transaction_with_broken_autocommit and not autocommit and
+            self.features.autocommits_when_autocommit_is_off
+        )
+
+        if start_transaction_under_autocommit:
+            self._start_transaction_under_autocommit()
+        else:
+            self._set_autocommit(autocommit)
+
         self.autocommit = autocommit
+
+        if autocommit and self.run_commit_hooks_on_set_autocommit_on:
+            self.run_and_clear_commit_hooks()
+            self.run_commit_hooks_on_set_autocommit_on = False
 
     def get_rollback(self):
         """
@@ -469,13 +533,14 @@ class BaseDatabaseWrapper(object):
         authorized to be shared between threads (via the `allow_thread_sharing`
         property). Raises an exception if the validation fails.
         """
-        if not (self.allow_thread_sharing
-                or self._thread_ident == thread.get_ident()):
-            raise DatabaseError("DatabaseWrapper objects created in a "
+        if not (self.allow_thread_sharing or self._thread_ident == _thread.get_ident()):
+            raise DatabaseError(
+                "DatabaseWrapper objects created in a "
                 "thread can only be used in that same thread. The object "
                 "with alias '%s' was created in thread id %s and this is "
                 "thread id %s."
-                % (self.alias, self._thread_ident, thread.get_ident()))
+                % (self.alias, self._thread_ident, _thread.get_ident())
+            )
 
     # ##### Miscellaneous #####
 
@@ -493,6 +558,13 @@ class BaseDatabaseWrapper(object):
         exceptions using Django's common wrappers.
         """
         return DatabaseErrorWrapper(self)
+
+    def chunked_cursor(self):
+        """
+        Return a cursor that tries to avoid caching in the database (if
+        supported by the database), otherwise return a regular cursor.
+        """
+        return self.cursor()
 
     def make_debug_cursor(self, cursor):
         """
@@ -524,10 +596,10 @@ class BaseDatabaseWrapper(object):
             if must_close:
                 self.close()
 
-    @cached_property
+    @property
     def _nodb_connection(self):
         """
-        Alternative connection to be used when there is no need to access
+        Return an alternative connection to be used when there is no need to access
         the main database, specifically for test db creation/deletion.
         This also prevents the production database from being exposed to
         potential child threads while (or after) the test database is destroyed.
@@ -558,3 +630,35 @@ class BaseDatabaseWrapper(object):
             raise NotImplementedError(
                 'The SchemaEditorClass attribute of this database wrapper is still None')
         return self.SchemaEditorClass(self, *args, **kwargs)
+
+    def on_commit(self, func):
+        if self.in_atomic_block:
+            # Transaction in progress; save for execution on commit.
+            self.run_on_commit.append((set(self.savepoint_ids), func))
+        elif not self.get_autocommit():
+            raise TransactionManagementError('on_commit() cannot be used in manual transaction management')
+        else:
+            # No transaction in progress and in autocommit mode; execute
+            # immediately.
+            func()
+
+    def run_and_clear_commit_hooks(self):
+        self.validate_no_atomic_block()
+        current_run_on_commit = self.run_on_commit
+        self.run_on_commit = []
+        while current_run_on_commit:
+            sids, func = current_run_on_commit.pop(0)
+            func()
+
+    def copy(self, alias=None, allow_thread_sharing=None):
+        """
+        Return a copy of this connection.
+
+        For tests that require two connections to the same database.
+        """
+        settings_dict = copy.deepcopy(self.settings_dict)
+        if alias is None:
+            alias = self.alias
+        if allow_thread_sharing is None:
+            allow_thread_sharing = self.allow_thread_sharing
+        return type(self)(settings_dict, alias, allow_thread_sharing)

@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
+import io
 
 from django.conf import settings
+from django.core.cache import cache
 from django.http import HttpResponse
 from django.http.response import HttpResponseBase
 from django.test import SimpleTestCase
@@ -60,10 +59,30 @@ class HttpResponseTests(SimpleTestCase):
         self.assertEqual(resp.status_code, 503)
         self.assertEqual(resp.reason_phrase, "Service Unavailable")
 
+    def test_valid_status_code_string(self):
+        resp = HttpResponse(status='100')
+        self.assertEqual(resp.status_code, 100)
+        resp = HttpResponse(status='404')
+        self.assertEqual(resp.status_code, 404)
+        resp = HttpResponse(status='599')
+        self.assertEqual(resp.status_code, 599)
+
+    def test_invalid_status_code(self):
+        must_be_integer = 'HTTP status code must be an integer.'
+        must_be_integer_in_range = 'HTTP status code must be an integer from 100 to 599.'
+        with self.assertRaisesMessage(TypeError, must_be_integer):
+            HttpResponse(status=object())
+        with self.assertRaisesMessage(TypeError, must_be_integer):
+            HttpResponse(status="J'attendrai")
+        with self.assertRaisesMessage(ValueError, must_be_integer_in_range):
+            HttpResponse(status=99)
+        with self.assertRaisesMessage(ValueError, must_be_integer_in_range):
+            HttpResponse(status=600)
+
     def test_reason_phrase(self):
         reason = "I'm an anarchist coffee pot on crack."
-        resp = HttpResponse(status=814, reason=reason)
-        self.assertEqual(resp.status_code, 814)
+        resp = HttpResponse(status=419, reason=reason)
+        self.assertEqual(resp.status_code, 419)
         self.assertEqual(resp.reason_phrase, reason)
 
     def test_charset_detection(self):
@@ -107,3 +126,31 @@ class HttpResponseTests(SimpleTestCase):
 
         response = HttpResponse(iso_content, content_type='text/plain')
         self.assertContains(response, iso_content)
+
+    def test_repr(self):
+        response = HttpResponse(content="Café :)".encode(UTF8), status=201)
+        expected = '<HttpResponse status_code=201, "text/html; charset=utf-8">'
+        self.assertEqual(repr(response), expected)
+
+    def test_repr_no_content_type(self):
+        response = HttpResponse(status=204)
+        del response['Content-Type']
+        self.assertEqual(repr(response), '<HttpResponse status_code=204>')
+
+    def test_wrap_textiowrapper(self):
+        content = "Café :)"
+        r = HttpResponse()
+        with io.TextIOWrapper(r, UTF8) as buf:
+            buf.write(content)
+        self.assertEqual(r.content, content.encode(UTF8))
+
+    def test_generator_cache(self):
+        generator = ("{}".format(i) for i in range(10))
+        response = HttpResponse(content=generator)
+        self.assertEqual(response.content, b'0123456789')
+        with self.assertRaises(StopIteration):
+            next(generator)
+
+        cache.set('my-response-key', response)
+        response = cache.get('my-response-key')
+        self.assertEqual(response.content, b'0123456789')

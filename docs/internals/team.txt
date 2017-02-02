@@ -39,20 +39,19 @@ Journal-World`_ of Lawrence, Kansas, USA.
 
 `Wilson Miner`_
     Wilson's design-fu is what makes Django look so nice. He created the design
-    that was used for nearly the first ten years on the Django Project Web
-    site, as well as the current design for Django's acclaimed admin interface.
-    Wilson was the designer for EveryBlock and Rdio_. He now designs for
-    Facebook.
+    that was used for nearly the first ten years on the Django Project website,
+    as well as the current design for Django's acclaimed admin interface. Wilson
+    was the designer for EveryBlock and Rdio_. He now designs for Facebook.
 
     Wilson lives in San Francisco, USA.
 
 .. _lawrence journal-world: http://ljworld.com/
 .. _adrian holovaty: http://holovaty.com/
-.. _everyblock: http://everyblock.com/
+.. _everyblock: https://everyblock.com/
 .. _soundslice: https://www.soundslice.com/
 .. _simon willison: http://simonwillison.net/
 .. _web-development blog: `simon willison`_
-.. _jacob kaplan-moss: http://jacobian.org/
+.. _jacob kaplan-moss: https://jacobian.org/
 .. _revolution systems: http://revsys.com/
 .. _wilson miner: http://wilsonminer.com/
 .. _heroku: https://heroku.com/
@@ -83,7 +82,7 @@ team <core-team>`.
     as a freelance developer.
 
     .. _luke plant: http://lukeplant.me.uk/
-    .. _michael meeks: http://en.wikipedia.org/wiki/Michael_Meeks_(software)
+    .. _michael meeks: https://en.wikipedia.org/wiki/Michael_Meeks_(software)
 
 `Russell Keith-Magee`_
     Russell studied physics as an undergraduate, and studied neural networks for
@@ -100,18 +99,20 @@ team <core-team>`.
     .. _russell keith-magee: http://cecinestpasun.com/
 
 `James Bennett`_
-    James is one of Django's release managers, and also contributes to the
-    documentation and provide the occasional bugfix.
+    James has been one of Django's release managers, and also
+    contributes to the documentation and provide the occasional
+    bugfix.
 
     James came to Web development from philosophy when he discovered
     that programmers get to argue just as much while collecting much
-    better pay. He lives in Lawrence, Kansas and previously worked at
-    World Online; currently, he's part of the Web development team at
-    Mozilla.
+    better pay. He lives in San Mateo, California and previously
+    worked at World Online and Mozilla; currently, he's part of the
+    Web engineering team at `Clover`_.
 
     He `keeps a blog`_, and enjoys fine port and talking to his car.
 
     .. _james bennett: http://b-list.org/
+    .. _Clover: https://www.cloverhealth.com/
     .. _keeps a blog: `james bennett`_
 
 Justin Bronn
@@ -150,8 +151,8 @@ Karen Tracey
 
     .. _Jannis Leidel: https://jezdez.com/
     .. _Bauhaus-University Weimar: http://www.uni-weimar.de/
-    .. _virtualenv: http://www.virtualenv.org/
-    .. _pip: http://www.pip-installer.org/
+    .. _virtualenv: https://virtualenv.pypa.io/
+    .. _pip: https://pip.pypa.io/
     .. _Mozilla: https://www.mozilla.org/
 
 `Andrew Godwin`_
@@ -163,13 +164,13 @@ Karen Tracey
 
     Andrew lives in San Francisco, CA, USA.
 
-    .. _Andrew Godwin: http://www.aeracode.org/
+    .. _Andrew Godwin: https://www.aeracode.org/
 
 `Carl Meyer`_
-    Carl has been working with Django since 2007 (long enough to remember
-    queryset-refactor, but not magic-removal), and works as a freelance
-    developer with OddBird_.  He became a Django contributor by accident,
-    because fixing bugs is more interesting than working around them.
+    Carl has been a Django user since 2007 (long enough to remember
+    queryset-refactor, but not magic-removal), and builds web apps at OddBird_.
+    He became a Django contributor by accident, because fixing bugs is more
+    interesting than working around them.
 
     Carl lives in Rapid City, SD, USA.
 
@@ -190,7 +191,7 @@ Ramiro Morales
 `Chris Beaven`_
     Chris has been submitting patches and suggesting crazy ideas for Django
     since early 2006. An advocate for community involvement and a long-term
-    triager, he is still often found answering questions in the #django IRC
+    triager, he is still often found answering questions in the `#django` IRC
     channel.
 
     Chris lives in Napier, New Zealand (adding to the pool of Oceanic core
@@ -218,23 +219,6 @@ Tim Graham
     He enjoys contributing to the docs because they're awesome.
 
     Tim works as a software engineer and lives in Philadelphia, PA, USA.
-
-`Idan Gazit`_
-    As a self-professed design geek, Idan was initially attracted to Django
-    sometime between magic-removal and queryset-refactor. Formally trained
-    as a software engineer, Idan straddles the worlds of design and code,
-    jack of two trades and master of none. He is passionate about usability
-    and finding novel ways to extract meaning from data, and is a longtime
-    photographer_.
-
-    Idan previously accepted freelance work under the Pixane_ imprint, but
-    now splits his days between his startup, Skills_, and beautifying all
-    things Django and Python.
-
-    .. _Idan Gazit: http://idan.gazit.me
-    .. _photographer: http://flickr.com/photos/idangazit
-    .. _Pixane: http://pixane.com
-    .. _Skills: http://skillsapp.com
 
 Paul McMillan
     Paul found Django in 2008 while looking for a more
@@ -267,10 +251,7 @@ Paul McMillan
     a continuous integration server, and likes proving that Django is a good
     choice for enterprise software.
 
-    He's the CTO of Oscaro_, an e-commerce company based in Paris, France.
-
     .. _Aymeric Augustin: https://myks.org/
-    .. _Oscaro: http://www.oscaro.com/
 
 `Claude Paroz`_
     Claude is a former teacher who fell in love with free software at the
@@ -286,14 +267,14 @@ Paul McMillan
     .. _l10n.gnome.org: https://l10n.gnome.org
 
 Anssi Kääriäinen
-    Anssi works as a developer at Finnish National Institute for Health and
-    Welfare. He is also a computer science student at Aalto University. In his
-    work he uses Django for developing internal business applications and sees
-    Django as a great match for that use case.
+    Anssi works as a Senior Backend Developer at `Holvi`, a Finnish financial
+    technology company building digital banking solutions for freelancers and
+    small businesses. What makes `Holvi` an exciting challenge for Anssi is
+    using technology to create something real people care for and actually want
+    to use. In his daily work, he's building a full stack bank with Django.
 
-    Anssi is interested in developing the object relational mapper (ORM) and
-    all related features. He's also a fan of benchmarking and he tries keep
-    Django as fast as possible.
+    Anssi works mostly on ORM related issues and enjoys making the ORM solve
+    complex query problems.
 
 Florian Apolloner
     Florian is currently studying Physics at the `Graz University of Technology`_.
@@ -303,7 +284,7 @@ Florian Apolloner
     For the time being he lives in Graz, Austria (not Australia ;)).
 
     .. _Graz University of Technology: http://tugraz.at/
-    .. _Ubuntuusers webteam: http://wiki.ubuntuusers.de/ubuntuusers/Webteam
+    .. _Ubuntuusers webteam: https://wiki.ubuntuusers.de/ubuntuusers/Webteam
 
 Jeremy Dunck
     Jeremy was rescued from corporate IT drudgery by Free Software and, in part,
@@ -347,7 +328,7 @@ Jeremy Dunck
 
     .. _Simon Charette: https://github.com/charettes
     .. _Ultimate Frisbee: http://www.montrealultimate.ca
-    .. _Reptiletech: http://www.reptiletech.com
+    .. _Reptiletech: https://www.reptiletech.com
 
 Donald Stufft
     Donald found Python and Django in 2007 while trying to find a language,
@@ -363,14 +344,14 @@ Donald Stufft
 
 Marc Tamlyn
     Marc started life on the web using Django 1.2 back in 2010, and has never
-    looked back. He was involved with rewriting the class based view
+    looked back. He was involved with rewriting the class-based view
     documentation at DjangoCon EU 2012, and also helped to develop `CCBV`_, an
-    additional class based view reference tool.
+    additional class-based view reference tool.
 
     Marc is currently a full-time parent, part-time developer, and lives in
     Oxford, UK.
 
-    .. _CCBV: http://ccbv.co.uk/
+    .. _CCBV: https://ccbv.co.uk/
 
 Shai Berger
     Shai started working with Python back in 1998, and with Django just
@@ -406,7 +387,7 @@ Daniele Procida
 
     .. _Divio: https://divio.ch/
     .. _Arkestra: http://arkestra-project.org/
-    .. _Don\'t be afraid to commit: https://dont-be-afraid-to-commit.readthedocs.org
+    .. _Don\'t be afraid to commit: https://dont-be-afraid-to-commit.readthedocs.io
 
 `Erik Romijn`_
     Erik started using Django in the days of 1.2. His largest contribution to Django was
@@ -421,8 +402,8 @@ Daniele Procida
     that goal in mind. Erik lives in Amsterdam, The Netherlands.
 
     .. _Erik Romijn: http://erik.io/
-    .. _Solid Links: http://solidlinks.nl/
-    .. _Erik's Pony Checkup: http://ponycheckup.com/
+    .. _Solid Links: https://solidlinks.nl/
+    .. _Erik's Pony Checkup: https://ponycheckup.com/
 
 `Loïc Bistuer`_
     Loïc studied telecommunications engineering and works as an independent
@@ -442,9 +423,9 @@ Daniele Procida
 `Michael Manfre`_
     Michael started running Django on Windows against a Microsoft SQL Server
     (MSSQL) database in 2008. He quickly became the maintainer of the
-    django-mssql 3rd party database backend. Much of his involvement with
-    Django relates to the ORM, the private 3rd party database API, and using
-    Django on Windows.
+    ``django-mssql`` database backend. Much of his involvement with Django
+    relates to the ORM, the private 3rd party database API, and using Django on
+    Windows.
 
     Michael lives in Cary, NC, USA.
 
@@ -480,24 +461,27 @@ Daniele Procida
     specialization.  Upon finding Django when it was first open sourced, he
     realized it was possible to enjoy web development.
 
-    He spends a lot of time helping people on the #django IRC channel, and has
-    authored and released a number of `smaller django apps`_.
+    He spends a lot of time helping people on the `#django` IRC channel, and
+    has authored and released a number of `smaller Django apps`_.
 
     .. _Curtis Maloney: http://musings.tinbrain.net/blog/
-    .. _smaller django apps: https://github.com/funkybob/
+    .. _smaller Django apps: https://github.com/funkybob/
 
 `Markus Holtermann`_
-    Markus is a Master of Science student in Computer Science at `Technical
-    University of Berlin`_. He started working with Django in 2010 when he
-    joined the `ubuntuusers.de`_ web team to work on *Inyoka*. Markus made his
-    first contribution to the Django project during DjangoCon Europe 2013 in
-    Warsaw. He was the web team leader for the `EuroPython 2014 website`_.
+    Markus is a senior backend developer at `LaterPay`_ in Munich. He studied
+    Computer Science at the `Technical University of Berlin`_. He started
+    working with Django in 2010 when he joined the `ubuntuusers.de`_ web team
+    to work on *Inyoka*. Markus made his first contribution to the Django
+    project during DjangoCon Europe 2013 in Warsaw. He was the web team leader
+    for the `EuroPython 2014 website`_ and started regular contributions to
+    Django after that.
 
     Markus lives in Berlin, Germany.
 
     .. _Markus Holtermann: https://github.com/MarkusH
+    .. _LaterPay: https://www.laterpay.net/
     .. _Technical University of Berlin: http://www.tu-berlin.de/
-    .. _ubuntuusers.de: http://ubuntuusers.de/
+    .. _ubuntuusers.de: https://ubuntuusers.de/
     .. _EuroPython 2014 website: https://ep2014.europython.eu/
 
 `Josh Smeaton`_
@@ -522,6 +506,95 @@ Daniele Procida
 
     .. _Preston Timmons: https://github.com/prestontimmons
 
+`Tomek Paczkowski`_
+    Tomek started using Django in 2007 as a tool for quickly dealing with
+    university projects. Since then, he worked with various technologies
+    like Ruby on Rails, JavaScript and Android but always returned to
+    Python and Django.
+
+    Tomek loves the Django community. He organized multiple Django
+    sprints, co-organized `DjangoCon Europe 2013`_ and has mentored at many
+    `Django Girls`_ events.
+
+    Originally from Poland, Tomek currently lives in London, where he
+    works at Squirrel_.
+
+    .. _Tomek Paczkowski: https://hauru.eu
+    .. _DjangoCon Europe 2013: http://love.djangocircus.com
+    .. _Django Girls: https://djangogirls.org
+    .. _Squirrel: https://squirrel.me
+
+`Ola Sitarska`_
+    Ola started working with Django in 2009, when she discovered the power of
+    the Django admin and quickly fell in love with the beauty of Python.
+
+    She co-organized `DjangoCon Europe 2013`_ in Warsaw and co-authored the
+    `Django Girls Tutorial`_, the most beginner friendly Django tutorial out
+    there. Together with Ola Sendecka, she started `Django Girls`_, a community
+    and series of Django workshops for women who've never programmed before.
+
+    In 2015, she became a Django Software Foundation board member. Ola was also
+    a part of the team responsible for shipping the djangoproject.com redesign.
+
+    Originally from Poland, Ola currently lives in London, where she
+    works with friends at `Potato`_.
+
+    .. _Ola Sitarska: http://ola.sitarska.com/
+    .. _DjangoCon Europe 2013: http://love.djangocircus.com
+    .. _Django Girls Tutorial: http://tutorial.djangogirls.org
+    .. _Django Girls: https://djangogirls.org
+    .. _Potato: https://p.ota.to
+
+`Ola Sendecka`_
+    Ola started her adventure with Django when writing a university project in
+    2009. After that she attended her first DjangoCon Europe which
+    defined her future life as a Django professional.
+
+    Since then she has been an active community member. Ola co-organized a number of
+    Django sprints and conferences including:
+    `DjangoCon Europe 2013`_, `Django Under the Hood 2015`_ and
+    `DjangoCon Europe 2016`_. Together with Ola Sitarska she founded
+    `Django Girls`_, co-authored the `Django Girls Tutorial`_ and
+    is a member of the Django Girls Foundation. She is also an author of
+    the `Coding is for Girls`_ YouTube series teaching programming and Django
+    to beginners.
+
+    Originally from Poland, Ola currently lives in London, where she works for `Potato`_.
+
+    .. _Ola Sendecka: https://twitter.com/asendecka
+    .. _DjangoCon Europe 2013: http://love.djangocircus.com
+    .. _Django Under the Hood 2015: http://www.djangounderthehood.com/
+    .. _DjangoCon Europe 2016: http://2016.djangocon.eu
+    .. _Django Girls: https://djangogirls.org
+    .. _Django Girls Tutorial: http://tutorial.djangogirls.org
+    .. _Coding is for Girls: https://www.youtube.com/channel/UC0hNd2uW8jTR5K3KBzRuG2A
+    .. _Potato: https://p.ota.to
+
+`Adam Johnson`_
+    Adam started working with Django in 2012 on his first non-PHP website and
+    has never looked back. He has since been pushing for it to be more friendly
+    with MySQL / MariaDB, and now helps organize the London Django Meetup.
+
+    Adam hails from Cheltenham, UK and currently resides in London where he
+    works for `Time Out`_.
+
+    .. _Adam Johnson: https://adamj.eu/
+    .. _Time Out: https://www.timeout.com/
+
+`Lucie Daeye`_
+    Lucie studied Geography and Korean Studies at university. She discovered
+    Django during the very first `Django Girls`_ in 2014: she coded her first
+    first web app for her PhD research, loved it, and decided to switch career
+    to programming.
+
+    Since then, she's organized two `Django Girls workshops in Paris`_ and
+    coached at numerous events. She started working for Django Girls in
+    September 2015 and is now their `Awesomeness Ambassador`_.
+
+    .. _Lucie Daeye: https://justhiding.org/
+    .. _Django Girls workshops in Paris: https://djangogirls.org/paris/
+    .. _Awesomeness Ambassador: https://github.com/DjangoGirls/wiki/blob/master/general/ambassador.md
+
 Past team members
 =================
 
@@ -540,7 +613,7 @@ Robert Wittams
     forms, admin, amongst others; he is most known for his work on
     multiple-database support in Django.
 
-    Alex lives in San Francisco, CA, USA.
+    Alex lives in Washington, DC, USA.
 
     .. _Alex Gaynor: https://alexgaynor.net
 
@@ -593,6 +666,19 @@ Malcolm Tredinnick
 
     .. _Preston Holmes: http://www.ptone.com/
 
+`Idan Gazit`_
+    As a self-professed design geek, Idan was initially attracted to Django
+    sometime between magic-removal and queryset-refactor. Formally trained
+    as a software engineer, Idan straddles the worlds of design and code,
+    jack of two trades and master of none. He is passionate about usability
+    and finding novel ways to extract meaning from data, and is a longtime
+    photographer_.
+
+    Idan is currently hacking on all things data and visualization at Heroku_.
+
+    .. _Idan Gazit: http://gazit.me
+    .. _photographer: https://flickr.com/photos/idangazit
+
 Matt Boersma
     Matt helped with Django's Oracle support.
 
@@ -612,7 +698,7 @@ Joseph Kocherhans
 
     Joseph lives in Chicago, USA.
 
-    .. _charango: http://en.wikipedia.org/wiki/Charango
+    .. _charango: https://en.wikipedia.org/wiki/Charango
 
 `Gary Wilson`_
     Gary starting contributing patches to Django in 2006 while developing Web
@@ -623,7 +709,7 @@ Joseph Kocherhans
     Gary lives in Austin, Texas, USA.
 
     .. _Gary Wilson: http://thegarywilson.com/
-    .. _The University of Texas: http://www.utexas.edu/
+    .. _The University of Texas: https://www.utexas.edu/
 
 `Brian Rosner`_
     Brian enjoys learning more about programming languages and system

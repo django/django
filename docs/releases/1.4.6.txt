@@ -10,7 +10,7 @@ the 1.4 series, as well as one other bug.
 This is the sixth bugfix/security release in the Django 1.4 series.
 
 Mitigated possible XSS attack via user-supplied redirect URLs
--------------------------------------------------------------
+=============================================================
 
 Django relies on user input in some cases (e.g.
 :func:`django.contrib.auth.views.login`, ``django.contrib.comments``, and

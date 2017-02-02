@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 from collections import OrderedDict
 
@@ -46,15 +44,15 @@ class ExtraRegressTests(TestCase):
             }]
         )
 
-        self.assertQuerysetEqual(qs,
-            [('Second Revision', 'First Revision')],
+        self.assertQuerysetEqual(
+            qs, [('Second Revision', 'First Revision')],
             transform=lambda r: (r.title, r.base.title)
         )
 
         # Queryset to search for string in title:
         qs2 = RevisionableModel.objects.filter(title__contains="Revision")
-        self.assertQuerysetEqual(qs2,
-            [
+        self.assertQuerysetEqual(
+            qs2, [
                 ('First Revision', 'First Revision'),
                 ('Second Revision', 'First Revision'),
             ],
@@ -63,7 +61,8 @@ class ExtraRegressTests(TestCase):
         )
 
         # Following queryset should return the most recent revision:
-        self.assertQuerysetEqual(qs & qs2,
+        self.assertQuerysetEqual(
+            qs & qs2,
             [('Second Revision', 'First Revision')],
             transform=lambda r: (r.title, r.base.title),
             ordered=False
@@ -111,10 +110,8 @@ class ExtraRegressTests(TestCase):
         query as well.
         """
         self.assertEqual(
-            list(User.objects
-                .extra(select={"alpha": "%s"}, select_params=(-6,))
-                .filter(id=self.u.id)
-                .values_list('id', flat=True)),
+            list(User.objects.extra(select={"alpha": "%s"}, select_params=(-6,))
+                 .filter(id=self.u.id).values_list('id', flat=True)),
             [self.u.id]
         )
 
@@ -170,10 +167,9 @@ class ExtraRegressTests(TestCase):
             when=datetime.datetime(2008, 9, 28, 10, 30, 0)
         )
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             RevisionableModel.objects.extra(select={"the_answer": 'id'}).datetimes('when', 'month'),
             [datetime.datetime(2008, 9, 1, 0, 0)],
-            transform=lambda d: d,
         )
 
     def test_values_with_extra(self):
@@ -185,100 +181,174 @@ class ExtraRegressTests(TestCase):
         obj.save()
 
         self.assertEqual(
-            list(TestObject.objects.extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third')))).values()),
-            [{'bar': 'second', 'third': 'third', 'second': 'second', 'whiz': 'third', 'foo': 'first', 'id': obj.pk, 'first': 'first'}]
+            list(
+                TestObject.objects
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+                .values()
+            ),
+            [{
+                'bar': 'second', 'third': 'third', 'second': 'second', 'whiz': 'third', 'foo': 'first',
+                'id': obj.pk, 'first': 'first'
+            }]
         )
 
         # Extra clauses after an empty values clause are still included
         self.assertEqual(
-            list(TestObject.objects.values().extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))),
-            [{'bar': 'second', 'third': 'third', 'second': 'second', 'whiz': 'third', 'foo': 'first', 'id': obj.pk, 'first': 'first'}]
+            list(
+                TestObject.objects
+                .values()
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+            ),
+            [{
+                'bar': 'second', 'third': 'third', 'second': 'second', 'whiz': 'third', 'foo': 'first',
+                'id': obj.pk, 'first': 'first'
+            }]
         )
 
         # Extra columns are ignored if not mentioned in the values() clause
         self.assertEqual(
-            list(TestObject.objects.extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third')))).values('first', 'second')),
+            list(
+                TestObject.objects
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+                .values('first', 'second')
+            ),
             [{'second': 'second', 'first': 'first'}]
         )
 
         # Extra columns after a non-empty values() clause are ignored
         self.assertEqual(
-            list(TestObject.objects.values('first', 'second').extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))),
+            list(
+                TestObject.objects
+                .values('first', 'second')
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+            ),
             [{'second': 'second', 'first': 'first'}]
         )
 
         # Extra columns can be partially returned
         self.assertEqual(
-            list(TestObject.objects.extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third')))).values('first', 'second', 'foo')),
+            list(
+                TestObject.objects
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+                .values('first', 'second', 'foo')
+            ),
             [{'second': 'second', 'foo': 'first', 'first': 'first'}]
         )
 
         # Also works if only extra columns are included
         self.assertEqual(
-            list(TestObject.objects.extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third')))).values('foo', 'whiz')),
+            list(
+                TestObject.objects
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+                .values('foo', 'whiz')
+            ),
             [{'foo': 'first', 'whiz': 'third'}]
         )
 
         # Values list works the same way
         # All columns are returned for an empty values_list()
         self.assertEqual(
-            list(TestObject.objects.extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third')))).values_list()),
+            list(
+                TestObject.objects
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+                .values_list()
+            ),
             [('first', 'second', 'third', obj.pk, 'first', 'second', 'third')]
         )
 
         # Extra columns after an empty values_list() are still included
         self.assertEqual(
-            list(TestObject.objects.values_list().extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))),
+            list(
+                TestObject.objects
+                .values_list()
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+            ),
             [('first', 'second', 'third', obj.pk, 'first', 'second', 'third')]
         )
 
         # Extra columns ignored completely if not mentioned in values_list()
         self.assertEqual(
-            list(TestObject.objects.extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third')))).values_list('first', 'second')),
+            list(
+                TestObject.objects
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+                .values_list('first', 'second')
+            ),
             [('first', 'second')]
         )
 
         # Extra columns after a non-empty values_list() clause are ignored completely
         self.assertEqual(
-            list(TestObject.objects.values_list('first', 'second').extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))),
+            list(
+                TestObject.objects
+                .values_list('first', 'second')
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+            ),
             [('first', 'second')]
         )
 
         self.assertEqual(
-            list(TestObject.objects.extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third')))).values_list('second', flat=True)),
+            list(
+                TestObject.objects
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+                .values_list('second', flat=True)
+            ),
             ['second']
         )
 
         # Only the extra columns specified in the values_list() are returned
         self.assertEqual(
-            list(TestObject.objects.extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third')))).values_list('first', 'second', 'whiz')),
+            list(
+                TestObject.objects
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+                .values_list('first', 'second', 'whiz')
+            ),
             [('first', 'second', 'third')]
         )
 
         # ...also works if only extra columns are included
         self.assertEqual(
-            list(TestObject.objects.extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third')))).values_list('foo', 'whiz')),
+            list(
+                TestObject.objects
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+                .values_list('foo', 'whiz')
+            ),
             [('first', 'third')]
         )
 
         self.assertEqual(
-            list(TestObject.objects.extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third')))).values_list('whiz', flat=True)),
+            list(
+                TestObject.objects
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+                .values_list('whiz', flat=True)
+            ),
             ['third']
         )
 
         # ... and values are returned in the order they are specified
         self.assertEqual(
-            list(TestObject.objects.extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third')))).values_list('whiz', 'foo')),
+            list(
+                TestObject.objects
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+                .values_list('whiz', 'foo')
+            ),
             [('third', 'first')]
         )
 
         self.assertEqual(
-            list(TestObject.objects.extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third')))).values_list('first', 'id')),
+            list(
+                TestObject.objects
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+                .values_list('first', 'id')
+            ),
             [('first', obj.pk)]
         )
 
         self.assertEqual(
-            list(TestObject.objects.extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third')))).values_list('whiz', 'first', 'bar', 'id')),
+            list(
+                TestObject.objects
+                .extra(select=OrderedDict((('foo', 'first'), ('bar', 'second'), ('whiz', 'third'))))
+                .values_list('whiz', 'first', 'bar', 'id')
+            ),
             [('third', 'first', 'second', obj.pk)]
         )
 
@@ -323,7 +393,7 @@ class ExtraRegressTests(TestCase):
 
     def test_regression_17877(self):
         """
-        Ensure that extra WHERE clauses get correctly ANDed, even when they
+        Extra WHERE clauses get correctly ANDed, even when they
         contain OR operations.
         """
         # Test Case 1: should appear in queryset.
@@ -359,12 +429,8 @@ class ExtraRegressTests(TestCase):
         qs = TestObject.objects.extra(
             select={'second_extra': 'second'}
         ).values_list('id', flat=True).distinct()
-        self.assertQuerysetEqual(
-            qs.order_by('second_extra'), [t1.pk, t2.pk], lambda x: x)
-        self.assertQuerysetEqual(
-            qs.order_by('-second_extra'), [t2.pk, t1.pk], lambda x: x)
+        self.assertSequenceEqual(qs.order_by('second_extra'), [t1.pk, t2.pk])
+        self.assertSequenceEqual(qs.order_by('-second_extra'), [t2.pk, t1.pk])
         # Note: the extra ordering must appear in select clause, so we get two
         # non-distinct results here (this is on purpose, see #7070).
-        self.assertQuerysetEqual(
-            qs.order_by('-second_extra').values_list('first', flat=True),
-            ['a', 'a'], lambda x: x)
+        self.assertSequenceEqual(qs.order_by('-second_extra').values_list('first', flat=True), ['a', 'a'])

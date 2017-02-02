@@ -1,6 +1,6 @@
-===================================
-Managing static files (CSS, images)
-===================================
+====================================================
+Managing static files (e.g. images, JavaScript, CSS)
+====================================================
 
 Websites generally need to serve additional files such as images, JavaScript,
 or CSS. In Django, we refer to these files as "static files".  Django provides
@@ -19,21 +19,21 @@ Configuring static files
       STATIC_URL = '/static/'
 
 3. In your templates, either hardcode the url like
-   ``/static/my_app/myexample.jpg`` or, preferably, use the
-   :ttag:`static<staticfiles-static>` template tag to build the URL for the given
-   relative path by using the configured :setting:`STATICFILES_STORAGE` storage
-   (this makes it much easier when you want to switch to a content delivery
-   network (CDN) for serving static files).
+   ``/static/my_app/example.jpg`` or, preferably, use the :ttag:`static`
+   template tag to build the URL for the given relative path by using the
+   configured :setting:`STATICFILES_STORAGE` storage (this makes it much easier
+   when you want to switch to a content delivery network (CDN) for serving
+   static files).
 
    .. _staticfiles-in-templates:
 
    .. code-block:: html+django
 
-        {% load staticfiles %}
-        <img src="{% static "my_app/myexample.jpg" %}" alt="My image"/>
+        {% load static %}
+        <img src="{% static "my_app/example.jpg" %}" alt="My image"/>
 
 4. Store your static files in a folder called ``static`` in your app. For
-   example ``my_app/static/my_app/myimage.jpg``.
+   example ``my_app/static/my_app/example.jpg``.
 
 .. admonition:: Serving the files
 
@@ -77,8 +77,8 @@ details on how ``staticfiles`` finds your files.
 
 .. _serving-static-files-in-development:
 
-Serving static files during development.
-========================================
+Serving static files during development
+=======================================
 
 If you use :mod:`django.contrib.staticfiles` as explained above,
 :djadmin:`runserver` will do this automatically when :setting:`DEBUG` is set
@@ -111,8 +111,8 @@ this by adding the following snippet to your urls.py::
 
 .. _serving-uploaded-files-in-development:
 
-Serving files uploaded by a user during development.
-====================================================
+Serving files uploaded by a user during development
+===================================================
 
 During development, you can serve user-uploaded media files from
 :setting:`MEDIA_ROOT` using the :func:`django.contrib.staticfiles.views.serve`

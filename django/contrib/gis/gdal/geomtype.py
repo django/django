@@ -1,9 +1,8 @@
 from django.contrib.gis.gdal.error import GDALException
-from django.utils import six
 
 
-class OGRGeomType(object):
-    "Encapulates OGR Geometry Types."
+class OGRGeomType:
+    "Encapsulates OGR Geometry Types."
 
     wkb25bit = -2147483648
 
@@ -18,6 +17,7 @@ class OGRGeomType(object):
               7: 'GeometryCollection',
               100: 'None',
               101: 'LinearRing',
+              102: 'PointZ',
               1 + wkb25bit: 'Point25D',
               2 + wkb25bit: 'LineString25D',
               3 + wkb25bit: 'Polygon25D',
@@ -33,7 +33,7 @@ class OGRGeomType(object):
         "Figures out the correct OGR Type based upon the input."
         if isinstance(type_input, OGRGeomType):
             num = type_input.num
-        elif isinstance(type_input, six.string_types):
+        elif isinstance(type_input, str):
             type_input = type_input.lower()
             if type_input == 'geometry':
                 type_input = 'unknown'
@@ -61,15 +61,12 @@ class OGRGeomType(object):
         """
         if isinstance(other, OGRGeomType):
             return self.num == other.num
-        elif isinstance(other, six.string_types):
+        elif isinstance(other, str):
             return self.name.lower() == other.lower()
         elif isinstance(other, int):
             return self.num == other
         else:
             return False
-
-    def __ne__(self, other):
-        return not (self == other)
 
     @property
     def name(self):
@@ -84,6 +81,8 @@ class OGRGeomType(object):
             return None
         elif s == 'Unknown':
             s = 'Geometry'
+        elif s == 'PointZ':
+            s = 'Point'
         return s + 'Field'
 
     def to_multi(self):

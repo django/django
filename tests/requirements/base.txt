@@ -1,9 +1,0 @@
-bcrypt
-docutils
-jinja2
-numpy
-Pillow
-PyYAML
-pytz > dev
-selenium
-sqlparse

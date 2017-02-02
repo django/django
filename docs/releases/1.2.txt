@@ -6,12 +6,10 @@ Django 1.2 release notes
 
 Welcome to Django 1.2!
 
-Nearly a year in the making, Django 1.2 packs an impressive list of `new
-features`_ and lots of bug fixes. These release notes cover the new features,
-as well as important changes you'll want to be aware of when upgrading from
-Django 1.1 or older versions.
-
-.. _new features: `What's new in Django 1.2`_
+Nearly a year in the making, Django 1.2 packs an impressive list of :ref:`new
+features <whats-new-1.2>` and lots of bug fixes. These release notes cover
+the new features, as well as important changes you'll want to be aware of when
+upgrading from Django 1.1 or older versions.
 
 Overview
 ========
@@ -115,6 +113,8 @@ A roadmap for Django's overall 2.x Python support, and eventual
 transition to Python 3.x, is currently being developed, and will be
 announced prior to the release of Django 1.3.
 
+.. _whats-new-1.2:
+
 What's new in Django 1.2
 ========================
 
@@ -142,8 +142,8 @@ Improved CSRF protection
 
 Django now has much improved protection against :doc:`Cross-Site Request Forgery
 (CSRF) attacks</ref/csrf>`. This type of attack occurs when a malicious
-Web site contains a link, a form button or some JavaScript that is intended to
-perform some action on your Web site, using the credentials of a logged-in user
+website contains a link, a form button or some JavaScript that is intended to
+perform some action on your website, using the credentials of a logged-in user
 who visits the malicious site in their browser. A related type of attack, "login
 CSRF," where an attacking site tricks a user's browser into logging into a site
 with someone else's credentials, is also covered.
@@ -309,7 +309,7 @@ Django's :doc:`internationalization framework </topics/i18n/index>` has been exp
 with locale-aware formatting and form processing. That means, if enabled, dates
 and numbers on templates will be displayed using the format specified for the
 current locale. Django will also use localized formats when parsing data in
-forms. See :ref:`Format localization <format-localization>` for more details.
+forms. See :doc:`/topics/i18n/formatting` for more details.
 
 ``readonly_fields`` in ``ModelAdmin``
 -------------------------------------
@@ -348,8 +348,7 @@ are now included:
 * ``django.contrib.gis.db.backends.oracle``
 * ``django.contrib.gis.db.backends.spatialite``
 
-GeoDjango now supports the rich capabilities added
-in the `PostGIS 1.5 release <http://postgis.net/docs/manual-1.5/>`_.
+GeoDjango now supports the rich capabilities added in the PostGIS 1.5 release.
 New features include support for the :ref:`geography type <geography-type>`
 and enabling of :ref:`distance queries <distance-queries>`
 with non-point geometries on geographic coordinate systems.
@@ -358,15 +357,10 @@ Support for 3D geometry fields was added, and may be enabled
 by setting the :attr:`~django.contrib.gis.db.models.GeometryField.dim`
 keyword to 3 in your :class:`~django.contrib.gis.db.models.GeometryField`.
 The :class:`~django.contrib.gis.db.models.Extent3D` aggregate
-and :meth:`~django.contrib.gis.db.models.GeoQuerySet.extent3d` ``GeoQuerySet``
-method were added as a part of this feature.
+and ``extent3d()`` ``GeoQuerySet`` method were added as a part of this feature.
 
-The following :class:`~django.contrib.gis.db.models.GeoQuerySet`
-methods are new in 1.2:
-
-* :meth:`~django.contrib.gis.db.models.GeoQuerySet.force_rhr`
-* :meth:`~django.contrib.gis.db.models.GeoQuerySet.reverse_geom`
-* :meth:`~django.contrib.gis.db.models.GeoQuerySet.geohash`
+The ``force_rhr()``, ``reverse_geom()``, and ``geohash()`` ``GeoQuerySet``
+methods are new.
 
 The GEOS interface was updated to use thread-safe C library functions when
 available on the platform.
@@ -440,7 +434,7 @@ should be aware of:
      The upgrade notes have been removed in current Django docs. Please refer
      to the docs for Django 1.3 or older to find these instructions.
 
-* ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
+* ``CsrfViewMiddleware`` is included in ``MIDDLEWARE_CLASSES`` by
   default. This turns on CSRF protection by default, so views that accept
   POST requests need to be written to work with the middleware. Instructions
   on how to do this are found in the CSRF docs.
@@ -1073,10 +1067,10 @@ to provide localizers the possibility to translate date and time formats. They
 were translatable :term:`translation strings <translation string>` that could
 be recognized because they were all upper case (for example
 :setting:`DATETIME_FORMAT`, :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT`).
-They have been deprecated in favor of the new :ref:`Format localization
-<format-localization>` infrastructure that allows localizers to specify that
-information in a ``formats.py`` file in the corresponding
-``django/conf/locale/<locale name>/`` directory.
+They have been deprecated in favor of the new :doc:`/topics/i18n/formatting`
+infrastructure that allows localizers to specify that information in a
+``formats.py`` file in the corresponding ``django/conf/locale/<locale name>/``
+directory.
 
 GeoDjango
 ---------
@@ -1090,7 +1084,7 @@ following sections provide information on the most-popular APIs that
 were affected by these changes.
 
 ``SpatialBackend``
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
 Prior to the creation of the separate spatial backends, the
 ``django.contrib.gis.db.backend.SpatialBackend`` object was
@@ -1118,7 +1112,7 @@ Would need to be changed::
     PostGISAdaptor = connection.ops.Adapter
 
 ``SpatialRefSys`` and ``GeometryColumns`` models
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In previous versions of GeoDjango, :mod:`django.contrib.gis.db.models`
 had ``SpatialRefSys`` and ``GeometryColumns`` models for querying

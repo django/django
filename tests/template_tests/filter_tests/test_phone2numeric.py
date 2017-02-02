@@ -15,8 +15,7 @@ class Phone2numericTests(SimpleTestCase):
         )
         self.assertEqual(output, '&lt;1-800-2255-63&gt; <1-800-2255-63>')
 
-    @setup({'phone2numeric02':
-        '{% autoescape off %}{{ a|phone2numeric }} {{ b|phone2numeric }}{% endautoescape %}'})
+    @setup({'phone2numeric02': '{% autoescape off %}{{ a|phone2numeric }} {{ b|phone2numeric }}{% endautoescape %}'})
     def test_phone2numeric02(self):
         output = self.engine.render_to_string(
             'phone2numeric02',

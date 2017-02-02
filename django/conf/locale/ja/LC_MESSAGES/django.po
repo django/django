@@ -1,17 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# xiu1 <d84ea@hotmail.co.jp>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Shinya Okano <tokibito@gmail.com>, 2012-2015
+# Kentaro Hori <kentaro0919@gmail.com>, 2015
+# Shinya Okano <tokibito@gmail.com>, 2012-2016
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-29 08:50+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
-"Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-10 13:16+0000\n"
+"Last-Translator: xiu1 <d84ea@hotmail.co.jp>\n"
+"Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -61,6 +63,9 @@ msgstr "デンマーク語"
 msgid "German"
 msgstr "ドイツ語"
 
+msgid "Lower Sorbian"
+msgstr "低地ソルブ語"
+
 msgid "Greek"
 msgstr "ギリシャ語"
 
@@ -81,6 +86,9 @@ msgstr "スペイン語"
 
 msgid "Argentinian Spanish"
 msgstr "アルゼンチンスペイン語"
+
+msgid "Colombian Spanish"
+msgstr "コロンビアスペイン語"
 
 msgid "Mexican Spanish"
 msgstr "メキシコスペイン語"
@@ -112,6 +120,9 @@ msgstr "フリジア語"
 msgid "Irish"
 msgstr "アイルランド語"
 
+msgid "Scottish Gaelic"
+msgstr "ゲール語(スコットランド)"
+
 msgid "Galician"
 msgstr "ガリシア語"
 
@@ -123,6 +134,9 @@ msgstr "ヒンディー語"
 
 msgid "Croatian"
 msgstr "クロアチア語"
+
+msgid "Upper Sorbian"
+msgstr "高地ソルブ語"
 
 msgid "Hungarian"
 msgstr "ハンガリー語"
@@ -184,7 +198,7 @@ msgstr "マラーティー語"
 msgid "Burmese"
 msgstr "ビルマ語"
 
-msgid "Norwegian Bokmal"
+msgid "Norwegian Bokmål"
 msgstr "ノルウェーのブークモール"
 
 msgid "Nepali"
@@ -283,9 +297,6 @@ msgstr "静的ファイル"
 msgid "Syndication"
 msgstr "シンジケーション"
 
-msgid "Web Design"
-msgstr "ウェブデザイン"
-
 msgid "Enter a valid value."
 msgstr "値を正しく入力してください。"
 
@@ -301,6 +312,13 @@ msgstr "有効なメールアドレスを入力してください。"
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "slug には半角の英数字、アンダースコア、ハイフン以外は使用できません。"
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"ユニコード文字、数字、アンダースコアまたはハイフンで構成された、有効な"
+"「slug」を入力してください"
 
 msgid "Enter a valid IPv4 address."
 msgstr "有効なIPアドレス (IPv4) を入力してください。"
@@ -350,6 +368,23 @@ msgstr[0] ""
 "この値は %(limit_value)d 文字以下でなければなりません( %(show_value)d 文字に"
 "なっています)。"
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "この値は合計 %(max)s 桁以内でなければなりません。"
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "この値は小数点以下が合計 %(max)s 桁以内でなければなりません。"
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "この値は小数点より前が合計 %(max)s 桁以内でなければなりません。"
+
 msgid "and"
 msgstr "と"
 
@@ -390,6 +425,9 @@ msgstr "整数"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' は整数値にしなければなりません。"
+
+msgid "Big (8 byte) integer"
+msgstr "大きな(8バイト)整数"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -471,9 +509,6 @@ msgstr "'%(value)s' は小数値にしなければなりません。"
 msgid "Floating point number"
 msgstr "浮動小数点"
 
-msgid "Big (8 byte) integer"
-msgstr "大きな(8バイト)整数"
-
 msgid "IPv4 address"
 msgstr "IPv4アドレス"
 
@@ -546,8 +581,22 @@ msgstr "外部キー(型は関連フィールドによって決まります)"
 msgid "One-to-one relationship"
 msgstr "1対1の関連"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s の関連"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s の関連"
+
 msgid "Many-to-many relationship"
 msgstr "多対多の関連"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "このフィールドは必須です。"
@@ -557,23 +606,6 @@ msgstr "整数を入力してください。"
 
 msgid "Enter a number."
 msgstr "整数を入力してください。"
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "この値は合計 %(max)s 桁以内でなければなりません。"
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "この値は小数点以下が合計 %(max)s 桁以内でなければなりません。"
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "この値は小数点より前が合計 %(max)s 桁以内でなければなりません。"
 
 msgid "Enter a valid date."
 msgstr "日付を正しく入力してください。"
@@ -637,12 +669,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(隠しフィールド %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "ManagementFormデータが見つからないか、改竄されています。"

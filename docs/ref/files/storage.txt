@@ -1,10 +1,11 @@
+================
 File storage API
 ================
 
 .. module:: django.core.files.storage
 
 Getting the current storage class
----------------------------------
+=================================
 
 Django provides two convenient ways to access the current storage class:
 
@@ -15,7 +16,7 @@ Django provides two convenient ways to access the current storage class:
     :setting:`DEFAULT_FILE_STORAGE`. :class:`DefaultStorage` uses
     :func:`~django.core.files.storage.get_storage_class` internally.
 
-.. function:: get_storage_class([import_path=None])
+.. function:: get_storage_class(import_path=None)
 
     Returns a class or module which implements the storage API.
 
@@ -26,10 +27,10 @@ Django provides two convenient ways to access the current storage class:
     given path and will return it if successful. An exception will be
     raised if the import is unsuccessful.
 
-The FileSystemStorage Class
----------------------------
+The ``FileSystemStorage`` class
+===============================
 
-.. class:: FileSystemStorage([location=None, base_url=None, file_permissions_mode=None, directory_permissions_mode=None])
+.. class:: FileSystemStorage(location=None, base_url=None, file_permissions_mode=None, directory_permissions_mode=None)
 
     The :class:`~django.core.files.storage.FileSystemStorage` class implements
     basic file storage on a local filesystem. It inherits from
@@ -61,8 +62,8 @@ The FileSystemStorage Class
         The ``FileSystemStorage.delete()`` method will not raise
         an exception if the given file name does not exist.
 
-The Storage Class
------------------
+The ``Storage`` class
+=====================
 
 .. class:: Storage
 
@@ -72,24 +73,9 @@ The Storage Class
     as necessary.
 
     .. note::
-        For methods returning naive ``datetime`` objects, the
-        effective timezone used will be the current value of
-        ``os.environ['TZ']``; note that this is usually set from
-        Django's :setting:`TIME_ZONE`.
-
-    .. method:: accessed_time(name)
-
-        Returns a naive ``datetime`` object containing the last
-        accessed time of the file. For storage systems that aren't
-        able to return the last accessed time this will raise
-        ``NotImplementedError`` instead.
-
-    .. method:: created_time(name)
-
-        Returns a naive ``datetime`` object containing the creation
-        time of the file.  For storage systems that aren't able to
-        return the creation time this will raise
-        ``NotImplementedError`` instead.
+        When methods return naive ``datetime`` objects, the effective timezone
+        used will be the current value of ``os.environ['TZ']``; note that this
+        is usually set from Django's :setting:`TIME_ZONE`.
 
     .. method:: delete(name)
 
@@ -102,6 +88,15 @@ The Storage Class
         Returns ``True`` if a file referenced by the given name already exists
         in the storage system, or ``False`` if the name is available for a new
         file.
+
+    .. method:: get_accessed_time(name)
+
+        Returns a :class:`~datetime.datetime` of the last accessed time of the
+        file. For storage systems unable to return the last accessed time this
+        will raise :exc:`NotImplementedError`.
+
+        If :setting:`USE_TZ` is ``True``, returns an aware ``datetime``,
+        otherwise returns a naive ``datetime`` in the local timezone.
 
     .. method:: get_available_name(name, max_length=None)
 
@@ -118,14 +113,41 @@ The Storage Class
         7 character alphanumeric string is appended to the filename before
         the extension.
 
-        .. versionchanged:: 1.8
+    .. method:: get_created_time(name)
 
-            The ``max_length`` argument was added.
+        Returns a :class:`~datetime.datetime` of the creation time of the file.
+        For storage systems unable to return the creation time this will raise
+        :exc:`NotImplementedError`.
+
+        If :setting:`USE_TZ` is ``True``, returns an aware ``datetime``,
+        otherwise returns a naive ``datetime`` in the local timezone.
+
+    .. method:: get_modified_time(name)
+
+        Returns a :class:`~datetime.datetime` of the last modified time of the
+        file. For storage systems unable to return the last modified time this
+        will raise :exc:`NotImplementedError`.
+
+        If :setting:`USE_TZ` is ``True``, returns an aware ``datetime``,
+        otherwise returns a naive ``datetime`` in the local timezone.
 
     .. method:: get_valid_name(name)
 
         Returns a filename based on the ``name`` parameter that's suitable
         for use on the target storage system.
+
+    .. method:: generate_filename(filename)
+
+        Validates the ``filename`` by calling :attr:`get_valid_name()` and
+        returns a filename to be passed to the :meth:`save` method.
+
+        The ``filename`` argument may include a path as returned by
+        :attr:`FileField.upload_to <django.db.models.FileField.upload_to>`.
+        In that case, the path won't be passed to :attr:`get_valid_name()` but
+        will be prepended back to the resulting name.
+
+        The default implementation uses :mod:`os.path` operations. Override
+        this method if that's not appropriate for your storage.
 
     .. method:: listdir(path)
 
@@ -133,13 +155,6 @@ The Storage Class
         the first item being directories, the second item being files. For
         storage systems that aren't able to provide such a listing, this will
         raise a ``NotImplementedError`` instead.
-
-    .. method:: modified_time(name)
-
-        Returns a naive ``datetime`` object containing the last
-        modified time. For storage systems that aren't able to return
-        the last modified time, this will raise
-        ``NotImplementedError`` instead.
 
     .. method:: open(name, mode='rb')
 
@@ -165,12 +180,8 @@ The Storage Class
         :meth:`get_available_name`.
 
         The ``content`` argument must be an instance of
-        :class:`django.core.files.File` or of a subclass of
-        :class:`~django.core.files.File`.
-
-        .. versionchanged:: 1.8
-
-            The ``max_length`` argument was added.
+        :class:`django.core.files.File` or a file-like object that can be
+        wrapped in ``File``.
 
     .. method:: size(name)
 

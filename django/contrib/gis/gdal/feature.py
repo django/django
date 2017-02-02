@@ -3,13 +3,11 @@ from django.contrib.gis.gdal.error import GDALException, OGRIndexError
 from django.contrib.gis.gdal.field import Field
 from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
 from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api
-from django.utils import six
 from django.utils.encoding import force_bytes, force_text
-from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:
-#  http://www.gdal.org/ogr/ogr__api_8h.html
+#  http://www.gdal.org/ogr__api_8h.html
 #
 # The OGR_F_* routines are relevant here.
 class Feature(GDALBase):
@@ -17,6 +15,7 @@ class Feature(GDALBase):
     This class that wraps an OGR Feature, needs to be instantiated
     from a Layer object.
     """
+    destructor = capi.destroy_feature
 
     def __init__(self, feat, layer):
         """
@@ -27,11 +26,6 @@ class Feature(GDALBase):
         self.ptr = feat
         self._layer = layer
 
-    def __del__(self):
-        "Releases a reference to this object."
-        if self._ptr and capi:
-            capi.destroy_feature(self._ptr)
-
     def __getitem__(self, index):
         """
         Gets the Field object at the specified index, which may be either
@@ -39,7 +33,7 @@ class Feature(GDALBase):
         is not the field's _value_ -- use the `get` method instead to
         retrieve the value (e.g. an integer) instead of a Field instance.
         """
-        if isinstance(index, six.string_types):
+        if isinstance(index, str):
             i = self.index(index)
         else:
             if index < 0 or index > self.num_fields:

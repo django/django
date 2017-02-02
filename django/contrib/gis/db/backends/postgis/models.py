@@ -3,15 +3,12 @@
 """
 from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class PostGISGeometryColumns(models.Model):
     """
-    The 'geometry_columns' table from the PostGIS. See the PostGIS
+    The 'geometry_columns' view from PostGIS. See the PostGIS
     documentation at Ch. 4.3.2.
-    On PostGIS 2, this is a view.
     """
     f_table_catalog = models.CharField(max_length=256)
     f_table_schema = models.CharField(max_length=256)
@@ -51,7 +48,7 @@ class PostGISGeometryColumns(models.Model):
 class PostGISSpatialRefSys(models.Model, SpatialRefSysMixin):
     """
     The 'spatial_ref_sys' table from PostGIS. See the PostGIS
-    documentaiton at Ch. 4.2.1.
+    documentation at Ch. 4.2.1.
     """
     srid = models.IntegerField(primary_key=True)
     auth_name = models.CharField(max_length=256)
@@ -67,7 +64,3 @@ class PostGISSpatialRefSys(models.Model, SpatialRefSysMixin):
     @property
     def wkt(self):
         return self.srtext
-
-    @classmethod
-    def wkt_col(cls):
-        return 'srtext'

@@ -17,16 +17,16 @@ class LoginRequiredTestCase(AuthViewsTestCase):
 
     def testCallable(self):
         """
-        Check that login_required is assignable to callable objects.
+        login_required is assignable to callable objects.
         """
-        class CallableView(object):
+        class CallableView:
             def __call__(self, *args, **kwargs):
                 pass
         login_required(CallableView())
 
     def testView(self):
         """
-        Check that login_required is assignable to normal views.
+        login_required is assignable to normal views.
         """
         def normal_view(request):
             pass
@@ -34,8 +34,8 @@ class LoginRequiredTestCase(AuthViewsTestCase):
 
     def testLoginRequired(self, view_url='/login_required/', login_url=None):
         """
-        Check that login_required works on a simple view wrapped in a
-        login_required decorator.
+        login_required works on a simple view wrapped in a login_required
+        decorator.
         """
         if login_url is None:
             login_url = settings.LOGIN_URL
@@ -48,11 +48,10 @@ class LoginRequiredTestCase(AuthViewsTestCase):
 
     def testLoginRequiredNextUrl(self):
         """
-        Check that login_required works on a simple view wrapped in a
-        login_required decorator with a login_url set.
+        login_required works on a simple view wrapped in a login_required
+        decorator with a login_url set.
         """
-        self.testLoginRequired(view_url='/login_required_login_url/',
-            login_url='/somewhere/')
+        self.testLoginRequired(view_url='/login_required_login_url/', login_url='/somewhere/')
 
 
 class PermissionsRequiredDecoratorTest(TestCase):
@@ -68,7 +67,17 @@ class PermissionsRequiredDecoratorTest(TestCase):
 
     def test_many_permissions_pass(self):
 
-        @permission_required(['auth.add_customuser', 'auth.change_customuser'])
+        @permission_required(['auth_tests.add_customuser', 'auth_tests.change_customuser'])
+        def a_view(request):
+            return HttpResponse()
+        request = self.factory.get('/rand')
+        request.user = self.user
+        resp = a_view(request)
+        self.assertEqual(resp.status_code, 200)
+
+    def test_many_permissions_in_set_pass(self):
+
+        @permission_required({'auth_tests.add_customuser', 'auth_tests.change_customuser'})
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
@@ -78,7 +87,7 @@ class PermissionsRequiredDecoratorTest(TestCase):
 
     def test_single_permission_pass(self):
 
-        @permission_required('auth.add_customuser')
+        @permission_required('auth_tests.add_customuser')
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
@@ -88,7 +97,7 @@ class PermissionsRequiredDecoratorTest(TestCase):
 
     def test_permissioned_denied_redirect(self):
 
-        @permission_required(['auth.add_customuser', 'auth.change_customuser', 'non-existent-permission'])
+        @permission_required(['auth_tests.add_customuser', 'auth_tests.change_customuser', 'non-existent-permission'])
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
@@ -99,10 +108,11 @@ class PermissionsRequiredDecoratorTest(TestCase):
     def test_permissioned_denied_exception_raised(self):
 
         @permission_required([
-            'auth.add_customuser', 'auth.change_customuser', 'non-existent-permission'
+            'auth_tests.add_customuser', 'auth_tests.change_customuser', 'non-existent-permission'
         ], raise_exception=True)
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
         request.user = self.user
-        self.assertRaises(PermissionDenied, a_view, request)
+        with self.assertRaises(PermissionDenied):
+            a_view(request)

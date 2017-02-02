@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, override_settings
-from django.utils.encoding import force_str
 from django.views.generic.base import View
 
 from .models import Artist, Author, Book, Page
@@ -59,7 +55,7 @@ class ListViewTests(TestCase):
         self.assertEqual(list(res.context['author_list'])[-1].name, 'Author 29')
 
     def test_paginated_queryset_shortdata(self):
-        # Test that short datasets ALSO result in a paginated view.
+        # Short datasets also result in a paginated view.
         res = self.client.get('/list/authors/paginated/')
         self.assertEqual(res.status_code, 200)
         self.assertTemplateUsed(res, 'generic_views/author_list.html')
@@ -204,7 +200,8 @@ class ListViewTests(TestCase):
         self.assertTemplateUsed(res, 'generic_views/author_list.html')
 
     def test_missing_items(self):
-        self.assertRaises(ImproperlyConfigured, self.client.get, '/list/authors/invalid/')
+        with self.assertRaises(ImproperlyConfigured):
+            self.client.get('/list/authors/invalid/')
 
     def test_paginated_list_view_does_not_load_entire_table(self):
         # Regression test for #17535
@@ -237,8 +234,7 @@ class ListViewTests(TestCase):
         self._make_authors(1)
         res = self.client.get('/list/authors/paginated/2/')
         self.assertEqual(res.status_code, 404)
-        self.assertEqual(force_str(res.context.get('reason')),
-                "Invalid page (2): That page contains no results")
+        self.assertEqual(res.context.get('reason'), "Invalid page (2): That page contains no results")
 
     def _make_authors(self, n):
         Author.objects.all().delete()

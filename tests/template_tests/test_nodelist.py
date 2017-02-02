@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from django.template import Context, Engine
-from django.template.base import VariableNode
+from django.template.base import TextNode, VariableNode
 
 
 class NodelistTest(TestCase):
@@ -9,7 +9,7 @@ class NodelistTest(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.engine = Engine()
-        super(NodelistTest, cls).setUpClass()
+        super().setUpClass()
 
     def test_for(self):
         template = self.engine.from_string('{% for i in 1 %}{{ a }}{% endfor %}')
@@ -32,6 +32,19 @@ class NodelistTest(TestCase):
         self.assertEqual(len(vars), 1)
 
 
+class TextNodeTest(TestCase):
+
+    def test_textnode_repr(self):
+        engine = Engine()
+        for temptext, reprtext in [
+            ("Hello, world!", "<TextNode: 'Hello, world!'>"),
+            ("One\ntwo.", "<TextNode: 'One\\ntwo.'>"),
+        ]:
+            template = engine.from_string(temptext)
+            texts = template.nodelist.get_nodes_by_type(TextNode)
+            self.assertEqual(repr(texts[0]), reprtext)
+
+
 class ErrorIndexTest(TestCase):
     """
     Checks whether index of error is calculated correctly in
@@ -40,9 +53,21 @@ class ErrorIndexTest(TestCase):
     def test_correct_exception_index(self):
         tests = [
             ('{% load bad_tag %}{% for i in range %}{% badsimpletag %}{% endfor %}', (38, 56)),
-            ('{% load bad_tag %}{% for i in range %}{% for j in range %}{% badsimpletag %}{% endfor %}{% endfor %}', (58, 76)),
-            ('{% load bad_tag %}{% for i in range %}{% badsimpletag %}{% for j in range %}Hello{% endfor %}{% endfor %}', (38, 56)),
-            ('{% load bad_tag %}{% for i in range %}{% for j in five %}{% badsimpletag %}{% endfor %}{% endfor %}', (38, 57)),
+            (
+                '{% load bad_tag %}{% for i in range %}{% for j in range %}'
+                '{% badsimpletag %}{% endfor %}{% endfor %}',
+                (58, 76)
+            ),
+            (
+                '{% load bad_tag %}{% for i in range %}{% badsimpletag %}'
+                '{% for j in range %}Hello{% endfor %}{% endfor %}',
+                (38, 56)
+            ),
+            (
+                '{% load bad_tag %}{% for i in range %}{% for j in five %}'
+                '{% badsimpletag %}{% endfor %}{% endfor %}',
+                (38, 57)
+            ),
             ('{% load bad_tag %}{% for j in five %}{% badsimpletag %}{% endfor %}', (18, 37)),
         ]
         context = Context({

@@ -33,7 +33,7 @@ class FlatpageNode(template.Node):
         # was provided, filter the list to only public flatpages.
         if self.user:
             user = self.user.resolve(context)
-            if not user.is_authenticated():
+            if not user.is_authenticated:
                 flatpages = flatpages.filter(registration_required=False)
         else:
             flatpages = flatpages.filter(registration_required=False)

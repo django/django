@@ -1,14 +1,13 @@
 import os
 from importlib import import_module
 
-from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
-from django.utils._os import upath
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import module_has_submodule
 
 MODELS_MODULE_NAME = 'models'
 
 
-class AppConfig(object):
+class AppConfig:
     """
     Class representing a Django application and its configuration.
     """
@@ -18,8 +17,12 @@ class AppConfig(object):
         self.name = app_name
 
         # Root module for the application eg. <module 'django.contrib.admin'
-        # from 'django/contrib/admin/__init__.pyc'>.
+        # from 'django/contrib/admin/__init__.py'>.
         self.module = app_module
+
+        # Reference to the Apps registry that holds this AppConfig. Set by the
+        # registry when it registers the AppConfig instance.
+        self.apps = None
 
         # The following attributes could be defined at the class level in a
         # subclass, hence the test-and-set pattern.
@@ -34,13 +37,12 @@ class AppConfig(object):
             self.verbose_name = self.label.title()
 
         # Filesystem path to the application directory eg.
-        # u'/usr/lib/python2.7/dist-packages/django/contrib/admin'. Unicode on
-        # Python 2 and a str on Python 3.
+        # '/path/to/django/contrib/admin'.
         if not hasattr(self, 'path'):
             self.path = self._path_from_module(app_module)
 
         # Module containing models eg. <module 'django.contrib.admin.models'
-        # from 'django/contrib/admin/models.pyc'>. Set by import_models().
+        # from 'django/contrib/admin/models.py'>. Set by import_models().
         # None if the application doesn't have a models module.
         self.models_module = None
 
@@ -55,13 +57,17 @@ class AppConfig(object):
         """Attempt to determine app's filesystem path from its module."""
         # See #21874 for extended discussion of the behavior of this method in
         # various cases.
-        # Convert paths to list because Python 3.3 _NamespacePath does not
-        # support indexing.
+        # Convert paths to list because Python's _NamespacePath doesn't support
+        # indexing.
         paths = list(getattr(module, '__path__', []))
         if len(paths) != 1:
             filename = getattr(module, '__file__', None)
             if filename is not None:
                 paths = [os.path.dirname(filename)]
+            else:
+                # For unknown reasons, sometimes the list returned by __path__
+                # contains duplicates that must be removed (#25246).
+                paths = list(set(paths))
         if len(paths) > 1:
             raise ImproperlyConfigured(
                 "The app module %r has multiple filesystem locations (%r); "
@@ -72,7 +78,7 @@ class AppConfig(object):
                 "The app module %r has no filesystem location, "
                 "you must configure this app with an AppConfig subclass "
                 "with a 'path' class attribute." % (module,))
-        return upath(paths[0])
+        return paths[0]
 
     @classmethod
     def create(cls, entry):
@@ -135,34 +141,35 @@ class AppConfig(object):
                 "'%s' must supply a name attribute." % entry)
 
         # Ensure app_name points to a valid module.
-        app_module = import_module(app_name)
+        try:
+            app_module = import_module(app_name)
+        except ImportError:
+            raise ImproperlyConfigured(
+                "Cannot import '%s'. Check that '%s.%s.name' is correct." % (
+                    app_name, mod_path, cls_name,
+                )
+            )
 
         # Entry is a path to an app config class.
         return cls(app_name, app_module)
 
-    def check_models_ready(self):
-        """
-        Raises an exception if models haven't been imported yet.
-        """
-        if self.models is None:
-            raise AppRegistryNotReady(
-                "Models for app '%s' haven't been imported yet." % self.label)
-
-    def get_model(self, model_name):
+    def get_model(self, model_name, require_ready=True):
         """
         Returns the model with the given case-insensitive model_name.
 
         Raises LookupError if no model exists with this name.
         """
-        self.check_models_ready()
+        if require_ready:
+            self.apps.check_models_ready()
+        else:
+            self.apps.check_apps_ready()
         try:
             return self.models[model_name.lower()]
         except KeyError:
             raise LookupError(
                 "App '%s' doesn't have a '%s' model." % (self.label, model_name))
 
-    def get_models(self, include_auto_created=False,
-                   include_deferred=False, include_swapped=False):
+    def get_models(self, include_auto_created=False, include_swapped=False):
         """
         Returns an iterable of models.
 
@@ -170,28 +177,23 @@ class AppConfig(object):
 
         - auto-created models for many-to-many relations without
           an explicit intermediate table,
-        - models created to satisfy deferred attribute queries,
         - models that have been swapped out.
 
         Set the corresponding keyword argument to True to include such models.
         Keyword arguments aren't documented; they're a private API.
         """
-        self.check_models_ready()
+        self.apps.check_models_ready()
         for model in self.models.values():
-            if model._deferred and not include_deferred:
-                continue
             if model._meta.auto_created and not include_auto_created:
                 continue
             if model._meta.swapped and not include_swapped:
                 continue
             yield model
 
-    def import_models(self, all_models):
+    def import_models(self):
         # Dictionary of models for this app, primarily maintained in the
         # 'all_models' attribute of the Apps this AppConfig is attached to.
-        # Injected as a parameter because it gets populated when models are
-        # imported, which might happen before populate() imports models.
-        self.models = all_models
+        self.models = self.apps.all_models[self.label]
 
         if module_has_submodule(self.module, MODELS_MODULE_NAME):
             models_module_name = '%s.%s' % (self.name, MODELS_MODULE_NAME)

@@ -1,25 +1,23 @@
-from __future__ import unicode_literals
-
-import warnings
+from collections import defaultdict
 
 from django.apps import apps
 from django.db import models
-from django.db.utils import IntegrityError, OperationalError, ProgrammingError
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
 
 class ContentTypeManager(models.Manager):
     use_in_migrations = True
 
-    # Cache to avoid re-looking up ContentType objects all over the place.
-    # This cache is shared by all the get_for_* methods.
-    _cache = {}
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Cache shared by all the get_for_* methods to speed up
+        # ContentType retrieval.
+        self._cache = {}
 
     def get_by_natural_key(self, app_label, model):
         try:
-            ct = self.__class__._cache[self.db][(app_label, model)]
+            ct = self._cache[self.db][(app_label, model)]
         except KeyError:
             ct = self.get(app_label=app_label, model=model)
             self._add_to_cache(self.db, ct)
@@ -28,21 +26,11 @@ class ContentTypeManager(models.Manager):
     def _get_opts(self, model, for_concrete_model):
         if for_concrete_model:
             model = model._meta.concrete_model
-        elif model._deferred:
-            model = model._meta.proxy_for_model
         return model._meta
 
     def _get_from_cache(self, opts):
         key = (opts.app_label, opts.model_name)
-        return self.__class__._cache[self.db][key]
-
-    def create(self, **kwargs):
-        if 'name' in kwargs:
-            del kwargs['name']
-            warnings.warn(
-                "ContentType.name field doesn't exist any longer. Please remove it from your code.",
-                RemovedInDjango20Warning, stacklevel=2)
-        return super(ContentTypeManager, self).create(**kwargs)
+        return self._cache[self.db][key]
 
     def get_for_model(self, model, for_concrete_model=True):
         """
@@ -59,39 +47,29 @@ class ContentTypeManager(models.Manager):
         # The ContentType entry was not found in the cache, therefore we
         # proceed to load or create it.
         try:
-            try:
-                # We start with get() and not get_or_create() in order to use
-                # the db_for_read (see #20401).
-                ct = self.get(app_label=opts.app_label, model=opts.model_name)
-            except self.model.DoesNotExist:
-                # Not found in the database; we proceed to create it.  This time we
-                # use get_or_create to take care of any race conditions.
-                ct, created = self.get_or_create(
-                    app_label=opts.app_label,
-                    model=opts.model_name,
-                )
-        except (OperationalError, ProgrammingError, IntegrityError):
-            # It's possible to migrate a single app before contenttypes,
-            # as it's not a required initial dependency (it's contrib!)
-            # Have a nice error for this.
-            raise RuntimeError(
-                "Error creating new content types. Please make sure contenttypes "
-                "is migrated before trying to migrate apps individually."
+            # Start with get() and not get_or_create() in order to use
+            # the db_for_read (see #20401).
+            ct = self.get(app_label=opts.app_label, model=opts.model_name)
+        except self.model.DoesNotExist:
+            # Not found in the database; we proceed to create it. This time
+            # use get_or_create to take care of any race conditions.
+            ct, created = self.get_or_create(
+                app_label=opts.app_label,
+                model=opts.model_name,
             )
         self._add_to_cache(self.db, ct)
         return ct
 
-    def get_for_models(self, *models, **kwargs):
+    def get_for_models(self, *models, for_concrete_models=True):
         """
         Given *models, returns a dictionary mapping {model: content_type}.
         """
-        for_concrete_models = kwargs.pop('for_concrete_models', True)
-        # Final results
         results = {}
-        # models that aren't already in the cache
+        # Models that aren't already in the cache.
         needed_app_labels = set()
         needed_models = set()
-        needed_opts = set()
+        # Mapping of opts to the list of models requiring it.
+        needed_opts = defaultdict(list)
         for model in models:
             opts = self._get_opts(model, for_concrete_models)
             try:
@@ -99,28 +77,30 @@ class ContentTypeManager(models.Manager):
             except KeyError:
                 needed_app_labels.add(opts.app_label)
                 needed_models.add(opts.model_name)
-                needed_opts.add(opts)
+                needed_opts[opts].append(model)
             else:
                 results[model] = ct
         if needed_opts:
+            # Lookup required content types from the DB.
             cts = self.filter(
                 app_label__in=needed_app_labels,
                 model__in=needed_models
             )
             for ct in cts:
                 model = ct.model_class()
-                if model._meta in needed_opts:
+                opts_models = needed_opts.pop(ct.model_class()._meta, [])
+                for model in opts_models:
                     results[model] = ct
-                    needed_opts.remove(model._meta)
                 self._add_to_cache(self.db, ct)
-        for opts in needed_opts:
-            # These weren't in the cache, or the DB, create them.
+        # Create content types that weren't in the cache or DB.
+        for opts, opts_models in needed_opts.items():
             ct = self.create(
                 app_label=opts.app_label,
                 model=opts.model_name,
             )
             self._add_to_cache(self.db, ct)
-            results[ct.model_class()] = ct
+            for model in opts_models:
+                results[model] = ct
         return results
 
     def get_for_id(self, id):
@@ -129,7 +109,7 @@ class ContentTypeManager(models.Manager):
         (though ContentTypes are obviously not created on-the-fly by get_by_id).
         """
         try:
-            ct = self.__class__._cache[self.db][id]
+            ct = self._cache[self.db][id]
         except KeyError:
             # This could raise a DoesNotExist; that's correct behavior and will
             # make sure that only correct ctypes get stored in the cache dict.
@@ -139,23 +119,19 @@ class ContentTypeManager(models.Manager):
 
     def clear_cache(self):
         """
-        Clear out the content-type cache. This needs to happen during database
-        flushes to prevent caching of "stale" content type IDs (see
-        django.contrib.contenttypes.management.update_contenttypes for where
-        this gets called).
+        Clear out the content-type cache.
         """
-        self.__class__._cache.clear()
+        self._cache.clear()
 
     def _add_to_cache(self, using, ct):
         """Insert a ContentType into the cache."""
         # Note it's possible for ContentType objects to be stale; model_class() will return None.
         # Hence, there is no reliance on model._meta.app_label here, just using the model fields instead.
         key = (ct.app_label, ct.model)
-        self.__class__._cache.setdefault(using, {})[key] = ct
-        self.__class__._cache.setdefault(using, {})[ct.id] = ct
+        self._cache.setdefault(using, {})[key] = ct
+        self._cache.setdefault(using, {})[ct.id] = ct
 
 
-@python_2_unicode_compatible
 class ContentType(models.Model):
     app_label = models.CharField(max_length=100)
     model = models.CharField(_('python model class name'), max_length=100)

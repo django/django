@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django import http
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
@@ -63,9 +61,11 @@ def shortcut(request, content_type_id, object_id):
             for field in obj._meta.fields:
                 if field.remote_field and field.remote_field.model is Site:
                     try:
-                        object_domain = getattr(obj, field.name).domain
+                        site = getattr(obj, field.name)
                     except Site.DoesNotExist:
-                        pass
+                        continue
+                    if site is not None:
+                        object_domain = site.domain
                     if object_domain is not None:
                         break
 

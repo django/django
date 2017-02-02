@@ -7,11 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
-"cy/)\n"
+"Language-Team: Welsh (http://www.transifex.com/django/django/language/cy/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -61,6 +60,9 @@ msgstr "Daneg"
 msgid "German"
 msgstr "Almaeneg"
 
+msgid "Lower Sorbian"
+msgstr ""
+
 msgid "Greek"
 msgstr "Groegedd"
 
@@ -81,6 +83,9 @@ msgstr "Sbaeneg"
 
 msgid "Argentinian Spanish"
 msgstr "Sbaeneg Ariannin"
+
+msgid "Colombian Spanish"
+msgstr ""
 
 msgid "Mexican Spanish"
 msgstr "Sbaeneg Mecsico"
@@ -112,6 +117,9 @@ msgstr "Ffrisieg"
 msgid "Irish"
 msgstr "Gwyddeleg"
 
+msgid "Scottish Gaelic"
+msgstr ""
+
 msgid "Galician"
 msgstr "Galisieg"
 
@@ -123,6 +131,9 @@ msgstr "Hindi"
 
 msgid "Croatian"
 msgstr "Croasieg"
+
+msgid "Upper Sorbian"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Hwngareg"
@@ -184,8 +195,8 @@ msgstr "Marathi"
 msgid "Burmese"
 msgstr "Byrmaneg"
 
-msgid "Norwegian Bokmal"
-msgstr "Bocmal Norwyeg "
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Nepaleg"
@@ -283,9 +294,6 @@ msgstr "Ffeiliau Statig"
 msgid "Syndication"
 msgstr "Syndicetiad"
 
-msgid "Web Design"
-msgstr "Dylunio Gwe"
-
 msgid "Enter a valid value."
 msgstr "Rhowch werth dilys."
 
@@ -303,6 +311,11 @@ msgid ""
 msgstr ""
 "Rhowch 'falwen' dilys yn cynnwys llythrennau, rhifau, tanlinellau neu "
 "cysylltnodau."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
 
 msgid "Enter a valid IPv4 address."
 msgstr "Rhowch gyfeiriad IPv4 dilys."
@@ -369,6 +382,32 @@ msgstr[3] ""
 "Sicrhewch fod gan y gwerth hwn ddim mwy na %(limit_value)d nod (mae ganddo "
 "%(show_value)d)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Sicrhewch nad oes mwy nag %(max)s digid i gyd."
+msgstr[1] "Sicrhewch nad oes mwy na %(max)s ddigid i gyd."
+msgstr[2] "Sicrhewch nad oes mwy na %(max)s digid i gyd."
+msgstr[3] "Sicrhewch nad oes mwy na %(max)s digid i gyd."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Sicrhewch nad oes mwy nag %(max)s lle degol."
+msgstr[1] "Sicrhewch nad oes mwy na %(max)s le degol."
+msgstr[2] "Sicrhewch nad oes mwy na %(max)s lle degol."
+msgstr[3] "Sicrhewch nad oes mwy na %(max)s lle degol."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "Sicrhewch nad oes mwy nag %(max)s digid cyn y pwynt degol."
+msgstr[1] "Sicrhewch nad oes mwy na %(max)s ddigid cyn y pwynt degol."
+msgstr[2] "Sicrhewch nad oes mwy na %(max)s digid cyn y pwynt degol."
+msgstr[3] "Sicrhewch nad oes mwy na %(max)s digid cyn y pwynt degol."
+
 msgid "and"
 msgstr "a"
 
@@ -407,6 +446,9 @@ msgstr "cyfanrif"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr "Rhaid i'r gwerth '%(value)s' fod yn gyfanrif."
+
+msgid "Big (8 byte) integer"
+msgstr "Cyfanrif mawr (8 beit)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -489,9 +531,6 @@ msgstr "Rhaid i '%(value)s' fod yn rif pwynt arnawf."
 msgid "Floating point number"
 msgstr "Rhif pwynt symudol"
 
-msgid "Big (8 byte) integer"
-msgstr "Cyfanrif mawr (8 beit)"
-
 msgid "IPv4 address"
 msgstr "Cyfeiriad IPv4"
 
@@ -566,8 +605,22 @@ msgstr "Allwedd Estron (math yn ddibynol ar y maes cysylltiedig)"
 msgid "One-to-one relationship"
 msgstr "Perthynas un-i-un"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
 msgid "Many-to-many relationship"
 msgstr "Perthynas llawer-i-lawer"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "Mae angen y maes hwn."
@@ -577,32 +630,6 @@ msgstr "Rhowch cyfanrif."
 
 msgid "Enter a number."
 msgstr "Rhowch rif."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Sicrhewch nad oes mwy nag %(max)s digid i gyd."
-msgstr[1] "Sicrhewch nad oes mwy na %(max)s ddigid i gyd."
-msgstr[2] "Sicrhewch nad oes mwy na %(max)s digid i gyd."
-msgstr[3] "Sicrhewch nad oes mwy na %(max)s digid i gyd."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Sicrhewch nad oes mwy nag %(max)s lle degol."
-msgstr[1] "Sicrhewch nad oes mwy na %(max)s le degol."
-msgstr[2] "Sicrhewch nad oes mwy na %(max)s lle degol."
-msgstr[3] "Sicrhewch nad oes mwy na %(max)s lle degol."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "Sicrhewch nad oes mwy nag %(max)s digid cyn y pwynt degol."
-msgstr[1] "Sicrhewch nad oes mwy na %(max)s ddigid cyn y pwynt degol."
-msgstr[2] "Sicrhewch nad oes mwy na %(max)s digid cyn y pwynt degol."
-msgstr[3] "Sicrhewch nad oes mwy na %(max)s digid cyn y pwynt degol."
 
 msgid "Enter a valid date."
 msgstr "Rhif ddyddiad dilys."
@@ -670,12 +697,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Maes cudd %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "Mae data ManagementForm ar goll neu mae rhywun wedi ymyrryd ynddo"

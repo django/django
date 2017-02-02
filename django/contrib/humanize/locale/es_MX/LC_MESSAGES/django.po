@@ -2,14 +2,15 @@
 #
 # Translators:
 # Abraham Estrada <abraham.estrada@gmail.com>, 2011-2012
+# Alex Dzul <alexexc2@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:12+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Spanish (Mexico) (http://www.transifex.com/projects/p/django/"
+"PO-Revision-Date: 2015-12-30 19:27+0000\n"
+"Last-Translator: Alex Dzul <alexexc2@gmail.com>\n"
+"Language-Team: Spanish (Mexico) (http://www.transifex.com/django/django/"
 "language/es_MX/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -221,16 +222,16 @@ msgstr[1] ""
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "hace un minuto"
+msgstr[1] "Hace %(count)s minutos"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "hace una hora"
+msgstr[1] "Hace %(count)s horas"
 
 #, python-format
 msgctxt "naturaltime"

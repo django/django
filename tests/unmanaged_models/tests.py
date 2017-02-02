@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db import connection
 from django.test import TestCase
 
@@ -12,14 +10,14 @@ class SimpleTests(TestCase):
         """
         The main test here is that the all the models can be created without
         any database errors. We can also do some more simple insertion and
-        lookup tests whilst we're here to show that the second of models do
+        lookup tests while we're here to show that the second of models do
         refer to the tables from the first set.
         """
         # Insert some data into one set of models.
         a = A01.objects.create(f_a="foo", f_b=42)
         B01.objects.create(fk_a=a, f_a="fred", f_b=1729)
         c = C01.objects.create(f_a="barney", f_b=1)
-        c.mm_a = [a]
+        c.mm_a.set([a])
 
         # ... and pull it out via the other set.
         a2 = A02.objects.all()[0]

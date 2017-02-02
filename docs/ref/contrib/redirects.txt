@@ -18,7 +18,7 @@ To install the redirects app, follow these steps:
    :ref:`is installed <enabling-the-sites-framework>`.
 2. Add ``'django.contrib.redirects'`` to your :setting:`INSTALLED_APPS` setting.
 3. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
-   to your :setting:`MIDDLEWARE_CLASSES` setting.
+   to your :setting:`MIDDLEWARE` setting.
 4. Run the command :djadmin:`manage.py migrate <migrate>`.
 
 How it works
@@ -49,9 +49,9 @@ given ``old_path`` with a site ID that corresponds to the
 The middleware only gets activated for 404s -- not for 500s or responses of any
 other status code.
 
-Note that the order of :setting:`MIDDLEWARE_CLASSES` matters. Generally, you
-can put :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
-at the end of the list, because it's a last resort.
+Note that the order of :setting:`MIDDLEWARE` matters. Generally, you can put
+:class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware` at the
+end of the list, because it's a last resort.
 
 For more on middleware, read the :doc:`middleware docs
 </topics/http/middleware>`.

@@ -1,6 +1,3 @@
-
-.. _index:
-
 ====================
 Django documentation
 ====================
@@ -25,11 +22,34 @@ Having trouble? We'd like to help!
 
 * Report bugs with Django in our `ticket tracker`_.
 
-.. _archives: http://groups.google.com/group/django-users/
+.. _archives: https://groups.google.com/group/django-users/
 .. _post a question: https://groups.google.com/d/forum/django-users
 .. _#django IRC channel: irc://irc.freenode.net/django
 .. _IRC logs: http://django-irc-logs.com/
 .. _ticket tracker: https://code.djangoproject.com/
+
+How the documentation is organized
+==================================
+
+Django has a lot of documentation. A high-level overview of how it's organized
+will help you know where to look for certain things:
+
+* :doc:`Tutorials </intro/index>` take you by the hand through a series of
+  steps to create a Web application. Start here if you're new to Django or Web
+  application development. Also look at the ":ref:`index-first-steps`" below.
+
+* :doc:`Topic guides </topics/index>` discuss key topics and concepts at a
+  fairly high level and provide useful background information and explanation.
+
+* :doc:`Reference guides </ref/index>` contain technical reference for APIs and
+  other aspects of Django's machinery. They describe how it works and how to
+  use it but assume that you have a basic understanding of key concepts.
+
+* :doc:`How-to guides </howto/index>` are recipes. They guide you through the
+  steps involved in addressing key problems and use-cases. They are more
+  advanced than tutorials and assume some knowledge of how Django works.
+
+.. _index-first-steps:
 
 First steps
 ===========
@@ -41,12 +61,13 @@ Are you new to Django or to programming? This is the place to start!
   :doc:`Installation <intro/install>`
 
 * **Tutorial:**
-  :doc:`Part 1: Models <intro/tutorial01>` |
-  :doc:`Part 2: The admin site <intro/tutorial02>` |
+  :doc:`Part 1: Requests and responses <intro/tutorial01>` |
+  :doc:`Part 2: Models and the admin site <intro/tutorial02>` |
   :doc:`Part 3: Views and templates <intro/tutorial03>` |
   :doc:`Part 4: Forms and generic views <intro/tutorial04>` |
   :doc:`Part 5: Testing <intro/tutorial05>` |
-  :doc:`Part 6: Static files <intro/tutorial06>`
+  :doc:`Part 6: Static files <intro/tutorial06>` |
+  :doc:`Part 7: Customizing the admin site <intro/tutorial07>`
 
 * **Advanced Tutorials:**
   :doc:`How to write reusable apps <intro/reusable-apps>` |
@@ -59,8 +80,9 @@ Django provides an abstraction layer (the "models") for structuring and
 manipulating the data of your Web application. Learn more about it below:
 
 * **Models:**
-  :doc:`Model syntax <topics/db/models>` |
+  :doc:`Introduction to models <topics/db/models>` |
   :doc:`Field types <ref/models/fields>` |
+  :doc:`Indexes <ref/models/indexes>` |
   :doc:`Meta options <ref/models/options>` |
   :doc:`Model class <ref/models/class>`
 
@@ -84,6 +106,7 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Raw SQL <topics/db/sql>` |
   :doc:`Transactions <topics/db/transactions>` |
   :doc:`Aggregation <topics/db/aggregation>` |
+  :doc:`Search <topics/db/search>` |
   :doc:`Custom fields <howto/custom-model-fields>` |
   :doc:`Multiple databases <topics/db/multi-db>` |
   :doc:`Custom lookups <howto/custom-lookups>` |
@@ -259,7 +282,6 @@ Django aims to be compatible with multiple different flavors and versions of
 Python:
 
 * :doc:`Jython support <howto/jython>`
-* :doc:`Python 3 compatibility <topics/python3>`
 
 Geographic framework
 ====================
@@ -274,7 +296,12 @@ Common Web application tools
 Django offers multiple tools commonly needed in the development of Web
 applications:
 
-* :doc:`Authentication <topics/auth/index>`
+* **Authentication:**
+  :doc:`Overview <topics/auth/index>` |
+  :doc:`Using the authentication system <topics/auth/default>` |
+  :doc:`Password management <topics/auth/passwords>` |
+  :doc:`Customizing authentication <topics/auth/customizing>` |
+  :doc:`API Reference <ref/contrib/auth>`
 * :doc:`Caching <topics/cache>`
 * :doc:`Logging <topics/logging>`
 * :doc:`Sending emails <topics/email>`

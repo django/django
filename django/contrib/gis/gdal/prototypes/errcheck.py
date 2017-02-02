@@ -8,7 +8,6 @@ from django.contrib.gis.gdal.error import (
     GDALException, SRSException, check_err,
 )
 from django.contrib.gis.gdal.libgdal import lgdal
-from django.utils import six
 
 
 # Helper routines for retrieving pointers and/or values from
@@ -79,7 +78,7 @@ def check_geom(result, func, cargs):
     "Checks a function that returns a geometry."
     # OGR_G_Clone may return an integer, even though the
     # restype is set to c_void_p
-    if isinstance(result, six.integer_types):
+    if isinstance(result, int):
         result = c_void_p(result)
     if not result:
         raise GDALException('Invalid geometry pointer returned from "%s".' % func.__name__)
@@ -95,7 +94,7 @@ def check_geom_offset(result, func, cargs, offset=-1):
 
 # ### Spatial Reference error-checking routines ###
 def check_srs(result, func, cargs):
-    if isinstance(result, six.integer_types):
+    if isinstance(result, int):
         result = c_void_p(result)
     if not result:
         raise SRSException('Invalid spatial reference pointer returned from "%s".' % func.__name__)
@@ -121,7 +120,7 @@ def check_errcode(result, func, cargs, cpl=False):
 
 def check_pointer(result, func, cargs):
     "Makes sure the result pointer is valid."
-    if isinstance(result, six.integer_types):
+    if isinstance(result, int):
         result = c_void_p(result)
     if result:
         return result

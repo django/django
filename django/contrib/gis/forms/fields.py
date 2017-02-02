@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django import forms
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.utils.translation import ugettext_lazy as _
@@ -24,12 +22,11 @@ class GeometryField(forms.Field):
                              'to the SRID of the geometry form field.'),
     }
 
-    def __init__(self, **kwargs):
-        # Pop out attributes from the database field, or use sensible
-        # defaults (e.g., allow None).
-        self.srid = kwargs.pop('srid', None)
-        self.geom_type = kwargs.pop('geom_type', self.geom_type)
-        super(GeometryField, self).__init__(**kwargs)
+    def __init__(self, *, srid=None, geom_type=None, **kwargs):
+        self.srid = srid
+        if geom_type is not None:
+            self.geom_type = geom_type
+        super().__init__(**kwargs)
         self.widget.attrs['geom_type'] = self.geom_type
 
     def to_python(self, value):
@@ -60,7 +57,7 @@ class GeometryField(forms.Field):
         object (which is returned).  A ValidationError is raised if
         the value cannot be instantiated as a Geometry.
         """
-        geom = super(GeometryField, self).clean(value)
+        geom = super().clean(value)
         if geom is None:
             return geom
 

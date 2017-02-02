@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Emil <bmachaku@gmail.com>, 2013-2014
+# Machaku <bmachaku@gmail.com>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:12+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 10:11+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Swahili (http://www.transifex.com/django/django/language/"
 "sw/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -113,8 +113,8 @@ msgstr[1] "Kumbuka: Uko masaa %s nyuma ukilinganisha na majira ya seva"
 msgid "Now"
 msgstr "Sasa"
 
-msgid "Clock"
-msgstr "Saa"
+msgid "Choose a Time"
+msgstr ""
 
 msgid "Choose a time"
 msgstr "Chagua wakati"
@@ -128,14 +128,17 @@ msgstr "Saa 12 alfajiri"
 msgid "Noon"
 msgstr "Adhuhuri"
 
+msgid "6 p.m."
+msgstr ""
+
 msgid "Cancel"
 msgstr "Ghairi"
 
 msgid "Today"
 msgstr "Leo"
 
-msgid "Calendar"
-msgstr "Kalenda"
+msgid "Choose a Date"
+msgstr ""
 
 msgid "Yesterday"
 msgstr "Jana"
@@ -143,15 +146,69 @@ msgstr "Jana"
 msgid "Tomorrow"
 msgstr "Kesho"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
+msgid "January"
 msgstr ""
-"Januari Februari Machi Aprili Mei Juni Julai Agosti Septemba Oktoba Novemba "
-"Desemba"
 
-msgid "S M T W T F S"
-msgstr "J2 J3 J4 J5 IJ JM JP"
+msgid "February"
+msgstr ""
+
+msgid "March"
+msgstr ""
+
+msgid "April"
+msgstr ""
+
+msgid "May"
+msgstr ""
+
+msgid "June"
+msgstr ""
+
+msgid "July"
+msgstr ""
+
+msgid "August"
+msgstr ""
+
+msgid "September"
+msgstr ""
+
+msgid "October"
+msgstr ""
+
+msgid "November"
+msgstr ""
+
+msgid "December"
+msgstr ""
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr ""
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr ""
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr ""
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr ""
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr ""
 
 msgid "Show"
 msgstr "Onesha"

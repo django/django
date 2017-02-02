@@ -4,14 +4,15 @@
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # quantum9876 <quantum9876@gmail.com>, 2011
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/django/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-08-19 08:04+0000\n"
+"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,7 +24,7 @@ msgid "Advanced options"
 msgstr "進階選項"
 
 msgid "Flat Pages"
-msgstr ""
+msgstr "簡平頁面"
 
 msgid "URL"
 msgstr "URL"
@@ -72,6 +73,9 @@ msgstr "請先註冊"
 
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr "如果此項被選取，則只有登入的使用者可以檢視頁面。"
+
+msgid "sites"
+msgstr "網站"
 
 msgid "flat page"
 msgstr "簡平頁面"

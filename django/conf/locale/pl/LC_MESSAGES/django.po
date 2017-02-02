@@ -2,6 +2,7 @@
 #
 # Translators:
 # sidewinder <adam.klosiu@gmail.com>, 2014
+# Adam Stachowicz <saibamenppl@gmail.com>, 2015
 # angularcircle, 2011,2013
 # angularcircle, 2011,2013
 # angularcircle, 2014
@@ -13,7 +14,8 @@
 # konryd <inactive+konryd@transifex.com>, 2011
 # konryd <inactive+konryd@transifex.com>, 2011
 # Łukasz Rekucki <lrekucki@gmail.com>, 2011
-# Maciek Olko <maciej.olko@gmail.com>, 2015
+# m_aciek <maciej.olko@gmail.com>, 2016
+# m_aciek <maciej.olko@gmail.com>, 2015
 # Michał Pasternak <michal.dtz@gmail.com>, 2013
 # p <inactive+poczciwiec@transifex.com>, 2012
 # Piotr Meuś <piotr.meus@gmail.com>, 2014
@@ -27,11 +29,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-20 22:21+0000\n"
-"Last-Translator: Maciek Olko <maciej.olko@gmail.com>\n"
-"Language-Team: Polish (http://www.transifex.com/projects/p/django/language/"
-"pl/)\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-08-09 13:26+0000\n"
+"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
+"Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -40,7 +41,7 @@ msgstr ""
 "|| n%100>=20) ? 1 : 2);\n"
 
 msgid "Afrikaans"
-msgstr "afryknerski"
+msgstr "afrykanerski"
 
 msgid "Arabic"
 msgstr "arabski"
@@ -81,6 +82,9 @@ msgstr "duński"
 msgid "German"
 msgstr "niemiecki"
 
+msgid "Lower Sorbian"
+msgstr "dolnołużycki"
+
 msgid "Greek"
 msgstr "grecki"
 
@@ -88,7 +92,7 @@ msgid "English"
 msgstr "angielski"
 
 msgid "Australian English"
-msgstr "Australijski Angielski"
+msgstr "australijski angielski"
 
 msgid "British English"
 msgstr "angielski brytyjski"
@@ -101,6 +105,9 @@ msgstr "hiszpański"
 
 msgid "Argentinian Spanish"
 msgstr "hiszpański argentyński"
+
+msgid "Colombian Spanish"
+msgstr "Kolumbijczyk hiszpański"
 
 msgid "Mexican Spanish"
 msgstr "hiszpański meksykański"
@@ -132,6 +139,9 @@ msgstr "fryzyjski"
 msgid "Irish"
 msgstr "irlandzki"
 
+msgid "Scottish Gaelic"
+msgstr "Szkocki gaelicki"
+
 msgid "Galician"
 msgstr "galicyjski"
 
@@ -143,6 +153,9 @@ msgstr "hindi"
 
 msgid "Croatian"
 msgstr "chorwacki"
+
+msgid "Upper Sorbian"
+msgstr "górnołużycki"
 
 msgid "Hungarian"
 msgstr "węgierski"
@@ -204,8 +217,8 @@ msgstr "marathi"
 msgid "Burmese"
 msgstr "birmański"
 
-msgid "Norwegian Bokmal"
-msgstr "norweski (Bokmal)"
+msgid "Norwegian Bokmål"
+msgstr "norweski (bokmål)"
 
 msgid "Nepali"
 msgstr "nepalski"
@@ -303,9 +316,6 @@ msgstr "Pliki statyczne"
 msgid "Syndication"
 msgstr "Syndykacja treści"
 
-msgid "Web Design"
-msgstr "Projektowanie stron"
-
 msgid "Enter a valid value."
 msgstr "Wpisz poprawną wartość."
 
@@ -321,6 +331,13 @@ msgstr "Wprowadź poprawny adres email."
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "To pole może zawierać jedynie litery, cyfry, podkreślenia i myślniki."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Poprawna wartość składa się z poprawnych liter alfabetu unicode, cyfr, "
+"podkreśleń lub myślników."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Wprowadź poprawny adres IPv4."
@@ -380,6 +397,34 @@ msgstr[2] ""
 "Upewnij się, że ta wartość ma co najwyżej %(limit_value)d znaków (obecnie ma "
 "%(show_value)d)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Upewnij się, że jest nie więcej niż %(max)s cyfra."
+msgstr[1] "Upewnij się, że jest nie więcej niż %(max)s cyfr."
+msgstr[2] "Upewnij się, że jest nie więcej niż %(max)s cyfr."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+"Upewnij się, że liczba ma nie więcej niż %(max)s cyfrę po przecinku."
+msgstr[1] ""
+"Upewnij się, że liczba ma nie więcej niż %(max)s cyfry po przecinku."
+msgstr[2] "Upewnij się, że liczba ma nie więcej niż %(max)s cyfr po przecinku."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Upewnij się, że liczba ma nie więcej niż %(max)s cyfrę przed przecinkiem."
+msgstr[1] ""
+"Upewnij się, że liczba ma nie więcej niż %(max)s cyfry przed przecinkiem."
+msgstr[2] ""
+"Upewnij się, że liczba ma nie więcej niż %(max)s cyfr przed przecinkiem."
+
 msgid "and"
 msgstr "i"
 
@@ -420,6 +465,9 @@ msgstr "Liczba całkowita"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr "wartość '%(value)s' musi być liczbą całkowitą."
+
+msgid "Big (8 byte) integer"
+msgstr "Duża liczba całkowita (8 bajtów)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -503,9 +551,6 @@ msgstr "wartość '%(value)s' musi być liczbą zmiennoprzecinkową."
 msgid "Floating point number"
 msgstr "Liczba zmiennoprzecinkowa"
 
-msgid "Big (8 byte) integer"
-msgstr "Duża liczba całkowita (8 bajtów)"
-
 msgid "IPv4 address"
 msgstr "adres IPv4"
 
@@ -580,8 +625,22 @@ msgstr "Klucz obcy (typ określony przez pole powiązane)"
 msgid "One-to-one relationship"
 msgstr "Powiązanie jeden do jednego"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "powiązanie %(from)s do %(to)s"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "powiązania %(from)s do %(to)s"
+
 msgid "Many-to-many relationship"
 msgstr "Powiązanie wiele do wiele"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "To pole jest wymagane."
@@ -591,34 +650,6 @@ msgstr "Wpisz liczbę całkowitą."
 
 msgid "Enter a number."
 msgstr "Wpisz liczbę."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Upewnij się, że jest nie więcej niż %(max)s cyfra."
-msgstr[1] "Upewnij się, że jest nie więcej niż %(max)s cyfr."
-msgstr[2] "Upewnij się, że jest nie więcej niż %(max)s cyfr."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-"Upewnij się, że liczba ma nie więcej niż %(max)s cyfrę po przecinku."
-msgstr[1] ""
-"Upewnij się, że liczba ma nie więcej niż %(max)s cyfry po przecinku."
-msgstr[2] "Upewnij się, że liczba ma nie więcej niż %(max)s cyfr po przecinku."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-"Upewnij się, że liczba ma nie więcej niż %(max)s cyfrę przed przecinkiem."
-msgstr[1] ""
-"Upewnij się, że liczba ma nie więcej niż %(max)s cyfry przed przecinkiem."
-msgstr[2] ""
-"Upewnij się, że liczba ma nie więcej niż %(max)s cyfr przed przecinkiem."
 
 msgid "Enter a valid date."
 msgstr "Wpisz poprawną datę."
@@ -687,12 +718,6 @@ msgstr ":"
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Ukryte pole %(name)s) %(error)s"
 
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
-
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "Brakuje danych ManagementForm lub zostały one zmodyfikowane."
 
@@ -743,7 +768,7 @@ msgstr "Wybierz poprawną wartość. Podana nie jest jednym z dostępnych wybor�
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" nie jest poprawną wartością klucza głównego."
+msgstr "„%(pk)s” nie jest poprawną wartością klucza głównego."
 
 #, python-format
 msgid ""
@@ -1111,9 +1136,9 @@ msgid ""
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
-"Jeżeli nagłówki \"Referer\" w Twojej przeglądarce są wyłączone, to proszę "
+"Jeżeli nagłówki „Referer” w Twojej przeglądarce są wyłączone, to proszę "
 "włącz je ponownie. Przynajmniej dla tej strony, połączeń HTTPS lub zapytań "
-"typu \"same-origin\"."
+"typu „same-origin”."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1130,7 +1155,7 @@ msgid ""
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
 "Jeżeli ciasteczka w Twojej przeglądarce są wyłączone, to proszę włącz je "
-"ponownie. Przynajmniej dla tej strony lub żadań typu \"same-origin\"."
+"ponownie. Przynajmniej dla tej strony lub żadań typu „same-origin”."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Więcej informacji jest dostępnych po ustawieniu DEBUG=True."

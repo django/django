@@ -1,18 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Chen Chun-Chia <ccc.larc@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mail6543210 <mail6543210@yahoo.com.tw>, 2013
 # quantum9876 <quantum9876@gmail.com>, 2011
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/django/"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-08-30 09:33+0000\n"
+"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,7 +23,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "管理文件"
 
 msgid "Home"
 msgstr "首頁"
@@ -36,19 +38,12 @@ msgid "Documentation bookmarklets"
 msgstr "文件 bookmarklets"
 
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
+"click the link and add it to your bookmarks. Now you can select the "
+"bookmarklet from any page in the site."
 msgstr ""
-"\n"
-"<p class=\"help\">要安裝 bookmarklet，把連結拖進你的書籤工具列，或右擊該連結"
-"後新增到你的書籤裡。現在你可以從網站的任何頁面來選擇 bookmarklet。注意其中某"
-"些 bookmarklet 要求你必須是從被稱為 \"內部\" 的電腦來檢視網站的 (如果你不確定"
-"你的電腦是否在 \"內部\"，那就和你的系統管理員談談)。</p>\n"
+"要安裝 bookmarklet，把連結拖進你的書籤工具列，或右擊該連結後新增到你的書籤"
+"裡。現在你可以從網站的任何頁面來選擇 bookmarklet。"
 
 msgid "Documentation for this page"
 msgstr "本頁面的文件"
@@ -58,31 +53,11 @@ msgid ""
 "that page."
 msgstr "讓你跳到用來產生該頁面之檢視的任何一頁文件。"
 
-msgid "Show object ID"
-msgstr "顯示物件 ID"
-
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr "顯示用來表示單一物件的頁面 content-type 與唯一 ID。"
-
-msgid "Edit this object (current window)"
-msgstr "編輯此物件 (目前視窗)"
-
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "跳到用來表示單一物件的管理頁面。"
-
-msgid "Edit this object (new window)"
-msgstr "編輯此物件 (新視窗)"
-
-msgid "As above, but opens the admin page in a new window."
-msgstr "同上，但在新視窗裡開啟管理頁面。"
-
 msgid "Tags"
 msgstr "標籤"
 
 msgid "List of all the template tags and their functions."
-msgstr ""
+msgstr "列出所有模板標籤與其函數"
 
 msgid "Filters"
 msgstr "過濾器"
@@ -111,73 +86,86 @@ msgid ""
 msgstr ""
 
 msgid "Tools for your browser to quickly access admin functionality."
-msgstr ""
+msgstr "方便使用管理功能的瀏覽器工具。"
 
 msgid "Please install docutils"
-msgstr ""
+msgstr "請安裝 docutils"
 
 #, python-format
 msgid ""
 "The admin documentation system requires Python's <a href=\"%(link)s"
 "\">docutils</a> library."
-msgstr ""
+msgstr "管理文件系統需要 Python 的 <a href=\"%(link)s\">docutils</a> 函式庫。"
 
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
-msgstr ""
+msgstr "請要求您的管理員安裝 <a href=\"%(link)s\">docutils</a>。"
 
 #, python-format
 msgid "Model: %(name)s"
-msgstr ""
+msgstr "模型：%(name)s"
+
+msgid "Fields"
+msgstr "欄位"
 
 msgid "Field"
-msgstr ""
+msgstr "欄位"
 
 msgid "Type"
-msgstr ""
+msgstr "類別"
 
 msgid "Description"
+msgstr "描述"
+
+msgid "Methods with arguments"
 msgstr ""
 
-msgid "Back to Model Documentation"
-msgstr ""
+msgid "Method"
+msgstr "方法"
+
+msgid "Arguments"
+msgstr "參數"
+
+msgid "Back to Model documentation"
+msgstr "回到模型文件"
 
 msgid "Model documentation"
-msgstr ""
+msgstr "模型文件"
 
 msgid "Model groups"
-msgstr ""
+msgstr "模型群組"
 
 msgid "Templates"
 msgstr "模版"
 
 #, python-format
 msgid "Template: %(name)s"
-msgstr ""
+msgstr "模版：%(name)s"
 
 #, python-format
 msgid "Template: \"%(name)s\""
-msgstr ""
+msgstr "模版：\"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
-msgstr ""
+msgstr "搜尋模板「%(name)s」的路徑："
 
 msgid "(does not exist)"
-msgstr ""
+msgstr "(不存在)"
 
 msgid "Back to Documentation"
-msgstr ""
+msgstr "回到文件"
 
 msgid "Template filters"
-msgstr ""
+msgstr "模板過濾器"
 
 msgid "Template filter documentation"
-msgstr ""
+msgstr "模板過濾器文件"
 
 msgid "Built-in filters"
-msgstr ""
+msgstr "內建過濾器"
 
 #, python-format
 msgid ""
@@ -186,13 +174,13 @@ msgid ""
 msgstr ""
 
 msgid "Template tags"
-msgstr ""
+msgstr "模版標籤"
 
 msgid "Template tag documentation"
-msgstr ""
+msgstr "模板標籤文件"
 
 msgid "Built-in tags"
-msgstr ""
+msgstr "內建標籤"
 
 #, python-format
 msgid ""
@@ -202,32 +190,32 @@ msgstr ""
 
 #, python-format
 msgid "View: %(name)s"
-msgstr ""
+msgstr "視圖：%(name)s"
 
 msgid "Context:"
 msgstr ""
 
 msgid "Templates:"
-msgstr ""
+msgstr "模版："
 
-msgid "Back to Views Documentation"
-msgstr ""
+msgid "Back to View documentation"
+msgstr "回到視圖文件"
 
 msgid "View documentation"
-msgstr ""
+msgstr "視圖文件"
 
 msgid "Jump to namespace"
-msgstr ""
+msgstr "跳至名稱空間"
 
 msgid "Empty namespace"
-msgstr ""
+msgstr "空的名稱空間"
 
 #, python-format
 msgid "Views by namespace %(name)s"
-msgstr ""
+msgstr "名稱空間 %(name)s 之視圖"
 
 msgid "Views by empty namespace"
-msgstr ""
+msgstr "空名稱空間之視圖"
 
 #, python-format
 msgid ""
@@ -235,6 +223,8 @@ msgid ""
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
+"\n"
+"視圖函式：<code>%(full_name)s</code>，名稱：<code>%(url_name)s</code>\n"
 
 msgid "Boolean (Either True or False)"
 msgstr "布林值 (True 或 False)"
@@ -254,7 +244,7 @@ msgstr "視圖："
 
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr ""
+msgstr "找不到 App %(app_label)r"
 
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"

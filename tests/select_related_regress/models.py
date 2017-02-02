@@ -1,10 +1,6 @@
-from __future__ import unicode_literals
-
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Building(models.Model):
     name = models.CharField(max_length=10)
 
@@ -12,29 +8,35 @@ class Building(models.Model):
         return "Building: %s" % self.name
 
 
-@python_2_unicode_compatible
 class Device(models.Model):
-    building = models.ForeignKey('Building')
+    building = models.ForeignKey('Building', models.CASCADE)
     name = models.CharField(max_length=10)
 
     def __str__(self):
         return "device '%s' in building %s" % (self.name, self.building)
 
 
-@python_2_unicode_compatible
 class Port(models.Model):
-    device = models.ForeignKey('Device')
+    device = models.ForeignKey('Device', models.CASCADE)
     port_number = models.CharField(max_length=10)
 
     def __str__(self):
         return "%s/%s" % (self.device.name, self.port_number)
 
 
-@python_2_unicode_compatible
 class Connection(models.Model):
-    start = models.ForeignKey(Port, related_name='connection_start',
-            unique=True)
-    end = models.ForeignKey(Port, related_name='connection_end', unique=True)
+    start = models.ForeignKey(
+        Port,
+        models.CASCADE,
+        related_name='connection_start',
+        unique=True,
+    )
+    end = models.ForeignKey(
+        Port,
+        models.CASCADE,
+        related_name='connection_end',
+        unique=True,
+    )
 
     def __str__(self):
         return "%s to %s" % (self.start, self.end)
@@ -48,24 +50,24 @@ class TUser(models.Model):
 
 
 class Person(models.Model):
-    user = models.ForeignKey(TUser, unique=True)
+    user = models.ForeignKey(TUser, models.CASCADE, unique=True)
 
 
 class Organizer(models.Model):
-    person = models.ForeignKey(Person)
+    person = models.ForeignKey(Person, models.CASCADE)
 
 
 class Student(models.Model):
-    person = models.ForeignKey(Person)
+    person = models.ForeignKey(Person, models.CASCADE)
 
 
 class Class(models.Model):
-    org = models.ForeignKey(Organizer)
+    org = models.ForeignKey(Organizer, models.CASCADE)
 
 
 class Enrollment(models.Model):
-    std = models.ForeignKey(Student)
-    cls = models.ForeignKey(Class)
+    std = models.ForeignKey(Student, models.CASCADE)
+    cls = models.ForeignKey(Class, models.CASCADE)
 
 # Models for testing bug #8036.
 
@@ -76,7 +78,7 @@ class Country(models.Model):
 
 class State(models.Model):
     name = models.CharField(max_length=50)
-    country = models.ForeignKey(Country)
+    country = models.ForeignKey(Country, models.CASCADE)
 
 
 class ClientStatus(models.Model):
@@ -85,8 +87,8 @@ class ClientStatus(models.Model):
 
 class Client(models.Model):
     name = models.CharField(max_length=50)
-    state = models.ForeignKey(State, null=True)
-    status = models.ForeignKey(ClientStatus)
+    state = models.ForeignKey(State, models.SET_NULL, null=True)
+    status = models.ForeignKey(ClientStatus, models.CASCADE)
 
 
 class SpecialClient(Client):
@@ -95,7 +97,6 @@ class SpecialClient(Client):
 # Some model inheritance exercises
 
 
-@python_2_unicode_compatible
 class Parent(models.Model):
     name = models.CharField(max_length=10)
 
@@ -107,10 +108,9 @@ class Child(Parent):
     value = models.IntegerField()
 
 
-@python_2_unicode_compatible
 class Item(models.Model):
     name = models.CharField(max_length=10)
-    child = models.ForeignKey(Child, null=True)
+    child = models.ForeignKey(Child, models.SET_NULL, null=True)
 
     def __str__(self):
         return self.name
@@ -118,7 +118,6 @@ class Item(models.Model):
 # Models for testing bug #19870.
 
 
-@python_2_unicode_compatible
 class Fowl(models.Model):
     name = models.CharField(max_length=10)
 
@@ -131,7 +130,7 @@ class Hen(Fowl):
 
 
 class Chick(Fowl):
-    mother = models.ForeignKey(Hen)
+    mother = models.ForeignKey(Hen, models.CASCADE)
 
 
 class Base(models.Model):
@@ -151,6 +150,6 @@ class B(Base):
 
 
 class C(Base):
-    c_a = models.ForeignKey(A)
-    c_b = models.ForeignKey(B)
+    c_a = models.ForeignKey(A, models.CASCADE)
+    c_b = models.ForeignKey(B, models.CASCADE)
     is_published = models.BooleanField(default=False)

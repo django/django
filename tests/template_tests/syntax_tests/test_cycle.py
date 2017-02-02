@@ -1,35 +1,15 @@
 from django.template import TemplateSyntaxError
-from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.test import SimpleTestCase
 
 from ..utils import setup
 
 
 class CycleTagTests(SimpleTestCase):
-    libraries = {'future': 'django.templatetags.future'}
 
     @setup({'cycle01': '{% cycle a %}'})
     def test_cycle01(self):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.get_template('cycle01')
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @setup({'cycle02': '{% cycle a,b,c as abc %}{% cycle abc %}'})
-    def test_cycle02(self):
-        output = self.engine.render_to_string('cycle02')
-        self.assertEqual(output, 'ab')
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @setup({'cycle03': '{% cycle a,b,c as abc %}{% cycle abc %}{% cycle abc %}'})
-    def test_cycle03(self):
-        output = self.engine.render_to_string('cycle03')
-        self.assertEqual(output, 'abc')
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @setup({'cycle04': '{% cycle a,b,c as abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}'})
-    def test_cycle04(self):
-        output = self.engine.render_to_string('cycle04')
-        self.assertEqual(output, 'abca')
 
     @setup({'cycle05': '{% cycle %}'})
     def test_cycle05(self):
@@ -41,23 +21,10 @@ class CycleTagTests(SimpleTestCase):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.get_template('cycle06')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
     @setup({'cycle07': '{% cycle a,b,c as foo %}{% cycle bar %}'})
     def test_cycle07(self):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.get_template('cycle07')
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @setup({'cycle08': '{% cycle a,b,c as foo %}{% cycle foo %}{{ foo }}{{ foo }}{% cycle foo %}{{ foo }}'})
-    def test_cycle08(self):
-        output = self.engine.render_to_string('cycle08')
-        self.assertEqual(output, 'abbbcc')
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @setup({'cycle09': '{% for i in test %}{% cycle a,b %}{{ i }},{% endfor %}'})
-    def test_cycle09(self):
-        output = self.engine.render_to_string('cycle09', {'test': list(range(5))})
-        self.assertEqual(output, 'a0,b1,a2,b3,a4,')
 
     @setup({'cycle10': "{% cycle 'a' 'b' 'c' as abc %}{% cycle abc %}"})
     def test_cycle10(self):
@@ -146,21 +113,57 @@ class CycleTagTests(SimpleTestCase):
         output = self.engine.render_to_string('cycle25', {'a': '<'})
         self.assertEqual(output, '&lt;')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @setup({'cycle26': '{% load cycle from future %}{% cycle a b as ab %}{% cycle ab %}'})
+    @setup({'cycle26': '{% cycle a b as ab %}{% cycle ab %}'})
     def test_cycle26(self):
         output = self.engine.render_to_string('cycle26', {'a': '<', 'b': '>'})
         self.assertEqual(output, '&lt;&gt;')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @setup({'cycle27': '{% load cycle from future %}'
-                       '{% autoescape off %}{% cycle a b as ab %}{% cycle ab %}{% endautoescape %}'})
+    @setup({'cycle27': '{% autoescape off %}{% cycle a b as ab %}{% cycle ab %}{% endautoescape %}'})
     def test_cycle27(self):
         output = self.engine.render_to_string('cycle27', {'a': '<', 'b': '>'})
         self.assertEqual(output, '<>')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @setup({'cycle28': '{% load cycle from future %}{% cycle a|safe b as ab %}{% cycle ab %}'})
+    @setup({'cycle28': '{% cycle a|safe b as ab %}{% cycle ab %}'})
     def test_cycle28(self):
         output = self.engine.render_to_string('cycle28', {'a': '<', 'b': '>'})
         self.assertEqual(output, '<&gt;')
+
+    @setup({
+        'cycle29': "{% cycle 'a' 'b' 'c' as cycler silent %}"
+                   "{% for x in values %}"
+                   "{% ifchanged x %}"
+                   "{% cycle cycler %}{{ cycler }}"
+                   "{% else %}"
+                   "{{ cycler }}"
+                   "{% endifchanged %}"
+                   "{% endfor %}"
+    })
+    def test_cycle29(self):
+        """
+        A named {% cycle %} tag works inside an {% ifchanged %} block and a
+        {% for %} loop.
+        """
+        output = self.engine.render_to_string('cycle29', {'values': [1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 9, 9]})
+        self.assertEqual(output, 'bcabcabcccaa')
+
+    @setup({
+        'cycle30': "{% cycle 'a' 'b' 'c' as cycler silent %}"
+                   "{% for x in values %}"
+                   "{% with doesnothing=irrelevant %}"
+                   "{% ifchanged x %}"
+                   "{% cycle cycler %}{{ cycler }}"
+                   "{% else %}"
+                   "{{ cycler }}"
+                   "{% endifchanged %}"
+                   "{% endwith %}"
+                   "{% endfor %}"})
+    def test_cycle30(self):
+        """
+        A {% with %} tag shouldn't reset the {% cycle %} variable.
+        """
+        output = self.engine.render_to_string(
+            'cycle30', {
+                'irrelevant': 1,
+                'values': [1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 9, 9]
+            })
+        self.assertEqual(output, 'bcabcabcccaa')

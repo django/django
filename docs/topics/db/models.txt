@@ -99,7 +99,7 @@ Example::
         instrument = models.CharField(max_length=100)
 
     class Album(models.Model):
-        artist = models.ForeignKey(Musician)
+        artist = models.ForeignKey(Musician, on_delete=models.CASCADE)
         name = models.CharField(max_length=100)
         release_date = models.DateField()
         num_stars = models.IntegerField()
@@ -111,7 +111,8 @@ Each field in your model should be an instance of the appropriate
 :class:`~django.db.models.Field` class. Django uses the field class types to
 determine a few things:
 
-* The database column type (e.g. ``INTEGER``, ``VARCHAR``).
+* The column type, which tells the database what kind of data to store (e.g.
+  ``INTEGER``, ``VARCHAR``, ``TEXT``).
 
 * The default HTML :doc:`widget </ref/forms/widgets>` to use when rendering a form
   field (e.g. ``<input type="text">``, ``<select>``).
@@ -169,10 +170,10 @@ ones:
         )
 
     The first element in each tuple is the value that will be stored in the
-    database, the second element will be displayed by the default form widget
-    or in a ModelChoiceField. Given an instance of a model object, the
-    display value for a choices field can be accessed using the
-    ``get_FOO_display`` method. For example::
+    database. The second element will be displayed by the default form widget
+    or in a :class:`~django.forms.ModelChoiceField`. Given a model instance,
+    the display value for a choices field can be accessed using the
+    ``get_FOO_display()`` method. For example::
 
         from django.db import models
 
@@ -281,9 +282,17 @@ In this example, the verbose name is ``"first name"``::
 :class:`~django.db.models.OneToOneField` require the first argument to be a
 model class, so use the :attr:`~Field.verbose_name` keyword argument::
 
-    poll = models.ForeignKey(Poll, verbose_name="the related poll")
+    poll = models.ForeignKey(
+        Poll,
+        on_delete=models.CASCADE,
+        verbose_name="the related poll",
+    )
     sites = models.ManyToManyField(Site, verbose_name="list of sites")
-    place = models.OneToOneField(Place, verbose_name="related place")
+    place = models.OneToOneField(
+        Place,
+        on_delete=models.CASCADE,
+        verbose_name="related place",
+    )
 
 The convention is not to capitalize the first letter of the
 :attr:`~Field.verbose_name`. Django will automatically capitalize the first
@@ -317,7 +326,7 @@ For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
         pass
 
     class Car(models.Model):
-        manufacturer = models.ForeignKey(Manufacturer)
+        manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)
         # ...
 
 You can also create :ref:`recursive relationships <recursive-relationships>` (an
@@ -331,7 +340,10 @@ above) be the name of the model, lowercase. You can, of course, call the field
 whatever you want. For example::
 
     class Car(models.Model):
-        company_that_makes_it = models.ForeignKey(Manufacturer)
+        company_that_makes_it = models.ForeignKey(
+            Manufacturer,
+            on_delete=models.CASCADE,
+        )
         # ...
 
 .. seealso::
@@ -376,8 +388,7 @@ For example, if a ``Pizza`` has multiple ``Topping`` objects -- that is, a
 As with :class:`~django.db.models.ForeignKey`, you can also create
 :ref:`recursive relationships <recursive-relationships>` (an object with a
 many-to-many relationship to itself) and :ref:`relationships to models not yet
-defined <lazy-relationships>`; see :ref:`the model field reference
-<ref-manytomany>` for details.
+defined <lazy-relationships>`.
 
 It's suggested, but not required, that the name of a
 :class:`~django.db.models.ManyToManyField` (``toppings`` in the example above)
@@ -434,19 +445,19 @@ something like this::
     class Person(models.Model):
         name = models.CharField(max_length=128)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Group(models.Model):
         name = models.CharField(max_length=128)
         members = models.ManyToManyField(Person, through='Membership')
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Membership(models.Model):
-        person = models.ForeignKey(Person)
-        group = models.ForeignKey(Group)
+        person = models.ForeignKey(Person, on_delete=models.CASCADE)
+        group = models.ForeignKey(Group, on_delete=models.CASCADE)
         date_joined = models.DateField()
         invite_reason = models.CharField(max_length=64)
 
@@ -490,24 +501,22 @@ the intermediate model::
     ...     invite_reason="Needed a new drummer.")
     >>> m1.save()
     >>> beatles.members.all()
-    [<Person: Ringo Starr>]
+    <QuerySet [<Person: Ringo Starr>]>
     >>> ringo.group_set.all()
-    [<Group: The Beatles>]
+    <QuerySet [<Group: The Beatles>]>
     >>> m2 = Membership.objects.create(person=paul, group=beatles,
     ...     date_joined=date(1960, 8, 1),
     ...     invite_reason="Wanted to form a band.")
     >>> beatles.members.all()
-    [<Person: Ringo Starr>, <Person: Paul McCartney>]
+    <QuerySet [<Person: Ringo Starr>, <Person: Paul McCartney>]>
 
-Unlike normal many-to-many fields, you *can't* use ``add``, ``create``,
-or assignment (i.e., ``beatles.members = [...]``) to create relationships::
+Unlike normal many-to-many fields, you *can't* use ``add()``, ``create()``,
+or ``set()`` to create relationships::
 
-    # THIS WILL NOT WORK
+    >>> # The following statements will not work
     >>> beatles.members.add(john)
-    # NEITHER WILL THIS
     >>> beatles.members.create(name="George Harrison")
-    # AND NEITHER WILL THIS
-    >>> beatles.members = [john, paul, ringo, george]
+    >>> beatles.members.set([john, paul, ringo, george])
 
 Why? You can't just create a relationship between a ``Person`` and a ``Group``
 - you need to specify all the detail for the relationship required by the
@@ -518,15 +527,27 @@ The only way to create this type of relationship is to create instances of the
 intermediate model.
 
 The :meth:`~django.db.models.fields.related.RelatedManager.remove` method is
-disabled for similar reasons. However, the
-:meth:`~django.db.models.fields.related.RelatedManager.clear` method can be
-used to remove all many-to-many relationships for an instance::
+disabled for similar reasons. For example, if the custom through table defined
+by the intermediate model does not enforce uniqueness on the
+``(model1, model2)`` pair, a ``remove()`` call would not provide enough
+information as to which intermediate model instance should be deleted::
+
+    >>> Membership.objects.create(person=ringo, group=beatles,
+    ...     date_joined=date(1968, 9, 4),
+    ...     invite_reason="You've been gone for a month and we miss you.")
+    >>> beatles.members.all()
+    <QuerySet [<Person: Ringo Starr>, <Person: Paul McCartney>, <Person: Ringo Starr>]>
+    >>> # This will not work because it cannot tell which membership to remove
+    >>> beatles.members.remove(ringo)
+
+However, the :meth:`~django.db.models.fields.related.RelatedManager.clear`
+method can be used to remove all many-to-many relationships for an instance::
 
     >>> # Beatles have broken up
     >>> beatles.members.clear()
     >>> # Note that this deletes the intermediate model instances
     >>> Membership.objects.all()
-    []
+    <QuerySet []>
 
 Once you have established the many-to-many relationships by creating instances
 of your intermediate model, you can issue queries. Just as with normal
@@ -535,7 +556,7 @@ many-to-many-related model::
 
     # Find all the groups with a member whose name starts with 'Paul'
     >>> Group.objects.filter(members__name__startswith='Paul')
-    [<Group: The Beatles>]
+    <QuerySet [<Group: The Beatles>]>
 
 As you are using an intermediate model, you can also query on its attributes::
 
@@ -543,7 +564,7 @@ As you are using an intermediate model, you can also query on its attributes::
     >>> Person.objects.filter(
     ...     group__name='The Beatles',
     ...     membership__date_joined__gt=date(1961,1,1))
-    [<Person: Ringo Starr]
+    <QuerySet [<Person: Ringo Starr]>
 
 If you need to access a membership's information you may do so by directly
 querying the ``Membership`` model::
@@ -563,7 +584,6 @@ Another way to access the same information is by querying the
     datetime.date(1962, 8, 16)
     >>> ringos_membership.invite_reason
     'Needed a new drummer.'
-
 
 One-to-one relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -588,20 +608,17 @@ restaurant "is a" place; in fact, to handle this you'd typically use
 :ref:`inheritance <model-inheritance>`, which involves an implicit
 one-to-one relation).
 
-As with :class:`~django.db.models.ForeignKey`, a
-:ref:`recursive relationship <recursive-relationships>`
-can be defined and
-:ref:`references to as-yet undefined models <lazy-relationships>`
-can be made; see :ref:`the model field reference <ref-onetoone>` for details.
+As with :class:`~django.db.models.ForeignKey`, a :ref:`recursive relationship
+<recursive-relationships>` can be defined and :ref:`references to as-yet
+undefined models <lazy-relationships>` can be made.
 
 .. seealso::
 
     See the :doc:`One-to-one relationship model example
     </topics/db/examples/one_to_one>` for a full example.
 
-:class:`~django.db.models.OneToOneField` fields also accept one specific,
-optional ``parent_link`` argument described in the :ref:`model field
-reference <ref-onetoone>`.
+:class:`~django.db.models.OneToOneField` fields also accept an optional
+:attr:`~django.db.models.OneToOneField.parent_link` argument.
 
 :class:`~django.db.models.OneToOneField` classes used to automatically become
 the primary key on a model. This is no longer true (although you can manually
@@ -621,7 +638,12 @@ just refer to the other model class wherever needed. For example::
 
     class Restaurant(models.Model):
         # ...
-        zip_code = models.ForeignKey(ZipCode)
+        zip_code = models.ForeignKey(
+            ZipCode,
+            on_delete=models.SET_NULL,
+            blank=True,
+            null=True,
+        )
 
 Field name restrictions
 -----------------------
@@ -659,8 +681,8 @@ provided in :doc:`/howto/custom-model-fields`.
 
 .. _meta-options:
 
-Meta options
-============
+``Meta`` options
+================
 
 Give your model metadata by using an inner ``class Meta``, like so::
 
@@ -727,10 +749,10 @@ For example, this model has a few custom methods::
             else:
                 return "Post-boomer"
 
-        def _get_full_name(self):
+        @property
+        def full_name(self):
             "Returns the person's full name."
             return '%s %s' % (self.first_name, self.last_name)
-        full_name = property(_get_full_name)
 
 The last method in this example is a :term:`property`.
 
@@ -739,11 +761,8 @@ of :ref:`methods automatically given to each model <model-instance-methods>`.
 You can override most of these -- see `overriding predefined model methods`_,
 below -- but there are a couple that you'll almost always want to define:
 
-:meth:`~Model.__str__` (Python 3)
-    Python 3 equivalent of ``__unicode__()``.
-
-:meth:`~Model.__unicode__` (Python 2)
-    A Python "magic method" that returns a unicode "representation" of any
+:meth:`~Model.__str__`
+    A Python "magic method" that returns a string representation of any
     object. This is what Python and Django will use whenever a model
     instance needs to be coerced and displayed as a plain string. Most
     notably, this happens when you display an object in an interactive
@@ -785,7 +804,7 @@ to happen whenever you save an object. For example (see
 
         def save(self, *args, **kwargs):
             do_something()
-            super(Blog, self).save(*args, **kwargs) # Call the "real" save() method.
+            super().save(*args, **kwargs)  # Call the "real" save() method.
             do_something_else()
 
 You can also prevent saving::
@@ -800,10 +819,10 @@ You can also prevent saving::
             if self.name == "Yoko Ono's blog":
                 return # Yoko shall never have her own blog!
             else:
-                super(Blog, self).save(*args, **kwargs) # Call the "real" save() method.
+                super().save(*args, **kwargs)  # Call the "real" save() method.
 
 It's important to remember to call the superclass method -- that's
-that ``super(Blog, self).save(*args, **kwargs)`` business -- to ensure
+that ``super().save(*args, **kwargs)`` business -- to ensure
 that the object still gets saved into the database. If you forget to
 call the superclass method, the default behavior won't happen and the
 database won't get touched.
@@ -819,9 +838,11 @@ code will automatically support those arguments when they are added.
 
     Note that the :meth:`~Model.delete()` method for an object is not
     necessarily called when :ref:`deleting objects in bulk using a
-    QuerySet<topics-db-queries-delete>`. To ensure customized delete logic
-    gets executed, you can use :data:`~django.db.models.signals.pre_delete`
-    and/or :data:`~django.db.models.signals.post_delete` signals.
+    QuerySet <topics-db-queries-delete>` or as a result of a :attr:`cascading
+    delete <django.db.models.ForeignKey.on_delete>`. To ensure customized
+    delete logic gets executed, you can use
+    :data:`~django.db.models.signals.pre_delete` and/or
+    :data:`~django.db.models.signals.post_delete` signals.
 
     Unfortunately, there isn't a workaround when
     :meth:`creating<django.db.models.query.QuerySet.bulk_create>` or
@@ -899,7 +920,7 @@ model, since it is an abstract base class. It does not generate a database
 table or have a manager, and cannot be instantiated or saved directly.
 
 For many uses, this type of model inheritance will be exactly what you want.
-It provides a way to factor out common information at the Python level, whilst
+It provides a way to factor out common information at the Python level, while
 still only creating one database table per child model at the database level.
 
 ``Meta`` inheritance
@@ -938,18 +959,23 @@ the same database table, which is almost certainly not what you want.
 
 .. _abstract-related-name:
 
-Be careful with ``related_name``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Be careful with ``related_name`` and ``related_query_name``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are using the :attr:`~django.db.models.ForeignKey.related_name` attribute on a ``ForeignKey`` or
-``ManyToManyField``, you must always specify a *unique* reverse name for the
-field. This would normally cause a problem in abstract base classes, since the
-fields on this class are included into each of the child classes, with exactly
-the same values for the attributes (including :attr:`~django.db.models.ForeignKey.related_name`) each time.
+If you are using :attr:`~django.db.models.ForeignKey.related_name` or
+:attr:`~django.db.models.ForeignKey.related_query_name` on a ``ForeignKey`` or
+``ManyToManyField``, you must always specify a *unique* reverse name and query
+name for the field. This would normally cause a problem in abstract base
+classes, since the fields on this class are included into each of the child
+classes, with exactly the same values for the attributes (including
+:attr:`~django.db.models.ForeignKey.related_name` and
+:attr:`~django.db.models.ForeignKey.related_query_name`) each time.
 
-To work around this problem, when you are using :attr:`~django.db.models.ForeignKey.related_name` in an
-abstract base class (only), part of the name should contain
-``'%(app_label)s'`` and ``'%(class)s'``.
+To work around this problem, when you are using
+:attr:`~django.db.models.ForeignKey.related_name` or
+:attr:`~django.db.models.ForeignKey.related_query_name` in an abstract base
+class (only), part of the value should contain ``'%(app_label)s'`` and
+``'%(class)s'``.
 
 - ``'%(class)s'`` is replaced by the lower-cased name of the child class
   that the field is used in.
@@ -963,7 +989,11 @@ For example, given an app ``common/models.py``::
     from django.db import models
 
     class Base(models.Model):
-        m2m = models.ManyToManyField(OtherModel, related_name="%(app_label)s_%(class)s_related")
+        m2m = models.ManyToManyField(
+            OtherModel,
+            related_name="%(app_label)s_%(class)s_related",
+            related_query_name="%(app_label)s_%(class)ss",
+        )
 
         class Meta:
             abstract = True
@@ -982,12 +1012,15 @@ Along with another app ``rare/models.py``::
         pass
 
 The reverse name of the ``common.ChildA.m2m`` field will be
-``common_childa_related``, whilst the reverse name of the
-``common.ChildB.m2m`` field will be ``common_childb_related``, and finally the
-reverse name of the ``rare.ChildB.m2m`` field will be ``rare_childb_related``.
-It is up to you how you use the ``'%(class)s'`` and ``'%(app_label)s`` portion
-to construct your related name, but if you forget to use it, Django will raise
-errors when you perform system checks (or run :djadmin:`migrate`).
+``common_childa_related`` and the reverse query name will be ``common_childas``.
+The reverse name of the ``common.ChildB.m2m`` field will be
+``common_childb_related`` and the reverse query name will be
+``common_childbs``. Finally, the reverse name of the ``rare.ChildB.m2m`` field
+will be ``rare_childb_related`` and the reverse query name will be
+``rare_childbs``. It's up to you how you use the ``'%(class)s'`` and
+``'%(app_label)s'`` portion to construct your related name or related query name
+but if you forget to use it, Django will raise errors when you perform system
+checks (or run :djadmin:`migrate`).
 
 If you don't specify a :attr:`~django.db.models.ForeignKey.related_name`
 attribute for a field in an abstract base class, the default reverse name will
@@ -1040,6 +1073,8 @@ However, if ``p`` in the above example was *not* a ``Restaurant`` (it had been
 created directly as a ``Place`` object or was the parent of some other class),
 referring to ``p.restaurant`` would raise a ``Restaurant.DoesNotExist``
 exception.
+
+.. _meta-and-multi-table-inheritance:
 
 ``Meta`` and multi-table inheritance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1104,7 +1139,7 @@ Specifying the parent link field
 
 As mentioned, Django will automatically create a
 :class:`~django.db.models.OneToOneField` linking your child
-class back any non-abstract parent models. If you want to control the
+class back to any non-abstract parent models. If you want to control the
 name of the attribute linking back to the parent, you can create your
 own :class:`~django.db.models.OneToOneField` and set
 :attr:`parent_link=True <django.db.models.OneToOneField.parent_link>`
@@ -1169,8 +1204,11 @@ order by the ``last_name`` attribute when you use the proxy. This is easy::
 Now normal ``Person`` queries will be unordered
 and ``OrderedPerson`` queries will be ordered by ``last_name``.
 
-QuerySets still return the model that was requested
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Proxy models inherit ``Meta`` attributes :ref:`in the same way as regular
+models <meta-and-multi-table-inheritance>`.
+
+``QuerySet``\s still return the model that was requested
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There is no way to have Django return, say, a ``MyPerson`` object whenever you
 query for ``Person`` objects. A queryset for ``Person`` objects will return
@@ -1187,7 +1225,8 @@ A proxy model must inherit from exactly one non-abstract model class. You
 can't inherit from multiple non-abstract models as the proxy model doesn't
 provide any connection between the rows in the different database tables. A
 proxy model can inherit from any number of abstract model classes, providing
-they do *not* define any model fields.
+they do *not* define any model fields. A proxy model may also inherit from any
+number of proxy models that share a common non-abstract parent class.
 
 Proxy model managers
 ~~~~~~~~~~~~~~~~~~~~
@@ -1233,38 +1272,24 @@ possible.
 
 .. _proxy-vs-unmanaged-models:
 
-Differences between proxy inheritance and  unmanaged models
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Differences between proxy inheritance and unmanaged models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Proxy model inheritance might look fairly similar to creating an unmanaged
 model, using the :attr:`~django.db.models.Options.managed` attribute on a
-model's ``Meta`` class. The two alternatives are not quite the same and it's
-worth considering which one you should use.
+model's ``Meta`` class.
 
-One difference is that you can (and, in fact, must unless you want an empty
-model) specify model fields on models with ``Meta.managed=False``. You could,
-with careful setting of :attr:`Meta.db_table
-<django.db.models.Options.db_table>` create an unmanaged model that shadowed
-an existing model and add Python methods to it. However, that would be very
-repetitive and fragile as you need to keep both copies synchronized if you
+With careful setting of :attr:`Meta.db_table
+<django.db.models.Options.db_table>` you could create an unmanaged model that
+shadows an existing model and adds Python methods to it. However, that would be
+very repetitive and fragile as you need to keep both copies synchronized if you
 make any changes.
 
-The other difference that is more important for proxy models, is how model
-managers are handled. Proxy models are intended to behave exactly like the
-model they are proxying for. So they inherit the parent model's managers,
-including the default manager. In the normal multi-table model inheritance
-case, children do not inherit managers from their parents as the custom
-managers aren't always appropriate when extra fields are involved. The
-:ref:`manager documentation <custom-managers-and-inheritance>` has more
-details about this latter case.
+On the other hand, proxy models are intended to behave exactly like the model
+they are proxying for. They are always in sync with the parent model since they
+directly inherit its fields and managers.
 
-When these two features were implemented, attempts were made to squash them
-into a single option. It turned out that interactions with inheritance, in
-general, and managers, in particular, made the API very complicated and
-potentially difficult to understand and use. It turned out that two options
-were needed in any case, so the current separation arose.
-
-So, the general rules are:
+The general rules are:
 
 1. If you are mirroring an existing model or database table and don't want
    all the original database table columns, use ``Meta.managed=False``.
@@ -1327,11 +1352,31 @@ Field name "hiding" is not permitted
 -------------------------------------
 
 In normal Python class inheritance, it is permissible for a child class to
-override any attribute from the parent class. In Django, this is not permitted
-for attributes that are :class:`~django.db.models.Field` instances (at
-least, not at the moment). If a base class has a field called ``author``, you
-cannot create another model field called ``author`` in any class that inherits
-from that base class.
+override any attribute from the parent class. In Django, this isn't usually
+permitted for model fields. If a non-abstract model base class has a field
+called ``author``, you can't create another model field or define
+an attribute called ``author`` in any class that inherits from that base class.
+
+This restriction doesn't apply to model fields inherited from an abstract
+model. Such fields may be overridden with another field or value, or be removed
+by setting ``field_name = None``.
+
+.. warning::
+
+    Model managers are inherited from abstract base classes. Overriding an
+    inherited field which is referenced by an inherited
+    :class:`~django.db.models.Manager` may cause subtle bugs. See :ref:`custom
+    managers and model inheritance <custom-managers-and-inheritance>`.
+
+.. note::
+
+    Some fields define extra attributes on the model, e.g. a
+    :class:`~django.db.models.ForeignKey` defines an extra attribute with
+    ``_id`` appended to the field name, as well as ``related_name`` and
+    ``related_query_name`` on the foreign model.
+
+    These extra attributes cannot be overridden unless the field that defines
+    it is changed or removed so that it no longer defines the extra attribute.
 
 Overriding fields in a parent model leads to difficulties in areas such as
 initializing new instances (specifying which field is being initialized in
@@ -1350,6 +1395,30 @@ different database tables).
 
 Django will raise a :exc:`~django.core.exceptions.FieldError` if you override
 any model field in any ancestor model.
+
+Organizing models in a package
+==============================
+
+The :djadmin:`manage.py startapp <startapp>` command creates an application
+structure that includes a ``models.py`` file. If you have many models,
+organizing them in separate files may be useful.
+
+To do so, create a ``models`` package. Remove ``models.py`` and create a
+``myapp/models/`` directory with an ``__init__.py`` file and the files to
+store your models. You must import the models in the ``__init__.py`` file.
+
+For example, if you had ``organic.py`` and ``synthetic.py`` in the ``models``
+directory:
+
+.. snippet::
+    :filename: myapp/models/__init__.py
+
+    from .organic import Person
+    from .synthetic import Robot
+
+Explicitly importing each model rather than using ``from .models import *``
+has the advantages of not cluttering the namespace, making code more readable,
+and keeping code analysis tools useful.
 
 .. seealso::
 

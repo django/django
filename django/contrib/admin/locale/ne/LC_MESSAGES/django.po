@@ -6,11 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Nepali (http://www.transifex.com/projects/p/django/language/"
-"ne/)\n"
+"Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -62,6 +61,12 @@ msgstr "यो महिना"
 msgid "This year"
 msgstr "यो साल"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -73,12 +78,27 @@ msgstr ""
 msgid "Action:"
 msgstr "कार्य:"
 
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "अर्को %(verbose_name)s थप्नुहोस ।"
+
+msgid "Remove"
+msgstr "हटाउनुहोस"
+
 msgid "action time"
 msgstr "कार्य समय"
+
+msgid "user"
+msgstr "प्रयोग कर्ता"
+
+msgid "content type"
+msgstr ""
 
 msgid "object id"
 msgstr "वस्तु परिचय"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr ""
 
@@ -109,6 +129,31 @@ msgstr "\"%(object)s\" मेटिएको छ ।"
 msgid "LogEntry Object"
 msgstr "लग ईन्ट्री वस्तु"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr "थपिएको छ ।"
+
+msgid "and"
+msgstr "र"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "कुनै फाँट फेरिएन ।"
+
 msgid "None"
 msgstr "शुन्य"
 
@@ -116,64 +161,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-#, python-format
-msgid "Changed %s."
-msgstr "%s परिवर्तित ।"
-
-msgid "and"
-msgstr "र"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" थपिएको छ ।"
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s को %(list)s फेरियो ।"
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" मेटिएको छ ।"
-
-msgid "No fields changed."
-msgstr "कुनै फाँट फेरिएन ।"
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" सफलतापूर्वक थप भयो ।  तपाई यो पुन: संशोधन गर्न सक्नुहुनेछ ।"
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" सफलता पूर्वक थप भयो ।  तपाई अर्को %(name)s तल राख्न सक्नु हुनेछ।"
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" सफलतापूर्वक परिवर्तन भयो । "
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"%(name)s \"%(obj)s\" सफलता पूर्वक फेर बदल भयो ।  तपाई तल यो पुन: संशोधन गर्न सक्नु "
-"हुनेछ ।"
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
-"%(name)s \"%(obj)s\" सफलता पूर्वक फेर बदल भयो ।  तपाई अर्को %(name)s तल राख्न सक्नु "
-"हुनेछ।"
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" सफलतापूर्वक परिवर्तन भयो । "
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -318,7 +334,7 @@ msgid "Welcome,"
 msgstr "स्वागतम्"
 
 msgid "View site"
-msgstr ""
+msgstr "साइट हेर्नु होस ।"
 
 msgid "Documentation"
 msgstr "विस्तृत विवरण"
@@ -326,18 +342,15 @@ msgstr "विस्तृत विवरण"
 msgid "Log out"
 msgstr "लग आउट"
 
-msgid "Add"
-msgstr "थप्नुहोस "
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s थप्नुहोस"
 
 msgid "History"
 msgstr "इतिहास"
 
 msgid "View on site"
 msgstr "साइटमा हेर्नुहोस"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "%(name)s थप्नुहोस"
 
 msgid "Filter"
 msgstr "छान्नुहोस"
@@ -408,13 +421,6 @@ msgstr "%(objects_name)s "
 msgid "Change"
 msgstr "फेर्नुहोस"
 
-msgid "Remove"
-msgstr "हटाउनुहोस"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "अर्को %(verbose_name)s थप्नुहोस ।"
-
 msgid "Delete?"
 msgstr "मेट्नुहुन्छ ?"
 
@@ -429,14 +435,17 @@ msgstr ""
 msgid "Models in the %(name)s application"
 msgstr "%(name)s एप्लिकेसनमा भएको मोडेलहरु"
 
+msgid "Add"
+msgstr "थप्नुहोस "
+
 msgid "You don't have permission to edit anything."
 msgstr "तपाइलाई केही पनि संपादन गर्ने अनुमति छैन ।"
 
-msgid "Recent Actions"
-msgstr "हालैका कार्यहरु"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "मेरो कार्यहरु"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "कुनै पनि उपलब्ध छैन ।"
@@ -451,6 +460,12 @@ msgid ""
 msgstr ""
 "डाटाबेस स्थापनामा केही त्रुटी छ । सम्वद्ध टेबल बनाएको र प्रयोगकर्तालाई डाटाबेसमा अनुमति "
 "भएको छ छैन जाच्नुहोस ।"
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "पासवर्ड अथवा प्रयोगकर्ता नाम भुल्नुभयो ।"
@@ -474,6 +489,9 @@ msgstr "सबै देखाउनुहोस"
 
 msgid "Save"
 msgstr "बचत गर्नुहोस"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -602,9 +620,6 @@ msgstr "मेरो पासवर्ड पुन: राख्नुहो�
 
 msgid "All dates"
 msgstr "सबै मिति"
-
-msgid "(None)"
-msgstr "(शुन्य)"
 
 #, python-format
 msgid "Select %s"

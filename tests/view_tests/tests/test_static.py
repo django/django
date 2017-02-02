@@ -1,10 +1,9 @@
-from __future__ import unicode_literals
-
 import mimetypes
 import unittest
 from os import path
 
 from django.conf.urls.static import static
+from django.core.exceptions import ImproperlyConfigured
 from django.http import FileResponse, HttpResponseNotModified
 from django.test import SimpleTestCase, override_settings
 from django.utils.http import http_date
@@ -56,8 +55,10 @@ class StaticTests(SimpleTestCase):
 
     def test_is_modified_since(self):
         file_name = 'file.txt'
-        response = self.client.get('/%s/%s' % (self.prefix, file_name),
-            HTTP_IF_MODIFIED_SINCE='Thu, 1 Jan 1970 00:00:00 GMT')
+        response = self.client.get(
+            '/%s/%s' % (self.prefix, file_name),
+            HTTP_IF_MODIFIED_SINCE='Thu, 1 Jan 1970 00:00:00 GMT'
+        )
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response_content)
@@ -106,26 +107,45 @@ class StaticTests(SimpleTestCase):
         response = self.client.get('/%s/non_existing_resource' % self.prefix)
         self.assertEqual(404, response.status_code)
 
+    def test_index(self):
+        response = self.client.get('/%s/' % self.prefix)
+        self.assertContains(response, 'Index of /')
+
 
 class StaticHelperTest(StaticTests):
     """
     Test case to make sure the static URL pattern helper works as expected
     """
     def setUp(self):
-        super(StaticHelperTest, self).setUp()
+        super().setUp()
         self._old_views_urlpatterns = urls.urlpatterns[:]
         urls.urlpatterns += static('/media/', document_root=media_dir)
 
     def tearDown(self):
-        super(StaticHelperTest, self).tearDown()
+        super().tearDown()
         urls.urlpatterns = self._old_views_urlpatterns
+
+    def test_prefix(self):
+        self.assertEqual(static('test')[0].regex.pattern, '^test(?P<path>.*)$')
+
+    @override_settings(DEBUG=False)
+    def test_debug_off(self):
+        """No URLs are served if DEBUG=False."""
+        self.assertEqual(static('test'), [])
+
+    def test_empty_prefix(self):
+        with self.assertRaisesMessage(ImproperlyConfigured, 'Empty static prefix not permitted'):
+            static('')
+
+    def test_special_prefix(self):
+        """No URLs are served if prefix contains '://'."""
+        self.assertEqual(static('http://'), [])
 
 
 class StaticUtilsTests(unittest.TestCase):
     def test_was_modified_since_fp(self):
         """
-        Test that a floating point mtime does not disturb was_modified_since.
-        (#18675)
+        A floating point mtime does not disturb was_modified_since (#18675).
         """
         mtime = 1343416141.107817
         header = http_date(mtime)

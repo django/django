@@ -7,13 +7,13 @@ Roles
 Technical board
 ===============
 
-The technical board for the 1.9 release cycle is:
+The technical board for the 1.11 release cycle is:
 
-* Aymeric Augustin
+* James Bennett
 * Andrew Godwin
 * Russell Keith-Magee
-* Jannis Leidel
 * Carl Meyer
+* Marc Tamlyn
 
 .. _committers:
 
@@ -37,13 +37,11 @@ The current security team members are:
 
 - Florian Apolloner
 - James Bennett
-- Jeremy Dunck
+- Tim Graham
 - Adrian Holovaty
-- Jacob Kaplan-Moss
-- Russell Keith-Magee
+- Markus Holtermann
 - Paul McMillan
 - Carl Meyer
-- Donald Stufft
 
 .. _releasers-list:
 
@@ -66,6 +64,7 @@ The ops team maintains Django's infrastructure like the Django Project server,
 Trac instance, and continuous integration infrastructure.
 
 - Florian Apolloner
-- Aymeric Augustin
 - Tim Graham
+- Markus Holtermann
 - Jannis Leidel
+- Tobias McNulty

@@ -51,6 +51,7 @@ def new_datetime(d):
         kw.extend([d.hour, d.minute, d.second, d.microsecond, d.tzinfo])
     return datetime(*kw)
 
+
 # This library does not support strftime's "%s" or "%y" format strings.
 # Allowed if there's an even number of "%"s because they are escaped.
 _illegal_formatting = re.compile(r"((^|[^%])(%%)*%[sy])")

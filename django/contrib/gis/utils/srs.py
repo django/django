@@ -65,7 +65,7 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
     if 'srtext' in srs_field_names:
         kwargs['srtext'] = srs.wkt
     if 'ref_sys_name' in srs_field_names:
-        # Spatialite specific
+        # SpatiaLite specific
         kwargs['ref_sys_name'] = ref_sys_name or srs.name
 
     # Creating the spatial_ref_sys model.
@@ -75,6 +75,3 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
         SpatialRefSys.objects.using(database).get(srid=srs.srid)
     except SpatialRefSys.DoesNotExist:
         SpatialRefSys.objects.using(database).create(**kwargs)
-
-# Alias is for backwards-compatibility purposes.
-add_postgis_srs = add_srs_entry

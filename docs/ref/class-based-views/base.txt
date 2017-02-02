@@ -13,13 +13,14 @@ views or various mixins. Because this inheritance chain is very important, the
 ancestor classes are  documented under the section title of **Ancestors (MRO)**.
 MRO is an acronym for Method Resolution Order.
 
-View
-----
+``View``
+========
 
 .. class:: django.views.generic.base.View
 
     The master class-based base view. All other class-based views inherit from
-    this base class.
+    this base class. It isn't strictly a generic view and thus can also be
+    imported from ``django.views``.
 
     **Method Flowchart**
 
@@ -30,7 +31,7 @@ View
     **Example views.py**::
 
         from django.http import HttpResponse
-        from django.views.generic import View
+        from django.views import View
 
         class MyView(View):
 
@@ -65,8 +66,6 @@ View
 
             response = MyView.as_view()(request)
 
-        .. versionadded:: 1.9
-
         The returned view has ``view_class`` and ``view_initkwargs``
         attributes.
 
@@ -94,11 +93,13 @@ View
 
     .. method:: options(request, *args, **kwargs)
 
-        Handles responding to requests for the OPTIONS HTTP verb.  Returns a
-        list of the allowed HTTP method names for the view.
+        Handles responding to requests for the OPTIONS HTTP verb. Returns a
+        response with the ``Allow`` header containing a list of the view's
+        allowed HTTP method names.
 
-TemplateView
-------------
+
+``TemplateView``
+================
 
 .. class:: django.views.generic.base.TemplateView
 
@@ -130,7 +131,7 @@ TemplateView
             template_name = "home.html"
 
             def get_context_data(self, **kwargs):
-                context = super(HomePageView, self).get_context_data(**kwargs)
+                context = super().get_context_data(**kwargs)
                 context['latest_articles'] = Article.objects.all()[:5]
                 return context
 
@@ -149,8 +150,8 @@ TemplateView
     * Populated (through :class:`~django.views.generic.base.ContextMixin`) with
       the keyword arguments captured from the URL pattern that served the view.
 
-RedirectView
-------------
+``RedirectView``
+================
 
 .. class:: django.views.generic.base.RedirectView
 
@@ -193,7 +194,7 @@ RedirectView
             def get_redirect_url(self, *args, **kwargs):
                 article = get_object_or_404(Article, pk=kwargs['pk'])
                 article.update_counter()
-                return super(ArticleCounterRedirectView, self).get_redirect_url(*args, **kwargs)
+                return super().get_redirect_url(*args, **kwargs)
 
     **Example urls.py**::
 
@@ -205,7 +206,7 @@ RedirectView
         urlpatterns = [
             url(r'^counter/(?P<pk>[0-9]+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
             url(r'^details/(?P<pk>[0-9]+)/$', ArticleDetail.as_view(), name='article-detail'),
-            url(r'^go-to-django/$', RedirectView.as_view(url='http://djangoproject.com'), name='go-to-django'),
+            url(r'^go-to-django/$', RedirectView.as_view(url='https://djangoproject.com'), name='go-to-django'),
         ]
 
     **Attributes**
@@ -226,11 +227,6 @@ RedirectView
         the HTTP status code returned. If ``True``, then the redirect will use
         status code 301. If ``False``, then the redirect will use status code
         302. By default, ``permanent`` is ``False``.
-
-        .. versionchanged:: 1.9
-
-            The default value of the ``permanent`` attribute changed from
-            ``True`` to ``False``.
 
     .. attribute:: query_string
 

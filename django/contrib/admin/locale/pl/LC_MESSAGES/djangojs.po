@@ -3,18 +3,18 @@
 # Translators:
 # angularcircle, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Janusz Harkot <jh@blueice.pl>, 2014
+# Janusz Harkot <jh@blueice.pl>, 2014-2015
 # konryd <inactive+konryd@transifex.com>, 2011
+# m_aciek <maciej.olko@gmail.com>, 2016
 # Roman Barczyński <rombar@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:12+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Polish (http://www.transifex.com/projects/p/django/language/"
-"pl/)\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-08-09 13:22+0000\n"
+"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
+"Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -32,7 +32,7 @@ msgid ""
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
 "To jest lista dostępnych %s. Aby wybrać pozycje zaznacz je i kliknij "
-"strzałkę \"Wybierz\" pomiędzy listami."
+"strzałkę „Wybierz” pomiędzy listami."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -42,7 +42,7 @@ msgid "Filter"
 msgstr "Filtr"
 
 msgid "Choose all"
-msgstr "Wybierz wszystko"
+msgstr "Wybierz wszystkie"
 
 #, javascript-format
 msgid "Click to choose all %s at once."
@@ -56,7 +56,7 @@ msgstr "Usuń"
 
 #, javascript-format
 msgid "Chosen %s"
-msgstr "Wybrano %s"
+msgstr "Wybrane %s"
 
 #, javascript-format
 msgid ""
@@ -64,7 +64,7 @@ msgid ""
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
 "To jest lista wybranych %s. Aby usunąć zaznacz pozycje wybrane do usunięcia "
-"i kliknij strzałkę \"Usuń\" pomiędzy listami."
+"i kliknij strzałkę „Usuń” pomiędzy listami."
 
 msgid "Remove all"
 msgstr "Usuń wszystkie"
@@ -100,7 +100,7 @@ msgid ""
 "button."
 msgstr ""
 "Wybrano akcję, lecz nie dokonano żadnych zmian. Prawdopodobnie szukasz "
-"przycisku \"Wykonaj\" (a nie \"Zapisz\")"
+"przycisku „Wykonaj” (a nie „Zapisz”)"
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -127,8 +127,8 @@ msgstr[2] ""
 msgid "Now"
 msgstr "Teraz"
 
-msgid "Clock"
-msgstr "Zegar"
+msgid "Choose a Time"
+msgstr "Wybierz czas"
 
 msgid "Choose a time"
 msgstr "Wybierz czas"
@@ -142,14 +142,17 @@ msgstr "6 rano"
 msgid "Noon"
 msgstr "Południe"
 
+msgid "6 p.m."
+msgstr "6 po południu"
+
 msgid "Cancel"
 msgstr "Anuluj"
 
 msgid "Today"
 msgstr "Dzisiaj"
 
-msgid "Calendar"
-msgstr "Kalendarz"
+msgid "Choose a Date"
+msgstr "Wybierz datę"
 
 msgid "Yesterday"
 msgstr "Wczoraj"
@@ -157,15 +160,69 @@ msgstr "Wczoraj"
 msgid "Tomorrow"
 msgstr "Jutro"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Styczeń Luty Marzec Kwiecień Maj Czerwiec Lipiec Sierpień Wrzesień "
-"Październik Listopad Grudzień"
+msgid "January"
+msgstr "styczeń"
 
-msgid "S M T W T F S"
-msgstr "N Pn Wt Śr Cz Pt So"
+msgid "February"
+msgstr "luty"
+
+msgid "March"
+msgstr "marzec"
+
+msgid "April"
+msgstr "kwiecień"
+
+msgid "May"
+msgstr "maj"
+
+msgid "June"
+msgstr "czerwiec"
+
+msgid "July"
+msgstr "lipiec"
+
+msgid "August"
+msgstr "sierpień"
+
+msgid "September"
+msgstr "wrzesień"
+
+msgid "October"
+msgstr "październik"
+
+msgid "November"
+msgstr "listopad"
+
+msgid "December"
+msgstr "grudzień"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "n"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "pn"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "w"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "ś"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "c"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "pt"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "s"
 
 msgid "Show"
 msgstr "Pokaż"

@@ -4,8 +4,15 @@ Coding style
 
 Please follow these coding standards when writing code for inclusion in Django.
 
+.. _coding-style-python:
+
 Python style
-------------
+============
+
+* Please conform to the indentation style dictated in the ``.editorconfig``
+  file. We recommend using a text editor with `EditorConfig`_ support to avoid
+  indentation and whitespace issues. The Python files use 4 spaces for
+  indentation and the HTML files use 2 spaces.
 
 * Unless otherwise specified, follow :pep:`8`.
 
@@ -27,7 +34,7 @@ Python style
 * Use four spaces for indentation.
 
 * Use underscores, not camelCase, for variable, function and method names
-  (i.e. ``poll.get_unique_voters()``, not ``poll.getUniqueVoters``).
+  (i.e. ``poll.get_unique_voters()``, not ``poll.getUniqueVoters()``).
 
 * Use ``InitialCaps`` for class names (or for factory functions that
   return classes).
@@ -40,8 +47,28 @@ Python style
           """
           ...
 
+* In tests, use :meth:`~django.test.SimpleTestCase.assertRaisesMessage` instead
+  of :meth:`~unittest.TestCase.assertRaises` so you can check the exception
+  message. Use :meth:`~unittest.TestCase.assertRaisesRegex` only if you need
+  regular expression matching.
+
+* In test docstrings, state the expected behavior that each test demonstrates.
+  Don't include preambles such as "Tests that" or "Ensures that".
+
+  Reserve ticket references for obscure issues where the ticket has additional
+  details that can't be easily described in docstrings or comments. Include the
+  ticket number at the end of a sentence like this::
+
+    def test_foo():
+        """
+        A test docstring looks like this (#123456).
+        """
+        ...
+
+.. _coding-style-imports:
+
 Imports
--------
+=======
 
 * Use `isort <https://github.com/timothycrosley/isort#readme>`_ to automate
   import sorting using the guidelines below.
@@ -62,7 +89,8 @@ Imports
 * Put imports in these groups: future, standard library, third-party libraries,
   other Django components, local Django component, try/excepts. Sort lines in
   each group alphabetically by the full module name. Place all ``import module``
-  statements before ``from module import objects`` in each section.
+  statements before ``from module import objects`` in each section. Use absolute
+  imports for other Django components and relative imports for local components.
 
 * On each line, alphabetize the items with the upper case items grouped before
   the lower case items.
@@ -101,9 +129,9 @@ Imports
 
       # try/except
       try:
-          import pytz
+          import yaml
       except ImportError:
-          pytz = None
+          yaml = None
 
       CONSTANT = 'foo'
 
@@ -113,14 +141,14 @@ Imports
 
 * Use convenience imports whenever available. For example, do this::
 
-      from django.views.generic import View
+      from django.views import View
 
   instead of::
 
       from django.views.generic.base import View
 
 Template style
---------------
+==============
 
 * In Django template code, put one (and only one) space between the curly
   brackets and the tag contents.
@@ -138,7 +166,7 @@ Template style
       {{foo}}
 
 View style
-----------
+==========
 
 * In Django views, the first parameter in a view function should be called
   ``request``.
@@ -154,7 +182,7 @@ View style
           # ...
 
 Model style
------------
+===========
 
 * Field names should be all lowercase, using underscores instead of
   camelCase.
@@ -200,10 +228,6 @@ Model style
           first_name = models.CharField(max_length=20)
           last_name = models.CharField(max_length=40)
 
-* If you define a ``__str__`` method (previously ``__unicode__`` before Python 3
-  was supported), decorate the model class with
-  :func:`~django.utils.encoding.python_2_unicode_compatible`.
-
 * The order of model inner classes and standard methods should be as
   follows (noting that these are not all required):
 
@@ -228,7 +252,7 @@ Model style
         )
 
 Use of ``django.conf.settings``
--------------------------------
+===============================
 
 Modules should not in general use settings stored in ``django.conf.settings``
 at the top level (i.e. evaluated when the module is imported). The explanation
@@ -250,7 +274,7 @@ already been configured).
 So, if there is a module containing some code as follows::
 
     from django.conf import settings
-    from django.core.urlresolvers import get_callable
+    from django.urls import get_callable
 
     default_foo_view = get_callable(settings.FOO_VIEW)
 
@@ -264,7 +288,7 @@ such as ``django.utils.functional.LazyObject``,
 ``django.utils.functional.lazy()`` or ``lambda``.
 
 Miscellaneous
--------------
+=============
 
 * Mark all strings for internationalization; see the :doc:`i18n
   documentation </topics/i18n/index>` for details.
@@ -286,4 +310,11 @@ Miscellaneous
   change to the ``AUTHORS`` file in your patch if you make more than a
   single trivial change.
 
+JavaScript style
+================
+
+For details about the JavaScript code style used by Django, see
+:doc:`javascript`.
+
+.. _editorconfig: http://editorconfig.org/
 .. _flake8: https://pypi.python.org/pypi/flake8

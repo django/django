@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib.gis import feeds
 
 from .models import City
@@ -23,8 +21,8 @@ class TestGeoRSS2(TestGeoRSS1):
     def geometry(self, obj):
         # This should attach a <georss:box> element for the extent of
         # of the cities in the database.  This tuple came from
-        # calling `City.objects.extent()` -- we can't do that call here
-        # because `extent` is not implemented for MySQL/Oracle.
+        # calling `City.objects.aggregate(Extent())` -- we can't do that call
+        # here because `Extent` is not implemented for MySQL/Oracle.
         return (-123.30, -41.32, 174.78, 48.46)
 
     def item_geometry(self, item):
@@ -59,6 +57,7 @@ class TestW3CGeo3(TestGeoRSS1):
     def item_geometry(self, item):
         from django.contrib.gis.geos import Polygon
         return Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
+
 
 # The feed dictionary to use for URLs.
 feed_dict = {

@@ -2,8 +2,6 @@
 termcolors.py
 """
 
-from django.utils import six
-
 color_names = ('black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white')
 foreground = {color_names[x]: '3%s' % x for x in range(8)}
 background = {color_names[x]: '4%s' % x for x in range(8)}
@@ -44,7 +42,7 @@ def colorize(text='', opts=(), **kwargs):
     code_list = []
     if text == '' and len(opts) == 1 and opts[0] == 'reset':
         return '\x1b[%sm' % RESET
-    for k, v in six.iteritems(kwargs):
+    for k, v in kwargs.items():
         if k == 'fg':
             code_list.append(foreground[v])
         elif k == 'bg':
@@ -69,6 +67,7 @@ def make_style(opts=(), **kwargs):
     """
     return lambda text: colorize(text, opts, **kwargs)
 
+
 NOCOLOR_PALETTE = 'nocolor'
 DARK_PALETTE = 'dark'
 LIGHT_PALETTE = 'light'
@@ -76,6 +75,7 @@ LIGHT_PALETTE = 'light'
 PALETTES = {
     NOCOLOR_PALETTE: {
         'ERROR': {},
+        'SUCCESS': {},
         'WARNING': {},
         'NOTICE': {},
         'SQL_FIELD': {},
@@ -91,11 +91,10 @@ PALETTES = {
         'HTTP_SERVER_ERROR': {},
         'MIGRATE_HEADING': {},
         'MIGRATE_LABEL': {},
-        'MIGRATE_SUCCESS': {},
-        'MIGRATE_FAILURE': {},
     },
     DARK_PALETTE: {
         'ERROR': {'fg': 'red', 'opts': ('bold',)},
+        'SUCCESS': {'fg': 'green', 'opts': ('bold',)},
         'WARNING': {'fg': 'yellow', 'opts': ('bold',)},
         'NOTICE': {'fg': 'red'},
         'SQL_FIELD': {'fg': 'green', 'opts': ('bold',)},
@@ -111,11 +110,10 @@ PALETTES = {
         'HTTP_SERVER_ERROR': {'fg': 'magenta', 'opts': ('bold',)},
         'MIGRATE_HEADING': {'fg': 'cyan', 'opts': ('bold',)},
         'MIGRATE_LABEL': {'opts': ('bold',)},
-        'MIGRATE_SUCCESS': {'fg': 'green', 'opts': ('bold',)},
-        'MIGRATE_FAILURE': {'fg': 'red', 'opts': ('bold',)},
     },
     LIGHT_PALETTE: {
         'ERROR': {'fg': 'red', 'opts': ('bold',)},
+        'SUCCESS': {'fg': 'green', 'opts': ('bold',)},
         'WARNING': {'fg': 'yellow', 'opts': ('bold',)},
         'NOTICE': {'fg': 'red'},
         'SQL_FIELD': {'fg': 'green', 'opts': ('bold',)},
@@ -131,8 +129,6 @@ PALETTES = {
         'HTTP_SERVER_ERROR': {'fg': 'magenta', 'opts': ('bold',)},
         'MIGRATE_HEADING': {'fg': 'cyan', 'opts': ('bold',)},
         'MIGRATE_LABEL': {'opts': ('bold',)},
-        'MIGRATE_SUCCESS': {'fg': 'green', 'opts': ('bold',)},
-        'MIGRATE_FAILURE': {'fg': 'red', 'opts': ('bold',)},
     }
 }
 DEFAULT_PALETTE = DARK_PALETTE
@@ -141,7 +137,7 @@ DEFAULT_PALETTE = DARK_PALETTE
 def parse_color_setting(config_string):
     """Parse a DJANGO_COLORS environment variable to produce the system palette
 
-    The general form of a pallete definition is:
+    The general form of a palette definition is:
 
         "palette;role=fg;role=fg/bg;role=fg,option,option;role=fg/bg,option,option"
 
@@ -153,20 +149,21 @@ def parse_color_setting(config_string):
         option is a display options.
 
     Specifying a named palette is the same as manually specifying the individual
-    definitions for each role. Any individual definitions following the pallete
+    definitions for each role. Any individual definitions following the palette
     definition will augment the base palette definition.
 
     Valid roles:
-        'error', 'notice', 'sql_field', 'sql_coltype', 'sql_keyword', 'sql_table',
-        'http_info', 'http_success', 'http_redirect', 'http_bad_request',
-        'http_not_found', 'http_server_error'
+        'error', 'success', 'warning', 'notice', 'sql_field', 'sql_coltype',
+        'sql_keyword', 'sql_table', 'http_info', 'http_success',
+        'http_redirect', 'http_not_modified', 'http_bad_request',
+        'http_not_found', 'http_server_error', 'migrate_heading',
+        'migrate_label'
 
     Valid colors:
         'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white'
 
     Valid options:
-        'bold', 'underscore', 'blink', 'reverse', 'conceal'
-
+        'bold', 'underscore', 'blink', 'reverse', 'conceal', 'noreset'
     """
     if not config_string:
         return PALETTES[DEFAULT_PALETTE]

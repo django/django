@@ -1,24 +1,28 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Fulong Sun <sunfulong@neusoft.edu.cn>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
-# ouyanghongyu <ouyanghongyu@gmail.com>, 2013-2014
+# Liping Wang <lynn.config@gmail.com>, 2016
+# mozillazg <opensource.mozillazg@gmail.com>, 2016
+# Ronald White <ouyanghongyu@gmail.com>, 2013-2014
 # Sean Lee <iseansay@gmail.com>, 2013
 # Sean Lee <iseansay@gmail.com>, 2013
 # slene <vslene@gmail.com>, 2011
 # Ziang Song <songziang@gmail.com>, 2012
 # Kevin Sze <leiarix@gmail.com>, 2012
-# ouyanghongyu <ouyanghongyu@gmail.com>, 2013
+# 雨翌 <yumendy@163.com>, 2016
+# Ronald White <ouyanghongyu@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-31 01:47+0000\n"
-"Last-Translator: Lele Long <schemacs@gmail.com>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-09-20 02:14+0000\n"
+"Last-Translator: Liping Wang <lynn.config@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -71,6 +75,12 @@ msgstr "本月"
 msgid "This year"
 msgstr "今年"
 
+msgid "No date"
+msgstr "没有日期"
+
+msgid "Has date"
+msgstr "具有日期"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -80,12 +90,27 @@ msgstr "请输入一个正确的 %(username)s 和密码. 注意他们都是区�
 msgid "Action:"
 msgstr "动作"
 
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "添加另一个 %(verbose_name)s"
+
+msgid "Remove"
+msgstr "删除"
+
 msgid "action time"
 msgstr "动作时间"
+
+msgid "user"
+msgstr "用户"
+
+msgid "content type"
+msgstr "内容类型"
 
 msgid "object id"
 msgstr "对象id"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "对象表示"
 
@@ -116,6 +141,31 @@ msgstr "删除了 \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "LogEntry对象"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "以添加{name}\"{object}\"。"
+
+msgid "Added."
+msgstr "已添加。"
+
+msgid "and"
+msgstr "和"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "已修改{name} \"{object}\"的{fields}。"
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "已修改{fields}。"
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "已删除{name}\"{object}\"。"
+
+msgid "No fields changed."
+msgstr "没有字段被修改。"
+
 msgid "None"
 msgstr "无"
 
@@ -123,60 +173,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "按住 ”Control“，或者Mac上的 “Command”，可以选择多个。"
 
-#, python-format
-msgid "Changed %s."
-msgstr "已修改 %s 。"
-
-msgid "and"
-msgstr "和"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "已添加 %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "已变更 %(list)s for %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "已删除 %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "没有字段被修改。"
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" 添加成功。你可以在下面再次编辑它。"
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" 已经添加成功。你可以在下面再次编辑它。"
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-" %(name)s \"%(obj)s\" 已经成功添加。你可以在下面添加另外的 %(name)s  。"
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" 添加成功。"
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr " %(name)s \"%(obj)s\" 已经成功进行变更。你可以在下面再次编辑它。"
+msgstr "{name} \"{obj}\" 已经添加成功。你可以在下面添加其它的{name}。"
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name}\"{obj}\"添加成功。"
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
-msgstr ""
-" %(name)s \"%(obj)s\" 已经成功进行变更。你可以在下面添加其它的 %(name)s。"
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" 添加成功。你可以在下面再次编辑它。"
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" 修改成功。"
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr "{name} \"{obj}\" 已经成功进行变更。你可以在下面添加其它的{name}。"
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name}\"{obj}\"修改成功。"
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -327,18 +352,15 @@ msgstr "文档"
 msgid "Log out"
 msgstr "注销"
 
-msgid "Add"
-msgstr "增加"
+#, python-format
+msgid "Add %(name)s"
+msgstr "增加 %(name)s"
 
 msgid "History"
 msgstr "历史"
 
 msgid "View on site"
 msgstr "在站点上查看"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "增加 %(name)s"
 
 msgid "Filter"
 msgstr "过滤器"
@@ -418,13 +440,6 @@ msgstr ""
 msgid "Change"
 msgstr "修改"
 
-msgid "Remove"
-msgstr "删除"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "添加另一个 %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "删除？"
 
@@ -439,13 +454,16 @@ msgstr "概览"
 msgid "Models in the %(name)s application"
 msgstr "在应用程序 %(name)s 中的模型"
 
+msgid "Add"
+msgstr "增加"
+
 msgid "You don't have permission to edit anything."
 msgstr "你无权修改任何东西。"
 
-msgid "Recent Actions"
+msgid "Recent actions"
 msgstr "最近动作"
 
-msgid "My Actions"
+msgid "My actions"
 msgstr "我的动作"
 
 msgid "None available"
@@ -461,6 +479,14 @@ msgid ""
 msgstr ""
 "你的数据库安装有误。确保已经创建了相应的数据库表，并确保数据库可被相关的用户"
 "读取。"
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"您当前以%(username)s登录，但是没有这个页面的访问权限。您想使用另外一个账号登"
+"录吗？"
 
 msgid "Forgotten your password or username?"
 msgstr "忘记了您的密码或用户名？"
@@ -484,6 +510,9 @@ msgstr "显示全部"
 
 msgid "Save"
 msgstr "保存"
+
+msgid "Popup closing..."
+msgstr "弹窗关闭中。。。"
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -612,9 +641,6 @@ msgstr "重设我的密码"
 
 msgid "All dates"
 msgstr "所有日期"
-
-msgid "(None)"
-msgstr "(None)"
 
 #, python-format
 msgid "Select %s"

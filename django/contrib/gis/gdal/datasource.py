@@ -40,17 +40,16 @@ from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.error import GDALException, OGRIndexError
 from django.contrib.gis.gdal.layer import Layer
 from django.contrib.gis.gdal.prototypes import ds as capi
-from django.utils import six
 from django.utils.encoding import force_bytes, force_text
-from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:
-#  http://www.gdal.org/ogr/ogr__api_8h.html
+#  http://www.gdal.org/ogr__api_8h.html
 #
 # The OGR_DS_* routines are relevant here.
 class DataSource(GDALBase):
     "Wraps an OGR Data Source object."
+    destructor = capi.destroy_ds
 
     def __init__(self, ds_input, ds_driver=False, write=False, encoding='utf-8'):
         # The write flag.
@@ -63,7 +62,7 @@ class DataSource(GDALBase):
 
         Driver.ensure_registered()
 
-        if isinstance(ds_input, six.string_types):
+        if isinstance(ds_input, str):
             # The data source driver is a void pointer.
             ds_driver = Driver.ptr_type()
             try:
@@ -85,11 +84,6 @@ class DataSource(GDALBase):
             # Raise an exception if the returned pointer is NULL
             raise GDALException('Invalid data source file "%s"' % ds_input)
 
-    def __del__(self):
-        "Destroys this DataStructure object."
-        if self._ptr and capi:
-            capi.destroy_ds(self._ptr)
-
     def __iter__(self):
         "Allows for iteration over the layers in a data source."
         for i in range(self.layer_count):
@@ -97,17 +91,17 @@ class DataSource(GDALBase):
 
     def __getitem__(self, index):
         "Allows use of the index [] operator to get a layer at the index."
-        if isinstance(index, six.string_types):
-            l = capi.get_layer_by_name(self.ptr, force_bytes(index))
-            if not l:
+        if isinstance(index, str):
+            layer = capi.get_layer_by_name(self.ptr, force_bytes(index))
+            if not layer:
                 raise OGRIndexError('invalid OGR Layer name given: "%s"' % index)
         elif isinstance(index, int):
             if index < 0 or index >= self.layer_count:
                 raise OGRIndexError('index out of range')
-            l = capi.get_layer(self._ptr, index)
+            layer = capi.get_layer(self._ptr, index)
         else:
             raise TypeError('Invalid index type: %s' % type(index))
-        return Layer(l, self)
+        return Layer(layer, self)
 
     def __len__(self):
         "Returns the number of layers within the data source."
@@ -115,7 +109,7 @@ class DataSource(GDALBase):
 
     def __str__(self):
         "Returns OGR GetName and Driver for the Data Source."
-        return '%s (%s)' % (self.name, str(self.driver))
+        return '%s (%s)' % (self.name, self.driver)
 
     @property
     def layer_count(self):

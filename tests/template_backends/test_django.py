@@ -1,10 +1,9 @@
 from template_tests.test_response import test_processor_name
 
-from django.template import RequestContext
+from django.template import Context, EngineHandler, RequestContext
 from django.template.backends.django import DjangoTemplates
 from django.template.library import InvalidTemplateLibrary
-from django.test import RequestFactory, ignore_warnings, override_settings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.test import RequestFactory, override_settings
 
 from .test_dummy import TemplateStringsTests
 
@@ -28,30 +27,31 @@ class DjangoTemplatesTests(TemplateStringsTests):
         template = engine.from_string('{{ processors }}')
         request = RequestFactory().get('/')
 
-        # Check that context processors run
+        # Context processors run
         content = template.render({}, request)
         self.assertEqual(content, 'yes')
 
-        # Check that context overrides context processors
+        # Context overrides context processors
         content = template.render({'processors': 'no'}, request)
         self.assertEqual(content, 'no')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_request_context_conflicts_with_request(self):
-        template = self.engine.from_string('hello')
-
-        request = RequestFactory().get('/')
-        request_context = RequestContext(request)
-        # This doesn't raise an exception.
-        template.render(request_context, request)
-
-        other_request = RequestFactory().get('/')
-        msg = ("render() was called with a RequestContext and a request "
-               "argument which refer to different requests. Make sure "
-               "that the context argument is a dict or at least that "
-               "the two arguments refer to the same request.")
-        with self.assertRaisesMessage(ValueError, msg):
-            template.render(request_context, other_request)
+    def test_render_requires_dict(self):
+        """django.Template.render() requires a dict."""
+        engine = DjangoTemplates({
+            'DIRS': [],
+            'APP_DIRS': False,
+            'NAME': 'django',
+            'OPTIONS': {},
+        })
+        template = engine.from_string('')
+        context = Context()
+        request_context = RequestContext(RequestFactory().get('/'), {})
+        msg = 'context must be a dict rather than Context.'
+        with self.assertRaisesMessage(TypeError, msg):
+            template.render(context)
+        msg = 'context must be a dict rather than RequestContext.'
+        with self.assertRaisesMessage(TypeError, msg):
+            template.render(request_context)
 
     @override_settings(INSTALLED_APPS=['template_backends.apps.good'])
     def test_templatetag_discovery(self):
@@ -127,3 +127,39 @@ class DjangoTemplatesTests(TemplateStringsTests):
                 'template_backends.apps.good.templatetags.good_tags',
             ]
         )
+
+    def test_autoescape_off(self):
+        templates = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'OPTIONS': {'autoescape': False},
+        }]
+        engines = EngineHandler(templates=templates)
+        self.assertEqual(
+            engines['django'].from_string('Hello, {{ name }}').render({'name': 'Bob & Jim'}),
+            'Hello, Bob & Jim'
+        )
+
+    def test_autoescape_default(self):
+        templates = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        }]
+        engines = EngineHandler(templates=templates)
+        self.assertEqual(
+            engines['django'].from_string('Hello, {{ name }}').render({'name': 'Bob & Jim'}),
+            'Hello, Bob &amp; Jim'
+        )
+
+    default_loaders = [
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+    ]
+
+    @override_settings(DEBUG=False)
+    def test_non_debug_default_template_loaders(self):
+        engine = DjangoTemplates({'DIRS': [], 'APP_DIRS': True, 'NAME': 'django', 'OPTIONS': {}})
+        self.assertEqual(engine.engine.loaders, [('django.template.loaders.cached.Loader', self.default_loaders)])
+
+    @override_settings(DEBUG=True)
+    def test_debug_default_template_loaders(self):
+        engine = DjangoTemplates({'DIRS': [], 'APP_DIRS': True, 'NAME': 'django', 'OPTIONS': {}})
+        self.assertEqual(engine.engine.loaders, self.default_loaders)

@@ -1,18 +1,16 @@
 import datetime
 import decimal
-import warnings
 from importlib import import_module
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends import utils
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.dateparse import parse_duration
-from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 
 
-class BaseDatabaseOperations(object):
+class BaseDatabaseOperations:
     """
     This class encapsulates all backend-specific differences, such as the way
     a backend performs ordering or calculates the ID of a recently-inserted
@@ -28,6 +26,11 @@ class BaseDatabaseOperations(object):
         'BigIntegerField': (-9223372036854775808, 9223372036854775807),
         'PositiveSmallIntegerField': (0, 32767),
         'PositiveIntegerField': (0, 2147483647),
+    }
+    set_operators = {
+        'union': 'UNION',
+        'intersection': 'INTERSECT',
+        'difference': 'EXCEPT',
     }
 
     def __init__(self, connection):
@@ -90,14 +93,17 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetrunc_sql() method')
 
-    def datetime_cast_sql(self):
+    def datetime_cast_date_sql(self, field_name, tzname):
         """
-        Returns the SQL necessary to cast a datetime value so that it will be
-        retrieved as a Python datetime object instead of a string.
+        Returns the SQL necessary to cast a datetime value to date value.
+        """
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_cast_date() method')
 
-        This SQL should include a '%s' in place of the field's name.
+    def datetime_cast_time_sql(self, field_name, tzname):
         """
-        return "%s"
+        Returns the SQL necessary to cast a datetime value to time value.
+        """
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_cast_time_sql() method')
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         """
@@ -116,6 +122,21 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_trunk_sql() method')
 
+    def time_trunc_sql(self, lookup_type, field_name):
+        """
+        Given a lookup_type of 'hour', 'minute' or 'second', returns the SQL
+        that truncates the given time field field_name to a time object with
+        only the given specificity.
+        """
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a time_trunc_sql() method')
+
+    def time_extract_sql(self, lookup_type, field_name):
+        """
+        Given a lookup_type of 'hour', 'minute' or 'second', returns the SQL
+        that extracts a value from the given time field field_name.
+        """
+        return self.date_extract_sql(lookup_type, field_name)
+
     def deferrable_sql(self):
         """
         Returns the SQL necessary to make a constraint "initially deferred"
@@ -133,19 +154,6 @@ class BaseDatabaseOperations(object):
             raise NotImplementedError('DISTINCT ON fields is not supported by this database backend')
         else:
             return 'DISTINCT'
-
-    def drop_foreignkey_sql(self):
-        """
-        Returns the SQL command that drops a foreign key.
-        """
-        return "DROP CONSTRAINT"
-
-    def drop_sequence_sql(self, table):
-        """
-        Returns any SQL necessary to drop the sequence for the given table.
-        Returns None if no SQL is necessary.
-        """
-        return None
 
     def fetch_returned_insert_id(self, cursor):
         """
@@ -172,22 +180,16 @@ class BaseDatabaseOperations(object):
         """
         return []
 
-    def for_update_sql(self, nowait=False):
+    def for_update_sql(self, nowait=False, skip_locked=False):
         """
         Returns the FOR UPDATE SQL clause to lock rows for an update operation.
         """
         if nowait:
             return 'FOR UPDATE NOWAIT'
+        elif skip_locked:
+            return 'FOR UPDATE SKIP LOCKED'
         else:
             return 'FOR UPDATE'
-
-    def fulltext_search_sql(self, field_name):
-        """
-        Returns the SQL WHERE clause to use in order to perform a full-text
-        search of the given field_name. Note that the resulting string should
-        contain a '%s' placeholder for the value being searched against.
-        """
-        raise NotImplementedError('Full-text search is not implemented for this database backend')
 
     def last_executed_query(self, cursor, sql, params):
         """
@@ -199,16 +201,17 @@ class BaseDatabaseOperations(object):
         exists for database backends to provide a better implementation
         according to their own quoting schemes.
         """
-        # Convert params to contain Unicode values.
-        to_unicode = lambda s: force_text(s, strings_only=True, errors='replace')
+        # Convert params to contain string values.
+        def to_string(s):
+            return force_text(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
-            u_params = tuple(to_unicode(val) for val in params)
+            u_params = tuple(to_string(val) for val in params)
         elif params is None:
             u_params = ()
         else:
-            u_params = {to_unicode(k): to_unicode(v) for k, v in params.items()}
+            u_params = {to_string(k): to_string(v) for k, v in params.items()}
 
-        return six.text_type("QUERY = %r - PARAMS = %r") % (sql, u_params)
+        return "QUERY = %r - PARAMS = %r" % (sql, u_params)
 
     def last_insert_id(self, cursor, table_name, pk_name):
         """
@@ -223,7 +226,7 @@ class BaseDatabaseOperations(object):
     def lookup_cast(self, lookup_type, internal_type=None):
         """
         Returns the string to use in a query when performing lookups
-        ("contains", "like", etc). The resulting string should contain a '%s'
+        ("contains", "like", etc.). The resulting string should contain a '%s'
         placeholder for the column being searched against.
         """
         return "%s"
@@ -258,7 +261,7 @@ class BaseDatabaseOperations(object):
 
     def prepare_sql_script(self, sql):
         """
-        Takes a SQL script that may contain multiple lines and returns a list
+        Takes an SQL script that may contain multiple lines and returns a list
         of statements to feed to successive cursor.execute() calls.
 
         Since few databases are able to process raw SQL scripts in a single
@@ -370,7 +373,7 @@ class BaseDatabaseOperations(object):
         to tables with foreign keys pointing the tables being truncated.
         PostgreSQL requires a cascade even if these tables are empty.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide a sql_flush() method')
+        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide an sql_flush() method')
 
     def sequence_reset_by_name_sql(self, style, sequences):
         """
@@ -419,7 +422,7 @@ class BaseDatabaseOperations(object):
 
     def prep_for_like_query(self, x):
         """Prepares a value for use in a LIKE query."""
-        return force_text(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
+        return force_text(x).replace("\\", "\\\\").replace("%", r"\%").replace("_", r"\_")
 
     # Same as prep_for_like_query(), but called for "iexact" matches, which
     # need not necessarily be implemented using "LIKE" in the backend.
@@ -459,7 +462,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return six.text_type(value)
+        return str(value)
 
     def adapt_datetimefield_value(self, value):
         """
@@ -468,7 +471,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return six.text_type(value)
+        return str(value)
 
     def adapt_timefield_value(self, value):
         """
@@ -479,9 +482,9 @@ class BaseDatabaseOperations(object):
             return None
         if timezone.is_aware(value):
             raise ValueError("Django does not support timezone-aware times.")
-        return six.text_type(value)
+        return str(value)
 
-    def adapt_decimalfield_value(self, value, max_digits, decimal_places):
+    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
         """
         Transforms a decimal.Decimal value to an object compatible with what is
         expected by the backend driver for decimal (numeric) columns.
@@ -493,7 +496,7 @@ class BaseDatabaseOperations(object):
         Transforms a string representation of an IP address into the expected
         type for the backend driver.
         """
-        return value
+        return value or None
 
     def year_lookup_bounds_for_date_field(self, value):
         """
@@ -542,13 +545,6 @@ class BaseDatabaseOperations(object):
             value = parse_duration(value)
         return value
 
-    def check_aggregate_support(self, aggregate_func):
-        warnings.warn(
-            "check_aggregate_support has been deprecated. Use "
-            "check_expression_support instead.",
-            RemovedInDjango21Warning, stacklevel=2)
-        return self.check_expression_support(aggregate_func)
-
     def check_expression_support(self, expression):
         """
         Check that the backend supports the provided expression.
@@ -572,7 +568,14 @@ class BaseDatabaseOperations(object):
     def combine_duration_expression(self, connector, sub_expressions):
         return self.combine_expression(connector, sub_expressions)
 
-    def modify_insert_params(self, placeholders, params):
+    def binary_placeholder_sql(self, value):
+        """
+        Some backends require special syntax to insert binary content (MySQL
+        for example uses '_binary %s').
+        """
+        return '%s'
+
+    def modify_insert_params(self, placeholder, params):
         """Allow modification of insert parameters. Needed for Oracle Spatial
         backend due to #10888.
         """
@@ -585,3 +588,10 @@ class BaseDatabaseOperations(object):
         range of the column type bound to the field.
         """
         return self.integer_field_ranges[internal_type]
+
+    def subtract_temporals(self, internal_type, lhs, rhs):
+        if self.connection.features.supports_temporal_subtraction:
+            lhs_sql, lhs_params = lhs
+            rhs_sql, rhs_params = rhs
+            return "(%s - %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
+        raise NotImplementedError("This backend does not support %s subtraction." % internal_type)

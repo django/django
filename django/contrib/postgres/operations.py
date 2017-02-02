@@ -14,13 +14,25 @@ class CreateExtension(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         if schema_editor.connection.vendor != 'postgresql':
             return
-        schema_editor.execute("CREATE EXTENSION IF NOT EXISTS %s" % self.name)
+        schema_editor.execute("CREATE EXTENSION IF NOT EXISTS %s" % schema_editor.quote_name(self.name))
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        schema_editor.execute("DROP EXTENSION %s" % self.name)
+        schema_editor.execute("DROP EXTENSION %s" % schema_editor.quote_name(self.name))
 
     def describe(self):
         return "Creates extension %s" % self.name
+
+
+class BtreeGinExtension(CreateExtension):
+
+    def __init__(self):
+        self.name = 'btree_gin'
+
+
+class CITextExtension(CreateExtension):
+
+    def __init__(self):
+        self.name = 'citext'
 
 
 class HStoreExtension(CreateExtension):
@@ -29,11 +41,17 @@ class HStoreExtension(CreateExtension):
         self.name = 'hstore'
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        super(HStoreExtension, self).database_forwards(app_label, schema_editor, from_state, to_state)
+        super().database_forwards(app_label, schema_editor, from_state, to_state)
         # Register hstore straight away as it cannot be done before the
         # extension is installed, a subsequent data migration would use the
         # same connection
         register_hstore_handler(schema_editor.connection)
+
+
+class TrigramExtension(CreateExtension):
+
+    def __init__(self):
+        self.name = 'pg_trgm'
 
 
 class UnaccentExtension(CreateExtension):

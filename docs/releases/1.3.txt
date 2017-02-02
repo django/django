@@ -6,11 +6,11 @@ Django 1.3 release notes
 
 Welcome to Django 1.3!
 
-Nearly a year in the making, Django 1.3 includes quite a few `new
-features`_ and plenty of bug fixes and improvements to existing
-features. These release notes cover the new features in 1.3, as well
-as some `backwards-incompatible changes`_ you'll want to be aware of
-when upgrading from Django 1.2 or older versions.
+Nearly a year in the making, Django 1.3 includes quite a few :ref:`new features
+<whats-new-1.3>` and plenty of bug fixes and improvements to existing features.
+These release notes cover the new features in 1.3, as well as some
+:ref:`backwards-incompatible changes <backwards-incompatible-changes-1.3>`
+you'll want to be aware of when upgrading from Django 1.2 or older versions.
 
 Overview
 ========
@@ -28,27 +28,15 @@ new features from landing, including:
 * Django's testing framework now supports (and ships with a copy of)
   `the unittest2 library`_.
 
-There's plenty more, of course; see the coverage of `new features`_
-below for a full rundown and details.
-
 Wherever possible, of course, new features are introduced in a
 backwards-compatible manner per :doc:`our API stability policy
 </misc/api-stability>` policy. As a result of this policy, Django 1.3
-`begins the deprecation process for some features`_.
+:ref:`begins the deprecation process for some features
+<deprecated-features-1.3>`.
 
-Some changes, unfortunately, are genuinely backwards-incompatible; in
-most cases these are due to security issues or bugs which simply
-couldn't be fixed any other way. Django 1.3 includes a few of these,
-and descriptions of them -- along with the (minor) modifications
-you'll need to make to handle them -- are documented in the list of
-`backwards-incompatible changes`_ below.
-
-.. _new features: `What's new in Django 1.3`_
-.. _backwards-incompatible changes: backwards-incompatible-changes-1.3_
 .. _using Python's logging facilities: `Logging`_
 .. _easy handling of static files: `Extended static files handling`_
 .. _the unittest2 library: `unittest2 support`_
-.. _begins the deprecation process for some features: `deprecated-features-1.3`_
 
 Python compatibility
 ====================
@@ -64,11 +52,13 @@ supported Python version will be 2.5. A document outlining our full
 timeline for deprecating Python 2.x and moving to Python 3.x will be
 published shortly after the release of Django 1.3.
 
+.. _whats-new-1.3:
+
 What's new in Django 1.3
 ========================
 
 Class-based views
-~~~~~~~~~~~~~~~~~
+-----------------
 
 Django 1.3 adds a framework that allows you to use a class as a view.
 This means you can compose a view out of a collection of methods that
@@ -86,7 +76,7 @@ your function-based generic views to class-based
 views <https://docs.djangoproject.com/en/1.4/topics/generic-views-migration/>`_.
 
 Logging
-~~~~~~~
+-------
 
 Django 1.3 adds framework-level support for Python's ``logging``
 module.  This means you can now easily configure and control logging
@@ -97,7 +87,7 @@ handled as a logging activity. See :doc:`the documentation on Django's
 logging interface </topics/logging>` for more details.
 
 Extended static files handling
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 Django 1.3 ships with a new contrib app --
 ``django.contrib.staticfiles`` -- to help developers handle the static
@@ -118,7 +108,7 @@ for more details or learn how to :doc:`manage static files
 </howto/static-files/index>`.
 
 unittest2 support
-~~~~~~~~~~~~~~~~~
+-----------------
 
 Python 2.7 introduced some major changes to the ``unittest`` library,
 adding some extremely useful features. To ensure that every Django
@@ -146,18 +136,16 @@ you just won't get any of the nice new unittest2 features.
 .. _unittest2: https://pypi.python.org/pypi/unittest2
 
 Transaction context managers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 Users of Python 2.5 and above may now use transaction management functions as
-`context managers`_. For example::
+context managers. For example::
 
     with transaction.autocommit():
         # ...
 
-.. _context managers: https://docs.python.org/glossary.html#term-context-manager
-
 Configurable delete-cascade
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 :class:`~django.db.models.ForeignKey` and
 :class:`~django.db.models.OneToOneField` now accept an
@@ -170,7 +158,7 @@ For more information, see the :attr:`~django.db.models.ForeignKey.on_delete`
 documentation.
 
 Contextual markers and comments for translatable strings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------------
 
 For translation strings with ambiguous meaning, you can now
 use the ``pgettext`` function to specify the context of the string.
@@ -182,7 +170,7 @@ For more information, see :ref:`contextual-markers` and
 :ref:`translator-comments`.
 
 Improvements to built-in template tags
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------
 
 A number of improvements have been made to Django's built-in template tags:
 
@@ -199,7 +187,7 @@ A number of improvements have been made to Django's built-in template tags:
   you to load a single tag or filter from a library.
 
 TemplateResponse
-~~~~~~~~~~~~~~~~
+----------------
 
 It can sometimes be beneficial to allow decorators or middleware to
 modify a response *after* it has been constructed by the view. For
@@ -220,7 +208,7 @@ For more details, see the :doc:`documentation </ref/template-response>`
 on the :class:`~django.template.response.TemplateResponse` class.
 
 Caching changes
-~~~~~~~~~~~~~~~
+---------------
 
 Django 1.3 sees the introduction of several improvements to the
 Django's caching infrastructure.
@@ -247,7 +235,7 @@ caching in Django</topics/cache>`.
 .. _pylibmc: http://sendapatch.se/projects/pylibmc/
 
 Permissions for inactive users
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 If you provide a custom auth backend with ``supports_inactive_user``
 set to ``True``, an inactive ``User`` instance will check the backend
@@ -256,14 +244,14 @@ permission handling. See the :doc:`authentication docs </topics/auth/index>`
 for more details.
 
 GeoDjango
-~~~~~~~~~
+---------
 
 The GeoDjango test suite is now included when
 :ref:`running the Django test suite <running-unit-tests>` with ``runtests.py``
 when using :ref:`spatial database backends <spatial-backends>`.
 
 :setting:`MEDIA_URL` and :setting:`STATIC_URL` must end in a slash
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------------------------
 
 Previously, the :setting:`MEDIA_URL` setting only required a trailing slash if
 it contained a suffix beyond the domain name.
@@ -279,7 +267,7 @@ In Django 1.4 this same condition will raise ``DeprecationWarning``,
 and in Django 1.5 will raise an ``ImproperlyConfigured`` exception.
 
 Everything else
-~~~~~~~~~~~~~~~
+---------------
 
 Django :doc:`1.1 <1.1>` and :doc:`1.2 <1.2>` added
 lots of big ticket items to Django, like multiple-database support,
@@ -321,7 +309,7 @@ requests. These include:
   template tags that require access to template context.
 
 * A new :meth:`~django.shortcuts.render()` shortcut -- an alternative
-  to :meth:`~django.shortcuts.render_to_response()` providing a
+  to ``django.shortcuts.render_to_response()`` providing a
   :class:`~django.template.RequestContext` by default.
 
 * Support for combining :class:`F expressions <django.db.models.F>`
@@ -335,7 +323,7 @@ Backwards-incompatible changes in 1.3
 =====================================
 
 CSRF validation now applies to AJAX requests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------
 
 Prior to Django 1.2.5, Django's CSRF-prevention system exempted AJAX
 requests from CSRF verification; due to `security issues`_ reported to
@@ -347,7 +335,7 @@ AJAX requests.
 .. _security issues: https://www.djangoproject.com/weblog/2011/feb/08/security/
 
 Restricted filters in admin interface
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 Prior to Django 1.2.5, the Django administrative interface allowed
 filtering on any model field or relation -- not just those specified
@@ -357,7 +345,7 @@ admin must be for fields or relations specified in ``list_filter`` or
 ``date_hierarchy``.
 
 Deleting a model doesn't delete associated files
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------
 
 In earlier Django versions, when a model instance containing a
 :class:`~django.db.models.FileField` was deleted,
@@ -371,7 +359,7 @@ instance, with a custom management command that can be run manually or
 scheduled to run periodically via e.g. cron).
 
 PasswordInput default rendering behavior
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------
 
 The :class:`~django.forms.PasswordInput` form widget, intended for use
 with form fields which represent passwords, accepts a boolean keyword
@@ -394,7 +382,7 @@ explicitly indicate this. For example::
         password = forms.CharField(widget=forms.PasswordInput(render_value=True))
 
 Clearable default widget for FileField
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------
 
 Django 1.3 now includes a :class:`~django.forms.ClearableFileInput` form widget
 in addition to :class:`~django.forms.FileInput`. ``ClearableFileInput`` renders
@@ -420,7 +408,7 @@ To return to the previous rendering (without the ability to clear the
             widgets = {'document': forms.FileInput}
 
 New index on database session table
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
 
 Prior to Django 1.3, the database table used by the database backend
 for the :doc:`sessions </topics/http/sessions>` app had no index on
@@ -437,7 +425,7 @@ index can be found by running the ``sqlindexes`` admin command::
     python manage.py sqlindexes sessions
 
 No more naughty words
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 Django has historically provided (and enforced) a list of profanities.
 The comments app has enforced this list of profanities, preventing people from
@@ -458,11 +446,11 @@ prohibited). However, if avoiding profanities is important to you, you
 would be well advised to seek out a better, less naive approach to the
 problem.
 
-.. _Scunthorpe problem: http://en.wikipedia.org/wiki/Scunthorpe_problem
+.. _Scunthorpe problem: https://en.wikipedia.org/wiki/Scunthorpe_problem
 .. _commit that implemented this change: https://code.djangoproject.com/changeset/13996
 
 Localflavor changes
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 Django 1.3 introduces the following backwards-incompatible changes to
 local flavors:
@@ -482,7 +470,7 @@ local flavors:
   ``USStateField`` not including them.
 
 FormSet updates
-~~~~~~~~~~~~~~~
+---------------
 
 In Django 1.3 ``FormSet`` creation behavior is modified slightly. Historically
 the class didn't make a distinction between not being passed data and being
@@ -511,7 +499,7 @@ if you need to instantiate an empty ``FormSet``, don't pass in the data or use
     >>> formset = ArticleFormSet(data=None)
 
 Callables in templates
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 Previously, a callable in a template would only be called automatically as part
 of the variable resolution process if it was retrieved via attribute
@@ -529,7 +517,7 @@ designed for web designers, and was never deliberately supported, it is possible
 that some templates may be broken by this change.
 
 Use of custom SQL to load initial data in tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------
 
 Django provides a custom SQL hooks as a way to inject hand-crafted SQL
 into the database synchronization process. One of the possible uses
@@ -559,7 +547,7 @@ should either insert it using :ref:`test fixtures
 test case.
 
 Changed priority of translation loading
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------
 
 Work has been done to simplify, rationalize and properly document the algorithm
 used by Django at runtime to build translations from the different translations
@@ -605,7 +593,7 @@ domain):
 .. _corresponding deprecated features section: loading_of_project_level_translations_
 
 Transaction management
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 When using managed transactions -- that is, anything but the default
 autocommit mode -- it is important when a transaction is marked as
@@ -639,14 +627,14 @@ the read operation that retrieves the ``MyObject`` instance leaves the
 transaction in a dirty state.
 
 No password reset for inactive users
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------
 
 Prior to Django 1.3, inactive users were able to request a password reset email
 and reset their password. In Django 1.3 inactive users will receive the same
 message as a nonexistent account.
 
 Password reset view now accepts ``from_email``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------
 
 The :func:`django.contrib.auth.views.password_reset` view now accepts a
 ``from_email`` parameter, which is passed to the ``password_reset_form``’s
@@ -679,7 +667,7 @@ be removed entirely.
     </internals/deprecation>`.
 
 ``mod_python`` support
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 The ``mod_python`` library has not had a release since 2007 or a commit since
 2008. The Apache Foundation board voted to remove ``mod_python`` from the set
@@ -694,7 +682,7 @@ recommended by the Django project, but FastCGI is also supported. Support for
 ``mod_python`` deployment will be removed in Django 1.5.
 
 Function-based generic views
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 As a result of the introduction of class-based generic views, the
 function-based generic views provided by Django have been deprecated.
@@ -706,7 +694,7 @@ The following modules and the views they contain have been deprecated:
 * ``django.views.generic.simple``
 
 Test client response ``template`` attribute
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------
 
 Django's :ref:`test client <test-client>` returns
 :class:`~django.test.Response` objects annotated with extra testing
@@ -722,7 +710,7 @@ In Django 1.3 the ``template`` attribute is deprecated in favor of a new
 list, even if it has only a single element or no elements.
 
 ``DjangoTestRunner``
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 As a result of the introduction of support for unittest2, the features
 of ``django.test.simple.DjangoTestRunner`` (including fail-fast
@@ -730,8 +718,8 @@ and Ctrl-C test termination) have been made redundant. In view of this
 redundancy, ``DjangoTestRunner`` has been turned into an empty placeholder
 class, and will be removed entirely in Django 1.5.
 
-Changes to :ttag:`url` and :ttag:`ssi`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Changes to ``url`` and ``ssi``
+------------------------------
 
 Most template tags will allow you to pass in either constants or
 variables as arguments -- for example::
@@ -745,15 +733,14 @@ context variable ``templ`` that contains the value ``base.html``::
 
 is also legal.
 
-However, due to an accident of history, the :ttag:`url` and
-:ttag:`ssi` are different. These tags use the second, quoteless
-syntax, but interpret the argument as a constant. This means it isn't
-possible to use a context variable as the target of a :ttag:`url` and
-:ttag:`ssi` tag.
+However, due to an accident of history, the ``url`` and ``ssi`` are different.
+These tags use the second, quoteless syntax, but interpret the argument as a
+constant. This means it isn't possible to use a context variable as the target
+of a ``url`` and ``ssi`` tag.
 
 Django 1.3 marks the start of the process to correct this historical
 accident. Django 1.3 adds a new template library -- ``future`` -- that
-provides alternate implementations of the :ttag:`url` and :ttag:`ssi`
+provides alternate implementations of the ``url`` and ``ssi``
 template tags. This ``future`` library implement behavior that makes
 the handling of the first argument consistent with the handling of all
 other variables. So, an existing template that contains::
@@ -772,7 +759,7 @@ templates should be modified to use the new ``future`` libraries and
 syntax.
 
 Changes to the login methods of the admin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------
 
 In previous version the admin app defined login methods in multiple locations
 and ignored the almost identical implementation in the already used auth app.
@@ -789,7 +776,7 @@ attribute.
 .. _r12634: https://code.djangoproject.com/changeset/12634
 
 ``reset`` and ``sqlreset`` management commands
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------
 
 Those commands have been deprecated. The ``flush`` and ``sqlflush`` commands
 can be used to delete everything. You can also use ALTER TABLE or DROP TABLE
@@ -797,7 +784,7 @@ statements manually.
 
 
 GeoDjango
-~~~~~~~~~
+---------
 
 * The function-based :setting:`TEST_RUNNER` previously used to execute
   the GeoDjango test suite, ``django.contrib.gis.tests.run_gis_tests``, was
@@ -813,7 +800,7 @@ GeoDjango
   called when the SRID of the geometry is less than 0 or ``None``.
 
 ``CZBirthNumberField.clean``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 Previously this field's ``clean()`` method accepted a second, gender, argument
 which allowed stronger validation checks to be made, however since this
@@ -821,7 +808,7 @@ argument could never actually be passed from the Django form machinery it is
 now pending deprecation.
 
 ``CompatCookie``
-~~~~~~~~~~~~~~~~
+----------------
 
 Previously, ``django.http`` exposed an undocumented ``CompatCookie`` class,
 which was a bugfix wrapper around the standard library ``SimpleCookie``. As the
@@ -831,7 +818,7 @@ django.http import SimpleCookie`` instead.
 .. _loading_of_project_level_translations:
 
 Loading of *project-level* translations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------
 
 This release of Django starts the deprecation process for inclusion of
 translations located under the so-called *project path* in the translation
@@ -866,7 +853,7 @@ Rationale for this decision:
   inconsistency.
 
 ``PermWrapper`` moved to ``django.contrib.auth.context_processors``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------------
 
 In Django 1.2, we began the process of changing the location of the
 ``auth`` context processor from ``django.core.context_processors`` to
@@ -878,7 +865,7 @@ moved to ``django.contrib.auth.context_processors``, along with the
 identical to their old versions; only the module location has changed.
 
 Removal of ``XMLField``
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 When Django was first released, Django included an ``XMLField`` that performed
 automatic XML validation for any field input. However, this validation function

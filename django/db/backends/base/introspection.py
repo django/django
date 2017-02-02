@@ -1,16 +1,13 @@
 from collections import namedtuple
 
-from django.utils import six
-
 # Structure returned by DatabaseIntrospection.get_table_list()
 TableInfo = namedtuple('TableInfo', ['name', 'type'])
 
 # Structure returned by the DB-API cursor.description interface (PEP 249)
-FieldInfo = namedtuple('FieldInfo',
-    'name type_code display_size internal_size precision scale null_ok')
+FieldInfo = namedtuple('FieldInfo', 'name type_code display_size internal_size precision scale null_ok default')
 
 
-class BaseDatabaseIntrospection(object):
+class BaseDatabaseIntrospection:
     """
     This class encapsulates all backend-specific introspection utilities
     """
@@ -80,7 +77,10 @@ class BaseDatabaseIntrospection(object):
                 if not model._meta.managed:
                     continue
                 tables.add(model._meta.db_table)
-                tables.update(f.m2m_db_table() for f in model._meta.local_many_to_many)
+                tables.update(
+                    f.m2m_db_table() for f in model._meta.local_many_to_many
+                    if f.remote_field.through._meta.managed
+                )
         tables = list(tables)
         if only_existing:
             existing_tables = self.table_names(include_views=include_views)
@@ -141,13 +141,14 @@ class BaseDatabaseIntrospection(object):
         """
         Returns the name of the primary key column for the given table.
         """
-        for column in six.iteritems(self.get_indexes(cursor, table_name)):
-            if column[1]['primary_key']:
-                return column[0]
+        for constraint in self.get_constraints(cursor, table_name).values():
+            if constraint['primary_key']:
+                return constraint['columns'][0]
         return None
 
     def get_indexes(self, cursor, table_name):
         """
+        Deprecated in Django 1.11, use get_constraints instead.
         Returns a dictionary of indexed fieldname -> infodict for the given
         table, where each infodict is in the format:
             {'primary_key': boolean representing whether it's the primary key,
@@ -170,6 +171,8 @@ class BaseDatabaseIntrospection(object):
          * foreign_key: (table, column) of target, or None
          * check: True if check constraint, False otherwise
          * index: True if index, False otherwise.
+         * orders: The order (ASC/DESC) defined for the columns of indexes
+         * type: The type of the index (btree, hash, etc.)
 
         Some backends may return special constraint names that don't exist
         if they don't name constraints of a certain type (e.g. SQLite)

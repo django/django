@@ -1,14 +1,11 @@
-from __future__ import unicode_literals
-
 from django.conf import settings
 from django.contrib.messages import constants, utils
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 
 LEVEL_TAGS = utils.get_level_tags()
 
 
-@python_2_unicode_compatible
-class Message(object):
+class Message:
     """
     Represents an actual message that can be stored in any of the supported
     storage classes (typically session- or cookie-based) and rendered in a view
@@ -23,7 +20,7 @@ class Message(object):
     def _prepare(self):
         """
         Prepares the message for serialization by forcing the ``message``
-        and ``extra_tags`` to unicode in case they are lazy translations.
+        and ``extra_tags`` to str in case they are lazy translations.
 
         Known "safe" types (None, int, etc.) are not converted (see Django's
         ``force_text`` implementation for details).
@@ -38,7 +35,8 @@ class Message(object):
     def __str__(self):
         return force_text(self.message)
 
-    def _get_tags(self):
+    @property
+    def tags(self):
         extra_tags = force_text(self.extra_tags, strings_only=True)
         if extra_tags and self.level_tag:
             return ' '.join([extra_tags, self.level_tag])
@@ -47,14 +45,13 @@ class Message(object):
         elif self.level_tag:
             return self.level_tag
         return ''
-    tags = property(_get_tags)
 
     @property
     def level_tag(self):
         return force_text(LEVEL_TAGS.get(self.level, ''), strings_only=True)
 
 
-class BaseStorage(object):
+class BaseStorage:
     """
     This is the base backend for temporary message storage.
 
@@ -67,7 +64,7 @@ class BaseStorage(object):
         self._queued_messages = []
         self.used = False
         self.added_new = False
-        super(BaseStorage, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __len__(self):
         return len(self._loaded_messages) + len(self._queued_messages)

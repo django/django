@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib.syndication import views
 from django.utils import feedgenerator
 from django.utils.timezone import get_fixed_timezone
@@ -88,8 +86,29 @@ class ArticlesFeed(TestRss2Feed):
         return Article.objects.all()
 
 
-class TestEnclosureFeed(TestRss2Feed):
-    pass
+class TestSingleEnclosureRSSFeed(TestRss2Feed):
+    """
+    A feed to test that RSS feeds work with a single enclosure.
+    """
+    def item_enclosure_url(self, item):
+        return 'http://example.com'
+
+    def item_enclosure_size(self, item):
+        return 0
+
+    def item_mime_type(self, item):
+        return 'image/png'
+
+
+class TestMultipleEnclosureRSSFeed(TestRss2Feed):
+    """
+    A feed to test that RSS feeds raise an exception with multiple enclosures.
+    """
+    def item_enclosures(self, item):
+        return [
+            feedgenerator.Enclosure('http://example.com/hello.png', 0, 'image/png'),
+            feedgenerator.Enclosure('http://example.com/goodbye.png', 0, 'image/png'),
+        ]
 
 
 class TemplateFeed(TestRss2Feed):
@@ -112,7 +131,7 @@ class TemplateContextFeed(TestRss2Feed):
     description_template = 'syndication/description_context.html'
 
     def get_context_data(self, **kwargs):
-        context = super(TemplateContextFeed, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['foo'] = 'bar'
         return context
 
@@ -145,23 +164,48 @@ class MyCustomAtom1Feed(feedgenerator.Atom1Feed):
     Test of a custom feed generator class.
     """
     def root_attributes(self):
-        attrs = super(MyCustomAtom1Feed, self).root_attributes()
+        attrs = super().root_attributes()
         attrs['django'] = 'rocks'
         return attrs
 
     def add_root_elements(self, handler):
-        super(MyCustomAtom1Feed, self).add_root_elements(handler)
+        super().add_root_elements(handler)
         handler.addQuickElement('spam', 'eggs')
 
     def item_attributes(self, item):
-        attrs = super(MyCustomAtom1Feed, self).item_attributes(item)
+        attrs = super().item_attributes(item)
         attrs['bacon'] = 'yum'
         return attrs
 
     def add_item_elements(self, handler, item):
-        super(MyCustomAtom1Feed, self).add_item_elements(handler, item)
+        super().add_item_elements(handler, item)
         handler.addQuickElement('ministry', 'silly walks')
 
 
 class TestCustomFeed(TestAtomFeed):
     feed_type = MyCustomAtom1Feed
+
+
+class TestSingleEnclosureAtomFeed(TestAtomFeed):
+    """
+    A feed to test that Atom feeds work with a single enclosure.
+    """
+    def item_enclosure_url(self, item):
+        return 'http://example.com'
+
+    def item_enclosure_size(self, item):
+        return 0
+
+    def item_mime_type(self, item):
+        return 'image/png'
+
+
+class TestMultipleEnclosureAtomFeed(TestAtomFeed):
+    """
+    A feed to test that Atom feeds work with multiple enclosures.
+    """
+    def item_enclosures(self, item):
+        return [
+            feedgenerator.Enclosure('http://example.com/hello.png', '0', 'image/png'),
+            feedgenerator.Enclosure('http://example.com/goodbye.png', '0', 'image/png'),
+        ]

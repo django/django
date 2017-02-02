@@ -7,8 +7,9 @@ from ..utils import setup
 
 class UrlizetruncTests(SimpleTestCase):
 
-    @setup({'urlizetrunc01':
-        '{% autoescape off %}{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}{% endautoescape %}'})
+    @setup({
+        'urlizetrunc01': '{% autoescape off %}{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}{% endautoescape %}'
+    })
     def test_urlizetrunc01(self):
         output = self.engine.render_to_string(
             'urlizetrunc01',
@@ -82,7 +83,7 @@ class FunctionTests(SimpleTestCase):
     def test_autoescape(self):
         self.assertEqual(
             urlizetrunc('foo<a href=" google.com ">bar</a>buz', 10),
-            'foo&lt;a href=&quot; <a href="http://google.com" rel="nofollow">google.com</a> &quot;&gt;bar&lt;/a&gt;buz',
+            'foo&lt;a href=&quot; <a href="http://google.com" rel="nofollow">google.com</a> &quot;&gt;bar&lt;/a&gt;buz'
         )
 
     def test_autoescape_off(self):

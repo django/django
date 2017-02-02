@@ -7,11 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Afrikaans (http://www.transifex.com/projects/p/django/"
-"language/af/)\n"
+"Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
+"af/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -60,6 +60,9 @@ msgstr "Deens"
 msgid "German"
 msgstr "Duits"
 
+msgid "Lower Sorbian"
+msgstr ""
+
 msgid "Greek"
 msgstr "Grieks"
 
@@ -80,6 +83,9 @@ msgstr "Spaans"
 
 msgid "Argentinian Spanish"
 msgstr "Argentynse Spaans"
+
+msgid "Colombian Spanish"
+msgstr ""
 
 msgid "Mexican Spanish"
 msgstr "Meksikaanse Spaans"
@@ -111,6 +117,9 @@ msgstr "Fries"
 msgid "Irish"
 msgstr "Iers"
 
+msgid "Scottish Gaelic"
+msgstr ""
+
 msgid "Galician"
 msgstr "Galicies"
 
@@ -122,6 +131,9 @@ msgstr "Hindoe"
 
 msgid "Croatian"
 msgstr "Kroaties"
+
+msgid "Upper Sorbian"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Hongaars"
@@ -183,8 +195,8 @@ msgstr ""
 msgid "Burmese"
 msgstr "Birmaans"
 
-msgid "Norwegian Bokmal"
-msgstr "Noors Bokmal"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Nepalees"
@@ -282,9 +294,6 @@ msgstr ""
 msgid "Syndication"
 msgstr "Sindikasie"
 
-msgid "Web Design"
-msgstr "Webontwerp"
-
 msgid "Enter a valid value."
 msgstr "Sleutel 'n geldige waarde in."
 
@@ -302,6 +311,11 @@ msgid ""
 msgstr ""
 "Sleutel 'n geldige \"slak\" wat bestaan ​​uit letters, syfers, beklemtoon of "
 "koppel."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
 
 msgid "Enter a valid IPv4 address."
 msgstr "Sleutel 'n geldige IPv4-adres in."
@@ -358,6 +372,28 @@ msgstr[1] ""
 "Maak seker hierdie waarde het op die meeste %(limit_value)d karakters (dit "
 "het %(show_value)d)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Maak seker dat daar nie meer as %(max)s syfer in totaal is nie."
+msgstr[1] "Maak seker dat daar nie meer as %(max)s syfers in totaal is nie."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Maak seker dat daar nie meer as %(max)s desimale plek is nie."
+msgstr[1] "Maak seker dat daar nie meer as %(max)s desimale plekke is nie."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Maak seker dat daar nie meer as %(max)s syfer voor die desimale punt is nie."
+msgstr[1] ""
+"Maak seker dat daar nie meer as %(max)s syfers voor die desimale punt is nie."
+
 msgid "and"
 msgstr "en"
 
@@ -397,6 +433,9 @@ msgstr "Heelgetal"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' waarde moet 'n heelgetal wees."
+
+msgid "Big (8 byte) integer"
+msgstr "Groot (8 greep) heelgetal"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -479,9 +518,6 @@ msgstr "'%(value)s' waarde meote 'n dryfpunt getal wees."
 msgid "Floating point number"
 msgstr "Dryfpunt getal"
 
-msgid "Big (8 byte) integer"
-msgstr "Groot (8 greep) heelgetal"
-
 msgid "IPv4 address"
 msgstr "IPv4 adres"
 
@@ -556,8 +592,22 @@ msgstr "Vreemde sleutel (tipe bepaal deur verwante veld)"
 msgid "One-to-one relationship"
 msgstr "Een-tot-een-verhouding"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
 msgid "Many-to-many relationship"
 msgstr "Baie-tot-baie-verwantskap"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "Die veld is verpligtend."
@@ -567,28 +617,6 @@ msgstr "Sleutel 'n hele getal in."
 
 msgid "Enter a number."
 msgstr "Sleutel 'n nommer in."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Maak seker dat daar nie meer as %(max)s syfer in totaal is nie."
-msgstr[1] "Maak seker dat daar nie meer as %(max)s syfers in totaal is nie."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Maak seker dat daar nie meer as %(max)s desimale plek is nie."
-msgstr[1] "Maak seker dat daar nie meer as %(max)s desimale plekke is nie."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-"Maak seker dat daar nie meer as %(max)s syfer voor die desimale punt is nie."
-msgstr[1] ""
-"Maak seker dat daar nie meer as %(max)s syfers voor die desimale punt is nie."
 
 msgid "Enter a valid date."
 msgstr "Sleutel 'n geldige datum in."
@@ -654,12 +682,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Versteekte veld %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr ""

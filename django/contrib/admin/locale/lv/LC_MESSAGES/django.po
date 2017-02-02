@@ -7,10 +7,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Latvian (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -64,6 +64,12 @@ msgstr "Šomēnes"
 msgid "This year"
 msgstr "Šogad"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -73,12 +79,27 @@ msgstr ""
 msgid "Action:"
 msgstr "Darbība:"
 
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Pievienot vēl %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Dzēst"
+
 msgid "action time"
 msgstr "darbības laiks"
+
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
 
 msgid "object id"
 msgstr "objekta id"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "objekta attēlojums"
 
@@ -109,6 +130,31 @@ msgstr ""
 msgid "LogEntry Object"
 msgstr ""
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "un"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Lauki nav izmainīti"
+
 msgid "None"
 msgstr "nekas"
 
@@ -116,58 +162,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-#, python-format
-msgid "Changed %s."
-msgstr "Izmainīts %s."
-
-msgid "and"
-msgstr "un"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Pievienots %(name)s \"%(object)s\""
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Izmainīts %(list)s priekš %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Dzēsts %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Lauki nav izmainīti"
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" pievienots sekmīgi. Zemāk varat to labot."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" pievienots sekmīgi."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" nomainīts sekmīgi."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -320,18 +343,15 @@ msgstr "Dokumentācija"
 msgid "Log out"
 msgstr "Atslēgties"
 
-msgid "Add"
-msgstr "Pievienot"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Pievienot %(name)s"
 
 msgid "History"
 msgstr "Vēsture"
 
 msgid "View on site"
 msgstr "Apskatīt lapā"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Pievienot %(name)s"
 
 msgid "Filter"
 msgstr "Filtrs"
@@ -406,13 +426,6 @@ msgstr ""
 msgid "Change"
 msgstr "Izmainīt"
 
-msgid "Remove"
-msgstr "Dzēst"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Pievienot vēl %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Dzēst?"
 
@@ -427,14 +440,17 @@ msgstr ""
 msgid "Models in the %(name)s application"
 msgstr ""
 
+msgid "Add"
+msgstr "Pievienot"
+
 msgid "You don't have permission to edit anything."
 msgstr "Jums nav tiesības neko labot."
 
-msgid "Recent Actions"
-msgstr "Nesenās darbības"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "Manas darbības"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Nav pieejams"
@@ -449,6 +465,12 @@ msgid ""
 msgstr ""
 "Problēma ar datubāzes instalāciju. Pārliecinieties, ka attiecīgās tabulas ir "
 "izveidotas un attiecīgajam lietotājam ir tiesības tai piekļūt."
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr ""
@@ -474,6 +496,9 @@ msgstr "Rādīt visu"
 
 msgid "Save"
 msgstr "Saglabāt"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -603,9 +628,6 @@ msgstr "Paroles pārstatīšana"
 
 msgid "All dates"
 msgstr "Visi datumi"
-
-msgid "(None)"
-msgstr ""
 
 #, python-format
 msgid "Select %s"

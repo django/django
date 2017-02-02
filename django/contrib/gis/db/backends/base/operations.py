@@ -1,4 +1,4 @@
-class BaseSpatialOperations(object):
+class BaseSpatialOperations:
     """
     This module holds the base `BaseSpatialBackend` object, which is
     instantiated by each spatial database backend with the features
@@ -56,12 +56,12 @@ class BaseSpatialOperations(object):
 
     # Blacklist/set of known unsupported functions of the backend
     unsupported_functions = {
-        'Area', 'AsGeoHash', 'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG',
+        'Area', 'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG',
         'BoundingCircle', 'Centroid', 'Difference', 'Distance', 'Envelope',
-        'ForceRHR', 'Intersection', 'Length', 'MemSize', 'NumGeometries',
-        'NumPoints', 'Perimeter', 'PointOnSurface', 'Reverse', 'Scale',
-        'SnapToGrid', 'SymDifference', 'Transform', 'Translate',
-        'Union',
+        'ForceRHR', 'GeoHash', 'Intersection', 'IsValid', 'Length', 'MakeValid',
+        'MemSize', 'NumGeometries', 'NumPoints', 'Perimeter', 'PointOnSurface',
+        'Reverse', 'Scale', 'SnapToGrid', 'SymDifference', 'Transform',
+        'Translate', 'Union',
     }
 
     # Serialization
@@ -82,9 +82,6 @@ class BaseSpatialOperations(object):
 
     def convert_extent3d(self, box, srid):
         raise NotImplementedError('Aggregate 3D extent not implemented for this spatial backend.')
-
-    def convert_geom(self, geom_val, geom_field):
-        raise NotImplementedError('Aggregate method not implemented for this spatial backend.')
 
     # For quoting column values, rather than columns.
     def geo_quote_name(self, name):
@@ -119,7 +116,7 @@ class BaseSpatialOperations(object):
             raise NotImplementedError(
                 "%s spatial aggregation is not supported by this database backend." % expression.name
             )
-        super(BaseSpatialOperations, self).check_expression_support(expression)
+        super().check_expression_support(expression)
 
     def spatial_aggregate_name(self, agg_name):
         raise NotImplementedError('Aggregate support not implemented for this spatial backend.')

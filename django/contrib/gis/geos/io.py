@@ -15,10 +15,10 @@ __all__ = ['WKBWriter', 'WKTWriter', 'WKBReader', 'WKTReader']
 class WKBReader(_WKBReader):
     def read(self, wkb):
         "Returns a GEOSGeometry for the given WKB buffer."
-        return GEOSGeometry(super(WKBReader, self).read(wkb))
+        return GEOSGeometry(super().read(wkb))
 
 
 class WKTReader(_WKTReader):
     def read(self, wkt):
         "Returns a GEOSGeometry for the given WKT string."
-        return GEOSGeometry(super(WKTReader, self).read(wkt))
+        return GEOSGeometry(super().read(wkt))

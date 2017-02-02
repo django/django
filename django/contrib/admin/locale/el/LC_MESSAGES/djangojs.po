@@ -5,16 +5,17 @@
 # glogiotatidis <seadog@sealabs.net>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Nikolas Demiridis <nikolas@demiridis.gr>, 2014
-# Panos Laganakos <panos.laganakos@gmail.com>, 2014
+# Nick Mavrakis <mavrakis.n@gmail.com>, 2016
+# Pãnoș <panos.laganakos@gmail.com>, 2014
+# Pãnoș <panos.laganakos@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Greek (http://www.transifex.com/projects/p/django/language/"
-"el/)\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-14 10:20+0000\n"
+"Last-Translator: Nick Mavrakis <mavrakis.n@gmail.com>\n"
+"Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -72,7 +73,7 @@ msgstr "Αφαίρεση όλων"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
-msgstr "Κλίκ για να αφαιρεθούν όλα τα επιλεγμένα %s αμέσως."
+msgstr "Κλίκ για να αφαιρεθούν όλα τα επιλεγμένα %s με τη μία."
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -100,7 +101,7 @@ msgid ""
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Έχετε επιλέξει μια ενέργεια, και δεν έχετε κάνει καμία αλλαγή στα εκάστωτε "
+"Έχετε επιλέξει μια ενέργεια, και δεν έχετε κάνει καμία αλλαγή στα εκάστοτε "
 "πεδία. Πιθανών θέλετε το κουμπί Go αντί του κουμπιού Αποθήκευσης."
 
 #, javascript-format
@@ -118,8 +119,8 @@ msgstr[1] "Σημείωση: Είστε %s ώρες πίσω από την ώρ�
 msgid "Now"
 msgstr "Τώρα"
 
-msgid "Clock"
-msgstr "Ρολόι"
+msgid "Choose a Time"
+msgstr "Επιλέξτε Χρόνο"
 
 msgid "Choose a time"
 msgstr "Επιλέξτε χρόνο"
@@ -133,14 +134,17 @@ msgstr "6 π.μ."
 msgid "Noon"
 msgstr "Μεσημέρι"
 
+msgid "6 p.m."
+msgstr "6 μ.μ."
+
 msgid "Cancel"
 msgstr "Ακύρωση"
 
 msgid "Today"
 msgstr "Σήμερα"
 
-msgid "Calendar"
-msgstr "Ημερολόγιο"
+msgid "Choose a Date"
+msgstr "Επιλέξτε μια Ημερομηνία"
 
 msgid "Yesterday"
 msgstr "Χθές"
@@ -148,15 +152,69 @@ msgstr "Χθές"
 msgid "Tomorrow"
 msgstr "Αύριο"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Ιανουάριος Φεβρουάριος Μάρτιος Απρίλιος Μάιος Ιούνιος Ιούλιος Αύγουστος "
-"Σεπτέμβρης Οκτώβριος Νοέμβριος Δεκέμβριος"
+msgid "January"
+msgstr "Ιανουάριος"
 
-msgid "S M T W T F S"
-msgstr "Κ Δ Τ Τ Π Π Σ"
+msgid "February"
+msgstr "Φεβρουάριος"
+
+msgid "March"
+msgstr "Μάρτιος"
+
+msgid "April"
+msgstr "Απρίλιος"
+
+msgid "May"
+msgstr "Μάιος"
+
+msgid "June"
+msgstr "Ιούνιος"
+
+msgid "July"
+msgstr "Ιούλιος"
+
+msgid "August"
+msgstr "Αύγουστος"
+
+msgid "September"
+msgstr "Σεπτέμβριος"
+
+msgid "October"
+msgstr "Οκτώβριος"
+
+msgid "November"
+msgstr "Νοέμβριος"
+
+msgid "December"
+msgstr "Δεκέμβριος"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "Κ"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "Δ"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "Τ"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "Τ"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "Π"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "Π"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "Σ"
 
 msgid "Show"
 msgstr "Προβολή"

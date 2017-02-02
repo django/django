@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 10:30+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 08:38+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Bosnian (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Bosnian (http://www.transifex.com/django/django/language/"
 "bs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -41,6 +41,12 @@ msgstr "Izmjeni lozinku: %s"
 msgid "Authentication and Authorization"
 msgstr ""
 
+msgid "password"
+msgstr "lozinka"
+
+msgid "last login"
+msgstr "posljednja prijava"
+
 msgid "No password set."
 msgstr ""
 
@@ -56,13 +62,13 @@ msgstr "Lozinka"
 msgid "Password confirmation"
 msgstr "Potvrda lozinke"
 
-msgid "Enter the same password as above, for verification."
-msgstr "Radi provjere tačnosti ponovo unesite lozinku koju ste unijeli gore."
+msgid "Enter the same password as before, for verification."
+msgstr ""
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
 
 #, python-format
@@ -104,6 +110,21 @@ msgstr ""
 msgid "hash"
 msgstr ""
 
+msgid "variety"
+msgstr ""
+
+msgid "version"
+msgstr ""
+
+msgid "memory cost"
+msgstr ""
+
+msgid "time cost"
+msgstr ""
+
+msgid "parallelism"
+msgstr ""
+
 msgid "work factor"
 msgstr ""
 
@@ -112,6 +133,9 @@ msgstr ""
 
 msgid "name"
 msgstr "ime"
+
+msgid "content type"
+msgstr ""
 
 msgid "codename"
 msgstr "šifra dozvole"
@@ -127,12 +151,6 @@ msgstr "grupa"
 
 msgid "groups"
 msgstr "grupe"
-
-msgid "password"
-msgstr "lozinka"
-
-msgid "last login"
-msgstr "posljednja prijava"
 
 msgid "superuser status"
 msgstr "status administratora"
@@ -158,13 +176,7 @@ msgstr ""
 msgid "username"
 msgstr "korisničko ime"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Neophodno. Najviše 30 slovnih mesta. Samo slova, brojke i  @/./+/-/_ only."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 
 msgid "A user with that username already exists."
@@ -206,7 +218,54 @@ msgid "users"
 msgstr "korisnici"
 
 #, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr ""
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+
+msgid "This password is too common."
+msgstr ""
+
+msgid "Your password can't be a commonly used password."
+msgstr ""
+
+msgid "This password is entirely numeric."
+msgstr ""
+
+msgid "Your password can't be entirely numeric."
+msgstr ""
+
+#, python-format
 msgid "Password reset on %(site_name)s"
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
 msgstr ""
 
 msgid "Logged out"

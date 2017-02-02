@@ -9,10 +9,8 @@
 """
 from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class OracleGeometryColumns(models.Model):
     "Maps to the Oracle USER_SDO_GEOM_METADATA table."
     table_name = models.CharField(max_length=32)
@@ -55,7 +53,6 @@ class OracleSpatialRefSys(models.Model, SpatialRefSysMixin):
     # Optional geometry representing the bounds of this coordinate
     # system.  By default, all are NULL in the table.
     cs_bounds = models.PolygonField(null=True)
-    objects = models.GeoManager()
 
     class Meta:
         app_label = 'gis'
@@ -65,7 +62,3 @@ class OracleSpatialRefSys(models.Model, SpatialRefSysMixin):
     @property
     def wkt(self):
         return self.wktext
-
-    @classmethod
-    def wkt_col(cls):
-        return 'wktext'

@@ -5,10 +5,9 @@ Used internally by Django and not intended for external use.
 This is not, and is not intended to be, a complete reg-exp decompiler. It
 should be good enough for a large class of URLS, however.
 """
-from __future__ import unicode_literals
+import warnings
 
-from django.utils import six
-from django.utils.six.moves import zip
+from django.utils.deprecation import RemovedInDjango21Warning
 
 # Mapping of an escape character to a representative of that class. So, e.g.,
 # "\w" is replaced by "x" in a reverse URL. A value of None means to ignore
@@ -48,7 +47,7 @@ class NonCapture(list):
 
 
 def normalize(pattern):
-    """
+    r"""
     Given a reg-exp pattern, normalizes it to an iterable of forms that
     suffice for reverse matching. This does the following:
 
@@ -59,9 +58,7 @@ def normalize(pattern):
     (3) Select the first (essentially an arbitrary) element from any character
         class. Select an arbitrary character for any unordered class (e.g. '.'
         or '\w') in the pattern.
-    (4) Ignore comments, look-ahead and look-behind assertions, and any of the
-        reg-exp flags that won't change what we construct ("iLmsu"). "(?x)" is
-        an error, however.
+    (4) Ignore look-ahead and look-behind assertions.
     (5) Raise an error on any disjunctive ('|') constructs.
 
     Django's URLs for forward resolving are either all positional arguments or
@@ -128,9 +125,15 @@ def normalize(pattern):
                     walk_to_end(ch, pattern_iter)
                 else:
                     ch, escaped = next(pattern_iter)
-                    if ch in "iLmsu#!=<":
+                    if ch in '!=<':
                         # All of these are ignorable. Walk to the end of the
                         # group.
+                        walk_to_end(ch, pattern_iter)
+                    elif ch in 'iLmsu#':
+                        warnings.warn(
+                            'Using (?%s) in url() patterns is deprecated.' % ch,
+                            RemovedInDjango21Warning
+                        )
                         walk_to_end(ch, pattern_iter)
                     elif ch == ':':
                         # Non-capturing group
@@ -203,7 +206,7 @@ def normalize(pattern):
 
 
 def next_char(input_iter):
-    """
+    r"""
     An iterator that yields the next character from "pattern_iter", respecting
     escape sequences. An escaped character is replaced by a representative of
     its class (e.g. \w -> "x"). If the escaped character is one that is
@@ -313,7 +316,7 @@ def flatten_result(source):
     result_args = [[]]
     pos = last = 0
     for pos, elt in enumerate(source):
-        if isinstance(elt, six.string_types):
+        if isinstance(elt, str):
             continue
         piece = ''.join(source[last:pos])
         if isinstance(elt, Group):

@@ -18,21 +18,27 @@ This registry is simply called :attr:`~django.apps.apps` and it's available in
 Projects and applications
 =========================
 
-Django has historically used the term **project** to describe an installation
-of Django. A project is defined primarily by a settings module.
+The term **project** describes a Django web application. The project Python
+package is defined primarily by a settings module, but it usually contains
+other things. For example, when you run  ``django-admin startproject mysite``
+you'll get a ``mysite`` project directory that contains a ``mysite`` Python
+package with ``settings.py``, ``urls.py``, and ``wsgi.py``. The project package
+is often extended to include things like fixtures, CSS, and templates which
+aren't tied to a particular application.
+
+A **project's root directory** (the one that contains ``manage.py``) is usually
+the container for all of a project's applications which aren't installed
+separately.
 
 The term **application** describes a Python package that provides some set of
-features. Applications may be reused in various projects.
-
-.. note::
-    This terminology is somewhat confusing these days as it became common to
-    use the phrase "web app" to describe what equates to a Django project.
+features. Applications :doc:`may be reused </intro/reusable-apps/>` in various
+projects.
 
 Applications include some combination of models, views, templates, template
 tags, static files, URLs, middleware, etc. They're generally wired into
 projects with the :setting:`INSTALLED_APPS` setting and optionally with other
-mechanisms such as URLconfs, the :setting:`MIDDLEWARE_CLASSES` setting, or
-template inheritance.
+mechanisms such as URLconfs, the :setting:`MIDDLEWARE` setting, or template
+inheritance.
 
 It is important to understand that a Django application is just a set of code
 that interacts with various parts of the framework. There's no such thing as
@@ -40,6 +46,12 @@ an ``Application`` object. However, there's a few places where Django needs to
 interact with installed applications, mainly for configuration and also for
 introspection. That's why the application registry maintains metadata in an
 :class:`~django.apps.AppConfig` instance for each installed application.
+
+There's no restriction that a project package can't also be considered an
+application and have models, etc. (which would require adding it to
+:setting:`INSTALLED_APPS`).
+
+.. _configuring-applications-ref:
 
 Configuring applications
 ========================
@@ -56,6 +68,14 @@ subclass for that application.
 
 If there is no ``default_app_config``, Django uses the base
 :class:`~django.apps.AppConfig` class.
+
+``default_app_config`` allows applications that predate Django 1.7 such as
+``django.contrib.admin`` to opt-in to :class:`~django.apps.AppConfig` features
+without requiring users to update their :setting:`INSTALLED_APPS`.
+
+New applications should avoid ``default_app_config``. Instead they should
+require the dotted path to the appropriate :class:`~django.apps.AppConfig`
+subclass to be configured explicitly in :setting:`INSTALLED_APPS`.
 
 For application authors
 -----------------------
@@ -81,7 +101,9 @@ subclass by default as follows::
 That will cause ``RockNRollConfig`` to be used when :setting:`INSTALLED_APPS`
 just contains ``'rock_n_roll'``. This allows you to make use of
 :class:`~django.apps.AppConfig` features without requiring your users to
-update their :setting:`INSTALLED_APPS` setting.
+update their :setting:`INSTALLED_APPS` setting. Besides this use case, it's
+best to avoid using ``default_app_config`` and instead specify the app config
+class in :setting:`INSTALLED_APPS` as described next.
 
 Of course, you can also tell your users to put
 ``'rock_n_roll.apps.RockNRollConfig'`` in their :setting:`INSTALLED_APPS`
@@ -110,20 +132,20 @@ For application users
 ---------------------
 
 If you're using "Rock ’n’ roll" in a project called ``anthology``, but you
-want it to show up as "Gypsy jazz" instead, you can provide your own
+want it to show up as "Jazz Manouche" instead, you can provide your own
 configuration::
 
     # anthology/apps.py
 
     from rock_n_roll.apps import RockNRollConfig
 
-    class GypsyJazzConfig(RockNRollConfig):
-        verbose_name = "Gypsy jazz"
+    class JazzManoucheConfig(RockNRollConfig):
+        verbose_name = "Jazz Manouche"
 
     # anthology/settings.py
 
     INSTALLED_APPS = [
-        'anthology.apps.GypsyJazzConfig',
+        'anthology.apps.JazzManoucheConfig',
         # ...
     ]
 
@@ -184,12 +206,12 @@ Read-only attributes
 .. attribute:: AppConfig.module
 
     Root module for the application, e.g. ``<module 'django.contrib.admin' from
-    'django/contrib/admin/__init__.pyc'>``.
+    'django/contrib/admin/__init__.py'>``.
 
 .. attribute:: AppConfig.models_module
 
     Module containing the models, e.g. ``<module 'django.contrib.admin.models'
-    from 'django/contrib/admin/models.pyc'>``.
+    from 'django/contrib/admin/models.py'>``.
 
     It may be ``None`` if the application doesn't contain a ``models`` module.
     Note that the database related signals such as
@@ -202,13 +224,25 @@ Methods
 
 .. method:: AppConfig.get_models()
 
-    Returns an iterable of :class:`~django.db.models.Model` classes.
+    Returns an iterable of :class:`~django.db.models.Model` classes for this
+    application.
 
-.. method:: AppConfig.get_model(model_name)
+    Requires the app registry to be fully populated.
+
+.. method:: AppConfig.get_model(model_name, require_ready=True)
 
     Returns the :class:`~django.db.models.Model` with the given
-    ``model_name``. Raises :exc:`LookupError` if no such model exists.
-    ``model_name`` is case-insensitive.
+    ``model_name``. ``model_name`` is case-insensitive.
+
+    Raises :exc:`LookupError` if no such model exists in this application.
+
+    Requires the app registry to be fully populated unless the
+    ``require_ready`` argument is set to ``False``. ``require_ready`` behaves
+    exactly as in :meth:`apps.get_model()`.
+
+    .. versionadded:: 1.11
+
+        The ``require_ready`` keyword argument was added.
 
 .. method:: AppConfig.ready()
 
@@ -216,12 +250,26 @@ Methods
     as registering signals. It is called as soon as the registry is fully
     populated.
 
-    You cannot import models in modules that define application configuration
-    classes, but you can use :meth:`get_model` to access a model class by
-    name, like this::
+    Although you can't import models at the module-level where
+    :class:`~django.apps.AppConfig` classes are defined, you can import them in
+    ``ready()``, using either an ``import`` statement or
+    :meth:`~AppConfig.get_model`.
+
+    If you're registering :mod:`model signals <django.db.models.signals>`, you
+    can refer to the sender by its string label instead of using the model
+    class itself.
+
+    Example::
+
+        from django.db.models.signals import pre_save
 
         def ready(self):
+            # importing model classes
+            from .models import MyModel  # or...
             MyModel = self.get_model('MyModel')
+
+            # registering signals with the model's string label
+            pre_save.connect(receiver, sender='app_label.MyModel')
 
     .. warning::
 
@@ -247,13 +295,12 @@ Methods
 
 .. _namespace package:
 
-Namespace packages as apps (Python 3.3+)
-----------------------------------------
+Namespace packages as apps
+--------------------------
 
-Python versions 3.3 and later support Python packages without an
-``__init__.py`` file. These packages are known as "namespace packages" and may
-be spread across multiple directories at different locations on ``sys.path``
-(see :pep:`420`).
+Python packages without an ``__init__.py`` file are known as "namespace
+packages" and may be spread across multiple directories at different locations
+on ``sys.path`` (see :pep:`420`).
 
 Django applications require a single base filesystem path where Django
 (depending on configuration) will search for templates, static assets,
@@ -281,8 +328,8 @@ Application registry
 
 .. attribute:: apps.ready
 
-    Boolean attribute that is set to ``True`` when the registry is fully
-    populated.
+    Boolean attribute that is set to ``True`` after the registry is fully
+    populated and all :meth:`AppConfig.ready` methods are called.
 
 .. method:: apps.get_app_configs()
 
@@ -299,16 +346,38 @@ Application registry
     Checks whether an application with the given name exists in the registry.
     ``app_name`` is the full name of the app, e.g. ``'django.contrib.admin'``.
 
-.. method:: apps.get_model(app_label, model_name)
+.. method:: apps.get_model(app_label, model_name, require_ready=True)
 
     Returns the :class:`~django.db.models.Model` with the given ``app_label``
     and ``model_name``. As a shortcut, this method also accepts a single
-    argument in the form ``app_label.model_name``. ``model_name`` is case-
-    insensitive.
+    argument in the form ``app_label.model_name``. ``model_name`` is
+    case-insensitive.
 
     Raises :exc:`LookupError` if no such application or model exists. Raises
     :exc:`ValueError` when called with a single argument that doesn't contain
     exactly one dot.
+
+    Requires the app registry to be fully populated unless the
+    ``require_ready`` argument is set to ``False``.
+
+    Setting ``require_ready`` to ``False`` allows looking up models
+    :ref:`while the app registry is being populated <app-loading-process>`,
+    specifically during the second phase where it imports models. Then
+    ``get_model()`` has the same effect as importing the model. The main use
+    case is to configure model classes with settings, such as
+    :setting:`AUTH_USER_MODEL`.
+
+    When ``require_ready`` is ``False``, ``get_model()`` returns a model class
+    that may not be fully functional (reverse accessors may be missing, for
+    example) until the app registry is fully populated. For this reason, it's
+    best to leave ``require_ready`` to the default value of ``True`` whenever
+    possible.
+
+    .. versionadded:: 1.11
+
+        The ``require_ready`` keyword argument was added.
+
+.. _app-loading-process:
 
 Initialization process
 ======================
@@ -321,12 +390,14 @@ application registry.
 
 .. currentmodule:: django
 
-.. function:: setup()
+.. function:: setup(set_prefix=True)
 
     Configures Django by:
 
     * Loading the settings.
     * Setting up logging.
+    * If ``set_prefix`` is True, setting the URL resolver script prefix to
+      :setting:`FORCE_SCRIPT_NAME` if defined, or ``/`` otherwise.
     * Initializing the application registry.
 
     This function is called automatically:
@@ -382,9 +453,9 @@ Troubleshooting
 
 Here are some common problems that you may encounter during initialization:
 
-* ``AppRegistryNotReady`` This happens when importing an application
-  configuration or a models module triggers code that depends on the app
-  registry.
+* :class:`~django.core.exceptions.AppRegistryNotReady`: This happens when
+  importing an application configuration or a models module triggers code that
+  depends on the app registry.
 
   For example, :func:`~django.utils.translation.ugettext()` uses the app
   registry to look up translation catalogs in applications. To translate at
@@ -396,10 +467,6 @@ Here are some common problems that you may encounter during initialization:
   Executing database queries with the ORM at import time in models modules
   will also trigger this exception. The ORM cannot function properly until all
   models are available.
-
-  Another common culprit is :func:`django.contrib.auth.get_user_model()`. Use
-  the :setting:`AUTH_USER_MODEL` setting to reference the User model at import
-  time.
 
   This exception also happens if you forget to call :func:`django.setup()` in
   a standalone Python script.

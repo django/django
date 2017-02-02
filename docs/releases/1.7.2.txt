@@ -6,7 +6,7 @@ Django 1.7.2 release notes
 
 Django 1.7.2 fixes several bugs in 1.7.1.
 
-Additionally, Django's vendored version of six, :mod:`django.utils.six`, has
+Additionally, Django's vendored version of six, ``django.utils.six``, has
 been upgraded to the latest release (1.9.0).
 
 Bugfixes
@@ -106,7 +106,7 @@ Bugfixes
   (:ticket:`23950`).
 
 * Prevented the
-  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware` from
+  ``django.contrib.auth.middleware.SessionAuthenticationMiddleware`` from
   setting a ``"Vary: Cookie"`` header on all responses (:ticket:`23939`).
 
 * Fixed a crash when adding ``blank=True`` to ``TextField()`` on MySQL
@@ -177,7 +177,7 @@ Bugfixes
   setup (:ticket:`24000`).
 
 * Restored support for objects that aren't :class:`str` or :class:`bytes` in
-  :func:`~django.utils.safestring.mark_for_escaping` on Python 3.
+  ``django.utils.safestring.mark_for_escaping()`` on Python 3.
 
 * Supported strings escaped by third-party libraries with the ``__html__``
   convention in the template engine (:ticket:`23831`).

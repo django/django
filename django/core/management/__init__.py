@@ -1,20 +1,20 @@
-from __future__ import unicode_literals
-
-import collections
-from importlib import import_module
+import functools
 import os
 import pkgutil
 import sys
+from collections import OrderedDict, defaultdict
+from importlib import import_module
 
 import django
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management.base import (BaseCommand, CommandError,
-    CommandParser, handle_default_options)
+from django.core.management.base import (
+    BaseCommand, CommandError, CommandParser, handle_default_options,
+)
 from django.core.management.color import color_style
-from django.utils import lru_cache, six
-from django.utils._os import npath, upath
+from django.utils import autoreload
+from django.utils.encoding import force_text
 
 
 def find_commands(management_dir):
@@ -25,7 +25,7 @@ def find_commands(management_dir):
     Returns an empty list if no commands are defined.
     """
     command_dir = os.path.join(management_dir, 'commands')
-    return [name for _, name, is_pkg in pkgutil.iter_modules([npath(command_dir)])
+    return [name for _, name, is_pkg in pkgutil.iter_modules([command_dir])
             if not is_pkg and not name.startswith('_')]
 
 
@@ -39,7 +39,7 @@ def load_command_class(app_name, name):
     return module.Command()
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def get_commands():
     """
     Returns a dictionary mapping command names to their callback applications.
@@ -62,7 +62,7 @@ def get_commands():
     The dictionary is cached on the first call and reused on subsequent
     calls.
     """
-    commands = {name: 'django.core' for name in find_commands(upath(__path__[0]))}
+    commands = {name: 'django.core' for name in find_commands(__path__[0])}
 
     if not settings.configured:
         return commands
@@ -74,56 +74,63 @@ def get_commands():
     return commands
 
 
-def call_command(name, *args, **options):
+def call_command(command_name, *args, **options):
     """
     Calls the given command, with the given options and args/kwargs.
 
     This is the primary API you should use for calling specific commands.
 
+    `name` may be a string or a command object. Using a string is preferred
+    unless the command object is required for further processing or testing.
+
     Some examples:
         call_command('migrate')
         call_command('shell', plain=True)
         call_command('sqlmigrate', 'myapp')
-    """
-    # Load the command object.
-    try:
-        app_name = get_commands()[name]
-    except KeyError:
-        raise CommandError("Unknown command: %r" % name)
 
-    if isinstance(app_name, BaseCommand):
-        # If the command is already loaded, use it directly.
-        command = app_name
+        from django.core.management.commands import flush
+        cmd = flush.Command()
+        call_command(cmd, verbosity=0, interactive=False)
+        # Do something with cmd ...
+    """
+    if isinstance(command_name, BaseCommand):
+        # Command object passed in.
+        command = command_name
+        command_name = command.__class__.__module__.split('.')[-1]
     else:
-        command = load_command_class(app_name, name)
+        # Load the command object by name.
+        try:
+            app_name = get_commands()[command_name]
+        except KeyError:
+            raise CommandError("Unknown command: %r" % command_name)
+
+        if isinstance(app_name, BaseCommand):
+            # If the command is already loaded, use it directly.
+            command = app_name
+        else:
+            command = load_command_class(app_name, command_name)
 
     # Simulate argument parsing to get the option defaults (see #10080 for details).
-    parser = command.create_parser('', name)
-    if command.use_argparse:
-        # Use the `dest` option name from the parser option
-        opt_mapping = {sorted(s_opt.option_strings)[0].lstrip('-').replace('-', '_'): s_opt.dest
-                       for s_opt in parser._actions if s_opt.option_strings}
-        arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
-        defaults = parser.parse_args(args=args)
-        defaults = dict(defaults._get_kwargs(), **arg_options)
-        # Move positional args out of options to mimic legacy optparse
-        args = defaults.pop('args', ())
-    else:
-        # Legacy optparse method
-        defaults, _ = parser.parse_args(args=[])
-        defaults = dict(defaults.__dict__, **options)
+    parser = command.create_parser('', command_name)
+    # Use the `dest` option name from the parser option
+    opt_mapping = {
+        sorted(s_opt.option_strings)[0].lstrip('-').replace('-', '_'): s_opt.dest
+        for s_opt in parser._actions if s_opt.option_strings
+    }
+    arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
+    defaults = parser.parse_args(args=[force_text(a) for a in args])
+    defaults = dict(defaults._get_kwargs(), **arg_options)
+    # Move positional args out of options to mimic legacy optparse
+    args = defaults.pop('args', ())
     if 'skip_checks' not in options:
         defaults['skip_checks'] = True
 
     return command.execute(*args, **defaults)
 
 
-class ManagementUtility(object):
+class ManagementUtility:
     """
     Encapsulates the logic of the django-admin and manage.py utilities.
-
-    A ManagementUtility has a number of commands, which can be manipulated
-    by editing the self.commands dictionary.
     """
     def __init__(self, argv=None):
         self.argv = argv or sys.argv[:]
@@ -143,8 +150,8 @@ class ManagementUtility(object):
                 "",
                 "Available subcommands:",
             ]
-            commands_dict = collections.defaultdict(lambda: [])
-            for name, app in six.iteritems(get_commands()):
+            commands_dict = defaultdict(lambda: [])
+            for name, app in get_commands().items():
                 if app == 'django.core':
                     app = 'django'
                 else:
@@ -176,10 +183,18 @@ class ManagementUtility(object):
         try:
             app_name = commands[subcommand]
         except KeyError:
-            # This might trigger ImproperlyConfigured (masked in get_commands)
-            settings.INSTALLED_APPS
-            sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" %
-                (subcommand, self.prog_name))
+            if os.environ.get('DJANGO_SETTINGS_MODULE'):
+                # If `subcommand` is missing due to misconfigured settings, the
+                # following line will retrigger an ImproperlyConfigured exception
+                # (get_commands() swallows the original one) so the user is
+                # informed about it.
+                settings.INSTALLED_APPS
+            else:
+                sys.stderr.write("No Django settings specified.\n")
+            sys.stderr.write(
+                "Unknown command: %r\nType '%s help' for usage.\n"
+                % (subcommand, self.prog_name)
+            )
             sys.exit(1)
         if isinstance(app_name, BaseCommand):
             # If the command is already loaded, use it directly.
@@ -242,12 +257,10 @@ class ManagementUtility(object):
                     # user will find out once they execute the command.
                     pass
             parser = subcommand_cls.create_parser('', cwords[0])
-            if subcommand_cls.use_argparse:
-                options.extend((sorted(s_opt.option_strings)[0], s_opt.nargs != 0) for s_opt in
-                               parser._actions if s_opt.option_strings)
-            else:
-                options.extend((s_opt.get_opt_string(), s_opt.nargs) for s_opt in
-                               parser.option_list)
+            options.extend(
+                (sorted(s_opt.option_strings)[0], s_opt.nargs != 0)
+                for s_opt in parser._actions if s_opt.option_strings
+            )
             # filter out previously specified options from available options
             prev_opts = [x.split('=')[0] for x in cwords[1:cword - 1]]
             options = [opt for opt in options if opt[0] not in prev_opts]
@@ -260,7 +273,10 @@ class ManagementUtility(object):
                 if option[1]:
                     opt_label += '='
                 print(opt_label)
-        sys.exit(1)
+        # Exit code of the bash completion function is never passed back to
+        # the user, so it's safe to always exit with 0.
+        # For more details see #25420.
+        sys.exit(0)
 
     def execute(self):
         """
@@ -285,23 +301,38 @@ class ManagementUtility(object):
         except CommandError:
             pass  # Ignore any option errors at this point.
 
-        no_settings_commands = [
-            'help', 'version', '--help', '--version', '-h',
-            'compilemessages', 'makemessages',
-            'startapp', 'startproject',
-        ]
-
         try:
             settings.INSTALLED_APPS
         except ImproperlyConfigured as exc:
             self.settings_exception = exc
-            # A handful of built-in management commands work without settings.
-            # Load the default settings -- where INSTALLED_APPS is empty.
-            if subcommand in no_settings_commands:
-                settings.configure()
 
         if settings.configured:
-            django.setup()
+            # Start the auto-reloading dev server even if the code is broken.
+            # The hardcoded condition is a code smell but we can't rely on a
+            # flag on the command class because we haven't located it yet.
+            if subcommand == 'runserver' and '--noreload' not in self.argv:
+                try:
+                    autoreload.check_errors(django.setup)()
+                except Exception:
+                    # The exception will be raised later in the child process
+                    # started by the autoreloader. Pretend it didn't happen by
+                    # loading an empty list of applications.
+                    apps.all_models = defaultdict(OrderedDict)
+                    apps.app_configs = OrderedDict()
+                    apps.apps_ready = apps.models_ready = apps.ready = True
+
+                    # Remove options not compatible with the built-in runserver
+                    # (e.g. options for the contrib.staticfiles' runserver).
+                    # Changes here require manually testing as described in
+                    # #27522.
+                    _parser = self.fetch_command('runserver').create_parser('django', 'runserver')
+                    _options, _args = _parser.parse_known_args(self.argv[2:])
+                    for _arg in _args:
+                        self.argv.remove(_arg)
+
+            # In all other cases, django.setup() is required to succeed.
+            else:
+                django.setup()
 
         self.autocomplete()
 

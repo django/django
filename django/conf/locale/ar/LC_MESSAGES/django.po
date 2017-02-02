@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bashar Al-Abdulhadi, 2015
+# Bashar Al-Abdulhadi, 2015-2016
 # Bashar Al-Abdulhadi, 2014
 # Eyad Toma <d.eyad.t@gmail.com>, 2013-2014
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -10,11 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Arabic (http://www.transifex.com/projects/p/django/language/"
-"ar/)\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-18 08:41+0000\n"
+"Last-Translator: Bashar Al-Abdulhadi\n"
+"Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -64,6 +63,9 @@ msgstr "الدنماركيّة"
 msgid "German"
 msgstr "الألمانيّة"
 
+msgid "Lower Sorbian"
+msgstr "الصربية السفلى"
+
 msgid "Greek"
 msgstr "اليونانيّة"
 
@@ -84,6 +86,9 @@ msgstr "الإسبانيّة"
 
 msgid "Argentinian Spanish"
 msgstr "الأسبانية الأرجنتينية"
+
+msgid "Colombian Spanish"
+msgstr "الكولومبية الإسبانية"
 
 msgid "Mexican Spanish"
 msgstr "الأسبانية المكسيكية"
@@ -115,6 +120,9 @@ msgstr "الفريزيّة"
 msgid "Irish"
 msgstr "الإيرلنديّة"
 
+msgid "Scottish Gaelic"
+msgstr "الغيلية الأسكتلندية"
+
 msgid "Galician"
 msgstr "الجليقيّة"
 
@@ -126,6 +134,9 @@ msgstr "الهندية"
 
 msgid "Croatian"
 msgstr "الكرواتيّة"
+
+msgid "Upper Sorbian"
+msgstr "الصربية العليا"
 
 msgid "Hungarian"
 msgstr "الهنغاريّة"
@@ -187,8 +198,8 @@ msgstr "المهاراتية"
 msgid "Burmese"
 msgstr "البورمية"
 
-msgid "Norwegian Bokmal"
-msgstr "البوكمال نرويجيّة"
+msgid "Norwegian Bokmål"
+msgstr "النرويجية"
 
 msgid "Nepali"
 msgstr "النيبالية"
@@ -275,7 +286,7 @@ msgid "Traditional Chinese"
 msgstr "الصينيّة التقليدية"
 
 msgid "Messages"
-msgstr ""
+msgstr "الرسائل"
 
 msgid "Site Maps"
 msgstr "خرائط الموقع"
@@ -285,9 +296,6 @@ msgstr "الملفات الثابتة"
 
 msgid "Syndication"
 msgstr "توظيف النشر"
-
-msgid "Web Design"
-msgstr "تصميم الموقع"
 
 msgid "Enter a valid value."
 msgstr "أدخل قيمة صحيحة."
@@ -303,6 +311,11 @@ msgstr "أدخل عنوان بريد إلكتروني صحيح."
 
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr "أدخل اختصار 'slug' صحيح يتكوّن من أحرف، أرقام، شرطات سفلية وعاديّة."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
 msgstr "أدخل اختصار 'slug' صحيح يتكوّن من أحرف، أرقام، شرطات سفلية وعاديّة."
 
 msgid "Enter a valid IPv4 address."
@@ -381,6 +394,38 @@ msgstr[5] ""
 "تأكد أن هذه القيمة تحتوي على %(limit_value)d حرف أو رمز على الأكثر (هي تحتوي "
 "حالياً على %(show_value)d)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "تحقق من أن تدخل %(max)s أرقام لا أكثر."
+msgstr[1] "تحقق من أن تدخل رقم %(max)s لا أكثر."
+msgstr[2] "تحقق من أن تدخل %(max)s رقمين لا أكثر."
+msgstr[3] "تحقق من أن تدخل %(max)s أرقام لا أكثر."
+msgstr[4] "تحقق من أن تدخل %(max)s أرقام لا أكثر."
+msgstr[5] "تحقق من أن تدخل %(max)s أرقام لا أكثر."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "تحقق من أن تدخل %(max)s خانات عشرية لا أكثر."
+msgstr[1] "تحقق من أن تدخل خانة %(max)s عشرية لا أكثر."
+msgstr[2] "تحقق من أن تدخل %(max)s خانتين عشريتين لا أكثر."
+msgstr[3] "تحقق من أن تدخل %(max)s خانات عشرية لا أكثر."
+msgstr[4] "تحقق من أن تدخل %(max)s خانات عشرية لا أكثر."
+msgstr[5] "تحقق من أن تدخل %(max)s خانات عشرية لا أكثر."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "تحقق من أن تدخل %(max)s أرقام قبل الفاصل العشري لا أكثر."
+msgstr[1] "تحقق من أن تدخل رقم %(max)s قبل الفاصل العشري لا أكثر."
+msgstr[2] "تحقق من أن تدخل %(max)s رقمين قبل الفاصل العشري لا أكثر."
+msgstr[3] "تحقق من أن تدخل %(max)s أرقام قبل الفاصل العشري لا أكثر."
+msgstr[4] "تحقق من أن تدخل %(max)s أرقام قبل الفاصل العشري لا أكثر."
+msgstr[5] "تحقق من أن تدخل %(max)s أرقام قبل الفاصل العشري لا أكثر."
+
 msgid "and"
 msgstr "و"
 
@@ -420,6 +465,9 @@ msgstr "عدد صحيح"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr "قيمة '%(value)s' يجب ان تكون عدد صحيح."
+
+msgid "Big (8 byte) integer"
+msgstr "عدد صحيح كبير (8 بايت)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -483,6 +531,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"قيمة '%(value)s' ليست بنسق صحيح. القيمة يجب ان تكون من التنسيق [DD] [HH:"
+"[MM:]]ss[.uuuuuu]."
 
 msgid "Duration"
 msgstr "المدّة"
@@ -499,9 +549,6 @@ msgstr "قيمة '%(value)s' يجب ان تكون عدد فاصل عائم."
 
 msgid "Floating point number"
 msgstr "رقم فاصلة عائمة"
-
-msgid "Big (8 byte) integer"
-msgstr "عدد صحيح كبير (8 بايت)"
 
 msgid "IPv4 address"
 msgstr "عنوان IPv4"
@@ -558,7 +605,7 @@ msgstr "البيانات الثنائية الخام"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "'%(value)s' ليست قيمة UUID صحيحة."
 
 msgid "File"
 msgstr "ملف"
@@ -568,7 +615,7 @@ msgstr "صورة"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "النموذج %(model)s ذو الحقل و القيمة %(field)s %(value)r غير موجود."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "الحقل المرتبط (تم تحديد النوع وفقاً للحقل المرتبط)"
@@ -576,8 +623,22 @@ msgstr "الحقل المرتبط (تم تحديد النوع وفقاً للح�
 msgid "One-to-one relationship"
 msgstr "علاقة واحد إلى واحد"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s علاقة"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s علاقات"
+
 msgid "Many-to-many relationship"
 msgstr "علاقة متعدد إلى متعدد"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "هذا الحقل مطلوب."
@@ -587,38 +648,6 @@ msgstr "أدخل رقما صحيحا."
 
 msgid "Enter a number."
 msgstr "أدخل رقماً."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "تحقق من أن تدخل %(max)s أرقام لا أكثر."
-msgstr[1] "تحقق من أن تدخل رقم %(max)s لا أكثر."
-msgstr[2] "تحقق من أن تدخل %(max)s رقمين لا أكثر."
-msgstr[3] "تحقق من أن تدخل %(max)s أرقام لا أكثر."
-msgstr[4] "تحقق من أن تدخل %(max)s أرقام لا أكثر."
-msgstr[5] "تحقق من أن تدخل %(max)s أرقام لا أكثر."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "تحقق من أن تدخل %(max)s خانات عشرية لا أكثر."
-msgstr[1] "تحقق من أن تدخل خانة %(max)s عشرية لا أكثر."
-msgstr[2] "تحقق من أن تدخل %(max)s خانتين عشريتين لا أكثر."
-msgstr[3] "تحقق من أن تدخل %(max)s خانات عشرية لا أكثر."
-msgstr[4] "تحقق من أن تدخل %(max)s خانات عشرية لا أكثر."
-msgstr[5] "تحقق من أن تدخل %(max)s خانات عشرية لا أكثر."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "تحقق من أن تدخل %(max)s أرقام قبل الفاصل العشري لا أكثر."
-msgstr[1] "تحقق من أن تدخل رقم %(max)s قبل الفاصل العشري لا أكثر."
-msgstr[2] "تحقق من أن تدخل %(max)s رقمين قبل الفاصل العشري لا أكثر."
-msgstr[3] "تحقق من أن تدخل %(max)s أرقام قبل الفاصل العشري لا أكثر."
-msgstr[4] "تحقق من أن تدخل %(max)s أرقام قبل الفاصل العشري لا أكثر."
-msgstr[5] "تحقق من أن تدخل %(max)s أرقام قبل الفاصل العشري لا أكثر."
 
 msgid "Enter a valid date."
 msgstr "أدخل تاريخاً صحيحاً."
@@ -685,7 +714,7 @@ msgid "Enter a complete value."
 msgstr "إدخال قيمة كاملة."
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "أدخل قيمة UUID صحيحة."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -694,12 +723,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(الحقل الخفي %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "بيانات ManagementForm مفقودة أو تم العبث بها"
@@ -1175,17 +1198,22 @@ msgid "It worked!"
 msgstr "أنه فعّال!"
 
 msgid "Congratulations on your first Django-powered page."
-msgstr ""
+msgstr "تهانينا على صفحتك الأولى بدعم من جانغو."
 
 msgid ""
 "Of course, you haven't actually done any work yet. Next, start your first "
 "app by running <code>python manage.py startapp [app_label]</code>."
 msgstr ""
+"وبطبيعة الحال، لم يتم عمل أي عمل فعلي حتى الآن. الخطوة التالية هي تشغيل أول "
+"تطبيق لك عبر الأمر التالي\n"
+" <code>python manage.py startapp [app_label]</code> ."
 
 msgid ""
 "You're seeing this message because you have <code>DEBUG = True</code> in "
 "your Django settings file and you haven't configured any URLs. Get to work!"
 msgstr ""
+"تظهر لك هذه الرسالة لأنه لديك <code>DEBUG = True</code> في ملف إعدادات جانغو "
+"الخاص بك، و ايضا لعدم تكوين أي عناوين المواقع. إبدأ العمل!"
 
 msgid "No year specified"
 msgstr "لم تحدد السنة"

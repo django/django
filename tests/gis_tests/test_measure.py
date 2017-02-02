@@ -5,7 +5,7 @@ and conversions. Here are some tests.
 
 import unittest
 
-from django.contrib.gis.measure import A, D, Area, Distance
+from django.contrib.gis.measure import A, Area, D, Distance
 
 
 class DistanceTest(unittest.TestCase):
@@ -34,7 +34,8 @@ class DistanceTest(unittest.TestCase):
 
     def testInitInvalid(self):
         "Testing initialization from invalid units"
-        self.assertRaises(AttributeError, D, banana=100)
+        with self.assertRaises(AttributeError):
+            D(banana=100)
 
     def testAccess(self):
         "Testing access in different units"
@@ -161,7 +162,8 @@ class AreaTest(unittest.TestCase):
 
     def testInitInvaliA(self):
         "Testing initialization from invalid units"
-        self.assertRaises(AttributeError, A, banana=100)
+        with self.assertRaises(AttributeError):
+            A(banana=100)
 
     def testAccess(self):
         "Testing access in different units"
@@ -274,6 +276,7 @@ def suite():
 
 def run(verbosity=2):
     unittest.TextTestRunner(verbosity=verbosity).run(suite())
+
 
 if __name__ == "__main__":
     run()

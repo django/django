@@ -1,12 +1,9 @@
-from __future__ import unicode_literals
-
-import sys
-
 from django.conf import settings
 from django.template import Library, Node, TemplateSyntaxError, Variable
 from django.template.base import TOKEN_TEXT, TOKEN_VAR, render_value_in_context
 from django.template.defaulttags import token_kwargs
-from django.utils import six, translation
+from django.utils import translation
+from django.utils.safestring import SafeData, mark_safe
 
 register = Library()
 
@@ -75,7 +72,7 @@ class TranslateNode(Node):
         self.asvar = asvar
         self.message_context = message_context
         self.filter_expression = filter_expression
-        if isinstance(self.filter_expression.var, six.string_types):
+        if isinstance(self.filter_expression.var, str):
             self.filter_expression.var = Variable("'%s'" %
                                                   self.filter_expression.var)
 
@@ -86,6 +83,11 @@ class TranslateNode(Node):
                 self.message_context.resolve(context))
         output = self.filter_expression.resolve(context)
         value = render_value_in_context(output, context)
+        # Restore percent signs. Percent signs in template text are doubled
+        # so they are not interpreted as string format flags.
+        is_safe = isinstance(value, SafeData)
+        value = value.replace('%%', '%')
+        value = mark_safe(value) if is_safe else value
         if self.asvar:
             context[self.asvar] = value
             return ''
@@ -96,7 +98,7 @@ class TranslateNode(Node):
 class BlockTranslateNode(Node):
 
     def __init__(self, extra_context, singular, plural=None, countervar=None,
-            counter=None, message_context=None, trimmed=False):
+                 counter=None, message_context=None, trimmed=False, asvar=None):
         self.extra_context = extra_context
         self.singular = singular
         self.plural = plural
@@ -104,6 +106,7 @@ class BlockTranslateNode(Node):
         self.counter = counter
         self.message_context = message_context
         self.trimmed = trimmed
+        self.asvar = asvar
 
     def render_token_list(self, tokens):
         result = []
@@ -162,11 +165,17 @@ class BlockTranslateNode(Node):
         except (KeyError, ValueError):
             if nested:
                 # Either string is malformed, or it's a bug
-                raise TemplateSyntaxError("'blocktrans' is unable to format "
-                    "string returned by gettext: %r using %r" % (result, data))
+                raise TemplateSyntaxError(
+                    "'blocktrans' is unable to format string returned by gettext: %r using %r"
+                    % (result, data)
+                )
             with translation.override(None):
                 result = self.render(context, nested=True)
-        return result
+        if self.asvar:
+            context[self.asvar] = result
+            return ''
+        else:
+            return result
 
 
 class LanguageNode(Node):
@@ -215,6 +224,7 @@ def do_get_language_info(parser, token):
         {% get_language_info for LANGUAGE_CODE as l %}
         {{ l.code }}
         {{ l.name }}
+        {{ l.name_translated }}
         {{ l.name_local }}
         {{ l.bidi|yesno:"bi-directional,uni-directional" }}
     """
@@ -238,6 +248,7 @@ def do_get_language_info_list(parser, token):
         {% for l in langs %}
           {{ l.code }}
           {{ l.name }}
+          {{ l.name_translated }}
           {{ l.name_local }}
           {{ l.bidi|yesno:"bi-directional,uni-directional" }}
         {% endfor %}
@@ -251,6 +262,12 @@ def do_get_language_info_list(parser, token):
 @register.filter
 def language_name(lang_code):
     return translation.get_language_info(lang_code)['name']
+
+
+@register.filter
+def language_name_translated(lang_code):
+    english_name = translation.get_language_info(lang_code)['name']
+    return translation.ugettext(english_name)
 
 
 @register.filter
@@ -369,8 +386,9 @@ def do_translate(parser, token):
             try:
                 value = remaining.pop(0)
             except IndexError:
-                msg = "No argument provided to the '%s' tag for the context option." % bits[0]
-                six.reraise(TemplateSyntaxError, TemplateSyntaxError(msg), sys.exc_info()[2])
+                raise TemplateSyntaxError(
+                    "No argument provided to the '%s' tag for the context option." % bits[0]
+                )
             if value in invalid_context:
                 raise TemplateSyntaxError(
                     "Invalid argument '%s' provided to the '%s' tag for the context option" % (value, bits[0]),
@@ -380,8 +398,9 @@ def do_translate(parser, token):
             try:
                 value = remaining.pop(0)
             except IndexError:
-                msg = "No argument provided to the '%s' tag for the as option." % bits[0]
-                six.reraise(TemplateSyntaxError, TemplateSyntaxError(msg), sys.exc_info()[2])
+                raise TemplateSyntaxError(
+                    "No argument provided to the '%s' tag for the as option." % bits[0]
+                )
             asvar = value
         else:
             raise TemplateSyntaxError(
@@ -421,6 +440,13 @@ def do_block_translate(parser, token):
         {% blocktrans with foo|filter as bar and baz|filter as boo %}
         {% blocktrans count var|length as count %}
 
+    The translated string can be stored in a variable using `asvar`::
+
+        {% blocktrans with bar=foo|filter boo=baz|filter asvar var %}
+        This is {{ bar }} and {{ boo }}.
+        {% endblocktrans %}
+        {{ var }}
+
     Contextual translations are supported::
 
         {% blocktrans with bar=foo|filter context "greeting" %}
@@ -434,6 +460,7 @@ def do_block_translate(parser, token):
 
     options = {}
     remaining_bits = bits[1:]
+    asvar = None
     while remaining_bits:
         option = remaining_bits.pop(0)
         if option in options:
@@ -454,12 +481,19 @@ def do_block_translate(parser, token):
                 value = remaining_bits.pop(0)
                 value = parser.compile_filter(value)
             except Exception:
-                msg = (
-                    '"context" in %r tag expected '
-                    'exactly one argument.') % bits[0]
-                six.reraise(TemplateSyntaxError, TemplateSyntaxError(msg), sys.exc_info()[2])
+                raise TemplateSyntaxError(
+                    '"context" in %r tag expected exactly one argument.' % bits[0]
+                )
         elif option == "trimmed":
             value = True
+        elif option == "asvar":
+            try:
+                value = remaining_bits.pop(0)
+            except IndexError:
+                raise TemplateSyntaxError(
+                    "No argument provided to the '%s' tag for the asvar option." % bits[0]
+                )
+            asvar = value
         else:
             raise TemplateSyntaxError('Unknown argument for %r tag: %r.' %
                                       (bits[0], option))
@@ -498,7 +532,8 @@ def do_block_translate(parser, token):
         raise TemplateSyntaxError("'blocktrans' doesn't allow other block tags (seen %r) inside it" % token.contents)
 
     return BlockTranslateNode(extra_context, singular, plural, countervar,
-                              counter, message_context, trimmed=trimmed)
+                              counter, message_context, trimmed=trimmed,
+                              asvar=asvar)
 
 
 @register.tag
@@ -511,7 +546,6 @@ def language(parser, token):
         {% language "de" %}
             This is {{ bar }} and {{ boo }}.
         {% endlanguage %}
-
     """
     bits = token.split_contents()
     if len(bits) != 2:

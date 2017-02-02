@@ -2,18 +2,18 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Nuno Mariz <nmariz@gmail.com>, 2011-2012
+# Nuno Mariz <nmariz@gmail.com>, 2011-2012,2015
 # Paulo Köch <paulo.koch@gmail.com>, 2011
 # Raúl Pedro Fernandes Santos, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:12+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 10:11+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Portuguese (http://www.transifex.com/projects/p/django/"
-"language/pt/)\n"
+"Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
+"pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -118,8 +118,8 @@ msgstr[1] ""
 msgid "Now"
 msgstr "Agora"
 
-msgid "Clock"
-msgstr "Relógio"
+msgid "Choose a Time"
+msgstr "Escolha a Hora"
 
 msgid "Choose a time"
 msgstr "Escolha a hora"
@@ -133,14 +133,17 @@ msgstr "6 a.m."
 msgid "Noon"
 msgstr "Meio-dia"
 
+msgid "6 p.m."
+msgstr "6 p.m."
+
 msgid "Cancel"
 msgstr "Cancelar"
 
 msgid "Today"
 msgstr "Hoje"
 
-msgid "Calendar"
-msgstr "Calendário"
+msgid "Choose a Date"
+msgstr "Escolha a Data"
 
 msgid "Yesterday"
 msgstr "Ontem"
@@ -148,15 +151,69 @@ msgstr "Ontem"
 msgid "Tomorrow"
 msgstr "Amanhã"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
+msgid "January"
 msgstr ""
-"Janeiro Fevereiro Março Abril Maio Junho Julho Agosto Setembro Outubro "
-"Novembro Dezembro"
 
-msgid "S M T W T F S"
-msgstr "D S T Q Q S S"
+msgid "February"
+msgstr ""
+
+msgid "March"
+msgstr ""
+
+msgid "April"
+msgstr ""
+
+msgid "May"
+msgstr ""
+
+msgid "June"
+msgstr ""
+
+msgid "July"
+msgstr ""
+
+msgid "August"
+msgstr ""
+
+msgid "September"
+msgstr ""
+
+msgid "October"
+msgstr ""
+
+msgid "November"
+msgstr ""
+
+msgid "December"
+msgstr ""
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr ""
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr ""
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr ""
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr ""
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr ""
 
 msgid "Show"
 msgstr "Mostrar"

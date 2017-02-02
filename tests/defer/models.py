@@ -3,7 +3,6 @@ Tests for defer() and only().
 """
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class Secondary(models.Model):
@@ -11,11 +10,10 @@ class Secondary(models.Model):
     second = models.CharField(max_length=50)
 
 
-@python_2_unicode_compatible
 class Primary(models.Model):
     name = models.CharField(max_length=50)
     value = models.CharField(max_length=50)
-    related = models.ForeignKey(Secondary)
+    related = models.ForeignKey(Secondary, models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -45,4 +43,4 @@ class RefreshPrimaryProxy(Primary):
             deferred_fields = self.get_deferred_fields()
             if fields.intersection(deferred_fields):
                 fields = fields.union(deferred_fields)
-        super(RefreshPrimaryProxy, self).refresh_from_db(using, fields, **kwargs)
+        super().refresh_from_db(using, fields, **kwargs)

@@ -2,18 +2,22 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Kewei Ma <marknv.42@gmail.com>, 2016
 # Lele Long <schemacs@gmail.com>, 2011,2015
+# Liping Wang <lynn.config@gmail.com>, 2016
+# mozillazg <opensource.mozillazg@gmail.com>, 2016
 # slene <vslene@gmail.com>, 2011
+# spaceoi <zhangzhaoyu@gmail.com>, 2016
 # Ziang Song <songziang@gmail.com>, 2012
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-30 15:21+0000\n"
-"Last-Translator: Lele Long <schemacs@gmail.com>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-09-20 02:18+0000\n"
+"Last-Translator: Liping Wang <lynn.config@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -61,7 +65,9 @@ msgstr "选中的 %s"
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
-msgstr "这是已选%s的列表。你可以"
+msgstr ""
+"这是选中的 %s 的列表。你可以在选择框下面进行选择，然后点击两选框之间的“删"
+"除”箭头进行删除。"
 
 msgid "Remove all"
 msgstr "删除全部"
@@ -109,8 +115,8 @@ msgstr[0] "注意：你比服务器时间滞后 %s 个小时。"
 msgid "Now"
 msgstr "现在"
 
-msgid "Clock"
-msgstr "时钟"
+msgid "Choose a Time"
+msgstr "选择一个时间"
 
 msgid "Choose a time"
 msgstr "选择一个时间"
@@ -124,14 +130,17 @@ msgstr "上午6点"
 msgid "Noon"
 msgstr "正午"
 
+msgid "6 p.m."
+msgstr "下午6点"
+
 msgid "Cancel"
 msgstr "取消"
 
 msgid "Today"
 msgstr "今天"
 
-msgid "Calendar"
-msgstr "日历"
+msgid "Choose a Date"
+msgstr "选择一个日期"
 
 msgid "Yesterday"
 msgstr "昨天"
@@ -139,13 +148,69 @@ msgstr "昨天"
 msgid "Tomorrow"
 msgstr "明天"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr "一月 二月 三月 四月 五月 六月 七月 八月 九月 十月 十一月 十二月"
+msgid "January"
+msgstr "一月"
 
-msgid "S M T W T F S"
-msgstr "日 一 二 三 四 五 六"
+msgid "February"
+msgstr "二月"
+
+msgid "March"
+msgstr "三月"
+
+msgid "April"
+msgstr "四月"
+
+msgid "May"
+msgstr "五月"
+
+msgid "June"
+msgstr "六月"
+
+msgid "July"
+msgstr "七月"
+
+msgid "August"
+msgstr "八月"
+
+msgid "September"
+msgstr "九月"
+
+msgid "October"
+msgstr "十月"
+
+msgid "November"
+msgstr "十一月"
+
+msgid "December"
+msgstr "十二月"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "S"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "M"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "T"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "W"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "T"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "F"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "S"
 
 msgid "Show"
 msgstr "显示"

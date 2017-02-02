@@ -1,11 +1,11 @@
 from django.core import checks
 from django.db import models
 from django.test import SimpleTestCase
+from django.test.utils import isolate_apps
 
-from .tests import IsolateModelsMixin
 
-
-class TestDeprecatedField(IsolateModelsMixin, SimpleTestCase):
+@isolate_apps('check_framework')
+class TestDeprecatedField(SimpleTestCase):
     def test_default_details(self):
         class MyField(models.Field):
             system_check_deprecated_details = {}
@@ -17,7 +17,6 @@ class TestDeprecatedField(IsolateModelsMixin, SimpleTestCase):
         self.assertEqual(model.check(), [
             checks.Warning(
                 msg='MyField has been deprecated.',
-                hint=None,
                 obj=Model._meta.get_field('name'),
                 id='fields.WXXX',
             )
@@ -45,7 +44,8 @@ class TestDeprecatedField(IsolateModelsMixin, SimpleTestCase):
         ])
 
 
-class TestRemovedField(IsolateModelsMixin, SimpleTestCase):
+@isolate_apps('check_framework')
+class TestRemovedField(SimpleTestCase):
     def test_default_details(self):
         class MyField(models.Field):
             system_check_removed_details = {}
@@ -57,7 +57,6 @@ class TestRemovedField(IsolateModelsMixin, SimpleTestCase):
         self.assertEqual(model.check(), [
             checks.Error(
                 msg='MyField has been removed except for support in historical migrations.',
-                hint=None,
                 obj=Model._meta.get_field('name'),
                 id='fields.EXXX',
             )

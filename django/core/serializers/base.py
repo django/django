@@ -1,8 +1,9 @@
 """
 Module for abstract serializer/unserializer base classes.
 """
+from io import StringIO
+
 from django.db import models
-from django.utils import six
 
 
 class SerializerDoesNotExist(KeyError):
@@ -22,12 +23,35 @@ class DeserializationError(Exception):
     def WithData(cls, original_exc, model, fk, field_value):
         """
         Factory method for creating a deserialization error which has a more
-        explanatory messsage.
+        explanatory message.
         """
         return cls("%s: (%s:pk=%s) field_value was '%s'" % (original_exc, model, fk, field_value))
 
 
-class Serializer(object):
+class ProgressBar:
+    progress_width = 75
+
+    def __init__(self, output, total_count):
+        self.output = output
+        self.total_count = total_count
+        self.prev_done = 0
+
+    def update(self, count):
+        if not self.output:
+            return
+        perc = count * 100 // self.total_count
+        done = perc * self.progress_width // 100
+        if self.prev_done >= done:
+            return
+        self.prev_done = done
+        cr = '' if self.total_count == 1 else '\r'
+        self.output.write(cr + '[' + '.' * done + ' ' * (self.progress_width - done) + ']')
+        if done == self.progress_width:
+            self.output.write('\n')
+        self.output.flush()
+
+
+class Serializer:
     """
     Abstract serializer base class.
     """
@@ -35,21 +59,25 @@ class Serializer(object):
     # Indicates if the implemented serializer is only available for
     # internal Django use.
     internal_use_only = False
+    progress_class = ProgressBar
+    stream_class = StringIO
 
-    def serialize(self, queryset, **options):
+    def serialize(self, queryset, *, stream=None, fields=None, use_natural_foreign_keys=False,
+                  use_natural_primary_keys=False, progress_output=None, object_count=0, **options):
         """
         Serialize a queryset.
         """
         self.options = options
 
-        self.stream = options.pop("stream", six.StringIO())
-        self.selected_fields = options.pop("fields", None)
-        self.use_natural_foreign_keys = options.pop('use_natural_foreign_keys', False)
-        self.use_natural_primary_keys = options.pop('use_natural_primary_keys', False)
+        self.stream = stream if stream is not None else self.stream_class()
+        self.selected_fields = fields
+        self.use_natural_foreign_keys = use_natural_foreign_keys
+        self.use_natural_primary_keys = use_natural_primary_keys
+        progress_bar = self.progress_class(progress_output, object_count)
 
         self.start_serialization()
         self.first = True
-        for obj in queryset:
+        for count, obj in enumerate(queryset, start=1):
             self.start_object(obj)
             # Use the concrete parent class' _meta instead of the object's _meta
             # This is to avoid local_fields problems for proxy models. Refs #17717.
@@ -60,17 +88,24 @@ class Serializer(object):
                         if self.selected_fields is None or field.attname in self.selected_fields:
                             self.handle_field(obj, field)
                     else:
-                        if self.selected_fields is None or field.attname[:-3] in self.selected_fields:
+                        if self.field_is_selected(field) and self.output_pk_field(obj, field):
                             self.handle_fk_field(obj, field)
             for field in concrete_model._meta.many_to_many:
                 if field.serialize:
                     if self.selected_fields is None or field.attname in self.selected_fields:
                         self.handle_m2m_field(obj, field)
             self.end_object(obj)
+            progress_bar.update(count)
             if self.first:
                 self.first = False
         self.end_serialization()
         return self.getvalue()
+
+    def field_is_selected(self, field):
+        return self.selected_fields is None or field.attname[:-3] in self.selected_fields
+
+    def output_pk_field(self, obj, pk_field):
+        return self.use_natural_primary_keys or pk_field != obj._meta.pk
 
     def start_serialization(self):
         """
@@ -123,7 +158,7 @@ class Serializer(object):
             return self.stream.getvalue()
 
 
-class Deserializer(six.Iterator):
+class Deserializer:
     """
     Abstract base deserializer class.
     """
@@ -133,8 +168,8 @@ class Deserializer(six.Iterator):
         Init this serializer given a stream or a string
         """
         self.options = options
-        if isinstance(stream_or_string, six.string_types):
-            self.stream = six.StringIO(stream_or_string)
+        if isinstance(stream_or_string, str):
+            self.stream = StringIO(stream_or_string)
         else:
             self.stream = stream_or_string
 
@@ -146,7 +181,7 @@ class Deserializer(six.Iterator):
         raise NotImplementedError('subclasses of Deserializer must provide a __next__() method')
 
 
-class DeserializedObject(object):
+class DeserializedObject:
     """
     A deserialized model.
 
@@ -163,17 +198,20 @@ class DeserializedObject(object):
         self.m2m_data = m2m_data
 
     def __repr__(self):
-        return "<DeserializedObject: %s(pk=%s)>" % (
-            self.object._meta.label, self.object.pk)
+        return "<%s: %s(pk=%s)>" % (
+            self.__class__.__name__,
+            self.object._meta.label,
+            self.object.pk,
+        )
 
-    def save(self, save_m2m=True, using=None):
+    def save(self, save_m2m=True, using=None, **kwargs):
         # Call save on the Model baseclass directly. This bypasses any
         # model-defined save. The save is also forced to be raw.
         # raw=True is passed to any pre/post_save signals.
-        models.Model.save_base(self.object, using=using, raw=True)
+        models.Model.save_base(self.object, using=using, raw=True, **kwargs)
         if self.m2m_data and save_m2m:
             for accessor_name, object_list in self.m2m_data.items():
-                setattr(self.object, accessor_name, object_list)
+                getattr(self.object, accessor_name).set(object_list)
 
         # prevent a second (possibly accidental) call to save() from saving
         # the m2m data twice.

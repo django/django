@@ -1,15 +1,15 @@
-from __future__ import unicode_literals
-
 import copy
 import pickle
 import sys
+import warnings
 from unittest import TestCase
 
-from django.utils import six
 from django.utils.functional import LazyObject, SimpleLazyObject, empty
 
+from .models import Category, CategoryInfo
 
-class Foo(object):
+
+class Foo:
     """
     A simple class with just one attribute.
     """
@@ -72,7 +72,7 @@ class LazyObjectTestCase(TestCase):
 
     def test_text(self):
         obj = self.lazy_wrap('foo')
-        self.assertEqual(six.text_type(obj), 'foo')
+        self.assertEqual(str(obj), 'foo')
 
     def test_bool(self):
         # Refs #21840
@@ -100,8 +100,7 @@ class LazyObjectTestCase(TestCase):
 
     def test_hash(self):
         obj = self.lazy_wrap('foo')
-        d = {}
-        d[obj] = 'bar'
+        d = {obj: 'bar'}
         self.assertIn('foo', d)
         self.assertEqual(d['foo'], 'bar')
 
@@ -168,7 +167,7 @@ class LazyObjectTestCase(TestCase):
         # Tests whether an object's custom `__iter__` method is being
         # used when iterating over it.
 
-        class IterObject(object):
+        class IterObject:
 
             def __init__(self, values):
                 self.values = values
@@ -191,28 +190,99 @@ class LazyObjectTestCase(TestCase):
         self.assertEqual(unpickled, obj)
         self.assertEqual(unpickled.foo, obj.foo)
 
-    def test_deepcopy(self):
-        # Check that we *can* do deep copy, and that it returns the right
-        # objects.
+    # Test copying lazy objects wrapping both builtin types and user-defined
+    # classes since a lot of the relevant code does __dict__ manipulation and
+    # builtin types don't have __dict__.
 
-        l = [1, 2, 3]
+    def test_copy_list(self):
+        # Copying a list works and returns the correct objects.
+        lst = [1, 2, 3]
 
-        obj = self.lazy_wrap(l)
-        len(l)  # forces evaluation
-        obj2 = copy.deepcopy(obj)
+        obj = self.lazy_wrap(lst)
+        len(lst)  # forces evaluation
+        obj2 = copy.copy(obj)
 
+        self.assertIsNot(obj, obj2)
         self.assertIsInstance(obj2, list)
         self.assertEqual(obj2, [1, 2, 3])
 
-    def test_deepcopy_no_evaluation(self):
-        # copying doesn't force evaluation
+    def test_copy_list_no_evaluation(self):
+        # Copying a list doesn't force evaluation.
+        lst = [1, 2, 3]
 
-        l = [1, 2, 3]
+        obj = self.lazy_wrap(lst)
+        obj2 = copy.copy(obj)
 
-        obj = self.lazy_wrap(l)
+        self.assertIsNot(obj, obj2)
+        self.assertIs(obj._wrapped, empty)
+        self.assertIs(obj2._wrapped, empty)
+
+    def test_copy_class(self):
+        # Copying a class works and returns the correct objects.
+        foo = Foo()
+
+        obj = self.lazy_wrap(foo)
+        str(foo)  # forces evaluation
+        obj2 = copy.copy(obj)
+
+        self.assertIsNot(obj, obj2)
+        self.assertIsInstance(obj2, Foo)
+        self.assertEqual(obj2, Foo())
+
+    def test_copy_class_no_evaluation(self):
+        # Copying a class doesn't force evaluation.
+        foo = Foo()
+
+        obj = self.lazy_wrap(foo)
+        obj2 = copy.copy(obj)
+
+        self.assertIsNot(obj, obj2)
+        self.assertIs(obj._wrapped, empty)
+        self.assertIs(obj2._wrapped, empty)
+
+    def test_deepcopy_list(self):
+        # Deep copying a list works and returns the correct objects.
+        lst = [1, 2, 3]
+
+        obj = self.lazy_wrap(lst)
+        len(lst)  # forces evaluation
         obj2 = copy.deepcopy(obj)
 
-        # Copying shouldn't force evaluation
+        self.assertIsNot(obj, obj2)
+        self.assertIsInstance(obj2, list)
+        self.assertEqual(obj2, [1, 2, 3])
+
+    def test_deepcopy_list_no_evaluation(self):
+        # Deep copying doesn't force evaluation.
+        lst = [1, 2, 3]
+
+        obj = self.lazy_wrap(lst)
+        obj2 = copy.deepcopy(obj)
+
+        self.assertIsNot(obj, obj2)
+        self.assertIs(obj._wrapped, empty)
+        self.assertIs(obj2._wrapped, empty)
+
+    def test_deepcopy_class(self):
+        # Deep copying a class works and returns the correct objects.
+        foo = Foo()
+
+        obj = self.lazy_wrap(foo)
+        str(foo)  # forces evaluation
+        obj2 = copy.deepcopy(obj)
+
+        self.assertIsNot(obj, obj2)
+        self.assertIsInstance(obj2, Foo)
+        self.assertEqual(obj2, Foo())
+
+    def test_deepcopy_class_no_evaluation(self):
+        # Deep copying doesn't force evaluation.
+        foo = Foo()
+
+        obj = self.lazy_wrap(foo)
+        obj2 = copy.deepcopy(obj)
+
+        self.assertIsNot(obj, obj2)
         self.assertIs(obj._wrapped, empty)
         self.assertIs(obj2._wrapped, empty)
 
@@ -229,7 +299,7 @@ class SimpleLazyObjectTestCase(LazyObjectTestCase):
         obj = self.lazy_wrap(42)
         # __repr__ contains __repr__ of setup function and does not evaluate
         # the SimpleLazyObject
-        six.assertRegex(self, repr(obj), '^<SimpleLazyObject:')
+        self.assertRegex(repr(obj), '^<SimpleLazyObject:')
         self.assertIs(obj._wrapped, empty)  # make sure evaluation hasn't been triggered
 
         self.assertEqual(obj, 42)  # evaluate the lazy object
@@ -284,3 +354,93 @@ class SimpleLazyObjectTestCase(LazyObjectTestCase):
         self.assertNotIn(6, lazy_set)
         self.assertEqual(len(lazy_list), 5)
         self.assertEqual(len(lazy_set), 4)
+
+
+class BaseBaz:
+    """
+    A base class with a funky __reduce__ method, meant to simulate the
+    __reduce__ method of Model, which sets self._django_version.
+    """
+    def __init__(self):
+        self.baz = 'wrong'
+
+    def __reduce__(self):
+        self.baz = 'right'
+        return super().__reduce__()
+
+    def __eq__(self, other):
+        if self.__class__ != other.__class__:
+            return False
+        for attr in ['bar', 'baz', 'quux']:
+            if hasattr(self, attr) != hasattr(other, attr):
+                return False
+            elif getattr(self, attr, None) != getattr(other, attr, None):
+                return False
+        return True
+
+
+class Baz(BaseBaz):
+    """
+    A class that inherits from BaseBaz and has its own __reduce_ex__ method.
+    """
+    def __init__(self, bar):
+        self.bar = bar
+        super().__init__()
+
+    def __reduce_ex__(self, proto):
+        self.quux = 'quux'
+        return super().__reduce_ex__(proto)
+
+
+class BazProxy(Baz):
+    """
+    A class that acts as a proxy for Baz. It does some scary mucking about with
+    dicts, which simulates some crazy things that people might do with
+    e.g. proxy models.
+    """
+    def __init__(self, baz):
+        self.__dict__ = baz.__dict__
+        self._baz = baz
+        # Grandparent super
+        super(BaseBaz, self).__init__()
+
+
+class SimpleLazyObjectPickleTestCase(TestCase):
+    """
+    Regression test for pickling a SimpleLazyObject wrapping a model (#25389).
+    Also covers other classes with a custom __reduce__ method.
+    """
+    def test_pickle_with_reduce(self):
+        """
+        Test in a fairly synthetic setting.
+        """
+        # Test every pickle protocol available
+        for protocol in range(pickle.HIGHEST_PROTOCOL + 1):
+            lazy_objs = [
+                SimpleLazyObject(lambda: BaseBaz()),
+                SimpleLazyObject(lambda: Baz(1)),
+                SimpleLazyObject(lambda: BazProxy(Baz(2))),
+            ]
+            for obj in lazy_objs:
+                pickled = pickle.dumps(obj, protocol)
+                unpickled = pickle.loads(pickled)
+                self.assertEqual(unpickled, obj)
+                self.assertEqual(unpickled.baz, 'right')
+
+    def test_pickle_model(self):
+        """
+        Test on an actual model, based on the report in #25426.
+        """
+        category = Category.objects.create(name="thing1")
+        CategoryInfo.objects.create(category=category)
+        # Test every pickle protocol available
+        for protocol in range(pickle.HIGHEST_PROTOCOL + 1):
+            lazy_category = SimpleLazyObject(lambda: category)
+            # Test both if we accessed a field on the model and if we didn't.
+            lazy_category.categoryinfo
+            lazy_category_2 = SimpleLazyObject(lambda: category)
+            with warnings.catch_warnings(record=True) as recorded:
+                self.assertEqual(pickle.loads(pickle.dumps(lazy_category, protocol)), category)
+                self.assertEqual(pickle.loads(pickle.dumps(lazy_category_2, protocol)), category)
+                # Assert that there were no warnings.
+                self.assertEqual(len(recorded), 0)

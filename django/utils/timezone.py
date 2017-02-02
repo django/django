@@ -1,23 +1,15 @@
 """
 Timezone-related classes and functions.
-
-This module uses pytz when it's available and fallbacks when it isn't.
 """
 
-import sys
-import time as _time
+import functools
+from contextlib import ContextDecorator
 from datetime import datetime, timedelta, tzinfo
 from threading import local
 
+import pytz
+
 from django.conf import settings
-from django.utils import lru_cache, six
-from django.utils.decorators import ContextDecorator
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
-
 
 __all__ = [
     'utc', 'get_fixed_timezone',
@@ -32,26 +24,6 @@ __all__ = [
 # UTC and local time zones
 
 ZERO = timedelta(0)
-
-
-class UTC(tzinfo):
-    """
-    UTC implementation taken from Python's docs.
-
-    Used only when pytz isn't available.
-    """
-
-    def __repr__(self):
-        return "<UTC>"
-
-    def utcoffset(self, dt):
-        return ZERO
-
-    def tzname(self, dt):
-        return "UTC"
-
-    def dst(self, dt):
-        return ZERO
 
 
 class FixedOffset(tzinfo):
@@ -79,76 +51,7 @@ class FixedOffset(tzinfo):
         return ZERO
 
 
-class ReferenceLocalTimezone(tzinfo):
-    """
-    Local time. Taken from Python's docs.
-
-    Used only when pytz isn't available, and most likely inaccurate. If you're
-    having trouble with this class, don't waste your time, just install pytz.
-
-    Kept as close as possible to the reference version. __init__ was added to
-    delay the computation of STDOFFSET, DSTOFFSET and DSTDIFF which is
-    performed at import time in the example.
-
-    Subclasses contain further improvements.
-    """
-
-    def __init__(self):
-        self.STDOFFSET = timedelta(seconds=-_time.timezone)
-        if _time.daylight:
-            self.DSTOFFSET = timedelta(seconds=-_time.altzone)
-        else:
-            self.DSTOFFSET = self.STDOFFSET
-        self.DSTDIFF = self.DSTOFFSET - self.STDOFFSET
-        tzinfo.__init__(self)
-
-    def utcoffset(self, dt):
-        if self._isdst(dt):
-            return self.DSTOFFSET
-        else:
-            return self.STDOFFSET
-
-    def dst(self, dt):
-        if self._isdst(dt):
-            return self.DSTDIFF
-        else:
-            return ZERO
-
-    def tzname(self, dt):
-        return _time.tzname[self._isdst(dt)]
-
-    def _isdst(self, dt):
-        tt = (dt.year, dt.month, dt.day,
-              dt.hour, dt.minute, dt.second,
-              dt.weekday(), 0, 0)
-        stamp = _time.mktime(tt)
-        tt = _time.localtime(stamp)
-        return tt.tm_isdst > 0
-
-
-class LocalTimezone(ReferenceLocalTimezone):
-    """
-    Slightly improved local time implementation focusing on correctness.
-
-    It still crashes on dates before 1970 or after 2038, but at least the
-    error message is helpful.
-    """
-
-    def tzname(self, dt):
-        is_dst = False if dt is None else self._isdst(dt)
-        return _time.tzname[is_dst]
-
-    def _isdst(self, dt):
-        try:
-            return super(LocalTimezone, self)._isdst(dt)
-        except (OverflowError, ValueError) as exc:
-            exc_type = type(exc)
-            exc_value = exc_type(
-                "Unsupported value: %r. You should install pytz." % dt)
-            exc_value.__cause__ = exc
-            six.reraise(exc_type, exc_value, sys.exc_info()[2])
-
-utc = pytz.utc if pytz else UTC()
+utc = pytz.utc
 """UTC time zone as a tzinfo instance."""
 
 
@@ -166,18 +69,14 @@ def get_fixed_timezone(offset):
 
 # In order to avoid accessing settings at compile time,
 # wrap the logic in a function and cache the result.
-@lru_cache.lru_cache()
+@functools.lru_cache()
 def get_default_timezone():
     """
     Returns the default time zone as a tzinfo instance.
 
     This is the time zone defined by settings.TIME_ZONE.
     """
-    if isinstance(settings.TIME_ZONE, six.string_types) and pytz is not None:
-        return pytz.timezone(settings.TIME_ZONE)
-    else:
-        # This relies on os.environ['TZ'] being set to settings.TIME_ZONE.
-        return LocalTimezone()
+    return pytz.timezone(settings.TIME_ZONE)
 
 
 # This function exists for consistency with get_current_timezone_name
@@ -186,6 +85,7 @@ def get_default_timezone_name():
     Returns the name of the default time zone.
     """
     return _get_timezone_name(get_default_timezone())
+
 
 _active = local()
 
@@ -226,11 +126,11 @@ def activate(timezone):
     Sets the time zone for the current thread.
 
     The ``timezone`` argument must be an instance of a tzinfo subclass or a
-    time zone name. If it is a time zone name, pytz is required.
+    time zone name.
     """
     if isinstance(timezone, tzinfo):
         _active.value = timezone
-    elif isinstance(timezone, six.string_types) and pytz is not None:
+    elif isinstance(timezone, str):
         _active.value = pytz.timezone(timezone)
     else:
         raise ValueError("Invalid timezone: %r" % timezone)
@@ -255,8 +155,8 @@ class override(ContextDecorator):
     on exit.
 
     The ``timezone`` argument must be an instance of a ``tzinfo`` subclass, a
-    time zone name, or ``None``. If is it a time zone name, pytz is required.
-    If it is ``None``, Django enables the default time zone.
+    time zone name, or ``None``. If it is ``None``, Django enables the default
+    time zone.
     """
     def __init__(self, timezone):
         self.timezone = timezone
@@ -286,31 +186,52 @@ def template_localtime(value, use_tz=None):
 
     This function is designed for use by the template engine.
     """
-    should_convert = (isinstance(value, datetime)
-        and (settings.USE_TZ if use_tz is None else use_tz)
-        and not is_naive(value)
-        and getattr(value, 'convert_to_local_time', True))
+    should_convert = (
+        isinstance(value, datetime) and
+        (settings.USE_TZ if use_tz is None else use_tz) and
+        not is_naive(value) and
+        getattr(value, 'convert_to_local_time', True)
+    )
     return localtime(value) if should_convert else value
 
 
 # Utilities
 
-def localtime(value, timezone=None):
+def localtime(value=None, timezone=None):
     """
     Converts an aware datetime.datetime to local time.
+
+    Only aware datetimes are allowed. When value is omitted, it defaults to
+    now().
 
     Local time is defined by the current time zone, unless another time zone
     is specified.
     """
+    if value is None:
+        value = now()
     if timezone is None:
         timezone = get_current_timezone()
-    # If `value` is naive, astimezone() will raise a ValueError,
-    # so we don't need to perform a redundant check.
+    # Emulate the behavior of astimezone() on Python < 3.6.
+    if is_naive(value):
+        raise ValueError("localtime() cannot be applied to a naive datetime")
     value = value.astimezone(timezone)
     if hasattr(timezone, 'normalize'):
         # This method is available for pytz time zones.
         value = timezone.normalize(value)
     return value
+
+
+def localdate(value=None, timezone=None):
+    """
+    Convert an aware datetime to local time and return the value's date.
+
+    Only aware datetimes are allowed. When value is omitted, it defaults to
+    now().
+
+    Local time is defined by the current time zone, unless another time zone is
+    specified.
+    """
+    return localtime(value, timezone).date()
 
 
 def now():
@@ -377,8 +298,9 @@ def make_naive(value, timezone=None):
     """
     if timezone is None:
         timezone = get_current_timezone()
-    # If `value` is naive, astimezone() will raise a ValueError,
-    # so we don't need to perform a redundant check.
+    # Emulate the behavior of astimezone() on Python < 3.6.
+    if is_naive(value):
+        raise ValueError("make_naive() cannot be applied to a naive datetime")
     value = value.astimezone(timezone)
     if hasattr(timezone, 'normalize'):
         # This method is available for pytz time zones.

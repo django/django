@@ -1,17 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2015
 # Nurlan Rakhimzhanov <nurlan.rakhimzhanov@gmail.com>, 2011
 # yun_man_ger <germanilyin@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Kazakh (http://www.transifex.com/projects/p/django/language/"
-"kk/)\n"
+"Language-Team: Kazakh (http://www.transifex.com/django/django/language/kk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -24,10 +24,10 @@ msgstr "Таңдалған %(count)d %(items)s элемент өшірілді."
 
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr "%(name)s өшіре алмайды"
+msgstr "%(name)s өшіру мүмкін емес"
 
 msgid "Are you sure?"
-msgstr "Сенімдісіз бе?"
+msgstr "Осыған сенімдісіз бе?"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
@@ -63,6 +63,12 @@ msgstr "Осы ай"
 msgid "This year"
 msgstr "Осы жыл"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -72,12 +78,27 @@ msgstr ""
 msgid "Action:"
 msgstr "Әрекет:"
 
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Тағы басқа %(verbose_name)s кос"
+
+msgid "Remove"
+msgstr "Өшіру"
+
 msgid "action time"
 msgstr "әрекет уақыты"
+
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
 
 msgid "object id"
 msgstr "объекттің id-i"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "объекттің repr-i"
 
@@ -108,6 +129,31 @@ msgstr ""
 msgid "LogEntry Object"
 msgstr ""
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "және"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Ешқандай толтырма өзгермеді."
+
 msgid "None"
 msgstr "Ешнәрсе"
 
@@ -115,58 +161,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-#, python-format
-msgid "Changed %s."
-msgstr "%s өзгертілді."
-
-msgid "and"
-msgstr "және"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" қосылды."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "\"%(object)s\" %(name)s-нің %(list)s өзгертілді."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "%(name)s \"%(object)s\" өшірілді."
-
-msgid "No fields changed."
-msgstr "Ешқандай толтырма өзгермеді."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" сәтті қосылды. Оны төменде өзгерте аласыз."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" сәтті қосылды."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" сәтті өзгертілді."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -325,18 +348,15 @@ msgstr "Құжаттама"
 msgid "Log out"
 msgstr "Шығу"
 
-msgid "Add"
-msgstr "Қосу"
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s қосу"
 
 msgid "History"
 msgstr "Тарих"
 
 msgid "View on site"
 msgstr "Сайтта көру"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "%(name)s қосу"
 
 msgid "Filter"
 msgstr "Сүзгіз"
@@ -419,13 +439,6 @@ msgstr ""
 msgid "Change"
 msgstr "Өзгетру"
 
-msgid "Remove"
-msgstr "Өшіру"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Тағы басқа %(verbose_name)s кос"
-
 msgid "Delete?"
 msgstr "Өшіру?"
 
@@ -440,14 +453,17 @@ msgstr ""
 msgid "Models in the %(name)s application"
 msgstr ""
 
+msgid "Add"
+msgstr "Қосу"
+
 msgid "You don't have permission to edit anything."
 msgstr "Бірденке түзетуге рұқсатыңыз жоқ."
 
-msgid "Recent Actions"
-msgstr "Соңғы әрекеттер"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "Менің әрекеттерім"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Қол жетімдісі жоқ"
@@ -462,6 +478,12 @@ msgid ""
 msgstr ""
 "Дерекқор орнатуыңызда бір қате бар. Дерекқор кестелері дұрыс құрылғаның және "
 "дерекқор көрсетілген дерекқор пайдаланушыда оқұ рұқсаты бар."
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr ""
@@ -486,6 +508,9 @@ msgstr "Барлығын көрсету"
 
 msgid "Save"
 msgstr "Сақтау"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -611,9 +636,6 @@ msgstr "Құпия сөзді жаңала"
 
 msgid "All dates"
 msgstr "Барлық мерзімдер"
-
-msgid "(None)"
-msgstr "(Ешнарсе)"
 
 #, python-format
 msgid "Select %s"

@@ -1,24 +1,20 @@
 """Default variable filters."""
-from __future__ import unicode_literals
-
 import random as random_module
 import re
-import warnings
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
+from operator import itemgetter
 from pprint import pformat
+from urllib.parse import quote
 
-from django.conf import settings
-from django.utils import formats, six
+from django.utils import formats
 from django.utils.dateformat import format, time_format
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.html import (
     avoid_wrapping, conditional_escape, escape, escapejs, linebreaks,
-    remove_tags, strip_tags, urlize as _urlize,
+    strip_tags, urlize as _urlize,
 )
-from django.utils.http import urlquote
-from django.utils.safestring import SafeData, mark_for_escaping, mark_safe
+from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import (
     Truncator, normalize_newlines, phone2numeric, slugify as _slugify, wrap,
 )
@@ -37,9 +33,8 @@ register = Library()
 
 def stringfilter(func):
     """
-    Decorator for filters which should only receive unicode objects. The object
-    passed as the first positional argument will be converted to a unicode
-    object.
+    Decorator for filters which should only receive strings. The object
+    passed as the first positional argument will be converted to a string.
     """
     def _dec(*args, **kwargs):
         if args:
@@ -87,19 +82,6 @@ def escapejs_filter(value):
     return escapejs(value)
 
 
-# Values for testing floatformat input against infinity and NaN representations,
-# which differ across platforms and Python versions.  Some (i.e. old Windows
-# ones) are not recognized by Decimal but we want to return them unchanged vs.
-# returning an empty string as we do for completely invalid input.  Note these
-# need to be built up from values that are not inf/nan, since inf/nan values do
-# not reload properly from .pyc files on Windows prior to some level of Python 2.5
-# (see Python Issue757815 and Issue1080440).
-pos_inf = 1e200 * 1e200
-neg_inf = -1e200 * 1e200
-nan = (1e200 * 1e200) // (1e200 * 1e200)
-special_floats = [str(pos_inf), str(neg_inf), str(nan)]
-
-
 @register.filter(is_safe=True)
 def floatformat(text, arg=-1):
     """
@@ -134,16 +116,12 @@ def floatformat(text, arg=-1):
     """
 
     try:
-        input_val = force_text(text)
+        input_val = repr(text)
         d = Decimal(input_val)
-    except UnicodeEncodeError:
-        return ''
     except InvalidOperation:
-        if input_val in special_floats:
-            return input_val
         try:
             d = Decimal(force_text(float(text)))
-        except (ValueError, InvalidOperation, TypeError, UnicodeEncodeError):
+        except (ValueError, InvalidOperation, TypeError):
             return ''
     try:
         p = int(arg)
@@ -162,33 +140,30 @@ def floatformat(text, arg=-1):
         exp = Decimal(1)
     else:
         exp = Decimal('1.0') / (Decimal(10) ** abs(p))
-    try:
-        # Set the precision high enough to avoid an exception, see #15789.
-        tupl = d.as_tuple()
-        units = len(tupl[1]) - tupl[2]
-        prec = abs(p) + units + 1
+    # Set the precision high enough to avoid an exception (#15789).
+    tupl = d.as_tuple()
+    units = len(tupl[1])
+    units += -tupl[2] if m else tupl[2]
+    prec = abs(p) + units + 1
 
-        # Avoid conversion to scientific notation by accessing `sign`, `digits`
-        # and `exponent` from `Decimal.as_tuple()` directly.
-        sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP,
-            Context(prec=prec)).as_tuple()
-        digits = [six.text_type(digit) for digit in reversed(digits)]
-        while len(digits) <= abs(exponent):
-            digits.append('0')
-        digits.insert(-exponent, '.')
-        if sign:
-            digits.append('-')
-        number = ''.join(reversed(digits))
-        return mark_safe(formats.number_format(number, abs(p)))
-    except InvalidOperation:
-        return input_val
+    # Avoid conversion to scientific notation by accessing `sign`, `digits`,
+    # and `exponent` from Decimal.as_tuple() directly.
+    sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP, Context(prec=prec)).as_tuple()
+    digits = [str(digit) for digit in reversed(digits)]
+    while len(digits) <= abs(exponent):
+        digits.append('0')
+    digits.insert(-exponent, '.')
+    if sign:
+        digits.append('-')
+    number = ''.join(reversed(digits))
+    return mark_safe(formats.number_format(number, abs(p)))
 
 
 @register.filter(is_safe=True)
 @stringfilter
 def iriencode(value):
     """Escapes an IRI value for use in a URL."""
-    return force_text(iri_to_uri(value))
+    return iri_to_uri(value)
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
@@ -198,7 +173,7 @@ def linenumbers(value, autoescape=True):
     lines = value.split('\n')
     # Find the maximum width of the line count, for use with zero padding
     # string format command
-    width = six.text_type(len(six.text_type(len(lines))))
+    width = str(len(str(len(lines))))
     if not autoescape or isinstance(value, SafeData):
         for i, line in enumerate(lines):
             lines[i] = ("%0" + width + "d. %s") % (i + 1, line)
@@ -246,11 +221,11 @@ def stringformat(value, arg):
     This specifier uses Python string formating syntax, with the exception that
     the leading "%" is dropped.
 
-    See http://docs.python.org/lib/typesseq-strings.html for documentation
-    of Python string formatting
+    See https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting
+    for documentation of Python string formatting.
     """
     try:
-        return ("%" + six.text_type(arg)) % value
+        return ("%" + str(arg)) % value
     except (ValueError, TypeError):
         return ""
 
@@ -260,7 +235,7 @@ def stringformat(value, arg):
 def title(value):
     """Converts a string into titlecase."""
     t = re.sub("([a-z])'([A-Z])", lambda m: m.group(0).lower(), value.title())
-    return re.sub("\d([A-Z])", lambda m: m.group(0).lower(), t)
+    return re.sub(r"\d([A-Z])", lambda m: m.group(0).lower(), t)
 
 
 @register.filter(is_safe=True)
@@ -343,14 +318,14 @@ def urlencode(value, safe=None):
     Escapes a value for use in a URL.
 
     Takes an optional ``safe`` parameter used to determine the characters which
-    should not be escaped by Django's ``urlquote`` method. If not provided, the
+    should not be escaped by Python's quote() function. If not provided, the
     default safe characters will be used (but an empty string can be provided
     when *all* characters should be escaped).
     """
     kwargs = {}
     if safe is not None:
         kwargs['safe'] = safe
-    return urlquote(value, **kwargs)
+    return quote(value, **kwargs)
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
@@ -369,8 +344,7 @@ def urlizetrunc(value, limit, autoescape=True):
 
     Argument: Length to truncate URLs to.
     """
-    return mark_safe(_urlize(value, trim_url_limit=int(limit), nofollow=True,
-                            autoescape=autoescape))
+    return mark_safe(_urlize(value, trim_url_limit=int(limit), nofollow=True, autoescape=autoescape))
 
 
 @register.filter(is_safe=False)
@@ -443,7 +417,7 @@ def escape_filter(value):
     """
     Marks the value as a string that should be auto-escaped.
     """
-    return mark_for_escaping(value)
+    return conditional_escape(value)
 
 
 @register.filter(is_safe=True)
@@ -496,17 +470,10 @@ def safe(value):
 def safeseq(value):
     """
     A "safe" filter for sequences. Marks each element in the sequence,
-    individually, as safe, after converting them to unicode. Returns a list
+    individually, as safe, after converting them to strings. Returns a list
     with the results.
     """
     return [mark_safe(force_text(obj)) for obj in value]
-
-
-@register.filter(is_safe=True)
-@stringfilter
-def removetags(value, tags):
-    """Removes a space separated list of [X]HTML tags from the output."""
-    return remove_tags(value, tags)
 
 
 @register.filter(is_safe=True)
@@ -520,6 +487,32 @@ def striptags(value):
 # LISTS           #
 ###################
 
+def _property_resolver(arg):
+    """
+    When arg is convertible to float, behave like operator.itemgetter(arg)
+    Otherwise, behave like Variable(arg).resolve
+
+    >>> _property_resolver(1)('abc')
+    'b'
+    >>> _property_resolver('1')('abc')
+    Traceback (most recent call last):
+    ...
+    TypeError: string indices must be integers
+    >>> class Foo:
+    ...     a = 42
+    ...     b = 3.14
+    ...     c = 'Hey!'
+    >>> _property_resolver('b')(Foo())
+    3.14
+    """
+    try:
+        float(arg)
+    except ValueError:
+        return Variable(arg).resolve
+    else:
+        return itemgetter(arg)
+
+
 @register.filter(is_safe=False)
 def dictsort(value, arg):
     """
@@ -527,7 +520,7 @@ def dictsort(value, arg):
     the argument.
     """
     try:
-        return sorted(value, key=Variable(arg).resolve)
+        return sorted(value, key=_property_resolver(arg))
     except (TypeError, VariableDoesNotExist):
         return ''
 
@@ -539,7 +532,7 @@ def dictsortreversed(value, arg):
     property given in the argument.
     """
     try:
-        return sorted(value, key=Variable(arg).resolve, reverse=True)
+        return sorted(value, key=_property_resolver(arg), reverse=True)
     except (TypeError, VariableDoesNotExist):
         return ''
 
@@ -648,57 +641,32 @@ def unordered_list(value, autoescape=True):
     if autoescape:
         escaper = conditional_escape
     else:
-        escaper = lambda x: x
-
-    def convert_old_style_list(list_):
-        """
-        Converts old style lists to the new easier to understand format.
-
-        The old list format looked like:
-            ['Item 1', [['Item 1.1', []], ['Item 1.2', []]]
-
-        And it is converted to:
-            ['Item 1', ['Item 1.1', 'Item 1.2]]
-        """
-        if not isinstance(list_, (tuple, list)) or len(list_) != 2:
-            return list_, False
-        first_item, second_item = list_
-        if second_item == []:
-            return [first_item], True
-        try:
-            # see if second item is iterable
-            iter(second_item)
-        except TypeError:
-            return list_, False
-        old_style_list = True
-        new_second_item = []
-        for sublist in second_item:
-            item, old_style_list = convert_old_style_list(sublist)
-            if not old_style_list:
-                break
-            new_second_item.extend(item)
-        if old_style_list:
-            second_item = new_second_item
-        return [first_item, second_item], old_style_list
+        def escaper(x):
+            return x
 
     def walk_items(item_list):
         item_iterator = iter(item_list)
-        for item in item_iterator:
-            try:
-                next_item = next(item_iterator)
-            except StopIteration:
-                next_item = None
-            if not isinstance(next_item, six.string_types):
+        try:
+            item = next(item_iterator)
+            while True:
                 try:
-                    iter(next_item)
-                except TypeError:
-                    pass
-                else:
-                    yield item, next_item
-                    continue
-            yield item, None
-            if next_item:
-                yield next_item, None
+                    next_item = next(item_iterator)
+                except StopIteration:
+                    yield item, None
+                    break
+                if not isinstance(next_item, str):
+                    try:
+                        iter(next_item)
+                    except TypeError:
+                        pass
+                    else:
+                        yield item, next_item
+                        item = next(item_iterator)
+                        continue
+                yield item, None
+                item = next_item
+        except StopIteration:
+            pass
 
     def list_formatter(item_list, tabs=1):
         indent = '\t' * tabs
@@ -712,12 +680,6 @@ def unordered_list(value, autoescape=True):
                 indent, escaper(force_text(item)), sublist))
         return '\n'.join(output)
 
-    value, converted = convert_old_style_list(value)
-    if converted:
-        warnings.warn(
-            "The old style syntax in `unordered_list` is deprecated and will "
-            "be removed in Django 2.0. Use the the new format instead.",
-            RemovedInDjango20Warning)
     return mark_safe(list_formatter(value))
 
 
@@ -767,8 +729,6 @@ def date(value, arg=None):
     """Formats a date according to the given format."""
     if value in (None, ''):
         return ''
-    if arg is None:
-        arg = settings.DATE_FORMAT
     try:
         return formats.date_format(value, arg)
     except AttributeError:
@@ -783,14 +743,12 @@ def time(value, arg=None):
     """Formats a time according to the given format."""
     if value in (None, ''):
         return ''
-    if arg is None:
-        arg = settings.TIME_FORMAT
     try:
         return formats.time_format(value, arg)
-    except AttributeError:
+    except (AttributeError, TypeError):
         try:
             return time_format(value, arg)
-        except AttributeError:
+        except (AttributeError, TypeError):
             return ''
 
 
@@ -838,7 +796,7 @@ def default_if_none(value, arg):
 
 @register.filter(is_safe=False)
 def divisibleby(value, arg):
-    """Returns True if the value is devisible by the argument."""
+    """Returns True if the value is divisible by the argument."""
     return int(value) % int(arg) == 0
 
 
@@ -880,18 +838,19 @@ def yesno(value, arg=None):
 ###################
 
 @register.filter(is_safe=True)
-def filesizeformat(bytes):
+def filesizeformat(bytes_):
     """
     Formats the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB,
-    102 bytes, etc).
+    102 bytes, etc.).
     """
     try:
-        bytes = float(bytes)
+        bytes_ = float(bytes_)
     except (TypeError, ValueError, UnicodeDecodeError):
         value = ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
         return avoid_wrapping(value)
 
-    filesize_number_format = lambda value: formats.number_format(round(value, 1), 1)
+    def filesize_number_format(value):
+        return formats.number_format(round(value, 1), 1)
 
     KB = 1 << 10
     MB = 1 << 20
@@ -899,19 +858,25 @@ def filesizeformat(bytes):
     TB = 1 << 40
     PB = 1 << 50
 
-    if bytes < KB:
-        value = ungettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}
-    elif bytes < MB:
-        value = ugettext("%s KB") % filesize_number_format(bytes / KB)
-    elif bytes < GB:
-        value = ugettext("%s MB") % filesize_number_format(bytes / MB)
-    elif bytes < TB:
-        value = ugettext("%s GB") % filesize_number_format(bytes / GB)
-    elif bytes < PB:
-        value = ugettext("%s TB") % filesize_number_format(bytes / TB)
-    else:
-        value = ugettext("%s PB") % filesize_number_format(bytes / PB)
+    negative = bytes_ < 0
+    if negative:
+        bytes_ = -bytes_  # Allow formatting of negative numbers.
 
+    if bytes_ < KB:
+        value = ungettext("%(size)d byte", "%(size)d bytes", bytes_) % {'size': bytes_}
+    elif bytes_ < MB:
+        value = ugettext("%s KB") % filesize_number_format(bytes_ / KB)
+    elif bytes_ < GB:
+        value = ugettext("%s MB") % filesize_number_format(bytes_ / MB)
+    elif bytes_ < TB:
+        value = ugettext("%s GB") % filesize_number_format(bytes_ / GB)
+    elif bytes_ < PB:
+        value = ugettext("%s TB") % filesize_number_format(bytes_ / TB)
+    else:
+        value = ugettext("%s PB") % filesize_number_format(bytes_ / PB)
+
+    if negative:
+        value = "-%s" % value
     return avoid_wrapping(value)
 
 

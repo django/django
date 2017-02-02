@@ -1,11 +1,13 @@
-from __future__ import unicode_literals
-
 import datetime
 
-from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.test import TestCase
+from django.http import Http404
+from django.template import TemplateDoesNotExist
+from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
+from django.views.defaults import (
+    bad_request, page_not_found, permission_denied, server_error,
+)
 
 from ..models import Article, Author, UrlArticle
 
@@ -18,12 +20,6 @@ class DefaultsTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        User.objects.create(
-            password='sha1$6efc0$f93efe9fd7542f25a7be94871ea45aa95de57161',
-            last_login=datetime.datetime(2006, 12, 17, 7, 3, 31), is_superuser=False, username='testclient',
-            first_name='Test', last_name='Client', email='testclient@example.com', is_staff=False, is_active=True,
-            date_joined=datetime.datetime(2006, 12, 17, 7, 3, 31)
-        )
         Author.objects.create(name='Boris')
         Article.objects.create(
             title='Old Article', slug='old_article', author_id=1,
@@ -88,8 +84,7 @@ class DefaultsTests(TestCase):
     }])
     def test_custom_templates(self):
         """
-        Test that 404.html and 500.html templates are picked by their respective
-        handler.
+        404.html and 500.html templates are picked by their respective handler.
         """
         response = self.client.get('/server_error/')
         self.assertContains(response, "test template for a 500 error", status_code=500)
@@ -123,3 +118,23 @@ class DefaultsTests(TestCase):
 
         response = self.client.get('/server_error/')
         self.assertEqual(response['Content-Type'], 'text/html')
+
+    def test_custom_templates_wrong(self):
+        """
+        Default error views should raise TemplateDoesNotExist when passed a
+        template that doesn't exist.
+        """
+        rf = RequestFactory()
+        request = rf.get('/')
+
+        with self.assertRaises(TemplateDoesNotExist):
+            bad_request(request, Exception(), template_name='nonexistent')
+
+        with self.assertRaises(TemplateDoesNotExist):
+            permission_denied(request, Exception(), template_name='nonexistent')
+
+        with self.assertRaises(TemplateDoesNotExist):
+            page_not_found(request, Http404(), template_name='nonexistent')
+
+        with self.assertRaises(TemplateDoesNotExist):
+            server_error(request, template_name='nonexistent')

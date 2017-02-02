@@ -1,14 +1,10 @@
-from __future__ import unicode_literals
-
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Square(models.Model):
     root = models.IntegerField()
     square = models.PositiveIntegerField()
@@ -17,7 +13,6 @@ class Square(models.Model):
         return "%s ** 2 == %s" % (self.root, self.square)
 
 
-@python_2_unicode_compatible
 class Person(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
@@ -33,10 +28,6 @@ class SchoolClass(models.Model):
 
 
 class VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ(models.Model):
-    class Meta:
-        # We need to use a short actual table name or
-        # we hit issue #8548 which we're not testing!
-        verbose_name = 'model_with_long_table_name'
     primary_key_is_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.AutoField(primary_key=True)
     charfield_is_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.CharField(max_length=100)
     m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz = models.ManyToManyField(Person, blank=True)
@@ -44,7 +35,7 @@ class VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=30)
-    content_type = models.ForeignKey(ContentType, related_name='backend_tags')
+    content_type = models.ForeignKey(ContentType, models.CASCADE, related_name='backend_tags')
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -58,7 +49,6 @@ class Post(models.Model):
         db_table = 'CaseSensitive_Post'
 
 
-@python_2_unicode_compatible
 class Reporter(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -72,19 +62,21 @@ class ReporterProxy(Reporter):
         proxy = True
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateField()
-    reporter = models.ForeignKey(Reporter)
-    reporter_proxy = models.ForeignKey(ReporterProxy, null=True,
-                                       related_name='reporter_proxy')
+    reporter = models.ForeignKey(Reporter, models.CASCADE)
+    reporter_proxy = models.ForeignKey(
+        ReporterProxy,
+        models.SET_NULL,
+        null=True,
+        related_name='reporter_proxy',
+    )
 
     def __str__(self):
         return self.headline
 
 
-@python_2_unicode_compatible
 class Item(models.Model):
     name = models.CharField(max_length=30)
     date = models.DateField()
@@ -95,7 +87,6 @@ class Item(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Object(models.Model):
     related_objects = models.ManyToManyField("self", db_constraint=False, symmetrical=False)
 
@@ -103,9 +94,8 @@ class Object(models.Model):
         return str(self.id)
 
 
-@python_2_unicode_compatible
 class ObjectReference(models.Model):
-    obj = models.ForeignKey(Object, db_constraint=False)
+    obj = models.ForeignKey(Object, models.CASCADE, db_constraint=False)
 
     def __str__(self):
         return str(self.obj_id)

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.utils.translation import ugettext_lazy as _
@@ -10,9 +8,10 @@ class AdminAuthenticationForm(AuthenticationForm):
     A custom authentication form used in the admin app.
     """
     error_messages = {
-        'invalid_login': _("Please enter the correct %(username)s and password "
-                           "for a staff account. Note that both fields may be "
-                           "case-sensitive."),
+        'invalid_login': _(
+            "Please enter the correct %(username)s and password for a staff "
+            "account. Note that both fields may be case-sensitive."
+        ),
     }
     required_css_class = 'required'
 

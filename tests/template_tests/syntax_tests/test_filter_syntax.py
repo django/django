@@ -1,6 +1,3 @@
-# coding: utf-8
-from __future__ import unicode_literals
-
 from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase
 
@@ -71,8 +68,17 @@ class FilterSyntaxTests(SimpleTestCase):
         """
         Raise TemplateSyntaxError for empty block tags
         """
-        with self.assertRaises(TemplateSyntaxError):
+        with self.assertRaisesMessage(TemplateSyntaxError, 'Empty block tag on line 1'):
             self.engine.get_template('filter-syntax08')
+
+    @setup({'filter-syntax08-multi-line': "line 1\nline 2\nline 3{% %}\nline 4\nline 5"})
+    def test_filter_syntax08_multi_line(self):
+        """
+        Raise TemplateSyntaxError for empty block tags in templates with
+        multiple lines.
+        """
+        with self.assertRaisesMessage(TemplateSyntaxError, 'Empty block tag on line 3'):
+            self.engine.get_template('filter-syntax08-multi-line')
 
     @setup({'filter-syntax09': '{{ var|cut:"o"|upper|lower }}'})
     def test_filter_syntax09(self):
@@ -154,8 +160,7 @@ class FilterSyntaxTests(SimpleTestCase):
     @setup({'filter-syntax18': r'{{ var }}'})
     def test_filter_syntax18(self):
         """
-        Make sure that any unicode strings are converted to bytestrings
-        in the final output.
+        Strings are converted to bytestrings in the final output.
         """
         output = self.engine.render_to_string('filter-syntax18', {'var': UTF8Class()})
         self.assertEqual(output, '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
@@ -228,3 +233,8 @@ class FilterSyntaxTests(SimpleTestCase):
         """
         with self.assertRaises(AttributeError):
             self.engine.render_to_string('filter-syntax25', {'var': SomeClass()})
+
+    @setup({'template': '{{ var.type_error_attribute }}'})
+    def test_type_error_attribute(self):
+        with self.assertRaises(TypeError):
+            self.engine.render_to_string('template', {'var': SomeClass()})

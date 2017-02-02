@@ -64,5 +64,5 @@ Bugfixes
 ========
 
 * To maintain compatibility with Python 2.5, Django's vendored version of six,
-  :mod:`django.utils.six`, has been downgraded to 1.8.0 which is the last
+  ``django.utils.six``, has been downgraded to 1.8.0 which is the last
   version to support Python 2.5.

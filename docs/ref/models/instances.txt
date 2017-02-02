@@ -67,21 +67,18 @@ Customizing model loading
 
 .. classmethod:: Model.from_db(db, field_names, values)
 
-.. versionadded:: 1.8
-
 The ``from_db()`` method can be used to customize model instance creation
 when loading from the database.
 
 The ``db`` argument contains the database alias for the database the model
 is loaded from, ``field_names`` contains the names of all loaded fields, and
 ``values`` contains the loaded values for each field in ``field_names``. The
-``field_names`` are in the same order as the ``values``, so it is possible to
-use ``cls(**(zip(field_names, values)))`` to instantiate the object. If all
-of the model's fields are present, then ``values`` are guaranteed to be in
-the order ``__init__()`` expects them. That is, the instance can be created
-by ``cls(*values)``. It is possible to check if all fields are present by
-consulting ``cls._deferred`` - if ``False``, then all fields have been loaded
-from the database.
+``field_names`` are in the same order as the ``values``. If all of the model's
+fields are present, then ``values`` are guaranteed to be in the order
+``__init__()`` expects them. That is, the instance can be created by
+``cls(*values)``. If any fields are deferred, they won't appear in
+``field_names``. In that case, assign a value of ``django.db.models.DEFERRED``
+to each of the missing fields.
 
 In addition to creating the new model, the ``from_db()`` method must set the
 ``adding`` and ``db`` flags in the new instance's ``_state`` attribute.
@@ -89,18 +86,24 @@ In addition to creating the new model, the ``from_db()`` method must set the
 Below is an example showing how to record the initial values of fields that
 are loaded from the database::
 
+    from django.db.models import DEFERRED
+
     @classmethod
     def from_db(cls, db, field_names, values):
-        # default implementation of from_db() (could be replaced
-        # with super())
-        if cls._deferred:
-            instance = cls(**zip(field_names, values))
-        else:
-            instance = cls(*values)
+        # Default implementation of from_db() (subject to change and could
+        # be replaced with super()).
+        if len(values) != len(cls._meta.concrete_fields):
+            values = list(values)
+            values.reverse()
+            values = [
+                values.pop() if f.attname in field_names else DEFERRED
+                for f in cls._meta.concrete_fields
+            ]
+        new = cls(*values)
         instance._state.adding = False
         instance._state.db = db
         # customization to store the original field values on the instance
-        instance._loaded_values = zip(field_names, values)
+        instance._loaded_values = dict(zip(field_names, values))
         return instance
 
     def save(self, *args, **kwargs):
@@ -110,7 +113,7 @@ are loaded from the database::
         if not self._state.adding and (
                 self.creator_id != self._loaded_values['creator_id']):
             raise ValueError("Updating the value of creator isn't allowed")
-        super(...).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 The example above shows a full ``from_db()`` implementation to clarify how that
 is done. In this case it would of course be possible to just use ``super()`` call
@@ -119,9 +122,14 @@ in the ``from_db()`` method.
 Refreshing objects from database
 ================================
 
-.. method:: Model.refresh_from_db(using=None, fields=None, **kwargs)
+If you delete a field from a model instance, accessing it again reloads the
+value from the database::
 
-.. versionadded:: 1.8
+    >>> obj = MyModel.objects.first()
+    >>> del obj.field
+    >>> obj.field  # Loads the field from the database
+
+.. method:: Model.refresh_from_db(using=None, fields=None)
 
 If you need to reload a model's values from the database, you can use the
 ``refresh_from_db()`` method. When this method is called without arguments the
@@ -136,8 +144,10 @@ following is done:
    be thrown away, and when next accessed it will be reloaded with the value of
    ``obj.author_id``.
 
-Note that only fields of the model are reloaded from the database. Other
-database dependent values such as annotations are not reloaded.
+Only fields of the model are reloaded from the database. Other
+database-dependent values such as annotations aren't reloaded. Any
+:func:`@cached_property <django.utils.functional.cached_property>` attributes
+aren't cleared either.
 
 The reloading happens from the database the instance was loaded from, or from
 the default database if the instance wasn't loaded from the database. The
@@ -174,11 +184,9 @@ all of the instance's fields when a deferred field is reloaded::
                 if fields.intersection(deferred_fields):
                     # then load all of them
                     fields = fields.union(deferred_fields)
-            super(ExampleModel, self).refresh_from_db(using, fields, **kwargs)
+            super().refresh_from_db(using, fields, **kwargs)
 
 .. method:: Model.get_deferred_fields()
-
-.. versionadded:: 1.8
 
 A helper method that returns a set containing the attribute names of all those
 fields that are currently deferred for this model.
@@ -253,13 +261,14 @@ access to more than a single field::
     import datetime
     from django.core.exceptions import ValidationError
     from django.db import models
+    from django.utils.translation import ugettext_lazy as _
 
     class Article(models.Model):
         ...
         def clean(self):
             # Don't allow draft entries to have a pub_date.
             if self.status == 'draft' and self.pub_date is not None:
-                raise ValidationError('Draft entries may not have a publication date.')
+                raise ValidationError(_('Draft entries may not have a publication date.'))
             # Set the pub_date for published items if it hasn't been set already.
             if self.status == 'published' and self.pub_date is None:
                 self.pub_date = datetime.date.today()
@@ -289,8 +298,16 @@ error to the ``pub_date`` field::
         def clean(self):
             # Don't allow draft entries to have a pub_date.
             if self.status == 'draft' and self.pub_date is not None:
-                raise ValidationError({'pub_date': 'Draft entries may not have a publication date.'})
+                raise ValidationError({'pub_date': _('Draft entries may not have a publication date.')})
             ...
+
+If you detect errors in multiple fields during ``Model.clean()``, you can also
+pass a dictionary mapping field names to errors::
+
+    raise ValidationError({
+        'title': ValidationError(_('Missing title.'), code='required'),
+        'pub_date': ValidationError(_('Invalid date.'), code='invalid'),
+    })
 
 Finally, ``full_clean()`` will check any unique constraints on your model.
 
@@ -312,7 +329,7 @@ Saving objects
 
 To save an object back to the database, call ``save()``:
 
-.. method:: Model.save([force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None])
+.. method:: Model.save(force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None)
 
 If you want customized saving behavior, you can override this ``save()``
 method. See :ref:`overriding-model-methods` for more details.
@@ -385,43 +402,36 @@ What happens when you save?
 
 When you save an object, Django performs the following steps:
 
-1. **Emit a pre-save signal.** The :doc:`signal </ref/signals>`
-   :attr:`django.db.models.signals.pre_save` is sent, allowing any
-   functions listening for that signal to take some customized
-   action.
+#. **Emit a pre-save signal.** The :data:`~django.db.models.signals.pre_save`
+   signal is sent, allowing any functions listening for that signal to do
+   something.
 
-2. **Pre-process the data.** Each field on the object is asked to
-   perform any automated data modification that the field may need
-   to perform.
+#. **Preprocess the data.** Each field's
+   :meth:`~django.db.models.Field.pre_save` method is called to perform any
+   automated data modification that's needed. For example, the date/time fields
+   override ``pre_save()`` to implement
+   :attr:`~django.db.models.DateField.auto_now_add` and
+   :attr:`~django.db.models.DateField.auto_now`.
 
-   Most fields do *no* pre-processing — the field data is kept as-is.
-   Pre-processing is only used on fields that have special behavior.  For
-   example, if your model has a :class:`~django.db.models.DateField` with
-   ``auto_now=True``, the pre-save phase will alter the data in the object
-   to ensure that the date field contains the current date stamp. (Our
-   documentation doesn't yet include a list of all the fields with this
-   "special behavior.")
-
-3. **Prepare the data for the database.** Each field is asked to provide
+#. **Prepare the data for the database.** Each field's
+   :meth:`~django.db.models.Field.get_db_prep_save` method is asked to provide
    its current value in a data type that can be written to the database.
 
-   Most fields require *no* data preparation. Simple data types, such as
-   integers and strings, are 'ready to write' as a Python object. However,
-   more complex data types often require some modification.
+   Most fields don't require data preparation. Simple data types, such as
+   integers and strings, are 'ready to write' as a Python object. However, more
+   complex data types often require some modification.
 
    For example, :class:`~django.db.models.DateField` fields use a Python
    ``datetime`` object to store data. Databases don't store ``datetime``
    objects, so the field value must be converted into an ISO-compliant date
    string for insertion into the database.
 
-4. **Insert the data into the database.** The pre-processed, prepared
-   data is then composed into an SQL statement for insertion into the
-   database.
+#. **Insert the data into the database.** The preprocessed, prepared data is
+   composed into an SQL statement for insertion into the database.
 
-5. **Emit a post-save signal.** The signal
-   :attr:`django.db.models.signals.post_save` is sent, allowing
-   any functions listening for that signal to take some customized
-   action.
+#. **Emit a post-save signal.** The :data:`~django.db.models.signals.post_save`
+   signal is sent, allowing any functions listening for that signal to do
+   something.
 
 How Django knows to UPDATE vs. INSERT
 -------------------------------------
@@ -533,7 +543,7 @@ value, the field will be added to the updated fields.
 Deleting objects
 ================
 
-.. method:: Model.delete([using=DEFAULT_DB_ALIAS, keep_parents=False])
+.. method:: Model.delete(using=DEFAULT_DB_ALIAS, keep_parents=False)
 
 Issues an SQL ``DELETE`` for the object. This only deletes the object in the
 database; the Python instance will still exist and will still have data in
@@ -550,14 +560,6 @@ Sometimes with :ref:`multi-table inheritance <multi-table-inheritance>` you may
 want to delete only a child model's data. Specifying ``keep_parents=True`` will
 keep the parent model's data.
 
-.. versionchanged:: 1.9
-
-    The ``keep_parents`` parameter was added.
-
-.. versionchanged:: 1.9
-
-    The return value describing the number of objects deleted was added.
-
 Pickling objects
 ================
 
@@ -573,8 +575,6 @@ the data that's currently in the database.
     Django version N+1. Pickles should not be used as part of a long-term
     archival strategy.
 
-    .. versionadded:: 1.8
-
     Since pickle compatibility errors can be difficult to diagnose, such as
     silently corrupted objects, a ``RuntimeWarning`` is raised when you try to
     unpickle a model in a Django version that is different than the one in
@@ -587,52 +587,15 @@ Other model instance methods
 
 A few object methods have special purposes.
 
-.. note::
-    On Python 3, as all strings are natively considered Unicode, only use the
-    ``__str__()`` method (the ``__unicode__()`` method is obsolete).
-    If you'd like compatibility with Python 2, you can decorate your model class
-    with :func:`~django.utils.encoding.python_2_unicode_compatible`.
-
-``__unicode__``
----------------
-
-.. method:: Model.__unicode__()
-
-The ``__unicode__()`` method is called whenever you call ``unicode()`` on an
-object. Django uses ``unicode(obj)`` (or the related function, :meth:`str(obj)
-<Model.__str__>`) in a number of places. Most notably, to display an object in
-the Django admin site and as the value inserted into a template when it
-displays an object. Thus, you should always return a nice, human-readable
-representation of the model from the ``__unicode__()`` method.
-
-For example::
-
-    from django.db import models
-
-    class Person(models.Model):
-        first_name = models.CharField(max_length=50)
-        last_name = models.CharField(max_length=50)
-
-        def __unicode__(self):
-            return u'%s %s' % (self.first_name, self.last_name)
-
-If you define a ``__unicode__()`` method on your model and not a
-:meth:`~Model.__str__()` method, Django will automatically provide you with a
-:meth:`~Model.__str__()` that calls ``__unicode__()`` and then converts the
-result correctly to a UTF-8 encoded string object. This is recommended
-development practice: define only ``__unicode__()`` and let Django take care of
-the conversion to string objects when required.
-
-``__str__``
------------
+``__str__()``
+-------------
 
 .. method:: Model.__str__()
 
-The ``__str__()`` method is called whenever you call ``str()`` on an
-object. In Python 3, Django uses ``str(obj)`` in a number of
-places. Most notably, to display an object in the Django admin site
-and as the value inserted into a template when it displays an
-object. Thus, you should always return a nice, human-readable
+The ``__str__()`` method is called whenever you call ``str()`` on an object.
+Django uses ``str(obj)`` in a number of places. Most notably, to display an
+object in the Django admin site and as the value inserted into a template when
+it displays an object. Thus, you should always return a nice, human-readable
 representation of the model from the ``__str__()`` method.
 
 For example::
@@ -646,36 +609,16 @@ For example::
         def __str__(self):
             return '%s %s' % (self.first_name, self.last_name)
 
-In Python 2, the main use of ``__str__`` directly inside Django is
-when the ``repr()`` output of a model is displayed anywhere (for
-example, in debugging output). It isn't required to put ``__str__()``
-methods everywhere if you have sensible :meth:`~Model.__unicode__()`
-methods.
-
-The previous :meth:`~Model.__unicode__()` example could be similarly written
-using ``__str__()`` like this::
-
-    from django.db import models
-    from django.utils.encoding import force_bytes
-
-    class Person(models.Model):
-        first_name = models.CharField(max_length=50)
-        last_name = models.CharField(max_length=50)
-
-        def __str__(self):
-            # Note use of django.utils.encoding.force_bytes() here because
-            # first_name and last_name will be unicode strings.
-            return force_bytes('%s %s' % (self.first_name, self.last_name))
-
-``__eq__``
-----------
+``__eq__()``
+------------
 
 .. method:: Model.__eq__()
 
 The equality method is defined such that instances with the same primary
-key value and the same concrete class are considered equal. For proxy
-models, concrete class is defined as the model's first non-proxy parent;
-for all other models it is simply the model's class.
+key value and the same concrete class are considered equal, except that
+instances with a primary key value of ``None`` aren't equal to anything except
+themselves. For proxy models, concrete class is defined as the model's first
+non-proxy parent; for all other models it's simply the model's class.
 
 For example::
 
@@ -691,27 +634,33 @@ For example::
     class MultitableInherited(MyModel):
         pass
 
+    # Primary keys compared
     MyModel(id=1) == MyModel(id=1)
-    MyModel(id=1) == MyProxyModel(id=1)
-    MyModel(id=1) != MultitableInherited(id=1)
     MyModel(id=1) != MyModel(id=2)
+    # Primay keys are None
+    MyModel(id=None) != MyModel(id=None)
+    # Same instance
+    instance = MyModel(id=None)
+    instance == instance
+    # Proxy model
+    MyModel(id=1) == MyProxyModel(id=1)
+    # Multi-table inheritance
+    MyModel(id=1) != MultitableInherited(id=1)
 
-``__hash__``
-------------
+``__hash__()``
+--------------
 
 .. method:: Model.__hash__()
 
-The ``__hash__`` method is based on the instance's primary key value. It
-is effectively hash(obj.pk). If the instance doesn't have a primary key
-value then a ``TypeError`` will be raised (otherwise the ``__hash__``
+The ``__hash__()`` method is based on the instance's primary key value. It
+is effectively ``hash(obj.pk)``. If the instance doesn't have a primary key
+value then a ``TypeError`` will be raised (otherwise the ``__hash__()``
 method would return different values before and after the instance is
-saved, but changing the ``__hash__`` value of an instance `is forbidden
-in Python`_).
+saved, but changing the :meth:`~object.__hash__` value of an instance is
+forbidden in Python.
 
-.. _is forbidden in Python: https://docs.python.org/reference/datamodel.html#object.__hash__
-
-``get_absolute_url``
---------------------
+``get_absolute_url()``
+----------------------
 
 .. method:: Model.get_absolute_url()
 
@@ -724,14 +673,14 @@ For example::
     def get_absolute_url(self):
         return "/people/%i/" % self.id
 
-(Whilst this code is correct and simple, it may not be the most portable way to
-write this kind of method. The :func:`~django.core.urlresolvers.reverse`
-function is usually the best approach.)
+While this code is correct and simple, it may not be the most portable way to
+to write this kind of method. The :func:`~django.urls.reverse` function is
+usually the best approach.
 
 For example::
 
     def get_absolute_url(self):
-        from django.core.urlresolvers import reverse
+        from django.urls import reverse
         return reverse('people.views.details', args=[str(self.id)])
 
 One place Django uses ``get_absolute_url()`` is in the admin app. If an object
@@ -784,8 +733,7 @@ in ``get_absolute_url()`` and have all your other code call that one place.
     Code and templates calling ``get_absolute_url()`` should be able to use the
     result directly without any further processing. You may wish to use the
     ``django.utils.encoding.iri_to_uri()`` function to help with this if you
-    are using unicode strings containing characters outside the ASCII range at
-    all.
+    are using strings containing characters outside the ASCII range.
 
 Extra instance methods
 ======================

@@ -6,11 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Tamil (http://www.transifex.com/projects/p/django/language/"
-"ta/)\n"
+"Language-Team: Tamil (http://www.transifex.com/django/django/language/ta/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -62,6 +61,12 @@ msgstr "இந்த மாதம்"
 msgid "This year"
 msgstr "இந்த வருடம்"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -71,12 +76,27 @@ msgstr ""
 msgid "Action:"
 msgstr ""
 
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr ""
+
+msgid "Remove"
+msgstr "அழிக்க"
+
 msgid "action time"
 msgstr "செயல் நேரம்"
+
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
 
 msgid "object id"
 msgstr "பொருள் அடையாளம்"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "பொருள் உருவகித்தம்"
 
@@ -107,6 +127,31 @@ msgstr ""
 msgid "LogEntry Object"
 msgstr ""
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "மற்றும்"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "எந்த புலமும் மாறவில்லை."
+
 msgid "None"
 msgstr ""
 
@@ -114,59 +159,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-#, python-format
-msgid "Changed %s."
-msgstr "%s மாற்றபட்டுள்ளது."
-
-msgid "and"
-msgstr "மற்றும்"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr ""
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr ""
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr ""
-
-msgid "No fields changed."
-msgstr "எந்த புலமும் மாறவில்லை."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"%(name)s \"%(obj)s\" வெற்றிகரமாக சேர்க்கப்பட்டுள்ளது. நீங்கள் கீழே தொகுக்க முடியும்."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" வெற்றிகரமாகச் சேர்க்கப்பட்டது."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" வெற்றிகரமாக மாற்றப்பட்டது."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -317,18 +338,15 @@ msgstr "ஆவனமாக்கம்"
 msgid "Log out"
 msgstr "வெளியேறு"
 
-msgid "Add"
-msgstr "சேர்க்க"
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s சேர்க்க"
 
 msgid "History"
 msgstr "வரலாறு"
 
 msgid "View on site"
 msgstr "தளத்தில் பார்"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "%(name)s சேர்க்க"
 
 msgid "Filter"
 msgstr "வடிகட்டி"
@@ -403,13 +421,6 @@ msgstr ""
 msgid "Change"
 msgstr "மாற்றுக"
 
-msgid "Remove"
-msgstr "அழிக்க"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr ""
-
 msgid "Delete?"
 msgstr ""
 
@@ -424,14 +435,17 @@ msgstr ""
 msgid "Models in the %(name)s application"
 msgstr ""
 
+msgid "Add"
+msgstr "சேர்க்க"
+
 msgid "You don't have permission to edit anything."
 msgstr "உங்களுக்கு மாற்றுவதற்குரிய உரிமையில்லை"
 
-msgid "Recent Actions"
-msgstr "தற்போதைய செயல்கள்"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "எனது செயல்கள்"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "எதுவும் கிடைக்கவில்லை"
@@ -447,6 +461,12 @@ msgstr ""
 "உங்களுடைய தகவல்சேமிப்பகத்தை  நிறுவுவதில் சில தவறுகள் உள்ளது. அதற்கு இணையான "
 "தகவல்சேமிப்பு அட்டவணையைதயாரிக்கவும். மேலும் பயனர் படிக்கும்  படியான தகவல்சேமிப்பகத்தை "
 "உருவாக்கவும்."
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr ""
@@ -471,6 +491,9 @@ msgstr "எல்லாவற்றையும் காட்டு"
 
 msgid "Save"
 msgstr "சேமிக்க"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -595,9 +618,6 @@ msgstr "எனது கடவுச்சொல்லை மாற்றிய�
 
 msgid "All dates"
 msgstr "அனைத்து தேதியும்"
-
-msgid "(None)"
-msgstr ""
 
 #, python-format
 msgid "Select %s"

@@ -5,17 +5,15 @@ Tests of ModelAdmin system checks logic.
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class Album(models.Model):
     title = models.CharField(max_length=150)
 
 
-@python_2_unicode_compatible
 class Song(models.Model):
     title = models.CharField(max_length=150)
-    album = models.ForeignKey(Album)
+    album = models.ForeignKey(Album, models.CASCADE)
     original_release = models.DateField(editable=False)
 
     class Meta:
@@ -30,8 +28,8 @@ class Song(models.Model):
 
 
 class TwoAlbumFKAndAnE(models.Model):
-    album1 = models.ForeignKey(Album, related_name="album1_set")
-    album2 = models.ForeignKey(Album, related_name="album2_set")
+    album1 = models.ForeignKey(Album, models.CASCADE, related_name="album1_set")
+    album2 = models.ForeignKey(Album, models.CASCADE, related_name="album2_set")
     e = models.CharField(max_length=1)
 
 
@@ -47,8 +45,8 @@ class Book(models.Model):
 
 
 class AuthorsBooks(models.Model):
-    author = models.ForeignKey(Author)
-    book = models.ForeignKey(Book)
+    author = models.ForeignKey(Author, models.CASCADE)
+    book = models.ForeignKey(Book, models.CASCADE)
     featured = models.BooleanField()
 
 
@@ -57,12 +55,12 @@ class State(models.Model):
 
 
 class City(models.Model):
-    state = models.ForeignKey(State)
+    state = models.ForeignKey(State, models.CASCADE)
 
 
 class Influence(models.Model):
     name = models.TextField()
 
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')

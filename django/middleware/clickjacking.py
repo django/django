@@ -6,9 +6,10 @@ malicious site loading resources from your site in a hidden frame.
 """
 
 from django.conf import settings
+from django.utils.deprecation import MiddlewareMixin
 
 
-class XFrameOptionsMiddleware(object):
+class XFrameOptionsMiddleware(MiddlewareMixin):
     """
     Middleware that sets the X-Frame-Options HTTP header in HTTP responses.
 
@@ -24,7 +25,7 @@ class XFrameOptionsMiddleware(object):
     clickjacking protection techniques should be used if protection in those
     browsers is required.
 
-    http://en.wikipedia.org/wiki/Clickjacking#Server_and_client
+    https://en.wikipedia.org/wiki/Clickjacking#Server_and_client
     """
     def process_response(self, request, response):
         # Don't set it if it's already in the response

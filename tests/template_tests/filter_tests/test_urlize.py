@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.template.defaultfilters import urlize
 from django.test import SimpleTestCase
+from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -159,16 +157,16 @@ class FunctionTests(SimpleTestCase):
             'www.mystore.com/30%OffCoupons</a>!',
         )
         self.assertEqual(
-            urlize('http://en.wikipedia.org/wiki/Caf%C3%A9'),
-            '<a href="http://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
-            'http://en.wikipedia.org/wiki/Caf%C3%A9</a>',
+            urlize('https://en.wikipedia.org/wiki/Caf%C3%A9'),
+            '<a href="https://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
+            'https://en.wikipedia.org/wiki/Caf%C3%A9</a>',
         )
 
     def test_unicode(self):
         self.assertEqual(
-            urlize('http://en.wikipedia.org/wiki/Café'),
-            '<a href="http://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
-            'http://en.wikipedia.org/wiki/Café</a>',
+            urlize('https://en.wikipedia.org/wiki/Café'),
+            '<a href="https://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
+            'https://en.wikipedia.org/wiki/Café</a>',
         )
 
     def test_parenthesis(self):
@@ -176,14 +174,14 @@ class FunctionTests(SimpleTestCase):
         #11911 - Check urlize keeps balanced parentheses
         """
         self.assertEqual(
-            urlize('http://en.wikipedia.org/wiki/Django_(web_framework)'),
-            '<a href="http://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
-            'http://en.wikipedia.org/wiki/Django_(web_framework)</a>',
+            urlize('https://en.wikipedia.org/wiki/Django_(web_framework)'),
+            '<a href="https://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
+            'https://en.wikipedia.org/wiki/Django_(web_framework)</a>',
         )
         self.assertEqual(
-            urlize('(see http://en.wikipedia.org/wiki/Django_(web_framework))'),
-            '(see <a href="http://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
-            'http://en.wikipedia.org/wiki/Django_(web_framework)</a>)',
+            urlize('(see https://en.wikipedia.org/wiki/Django_(web_framework))'),
+            '(see <a href="https://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
+            'https://en.wikipedia.org/wiki/Django_(web_framework)</a>)',
         )
 
     def test_nofollow(self):
@@ -242,6 +240,24 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(
             urlize('(Go to http://www.example.com/foo.)'),
             '(Go to <a href="http://www.example.com/foo" rel="nofollow">http://www.example.com/foo</a>.)',
+        )
+
+    def test_trailing_multiple_punctuation(self):
+        self.assertEqual(
+            urlize('A test http://testing.com/example..'),
+            'A test <a href="http://testing.com/example" rel="nofollow">http://testing.com/example</a>..'
+        )
+        self.assertEqual(
+            urlize('A test http://testing.com/example!!'),
+            'A test <a href="http://testing.com/example" rel="nofollow">http://testing.com/example</a>!!'
+        )
+        self.assertEqual(
+            urlize('A test http://testing.com/example!!!'),
+            'A test <a href="http://testing.com/example" rel="nofollow">http://testing.com/example</a>!!!'
+        )
+        self.assertEqual(
+            urlize('A test http://testing.com/example.,:;)"!'),
+            'A test <a href="http://testing.com/example" rel="nofollow">http://testing.com/example</a>.,:;)&quot;!'
         )
 
     def test_brackets(self):
@@ -340,11 +356,18 @@ class FunctionTests(SimpleTestCase):
     def test_autoescape(self):
         self.assertEqual(
             urlize('foo<a href=" google.com ">bar</a>buz'),
-            'foo&lt;a href=&quot; <a href="http://google.com" rel="nofollow">google.com</a> &quot;&gt;bar&lt;/a&gt;buz',
+            'foo&lt;a href=&quot; <a href="http://google.com" rel="nofollow">google.com</a> &quot;&gt;bar&lt;/a&gt;buz'
         )
 
     def test_autoescape_off(self):
         self.assertEqual(
             urlize('foo<a href=" google.com ">bar</a>buz', autoescape=False),
             'foo<a href=" <a href="http://google.com" rel="nofollow">google.com</a> ">bar</a>buz',
+        )
+
+    def test_lazystring(self):
+        prepend_www = lazy(lambda url: 'www.' + url, str)
+        self.assertEqual(
+            urlize(prepend_www('google.com')),
+            '<a href="http://www.google.com" rel="nofollow">www.google.com</a>',
         )

@@ -5,15 +5,16 @@
 # Alireza Savand <alireza.savand@gmail.com>, 2013
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Pouya Abbassi, 2016
 # Saeed <sd.javadi@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-04-12 14:18+0000\n"
-"Last-Translator: Ali Vakilzade <ali.vakilzade@gmail.com>\n"
-"Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-08-16 13:53+0000\n"
+"Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
+"Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,8 +25,12 @@ msgstr ""
 msgid "GIS"
 msgstr "جی‌آی‌اس"
 
-msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr "فیلد  GIS  پایه -- نقشه‌ها برای مشخصه‌های هندسی OpenGIS"
+msgid "The base GIS field."
+msgstr "پایه‌ی سیستم اطلاعات جغرافیایی میدانی."
+
+msgid ""
+"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+msgstr "پایه‌ی فیلد هندسی --نوع خاص هندسه‌ی نقشه‌ها‌ی نوع OpenGIS"
 
 msgid "Point"
 msgstr "نقطه"
@@ -49,7 +54,10 @@ msgid "Geometry collection"
 msgstr "مجموعه هندسی"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "تراکم وسعت حوزه‌ی "
+
+msgid "Raster Field"
+msgstr "حوزه‌ی شطرنجی"
 
 msgid "No geometry value provided."
 msgstr "مقدار جغرافیایی‌ای مقرر نشده است."
@@ -66,16 +74,16 @@ msgid ""
 msgstr "مشکلی در هنگام انتقال مختصات هندسی از فیلد به SRID رخ داد."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "حذف همه‌ی اشیاء"
 
 msgid "WKT debugging window:"
-msgstr ""
+msgstr "پنجره‌ی اشکال زدایی «متن قابل درک»"
 
 msgid "Google Maps via GeoDjango"
-msgstr ""
+msgstr "نقشه‌ی گوگل از طریق GeoDjango"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "پنجره‌ی اشکال زدایی (ارزش متوالی)"
 
 msgid "No feeds are registered."
 msgstr "هیچ فیدی ثبت شده است."

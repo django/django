@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import migrations, models
 
 
@@ -16,7 +13,7 @@ class Migration(migrations.Migration):
             "Book",
             [
                 ("id", models.AutoField(primary_key=True)),
-                ("user", models.ForeignKey("auth.User", null=True)),
+                ("user", models.ForeignKey("auth.User", models.SET_NULL, null=True)),
             ],
         )
 

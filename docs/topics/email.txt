@@ -20,8 +20,13 @@ In two lines::
 
     from django.core.mail import send_mail
 
-    send_mail('Subject here', 'Here is the message.', 'from@example.com',
-        ['to@example.com'], fail_silently=False)
+    send_mail(
+        'Subject here',
+        'Here is the message.',
+        'from@example.com',
+        ['to@example.com'],
+        fail_silently=False,
+    )
 
 Mail is sent using the SMTP host and port specified in the
 :setting:`EMAIL_HOST` and :setting:`EMAIL_PORT` settings. The
@@ -35,8 +40,8 @@ a secure connection is used.
     The character set of email sent with ``django.core.mail`` will be set to
     the value of your :setting:`DEFAULT_CHARSET` setting.
 
-send_mail()
-===========
+``send_mail()``
+===============
 
 .. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
 
@@ -74,8 +79,8 @@ are required.
 The return value will be the number of successfully delivered messages (which
 can be ``0`` or ``1`` since it can only send one message).
 
-send_mass_mail()
-================
+``send_mass_mail()``
+====================
 
 .. function:: send_mass_mail(datatuple, fail_silently=False, auth_user=None, auth_password=None, connection=None)
 
@@ -103,8 +108,8 @@ mail server would be opened::
 
 The return value will be the number of successfully delivered messages.
 
-send_mass_mail() vs. send_mail()
---------------------------------
+``send_mass_mail()`` vs. ``send_mail()``
+----------------------------------------
 
 The main difference between :meth:`~django.core.mail.send_mass_mail()` and
 :meth:`~django.core.mail.send_mail()` is that
@@ -113,8 +118,8 @@ each time it's executed, while :meth:`~django.core.mail.send_mass_mail()` uses
 a single connection for all of its messages. This makes
 :meth:`~django.core.mail.send_mass_mail()` slightly more efficient.
 
-mail_admins()
-=============
+``mail_admins()``
+=================
 
 .. function:: mail_admins(subject, message, fail_silently=False, connection=None, html_message=None)
 
@@ -134,8 +139,8 @@ If ``html_message`` is provided, the resulting email will be a
 :mimetype:`text/plain` content type and ``html_message`` as the
 :mimetype:`text/html` content type.
 
-mail_managers()
-===============
+``mail_managers()``
+===================
 
 .. function:: mail_managers(subject, message, fail_silently=False, connection=None, html_message=None)
 
@@ -149,8 +154,12 @@ Examples
 This sends a single email to john@example.com and jane@example.com, with them
 both appearing in the "To:"::
 
-    send_mail('Subject', 'Message.', 'from@example.com',
-        ['john@example.com', 'jane@example.com'])
+    send_mail(
+        'Subject',
+        'Message.',
+        'from@example.com',
+        ['john@example.com', 'jane@example.com'],
+    )
 
 This sends a message to john@example.com and jane@example.com, with them both
 receiving a separate email::
@@ -205,8 +214,8 @@ from the request's POST data, sends that to admin@example.com and redirects to
 
 .. _emailmessage-and-smtpconnection:
 
-The EmailMessage class
-======================
+The ``EmailMessage`` class
+==========================
 
 Django's :meth:`~django.core.mail.send_mail()` and
 :meth:`~django.core.mail.send_mass_mail()` functions are actually thin
@@ -235,8 +244,8 @@ For convenience, :class:`~django.core.mail.EmailMessage` provides a simple
 messages, the email backend API :ref:`provides an alternative
 <topics-sending-multiple-emails>`.
 
-EmailMessage Objects
---------------------
+``EmailMessage`` Objects
+------------------------
 
 .. class:: EmailMessage
 
@@ -277,15 +286,19 @@ All parameters are optional and can be set at any time prior to calling the
 * ``reply_to``: A list or tuple of recipient addresses used in the "Reply-To"
   header when sending the email.
 
-.. versionchanged:: 1.8
-
-    The ``reply_to`` parameter was added.
-
 For example::
 
-    email = EmailMessage('Hello', 'Body goes here', 'from@example.com',
-                ['to1@example.com', 'to2@example.com'], ['bcc@example.com'],
-                reply_to=['another@example.com'], headers={'Message-ID': 'foo'})
+    from django.core.mail import EmailMessage
+
+    email = EmailMessage(
+        'Hello',
+        'Body goes here',
+        'from@example.com',
+        ['to1@example.com', 'to2@example.com'],
+        ['bcc@example.com'],
+        reply_to=['another@example.com'],
+        headers={'Message-ID': 'foo'},
+    )
 
 The class has the following methods:
 
@@ -332,6 +345,11 @@ The class has the following methods:
     If you specify a ``mimetype`` of ``message/rfc822``, it will also accept
     :class:`django.core.mail.EmailMessage` and :py:class:`email.message.Message`.
 
+    For a ``mimetype`` starting with ``text/``, content is expected to be a
+    string. Binary data will be decoded using UTF-8, and if that fails, the
+    MIME type will be changed to ``application/octet-stream`` and the data will
+    be attached unchanged.
+
     In addition, ``message/rfc822`` attachments will no longer be
     base64-encoded in violation of :rfc:`2046#section-5.2.1`, which can cause
     issues with displaying the attachments in `Evolution`__ and `Thunderbird`__.
@@ -345,6 +363,14 @@ The class has the following methods:
   will be guessed from the filename. The simplest use would be::
 
     message.attach_file('/images/weather_map.png')
+
+  For MIME types starting with ``text/``, binary data is handled as in
+  ``attach()``.
+
+.. versionchanged:: 1.11
+
+    Added the fallback to MIME type ``application/octet-stream`` when binary
+    data for a ``text/*`` attachment cannot be decoded.
 
 Sending alternative content types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -407,14 +433,14 @@ It can also be used as a context manager, which will automatically call
     from django.core import mail
 
     with mail.get_connection() as connection:
-        mail.EmailMessage(subject1, body1, from1, [to1],
-                          connection=connection).send()
-        mail.EmailMessage(subject2, body2, from2, [to2],
-                          connection=connection).send()
-
-.. versionadded:: 1.8
-
-    The context manager protocol was added.
+        mail.EmailMessage(
+            subject1, body1, from1, [to1],
+            connection=connection,
+        ).send()
+        mail.EmailMessage(
+            subject2, body2, from2, [to2],
+            connection=connection,
+        ).send()
 
 Obtaining an instance of an email backend
 -----------------------------------------
@@ -447,7 +473,7 @@ can :ref:`write your own email backend <topic-custom-email-backend>`.
 SMTP backend
 ~~~~~~~~~~~~
 
-.. class:: backends.smtp.EmailBackend([host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs])
+.. class:: backends.smtp.EmailBackend(host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs)
 
     This is the default backend. Email will be sent through a SMTP server.
 
@@ -471,12 +497,6 @@ SMTP backend
 
     If unspecified, the default ``timeout`` will be the one provided by
     :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no timeout).
-
-    .. versionchanged:: 1.8
-
-        The ``ssl_keyfile``, and ``ssl_certfile`` parameters and corresponding
-        settings were added. The ability to customize ``timeout`` using
-        a setting (:setting:`EMAIL_TIMEOUT`) was added.
 
 .. _topic-email-console-backend:
 
@@ -604,15 +624,28 @@ manually open the connection, you can control when it is closed. For example::
     connection.open()
 
     # Construct an email message that uses the connection
-    email1 = mail.EmailMessage('Hello', 'Body goes here', 'from@example.com',
-                              ['to1@example.com'], connection=connection)
+    email1 = mail.EmailMessage(
+        'Hello',
+        'Body goes here',
+        'from@example.com',
+        ['to1@example.com'],
+        connection=connection,
+    )
     email1.send() # Send the email
 
     # Construct two more messages
-    email2 = mail.EmailMessage('Hello', 'Body goes here', 'from@example.com',
-                              ['to2@example.com'])
-    email3 = mail.EmailMessage('Hello', 'Body goes here', 'from@example.com',
-                              ['to3@example.com'])
+    email2 = mail.EmailMessage(
+        'Hello',
+        'Body goes here',
+        'from@example.com',
+        ['to2@example.com'],
+    )
+    email3 = mail.EmailMessage(
+        'Hello',
+        'Body goes here',
+        'from@example.com',
+        ['to3@example.com'],
+    )
 
     # Send the two emails in a single call -
     connection.send_messages([email2, email3])
@@ -625,7 +658,7 @@ Configuring email for development
 =================================
 
 There are times when you do not want Django to send emails at
-all. For example, while developing a Web site, you probably don't want
+all. For example, while developing a website, you probably don't want
 to send out thousands of emails -- but you may want to validate that
 emails will be sent to the right people under the right conditions,
 and that those emails will contain the correct content.

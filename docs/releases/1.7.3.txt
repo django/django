@@ -82,8 +82,7 @@ Bugfixes
   (:ticket:`23815`).
 
 * Fixed a crash in the ``django.contrib.auth.redirect_to_login`` view when
-  passing a :func:`~django.core.urlresolvers.reverse_lazy` result on Python 3
-  (:ticket:`24097`).
+  passing a ``reverse_lazy()`` result on Python 3 (:ticket:`24097`).
 
 * Added correct formats for Greek (``el``) (:ticket:`23967`).
 

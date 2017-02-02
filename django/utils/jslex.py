@@ -1,11 +1,9 @@
 """JsLex: a lexer for Javascript"""
 # Originally from https://bitbucket.org/ned/jslex
-from __future__ import unicode_literals
-
 import re
 
 
-class Tok(object):
+class Tok:
     """
     A specification for a token class.
     """
@@ -25,12 +23,11 @@ def literals(choices, prefix="", suffix=""):
 
     If provided, `prefix` and `suffix` will be attached to each choice
     individually.
-
     """
     return "|".join(prefix + re.escape(c) + suffix for c in choices.split())
 
 
-class Lexer(object):
+class Lexer:
     """
     A generic multi-state regex-based lexer.
     """
@@ -182,7 +179,7 @@ class JsLexer(Lexer):
     }
 
     def __init__(self):
-        super(JsLexer, self).__init__(self.states, 'reg')
+        super().__init__(self.states, 'reg')
 
 
 def prepare_js_for_gettext(js):

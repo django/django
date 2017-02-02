@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.core import checks
 from django.db import models
 
@@ -8,9 +5,4 @@ from django.db import models
 class ModelRaisingMessages(models.Model):
     @classmethod
     def check(self, **kwargs):
-        return [
-            checks.Warning(
-                'A warning',
-                hint=None,
-            ),
-        ]
+        return [checks.Warning('A warning')]

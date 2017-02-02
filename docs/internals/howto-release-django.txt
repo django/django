@@ -92,8 +92,11 @@ any time leading up to the actual release:
    the release. We maintain a list of who gets these pre-notification emails in
    the private ``django-core`` repository. Send the mail to
    ``security@djangoproject.com`` and BCC the pre-notification recipients.
-   This email should be signed by the key you'll use for the release, and
-   should include patches for each issue being fixed.
+   This email should be signed by the key you'll use for the release and
+   should include `CVE IDs <https://cveform.mitre.org/>`_ (requested with
+   Vendor: djangoproject, Product: django) and patches for each issue being
+   fixed. Also, :ref:`notify django-announce <security-disclosure>` of the
+   upcoming security release.
 
 #. As the release approaches, watch Trac to make sure no release blockers
    are left for the upcoming release.
@@ -112,7 +115,7 @@ any time leading up to the actual release:
 #. Double-check that the release notes index has a link to the notes
    for the new release; this will be in ``docs/releases/index.txt``.
 
-#. If this is a major release, ensure translations from Transifex have been
+#. If this is a feature release, ensure translations from Transifex have been
    integrated. This is typically done by a separate translation's manager
    rather than the releaser, but here are the steps. Provided you have an
    account on Transifex::
@@ -181,20 +184,15 @@ OK, this is the fun part, where we actually push out a release!
 
    __ https://github.com/django/django/commit/3ef4bbf495cc6c061789132e3d50a8231a89406b
 
-#. For a major version release, remove the ``UNDER DEVELOPMENT`` header at the
+#. For a feature release, remove the ``UNDER DEVELOPMENT`` header at the
    top of the release notes and add the release date on the next line. For a
-   minor release, replace ``*Under Development*`` with the release date. Make
+   patch release, replace ``*Under Development*`` with the release date. Make
    this change on all branches where the release notes for a particular version
    are located.
 
 #. Update the version number in ``django/__init__.py`` for the release.
    Please see `notes on setting the VERSION tuple`_ below for details
    on ``VERSION``.
-
-   In 1.4, the version number in ``docs/conf.py`` and ``setup.py`` should also
-   be updated. Here's `an example commit updating version numbers`__ for that.
-
-   __ https://github.com/django/django/commit/592187e11b934f83153133cd5b3a246a881359e7
 
 #. If this is a pre-release package, update the "Development Status" trove
    classifier in ``setup.py`` to reflect this. Otherwise, make sure the
@@ -211,8 +209,7 @@ OK, this is the fun part, where we actually push out a release!
 #. Make sure you have an absolutely clean tree by running ``git clean -dfx``.
 
 #. Run ``make -f extras/Makefile`` to generate the release packages. This will
-   create the release packages in a ``dist/`` directory. Note that we don't
-   publish wheel files for 1.4.
+   create the release packages in a ``dist/`` directory.
 
 #. Generate the hashes of the release packages::
 
@@ -229,7 +226,7 @@ OK, this is the fun part, where we actually push out a release!
    .. code-block:: text
 
     This file contains MD5, SHA1, and SHA256 checksums for the source-code
-    tarball of Django <<VERSION>>, released <<DATE>>.
+    tarball and wheel files of Django <<VERSION>>, released <<DATE>>.
 
     To use this file, you will need a working install of PGP or other
     compatible public-key encryption software. You will also need to have
@@ -251,8 +248,8 @@ OK, this is the fun part, where we actually push out a release!
     Release packages:
     =================
 
-    Django <<VERSION>> (tar.tgz): https://www.djangoproject.com/m/releases/<<RELEASE TAR.GZ FILENAME>>
-    Django <<VERSION>> (.whl): https://www.djangoproject.com/m/releases/<<RELEASE WHL FILENAME>>
+    https://www.djangoproject.com/m/releases/<<RELEASE TAR.GZ FILENAME>>
+    https://www.djangoproject.com/m/releases/<<RELEASE WHL FILENAME>>
 
     MD5 checksums:
     ==============
@@ -306,7 +303,7 @@ Now you're ready to actually put the release out there. To do this:
         $ pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
         $ deactivate
         $ mktmpenv
-        $ pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION-py2.py3-none-any.whl
+        $ pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION-py3-none-any.whl
         $ deactivate
 
    This just tests that the tarballs are available (i.e. redirects are up) and
@@ -346,6 +343,9 @@ Now you're ready to actually put the release out there. To do this:
    announcement blog post. If this is a security release, also include
    oss-security@lists.openwall.com.
 
+#. Add a link to the blog post in the topic of the `#django` IRC channel:
+   ``/msg chanserv TOPIC #django new topic goes here``.
+
 Post-release
 ============
 
@@ -368,7 +368,7 @@ You're almost done! All that's left to do now is:
 New stable branch tasks
 =======================
 
-There are several items to do in the time following a the creation of a new
+There are several items to do in the time following the creation of a new
 stable branch (often following an alpha release). Some of these tasks don't
 need to be done by the releaser.
 
@@ -377,9 +377,9 @@ need to be done by the releaser.
    ``docs/fixtures/doc_releases.json`` JSON fixture, so people without access
    to the production DB can still run an up-to-date copy of the docs site.
 
-#. Create a stub release note for the new major version. Use the stub from the
-   previous major version or use the previous major version and delete most of
-   the contents leaving only section headings.
+#. Create a stub release note for the new feature version. Use the stub from
+   the previous feature release version or copy the contents from the previous
+   feature version and delete most of the contents leaving only the headings.
 
 #. Increase the default PBKDF2 iterations in
    ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` by about 20%

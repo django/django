@@ -41,9 +41,14 @@ lower level APIs:
 Configuring an engine
 =====================
 
-.. class:: Engine([dirs][, app_dirs][, allowed_include_roots][, context_processors][, debug][, loaders][, string_if_invalid][, file_charset][, libraries][, builtins])
+If you are simply using the
+:class:`~django.template.backends.django.DjangoTemplates` backend, this
+probably isn't the documentation you're looking for. An instance of the
+``Engine`` class described below is accessible using the ``engine`` attribute
+of that backend and any attribute defaults mentioned below are overridden by
+what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
 
-    .. versionadded:: 1.8
+.. class:: Engine(dirs=None, app_dirs=False, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None, autoescape=True)
 
     When instantiating an ``Engine`` all arguments must be passed as keyword
     arguments:
@@ -58,20 +63,13 @@ Configuring an engine
 
       It defaults to ``False``.
 
-    * ``allowed_include_roots`` is a list of strings representing allowed
-      prefixes for the ``{% ssi %}`` template tag. This is a security measure,
-      so that template authors can't access files that they shouldn't be
-      accessing.
+    * ``autoescape`` controls whether HTML autoescaping is enabled.
 
-      For example, if ``'allowed_include_roots'`` is ``['/home/html',
-      '/var/www']``, then ``{% ssi /home/html/foo.txt %}`` would work, but ``{%
-      ssi /etc/passwd %}`` wouldn't.
+      It defaults to ``True``.
 
-      It defaults to an empty list.
+      .. warning::
 
-      .. deprecated:: 1.8
-
-          ``allowed_include_roots`` is deprecated.
+          Only set it to ``False`` if you're rendering non-HTML templates!
 
     * ``context_processors`` is a list of dotted Python paths to callables
       that are used to populate the context when a template is rendered with a
@@ -101,7 +99,15 @@ Configuring an engine
       * ``'django.template.loaders.app_directories.Loader'`` if and only if
         ``app_dirs`` is ``True``.
 
+      If ``debug`` is ``False``, these loaders are wrapped in
+      :class:`django.template.loaders.cached.Loader`.
+
       See :ref:`template-loaders` for details.
+
+      .. versionchanged:: 1.11
+
+          Enabling of the cached template loader when ``debug`` is ``False``
+          was added.
 
     * ``string_if_invalid`` is the output, as a string, that the template
       system should use for invalid (e.g. misspelled) variables.
@@ -137,10 +143,6 @@ Configuring an engine
 
       Tags and filters from built-in libraries can be used without first calling
       the :ttag:`{% load %}<load>` tag.
-
-.. versionadded:: 1.9
-
-    The ``libraries`` and ``builtins`` arguments were added.
 
 .. staticmethod:: Engine.get_default()
 
@@ -202,7 +204,7 @@ Once you have a compiled :class:`Template` object, you can render a context
 with it. You can reuse the same template to render it several times with
 different contexts.
 
-.. class:: Context([dict_][, current_app])
+.. class:: Context(dict_=None)
 
     This class lives at ``django.template.Context``. The constructor takes
     two optional arguments:
@@ -212,11 +214,6 @@ different contexts.
     * The name of the current application. This application name is used
       to help :ref:`resolve namespaced URLs<topics-http-reversing-url-namespaces>`.
       If you're not using namespaced URLs, you can ignore this argument.
-
-      .. deprecated:: 1.8
-
-          The ``current_app`` argument is deprecated. If you need it, you must
-          now use a :class:`RequestContext` instead of a :class:`Context`.
 
     For details, see :ref:`playing-with-context` below.
 
@@ -424,8 +421,8 @@ variables or use a custom template tag or filter to workaround the limitation.
 
 .. _playing-with-context:
 
-Playing with Context objects
-============================
+Playing with ``Context`` objects
+================================
 
 Most of the time, you'll instantiate :class:`Context` objects by passing in a
 fully-populated dictionary to ``Context()``. But you can add and delete items
@@ -451,8 +448,6 @@ dictionary syntax::
     ``otherwise``.
 
 .. method:: Context.setdefault(key, default=None)
-
-    .. versionadded:: 1.9
 
     If ``key`` is in the context, returns its value. Otherwise inserts ``key``
     with a value of ``default`` and returns ``default``.
@@ -536,10 +531,6 @@ matching ``pop()`` is called.
     >>> c['foo']
     'first level'
 
-.. versionadded:: 1.9
-
-    The ability to use ``update()`` as a context manager was added.
-
 Using a ``Context`` as a stack comes in handy in :ref:`some custom template
 tags <howto-writing-custom-template-tags>`.
 
@@ -582,10 +573,10 @@ against ``dict``::
 
 .. _subclassing-context-requestcontext:
 
-Subclassing Context: RequestContext
------------------------------------
+Using ``RequestContext``
+------------------------
 
-.. class:: RequestContext(request[, dict_][, processors])
+.. class:: RequestContext(request, dict_=None, processors=None)
 
 Django comes with a special ``Context`` class,
 ``django.template.RequestContext``, that acts slightly differently from the
@@ -612,12 +603,6 @@ processors::
         'django.contrib.auth.context_processors.auth',
         'django.contrib.messages.context_processors.messages',
     ]
-
-.. versionchanged:: 1.8
-
-    Built-in template context processors were moved from
-    ``django.core.context_processors`` to
-    ``django.template.context_processors`` in Django 1.8.
 
 In addition to these, :class:`RequestContext` always enables
 ``'django.template.context_processors.csrf'``.  This is a security related
@@ -655,30 +640,31 @@ using the optional, third positional argument, ``processors``. In this
 example, the :class:`RequestContext` instance gets a ``ip_address`` variable::
 
     from django.http import HttpResponse
-    from django.template import RequestContext
+    from django.template import RequestContext, Template
 
     def ip_address_processor(request):
         return {'ip_address': request.META['REMOTE_ADDR']}
 
-    def some_view(request):
-        # ...
-        c = RequestContext(request, {
-            'foo': 'bar',
+    def client_ip_view(request):
+        template = Template('{{ title }}: {{ ip_address }}')
+        context = RequestContext(request, {
+            'title': 'Your IP Address',
         }, [ip_address_processor])
-        return HttpResponse(t.render(c))
+        return HttpResponse(template.render(context))
+
+.. _context-processors:
 
 Built-in template context processors
 ------------------------------------
 
-.. _context-processors:
-
-Context processors
-------------------
-
 Here's what each of the built-in processors does:
 
-django.contrib.auth.context_processors.auth
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. currentmodule:: django.contrib.auth.context_processors
+
+``django.contrib.auth.context_processors.auth``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function:: auth
 
 If this processor is enabled, every ``RequestContext`` will contain these
 variables:
@@ -693,8 +679,10 @@ variables:
 
 .. currentmodule:: django.template.context_processors
 
-django.template.context_processors.debug
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.debug``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function:: debug
 
 If this processor is enabled, every ``RequestContext`` will contain these two
 variables -- but only if your :setting:`DEBUG` setting is set to ``True`` and
@@ -705,11 +693,11 @@ the request's IP address (``request.META['REMOTE_ADDR']``) is in the
   you're in :setting:`DEBUG` mode.
 * ``sql_queries`` -- A list of ``{'sql': ..., 'time': ...}`` dictionaries,
   representing every SQL query that has happened so far during the request
-  and how long it took. The list is in order by query and lazily generated
-  on access.
+  and how long it took. The list is in order by database alias and then by
+  query. It's lazily generated on access.
 
-django.template.context_processors.i18n
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.i18n``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If this processor is enabled, every ``RequestContext`` will contain these two
 variables:
@@ -720,35 +708,43 @@ variables:
 
 See :doc:`/topics/i18n/index` for more.
 
-django.template.context_processors.media
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.media``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``MEDIA_URL``, providing the value of the :setting:`MEDIA_URL` setting.
 
-django.template.context_processors.static
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.static``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: static
 
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``STATIC_URL``, providing the value of the :setting:`STATIC_URL` setting.
 
-django.template.context_processors.csrf
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.csrf``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This processor adds a token that is needed by the :ttag:`csrf_token` template
 tag for protection against :doc:`Cross Site Request Forgeries
 </ref/csrf>`.
 
-django.template.context_processors.request
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.request``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If this processor is enabled, every ``RequestContext`` will contain a variable
 ``request``, which is the current :class:`~django.http.HttpRequest`.
 
-django.contrib.messages.context_processors.messages
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``django.template.context_processors.tz``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function:: tz
+
+If this processor is enabled, every ``RequestContext`` will contain a variable
+``TIME_ZONE``, providing the name of the currently active time zone.
+
+``django.contrib.messages.context_processors.messages``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If this processor is enabled, every ``RequestContext`` will contain these two
 variables:
@@ -761,7 +757,7 @@ variables:
 Writing your own context processors
 -----------------------------------
 
-A context processor has a very simple interface: It's just a Python function
+A context processor has a very simple interface: It's a Python function
 that takes one argument, an :class:`~django.http.HttpRequest` object, and
 returns a dictionary that gets added to the template context. Each context
 processor *must* return a dictionary.
@@ -786,10 +782,6 @@ way of specifying template directories is by using the :setting:`DIRS
 
 The :setting:`DIRS <TEMPLATES-DIRS>` option
 -------------------------------------------
-
-.. versionchanged:: 1.8
-
-    This value used to be defined by the ``TEMPLATE_DIRS`` setting.
 
 Tell Django what your template directories are by using the :setting:`DIRS
 <TEMPLATES-DIRS>` option in the :setting:`TEMPLATES` setting in your settings
@@ -846,6 +838,26 @@ loaders that come with Django:
             'DIRS': [os.path.join(BASE_DIR, 'templates')],
         }]
 
+    You can also override ``'DIRS'`` and specify specific directories for a
+    particular filesystem loader::
+
+        TEMPLATES = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'OPTIONS': {
+                'loaders': [
+                    (
+                        'django.template.loaders.filesystem.Loader',
+                        [os.path.join(BASE_DIR, 'templates')],
+                    ),
+                ],
+            },
+        }]
+
+    .. versionchanged:: 1.11
+
+        The ability to specify directories for a particular filesystem loader
+        was added.
+
 ``django.template.loaders.app_directories.Loader``
 
 .. class:: app_directories.Loader
@@ -889,31 +901,26 @@ loaders that come with Django:
             'APP_DIRS': True,
         }]
 
-``django.template.loaders.eggs.Loader``
-
-.. class:: eggs.Loader
-
-    Just like ``app_directories`` above, but it loads templates from Python
-    eggs rather than from the filesystem.
-
-    This loader is disabled by default.
-
 ``django.template.loaders.cached.Loader``
 
 .. class:: cached.Loader
 
-    By default, the templating system will read and compile your templates every
-    time they need to be rendered. While the Django templating system is quite
-    fast, the overhead from reading and compiling templates can add up.
+    By default (when :setting:`DEBUG` is ``True``), the template system reads
+    and compiles your templates every time they're rendered. While the Django
+    template system is quite fast, the overhead from reading and compiling
+    templates can add up.
 
-    The cached template loader is a class-based loader that you configure with
-    a list of other loaders that it should wrap. The wrapped loaders are used to
-    locate unknown templates when they are first encountered. The cached loader
-    then stores the compiled ``Template`` in memory. The cached ``Template``
-    instance is returned for subsequent requests to load the same template.
+    You configure the cached template loader with a list of other loaders that
+    it should wrap. The wrapped loaders are used to locate unknown templates
+    when they're first encountered. The cached loader then stores the compiled
+    ``Template`` in memory. The cached ``Template`` instance is returned for
+    subsequent requests to load the same template.
 
-    For example, to enable template caching with the ``filesystem`` and
-    ``app_directories`` template loaders you might use the following settings::
+    This loader is automatically enabled if :setting:`DEBUG` is ``False`` and
+    :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't specified.
+
+    You can also enable template caching with some custom template loaders
+    using settings like this::
 
         TEMPLATES = [{
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -923,6 +930,7 @@ loaders that come with Django:
                     ('django.template.loaders.cached.Loader', [
                         'django.template.loaders.filesystem.Loader',
                         'django.template.loaders.app_directories.Loader',
+                        'path.to.custom.Loader',
                     ]),
                 ],
             },
@@ -937,11 +945,12 @@ loaders that come with Django:
         information, see :ref:`template tag thread safety considerations
         <template_tag_thread_safety>`.
 
-    This loader is disabled by default.
+    .. versionchanged:: 1.11
+
+        The automatic enabling of the cached template loader when ``debug`` is
+        ``False`` was added.
 
 ``django.template.loaders.locmem.Loader``
-
-.. versionadded:: 1.8
 
 .. class:: locmem.Loader
 
@@ -976,16 +985,6 @@ It's possible to load templates from additional sources using custom template
 loaders. Custom ``Loader`` classes should inherit from
 ``django.template.loaders.base.Loader`` and define the ``get_contents()`` and
 ``get_template_sources()`` methods.
-
-.. versionchanged:: 1.8
-
-    ``django.template.loaders.base.Loader`` used to be defined at
-    ``django.template.loader.BaseLoader``.
-
-.. versionchanged:: 1.9
-
-    In previous versions of Django, custom loaders defined a single method:
-    ``load_template_source()``.
 
 Loader methods
 --------------
@@ -1036,37 +1035,6 @@ Loader methods
         :meth:`get_contents` for custom template loaders. ``get_template()``
         will usually not need to be overridden.
 
-    .. method:: load_template_source(template_name, template_dirs=None)
-
-        Returns a tuple of (``template_string``, ``template_origin``), where
-        ``template_string`` is a string containing the template contents,
-        and ``template_origin`` is a string identifying the template source.
-        A filesystem-based loader may return the full path to the file as the
-        ``template_origin``, for example.
-
-        ``template_dirs`` is an optional argument used to control which
-        directories the loader will search.
-
-        This method is called automatically by :meth:`load_template` and should
-        be overridden when writing custom template loaders.
-
-        .. deprecated:: 1.9
-
-             Custom loaders should use :meth:`get_template` and
-             :meth:`get_contents` instead.
-
-    .. method:: load_template(template_name, template_dirs=None)
-
-        Returns a tuple of (``template``, ``template_origin``), where ``template``
-        is a ``Template`` object and ``template_origin`` is a string identifying
-        the template source. A filesystem-based loader may return the full
-        path to the file as the ``template_origin``, for example.
-
-        .. deprecated:: 1.9
-
-             Custom loaders should use :meth:`get_template` and
-             :meth:`get_contents` instead.
-
 .. admonition:: Building your own
 
     For examples, `read the source code for Django's built-in loaders`_.
@@ -1080,13 +1048,6 @@ Template origin
 
 Templates have an ``origin`` containing attributes depending on the source
 they are loaded from.
-
-.. versionchanged:: 1.9
-
-    Django used to create an origin based on
-    ``django.template.loader.LoaderOrigin`` or
-    ``django.template.base.StringOrigin``. These have been replaced by
-    ``django.template.base.Origin``.
 
 .. class:: Origin
 

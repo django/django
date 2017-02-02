@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.loader import MigrationLoader
@@ -10,30 +7,50 @@ class Command(BaseCommand):
     help = "Shows all available migrations for the current project"
 
     def add_arguments(self, parser):
-        parser.add_argument('app_labels', nargs='*',
-            help='App labels of applications to limit the output to.')
-        parser.add_argument('--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
-            help='Nominates a database to synchronize. Defaults to the "default" database.')
+        parser.add_argument(
+            'app_label', nargs='*',
+            help='App labels of applications to limit the output to.',
+        )
+        parser.add_argument(
+            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            help='Nominates a database to synchronize. Defaults to the "default" database.',
+        )
 
         formats = parser.add_mutually_exclusive_group()
-        formats.add_argument('--list', '-l', action='store_const', dest='format', const='list',
-            help='Shows a list of all migrations and which are applied.')
-        formats.add_argument('--plan', '-p', action='store_const', dest='format', const='plan',
-            help='Shows all migrations in the order they will be applied.')
+        formats.add_argument(
+            '--list', '-l', action='store_const', dest='format', const='list',
+            help='Shows a list of all migrations and which are applied.',
+        )
+        formats.add_argument(
+            '--plan', '-p', action='store_const', dest='format', const='plan',
+            help=(
+                'Shows all migrations in the order they will be applied. '
+                'With a verbosity level of 2 or above all direct migration dependencies '
+                'and reverse dependencies (run_before) will be included.'
+            )
+        )
 
         parser.set_defaults(format='list')
 
     def handle(self, *args, **options):
-        self.verbosity = options.get('verbosity')
+        self.verbosity = options['verbosity']
 
         # Get the database we're operating from
-        db = options.get('database')
+        db = options['database']
         connection = connections[db]
 
         if options['format'] == "plan":
-            return self.show_plan(connection)
+            return self.show_plan(connection, options['app_label'])
         else:
-            return self.show_list(connection, options['app_labels'])
+            return self.show_list(connection, options['app_label'])
+
+    def _validate_app_names(self, loader, app_names):
+        invalid_apps = []
+        for app_name in app_names:
+            if app_name not in loader.migrated_apps:
+                invalid_apps.append(app_name)
+        if invalid_apps:
+            raise CommandError('No migrations present for: %s' % (', '.join(sorted(invalid_apps))))
 
     def show_list(self, connection, app_names=None):
         """
@@ -45,12 +62,7 @@ class Command(BaseCommand):
         graph = loader.graph
         # If we were passed a list of apps, validate it
         if app_names:
-            invalid_apps = []
-            for app_name in app_names:
-                if app_name not in loader.migrated_apps:
-                    invalid_apps.append(app_name)
-            if invalid_apps:
-                raise CommandError("No migrations present for: %s" % (", ".join(invalid_apps)))
+            self._validate_app_names(loader, app_names)
         # Otherwise, show all apps in alphabetic order
         else:
             app_names = sorted(loader.migrated_apps)
@@ -74,16 +86,21 @@ class Command(BaseCommand):
                         shown.add(plan_node)
             # If we didn't print anything, then a small message
             if not shown:
-                self.stdout.write(" (no migrations)", self.style.MIGRATE_FAILURE)
+                self.stdout.write(" (no migrations)", self.style.ERROR)
 
-    def show_plan(self, connection):
+    def show_plan(self, connection, app_names=None):
         """
-        Shows all known migrations in the order they will be applied
+        Shows all known migrations (or only those of the specified app_names)
+        in the order they will be applied.
         """
         # Load migrations from disk/DB
         loader = MigrationLoader(connection)
         graph = loader.graph
-        targets = graph.leaf_nodes()
+        if app_names:
+            self._validate_app_names(loader, app_names)
+            targets = [key for key in graph.leaf_nodes() if key[0] in app_names]
+        else:
+            targets = graph.leaf_nodes()
         plan = []
         seen = set()
 
@@ -91,26 +108,24 @@ class Command(BaseCommand):
         for target in targets:
             for migration in graph.forwards_plan(target):
                 if migration not in seen:
-                    plan.append(graph.nodes[migration])
+                    node = graph.node_map[migration]
+                    plan.append(node)
                     seen.add(migration)
 
         # Output
-        def print_deps(migration):
+        def print_deps(node):
             out = []
-            for dep in migration.dependencies:
-                if dep[1] == "__first__":
-                    roots = graph.root_nodes(dep[0])
-                    dep = roots[0] if roots else (dep[0], "__first__")
-                out.append("%s.%s" % dep)
+            for parent in sorted(node.parents):
+                out.append("%s.%s" % parent.key)
             if out:
                 return " ... (%s)" % ", ".join(out)
             return ""
 
-        for migration in plan:
+        for node in plan:
             deps = ""
             if self.verbosity >= 2:
-                deps = print_deps(migration)
-            if (migration.app_label, migration.name) in loader.applied_migrations:
-                self.stdout.write("[X]  %s%s" % (migration, deps))
+                deps = print_deps(node)
+            if node.key in loader.applied_migrations:
+                self.stdout.write("[X]  %s.%s%s" % (node.key[0], node.key[1], deps))
             else:
-                self.stdout.write("[ ]  %s%s" % (migration, deps))
+                self.stdout.write("[ ]  %s.%s%s" % (node.key[0], node.key[1], deps))

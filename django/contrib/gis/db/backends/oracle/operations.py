@@ -16,9 +16,7 @@ from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
-from django.db.backends.oracle.base import Database
 from django.db.backends.oracle.operations import DatabaseOperations
-from django.utils import six
 
 DEFAULT_TOLERANCE = '0.05'
 
@@ -28,7 +26,7 @@ class SDOOperator(SpatialOperator):
 
 
 class SDODistance(SpatialOperator):
-    sql_template = "SDO_GEOM.SDO_DISTANCE(%%(lhs)s, %%(rhs)s, %s) %%(op)s %%%%s" % DEFAULT_TOLERANCE
+    sql_template = "SDO_GEOM.SDO_DISTANCE(%%(lhs)s, %%(rhs)s, %s) %%(op)s %%(value)s" % DEFAULT_TOLERANCE
 
 
 class SDODWithin(SpatialOperator):
@@ -45,12 +43,16 @@ class SDORelate(SpatialOperator):
     def check_relate_argument(self, arg):
         masks = 'TOUCH|OVERLAPBDYDISJOINT|OVERLAPBDYINTERSECT|EQUAL|INSIDE|COVEREDBY|CONTAINS|COVERS|ANYINTERACT|ON'
         mask_regex = re.compile(r'^(%s)(\+(%s))*$' % (masks, masks), re.I)
-        if not isinstance(arg, six.string_types) or not mask_regex.match(arg):
+        if not isinstance(arg, str) or not mask_regex.match(arg):
             raise ValueError('Invalid SDO_RELATE mask: "%s"' % arg)
 
     def as_sql(self, connection, lookup, template_params, sql_params):
         template_params['mask'] = sql_params.pop()
-        return super(SDORelate, self).as_sql(connection, lookup, template_params, sql_params)
+        return super().as_sql(connection, lookup, template_params, sql_params)
+
+
+class SDOIsValid(SpatialOperator):
+    sql_template = "%%(func)s(%%(lhs)s, %s) = 'TRUE'" % DEFAULT_TOLERANCE
 
 
 class OracleOperations(BaseSpatialOperations, DatabaseOperations):
@@ -60,7 +62,6 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     disallowed_aggregates = (aggregates.Collect, aggregates.Extent3D, aggregates.MakeLine)
 
     Adapter = OracleSpatialAdapter
-    Adaptor = Adapter  # Backwards-compatibility alias.
 
     area = 'SDO_GEOM.SDO_AREA'
     gml = 'SDO_UTIL.TO_GMLGEOMETRY'
@@ -70,7 +71,6 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     extent = 'SDO_AGGR_MBR'
     intersection = 'SDO_GEOM.SDO_INTERSECTION'
     length = 'SDO_GEOM.SDO_LENGTH'
-    num_geom = 'SDO_UTIL.GETNUMELEM'
     num_points = 'SDO_UTIL.GETNUMVERTICES'
     perimeter = length
     point_on_surface = 'SDO_GEOM.SDO_POINTONSURFACE'
@@ -79,6 +79,27 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     transform = 'SDO_CS.TRANSFORM'
     union = 'SDO_GEOM.SDO_UNION'
     unionagg = 'SDO_AGGR_UNION'
+
+    from_text = 'SDO_GEOMETRY'
+
+    function_names = {
+        'Area': 'SDO_GEOM.SDO_AREA',
+        'BoundingCircle': 'SDO_GEOM.SDO_MBC',
+        'Centroid': 'SDO_GEOM.SDO_CENTROID',
+        'Difference': 'SDO_GEOM.SDO_DIFFERENCE',
+        'Distance': 'SDO_GEOM.SDO_DISTANCE',
+        'Intersection': 'SDO_GEOM.SDO_INTERSECTION',
+        'IsValid': 'SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT',
+        'Length': 'SDO_GEOM.SDO_LENGTH',
+        'NumGeometries': 'SDO_UTIL.GETNUMELEM',
+        'NumPoints': 'SDO_UTIL.GETNUMVERTICES',
+        'Perimeter': 'SDO_GEOM.SDO_LENGTH',
+        'PointOnSurface': 'SDO_GEOM.SDO_POINTONSURFACE',
+        'Reverse': 'SDO_UTIL.REVERSE_LINESTRING',
+        'SymDifference': 'SDO_GEOM.SDO_XOR',
+        'Transform': 'SDO_CS.TRANSFORM',
+        'Union': 'SDO_GEOM.SDO_UNION',
+    }
 
     # We want to get SDO Geometries as WKT because it is much easier to
     # instantiate GEOS proxies from WKT than SDO_GEOMETRY(...) strings.
@@ -93,6 +114,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         'covers': SDOOperator(func='SDO_COVERS'),
         'disjoint': SDODisjoint(),
         'intersects': SDOOperator(func='SDO_OVERLAPBDYINTERSECT'),  # TODO: Is this really the same as ST_Intersects()?
+        'isvalid': SDOIsValid(func='SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT'),
         'equals': SDOOperator(func='SDO_EQUAL'),
         'exact': SDOOperator(func='SDO_EQUAL'),
         'overlaps': SDOOperator(func='SDO_OVERLAPS'),
@@ -109,11 +131,16 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     truncate_params = {'relate': None}
 
+    unsupported_functions = {
+        'AsGeoJSON', 'AsKML', 'AsSVG', 'Envelope', 'ForceRHR', 'GeoHash',
+        'MakeValid', 'MemSize', 'Scale', 'SnapToGrid', 'Translate',
+    }
+
     def geo_quote_name(self, name):
-        return super(OracleOperations, self).geo_quote_name(name).upper()
+        return super().geo_quote_name(name).upper()
 
     def get_db_converters(self, expression):
-        converters = super(OracleOperations, self).get_db_converters(expression)
+        converters = super().get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
         geometry_fields = (
             'PointField', 'GeometryField', 'LineStringField',
@@ -156,14 +183,6 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         else:
             return None
 
-    def convert_geom(self, value, geo_field):
-        if value:
-            if isinstance(value, Database.LOB):
-                value = value.read()
-            return Geometry(value, geo_field.srid)
-        else:
-            return None
-
     def geo_db_type(self, f):
         """
         Returns the geometry database type for Oracle.  Unlike other spatial
@@ -172,7 +191,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         """
         return 'MDSYS.SDO_GEOMETRY'
 
-    def get_distance(self, f, value, lookup_type):
+    def get_distance(self, f, value, lookup_type, **kwargs):
         """
         Returns the distance parameters given the value and the lookup type.
         On Oracle, geometry columns with a geodetic coordinate system behave
@@ -240,11 +259,10 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         from django.contrib.gis.db.backends.oracle.models import OracleSpatialRefSys
         return OracleSpatialRefSys
 
-    def modify_insert_params(self, placeholders, params):
+    def modify_insert_params(self, placeholder, params):
         """Drop out insert parameters for NULL placeholder. Needed for Oracle Spatial
-        backend due to #10888
+        backend due to #10888.
         """
-        # This code doesn't work for bulk insert cases.
-        assert len(placeholders) == 1
-        return [[param for pholder, param
-                 in six.moves.zip(placeholders[0], params[0]) if pholder != 'NULL'], ]
+        if placeholder == 'NULL':
+            return []
+        return super().modify_insert_params(placeholder, params)

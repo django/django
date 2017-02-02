@@ -1,9 +1,10 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Abhabongse Janthong, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kowit Charoenratchatabhan <kowit.s.c@gmail.com>, 2014
-# Sippakorn Khaimook <sipp11@mycapsules.com>, 2014
+# sipp11 <sipp11@mycapsules.com>, 2014
 # Suteepat Damrongyingsupab <tianissimo@hotmail.com>, 2011-2012
 # Suteepat Damrongyingsupab <tianissimo@hotmail.com>, 2013
 # Vichai Vongvorakul <vongvichai@gmail.com>, 2013
@@ -11,11 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Thai (http://www.transifex.com/projects/p/django/language/"
-"th/)\n"
+"Language-Team: Thai (http://www.transifex.com/django/django/language/th/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -64,6 +64,9 @@ msgstr "เดนมาร์ก"
 msgid "German"
 msgstr "เยอรมัน"
 
+msgid "Lower Sorbian"
+msgstr ""
+
 msgid "Greek"
 msgstr "กรีก"
 
@@ -84,6 +87,9 @@ msgstr "สเปน"
 
 msgid "Argentinian Spanish"
 msgstr "สเปน - อาร์เจนติน่า"
+
+msgid "Colombian Spanish"
+msgstr ""
 
 msgid "Mexican Spanish"
 msgstr "เม็กซิกันสเปน"
@@ -115,6 +121,9 @@ msgstr "ฟริเซียน"
 msgid "Irish"
 msgstr "ไอริช"
 
+msgid "Scottish Gaelic"
+msgstr ""
+
 msgid "Galician"
 msgstr "กาลิเซีย"
 
@@ -126,6 +135,9 @@ msgstr "ฮินดี"
 
 msgid "Croatian"
 msgstr "โครเอเชีย"
+
+msgid "Upper Sorbian"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "ฮังการี"
@@ -187,8 +199,8 @@ msgstr ""
 msgid "Burmese"
 msgstr "พม่า"
 
-msgid "Norwegian Bokmal"
-msgstr "นอร์เวย์ - Bokmal"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "เนปาล"
@@ -286,9 +298,6 @@ msgstr ""
 msgid "Syndication"
 msgstr ""
 
-msgid "Web Design"
-msgstr ""
-
 msgid "Enter a valid value."
 msgstr "กรุณาใส่ค่าที่ถูกต้อง"
 
@@ -304,6 +313,11 @@ msgstr "ป้อนที่อยู่อีเมลที่ถูกต้
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "ใส่ 'slug' ประกอปด้วย ตัวหนังสือ ตัวเลข เครื่องหมายขีดล่าง หรือ  เครื่องหมายขีด"
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
 
 msgid "Enter a valid IPv4 address."
 msgstr "กรุณาใส่หมายเลขไอพีที่ถูกต้อง"
@@ -347,6 +361,23 @@ msgid_plural ""
 "%(show_value)d)."
 msgstr[0] ""
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] ""
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+
 msgid "and"
 msgstr "และ"
 
@@ -385,6 +416,9 @@ msgstr "จำนวนเต็ม"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr ""
+
+msgid "Big (8 byte) integer"
+msgstr "จำนวนเต็ม (8 byte)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -459,9 +493,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr "เลขทศนิยม"
 
-msgid "Big (8 byte) integer"
-msgstr "จำนวนเต็ม (8 byte)"
-
 msgid "IPv4 address"
 msgstr "IPv4 address"
 
@@ -533,8 +564,22 @@ msgstr "Foreign Key (ชนิดของข้อมูลจะถูกก�
 msgid "One-to-one relationship"
 msgstr "ความสัมพันธ์แบบหนึ่งต่อหนึ่ง"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
 msgid "Many-to-many relationship"
 msgstr "ความสัมพันธ์แบบ many-to-many"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "ฟิลด์นี้จำเป็น"
@@ -544,23 +589,6 @@ msgstr "กรอกหมายเลข"
 
 msgid "Enter a number."
 msgstr "กรอกหมายเลข"
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
 
 msgid "Enter a valid date."
 msgstr "กรุณาใส่วัน"
@@ -617,12 +645,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr ""
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr ""
@@ -784,7 +806,7 @@ msgid "Sat"
 msgstr "ส."
 
 msgid "Sun"
-msgstr "อ."
+msgstr "อา."
 
 msgid "January"
 msgstr "มกราคม"

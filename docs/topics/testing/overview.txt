@@ -46,6 +46,17 @@ automatically build a test suite out of those test cases, and run that suite.
 
 For more details about :mod:`unittest`, see the Python documentation.
 
+.. admonition:: Where should the tests live?
+
+    The default :djadmin:`startapp` template creates a ``tests.py`` file in the
+    new application. This might be fine if you only have a few tests, but as
+    your test suite grows you'll likely want to restructure it into a tests
+    package so you can split your tests into different submodules such as
+    ``test_models.py``, ``test_views.py``, ``test_forms.py``, etc. Feel free to
+    pick whatever organizational scheme you like.
+
+    See also :ref:`testing-reusable-applications`.
+
 .. warning::
 
     If your tests rely on database access such as creating or querying models,
@@ -59,7 +70,6 @@ For more details about :mod:`unittest`, see the Python documentation.
     isolation but fail when run in a suite.
 
 .. _running-tests:
-
 
 Running tests
 =============
@@ -105,9 +115,10 @@ wait for the currently running test to complete and then exit gracefully.
 During a graceful exit the test runner will output details of any test
 failures, report on how many tests were run and how many errors and failures
 were encountered, and destroy any test databases as usual. Thus pressing
-``Ctrl-C`` can be very useful if you forget to pass the :djadminopt:`--failfast`
-option, notice that some tests are unexpectedly failing, and want to get details
-on the failures without waiting for the full test run to complete.
+``Ctrl-C`` can be very useful if you forget to pass the :option:`--failfast
+<test --failfast>` option, notice that some tests are unexpectedly failing and
+want to get details on the failures without waiting for the full test run to
+complete.
 
 If you do not want to wait for the currently running test to finish, you
 can press ``Ctrl-C`` a second time and the test run will halt immediately,
@@ -135,22 +146,19 @@ Tests that require a database (namely, model tests) will not use your "real"
 Regardless of whether the tests pass or fail, the test databases are destroyed
 when all the tests have been executed.
 
-.. versionadded:: 1.8
+You can prevent the test databases from being destroyed by using the
+:option:`test --keepdb` option. This will preserve the test database between
+runs. If the database does not exist, it will first be created. Any migrations
+will also be applied in order to keep it up to date.
 
-   You can prevent the test databases from being destroyed by adding the
-   :djadminopt:`--keepdb` flag to the test command. This will preserve the test
-   database between runs. If the database does not exist, it will first
-   be created. Any migrations will also be applied in order to keep it
-   up to date.
-
-By default the test databases get their names by prepending ``test_``
-to the value of the :setting:`NAME` settings for the databases
-defined in :setting:`DATABASES`. When using the SQLite database engine
-the tests will by default use an in-memory database (i.e., the
-database will be created in memory, bypassing the filesystem
-entirely!). If you want to use a different database name, specify
-:setting:`NAME <TEST_NAME>` in the :setting:`TEST <DATABASE-TEST>`
-dictionary for any given database in :setting:`DATABASES`.
+The default test database names are created by prepending ``test_`` to the
+value of each :setting:`NAME` in :setting:`DATABASES`. When using SQLite, the
+tests will use an in-memory database by default (i.e., the database will be
+created in memory, bypassing the filesystem entirely!). The :setting:`TEST
+<DATABASE-TEST>` dictionary in :setting:`DATABASES` offers a number of settings
+to configure your test database. For example, if you want to use a different
+database name, specify :setting:`NAME <TEST_NAME>` in the :setting:`TEST
+<DATABASE-TEST>` dictionary for any given database in :setting:`DATABASES`.
 
 On PostgreSQL, :setting:`USER` will also need read access to the built-in
 ``postgres`` database.
@@ -169,13 +177,9 @@ control the particular collation used by the test database. See the
 :doc:`settings documentation </ref/settings>` for details of these
 and other advanced settings.
 
-If using a SQLite in-memory database with Python 3.4+ and SQLite 3.7.13+,
-`shared cache <https://www.sqlite.org/sharedcache.html>`_ will be enabled, so
-you can write tests with ability to share the database between threads.
-
-.. versionadded:: 1.8
-
-    The ability to use SQLite with a shared cache as described above was added.
+If using an SQLite in-memory database with SQLite 3.7.13+, `shared cache
+<https://www.sqlite.org/sharedcache.html>`_ is enabled, so you can write tests
+with ability to share the database between threads.
 
 .. admonition:: Finding data from your production database when running tests?
 
@@ -218,11 +222,9 @@ the Django test runner reorders tests in the following way:
     database by a given :class:`~django.test.TransactionTestCase` test, they
     must be updated to be able to run independently.
 
-.. versionadded:: 1.8
-
-    You may reverse the execution order inside groups by passing
-    :djadminopt:`--reverse` to the test command. This can help with ensuring
-    your tests are independent from each other.
+You may reverse the execution order inside groups using the :option:`test
+--reverse` option. This can help with ensuring your tests are independent from
+each other.
 
 .. _test-case-serialized-rollback:
 
@@ -249,6 +251,11 @@ not need this setting.
 The initial serialization is usually very quick, but if you wish to exclude
 some apps from this process (and speed up test runs slightly), you may add
 those apps to :setting:`TEST_NON_SERIALIZED_APPS`.
+
+To prevent serialized data from being loaded twice, setting
+``serialized_rollback=True`` disables the
+:data:`~django.db.models.signals.post_migrate` signal when flushing the test
+database.
 
 Other test conditions
 ---------------------
@@ -295,8 +302,8 @@ failed::
     ----------------------------------------------------------------------
     Traceback (most recent call last):
       File "/dev/mysite/polls/tests.py", line 16, in test_was_published_recently_with_future_poll
-        self.assertEqual(future_poll.was_published_recently(), False)
-    AssertionError: True != False
+        self.assertIs(future_poll.was_published_recently(), False)
+    AssertionError: True is not False
 
     ----------------------------------------------------------------------
     Ran 1 test in 0.003s
@@ -312,13 +319,23 @@ failed and erroneous tests. If all the tests pass, the return code is 0. This
 feature is useful if you're using the test-runner script in a shell script and
 need to test for success or failure at that level.
 
+.. _speeding-up-tests-auth-hashers:
+
 Speeding up the tests
 ---------------------
 
-In recent versions of Django, the default password hasher is rather slow by
-design. If during your tests you are authenticating many users, you may want
-to use a custom settings file and set the :setting:`PASSWORD_HASHERS` setting
-to a faster hashing algorithm::
+Running tests in parallel
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As long as your tests are properly isolated, you can run them in parallel to
+gain a speed up on multi-core hardware. See :option:`test --parallel`.
+
+Password hashing
+~~~~~~~~~~~~~~~~
+
+The default password hasher is rather slow by design. If you're authenticating
+many users in your tests, you may want to use a custom settings file and set
+the :setting:`PASSWORD_HASHERS` setting to a faster hashing algorithm::
 
     PASSWORD_HASHERS = [
         'django.contrib.auth.hashers.MD5PasswordHasher',

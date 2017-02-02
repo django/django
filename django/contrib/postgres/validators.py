@@ -24,7 +24,7 @@ class ArrayMinLengthValidator(MinLengthValidator):
 
 
 @deconstructible
-class KeysValidator(object):
+class KeysValidator:
     """A validator designed for HStore to require/restrict keys."""
 
     messages = {
@@ -44,35 +44,36 @@ class KeysValidator(object):
         keys = set(value.keys())
         missing_keys = self.keys - keys
         if missing_keys:
-            raise ValidationError(self.messages['missing_keys'],
+            raise ValidationError(
+                self.messages['missing_keys'],
                 code='missing_keys',
                 params={'keys': ', '.join(missing_keys)},
             )
         if self.strict:
             extra_keys = keys - self.keys
             if extra_keys:
-                raise ValidationError(self.messages['extra_keys'],
+                raise ValidationError(
+                    self.messages['extra_keys'],
                     code='extra_keys',
                     params={'keys': ', '.join(extra_keys)},
                 )
 
     def __eq__(self, other):
         return (
-            isinstance(other, self.__class__)
-            and (self.keys == other.keys)
-            and (self.messages == other.messages)
-            and (self.strict == other.strict)
+            isinstance(other, self.__class__) and
+            self.keys == other.keys and
+            self.messages == other.messages and
+            self.strict == other.strict
         )
-
-    def __ne__(self, other):
-        return not (self == other)
 
 
 class RangeMaxValueValidator(MaxValueValidator):
-    compare = lambda self, a, b: a.upper > b
+    def compare(self, a, b):
+        return a.upper > b
     message = _('Ensure that this range is completely less than or equal to %(limit_value)s.')
 
 
 class RangeMinValueValidator(MinValueValidator):
-    compare = lambda self, a, b: a.lower < b
+    def compare(self, a, b):
+        return a.lower < b
     message = _('Ensure that this range is completely greater than or equal to %(limit_value)s.')

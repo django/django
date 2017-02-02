@@ -5,8 +5,10 @@ ORM.
 
 import copy
 
+from django.utils.encoding import force_text
 
-class Node(object):
+
+class Node:
     """
     A single internal node in the tree graph. A Node should be viewed as a
     connection (the root) with the children being either leaf nodes or other
@@ -42,11 +44,8 @@ class Node(object):
         return obj
 
     def __str__(self):
-        if self.negated:
-            return '(NOT (%s: %s))' % (self.connector, ', '.join(str(c) for c
-                    in self.children))
-        return '(%s: %s)' % (self.connector, ', '.join(str(c) for c in
-                self.children))
+        template = '(NOT (%s: %s))' if self.negated else '(%s: %s)'
+        return template % (self.connector, ', '.join(force_text(c) for c in self.children))
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self)
@@ -71,9 +70,6 @@ class Node(object):
         For truth value testing.
         """
         return bool(self.children)
-
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
 
     def __contains__(self, other):
         """
@@ -103,8 +99,8 @@ class Node(object):
             return data
         if self.connector == conn_type:
             # We can reuse self.children to append or squash the node other.
-            if (isinstance(data, Node) and not data.negated
-                    and (data.connector == conn_type or len(data) == 1)):
+            if (isinstance(data, Node) and not data.negated and
+                    (data.connector == conn_type or len(data) == 1)):
                 # We can squash the other node's children directly into this
                 # node. We are just doing (AB)(CD) == (ABCD) here, with the
                 # addition that if the length of the other node is 1 the

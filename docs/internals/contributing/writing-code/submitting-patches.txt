@@ -7,16 +7,16 @@ with associated patches will get fixed *far* more quickly than those
 without patches.
 
 Typo fixes and trivial documentation changes
---------------------------------------------
+============================================
 
 If you are fixing a really trivial issue, for example changing a word in the
 documentation, the preferred way to provide the patch is using GitHub pull
-requests without a Trac ticket. Trac tickets are still acceptable.
+requests without a Trac ticket.
 
 See the :doc:`working-with-git` for more details on how to use pull requests.
 
 "Claiming" tickets
-------------------
+==================
 
 In an open-source project with hundreds of contributors around the world, it's
 important to manage communication efficiently so that work doesn't get
@@ -29,9 +29,9 @@ If you have identified a contribution you want to make and you're capable of
 fixing it (as measured by your coding ability, knowledge of Django internals
 and time availability), claim it by following these steps:
 
-* `Create an account`_ to use in our ticket system. If you have an account
-  but have forgotten your password, you can reset it using the
-  `password reset page`_.
+* `Login using your GitHub account`_ or `create an account`_ in our ticket
+  system. If you have an account but have forgotten your password, you can
+  reset it using the `password reset page`_.
 
 * If a ticket for this issue doesn't exist yet, create one in our
   `ticket tracker`_.
@@ -39,18 +39,16 @@ and time availability), claim it by following these steps:
 * If a ticket for this issue already exists, make sure nobody else has
   claimed it. To do this, look at the "Owned by" section of the ticket.
   If it's assigned to "nobody," then it's available to be claimed.
-  Otherwise, somebody else is working on this ticket, and you either find
-  another bug/feature to work on, or contact the developer working on the
-  ticket to offer your help.
+  Otherwise, somebody else may be working on this ticket. Either find another
+  bug/feature to work on, or contact the developer working on the ticket to
+  offer your help. If a ticket has been assigned for weeks or months without
+  any activity, it's probably safe to reassign it to yourself.
 
-* Log into your account, if you haven't already, by clicking "Login" in
-  the upper right of the ticket page.
+* Log into your account, if you haven't already, by clicking "GitHub Login"
+  or "DjangoProject Login" in the upper left of the ticket page.
 
-* Claim the ticket:
-
-  1. click the "assign to myself" radio button under "Action" near the bottom of the
-     page,
-  2. then click "Submit changes."
+* Claim the ticket by clicking the "assign to myself" radio button under
+  "Action" near the bottom of the page, then click "Submit changes."
 
 .. note::
     The Django software foundation requests that anyone contributing more than
@@ -58,12 +56,13 @@ and time availability), claim it by following these steps:
     Agreement`_, this ensures that the Django Software Foundation has clear
     license to all contributions allowing for a clear license for all users.
 
+.. _Login using your GitHub account: https://code.djangoproject.com/github/login
 .. _Create an account: https://www.djangoproject.com/accounts/register/
 .. _password reset page: https://www.djangoproject.com/accounts/password/reset/
 .. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/
 
 Ticket claimers' responsibility
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 Once you've claimed a ticket, you have a responsibility to work on that ticket
 in a reasonably timely fashion. If you don't have time to work on it, either
@@ -81,7 +80,7 @@ your claim on the ticket may be revoked.
 As always, more communication is better than less communication!
 
 Which tickets should be claimed?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 Of course, going through the steps of claiming tickets is overkill in some
 cases.
@@ -97,7 +96,7 @@ or not, to submit patches to a ticket if you happen to have a patch ready.
 .. _patch-style:
 
 Patch style
------------
+===========
 
 Make sure that any contribution you do fulfills at least the following
 requirements:
@@ -114,21 +113,14 @@ requirements:
   behavior of an existing feature, the patch should also contain
   documentation.
 
-You can use either GitHub branches and pull requests or direct patches
-to publish your work. If you use the Git workflow, then you should
-announce your branch in the ticket by including a link to your branch.
-When you think your work is ready to be merged in create a pull request.
+When you think your work is ready to be reviewed, send :doc:`a GitHub pull
+request <working-with-git>`. Please review the patch yourself using our
+:ref:`patch review checklist <patch-review-checklist>` first.
 
-See the :doc:`working-with-git` documentation for more details.
-
-You can also use patches in Trac. When using this style, follow these
-guidelines.
+If you can't send a pull request for some reason, you can also use patches in
+Trac. When using this style, follow these guidelines.
 
 * Submit patches in the format returned by the ``git diff`` command.
-  An exception is for code changes that are described more clearly in
-  plain English than in code. Indentation is the most common example; it's
-  hard to read patches when the only difference in code is that it's
-  indented.
 
 * Attach patches to a ticket in the `ticket tracker`_, using the "attach
   file" button. Please *don't* put the patch in the ticket description
@@ -139,15 +131,19 @@ guidelines.
 
 Regardless of the way you submit your work, follow these steps.
 
-* Make sure your code matches our :doc:`coding-style`.
+* Make sure your code fulfills the requirements in our :ref:`patch review
+  checklist <patch-review-checklist>`.
 
-* Check the "Has patch" box on the ticket details. This will make it
-  obvious that the ticket includes a patch, and it will add the ticket to
-  the `list of tickets with patches`_.
+* Check the "Has patch" box on the ticket and make sure the "Needs
+  documentation", "Needs tests", and "Patch needs improvement" boxes aren't
+  checked. This makes the ticket appear in the "Patches needing review" queue
+  on the `Development dashboard`_.
 
+.. _ticket tracker: https://code.djangoproject.com/
+.. _Development dashboard: https://dashboard.djangoproject.com/
 
 Non-trivial patches
--------------------
+===================
 
 A "non-trivial" patch is one that is more than a simple bug fix. It's a patch
 that introduces Django functionality and makes some sort of design decision.
@@ -161,7 +157,7 @@ ask.
 .. _deprecating-a-feature:
 
 Deprecating a feature
----------------------
+=====================
 
 There are a couple reasons that code in Django might be deprecated:
 
@@ -205,12 +201,6 @@ level:
     class MyDeprecatedTests(unittest.TestCase):
         ...
 
-.. versionchanged:: 1.8
-
-    Previous versions of Django had some ``Ignore*DeprecationWarningsMixin``
-    classes to prevent warnings from appearing. These have been replaced by the
-    ``ignore_warnings`` decorator.
-
 You can also add a test for the deprecation warning. You'll have to disable the
 "warning as error" behavior in your test by doing::
 
@@ -236,53 +226,22 @@ Finally, there are a couple of updates to Django's documentation to make:
    the "Features deprecated in A.B" heading.
 
 #) Add an entry in the deprecation timeline (``docs/internals/deprecation.txt``)
-   under the ``A.B+2`` version describing what code will be removed.
+   under the appropriate version describing what code will be removed.
 
 Once you have completed these steps, you are finished with the deprecation.
-In each major release, all ``RemovedInDjangoXXWarning``\s matching the new
-version are removed.
+In each :term:`feature release`, all ``RemovedInDjangoXXWarning``\s matching
+the new version are removed.
 
 JavaScript patches
-------------------
+==================
 
-Django's admin system leverages the jQuery framework to increase the
-capabilities of the admin interface. In conjunction, there is an emphasis on
-admin JavaScript performance and minimizing overall admin media file size.
-Serving compressed or "minified" versions of JavaScript files is considered
-best practice in this regard.
-
-To that end, patches for JavaScript files should include both the original
-code for future development (e.g. ``foo.js``), and a compressed version for
-production use (e.g. ``foo.min.js``). Any links to the file in the codebase
-should point to the compressed version.
-
-Compressing JavaScript
-~~~~~~~~~~~~~~~~~~~~~~
-
-To simplify the process of providing optimized JavaScript code, Django
-includes a handy python script which should be used to create a "minified"
-version. To run it::
-
-    python django/contrib/admin/bin/compress.py
-
-Behind the scenes, ``compress.py`` is a front-end for Google's
-`Closure Compiler`_ which is written in Java. However, the Closure Compiler
-library is not bundled with Django directly, so those wishing to contribute
-complete JavaScript patches will need to download and install the library
-independently. The Closure Compiler library requires `Java`_ 7 or higher.
-
-Please don't forget to run ``compress.py`` and include the ``diff`` of the
-minified scripts when submitting patches for Django's JavaScript.
-
-.. _Closure Compiler: https://developers.google.com/closure/compiler/
-.. _list of tickets with patches: https://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
-.. _ticket tracker: https://code.djangoproject.com/newticket
-.. _Java: https://www.java.com
+For information on JavaScript patches, see the :ref:`javascript-patches`
+documentation.
 
 .. _patch-review-checklist:
 
 Patch review checklist
-----------------------
+======================
 
 Use this checklist to review a pull request. If you are reviewing a pull
 request that is not your own and it passes all the criteria below, please set
@@ -290,9 +249,9 @@ the "Triage Stage" on the corresponding Trac ticket to "Ready for checkin".
 If you've left comments for improvement on the pull request, please tick the
 appropriate flags on the Trac ticket based on the results of your review:
 "Patch needs improvement", "Needs documentation", and/or "Needs tests". As time
-and interest permits, core developers do final reviews of "Ready for checkin"
+and interest permits, committers do final reviews of "Ready for checkin"
 tickets and will either commit the patch or bump it back to "Accepted" if
-further works need to be done. If you're looking to become a core developer,
+further works need to be done. If you're looking to become a committer,
 doing thorough reviews of patches is a great way to earn trust.
 
 Looking for a patch to review? Check out the "Patches needing review" section
@@ -301,7 +260,7 @@ Looking to get your patch reviewed? Ensure the Trac flags on the ticket are
 set so that the ticket appears in that queue.
 
 Documentation
-~~~~~~~~~~~~~
+-------------
 
 * Does the documentation build without any errors (``make html``, or
   ``make.bat html`` on Windows, from the ``docs`` directory)?
@@ -310,13 +269,13 @@ Documentation
 * Are there any :ref:`spelling errors <documentation-spelling-check>`?
 
 Bugs
-~~~~
+----
 
 * Is there a proper regression test (the test should fail before the fix
   is applied)?
 
 New Features
-~~~~~~~~~~~~
+------------
 
 * Are there tests to "exercise" all of the new code?
 * Is there a release note in ``docs/releases/A.B.txt``?
@@ -325,23 +284,22 @@ New Features
   ``.. versionadded:: A.B`` or ``.. versionchanged:: A.B``?
 
 Deprecating a feature
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 See the :ref:`deprecating-a-feature` guide.
 
 All code changes
-~~~~~~~~~~~~~~~~
+----------------
 
 * Does the :doc:`coding style
   </internals/contributing/writing-code/coding-style>` conform to our
   guidelines? Are there any ``flake8`` errors?
 * If the change is backwards incompatible in any way, is there a note
   in the release notes (``docs/releases/A.B.txt``)?
-* Is Django's test suite passing? Ask in ``#django-dev`` for a core dev
-  to build the pull request against our continuous integration server.
+* Is Django's test suite passing?
 
 All tickets
-~~~~~~~~~~~
+-----------
 
 * Is the pull request a single squashed commit with a message that follows our
   :ref:`commit message format <committing-guidelines>`?

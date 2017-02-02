@@ -2,14 +2,15 @@
 #
 # Translators:
 # Besnik <besnik@programeshqip.org>, 2011
+# Besnik <besnik@programeshqip.org>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-25 08:36+0000\n"
+"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -74,6 +75,9 @@ msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "Po iu vu shenjë kësaj, vetëm përdoruesit që kanë bërë hyrjen do të jenë në "
 "gjendje ta shohin faqen."
+
+msgid "sites"
+msgstr "sajte"
 
 msgid "flat page"
 msgstr "faqe e e thjeshtë"

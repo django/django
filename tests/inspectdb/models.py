@@ -1,25 +1,22 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import models
 
 
 class People(models.Model):
     name = models.CharField(max_length=255)
-    parent = models.ForeignKey('self')
+    parent = models.ForeignKey('self', models.CASCADE)
 
 
 class Message(models.Model):
-    from_field = models.ForeignKey(People, db_column='from_id')
+    from_field = models.ForeignKey(People, models.CASCADE, db_column='from_id')
 
 
 class PeopleData(models.Model):
-    people_pk = models.ForeignKey(People, primary_key=True)
+    people_pk = models.ForeignKey(People, models.CASCADE, primary_key=True)
     ssn = models.CharField(max_length=11)
 
 
 class PeopleMoreData(models.Model):
-    people_unique = models.ForeignKey(People, unique=True)
+    people_unique = models.ForeignKey(People, models.CASCADE, unique=True)
     license = models.CharField(max_length=255)
 
 
@@ -50,7 +47,6 @@ class ColumnTypes(models.Model):
     null_bool_field = models.NullBooleanField()
     char_field = models.CharField(max_length=10)
     null_char_field = models.CharField(max_length=10, blank=True, null=True)
-    comma_separated_int_field = models.CommaSeparatedIntegerField(max_length=99)
     date_field = models.DateField()
     date_time_field = models.DateTimeField()
     decimal_field = models.DecimalField(max_digits=6, decimal_places=1)
@@ -59,7 +55,7 @@ class ColumnTypes(models.Model):
     file_path_field = models.FilePathField()
     float_field = models.FloatField()
     int_field = models.IntegerField()
-    gen_ip_adress_field = models.GenericIPAddressField(protocol="ipv4")
+    gen_ip_address_field = models.GenericIPAddressField(protocol="ipv4")
     pos_int_field = models.PositiveIntegerField()
     pos_small_int_field = models.PositiveSmallIntegerField()
     slug_field = models.SlugField()
@@ -67,11 +63,19 @@ class ColumnTypes(models.Model):
     text_field = models.TextField()
     time_field = models.TimeField()
     url_field = models.URLField()
+    uuid_field = models.UUIDField()
 
 
 class UniqueTogether(models.Model):
     field1 = models.IntegerField()
     field2 = models.CharField(max_length=10)
+    from_field = models.IntegerField(db_column='from')
+    non_unique = models.IntegerField(db_column='non__unique_column')
+    non_unique_0 = models.IntegerField(db_column='non_unique__column')
 
     class Meta:
-        unique_together = ('field1', 'field2')
+        unique_together = [
+            ('field1', 'field2'),
+            ('from_field', 'field1'),
+            ('non_unique', 'non_unique_0'),
+        ]

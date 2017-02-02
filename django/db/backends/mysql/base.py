@@ -2,33 +2,25 @@
 MySQL database backend for Django.
 
 Requires mysqlclient: https://pypi.python.org/pypi/mysqlclient/
-MySQLdb is supported for Python 2 only: http://sourceforge.net/projects/mysql-python
 """
-from __future__ import unicode_literals
-
-import datetime
 import re
-import sys
-import warnings
 
-from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.utils import six, timezone
-from django.utils.deprecation import RemovedInDjango21Warning
-from django.utils.encoding import force_str
 from django.utils.functional import cached_property
-from django.utils.safestring import SafeBytes, SafeText
 
 try:
     import MySQLdb as Database
-except ImportError as e:
-    from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
+except ImportError as err:
+    raise ImproperlyConfigured(
+        'Error loading MySQLdb module.\n'
+        'Did you install mysqlclient?'
+    ) from err
 
 from MySQLdb.constants import CLIENT, FIELD_TYPE                # isort:skip
-from MySQLdb.converters import Thing2Literal, conversions       # isort:skip
+from MySQLdb.converters import conversions                      # isort:skip
 
 # Some of these import MySQLdb, so import them after checking if it's installed.
 from .client import DatabaseClient                          # isort:skip
@@ -39,61 +31,25 @@ from .operations import DatabaseOperations                  # isort:skip
 from .schema import DatabaseSchemaEditor                    # isort:skip
 from .validation import DatabaseValidation                  # isort:skip
 
-# We want version (1, 2, 1, 'final', 2) or later. We can't just use
-# lexicographic ordering in this check because then (1, 2, 1, 'gamma')
-# inadvertently passes the version test.
 version = Database.version_info
-if (version < (1, 2, 1) or (version[:3] == (1, 2, 1) and
-        (len(version) < 5 or version[3] != 'final' or version[4] < 2))):
-    from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
+if version < (1, 3, 3):
+    raise ImproperlyConfigured("mysqlclient 1.3.3 or newer is required; you have %s" % Database.__version__)
 
 
-DatabaseError = Database.DatabaseError
-IntegrityError = Database.IntegrityError
-
-
-def adapt_datetime_warn_on_aware_datetime(value, conv):
-    # Remove this function and rely on the default adapter in Django 2.1.
-    if settings.USE_TZ and timezone.is_aware(value):
-        warnings.warn(
-            "The MySQL database adapter received an aware datetime (%s), "
-            "probably from cursor.execute(). Update your code to pass a "
-            "naive datetime in the database connection's time zone (UTC by "
-            "default).", RemovedInDjango21Warning)
-        # This doesn't account for the database connection's timezone,
-        # which isn't known. (That's why this adapter is deprecated.)
-        value = value.astimezone(timezone.utc).replace(tzinfo=None)
-    return Thing2Literal(value.strftime("%Y-%m-%d %H:%M:%S.%f"), conv)
-
-# MySQLdb-1.2.1 returns TIME columns as timedelta -- they are more like
-# timedelta in terms of actual behavior as they are signed and include days --
-# and Django expects time, so we still need to override that. We also need to
-# add special handling for SafeText and SafeBytes as MySQLdb's type
-# checking is too tight to catch those (see Django ticket #6052).
+# MySQLdb returns TIME columns as timedelta -- they are more like timedelta in
+# terms of actual behavior as they are signed and include days -- and Django
+# expects time.
 django_conversions = conversions.copy()
 django_conversions.update({
     FIELD_TYPE.TIME: backend_utils.typecast_time,
-    FIELD_TYPE.DECIMAL: backend_utils.typecast_decimal,
-    FIELD_TYPE.NEWDECIMAL: backend_utils.typecast_decimal,
-    datetime.datetime: adapt_datetime_warn_on_aware_datetime,
 })
 
 # This should match the numerical portion of the version numbers (we can treat
-# versions like 5.0.24 and 5.0.24a as the same). Based on the list of version
-# at http://dev.mysql.com/doc/refman/4.1/en/news.html and
-# http://dev.mysql.com/doc/refman/5.0/en/news.html .
+# versions like 5.0.24 and 5.0.24a as the same).
 server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 
 
-# MySQLdb-1.2.1 and newer automatically makes use of SHOW WARNINGS on
-# MySQL-4.1 and newer, so the MysqlDebugWrapper is unnecessary. Since the
-# point is to raise Warnings as exceptions, this can be done with the Python
-# warning module, and this is setup when the connection is created, and the
-# standard backend_utils.CursorDebugWrapper can be used. Also, using sql_mode
-# TRADITIONAL will automatically cause most warnings to be treated as errors.
-
-class CursorWrapper(object):
+class CursorWrapper:
     """
     A thin wrapper around MySQLdb's normal cursor class so that we can catch
     particular exception instances and reraise them with the right types.
@@ -114,7 +70,7 @@ class CursorWrapper(object):
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e.args[0] in self.codes_for_integrityerror:
-                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+                raise utils.IntegrityError(*tuple(e.args))
             raise
 
     def executemany(self, query, args):
@@ -124,7 +80,7 @@ class CursorWrapper(object):
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e.args[0] in self.codes_for_integrityerror:
-                six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
+                raise utils.IntegrityError(*tuple(e.args))
             raise
 
     def __getattr__(self, attr):
@@ -140,8 +96,8 @@ class CursorWrapper(object):
         return self
 
     def __exit__(self, type, value, traceback):
-        # Ticket #17671 - Close instead of passing thru to avoid backend
-        # specific behavior.
+        # Close instead of passing through to avoid backend-specific behavior
+        # (#17671).
         self.close()
 
 
@@ -153,10 +109,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # If a column type is set to None, it won't be included in the output.
     _data_types = {
         'AutoField': 'integer AUTO_INCREMENT',
+        'BigAutoField': 'bigint AUTO_INCREMENT',
         'BinaryField': 'longblob',
         'BooleanField': 'bool',
         'CharField': 'varchar(%(max_length)s)',
-        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
         'DateField': 'date',
         'DateTimeField': 'datetime',
         'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
@@ -221,33 +177,35 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE CONCAT('%%', {})",
     }
 
+    isolation_levels = {
+        'read uncommitted',
+        'read committed',
+        'repeatable read',
+        'serializable',
+    }
+
     Database = Database
     SchemaEditorClass = DatabaseSchemaEditor
-
-    def __init__(self, *args, **kwargs):
-        super(DatabaseWrapper, self).__init__(*args, **kwargs)
-
-        self.features = DatabaseFeatures(self)
-        self.ops = DatabaseOperations(self)
-        self.client = DatabaseClient(self)
-        self.creation = DatabaseCreation(self)
-        self.introspection = DatabaseIntrospection(self)
-        self.validation = DatabaseValidation(self)
+    # Classes instantiated in __init__().
+    client_class = DatabaseClient
+    creation_class = DatabaseCreation
+    features_class = DatabaseFeatures
+    introspection_class = DatabaseIntrospection
+    ops_class = DatabaseOperations
+    validation_class = DatabaseValidation
 
     def get_connection_params(self):
         kwargs = {
             'conv': django_conversions,
             'charset': 'utf8',
         }
-        if six.PY2:
-            kwargs['use_unicode'] = True
         settings_dict = self.settings_dict
         if settings_dict['USER']:
             kwargs['user'] = settings_dict['USER']
         if settings_dict['NAME']:
             kwargs['db'] = settings_dict['NAME']
         if settings_dict['PASSWORD']:
-            kwargs['passwd'] = force_str(settings_dict['PASSWORD'])
+            kwargs['passwd'] = settings_dict['PASSWORD']
         if settings_dict['HOST'].startswith('/'):
             kwargs['unix_socket'] = settings_dict['HOST']
         elif settings_dict['HOST']:
@@ -257,24 +215,45 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # We need the number of potentially affected rows after an
         # "UPDATE", not the number of changed rows.
         kwargs['client_flag'] = CLIENT.FOUND_ROWS
-        kwargs.update(settings_dict['OPTIONS'])
+        # Validate the transaction isolation level, if specified.
+        options = settings_dict['OPTIONS'].copy()
+        isolation_level = options.pop('isolation_level', 'read committed')
+        if isolation_level:
+            isolation_level = isolation_level.lower()
+            if isolation_level not in self.isolation_levels:
+                raise ImproperlyConfigured(
+                    "Invalid transaction isolation level '%s' specified.\n"
+                    "Use one of %s, or None." % (
+                        isolation_level,
+                        ', '.join("'%s'" % s for s in sorted(self.isolation_levels))
+                    ))
+            # The variable assignment form of setting transaction isolation
+            # levels will be used, e.g. "set tx_isolation='repeatable-read'".
+            isolation_level = isolation_level.replace(' ', '-')
+        self.isolation_level = isolation_level
+        kwargs.update(options)
         return kwargs
 
     def get_new_connection(self, conn_params):
-        conn = Database.connect(**conn_params)
-        conn.encoders[SafeText] = conn.encoders[six.text_type]
-        conn.encoders[SafeBytes] = conn.encoders[bytes]
-        return conn
+        return Database.connect(**conn_params)
 
     def init_connection_state(self):
-        with self.cursor() as cursor:
-            # SQL_AUTO_IS_NULL in MySQL controls whether an AUTO_INCREMENT column
-            # on a recently-inserted row will return when the field is tested for
-            # NULL.  Disabling this value brings this aspect of MySQL in line with
-            # SQL standards.
-            cursor.execute('SET SQL_AUTO_IS_NULL = 0')
+        assignments = []
+        if self.features.is_sql_auto_is_null_enabled:
+            # SQL_AUTO_IS_NULL controls whether an AUTO_INCREMENT column on
+            # a recently inserted row will return when the field is tested
+            # for NULL. Disabling this brings this aspect of MySQL in line
+            # with SQL standards.
+            assignments.append('SQL_AUTO_IS_NULL = 0')
 
-    def create_cursor(self):
+        if self.isolation_level:
+            assignments.append("TX_ISOLATION = '%s'" % self.isolation_level)
+
+        if assignments:
+            with self.cursor() as cursor:
+                cursor.execute('SET ' + ', '.join(assignments))
+
+    def create_cursor(self, name=None):
         cursor = self.connection.cursor()
         return CursorWrapper(cursor)
 
@@ -332,19 +311,27 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 continue
             key_columns = self.introspection.get_key_columns(cursor, table_name)
             for column_name, referenced_table_name, referenced_column_name in key_columns:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT REFERRING.`%s`, REFERRING.`%s` FROM `%s` as REFERRING
                     LEFT JOIN `%s` as REFERRED
                     ON (REFERRING.`%s` = REFERRED.`%s`)
-                    WHERE REFERRING.`%s` IS NOT NULL AND REFERRED.`%s` IS NULL"""
-                    % (primary_key_column_name, column_name, table_name, referenced_table_name,
-                    column_name, referenced_column_name, column_name, referenced_column_name))
+                    WHERE REFERRING.`%s` IS NOT NULL AND REFERRED.`%s` IS NULL
+                    """ % (
+                        primary_key_column_name, column_name, table_name,
+                        referenced_table_name, column_name, referenced_column_name,
+                        column_name, referenced_column_name,
+                    )
+                )
                 for bad_row in cursor.fetchall():
-                    raise utils.IntegrityError("The row in table '%s' with primary key '%s' has an invalid "
+                    raise utils.IntegrityError(
+                        "The row in table '%s' with primary key '%s' has an invalid "
                         "foreign key: %s.%s contains a value '%s' that does not have a corresponding value in %s.%s."
-                        % (table_name, bad_row[0],
-                        table_name, column_name, bad_row[1],
-                        referenced_table_name, referenced_column_name))
+                        % (
+                            table_name, bad_row[0], table_name, column_name,
+                            bad_row[1], referenced_table_name, referenced_column_name,
+                        )
+                    )
 
     def is_usable(self):
         try:
@@ -356,8 +343,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def mysql_version(self):
-        with self.temporary_connection():
-            server_info = self.connection.get_server_info()
+        with self.temporary_connection() as cursor:
+            cursor.execute('SELECT VERSION()')
+            server_info = cursor.fetchone()[0]
         match = server_version_re.match(server_info)
         if not match:
             raise Exception('Unable to determine MySQL version from version string %r' % server_info)

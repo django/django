@@ -98,7 +98,7 @@ class IfEqualTagTests(SimpleTestCase):
 
     @setup({'ifequal-split09': r"{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}"})
     def test_ifequal_split09(self):
-        output = self.engine.render_to_string('ifequal-split09', {'a': 'slash\man'})
+        output = self.engine.render_to_string('ifequal-split09', {'a': r'slash\man'})
         self.assertEqual(output, 'yes')
 
     @setup({'ifequal-split10': r"{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}"})

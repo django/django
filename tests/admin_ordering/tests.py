@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
 from django.contrib.auth.models import User
@@ -11,16 +9,17 @@ from .models import (
 )
 
 
-class MockRequest(object):
+class MockRequest:
     pass
 
 
-class MockSuperUser(object):
+class MockSuperUser:
     def has_perm(self, perm):
         return True
 
     def has_module_perms(self, module):
         return True
+
 
 request = MockRequest()
 request.user = MockSuperUser()
@@ -129,8 +128,8 @@ class TestRelatedFieldsAdminOrdering(TestCase):
             site.unregister(Band)
 
     def check_ordering_of_field_choices(self, correct_ordering):
-        fk_field = site._registry[Song].formfield_for_foreignkey(Song.band.field)
-        m2m_field = site._registry[Song].formfield_for_manytomany(Song.other_interpreters.field)
+        fk_field = site._registry[Song].formfield_for_foreignkey(Song.band.field, request=None)
+        m2m_field = site._registry[Song].formfield_for_manytomany(Song.other_interpreters.field, request=None)
 
         self.assertListEqual(list(fk_field.queryset), correct_ordering)
         self.assertListEqual(list(m2m_field.queryset), correct_ordering)
@@ -156,18 +155,18 @@ class TestRelatedFieldsAdminOrdering(TestCase):
         self.check_ordering_of_field_choices([self.b1, self.b2])
 
     def test_custom_queryset_still_wins(self):
-        """Test that custom queryset has still precedence (#21405)"""
+        """Custom queryset has still precedence (#21405)"""
         class SongAdmin(admin.ModelAdmin):
             # Exclude one of the two Bands from the querysets
-            def formfield_for_foreignkey(self, db_field, **kwargs):
+            def formfield_for_foreignkey(self, db_field, request, **kwargs):
                 if db_field.name == 'band':
                     kwargs["queryset"] = Band.objects.filter(rank__gt=2)
-                return super(SongAdmin, self).formfield_for_foreignkey(db_field, **kwargs)
+                return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
-            def formfield_for_manytomany(self, db_field, **kwargs):
+            def formfield_for_manytomany(self, db_field, request, **kwargs):
                 if db_field.name == 'other_interpreters':
                     kwargs["queryset"] = Band.objects.filter(rank__gt=2)
-                return super(SongAdmin, self).formfield_for_foreignkey(db_field, **kwargs)
+                return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
         class StaticOrderingBandAdmin(admin.ModelAdmin):
             ordering = ('rank',)

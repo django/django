@@ -2,16 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Janusz Harkot <jh@blueice.pl>, 2014
+# Janusz Harkot <jh@blueice.pl>, 2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:12+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Polish (http://www.transifex.com/projects/p/django/language/"
-"pl/)\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-25 16:57+0000\n"
+"Last-Translator: Janusz Harkot <jh@blueice.pl>\n"
+"Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -21,6 +20,9 @@ msgstr ""
 
 msgid "Redirects"
 msgstr "Przekierowania"
+
+msgid "site"
+msgstr "strony"
 
 msgid "redirect from"
 msgstr "przekieruj z"

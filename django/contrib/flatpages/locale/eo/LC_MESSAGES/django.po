@@ -2,16 +2,16 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2011-2012
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2014
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Esperanto (http://www.transifex.com/projects/p/django/"
-"language/eo/)\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-20 13:36+0000\n"
+"Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
+"Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
+"eo/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -74,6 +74,9 @@ msgstr "registrado postulita"
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "Se ĉi tio estus elektita, nur ensalutitaj uzantoj povus rigardi la paĝon."
+
+msgid "sites"
+msgstr "retejoj"
 
 msgid "flat page"
 msgstr "plata paĝo"

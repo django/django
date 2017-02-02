@@ -2,22 +2,21 @@
 #
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2013
-# ander <ander.basaundi@gmail.com>, 2013-2014
+# Ander Martínez <ander.basaundi@gmail.com>, 2013-2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jazpillaga <jazpillaga@codesyntax.com>, 2011
 # julen <julenx@gmail.com>, 2011-2012
 # julen <julenx@gmail.com>, 2013,2015
 # totorika93 <totorika93@gmail.com>, 2012
-# Unai Zalakain <unai@gisa-elkartea.org>, 2013
+# Unai Zalakain <inactive+unaizalakain@transifex.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Basque (http://www.transifex.com/projects/p/django/language/"
-"eu/)\n"
+"Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -66,6 +65,9 @@ msgstr "Daniera"
 msgid "German"
 msgstr "Alemaniera"
 
+msgid "Lower Sorbian"
+msgstr ""
+
 msgid "Greek"
 msgstr "Greziera"
 
@@ -86,6 +88,9 @@ msgstr "Espainola"
 
 msgid "Argentinian Spanish"
 msgstr "Espainola (Argentina)"
+
+msgid "Colombian Spanish"
+msgstr ""
 
 msgid "Mexican Spanish"
 msgstr "Espainola (Mexiko)"
@@ -117,6 +122,9 @@ msgstr "Frisiera"
 msgid "Irish"
 msgstr "Irlandako gaelera"
 
+msgid "Scottish Gaelic"
+msgstr ""
+
 msgid "Galician"
 msgstr "Galiziera"
 
@@ -128,6 +136,9 @@ msgstr "Hindi"
 
 msgid "Croatian"
 msgstr "Kroaziarra"
+
+msgid "Upper Sorbian"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Hungariera"
@@ -189,8 +200,8 @@ msgstr ""
 msgid "Burmese"
 msgstr "Birmaniera"
 
-msgid "Norwegian Bokmal"
-msgstr "Bokmal"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Nepalera"
@@ -288,9 +299,6 @@ msgstr "Fitxategi estatikoak"
 msgid "Syndication"
 msgstr ""
 
-msgid "Web Design"
-msgstr "Web diseinua"
-
 msgid "Enter a valid value."
 msgstr "Idatzi balio zuzena."
 
@@ -307,6 +315,11 @@ msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Idatzi hizki, zenbaki, azpimarra edo marratxoz osatutako baleko 'slug' bat."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
 
 msgid "Enter a valid IPv4 address."
 msgstr "Sartu IPv4 helbide zuzena."
@@ -362,6 +375,26 @@ msgstr[1] ""
 "Ziurtatu balio honek gehienez %(limit_value)d karaktere dituela "
 "(%(show_value)d ditu)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Ziurtatu digitu %(max)s baino gehiago ez dagoela guztira."
+msgstr[1] "Ziurtatu %(max)s digitu baino gehiago ez dagoela guztira."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Ziurtatu ez dagoela digitu %(max)s baino gehiago komaren atzetik."
+msgstr[1] "Ziurtatu ez dagoela %(max)s digitu baino gehiago komaren atzetik."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "Ziurtatu ez dagoela digitu %(max)s baino gehiago komaren aurretik."
+msgstr[1] "Ziurtatu ez dagoela %(max)s digitu baino gehiago komaren aurretik."
+
 msgid "and"
 msgstr "eta"
 
@@ -400,6 +433,9 @@ msgstr "Zenbaki osoa"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr ""
+
+msgid "Big (8 byte) integer"
+msgstr "Zenbaki osoa (handia 8 byte)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -474,9 +510,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr "Koma higikorreko zenbakia (float)"
 
-msgid "Big (8 byte) integer"
-msgstr "Zenbaki osoa (handia 8 byte)"
-
 msgid "IPv4 address"
 msgstr "IPv4 helbidea"
 
@@ -547,8 +580,22 @@ msgstr "1-N (mota erlazionatutako eremuaren arabera)"
 msgid "One-to-one relationship"
 msgstr "Bat-bat erlazioa"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
 msgid "Many-to-many relationship"
 msgstr "M:N erlazioa"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "Eremu hau beharrezkoa da."
@@ -558,26 +605,6 @@ msgstr "Idatzi zenbaki oso bat."
 
 msgid "Enter a number."
 msgstr "Idatzi zenbaki bat."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Ziurtatu digitu %(max)s baino gehiago ez dagoela guztira."
-msgstr[1] "Ziurtatu %(max)s digitu baino gehiago ez dagoela guztira."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Ziurtatu ez dagoela digitu %(max)s baino gehiago komaren atzetik."
-msgstr[1] "Ziurtatu ez dagoela %(max)s digitu baino gehiago komaren atzetik."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "Ziurtatu ez dagoela digitu %(max)s baino gehiago komaren aurretik."
-msgstr[1] "Ziurtatu ez dagoela %(max)s digitu baino gehiago komaren aurretik."
 
 msgid "Enter a valid date."
 msgstr "Idatzi baliozko data bat."
@@ -641,12 +668,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(%(name)s eremu ezkutua) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr ""

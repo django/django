@@ -3,11 +3,11 @@ The "sites" framework
 =====================
 
 .. module:: django.contrib.sites
-   :synopsis: Lets you operate multiple Web sites from the same database and
+   :synopsis: Lets you operate multiple websites from the same database and
               Django project
 
 Django comes with an optional "sites" framework. It's a hook for associating
-objects and functionality to particular Web sites, and it's a holding place for
+objects and functionality to particular websites, and it's a holding place for
 the domain names and "verbose" names of your Django-powered sites.
 
 Use it if your single Django installation powers more than one site and you
@@ -17,20 +17,16 @@ The sites framework is mainly based on a simple model:
 
 .. class:: models.Site
 
-    A model for storing the ``domain`` and ``name`` attributes of a Web site.
+    A model for storing the ``domain`` and ``name`` attributes of a website.
 
     .. attribute:: domain
 
-        The domain name associated with the Web site.
-
-        .. versionchanged:: 1.9
-
-            The ``domain`` field was set to be
-            :attr:`~django.db.models.Field.unique`.
+        The fully qualified domain name associated with the website.
+        For example, ``www.example.com``.
 
     .. attribute:: name
 
-        A human-readable "verbose" name for the Web site.
+        A human-readable "verbose" name for the website.
 
 The :setting:`SITE_ID` setting specifies the database ID of the
 :class:`~django.contrib.sites.models.Site` object associated with that
@@ -57,7 +53,7 @@ Kansas. LJWorld.com focuses on news, while Lawrence.com focuses on local
 entertainment. But sometimes editors want to publish an article on *both*
 sites.
 
-The brain-dead way of solving the problem would be to require site producers to
+The naive way of solving the problem would be to require site producers to
 publish the same story twice: once for LJWorld.com and again for Lawrence.com.
 But that's inefficient for site producers, and it's redundant to store
 multiple copies of the same story in the database.
@@ -116,7 +112,7 @@ like this::
     class Article(models.Model):
         headline = models.CharField(max_length=200)
         # ...
-        site = models.ForeignKey(Site)
+        site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
 This has the same benefits as described in the last section.
 
@@ -201,10 +197,14 @@ Here's an example of what the form-handling view looks like::
         # ...
 
         current_site = get_current_site(request)
-        send_mail('Thanks for subscribing to %s alerts' % current_site.name,
-            'Thanks for your subscription. We appreciate it.\n\n-The %s team.' % current_site.name,
+        send_mail(
+            'Thanks for subscribing to %s alerts' % current_site.name,
+            'Thanks for your subscription. We appreciate it.\n\n-The %s team.' % (
+                current_site.name,
+            ),
             'editor@%s' % current_site.domain,
-            [user.email])
+            [user.email],
+        )
 
         # ...
 
@@ -251,8 +251,8 @@ To do this, you can use the sites framework. A simple example::
     '/mymodel/objects/3/'
     >>> Site.objects.get_current().domain
     'example.com'
-    >>> 'http://%s%s' % (Site.objects.get_current().domain, obj.get_absolute_url())
-    'http://example.com/mymodel/objects/3/'
+    >>> 'https://%s%s' % (Site.objects.get_current().domain, obj.get_absolute_url())
+    'https://example.com/mymodel/objects/3/'
 
 .. _enabling-the-sites-framework:
 
@@ -330,10 +330,10 @@ your model explicitly. For example::
     from django.contrib.sites.managers import CurrentSiteManager
 
     class Photo(models.Model):
-        photo = models.FileField(upload_to='/home/photos')
+        photo = models.FileField(upload_to='photos')
         photographer_name = models.CharField(max_length=100)
         pub_date = models.DateField()
-        site = models.ForeignKey(Site)
+        site = models.ForeignKey(Site, on_delete=models.CASCADE)
         objects = models.Manager()
         on_site = CurrentSiteManager()
 
@@ -367,10 +367,10 @@ demonstrates this::
     from django.contrib.sites.managers import CurrentSiteManager
 
     class Photo(models.Model):
-        photo = models.FileField(upload_to='/home/photos')
+        photo = models.FileField(upload_to='photos')
         photographer_name = models.CharField(max_length=100)
         pub_date = models.DateField()
-        publish_on = models.ForeignKey(Site)
+        publish_on = models.ForeignKey(Site, on_delete=models.CASCADE)
         objects = models.Manager()
         on_site = CurrentSiteManager('publish_on')
 
@@ -404,8 +404,8 @@ If you often use this pattern::
 
 there is simple way to avoid repetitions. Add
 :class:`django.contrib.sites.middleware.CurrentSiteMiddleware` to
-:setting:`MIDDLEWARE_CLASSES`. The middleware sets the ``site`` attribute on
-every request object, so you can use ``request.site`` to get the current site.
+:setting:`MIDDLEWARE`. The middleware sets the ``site`` attribute on every
+request object, so you can use ``request.site`` to get the current site.
 
 How Django uses the sites framework
 ===================================
@@ -436,8 +436,8 @@ Here's how Django uses the sites framework:
   the current :class:`~django.contrib.sites.models.Site` object if you don't
   specify a fully-qualified domain.
 
-* In the :mod:`authentication framework <django.contrib.auth>`, the
-  :func:`django.contrib.auth.views.login` view passes the current
+* In the :mod:`authentication framework <django.contrib.auth>`,
+  :class:`django.contrib.auth.views.LoginView` passes the current
   :class:`~django.contrib.sites.models.Site` name to the template as
   ``{{ site_name }}``.
 
@@ -495,10 +495,15 @@ Finally, to avoid repetitive fallback code, the framework provides a
     A function that checks if ``django.contrib.sites`` is installed and
     returns either the current :class:`~django.contrib.sites.models.Site`
     object or a :class:`~django.contrib.sites.requests.RequestSite` object
-    based on the request.
+    based on the request. It looks up the current site based on
+    :meth:`request.get_host() <django.http.HttpRequest.get_host>` if the
+    :setting:`SITE_ID` setting is not defined.
 
-    .. versionchanged:: 1.8
-
-        This function will now lookup the current site based on
-        :meth:`request.get_host() <django.http.HttpRequest.get_host>` if the
-        :setting:`SITE_ID` setting is not defined.
+    Both a domain and a port may be returned by :meth:`request.get_host()
+    <django.http.HttpRequest.get_host>` when the Host header has a port
+    explicitly specified, e.g. ``example.com:80``. In such cases, if the
+    lookup fails because the host does not match a record in the database,
+    the port is stripped and the lookup is retried with the domain part
+    only. This does not apply to
+    :class:`~django.contrib.sites.requests.RequestSite` which will always
+    use the unmodified host.

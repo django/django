@@ -1,11 +1,9 @@
 """
 SQL functions reference lists:
-http://www.gaia-gis.it/spatialite-2.4.0/spatialite-sql-2.4.html
-http://www.gaia-gis.it/spatialite-3.0.0-BETA/spatialite-sql-3.0.0.html
+https://web.archive.org/web/20130407175746/http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.0.0.html
 http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.2.1.html
 """
 import re
-import sys
 
 from django.contrib.gis.db.backends.base.operations import \
     BaseSpatialOperations
@@ -16,9 +14,21 @@ from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.operations import DatabaseOperations
-from django.db.utils import DatabaseError
-from django.utils import six
 from django.utils.functional import cached_property
+
+
+class SpatiaLiteDistanceOperator(SpatialOperator):
+    def as_sql(self, connection, lookup, template_params, sql_params):
+        if lookup.lhs.output_field.geodetic(connection):
+            # SpatiaLite returns NULL instead of zero on geodetic coordinates
+            sql_template = 'COALESCE(%(func)s(%(lhs)s, %(rhs)s, %%s), 0) %(op)s %(value)s'
+            template_params.update({
+                'op': self.op,
+                'func': connection.ops.spatial_function_name('Distance'),
+            })
+            sql_params.insert(1, len(lookup.rhs) == 3 and lookup.rhs[-1] == 'spheroid')
+            return sql_template % template_params, sql_params
+        return super().as_sql(connection, lookup, template_params, sql_params)
 
 
 class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
@@ -27,7 +37,6 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')
 
     Adapter = SpatiaLiteAdapter
-    Adaptor = Adapter  # Backwards-compatibility alias.
 
     area = 'Area'
     centroid = 'Centroid'
@@ -37,8 +46,12 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     distance = 'Distance'
     envelope = 'Envelope'
     extent = 'Extent'
+    geojson = 'AsGeoJSON'
+    gml = 'AsGML'
     intersection = 'Intersection'
+    kml = 'AsKML'
     length = 'GLength'  # OpenGis defines Length, but this conflicts with an SQLite reserved keyword
+    makeline = 'MakeLine'
     num_geom = 'NumGeometries'
     num_points = 'NumPoints'
     point_on_surface = 'PointOnSurface'
@@ -55,6 +68,9 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     select = 'AsText(%s)'
 
     gis_operators = {
+        # Unary predicates
+        'isvalid': SpatialOperator(func='IsValid'),
+        # Binary predicates
         'equals': SpatialOperator(func='Equals'),
         'disjoint': SpatialOperator(func='Disjoint'),
         'touches': SpatialOperator(func='Touches'),
@@ -73,12 +89,15 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         # These are implemented here as synonyms for Equals
         'same_as': SpatialOperator(func='Equals'),
         'exact': SpatialOperator(func='Equals'),
-
-        'distance_gt': SpatialOperator(func='Distance', op='>'),
-        'distance_gte': SpatialOperator(func='Distance', op='>='),
-        'distance_lt': SpatialOperator(func='Distance', op='<'),
-        'distance_lte': SpatialOperator(func='Distance', op='<='),
+        # Distance predicates
+        'dwithin': SpatialOperator(func='PtDistWithin'),
+        'distance_gt': SpatiaLiteDistanceOperator(func='Distance', op='>'),
+        'distance_gte': SpatiaLiteDistanceOperator(func='Distance', op='>='),
+        'distance_lt': SpatiaLiteDistanceOperator(func='Distance', op='<'),
+        'distance_lte': SpatiaLiteDistanceOperator(func='Distance', op='<='),
     }
+
+    disallowed_aggregates = (aggregates.Extent3D,)
 
     @cached_property
     def function_names(self):
@@ -86,17 +105,15 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
             'Length': 'ST_Length',
             'Reverse': 'ST_Reverse',
             'Scale': 'ScaleCoords',
-            'Translate': 'ST_Translate' if self.spatial_version >= (3, 1, 0) else 'ShiftCoords',
+            'Translate': 'ST_Translate',
             'Union': 'ST_Union',
         }
 
     @cached_property
     def unsupported_functions(self):
-        unsupported = {'BoundingCircle', 'ForceRHR', 'GeoHash', 'MemSize'}
-        if self.spatial_version < (3, 1, 0):
-            unsupported.add('SnapToGrid')
-        if self.spatial_version < (4, 0, 0):
-            unsupported.update({'Perimeter', 'Reverse'})
+        unsupported = {'BoundingCircle', 'ForceRHR', 'MemSize'}
+        if not self.lwgeom_version():
+            unsupported |= {'GeoHash', 'IsValid', 'MakeValid'}
         return unsupported
 
     @cached_property
@@ -104,53 +121,20 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         """Determine the version of the SpatiaLite library."""
         try:
             version = self.spatialite_version_tuple()[1:]
-        except Exception as msg:
-            new_msg = (
-                'Cannot determine the SpatiaLite version for the "%s" '
-                'database (error was "%s").  Was the SpatiaLite initialization '
-                'SQL loaded on this database?') % (self.connection.settings_dict['NAME'], msg)
-            six.reraise(ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2])
-        if version < (2, 4, 0):
-            raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions '
-                                       '2.4.0 and above')
+        except Exception as exc:
+            raise ImproperlyConfigured(
+                'Cannot determine the SpatiaLite version for the "%s" database. '
+                'Was the SpatiaLite initialization SQL loaded on this database?' % (
+                    self.connection.settings_dict['NAME'],
+                )
+            ) from exc
+        if version < (4, 0, 0):
+            raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions 4.0.0 and above.')
         return version
-
-    @property
-    def _version_greater_2_4_0_rc4(self):
-        if self.spatial_version >= (2, 4, 1):
-            return True
-        else:
-            # Spatialite 2.4.0-RC4 added AsGML and AsKML, however both
-            # RC2 (shipped in popular Debian/Ubuntu packages) and RC4
-            # report version as '2.4.0', so we fall back to feature detection
-            try:
-                self._get_spatialite_func("AsGML(GeomFromText('POINT(1 1)'))")
-            except DatabaseError:
-                return False
-            return True
-
-    @cached_property
-    def disallowed_aggregates(self):
-        disallowed = (aggregates.Extent3D, aggregates.MakeLine)
-        if self.spatial_version < (3, 0, 0):
-            disallowed += (aggregates.Collect, aggregates.Extent)
-        return disallowed
-
-    @cached_property
-    def gml(self):
-        return 'AsGML' if self._version_greater_2_4_0_rc4 else None
-
-    @cached_property
-    def kml(self):
-        return 'AsKML' if self._version_greater_2_4_0_rc4 else None
-
-    @cached_property
-    def geojson(self):
-        return 'AsGeoJSON' if self.spatial_version >= (3, 0, 0) else None
 
     def convert_extent(self, box, srid):
         """
-        Convert the polygon data received from Spatialite to min/max values.
+        Convert the polygon data received from SpatiaLite to min/max values.
         """
         if box is None:
             return None
@@ -159,38 +143,29 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         xmax, ymax = shell[2][:2]
         return (xmin, ymin, xmax, ymax)
 
-    def convert_geom(self, wkt, geo_field):
-        """
-        Converts geometry WKT returned from a SpatiaLite aggregate.
-        """
-        if wkt:
-            return Geometry(wkt, geo_field.srid)
-        else:
-            return None
-
     def geo_db_type(self, f):
         """
-        Returns None because geometry columnas are added via the
+        Returns None because geometry columns are added via the
         `AddGeometryColumn` stored procedure on SpatiaLite.
         """
         return None
 
-    def get_distance(self, f, value, lookup_type):
+    def get_distance(self, f, value, lookup_type, **kwargs):
         """
         Returns the distance parameters for the given geometry field,
-        lookup value, and lookup type.  SpatiaLite only supports regular
-        cartesian-based queries (no spheroid/sphere calculations for point
-        geometries like PostGIS).
+        lookup value, and lookup type.
         """
         if not value:
             return []
         value = value[0]
         if isinstance(value, Distance):
             if f.geodetic(self.connection):
-                raise ValueError('SpatiaLite does not support distance queries on '
-                                 'geometry fields with a geodetic coordinate system. '
-                                 'Distance objects; use a numeric value of your '
-                                 'distance in degrees instead.')
+                if lookup_type == 'dwithin':
+                    raise ValueError(
+                        'Only numeric values of degree units are allowed on '
+                        'geographic DWithin queries.'
+                    )
+                dist_param = value.m
             else:
                 dist_param = getattr(value, Distance.unit_attname(f.units_name(self.connection)))
         else:
@@ -243,6 +218,10 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         "Returns the version of the PROJ.4 library used by SpatiaLite."
         return self._get_spatialite_func('proj4_version()')
 
+    def lwgeom_version(self):
+        """Return the version of LWGEOM library used by SpatiaLite."""
+        return self._get_spatialite_func('lwgeom_version()')
+
     def spatialite_version(self):
         "Returns the SpatiaLite library version as a string."
         return self._get_spatialite_func('spatialite_version()')
@@ -282,7 +261,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         return SpatialiteSpatialRefSys
 
     def get_db_converters(self, expression):
-        converters = super(SpatiaLiteOperations, self).get_db_converters(expression)
+        converters = super().get_db_converters(expression)
         if hasattr(expression.output_field, 'geom_type'):
             converters.append(self.convert_geometry)
         return converters

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.http import Http404
@@ -89,8 +87,6 @@ class SingleObjectMixin(ContextMixin):
         if self.context_object_name:
             return self.context_object_name
         elif isinstance(obj, models.Model):
-            if self.object._deferred:
-                obj = obj._meta.proxy_for_model
             return obj._meta.model_name
         else:
             return None
@@ -106,7 +102,7 @@ class SingleObjectMixin(ContextMixin):
             if context_object_name:
                 context[context_object_name] = self.object
         context.update(kwargs)
-        return super(SingleObjectMixin, self).get_context_data(**context)
+        return super().get_context_data(**context)
 
 
 class BaseDetailView(SingleObjectMixin, View):
@@ -134,7 +130,7 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
         * ``<app_label>/<model_name><template_name_suffix>.html``
         """
         try:
-            names = super(SingleObjectTemplateResponseMixin, self).get_template_names()
+            names = super().get_template_names()
         except ImproperlyConfigured:
             # If template_name isn't specified, it's not a problem --
             # we just start with an empty list.
@@ -152,8 +148,6 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             # only use this if the object in question is a model.
             if isinstance(self.object, models.Model):
                 object_meta = self.object._meta
-                if self.object._deferred:
-                    object_meta = self.object._meta.proxy_for_model._meta
                 names.append("%s/%s%s.html" % (
                     object_meta.app_label,
                     object_meta.model_name,

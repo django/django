@@ -1,10 +1,7 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import ImproperlyConfigured
 from django.core.paginator import InvalidPage, Paginator
 from django.db.models.query import QuerySet
 from django.http import Http404
-from django.utils import six
 from django.utils.translation import ugettext as _
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
@@ -46,7 +43,7 @@ class MultipleObjectMixin(ContextMixin):
             )
         ordering = self.get_ordering()
         if ordering:
-            if isinstance(ordering, six.string_types):
+            if isinstance(ordering, str):
                 ordering = (ordering,)
             queryset = queryset.order_by(*ordering)
 
@@ -123,11 +120,11 @@ class MultipleObjectMixin(ContextMixin):
         else:
             return None
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *, object_list=None, **kwargs):
         """
         Get the context for this view.
         """
-        queryset = kwargs.pop('object_list', self.object_list)
+        queryset = object_list if object_list is not None else self.object_list
         page_size = self.get_paginate_by(queryset)
         context_object_name = self.get_context_object_name(queryset)
         if page_size:
@@ -148,7 +145,7 @@ class MultipleObjectMixin(ContextMixin):
         if context_object_name is not None:
             context[context_object_name] = queryset
         context.update(kwargs)
-        return super(MultipleObjectMixin, self).get_context_data(**context)
+        return super().get_context_data(**context)
 
 
 class BaseListView(MultipleObjectMixin, View):
@@ -163,14 +160,14 @@ class BaseListView(MultipleObjectMixin, View):
             # When pagination is enabled and object_list is a queryset,
             # it's better to do a cheap query than to load the unpaginated
             # queryset in memory.
-            if (self.get_paginate_by(self.object_list) is not None
-                    and hasattr(self.object_list, 'exists')):
+            if self.get_paginate_by(self.object_list) is not None and hasattr(self.object_list, 'exists'):
                 is_empty = not self.object_list.exists()
             else:
                 is_empty = len(self.object_list) == 0
             if is_empty:
-                raise Http404(_("Empty list and '%(class_name)s.allow_empty' is False.")
-                        % {'class_name': self.__class__.__name__})
+                raise Http404(_("Empty list and '%(class_name)s.allow_empty' is False.") % {
+                    'class_name': self.__class__.__name__,
+                })
         context = self.get_context_data()
         return self.render_to_response(context)
 
@@ -187,7 +184,7 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
         a list. May not be called if render_to_response is overridden.
         """
         try:
-            names = super(MultipleObjectTemplateResponseMixin, self).get_template_names()
+            names = super().get_template_names()
         except ImproperlyConfigured:
             # If template_name isn't specified, it's not a problem --
             # we just start with an empty list.

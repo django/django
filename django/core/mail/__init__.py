@@ -1,21 +1,18 @@
 """
 Tools for sending email.
 """
-from __future__ import unicode_literals
-
 from django.conf import settings
-from django.utils.module_loading import import_string
-
-# Imported for backwards compatibility, and for the sake
+# Imported for backwards compatibility and for the sake
 # of a cleaner namespace. These symbols used to be in
 # django/core/mail.py before the introduction of email
 # backends and the subsequent reorganization (See #10355)
-from django.core.mail.utils import CachedDnsName, DNS_NAME
 from django.core.mail.message import (
-    EmailMessage, EmailMultiAlternatives,
-    SafeMIMEText, SafeMIMEMultipart,
-    DEFAULT_ATTACHMENT_MIME_TYPE, make_msgid,
-    BadHeaderError, forbid_multi_line_headers)
+    DEFAULT_ATTACHMENT_MIME_TYPE, BadHeaderError, EmailMessage,
+    EmailMultiAlternatives, SafeMIMEMultipart, SafeMIMEText,
+    forbid_multi_line_headers, make_msgid,
+)
+from django.core.mail.utils import DNS_NAME, CachedDnsName
+from django.utils.module_loading import import_string
 
 __all__ = [
     'CachedDnsName', 'DNS_NAME', 'EmailMessage', 'EmailMultiAlternatives',
@@ -51,11 +48,12 @@ def send_mail(subject, message, from_email, recipient_list,
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
-    connection = connection or get_connection(username=auth_user,
-                                    password=auth_password,
-                                    fail_silently=fail_silently)
-    mail = EmailMultiAlternatives(subject, message, from_email, recipient_list,
-                                  connection=connection)
+    connection = connection or get_connection(
+        username=auth_user,
+        password=auth_password,
+        fail_silently=fail_silently,
+    )
+    mail = EmailMultiAlternatives(subject, message, from_email, recipient_list, connection=connection)
     if html_message:
         mail.attach_alternative(html_message, 'text/html')
 
@@ -76,12 +74,15 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=None,
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
     """
-    connection = connection or get_connection(username=auth_user,
-                                    password=auth_password,
-                                    fail_silently=fail_silently)
-    messages = [EmailMessage(subject, message, sender, recipient,
-                             connection=connection)
-                for subject, message, sender, recipient in datatuple]
+    connection = connection or get_connection(
+        username=auth_user,
+        password=auth_password,
+        fail_silently=fail_silently,
+    )
+    messages = [
+        EmailMessage(subject, message, sender, recipient, connection=connection)
+        for subject, message, sender, recipient in datatuple
+    ]
     return connection.send_messages(messages)
 
 
@@ -90,9 +91,11 @@ def mail_admins(subject, message, fail_silently=False, connection=None,
     """Sends a message to the admins, as defined by the ADMINS setting."""
     if not settings.ADMINS:
         return
-    mail = EmailMultiAlternatives('%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
-                message, settings.SERVER_EMAIL, [a[1] for a in settings.ADMINS],
-                connection=connection)
+    mail = EmailMultiAlternatives(
+        '%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject), message,
+        settings.SERVER_EMAIL, [a[1] for a in settings.ADMINS],
+        connection=connection,
+    )
     if html_message:
         mail.attach_alternative(html_message, 'text/html')
     mail.send(fail_silently=fail_silently)
@@ -103,9 +106,11 @@ def mail_managers(subject, message, fail_silently=False, connection=None,
     """Sends a message to the managers, as defined by the MANAGERS setting."""
     if not settings.MANAGERS:
         return
-    mail = EmailMultiAlternatives('%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject),
-                message, settings.SERVER_EMAIL, [a[1] for a in settings.MANAGERS],
-                connection=connection)
+    mail = EmailMultiAlternatives(
+        '%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject), message,
+        settings.SERVER_EMAIL, [a[1] for a in settings.MANAGERS],
+        connection=connection,
+    )
     if html_message:
         mail.attach_alternative(html_message, 'text/html')
     mail.send(fail_silently=fail_silently)

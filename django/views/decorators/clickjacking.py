@@ -1,7 +1,5 @@
 from functools import wraps
 
-from django.utils.decorators import available_attrs
-
 
 def xframe_options_deny(view_func):
     """
@@ -14,14 +12,13 @@ def xframe_options_deny(view_func):
     @xframe_options_deny
     def some_view(request):
         ...
-
     """
     def wrapped_view(*args, **kwargs):
         resp = view_func(*args, **kwargs)
         if resp.get('X-Frame-Options') is None:
             resp['X-Frame-Options'] = 'DENY'
         return resp
-    return wraps(view_func, assigned=available_attrs(view_func))(wrapped_view)
+    return wraps(view_func)(wrapped_view)
 
 
 def xframe_options_sameorigin(view_func):
@@ -35,14 +32,13 @@ def xframe_options_sameorigin(view_func):
     @xframe_options_sameorigin
     def some_view(request):
         ...
-
     """
     def wrapped_view(*args, **kwargs):
         resp = view_func(*args, **kwargs)
         if resp.get('X-Frame-Options') is None:
             resp['X-Frame-Options'] = 'SAMEORIGIN'
         return resp
-    return wraps(view_func, assigned=available_attrs(view_func))(wrapped_view)
+    return wraps(view_func)(wrapped_view)
 
 
 def xframe_options_exempt(view_func):
@@ -55,10 +51,9 @@ def xframe_options_exempt(view_func):
     @xframe_options_exempt
     def some_view(request):
         ...
-
     """
     def wrapped_view(*args, **kwargs):
         resp = view_func(*args, **kwargs)
         resp.xframe_options_exempt = True
         return resp
-    return wraps(view_func, assigned=available_attrs(view_func))(wrapped_view)
+    return wraps(view_func)(wrapped_view)

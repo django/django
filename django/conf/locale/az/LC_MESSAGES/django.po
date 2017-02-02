@@ -1,17 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Emin Mastizada <emin@mastizada.com>, 2015
+# Emin Mastizada <emin@linux.com>, 2015-2016
 # Metin Amiroff <amiroff@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Azerbaijani (http://www.transifex.com/projects/p/django/"
-"language/az/)\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-08-05 11:00+0000\n"
+"Last-Translator: Emin Mastizada <emin@linux.com>\n"
+"Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
+"az/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -60,6 +60,9 @@ msgstr "Danimarkaca"
 msgid "German"
 msgstr "Almanca"
 
+msgid "Lower Sorbian"
+msgstr "Aşağı Sorbca"
+
 msgid "Greek"
 msgstr "Yunanca"
 
@@ -80,6 +83,9 @@ msgstr "İspanca"
 
 msgid "Argentinian Spanish"
 msgstr "Argentina İspancası"
+
+msgid "Colombian Spanish"
+msgstr "Kolumbia İspancası"
 
 msgid "Mexican Spanish"
 msgstr "Meksika İspancası"
@@ -111,6 +117,9 @@ msgstr "Friscə"
 msgid "Irish"
 msgstr "İrlandca"
 
+msgid "Scottish Gaelic"
+msgstr "Şotland Keltcəsi"
+
 msgid "Galician"
 msgstr "Qallik dili"
 
@@ -122,6 +131,9 @@ msgstr "Hindcə"
 
 msgid "Croatian"
 msgstr "Xorvatca"
+
+msgid "Upper Sorbian"
+msgstr "Üst Sorbca"
 
 msgid "Hungarian"
 msgstr "Macarca"
@@ -183,8 +195,8 @@ msgstr "Marathicə"
 msgid "Burmese"
 msgstr "Burmescə"
 
-msgid "Norwegian Bokmal"
-msgstr "Bokmal Norveçcəsi"
+msgid "Norwegian Bokmål"
+msgstr "Norveç Bukmolcası"
 
 msgid "Nepali"
 msgstr "Nepal"
@@ -271,7 +283,7 @@ msgid "Traditional Chinese"
 msgstr "Ənənəvi Çincə"
 
 msgid "Messages"
-msgstr ""
+msgstr "Mesajlar"
 
 msgid "Site Maps"
 msgstr "Sayt Xəritələri"
@@ -281,9 +293,6 @@ msgstr "Statik Fayllar"
 
 msgid "Syndication"
 msgstr "Sindikasiya"
-
-msgid "Web Design"
-msgstr "Web Dizayn"
 
 msgid "Enter a valid value."
 msgstr "Düzgün qiymət daxil edin."
@@ -302,6 +311,13 @@ msgid ""
 msgstr ""
 "Hərflərdən, rəqəmlərdən, alt-xətlərdən və ya defislərdən ibarət düzgün "
 "qısaltma daxil edin."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Keçərli Unicode hərfləri, rəqəmlər, alt xətt və ya defis olan 'slug' daxil "
+"edin."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Düzgün IPv4 ünvanı daxil edin."
@@ -337,7 +353,11 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"Bu dəyərin ən az %(limit_value)d simvol olduğuna əmin olun (%(show_value)d "
+"var)"
 msgstr[1] ""
+"Bu dəyərin ən az %(limit_value)d simvol olduğuna əmin olun (%(show_value)d "
+"var)"
 
 #, python-format
 msgid ""
@@ -347,14 +367,38 @@ msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"Bu dəyərin ən çox %(limit_value)d simvol olduğuna əmin olun (%(show_value)d "
+"var)"
 msgstr[1] ""
+"Bu dəyərin ən çox %(limit_value)d simvol olduğuna əmin olun (%(show_value)d "
+"var)"
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Toplamda %(max)s rəqəmdən çox olmadığına əmin olun."
+msgstr[1] "Toplamda %(max)s rəqəmdən çox olmadığına əmin olun."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Onluq hissənin %(max)s rəqəmdən çox olmadığına əmin olun."
+msgstr[1] "Onluq hissənin %(max)s rəqəmdən çox olmadığına əmin olun."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "Onluq hissədən əvvəl %(max)s rəqəmdən çox olmadığına əmin olun."
+msgstr[1] "Onluq hissədən əvvəl %(max)s rəqəmdən çox olmadığına əmin olun."
 
 msgid "and"
 msgstr "və"
 
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(field_labels)s ilə %(model_name)s artıq mövcuddur."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
@@ -390,6 +434,9 @@ msgstr "Tam ədəd"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' dəyəri tam rəqəm olmalıdır."
 
+msgid "Big (8 byte) integer"
+msgstr "Böyük (8 bayt) tam ədəd"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' dəyəri True və ya False olmalıdır."
@@ -409,12 +456,15 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"'%(value)s' dəyəri səhv tarix formatındadır. Bu İİİİ-AA-GG formatında "
+"olmalıdır."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"'%(value)s dəyəri düzgün formatdadır (İİİİ-AA-GG) amma bu xətalı tarixdir."
 
 msgid "Date (without time)"
 msgstr "Tarix (saatsız)"
@@ -462,9 +512,6 @@ msgstr ""
 
 msgid "Floating point number"
 msgstr "Sürüşən vergüllü ədəd"
-
-msgid "Big (8 byte) integer"
-msgstr "Böyük (8 bayt) tam ədəd"
 
 msgid "IPv4 address"
 msgstr "IPv4 ünvanı"
@@ -518,7 +565,7 @@ msgstr ""
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "'%(value)s' keçərli UUID deyil."
 
 msgid "File"
 msgstr "Fayl"
@@ -536,8 +583,22 @@ msgstr "Xarici açar (bağlı olduğu sahəyə uyğun tipi alır)"
 msgid "One-to-one relationship"
 msgstr "Birin-birə münasibət"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
 msgid "Many-to-many relationship"
 msgstr "Çoxun-çoxa münasibət"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "Bu sahə vacibdir."
@@ -547,26 +608,6 @@ msgstr "Tam ədəd daxil edin."
 
 msgid "Enter a number."
 msgstr "Ədəd daxil edin."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-msgstr[1] ""
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-msgstr[1] ""
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-msgstr[1] ""
 
 msgid "Enter a valid date."
 msgstr "Düzgün tarix daxil edin."
@@ -578,7 +619,7 @@ msgid "Enter a valid date/time."
 msgstr "Düzgün tarix/vaxt daxil edin."
 
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "Keçərli müddət daxil edin."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Fayl göndərilməyib. Vərəqənin (\"form\") şifrələmə tipini yoxlayın."
@@ -615,10 +656,10 @@ msgid "Enter a list of values."
 msgstr "Qiymətlərin siyahısını daxil edin."
 
 msgid "Enter a complete value."
-msgstr ""
+msgstr "Tam dəyər daxil edin."
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "Keçərli UUID daxil et."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -626,13 +667,7 @@ msgstr ":"
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
+msgstr "(Gizli %(name)s sahəsi) %(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr ""
@@ -640,14 +675,14 @@ msgstr ""
 #, python-format
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Lütfən %d və ya daha az forma göndərin."
+msgstr[1] "Lütfən %d və ya daha az forma göndərin."
 
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Lütfən %d və ya daha çox forma göndərin."
+msgstr[1] "Lütfən %d və ya daha çox forma göndərin."
 
 msgid "Order"
 msgstr "Sırala"
@@ -684,7 +719,7 @@ msgstr "Düzgün seçim edin. Bu seçim mümkün deyil."
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr ""
+msgstr "\"%(pk)s\" əsas açar üçün keçərli dəyər deyil."
 
 #, python-format
 msgid ""

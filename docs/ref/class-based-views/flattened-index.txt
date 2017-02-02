@@ -6,13 +6,19 @@ This index provides an alternate organization of the reference documentation
 for class-based views. For each view, the effective attributes and methods from
 the class tree are represented under that view. For the reference
 documentation organized by the class which defines the behavior, see
-:doc:`Class-based views</ref/class-based-views/index>`
+:doc:`Class-based views</ref/class-based-views/index>`.
+
+.. seealso::
+
+   `Classy Class-Based Views <https://ccbv.co.uk/>`_ provides a nice interface
+   to navigate the class hierarchy of the built-in class-based views.
 
 Simple generic views
---------------------
+====================
 
-View
-~~~~
+``View``
+--------
+
 .. class:: View()
 
 **Attributes** (with optional accessor):
@@ -26,8 +32,9 @@ View
 * ``head()``
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
 
-TemplateView
-~~~~~~~~~~~~
+``TemplateView``
+----------------
+
 .. class:: TemplateView()
 
 **Attributes** (with optional accessor):
@@ -48,8 +55,9 @@ TemplateView
 * :meth:`~django.views.generic.base.View.http_method_not_allowed`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
-RedirectView
-~~~~~~~~~~~~
+``RedirectView``
+----------------
+
 .. class:: RedirectView()
 
 **Attributes** (with optional accessor):
@@ -73,10 +81,11 @@ RedirectView
 * ``put()``
 
 Detail Views
-------------
+============
 
-DetailView
-~~~~~~~~~~
+``DetailView``
+--------------
+
 .. class:: DetailView()
 
 **Attributes** (with optional accessor):
@@ -107,10 +116,11 @@ DetailView
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
 List Views
-----------
+==========
 
-ListView
-~~~~~~~~
+``ListView``
+------------
+
 .. class:: ListView()
 
 **Attributes** (with optional accessor):
@@ -143,10 +153,11 @@ ListView
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
 Editing views
--------------
+=============
 
-FormView
-~~~~~~~~
+``FormView``
+------------
+
 .. class:: FormView()
 
 **Attributes** (with optional accessor):
@@ -175,8 +186,9 @@ FormView
 * :meth:`~django.views.generic.edit.ProcessFormView.post`
 * :meth:`~django.views.generic.edit.ProcessFormView.put`
 
-CreateView
-~~~~~~~~~~
+``CreateView``
+--------------
+
 .. class:: CreateView()
 
 **Attributes** (with optional accessor):
@@ -217,8 +229,9 @@ CreateView
 * ``put()``
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
-UpdateView
-~~~~~~~~~~
+``UpdateView``
+--------------
+
 .. class:: UpdateView()
 
 **Attributes** (with optional accessor):
@@ -259,8 +272,9 @@ UpdateView
 * ``put()``
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
-DeleteView
-~~~~~~~~~~
+``DeleteView``
+--------------
+
 .. class:: DeleteView()
 
 **Attributes** (with optional accessor):
@@ -294,10 +308,11 @@ DeleteView
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
 Date-based views
-----------------
+================
 
-ArchiveIndexView
-~~~~~~~~~~~~~~~~
+``ArchiveIndexView``
+--------------------
+
 .. class:: ArchiveIndexView()
 
 **Attributes** (with optional accessor):
@@ -334,8 +349,9 @@ ArchiveIndexView
 * :meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
-YearArchiveView
-~~~~~~~~~~~~~~~
+``YearArchiveView``
+-------------------
+
 .. class:: YearArchiveView()
 
 **Attributes** (with optional accessor):
@@ -375,8 +391,9 @@ YearArchiveView
 * :meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
-MonthArchiveView
-~~~~~~~~~~~~~~~~
+``MonthArchiveView``
+--------------------
+
 .. class:: MonthArchiveView()
 
 **Attributes** (with optional accessor):
@@ -419,8 +436,9 @@ MonthArchiveView
 * :meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
-WeekArchiveView
-~~~~~~~~~~~~~~~
+``WeekArchiveView``
+-------------------
+
 .. class:: WeekArchiveView()
 
 **Attributes** (with optional accessor):
@@ -461,8 +479,9 @@ WeekArchiveView
 * :meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
-DayArchiveView
-~~~~~~~~~~~~~~
+``DayArchiveView``
+------------------
+
 .. class:: DayArchiveView()
 
 **Attributes** (with optional accessor):
@@ -509,8 +528,9 @@ DayArchiveView
 * :meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
-TodayArchiveView
-~~~~~~~~~~~~~~~~
+``TodayArchiveView``
+--------------------
+
 .. class:: TodayArchiveView()
 
 **Attributes** (with optional accessor):
@@ -557,8 +577,9 @@ TodayArchiveView
 * :meth:`~django.views.generic.list.MultipleObjectMixin.paginate_queryset`
 * :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`
 
-DateDetailView
-~~~~~~~~~~~~~~
+``DateDetailView``
+------------------
+
 .. class:: DateDetailView()
 
 **Attributes** (with optional accessor):

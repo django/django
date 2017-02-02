@@ -1,30 +1,28 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import os
 import unittest
 from copy import copy
 from decimal import Decimal
-from unittest import skipUnless
 
 from django.conf import settings
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
 from django.db import connection
 from django.test import TestCase, override_settings, skipUnlessDBFeature
-from django.utils._os import upath
 
 if HAS_GEOS and HAS_GDAL:
-    from django.contrib.gis.utils.layermapping import (LayerMapping,
-        LayerMapError, InvalidDecimal, InvalidString, MissingForeignKey)
+    from django.contrib.gis.utils.layermapping import (
+        LayerMapping, LayerMapError, InvalidDecimal, InvalidString,
+        MissingForeignKey,
+    )
     from django.contrib.gis.gdal import DataSource
 
     from .models import (
         City, County, CountyFeat, Interstate, ICity1, ICity2, Invalid, State,
-        city_mapping, co_mapping, cofeat_mapping, inter_mapping)
+        city_mapping, co_mapping, cofeat_mapping, inter_mapping,
+    )
 
 
-shp_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), os.pardir, 'data'))
+shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), os.pardir, 'data'))
 city_shp = os.path.join(shp_path, 'cities', 'cities.shp')
 co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
 inter_shp = os.path.join(shp_path, 'interstates', 'interstates.shp')
@@ -36,7 +34,6 @@ NUMS = [1, 2, 1, 19, 1]  # Number of polygons for each.
 STATES = ['Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado']
 
 
-@skipUnless(HAS_GDAL, "LayerMapTest needs GDAL support")
 @skipUnlessDBFeature("gis_enabled")
 class LayerMapTest(TestCase):
 
@@ -140,27 +137,29 @@ class LayerMapTest(TestCase):
     def test_layermap_unique_multigeometry_fk(self):
         "Testing the `unique`, and `transform`, geometry collection conversion, and ForeignKey mappings."
         # All the following should work.
-        try:
-            # Telling LayerMapping that we want no transformations performed on the data.
-            lm = LayerMapping(County, co_shp, co_mapping, transform=False)
 
-            # Specifying the source spatial reference system via the `source_srs` keyword.
-            lm = LayerMapping(County, co_shp, co_mapping, source_srs=4269)
-            lm = LayerMapping(County, co_shp, co_mapping, source_srs='NAD83')
+        # Telling LayerMapping that we want no transformations performed on the data.
+        lm = LayerMapping(County, co_shp, co_mapping, transform=False)
 
-            # Unique may take tuple or string parameters.
-            for arg in ('name', ('name', 'mpoly')):
-                lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique=arg)
-        except Exception:
-            self.fail('No exception should be raised for proper use of keywords.')
+        # Specifying the source spatial reference system via the `source_srs` keyword.
+        lm = LayerMapping(County, co_shp, co_mapping, source_srs=4269)
+        lm = LayerMapping(County, co_shp, co_mapping, source_srs='NAD83')
+
+        # Unique may take tuple or string parameters.
+        for arg in ('name', ('name', 'mpoly')):
+            lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique=arg)
+
+        # Now test for failures
 
         # Testing invalid params for the `unique` keyword.
         for e, arg in ((TypeError, 5.0), (ValueError, 'foobar'), (ValueError, ('name', 'mpolygon'))):
-            self.assertRaises(e, LayerMapping, County, co_shp, co_mapping, transform=False, unique=arg)
+            with self.assertRaises(e):
+                LayerMapping(County, co_shp, co_mapping, transform=False, unique=arg)
 
         # No source reference system defined in the shapefile, should raise an error.
         if connection.features.supports_transform:
-            self.assertRaises(LayerMapError, LayerMapping, County, co_shp, co_mapping)
+            with self.assertRaises(LayerMapError):
+                LayerMapping(County, co_shp, co_mapping)
 
         # Passing in invalid ForeignKey mapping parameters -- must be a dictionary
         # mapping for the model the ForeignKey points to.
@@ -168,14 +167,17 @@ class LayerMapTest(TestCase):
         bad_fk_map1['state'] = 'name'
         bad_fk_map2 = copy(co_mapping)
         bad_fk_map2['state'] = {'nombre': 'State'}
-        self.assertRaises(TypeError, LayerMapping, County, co_shp, bad_fk_map1, transform=False)
-        self.assertRaises(LayerMapError, LayerMapping, County, co_shp, bad_fk_map2, transform=False)
+        with self.assertRaises(TypeError):
+            LayerMapping(County, co_shp, bad_fk_map1, transform=False)
+        with self.assertRaises(LayerMapError):
+            LayerMapping(County, co_shp, bad_fk_map2, transform=False)
 
         # There exist no State models for the ForeignKey mapping to work -- should raise
         # a MissingForeignKey exception (this error would be ignored if the `strict`
         # keyword is not set).
         lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique='name')
-        self.assertRaises(MissingForeignKey, lm.save, silent=True, strict=True)
+        with self.assertRaises(MissingForeignKey):
+            lm.save(silent=True, strict=True)
 
         # Now creating the state models so the ForeignKey mapping may work.
         State.objects.bulk_create([
@@ -222,11 +224,13 @@ class LayerMapTest(TestCase):
         # Bad feature id ranges should raise a type error.
         bad_ranges = (5.0, 'foo', co_shp)
         for bad in bad_ranges:
-            self.assertRaises(TypeError, lm.save, fid_range=bad)
+            with self.assertRaises(TypeError):
+                lm.save(fid_range=bad)
 
         # Step keyword should not be allowed w/`fid_range`.
         fr = (3, 5)  # layer[3:5]
-        self.assertRaises(LayerMapError, lm.save, fid_range=fr, step=10)
+        with self.assertRaises(LayerMapError):
+            lm.save(fid_range=fr, step=10)
         lm.save(fid_range=fr)
 
         # Features IDs 3 & 4 are for Galveston County, Texas -- only
@@ -296,7 +300,7 @@ class LayerMapTest(TestCase):
             lm.save(silent=True, strict=True)
 
     def test_textfield(self):
-        "Tests that String content fits also in a TextField"
+        "String content fits also in a TextField"
         mapping = copy(city_mapping)
         mapping['name_txt'] = 'Name'
         lm = LayerMapping(City, city_shp, mapping)
@@ -313,7 +317,7 @@ class LayerMapTest(TestCase):
         self.assertEqual(City.objects.all()[0].name, "Zürich")
 
 
-class OtherRouter(object):
+class OtherRouter:
     def db_for_read(self, model, **hints):
         return 'other'
 
@@ -327,7 +331,6 @@ class OtherRouter(object):
         return True
 
 
-@skipUnless(HAS_GDAL, "LayerMapRouterTest needs GDAL support")
 @skipUnlessDBFeature("gis_enabled")
 @override_settings(DATABASE_ROUTERS=[OtherRouter()])
 class LayerMapRouterTest(TestCase):

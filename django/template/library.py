@@ -1,10 +1,8 @@
 import functools
-import warnings
 from importlib import import_module
-from inspect import getargspec
 
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.html import conditional_escape
+from django.utils.inspect import getargspec
 from django.utils.itercompat import is_iterable
 
 from .base import Node, Template, token_kwargs
@@ -15,7 +13,7 @@ class InvalidTemplateLibrary(Exception):
     pass
 
 
-class Library(object):
+class Library:
     """
     A class for registering template tags and filters. Compiled filter and
     template tag functions are stored in the filters and tags attributes.
@@ -118,8 +116,10 @@ class Library(object):
                 if len(bits) >= 2 and bits[-2] == 'as':
                     target_var = bits[-1]
                     bits = bits[:-2]
-                args, kwargs = parse_bits(parser, bits, params,
-                    varargs, varkw, defaults, takes_context, function_name)
+                args, kwargs = parse_bits(
+                    parser, bits, params, varargs, varkw, defaults,
+                    takes_context, function_name
+                )
                 return SimpleNode(func, takes_context, args, kwargs, target_var)
             self.tag(function_name, compile_func)
             return func
@@ -132,14 +132,6 @@ class Library(object):
             return dec(func)
         else:
             raise ValueError("Invalid arguments provided to simple_tag")
-
-    def assignment_tag(self, func=None, takes_context=None, name=None):
-        warnings.warn(
-            "assignment_tag() is deprecated. Use simple_tag() instead",
-            RemovedInDjango21Warning,
-            stacklevel=2,
-        )
-        return self.simple_tag(func, takes_context, name)
 
     def inclusion_tag(self, filename, func=None, takes_context=None, name=None):
         """
@@ -192,7 +184,7 @@ class TagHelperNode(Node):
 class SimpleNode(TagHelperNode):
 
     def __init__(self, func, takes_context, args, kwargs, target_var):
-        super(SimpleNode, self).__init__(func, takes_context, args, kwargs)
+        super().__init__(func, takes_context, args, kwargs)
         self.target_var = target_var
 
     def render(self, context):
@@ -201,13 +193,15 @@ class SimpleNode(TagHelperNode):
         if self.target_var is not None:
             context[self.target_var] = output
             return ''
+        if context.autoescape:
+            output = conditional_escape(output)
         return output
 
 
 class InclusionNode(TagHelperNode):
 
     def __init__(self, func, takes_context, args, kwargs, filename):
-        super(InclusionNode, self).__init__(func, takes_context, args, kwargs)
+        super().__init__(func, takes_context, args, kwargs)
         self.filename = filename
 
     def render(self, context):
@@ -225,7 +219,7 @@ class InclusionNode(TagHelperNode):
                 t = self.filename
             elif isinstance(getattr(self.filename, 'template', None), Template):
                 t = self.filename.template
-            elif not isinstance(self.filename, six.string_types) and is_iterable(self.filename):
+            elif not isinstance(self.filename, str) and is_iterable(self.filename):
                 t = context.template.engine.select_template(self.filename)
             else:
                 t = context.template.engine.get_template(self.filename)

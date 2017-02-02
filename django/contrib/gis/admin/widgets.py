@@ -3,8 +3,7 @@ import logging
 from django.contrib.gis.gdal import GDALException
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.forms.widgets import Textarea
-from django.template import loader
-from django.utils import six, translation
+from django.utils import translation
 
 # Creating a template context that contains Django settings
 # values needed by admin map templates.
@@ -16,7 +15,7 @@ class OpenLayersWidget(Textarea):
     """
     Renders an OpenLayers map using the WKT of the geometry.
     """
-    def render(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs=None):
         # Update the template parameters with any attributes passed in.
         if attrs:
             self.params.update(attrs)
@@ -31,14 +30,11 @@ class OpenLayersWidget(Textarea):
 
         # If a string reaches here (via a validation error on another
         # field) then just reconstruct the Geometry.
-        if isinstance(value, six.string_types):
+        if value and isinstance(value, str):
             try:
                 value = GEOSGeometry(value)
             except (GEOSException, ValueError) as err:
-                logger.error(
-                    "Error creating geometry from value '%s' (%s)" % (
-                        value, err)
-                )
+                logger.error("Error creating geometry from value '%s' (%s)", value, err)
                 value = None
 
         if (value and value.geom_type.upper() != self.geom_type and
@@ -68,8 +64,8 @@ class OpenLayersWidget(Textarea):
                     wkt = ogr.wkt
                 except GDALException as err:
                     logger.error(
-                        "Error transforming geometry from srid '%s' to srid '%s' (%s)" % (
-                            value.srid, srid, err)
+                        "Error transforming geometry from srid '%s' to srid '%s' (%s)",
+                        value.srid, srid, err
                     )
                     wkt = ''
             else:
@@ -80,14 +76,14 @@ class OpenLayersWidget(Textarea):
             self.params['wkt'] = wkt
 
         self.params.update(geo_context)
-        return loader.render_to_string(self.template, self.params)
+        return self.params
 
     def map_options(self):
         "Builds the map options hash for the OpenLayers template."
 
         # JavaScript construction utilities for the Bounds and Projection.
         def ol_bounds(extent):
-            return 'new OpenLayers.Bounds(%s)' % str(extent)
+            return 'new OpenLayers.Bounds(%s)' % extent
 
         def ol_projection(srid):
             return 'new OpenLayers.Projection("EPSG:%s")' % srid

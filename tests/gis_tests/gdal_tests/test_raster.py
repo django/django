@@ -48,29 +48,27 @@ import unittest
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.shortcuts import numpy
-from django.utils import six
-from django.utils._os import upath
+from django.test import SimpleTestCase
 
 from ..data.rasters.textrasters import JSON_RASTER
 
 if HAS_GDAL:
-    from django.contrib.gis.gdal import GDALRaster
+    from django.contrib.gis.gdal import GDALRaster, GDAL_VERSION
     from django.contrib.gis.gdal.raster.band import GDALBand
 
 
 @unittest.skipUnless(HAS_GDAL, "GDAL is required")
-class GDALRasterTests(unittest.TestCase):
+class GDALRasterTests(SimpleTestCase):
     """
     Test a GDALRaster instance created from a file (GeoTiff).
     """
     def setUp(self):
-        self.rs_path = os.path.join(os.path.dirname(upath(__file__)),
-                                    '../data/rasters/raster.tif')
+        self.rs_path = os.path.join(os.path.dirname(__file__), '../data/rasters/raster.tif')
         self.rs = GDALRaster(self.rs_path)
 
     def test_rs_name_repr(self):
         self.assertEqual(self.rs_path, self.rs.name)
-        six.assertRegex(self, repr(self.rs), "<Raster object at 0x\w+>")
+        self.assertRegex(repr(self.rs), r"<Raster object at 0x\w+>")
 
     def test_rs_driver(self):
         self.assertEqual(self.rs.driver.name, 'GTiff')
@@ -83,10 +81,22 @@ class GDALRasterTests(unittest.TestCase):
         self.assertEqual(self.rs.srs.srid, 3086)
         self.assertEqual(self.rs.srs.units, (1.0, 'metre'))
 
+    def test_rs_srid(self):
+        rast = GDALRaster({
+            'width': 16,
+            'height': 16,
+            'srid': 4326,
+        })
+        self.assertEqual(rast.srid, 4326)
+        rast.srid = 3086
+        self.assertEqual(rast.srid, 3086)
+
     def test_geotransform_and_friends(self):
         # Assert correct values for file based raster
-        self.assertEqual(self.rs.geotransform,
-            [511700.4680706557, 100.0, 0.0, 435103.3771231986, 0.0, -100.0])
+        self.assertEqual(
+            self.rs.geotransform,
+            [511700.4680706557, 100.0, 0.0, 435103.3771231986, 0.0, -100.0]
+        )
         self.assertEqual(self.rs.origin, [511700.4680706557, 435103.3771231986])
         self.assertEqual(self.rs.origin.x, 511700.4680706557)
         self.assertEqual(self.rs.origin.y, 435103.3771231986)
@@ -113,13 +123,35 @@ class GDALRasterTests(unittest.TestCase):
         self.assertEqual(rsmem.height, 5)
 
     def test_rs_extent(self):
-        self.assertEqual(self.rs.extent,
-            (511700.4680706557, 417703.3771231986,
-             528000.4680706557, 435103.3771231986))
+        self.assertEqual(
+            self.rs.extent,
+            (511700.4680706557, 417703.3771231986, 528000.4680706557, 435103.3771231986)
+        )
 
     def test_rs_bands(self):
         self.assertEqual(len(self.rs.bands), 1)
         self.assertIsInstance(self.rs.bands[0], GDALBand)
+
+    def test_memory_based_raster_creation(self):
+        # Create uint8 raster with full pixel data range (0-255)
+        rast = GDALRaster({
+            'datatype': 1,
+            'width': 16,
+            'height': 16,
+            'srid': 4326,
+            'bands': [{
+                'data': range(256),
+                'nodata_value': 255,
+            }],
+        })
+
+        # Get array from raster
+        result = rast.bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+
+        # Assert data is same as original input
+        self.assertEqual(result, list(range(256)))
 
     def test_file_based_raster_creation(self):
         # Prepare tempfile
@@ -139,8 +171,8 @@ class GDALRasterTests(unittest.TestCase):
             'skew': (self.rs.skew.x, self.rs.skew.y),
             'bands': [{
                 'data': self.rs.bands[0].data(),
-                'nodata_value': self.rs.bands[0].nodata_value
-            }]
+                'nodata_value': self.rs.bands[0].nodata_value,
+            }],
         })
 
         # Reload newly created raster from file
@@ -155,24 +187,250 @@ class GDALRasterTests(unittest.TestCase):
         else:
             self.assertEqual(restored_raster.bands[0].data(), self.rs.bands[0].data())
 
+    def test_offset_size_and_shape_on_raster_creation(self):
+        rast = GDALRaster({
+            'datatype': 1,
+            'width': 4,
+            'height': 4,
+            'srid': 4326,
+            'bands': [{
+                'data': (1,),
+                'offset': (1, 1),
+                'size': (2, 2),
+                'shape': (1, 1),
+                'nodata_value': 2,
+            }],
+        })
+        # Get array from raster.
+        result = rast.bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+        # Band data is equal to nodata value except on input block of ones.
+        self.assertEqual(
+            result,
+            [2, 2, 2, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 2, 2, 2]
+        )
+
+    def test_set_nodata_value_on_raster_creation(self):
+        # Create raster filled with nodata values.
+        rast = GDALRaster({
+            'datatype': 1,
+            'width': 2,
+            'height': 2,
+            'srid': 4326,
+            'bands': [{'nodata_value': 23}],
+        })
+        # Get array from raster.
+        result = rast.bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+        # All band data is equal to nodata value.
+        self.assertEqual(result, [23, ] * 4)
+
+    def test_set_nodata_none_on_raster_creation(self):
+        if GDAL_VERSION < (2, 1):
+            self.skipTest("GDAL >= 2.1 is required for this test.")
+        # Create raster without data and without nodata value.
+        rast = GDALRaster({
+            'datatype': 1,
+            'width': 2,
+            'height': 2,
+            'srid': 4326,
+            'bands': [{'nodata_value': None}],
+        })
+        # Get array from raster.
+        result = rast.bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+        # Band data is equal to zero becaues no nodata value has been specified.
+        self.assertEqual(result, [0] * 4)
+
+    def test_raster_warp(self):
+        # Create in memory raster
+        source = GDALRaster({
+            'datatype': 1,
+            'driver': 'MEM',
+            'name': 'sourceraster',
+            'width': 4,
+            'height': 4,
+            'nr_of_bands': 1,
+            'srid': 3086,
+            'origin': (500000, 400000),
+            'scale': (100, -100),
+            'skew': (0, 0),
+            'bands': [{
+                'data': range(16),
+                'nodata_value': 255,
+            }],
+        })
+
+        # Test altering the scale, width, and height of a raster
+        data = {
+            'scale': [200, -200],
+            'width': 2,
+            'height': 2,
+        }
+        target = source.warp(data)
+        self.assertEqual(target.width, data['width'])
+        self.assertEqual(target.height, data['height'])
+        self.assertEqual(target.scale, data['scale'])
+        self.assertEqual(target.bands[0].datatype(), source.bands[0].datatype())
+        self.assertEqual(target.name, 'sourceraster_copy.MEM')
+        result = target.bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+        self.assertEqual(result, [5, 7, 13, 15])
+
+        # Test altering the name and datatype (to float)
+        data = {
+            'name': '/path/to/targetraster.tif',
+            'datatype': 6,
+        }
+        target = source.warp(data)
+        self.assertEqual(target.bands[0].datatype(), 6)
+        self.assertEqual(target.name, '/path/to/targetraster.tif')
+        self.assertEqual(target.driver.name, 'MEM')
+        result = target.bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+        self.assertEqual(
+            result,
+            [0.0, 1.0, 2.0, 3.0,
+             4.0, 5.0, 6.0, 7.0,
+             8.0, 9.0, 10.0, 11.0,
+             12.0, 13.0, 14.0, 15.0]
+        )
+
+    def test_raster_warp_nodata_zone(self):
+        # Create in memory raster.
+        source = GDALRaster({
+            'datatype': 1,
+            'driver': 'MEM',
+            'width': 4,
+            'height': 4,
+            'srid': 3086,
+            'origin': (500000, 400000),
+            'scale': (100, -100),
+            'skew': (0, 0),
+            'bands': [{
+                'data': range(16),
+                'nodata_value': 23,
+            }],
+        })
+        # Warp raster onto a location that does not cover any pixels of the original.
+        result = source.warp({'origin': (200000, 200000)}).bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+        # The result is an empty raster filled with the correct nodata value.
+        self.assertEqual(result, [23] * 16)
+
+    def test_raster_transform(self):
+        # Prepare tempfile and nodata value
+        rstfile = tempfile.NamedTemporaryFile(suffix='.tif')
+        ndv = 99
+
+        # Create in file based raster
+        source = GDALRaster({
+            'datatype': 1,
+            'driver': 'tif',
+            'name': rstfile.name,
+            'width': 5,
+            'height': 5,
+            'nr_of_bands': 1,
+            'srid': 4326,
+            'origin': (-5, 5),
+            'scale': (2, -2),
+            'skew': (0, 0),
+            'bands': [{
+                'data': range(25),
+                'nodata_value': ndv,
+            }],
+        })
+
+        # Transform raster into srid 4326.
+        target = source.transform(3086)
+
+        # Reload data from disk
+        target = GDALRaster(target.name)
+
+        self.assertEqual(target.srs.srid, 3086)
+        self.assertEqual(target.width, 7)
+        self.assertEqual(target.height, 7)
+        self.assertEqual(target.bands[0].datatype(), source.bands[0].datatype())
+        self.assertAlmostEqual(target.origin[0], 9124842.791079799)
+        self.assertAlmostEqual(target.origin[1], 1589911.6476407414)
+        self.assertAlmostEqual(target.scale[0], 223824.82664250192)
+        self.assertAlmostEqual(target.scale[1], -223824.82664250192)
+        self.assertEqual(target.skew, [0, 0])
+
+        result = target.bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+
+        # The reprojection of a raster that spans over a large area
+        # skews the data matrix and might introduce nodata values.
+        self.assertEqual(
+            result,
+            [
+                ndv, ndv, ndv, ndv, 4, ndv, ndv,
+                ndv, ndv, 2, 3, 9, ndv, ndv,
+                ndv, 1, 2, 8, 13, 19, ndv,
+                0, 6, 6, 12, 18, 18, 24,
+                ndv, 10, 11, 16, 22, 23, ndv,
+                ndv, ndv, 15, 21, 22, ndv, ndv,
+                ndv, ndv, 20, ndv, ndv, ndv, ndv,
+            ]
+        )
+
 
 @unittest.skipUnless(HAS_GDAL, "GDAL is required")
-class GDALBandTests(unittest.TestCase):
+class GDALBandTests(SimpleTestCase):
     def setUp(self):
-        self.rs_path = os.path.join(os.path.dirname(upath(__file__)),
-                               '../data/rasters/raster.tif')
+        self.rs_path = os.path.join(os.path.dirname(__file__), '../data/rasters/raster.tif')
         rs = GDALRaster(self.rs_path)
         self.band = rs.bands[0]
 
     def test_band_data(self):
+        pam_file = self.rs_path + '.aux.xml'
         self.assertEqual(self.band.width, 163)
         self.assertEqual(self.band.height, 174)
         self.assertEqual(self.band.description, '')
         self.assertEqual(self.band.datatype(), 1)
         self.assertEqual(self.band.datatype(as_string=True), 'GDT_Byte')
-        self.assertEqual(self.band.min, 0)
-        self.assertEqual(self.band.max, 255)
         self.assertEqual(self.band.nodata_value, 15)
+        if numpy:
+            data = self.band.data()
+            assert_array = numpy.loadtxt(
+                os.path.join(os.path.dirname(__file__), '../data/rasters/raster.numpy.txt')
+            )
+            numpy.testing.assert_equal(data, assert_array)
+            self.assertEqual(data.shape, (self.band.height, self.band.width))
+        try:
+            smin, smax, smean, sstd = self.band.statistics(approximate=True)
+            self.assertEqual(smin, 0)
+            self.assertEqual(smax, 9)
+            self.assertAlmostEqual(smean, 2.842331288343558)
+            self.assertAlmostEqual(sstd, 2.3965567248965356)
+
+            smin, smax, smean, sstd = self.band.statistics(approximate=False, refresh=True)
+            self.assertEqual(smin, 0)
+            self.assertEqual(smax, 9)
+            self.assertAlmostEqual(smean, 2.828326634228898)
+            self.assertAlmostEqual(sstd, 2.4260526986669095)
+
+            self.assertEqual(self.band.min, 0)
+            self.assertEqual(self.band.max, 9)
+            self.assertAlmostEqual(self.band.mean, 2.828326634228898)
+            self.assertAlmostEqual(self.band.std, 2.4260526986669095)
+
+            # Statistics are persisted into PAM file on band close
+            self.band = None
+            self.assertTrue(os.path.isfile(pam_file))
+        finally:
+            # Close band and remove file if created
+            self.band = None
+            if os.path.isfile(pam_file):
+                os.remove(pam_file)
 
     def test_read_mode_error(self):
         # Open raster in read mode
@@ -180,7 +438,8 @@ class GDALBandTests(unittest.TestCase):
         band = rs.bands[0]
 
         # Setting attributes in write mode raises exception in the _flush method
-        self.assertRaises(GDALException, setattr, band, 'nodata_value', 10)
+        with self.assertRaises(GDALException):
+            setattr(band, 'nodata_value', 10)
 
     def test_band_data_setters(self):
         # Create in-memory raster and get band
@@ -243,7 +502,7 @@ class GDALBandTests(unittest.TestCase):
             self.assertEqual(result, block)
 
         # Set data from memoryview
-        bandmem.data(six.memoryview(packed_block), (1, 1), (2, 2))
+        bandmem.data(memoryview(packed_block), (1, 1), (2, 2))
         result = bandmem.data(offset=(1, 1), size=(2, 2))
         if numpy:
             numpy.testing.assert_equal(result, numpy.array(block).reshape(2, 2))
@@ -268,3 +527,67 @@ class GDALBandTests(unittest.TestCase):
             )
         else:
             self.assertEqual(bandmemjson.data(), list(range(25)))
+
+    def test_band_statistics_automatic_refresh(self):
+        rsmem = GDALRaster({
+            'srid': 4326,
+            'width': 2,
+            'height': 2,
+            'bands': [{'data': [0] * 4, 'nodata_value': 99}],
+        })
+        band = rsmem.bands[0]
+        # Populate statistics cache
+        self.assertEqual(band.statistics(), (0, 0, 0, 0))
+        # Change data
+        band.data([1, 1, 0, 0])
+        # Statistics are properly updated
+        self.assertEqual(band.statistics(), (0.0, 1.0, 0.5, 0.5))
+        # Change nodata_value
+        band.nodata_value = 0
+        # Statistics are properly updated
+        self.assertEqual(band.statistics(), (1.0, 1.0, 1.0, 0.0))
+
+    def test_band_statistics_empty_band(self):
+        rsmem = GDALRaster({
+            'srid': 4326,
+            'width': 1,
+            'height': 1,
+            'bands': [{'data': [0], 'nodata_value': 0}],
+        })
+        self.assertEqual(rsmem.bands[0].statistics(), (None, None, None, None))
+
+    def test_band_delete_nodata(self):
+        rsmem = GDALRaster({
+            'srid': 4326,
+            'width': 1,
+            'height': 1,
+            'bands': [{'data': [0], 'nodata_value': 1}],
+        })
+        if GDAL_VERSION < (2, 1):
+            msg = 'GDAL >= 2.1 required to delete nodata values.'
+            with self.assertRaisesMessage(ValueError, msg):
+                rsmem.bands[0].nodata_value = None
+        else:
+            rsmem.bands[0].nodata_value = None
+            self.assertIsNone(rsmem.bands[0].nodata_value)
+
+    def test_band_data_replication(self):
+        band = GDALRaster({
+            'srid': 4326,
+            'width': 3,
+            'height': 3,
+            'bands': [{'data': range(10, 19), 'nodata_value': 0}],
+        }).bands[0]
+
+        # Variations for input (data, shape, expected result).
+        combos = (
+            ([1], (1, 1), [1] * 9),
+            (range(3), (1, 3), [0, 0, 0, 1, 1, 1, 2, 2, 2]),
+            (range(3), (3, 1), [0, 1, 2, 0, 1, 2, 0, 1, 2]),
+        )
+        for combo in combos:
+            band.data(combo[0], shape=combo[1])
+            if numpy:
+                numpy.testing.assert_equal(band.data(), numpy.array(combo[2]).reshape(3, 3))
+            else:
+                self.assertEqual(band.data(), list(combo[2]))

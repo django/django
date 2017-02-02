@@ -7,10 +7,9 @@ from ctypes import byref, c_double, c_uint
 
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.base import GEOSBase
-from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
+from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.libgeos import CS_PTR
 from django.contrib.gis.shortcuts import numpy
-from django.utils.six.moves import range
 
 
 class GEOSCoordSeq(GEOSBase):
@@ -74,7 +73,7 @@ class GEOSCoordSeq(GEOSBase):
         "Checks the given index."
         sz = self.size
         if (sz < 1) or (index < 0) or (index >= sz):
-            raise GEOSIndexError('invalid GEOS Geometry index: %s' % str(index))
+            raise IndexError('invalid GEOS Geometry index: %s' % index)
 
     def _checkdim(self, dim):
         "Checks the given dimension."

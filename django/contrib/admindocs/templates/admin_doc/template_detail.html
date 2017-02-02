@@ -15,6 +15,7 @@
 {% block content %}
 <h1>{% blocktrans %}Template: "{{ name }}"{% endblocktrans %}</h1>
 
+{# Translators: Search is not a verb here, it qualifies path (a search path) #}
 <h2>{% blocktrans %}Search path for template "{{ name }}":{% endblocktrans %}</h2>
 <ol>
 {% for template in templates|dictsort:"order" %}

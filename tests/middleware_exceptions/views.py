@@ -9,8 +9,8 @@ def normal_view(request):
 
 
 def template_response(request):
-    template = engines['django'].from_string('OK')
-    return TemplateResponse(request, template)
+    template = engines['django'].from_string('template_response OK{% for m in mw %}\n{{ m }}{% endfor %}')
+    return TemplateResponse(request, template, context={'mw': []})
 
 
 def template_response_error(request):
@@ -32,3 +32,11 @@ def null_view(request):
 
 def permission_denied(request):
     raise PermissionDenied()
+
+
+def exception_in_render(request):
+    class CustomHttpResponse(http.HttpResponse):
+        def render(self):
+            raise Exception('Exception in HttpResponse.render()')
+
+    return CustomHttpResponse('Error')

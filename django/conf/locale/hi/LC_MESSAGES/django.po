@@ -9,11 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Hindi (http://www.transifex.com/projects/p/django/language/"
-"hi/)\n"
+"Language-Team: Hindi (http://www.transifex.com/django/django/language/hi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -62,6 +61,9 @@ msgstr "दानिश"
 msgid "German"
 msgstr "जर्मन"
 
+msgid "Lower Sorbian"
+msgstr ""
+
 msgid "Greek"
 msgstr "ग्रीक"
 
@@ -82,6 +84,9 @@ msgstr "स्पानिश"
 
 msgid "Argentinian Spanish"
 msgstr "अर्जेंटीना स्पैनिश "
+
+msgid "Colombian Spanish"
+msgstr ""
 
 msgid "Mexican Spanish"
 msgstr "मेक्सिकन स्पैनिश"
@@ -113,6 +118,9 @@ msgstr "फ्रिसियन"
 msgid "Irish"
 msgstr "आयरिश"
 
+msgid "Scottish Gaelic"
+msgstr ""
+
 msgid "Galician"
 msgstr "गलिशियन"
 
@@ -124,6 +132,9 @@ msgstr "हिंदी"
 
 msgid "Croatian"
 msgstr "क्रोयेशियन"
+
+msgid "Upper Sorbian"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "हंगेरियन"
@@ -185,8 +196,8 @@ msgstr ""
 msgid "Burmese"
 msgstr "बर्मीज़"
 
-msgid "Norwegian Bokmal"
-msgstr "नार्वेजियन बोकमाल"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "नेपाली"
@@ -284,9 +295,6 @@ msgstr ""
 msgid "Syndication"
 msgstr ""
 
-msgid "Web Design"
-msgstr ""
-
 msgid "Enter a valid value."
 msgstr "एक मान्य मूल्य दर्ज करें"
 
@@ -302,6 +310,11 @@ msgstr "वैध डाक पता प्रविष्ट करें।"
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "एक वैध 'काउंटर' वर्णों, संख्याओं,रेखांकित चिन्ह ,या हाइफ़न से मिलाकर दर्ज करें ।"
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
 
 msgid "Enter a valid IPv4 address."
 msgstr "वैध आइ.पि वी 4 पता भरें ।"
@@ -349,6 +362,26 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "and"
 msgstr "और"
 
@@ -387,6 +420,9 @@ msgstr "पूर्णांक"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr ""
+
+msgid "Big (8 byte) integer"
+msgstr "बड़ा (8 बाइट) पूर्णांक "
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -461,9 +497,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr "चल बिन्दु संख्या"
 
-msgid "Big (8 byte) integer"
-msgstr "बड़ा (8 बाइट) पूर्णांक "
-
 msgid "IPv4 address"
 msgstr "IPv4 पता"
 
@@ -534,8 +567,22 @@ msgstr "विदेशी कुंजी (संबंधित क्षे�
 msgid "One-to-one relationship"
 msgstr "एक-एक संबंध"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
 msgid "Many-to-many relationship"
 msgstr "बहुत से कई संबंध"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ""
 
 msgid "This field is required."
 msgstr "यह क्षेत्र अपेक्षित हैं"
@@ -545,26 +592,6 @@ msgstr "एक पूर्ण संख्या दर्ज करें ।"
 
 msgid "Enter a number."
 msgstr "एक संख्या दर्ज करें ।"
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-msgstr[1] ""
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-msgstr[1] ""
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-msgstr[1] ""
 
 msgid "Enter a valid date."
 msgstr "वैध तिथि भरें ।"
@@ -621,12 +648,6 @@ msgstr ""
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
 msgstr ""
 
 msgid "ManagementForm data is missing or has been tampered with"

@@ -2,7 +2,7 @@
 # the template system can understand.
 
 
-class PermLookupDict(object):
+class PermLookupDict:
     def __init__(self, user, app_label):
         self.user, self.app_label = user, app_label
 
@@ -13,18 +13,15 @@ class PermLookupDict(object):
         return self.user.has_perm("%s.%s" % (self.app_label, perm_name))
 
     def __iter__(self):
-        # To fix 'item in perms.someapp' and __getitem__ iteraction we need to
+        # To fix 'item in perms.someapp' and __getitem__ interaction we need to
         # define __iter__. See #18979 for details.
         raise TypeError("PermLookupDict is not iterable.")
 
     def __bool__(self):
         return self.user.has_module_perms(self.app_label)
 
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
 
-
-class PermWrapper(object):
+class PermWrapper:
     def __init__(self, user):
         self.user = user
 

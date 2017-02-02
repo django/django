@@ -2,24 +2,28 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
+# Carlos E C Leite <caduado@gmail.com>, 2016
+# Filipe Cifali <cifali.filipe@gmail.com>, 2016
+# Claudemiro Alves Feitosa Neto <dimiro1@gmail.com>, 2015
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # dudanogueira <dudanogueira@gmail.com>, 2014
-# Eduardo Carvalho <eduardocereto@gmail.com>, 2013
+# Eduardo Cereto Carvalho, 2013
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
 # gilberto dos santos alves <gsavix@gmail.com>, 2013
-# Guilherme Gondim <semente@taurinus.org>, 2012
+# Guilherme Gondim, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Lucas Infante <maccinza@gmail.com>, 2015
 # Sandro <sandrossv@hotmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 10:30+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/"
-"django/language/pt_BR/)\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-05 14:23+0000\n"
+"Last-Translator: Carlos E C Leite <caduado@gmail.com>\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
+"language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -37,7 +41,7 @@ msgstr "Datas importantes"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "objeto %(name)s com chave primária %(key)r não existe."
 
 msgid "Password changed successfully."
 msgstr "Senha modificada com sucesso."
@@ -48,6 +52,12 @@ msgstr "Alterar senha: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Autenticação e Autorização"
+
+msgid "password"
+msgstr "senha"
+
+msgid "last login"
+msgstr "último login"
 
 msgid "No password set."
 msgstr "Nenhuma senha definida."
@@ -64,17 +74,17 @@ msgstr "Senha"
 msgid "Password confirmation"
 msgstr "Confirmação de senha"
 
-msgid "Enter the same password as above, for verification."
-msgstr "Informe a mesma senha digitada acima, para verificação."
+msgid "Enter the same password as before, for verification."
+msgstr "Informe a mesma senha informada anteriormente, para verificação."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
-"Não são armazenadas senhas no formato plano, por isso não há como visualizar "
-"a senha do usuário, mas você pode alterá-la usando <a href=\"password/"
-"\">este formulário</a> ."
+"Não são armazenadas senhas desprotegidas e, por isso, não há como visualizar "
+"a senha de um usuário, mas você pode alterá-la utilizando <a href=\"../"
+"password/\">este formulário</a>"
 
 #, python-format
 msgid ""
@@ -118,6 +128,21 @@ msgstr "salt"
 msgid "hash"
 msgstr "hash"
 
+msgid "variety"
+msgstr "variedade"
+
+msgid "version"
+msgstr "versão"
+
+msgid "memory cost"
+msgstr "custo de memória"
+
+msgid "time cost"
+msgstr "custo de tempo"
+
+msgid "parallelism"
+msgstr "paralelismo"
+
 msgid "work factor"
 msgstr "fator de trabalho"
 
@@ -126,6 +151,9 @@ msgstr "checksum"
 
 msgid "name"
 msgstr "nome"
+
+msgid "content type"
+msgstr "tipo de conteúdo"
 
 msgid "codename"
 msgstr "apelido"
@@ -141,12 +169,6 @@ msgstr "grupo"
 
 msgid "groups"
 msgstr "grupos"
-
-msgid "password"
-msgstr "senha"
-
-msgid "last login"
-msgstr "último login"
 
 msgid "superuser status"
 msgstr "status de superusuário"
@@ -174,16 +196,9 @@ msgstr "Permissões específicas para este usuário."
 msgid "username"
 msgstr "usuário"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Obrigatório. 30 caracteres ou menos. Somente letras, dígitos e @/./+/-/_."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Digite um nome de usuário válido. Este valor pode conter apenas letras, "
-"números e os caracteres <code>@/./+/-/_</code>."
+"Obrigatório. 150 caracteres ou menos. Letras, números e @/./+/-/_ apenas."
 
 msgid "A user with that username already exists."
 msgstr "Um usuário com este nome de usuário já existe."
@@ -223,8 +238,62 @@ msgid "users"
 msgstr "usuários"
 
 #, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Esta senha é muito curta. Ela precisa conter pelo menos %(min_length)d "
+"caracteres."
+msgstr[1] ""
+"Esta senha é muito curta. Ela precisa conter pelo menos %(min_length)d "
+"caracteres."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Sua senha precisa conter pelo menos %(min_length)d caracteres."
+msgstr[1] "Sua senha precisa conter pelo menos %(min_length)d caracteres."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "A senha é muito parecida com %(verbose_name)s"
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+"Sua senha não pode ser tão parecida com suas outras informações pessoais."
+
+msgid "This password is too common."
+msgstr "Esta senha é muito comum."
+
+msgid "Your password can't be a commonly used password."
+msgstr "Sua senha não pode ser uma senha habitualmente utilizada."
+
+msgid "This password is entirely numeric."
+msgstr "Esta senha é inteiramente numérica."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Sua senha não pode ser inteiramente numérica."
+
+#, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Redefinição de senha em %(site_name)s "
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Informe um nome de usuário válido. Este valor pode conter apenas letras, "
+"números e os seguintes caracteres @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Informe um nome de usuário válido. Este valor pode conter apenas letras, "
+"números e os seguintes caracteres @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Sessão encerrada"

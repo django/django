@@ -2,18 +2,23 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
+# andrewsmedina <andrewsmedina@gmail.com>, 2016
+# Carlos E C Leite <caduado@gmail.com>, 2016
+# Filipe Cifali <cifali.filipe@gmail.com>, 2016
+# Eduardo Cereto Carvalho, 2016
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
-# Guilherme Gondim <semente@taurinus.org>, 2012
+# Guilherme Gondim, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Lucas Infante <maccinza@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/"
-"django/language/pt_BR/)\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-28 23:31+0000\n"
+"Last-Translator: Tarsis Azevedo <tarsis.azevedo@gmail.com>\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
+"language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -36,22 +41,13 @@ msgid "Documentation bookmarklets"
 msgstr "Documentação de itens de bookmark"
 
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
+"click the link and add it to your bookmarks. Now you can select the "
+"bookmarklet from any page in the site."
 msgstr ""
-"\n"
-"<p class=\"help\">Para instalar um item no bookmark, arraste o link para a \n"
-"barra de ferramentas de bookmarks, ou clique com o botão direito no link e\n"
-"adicione-o à barra de ferramentas. Agora você pode selecionar o item de\n"
-"bookmark de qualquer página do site. Lembre-se que alguns desses itens\n"
-"de bookmark requerem que você veja o site de um computador designado\n"
-"como \"interno\" (converse com seu administrador de sistemas se você não\n"
-"souber se seu computador é \"interno\").</p>\n"
+"Para instalar bookmarklets, arraste o link para a sua barra de favoritos, ou "
+"clique com o botão direito no link e o adicione aos seus favoritos. Agora "
+"você pode selecionar o bookmarklet a partir de qualquer página do site."
 
 msgid "Documentation for this page"
 msgstr "Documentação para esta página"
@@ -62,32 +58,11 @@ msgid ""
 msgstr ""
 "Leva você de qualquer página para a documentação da view que gera tal página."
 
-msgid "Show object ID"
-msgstr "Mostar ID de objeto"
-
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Mostra o tipo de conteúdo e ID único para páginas que representam um objeto."
-
-msgid "Edit this object (current window)"
-msgstr "Editar este objeto (janela atual)"
-
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Vai para a página de administração que representa um objeto."
-
-msgid "Edit this object (new window)"
-msgstr "Editar este objeto (nova janela)"
-
-msgid "As above, but opens the admin page in a new window."
-msgstr "Como acima, mas abre a página de administração em uma nova janela."
-
 msgid "Tags"
 msgstr "Tags"
 
 msgid "List of all the template tags and their functions."
-msgstr "Lista de todas as template tags e suas funções."
+msgstr "Lista de todas as tags de template e suas funções."
 
 msgid "Filters"
 msgstr "Filtros"
@@ -96,7 +71,7 @@ msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
 msgstr ""
-"Os filtros são ações que podem ser aplicadas às variáveis ​​de um template "
+"Os filtros são ações que podem ser aplicadas às variáveis ​​em um template "
 "para alterar a saída."
 
 msgid "Models"
@@ -107,9 +82,9 @@ msgid ""
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
 msgstr ""
-"Models são descrições de todos os objetos no sistema e seus campos "
-"associados. Cada model tem uma lista de campos que podem ser acessados ​​como "
-"variáveis ​​de template"
+"Modelos são descrições de todos os objetos no sistema e seus campos "
+"associados. Cada modelo tem uma lista de campos que podem ser acessados ​​como "
+"variáveis ​​no template"
 
 msgid "Views"
 msgstr "Views"
@@ -121,7 +96,7 @@ msgid ""
 msgstr ""
 "Cada página no site público é gerada por uma view. A view define qual "
 "template será usado para gerar a página e quais objetos estarão disponíveis "
-"para esse modelo."
+"para este template."
 
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
@@ -150,6 +125,9 @@ msgstr ""
 msgid "Model: %(name)s"
 msgstr "Model: %(name)s"
 
+msgid "Fields"
+msgstr "Campos"
+
 msgid "Field"
 msgstr "Campo"
 
@@ -159,7 +137,16 @@ msgstr "Tipo"
 msgid "Description"
 msgstr "Descrição"
 
-msgid "Back to Model Documentation"
+msgid "Methods with arguments"
+msgstr "Métodos com argumentos"
+
+msgid "Method"
+msgstr "Método"
+
+msgid "Arguments"
+msgstr "Argumentos"
+
+msgid "Back to Model documentation"
 msgstr "Voltar para Documentação do Model"
 
 msgid "Model documentation"
@@ -179,6 +166,7 @@ msgstr "Template: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Template: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Caminho de busca para o template \"%(name)s\":"
@@ -203,8 +191,8 @@ msgid ""
 "To use these filters, put <code>%(code)s</code> in your template before "
 "using the filter."
 msgstr ""
-"Para usar esses filtros, coloque o código <code>%(code)s</code> no seu "
-"template antes de usar o filtro."
+"Para usar esses filtros, coloque <code>%(code)s</code> no seu template antes "
+"de usar o filtro."
 
 msgid "Template tags"
 msgstr "Tags de template"
@@ -233,7 +221,7 @@ msgstr "Contexto:"
 msgid "Templates:"
 msgstr "Templates:"
 
-msgid "Back to Views Documentation"
+msgid "Back to View documentation"
 msgstr "Voltar para a Documentação das Views"
 
 msgid "View documentation"

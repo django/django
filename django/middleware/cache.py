@@ -4,7 +4,7 @@ URL. The canonical way to enable cache middleware is to set
 ``UpdateCacheMiddleware`` as your first piece of middleware, and
 ``FetchFromCacheMiddleware`` as the last::
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
         'django.middleware.cache.UpdateCacheMiddleware',
         ...
         'django.middleware.cache.FetchFromCacheMiddleware'
@@ -49,22 +49,24 @@ from django.utils.cache import (
     get_cache_key, get_max_age, has_vary_header, learn_cache_key,
     patch_response_headers,
 )
+from django.utils.deprecation import MiddlewareMixin
 
 
-class UpdateCacheMiddleware(object):
+class UpdateCacheMiddleware(MiddlewareMixin):
     """
     Response-phase cache middleware that updates the cache if the response is
     cacheable.
 
     Must be used as part of the two-part update/fetch cache middleware.
-    UpdateCacheMiddleware must be the first piece of middleware in
-    MIDDLEWARE_CLASSES so that it'll get called last during the response phase.
+    UpdateCacheMiddleware must be the first piece of middleware in MIDDLEWARE
+    so that it'll get called last during the response phase.
     """
-    def __init__(self):
+    def __init__(self, get_response=None):
         self.cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
         self.cache = caches[self.cache_alias]
+        self.get_response = get_response
 
     def _should_update_cache(self, request, response):
         return hasattr(request, '_cache_update_cache') and request._cache_update_cache
@@ -75,7 +77,7 @@ class UpdateCacheMiddleware(object):
             # We don't need to update the cache, just return.
             return response
 
-        if response.streaming or response.status_code != 200:
+        if response.streaming or response.status_code not in (200, 304):
             return response
 
         # Don't cache responses that set a user-specific (and maybe security
@@ -93,7 +95,7 @@ class UpdateCacheMiddleware(object):
             # max-age was set to 0, don't bother caching.
             return response
         patch_response_headers(response, timeout)
-        if timeout:
+        if timeout and response.status_code == 200:
             cache_key = learn_cache_key(request, response, timeout, self.key_prefix, cache=self.cache)
             if hasattr(response, 'render') and callable(response.render):
                 response.add_post_render_callback(
@@ -104,18 +106,19 @@ class UpdateCacheMiddleware(object):
         return response
 
 
-class FetchFromCacheMiddleware(object):
+class FetchFromCacheMiddleware(MiddlewareMixin):
     """
     Request-phase cache middleware that fetches a page from the cache.
 
     Must be used as part of the two-part update/fetch cache middleware.
-    FetchFromCacheMiddleware must be the last piece of middleware in
-    MIDDLEWARE_CLASSES so that it'll get called last during the request phase.
+    FetchFromCacheMiddleware must be the last piece of middleware in MIDDLEWARE
+    so that it'll get called last during the request phase.
     """
-    def __init__(self):
+    def __init__(self, get_response=None):
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
         self.cache = caches[self.cache_alias]
+        self.get_response = get_response
 
     def process_request(self, request):
         """
@@ -153,7 +156,8 @@ class CacheMiddleware(UpdateCacheMiddleware, FetchFromCacheMiddleware):
     Also used as the hook point for the cache decorator, which is generated
     using the decorator-from-middleware utility.
     """
-    def __init__(self, cache_timeout=None, **kwargs):
+    def __init__(self, get_response=None, cache_timeout=None, **kwargs):
+        self.get_response = get_response
         # We need to differentiate between "provided, but using default value",
         # and "not provided". If the value is provided using a default, then
         # we fall back to system defaults. If it is not provided at all,

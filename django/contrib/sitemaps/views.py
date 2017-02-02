@@ -3,10 +3,10 @@ from calendar import timegm
 from functools import wraps
 
 from django.contrib.sites.shortcuts import get_current_site
-from django.core import urlresolvers
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.http import http_date
 
 
@@ -32,8 +32,7 @@ def index(request, sitemaps,
         if callable(site):
             site = site()
         protocol = req_protocol if site.protocol is None else site.protocol
-        sitemap_url = urlresolvers.reverse(
-            sitemap_url_name, kwargs={'section': section})
+        sitemap_url = reverse(sitemap_url_name, kwargs={'section': section})
         absolute_url = '%s://%s%s' % (protocol, req_site.domain, sitemap_url)
         sites.append(absolute_url)
         for page in range(2, site.paginator.num_pages + 1):
@@ -58,6 +57,8 @@ def sitemap(request, sitemaps, section=None,
         maps = sitemaps.values()
     page = request.GET.get("p", 1)
 
+    lastmod = None
+    all_sites_lastmod = True
     urls = []
     for site in maps:
         try:
@@ -65,20 +66,24 @@ def sitemap(request, sitemaps, section=None,
                 site = site()
             urls.extend(site.get_urls(page=page, site=req_site,
                                       protocol=req_protocol))
+            if all_sites_lastmod:
+                site_lastmod = getattr(site, 'latest_lastmod', None)
+                if site_lastmod is not None:
+                    site_lastmod = (
+                        site_lastmod.utctimetuple() if isinstance(site_lastmod, datetime.datetime)
+                        else site_lastmod.timetuple()
+                    )
+                    lastmod = site_lastmod if lastmod is None else max(lastmod, site_lastmod)
+                else:
+                    all_sites_lastmod = False
         except EmptyPage:
             raise Http404("Page %s empty" % page)
         except PageNotAnInteger:
             raise Http404("No page '%s'" % page)
     response = TemplateResponse(request, template_name, {'urlset': urls},
                                 content_type=content_type)
-    if hasattr(site, 'latest_lastmod'):
-        # if latest_lastmod is defined for site, set header so as
+    if all_sites_lastmod and lastmod is not None:
+        # if lastmod is defined for all sites, set header so as
         # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
-        lastmod = site.latest_lastmod
-        response['Last-Modified'] = http_date(
-            timegm(
-                lastmod.utctimetuple() if isinstance(lastmod, datetime.datetime)
-                else lastmod.timetuple()
-            )
-        )
+        response['Last-Modified'] = http_date(timegm(lastmod))
     return response

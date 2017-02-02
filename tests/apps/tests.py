@@ -1,9 +1,4 @@
-from __future__ import unicode_literals
-
 import os
-import sys
-import warnings
-from unittest import skipUnless
 
 from django.apps import AppConfig, apps
 from django.apps.registry import Apps
@@ -11,9 +6,7 @@ from django.contrib.admin.models import LogEntry
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.db import models
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import extend_sys_path
-from django.utils import six
-from django.utils._os import upath
+from django.test.utils import extend_sys_path, isolate_apps
 
 from .default_config_app.apps import CustomConfig
 from .models import SoAlternative, TotallyNormal, new_apps
@@ -35,14 +28,14 @@ SOME_INSTALLED_APPS_NAMES = [
     'django.contrib.auth',
 ] + SOME_INSTALLED_APPS[2:]
 
-HERE = os.path.dirname(upath(__file__))
+HERE = os.path.dirname(__file__)
 
 
 class AppsTests(SimpleTestCase):
 
     def test_singleton_master(self):
         """
-        Ensures that only one master registry can exist.
+        Only one master registry can exist.
         """
         with self.assertRaises(RuntimeError):
             Apps(installed_apps=None)
@@ -80,7 +73,8 @@ class AppsTests(SimpleTestCase):
         with self.assertRaises(ImportError):
             with self.settings(INSTALLED_APPS=['there is no such app']):
                 pass
-        with self.assertRaises(ImportError):
+        msg = "Cannot import 'there is no such app'. Check that 'apps.apps.NoSuchApp.name' is correct."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             with self.settings(INSTALLED_APPS=['apps.apps.NoSuchApp']):
                 pass
 
@@ -119,7 +113,7 @@ class AppsTests(SimpleTestCase):
         self.assertEqual(app_config.name, 'django.contrib.staticfiles')
 
         with self.assertRaises(LookupError):
-            apps.get_app_config('webdesign')
+            apps.get_app_config('admindocs')
 
         msg = "No installed app with label 'django.contrib.auth'. Did you mean 'myauth'"
         with self.assertRaisesMessage(LookupError, msg):
@@ -133,7 +127,7 @@ class AppsTests(SimpleTestCase):
         self.assertTrue(apps.is_installed('django.contrib.admin'))
         self.assertTrue(apps.is_installed('django.contrib.auth'))
         self.assertTrue(apps.is_installed('django.contrib.staticfiles'))
-        self.assertFalse(apps.is_installed('django.contrib.webdesign'))
+        self.assertFalse(apps.is_installed('django.contrib.admindocs'))
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_model(self):
@@ -161,12 +155,12 @@ class AppsTests(SimpleTestCase):
         self.assertEqual(apps.get_app_config('relabeled').name, 'apps')
 
     def test_duplicate_labels(self):
-        with six.assertRaisesRegex(self, ImproperlyConfigured, "Application labels aren't unique"):
+        with self.assertRaisesMessage(ImproperlyConfigured, "Application labels aren't unique"):
             with self.settings(INSTALLED_APPS=['apps.apps.PlainAppsConfig', 'apps']):
                 pass
 
     def test_duplicate_names(self):
-        with six.assertRaisesRegex(self, ImproperlyConfigured, "Application names aren't unique"):
+        with self.assertRaisesMessage(ImproperlyConfigured, "Application names aren't unique"):
             with self.settings(INSTALLED_APPS=['apps.apps.RelabeledAppsConfig', 'apps']):
                 pass
 
@@ -174,13 +168,13 @@ class AppsTests(SimpleTestCase):
         """
         App discovery should preserve stack traces. Regression test for #22920.
         """
-        with six.assertRaisesRegex(self, ImportError, "Oops"):
+        with self.assertRaisesMessage(ImportError, "Oops"):
             with self.settings(INSTALLED_APPS=['import_error_package']):
                 pass
 
     def test_models_py(self):
         """
-        Tests that the models in the models.py file were loaded correctly.
+        The models in the models.py file were loaded correctly.
         """
         self.assertEqual(apps.get_model("apps", "TotallyNormal"), TotallyNormal)
         with self.assertRaises(LookupError):
@@ -202,10 +196,10 @@ class AppsTests(SimpleTestCase):
             'app_label': "apps",
             'apps': new_apps,
         }
-        meta = type(str("Meta"), tuple(), meta_contents)
+        meta = type("Meta", tuple(), meta_contents)
         body['Meta'] = meta
         body['__module__'] = TotallyNormal.__module__
-        temp_model = type(str("SouthPonies"), (models.Model,), body)
+        temp_model = type("SouthPonies", (models.Model,), body)
         # Make sure it appeared in the right place!
         self.assertListEqual(list(apps.get_app_config("apps").get_models()), old_models)
         with self.assertRaises(LookupError):
@@ -223,33 +217,31 @@ class AppsTests(SimpleTestCase):
         }
 
         body = {}
-        body['Meta'] = type(str("Meta"), tuple(), meta_contents)
+        body['Meta'] = type("Meta", tuple(), meta_contents)
         body['__module__'] = TotallyNormal.__module__
-        type(str("SouthPonies"), (models.Model,), body)
+        type("SouthPonies", (models.Model,), body)
 
         # When __name__ and __module__ match we assume the module
         # was reloaded and issue a warning. This use-case is
         # useful for REPL. Refs #23621.
         body = {}
-        body['Meta'] = type(str("Meta"), tuple(), meta_contents)
+        body['Meta'] = type("Meta", tuple(), meta_contents)
         body['__module__'] = TotallyNormal.__module__
-        with warnings.catch_warnings(record=True) as w:
-            type(str("SouthPonies"), (models.Model,), body)
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[-1].category, RuntimeWarning))
-            self.assertEqual(str(w[-1].message),
-                 "Model 'southponies.apps' was already registered. "
-                 "Reloading models is not advised as it can lead to inconsistencies, "
-                 "most notably with related models.")
+        msg = (
+            "Model 'apps.southponies' was already registered. "
+            "Reloading models is not advised as it can lead to inconsistencies, "
+            "most notably with related models."
+        )
+        with self.assertRaisesMessage(RuntimeWarning, msg):
+            type("SouthPonies", (models.Model,), body)
 
         # If it doesn't appear to be a reloaded module then we expect
         # a RuntimeError.
         body = {}
-        body['Meta'] = type(str("Meta"), tuple(), meta_contents)
+        body['Meta'] = type("Meta", tuple(), meta_contents)
         body['__module__'] = TotallyNormal.__module__ + '.whatever'
-        with six.assertRaisesRegex(self, RuntimeError,
-                "Conflicting 'southponies' models in application 'apps':.*"):
-            type(str("SouthPonies"), (models.Model,), body)
+        with self.assertRaisesMessage(RuntimeError, "Conflicting 'southponies' models in application 'apps':"):
+            type("SouthPonies", (models.Model,), body)
 
     def test_get_containing_app_config_apps_not_ready(self):
         """
@@ -263,7 +255,8 @@ class AppsTests(SimpleTestCase):
         finally:
             apps.apps_ready = True
 
-    def test_lazy_model_operation(self):
+    @isolate_apps('apps', kwarg_name='apps')
+    def test_lazy_model_operation(self, apps):
         """
         Tests apps.lazy_model_operation().
         """
@@ -284,7 +277,7 @@ class AppsTests(SimpleTestCase):
         # and LazyModelC shouldn't be waited on until LazyModelB exists.
         self.assertSetEqual(set(apps._pending_operations) - initial_pending, {('apps', 'lazyb')})
 
-        # Test that multiple operations can wait on the same model
+        # Multiple operations can wait on the same model
         apps.lazy_model_operation(test_func, ('apps', 'lazyb'))
 
         class LazyB(models.Model):
@@ -302,7 +295,7 @@ class AppsTests(SimpleTestCase):
         self.assertListEqual(model_classes, [LazyA, LazyB, LazyB, LazyC, LazyA])
 
 
-class Stub(object):
+class Stub:
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
@@ -366,10 +359,19 @@ class AppConfigTests(SimpleTestCase):
         with self.assertRaises(ImproperlyConfigured):
             AppConfig('label', Stub(__path__=['a', 'b']))
 
+    def test_duplicate_dunder_path_no_dunder_file(self):
+        """
+        If the __path__ attr contains duplicate paths and there is no
+        __file__, they duplicates should be deduplicated (#25246).
+        """
+        ac = AppConfig('label', Stub(__path__=['a', 'a']))
+        self.assertEqual(ac.path, 'a')
 
-@skipUnless(
-    sys.version_info > (3, 3, 0),
-    "Namespace packages sans __init__.py were added in Python 3.3")
+    def test_repr(self):
+        ac = AppConfig('label', Stub(__path__=['a']))
+        self.assertEqual(repr(ac), '<AppConfig: label>')
+
+
 class NamespacePackageAppTests(SimpleTestCase):
     # We need nsapp to be top-level so our multiple-paths tests can add another
     # location for it (if its inside a normal package with an __init__.py that
@@ -386,15 +388,14 @@ class NamespacePackageAppTests(SimpleTestCase):
         with extend_sys_path(self.base_location):
             with self.settings(INSTALLED_APPS=['nsapp']):
                 app_config = apps.get_app_config('nsapp')
-                self.assertEqual(app_config.path, upath(self.app_path))
+                self.assertEqual(app_config.path, self.app_path)
 
     def test_multiple_paths(self):
         """
         A Py3.3+ namespace package with multiple locations cannot be an app.
 
         (Because then we wouldn't know where to load its templates, static
-        assets, etc from.)
-
+        assets, etc. from.)
         """
         # Temporarily add two directories to sys.path that both contain
         # components of the "nsapp" package.
@@ -412,4 +413,4 @@ class NamespacePackageAppTests(SimpleTestCase):
         with extend_sys_path(self.base_location, self.other_location):
             with self.settings(INSTALLED_APPS=['nsapp.apps.NSAppConfig']):
                 app_config = apps.get_app_config('nsapp')
-                self.assertEqual(app_config.path, upath(self.app_path))
+                self.assertEqual(app_config.path, self.app_path)

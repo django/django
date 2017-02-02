@@ -1,18 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# dekomote <dr.mote@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2016
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2015
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2011-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Macedonian (http://www.transifex.com/projects/p/django/"
-"language/mk/)\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-08 09:35+0000\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
+"Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
+"mk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -61,6 +63,9 @@ msgstr "Дански"
 msgid "German"
 msgstr "Германски"
 
+msgid "Lower Sorbian"
+msgstr "Долно Лужичко-Српски"
+
 msgid "Greek"
 msgstr "Грчки"
 
@@ -81,6 +86,9 @@ msgstr "Шпански"
 
 msgid "Argentinian Spanish"
 msgstr "Аргентински шпански"
+
+msgid "Colombian Spanish"
+msgstr "Колумбиски Шпански"
 
 msgid "Mexican Spanish"
 msgstr "Мексикански шпански"
@@ -112,6 +120,9 @@ msgstr "Фризиски"
 msgid "Irish"
 msgstr "Ирски"
 
+msgid "Scottish Gaelic"
+msgstr "Шкотски Галски"
+
 msgid "Galician"
 msgstr "Галски"
 
@@ -123,6 +134,9 @@ msgstr "Хинди"
 
 msgid "Croatian"
 msgstr "Хрватски"
+
+msgid "Upper Sorbian"
+msgstr "Горно Лужичко-Српски"
 
 msgid "Hungarian"
 msgstr "Унгарски"
@@ -184,8 +198,8 @@ msgstr "Марати"
 msgid "Burmese"
 msgstr "Бурмански"
 
-msgid "Norwegian Bokmal"
-msgstr "Бокманл норвешки"
+msgid "Norwegian Bokmål"
+msgstr "Норвешки Бокмел"
 
 msgid "Nepali"
 msgstr "Непалски"
@@ -272,7 +286,7 @@ msgid "Traditional Chinese"
 msgstr "Традиционален кинески"
 
 msgid "Messages"
-msgstr ""
+msgstr "Пораки"
 
 msgid "Site Maps"
 msgstr "Сајт мапи"
@@ -282,9 +296,6 @@ msgstr "Статички датотеки"
 
 msgid "Syndication"
 msgstr "Синдикација"
-
-msgid "Web Design"
-msgstr "Веб дизајн"
 
 msgid "Enter a valid value."
 msgstr "Внесете правилна вредност."
@@ -303,6 +314,13 @@ msgid ""
 msgstr ""
 "Внесете правилно кратко име (slug) кое се соддржи од букви, цифри, долна "
 "црта или тире."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Внесете валидна кратенка која се состои од Unicode букви, бројки, долни црти "
+"и црти"
 
 msgid "Enter a valid IPv4 address."
 msgstr "Внесeте правилна IPv4 адреса."
@@ -360,6 +378,28 @@ msgstr[1] ""
 "Осигурајте се дека оваа вредност има најмногу %(limit_value)d карактери (има "
 "%(show_value)d)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Осигурајте се дека вкупно нема повеќе од %(max)s цифра."
+msgstr[1] "Осигурајте се дека вкупно нема повеќе од %(max)s цифри."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Осигурајте се дека нема повеќе од %(max)s децимално место."
+msgstr[1] "Осигурајте се дека нема повеќе од %(max)s децимални места."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Осигурајте се дека нема повеќе одs %(max)s цифра пред децималната запирка."
+msgstr[1] ""
+"Осигурајте се дека нема повеќе од %(max)s цифри пред децималната запирка."
+
 msgid "and"
 msgstr "и"
 
@@ -400,6 +440,9 @@ msgstr "Цел број"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr "Вредноста '%(value)s' мора да биде цел број."
+
+msgid "Big (8 byte) integer"
+msgstr "Голем (8 бајти) цел број"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -483,9 +526,6 @@ msgstr "Вредноста '%(value)s' мора да биде децимален
 msgid "Floating point number"
 msgstr "Децимален број подвижна запирка"
 
-msgid "Big (8 byte) integer"
-msgstr "Голем (8 бајти) цел број"
-
 msgid "IPv4 address"
 msgstr "IPv4 адреса"
 
@@ -560,8 +600,22 @@ msgstr "Надворешен клуч (типот е одреден според
 msgid "One-to-one relationship"
 msgstr "Еден-према-еден релација"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s релација"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s релации"
+
 msgid "Many-to-many relationship"
 msgstr "Повеќе-према-повеќе релација"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "Ова поле е задолжително."
@@ -571,28 +625,6 @@ msgstr "Внесете цел број."
 
 msgid "Enter a number."
 msgstr "Внесете број."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Осигурајте се дека вкупно нема повеќе од %(max)s цифра."
-msgstr[1] "Осигурајте се дека вкупно нема повеќе од %(max)s цифри."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Осигурајте се дека нема повеќе од %(max)s децимално место."
-msgstr[1] "Осигурајте се дека нема повеќе од %(max)s децимални места."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-"Осигурајте се дека нема повеќе одs %(max)s цифра пред децималната запирка."
-msgstr[1] ""
-"Осигурајте се дека нема повеќе од %(max)s цифри пред децималната запирка."
 
 msgid "Enter a valid date."
 msgstr "Внесете правилен датум."
@@ -658,12 +690,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Скриено поле %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "Недостасуваат податоци од ManagementForm или некој ги менувал"

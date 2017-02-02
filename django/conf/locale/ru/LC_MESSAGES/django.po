@@ -2,30 +2,33 @@
 #
 # Translators:
 # Mingun <Alexander_Sergey@mail.ru>, 2014
-# Denis Darii <sinednx@gmail.com>, 2011
+# Denis Darii <denis.darii@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
 # eigrad <andrew@ei-grad.ru>, 2012
-# Eugene MechanisM <contact@mechanism.name>, 2013
+# Eugene MechanisM <eugene@mechanism.pro>, 2013
 # eXtractor <evg.kirov@gmail.com>, 2015
 # Igor Melnyk, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# lilo.panic, 2016
 # Mikhail Zholobov <legal90@gmail.com>, 2013
-# Алексей Борискин <sun.void@gmail.com>, 2013-2015
+# Алексей Борискин <sun.void@gmail.com>, 2013-2016
+# Дмитрий Шатера <mr.bobsans@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-20 11:18+0000\n"
-"Last-Translator: eXtractor <evg.kirov@gmail.com>\n"
-"Language-Team: Russian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-20 09:53+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
+"Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
 
 msgid "Afrikaans"
 msgstr "Бурский"
@@ -69,6 +72,9 @@ msgstr "Датский"
 msgid "German"
 msgstr "Немецкий"
 
+msgid "Lower Sorbian"
+msgstr "Нижнелужицкий"
+
 msgid "Greek"
 msgstr "Греческий"
 
@@ -89,6 +95,9 @@ msgstr "Испанский"
 
 msgid "Argentinian Spanish"
 msgstr "Аргентинский испанский"
+
+msgid "Colombian Spanish"
+msgstr "Колумбийский испанский"
 
 msgid "Mexican Spanish"
 msgstr "Мексиканский испанский"
@@ -120,6 +129,9 @@ msgstr "Фризский"
 msgid "Irish"
 msgstr "Ирландский"
 
+msgid "Scottish Gaelic"
+msgstr "Шотландский гэльский"
+
 msgid "Galician"
 msgstr "Галисийский"
 
@@ -131,6 +143,9 @@ msgstr "Хинди"
 
 msgid "Croatian"
 msgstr "Хорватский"
+
+msgid "Upper Sorbian"
+msgstr "Верхнелужицкий"
 
 msgid "Hungarian"
 msgstr "Венгерский"
@@ -192,7 +207,7 @@ msgstr "Маратхи"
 msgid "Burmese"
 msgstr "Бирманский"
 
-msgid "Norwegian Bokmal"
+msgid "Norwegian Bokmål"
 msgstr "Норвежский (Букмол)"
 
 msgid "Nepali"
@@ -291,9 +306,6 @@ msgstr "Статические файлы"
 msgid "Syndication"
 msgstr "Ленты новостей"
 
-msgid "Web Design"
-msgstr "Генерация «рыбных» текстов"
-
 msgid "Enter a valid value."
 msgstr "Введите правильное значение."
 
@@ -301,7 +313,7 @@ msgid "Enter a valid URL."
 msgstr "Введите правильный URL."
 
 msgid "Enter a valid integer."
-msgstr "Введите целое число."
+msgstr "Введите правильное число."
 
 msgid "Enter a valid email address."
 msgstr "Введите правильный адрес электронной почты."
@@ -311,6 +323,13 @@ msgid ""
 msgstr ""
 "Значение должно состоять только из букв, цифр, знаков подчеркивания или "
 "дефиса."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Значение должно состоять только из букв, цифр, символов подчёркивания или "
+"дефисов, входящих в стандарт Юникод."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Введите правильный IPv4 адрес."
@@ -353,6 +372,9 @@ msgstr[1] ""
 msgstr[2] ""
 "Убедитесь, что это значение содержит не менее %(limit_value)d символов "
 "(сейчас %(show_value)d)."
+msgstr[3] ""
+"Убедитесь, что это значение содержит не менее %(limit_value)d символов "
+"(сейчас %(show_value)d)."
 
 #, python-format
 msgid ""
@@ -370,6 +392,35 @@ msgstr[1] ""
 msgstr[2] ""
 "Убедитесь, что это значение содержит не более %(limit_value)d символов "
 "(сейчас %(show_value)d)."
+msgstr[3] ""
+"Убедитесь, что это значение содержит не более %(limit_value)d символов "
+"(сейчас %(show_value)d)."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Убедитесь, что вы ввели не более %(max)s цифры."
+msgstr[1] "Убедитесь, что вы ввели не более %(max)s цифр."
+msgstr[2] "Убедитесь, что вы ввели не более %(max)s цифр."
+msgstr[3] "Убедитесь, что вы ввели не более %(max)s цифр."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Убедитесь, что вы ввели не более %(max)s цифры после запятой."
+msgstr[1] "Убедитесь, что вы ввели не более %(max)s цифр после запятой."
+msgstr[2] "Убедитесь, что вы ввели не более %(max)s цифр после запятой."
+msgstr[3] "Убедитесь, что вы ввели не более %(max)s цифр после запятой."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "Убедитесь, что вы ввели не более %(max)s цифры перед запятой."
+msgstr[1] "Убедитесь, что вы ввели не более %(max)s цифр перед запятой."
+msgstr[2] "Убедитесь, что вы ввели не более %(max)s цифр перед запятой."
+msgstr[3] "Убедитесь, что вы ввели не более %(max)s цифр перед запятой."
 
 msgid "and"
 msgstr "и"
@@ -412,6 +463,9 @@ msgstr "Целое"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr "Значение '%(value)s' должно быть целым числом."
+
+msgid "Big (8 byte) integer"
+msgstr "Длинное целое (8 байт)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -496,9 +550,6 @@ msgstr "Значение '%(value)s' должно быть числом с пл�
 msgid "Floating point number"
 msgstr "Число с плавающей запятой"
 
-msgid "Big (8 byte) integer"
-msgstr "Длинное целое (8 байт)"
-
 msgid "IPv4 address"
 msgstr "IPv4 адрес"
 
@@ -575,8 +626,22 @@ msgstr "Внешний Ключ (тип определен по связанно
 msgid "One-to-one relationship"
 msgstr "Связь \"один к одному\""
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "Связь %(from)s-%(to)s"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "Связьи %(from)s-%(to)s"
+
 msgid "Many-to-many relationship"
 msgstr "Связь \"многие ко многим\""
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "Обязательное поле."
@@ -586,29 +651,6 @@ msgstr "Введите целое число."
 
 msgid "Enter a number."
 msgstr "Введите число."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Убедитесь, что вы ввели не более %(max)s цифры."
-msgstr[1] "Убедитесь, что вы ввели не более %(max)s цифр."
-msgstr[2] "Убедитесь, что вы ввели не более %(max)s цифр."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Убедитесь, что вы ввели не более %(max)s цифры после запятой."
-msgstr[1] "Убедитесь, что вы ввели не более %(max)s цифр после запятой."
-msgstr[2] "Убедитесь, что вы ввели не более %(max)s цифр после запятой."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "Убедитесь, что вы ввели не более %(max)s цифры перед запятой."
-msgstr[1] "Убедитесь, что вы ввели не более %(max)s цифр перед запятой."
-msgstr[2] "Убедитесь, что вы ввели не более %(max)s цифр перед запятой."
 
 msgid "Enter a valid date."
 msgstr "Введите правильную дату."
@@ -642,6 +684,9 @@ msgstr[1] ""
 "Убедитесь, что это имя файла содержит не более %(max)d символов (сейчас "
 "%(length)d)."
 msgstr[2] ""
+"Убедитесь, что это имя файла содержит не более %(max)d символов (сейчас "
+"%(length)d)."
+msgstr[3] ""
 "Убедитесь, что это имя файла содержит не более %(max)d символов (сейчас "
 "%(length)d)."
 
@@ -678,12 +723,6 @@ msgstr ":"
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Скрытое поле %(name)s) %(error)s"
 
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
-
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "Данные управляющей формы отсутствуют или были повреждены"
 
@@ -693,6 +732,7 @@ msgid_plural "Please submit %d or fewer forms."
 msgstr[0] "Пожалуйста, заполните не более %d формы."
 msgstr[1] "Пожалуйста, заполните не более %d форм."
 msgstr[2] "Пожалуйста, заполните не более %d форм."
+msgstr[3] "Пожалуйста, заполните не более %d форм."
 
 #, python-format
 msgid "Please submit %d or more forms."
@@ -700,6 +740,7 @@ msgid_plural "Please submit %d or more forms."
 msgstr[0] "Пожалуйста, отправьте как минимум %d форму."
 msgstr[1] "Пожалуйста, отправьте как минимум %d формы."
 msgstr[2] "Пожалуйста, отправьте как минимум %d форм."
+msgstr[3] "Пожалуйста, отправьте как минимум %d форм."
 
 msgid "Order"
 msgstr "Порядок"
@@ -774,6 +815,7 @@ msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d байт"
 msgstr[1] "%(size)d байта"
 msgstr[2] "%(size)d байт"
+msgstr[3] "%(size)d байт"
 
 #, python-format
 msgid "%s KB"
@@ -1044,6 +1086,7 @@ msgid_plural "%d years"
 msgstr[0] "%d год"
 msgstr[1] "%d года"
 msgstr[2] "%d лет"
+msgstr[3] "%d лет"
 
 #, python-format
 msgid "%d month"
@@ -1051,6 +1094,7 @@ msgid_plural "%d months"
 msgstr[0] "%d месяц"
 msgstr[1] "%d месяца"
 msgstr[2] "%d месяцев"
+msgstr[3] "%d месяцев"
 
 #, python-format
 msgid "%d week"
@@ -1058,6 +1102,7 @@ msgid_plural "%d weeks"
 msgstr[0] "%d неделя"
 msgstr[1] "%d недели"
 msgstr[2] "%d недель"
+msgstr[3] "%d недель"
 
 #, python-format
 msgid "%d day"
@@ -1065,6 +1110,7 @@ msgid_plural "%d days"
 msgstr[0] "%d день"
 msgstr[1] "%d дня"
 msgstr[2] "%d дней"
+msgstr[3] "%d дней"
 
 #, python-format
 msgid "%d hour"
@@ -1072,6 +1118,7 @@ msgid_plural "%d hours"
 msgstr[0] "%d час"
 msgstr[1] "%d часа"
 msgstr[2] "%d часов"
+msgstr[3] "%d часов"
 
 #, python-format
 msgid "%d minute"
@@ -1079,6 +1126,7 @@ msgid_plural "%d minutes"
 msgstr[0] "%d минута"
 msgstr[1] "%d минуты"
 msgstr[2] "%d минут"
+msgstr[3] "%d минут"
 
 msgid "0 minutes"
 msgstr "0 минут"
@@ -1158,7 +1206,7 @@ msgid ""
 "your Django settings file and you haven't configured any URLs. Get to work!"
 msgstr ""
 "Вы видите это сообщение, потому что в файле ваших настроек Django есть "
-"строчка <code>DEBUG = True</code> и вы не сконфигурировали на одного URL. За "
+"строчка <code>DEBUG = True</code> и вы не сконфигурировали ни одного URL. За "
 "работу!"
 
 msgid "No year specified"

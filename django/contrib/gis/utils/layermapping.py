@@ -15,11 +15,11 @@ from django.contrib.gis.gdal import (
     SpatialReference,
 )
 from django.contrib.gis.gdal.field import (
-    OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime,
+    OFTDate, OFTDateTime, OFTInteger, OFTInteger64, OFTReal, OFTString,
+    OFTTime,
 )
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import connections, models, router, transaction
-from django.utils import six
 from django.utils.encoding import force_text
 
 
@@ -44,7 +44,7 @@ class MissingForeignKey(LayerMapError):
     pass
 
 
-class LayerMapping(object):
+class LayerMapping:
     "A class that maps OGR Layers to GeoDjango Models."
 
     # Acceptable 'base' types for a multi-geometry type.
@@ -60,6 +60,7 @@ class LayerMapping(object):
     # counterparts.
     FIELD_TYPES = {
         models.AutoField: OFTInteger,
+        models.BigAutoField: OFTInteger64,
         models.IntegerField: (OFTInteger, OFTReal, OFTString),
         models.FloatField: (OFTInteger, OFTReal),
         models.DateField: OFTDate,
@@ -87,7 +88,7 @@ class LayerMapping(object):
         argument usage.
         """
         # Getting the DataSource and the associated Layer.
-        if isinstance(data, six.string_types):
+        if isinstance(data, str):
             self.ds = DataSource(data, encoding=encoding)
         else:
             self.ds = data
@@ -264,7 +265,7 @@ class LayerMapping(object):
             sr = source_srs
         elif isinstance(source_srs, self.spatial_backend.spatial_ref_sys()):
             sr = source_srs.srs
-        elif isinstance(source_srs, (int, six.string_types)):
+        elif isinstance(source_srs, (int, str)):
             sr = SpatialReference(source_srs)
         else:
             # Otherwise just pulling the SpatialReference from the layer
@@ -282,7 +283,7 @@ class LayerMapping(object):
             for attr in unique:
                 if attr not in self.mapping:
                     raise ValueError
-        elif isinstance(unique, six.string_types):
+        elif isinstance(unique, str):
             # Only a single field passed in.
             if unique not in self.mapping:
                 raise ValueError
@@ -329,7 +330,7 @@ class LayerMapping(object):
         will construct and return the uniqueness keyword arguments -- a subset
         of the feature kwargs.
         """
-        if isinstance(self.unique, six.string_types):
+        if isinstance(self.unique, str):
             return {self.unique: kwargs[self.unique]}
         else:
             return {fld: kwargs[fld] for fld in self.unique}
@@ -454,9 +455,10 @@ class LayerMapping(object):
 
             # Creating the CoordTransform object
             return CoordTransform(self.source_srs, target_srs)
-        except Exception as msg:
-            new_msg = 'Could not translate between the data source and model geometry: %s' % msg
-            six.reraise(LayerMapError, LayerMapError(new_msg), sys.exc_info()[2])
+        except Exception as exc:
+            raise LayerMapError(
+                'Could not translate between the data source and model geometry.'
+            ) from exc
 
     def geometry_field(self):
         "Returns the GeometryField instance associated with the geographic column."
@@ -619,7 +621,7 @@ class LayerMapping(object):
                 try:
                     num_feat, num_saved = _save(step_slice, num_feat, num_saved)
                     beg = end
-                except:  # Deliberately catch everything
+                except Exception:  # Deliberately catch everything
                     stream.write('%s\nFailed to save slice: %s\n' % ('=-' * 20, step_slice))
                     raise
         else:

@@ -1,9 +1,7 @@
 from django.db import models
-from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 
-@python_2_unicode_compatible
 class Site(models.Model):
     domain = models.CharField(max_length=100)
 
@@ -15,10 +13,10 @@ class Article(models.Model):
     """
     A simple Article model for testing
     """
-    site = models.ForeignKey(Site, related_name="admin_articles")
+    site = models.ForeignKey(Site, models.CASCADE, related_name="admin_articles")
     title = models.CharField(max_length=100)
-    title2 = models.CharField(max_length=100, verbose_name="another name")
-    created = models.DateTimeField()
+    hist = models.CharField(max_length=100, verbose_name=_("History"))
+    created = models.DateTimeField(null=True)
 
     def test_from_model(self):
         return "nothing"
@@ -28,13 +26,17 @@ class Article(models.Model):
     test_from_model_with_override.short_description = "not What you Expect"
 
 
-@python_2_unicode_compatible
+class ArticleProxy(Article):
+    class Meta:
+        proxy = True
+
+
 class Count(models.Model):
     num = models.PositiveSmallIntegerField()
-    parent = models.ForeignKey('self', null=True)
+    parent = models.ForeignKey('self', models.CASCADE, null=True)
 
     def __str__(self):
-        return six.text_type(self.num)
+        return str(self.num)
 
 
 class Event(models.Model):
@@ -42,11 +44,11 @@ class Event(models.Model):
 
 
 class Location(models.Model):
-    event = models.OneToOneField(Event, verbose_name='awesome event')
+    event = models.OneToOneField(Event, models.CASCADE, verbose_name='awesome event')
 
 
 class Guest(models.Model):
-    event = models.OneToOneField(Event)
+    event = models.OneToOneField(Event, models.CASCADE)
     name = models.CharField(max_length=255)
 
     class Meta:
@@ -54,7 +56,7 @@ class Guest(models.Model):
 
 
 class EventGuide(models.Model):
-    event = models.ForeignKey(Event, on_delete=models.DO_NOTHING)
+    event = models.ForeignKey(Event, models.DO_NOTHING)
 
 
 class Vehicle(models.Model):
@@ -62,7 +64,12 @@ class Vehicle(models.Model):
 
 
 class VehicleMixin(Vehicle):
-    vehicle = models.OneToOneField(Vehicle, parent_link=True, related_name='vehicle_%(app_label)s_%(class)s')
+    vehicle = models.OneToOneField(
+        Vehicle,
+        models.CASCADE,
+        parent_link=True,
+        related_name='vehicle_%(app_label)s_%(class)s',
+    )
 
     class Meta:
         abstract = True

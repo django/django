@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Western Frisian (http://www.transifex.com/projects/p/django/"
+"Language-Team: Western Frisian (http://www.transifex.com/django/django/"
 "language/fy/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -59,6 +59,9 @@ msgstr ""
 msgid "German"
 msgstr ""
 
+msgid "Lower Sorbian"
+msgstr ""
+
 msgid "Greek"
 msgstr ""
 
@@ -78,6 +81,9 @@ msgid "Spanish"
 msgstr ""
 
 msgid "Argentinian Spanish"
+msgstr ""
+
+msgid "Colombian Spanish"
 msgstr ""
 
 msgid "Mexican Spanish"
@@ -110,6 +116,9 @@ msgstr ""
 msgid "Irish"
 msgstr ""
 
+msgid "Scottish Gaelic"
+msgstr ""
+
 msgid "Galician"
 msgstr ""
 
@@ -120,6 +129,9 @@ msgid "Hindi"
 msgstr ""
 
 msgid "Croatian"
+msgstr ""
+
+msgid "Upper Sorbian"
 msgstr ""
 
 msgid "Hungarian"
@@ -182,7 +194,7 @@ msgstr ""
 msgid "Burmese"
 msgstr ""
 
-msgid "Norwegian Bokmal"
+msgid "Norwegian Bokmål"
 msgstr ""
 
 msgid "Nepali"
@@ -281,9 +293,6 @@ msgstr ""
 msgid "Syndication"
 msgstr ""
 
-msgid "Web Design"
-msgstr ""
-
 msgid "Enter a valid value."
 msgstr "Jou in falide wearde."
 
@@ -301,6 +310,11 @@ msgid ""
 msgstr ""
 "Jou in falida 'slug' gearsteld mei letters, nûmers, ûnderstreekjes of "
 "koppelteken."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
 
 msgid "Enter a valid IPv4 address."
 msgstr "Jou in falide IPv4-adres."
@@ -346,6 +360,26 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "and"
 msgstr ""
 
@@ -383,6 +417,9 @@ msgstr ""
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
+msgstr ""
+
+msgid "Big (8 byte) integer"
 msgstr ""
 
 #, python-format
@@ -458,9 +495,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr ""
 
-msgid "Big (8 byte) integer"
-msgstr ""
-
 msgid "IPv4 address"
 msgstr ""
 
@@ -531,7 +565,21 @@ msgstr ""
 msgid "One-to-one relationship"
 msgstr ""
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
 msgid "Many-to-many relationship"
+msgstr ""
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
 msgstr ""
 
 msgid "This field is required."
@@ -542,26 +590,6 @@ msgstr "Jou in folslein nûmer."
 
 msgid "Enter a number."
 msgstr "Jou in nûmer."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-msgstr[1] ""
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-msgstr[1] ""
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-msgstr[1] ""
 
 msgid "Enter a valid date."
 msgstr "Jou in falide datum."
@@ -623,12 +651,6 @@ msgstr ""
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
 msgstr ""
 
 msgid "ManagementForm data is missing or has been tampered with"

@@ -4,6 +4,7 @@
 # Federico Capoano <federico.capoano@teletu.it>, 2011
 # Flavio Curella <flavio.curella@gmail.com>, 2013-2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Luciano De Falco Alfano, 2016
 # Marco Bonetti, 2014
 # palmux <palmux@gmail.com>, 2015
 # Mattia Procopio <promat85@gmail.com>, 2015
@@ -12,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-29 16:14+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-18 09:50+0000\n"
 "Last-Translator: palmux <palmux@gmail.com>\n"
-"Language-Team: Italian (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -46,6 +47,12 @@ msgstr "Modifica la password: %s"
 msgid "Authentication and Authorization"
 msgstr "Autenticazione e Autorizzazione "
 
+msgid "password"
+msgstr "password"
+
+msgid "last login"
+msgstr "ultimo accesso"
+
 msgid "No password set."
 msgstr "Nessuna password impostata."
 
@@ -61,17 +68,17 @@ msgstr "Password"
 msgid "Password confirmation"
 msgstr "Conferma password"
 
-msgid "Enter the same password as above, for verification."
+msgid "Enter the same password as before, for verification."
 msgstr "Inserisci la stessa password inserita sopra, come verifica."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
-"Le password originarie non vengono conservate, quindi non c'è modo di vedere "
-"la password di questo utente, ma è possibile modificarla usando <a href="
-"\"password/\">questo modulo</a>."
+"Le password inserite non vengono conservate, quindi non c'è modo di vedere "
+"la password di questo utente, ma è possibile modificarla usando <a href=\"../"
+"password/\">questo modulo</a>."
 
 #, python-format
 msgid ""
@@ -115,6 +122,21 @@ msgstr "salt"
 msgid "hash"
 msgstr "hash"
 
+msgid "variety"
+msgstr "varietà"
+
+msgid "version"
+msgstr "versione"
+
+msgid "memory cost"
+msgstr "impegno di memoria"
+
+msgid "time cost"
+msgstr "impiego di tempo"
+
+msgid "parallelism"
+msgstr "parallelismo"
+
 msgid "work factor"
 msgstr "work factor"
 
@@ -123,6 +145,9 @@ msgstr "checksum"
 
 msgid "name"
 msgstr "nome"
+
+msgid "content type"
+msgstr "content type"
 
 msgid "codename"
 msgstr "nome in codice"
@@ -138,12 +163,6 @@ msgstr "gruppo"
 
 msgid "groups"
 msgstr "gruppi"
-
-msgid "password"
-msgstr "password"
-
-msgid "last login"
-msgstr "ultimo accesso"
 
 msgid "superuser status"
 msgstr "privilegi di superutente"
@@ -171,15 +190,8 @@ msgstr "Permessi specifici per questo utente."
 msgid "username"
 msgstr "nome utente"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Obbligatorio. 30 caratteri o meno. Solo lettere, cifre e @/./+/-/_ ."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Inserisci un nome utente valido. Questo campo può contenere solamente "
-"lettere, numeri e i caratteri @/./+/-/_"
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Obbligatorio. 150 caratteri o meno.Solo lettere, cifre e @/./+/-/_"
 
 msgid "A user with that username already exists."
 msgstr "Un utente con questo nome è già presente."
@@ -219,8 +231,63 @@ msgid "users"
 msgstr "utenti"
 
 #, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Questa password è troppo corta. Deve contenere almeno %(min_length)d "
+"carattere."
+msgstr[1] ""
+"Questa password è troppo corta. Deve contenere almeno %(min_length)d "
+"caratteri."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "La tua password deve contenere almeno %(min_length)d carattere."
+msgstr[1] "La tua password deve contenere almeno %(min_length)d caratteri."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "La password è troppo simile a %(verbose_name)s."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+"La tua password non può essere troppo simile alle altre tue informazioni "
+"personali."
+
+msgid "This password is too common."
+msgstr "Questa password è troppo comune."
+
+msgid "Your password can't be a commonly used password."
+msgstr "La tua password non può essere una password comunemente usata."
+
+msgid "This password is entirely numeric."
+msgstr "Questa password è interamente numerica."
+
+msgid "Your password can't be entirely numeric."
+msgstr "La tua password non può essere interamente numerica."
+
+#, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Password reset su %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Immetti un nome utente valido. Questo campo può contenere solo lettere "
+"dell'alfabeto inglese, numeri e caratteri @/./+/-/_ ."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Immetti un nome utente valido. Questo campo può contenere solo lettere "
+"dell'alfabeto inglese, numeri e caratteri @/./+/-/_ ."
 
 msgid "Logged out"
 msgstr "Accesso annullato"

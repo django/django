@@ -12,6 +12,15 @@ Django Core Exceptions
 
 Django core exception classes are defined in ``django.core.exceptions``.
 
+``AppRegistryNotReady``
+-----------------------
+
+.. exception:: AppRegistryNotReady
+
+    This exception is raised when attempting to use models before the :ref:`app
+    loading process <app-loading-process>`, which initializes the ORM, is
+    complete.
+
 ``ObjectDoesNotExist``
 ----------------------
 
@@ -24,6 +33,19 @@ Django core exception classes are defined in ``django.core.exceptions``.
     See :meth:`~django.db.models.query.QuerySet.get()` for further information
     on :exc:`ObjectDoesNotExist` and :exc:`~django.db.models.Model.DoesNotExist`.
 
+``EmptyResultSet``
+------------------
+
+.. exception:: EmptyResultSet
+
+    ``EmptyResultSet`` may be raised during query generation if a query won't
+    return any results. Most Django projects won't encounter this exception,
+    but it might be useful for implementing custom lookups and expressions.
+
+    .. versionchanged:: 1.11
+
+        In older versions, it's only importable from ``django.db.models.sql``.
+
 ``FieldDoesNotExist``
 ---------------------
 
@@ -32,11 +54,6 @@ Django core exception classes are defined in ``django.core.exceptions``.
     The ``FieldDoesNotExist`` exception is raised by a model's
     ``_meta.get_field()`` method when the requested field does not exist on the
     model or on the model's parents.
-
-    .. versionchanged:: 1.8
-
-        This exception was previously defined only in
-        ``django.db.models.fields`` and wasn't part of the public API.
 
 ``MultipleObjectsReturned``
 ---------------------------
@@ -66,9 +83,11 @@ Django core exception classes are defined in ``django.core.exceptions``.
     * ``DisallowedModelAdminToField``
     * ``DisallowedRedirect``
     * ``InvalidSessionKey``
+    * ``RequestDataTooBig``
     * ``SuspiciousFileOperation``
     * ``SuspiciousMultipartForm``
     * ``SuspiciousSession``
+    * ``TooManyFieldsSent``
 
     If a ``SuspiciousOperation`` exception reaches the WSGI handler level it is
     logged at the ``Error`` level and results in
@@ -89,7 +108,7 @@ Django core exception classes are defined in ``django.core.exceptions``.
 .. exception:: ViewDoesNotExist
 
     The :exc:`ViewDoesNotExist` exception is raised by
-    :mod:`django.core.urlresolvers` when a requested view does not exist.
+    :mod:`django.urls` when a requested view does not exist.
 
 ``MiddlewareNotUsed``
 ---------------------
@@ -147,12 +166,12 @@ or model are classified as ``NON_FIELD_ERRORS``. This constant is used
 as a key in dictionaries that otherwise map fields to their respective
 list of errors.
 
-.. currentmodule:: django.core.urlresolvers
+.. currentmodule:: django.urls
 
 URL Resolver exceptions
 =======================
 
-URL Resolver exceptions are defined in ``django.core.urlresolvers``.
+URL Resolver exceptions are defined in ``django.urls``.
 
 ``Resolver404``
 ---------------
@@ -160,18 +179,17 @@ URL Resolver exceptions are defined in ``django.core.urlresolvers``.
 .. exception:: Resolver404
 
     The :exc:`Resolver404` exception is raised by
-    :func:`django.core.urlresolvers.resolve()` if the path passed to
-    ``resolve()`` doesn't map to a view. It's a subclass of
-    :class:`django.http.Http404`.
+    :func:`~django.urls.resolve()` if the path passed to ``resolve()`` doesn't
+    map to a view. It's a subclass of :class:`django.http.Http404`.
 
 ``NoReverseMatch``
 ------------------
 
 .. exception:: NoReverseMatch
 
-    The :exc:`NoReverseMatch` exception is raised by
-    :mod:`django.core.urlresolvers` when a matching URL in your URLconf
-    cannot be identified based on the parameters supplied.
+    The :exc:`NoReverseMatch` exception is raised by :mod:`django.urls` when a
+    matching URL in your URLconf cannot be identified based on the parameters
+    supplied.
 
 .. currentmodule:: django.db
 
@@ -199,9 +217,7 @@ Specification v2.0, for further information.
 
 As per :pep:`3134`, a ``__cause__`` attribute is set with the original
 (underlying) database exception, allowing access to any additional
-information provided. (Note that this attribute is available under
-both Python 2 and Python 3, although :pep:`3134` normally only applies
-to Python 3.)
+information provided.
 
 .. exception:: models.ProtectedError
 
@@ -249,8 +265,6 @@ Exceptions provided by the ``django.test`` package.
 ----------------------
 
 .. exception:: client.RedirectCycleError
-
-    .. versionadded:: 1.8
 
     :exc:`~client.RedirectCycleError` is raised when the test client detects a
     loop or an overly long chain of redirects.

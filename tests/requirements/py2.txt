@@ -1,3 +1,0 @@
--r base.txt
-python-memcached
-mock

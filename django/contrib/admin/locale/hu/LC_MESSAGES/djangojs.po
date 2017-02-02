@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# András Veres-Szentkirályi, 2016
 # Attila Nagy <>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # János Péter Ronkay <transifex2@hangya.net>, 2011
@@ -10,11 +11,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Hungarian (http://www.transifex.com/projects/p/django/"
-"language/hu/)\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-19 07:42+0000\n"
+"Last-Translator: András Veres-Szentkirályi\n"
+"Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
+"hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -104,20 +105,20 @@ msgstr ""
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Megjegyzés: %s órával a szerveridő előtt jársz"
+msgstr[1] "Megjegyzés: %s órával a szerveridő előtt jársz"
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Megjegyzés: %s órával a szerveridő mögött jársz"
+msgstr[1] "Megjegyzés: %s órával a szerveridő mögött jársz"
 
 msgid "Now"
 msgstr "Most"
 
-msgid "Clock"
-msgstr "Óra"
+msgid "Choose a Time"
+msgstr "Válassza ki az időt"
 
 msgid "Choose a time"
 msgstr "Válassza ki az időt"
@@ -131,14 +132,17 @@ msgstr "Reggel 6 óra"
 msgid "Noon"
 msgstr "Dél"
 
+msgid "6 p.m."
+msgstr "Este 6 óra"
+
 msgid "Cancel"
 msgstr "Mégsem"
 
 msgid "Today"
 msgstr "Ma"
 
-msgid "Calendar"
-msgstr "Naptár"
+msgid "Choose a Date"
+msgstr "Válassza ki a dátumot"
 
 msgid "Yesterday"
 msgstr "Tegnap"
@@ -146,15 +150,69 @@ msgstr "Tegnap"
 msgid "Tomorrow"
 msgstr "Holnap"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"január február március április május június július augusztus szeptember "
-"október november december"
+msgid "January"
+msgstr "január"
 
-msgid "S M T W T F S"
-msgstr "V H K Sz Cs P Szo"
+msgid "February"
+msgstr "február"
+
+msgid "March"
+msgstr "március"
+
+msgid "April"
+msgstr "április"
+
+msgid "May"
+msgstr "május"
+
+msgid "June"
+msgstr "június"
+
+msgid "July"
+msgstr "július"
+
+msgid "August"
+msgstr "augusztus"
+
+msgid "September"
+msgstr "szeptember"
+
+msgid "October"
+msgstr "október"
+
+msgid "November"
+msgstr "november"
+
+msgid "December"
+msgstr "december"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "V"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "H"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "K"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "S"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "C"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "P"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "S"
 
 msgid "Show"
 msgstr "Mutat"

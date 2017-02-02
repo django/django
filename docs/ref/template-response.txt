@@ -1,6 +1,6 @@
-===========================================
-TemplateResponse and SimpleTemplateResponse
-===========================================
+===================================================
+``TemplateResponse`` and ``SimpleTemplateResponse``
+===================================================
 
 .. module:: django.template.response
    :synopsis: Classes dealing with lazy-rendered HTTP responses.
@@ -21,8 +21,8 @@ the details of the template and context that was provided by the view to
 compute the response. The final output of the response is not computed until
 it is needed, later in the response process.
 
-SimpleTemplateResponse objects
-==============================
+``SimpleTemplateResponse`` objects
+==================================
 
 .. class:: SimpleTemplateResponse()
 
@@ -38,20 +38,12 @@ Attributes
 
     Example: ``['foo.html', 'path/to/bar.html']``
 
-    .. deprecated:: 1.8
-
-        ``template_name`` used to accept a :class:`~django.template.Template`.
-
 .. attribute:: SimpleTemplateResponse.context_data
 
     The context data to be used when rendering the template. It must be a
     :class:`dict`.
 
     Example: ``{'foo': 123}``
-
-    .. deprecated:: 1.8
-
-        ``context_data`` used to accept a :class:`~django.template.Context`.
 
 .. attribute:: SimpleTemplateResponse.rendered_content
 
@@ -76,17 +68,9 @@ Methods
         :func:`~django.template.loader.get_template()`), the name of a template,
         or a list of template names.
 
-        .. deprecated:: 1.8
-
-            ``template`` used to accept a :class:`~django.template.Template`.
-
     ``context``
         A :class:`dict` of values to add to the template context. By default,
         this is an empty dictionary.
-
-        .. deprecated:: 1.8
-
-            ``context`` used to accept a :class:`~django.template.Context`.
 
     ``content_type``
         The value included in the HTTP ``Content-Type`` header, including the
@@ -106,10 +90,6 @@ Methods
         The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
         loading the template.
 
-    .. versionchanged:: 1.8
-
-        The ``charset`` and ``using`` parameters were added.
-
 .. method:: SimpleTemplateResponse.resolve_context(context)
 
     Preprocesses context data that will be used for rendering a template.
@@ -117,16 +97,6 @@ Methods
     :class:`dict`.
 
     Override this method in order to customize the context.
-
-    .. versionchanged:: 1.8
-
-        ``resolve_context`` returns a :class:`dict`. It used to return a
-        :class:`~django.template.Context`.
-
-    .. deprecated:: 1.8
-
-        ``resolve_context`` no longer accepts a
-        :class:`~django.template.Context`.
 
 .. method:: SimpleTemplateResponse.resolve_template(template)
 
@@ -138,16 +108,6 @@ Methods
     Returns the backend-dependent template object instance to be rendered.
 
     Override this method in order to customize template loading.
-
-    .. versionchanged:: 1.8
-
-        ``resolve_template`` returns backend-dependent template object. It
-        used to return a :class:`~django.template.Template`.
-
-    .. deprecated:: 1.8
-
-        ``resolve_template`` no longer accepts a
-        :class:`~django.template.Template`.
 
 .. method:: SimpleTemplateResponse.add_post_render_callback()
 
@@ -177,8 +137,8 @@ Methods
     subsequent calls, it will return the result obtained from the first call.
 
 
-TemplateResponse objects
-========================
+``TemplateResponse`` objects
+============================
 
 .. class:: TemplateResponse()
 
@@ -189,7 +149,7 @@ TemplateResponse objects
 Methods
 -------
 
-.. method:: TemplateResponse.__init__(request, template, context=None, content_type=None, status=None, current_app=None, charset=None, using=None)
+.. method:: TemplateResponse.__init__(request, template, context=None, content_type=None, status=None, charset=None, using=None)
 
     Instantiates a :class:`~django.template.response.TemplateResponse` object
     with the given request, template, context, content type, HTTP status, and
@@ -203,17 +163,9 @@ Methods
         :func:`~django.template.loader.get_template()`), the name of a template,
         or a list of template names.
 
-        .. deprecated:: 1.8
-
-            ``template`` used to accept a :class:`~django.template.Template`.
-
     ``context``
         A :class:`dict` of values to add to the template context. By default,
         this is an empty dictionary.
-
-        .. deprecated:: 1.8
-
-            ``context`` used to accept a :class:`~django.template.Context`.
 
     ``content_type``
         The value included in the HTTP ``Content-Type`` header, including the
@@ -224,16 +176,6 @@ Methods
     ``status``
         The HTTP status code for the response.
 
-    ``current_app``
-        A hint indicating which application contains the current view. See the
-        :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`
-        for more information.
-
-        .. deprecated:: 1.8
-
-           The ``current_app`` argument is deprecated. Instead you should set
-           ``request.current_app``.
-
     ``charset``
         The charset in which the response will be encoded. If not given it will
         be extracted from ``content_type``, and if that is unsuccessful, the
@@ -242,10 +184,6 @@ Methods
     ``using``
         The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
         loading the template.
-
-    .. versionchanged:: 1.8
-
-        The ``charset`` and ``using`` parameters were added.
 
 The rendering process
 =====================
@@ -303,7 +241,7 @@ rendered response.
 
 If you're using middleware, the solution is easy. Middleware provides
 multiple opportunities to process a response on exit from a view. If
-you put behavior in the Response middleware is guaranteed to execute
+you put behavior in the response middleware, it's guaranteed to execute
 after template rendering has taken place.
 
 However, if you're using a decorator, the same opportunities do not
@@ -340,13 +278,12 @@ has been rendered, and will be provided the fully rendered
 If the template has already been rendered, the callback will be
 invoked immediately.
 
-Using TemplateResponse and SimpleTemplateResponse
-=================================================
+Using ``TemplateResponse`` and ``SimpleTemplateResponse``
+=========================================================
 
 A :class:`TemplateResponse` object can be used anywhere that a normal
 :class:`django.http.HttpResponse` can be used. It can also be used as an
-alternative to calling :func:`~django.shortcuts.render()` or
-:func:`~django.shortcuts.render_to_response()`.
+alternative to calling :func:`~django.shortcuts.render()`.
 
 For example, the following simple view returns a :class:`TemplateResponse`
 with a simple template and a context containing a queryset::

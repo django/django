@@ -40,9 +40,9 @@ algorithm the system follows to determine which Python code to execute:
 
 1. Django determines the root URLconf module to use. Ordinarily,
    this is the value of the :setting:`ROOT_URLCONF` setting, but if the incoming
-   ``HttpRequest`` object has an attribute called ``urlconf`` (set by
-   middleware :ref:`request processing <request-middleware>`), its value
-   will be used in place of the :setting:`ROOT_URLCONF` setting.
+   ``HttpRequest`` object has a :attr:`~django.http.HttpRequest.urlconf`
+   attribute (set by middleware), its value will be used in place of the
+   :setting:`ROOT_URLCONF` setting.
 
 2. Django loads that Python module and looks for the variable
    ``urlpatterns``. This should be a Python list of :func:`django.conf.urls.url`
@@ -52,7 +52,7 @@ algorithm the system follows to determine which Python code to execute:
    one that matches the requested URL.
 
 4. Once one of the regexes matches, Django imports and calls the given view,
-   which is a simple Python function (or a :doc:`class based view
+   which is a simple Python function (or a :doc:`class-based view
    </topics/class-based-views/index>`). The view gets passed the following
    arguments:
 
@@ -179,10 +179,10 @@ What the URLconf searches against
 The URLconf searches against the requested URL, as a normal Python string. This
 does not include GET or POST parameters, or the domain name.
 
-For example, in a request to ``http://www.example.com/myapp/``, the URLconf
+For example, in a request to ``https://www.example.com/myapp/``, the URLconf
 will look for ``myapp/``.
 
-In a request to ``http://www.example.com/myapp/?page=3``, the URLconf will look
+In a request to ``https://www.example.com/myapp/?page=3``, the URLconf will look
 for ``myapp/``.
 
 The URLconf doesn't look at the request method. In other words, all request
@@ -234,8 +234,8 @@ Performance
 Each regular expression in a ``urlpatterns`` is compiled the first time it's
 accessed. This makes the system blazingly fast.
 
-Syntax of the urlpatterns variable
-==================================
+Syntax of the ``urlpatterns`` variable
+======================================
 
 ``urlpatterns`` should be a Python list of :func:`~django.conf.urls.url`
 instances.
@@ -274,7 +274,7 @@ Including other URLconfs
 At any point, your ``urlpatterns`` can "include" other URLconf modules. This
 essentially "roots" a set of URLs below other ones.
 
-For example, here's an excerpt of the URLconf for the `Django Web site`_
+For example, here's an excerpt of the URLconf for the `Django website`_
 itself. It includes a number of other URLconfs::
 
     from django.conf.urls import include, url
@@ -343,7 +343,7 @@ the suffixes that differ::
         ])),
     ]
 
-.. _`Django Web site`: https://www.djangoproject.com/
+.. _`Django website`: https://www.djangoproject.com/
 
 Captured parameters
 -------------------
@@ -533,8 +533,7 @@ layers where URLs are needed:
 
 * In templates: Using the :ttag:`url` template tag.
 
-* In Python code: Using the :func:`django.core.urlresolvers.reverse`
-  function.
+* In Python code: Using the :func:`~django.urls.reverse` function.
 
 * In higher level code related to handling of URLs of Django model instances:
   The :meth:`~django.db.models.Model.get_absolute_url` method.
@@ -571,7 +570,7 @@ You can obtain these in template code by using:
 
 Or in Python code::
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.http import HttpResponseRedirect
 
     def redirect_to_year(request):
@@ -627,7 +626,7 @@ way to tell these named URLs apart.
 Django applications that make proper use of URL namespacing can be deployed more
 than once for a particular site. For example :mod:`django.contrib.admin` has an
 :class:`~django.contrib.admin.AdminSite` class which allows you to easily
-:ref:`deploy more than once instance of the admin <multiple-admin-sites>`.
+:ref:`deploy more than one instance of the admin <multiple-admin-sites>`.
 In a later example, we'll discuss the idea of deploying the polls application
 from the tutorial in two different locations so we can serve the same
 functionality to two different audiences (authors and publishers).
@@ -669,21 +668,16 @@ the fully qualified name into parts and then tries the following lookup:
    example, ``'polls'``). This will yield a list of instances of that
    application.
 
-2. If there is a *current* application defined, Django finds and returns
-   the URL resolver for that instance. The *current* application can be
-   specified as an attribute on the request. Applications that expect to
-   have multiple deployments should set the ``current_app`` attribute on
-   the ``request`` being processed.
+2. If there is a current application defined, Django finds and returns the URL
+   resolver for that instance. The current application can be specified with
+   the ``current_app`` argument to the :func:`~django.urls.reverse()`
+   function.
 
-   .. versionchanged:: 1.8
-
-      In previous versions of Django, you had to set the ``current_app``
-      attribute on any :class:`~django.template.Context` or
-      :class:`~django.template.RequestContext` that is used to render a
-      template.
-
-   The current application can also be specified manually as an argument
-   to the :func:`~django.core.urlresolvers.reverse` function.
+   The :ttag:`url` template tag uses the namespace of the currently resolved
+   view as the current application in a
+   :class:`~django.template.RequestContext`. You can override this default by
+   setting the current application on the :attr:`request.current_app
+   <django.http.HttpRequest.current_app>` attribute.
 
 3. If there is no current application. Django looks for a default
    application instance. The default application instance is the instance
@@ -716,8 +710,8 @@ displaying polls.
     from django.conf.urls import include, url
 
     urlpatterns = [
-        url(r'^author-polls/', include('polls.urls', namespace='author-polls', app_name='polls')),
-        url(r'^publisher-polls/', include('polls.urls', namespace='publisher-polls', app_name='polls')),
+        url(r'^author-polls/', include('polls.urls', namespace='author-polls')),
+        url(r'^publisher-polls/', include('polls.urls', namespace='publisher-polls')),
     ]
 
 .. snippet::
@@ -727,6 +721,7 @@ displaying polls.
 
     from . import views
 
+    app_name = 'polls'
     urlpatterns = [
         url(r'^$', views.IndexView.as_view(), name='index'),
         url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
@@ -750,13 +745,6 @@ Using this setup, the following lookups are possible:
 
     {% url 'polls:index' %}
 
-  Note that reversing in the template requires the ``current_app`` be added as
-  an attribute to the ``request`` like this::
-
-    def render_to_response(self, context, **response_kwargs):
-        self.request.current_app = self.request.resolver_match.namespace
-        return super(DetailView, self).render_to_response(context, **response_kwargs)
-
 * If there is no current instance - say, if we were rendering a page
   somewhere else on the site - ``'polls:index'`` will resolve to the last
   registered instance of ``polls``. Since there is no default instance
@@ -778,25 +766,44 @@ declared last in ``urlpatterns``.
 URL namespaces and included URLconfs
 ------------------------------------
 
-URL namespaces of included URLconfs can be specified in two ways.
+Application namespaces of included URLconfs can be specified in two ways.
 
-Firstly, you can provide the :term:`application <application namespace>` and
-:term:`instance <instance namespace>` namespaces as arguments to
-:func:`~django.conf.urls.include()` when you construct your URL patterns. For
-example,::
+Firstly, you can set an ``app_name`` attribute in the included URLconf module,
+at the same level as the ``urlpatterns`` attribute. You have to pass the actual
+module, or a string reference to the module, to
+:func:`~django.conf.urls.include`, not the list of ``urlpatterns`` itself.
 
-    url(r'^polls/', include('polls.urls', namespace='author-polls', app_name='polls')),
+.. snippet::
+    :filename: polls/urls.py
 
-This will include the URLs defined in ``polls.urls`` into the
-:term:`application namespace` ``'polls'``, with the :term:`instance namespace`
-``'author-polls'``.
+    from django.conf.urls import url
+
+    from . import views
+
+    app_name = 'polls'
+    urlpatterns = [
+        url(r'^$', views.IndexView.as_view(), name='index'),
+        url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
+        ...
+    ]
+
+.. snippet::
+    :filename: urls.py
+
+    from django.conf.urls import include, url
+
+    urlpatterns = [
+        url(r'^polls/', include('polls.urls')),
+    ]
+
+The URLs defined in ``polls.urls`` will have an application namespace ``polls``.
 
 Secondly, you can include an object that contains embedded namespace data. If
 you ``include()`` a list of :func:`~django.conf.urls.url` instances,
 the URLs contained in that object will be added to the global namespace.
-However, you can also ``include()`` a 3-tuple containing::
+However, you can also ``include()`` a 2-tuple containing::
 
-    (<list of url() instances>, <application namespace>, <instance namespace>)
+    (<list of url() instances>, <application namespace>)
 
 For example::
 
@@ -804,25 +811,19 @@ For example::
 
     from . import views
 
-    polls_patterns = [
+    polls_patterns = ([
         url(r'^$', views.IndexView.as_view(), name='index'),
         url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
+    ], 'polls')
+
+    urlpatterns = [
+        url(r'^polls/', include(polls_patterns)),
     ]
 
-    url(r'^polls/', include((polls_patterns, 'polls', 'author-polls'))),
+This will include the nominated URL patterns into the given application
+namespace.
 
-This will include the nominated URL patterns into the given application and
-instance namespace.
-
-For example, the Django admin is deployed as instances of
-:class:`~django.contrib.admin.AdminSite`.  ``AdminSite`` objects have a ``urls``
-attribute: A 3-tuple that contains all the patterns in the corresponding admin
-site, plus the application namespace ``'admin'``, and the name of the admin
-instance. It is this ``urls`` attribute that you ``include()`` into your
-projects ``urlpatterns`` when you deploy an admin instance.
-
-Be sure to pass a tuple to ``include()``. If you simply pass three arguments:
-``include(polls_patterns, 'polls', 'author-polls')``, Django won't throw an
-error but due to the signature of ``include()``, ``'polls'`` will be the
-instance namespace and ``'author-polls'`` will be the application namespace
-instead of vice versa.
+The instance namespace can be specified using the ``namespace`` argument to
+:func:`~django.conf.urls.include`. If the instance namespace is not specified,
+it will default to the included URLconf's application namespace. This means
+it will also be the default instance for that namespace.

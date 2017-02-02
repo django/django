@@ -18,7 +18,7 @@ action; Django ships with a "delete selected objects" action available to all
 models. For example, here's the user module from Django's built-in
 :mod:`django.contrib.auth` app:
 
-.. image:: _images/user_actions.png
+.. image:: _images/admin-actions.png
 
 .. warning::
 
@@ -57,7 +57,7 @@ simple news application with an ``Article`` model::
         body = models.TextField()
         status = models.CharField(max_length=1, choices=STATUS_CHOICES)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.title
 
 A common task we might perform with a model like this is to update an
@@ -134,7 +134,7 @@ the action and its registration would look like::
 
 That code will give us an admin change list that looks something like this:
 
-.. image:: _images/article_actions.png
+.. image:: _images/adding-actions-to-the-modeladmin.png
 
 That's really all there is to it! If you're itching to write your own actions,
 you now know enough to get started. The rest of this document just covers more
@@ -202,7 +202,7 @@ that the action was successful::
 This make the action match what the admin itself does after successfully
 performing an action:
 
-.. image:: _images/article_actions_message.png
+.. image:: _images/actions-as-modeladmin-methods.png
 
 Actions that provide intermediate pages
 ---------------------------------------
@@ -257,7 +257,7 @@ Writing this view is left as an exercise to the reader.
 Making actions available site-wide
 ----------------------------------
 
-.. method:: AdminSite.add_action(action[, name])
+.. method:: AdminSite.add_action(action, name=None)
 
     Some actions are best if they're made available to *any* object in the admin
     site -- the export action defined above would be a good candidate. You can
@@ -351,7 +351,7 @@ Conditionally enabling or disabling actions
             ...
 
             def get_actions(self, request):
-                actions = super(MyModelAdmin, self).get_actions(request)
+                actions = super().get_actions(request)
                 if request.user.username[0].upper() != 'J':
                     if 'delete_selected' in actions:
                         del actions['delete_selected']

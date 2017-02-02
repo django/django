@@ -1,18 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Alex Gaynor <alex.gaynor@gmail.com>, 2011-2012
+# Alex Gaynor <inactive+Alex@transifex.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Meir Kriheli <mkriheli@gmail.com>, 2011-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-21 19:33+0000\n"
-"Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
-"Language-Team: Hebrew (http://www.transifex.com/projects/p/django/language/"
-"he/)\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -61,6 +60,9 @@ msgstr "דנית"
 msgid "German"
 msgstr "גרמנית"
 
+msgid "Lower Sorbian"
+msgstr ""
+
 msgid "Greek"
 msgstr "יוונית"
 
@@ -81,6 +83,9 @@ msgstr "ספרדית"
 
 msgid "Argentinian Spanish"
 msgstr "ספרדית ארגנטינית"
+
+msgid "Colombian Spanish"
+msgstr "ספרדית קולומביאנית"
 
 msgid "Mexican Spanish"
 msgstr "ספרדית מקסיקנית"
@@ -112,6 +117,9 @@ msgstr "פריזית"
 msgid "Irish"
 msgstr "אירית"
 
+msgid "Scottish Gaelic"
+msgstr "גאלית סקוטית"
+
 msgid "Galician"
 msgstr "גאליציאנית"
 
@@ -123,6 +131,9 @@ msgstr "הינדי"
 
 msgid "Croatian"
 msgstr "קרואטית"
+
+msgid "Upper Sorbian"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "הונגרית"
@@ -184,8 +195,8 @@ msgstr "מראטהי"
 msgid "Burmese"
 msgstr "בּוּרְמֶזִית"
 
-msgid "Norwegian Bokmal"
-msgstr "נורבגית ספרותית"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "נפאלית"
@@ -283,9 +294,6 @@ msgstr "קבצים סטטיים"
 msgid "Syndication"
 msgstr "הפצת תכנים"
 
-msgid "Web Design"
-msgstr "עיצוב אתרים"
-
 msgid "Enter a valid value."
 msgstr "יש להזין ערך חוקי."
 
@@ -301,6 +309,12 @@ msgstr "נא להזין כתובת דוא\"ל חוקית"
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "יש להזין ערך המכיל אותיות, ספרות, קווים תחתונים ומקפים בלבד."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"יש להזין 'slug' חוקי המכיל אותיות יוניקוד, ספרות, קווים תחתונים ומקפים בלבד."
 
 msgid "Enter a valid IPv4 address."
 msgstr "יש להזין כתובת IPv4 חוקית."
@@ -350,6 +364,26 @@ msgstr[0] ""
 msgstr[1] ""
 "נא לוודא שערך זה מכיל %(limit_value)d תווים לכל היותר (מכיל %(show_value)d)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "נא לוודא שאין יותר מספרה %(max)s בסה\"כ."
+msgstr[1] "נא לוודא שאין יותר מ־%(max)s ספרות בסה\"כ."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "נא לוודא שאין יותר מספרה %(max)s אחרי הנקודה."
+msgstr[1] "נא לוודא שאין יותר מ־%(max)s ספרות אחרי הנקודה."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] "נא לוודא שאין יותר מספרה %(max)s לפני הנקודה העשרונית"
+msgstr[1] "נא לוודא שאין יותר מ־%(max)s ספרות לפני הנקודה העשרונית"
+
 msgid "and"
 msgstr "ו"
 
@@ -389,6 +423,9 @@ msgstr "מספר שלם"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr "הערך '%(value)s' חייב להיות מספר שלם."
+
+msgid "Big (8 byte) integer"
+msgstr "מספר שלם גדול (8 בתים)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -470,9 +507,6 @@ msgstr "הערך '%(value)s' חייב להיות מספר עם נקודה צפה
 msgid "Floating point number"
 msgstr "מספר עשרוני"
 
-msgid "Big (8 byte) integer"
-msgstr "מספר שלם גדול (8 בתים)"
-
 msgid "IPv4 address"
 msgstr "כתובת IPv4"
 
@@ -545,8 +579,22 @@ msgstr "Foreign Key (הסוג נקבע לפי השדה המקושר)"
 msgid "One-to-one relationship"
 msgstr "יחס של אחד לאחד"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
 msgid "Many-to-many relationship"
 msgstr "יחס של רבים לרבים"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "יש להזין תוכן בשדה זה."
@@ -556,26 +604,6 @@ msgstr "נא להזין מספר שלם."
 
 msgid "Enter a number."
 msgstr "נא להזין מספר."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "נא לוודא שאין יותר מספרה %(max)s בסה\"כ."
-msgstr[1] "נא לוודא שאין יותר מ־%(max)s ספרות בסה\"כ."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "נא לוודא שאין יותר מספרה %(max)s אחרי הנקודה."
-msgstr[1] "נא לוודא שאין יותר מ־%(max)s ספרות אחרי הנקודה."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "נא לוודא שאין יותר מספרה %(max)s לפני הנקודה העשרונית"
-msgstr[1] "נא לוודא שאין יותר מ־%(max)s ספרות לפני הנקודה העשרונית"
 
 msgid "Enter a valid date."
 msgstr "יש להזין תאריך חוקי."
@@ -634,12 +662,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(שדה מוסתר %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "מידע ManagementForm חסר או התעסקו איתו."

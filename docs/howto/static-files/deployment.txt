@@ -74,7 +74,7 @@ type of web server -- faster but less full-featured. Some common choices are:
 * A stripped-down version of Apache_
 
 .. _Nginx: http://wiki.nginx.org/Main
-.. _Apache: http://httpd.apache.org/
+.. _Apache: https://httpd.apache.org/
 
 Configuring these servers is out of scope of this document; check each
 server's respective documentation for instructions.
@@ -95,7 +95,7 @@ Here's how this might look in a fabfile::
     from fabric.contrib import project
 
     # Where the static files get collected locally. Your STATIC_ROOT setting.
-    env.local_static_root = '/tmp/static'
+    env.local_static_root = '/path/to/static'
 
     # Where the static files should go remotely
     env.remote_static_root = '/home/www/static.example.com'
@@ -104,9 +104,9 @@ Here's how this might look in a fabfile::
     def deploy_static():
         local('./manage.py collectstatic')
         project.rsync_project(
-            remote_dir = env.remote_static_root,
-            local_dir = env.local_static_root,
-            delete = True
+            remote_dir=env.remote_static_root,
+            local_dir=env.local_static_root,
+            delete=True,
         )
 
 .. _staticfiles-from-cdn:
@@ -117,7 +117,7 @@ Serving static files from a cloud service or CDN
 Another common tactic is to serve static files from a cloud storage provider
 like Amazon's S3 and/or a CDN (content delivery network). This lets you
 ignore the problems of serving static files and can often make for
-faster-loading webpages (especially when using a CDN).
+faster-loading Web pages (especially when using a CDN).
 
 When using these services, the basic workflow would look a bit like the above,
 except that instead of using ``rsync`` to transfer your static files to the

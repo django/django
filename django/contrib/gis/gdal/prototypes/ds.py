@@ -6,10 +6,10 @@
 from ctypes import POINTER, c_char_p, c_double, c_int, c_long, c_void_p
 
 from django.contrib.gis.gdal.envelope import OGREnvelope
-from django.contrib.gis.gdal.libgdal import lgdal
+from django.contrib.gis.gdal.libgdal import GDAL_VERSION, lgdal
 from django.contrib.gis.gdal.prototypes.generation import (
-    const_string_output, double_output, geom_output, int_output, srs_output,
-    void_output, voidptr_output,
+    const_string_output, double_output, geom_output, int64_output, int_output,
+    srs_output, void_output, voidptr_output,
 )
 
 c_int_p = POINTER(c_int)  # shortcut type
@@ -42,7 +42,8 @@ reset_reading = void_output(lgdal.OGR_L_ResetReading, [c_void_p], errcheck=False
 test_capability = int_output(lgdal.OGR_L_TestCapability, [c_void_p, c_char_p])
 get_spatial_filter = geom_output(lgdal.OGR_L_GetSpatialFilter, [c_void_p])
 set_spatial_filter = void_output(lgdal.OGR_L_SetSpatialFilter, [c_void_p, c_void_p], errcheck=False)
-set_spatial_filter_rect = void_output(lgdal.OGR_L_SetSpatialFilterRect,
+set_spatial_filter_rect = void_output(
+    lgdal.OGR_L_SetSpatialFilterRect,
     [c_void_p, c_double, c_double, c_double, c_double], errcheck=False
 )
 
@@ -61,11 +62,14 @@ get_feat_geom_ref = geom_output(lgdal.OGR_F_GetGeometryRef, [c_void_p])
 get_feat_field_count = int_output(lgdal.OGR_F_GetFieldCount, [c_void_p])
 get_feat_field_defn = voidptr_output(lgdal.OGR_F_GetFieldDefnRef, [c_void_p, c_int])
 get_fid = int_output(lgdal.OGR_F_GetFID, [c_void_p])
-get_field_as_datetime = int_output(lgdal.OGR_F_GetFieldAsDateTime,
+get_field_as_datetime = int_output(
+    lgdal.OGR_F_GetFieldAsDateTime,
     [c_void_p, c_int, c_int_p, c_int_p, c_int_p, c_int_p, c_int_p, c_int_p]
 )
 get_field_as_double = double_output(lgdal.OGR_F_GetFieldAsDouble, [c_void_p, c_int])
 get_field_as_integer = int_output(lgdal.OGR_F_GetFieldAsInteger, [c_void_p, c_int])
+if GDAL_VERSION >= (2, 0):
+    get_field_as_integer64 = int64_output(lgdal.OGR_F_GetFieldAsInteger64, [c_void_p, c_int])
 get_field_as_string = const_string_output(lgdal.OGR_F_GetFieldAsString, [c_void_p, c_int])
 get_field_index = int_output(lgdal.OGR_F_GetFieldIndex, [c_void_p, c_char_p])
 

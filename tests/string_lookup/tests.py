@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.test import TestCase
 
 from .models import Article, Bar, Base, Child, Foo, Whiz
@@ -12,8 +9,8 @@ class StringLookupTests(TestCase):
         """
         Regression test for #1661 and #1662
 
-        Check that string form referencing of
-        models works, both as pre and post reference, on all RelatedField types.
+        String form referencing of models works, both as pre and post
+        reference, on all RelatedField types.
         """
 
         f1 = Foo(name="Foo1")
@@ -78,7 +75,6 @@ class StringLookupTests(TestCase):
         """
         a = Article(name='IP test', text='The body', submitted_from='192.0.2.100')
         a.save()
-        self.assertEqual(repr(Article.objects.filter(submitted_from__contains='192.0.2')),
-            repr([a]))
-        # Test that the searches do not match the subnet mask (/32 in this case)
+        self.assertSequenceEqual(Article.objects.filter(submitted_from__contains='192.0.2'), [a])
+        # The searches do not match the subnet mask (/32 in this case)
         self.assertEqual(Article.objects.filter(submitted_from__contains='32').count(), 0)

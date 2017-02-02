@@ -1,5 +1,11 @@
 {% extends "admin/base_site.html" %}
-{% load i18n l10n admin_urls %}
+{% load i18n l10n admin_urls static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ media }}
+    <script type="text/javascript" src="{% static 'admin/js/cancel.js' %}"></script>
+{% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation delete-selected-confirmation{% endblock %}
 
@@ -34,7 +40,7 @@
     {% for deletable_object in deletable_objects %}
         <ul>{{ deletable_object|unordered_list }}</ul>
     {% endfor %}
-    <form action="" method="post">{% csrf_token %}
+    <form method="post">{% csrf_token %}
     <div>
     {% for obj in queryset %}
     <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
@@ -42,7 +48,7 @@
     <input type="hidden" name="action" value="delete_selected" />
     <input type="hidden" name="post" value="yes" />
     <input type="submit" value="{% trans "Yes, I'm sure" %}" />
-    <a href="#" onclick="window.history.back(); return false;" class="button cancel-link">{% trans "No, take me back" %}</a>
+    <a href="#" class="button cancel-link">{% trans "No, take me back" %}</a>
     </div>
     </form>
 {% endif %}

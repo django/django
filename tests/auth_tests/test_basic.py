@@ -1,29 +1,17 @@
-from __future__ import unicode_literals
-
-from django.apps import apps
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user, get_user_model
 from django.contrib.auth.models import AnonymousUser, User
-from django.contrib.auth.tests.custom_user import CustomUser
 from django.core.exceptions import ImproperlyConfigured
-from django.dispatch import receiver
+from django.db import IntegrityError
+from django.http import HttpRequest
 from django.test import TestCase, override_settings
-from django.test.signals import setting_changed
 from django.utils import translation
 
-
-@receiver(setting_changed)
-def user_model_swapped(**kwargs):
-    if kwargs['setting'] == 'AUTH_USER_MODEL':
-        from django.db.models.manager import ensure_default_manager
-        # Reset User manager
-        setattr(User, 'objects', User._default_manager)
-        ensure_default_manager(User)
-        apps.clear_cache()
+from .models import CustomUser
 
 
 class BasicTestCase(TestCase):
     def test_user(self):
-        "Check that users can be created and can set their password"
+        "Users can be created and can set their password"
         u = User.objects.create_user('testuser', 'test@example.com', 'testpw')
         self.assertTrue(u.has_usable_password())
         self.assertFalse(u.check_password('bad'))
@@ -43,7 +31,8 @@ class BasicTestCase(TestCase):
         self.assertEqual(u.get_username(), 'testuser')
 
         # Check authentication/permissions
-        self.assertTrue(u.is_authenticated())
+        self.assertFalse(u.is_anonymous)
+        self.assertTrue(u.is_authenticated)
         self.assertFalse(u.is_staff)
         self.assertTrue(u.is_active)
         self.assertFalse(u.is_superuser)
@@ -52,8 +41,18 @@ class BasicTestCase(TestCase):
         u2 = User.objects.create_user('testuser2', 'test2@example.com')
         self.assertFalse(u2.has_usable_password())
 
+    def test_unicode_username(self):
+        User.objects.create_user('jörg')
+        User.objects.create_user('Григорий')
+        # Two equivalent unicode normalized usernames should be duplicates
+        omega_username = 'iamtheΩ'  # U+03A9 GREEK CAPITAL LETTER OMEGA
+        ohm_username = 'iamtheΩ'  # U+2126 OHM SIGN
+        User.objects.create_user(ohm_username)
+        with self.assertRaises(IntegrityError):
+            User.objects.create_user(omega_username)
+
     def test_user_no_email(self):
-        "Check that users can be created without an email"
+        "Users can be created without an email"
         u = User.objects.create_user('testuser1')
         self.assertEqual(u.email, '')
 
@@ -66,10 +65,11 @@ class BasicTestCase(TestCase):
     def test_anonymous_user(self):
         "Check the properties of the anonymous user"
         a = AnonymousUser()
-        self.assertEqual(a.pk, None)
+        self.assertIsNone(a.pk)
         self.assertEqual(a.username, '')
         self.assertEqual(a.get_username(), '')
-        self.assertFalse(a.is_authenticated())
+        self.assertTrue(a.is_anonymous)
+        self.assertFalse(a.is_authenticated)
         self.assertFalse(a.is_staff)
         self.assertFalse(a.is_active)
         self.assertFalse(a.is_superuser)
@@ -87,7 +87,7 @@ class BasicTestCase(TestCase):
         "The current user model can be retrieved"
         self.assertEqual(get_user_model(), User)
 
-    @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
     def test_swappable_user(self):
         "The current user model can be swapped out for another"
         self.assertEqual(get_user_model(), CustomUser)
@@ -114,3 +114,21 @@ class BasicTestCase(TestCase):
         with translation.override('es'):
             self.assertEqual(User._meta.verbose_name, 'usuario')
             self.assertEqual(User._meta.verbose_name_plural, 'usuarios')
+
+
+class TestGetUser(TestCase):
+
+    def test_get_user_anonymous(self):
+        request = HttpRequest()
+        request.session = self.client.session
+        user = get_user(request)
+        self.assertIsInstance(user, AnonymousUser)
+
+    def test_get_user(self):
+        created_user = User.objects.create_user('testuser', 'test@example.com', 'testpw')
+        self.client.login(username='testuser', password='testpw')
+        request = HttpRequest()
+        request.session = self.client.session
+        user = get_user(request)
+        self.assertIsInstance(user, User)
+        self.assertEqual(user.username, created_user.username)

@@ -9,21 +9,17 @@ The canonical example is tags (although this example implementation is *far*
 from complete).
 """
 
-from __future__ import unicode_literals
-
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class TaggedItem(models.Model):
     """A tag on an item."""
     tag = models.SlugField()
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
 
     content_object = GenericForeignKey()
@@ -42,19 +38,18 @@ class ValuableTaggedItem(TaggedItem):
 class AbstractComparison(models.Model):
     comparative = models.CharField(max_length=50)
 
-    content_type1 = models.ForeignKey(ContentType, related_name="comparative1_set")
+    content_type1 = models.ForeignKey(ContentType, models.CASCADE, related_name="comparative1_set")
     object_id1 = models.PositiveIntegerField()
 
     first_obj = GenericForeignKey(ct_field="content_type1", fk_field="object_id1")
 
 
-@python_2_unicode_compatible
 class Comparison(AbstractComparison):
     """
     A model that tests having multiple GenericForeignKeys. One is defined
     through an inherited abstract model and one defined directly on this class.
     """
-    content_type2 = models.ForeignKey(ContentType, related_name="comparative2_set")
+    content_type2 = models.ForeignKey(ContentType, models.CASCADE, related_name="comparative2_set")
     object_id2 = models.PositiveIntegerField()
 
     other_obj = GenericForeignKey(ct_field="content_type2", fk_field="object_id2")
@@ -63,7 +58,6 @@ class Comparison(AbstractComparison):
         return "%s is %s than %s" % (self.first_obj, self.comparative, self.other_obj)
 
 
-@python_2_unicode_compatible
 class Animal(models.Model):
     common_name = models.CharField(max_length=150)
     latin_name = models.CharField(max_length=150)
@@ -77,7 +71,6 @@ class Animal(models.Model):
         return self.common_name
 
 
-@python_2_unicode_compatible
 class Vegetable(models.Model):
     name = models.CharField(max_length=150)
     is_yucky = models.BooleanField(default=True)
@@ -88,7 +81,10 @@ class Vegetable(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
+class Carrot(Vegetable):
+    pass
+
+
 class Mineral(models.Model):
     name = models.CharField(max_length=150)
     hardness = models.PositiveSmallIntegerField()
@@ -101,7 +97,7 @@ class Mineral(models.Model):
 
 class GeckoManager(models.Manager):
     def get_queryset(self):
-        return super(GeckoManager, self).get_queryset().filter(has_tail=True)
+        return super().get_queryset().filter(has_tail=True)
 
 
 class Gecko(models.Model):
@@ -114,20 +110,24 @@ class Rock(Mineral):
     tags = GenericRelation(TaggedItem)
 
 
+class ValuableRock(Mineral):
+    tags = GenericRelation(ValuableTaggedItem)
+
+
 class ManualPK(models.Model):
     id = models.IntegerField(primary_key=True)
     tags = GenericRelation(TaggedItem, related_query_name='manualpk')
 
 
 class ForProxyModelModel(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     obj = GenericForeignKey(for_concrete_model=False)
     title = models.CharField(max_length=255, null=True)
 
 
 class ForConcreteModelModel(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     obj = GenericForeignKey()
 
@@ -143,6 +143,6 @@ class ProxyRelatedModel(ConcreteRelatedModel):
 
 # To test fix for #7551
 class AllowsNullGFK(models.Model):
-    content_type = models.ForeignKey(ContentType, null=True)
+    content_type = models.ForeignKey(ContentType, models.SET_NULL, null=True)
     object_id = models.PositiveIntegerField(null=True)
     content_object = GenericForeignKey()

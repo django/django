@@ -9,7 +9,7 @@ class SessionStore(SessionBase):
     This means that saving the session will change the session key.
     """
     def __init__(self, session_key=None):
-        super(SessionStore, self).__init__(session_key)
+        super().__init__(session_key)
 
     def exists(self, session_key):
         return False
@@ -26,6 +26,6 @@ class SessionStore(SessionBase):
     def load(self):
         try:
             return self.decode(self.session_key)
-        except:
+        except Exception:
             self.modified = True
             return {}

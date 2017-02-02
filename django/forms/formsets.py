@@ -1,16 +1,11 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import ValidationError
 from django.forms import Form
 from django.forms.fields import BooleanField, IntegerField
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
-from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.html import html_safe
 from django.utils.safestring import mark_safe
-from django.utils.six.moves import range
 from django.utils.translation import ugettext as _, ungettext
 
 __all__ = ('BaseFormSet', 'formset_factory', 'all_valid')
@@ -44,23 +39,23 @@ class ManagementForm(Form):
         # code. The POST value of them returned from the client is not checked.
         self.base_fields[MIN_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
-        super(ManagementForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 @html_safe
-@python_2_unicode_compatible
-class BaseFormSet(object):
+class BaseFormSet:
     """
     A collection of instances of the same Form class.
     """
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList):
+                 initial=None, error_class=ErrorList, form_kwargs=None):
         self.is_bound = data is not None or files is not None
         self.prefix = prefix or self.get_default_prefix()
         self.auto_id = auto_id
         self.data = data or {}
         self.files = files or {}
         self.initial = initial
+        self.form_kwargs = form_kwargs or {}
         self.error_class = error_class
         self._errors = None
         self._non_form_errors = None
@@ -83,10 +78,7 @@ class BaseFormSet(object):
         """All formsets have a management form which is not included in the length"""
         return True
 
-    def __nonzero__(self):      # Python 2 compatibility
-        return type(self).__bool__(self)
-
-    @property
+    @cached_property
     def management_form(self):
         """Returns the ManagementForm instance for this FormSet."""
         if self.is_bound:
@@ -139,8 +131,18 @@ class BaseFormSet(object):
         Instantiate forms at first property access.
         """
         # DoS protection is included in total_form_count()
-        forms = [self._construct_form(i) for i in range(self.total_form_count())]
+        forms = [self._construct_form(i, **self.get_form_kwargs(i))
+                 for i in range(self.total_form_count())]
         return forms
+
+    def get_form_kwargs(self, index):
+        """
+        Return additional keyword arguments for each individual formset form.
+
+        index will be None if the form being constructed is a new empty
+        form.
+        """
+        return self.form_kwargs.copy()
 
     def _construct_form(self, i, **kwargs):
         """
@@ -150,6 +152,10 @@ class BaseFormSet(object):
             'auto_id': self.auto_id,
             'prefix': self.add_prefix(i),
             'error_class': self.error_class,
+            # Don't render the HTML 'required' attribute as it may cause
+            # incorrect validation for extra, optional, and deleted
+            # forms in the formset.
+            'use_required_attribute': False,
         }
         if self.is_bound:
             defaults['data'] = self.data
@@ -184,6 +190,8 @@ class BaseFormSet(object):
             auto_id=self.auto_id,
             prefix=self.add_prefix('__prefix__'),
             empty_permitted=True,
+            use_required_attribute=False,
+            **self.get_form_kwargs(None)
         )
         self.add_fields(form, None)
         return form
@@ -319,11 +327,15 @@ class BaseFormSet(object):
         """
         self._errors = []
         self._non_form_errors = self.error_class()
+        empty_forms_count = 0
 
         if not self.is_bound:  # Stop further processing.
             return
         for i in range(0, self.total_form_count()):
             form = self.forms[i]
+            if not form.has_changed():
+                empty_forms_count += 1
+
             self._errors.append(form.errors)
         try:
             if (self.validate_max and
@@ -335,7 +347,7 @@ class BaseFormSet(object):
                     code='too_many_forms',
                 )
             if (self.validate_min and
-                    self.total_form_count() - len(self.deleted_forms) < self.min_num):
+                    self.total_form_count() - len(self.deleted_forms) - empty_forms_count < self.min_num):
                 raise ValidationError(ungettext(
                     "Please submit %d or more forms.",
                     "Please submit %d or more forms.", self.min_num) % self.min_num,
@@ -399,17 +411,17 @@ class BaseFormSet(object):
         # probably should be. It might make sense to render each form as a
         # table row with each field as a td.
         forms = ' '.join(form.as_table() for form in self)
-        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
+        return mark_safe('\n'.join([str(self.management_form), forms]))
 
     def as_p(self):
         "Returns this formset rendered as HTML <p>s."
         forms = ' '.join(form.as_p() for form in self)
-        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
+        return mark_safe('\n'.join([str(self.management_form), forms]))
 
     def as_ul(self):
         "Returns this formset rendered as HTML <li>s."
         forms = ' '.join(form.as_ul() for form in self)
-        return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
+        return mark_safe('\n'.join([str(self.management_form), forms]))
 
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
@@ -429,7 +441,7 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
              'min_num': min_num, 'max_num': max_num,
              'absolute_max': absolute_max, 'validate_min': validate_min,
              'validate_max': validate_max}
-    return type(form.__name__ + str('FormSet'), (formset,), attrs)
+    return type(form.__name__ + 'FormSet', (formset,), attrs)
 
 
 def all_valid(formsets):

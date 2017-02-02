@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Asturian (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Asturian (http://www.transifex.com/django/django/language/"
 "ast/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -59,6 +59,9 @@ msgstr "Danés"
 msgid "German"
 msgstr "Alemán"
 
+msgid "Lower Sorbian"
+msgstr ""
+
 msgid "Greek"
 msgstr "Griegu"
 
@@ -79,6 +82,9 @@ msgstr "Castellán"
 
 msgid "Argentinian Spanish"
 msgstr "Español arxentín"
+
+msgid "Colombian Spanish"
+msgstr ""
 
 msgid "Mexican Spanish"
 msgstr "Español mexicanu"
@@ -110,6 +116,9 @@ msgstr "Frisón"
 msgid "Irish"
 msgstr "Irlandés"
 
+msgid "Scottish Gaelic"
+msgstr ""
+
 msgid "Galician"
 msgstr "Gallegu"
 
@@ -121,6 +130,9 @@ msgstr "Hindi"
 
 msgid "Croatian"
 msgstr "Croata"
+
+msgid "Upper Sorbian"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "Húngaru"
@@ -182,8 +194,8 @@ msgstr ""
 msgid "Burmese"
 msgstr "Birmanu"
 
-msgid "Norwegian Bokmal"
-msgstr "Bokmal noruegu"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Nepalí"
@@ -281,9 +293,6 @@ msgstr ""
 msgid "Syndication"
 msgstr ""
 
-msgid "Web Design"
-msgstr ""
-
 msgid "Enter a valid value."
 msgstr "Introduz un valor válidu."
 
@@ -301,6 +310,11 @@ msgid ""
 msgstr ""
 "Introduz un 'slug' válidu que consista en lletres, númberu, guiones baxos o "
 "medios. "
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
 
 msgid "Enter a valid IPv4 address."
 msgstr "Introduz una direición IPv4 válida."
@@ -354,6 +368,28 @@ msgstr[1] ""
 "Asegúrate qu'esti valor tien como muncho %(limit_value)d caráuteres (tien "
 "%(show_value)d)."
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Asegúrate que nun hai más de %(max)s díxitu en total."
+msgstr[1] "Asegúrate que nun hai más de %(max)s díxitos en total."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Asegúrate que nun hai más de %(max)s allugamientu decimal."
+msgstr[1] "Asegúrate que nun hai más de %(max)s allugamientos decimales."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Asegúrate que nun hai más de %(max)s díxitu enantes del puntu decimal."
+msgstr[1] ""
+"Asegúrate que nun hai más de %(max)s díxitos enantes del puntu decimal."
+
 msgid "and"
 msgstr "y"
 
@@ -392,6 +428,9 @@ msgstr "Enteru"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr ""
+
+msgid "Big (8 byte) integer"
+msgstr "Enteru big (8 byte)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -466,9 +505,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr "Númberu de puntu flotante"
 
-msgid "Big (8 byte) integer"
-msgstr "Enteru big (8 byte)"
-
 msgid "IPv4 address"
 msgstr "Direición IPv4"
 
@@ -539,8 +575,22 @@ msgstr "Clave foriata (triba determinada pol campu rellacionáu)"
 msgid "One-to-one relationship"
 msgstr "Rellación a ún"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
 msgid "Many-to-many relationship"
 msgstr "Rellación a munchos"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "Requierse esti campu."
@@ -550,28 +600,6 @@ msgstr "Introduz un númberu completu"
 
 msgid "Enter a number."
 msgstr "Introduz un númberu."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Asegúrate que nun hai más de %(max)s díxitu en total."
-msgstr[1] "Asegúrate que nun hai más de %(max)s díxitos en total."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Asegúrate que nun hai más de %(max)s allugamientu decimal."
-msgstr[1] "Asegúrate que nun hai más de %(max)s allugamientos decimales."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-"Asegúrate que nun hai más de %(max)s díxitu enantes del puntu decimal."
-msgstr[1] ""
-"Asegúrate que nun hai más de %(max)s díxitos enantes del puntu decimal."
 
 msgid "Enter a valid date."
 msgstr "Introduz una data válida."
@@ -637,12 +665,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Campu anubríu %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr ""

@@ -6,16 +6,12 @@ Django 1.4 release notes
 
 Welcome to Django 1.4!
 
-These release notes cover the `new features`_, as well
-as some `backwards incompatible changes`_ you'll want to be aware of
-when upgrading from Django 1.3 or older versions. We've also dropped some
-features, which are detailed in :ref:`our deprecation plan
-<deprecation-removed-in-1.4>`, and we've `begun the deprecation process for
-some features`_.
-
-.. _`new features`: `What's new in Django 1.4`_
-.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.4`_
-.. _`begun the deprecation process for some features`: `Features deprecated in 1.4`_
+These release notes cover the :ref:`new features <whats-new-1.4>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.4>` you'll
+want to be aware of when upgrading from Django 1.3 or older versions. We've
+also dropped some features, which are detailed in :ref:`our deprecation plan
+<deprecation-removed-in-1.4>`, and we've :ref:`begun the deprecation process
+for some features <deprecated-features-1.4>`.
 
 Overview
 ========
@@ -25,8 +21,8 @@ handling date/times. When enabled, this Django will store date/times in UTC,
 use timezone-aware objects internally, and translate them to users' local
 timezones for display.
 
-If you're upgrading an existing project to Django 1.4, switching to the time-
-zone aware mode may take some care: the new mode disallows some rather sloppy
+If you're upgrading an existing project to Django 1.4, switching to the timezone
+aware mode may take some care: the new mode disallows some rather sloppy
 behavior that used to be accepted. We encourage anyone who's upgrading to check
 out the :ref:`timezone migration guide <time-zones-migration-guide>` and the
 :ref:`timezone FAQ <time-zones-faq>` for useful pointers.
@@ -56,8 +52,8 @@ Other notable new features in Django 1.4 include:
 Wherever possible we try to introduce new features in a backwards-compatible
 manner per :doc:`our API stability policy </misc/api-stability>` policy.
 However, as with previous releases, Django 1.4 ships with some minor
-`backwards incompatible changes`_; people upgrading from previous versions
-of Django should read that list carefully.
+:ref:`backwards incompatible changes <backwards-incompatible-1.4>`; people
+upgrading from previous versions of Django should read that list carefully.
 
 Python compatibility
 ====================
@@ -77,11 +73,13 @@ Django does not support Python 3.x at this time. At some point before the
 release of Django 1.4, we plan to publish a document outlining our full
 timeline for deprecating Python 2.x and moving to Python 3.x.
 
+.. _whats-new-1.4:
+
 What's new in Django 1.4
 ========================
 
 Support for time zones
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 In previous versions, Django used "naive" date/times (that is, date/times
 without an associated time zone), leaving it up to each developer to interpret
@@ -108,7 +106,7 @@ project, read the :ref:`migration guide <time-zones-migration-guide>`. If you
 encounter problems, there's a helpful :ref:`FAQ <time-zones-faq>`.
 
 Support for in-browser testing frameworks
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------
 
 Django 1.4 supports integration with in-browser testing frameworks like
 Selenium_. The new :class:`django.test.LiveServerTestCase` base class lets you
@@ -120,7 +118,7 @@ concrete examples.
 .. _Selenium: http://seleniumhq.org/
 
 Updated default project layout and ``manage.py``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------
 
 Django 1.4 ships with an updated default project layout and ``manage.py`` file
 for the :djadmin:`startproject` management command. These fix some issues with
@@ -150,7 +148,7 @@ actual project.
 
 If settings, URLconfs and apps within the project are imported or referenced
 using the project name prefix (e.g. ``myproject.settings``, ``ROOT_URLCONF =
-"myproject.urls"``, etc), the new ``manage.py`` will need to be moved one
+"myproject.urls"``, etc.), the new ``manage.py`` will need to be moved one
 directory up, so it is outside the project package rather than adjacent to
 ``settings.py`` and ``urls.py``.
 
@@ -186,7 +184,7 @@ prefix, some places without it), the imports will need to be cleaned up when
 switching to the new ``manage.py``.
 
 Custom project and app templates
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 The :djadmin:`startapp` and :djadmin:`startproject` management commands
 now have a ``--template`` option for specifying a path or URL to a custom app
@@ -207,7 +205,7 @@ For more information, see the :djadmin:`startapp` and :djadmin:`startproject`
 documentation.
 
 Improved WSGI support
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 The :djadmin:`startproject` management command now adds a :file:`wsgi.py`
 module to the initial project layout, containing a simple WSGI application that
@@ -224,7 +222,7 @@ with the same WSGI configuration that is used for deployment. The new
 callable configured via :setting:`WSGI_APPLICATION`.)
 
 ``SELECT FOR UPDATE`` support
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 Django 1.4 includes a :meth:`QuerySet.select_for_update()
 <django.db.models.query.QuerySet.select_for_update>` method, which generates a
@@ -236,7 +234,7 @@ For more details, see the documentation for
 :meth:`~django.db.models.query.QuerySet.select_for_update`.
 
 ``Model.objects.bulk_create`` in the ORM
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------
 
 This method lets you create multiple objects more efficiently. It can result in
 significant performance increases if you have many objects.
@@ -248,7 +246,7 @@ See the :meth:`~django.db.models.query.QuerySet.bulk_create` docs for more
 information.
 
 ``QuerySet.prefetch_related``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 Similar to :meth:`~django.db.models.query.QuerySet.select_related` but with a
 different strategy and broader scope,
@@ -263,7 +261,7 @@ doing O(n) database queries (or worse) if objects on your primary ``QuerySet``
 each have many related objects that you also need to fetch.
 
 Improved password hashing
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 Django's auth system (``django.contrib.auth``) stores passwords using a one-way
 algorithm. Django 1.3 uses the SHA1_ algorithm, but increasing processor speeds
@@ -273,13 +271,13 @@ uses the PBKDF2_ algorithm (as recommended by NIST_). You can also easily choose
 a different algorithm (including the popular bcrypt_ algorithm). For more
 details, see :ref:`auth_password_storage`.
 
-.. _sha1: http://en.wikipedia.org/wiki/SHA1
-.. _pbkdf2: http://en.wikipedia.org/wiki/PBKDF2
+.. _sha1: https://en.wikipedia.org/wiki/SHA1
+.. _pbkdf2: https://en.wikipedia.org/wiki/PBKDF2
 .. _nist: http://csrc.nist.gov/publications/nistpubs/800-132/nist-sp800-132.pdf
-.. _bcrypt: http://en.wikipedia.org/wiki/Bcrypt
+.. _bcrypt: https://en.wikipedia.org/wiki/Bcrypt
 
 HTML5 doctype
-~~~~~~~~~~~~~
+-------------
 
 We've switched the admin and other bundled templates to use the HTML5
 doctype. While Django will be careful to maintain compatibility with older
@@ -288,7 +286,7 @@ admin pages without having to lose HTML validity or override the provided
 templates to change the doctype.
 
 List filters in admin interface
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 Prior to Django 1.4, the :mod:`~django.contrib.admin` app let you specify
 change list filters by specifying a field lookup, but it didn't allow you to
@@ -297,7 +295,7 @@ used internally and known as "FilterSpec"). For more details, see the
 documentation for :attr:`~django.contrib.admin.ModelAdmin.list_filter`.
 
 Multiple sort in admin interface
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 The admin change list now supports sorting on multiple columns. It respects all
 elements of the :attr:`~django.contrib.admin.ModelAdmin.ordering` attribute, and
@@ -307,7 +305,7 @@ behavior of desktop GUIs. We also added a
 ordering dynamically (i.e., depending on the request).
 
 New ``ModelAdmin`` methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
 We added a :meth:`~django.contrib.admin.ModelAdmin.save_related` method to
 :mod:`~django.contrib.admin.ModelAdmin` to ease customization of how
@@ -320,7 +318,7 @@ enable dynamic customization of fields and links displayed on the admin
 change list.
 
 Admin inlines respect user permissions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------
 
 Admin inlines now only allow those actions for which the user has
 permission. For ``ManyToMany`` relationships with an auto-created intermediate
@@ -329,7 +327,7 @@ related model determines if the user has the permission to add, change or
 delete relationships.
 
 Tools for cryptographic signing
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 Django 1.4 adds both a low-level API for signing values and a high-level API
 for setting and reading signed cookies, one of the most common uses of
@@ -339,7 +337,7 @@ See the :doc:`cryptographic signing </topics/signing>` docs for more
 information.
 
 Cookie-based session backend
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 Django 1.4 introduces a cookie-based session backend that uses the tools for
 :doc:`cryptographic signing </topics/signing>` to store the session data in
@@ -356,7 +354,7 @@ See the :ref:`cookie-based session backend <cookie-session-backend>` docs for
 more information.
 
 New form wizard
-~~~~~~~~~~~~~~~
+---------------
 
 The previous ``FormWizard`` from ``django.contrib.formtools`` has been
 replaced with a new implementation based on the class-based views
@@ -369,13 +367,13 @@ storage backend. The latter uses the tools for
 Django 1.4 to store the wizard's state in the user's cookies.
 
 ``reverse_lazy``
-~~~~~~~~~~~~~~~~
+----------------
 
-A lazily evaluated version of :func:`django.core.urlresolvers.reverse` was
-added to allow using URL reversals before the project's URLconf gets loaded.
+A lazily evaluated version of ``reverse()`` was added to allow using URL
+reversals before the project's URLconf gets loaded.
 
 Translating URL patterns
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 Django can now look for a language prefix in the URLpattern when using the new
 :func:`~django.conf.urls.i18n.i18n_patterns` helper function.
@@ -385,7 +383,7 @@ It's also now possible to define translatable URL patterns using
 and how to internationalize URL patterns.
 
 Contextual translation support for ``{% trans %}`` and ``{% blocktrans %}``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------------------------------
 
 The :ref:`contextual translation<contextual-markers>` support introduced in
 Django 1.3 via the ``pgettext`` function has been extended to the
@@ -393,7 +391,7 @@ Django 1.3 via the ``pgettext`` function has been extended to the
 keyword.
 
 Customizable ``SingleObjectMixin`` URLConf kwargs
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------
 
 Two new attributes,
 :attr:`pk_url_kwarg<django.views.generic.detail.SingleObjectMixin.pk_url_kwarg>`
@@ -404,21 +402,19 @@ enable the customization of URLconf keyword arguments used for single
 object generic views.
 
 Assignment template tags
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
-A new :ref:`assignment_tag<howto-custom-template-tags-assignment-tags>` helper
-function was added to ``template.Library`` to ease the creation of template
-tags that store data in a specified context variable.
+A new ``assignment_tag`` helper function was added to ``template.Library`` to
+ease the creation of template tags that store data in a specified context
+variable.
 
 ``*args`` and ``**kwargs`` support for template tag helper functions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------------------------
 
 The :ref:`simple_tag<howto-custom-template-tags-simple-tags>`,
-:ref:`inclusion_tag <howto-custom-template-tags-inclusion-tags>` and
-newly introduced
-:ref:`assignment_tag<howto-custom-template-tags-assignment-tags>` template
-helper functions may now accept any number of positional or keyword arguments.
-For example::
+:ref:`inclusion_tag <howto-custom-template-tags-inclusion-tags>` and newly
+introduced ``assignment_tag`` template helper functions may now accept any
+number of positional or keyword arguments. For example::
 
     @register.simple_tag
     def my_tag(a, b, *args, **kwargs):
@@ -435,7 +431,7 @@ For example:
     {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
 
 No wrapping of exceptions in ``TEMPLATE_DEBUG`` mode
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------------
 
 In previous versions of Django, whenever the ``TEMPLATE_DEBUG`` setting
 was ``True``, any exception raised during template rendering (even exceptions
@@ -450,7 +446,7 @@ exceptions from template rendering is now consistent regardless of the value of
 ``TemplateSyntaxError`` in order to catch other errors.
 
 ``truncatechars`` template filter
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 This new filter truncates a string to be no longer than the specified
 number of characters. Truncated strings end with a translatable ellipsis
@@ -458,16 +454,16 @@ sequence ("..."). See the documentation for :tfilter:`truncatechars` for
 more details.
 
 ``static`` template tag
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 The :mod:`staticfiles<django.contrib.staticfiles>` contrib app has a new
-:ttag:`static<staticfiles-static>` template tag to refer to files saved with
-the :setting:`STATICFILES_STORAGE` storage backend. It uses the storage
-backend's ``url`` method and therefore supports advanced features such as
-:ref:`serving files from a cloud service<staticfiles-from-cdn>`.
+``static`` template tag to refer to files saved with the
+:setting:`STATICFILES_STORAGE` storage backend. It uses the storage backend's
+``url`` method and therefore supports advanced features such as :ref:`serving
+files from a cloud service<staticfiles-from-cdn>`.
 
 ``CachedStaticFilesStorage`` storage backend
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------
 
 The :mod:`staticfiles<django.contrib.staticfiles>` contrib app now has a
 :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage` backend
@@ -480,16 +476,16 @@ See the :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
 docs for more information.
 
 Simple clickjacking protection
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 We've added a middleware to provide easy protection against `clickjacking
-<http://en.wikipedia.org/wiki/Clickjacking>`_ using the ``X-Frame-Options``
+<https://en.wikipedia.org/wiki/Clickjacking>`_ using the ``X-Frame-Options``
 header. It's not enabled by default for backwards compatibility reasons, but
 you'll almost certainly want to :doc:`enable it </ref/clickjacking/>` to help
 plug that security hole for browsers that support the header.
 
 CSRF improvements
-~~~~~~~~~~~~~~~~~
+-----------------
 
 We've made various improvements to our CSRF features, including the
 :func:`~django.views.decorators.csrf.ensure_csrf_cookie` decorator, which can
@@ -499,7 +495,7 @@ improve the security and usefulness of CSRF protection. See the :doc:`CSRF
 docs </ref/csrf>` for more information.
 
 Error report filtering
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 We added two function decorators,
 :func:`~django.views.decorators.debug.sensitive_variables` and
@@ -518,7 +514,7 @@ filter<custom-error-reports>`. For more information see the docs on
 :ref:`Filtering error reports<filtering-error-reports>`.
 
 Extended IPv6 support
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 Django 1.4 can now better handle IPv6 addresses with the new
 :class:`~django.db.models.GenericIPAddressField` model field,
@@ -527,7 +523,7 @@ the validators :data:`~django.core.validators.validate_ipv46_address` and
 :data:`~django.core.validators.validate_ipv6_address`.
 
 HTML comparisons in tests
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 The base classes in :mod:`django.test` now have some helpers to
 compare HTML without tripping over irrelevant differences in whitespace,
@@ -542,10 +538,10 @@ client's response contains a given HTML fragment. See the :ref:`assertions
 documentation <assertions>` for more.
 
 Two new date format strings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 Two new :tfilter:`date` formats were added for use in template filters,
-template tags and :ref:`format-localization`:
+template tags and :doc:`/topics/i18n/formatting`:
 
 - ``e`` -- the name of the timezone of the given datetime object
 - ``o`` -- the ISO 8601 year number
@@ -564,7 +560,7 @@ But now it needs to also escape ``e`` and ``o``::
 For more information, see the :tfilter:`date` documentation.
 
 Minor features
-~~~~~~~~~~~~~~
+--------------
 
 Django 1.4 also includes several smaller improvements worth noting:
 
@@ -624,8 +620,7 @@ Django 1.4 also includes several smaller improvements worth noting:
   This should make it easier to read when debugging interaction with
   client-side JavaScript.
 
-* Added the :djadminopt:`--no-location` option to the :djadmin:`makemessages`
-  command.
+* Added the :option:`makemessages --no-location` option.
 
 * Changed the ``locmem`` cache backend to use
   ``pickle.HIGHEST_PROTOCOL`` for better compatibility with the other
@@ -665,11 +660,13 @@ Django 1.4 also includes several smaller improvements worth noting:
   useful in tests that don't need to hit a database. See
   :ref:`testcase_hierarchy_diagram`.
 
+.. _backwards-incompatible-1.4:
+
 Backwards incompatible changes in 1.4
 =====================================
 
 SECRET_KEY setting is required
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 Running Django with an empty or known :setting:`SECRET_KEY` disables many of
 Django's security protections and can lead to remote-code-execution
@@ -682,8 +679,8 @@ refuse to start. This is slightly accelerated from the usual deprecation path
 due to the severity of the consequences of running Django with no
 :setting:`SECRET_KEY`.
 
-django.contrib.admin
-~~~~~~~~~~~~~~~~~~~~
+``django.contrib.admin``
+------------------------
 
 The included administration app ``django.contrib.admin`` has for a long time
 shipped with a default set of static files such as JavaScript, images and
@@ -718,7 +715,7 @@ If your ``ADMIN_MEDIA_PREFIX`` is set to an specific domain (e.g.
     :file:`django/contrib/admin/static/admin/`.
 
 Supported browsers for the admin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 Django hasn't had a clear policy on which browsers are supported by the
 admin app. Our new policy formalizes existing practices: `YUI's A-grade`_
@@ -736,7 +733,7 @@ any range of browsers.
 .. _YUI's A-grade: http://yuilibrary.com/yui/docs/tutorials/gbs/
 
 Removed admin icons
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 As part of an effort to improve the performance and usability of the admin's
 change-list sorting interface and :attr:`horizontal
@@ -754,7 +751,7 @@ If you used those icons to customize the admin, then you'll need to replace
 them with your own icons or get the files from a previous release.
 
 CSS class names in admin forms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 To avoid conflicts with other common CSS class names (e.g. "button"), we added
 a prefix ("field-") to all CSS class names automatically generated from the
@@ -764,7 +761,7 @@ style sheets or JavaScript files if you previously used plain field names as
 selectors for custom styles or JavaScript transformations.
 
 Compatibility with old signed data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 Django 1.3 changed the cryptographic signing mechanisms used in a number of
 places in Django. While Django 1.3 kept fallbacks that would accept hashes
@@ -833,8 +830,8 @@ instance:
     well with Django 1.4 and you won't have to roll back to 1.3, enable the new
     password hashes.
 
-django.contrib.flatpages
-~~~~~~~~~~~~~~~~~~~~~~~~
+``django.contrib.flatpages``
+----------------------------
 
 Starting in 1.4, the
 :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware` only
@@ -848,7 +845,7 @@ Also, redirects returned by flatpages are now permanent (with 301 status code),
 to match the behavior of :class:`~django.middleware.common.CommonMiddleware`.
 
 Serialization of :class:`~datetime.datetime` and :class:`~datetime.time`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------------------------------
 
 As a consequence of time-zone support, and according to the ECMA-262
 specification, we made changes to the JSON serializer:
@@ -868,7 +865,7 @@ Though the serializers now use these new formats when creating fixtures, they
 can still load fixtures that use the old format.
 
 ``supports_timezone`` changed to ``False`` for SQLite
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------
 
 The database feature ``supports_timezone`` used to be ``True`` for SQLite.
 Indeed, if you saved an aware datetime object, SQLite stored a string that
@@ -881,7 +878,7 @@ datetimes are now stored without time-zone information in SQLite. When
 object, Django raises an exception.
 
 ``MySQLdb``-specific exceptions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 The MySQL backend historically has raised ``MySQLdb.OperationalError``
 when a query triggered an exception. We've fixed this bug, and we now raise
@@ -890,7 +887,7 @@ when a query triggered an exception. We've fixed this bug, and we now raise
 clauses.
 
 Database connection's thread-locality
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 ``DatabaseWrapper`` objects (i.e. the connection objects referenced by
 ``django.db.connection`` and ``django.db.connections["some_alias"]``) used to
@@ -916,7 +913,7 @@ Concurrency behavior is defined by the underlying backend implementation.
 Check their documentation for details.
 
 `COMMENTS_BANNED_USERS_GROUP` setting
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------
 
 Django's comments has historically
 supported excluding the comments of a special user group, but we've never
@@ -932,7 +929,7 @@ comment model manager to exclude the user group, like this::
 
     class BanningCommentManager(CommentManager):
         def get_query_set(self):
-            qs = super(BanningCommentManager, self).get_query_set()
+            qs = super().get_query_set()
             if getattr(settings, 'COMMENTS_BANNED_USERS_GROUP', None):
                 where = ['user_id NOT IN (SELECT user_id FROM auth_user_groups WHERE group_id = %s)']
                 params = [settings.COMMENTS_BANNED_USERS_GROUP]
@@ -953,7 +950,7 @@ Save this model manager in your custom comment app (e.g., in
         objects = BanningCommentManager()
 
 `IGNORABLE_404_STARTS` and `IGNORABLE_404_ENDS` settings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------------
 
 Until Django 1.3, it was possible to exclude some URLs from Django's
 :doc:`404 error reporting</howto/error-reporting>` by adding prefixes to
@@ -991,7 +988,7 @@ Don't forget to escape characters that have a special meaning in a regular
 expression, such as periods.
 
 CSRF protection extended to PUT and DELETE
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
 
 Previously, Django's :doc:`CSRF protection </ref/csrf/>` provided
 protection only against POST requests. Since use of PUT and DELETE methods in
@@ -1003,7 +1000,7 @@ If you're using PUT or DELETE methods in AJAX applications, please see the
 :ref:`instructions about using AJAX and CSRF <csrf-ajax>`.
 
 Password reset view now accepts ``subject_template_name``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------------
 
 The ``password_reset`` view in ``django.contrib.auth`` now accepts a
 ``subject_template_name`` parameter, which is passed to the password save form
@@ -1012,21 +1009,21 @@ form, then you will need to ensure your form's ``save()`` method accepts this
 keyword argument.
 
 ``django.core.template_loaders``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 This was an alias to ``django.template.loader`` since 2005, and we've removed it
 without emitting a warning due to the length of the deprecation. If your code
 still referenced this, please use ``django.template.loader`` instead.
 
 ``django.db.models.fields.URLField.verify_exists``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------
 
 This functionality has been removed due to intractable performance and
 security issues. Any existing usage of ``verify_exists`` should be
 removed.
 
 ``django.core.files.storage.Storage.open``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
 
 The ``open`` method of the base Storage class used to take an obscure parameter
 ``mixin`` that allowed you to dynamically change the base classes of the
@@ -1052,7 +1049,7 @@ method, like this::
             return Spam(open(self.path(name), mode))
 
 YAML deserializer now uses ``yaml.safe_load``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------
 
 ``yaml.load`` is able to construct any Python object, which may trigger
 arbitrary code execution if you process a YAML document that comes from an
@@ -1062,7 +1059,7 @@ fixtures are trusted data, the YAML deserializer now uses ``yaml.safe_load``
 for additional security.
 
 Session cookies now have the ``httponly`` flag by default
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------------
 
 Session cookies now include the ``httponly`` attribute by default to
 help reduce the impact of potential XSS attacks. As a consequence of
@@ -1072,7 +1069,7 @@ compatibility, use ``SESSION_COOKIE_HTTPONLY = False`` in your
 settings file.
 
 The :tfilter:`urlize` filter no longer escapes every URL
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------------
 
 When a URL contains a ``%xx`` sequence, where ``xx`` are two hexadecimal
 digits, :tfilter:`urlize` now assumes that the URL is already escaped and
@@ -1081,7 +1078,7 @@ contains a ``%xx`` sequence, but such URLs are very unlikely to happen in the
 wild, because they would confuse browsers too.
 
 ``assertTemplateUsed`` and ``assertTemplateNotUsed`` as context manager
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------------------------
 
 It's now possible to check whether a template was used within a block of
 code with :meth:`~django.test.SimpleTestCase.assertTemplateUsed` and
@@ -1096,7 +1093,7 @@ can be used as a context manager::
 See the :ref:`assertion documentation<assertions>` for more.
 
 Database connections after running the test suite
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------
 
 The default test runner no longer restores the database connections after
 tests' execution. This prevents the production database from being exposed to
@@ -1109,7 +1106,7 @@ subclassing ``DjangoTestRunner`` and overriding its ``teardown_databases()``
 method.
 
 Output of :djadmin:`manage.py help <help>`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
 
 :djadmin:`manage.py help <help>` now groups available commands by application.
 If you depended on the output of this command -- if you parsed it, for example
@@ -1118,7 +1115,7 @@ management commands in a script, use
 :djadmin:`manage.py help --commands <help>` instead.
 
 ``extends`` template tag
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 Previously, the :ttag:`extends` tag used a buggy method of parsing arguments,
 which could lead to it erroneously considering an argument as a string literal
@@ -1129,7 +1126,7 @@ interests of full disclosure, the ``ExtendsNode.__init__`` definition has
 changed, which may break any custom tags that use this class.
 
 Loading some incomplete fixtures no longer works
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------
 
 Prior to 1.4, a default value was inserted for fixture objects that were missing
 a specific date or datetime value when auto_now or auto_now_add was set for the
@@ -1138,16 +1135,16 @@ incomplete fixtures will fail. Because fixtures are a raw import, they should
 explicitly specify all field values, regardless of field options on the model.
 
 Development Server Multithreading
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 The development server is now is multithreaded by default. Use the
-:djadminopt:`--nothreading` option to disable the use of threading in the
+:option:`runserver --nothreading` option to disable the use of threading in the
 development server::
 
     django-admin.py runserver --nothreading
 
 Attributes disabled in markdown when safe mode set
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------
 
 Prior to Django 1.4, attributes were included in any markdown output regardless
 of safe mode setting of the filter. With version > 2.1 of the Python-Markdown
@@ -1158,7 +1155,7 @@ Python-Markdown library less than 2.1, a warning is issued that the output is
 insecure.
 
 FormMixin get_initial returns an instance-specific dictionary
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------
 
 In Django 1.3, the ``get_initial`` method of the
 :class:`django.views.generic.edit.FormMixin` class was returning the
@@ -1172,14 +1169,14 @@ Features deprecated in 1.4
 ==========================
 
 Old styles of calling ``cache_page`` decorator
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------
 
 Some legacy ways of calling :func:`~django.views.decorators.cache.cache_page`
 have been deprecated. Please see the documentation for the correct way to use
 this decorator.
 
 Support for PostgreSQL versions older than 8.2
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------
 
 Django 1.3 dropped support for PostgreSQL versions older than 8.0, and we
 suggested using a more recent version because of performance improvements
@@ -1190,7 +1187,7 @@ Django 1.4 takes that policy further and sets 8.2 as the minimum PostgreSQL
 version it officially supports.
 
 Request exceptions are now always logged
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------
 
 When we added :doc:`logging support </topics/logging/>` in Django in 1.3, the
 admin error email support was moved into the
@@ -1230,17 +1227,17 @@ The existence of any ``'filters'`` key under the ``'mail_admins'`` handler will
 disable this backward-compatibility shim and deprecation warning.
 
 ``django.conf.urls.defaults``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 Until Django 1.3, the functions :func:`~django.conf.urls.include`,
-:func:`~django.conf.urls.patterns` and :func:`~django.conf.urls.url` plus
+``patterns()`` and :func:`~django.conf.urls.url` plus
 :data:`~django.conf.urls.handler404`, :data:`~django.conf.urls.handler500`
 were located in a ``django.conf.urls.defaults`` module.
 
 In Django 1.4, they live in :mod:`django.conf.urls`.
 
 ``django.contrib.databrowse``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 Databrowse has not seen active development for some time, and this does not show
 any sign of changing. There had been a suggestion for a `GSOC project`_ to
@@ -1255,7 +1252,7 @@ itself, so it's available to be adopted by an individual or group as
 a third-party project.
 
 ``django.core.management.setup_environ``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------
 
 This function temporarily modified ``sys.path`` in order to make the parent
 "project" directory importable under the old flat :djadmin:`startproject`
@@ -1268,7 +1265,7 @@ These uses should be replaced by setting the ``DJANGO_SETTINGS_MODULE``
 environment variable or using :func:`django.conf.settings.configure`.
 
 ``django.core.management.execute_manager``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
 
 This function was previously used by ``manage.py`` to execute a management
 command. It is identical to
@@ -1279,7 +1276,7 @@ of these functions is documented as part of the public API, but a deprecation
 path is needed due to use in existing ``manage.py`` files.
 
 ``is_safe`` and ``needs_autoescape`` attributes of template filters
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------------
 
 Two flags, ``is_safe`` and ``needs_autoescape``, define how each template filter
 interacts with Django's auto-escaping behavior. They used to be attributes of
@@ -1302,28 +1299,26 @@ Now, the flags are keyword arguments of :meth:`@register.filter
 See :ref:`filters and auto-escaping <filters-auto-escaping>` for more information.
 
 Wildcard expansion of application names in `INSTALLED_APPS`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------------
 
 Until Django 1.3, :setting:`INSTALLED_APPS` accepted wildcards in application
 names, like ``django.contrib.*``. The expansion was performed by a
 filesystem-based implementation of ``from <package> import *``. Unfortunately,
-`this can't be done reliably`_.
+this can't be done reliably.
 
 This behavior was never documented. Since it is unpythonic and not obviously
 useful, it was removed in Django 1.4. If you relied on it, you must edit your
 settings file to list all your applications explicitly.
 
-.. _this can't be done reliably: https://docs.python.org/tutorial/modules.html#importing-from-a-package
-
 ``HttpRequest.raw_post_data`` renamed to ``HttpRequest.body``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------
 
 This attribute was confusingly named ``HttpRequest.raw_post_data``, but it
 actually provided the body of the HTTP request. It's been renamed to
 ``HttpRequest.body``, and ``HttpRequest.raw_post_data`` has been deprecated.
 
 ``django.contrib.sitemaps`` bug fix with potential performance implications
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------------------------------
 
 In previous versions, ``Paginator`` objects used in sitemap classes were
 cached, which could result in stale site maps. We've removed the caching, so
@@ -1335,7 +1330,7 @@ To mitigate the performance impact, consider using the :doc:`caching
 framework </topics/cache>` within your ``Sitemap`` subclass.
 
 Versions of Python-Markdown earlier than 2.1
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------
 
 Versions of Python-Markdown earlier than 2.1 do not support the option to
 disable attributes. As a security issue, earlier versions of this library will

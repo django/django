@@ -1,13 +1,9 @@
-from __future__ import unicode_literals
-
-import datetime
-
-from django.conf.urls import include, url
+from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
+from django.urls import reverse
 
 from .models import Article
 
@@ -16,14 +12,11 @@ site.register(User)
 site.register(Article)
 
 urlpatterns = [
-    url(r'^test_admin/admin/', include(site.urls)),
+    url(r'^test_admin/admin/', site.urls),
 ]
 
 
-@override_settings(
-    PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
-    ROOT_URLCONF="admin_views.test_adminsite",
-)
+@override_settings(ROOT_URLCONF='admin_views.test_adminsite')
 class SiteEachContextTest(TestCase):
     """
     Check each_context contains the documented variables and that available_apps context
@@ -31,12 +24,7 @@ class SiteEachContextTest(TestCase):
     """
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
-            first_name='Super', last_name='User', email='super@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10),
-        )
+        cls.u1 = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
 
     def setUp(self):
         factory = RequestFactory()
@@ -49,7 +37,12 @@ class SiteEachContextTest(TestCase):
         self.assertEqual(ctx['site_header'], 'Django administration')
         self.assertEqual(ctx['site_title'], 'Django site admin')
         self.assertEqual(ctx['site_url'], '/')
-        self.assertEqual(ctx['has_permission'], True)
+        self.assertIs(ctx['has_permission'], True)
+
+    def test_each_context_site_url_with_script_name(self):
+        request = RequestFactory().get(reverse('test_adminsite:index'), SCRIPT_NAME='/my-script-name/')
+        request.user = self.u1
+        self.assertEqual(site.each_context(request)['site_url'], '/my-script-name/')
 
     def test_available_apps(self):
         ctx = self.ctx
@@ -71,12 +64,12 @@ class SiteEachContextTest(TestCase):
         self.assertEqual(user['object_name'], 'User')
 
         self.assertEqual(auth['app_url'], '/test_admin/admin/auth/')
-        self.assertEqual(auth['has_module_perms'], True)
+        self.assertIs(auth['has_module_perms'], True)
 
         self.assertIn('perms', user)
-        self.assertEqual(user['perms']['add'], True)
-        self.assertEqual(user['perms']['change'], True)
-        self.assertEqual(user['perms']['delete'], True)
+        self.assertIs(user['perms']['add'], True)
+        self.assertIs(user['perms']['change'], True)
+        self.assertIs(user['perms']['delete'], True)
         self.assertEqual(user['admin_url'], '/test_admin/admin/auth/user/')
         self.assertEqual(user['add_url'], '/test_admin/admin/auth/user/add/')
         self.assertEqual(user['name'], 'Users')

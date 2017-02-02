@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# A S Alam <apreet.alam@gmail.com>, 2011,2013
+# A S Alam <apreet.alam@gmail.com>, 2011,2013,2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Panjabi (Punjabi) (http://www.transifex.com/projects/p/django/"
+"Language-Team: Panjabi (Punjabi) (http://www.transifex.com/django/django/"
 "language/pa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -60,6 +60,9 @@ msgstr "ਡੈਨਿਸ਼"
 msgid "German"
 msgstr "ਜਰਮਨ"
 
+msgid "Lower Sorbian"
+msgstr ""
+
 msgid "Greek"
 msgstr "ਗਰੀਕ"
 
@@ -80,6 +83,9 @@ msgstr "ਸਪੇਨੀ"
 
 msgid "Argentinian Spanish"
 msgstr "ਅਰਜਨਟੀਨੀ ਸਪੇਨੀ"
+
+msgid "Colombian Spanish"
+msgstr ""
 
 msgid "Mexican Spanish"
 msgstr "ਮੈਕਸੀਕਨ ਸਪੇਨੀ"
@@ -111,6 +117,9 @@ msgstr "ਫ਼ਾਰਸੀ"
 msgid "Irish"
 msgstr "ਆਈਰਸ਼"
 
+msgid "Scottish Gaelic"
+msgstr ""
+
 msgid "Galician"
 msgstr "ਗਲੀਸੀਆਈ"
 
@@ -122,6 +131,9 @@ msgstr "ਹਿੰਦੀ"
 
 msgid "Croatian"
 msgstr "ਕਰੋਆਟੀਆਈ"
+
+msgid "Upper Sorbian"
+msgstr ""
 
 msgid "Hungarian"
 msgstr "ਹੰਗਰੀਆਈ"
@@ -178,13 +190,13 @@ msgid "Mongolian"
 msgstr "ਮੰਗੋਲੀਆਈ"
 
 msgid "Marathi"
-msgstr ""
+msgstr "ਮਰਾਠੀ"
 
 msgid "Burmese"
 msgstr ""
 
-msgid "Norwegian Bokmal"
-msgstr "ਨਾਰਵੇਗੀਆਈ ਬੋਕਮਾਲ"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "ਨੇਪਾਲੀ"
@@ -271,18 +283,15 @@ msgid "Traditional Chinese"
 msgstr "ਮੂਲ ਚੀਨੀ"
 
 msgid "Messages"
-msgstr ""
+msgstr "ਸੁਨੇਹੇ"
 
 msgid "Site Maps"
-msgstr ""
+msgstr "ਸਾਈਟ ਖਾਕੇ"
 
 msgid "Static Files"
-msgstr ""
+msgstr "ਸਥਿਰ ਫਾਈਲਾਂ"
 
 msgid "Syndication"
-msgstr ""
-
-msgid "Web Design"
 msgstr ""
 
 msgid "Enter a valid value."
@@ -299,6 +308,11 @@ msgstr "ਢੁੱਕਵਾਂ ਈਮੇਲ ਸਿਰਨਾਵਾਂ ਦਿਉ �
 
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
 msgstr ""
 
 msgid "Enter a valid IPv4 address."
@@ -345,6 +359,26 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "and"
 msgstr "ਅਤੇ"
 
@@ -382,6 +416,9 @@ msgstr "ਅੰਕ"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
+msgstr ""
+
+msgid "Big (8 byte) integer"
 msgstr ""
 
 #, python-format
@@ -442,7 +479,7 @@ msgid ""
 msgstr ""
 
 msgid "Duration"
-msgstr ""
+msgstr "ਅੰਤਰਾਲ"
 
 msgid "Email address"
 msgstr "ਈਮੇਲ ਐਡਰੈੱਸ"
@@ -455,9 +492,6 @@ msgid "'%(value)s' value must be a float."
 msgstr ""
 
 msgid "Floating point number"
-msgstr ""
-
-msgid "Big (8 byte) integer"
 msgstr ""
 
 msgid "IPv4 address"
@@ -530,8 +564,22 @@ msgstr ""
 msgid "One-to-one relationship"
 msgstr "ਇੱਕ-ਤੋਂ-ਇੱਕ ਸਬੰਧ"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
 msgid "Many-to-many relationship"
 msgstr "ਕਈ-ਤੋਂ-ਕਈ ਸਬੰਧ"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ""
 
 msgid "This field is required."
 msgstr "ਇਹ ਖੇਤਰ ਲਾਜ਼ਮੀ ਹੈ।"
@@ -541,26 +589,6 @@ msgstr "ਪੂਰਨ ਨੰਬਰ ਦਿਉ।"
 
 msgid "Enter a number."
 msgstr "ਨੰਬਰ ਦਿਓ।"
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-msgstr[1] ""
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-msgstr[1] ""
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-msgstr[1] ""
 
 msgid "Enter a valid date."
 msgstr "ਠੀਕ ਮਿਤੀ ਦਿਓ।"
@@ -613,16 +641,10 @@ msgstr ""
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
-msgstr ""
+msgstr ":"
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
 msgstr ""
 
 msgid "ManagementForm data is missing or has been tampered with"
@@ -1042,10 +1064,10 @@ msgid "More information is available with DEBUG=True."
 msgstr ""
 
 msgid "Welcome to Django"
-msgstr ""
+msgstr "ਡਿਜਾਂਗੋ ਉੱਤੇ ਜੀ ਆਇਆਂ ਨੂੰ"
 
 msgid "It worked!"
-msgstr ""
+msgstr "ਇਹ ਕੰਮ ਕਰਦਾ ਹੈ!"
 
 msgid "Congratulations on your first Django-powered page."
 msgstr ""

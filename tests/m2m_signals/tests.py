@@ -270,7 +270,7 @@ class ManyToManySignalsTest(TestCase):
         self.assertEqual(self.m2m_changed_messages, expected_messages)
 
         # direct assignment clears the set first, then adds
-        self.vw.default_parts = [self.wheelset, self.doors, self.engine]
+        self.vw.default_parts.set([self.wheelset, self.doors, self.engine])
         expected_messages.append({
             'instance': self.vw,
             'action': 'pre_remove',
@@ -359,10 +359,10 @@ class ManyToManySignalsTest(TestCase):
 
         self._initialize_signal_car(add_default_parts_before_set_signal=True)
 
-        # Check that signals still work when model inheritance is involved
+        # Signals still work when model inheritance is involved
         c4 = SportsCar.objects.create(name='Bugatti', price='1000000')
         c4b = Car.objects.get(name='Bugatti')
-        c4.default_parts = [self.doors]
+        c4.default_parts.set([self.doors])
         expected_messages.append({
             'instance': c4,
             'action': 'pre_add',
@@ -407,7 +407,7 @@ class ManyToManySignalsTest(TestCase):
 
     def test_m2m_relations_with_self_add_friends(self):
         self._initialize_signal_person()
-        self.alice.friends = [self.bob, self.chuck]
+        self.alice.friends.set([self.bob, self.chuck])
         self.assertEqual(self.m2m_changed_messages, [
             {
                 'instance': self.alice,
@@ -426,7 +426,7 @@ class ManyToManySignalsTest(TestCase):
 
     def test_m2m_relations_with_self_add_fan(self):
         self._initialize_signal_person()
-        self.alice.fans = [self.daisy]
+        self.alice.fans.set([self.daisy])
         self.assertEqual(self.m2m_changed_messages, [
             {
                 'instance': self.alice,
@@ -445,7 +445,7 @@ class ManyToManySignalsTest(TestCase):
 
     def test_m2m_relations_with_self_add_idols(self):
         self._initialize_signal_person()
-        self.chuck.idols = [self.alice, self.bob]
+        self.chuck.idols.set([self.alice, self.bob])
         self.assertEqual(self.m2m_changed_messages, [
             {
                 'instance': self.chuck,

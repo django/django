@@ -13,4 +13,4 @@ Bugfixes
   security release, the ``django.views.static.serve()`` function was altered
   to stream the files it serves. Unfortunately, the ``GZipMiddleware`` consumed
   the stream prematurely and prevented files from being served properly
-  (`#24158 <http://code.djangoproject.com/ticket/24158>`_).
+  (:ticket:`24158`).

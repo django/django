@@ -1,7 +1,10 @@
+import warnings
+
 from django.template import (
     Context, Engine, TemplateDoesNotExist, TemplateSyntaxError,
 )
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango21Warning
 
 from ..utils import setup
 from .test_basic import basic_templates
@@ -41,8 +44,19 @@ class IncludeTagTests(SimpleTestCase):
             with self.assertRaises(TemplateDoesNotExist):
                 template.render(Context({}))
         else:
-            output = template.render(Context({}))
+            with warnings.catch_warnings(record=True) as warns:
+                warnings.simplefilter('always')
+                output = template.render(Context({}))
+
             self.assertEqual(output, "ab")
+
+            self.assertEqual(len(warns), 1)
+            self.assertEqual(
+                str(warns[0].message),
+                "Rendering {% include 'include04' %} raised "
+                "TemplateDoesNotExist. In Django 2.1, this exception will be "
+                "raised rather than silenced and rendered as an empty string.",
+            )
 
     @setup({
         'include 05': 'template with a space',
@@ -169,7 +183,8 @@ class IncludeTagTests(SimpleTestCase):
             with self.assertRaises(RuntimeError):
                 template.render(Context())
         else:
-            self.assertEqual(template.render(Context()), '')
+            with ignore_warnings(category=RemovedInDjango21Warning):
+                self.assertEqual(template.render(Context()), '')
 
     @setup({'include-error08': '{% include "include-fail2" %}'}, include_fail_templates)
     def test_include_error08(self):
@@ -179,7 +194,8 @@ class IncludeTagTests(SimpleTestCase):
             with self.assertRaises(TemplateSyntaxError):
                 template.render(Context())
         else:
-            self.assertEqual(template.render(Context()), '')
+            with ignore_warnings(category=RemovedInDjango21Warning):
+                self.assertEqual(template.render(Context()), '')
 
     @setup({'include-error09': '{% include failed_include %}'}, include_fail_templates)
     def test_include_error09(self):
@@ -190,7 +206,8 @@ class IncludeTagTests(SimpleTestCase):
             with self.assertRaises(RuntimeError):
                 template.render(context)
         else:
-            self.assertEqual(template.render(context), '')
+            with ignore_warnings(category=RemovedInDjango21Warning):
+                self.assertEqual(template.render(context), '')
 
     @setup({'include-error10': '{% include failed_include %}'}, include_fail_templates)
     def test_include_error10(self):
@@ -201,14 +218,15 @@ class IncludeTagTests(SimpleTestCase):
             with self.assertRaises(TemplateSyntaxError):
                 template.render(context)
         else:
-            self.assertEqual(template.render(context), '')
+            with ignore_warnings(category=RemovedInDjango21Warning):
+                self.assertEqual(template.render(context), '')
 
 
 class IncludeTests(SimpleTestCase):
 
     def test_include_missing_template(self):
         """
-        Tests that the correct template is identified as not existing
+        The correct template is identified as not existing
         when {% include %} specifies a template that does not exist.
         """
         engine = Engine(app_dirs=True, debug=True)
@@ -219,7 +237,7 @@ class IncludeTests(SimpleTestCase):
 
     def test_extends_include_missing_baseloader(self):
         """
-        #12787 -- Tests that the correct template is identified as not existing
+        #12787 -- The correct template is identified as not existing
         when {% extends %} specifies a template that does exist, but that
         template has an {% include %} of something that does not exist.
         """
@@ -230,9 +248,6 @@ class IncludeTests(SimpleTestCase):
         self.assertEqual(e.exception.args[0], 'missing.html')
 
     def test_extends_include_missing_cachedloader(self):
-        """
-        Test the cache loader separately since it overrides load_template.
-        """
         engine = Engine(debug=True, loaders=[
             ('django.template.loaders.cached.Loader', [
                 'django.template.loaders.app_directories.Loader',

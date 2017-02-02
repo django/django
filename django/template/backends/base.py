@@ -1,6 +1,3 @@
-# Since this package contains a "django" module, this is required on Python 2.
-from __future__ import absolute_import
-
 from django.core.exceptions import (
     ImproperlyConfigured, SuspiciousFileOperation,
 )
@@ -9,7 +6,7 @@ from django.utils._os import safe_join
 from django.utils.functional import cached_property
 
 
-class BaseEngine(object):
+class BaseEngine:
 
     # Core methods: engines have to provide their own implementation
     #               (except for from_string which is optional).

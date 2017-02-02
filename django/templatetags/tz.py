@@ -1,20 +1,16 @@
 from datetime import datetime, tzinfo
 
+import pytz
+
 from django.template import Library, Node, TemplateSyntaxError
-from django.utils import six, timezone
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
-
+from django.utils import timezone
 
 register = Library()
 
 
-# HACK: datetime is an old-style class, create a new-style equivalent
-# so we can define additional attributes.
-class datetimeobject(datetime, object):
+# HACK: datetime instances cannot be assigned new attributes. Define a subclass
+# in order to define new attributes in do_timezone().
+class datetimeobject(datetime):
     pass
 
 
@@ -44,7 +40,6 @@ def do_timezone(value, arg):
     Converts a datetime to local time in a given time zone.
 
     The argument must be an instance of a tzinfo subclass or a time zone name.
-    If it is a time zone name, pytz is required.
 
     Naive datetimes are assumed to be in local time in the default time zone.
     """
@@ -64,7 +59,7 @@ def do_timezone(value, arg):
     # Obtain a tzinfo instance
     if isinstance(arg, tzinfo):
         tz = arg
-    elif isinstance(arg, six.string_types) and pytz is not None:
+    elif isinstance(arg, str):
         try:
             tz = pytz.timezone(arg)
         except pytz.UnknownTimeZoneError:
@@ -136,7 +131,6 @@ def localtime_tag(parser, token):
     Sample usage::
 
         {% localtime off %}{{ value_in_utc }}{% endlocaltime %}
-
     """
     bits = token.split_contents()
     if len(bits) == 1:
@@ -157,15 +151,14 @@ def timezone_tag(parser, token):
     Enables a given time zone just for this block.
 
     The ``timezone`` argument must be an instance of a ``tzinfo`` subclass, a
-    time zone name, or ``None``. If is it a time zone name, pytz is required.
-    If it is ``None``, the default time zone is used within the block.
+    time zone name, or ``None``. If it is ``None``, the default time zone is
+    used within the block.
 
     Sample usage::
 
         {% timezone "Europe/Paris" %}
             It is {{ now }} in Paris.
         {% endtimezone %}
-
     """
     bits = token.split_contents()
     if len(bits) != 2:

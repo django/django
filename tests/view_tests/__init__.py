@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
-
 class BrokenException(Exception):
     pass
+
 
 except_args = (b'Broken!',         # plain exception with ASCII text
                '¡Broken!',         # non-ASCII unicode data
