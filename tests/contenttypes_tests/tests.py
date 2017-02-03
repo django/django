@@ -1,5 +1,6 @@
 import datetime
 from unittest import mock
+import json
 
 from django.apps.registry import Apps, apps
 from django.conf import settings
@@ -18,8 +19,8 @@ from django.test import (
 from django.test.utils import captured_stdout, isolate_apps
 
 from .models import (
-    Article, Author, ModelWithNullFKToSite, Post, SchemeIncludedURL,
-    Site as MockSite,
+    Answer, Article, Author, ModelWithNullFKToSite, Post, Question,
+    SchemeIncludedURL, Site as MockSite,
 )
 
 
@@ -371,6 +372,29 @@ class GenericRelationshipTests(SimpleTestCase):
             )
         ]
         self.assertEqual(errors, expected)
+
+
+class GenericRelationshipModelTests(TestCase):
+    def test_value_to_string(self):
+        question = Question.objects.create(text='test')
+        answer1 = Answer.objects.create(question=question)
+        answer2 = Answer.objects.create(question=question)
+        result = json.loads(Question.answer_set.field.value_to_string(question))
+        self.assertCountEqual(result, [answer1.pk, answer2.pk])
+
+    def test_get_content_type_no_arguments(self):
+        with self.assertRaisesMessage(Exception, 'Impossible arguments to GFK.get_content_type!'):
+            Answer.question.get_content_type()
+
+    def test_incorrect_get_content_type_arguments(self):
+        with self.assertRaisesMessage(ValueError, "Custom queryset can't be used for this lookup."):
+            Answer.question.get_prefetch_queryset(Answer.objects.all(), Answer.objects.all())
+
+    def test_wrong_instance(self):
+        question = Question.objects.create(text='test')
+        post = Post.objects.create(title='test')
+        with self.assertRaisesMessage(TypeError, "'Answer' instance expected, got <Post: test>"):
+            question.answer_set.add(post)
 
 
 class UpdateContentTypesTests(TestCase):

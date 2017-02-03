@@ -2,9 +2,10 @@ from django import forms
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
-from django.db import IntegrityError
+from django.db import IntegrityError, models
 from django.db.models import Q
 from django.test import SimpleTestCase, TestCase
+from django.test.utils import isolate_apps
 
 from .models import (
     AllowsNullGFK, Animal, Carrot, Comparison, ConcreteRelatedModel,
@@ -595,6 +596,15 @@ class GenericInlineFormsetTest(TestCase):
         Formset = generic_inlineformset_factory(TaggedItem, TaggedItemForm)
         form = Formset().forms[0]
         self.assertIsInstance(form['tag'].field.widget, CustomWidget)
+
+    @isolate_apps('generic_relations')
+    def test_incorrect_content_type(self):
+        class BadModel(models.Model):
+            content_type = models.PositiveIntegerField()
+
+        msg = "fk_name 'generic_relations.BadModel.content_type' is not a ForeignKey to ContentType"
+        with self.assertRaisesMessage(Exception, msg):
+            generic_inlineformset_factory(BadModel, TaggedItemForm)
 
     def test_save_new_uses_form_save(self):
         """
