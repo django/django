@@ -437,6 +437,12 @@ class ClearableFileInput(FileInput):
     def use_required_attribute(self, initial):
         return super(ClearableFileInput, self).use_required_attribute(initial) and not initial
 
+    def value_omitted_from_data(self, data, files, name):
+        return (
+            super(ClearableFileInput, self).value_omitted_from_data(data, files, name) and
+            self.clear_checkbox_name(name) not in data
+        )
+
 
 class Textarea(Widget):
     template_name = 'django/forms/widgets/textarea.html'
