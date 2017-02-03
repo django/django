@@ -38,6 +38,33 @@ class FieldOperation(Operation):
         # a field referencing the specified model.
         return True
 
+    def references_field(self, model_name, name, app_label=None):
+        model_name_lower = model_name.lower()
+        # Check if this operation locally references the field.
+        if model_name_lower == self.model_name_lower:
+            if name == self.name:
+                return True
+            elif self.field and hasattr(self.field, 'from_fields') and name in self.field.from_fields:
+                return True
+        # Check if this operation remotely references the field.
+        if self.field:
+            model_tuple = ModelTuple(app_label, model_name_lower)
+            remote_field = self.field.remote_field
+            if remote_field:
+                if (ModelTuple.from_model(remote_field.model) == model_tuple and
+                        (not hasattr(self.field, 'to_fields') or
+                            name in self.field.to_fields or None in self.field.to_fields)):
+                    return True
+                through = getattr(remote_field, 'through', None)
+                if (through and ModelTuple.from_model(through) == model_tuple and
+                        (getattr(remote_field, 'through_fields', None) is None or
+                            name in remote_field.through_fields)):
+                    return True
+            return False
+        # Refuse the temptation to guess. This operation could be performed on
+        # a field referencing the specified model.
+        return True
+
     def reduce(self, operation, in_between, app_label=None):
         return (
             super().reduce(operation, in_between, app_label=app_label) or

@@ -4,6 +4,7 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db import connection, migrations, models, transaction
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations import CreateModel
+from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.state import ModelState, ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
@@ -2753,3 +2754,60 @@ class TestCreateModel(SimpleTestCase):
 
     def test_references_model_mixin(self):
         CreateModel('name', [], bases=(Mixin, models.Model)).references_model('other_model')
+
+
+class FieldOperationTests(SimpleTestCase):
+    def test_references_model(self):
+        operation = FieldOperation('MoDel', 'field')
+        # When missing a field declaration always assume it's referencing.
+        self.assertIs(operation.references_model('Whatever'), True)
+        operation.field = models.ForeignKey('Other', models.CASCADE)
+        # Model name match.
+        self.assertIs(operation.references_model('mOdEl'), True)
+        # Referenced field.
+        self.assertIs(operation.references_model('oTher'), True)
+        # Doesn't reference.
+        self.assertIs(operation.references_model('Whatever'), False)
+
+    def test_references_field_missing_field(self):
+        operation = FieldOperation('MoDel', 'field')
+        self.assertIs(operation.references_field('Whatever', 'missing'), True)
+
+    def test_references_field_by_name(self):
+        operation = FieldOperation('MoDel', 'field', models.BooleanField(default=False))
+        self.assertIs(operation.references_field('model', 'field'), True)
+
+    def test_references_field_by_remote_field_model(self):
+        operation = FieldOperation('Model', 'field', models.ForeignKey('Other', models.CASCADE))
+        self.assertIs(operation.references_field('Other', 'whatever'), True)
+        self.assertIs(operation.references_field('Missing', 'whatever'), False)
+
+    def test_references_field_by_from_fields(self):
+        operation = FieldOperation(
+            'Model', 'field', models.fields.related.ForeignObject('Other', models.CASCADE, ['from'], ['to'])
+        )
+        self.assertIs(operation.references_field('Model', 'from'), True)
+        self.assertIs(operation.references_field('Model', 'to'), False)
+        self.assertIs(operation.references_field('Other', 'from'), False)
+        self.assertIs(operation.references_field('Model', 'to'), False)
+
+    def test_references_field_by_to_fields(self):
+        operation = FieldOperation('Model', 'field', models.ForeignKey('Other', models.CASCADE, to_field='field'))
+        self.assertIs(operation.references_field('Other', 'field'), True)
+        self.assertIs(operation.references_field('Other', 'whatever'), False)
+        self.assertIs(operation.references_field('Missing', 'whatever'), False)
+
+    def test_references_field_by_through(self):
+        operation = FieldOperation('Model', 'field', models.ManyToManyField('Other', through='Through'))
+        self.assertIs(operation.references_field('Other', 'whatever'), True)
+        self.assertIs(operation.references_field('Through', 'whatever'), True)
+        self.assertIs(operation.references_field('Missing', 'whatever'), False)
+
+    def test_reference_field_by_through_fields(self):
+        operation = FieldOperation(
+            'Model', 'field', models.ManyToManyField('Other', through='Through', through_fields=('first', 'second'))
+        )
+        self.assertIs(operation.references_field('Other', 'whatever'), True)
+        self.assertIs(operation.references_field('Through', 'whatever'), False)
+        self.assertIs(operation.references_field('Through', 'first'), True)
+        self.assertIs(operation.references_field('Through', 'second'), True)
