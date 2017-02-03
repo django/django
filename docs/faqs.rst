@@ -152,7 +152,7 @@ Are channels Python 2, 3 or 2+3?
 --------------------------------
 
 Django-channels and all of its dependencies are compatible with Python 2.7,
-3.3, and higher. This includes the parts of Twisted that some of the Channels
+3.4, and higher. This includes the parts of Twisted that some of the Channels
 packages (like daphne) use.
 
 
