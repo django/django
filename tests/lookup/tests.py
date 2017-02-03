@@ -252,7 +252,7 @@ class LookupTests(TestCase):
             ],
         )
         # However, an exception FieldDoesNotExist will be thrown if you specify
-        # a non-existent field name in values() (a field that is neither in the
+        # a nonexistent field name in values() (a field that is neither in the
         # model nor in extra(select)).
         with self.assertRaises(FieldError):
             Article.objects.extra(select={'id_plus_one': 'id + 1'}).values('id', 'id_plus_two')

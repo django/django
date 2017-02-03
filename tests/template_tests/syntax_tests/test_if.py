@@ -533,9 +533,7 @@ class IfTagTests(SimpleTestCase):
 
     @setup({'if-tag-badarg01': '{% if x|default_if_none:y %}yes{% endif %}'})
     def test_if_tag_badarg01(self):
-        """
-        Non-existent args
-        """
+        """Nonexistent args"""
         output = self.engine.render_to_string('if-tag-badarg01')
         self.assertEqual(output, '')
 

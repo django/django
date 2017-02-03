@@ -104,7 +104,7 @@ class StaticTests(SimpleTestCase):
         self.assertEqual(len(response_content), int(response['Content-Length']))
 
     def test_404(self):
-        response = self.client.get('/%s/non_existing_resource' % self.prefix)
+        response = self.client.get('/%s/nonexistent_resource' % self.prefix)
         self.assertEqual(404, response.status_code)
 
     def test_index(self):

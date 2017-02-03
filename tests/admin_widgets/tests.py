@@ -222,7 +222,7 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
         post_data = {
             "main_band": '%s' % pk,
         }
-        # Try posting with a non-existent pk in a raw id field: this
+        # Try posting with a nonexistent pk in a raw id field: this
         # should result in an error message, not a server exception.
         response = self.client.post(reverse('admin:admin_widgets_event_add'), post_data)
         self.assertContains(response, 'Select a valid choice. That choice is not one of the available choices.')

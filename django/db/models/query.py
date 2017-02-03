@@ -1267,7 +1267,7 @@ class RawQuerySet:
                 index = columns.index(query_name)
                 columns[index] = model_name
             except ValueError:
-                # Ignore translations for non-existent column names
+                # Ignore translations for nonexistent column names
                 pass
         return columns
 

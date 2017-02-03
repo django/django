@@ -37,9 +37,9 @@ class TemplateStringsTests(SimpleTestCase):
         content = template.render({'name': 'world'})
         self.assertEqual(content, "Hello world!\n")
 
-    def test_get_template_non_existing(self):
+    def test_get_template_nonexistent(self):
         with self.assertRaises(TemplateDoesNotExist) as e:
-            self.engine.get_template('template_backends/non_existing.html')
+            self.engine.get_template('template_backends/nonexistent.html')
         self.assertEqual(e.exception.backend, self.engine)
 
     def test_get_template_syntax_error(self):

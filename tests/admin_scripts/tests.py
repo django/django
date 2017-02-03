@@ -1132,9 +1132,7 @@ class ManageCheck(AdminScriptTestCase):
         self.remove_settings('settings.py')
 
     def test_nonexistent_app(self):
-        """ manage.py check reports an error on a non-existent app in
-        INSTALLED_APPS """
-
+        """check reports an error on a nonexistent app in INSTALLED_APPS."""
         self.write_settings(
             'settings.py',
             apps=['admin_scriptz.broken_app'],

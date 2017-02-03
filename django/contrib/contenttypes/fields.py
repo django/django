@@ -97,7 +97,8 @@ class GenericForeignKey:
         except FieldDoesNotExist:
             return [
                 checks.Error(
-                    "The GenericForeignKey object ID references the non-existent field '%s'." % self.fk_field,
+                    "The GenericForeignKey object ID references the "
+                    "nonexistent field '%s'." % self.fk_field,
                     obj=self,
                     id='contenttypes.E001',
                 )
@@ -115,7 +116,8 @@ class GenericForeignKey:
         except FieldDoesNotExist:
             return [
                 checks.Error(
-                    "The GenericForeignKey content type references the non-existent field '%s.%s'." % (
+                    "The GenericForeignKey content type references the "
+                    "nonexistent field '%s.%s'." % (
                         self.model._meta.object_name, self.ct_field
                     ),
                     obj=self,

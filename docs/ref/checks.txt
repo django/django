@@ -281,13 +281,13 @@ Models
 * **models.E010**: ``unique_together`` must be a list or tuple.
 * **models.E011**: All ``unique_together`` elements must be lists or tuples.
 * **models.E012**: ``index_together/unique_together`` refers to the
-  non-existent field ``<field name>``.
+  nonexistent field ``<field name>``.
 * **models.E013**: ``index_together/unique_together`` refers to a
   ``ManyToManyField`` ``<field name>``, but ``ManyToManyField``\s are not
   supported for that option.
 * **models.E014**: ``ordering`` must be a tuple or list (even if you want to
   order by only one field).
-* **models.E015**: ``ordering`` refers to the non-existent field
+* **models.E015**: ``ordering`` refers to the nonexistent field
   ``<field name>``.
 * **models.E016**: ``index_together/unique_together`` refers to field
   ``<field_name>`` which is not local to model ``<model>``.
@@ -659,9 +659,9 @@ The following checks are performed when a model contains a
 :class:`~django.contrib.contenttypes.fields.GenericRelation`:
 
 * **contenttypes.E001**: The ``GenericForeignKey`` object ID references the
-  non-existent field ``<field>``.
+  nonexistent field ``<field>``.
 * **contenttypes.E002**: The ``GenericForeignKey`` content type references the
-  non-existent field ``<field>``.
+  nonexistent field ``<field>``.
 * **contenttypes.E003**: ``<field>`` is not a ``ForeignKey``.
 * **contenttypes.E004**: ``<field>`` is not a ``ForeignKey`` to
   ``contenttypes.ContentType``.

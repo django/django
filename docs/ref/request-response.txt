@@ -323,10 +323,10 @@ Methods
         'Tony'
         >>> request.get_signed_cookie('name', salt='name-salt')
         'Tony' # assuming cookie was set using the same salt
-        >>> request.get_signed_cookie('non-existing-cookie')
+        >>> request.get_signed_cookie('nonexistent-cookie')
         ...
-        KeyError: 'non-existing-cookie'
-        >>> request.get_signed_cookie('non-existing-cookie', False)
+        KeyError: 'nonexistent-cookie'
+        >>> request.get_signed_cookie('nonexistent-cookie', False)
         False
         >>> request.get_signed_cookie('cookie-that-was-tampered-with')
         ...

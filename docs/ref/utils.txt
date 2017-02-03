@@ -984,7 +984,7 @@ appropriate entities.
     ``value`` aware during a DST transition such that the time never occurred
     (when entering into DST). Setting ``is_dst`` to ``True`` or ``False`` will
     avoid the exception by moving the hour backwards or forwards by 1
-    respectively. For example, ``is_dst=True`` would change a non-existent
+    respectively. For example, ``is_dst=True`` would change a nonexistent
     time of 2:30 to 1:30 and ``is_dst=False`` would change the time to 3:30.
 
 .. function:: make_naive(value, timezone=None)

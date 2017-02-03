@@ -83,7 +83,7 @@ class DummyCacheTests(SimpleTestCase):
         self.assertIsNone(cache.get("addkey1"))
 
     def test_non_existent(self):
-        "Non-existent keys aren't found in the dummy cache backend"
+        "Nonexistent keys aren't found in the dummy cache backend"
         self.assertIsNone(cache.get("does_not_exist"))
         self.assertEqual(cache.get("does_not_exist", "bang!"), "bang!")
 
@@ -280,8 +280,7 @@ class BaseCacheTests:
         self.assertEqual(caches['prefix'].get('somekey'), 'value2')
 
     def test_non_existent(self):
-        # Non-existent cache keys return as None/default
-        # get with non-existent keys
+        """Nonexistent cache keys return as None/default."""
         self.assertIsNone(cache.get("does_not_exist"))
         self.assertEqual(cache.get("does_not_exist", "bang!"), "bang!")
 

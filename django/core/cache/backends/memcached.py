@@ -108,7 +108,7 @@ class BaseMemcachedCache(BaseCache):
         try:
             val = self._cache.incr(key, delta)
 
-        # python-memcache responds to incr on non-existent keys by
+        # python-memcache responds to incr on nonexistent keys by
         # raising a ValueError, pylibmc by raising a pylibmc.NotFound
         # and Cmemcache returns None. In all cases,
         # we should raise a ValueError though.
@@ -126,7 +126,7 @@ class BaseMemcachedCache(BaseCache):
         try:
             val = self._cache.decr(key, delta)
 
-        # python-memcache responds to incr on non-existent keys by
+        # python-memcache responds to incr on nonexistent keys by
         # raising a ValueError, pylibmc by raising a pylibmc.NotFound
         # and Cmemcache returns None. In all cases,
         # we should raise a ValueError though.

@@ -44,21 +44,21 @@ class GetStorageClassTests(SimpleTestCase):
         get_storage_class raises an error if the requested import don't exist.
         """
         with self.assertRaisesMessage(ImportError, "No module named 'storage'"):
-            get_storage_class('storage.NonExistingStorage')
+            get_storage_class('storage.NonexistentStorage')
 
-    def test_get_nonexisting_storage_class(self):
+    def test_get_nonexistent_storage_class(self):
         """
         get_storage_class raises an error if the requested class don't exist.
         """
         with self.assertRaises(ImportError):
-            get_storage_class('django.core.files.storage.NonExistingStorage')
+            get_storage_class('django.core.files.storage.NonexistentStorage')
 
-    def test_get_nonexisting_storage_module(self):
+    def test_get_nonexistent_storage_module(self):
         """
         get_storage_class raises an error if the requested module don't exist.
         """
-        with self.assertRaisesMessage(ImportError, "No module named 'django.core.files.non_existing_storage'"):
-            get_storage_class('django.core.files.non_existing_storage.NonExistingStorage')
+        with self.assertRaisesMessage(ImportError, "No module named 'django.core.files.nonexistent_storage'"):
+            get_storage_class('django.core.files.nonexistent_storage.NonexistentStorage')
 
 
 class FileSystemStorageTests(unittest.TestCase):

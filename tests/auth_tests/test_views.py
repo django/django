@@ -234,7 +234,7 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertContains(response, "The password reset link was invalid")
 
     def test_confirm_invalid_user(self):
-        # A non-existent user returns a 200 response, not a 404.
+        # A nonexistent user returns a 200 response, not a 404.
         response = self.client.get('/reset/123456/1-1/')
         self.assertContains(response, "The password reset link was invalid")
 

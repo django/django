@@ -772,9 +772,7 @@ class MakeMigrationsTests(MigrationTestBase):
         self.assertIn("No conflicts detected to merge.", out.getvalue())
 
     def test_makemigrations_no_app_sys_exit(self):
-        """
-        makemigrations exits if a non-existent app is specified.
-        """
+        """makemigrations exits if a nonexistent app is specified."""
         err = io.StringIO()
         with self.assertRaises(SystemExit):
             call_command("makemigrations", "this_app_does_not_exist", stderr=err)

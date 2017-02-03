@@ -1497,7 +1497,7 @@ class Model(metaclass=ModelBase):
             except KeyError:
                 errors.append(
                     checks.Error(
-                        "'%s' refers to the non-existent field '%s'." % (
+                        "'%s' refers to the nonexistent field '%s'." % (
                             option, field_name,
                         ),
                         obj=cls,
@@ -1570,7 +1570,7 @@ class Model(metaclass=ModelBase):
         # but is an alias and therefore won't be found by opts.get_field.
         fields = {f for f in fields if f != 'pk'}
 
-        # Check for invalid or non-existent fields in ordering.
+        # Check for invalid or nonexistent fields in ordering.
         invalid_fields = []
 
         # Any field name that is not present in field_names does not exist.
@@ -1586,7 +1586,7 @@ class Model(metaclass=ModelBase):
         for invalid_field in invalid_fields:
             errors.append(
                 checks.Error(
-                    "'ordering' refers to the non-existent field '%s'." % invalid_field,
+                    "'ordering' refers to the nonexistent field '%s'." % invalid_field,
                     obj=cls,
                     id='models.E015',
                 )

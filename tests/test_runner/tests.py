@@ -147,7 +147,7 @@ class ManageCommandTests(unittest.TestCase):
 
     def test_bad_test_runner(self):
         with self.assertRaises(AttributeError):
-            call_command('test', 'sites', testrunner='test_runner.NonExistentRunner')
+            call_command('test', 'sites', testrunner='test_runner.NonexistentRunner')
 
 
 class CustomTestRunnerOptionsTests(AdminScriptTestCase):

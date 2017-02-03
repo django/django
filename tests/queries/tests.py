@@ -2827,13 +2827,13 @@ class EmptyStringsAsNullTest(TestCase):
 
     def test_direct_exclude(self):
         self.assertQuerysetEqual(
-            NamedCategory.objects.exclude(name__in=['nonexisting']),
+            NamedCategory.objects.exclude(name__in=['nonexistent']),
             [self.nc.pk], attrgetter('pk')
         )
 
     def test_joined_exclude(self):
         self.assertQuerysetEqual(
-            DumbCategory.objects.exclude(namedcategory__name__in=['nonexisting']),
+            DumbCategory.objects.exclude(namedcategory__name__in=['nonexistent']),
             [self.nc.pk], attrgetter('pk')
         )
 

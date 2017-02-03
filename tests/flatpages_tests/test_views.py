@@ -60,7 +60,7 @@ class FlatpageViewTests(TestDataMixin, TestCase):
         self.assertContains(response, "<p>Isn't it flat!</p>")
 
     def test_view_non_existent_flatpage(self):
-        "A non-existent flatpage raises 404 when served through a view"
+        """A nonexistent flatpage raises 404 when served through a view."""
         response = self.client.get('/flatpage_root/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
@@ -79,7 +79,10 @@ class FlatpageViewTests(TestDataMixin, TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage won't be served if the fallback middleware is disabled"
+        """
+        A nonexistent flatpage won't be served if the fallback middleware is
+        disabled.
+        """
         response = self.client.get('/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
@@ -122,7 +125,10 @@ class FlatpageViewAppendSlashTests(TestDataMixin, TestCase):
         self.assertRedirects(response, '/flatpage_root/flatpage/', status_code=301)
 
     def test_redirect_view_non_existent_flatpage(self):
-        "A non-existent flatpage raises 404 when served through a view and should not add a slash"
+        """
+        A nonexistent flatpage raises 404 when served through a view and
+        should not add a slash.
+        """
         response = self.client.get('/flatpage_root/no_such_flatpage')
         self.assertEqual(response.status_code, 404)
 
@@ -132,7 +138,10 @@ class FlatpageViewAppendSlashTests(TestDataMixin, TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_redirect_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage won't be served if the fallback middleware is disabled and should not add a slash"
+        """
+        A nonexistent flatpage won't be served if the fallback middleware is
+        disabled and should not add a slash.
+        """
         response = self.client.get('/no_such_flatpage')
         self.assertEqual(response.status_code, 404)
 

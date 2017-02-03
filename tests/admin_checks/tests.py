@@ -344,7 +344,10 @@ class SystemChecksTestCase(SimpleTestCase):
         self.assertEqual(errors, expected)
 
     def test_generic_inline_model_admin_bad_ct_field(self):
-        "A GenericInlineModelAdmin raises problems if the ct_field points to a non-existent field."
+        """
+        A GenericInlineModelAdmin errors if the ct_field points to a
+        nonexistent field.
+        """
         class InfluenceInline(GenericStackedInline):
             model = Influence
             ct_field = 'nonexistent'
@@ -363,7 +366,10 @@ class SystemChecksTestCase(SimpleTestCase):
         self.assertEqual(errors, expected)
 
     def test_generic_inline_model_admin_bad_fk_field(self):
-        "A GenericInlineModelAdmin raises problems if the ct_fk_field points to a non-existent field."
+        """
+        A GenericInlineModelAdmin errors if the ct_fk_field points to a
+        nonexistent field.
+        """
         class InfluenceInline(GenericStackedInline):
             model = Influence
             ct_fk_field = 'nonexistent'
@@ -428,18 +434,15 @@ class SystemChecksTestCase(SimpleTestCase):
         self.assertEqual(errors, expected)
 
     def test_app_label_in_admin_checks(self):
-        """
-        Regression test for #15669 - Include app label in admin system check messages
-        """
-        class RawIdNonexistingAdmin(admin.ModelAdmin):
-            raw_id_fields = ('nonexisting',)
+        class RawIdNonexistentAdmin(admin.ModelAdmin):
+            raw_id_fields = ('nonexistent',)
 
-        errors = RawIdNonexistingAdmin(Album, AdminSite()).check()
+        errors = RawIdNonexistentAdmin(Album, AdminSite()).check()
         expected = [
             checks.Error(
-                "The value of 'raw_id_fields[0]' refers to 'nonexisting', "
+                "The value of 'raw_id_fields[0]' refers to 'nonexistent', "
                 "which is not an attribute of 'admin_checks.Album'.",
-                obj=RawIdNonexistingAdmin,
+                obj=RawIdNonexistentAdmin,
                 id='admin.E002',
             )
         ]

@@ -352,7 +352,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             try:
                 field = model._meta.get_field(part)
             except FieldDoesNotExist:
-                # Lookups on non-existent fields are ok, since they're ignored
+                # Lookups on nonexistent fields are ok, since they're ignored
                 # later.
                 break
             # It is allowed to filter on values that would be found from local

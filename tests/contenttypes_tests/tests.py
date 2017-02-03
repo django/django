@@ -154,7 +154,7 @@ class GenericForeignKeyTests(SimpleTestCase):
         errors = TaggedItem.content_object.check()
         expected = [
             checks.Error(
-                "The GenericForeignKey content type references the non-existent field 'TaggedItem.content_type'.",
+                "The GenericForeignKey content type references the nonexistent field 'TaggedItem.content_type'.",
                 obj=TaggedItem.content_object,
                 id='contenttypes.E002',
             )
@@ -212,7 +212,7 @@ class GenericForeignKeyTests(SimpleTestCase):
         errors = TaggedItem.content_object.check()
         expected = [
             checks.Error(
-                "The GenericForeignKey object ID references the non-existent field 'object_id'.",
+                "The GenericForeignKey object ID references the nonexistent field 'object_id'.",
                 obj=TaggedItem.content_object,
                 id='contenttypes.E001',
             )
