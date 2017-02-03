@@ -80,16 +80,6 @@ class Operation:
         """
         return "%s: %s" % (self.__class__.__name__, self._constructor_args)
 
-    def model_to_key(self, model):
-        """
-        Take either a model class or an 'app_label.ModelName' string and return
-        (app_label, model_name).
-        """
-        if isinstance(model, str):
-            return tuple(model.lower().split('.', 1))
-        else:
-            return model._meta.app_label, model._meta.model_name
-
     def references_model(self, name, app_label=None):
         """
         Return True if there is a chance this operation references the given

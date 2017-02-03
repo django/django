@@ -3,7 +3,9 @@ from django.db.models.fields import NOT_PROVIDED
 from django.utils.functional import cached_property
 
 from .base import Operation
-from .utils import is_referenced_by_foreign_key
+from .utils import (
+    ModelTuple, field_references_model, is_referenced_by_foreign_key,
+)
 
 
 class FieldOperation(Operation):
@@ -31,40 +33,9 @@ class FieldOperation(Operation):
         if name_lower == self.model_name_lower:
             return True
         if self.field:
-            if self.field.remote_field:
-                remote_app_label, remote_model_name = self.model_to_key(self.field.remote_field.model)
-                if (remote_model_name == name_lower and app_label is None or
-                        not remote_app_label or remote_app_label == app_label):
-                    return True
-                through = getattr(self.field.remote_field, 'through', None)
-                if through and self.model_to_key(through) == (app_label, name_lower):
-                    through_app_label, through_model_name = self.model_to_key(through)
-                    if (through_model_name == name_lower and app_label is None or
-                            not through_app_label or through_app_label == app_label):
-                        return True
-            return False
-        return True
-
-    def references_field(self, model_name, name, app_label=None):
-        if self.field:
-            model_name_lower = model_name.lower()
-            remote_field = self.field.remote_field
-            if remote_field:
-                remote_app_label, remote_model_name = self.model_to_key(remote_field.model)
-                if (remote_model_name == model_name_lower and
-                        (app_label is None or not remote_app_label or remote_app_label == app_label)):
-                    # TODO: Consider to_fields/from_fields.
-                    return True
-                through = getattr(remote_field, 'through', None)
-                if through and self.model_to_key(through) == (app_label, model_name_lower):
-                    through_app_label, through_model_name = self.model_to_key(through)
-                    if (through_model_name == model_name_lower and
-                        (app_label is None or not through_app_label or through_app_label == app_label) and
-                            (remote_field.through_fields is None or name in remote_field.through_fields)):
-                            return True
-            elif model_name_lower == self.model_name_lower and name == self.name:
-                return True
-            return False
+            return field_references_model(self.field, ModelTuple(app_label, name_lower))
+        # Refuse the temptation to guess. This operation could be performed on
+        # a field referencing the specified model.
         return True
 
     def reduce(self, operation, in_between, app_label=None):
