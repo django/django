@@ -7,9 +7,10 @@ from .utils import is_referenced_by_foreign_key
 
 
 class FieldOperation(Operation):
-    def __init__(self, model_name, name):
+    def __init__(self, model_name, name, field=None):
         self.model_name = model_name
         self.name = name
+        self.field = field
 
     @cached_property
     def model_name_lower(self):
@@ -29,22 +30,42 @@ class FieldOperation(Operation):
         name_lower = name.lower()
         if name_lower == self.model_name_lower:
             return True
-        field = getattr(self, 'field', None)
-        if field and field.remote_field:
-            remote_app_label, remote_model_name = self.model_to_key(field.remote_field.model)
-            if (remote_model_name == name_lower and app_label is None or
-                    not remote_app_label or remote_app_label == app_label):
-                return True
-            through = getattr(field.remote_field, 'through', None)
-            if through and self.model_to_key(through) == (app_label, name_lower):
-                through_app_label, through_model_name = self.model_to_key(through)
-                if (through_model_name == name_lower and app_label is None or
-                        not through_app_label or through_app_label == app_label):
+        if self.field:
+            if self.field.remote_field:
+                remote_app_label, remote_model_name = self.model_to_key(self.field.remote_field.model)
+                if (remote_model_name == name_lower and app_label is None or
+                        not remote_app_label or remote_app_label == app_label):
                     return True
-        return False
+                through = getattr(self.field.remote_field, 'through', None)
+                if through and self.model_to_key(through) == (app_label, name_lower):
+                    through_app_label, through_model_name = self.model_to_key(through)
+                    if (through_model_name == name_lower and app_label is None or
+                            not through_app_label or through_app_label == app_label):
+                        return True
+            return False
+        return True
 
     def references_field(self, model_name, name, app_label=None):
-        return self.references_model(model_name, app_label) and name.lower() == self.name_lower
+        if self.field:
+            model_name_lower = model_name.lower()
+            remote_field = self.field.remote_field
+            if remote_field:
+                remote_app_label, remote_model_name = self.model_to_key(remote_field.model)
+                if (remote_model_name == model_name_lower and
+                        (app_label is None or not remote_app_label or remote_app_label == app_label)):
+                    # TODO: Consider to_fields/from_fields.
+                    return True
+                through = getattr(remote_field, 'through', None)
+                if through and self.model_to_key(through) == (app_label, model_name_lower):
+                    through_app_label, through_model_name = self.model_to_key(through)
+                    if (through_model_name == model_name_lower and
+                        (app_label is None or not through_app_label or through_app_label == app_label) and
+                            (remote_field.through_fields is None or name in remote_field.through_fields)):
+                            return True
+            elif model_name_lower == self.model_name_lower and name == self.name:
+                return True
+            return False
+        return True
 
     def reduce(self, operation, in_between, app_label=None):
         return (
@@ -57,9 +78,8 @@ class AddField(FieldOperation):
     """Add a field to a model."""
 
     def __init__(self, model_name, name, field, preserve_default=True):
-        self.field = field
         self.preserve_default = preserve_default
-        super().__init__(model_name, name)
+        super().__init__(model_name, name, field)
 
     def deconstruct(self):
         kwargs = {
@@ -173,6 +193,12 @@ class RemoveField(FieldOperation):
     def describe(self):
         return "Remove field %s from %s" % (self.name, self.model_name)
 
+    def reduce(self, operation, in_between, app_label=None):
+        from .models import DeleteModel
+        if isinstance(operation, DeleteModel) and operation.name_lower == self.model_name_lower:
+            return [operation]
+        return super().reduce(operation, in_between, app_label=app_label)
+
 
 class AlterField(FieldOperation):
     """
@@ -181,9 +207,8 @@ class AlterField(FieldOperation):
     """
 
     def __init__(self, model_name, name, field, preserve_default=True):
-        self.field = field
         self.preserve_default = preserve_default
-        super().__init__(model_name, name)
+        super().__init__(model_name, name, field)
 
     def deconstruct(self):
         kwargs = {

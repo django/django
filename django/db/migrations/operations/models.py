@@ -225,6 +225,11 @@ class DeleteModel(ModelOperation):
         if self.allow_migrate_model(schema_editor.connection.alias, model):
             schema_editor.create_model(model)
 
+    def references_model(self, name, app_label=None):
+        # The deleted model could be referencing the specified model through
+        # related fields.
+        return True
+
     def describe(self):
         return "Delete model %s" % self.name
 
