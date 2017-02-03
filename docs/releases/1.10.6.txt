@@ -9,4 +9,5 @@ Django 1.10.6 fixes several bugs in 1.10.5.
 Bugfixes
 ========
 
-* ...
+* Fixed ``ClearableFileInput``’s "Clear" checkbox on model form fields where
+  the model field has a ``default`` (:ticket:`27805`).
