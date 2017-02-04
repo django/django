@@ -108,19 +108,8 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
         return s
     if isinstance(s, memoryview):
         return bytes(s)
-    if isinstance(s, Promise):
+    if isinstance(s, Promise) or not isinstance(s, str):
         return str(s).encode(encoding, errors)
-    if not isinstance(s, str):
-        try:
-            return str(s).encode(encoding)
-        except UnicodeEncodeError:
-            if isinstance(s, Exception):
-                # An Exception subclass containing non-ASCII data that doesn't
-                # know how to print itself properly. We shouldn't raise a
-                # further exception.
-                return b' '.join(force_bytes(arg, encoding, strings_only, errors)
-                                 for arg in s)
-            return str(s).encode(encoding, errors)
     else:
         return s.encode(encoding, errors)
 

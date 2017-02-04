@@ -42,8 +42,8 @@ class TestEncodingUtils(SimpleTestCase):
         """
         error_msg = "This is an exception, voilà"
         exc = ValueError(error_msg)
-        result = force_bytes(exc)
-        self.assertEqual(result, error_msg.encode('utf-8'))
+        self.assertEqual(force_bytes(exc), error_msg.encode('utf-8'))
+        self.assertEqual(force_bytes(exc, encoding='ascii', errors='ignore'), b'This is an exception, voil')
 
     def test_force_bytes_strings_only(self):
         today = datetime.date.today()
