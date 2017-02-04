@@ -4,13 +4,17 @@ from django.apps.registry import Apps, apps
 from django.contrib.contenttypes import management as contenttypes_management
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, modify_settings
 from django.test.utils import captured_stdout
 
 from .models import ModelWithNullFKToSite, Post
 
 
+@modify_settings(INSTALLED_APPS={'append': ['no_models']})
 class UpdateContentTypesTests(TestCase):
+    # Speed up tests by avoiding retrieving ContentTypes for all test apps.
+    available_apps = ['contenttypes_tests', 'no_models', 'django.contrib.contenttypes']
+
     def setUp(self):
         self.before_count = ContentType.objects.count()
         self.content_type = ContentType.objects.create(app_label='contenttypes_tests', model='Fake')
@@ -63,3 +67,10 @@ class UpdateContentTypesTests(TestCase):
         with self.assertNumQueries(0):
             contenttypes_management.create_contenttypes(self.app_config, interactive=False, verbosity=0, apps=apps)
         self.assertEqual(ContentType.objects.count(), self.before_count + 1)
+
+    def test_contenttypes_removed_in_apps_without_models(self):
+        ContentType.objects.create(app_label='no_models', model='Fake')
+        with mock.patch('builtins.input', return_value='yes'), captured_stdout() as stdout:
+            call_command('remove_stale_contenttypes', verbosity=2)
+        self.assertIn("Deleting stale content type 'no_models | Fake'", stdout.getvalue())
+        self.assertEqual(ContentType.objects.count(), self.before_count)
