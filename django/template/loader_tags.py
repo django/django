@@ -93,7 +93,7 @@ class ExtendsNode(Node):
         self.blocks = {n.name: n for n in nodelist.get_nodes_by_type(BlockNode)}
 
     def __repr__(self):
-        return '<ExtendsNode: extends %s>' % self.parent_name.token
+        return '<%s: extends %s>' % (self.__class__.__name__, self.parent_name.token)
 
     def find_template(self, template_name, context):
         """

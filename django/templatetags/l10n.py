@@ -29,7 +29,7 @@ class LocalizeNode(Node):
         self.use_l10n = use_l10n
 
     def __repr__(self):
-        return "<LocalizeNode>"
+        return '<%s>' % self.__class__.__name__
 
     def render(self, context):
         old_setting = context.use_l10n

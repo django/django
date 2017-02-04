@@ -278,7 +278,7 @@ class IfEqualNode(Node):
         self.negate = negate
 
     def __repr__(self):
-        return "<IfEqualNode>"
+        return '<%s>' % self.__class__.__name__
 
     def render(self, context):
         val1 = self.var1.resolve(context, True)
@@ -294,7 +294,7 @@ class IfNode(Node):
         self.conditions_nodelists = conditions_nodelists
 
     def __repr__(self):
-        return "<IfNode>"
+        return '<%s>' % self.__class__.__name__
 
     def __iter__(self):
         for _, nodelist in self.conditions_nodelists:
@@ -518,7 +518,7 @@ class WithNode(Node):
             self.extra_context[name] = var
 
     def __repr__(self):
-        return "<WithNode>"
+        return '<%s>' % self.__class__.__name__
 
     def render(self, context):
         values = {key: val.resolve(context) for key, val in self.extra_context.items()}

@@ -42,7 +42,7 @@ class Node:
         return str(self.key)
 
     def __repr__(self):
-        return '<Node: (%r, %r)>' % self.key
+        return '<%s: (%r, %r)>' % (self.__class__.__name__, self.key[0], self.key[1])
 
     def add_child(self, child):
         self.children.add(child)
@@ -80,9 +80,6 @@ class DummyNode(Node):
         super().__init__(key)
         self.origin = origin
         self.error_message = error_message
-
-    def __repr__(self):
-        return '<DummyNode: (%r, %r)>' % self.key
 
     def promote(self):
         """
