@@ -93,7 +93,7 @@ class HandlerTests(SimpleTestCase):
         self.assertEqual(response.status_code, 400)
 
 
-@override_settings(ROOT_URLCONF='handlers.urls')
+@override_settings(ROOT_URLCONF='handlers.urls', MIDDLEWARE=[])
 class TransactionsPerRequestTests(TransactionTestCase):
 
     available_apps = []
