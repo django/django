@@ -8,6 +8,10 @@ __all__ = [
 
 class ArrayAgg(Aggregate):
     function = 'ARRAY_AGG'
+    template = '%(function)s(%(distinct)s%(expressions)s)'
+
+    def __init__(self, expression, distinct=False, **extra):
+        super().__init__(expression, distinct='DISTINCT ' if distinct else '', **extra)
 
     def convert_value(self, value, expression, connection, context):
         if not value:
