@@ -5,7 +5,6 @@ import re
 import sys
 import tempfile
 from io import StringIO
-from unittest import mock
 
 from django.conf.urls import url
 from django.core import mail
@@ -58,7 +57,7 @@ class CallableSettingWrapperTests(SimpleTestCase):
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF='view_tests.urls')
-class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
+class DebugViewTests(SimpleTestCase):
 
     def test_files(self):
         response = self.client.get('/raises/')
@@ -272,8 +271,7 @@ class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
         self.assertContains(response, '<div class="context" id="', status_code=500)
 
 
-@override_settings(ROOT_URLCONF='view_tests.urls')
-class ExceptionReporterTests(LoggingCaptureMixin, SimpleTestCase):
+class ExceptionReporterTests(SimpleTestCase):
     rf = RequestFactory()
 
     def test_request_and_exception(self):
@@ -559,20 +557,20 @@ class ExceptionReporterTests(LoggingCaptureMixin, SimpleTestCase):
         text = reporter.get_traceback_text()
         self.assertIn('USER: [unable to retrieve the current user]', text)
 
-    @override_settings(ROOT_URLCONF='view_tests.urls')
     def test_sensitive_request_meta_redacted(self):
         sensitive_data = {'some-key': 'a-value-that-should-be-redacted'}
         try:
-            request = self.rf.get('/test_view/', SENSITIVE_DATA=sensitive_data)
-            request.user = User()
-            raise ValueError("Forcibly generate an error to make a stacktrace")
+            request = self.rf.get('/test_view/', **sensitive_data)
+            raise ValueError("Raise an error to make a stacktrace.")
         except ValueError:
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(request, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
-        self.assertInHTML(('<tr><td>SENSITIVE_DATA</td><td class="code">'
-                           '<pre>{&#39;some-key&#39;: &#39;********************&#39;}</pre>'
-                           '</td></tr>'), html)
+        self.assertInHTML(
+            '<tr><td>some-key</td><td class="code"><pre>'
+            '&#39;********************&#39;</pre></td></tr>',
+            html
+        )
 
 
 class PlainTextReportTests(SimpleTestCase):
@@ -1096,14 +1094,9 @@ class HelperFunctionTests(SimpleTestCase):
         self.assertEqual(cleanse_setting('SETTING_NAME', initial), expected)
 
     def test_get_safe_request_meta(self):
-        request = mock.MagicMock()
-        sensitive_keys = [
-            'SECRET_KEY',
-            'PASSWORD',
-            'API_KEY',
-            'AUTH_TOKEN',
-        ]
+        rf = RequestFactory()
+        sensitive_keys = ('SECRET_KEY', 'PASSWORD', 'API_KEY', 'AUTH_TOKEN')
         for key in sensitive_keys:
-            META = mock.PropertyMock(return_value={key: 'value-that-should-be-redacted'})
-            type(request).META = META
-            self.assertEqual(get_safe_request_meta(request), {key: CLEANSED_SUBSTITUTE})
+            request = rf.get('/test_view/', **{key: 'value-that-should-be-redacted'})
+            with self.subTest(key=key):
+                self.assertEqual(get_safe_request_meta(request)[key], CLEANSED_SUBSTITUTE)

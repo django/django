@@ -301,8 +301,8 @@ class ExceptionReporter:
             'unicode_hint': unicode_hint,
             'frames': frames,
             'request': self.request,
-            'META': get_safe_request_meta(self.request),
             'user_str': user_str,
+            'filtered_META_items': get_safe_request_meta(self.request).items(),
             'filtered_POST_items': self.filter.get_post_parameters(self.request).items(),
             'settings': get_safe_settings(),
             'sys_executable': sys.executable,
@@ -1001,7 +1001,7 @@ Exception Value: {{ exception_value|force_escape }}
       </tr>
     </thead>
     <tbody>
-      {% for var in META.items|dictsort:0 %}
+      {% for var in filtered_META_items|dictsort:0 %}
         <tr>
           <td>{{ var.0 }}</td>
           <td class="code"><pre>{{ var.1|pprint }}</pre></td>
@@ -1114,7 +1114,7 @@ FILES:{% for k, v in request_FILES_items %}
 COOKIES:{% for k, v in request_COOKIES_items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No cookie data{% endfor %}
 
-META:{% for k, v in META.items|dictsort:0 %}
+META:{% for k, v in filtered_META_items|dictsort:0 %}
 {{ k }} = {{ v|stringformat:"r" }}{% endfor %}
 {% else %}Request data not supplied
 {% endif %}
