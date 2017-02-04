@@ -63,3 +63,13 @@ class UpdateContentTypesTests(TestCase):
         with self.assertNumQueries(0):
             contenttypes_management.create_contenttypes(self.app_config, interactive=False, verbosity=0, apps=apps)
         self.assertEqual(ContentType.objects.count(), self.before_count + 1)
+
+    def test_no_models_present(self):
+        tests_app_models = self.app_config.apps.get_app_config(__package__).models
+        contenttypes_to_be_removed_count = len(tests_app_models)
+        tests_app_models.clear()
+        with mock.patch('builtins.input', return_value='yes'):
+            with captured_stdout() as stdout:
+                call_command('remove_stale_contenttypes', verbosity=2)
+        self.assertIn("Deleting stale content type", stdout.getvalue())
+        self.assertEquals(ContentType.objects.count(), self.before_count - contenttypes_to_be_removed_count)
