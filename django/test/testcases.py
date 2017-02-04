@@ -835,6 +835,8 @@ class TransactionTestCase(SimpleTestCase):
             )
             for db_name in self._databases_names(include_mirrors=False):
                 emit_post_migrate_signal(verbosity=0, interactive=False, db=db_name)
+        for db_name in self._databases_names(include_mirrors=False):
+            connections[db_name].queries_log.clear()
         try:
             self._fixture_setup()
         except Exception:
