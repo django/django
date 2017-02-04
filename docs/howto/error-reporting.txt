@@ -276,6 +276,11 @@ following methods:
     Returns ``True`` to activate the filtering operated in the other methods.
     By default the filter is active if :setting:`DEBUG` is ``False``.
 
+.. method:: SafeExceptionReporterFilter.get_safe_request_meta(request)
+
+    Returns the filtered dictionary of META parameters. By default it replaces
+    the values of sensitive parameters with stars (`**********`).
+
 .. method:: SafeExceptionReporterFilter.get_post_parameters(request)
 
     Returns the filtered dictionary of POST parameters. By default it replaces

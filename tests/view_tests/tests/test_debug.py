@@ -18,7 +18,7 @@ from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
 from django.views.debug import (
     CLEANSED_SUBSTITUTE, CallableSettingWrapper, ExceptionReporter,
-    cleanse_setting, get_safe_request_meta, technical_500_response,
+    cleanse_setting, technical_500_response,
 )
 
 from .. import BrokenException, except_args
@@ -57,7 +57,7 @@ class CallableSettingWrapperTests(SimpleTestCase):
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF='view_tests.urls')
-class DebugViewTests(SimpleTestCase):
+class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
 
     def test_files(self):
         response = self.client.get('/raises/')
@@ -556,6 +556,15 @@ class ExceptionReporterTests(SimpleTestCase):
 
         text = reporter.get_traceback_text()
         self.assertIn('USER: [unable to retrieve the current user]', text)
+
+    def test_get_safe_request_meta(self):
+        rf = RequestFactory()
+        sensitive_keys = ('SECRET_KEY', 'PASSWORD', 'API_KEY', 'AUTH_TOKEN')
+        for key in sensitive_keys:
+            request = rf.get('/test_view/', **{key: 'value-that-should-be-redacted'})
+            reporter = ExceptionReporter(request, None, None, None)
+            with self.subTest(key=key):
+                self.assertEqual(reporter.filter.get_safe_request_meta(request)[key], CLEANSED_SUBSTITUTE)
 
     def test_sensitive_request_meta_redacted(self):
         sensitive_data = {'some-key': 'a-value-that-should-be-redacted'}
@@ -1092,11 +1101,3 @@ class HelperFunctionTests(SimpleTestCase):
         initial = {'login': 'cooper', 'password': 'secret'}
         expected = {'login': 'cooper', 'password': CLEANSED_SUBSTITUTE}
         self.assertEqual(cleanse_setting('SETTING_NAME', initial), expected)
-
-    def test_get_safe_request_meta(self):
-        rf = RequestFactory()
-        sensitive_keys = ('SECRET_KEY', 'PASSWORD', 'API_KEY', 'AUTH_TOKEN')
-        for key in sensitive_keys:
-            request = rf.get('/test_view/', **{key: 'value-that-should-be-redacted'})
-            with self.subTest(key=key):
-                self.assertEqual(get_safe_request_meta(request)[key], CLEANSED_SUBSTITUTE)
