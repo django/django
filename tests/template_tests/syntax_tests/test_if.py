@@ -1,4 +1,5 @@
 from django.template import TemplateSyntaxError
+from django.template.defaulttags import IfNode
 from django.test import SimpleTestCase
 
 from ..utils import TestObj, setup
@@ -599,3 +600,9 @@ class IfTagTests(SimpleTestCase):
     def test_if_is_not_both_variables_missing(self):
         output = self.engine.render_to_string('template', {})
         self.assertEqual(output, 'no')
+
+
+class IfNodeTests(SimpleTestCase):
+    def test_repr(self):
+        node = IfNode(conditions_nodelists=[])
+        self.assertEqual(repr(node), '<IfNode>')
