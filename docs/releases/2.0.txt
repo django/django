@@ -427,7 +427,7 @@ these features.
   ``_apply_rel_filters()`` method is removed.
 
 * Using ``User.is_authenticated()`` and ``User.is_anonymous()`` as methods
-  rather than properties is no longer be supported.
+  rather than properties is no longer supported.
 
 * The  ``Model._meta.virtual_fields`` attribute is removed.
 
