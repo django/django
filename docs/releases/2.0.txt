@@ -207,6 +207,11 @@ Validators
 Backwards incompatible changes in 2.0
 =====================================
 
+URLs
+----
+
+* ``django.core.urlresolvers`` moved to ``django.urls``.
+
 Removed support for bytestrings in some places
 ----------------------------------------------
 
@@ -220,7 +225,9 @@ bytestrings in certain code paths.
 Database backend API
 --------------------
 
-* ...
+* ForeignKey and OneToOne field now require the ``on_delete`` argument. To keep
+  the old behaviour, use ``on_delete=models.CASCADE``. Note that you will have
+  to change migration files too.
 
 Dropped support for Oracle 11.2
 -------------------------------
