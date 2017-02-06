@@ -122,19 +122,16 @@ WHEN (new.%(col_name)s IS NULL)
 
     def datetime_cast_date_sql(self, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
-        sql = 'TRUNC(%s)' % field_name
-        return sql, []
+        return 'TRUNC(%s)' % field_name
 
     def datetime_cast_time_sql(self, field_name, tzname):
         # Since `TimeField` values are stored as TIMESTAMP where only the date
         # part is ignored, convert the field to the specified timezone.
-        field_name = self._convert_field_to_tz(field_name, tzname)
-        return field_name, []
+        return self._convert_field_to_tz(field_name, tzname)
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
-        sql = self.date_extract_sql(lookup_type, field_name)
-        return sql, []
+        return self.date_extract_sql(lookup_type, field_name)
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
@@ -149,7 +146,7 @@ WHEN (new.%(col_name)s IS NULL)
             sql = "TRUNC(%s, 'MI')" % field_name
         else:
             sql = "CAST(%s AS DATE)" % field_name  # Cast to DATE removes sub-second precision.
-        return sql, []
+        return sql
 
     def time_trunc_sql(self, lookup_type, field_name):
         # The implementation is similar to `datetime_trunc_sql` as both
