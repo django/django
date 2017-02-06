@@ -47,6 +47,9 @@ Minor features
   :meth:`.ModelAdmin.get_sortable_by` method allow limiting the columns that
   can be sorted in the change list page.
 
+* The ``admin_order_field`` attribute for elements in
+  :attr:`.ModelAdmin.list_display` may now be a query expression.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

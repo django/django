@@ -1,3 +1,4 @@
+import datetime
 import os
 import tempfile
 from io import StringIO
@@ -94,6 +95,7 @@ class ArticleAdmin(admin.ModelAdmin):
     list_display = (
         'content', 'date', callable_year, 'model_year', 'modeladmin_year',
         'model_year_reversed', 'section', lambda obj: obj.title,
+        'order_by_expression',
     )
     list_editable = ('section',)
     list_filter = ('date', 'section')
@@ -109,6 +111,12 @@ class ArticleAdmin(admin.ModelAdmin):
             'fields': ('date', 'section', 'sub_section')
         })
     )
+
+    def order_by_expression(self, obj):
+        return obj.model_year
+    # This ordering isn't particularly useful but shows that expressions can
+    # be used for admin_order_field.
+    order_by_expression.admin_order_field = models.F('date') + datetime.timedelta(days=3)
 
     def changelist_view(self, request):
         return super().changelist_view(request, extra_context={'extra_var': 'Hello!'})

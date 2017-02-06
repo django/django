@@ -286,8 +286,11 @@ class ChangeList:
                     order_field = self.get_ordering_field(field_name)
                     if not order_field:
                         continue  # No 'admin_order_field', skip it
+                    if hasattr(order_field, 'as_sql'):
+                        # order_field is an expression.
+                        ordering.append(order_field.desc() if pfx == '-' else order_field.asc())
                     # reverse order if order_field has already "-" as prefix
-                    if order_field.startswith('-') and pfx == "-":
+                    elif order_field.startswith('-') and pfx == '-':
                         ordering.append(order_field[1:])
                     else:
                         ordering.append(pfx + order_field)
