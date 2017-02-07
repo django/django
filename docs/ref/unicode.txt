@@ -195,19 +195,17 @@ result.
 
 Similarly, Django provides :func:`django.utils.encoding.uri_to_iri()` which
 implements the conversion from URI to IRI as per :rfc:`3987#section-3.2`.
-It decodes all percent-encodings except those that don't represent a valid
-UTF-8 sequence.
 
 An example to demonstrate::
 
     >>> uri_to_iri('/%E2%99%A5%E2%99%A5/?utf8=%E2%9C%93')
     '/♥♥/?utf8=✓'
-    >>> uri_to_iri('%A9helloworld')
-    '%A9helloworld'
+    >>> uri_to_iri('%A9hello%3Fworld')
+    '%A9hello%3Fworld'
 
-In the first example, the UTF-8 characters and reserved characters are
-unquoted. In the second, the percent-encoding remains unchanged because it
-lies outside the valid UTF-8 range.
+In the first example, the UTF-8 characters are unquoted. In the second, the
+percent-encodings remain unchanged because they lie outside the valid UTF-8
+range or represent a reserved character.
 
 Both ``iri_to_uri()`` and ``uri_to_iri()`` functions are idempotent, which means the
 following is always true::

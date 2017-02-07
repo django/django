@@ -93,8 +93,12 @@ class TestRFC3987IEncodingUtils(unittest.TestCase):
     def test_uri_to_iri(self):
         cases = [
             # Valid UTF-8 sequences are decoded.
-            ('/%E2%99%A5%E2%99%A5/', '/♥♥/'),
+            ('/%e2%89%Ab%E2%99%a5%E2%89%aB/', '/≫♥≫/'),
             ('/%E2%99%A5%E2%99%A5/?utf8=%E2%9C%93', '/♥♥/?utf8=✓'),
+            ('/%41%5a%6B/', '/AZk/'),
+
+            # Reserved and non-url-valid ascii chars are not decoded
+            ('/%25%20%02%41%7b/', '/%25%20%02A%7b/'),
 
             # Broken UTF-8 sequences remain escaped.
             ('/%AAd%AAj%AAa%AAn%AAg%AAo%AA/', '/%AAd%AAj%AAa%AAn%AAg%AAo%AA/'),
@@ -112,11 +116,12 @@ class TestRFC3987IEncodingUtils(unittest.TestCase):
 
     def test_complementarity(self):
         cases = [
-            ('/blog/for/J%C3%BCrgen%20M%C3%BCnster/', '/blog/for/J\xfcrgen M\xfcnster/'),
+            ('/blog/for/J%C3%BCrgen%20M%C3%BCnster/', '/blog/for/J\xfcrgen%20M\xfcnster/'),
             ('%&', '%&'),
             ('red&%E2%99%A5ros%#red', 'red&♥ros%#red'),
             ('/%E2%99%A5%E2%99%A5/', '/♥♥/'),
             ('/%E2%99%A5%E2%99%A5/?utf8=%E2%9C%93', '/♥♥/?utf8=✓'),
+            ('/%25%20%02%7b/', '/%25%20%02%7b/'),
             ('/%AAd%AAj%AAa%AAn%AAg%AAo%AA/', '/%AAd%AAj%AAa%AAn%AAg%AAo%AA/'),
             ('/%E2%99%A5%E2%E2%99%A5/', '/♥%E2♥/'),
             ('/%E2%99%A5%E2%99%E2%99%A5/', '/♥%E2%99♥/'),
