@@ -644,7 +644,7 @@ Miscellaneous
 
 * ``EmailField`` and ``URLField`` no longer accept the ``strip`` keyword
   argument. Remove it because it doesn't have an effect in older versions of
-  Django as these fields alway strip whitespace.
+  Django as these fields always strip whitespace.
 
 * The ``checked`` and ``selected`` attribute rendered by form widgets now uses
   HTML5 boolean syntax rather than XHTML's ``checked='checked'`` and
