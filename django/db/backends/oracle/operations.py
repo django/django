@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes, force_text
 
 from .base import Database
-from .utils import InsertIdVar, Oracle_datetime
+from .utils import BulkInsertMapper, InsertIdVar, Oracle_datetime
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -523,10 +523,18 @@ WHEN (new.%(col_name)s IS NULL)
         return truncate_name(trigger_name, name_length).upper()
 
     def bulk_insert_sql(self, fields, placeholder_rows):
-        return " UNION ALL ".join(
-            "SELECT %s FROM DUAL" % ", ".join(row)
-            for row in placeholder_rows
-        )
+        query = []
+        for row in placeholder_rows:
+            select = []
+            for i, placeholder in enumerate(row):
+                # A model without any fields has fields=[None].
+                if not fields[i]:
+                    select.append(placeholder)
+                else:
+                    internal_type = getattr(fields[i], 'target_field', fields[i]).get_internal_type()
+                    select.append(BulkInsertMapper.types.get(internal_type, '%s') % placeholder)
+            query.append('SELECT %s FROM DUAL' % ', '.join(select))
+        return ' UNION ALL '.join(query)
 
     def subtract_temporals(self, internal_type, lhs, rhs):
         if internal_type == 'DateField':
