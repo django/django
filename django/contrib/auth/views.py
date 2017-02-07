@@ -107,6 +107,11 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
     def get_form_class(self):
         return self.authentication_form or self.form_class
 
+    def get_form_kwargs(self):
+        kwargs = super(LoginView, self).get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
     def form_valid(self, form):
         """Security check complete. Log the user in."""
         auth_login(self.request, form.get_user())
