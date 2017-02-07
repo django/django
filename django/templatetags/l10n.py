@@ -1,6 +1,5 @@
 from django.template import Library, Node, TemplateSyntaxError
 from django.utils import formats
-from django.utils.encoding import force_text
 
 register = Library()
 
@@ -11,7 +10,7 @@ def localize(value):
     Forces a value to be rendered as a localized value,
     regardless of the value of ``settings.USE_L10N``.
     """
-    return force_text(formats.localize(value, use_l10n=True))
+    return str(formats.localize(value, use_l10n=True))
 
 
 @register.filter(is_safe=False)
@@ -20,7 +19,7 @@ def unlocalize(value):
     Forces a value to be rendered as a non-localized value,
     regardless of the value of ``settings.USE_L10N``.
     """
-    return force_text(value)
+    return str(value)
 
 
 class LocalizeNode(Node):

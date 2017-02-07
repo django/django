@@ -17,20 +17,20 @@ class I18nBlockTransTagTests(SimpleTestCase):
     @setup({'i18n03': '{% load i18n %}{% blocktrans %}{{ anton }}{% endblocktrans %}'})
     def test_i18n03(self):
         """simple translation of a variable"""
-        output = self.engine.render_to_string('i18n03', {'anton': b'\xc3\x85'})
+        output = self.engine.render_to_string('i18n03', {'anton': 'Å'})
         self.assertEqual(output, 'Å')
 
     @setup({'i18n04': '{% load i18n %}{% blocktrans with berta=anton|lower %}{{ berta }}{% endblocktrans %}'})
     def test_i18n04(self):
         """simple translation of a variable and filter"""
-        output = self.engine.render_to_string('i18n04', {'anton': b'\xc3\x85'})
+        output = self.engine.render_to_string('i18n04', {'anton': 'Å'})
         self.assertEqual(output, 'å')
 
     @setup({'legacyi18n04': '{% load i18n %}'
                             '{% blocktrans with anton|lower as berta %}{{ berta }}{% endblocktrans %}'})
     def test_legacyi18n04(self):
         """simple translation of a variable and filter"""
-        output = self.engine.render_to_string('legacyi18n04', {'anton': b'\xc3\x85'})
+        output = self.engine.render_to_string('legacyi18n04', {'anton': 'Å'})
         self.assertEqual(output, 'å')
 
     @setup({'i18n05': '{% load i18n %}{% blocktrans %}xxx{{ anton }}xxx{% endblocktrans %}'})

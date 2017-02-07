@@ -5,7 +5,6 @@ from decimal import Decimal
 from django import template
 from django.conf import settings
 from django.template import defaultfilters
-from django.utils.encoding import force_text
 from django.utils.formats import number_format
 from django.utils.safestring import mark_safe
 from django.utils.timezone import is_aware, utc
@@ -45,7 +44,7 @@ def intcomma(value, use_l10n=True):
             return intcomma(value, False)
         else:
             return number_format(value, force_grouping=True)
-    orig = force_text(value)
+    orig = str(value)
     new = re.sub(r"^(-?\d+)(\d{3})", r'\g<1>,\g<2>', orig)
     if orig == new:
         return new

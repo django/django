@@ -9,7 +9,7 @@ from urllib.parse import quote
 
 from django.utils import formats
 from django.utils.dateformat import format, time_format
-from django.utils.encoding import force_text, iri_to_uri
+from django.utils.encoding import iri_to_uri
 from django.utils.html import (
     avoid_wrapping, conditional_escape, escape, escapejs, linebreaks,
     strip_tags, urlize as _urlize,
@@ -39,7 +39,7 @@ def stringfilter(func):
     def _dec(*args, **kwargs):
         if args:
             args = list(args)
-            args[0] = force_text(args[0])
+            args[0] = str(args[0])
             if (isinstance(args[0], SafeData) and
                     getattr(_dec._decorated_function, 'is_safe', False)):
                 return mark_safe(func(*args, **kwargs))
@@ -120,7 +120,7 @@ def floatformat(text, arg=-1):
         d = Decimal(input_val)
     except InvalidOperation:
         try:
-            d = Decimal(force_text(float(text)))
+            d = Decimal(str(float(text)))
         except (ValueError, InvalidOperation, TypeError):
             return ''
     try:
@@ -473,7 +473,7 @@ def safeseq(value):
     individually, as safe, after converting them to strings. Returns a list
     with the results.
     """
-    return [mark_safe(force_text(obj)) for obj in value]
+    return [mark_safe(str(obj)) for obj in value]
 
 
 @register.filter(is_safe=True)
@@ -551,7 +551,6 @@ def join(value, arg, autoescape=True):
     """
     Joins a list with a string, like Python's ``str.join(list)``.
     """
-    value = map(force_text, value)
     if autoescape:
         value = [conditional_escape(v) for v in value]
     try:
@@ -677,7 +676,7 @@ def unordered_list(value, autoescape=True):
                 sublist = '\n%s<ul>\n%s\n%s</ul>\n%s' % (
                     indent, list_formatter(children, tabs + 1), indent, indent)
             output.append('%s<li>%s%s</li>' % (
-                indent, escaper(force_text(item)), sublist))
+                indent, escaper(item), sublist))
         return '\n'.join(output)
 
     return mark_safe(list_formatter(value))
@@ -937,4 +936,4 @@ def pprint(value):
     try:
         return pformat(value)
     except Exception as e:
-        return "Error in formatting: %s: %s" % (e.__class__.__name__, force_text(e, errors="replace"))
+        return "Error in formatting: %s: %s" % (e.__class__.__name__, e)

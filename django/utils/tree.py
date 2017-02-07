@@ -5,8 +5,6 @@ ORM.
 
 import copy
 
-from django.utils.encoding import force_text
-
 
 class Node:
     """
@@ -45,7 +43,7 @@ class Node:
 
     def __str__(self):
         template = '(NOT (%s: %s))' if self.negated else '(%s: %s)'
-        return template % (self.connector, ', '.join(force_text(c) for c in self.children))
+        return template % (self.connector, ', '.join(str(c) for c in self.children))
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self)

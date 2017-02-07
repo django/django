@@ -56,7 +56,6 @@ import re
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
 )
-from django.utils.encoding import force_text
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
 from django.utils.inspect import getargspec
@@ -108,10 +107,6 @@ tag_re = (re.compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
 logger = logging.getLogger('django.template')
 
 
-class TemplateEncodingError(Exception):
-    pass
-
-
 class VariableDoesNotExist(Exception):
 
     def __init__(self, msg, params=()):
@@ -150,13 +145,6 @@ class Origin:
 
 class Template:
     def __init__(self, template_string, origin=None, name=None, engine=None):
-        try:
-            template_string = force_text(template_string)
-        except UnicodeDecodeError:
-            raise TemplateEncodingError(
-                "Templates can only be constructed from strings or UTF-8 "
-                "bytestrings."
-            )
         # If Template is instantiated directly rather than from an Engine and
         # exactly one Django template engine is configured, use that engine.
         # This is required to preserve backwards-compatibility for direct use
@@ -274,7 +262,7 @@ class Template:
         # In some rare cases exc_value.args can be empty or an invalid
         # string.
         try:
-            message = force_text(exception.args[0])
+            message = str(exception.args[0])
         except (IndexError, UnicodeDecodeError):
             message = '(Could not get exception message)'
 
@@ -957,7 +945,7 @@ class NodeList(list):
                 bit = node.render_annotated(context)
             else:
                 bit = node
-            bits.append(force_text(bit))
+            bits.append(str(bit))
         return mark_safe(''.join(bits))
 
     def get_nodes_by_type(self, nodetype):
@@ -987,11 +975,12 @@ def render_value_in_context(value, context):
     """
     value = template_localtime(value, use_tz=context.use_tz)
     value = localize(value, use_l10n=context.use_l10n)
-    value = force_text(value)
     if context.autoescape:
+        if not issubclass(type(value), str):
+            value = str(value)
         return conditional_escape(value)
     else:
-        return value
+        return str(value)
 
 
 class VariableNode(Node):
