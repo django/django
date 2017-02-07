@@ -1,6 +1,5 @@
 import base64
 import hashlib
-import json
 import os
 import shutil
 import sys
@@ -89,9 +88,7 @@ class FileUploadTests(TestCase):
             'wsgi.input': payload,
         }
         response = self.client.request(**r)
-        received = json.loads(response.content.decode('utf-8'))
-
-        self.assertEqual(received['file'], content)
+        self.assertEqual(response.json()['file'], content)
 
     def test_base64_upload(self):
         self._test_base64_upload("This data will be transmitted base64-encoded.")
@@ -196,7 +193,7 @@ class FileUploadTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Empty filenames should be ignored
-        received = json.loads(response.content.decode('utf-8'))
+        received = response.json()
         for i, name in enumerate(filenames):
             self.assertIsNone(received.get('file%s' % i))
 
@@ -240,9 +237,8 @@ class FileUploadTests(TestCase):
             'wsgi.input': payload,
         }
         response = self.client.request(**r)
-
         # The filenames should have been sanitized by the time it got to the view.
-        received = json.loads(response.content.decode('utf-8'))
+        received = response.json()
         for i, name in enumerate(scary_file_names):
             got = received["file%s" % i]
             self.assertEqual(got, "hax0rd.txt")
@@ -277,8 +273,7 @@ class FileUploadTests(TestCase):
             'wsgi.input': payload,
         }
         response = self.client.request(**r)
-
-        result = json.loads(response.content.decode('utf-8'))
+        result = response.json()
         for name, _, expected in cases:
             got = result[name]
             self.assertEqual(expected, got, 'Mismatch for {}'.format(name))
@@ -304,7 +299,7 @@ class FileUploadTests(TestCase):
                 'string': string_io,
                 'binary': bytes_io,
             })
-            received = json.loads(response.content.decode('utf-8'))
+            received = response.json()
             self.assertEqual(received['no_content_type'], 'no content')
             self.assertEqual(received['simple_file'], 'text content')
             self.assertEqual(received['string'], 'string content')
@@ -325,7 +320,7 @@ class FileUploadTests(TestCase):
                 'no_content_type': no_content_type,
                 'simple_file': simple_file,
             })
-            received = json.loads(response.content.decode('utf-8'))
+            received = response.json()
             self.assertEqual(received['no_content_type'], {})
             self.assertEqual(received['simple_file'], {'test-key': 'test_value'})
 
@@ -352,8 +347,7 @@ class FileUploadTests(TestCase):
             'REQUEST_METHOD': 'POST',
             'wsgi.input': payload,
         }
-        got = json.loads(self.client.request(**r).content.decode('utf-8'))
-        self.assertEqual(got, {})
+        self.assertEqual(self.client.request(**r).json(), {})
 
     def test_empty_multipart_handled_gracefully(self):
         """
@@ -367,8 +361,7 @@ class FileUploadTests(TestCase):
             'REQUEST_METHOD': 'POST',
             'wsgi.input': client.FakePayload(b''),
         }
-        got = json.loads(self.client.request(**r).content.decode('utf-8'))
-        self.assertEqual(got, {})
+        self.assertEqual(self.client.request(**r).json(), {})
 
     def test_custom_upload_handler(self):
         file = tempfile.NamedTemporaryFile
@@ -382,14 +375,10 @@ class FileUploadTests(TestCase):
             bigfile.seek(0)
 
             # Small file posting should work.
-            response = self.client.post('/quota/', {'f': smallfile})
-            got = json.loads(response.content.decode('utf-8'))
-            self.assertIn('f', got)
+            self.assertIn('f', self.client.post('/quota/', {'f': smallfile}).json())
 
             # Large files don't go through.
-            response = self.client.post("/quota/", {'f': bigfile})
-            got = json.loads(response.content.decode('utf-8'))
-            self.assertNotIn('f', got)
+            self.assertNotIn('f', self.client.post("/quota/", {'f': bigfile}).json())
 
     def test_broken_custom_upload_handler(self):
         with tempfile.NamedTemporaryFile() as file:
@@ -421,8 +410,7 @@ class FileUploadTests(TestCase):
                 'field5': 'test7',
                 'file2': (file2, file2a)
             })
-            got = json.loads(response.content.decode('utf-8'))
-
+            got = response.json()
             self.assertEqual(got.get('file1'), 1)
             self.assertEqual(got.get('file2'), 2)
 
