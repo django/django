@@ -83,6 +83,11 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
     def get_form_class(self):
         return self.authentication_form or self.form_class
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
     def form_valid(self, form):
         """Security check complete. Log the user in."""
         auth_login(self.request, form.get_user())
@@ -99,11 +104,6 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
         if self.extra_context is not None:
             context.update(self.extra_context)
         return context
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['request'] = self.request
-        return kwargs
 
 
 def login(request, *args, **kwargs):
