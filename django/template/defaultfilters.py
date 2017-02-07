@@ -111,6 +111,12 @@ def floatformat(text, arg=-1):
     * {{ num2|floatformat:"-3" }} displays "34"
     * {{ num3|floatformat:"-3" }} displays "34.260"
 
+    If arg is "n", it will use Decimal normalize function:
+
+    * {{ num1|floatformat:"n" }} displays "34.23234"
+    * {{ num2|floatformat:"n" }} displays "34"
+    * {{ num3|floatformat:"n" }} displays "34.26"
+
     If the input float is infinity or NaN, the (platform-dependent) string
     representation of that value will be displayed.
     """
@@ -123,6 +129,10 @@ def floatformat(text, arg=-1):
             d = Decimal(str(float(text)))
         except (ValueError, InvalidOperation, TypeError):
             return ''
+
+    if arg == 'n':
+        return d.normalize()
+
     try:
         p = int(arg)
     except ValueError:
