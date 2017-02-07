@@ -5,7 +5,7 @@ import six
 class ConsumeLater(Exception):
     """
     Exception that says that the current message should be re-queued back
-    onto its channel as it's not ready to be consumd yet (e.g. global order
+    onto its channel as it's not ready to be consumed yet (e.g. global order
     is being enforced)
     """
     pass

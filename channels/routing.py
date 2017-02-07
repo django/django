@@ -177,7 +177,7 @@ class Route(object):
 class RouteClass(Route):
     """
     Like Route, but targets a class-based consumer rather than a functional
-    one, meaning it looks for a (class) method called "channels()" on the
+    one, meaning it looks for a (class) method called "channel_names()" on the
     object rather than having a single channel passed in.
     """
 
