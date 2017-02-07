@@ -594,13 +594,14 @@ class LoginTest(AuthViewsTestCase):
         self.assertEqual(response.url, settings.LOGIN_REDIRECT_URL)
 
     def test_login_form_contains_request(self):
-        # 15198
-        self.client.post('/custom_requestauth_login/', {
+        # The custom authentication form for this login requires a request to
+        # initialize it.
+        response = self.client.post('/custom_request_auth_login/', {
             'username': 'testclient',
             'password': 'password',
-        }, follow=True)
-        # the custom authentication form used by this login asserts
-        # that a request is passed to the form successfully.
+        })
+        # The login was successful.
+        self.assertRedirects(response, settings.LOGIN_REDIRECT_URL, fetch_redirect_response=False)
 
     def test_login_csrf_rotate(self):
         """

@@ -100,6 +100,11 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
             context.update(self.extra_context)
         return context
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+
 
 def login(request, *args, **kwargs):
     warnings.warn(
