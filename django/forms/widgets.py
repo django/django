@@ -855,12 +855,18 @@ class SplitDateTimeWidget(MultiWidget):
     supports_microseconds = False
     template_name = 'django/forms/widgets/splitdatetime.html'
 
-    def __init__(self, attrs=None, date_format=None, time_format=None):
+    def __init__(self, attrs=None, date_format=None, time_format=None, date_attrs=None, time_attrs=None):
         widgets = (
-            DateInput(attrs=attrs, format=date_format),
-            TimeInput(attrs=attrs, format=time_format),
+            DateInput(
+                attrs=attrs if date_attrs is None else date_attrs,
+                format=date_format,
+            ),
+            TimeInput(
+                attrs=attrs if time_attrs is None else time_attrs,
+                format=time_format,
+            ),
         )
-        super().__init__(widgets, attrs)
+        super().__init__(widgets)
 
     def decompress(self, value):
         if value:
@@ -875,8 +881,8 @@ class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
     """
     template_name = 'django/forms/widgets/splithiddendatetime.html'
 
-    def __init__(self, attrs=None, date_format=None, time_format=None):
-        super().__init__(attrs, date_format, time_format)
+    def __init__(self, attrs=None, date_format=None, time_format=None, date_attrs=None, time_attrs=None):
+        super().__init__(attrs, date_format, time_format, date_attrs, time_attrs)
         for widget in self.widgets:
             widget.input_type = 'hidden'
 

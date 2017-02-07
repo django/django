@@ -840,7 +840,7 @@ Composite widgets
     for the date, and :class:`TimeInput` for the time. Must be used with
     :class:`SplitDateTimeField` rather than :class:`DateTimeField`.
 
-    ``SplitDateTimeWidget`` has two optional attributes:
+    ``SplitDateTimeWidget`` has several optional arguments:
 
     .. attribute:: SplitDateTimeWidget.date_format
 
@@ -849,6 +849,16 @@ Composite widgets
     .. attribute:: SplitDateTimeWidget.time_format
 
         Similar to :attr:`TimeInput.format`
+
+    .. attribute:: SplitDateTimeWidget.date_attrs
+    .. attribute:: SplitDateTimeWidget.time_attrs
+
+        .. versionadded:: 2.0
+
+        Similar to :attr:`Widget.attrs`. A dictionary containing HTML
+        attributes to be set on the rendered :class:`DateInput` and
+        :class:`TimeInput` widgets, respectively. If these attributes aren't
+        set, :attr:`Widget.attrs` is used instead.
 
 ``SplitHiddenDateTimeWidget``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
