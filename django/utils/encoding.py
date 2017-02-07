@@ -165,7 +165,7 @@ def uri_to_iri(uri):
         return uri
     uri = force_bytes(uri)
     iri = unquote_to_bytes(uri)
-    return repercent_broken_unicode(iri).decode('utf-8')
+    return repercent_broken_unicode(iri).decode()
 
 
 def escape_uri_path(path):
@@ -192,7 +192,7 @@ def repercent_broken_unicode(path):
     strictly legal UTF-8 octet sequence.
     """
     try:
-        path.decode('utf-8')
+        path.decode()
     except UnicodeDecodeError as e:
         repercent = quote(path[e.start:e.end], safe=b"/#%[]=:;$&()+,!?*@'~")
         path = repercent_broken_unicode(

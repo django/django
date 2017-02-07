@@ -1147,7 +1147,7 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         self.sink_lock = threading.Lock()
 
     def process_message(self, peer, mailfrom, rcpttos, data):
-        data = data.encode('utf-8')
+        data = data.encode()
         m = message_from_bytes(data)
         maddr = parseaddr(m.get('from'))[1]
 
@@ -1419,7 +1419,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
             self.assertTrue(msg)
 
-            msg = msg.decode('utf-8')
+            msg = msg.decode()
             # The message only contains CRLF and not combinations of CRLF, LF, and CR.
             msg = msg.replace('\r\n', '')
             self.assertNotIn('\r', msg)

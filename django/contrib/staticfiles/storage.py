@@ -381,7 +381,7 @@ class ManifestFilesMixin(HashedFilesMixin):
     def read_manifest(self):
         try:
             with self.open(self.manifest_name) as manifest:
-                return manifest.read().decode('utf-8')
+                return manifest.read().decode()
         except IOError:
             return None
 
@@ -411,7 +411,7 @@ class ManifestFilesMixin(HashedFilesMixin):
         payload = {'paths': self.hashed_files, 'version': self.manifest_version}
         if self.exists(self.manifest_name):
             self.delete(self.manifest_name)
-        contents = json.dumps(payload).encode('utf-8')
+        contents = json.dumps(payload).encode()
         self._save(self.manifest_name, ContentFile(contents))
 
     def stored_name(self, name):

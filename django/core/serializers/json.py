@@ -70,7 +70,7 @@ def Deserializer(stream_or_string, **options):
     if not isinstance(stream_or_string, (bytes, str)):
         stream_or_string = stream_or_string.read()
     if isinstance(stream_or_string, bytes):
-        stream_or_string = stream_or_string.decode('utf-8')
+        stream_or_string = stream_or_string.decode()
     try:
         objects = json.loads(stream_or_string)
         for obj in PythonDeserializer(objects, **options):

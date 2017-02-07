@@ -131,14 +131,14 @@ class AssertContainsTests(SimpleTestCase):
         # Regression test for #10183
         r = self.client.get('/check_unicode/')
         self.assertContains(r, 'さかき')
-        self.assertContains(r, b'\xe5\xb3\xa0'.decode('utf-8'))
+        self.assertContains(r, b'\xe5\xb3\xa0'.decode())
 
     def test_unicode_not_contains(self):
         "Unicode characters can be searched for, and not found in template context"
         # Regression test for #10183
         r = self.client.get('/check_unicode/')
         self.assertNotContains(r, 'はたけ')
-        self.assertNotContains(r, b'\xe3\x81\xaf\xe3\x81\x9f\xe3\x81\x91'.decode('utf-8'))
+        self.assertNotContains(r, b'\xe3\x81\xaf\xe3\x81\x9f\xe3\x81\x91'.decode())
 
     def test_binary_contains(self):
         r = self.client.get('/check_binary/')
@@ -1277,7 +1277,7 @@ class UnicodePayloadTests(SimpleTestCase):
         # Regression test for #10571
         json = '{"dog": "собака"}'
         response = self.client.post("/parse_unicode_json/", json, content_type="application/json; charset=utf-8")
-        self.assertEqual(response.content, json.encode('utf-8'))
+        self.assertEqual(response.content, json.encode())
 
     def test_unicode_payload_utf16(self):
         "A non-ASCII unicode data encoded as UTF-16 can be POSTed"

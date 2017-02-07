@@ -97,7 +97,7 @@ def file_upload_echo_content(request):
     """
     def read_and_close(f):
         with f:
-            return f.read().decode('utf-8')
+            return f.read().decode()
     r = {k: read_and_close(f) for k, f in request.FILES.items()}
     return JsonResponse(r)
 

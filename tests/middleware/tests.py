@@ -785,7 +785,7 @@ class GZipMiddlewareTest(SimpleTestCase):
         r = GZipMiddleware().process_response(self.req, self.stream_resp_unicode)
         self.assertEqual(
             self.decompress(b''.join(r)),
-            b''.join(x.encode('utf-8') for x in self.sequence_unicode)
+            b''.join(x.encode() for x in self.sequence_unicode)
         )
         self.assertEqual(r.get('Content-Encoding'), 'gzip')
         self.assertFalse(r.has_header('Content-Length'))

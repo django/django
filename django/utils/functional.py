@@ -111,7 +111,7 @@ def lazy(func, *resultclasses):
             return bytes(func(*self.__args, **self.__kw))
 
         def __bytes_cast_encoded(self):
-            return func(*self.__args, **self.__kw).encode('utf-8')
+            return func(*self.__args, **self.__kw).encode()
 
         def __cast(self):
             if self._delegate_bytes:

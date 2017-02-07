@@ -317,7 +317,7 @@ class HttpResponseTests(unittest.TestCase):
         with self.assertRaises(UnicodeError):
             r.__setitem__('føø', 'bar')
         with self.assertRaises(UnicodeError):
-            r.__setitem__('føø'.encode('utf-8'), 'bar')
+            r.__setitem__('føø'.encode(), 'bar')
 
     def test_long_line(self):
         # Bug #20889: long lines trigger newlines to be added to headers
@@ -371,7 +371,7 @@ class HttpResponseTests(unittest.TestCase):
         # test odd inputs
         r = HttpResponse()
         r.content = ['1', '2', 3, '\u079e']
-        # '\xde\x9e' == unichr(1950).encode('utf-8')
+        # '\xde\x9e' == unichr(1950).encode()
         self.assertEqual(r.content, b'123\xde\x9e')
 
         # .content can safely be accessed multiple times.
@@ -573,7 +573,7 @@ class StreamingHttpResponseTests(SimpleTestCase):
         # iterating over strings still yields bytestring chunks.
         r.streaming_content = iter(['hello', 'café'])
         chunks = list(r)
-        # '\xc3\xa9' == unichr(233).encode('utf-8')
+        # '\xc3\xa9' == unichr(233).encode()
         self.assertEqual(chunks, [b'hello', b'caf\xc3\xa9'])
         for chunk in chunks:
             self.assertIsInstance(chunk, bytes)
