@@ -64,6 +64,7 @@ class DebugContextProcessorTests(TestCase):
     """
     Tests for the ``django.template.context_processors.debug`` processor.
     """
+    multi_db = True
 
     def test_debug(self):
         url = '/debug/'

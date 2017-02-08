@@ -1,7 +1,6 @@
 from django.contrib.contenttypes.models import ContentType, ContentTypeManager
 from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.shortcuts import get_current_site
-from django.db import connections
 from django.http import Http404, HttpRequest
 from django.test import TestCase, override_settings
 
@@ -259,14 +258,7 @@ class TestRouter:
 
 @override_settings(DATABASE_ROUTERS=[TestRouter()])
 class ContentTypesMultidbTests(TestCase):
-
-    def setUp(self):
-        # When a test starts executing, only the "default" database is
-        # connected. Connect to the "other" database here because otherwise it
-        # will be connected later when it's queried. Some database backends
-        # perform extra queries upon connecting (MySQL executes
-        # "SET SQL_AUTO_IS_NULL = 0"), which will affect assertNumQueries().
-        connections['other'].ensure_connection()
+    multi_db = True
 
     def test_multidb(self):
         """
