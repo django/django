@@ -1117,7 +1117,7 @@ This test case will flush *all* the test databases before running
 ``test_index_page_view``.
 
 The ``multi_db`` flag also affects into which databases the
-attr:`TransactionTestCase.fixtures` are loaded. By default (when
+:attr:`TransactionTestCase.fixtures` are loaded. By default (when
 ``multi_db=False``), fixtures are only loaded into the ``default`` database.
 If ``multi_db=True``, fixtures are loaded into all databases.
 
