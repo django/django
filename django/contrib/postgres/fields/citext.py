@@ -1,8 +1,8 @@
-from django.db.models import CharField
+from django.db.models import TextField
 
 __all__ = ['CITextField']
 
 
-class CITextField(CharField):
+class CITextField(TextField):
     def db_type(self, connection):
         return 'citext'
