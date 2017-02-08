@@ -69,8 +69,9 @@ overridden:
   formfield-specific piece of validation and, possibly,
   cleaning/normalizing the data.
 
-  This method should return the cleaned value obtained from ``cleaned_data``,
-  regardless of whether it changed anything or not.
+  The return value of this method replaces the existing value in
+  ``cleaned_data``, so it must be the field's value from ``cleaned_data`` (even
+  if this method didn't change it) or a new cleaned value.
 
 * The form subclass's ``clean()`` method can perform validation that requires
   access to multiple form fields. This is where you might put in checks such as
@@ -315,8 +316,8 @@ write a cleaning method that operates on the ``recipients`` field, like so::
             if "fred@example.com" not in data:
                 raise forms.ValidationError("You have forgotten about Fred!")
 
-            # Always return the cleaned data, whether you have changed it or
-            # not.
+            # Always return a value to use as the new cleaned data, even if
+            # this method didn't change it.
             return data
 
 .. _validating-fields-with-clean:
