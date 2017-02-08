@@ -1,6 +1,7 @@
 from io import BytesIO
 
 from django.core.exceptions import RequestDataTooBig, TooManyFieldsSent
+from django.core.handlers.exception import response_for_exception
 from django.core.handlers.wsgi import WSGIRequest
 from django.test import SimpleTestCase
 from django.test.client import FakePayload
@@ -17,6 +18,8 @@ class DataUploadMaxMemorySizeFormPostTests(SimpleTestCase):
             'CONTENT_TYPE': 'application/x-www-form-urlencoded',
             'CONTENT_LENGTH': len(payload),
             'wsgi.input': payload,
+            'SERVER_NAME': 'test',
+            'SERVER_PORT': '8000'
         })
 
     def test_size_exceeded(self):
@@ -31,6 +34,15 @@ class DataUploadMaxMemorySizeFormPostTests(SimpleTestCase):
     def test_no_limit(self):
         with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=None):
             self.request._load_post_and_files()
+
+    def test_response_for_exception(self):
+        """
+        response_for_exception should not trigger again RequestDataTooBig
+        when handling RequestDataTooBig.
+        """
+        exc = RequestDataTooBig()
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=12):
+            response_for_exception(self.request, exc)
 
 
 class DataUploadMaxMemorySizeMultipartPostTests(SimpleTestCase):
