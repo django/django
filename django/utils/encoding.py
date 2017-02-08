@@ -194,11 +194,13 @@ def uri_to_iri(uri):
     else:
         parts = [bits[0]]
         append = parts.append
+        hextobyte = _hextobyte
         for item in bits[1:]:
-            try:
-                append(_hextobyte[item[:2]])
+            hex = item[:2]
+            if hex in hextobyte:
+                append(hextobyte[item[:2]])
                 append(item[2:])
-            except KeyError:
+            else:
                 append(b'%')
                 append(item)
         iri = b''.join(parts)
