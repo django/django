@@ -151,23 +151,22 @@ def iri_to_uri(iri):
     return quote(iri, safe="/#%[]=:;$&()+,!?*@'~")
 
 
-# List of byte values that uri_to_iri is going to decode from percent encoding.
-# First the unreserved characters from RFC 3986:
+# List of byte values that uri_to_iri() decodes from percent encoding.
+# First, the unreserved characters from RFC 3986:
 _ascii_ranges = [[45, 46, 95, 126], range(65, 91), range(97, 123)]
 _hextobyte = {
     (fmt % char).encode(): bytes((char,))
-    for range in _ascii_ranges
-    for char in range
+    for ascii_range in _ascii_ranges
+    for char in ascii_range
     for fmt in ['%02x', '%02X']
 }
-# And then everything above 128, because bytes >= 128 are part of multibyte
+# And then everything above 128, because bytes ≥ 128 are part of multibyte
 # unicode characters.
 _hexdig = '0123456789ABCDEFabcdef'
 _hextobyte.update({
     (a + b).encode(): bytes.fromhex(a + b)
     for a in _hexdig[8:] for b in _hexdig
 })
-_hextobyte
 
 
 def uri_to_iri(uri):
@@ -178,12 +177,17 @@ def uri_to_iri(uri):
     This is the algorithm from section 3.2 of RFC 3987, excluding step 4.
 
     Takes an URI in ASCII bytes (e.g. '/I%20%E2%99%A5%20Django/') and returns
-    a string containing the encoded result (e.g. '/I \xe2\x99\xa5 Django/').
+    a string containing the encoded result (e.g. '/I%20♥%20Django/').
     """
     if uri is None:
         return uri
     uri = force_bytes(uri)
 
+    # Fast selective unqote: First we split on '%' and then starting at the
+    # second block:
+    # • Decode the first 2 bytes if they represent a hex code we want to decode
+    # • The rest of the block is the part after '%AB', not containing any '%'.
+    #   Just add that to the output without further processing.
     bits = uri.split(b'%')
     if len(bits) == 1:
         iri = uri

@@ -25,7 +25,6 @@ from django.utils.functional import SimpleLazyObject, curry
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
 
-
 __all__ = ('Client', 'RedirectCycleError', 'RequestFactory', 'encode_file', 'encode_multipart')
 
 
