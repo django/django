@@ -258,9 +258,6 @@ class ExceptionReporter:
                 frame_vars = []
                 for k, v in frame['vars']:
                     v = pprint(v)
-                    # The force_escape filter assumes str, make sure that works
-                    if isinstance(v, bytes):
-                        v = v.decode('utf-8', 'replace')  # don't choke on non-utf-8 input
                     # Trim large blobs of data
                     if len(v) > 4096:
                         v = '%s... <trimmed %d bytes string>' % (v[0:4096], len(v))
