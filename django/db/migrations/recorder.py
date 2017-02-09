@@ -58,7 +58,11 @@ class MigrationRecorder:
         """
         Returns a set of (app, name) of applied migrations.
         """
-        self.ensure_schema()
+        try:
+            self.ensure_schema()
+        except MigrationSchemaMissing:
+            # If the migration schema is missing, then there are no migrations applied.
+            return set()
         return set(tuple(x) for x in self.migration_qs.values_list("app", "name"))
 
     def record_applied(self, app, name):
