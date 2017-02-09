@@ -16,21 +16,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cx_Oracle.CLOB: 'TextField',
         cx_Oracle.DATETIME: 'DateField',
         cx_Oracle.FIXED_CHAR: 'CharField',
+        cx_Oracle.FIXED_NCHAR: 'CharField',
+        cx_Oracle.NATIVE_FLOAT: 'FloatField',
+        cx_Oracle.NCHAR: 'CharField',
         cx_Oracle.NCLOB: 'TextField',
         cx_Oracle.NUMBER: 'DecimalField',
         cx_Oracle.STRING: 'CharField',
         cx_Oracle.TIMESTAMP: 'DateTimeField',
     }
-
-    try:
-        data_types_reverse[cx_Oracle.NATIVE_FLOAT] = 'FloatField'
-    except AttributeError:
-        pass
-
-    try:
-        data_types_reverse[cx_Oracle.UNICODE] = 'CharField'
-    except AttributeError:
-        pass
 
     cache_bust_counter = 1
 
