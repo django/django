@@ -1,15 +1,16 @@
 from operator import attrgetter
 
 from django.db import connection
-from django.db.models import Value
+from django.db.models import FileField, Value
 from django.db.models.functions import Lower
 from django.test import (
     TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature,
 )
 
 from .models import (
-    Country, NoFields, Pizzeria, ProxyCountry, ProxyMultiCountry,
-    ProxyMultiProxyCountry, ProxyProxyCountry, Restaurant, State, TwoFields,
+    Country, NoFields, NullableFields, Pizzeria, ProxyCountry,
+    ProxyMultiCountry, ProxyMultiProxyCountry, ProxyProxyCountry, Restaurant,
+    State, TwoFields,
 )
 
 
@@ -203,6 +204,19 @@ class BulkCreateTests(TestCase):
         ])
         bbb = Restaurant.objects.filter(name="betty's beetroot bar")
         self.assertEqual(bbb.count(), 1)
+
+    @skipUnlessDBFeature('has_bulk_insert')
+    def test_bulk_insert_nullable_fields(self):
+        # NULL can be mixed with other values in nullable fields
+        nullable_fields = [field for field in NullableFields._meta.get_fields() if field.name != 'id']
+        NullableFields.objects.bulk_create([
+            NullableFields(**{field.name: None}) for field in nullable_fields
+        ])
+        self.assertEqual(NullableFields.objects.count(), len(nullable_fields))
+        for field in nullable_fields:
+            with self.subTest(field=field):
+                field_value = '' if isinstance(field, FileField) else None
+                self.assertEqual(NullableFields.objects.filter(**{field.name: field_value}).count(), 1)
 
     @skipUnlessDBFeature('can_return_ids_from_bulk_insert')
     def test_set_pk_and_insert_single_item(self):

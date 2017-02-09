@@ -29,3 +29,27 @@ class Oracle_datetime(datetime.datetime):
             dt.year, dt.month, dt.day,
             dt.hour, dt.minute, dt.second, dt.microsecond,
         )
+
+
+class BulkInsertMapper:
+    BLOB = 'TO_BLOB(%s)'
+    DATE = 'TO_DATE(%s)'
+    NUMBER = 'TO_NUMBER(%s)'
+    TIMESTAMP = 'TO_TIMESTAMP(%s)'
+    INTERVAL = 'CAST(%s as INTERVAL DAY(9) TO SECOND(6))'
+
+    types = {
+        'BigIntegerField': NUMBER,
+        'BinaryField': BLOB,
+        'DateField': DATE,
+        'DateTimeField': TIMESTAMP,
+        'DecimalField': NUMBER,
+        'DurationField': INTERVAL,
+        'FloatField': NUMBER,
+        'IntegerField': NUMBER,
+        'NullBooleanField': NUMBER,
+        'PositiveIntegerField': NUMBER,
+        'PositiveSmallIntegerField': NUMBER,
+        'SmallIntegerField': NUMBER,
+        'TimeField': TIMESTAMP,
+    }
