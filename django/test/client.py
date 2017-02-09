@@ -6,11 +6,11 @@ import sys
 from copy import copy
 from importlib import import_module
 from io import BytesIO
-from urllib.parse import urljoin, urlparse, urlsplit
+from urllib.parse import unquote_to_bytes, urljoin, urlparse, urlsplit
 
 from django.conf import settings
 from django.core.handlers.base import BaseHandler
-from django.core.handlers.wsgi import ISO_8859_1, UTF_8, WSGIRequest
+from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import (
     got_request_exception, request_finished, request_started,
 )
@@ -20,7 +20,7 @@ from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.test.utils import ContextList
 from django.urls import resolve
-from django.utils.encoding import force_bytes, uri_to_iri
+from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject, curry
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
@@ -320,11 +320,11 @@ class RequestFactory:
         # If there are parameters, add them
         if parsed.params:
             path += ";" + parsed.params
-        path = uri_to_iri(path).encode(UTF_8)
+        path = unquote_to_bytes(path)
         # Replace the behavior where non-ASCII values in the WSGI environ are
         # arbitrarily decoded with ISO-8859-1.
         # Refs comment in `get_bytes_from_wsgi()`.
-        return path.decode(ISO_8859_1)
+        return path.decode('iso-8859-1')
 
     def get(self, path, data=None, secure=False, **extra):
         "Construct a GET request."
