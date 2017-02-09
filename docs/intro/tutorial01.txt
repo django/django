@@ -13,7 +13,8 @@ It'll consist of two parts:
 * An admin site that lets you add, change, and delete polls.
 
 We'll assume you have :doc:`Django installed </intro/install>` already. You can
-tell Django is installed and which version by running the following command:
+tell Django is installed and which version by running the following command
+in a shell prompt (indicated by the $ prefix):
 
 .. code-block:: console
 
