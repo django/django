@@ -120,6 +120,11 @@ class FeedgeneratorTest(unittest.TestCase):
         self.assertIn('href="/feed/"', feed_content)
         self.assertIn('rel="self"', feed_content)
 
+    def test_attribute_order(self):
+        feed = feedgenerator.Atom1Feed('title', '/link/', 'desc')
+        feed_content = feed.writeString('utf-8')
+        self.assertIn('href="/link/" rel="alternate"', feed_content)
+
 
 class FeedgeneratorDBTest(TestCase):
 
