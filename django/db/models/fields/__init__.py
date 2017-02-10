@@ -2337,6 +2337,8 @@ class UUIDField(Field):
         return value.hex
 
     def to_python(self, value):
+        if value is None:
+            return None
         if not isinstance(value, uuid.UUID):
             try:
                 return uuid.UUID(value)
