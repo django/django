@@ -102,7 +102,7 @@ class Character(models.Model):
 
 
 class CITextTestModel(PostgreSQLModel):
-    name = CITextField(primary_key=True, max_length=255)
+    name = CITextField(primary_key=True)
 
     def __str__(self):
         return self.name
