@@ -2,9 +2,9 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import migrations, models
 
 from ..fields import (
-    ArrayField, BigIntegerRangeField, CITextField, DateRangeField,
-    DateTimeRangeField, FloatRangeField, HStoreField, IntegerRangeField,
-    JSONField, SearchVectorField,
+    ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,
+    DateRangeField, DateTimeRangeField, FloatRangeField, HStoreField,
+    IntegerRangeField, JSONField, SearchVectorField,
 )
 from ..models import TagField
 
@@ -136,9 +136,11 @@ class Migration(migrations.Migration):
             bases=None,
         ),
         migrations.CreateModel(
-            name='CITextTestModel',
+            name='CITestModel',
             fields=[
-                ('name', CITextField(primary_key=True, max_length=255)),
+                ('name', CICharField(primary_key=True, max_length=255)),
+                ('email', CIEmailField()),
+                ('description', CITextField()),
             ],
             options={
                 'required_db_vendor': 'postgresql',
