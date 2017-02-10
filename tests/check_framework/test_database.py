@@ -8,6 +8,8 @@ from django.test import TestCase
 
 
 class DatabaseCheckTests(TestCase):
+    multi_db = True
+
     @property
     def func(self):
         from django.core.checks.database import check_database_backends
