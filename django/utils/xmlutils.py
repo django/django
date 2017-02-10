@@ -3,6 +3,7 @@ Utilities for XML generation/parsing.
 """
 
 import re
+from collections import OrderedDict
 from xml.sax.saxutils import XMLGenerator
 
 
@@ -26,3 +27,8 @@ class SimplerXMLGenerator(XMLGenerator):
             # See http://www.w3.org/International/questions/qa-controls
             raise UnserializableContentError("Control characters are not supported in XML 1.0")
         XMLGenerator.characters(self, content)
+
+    def startElement(self, name, attrs):
+        # Sort attrs for a deterministic output.
+        sorted_attrs = OrderedDict(sorted(attrs.items())) if attrs else attrs
+        super().startElement(name, sorted_attrs)

@@ -126,6 +126,11 @@ class FeedgeneratorTest(unittest.TestCase):
         feed.add_item('item_title', 'item_link', 'item_description')
         feed.writeString('utf-8')
 
+    def test_deterministic_attribute_order(self):
+        feed = feedgenerator.Atom1Feed('title', '/link/', 'desc')
+        feed_content = feed.writeString('utf-8')
+        self.assertIn('href="/link/" rel="alternate"', feed_content)
+
 
 class FeedgeneratorDBTest(TestCase):
 
