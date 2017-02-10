@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed ``ClearableFileInput``’s "Clear" checkbox on model form fields where
   the model field has a ``default`` (:ticket:`27805`).
+
+* Fixed ``RequestDataTooBig`` and ``TooManyFieldsSent`` exceptions crashing
+  rather than generating a bad request response (:ticket:`27820`).
