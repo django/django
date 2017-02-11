@@ -17,6 +17,8 @@ details on these changes.
 
 * The ``django.db.backends.postgresql_psycopg2`` module will be removed.
 
+* ``django.shortcuts.render_to_response()`` will be removed.
+
 .. _deprecation-removed-in-2.1:
 
 2.1

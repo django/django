@@ -297,6 +297,10 @@ Miscellaneous
   ``'django.db.backends.postgresql_psycopg2'``, though you can simplify that by
   using the ``'django.db.backends.postgresql'`` name added in Django 1.9.
 
+* ``django.shortcuts.render_to_response()`` is deprecated in favor of
+  :func:`django.shortcuts.render`. ``render()`` takes the same arguments
+  except that is also requires a ``request``.
+
 .. _removed-features-2.0:
 
 Features removed in 2.0
