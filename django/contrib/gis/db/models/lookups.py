@@ -436,7 +436,7 @@ class DistanceLookupBase(GISLookup):
         else:
             params += connection.ops.get_distance(
                 self.lhs.output_field, (dist_param,) + self.rhs[2:],
-                self.lookup_name, handle_spheroid=False
+                self.lookup_name,
             )
         rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, params[0], compiler)
         return (rhs, params)

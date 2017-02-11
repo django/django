@@ -285,7 +285,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         else:
             return 'geometry(%s,%d)' % (geom_type, f.srid)
 
-    def get_distance(self, f, dist_val, lookup_type, handle_spheroid=True):
+    def get_distance(self, f, dist_val, lookup_type):
         """
         Retrieve the distance parameters for the given geometry field,
         distance lookup value, and the distance lookup type.
@@ -316,16 +316,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             # Assuming the distance is in the units of the field.
             dist_param = value
 
-        params = [dist_param]
-        # handle_spheroid *might* be dropped in Django 2.0 as PostGISDistanceOperator
-        # also handles it (#25524).
-        if handle_spheroid and len(dist_val) > 1:
-            option = dist_val[1]
-            if not geography and geodetic and lookup_type != 'dwithin' and option == 'spheroid':
-                # using distance_spheroid requires the spheroid of the field as
-                # a parameter.
-                params.insert(0, f._spheroid)
-        return params
+        return [dist_param]
 
     def get_geom_placeholder(self, f, value, compiler):
         """

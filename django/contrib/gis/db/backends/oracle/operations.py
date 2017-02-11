@@ -191,7 +191,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         """
         return 'MDSYS.SDO_GEOMETRY'
 
-    def get_distance(self, f, value, lookup_type, **kwargs):
+    def get_distance(self, f, value, lookup_type):
         """
         Return the distance parameters given the value and the lookup type.
         On Oracle, geometry columns with a geodetic coordinate system behave
