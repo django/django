@@ -73,11 +73,6 @@ class WSGIServer(simple_server.WSGIServer, object):
         self.allow_reuse_address = kwargs.pop('allow_reuse_address', True)
         super(WSGIServer, self).__init__(*args, **kwargs)
 
-    def server_bind(self):
-        """Override server_bind to store the server name."""
-        super(WSGIServer, self).server_bind()
-        self.setup_environ()
-
     def handle_error(self, request, client_address):
         if is_broken_pipe_error():
             logger.info("- Broken pipe from %s\n", client_address)
