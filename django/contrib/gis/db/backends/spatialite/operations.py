@@ -150,7 +150,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         """
         return None
 
-    def get_distance(self, f, value, lookup_type, **kwargs):
+    def get_distance(self, f, value, lookup_type):
         """
         Return the distance parameters for the given geometry field,
         lookup value, and lookup type.
