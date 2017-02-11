@@ -14,8 +14,8 @@ def get_connection():
 
 
 @override_settings(DEBUG=True)
-@unittest.skipUnless(connection.vendor == 'mysql', 'MySQL specific test.')
-class MySQLTests(TestCase):
+@unittest.skipUnless(connection.vendor == 'mysql', 'MySQL tests')
+class IsolationLevelTests(TestCase):
 
     read_committed = 'read committed'
     repeatable_read = 'repeatable read'
