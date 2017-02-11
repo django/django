@@ -3,11 +3,14 @@ This module collects helper functions and classes that "span" multiple levels
 of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
+import warnings
+
 from django.http import (
     Http404, HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
 from django.template import loader
 from django.urls import NoReverseMatch, reverse
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
 
@@ -17,6 +20,11 @@ def render_to_response(template_name, context=None, content_type=None, status=No
     Returns a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     """
+    warnings.warn(
+        'render_to_response() is deprecated in favor render(). It has the '
+        'same signature except that it also requires a request.',
+        RemovedInDjango30Warning, stacklevel=2,
+    )
     content = loader.render_to_string(template_name, context, using=using)
     return HttpResponse(content, content_type, status)
 
