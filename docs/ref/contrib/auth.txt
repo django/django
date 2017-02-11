@@ -38,8 +38,7 @@ Fields
             usernames. Although it wasn't a deliberate choice, Unicode
             characters have always been accepted when using Python 3. Django
             1.10 officially added Unicode support in usernames, keeping the
-            ASCII-only behavior on Python 2, with the option to customize the
-            behavior using :attr:`.User.username_validator`.
+            ASCII-only behavior on Python 2.
 
     .. attribute:: first_name
 
@@ -136,24 +135,6 @@ Attributes
         objects. Generally, you should prefer using
         :attr:`~django.contrib.auth.models.User.is_authenticated` to this
         attribute.
-
-    .. attribute:: username_validator
-
-        Points to a validator instance used to validate usernames. Defaults to
-        :class:`validators.UnicodeUsernameValidator`.
-
-        To change the default username validator, you can subclass the ``User``
-        model and set this attribute to a different validator instance. For
-        example, to use ASCII usernames::
-
-            from django.contrib.auth.models import User
-            from django.contrib.auth.validators import ASCIIUsernameValidator
-
-            class CustomUser(User):
-                username_validator = ASCIIUsernameValidator()
-
-                class Meta:
-                    proxy = True  # If no new field is added.
 
 Methods
 -------
