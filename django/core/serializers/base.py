@@ -88,7 +88,7 @@ class Serializer:
                         if self.selected_fields is None or field.attname in self.selected_fields:
                             self.handle_field(obj, field)
                     else:
-                        if self.field_is_selected(field) and self.output_pk_field(obj, field):
+                        if self.selected_fields is None or field.attname[:-3] in self.selected_fields:
                             self.handle_fk_field(obj, field)
             for field in concrete_model._meta.many_to_many:
                 if field.serialize:
@@ -100,12 +100,6 @@ class Serializer:
                 self.first = False
         self.end_serialization()
         return self.getvalue()
-
-    def field_is_selected(self, field):
-        return self.selected_fields is None or field.attname[:-3] in self.selected_fields
-
-    def output_pk_field(self, obj, pk_field):
-        return self.use_natural_primary_keys or pk_field != obj._meta.pk
 
     def start_serialization(self):
         """
