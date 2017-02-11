@@ -202,6 +202,9 @@ class IncludeNode(Node):
                 if template is None:
                     template = context.template.engine.get_template(template_name)
                     cache[template_name] = template
+            # Use the base.Template of a backends.django.Template.
+            elif hasattr(template, 'template'):
+                template = template.template
             values = {
                 name: var.resolve(context)
                 for name, var in six.iteritems(self.extra_context)
