@@ -6,9 +6,9 @@ from django.db import models
 
 try:
     from django.contrib.postgres.fields import (
-        ArrayField, BigIntegerRangeField, CITextField, DateRangeField,
-        DateTimeRangeField, FloatRangeField, HStoreField, IntegerRangeField,
-        JSONField,
+        ArrayField, BigIntegerRangeField, CICharField, CIEmailField,
+        CITextField, DateRangeField, DateTimeRangeField, FloatRangeField,
+        HStoreField, IntegerRangeField, JSONField,
     )
     from django.contrib.postgres.search import SearchVectorField
 except ImportError:
@@ -30,6 +30,8 @@ except ImportError:
 
     ArrayField = DummyArrayField
     BigIntegerRangeField = models.Field
+    CICharField = models.Field
+    CIEmailField = models.Field
     CITextField = models.Field
     DateRangeField = models.Field
     DateTimeRangeField = models.Field

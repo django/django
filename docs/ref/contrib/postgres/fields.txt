@@ -250,22 +250,32 @@ At present using :attr:`~django.db.models.Field.db_index` will create a
 A more useful index is a ``GIN`` index, which you should create using a
 :class:`~django.db.migrations.operations.RunSQL` operation.
 
-``CITextField``
-===============
+``CIText`` fields
+=================
 
-.. class:: CITextField(**options)
+.. class:: CIText(**options)
 
     .. versionadded:: 1.11
 
-    This field is a subclass of :class:`~django.db.models.CharField` backed by
-    the citext_ type, a case-insensitive character string type. Read about `the
-    performance considerations`_ prior to using this field.
+    A mixin to create case-insensitive text fields backed by the citext_ type.
+    Read about `the performance considerations`_ prior to using it.
 
-    To use this field, setup the ``citext`` extension in PostgreSQL before the
-    first ``CreateModel`` migration operation using the
-    :class:`~django.contrib.postgres.operations.CITextExtension` operation. The
-    code to setup the extension is similar to the example for
-    :class:`~django.contrib.postgres.fields.HStoreField`.
+    To use ``citext``, use the :class:`.CITextExtension` operation to
+    :ref:`setup the citext extension <create-postgresql-extensions>` in
+    PostgreSQL before the first ``CreateModel`` migration operation.
+
+    Several fields that use the mixin are provided:
+
+.. class:: CICharField(**options)
+.. class:: CIEmailField(**options)
+.. class:: CITextField(**options)
+
+    These fields subclass :class:`~django.db.models.CharField`,
+    :class:`~django.db.models.EmailField`, and
+    :class:`~django.db.models.TextField`, respectively.
+
+    ``max_length`` won't be enforced in the database since ``citext`` behaves
+    similar to PostgreSQL's ``text`` type.
 
     .. _citext: https://www.postgresql.org/docs/current/static/citext.html
     .. _the performance considerations: https://www.postgresql.org/docs/current/static/citext.html#AEN169274
