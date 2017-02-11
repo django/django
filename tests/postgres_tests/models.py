@@ -2,9 +2,9 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 from .fields import (
-    ArrayField, BigIntegerRangeField, CITextField, DateRangeField,
-    DateTimeRangeField, FloatRangeField, HStoreField, IntegerRangeField,
-    JSONField, SearchVectorField,
+    ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,
+    DateRangeField, DateTimeRangeField, FloatRangeField, HStoreField,
+    IntegerRangeField, JSONField, SearchVectorField,
 )
 
 
@@ -101,8 +101,10 @@ class Character(models.Model):
         return self.name
 
 
-class CITextTestModel(PostgreSQLModel):
-    name = CITextField(primary_key=True, max_length=255)
+class CITestModel(PostgreSQLModel):
+    name = CICharField(primary_key=True, max_length=255)
+    email = CIEmailField()
+    description = CITextField()
 
     def __str__(self):
         return self.name
