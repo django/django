@@ -69,7 +69,7 @@ class AbstractBaseUser(models.Model):
     def __str__(self):
         return self.get_username()
 
-    def clean(self):
+    def clean(self, exclude=None):
         setattr(self, self.USERNAME_FIELD, self.normalize_username(self.get_username()))
 
     def save(self, *args, **kwargs):

@@ -337,8 +337,8 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = _('users')
         abstract = True
 
-    def clean(self):
-        super().clean()
+    def clean(self, exclude=None):
+        super().clean(exclude)
         self.email = self.__class__.objects.normalize_email(self.email)
 
     def get_full_name(self):

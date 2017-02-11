@@ -26,8 +26,10 @@ from django.db.models.signals import (
     class_prepared, post_init, post_save, pre_init, pre_save,
 )
 from django.db.models.utils import make_model_tuple
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 from django.utils.functional import curry
+from django.utils.inspect import func_supports_parameter
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext_lazy as _
 from django.utils.version import get_version
@@ -925,7 +927,7 @@ class Model(metaclass=ModelBase):
             raise ValueError("Unsaved model instance %r cannot be used in an ORM query." % self)
         return getattr(self, field.remote_field.get_related_field().attname)
 
-    def clean(self):
+    def clean(self, exclude=None):
         """
         Hook for doing any extra model-wide validation after clean() has been
         called on every field by self.clean_fields. Any ValidationError raised
@@ -1142,7 +1144,15 @@ class Model(metaclass=ModelBase):
         # Form.clean() is run even if other validation fails, so do the
         # same with Model.clean() for consistency.
         try:
-            self.clean()
+            if func_supports_parameter(self.clean, 'exclude'):
+                self.clean(exclude=exclude)
+            else:
+                warnings.warn(
+                    'Add the `exclude` argument to the clean() method of %s. '
+                    'It will be mandatory in Django 2.1' % self.__class__,
+                    RemovedInDjango21Warning, stacklevel=2,
+                )
+                self.clean()
         except ValidationError as e:
             errors = e.update_error_dict(errors)
 

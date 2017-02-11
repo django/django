@@ -315,7 +315,7 @@ class Vodcast(Media):
 class Parent(models.Model):
     name = models.CharField(max_length=128)
 
-    def clean(self):
+    def clean(self, exclude=None):
         if self.name == '_invalid':
             raise ValidationError('invalid')
 
@@ -324,7 +324,7 @@ class Child(models.Model):
     parent = models.ForeignKey(Parent, models.CASCADE, editable=False)
     name = models.CharField(max_length=30, blank=True)
 
-    def clean(self):
+    def clean(self, exclude=None):
         if self.name == '_invalid':
             raise ValidationError('invalid')
 

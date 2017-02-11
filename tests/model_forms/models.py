@@ -372,7 +372,7 @@ class CustomErrorMessage(models.Model):
         error_messages={'invalid': 'Model custom error message.'},
     )
 
-    def clean(self):
+    def clean(self, exclude=None):
         if self.name1 == 'FORBIDDEN_VALUE':
             raise ValidationError({'name1': [ValidationError('Model.clean() error messages.')]})
         elif self.name1 == 'FORBIDDEN_VALUE2':

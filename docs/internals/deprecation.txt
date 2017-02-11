@@ -64,6 +64,9 @@ details on these changes.
 * Support for ``Widget.render()`` methods without the ``renderer`` argument
   will be removed.
 
+* Support for ``Model.clean()`` methods without the ``exclude`` argument
+  will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0
