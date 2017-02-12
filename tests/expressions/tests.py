@@ -15,7 +15,7 @@ from django.db.models.expressions import (
     When,
 )
 from django.db.models.functions import (
-    Coalesce, Concat, Length, Lower, Substr, Upper,
+    Cast, Coalesce, Concat, Length, Lower, Substr, Upper,
 )
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
@@ -907,6 +907,15 @@ class FTimeDeltaTests(TestCase):
             completed__gt=self.stime + F('estimated_time'),
         ).order_by('name')
         self.assertQuerysetEqual(over_estimate, ['e3', 'e4'], lambda e: e.name)
+
+    def test_date_minus_duration(self):
+        value = (
+            Cast(Value(datetime.timedelta(days=4)), models.DurationField())
+            if connection.vendor == 'oracle'
+            else Value(datetime.timedelta(days=4), output_field=models.DurationField())
+        )
+        more_than_4_days = Experiment.objects.filter(assigned__lt=F('completed') - value)
+        self.assertQuerysetEqual(more_than_4_days, ['e3', 'e4'], lambda e: e.name)
 
 
 class ValueTests(TestCase):
