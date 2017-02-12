@@ -194,7 +194,7 @@ Example using class-based consumer::
 
     from channels.generic.websockets import WebsocketDemultiplexer, JsonWebsocketConsumer
 
-    class EchoConsumer(websockets.JsonWebsocketConsumer):
+    class EchoConsumer(JsonWebsocketConsumer):
         def connect(self, message, multiplexer, **kwargs):
             # Send data with the multiplexer
             multiplexer.send({"status": "I just connected!"})
@@ -207,7 +207,7 @@ Example using class-based consumer::
             multiplexer.send({"original_message": content})
 
 
-    class AnotherConsumer(websockets.JsonWebsocketConsumer):
+    class AnotherConsumer(JsonWebsocketConsumer):
         def receive(self, content, multiplexer=None, **kwargs):
             # Some other actions here
             pass
