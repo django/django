@@ -5,6 +5,11 @@ from decimal import Decimal
 from django.db import models
 from django.utils import timezone
 
+try:
+    from PIL import Image
+except ImportError:
+    Image = None
+
 
 class Country(models.Model):
     name = models.CharField(max_length=255)
@@ -76,11 +81,11 @@ class NullableFields(models.Model):
     # Fields not required in BulkInsertMapper
     char_field = models.CharField(null=True, max_length=4, default='char')
     email_field = models.EmailField(null=True, default='user@example.com')
-    duration_field = models.DurationField(null=True, default=datetime.timedelta(1))
     file_field = models.FileField(null=True, default='file.txt')
     file_path_field = models.FilePathField(path='/tmp', null=True, default='file.txt')
     generic_ip_address_field = models.GenericIPAddressField(null=True, default='127.0.0.1')
-    image_field = models.ImageField(null=True, default='image.jpg')
+    if Image:
+        image_field = models.ImageField(null=True, default='image.jpg')
     slug_field = models.SlugField(null=True, default='slug')
     text_field = models.TextField(null=True, default='text')
     url_field = models.URLField(null=True, default='/')
