@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed ``RequestDataTooBig`` and ``TooManyFieldsSent`` exceptions crashing
   rather than generating a bad request response (:ticket:`27820`).
+
+* Fixed a crash on Oracle and PostgreSQL when subtracting ``DurationField``
+  or ``IntegerField`` from ``DateField`` (:ticket:`27828`).

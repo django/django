@@ -1184,6 +1184,12 @@ class FTimeDeltaTests(TestCase):
         ).order_by('name')
         self.assertQuerysetEqual(over_estimate, ['e3', 'e4'], lambda e: e.name)
 
+    def test_date_minus_duration(self):
+        more_than_4_days = Experiment.objects.filter(
+            assigned__lt=F('completed') - Value(datetime.timedelta(days=4), output_field=models.DurationField())
+        )
+        self.assertQuerysetEqual(more_than_4_days, ['e3', 'e4'], lambda e: e.name)
+
     def test_negative_timedelta_update(self):
         # subtract 30 seconds, 30 minutes, 2 hours and 2 days
         experiments = Experiment.objects.filter(name='e0').annotate(
