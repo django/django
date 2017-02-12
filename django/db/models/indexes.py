@@ -2,7 +2,7 @@ import hashlib
 
 from django.utils.encoding import force_bytes
 
-__all__ = ['Index']
+__all__ = ['FuncIndex', 'Index']
 
 
 class Index:
@@ -128,3 +128,33 @@ class Index:
 
     def __eq__(self, other):
         return (self.__class__ == other.__class__) and (self.deconstruct() == other.deconstruct())
+
+
+class FuncIndex(Index):
+    suffix = 'func'
+
+    def __init__(self, expression, name=None):
+        self.expression, self.name = expression, name
+
+    def create_sql(self, model, schema_editor):
+        connection = schema_editor.connection
+        compiler = connection.ops.compiler('SQLCompiler')(None, connection, 'default')
+        func_sql, params = compiler.compile(self.expression)
+        params = tuple(map(schema_editor.quote_value, params))
+        columns = func_sql % params
+        quote_name = schema_editor.quote_name
+        return schema_editor.sql_create_index % {
+            'table': quote_name(model._meta.db_table),
+            'name': quote_name(self.name),
+            'columns': columns,
+            'using': '',
+            'extra': '',
+        }
+
+    def deconstruct(self):
+        path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
+        path = path.replace('django.db.models.indexes', 'django.db.models')
+        return (path, (), {'expression': self.expression, 'name': self.name})
+
+    def __repr__(self):
+        return "<%s: expression='%r'>" % (self.__class__.__name__, self.expression)
