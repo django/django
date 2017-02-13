@@ -1140,6 +1140,11 @@ Default content type to use for all ``HttpResponse`` objects, if a MIME type
 isn't manually specified. Used with :setting:`DEFAULT_CHARSET` to construct
 the ``Content-Type`` header.
 
+.. deprecated:: 2.0
+
+    This setting is deprecated because it doesn't interact well with
+    third-party apps and is obsolete since HTML5 has mostly superseded XHTML.
+
 .. setting:: DEFAULT_EXCEPTION_REPORTER_FILTER
 
 ``DEFAULT_EXCEPTION_REPORTER_FILTER``

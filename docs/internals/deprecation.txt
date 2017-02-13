@@ -19,6 +19,8 @@ details on these changes.
 
 * ``django.shortcuts.render_to_response()`` will be removed.
 
+* The ``DEFAULT_CONTENT_TYPE`` setting will be removed.
+
 .. _deprecation-removed-in-2.1:
 
 2.1
