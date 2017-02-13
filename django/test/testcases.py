@@ -781,6 +781,9 @@ class TransactionTestCase(SimpleTestCase):
     # Subclasses can define fixtures which will be automatically installed.
     fixtures = None
 
+    # Do the tests in this class query non-default databases?
+    multi_db = False
+
     # If transactions aren't available, Django will serialize the database
     # contents into a fixture during setup and flush and reload them
     # during teardown (as flush does not restore data from migrations).
@@ -827,7 +830,7 @@ class TransactionTestCase(SimpleTestCase):
     def _databases_names(cls, include_mirrors=True):
         # If the test case has a multi_db=True flag, act on all databases,
         # including mirrors or not. Otherwise, just on the default DB.
-        if getattr(cls, 'multi_db', False):
+        if cls.multi_db:
             return [
                 alias for alias in connections
                 if include_mirrors or not connections[alias].settings_dict['TEST']['MIRROR']
