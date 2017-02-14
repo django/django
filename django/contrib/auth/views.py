@@ -460,9 +460,9 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
 
     def form_valid(self, form):
         user = form.save()
+        del self.request.session[INTERNAL_RESET_SESSION_TOKEN]
         if self.post_reset_login:
             auth_login(self.request, user)
-        del self.request.session[INTERNAL_RESET_SESSION_TOKEN]
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
