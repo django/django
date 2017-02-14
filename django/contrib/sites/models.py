@@ -75,7 +75,7 @@ class Site(AbstractBaseSite):
 
 def clear_site_cache(sender, **kwargs):
     """
-    Clear the cache (if primed) each time a site is saved or deleted
+    Clear the cache (if primed) each time a site is saved or deleted.
     """
     instance = kwargs['instance']
     using = kwargs['using']
