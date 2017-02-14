@@ -175,7 +175,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     ops_class = DatabaseOperations
 
     def __init__(self, *args, **kwargs):
-        super(DatabaseWrapper, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
         self.features.can_return_id_from_insert = use_returning_into
 
@@ -322,8 +322,7 @@ class OracleParam:
             param = Oracle_datetime.from_datetime(param)
 
         string_size = 0
-        # Oracle doesn't recognize True and False correctly in Python 3.
-        # The conversion done below works both in 2 and 3.
+        # Oracle doesn't recognize True and False correctly.
         if param is True:
             param = 1
         elif param is False:
@@ -527,7 +526,7 @@ class CursorIterator:
 
 def _rowfactory(row, cursor):
     # Cast numeric values as the appropriate Python type based upon the
-    # cursor description, and convert strings to unicode.
+    # cursor description.
     casted = []
     for value, desc in zip(row, cursor.description):
         if value is not None and desc[1] is Database.NUMBER:

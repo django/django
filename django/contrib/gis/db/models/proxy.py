@@ -11,19 +11,19 @@ from django.db.models.query_utils import DeferredAttribute
 class SpatialProxy(DeferredAttribute):
     def __init__(self, klass, field):
         """
-        Proxy initializes on the given Geometry or Raster class (not an instance)
+        Initialize on the given Geometry or Raster class (not an instance)
         and the corresponding field.
         """
         self._field = field
         self._klass = klass
-        super(SpatialProxy, self).__init__(field.attname, klass)
+        super().__init__(field.attname, klass)
 
     def __get__(self, instance, cls=None):
         """
-        This accessor retrieves the geometry or raster, initializing it using
-        the corresponding class specified during initialization and the value
-        of the field. Currently, GEOS or OGR geometries as well as GDALRasters
-        are supported.
+        Retrieve the geometry or raster, initializing it using the
+        corresponding class specified during initialization and the value of
+        the field. Currently, GEOS or OGR geometries as well as GDALRasters are
+        supported.
         """
         if instance is None:
             # Accessed on a class, not an instance
@@ -33,7 +33,7 @@ class SpatialProxy(DeferredAttribute):
         try:
             geo_value = instance.__dict__[self._field.attname]
         except KeyError:
-            geo_value = super(SpatialProxy, self).__get__(instance, cls)
+            geo_value = super().__get__(instance, cls)
 
         if isinstance(geo_value, self._klass):
             geo_obj = geo_value
@@ -48,11 +48,11 @@ class SpatialProxy(DeferredAttribute):
 
     def __set__(self, instance, value):
         """
-        This accessor sets the proxied geometry or raster with the
-        corresponding class specified during initialization.
+        Retrieve the proxied geometry or raster with the corresponding class
+        specified during initialization.
 
-        To set geometries, values of None, HEXEWKB, or WKT may be used.
-        To set rasters, JSON or dict values may be used.
+        To set geometries, use values of None, HEXEWKB, or WKT.
+        To set rasters, use JSON or dict values.
         """
         # The geographic type of the field.
         gtype = self._field.geom_type

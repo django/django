@@ -11,7 +11,6 @@ from django.utils.cache import (
     cc_delim_re, get_conditional_response, set_response_etag,
 )
 from django.utils.deprecation import MiddlewareMixin, RemovedInDjango21Warning
-from django.utils.encoding import force_text
 
 
 class CommonMiddleware(MiddlewareMixin):
@@ -157,10 +156,10 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
         if response.status_code == 404 and not settings.DEBUG:
             domain = request.get_host()
             path = request.get_full_path()
-            referer = force_text(request.META.get('HTTP_REFERER', ''), errors='replace')
+            referer = request.META.get('HTTP_REFERER', '')
 
             if not self.is_ignorable_request(request, path, domain, referer):
-                ua = force_text(request.META.get('HTTP_USER_AGENT', '<none>'), errors='replace')
+                ua = request.META.get('HTTP_USER_AGENT', '<none>')
                 ip = request.META.get('REMOTE_ADDR', '<none>')
                 mail_managers(
                     "Broken %slink on %s" % (

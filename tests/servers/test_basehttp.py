@@ -81,7 +81,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
                 '%s:%s' % (k, v) for k, v in environ.items()
                 if k.startswith('HTTP_')
             )
-            yield (','.join(http_environ_items)).encode('utf-8')
+            yield (','.join(http_environ_items)).encode()
 
         rfile = BytesIO()
         rfile.write(b"GET / HTTP/1.0\r\n")

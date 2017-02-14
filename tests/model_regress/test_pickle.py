@@ -15,7 +15,7 @@ class ModelPickleTestCase(TestCase):
             title = models.CharField(max_length=10)
 
             def __reduce__(self):
-                reduce_list = super(MissingDjangoVersion, self).__reduce__()
+                reduce_list = super().__reduce__()
                 data = reduce_list[-1]
                 del data[DJANGO_VERSION_PICKLE_KEY]
                 return reduce_list
@@ -34,7 +34,7 @@ class ModelPickleTestCase(TestCase):
             title = models.CharField(max_length=10)
 
             def __reduce__(self):
-                reduce_list = super(DifferentDjangoVersion, self).__reduce__()
+                reduce_list = super().__reduce__()
                 data = reduce_list[-1]
                 data[DJANGO_VERSION_PICKLE_KEY] = '1.0'
                 return reduce_list

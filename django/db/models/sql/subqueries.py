@@ -88,7 +88,7 @@ class UpdateQuery(Query):
     compiler = 'SQLUpdateCompiler'
 
     def __init__(self, *args, **kwargs):
-        super(UpdateQuery, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._setup_query()
 
     def _setup_query(self):
@@ -103,7 +103,7 @@ class UpdateQuery(Query):
             self.related_updates = {}
 
     def clone(self, klass=None, **kwargs):
-        return super(UpdateQuery, self).clone(klass, related_updates=self.related_updates.copy(), **kwargs)
+        return super().clone(klass, related_updates=self.related_updates.copy(), **kwargs)
 
     def update_batch(self, pk_list, values, using):
         self.add_update_values(values)
@@ -176,7 +176,7 @@ class InsertQuery(Query):
     compiler = 'SQLInsertCompiler'
 
     def __init__(self, *args, **kwargs):
-        super(InsertQuery, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields = []
         self.objs = []
 

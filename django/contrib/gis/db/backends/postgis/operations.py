@@ -29,7 +29,7 @@ class PostGISOperator(SpatialOperator):
         # polygons. If the raster argument is set to BILATERAL, then the
         # operator cannot handle mixed geom-raster lookups.
         self.raster = raster
-        super(PostGISOperator, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def as_sql(self, connection, lookup, template_params, *args):
         if lookup.lhs.output_field.geography and not self.geography:
@@ -37,7 +37,7 @@ class PostGISOperator(SpatialOperator):
                              'function/operator.' % (self.func or self.op,))
 
         template_params = self.check_raster(lookup, template_params)
-        return super(PostGISOperator, self).as_sql(connection, lookup, template_params, *args)
+        return super().as_sql(connection, lookup, template_params, *args)
 
     def check_raster(self, lookup, template_params):
         # Get rhs value.
@@ -100,7 +100,7 @@ class PostGISDistanceOperator(PostGISOperator):
             else:
                 template_params.update({'op': self.op, 'func': connection.ops.spatial_function_name('DistanceSphere')})
             return sql_template % template_params, sql_params
-        return super(PostGISDistanceOperator, self).as_sql(connection, lookup, template_params, sql_params)
+        return super().as_sql(connection, lookup, template_params, sql_params)
 
 
 class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
@@ -149,7 +149,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     unsupported_functions = set()
 
     def __init__(self, connection):
-        super(PostGISOperations, self).__init__(connection)
+        super().__init__(connection)
 
         prefix = self.geom_func_prefix
 
@@ -240,7 +240,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def convert_extent(self, box, srid):
         """
-        Returns a 4-tuple extent for the `Extent` aggregate by converting
+        Return a 4-tuple extent for the `Extent` aggregate by converting
         the bounding box text returned by PostGIS (`box` argument), for
         example: "BOX(-90.0 30.0, -85.0 40.0)".
         """
@@ -253,7 +253,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def convert_extent3d(self, box3d, srid):
         """
-        Returns a 6-tuple extent for the `Extent3D` aggregate by converting
+        Return a 6-tuple extent for the `Extent3D` aggregate by converting
         the 3d bounding-box text returned by PostGIS (`box3d` argument), for
         example: "BOX3D(-90.0 30.0 1, -85.0 40.0 2)".
         """
@@ -285,7 +285,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         else:
             return 'geometry(%s,%d)' % (geom_type, f.srid)
 
-    def get_distance(self, f, dist_val, lookup_type, handle_spheroid=True):
+    def get_distance(self, f, dist_val, lookup_type):
         """
         Retrieve the distance parameters for the given geometry field,
         distance lookup value, and the distance lookup type.
@@ -316,16 +316,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             # Assuming the distance is in the units of the field.
             dist_param = value
 
-        params = [dist_param]
-        # handle_spheroid *might* be dropped in Django 2.0 as PostGISDistanceOperator
-        # also handles it (#25524).
-        if handle_spheroid and len(dist_val) > 1:
-            option = dist_val[1]
-            if not geography and geodetic and lookup_type != 'dwithin' and option == 'spheroid':
-                # using distance_spheroid requires the spheroid of the field as
-                # a parameter.
-                params.insert(0, f._spheroid)
-        return params
+        return [dist_param]
 
     def get_geom_placeholder(self, f, value, compiler):
         """
@@ -369,28 +360,28 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             return cursor.fetchone()[0]
 
     def postgis_geos_version(self):
-        "Returns the version of the GEOS library used with PostGIS."
+        "Return the version of the GEOS library used with PostGIS."
         return self._get_postgis_func('postgis_geos_version')
 
     def postgis_lib_version(self):
-        "Returns the version number of the PostGIS library used with PostgreSQL."
+        "Return the version number of the PostGIS library used with PostgreSQL."
         return self._get_postgis_func('postgis_lib_version')
 
     def postgis_proj_version(self):
-        "Returns the version of the PROJ.4 library used with PostGIS."
+        "Return the version of the PROJ.4 library used with PostGIS."
         return self._get_postgis_func('postgis_proj_version')
 
     def postgis_version(self):
-        "Returns PostGIS version number and compile-time options."
+        "Return PostGIS version number and compile-time options."
         return self._get_postgis_func('postgis_version')
 
     def postgis_full_version(self):
-        "Returns PostGIS version number and compile-time options."
+        "Return PostGIS version number and compile-time options."
         return self._get_postgis_func('postgis_full_version')
 
     def postgis_version_tuple(self):
         """
-        Returns the PostGIS version as a tuple (version string, major,
+        Return the PostGIS version as a tuple (version string, major,
         minor, subminor).
         """
         # Getting the PostGIS version

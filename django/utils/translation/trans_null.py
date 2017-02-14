@@ -3,7 +3,13 @@
 # settings.USE_I18N = False can use this module rather than trans_real.py.
 
 from django.conf import settings
-from django.utils.encoding import force_text
+
+
+def gettext(message):
+    return message
+
+
+gettext_noop = gettext_lazy = _ = gettext
 
 
 def ngettext(singular, plural, number):
@@ -15,16 +21,12 @@ def ngettext(singular, plural, number):
 ngettext_lazy = ngettext
 
 
-def ungettext(singular, plural, number):
-    return force_text(ngettext(singular, plural, number))
-
-
 def pgettext(context, message):
-    return ugettext(message)
+    return gettext(message)
 
 
 def npgettext(context, singular, plural, number):
-    return ungettext(singular, plural, number)
+    return ngettext(singular, plural, number)
 
 
 def activate(x):
@@ -48,17 +50,6 @@ def get_language_bidi():
 
 def check_for_language(x):
     return True
-
-
-def gettext(message):
-    return message
-
-
-def ugettext(message):
-    return force_text(gettext(message))
-
-
-gettext_noop = gettext_lazy = _ = gettext
 
 
 def to_locale(language):

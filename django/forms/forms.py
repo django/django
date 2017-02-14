@@ -16,7 +16,7 @@ from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, html_safe
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from .renderers import get_default_renderer
 
@@ -34,7 +34,6 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
             if isinstance(value, Field):
                 current_fields.append((key, value))
                 attrs.pop(key)
-        current_fields.sort(key=lambda x: x[1].creation_counter)
         attrs['declared_fields'] = OrderedDict(current_fields)
 
         new_class = super(DeclarativeFieldsMetaclass, mcs).__new__(mcs, name, bases, attrs)
@@ -55,6 +54,11 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
         new_class.declared_fields = declared_fields
 
         return new_class
+
+    @classmethod
+    def __prepare__(metacls, name, bases, **kwds):
+        # Remember the order in which form fields are defined.
+        return OrderedDict()
 
 
 @html_safe

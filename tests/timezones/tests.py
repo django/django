@@ -596,7 +596,7 @@ class ForcedTimeZoneDatabaseTests(TransactionTestCase):
         if not connection.features.test_db_allows_multiple_connections:
             raise SkipTest("Database doesn't support feature(s): test_db_allows_multiple_connections")
 
-        super(ForcedTimeZoneDatabaseTests, cls).setUpClass()
+        super().setUpClass()
 
     @contextmanager
     def override_database_connection_timezone(self, timezone):

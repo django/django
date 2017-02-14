@@ -1,15 +1,16 @@
 import datetime
 import unittest
+from urllib.parse import quote_plus
 
+from django.test import SimpleTestCase
 from django.utils.encoding import (
-    escape_uri_path, filepath_to_uri, force_bytes, force_text, iri_to_uri,
-    smart_text, uri_to_iri,
+    DjangoUnicodeDecodeError, escape_uri_path, filepath_to_uri, force_bytes,
+    force_text, iri_to_uri, smart_text, uri_to_iri,
 )
 from django.utils.functional import SimpleLazyObject
-from django.utils.http import urlquote_plus
 
 
-class TestEncodingUtils(unittest.TestCase):
+class TestEncodingUtils(SimpleTestCase):
     def test_force_text_exception(self):
         """
         Broken __str__ actually raises an error.
@@ -26,6 +27,14 @@ class TestEncodingUtils(unittest.TestCase):
         s = SimpleLazyObject(lambda: 'x')
         self.assertTrue(type(force_text(s)), str)
 
+    def test_force_text_DjangoUnicodeDecodeError(self):
+        msg = (
+            "'utf-8' codec can't decode byte 0xff in position 0: invalid "
+            "start byte. You passed in b'\\xff' (<class 'bytes'>)"
+        )
+        with self.assertRaisesMessage(DjangoUnicodeDecodeError, msg):
+            force_text(b'\xff')
+
     def test_force_bytes_exception(self):
         """
         force_bytes knows how to convert to bytes an exception
@@ -33,8 +42,8 @@ class TestEncodingUtils(unittest.TestCase):
         """
         error_msg = "This is an exception, voilà"
         exc = ValueError(error_msg)
-        result = force_bytes(exc)
-        self.assertEqual(result, error_msg.encode('utf-8'))
+        self.assertEqual(force_bytes(exc), error_msg.encode())
+        self.assertEqual(force_bytes(exc, encoding='ascii', errors='ignore'), b'This is an exception, voil')
 
     def test_force_bytes_strings_only(self):
         today = datetime.date.today()
@@ -62,17 +71,13 @@ class TestRFC3987IEncodingUtils(unittest.TestCase):
 
     def test_filepath_to_uri(self):
         self.assertEqual(filepath_to_uri('upload\\чубака.mp4'), 'upload/%D1%87%D1%83%D0%B1%D0%B0%D0%BA%D0%B0.mp4')
-        self.assertEqual(
-            filepath_to_uri('upload\\чубака.mp4'.encode('utf-8')),
-            'upload/%D1%87%D1%83%D0%B1%D0%B0%D0%BA%D0%B0.mp4'
-        )
 
     def test_iri_to_uri(self):
         cases = [
             # Valid UTF-8 sequences are encoded.
             ('red%09rosé#red', 'red%09ros%C3%A9#red'),
             ('/blog/for/Jürgen Münster/', '/blog/for/J%C3%BCrgen%20M%C3%BCnster/'),
-            ('locations/%s' % urlquote_plus('Paris & Orléans'), 'locations/Paris+%26+Orl%C3%A9ans'),
+            ('locations/%s' % quote_plus('Paris & Orléans'), 'locations/Paris+%26+Orl%C3%A9ans'),
 
             # Reserved chars remain unescaped.
             ('%&', '%&'),
@@ -88,9 +93,11 @@ class TestRFC3987IEncodingUtils(unittest.TestCase):
     def test_uri_to_iri(self):
         cases = [
             # Valid UTF-8 sequences are decoded.
-            ('/%E2%99%A5%E2%99%A5/', '/♥♥/'),
+            ('/%e2%89%Ab%E2%99%a5%E2%89%aB/', '/≫♥≫/'),
             ('/%E2%99%A5%E2%99%A5/?utf8=%E2%9C%93', '/♥♥/?utf8=✓'),
-
+            ('/%41%5a%6B/', '/AZk/'),
+            # Reserved and non-URL valid ASCII chars are not decoded.
+            ('/%25%20%02%41%7b/', '/%25%20%02A%7b/'),
             # Broken UTF-8 sequences remain escaped.
             ('/%AAd%AAj%AAa%AAn%AAg%AAo%AA/', '/%AAd%AAj%AAa%AAn%AAg%AAo%AA/'),
             ('/%E2%99%A5%E2%E2%99%A5/', '/♥%E2♥/'),
@@ -107,11 +114,12 @@ class TestRFC3987IEncodingUtils(unittest.TestCase):
 
     def test_complementarity(self):
         cases = [
-            ('/blog/for/J%C3%BCrgen%20M%C3%BCnster/', '/blog/for/J\xfcrgen M\xfcnster/'),
+            ('/blog/for/J%C3%BCrgen%20M%C3%BCnster/', '/blog/for/J\xfcrgen%20M\xfcnster/'),
             ('%&', '%&'),
             ('red&%E2%99%A5ros%#red', 'red&♥ros%#red'),
             ('/%E2%99%A5%E2%99%A5/', '/♥♥/'),
             ('/%E2%99%A5%E2%99%A5/?utf8=%E2%9C%93', '/♥♥/?utf8=✓'),
+            ('/%25%20%02%7b/', '/%25%20%02%7b/'),
             ('/%AAd%AAj%AAa%AAn%AAg%AAo%AA/', '/%AAd%AAj%AAa%AAn%AAg%AAo%AA/'),
             ('/%E2%99%A5%E2%E2%99%A5/', '/♥%E2♥/'),
             ('/%E2%99%A5%E2%99%E2%99%A5/', '/♥%E2%99♥/'),

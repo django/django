@@ -150,7 +150,7 @@ class URLTranslationTests(URLTestCaseBase):
 
     def test_translate_url_utility(self):
         with translation.override('en'):
-            self.assertEqual(translate_url('/en/non-existent/', 'nl'), '/en/non-existent/')
+            self.assertEqual(translate_url('/en/nonexistent/', 'nl'), '/en/nonexistent/')
             self.assertEqual(translate_url('/en/users/', 'nl'), '/nl/gebruikers/')
             # Namespaced URL
             self.assertEqual(translate_url('/en/account/register/', 'nl'), '/nl/profiel/registeren/')

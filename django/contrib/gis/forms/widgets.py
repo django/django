@@ -12,7 +12,7 @@ logger = logging.getLogger('django.contrib.gis')
 class BaseGeometryWidget(Widget):
     """
     The base class for rich geometry widgets.
-    Renders a map using the WKT of the geometry.
+    Render a map using the WKT of the geometry.
     """
     geom_type = 'GEOMETRY'
     map_srid = 4326
@@ -103,7 +103,7 @@ class OSMWidget(OpenLayersWidget):
     map_srid = 3857
 
     def __init__(self, attrs=None):
-        super(OSMWidget, self).__init__()
+        super().__init__()
         for key in ('default_lon', 'default_lat'):
             self.attrs[key] = getattr(self, key)
         if attrs:

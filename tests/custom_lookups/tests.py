@@ -145,13 +145,13 @@ class SQLFuncMixin:
 
 class SQLFuncLookup(SQLFuncMixin, models.Lookup):
     def __init__(self, name, *args, **kwargs):
-        super(SQLFuncLookup, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.name = name
 
 
 class SQLFuncTransform(SQLFuncMixin, models.Transform):
     def __init__(self, name, *args, **kwargs):
-        super(SQLFuncTransform, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.name = name
 
 
@@ -173,13 +173,13 @@ class CustomField(models.TextField):
         if lookup_name.startswith('lookupfunc_'):
             key, name = lookup_name.split('_', 1)
             return SQLFuncFactory(key, name)
-        return super(CustomField, self).get_lookup(lookup_name)
+        return super().get_lookup(lookup_name)
 
     def get_transform(self, lookup_name):
         if lookup_name.startswith('transformfunc_'):
             key, name = lookup_name.split('_', 1)
             return SQLFuncFactory(key, name)
-        return super(CustomField, self).get_transform(lookup_name)
+        return super().get_transform(lookup_name)
 
 
 class CustomModel(models.Model):
@@ -490,11 +490,11 @@ class TrackCallsYearTransform(YearTransform):
 
     def get_lookup(self, lookup_name):
         self.call_order.append('lookup')
-        return super(TrackCallsYearTransform, self).get_lookup(lookup_name)
+        return super().get_lookup(lookup_name)
 
     def get_transform(self, lookup_name):
         self.call_order.append('transform')
-        return super(TrackCallsYearTransform, self).get_transform(lookup_name)
+        return super().get_transform(lookup_name)
 
 
 class LookupTransformCallOrderTests(TestCase):

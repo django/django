@@ -99,7 +99,7 @@ class FileSystemLoaderTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         cls.engine = Engine(dirs=[TEMPLATE_DIR], loaders=['django.template.loaders.filesystem.Loader'])
-        super(FileSystemLoaderTests, cls).setUpClass()
+        super().setUpClass()
 
     @contextmanager
     def set_dirs(self, dirs):
@@ -158,7 +158,7 @@ class FileSystemLoaderTests(SimpleTestCase):
         with self.source_checker(['/dir1', '/dir2']) as check_sources:
             # UTF-8 bytestrings are permitted.
             check_sources(b'\xc3\x85ngstr\xc3\xb6m', ['/dir1/Ångström', '/dir2/Ångström'])
-            # Unicode strings are permitted.
+            # Strings are permitted.
             check_sources('Ångström', ['/dir1/Ångström', '/dir2/Ångström'])
 
     def test_utf8_bytestring(self):
@@ -213,7 +213,7 @@ class AppDirectoriesLoaderTests(SimpleTestCase):
         cls.engine = Engine(
             loaders=['django.template.loaders.app_directories.Loader'],
         )
-        super(AppDirectoriesLoaderTests, cls).setUpClass()
+        super().setUpClass()
 
     @override_settings(INSTALLED_APPS=['template_tests'])
     def test_get_template(self):
@@ -237,7 +237,7 @@ class LocmemLoaderTests(SimpleTestCase):
                 'index.html': 'index',
             })],
         )
-        super(LocmemLoaderTests, cls).setUpClass()
+        super().setUpClass()
 
     def test_get_template(self):
         template = self.engine.get_template('index.html')

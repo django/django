@@ -22,4 +22,7 @@ TEST_SETTINGS = {
         'staticfiles_tests.apps.test',
         'staticfiles_tests.apps.no_label',
     ],
+    # In particular, AuthenticationMiddleware can't be used because
+    # contrib.auth isn't in INSTALLED_APPS.
+    'MIDDLEWARE': [],
 }

@@ -508,10 +508,10 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         # Reset the file session backend's internal caches
         if hasattr(self.backend, '_storage_path'):
             del self.backend._storage_path
-        super(FileSessionTests, self).setUp()
+        super().setUp()
 
     def tearDown(self):
-        super(FileSessionTests, self).tearDown()
+        super().tearDown()
         settings.SESSION_FILE_PATH = self.original_session_file_path
         shutil.rmtree(self.temp_session_store)
 
@@ -845,7 +845,7 @@ class CookieSessionTests(SessionTestsMixin, unittest.TestCase):
     @unittest.expectedFailure
     def test_actual_expiry(self):
         # The cookie backend doesn't handle non-default expiry dates, see #19201
-        super(CookieSessionTests, self).test_actual_expiry()
+        super().test_actual_expiry()
 
     def test_unpickling_exception(self):
         # signed_cookies backend should handle unpickle exceptions gracefully

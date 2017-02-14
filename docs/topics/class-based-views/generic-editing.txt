@@ -48,7 +48,7 @@ The view can be constructed using a ``FormView``:
             # This method is called when valid form data has been POSTed.
             # It should return an HttpResponse.
             form.send_email()
-            return super(ContactView, self).form_valid(form)
+            return super().form_valid(form)
 
 Notes:
 
@@ -215,7 +215,7 @@ to edit, and override
 
         def form_valid(self, form):
             form.instance.created_by = self.request.user
-            return super(AuthorCreate, self).form_valid(form)
+            return super().form_valid(form)
 
 Note that you'll need to :ref:`decorate this
 view<decorating-class-based-views>` using
@@ -239,7 +239,7 @@ works for AJAX requests as well as 'normal' form POSTs::
         Must be used with an object-based FormView (e.g. CreateView)
         """
         def form_invalid(self, form):
-            response = super(AjaxableResponseMixin, self).form_invalid(form)
+            response = super().form_invalid(form)
             if self.request.is_ajax():
                 return JsonResponse(form.errors, status=400)
             else:
@@ -249,7 +249,7 @@ works for AJAX requests as well as 'normal' form POSTs::
             # We make sure to call the parent's form_valid() method because
             # it might do some processing (in the case of CreateView, it will
             # call form.save() for example).
-            response = super(AjaxableResponseMixin, self).form_valid(form)
+            response = super().form_valid(form)
             if self.request.is_ajax():
                 data = {
                     'pk': self.object.pk,

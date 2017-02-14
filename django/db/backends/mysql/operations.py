@@ -44,29 +44,23 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def _convert_field_to_tz(self, field_name, tzname):
         if settings.USE_TZ:
-            field_name = "CONVERT_TZ(%s, 'UTC', %%s)" % field_name
-            params = [tzname]
-        else:
-            params = []
-        return field_name, params
+            field_name = "CONVERT_TZ(%s, 'UTC', '%s')" % (field_name, tzname)
+        return field_name
 
     def datetime_cast_date_sql(self, field_name, tzname):
-        field_name, params = self._convert_field_to_tz(field_name, tzname)
-        sql = "DATE(%s)" % field_name
-        return sql, params
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        return "DATE(%s)" % field_name
 
     def datetime_cast_time_sql(self, field_name, tzname):
-        field_name, params = self._convert_field_to_tz(field_name, tzname)
-        sql = "TIME(%s)" % field_name
-        return sql, params
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        return "TIME(%s)" % field_name
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
-        field_name, params = self._convert_field_to_tz(field_name, tzname)
-        sql = self.date_extract_sql(lookup_type, field_name)
-        return sql, params
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        return self.date_extract_sql(lookup_type, field_name)
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        field_name, params = self._convert_field_to_tz(field_name, tzname)
+        field_name = self._convert_field_to_tz(field_name, tzname)
         fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
         format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s')  # Use double percents to escape.
         format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
@@ -77,7 +71,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
             sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
-        return sql, params
+        return sql
 
     def time_trunc_sql(self, lookup_type, field_name):
         fields = {
@@ -202,10 +196,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         elif connector == '>>':
             lhs, rhs = sub_expressions
             return 'FLOOR(%(lhs)s / POW(2, %(rhs)s))' % {'lhs': lhs, 'rhs': rhs}
-        return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+        return super().combine_expression(connector, sub_expressions)
 
     def get_db_converters(self, expression):
-        converters = super(DatabaseOperations, self).get_db_converters(expression)
+        converters = super().get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
         if internal_type == 'TextField':
             converters.append(self.convert_textfield_value)

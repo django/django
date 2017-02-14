@@ -1,8 +1,8 @@
 class RequestSite:
     """
-    A class that shares the primary interface of Site (i.e., it has
-    ``domain`` and ``name`` attributes) but gets its data from a Django
-    HttpRequest object rather than from a database.
+    A class that shares the primary interface of Site (i.e., it has ``domain``
+    and ``name`` attributes) but gets its data from an HttpRequest object
+    rather than from a database.
 
     The save() and delete() methods raise NotImplementedError.
     """

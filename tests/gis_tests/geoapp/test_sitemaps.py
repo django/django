@@ -17,7 +17,7 @@ from .models import City, Country
 class GeoSitemapTest(TestCase):
 
     def setUp(self):
-        super(GeoSitemapTest, self).setUp()
+        super().setUp()
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
 
     def assertChildNodes(self, elem, expected):

@@ -194,7 +194,7 @@ class InlineFormsetFactoryTest(TestCase):
         class PoemModelForm(ModelForm):
             def __init__(self, *args, **kwargs):
                 assert 'poet' in self._meta.fields
-                super(PoemModelForm, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
 
         poet = Poet.objects.create(name='test')
         poet.poem_set.create(name='first test poem')

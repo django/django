@@ -52,10 +52,10 @@ iso8601_duration_re = re.compile(
 
 
 def parse_date(value):
-    """Parses a string and return a datetime.date.
+    """Parse a string and return a datetime.date.
 
-    Raises ValueError if the input is well formatted but not a valid date.
-    Returns None if the input isn't well formatted.
+    Raise ValueError if the input is well formatted but not a valid date.
+    Return None if the input isn't well formatted.
     """
     match = date_re.match(value)
     if match:
@@ -64,12 +64,12 @@ def parse_date(value):
 
 
 def parse_time(value):
-    """Parses a string and return a datetime.time.
+    """Parse a string and return a datetime.time.
 
     This function doesn't support time zone offsets.
 
-    Raises ValueError if the input is well formatted but not a valid time.
-    Returns None if the input isn't well formatted, in particular if it
+    Raise ValueError if the input is well formatted but not a valid time.
+    Return None if the input isn't well formatted, in particular if it
     contains an offset.
     """
     match = time_re.match(value)
@@ -82,13 +82,13 @@ def parse_time(value):
 
 
 def parse_datetime(value):
-    """Parses a string and return a datetime.datetime.
+    """Parse a string and return a datetime.datetime.
 
     This function supports time zone offsets. When the input contains one,
     the output uses a timezone with a fixed offset from UTC.
 
-    Raises ValueError if the input is well formatted but not a valid datetime.
-    Returns None if the input isn't well formatted.
+    Raise ValueError if the input is well formatted but not a valid datetime.
+    Return None if the input isn't well formatted.
     """
     match = datetime_re.match(value)
     if match:
@@ -110,7 +110,7 @@ def parse_datetime(value):
 
 
 def parse_duration(value):
-    """Parses a duration string and returns a datetime.timedelta.
+    """Parse a duration string and return a datetime.timedelta.
 
     The preferred format for durations in Django is '%d %H:%M:%S.%f'.
 

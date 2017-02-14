@@ -61,7 +61,7 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
         return field_type, field_params
 
     def get_constraints(self, cursor, table_name):
-        constraints = super(SpatiaLiteIntrospection, self).get_constraints(cursor, table_name)
+        constraints = super().get_constraints(cursor, table_name)
         cursor.execute('SELECT f_geometry_column '
                        'FROM geometry_columns '
                        'WHERE f_table_name=%s AND spatial_index_enabled=1', (table_name,))

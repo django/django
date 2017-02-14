@@ -34,17 +34,16 @@ class cached_property:
 
 class Promise:
     """
-    This is just a base class for the proxy class created in
-    the closure of the lazy function. It can be used to recognize
-    promises in code.
+    Base class for the proxy class created in the closure of the lazy function.
+    It's used to recognize promises in code.
     """
     pass
 
 
 def lazy(func, *resultclasses):
     """
-    Turns any callable into a lazy evaluated callable. You need to give result
-    classes or types -- at least one is needed so that the automatic forcing of
+    Turn any callable into a lazy evaluated callable. result classes or types
+    is required -- at least one is needed so that the automatic forcing of
     the lazy evaluation code is triggered. Results are not memoized; the
     function is evaluated on every access.
     """
@@ -111,7 +110,7 @@ def lazy(func, *resultclasses):
             return bytes(func(*self.__args, **self.__kw))
 
         def __bytes_cast_encoded(self):
-            return func(*self.__args, **self.__kw).encode('utf-8')
+            return func(*self.__args, **self.__kw).encode()
 
         def __cast(self):
             if self._delegate_bytes:
@@ -348,7 +347,7 @@ class SimpleLazyObject(LazyObject):
         value.
         """
         self.__dict__['_setupfunc'] = func
-        super(SimpleLazyObject, self).__init__()
+        super().__init__()
 
     def _setup(self):
         self._wrapped = self._setupfunc()
@@ -383,7 +382,7 @@ class SimpleLazyObject(LazyObject):
 
 def partition(predicate, values):
     """
-    Splits the values into two sets, based on the return value of the function
+    Split the values into two sets, based on the return value of the function
     (True/False). e.g.:
 
         >>> partition(lambda x: x > 3, range(5))

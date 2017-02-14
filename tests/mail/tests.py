@@ -26,7 +26,7 @@ from django.core.mail.message import BadHeaderError, sanitize_address
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import requires_tz_support
 from django.utils.encoding import force_bytes, force_text
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 
 class HeadersCheckMixin:
@@ -177,7 +177,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         with self.assertRaises(BadHeaderError):
             email.message()
         email = EmailMessage(
-            ugettext_lazy('Subject\nInjection Test'), 'Content', 'from@example.com', ['to@example.com']
+            gettext_lazy('Subject\nInjection Test'), 'Content', 'from@example.com', ['to@example.com']
         )
         with self.assertRaises(BadHeaderError):
             email.message()
@@ -192,7 +192,6 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             'Content', 'from@example.com', ['to@example.com']
         )
         message = email.message()
-        # Note that in Python 3, maximum line length has increased from 76 to 78
         self.assertEqual(
             message['Subject'].encode(),
             b'Long subject lines that get wrapped should contain a space continuation\n'
@@ -494,14 +493,11 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             mail.get_connection('django.core.mail.backends.console.EmailBackend'),
             console.EmailBackend
         )
-        tmp_dir = tempfile.mkdtemp()
-        try:
+        with tempfile.TemporaryDirectory() as tmp_dir:
             self.assertIsInstance(
                 mail.get_connection('django.core.mail.backends.filebased.EmailBackend', file_path=tmp_dir),
                 filebased.EmailBackend
             )
-        finally:
-            shutil.rmtree(tmp_dir)
         self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
     @override_settings(
@@ -860,12 +856,12 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         String prefix + lazy translated subject = bad output
         Regression for #13494
         """
-        mail_managers(ugettext_lazy('Subject'), 'Content')
+        mail_managers(gettext_lazy('Subject'), 'Content')
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), '[Django] Subject')
 
         self.flush_mailbox()
-        mail_admins(ugettext_lazy('Subject'), 'Content')
+        mail_admins(gettext_lazy('Subject'), 'Content')
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), '[Django] Subject')
 
@@ -930,7 +926,7 @@ class BaseEmailBackendTests(HeadersCheckMixin):
         """
         Email sending should support lazy email addresses (#24416).
         """
-        _ = ugettext_lazy
+        _ = gettext_lazy
         self.assertTrue(send_mail('Subject', 'Content', _('tester'), [_('django')]))
         message = self.get_the_message()
         self.assertEqual(message.get('from'), 'tester')
@@ -990,7 +986,7 @@ class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
         mail.outbox = []
 
     def tearDown(self):
-        super(LocmemBackendTests, self).tearDown()
+        super().tearDown()
         mail.outbox = []
 
     def test_locmem_shared_messages(self):
@@ -1017,7 +1013,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
     email_backend = 'django.core.mail.backends.filebased.EmailBackend'
 
     def setUp(self):
-        super(FileBackendTests, self).setUp()
+        super().setUp()
         self.tmp_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp_dir)
         self._settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
@@ -1025,7 +1021,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
     def tearDown(self):
         self._settings_override.disable()
-        super(FileBackendTests, self).tearDown()
+        super().tearDown()
 
     def flush_mailbox(self):
         for filename in os.listdir(self.tmp_dir):
@@ -1077,7 +1073,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
     email_backend = 'django.core.mail.backends.console.EmailBackend'
 
     def setUp(self):
-        super(ConsoleBackendTests, self).setUp()
+        super().setUp()
         self.__stdout = sys.stdout
         self.stream = sys.stdout = StringIO()
 
@@ -1085,7 +1081,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
         del self.stream
         sys.stdout = self.__stdout
         del self.__stdout
-        super(ConsoleBackendTests, self).tearDown()
+        super().tearDown()
 
     def flush_mailbox(self):
         self.stream = sys.stdout = StringIO()
@@ -1151,14 +1147,14 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
         self.sink_lock = threading.Lock()
 
     def process_message(self, peer, mailfrom, rcpttos, data):
-        data = data.encode('utf-8')
+        data = data.encode()
         m = message_from_bytes(data)
         maddr = parseaddr(m.get('from'))[1]
 
         if mailfrom != maddr:
             # According to the spec, mailfrom does not necessarily match the
-            # From header - on Python 3 this is the case where the local part
-            # isn't encoded, so try to correct that.
+            # From header - this is the case where the local part isn't
+            # encoded, so try to correct that.
             lp, domain = mailfrom.split('@', 1)
             lp = Header(lp, 'utf-8').encode()
             mailfrom = '@'.join([lp, domain])
@@ -1214,7 +1210,7 @@ class SMTPBackendTestsBase(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(SMTPBackendTestsBase, cls).setUpClass()
+        super().setUpClass()
         cls.server = FakeSMTPServer(('127.0.0.1', 0), None)
         cls._settings_override = override_settings(
             EMAIL_HOST="127.0.0.1",
@@ -1226,19 +1222,19 @@ class SMTPBackendTestsBase(SimpleTestCase):
     def tearDownClass(cls):
         cls._settings_override.disable()
         cls.server.stop()
-        super(SMTPBackendTestsBase, cls).tearDownClass()
+        super().tearDownClass()
 
 
 class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     email_backend = 'django.core.mail.backends.smtp.EmailBackend'
 
     def setUp(self):
-        super(SMTPBackendTests, self).setUp()
+        super().setUp()
         self.server.flush_sink()
 
     def tearDown(self):
         self.server.flush_sink()
-        super(SMTPBackendTests, self).tearDown()
+        super().tearDown()
 
     def flush_mailbox(self):
         self.server.flush_sink()
@@ -1386,7 +1382,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         class MyEmailBackend(smtp.EmailBackend):
             def __init__(self, *args, **kwargs):
                 kwargs.setdefault('timeout', 42)
-                super(MyEmailBackend, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
 
         myemailbackend = MyEmailBackend()
         myemailbackend.open()
@@ -1423,7 +1419,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
 
             self.assertTrue(msg)
 
-            msg = msg.decode('utf-8')
+            msg = msg.decode()
             # The message only contains CRLF and not combinations of CRLF, LF, and CR.
             msg = msg.replace('\r\n', '')
             self.assertNotIn('\r', msg)
@@ -1454,7 +1450,7 @@ class SMTPBackendStoppedServerTests(SMTPBackendTestsBase):
     """
     @classmethod
     def setUpClass(cls):
-        super(SMTPBackendStoppedServerTests, cls).setUpClass()
+        super().setUpClass()
         cls.backend = smtp.EmailBackend(username='', password='')
         cls.server.stop()
 

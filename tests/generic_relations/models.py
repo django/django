@@ -97,7 +97,7 @@ class Mineral(models.Model):
 
 class GeckoManager(models.Manager):
     def get_queryset(self):
-        return super(GeckoManager, self).get_queryset().filter(has_tail=True)
+        return super().get_queryset().filter(has_tail=True)
 
 
 class Gecko(models.Model):

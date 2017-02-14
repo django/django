@@ -121,7 +121,7 @@ default, call the view ``django.views.defaults.permission_denied``.
 This view loads and renders the template ``403.html`` in your root template
 directory, or if this file does not exist, instead serves the text
 "403 Forbidden", as per :rfc:`7231#section-6.5.3` (the HTTP 1.1 Specification).
-The template context contains ``exception``, which is the unicode
+The template context contains ``exception``, which is the string
 representation of the exception that triggered the view.
 
 ``django.views.defaults.permission_denied`` is triggered by a

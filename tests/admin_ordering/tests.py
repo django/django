@@ -161,12 +161,12 @@ class TestRelatedFieldsAdminOrdering(TestCase):
             def formfield_for_foreignkey(self, db_field, request, **kwargs):
                 if db_field.name == 'band':
                     kwargs["queryset"] = Band.objects.filter(rank__gt=2)
-                return super(SongAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+                return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
             def formfield_for_manytomany(self, db_field, request, **kwargs):
                 if db_field.name == 'other_interpreters':
                     kwargs["queryset"] = Band.objects.filter(rank__gt=2)
-                return super(SongAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+                return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
         class StaticOrderingBandAdmin(admin.ModelAdmin):
             ordering = ('rank',)

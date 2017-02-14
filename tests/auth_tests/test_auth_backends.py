@@ -27,7 +27,7 @@ class CountingMD5PasswordHasher(MD5PasswordHasher):
 
     def encode(self, *args, **kwargs):
         type(self).calls += 1
-        return super(CountingMD5PasswordHasher, self).encode(*args, **kwargs)
+        return super().encode(*args, **kwargs)
 
 
 class BaseModelBackendTest:

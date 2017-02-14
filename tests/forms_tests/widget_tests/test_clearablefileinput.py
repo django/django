@@ -6,7 +6,7 @@ from .base import WidgetTest
 
 class FakeFieldFile:
     """
-    Quacks like a FieldFile (has a .url and unicode representation), but
+    Quacks like a FieldFile (has a .url and string representation), but
     doesn't require us to care about storages etc.
     """
     url = 'something'
@@ -143,3 +143,9 @@ class ClearableFileInputTest(WidgetTest):
         # user to keep the existing, initial value.
         self.assertIs(self.widget.use_required_attribute(None), True)
         self.assertIs(self.widget.use_required_attribute('resume.txt'), False)
+
+    def test_value_omitted_from_data(self):
+        widget = ClearableFileInput()
+        self.assertIs(widget.value_omitted_from_data({}, {}, 'field'), True)
+        self.assertIs(widget.value_omitted_from_data({}, {'field': 'x'}, 'field'), False)
+        self.assertIs(widget.value_omitted_from_data({'field-clear': 'y'}, {}, 'field'), False)

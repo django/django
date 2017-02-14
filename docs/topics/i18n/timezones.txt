@@ -472,11 +472,6 @@ Setup
    of local time. This shields you from subtle and unreproducible bugs around
    Daylight Saving Time (DST) transitions.
 
-   In this regard, time zones are comparable to ``unicode`` in Python. At first
-   it's hard. You get encoding and decoding errors. Then you learn the rules.
-   And some problems disappear -- you never get mangled output again when your
-   application receives non-ASCII input.
-
    When you enable time zone support, you'll encounter some errors because
    you're using naive datetimes where Django expects aware datetimes. Such
    errors show up when running tests and they're easy to fix. You'll quickly

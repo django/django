@@ -23,7 +23,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return psycopg2.extensions.adapt(value)
 
     def _field_indexes_sql(self, model, field):
-        output = super(DatabaseSchemaEditor, self)._field_indexes_sql(model, field)
+        output = super()._field_indexes_sql(model, field)
         like_index_statement = self._create_like_index_sql(model, field)
         if like_index_statement is not None:
             output.append(like_index_statement)
@@ -101,13 +101,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 ],
             )
         else:
-            return super(DatabaseSchemaEditor, self)._alter_column_type_sql(
-                table, old_field, new_field, new_type
-            )
+            return super()._alter_column_type_sql(table, old_field, new_field, new_type)
 
     def _alter_field(self, model, old_field, new_field, old_type, new_type,
                      old_db_params, new_db_params, strict=False):
-        super(DatabaseSchemaEditor, self)._alter_field(
+        super()._alter_field(
             model, old_field, new_field, old_type, new_type, old_db_params,
             new_db_params, strict,
         )

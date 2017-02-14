@@ -283,7 +283,7 @@ class SignalTests(BaseSignalTest):
 
 class LazyModelRefTest(BaseSignalTest):
     def setUp(self):
-        super(LazyModelRefTest, self).setUp()
+        super().setUp()
         self.received = []
 
     def receiver(self, **kwargs):

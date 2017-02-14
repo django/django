@@ -31,7 +31,7 @@ def decoder(conv_func):
         This function converts the received value to a regular string before
         passing it to the receiver function.
     """
-    return lambda s: conv_func(s.decode('utf-8'))
+    return lambda s: conv_func(s.decode())
 
 
 Database.register_converter("bool", decoder(lambda s: s == '1'))

@@ -1,4 +1,3 @@
-import imp
 import os
 import sys
 import unittest
@@ -13,11 +12,6 @@ from django.utils.module_loading import (
 
 
 class DefaultLoader(unittest.TestCase):
-    def setUp(self):
-        sys.meta_path.insert(0, ProxyFinder())
-
-    def tearDown(self):
-        sys.meta_path.pop(0)
 
     def test_loader(self):
         "Normal module existence can be tested"
@@ -178,35 +172,6 @@ class AutodiscoverModulesTestCase(SimpleTestCase):
         self.assertEqual(site._registry, {'lorem': 'ipsum'})
 
 
-class ProxyFinder:
-    def __init__(self):
-        self._cache = {}
-
-    def find_module(self, fullname, path=None):
-        tail = fullname.rsplit('.', 1)[-1]
-        try:
-            fd, fn, info = imp.find_module(tail, path)
-            if fullname in self._cache:
-                old_fd = self._cache[fullname][0]
-                if old_fd:
-                    old_fd.close()
-            self._cache[fullname] = (fd, fn, info)
-        except ImportError:
-            return None
-        else:
-            return self  # this is a loader as well
-
-    def load_module(self, fullname):
-        if fullname in sys.modules:
-            return sys.modules[fullname]
-        fd, fn, info = self._cache[fullname]
-        try:
-            return imp.load_module(fullname, fd, fn, info)
-        finally:
-            if fd:
-                fd.close()
-
-
 class TestFinder:
     def __init__(self, *args, **kwargs):
         self.importer = zipimporter(*args, **kwargs)
@@ -235,10 +200,10 @@ class CustomLoader(EggLoader):
     into one class, this isn't required.
     """
     def setUp(self):
-        super(CustomLoader, self).setUp()
+        super().setUp()
         sys.path_hooks.insert(0, TestFinder)
         sys.path_importer_cache.clear()
 
     def tearDown(self):
-        super(CustomLoader, self).tearDown()
+        super().tearDown()
         sys.path_hooks.pop(0)

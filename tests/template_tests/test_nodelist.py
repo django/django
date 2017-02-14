@@ -9,7 +9,7 @@ class NodelistTest(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.engine = Engine()
-        super(NodelistTest, cls).setUpClass()
+        super().setUpClass()
 
     def test_for(self):
         template = self.engine.from_string('{% for i in 1 %}{{ a }}{% endfor %}')

@@ -3,7 +3,9 @@ import warnings
 from django.db.migrations.exceptions import (
     CircularDependencyError, NodeNotFoundError,
 )
-from django.db.migrations.graph import RECURSION_DEPTH_WARNING, MigrationGraph
+from django.db.migrations.graph import (
+    RECURSION_DEPTH_WARNING, DummyNode, MigrationGraph, Node,
+)
 from django.test import SimpleTestCase
 
 
@@ -407,3 +409,28 @@ class GraphTests(SimpleTestCase):
 
         self.assertEqual(str(graph), "Graph: 5 nodes, 3 edges")
         self.assertEqual(repr(graph), "<MigrationGraph: nodes=5, edges=3>")
+
+
+class NodeTests(SimpleTestCase):
+    def test_node_repr(self):
+        node = Node(('app_a', '0001'))
+        self.assertEqual(repr(node), "<Node: ('app_a', '0001')>")
+
+    def test_dummynode_repr(self):
+        node = DummyNode(
+            key=('app_a', '0001'),
+            origin='app_a.0001',
+            error_message='x is missing',
+        )
+        self.assertEqual(repr(node), "<DummyNode: ('app_a', '0001')>")
+
+    def test_dummynode_promote(self):
+        dummy = DummyNode(
+            key=('app_a', '0001'),
+            origin='app_a.0002',
+            error_message="app_a.0001 (req'd by app_a.0002) is missing!",
+        )
+        dummy.promote()
+        self.assertIsInstance(dummy, Node)
+        self.assertFalse(hasattr(dummy, 'origin'))
+        self.assertFalse(hasattr(dummy, 'error_message'))

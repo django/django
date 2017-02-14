@@ -337,11 +337,11 @@ class URLPatternReverse(SimpleTestCase):
 
     def test_view_not_found_message(self):
         msg = (
-            "Reverse for 'non-existent-view' not found. 'non-existent-view' "
+            "Reverse for 'nonexistent-view' not found. 'nonexistent-view' "
             "is not a valid view function or pattern name."
         )
         with self.assertRaisesMessage(NoReverseMatch, msg):
-            reverse('non-existent-view')
+            reverse('nonexistent-view')
 
     def test_no_args_message(self):
         msg = "Reverse for 'places' with no arguments not found. 1 pattern(s) tried:"
@@ -386,6 +386,23 @@ class ResolverTests(SimpleTestCase):
         self.assertEqual(resolver.reverse('named-url2', 'arg'), 'extra/arg/')
         self.assertEqual(resolver.reverse('named-url2', extra='arg'), 'extra/arg/')
 
+    def test_resolver_reverse_conflict(self):
+        """
+        url() name arguments don't need to be unique. The last registered
+        pattern takes precedence for conflicting names.
+        """
+        resolver = get_resolver('urlpatterns_reverse.named_urls_conflict')
+        # Without arguments, the last URL in urlpatterns has precedence.
+        self.assertEqual(resolver.reverse('name-conflict'), 'conflict/')
+        # With an arg, the last URL in urlpatterns has precedence.
+        self.assertEqual(resolver.reverse('name-conflict', 'arg'), 'conflict-last/arg/')
+        # With a kwarg, other url()s can be reversed.
+        self.assertEqual(resolver.reverse('name-conflict', first='arg'), 'conflict-first/arg/')
+        self.assertEqual(resolver.reverse('name-conflict', middle='arg'), 'conflict-middle/arg/')
+        self.assertEqual(resolver.reverse('name-conflict', last='arg'), 'conflict-last/arg/')
+        # The number and order of the arguments don't interfere with reversing.
+        self.assertEqual(resolver.reverse('name-conflict', 'arg', 'arg'), 'conflict/arg/arg/')
+
     def test_non_regex(self):
         """
         A Resolver404 is raised if resolving doesn't meet the basic
@@ -410,8 +427,8 @@ class ResolverTests(SimpleTestCase):
         """
         urls = 'urlpatterns_reverse.named_urls'
         # this list matches the expected URL types and names returned when
-        # you try to resolve a non-existent URL in the first level of included
-        # URLs in named_urls.py (e.g., '/included/non-existent-url')
+        # you try to resolve a nonexistent URL in the first level of included
+        # URLs in named_urls.py (e.g., '/included/nonexistent-url')
         url_types_names = [
             [{'type': RegexURLPattern, 'name': 'named-url1'}],
             [{'type': RegexURLPattern, 'name': 'named-url2'}],
@@ -422,11 +439,10 @@ class ResolverTests(SimpleTestCase):
             [{'type': RegexURLResolver}, {'type': RegexURLResolver}],
         ]
         with self.assertRaisesMessage(Resolver404, 'tried') as cm:
-            resolve('/included/non-existent-url', urlconf=urls)
+            resolve('/included/nonexistent-url', urlconf=urls)
         e = cm.exception
         # make sure we at least matched the root ('/') url resolver:
         self.assertIn('tried', e.args[0])
-        tried = e.args[0]['tried']
         self.assertEqual(
             len(e.args[0]['tried']),
             len(url_types_names),
@@ -595,7 +611,7 @@ class NamespaceTests(SimpleTestCase):
             reverse('inner-nothing', kwargs={'arg1': 42, 'arg2': 37})
 
     def test_non_existent_namespace(self):
-        "Non-existent namespaces raise errors"
+        "Nonexistent namespaces raise errors"
         with self.assertRaises(NoReverseMatch):
             reverse('blahblah:urlobject-view')
         with self.assertRaises(NoReverseMatch):
@@ -805,20 +821,20 @@ class NamespaceTests(SimpleTestCase):
         "current_app should either match the whole path or shouldn't be used"
         self.assertEqual(
             '/ns-included1/test4/inner/',
-            reverse('inc-ns1:testapp:urlobject-view', current_app='non-existent:test-ns3')
+            reverse('inc-ns1:testapp:urlobject-view', current_app='nonexistent:test-ns3')
         )
         self.assertEqual(
             '/ns-included1/test4/inner/37/42/',
-            reverse('inc-ns1:testapp:urlobject-view', args=[37, 42], current_app='non-existent:test-ns3')
+            reverse('inc-ns1:testapp:urlobject-view', args=[37, 42], current_app='nonexistent:test-ns3')
         )
         self.assertEqual(
             '/ns-included1/test4/inner/42/37/',
             reverse('inc-ns1:testapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37},
-                    current_app='non-existent:test-ns3')
+                    current_app='nonexistent:test-ns3')
         )
         self.assertEqual(
             '/ns-included1/test4/inner/+%5C$*/',
-            reverse('inc-ns1:testapp:urlobject-special-view', current_app='non-existent:test-ns3')
+            reverse('inc-ns1:testapp:urlobject-special-view', current_app='nonexistent:test-ns3')
         )
 
 
@@ -1059,10 +1075,20 @@ class IncludeTests(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             include(self.url_patterns, 'namespace')
 
+    def test_include_4_tuple(self):
+        msg = 'Passing a 4-tuple to django.conf.urls.include() is not supported.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            include((self.url_patterns, 'app_name', 'namespace', 'blah'))
+
     def test_include_3_tuple(self):
         msg = 'Passing a 3-tuple to django.conf.urls.include() is not supported.'
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             include((self.url_patterns, 'app_name', 'namespace'))
+
+    def test_include_3_tuple_namespace(self):
+        msg = 'Cannot override the namespace for a dynamic module that provides a namespace.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            include((self.url_patterns, 'app_name', 'namespace'), 'namespace')
 
     def test_include_2_tuple(self):
         self.assertEqual(

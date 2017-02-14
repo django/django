@@ -6,7 +6,7 @@ from django.contrib.messages.storage import base, default_storage
 from django.contrib.messages.storage.base import Message
 from django.test import modify_settings, override_settings
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 
 def add_level_messages(storage):
@@ -24,7 +24,7 @@ def add_level_messages(storage):
 
 class override_settings_tags(override_settings):
     def enable(self):
-        super(override_settings_tags, self).enable()
+        super().enable()
         # LEVEL_TAGS is a constant defined in the
         # django.contrib.messages.storage.base module, so after changing
         # settings.MESSAGE_TAGS, update that constant also.
@@ -32,7 +32,7 @@ class override_settings_tags(override_settings):
         base.LEVEL_TAGS = utils.get_level_tags()
 
     def disable(self):
-        super(override_settings_tags, self).disable()
+        super().disable()
         base.LEVEL_TAGS = self.old_level_tags
 
 
@@ -100,7 +100,7 @@ class BaseTests:
         storage = self.get_storage()
         response = self.get_response()
 
-        storage.add(constants.INFO, ugettext_lazy('lazy message'))
+        storage.add(constants.INFO, gettext_lazy('lazy message'))
         storage.update(response)
 
         storing = self.stored_messages_count(storage, response)

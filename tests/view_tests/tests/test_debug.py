@@ -21,7 +21,6 @@ from django.views.debug import (
     cleanse_setting, technical_500_response,
 )
 
-from .. import BrokenException, except_args
 from ..views import (
     custom_exception_reporter_filter_view, index_page,
     multivalue_dict_key_error, non_sensitive_view, paranoid_view,
@@ -127,11 +126,6 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         self.assertContains(response, "Raised by:", status_code=404)
         self.assertContains(response, "view_tests.views.Http404View", status_code=404)
 
-    def test_view_exceptions(self):
-        for n in range(len(except_args)):
-            with self.assertRaises(BrokenException):
-                self.client.get(reverse('view_exception', args=(n,)))
-
     def test_non_l10ned_numeric_ids(self):
         """
         Numeric IDs and fancy traceback context blocks line numbers shouldn't be localized.
@@ -150,16 +144,15 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
             )
 
     def test_template_exceptions(self):
-        for n in range(len(except_args)):
-            try:
-                self.client.get(reverse('template_exception', args=(n,)))
-            except Exception:
-                raising_loc = inspect.trace()[-1][-2][0].strip()
-                self.assertNotEqual(
-                    raising_loc.find('raise BrokenException'), -1,
-                    "Failed to find 'raise BrokenException' in last frame of "
-                    "traceback, instead found: %s" % raising_loc
-                )
+        try:
+            self.client.get(reverse('template_exception'))
+        except Exception:
+            raising_loc = inspect.trace()[-1][-2][0].strip()
+            self.assertNotEqual(
+                raising_loc.find("raise Exception('boom')"), -1,
+                "Failed to find 'raise Exception' in last frame of "
+                "traceback, instead found: %s" % raising_loc
+            )
 
     def test_template_loader_postmortem(self):
         """Tests for not existing file"""

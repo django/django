@@ -197,14 +197,14 @@ given ``geo_input`` argument, and then assumes the proper geometry subclass
 The following input formats, along with their corresponding Python types,
 are accepted:
 
-=======================  ======================
+=======================  ==========
 Format                   Input Type
-=======================  ======================
-WKT / EWKT               ``str`` or ``unicode``
-HEX / HEXEWKB            ``str`` or ``unicode``
+=======================  ==========
+WKT / EWKT               ``str``
+HEX / HEXEWKB            ``str``
 WKB / EWKB               ``buffer``
-GeoJSON                  ``str`` or ``unicode``
-=======================  ======================
+GeoJSON                  ``str``
+=======================  ==========
 
 .. classmethod:: GEOSGeometry.from_gml(gml_string)
 

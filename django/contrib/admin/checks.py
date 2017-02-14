@@ -513,7 +513,7 @@ class BaseModelAdminChecks:
 class ModelAdminChecks(BaseModelAdminChecks):
 
     def check(self, admin_obj, **kwargs):
-        errors = super(ModelAdminChecks, self).check(admin_obj)
+        errors = super().check(admin_obj)
         errors.extend(self._check_save_as(admin_obj))
         errors.extend(self._check_save_on_top(admin_obj))
         errors.extend(self._check_inlines(admin_obj))
@@ -866,7 +866,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
 class InlineModelAdminChecks(BaseModelAdminChecks):
 
     def check(self, inline_obj, **kwargs):
-        errors = super(InlineModelAdminChecks, self).check(inline_obj)
+        errors = super().check(inline_obj)
         parent_model = inline_obj.parent_model
         errors.extend(self._check_relation(inline_obj, parent_model))
         errors.extend(self._check_exclude_of_parent_model(inline_obj, parent_model))
@@ -879,7 +879,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
     def _check_exclude_of_parent_model(self, obj, parent_model):
         # Do not perform more specific checks if the base checks result in an
         # error.
-        errors = super(InlineModelAdminChecks, self)._check_exclude(obj)
+        errors = super()._check_exclude(obj)
         if errors:
             return []
 

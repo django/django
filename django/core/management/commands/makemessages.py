@@ -110,7 +110,7 @@ class BuildFile:
         if self.domain == 'djangojs':
             content = prepare_js_for_gettext(src_data)
         elif self.domain == 'django':
-            content = templatize(src_data, origin=self.path[2:], charset=encoding)
+            content = templatize(src_data, origin=self.path[2:])
 
         with open(self.work_path, 'w', encoding='utf-8') as fp:
             fp.write(content)

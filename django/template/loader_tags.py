@@ -93,7 +93,7 @@ class ExtendsNode(Node):
         self.blocks = {n.name: n for n in nodelist.get_nodes_by_type(BlockNode)}
 
     def __repr__(self):
-        return '<ExtendsNode: extends %s>' % self.parent_name.token
+        return '<%s: extends %s>' % (self.__class__.__name__, self.parent_name.token)
 
     def find_template(self, template_name, context):
         """
@@ -157,11 +157,11 @@ class ExtendsNode(Node):
 class IncludeNode(Node):
     context_key = '__include_context'
 
-    def __init__(self, template, *args, **kwargs):
+    def __init__(self, template, *args, extra_context=None, isolated_context=False, **kwargs):
         self.template = template
-        self.extra_context = kwargs.pop('extra_context', {})
-        self.isolated_context = kwargs.pop('isolated_context', False)
-        super(IncludeNode, self).__init__(*args, **kwargs)
+        self.extra_context = extra_context or {}
+        self.isolated_context = isolated_context
+        super().__init__(*args, **kwargs)
 
     def render(self, context):
         """
@@ -180,6 +180,9 @@ class IncludeNode(Node):
                 if template is None:
                     template = context.template.engine.get_template(template_name)
                     cache[template_name] = template
+            # Use the base.Template of a backends.django.Template.
+            elif hasattr(template, 'template'):
+                template = template.template
             values = {
                 name: var.resolve(context)
                 for name, var in self.extra_context.items()

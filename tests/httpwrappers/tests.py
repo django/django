@@ -280,7 +280,7 @@ class HttpResponseTests(unittest.TestCase):
     def test_headers_type(self):
         r = HttpResponse()
 
-        # ASCII unicode or bytes values are converted to strings.
+        # ASCII strings or bytes values are converted to strings.
         r['key'] = 'test'
         self.assertEqual(r['key'], 'test')
         r['key'] = 'test'.encode('ascii')
@@ -296,7 +296,7 @@ class HttpResponseTests(unittest.TestCase):
         self.assertEqual(r['key'], '=?utf-8?b?4oCg?=')
         self.assertIn(b'=?utf-8?b?4oCg?=', r.serialize_headers())
 
-        # The response also converts unicode or bytes keys to strings, but requires
+        # The response also converts string or bytes keys to strings, but requires
         # them to contain ASCII
         r = HttpResponse()
         del r['Content-Type']
@@ -317,7 +317,7 @@ class HttpResponseTests(unittest.TestCase):
         with self.assertRaises(UnicodeError):
             r.__setitem__('føø', 'bar')
         with self.assertRaises(UnicodeError):
-            r.__setitem__('føø'.encode('utf-8'), 'bar')
+            r.__setitem__('føø'.encode(), 'bar')
 
     def test_long_line(self):
         # Bug #20889: long lines trigger newlines to be added to headers
@@ -371,7 +371,7 @@ class HttpResponseTests(unittest.TestCase):
         # test odd inputs
         r = HttpResponse()
         r.content = ['1', '2', 3, '\u079e']
-        # '\xde\x9e' == unichr(1950).encode('utf-8')
+        # '\xde\x9e' == unichr(1950).encode()
         self.assertEqual(r.content, b'123\xde\x9e')
 
         # .content can safely be accessed multiple times.
@@ -570,10 +570,10 @@ class StreamingHttpResponseTests(SimpleTestCase):
         self.assertEqual(list(r), [b'abc', b'def'])
         self.assertEqual(list(r), [])
 
-        # iterating over Unicode strings still yields bytestring chunks.
+        # iterating over strings still yields bytestring chunks.
         r.streaming_content = iter(['hello', 'café'])
         chunks = list(r)
-        # '\xc3\xa9' == unichr(233).encode('utf-8')
+        # '\xc3\xa9' == unichr(233).encode()
         self.assertEqual(chunks, [b'hello', b'caf\xc3\xa9'])
         for chunk in chunks:
             self.assertIsInstance(chunk, bytes)

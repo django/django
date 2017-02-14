@@ -187,7 +187,7 @@ class ManyToOneRel(ForeignObjectRel):
 
     def __init__(self, field, to, field_name, related_name=None, related_query_name=None,
                  limit_choices_to=None, parent_link=False, on_delete=None):
-        super(ManyToOneRel, self).__init__(
+        super().__init__(
             field, to,
             related_name=related_name,
             related_query_name=related_query_name,
@@ -226,7 +226,7 @@ class OneToOneRel(ManyToOneRel):
 
     def __init__(self, field, to, field_name, related_name=None, related_query_name=None,
                  limit_choices_to=None, parent_link=False, on_delete=None):
-        super(OneToOneRel, self).__init__(
+        super().__init__(
             field, to, field_name,
             related_name=related_name,
             related_query_name=related_query_name,
@@ -249,7 +249,7 @@ class ManyToManyRel(ForeignObjectRel):
     def __init__(self, field, to, related_name=None, related_query_name=None,
                  limit_choices_to=None, symmetrical=True, through=None,
                  through_fields=None, db_constraint=True):
-        super(ManyToManyRel, self).__init__(
+        super().__init__(
             field, to,
             related_name=related_name,
             related_query_name=related_query_name,

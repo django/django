@@ -17,7 +17,7 @@ from django.utils.encoding import force_text
 from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy as _
 
 from .renderers import get_default_renderer
 
@@ -200,9 +200,7 @@ class Widget(metaclass=MediaDefiningClass):
         return context
 
     def render(self, name, value, attrs=None, renderer=None):
-        """
-        Returns this Widget rendered as HTML, as a Unicode string.
-        """
+        """Render the widget as an HTML string."""
         context = self.get_context(name, value, attrs)
         return self._render(self.template_name, context, renderer)
 
@@ -255,10 +253,10 @@ class Input(Widget):
         if attrs is not None:
             attrs = attrs.copy()
             self.input_type = attrs.pop('type', self.input_type)
-        super(Input, self).__init__(attrs)
+        super().__init__(attrs)
 
     def get_context(self, name, value, attrs=None):
-        context = super(Input, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context['widget']['type'] = self.input_type
         return context
 
@@ -288,13 +286,13 @@ class PasswordInput(Input):
     template_name = 'django/forms/widgets/password.html'
 
     def __init__(self, attrs=None, render_value=False):
-        super(PasswordInput, self).__init__(attrs)
+        super().__init__(attrs)
         self.render_value = render_value
 
     def get_context(self, name, value, attrs):
         if not self.render_value:
             value = None
-        return super(PasswordInput, self).get_context(name, value, attrs)
+        return super().get_context(name, value, attrs)
 
 
 class HiddenInput(Input):
@@ -310,7 +308,7 @@ class MultipleHiddenInput(HiddenInput):
     template_name = 'django/forms/widgets/multiple_hidden.html'
 
     def get_context(self, name, value, attrs=None):
-        context = super(MultipleHiddenInput, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         final_attrs = context['widget']['attrs']
         id_ = context['widget']['attrs'].get('id')
 
@@ -360,9 +358,9 @@ FILE_INPUT_CONTRADICTION = object()
 
 
 class ClearableFileInput(FileInput):
-    clear_checkbox_label = ugettext_lazy('Clear')
-    initial_text = ugettext_lazy('Currently')
-    input_text = ugettext_lazy('Change')
+    clear_checkbox_label = _('Clear')
+    initial_text = _('Currently')
+    input_text = _('Change')
     template_name = 'django/forms/widgets/clearable_file_input.html'
 
     def clear_checkbox_name(self, name):
@@ -392,7 +390,7 @@ class ClearableFileInput(FileInput):
             return value
 
     def get_context(self, name, value, attrs=None):
-        context = super(ClearableFileInput, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         checkbox_name = self.clear_checkbox_name(name)
         checkbox_id = self.clear_checkbox_id(checkbox_name)
         context.update({
@@ -406,7 +404,7 @@ class ClearableFileInput(FileInput):
         return context
 
     def value_from_datadict(self, data, files, name):
-        upload = super(ClearableFileInput, self).value_from_datadict(data, files, name)
+        upload = super().value_from_datadict(data, files, name)
         if not self.is_required and CheckboxInput().value_from_datadict(
                 data, files, self.clear_checkbox_name(name)):
 
@@ -420,7 +418,13 @@ class ClearableFileInput(FileInput):
         return upload
 
     def use_required_attribute(self, initial):
-        return super(ClearableFileInput, self).use_required_attribute(initial) and not initial
+        return super().use_required_attribute(initial) and not initial
+
+    def value_omitted_from_data(self, data, files, name):
+        return (
+            super().value_omitted_from_data(data, files, name) and
+            self.clear_checkbox_name(name) not in data
+        )
 
 
 class Textarea(Widget):
@@ -431,7 +435,7 @@ class Textarea(Widget):
         default_attrs = {'cols': '40', 'rows': '10'}
         if attrs:
             default_attrs.update(attrs)
-        super(Textarea, self).__init__(default_attrs)
+        super().__init__(default_attrs)
 
 
 class DateTimeBaseInput(TextInput):
@@ -439,7 +443,7 @@ class DateTimeBaseInput(TextInput):
     supports_microseconds = False
 
     def __init__(self, attrs=None, format=None):
-        super(DateTimeBaseInput, self).__init__(attrs)
+        super().__init__(attrs)
         self.format = format if format else None
 
     def format_value(self, value):
@@ -471,7 +475,7 @@ class CheckboxInput(Input):
     template_name = 'django/forms/widgets/checkbox.html'
 
     def __init__(self, attrs=None, check_test=None):
-        super(CheckboxInput, self).__init__(attrs)
+        super().__init__(attrs)
         # check_test is a callable that takes a value and returns True
         # if the checkbox should be checked for that value.
         self.check_test = boolean_check if check_test is None else check_test
@@ -487,7 +491,7 @@ class CheckboxInput(Input):
             if attrs is None:
                 attrs = {}
             attrs['checked'] = True
-        return super(CheckboxInput, self).get_context(name, value, attrs)
+        return super().get_context(name, value, attrs)
 
     def value_from_datadict(self, data, files, name):
         if name not in data:
@@ -517,7 +521,7 @@ class ChoiceWidget(Widget):
     option_inherits_attrs = True
 
     def __init__(self, attrs=None, choices=()):
-        super(ChoiceWidget, self).__init__(attrs)
+        super().__init__(attrs)
         # choices can be any iterable, but we may need to render this widget
         # multiple times. Thus, collapse it into a list so it can be consumed
         # more than once.
@@ -554,8 +558,6 @@ class ChoiceWidget(Widget):
         for option_value, option_label in chain(self.choices):
             if option_value is None:
                 option_value = ''
-            else:
-                option_value = force_text(option_value)
 
             if isinstance(option_label, (list, tuple)):
                 index = groups[-1][2] + 1
@@ -571,7 +573,7 @@ class ChoiceWidget(Widget):
 
             for subvalue, sublabel in choices:
                 selected = (
-                    subvalue in value and
+                    force_text(subvalue) in value and
                     (has_selected is False or self.allow_multiple_selected)
                 )
                 if selected is True and has_selected is False:
@@ -605,7 +607,7 @@ class ChoiceWidget(Widget):
         }
 
     def get_context(self, name, value, attrs=None):
-        context = super(ChoiceWidget, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context['widget']['optgroups'] = self.optgroups(name, context['widget']['value'], attrs)
         context['wrap_label'] = True
         return context
@@ -657,7 +659,7 @@ class Select(ChoiceWidget):
     option_inherits_attrs = False
 
     def get_context(self, name, value, attrs=None):
-        context = super(Select, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         if self.allow_multiple_selected:
             context['widget']['attrs']['multiple'] = 'multiple'
         return context
@@ -673,7 +675,7 @@ class Select(ChoiceWidget):
         Don't render 'required' if the first <option> has a value, as that's
         invalid HTML.
         """
-        use_required_attribute = super(Select, self).use_required_attribute(initial)
+        use_required_attribute = super().use_required_attribute(initial)
         # 'required' is always okay for <select multiple>.
         if self.allow_multiple_selected:
             return use_required_attribute
@@ -688,11 +690,11 @@ class NullBooleanSelect(Select):
     """
     def __init__(self, attrs=None):
         choices = (
-            ('1', ugettext_lazy('Unknown')),
-            ('2', ugettext_lazy('Yes')),
-            ('3', ugettext_lazy('No')),
+            ('1', _('Unknown')),
+            ('2', _('Yes')),
+            ('3', _('No')),
         )
-        super(NullBooleanSelect, self).__init__(attrs, choices)
+        super().__init__(attrs, choices)
 
     def format_value(self, value):
         try:
@@ -752,7 +754,7 @@ class CheckboxSelectMultiple(ChoiceWidget):
         """
         if index is None:
             return ''
-        return super(CheckboxSelectMultiple, self).id_for_label(id_, index)
+        return super().id_for_label(id_, index)
 
 
 class MultiWidget(Widget):
@@ -769,14 +771,14 @@ class MultiWidget(Widget):
 
     def __init__(self, widgets, attrs=None):
         self.widgets = [w() if isinstance(w, type) else w for w in widgets]
-        super(MultiWidget, self).__init__(attrs)
+        super().__init__(attrs)
 
     @property
     def is_hidden(self):
         return all(w.is_hidden for w in self.widgets)
 
     def get_context(self, name, value, attrs=None):
-        context = super(MultiWidget, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         if self.is_localized:
             for widget in self.widgets:
                 widget.is_localized = self.is_localized
@@ -837,7 +839,7 @@ class MultiWidget(Widget):
     media = property(_get_media)
 
     def __deepcopy__(self, memo):
-        obj = super(MultiWidget, self).__deepcopy__(memo)
+        obj = super().__deepcopy__(memo)
         obj.widgets = copy.deepcopy(self.widgets)
         return obj
 
@@ -853,12 +855,18 @@ class SplitDateTimeWidget(MultiWidget):
     supports_microseconds = False
     template_name = 'django/forms/widgets/splitdatetime.html'
 
-    def __init__(self, attrs=None, date_format=None, time_format=None):
+    def __init__(self, attrs=None, date_format=None, time_format=None, date_attrs=None, time_attrs=None):
         widgets = (
-            DateInput(attrs=attrs, format=date_format),
-            TimeInput(attrs=attrs, format=time_format),
+            DateInput(
+                attrs=attrs if date_attrs is None else date_attrs,
+                format=date_format,
+            ),
+            TimeInput(
+                attrs=attrs if time_attrs is None else time_attrs,
+                format=time_format,
+            ),
         )
-        super(SplitDateTimeWidget, self).__init__(widgets, attrs)
+        super().__init__(widgets)
 
     def decompress(self, value):
         if value:
@@ -873,8 +881,8 @@ class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
     """
     template_name = 'django/forms/widgets/splithiddendatetime.html'
 
-    def __init__(self, attrs=None, date_format=None, time_format=None):
-        super(SplitHiddenDateTimeWidget, self).__init__(attrs, date_format, time_format)
+    def __init__(self, attrs=None, date_format=None, time_format=None, date_attrs=None, time_attrs=None):
+        super().__init__(attrs, date_format, time_format, date_attrs, time_attrs)
         for widget in self.widgets:
             widget.input_type = 'hidden'
 
@@ -928,7 +936,7 @@ class SelectDateWidget(Widget):
             self.day_none_value = self.none_value
 
     def get_context(self, name, value, attrs=None):
-        context = super(SelectDateWidget, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         date_context = {}
         year_choices = [(i, i) for i in self.years]
         if self.is_required is False:

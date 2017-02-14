@@ -27,7 +27,7 @@ class SiteManager(models.Manager):
             if host not in SITE_CACHE:
                 SITE_CACHE[host] = self.get(domain__iexact=host)
             return SITE_CACHE[host]
-        except self.model.DoesNotExist:
+        except Site.DoesNotExist:
             # Fallback to looking up site after stripping port from the host.
             domain, port = split_domain_port(host)
             if domain not in SITE_CACHE:
@@ -36,8 +36,8 @@ class SiteManager(models.Manager):
 
     def get_current(self, request=None):
         """
-        Returns the current Site based on the SITE_ID in the project's settings.
-        If SITE_ID isn't defined, it returns the site with domain matching
+        Return the current Site based on the SITE_ID in the project's settings.
+        If SITE_ID isn't defined, it return the site with domain matching
         request.get_host(). The ``Site`` object is cached the first time it's
         retrieved from the database.
         """
@@ -56,7 +56,7 @@ class SiteManager(models.Manager):
         )
 
     def clear_cache(self):
-        """Clears the ``Site`` object cache."""
+        """Clear the ``Site`` object cache."""
         global SITE_CACHE
         SITE_CACHE = {}
 
@@ -65,22 +65,17 @@ class SiteManager(models.Manager):
 
 
 class Site(AbstractBaseSite):
-    """
-    Sites within the Django sites app are represented by this
-    model.
-
-    Domain and name are required.
-    """
     objects = SiteManager()
 
     class Meta(AbstractBaseSite.Meta):
+        app_label = 'sites'
         db_table = 'django_site'
         swappable = 'SITES_SITE_MODEL'
 
 
 def clear_site_cache(sender, **kwargs):
     """
-    Clears the cache (if primed) each time a site is saved or deleted
+    Clear the cache (if primed) each time a site is saved or deleted
     """
     instance = kwargs['instance']
     using = kwargs['using']

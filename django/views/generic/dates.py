@@ -7,7 +7,7 @@ from django.http import Http404
 from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.generic.base import View
 from django.views.generic.detail import (
     BaseDetailView, SingleObjectTemplateResponseMixin,
@@ -668,7 +668,7 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
         lookup_kwargs = self._make_single_date_lookup(date)
         qs = qs.filter(**lookup_kwargs)
 
-        return super(BaseDetailView, self).get_object(queryset=qs)
+        return super().get_object(queryset=qs)
 
 
 class DateDetailView(SingleObjectTemplateResponseMixin, BaseDateDetailView):

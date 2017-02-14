@@ -19,12 +19,12 @@ class BaseManager:
 
     def __new__(cls, *args, **kwargs):
         # We capture the arguments to make returning them trivial
-        obj = super(BaseManager, cls).__new__(cls)
+        obj = super().__new__(cls)
         obj._constructor_args = (args, kwargs)
         return obj
 
     def __init__(self):
-        super(BaseManager, self).__init__()
+        super().__init__()
         self._set_creation_counter()
         self.model = None
         self.name = None
@@ -196,8 +196,8 @@ class ManagerDescriptor:
 
 class EmptyManager(Manager):
     def __init__(self, model):
-        super(EmptyManager, self).__init__()
+        super().__init__()
         self.model = model
 
     def get_queryset(self):
-        return super(EmptyManager, self).get_queryset().none()
+        return super().get_queryset().none()

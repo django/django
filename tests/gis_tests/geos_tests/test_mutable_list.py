@@ -14,7 +14,7 @@ class UserListA(ListMixin):
 
     def __init__(self, i_list, *args, **kwargs):
         self._list = self._mytype(i_list)
-        super(UserListA, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __len__(self):
         return len(self._list)

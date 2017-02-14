@@ -367,6 +367,10 @@ class AppConfigTests(SimpleTestCase):
         ac = AppConfig('label', Stub(__path__=['a', 'a']))
         self.assertEqual(ac.path, 'a')
 
+    def test_repr(self):
+        ac = AppConfig('label', Stub(__path__=['a']))
+        self.assertEqual(repr(ac), '<AppConfig: label>')
+
 
 class NamespacePackageAppTests(SimpleTestCase):
     # We need nsapp to be top-level so our multiple-paths tests can add another

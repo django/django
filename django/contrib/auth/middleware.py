@@ -84,7 +84,7 @@ class RemoteUserMiddleware(MiddlewareMixin):
 
     def clean_username(self, username, request):
         """
-        Allows the backend to clean the username, if the backend defines a
+        Allow the backend to clean the username, if the backend defines a
         clean_username method.
         """
         backend_str = request.session[auth.BACKEND_SESSION_KEY]
@@ -97,7 +97,7 @@ class RemoteUserMiddleware(MiddlewareMixin):
 
     def _remove_invalid_user(self, request):
         """
-        Removes the current authenticated user in the request which is invalid
+        Remove the current authenticated user in the request which is invalid
         but only if the user is authenticated via the RemoteUserBackend.
         """
         try:

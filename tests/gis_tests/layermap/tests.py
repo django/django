@@ -334,6 +334,7 @@ class OtherRouter:
 @skipUnlessDBFeature("gis_enabled")
 @override_settings(DATABASE_ROUTERS=[OtherRouter()])
 class LayerMapRouterTest(TestCase):
+    multi_db = True
 
     @unittest.skipUnless(len(settings.DATABASES) > 1, 'multiple databases required')
     def test_layermapping_default_db(self):

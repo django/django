@@ -22,12 +22,12 @@ class PersonManager(models.Manager):
 
 class PublishedBookManager(models.Manager):
     def get_queryset(self):
-        return super(PublishedBookManager, self).get_queryset().filter(is_published=True)
+        return super().get_queryset().filter(is_published=True)
 
 
 class CustomQuerySet(models.QuerySet):
     def filter(self, *args, **kwargs):
-        queryset = super(CustomQuerySet, self).filter(fun=True)
+        queryset = super().filter(fun=True)
         queryset._filter_CustomQuerySet = True
         return queryset
 
@@ -48,11 +48,11 @@ class CustomQuerySet(models.QuerySet):
 
 class BaseCustomManager(models.Manager):
     def __init__(self, arg):
-        super(BaseCustomManager, self).__init__()
+        super().__init__()
         self.init_arg = arg
 
     def filter(self, *args, **kwargs):
-        queryset = super(BaseCustomManager, self).filter(fun=True)
+        queryset = super().filter(fun=True)
         queryset._filter_CustomManager = True
         return queryset
 
@@ -66,23 +66,23 @@ CustomManager = BaseCustomManager.from_queryset(CustomQuerySet)
 class CustomInitQuerySet(models.QuerySet):
     # QuerySet with an __init__() method that takes an additional argument.
     def __init__(self, custom_optional_arg=None, model=None, query=None, using=None, hints=None):
-        super(CustomInitQuerySet, self).__init__(model=model, query=query, using=using, hints=hints)
+        super().__init__(model=model, query=query, using=using, hints=hints)
 
 
 class DeconstructibleCustomManager(BaseCustomManager.from_queryset(CustomQuerySet)):
 
     def __init__(self, a, b, c=1, d=2):
-        super(DeconstructibleCustomManager, self).__init__(a)
+        super().__init__(a)
 
 
 class FunPeopleManager(models.Manager):
     def get_queryset(self):
-        return super(FunPeopleManager, self).get_queryset().filter(fun=True)
+        return super().get_queryset().filter(fun=True)
 
 
 class BoringPeopleManager(models.Manager):
     def get_queryset(self):
-        return super(BoringPeopleManager, self).get_queryset().filter(fun=False)
+        return super().get_queryset().filter(fun=False)
 
 
 class Person(models.Model):
@@ -151,7 +151,7 @@ class Book(models.Model):
 
 class FastCarManager(models.Manager):
     def get_queryset(self):
-        return super(FastCarManager, self).get_queryset().filter(top_speed__gt=150)
+        return super().get_queryset().filter(top_speed__gt=150)
 
 
 class Car(models.Model):
@@ -179,7 +179,7 @@ class FastCarAsDefault(Car):
 
 class RestrictedManager(models.Manager):
     def get_queryset(self):
-        return super(RestrictedManager, self).get_queryset().filter(is_public=True)
+        return super().get_queryset().filter(is_public=True)
 
 
 class RelatedModel(models.Model):

@@ -43,7 +43,7 @@ import zlib
 from django.conf import settings
 from django.utils import baseconv
 from django.utils.crypto import constant_time_compare, salted_hmac
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
 
 _SEP_UNSAFE = re.compile(r'^[A-z0-9-_=]*$')
@@ -73,7 +73,7 @@ def b64_decode(s):
 
 
 def base64_hmac(salt, value, key):
-    return b64_encode(salted_hmac(salt, value, key).digest())
+    return b64_encode(salted_hmac(salt, value, key).digest()).decode()
 
 
 def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
@@ -121,9 +121,9 @@ def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, 
         if len(compressed) < (len(data) - 1):
             data = compressed
             is_compressed = True
-    base64d = b64_encode(data)
+    base64d = b64_encode(data).decode()
     if is_compressed:
-        base64d = b'.' + base64d
+        base64d = '.' + base64d
     return TimestampSigner(key, salt=salt).sign(base64d)
 
 
@@ -133,8 +133,8 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
 
     The serializer is expected to accept a bytestring.
     """
-    # TimestampSigner.unsign always returns unicode but base64 and zlib
-    # compression operate on bytes.
+    # TimestampSigner.unsign() returns str but base64 and zlib compression
+    # operate on bytes.
     base64d = force_bytes(TimestampSigner(key, salt=salt).unsign(s, max_age=max_age))
     decompress = False
     if base64d[:1] == b'.':
@@ -161,7 +161,7 @@ class Signer:
         self.salt = salt or '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
 
     def signature(self, value):
-        return force_text(base64_hmac(self.salt + 'signer', value, self.key))
+        return base64_hmac(self.salt + 'signer', value, self.key)
 
     def sign(self, value):
         return '%s%s%s' % (value, self.sep, self.signature(value))
@@ -171,7 +171,7 @@ class Signer:
             raise BadSignature('No "%s" found in value' % self.sep)
         value, sig = signed_value.rsplit(self.sep, 1)
         if constant_time_compare(sig, self.signature(value)):
-            return force_text(value)
+            return value
         raise BadSignature('Signature "%s" does not match' % sig)
 
 
@@ -181,15 +181,15 @@ class TimestampSigner(Signer):
         return baseconv.base62.encode(int(time.time()))
 
     def sign(self, value):
-        value = '%s%s%s' % (force_text(value), self.sep, self.timestamp())
-        return super(TimestampSigner, self).sign(value)
+        value = '%s%s%s' % (value, self.sep, self.timestamp())
+        return super().sign(value)
 
     def unsign(self, value, max_age=None):
         """
         Retrieve original value and check it wasn't signed more
         than max_age seconds ago.
         """
-        result = super(TimestampSigner, self).unsign(value)
+        result = super().unsign(value)
         value, timestamp = result.rsplit(self.sep, 1)
         timestamp = baseconv.base62.decode(timestamp)
         if max_age is not None:

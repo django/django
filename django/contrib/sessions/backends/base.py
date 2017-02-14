@@ -92,7 +92,7 @@ class SessionBase:
         return salted_hmac(key_salt, value).hexdigest()
 
     def encode(self, session_dict):
-        "Returns the given session dictionary serialized and encoded as a string."
+        "Return the given session dictionary serialized and encoded as a string."
         serialized = self.serializer().dumps(session_dict)
         hash = self._hash(serialized)
         return base64.b64encode(hash.encode() + b":" + serialized).decode('ascii')
@@ -140,14 +140,14 @@ class SessionBase:
         self.modified = True
 
     def is_empty(self):
-        "Returns True when there is no session_key and the session is empty"
+        "Return True when there is no session_key and the session is empty."
         try:
             return not bool(self._session_key) and not self._session_cache
         except AttributeError:
             return True
 
     def _get_new_session_key(self):
-        "Returns session key that isn't being used."
+        "Return session key that isn't being used."
         while True:
             session_key = get_random_string(32, VALID_KEY_CHARS)
             if not self.exists(session_key):
@@ -183,8 +183,8 @@ class SessionBase:
 
     def _get_session(self, no_load=False):
         """
-        Lazily loads session from storage (unless "no_load" is True, when only
-        an empty dict is stored) and stores it in the current instance.
+        Lazily load session from storage (unless "no_load" is True, when only
+        an empty dict is stored) and store it in the current instance.
         """
         self.accessed = True
         try:
@@ -247,7 +247,7 @@ class SessionBase:
 
     def set_expiry(self, value):
         """
-        Sets a custom expiration for the session. ``value`` can be an integer,
+        Set a custom expiration for the session. ``value`` can be an integer,
         a Python ``datetime`` or ``timedelta`` object or ``None``.
 
         If ``value`` is an integer, the session will expire after that many
@@ -273,7 +273,7 @@ class SessionBase:
 
     def get_expire_at_browser_close(self):
         """
-        Returns ``True`` if the session is set to expire when the browser
+        Return ``True`` if the session is set to expire when the browser
         closes, and ``False`` if there's an expiry date. Use
         ``get_expiry_date()`` or ``get_expiry_age()`` to find the actual expiry
         date/age, if there is one.
@@ -284,7 +284,7 @@ class SessionBase:
 
     def flush(self):
         """
-        Removes the current session data from the database and regenerates the
+        Remove the current session data from the database and regenerate the
         key.
         """
         self.clear()
@@ -293,7 +293,7 @@ class SessionBase:
 
     def cycle_key(self):
         """
-        Creates a new session key, while retaining the current session data.
+        Create a new session key, while retaining the current session data.
         """
         try:
             data = self._session_cache
@@ -309,13 +309,13 @@ class SessionBase:
 
     def exists(self, session_key):
         """
-        Returns True if the given session_key already exists.
+        Return True if the given session_key already exists.
         """
         raise NotImplementedError('subclasses of SessionBase must provide an exists() method')
 
     def create(self):
         """
-        Creates a new session instance. Guaranteed to create a new object with
+        Create a new session instance. Guaranteed to create a new object with
         a unique key and will have saved the result once (with empty data)
         before the method returns.
         """
@@ -323,23 +323,22 @@ class SessionBase:
 
     def save(self, must_create=False):
         """
-        Saves the session data. If 'must_create' is True, a new session object
-        is created (otherwise a CreateError exception is raised). Otherwise,
-        save() only updates an existing object and does not create one
-        (an UpdateError is raised).
+        Save the session data. If 'must_create' is True, create a new session
+        object (or raise CreateError). Otherwise, only update an existing
+        object and don't create one (raise UpdateError if needed).
         """
         raise NotImplementedError('subclasses of SessionBase must provide a save() method')
 
     def delete(self, session_key=None):
         """
-        Deletes the session data under this key. If the key is None, the
-        current session key value is used.
+        Delete the session data under this key. If the key is None, use the
+        current session key value.
         """
         raise NotImplementedError('subclasses of SessionBase must provide a delete() method')
 
     def load(self):
         """
-        Loads the session data and returns a dictionary.
+        Load the session data and return a dictionary.
         """
         raise NotImplementedError('subclasses of SessionBase must provide a load() method')
 

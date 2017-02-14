@@ -238,7 +238,7 @@ class PermissionsRequiredMixinTests(TestCase):
     def test_permissioned_denied_redirect(self):
         class AView(PermissionRequiredMixin, EmptyResponseView):
             permission_required = [
-                'auth_tests.add_customuser', 'auth_tests.change_customuser', 'non-existent-permission',
+                'auth_tests.add_customuser', 'auth_tests.change_customuser', 'nonexistent-permission',
             ]
 
         request = self.factory.get('/rand')
@@ -249,7 +249,7 @@ class PermissionsRequiredMixinTests(TestCase):
     def test_permissioned_denied_exception_raised(self):
         class AView(PermissionRequiredMixin, EmptyResponseView):
             permission_required = [
-                'auth_tests.add_customuser', 'auth_tests.change_customuser', 'non-existent-permission',
+                'auth_tests.add_customuser', 'auth_tests.change_customuser', 'nonexistent-permission',
             ]
             raise_exception = True
 

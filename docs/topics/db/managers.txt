@@ -121,7 +121,7 @@ all objects, and one that returns only the books by Roald Dahl::
     # First, define the Manager subclass.
     class DahlBookManager(models.Manager):
         def get_queryset(self):
-            return super(DahlBookManager, self).get_queryset().filter(author='Roald Dahl')
+            return super().get_queryset().filter(author='Roald Dahl')
 
     # Then hook it into the Book model explicitly.
     class Book(models.Model):
@@ -152,11 +152,11 @@ For example::
 
     class AuthorManager(models.Manager):
         def get_queryset(self):
-            return super(AuthorManager, self).get_queryset().filter(role='A')
+            return super().get_queryset().filter(role='A')
 
     class EditorManager(models.Manager):
         def get_queryset(self):
-            return super(EditorManager, self).get_queryset().filter(role='E')
+            return super().get_queryset().filter(role='E')
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)

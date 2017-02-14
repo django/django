@@ -56,7 +56,7 @@ class FoodQuerySet(models.query.QuerySet):
 
 class BaseFoodManager(models.Manager):
     def __init__(self, a, b, c=1, d=2):
-        super(BaseFoodManager, self).__init__()
+        super().__init__()
         self.args = (a, b, c, d)
 
 

@@ -39,7 +39,7 @@ class ActiveTranslationField(models.ForeignObject):
         return {'lang': get_language()}
 
     def contribute_to_class(self, cls, name):
-        super(ActiveTranslationField, self).contribute_to_class(cls, name)
+        super().contribute_to_class(cls, name)
         setattr(cls, self.name, ArticleTranslationDescriptor(self))
 
 

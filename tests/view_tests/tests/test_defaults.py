@@ -15,8 +15,10 @@ from ..models import Article, Author, UrlArticle
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class DefaultsTests(TestCase):
     """Test django views in django/views/defaults.py"""
-    non_existing_urls = ['/non_existing_url/',  # this is in urls.py
-                         '/other_non_existing_url/']  # this NOT in urls.py
+    nonexistent_urls = [
+        '/nonexistent_url/',  # this is in urls.py
+        '/other_nonexistent_url/',  # this NOT in urls.py
+    ]
 
     @classmethod
     def setUpTestData(cls):
@@ -41,7 +43,7 @@ class DefaultsTests(TestCase):
 
     def test_page_not_found(self):
         "A 404 status is returned by the page_not_found view"
-        for url in self.non_existing_urls:
+        for url in self.nonexistent_urls:
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
 
@@ -60,7 +62,7 @@ class DefaultsTests(TestCase):
         The 404 page should have the csrf_token available in the context
         """
         # See ticket #14565
-        for url in self.non_existing_urls:
+        for url in self.nonexistent_urls:
             response = self.client.get(url)
             self.assertNotEqual(response.content, 'NOTPROVIDED')
             self.assertNotEqual(response.content, '')
@@ -113,7 +115,7 @@ class DefaultsTests(TestCase):
         response = self.client.get('/raises403/')
         self.assertEqual(response['Content-Type'], 'text/html')
 
-        response = self.client.get('/non_existing_url/')
+        response = self.client.get('/nonexistent_url/')
         self.assertEqual(response['Content-Type'], 'text/html')
 
         response = self.client.get('/server_error/')

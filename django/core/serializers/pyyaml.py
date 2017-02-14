@@ -53,13 +53,13 @@ class Serializer(PythonSerializer):
         if isinstance(field, models.TimeField) and getattr(obj, field.name) is not None:
             self._current[field.name] = str(getattr(obj, field.name))
         else:
-            super(Serializer, self).handle_field(obj, field)
+            super().handle_field(obj, field)
 
     def end_serialization(self):
         yaml.dump(self.objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
 
     def getvalue(self):
-        # Grand-parent super
+        # Grandparent super
         return super(PythonSerializer, self).getvalue()
 
 
@@ -68,7 +68,7 @@ def Deserializer(stream_or_string, **options):
     Deserialize a stream or string of YAML data.
     """
     if isinstance(stream_or_string, bytes):
-        stream_or_string = stream_or_string.decode('utf-8')
+        stream_or_string = stream_or_string.decode()
     if isinstance(stream_or_string, str):
         stream = StringIO(stream_or_string)
     else:

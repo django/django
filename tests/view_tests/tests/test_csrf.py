@@ -10,7 +10,7 @@ from django.views.csrf import CSRF_FAILURE_TEMPLATE_NAME, csrf_failure
 class CsrfViewTests(SimpleTestCase):
 
     def setUp(self):
-        super(CsrfViewTests, self).setUp()
+        super().setUp()
         self.client = Client(enforce_csrf_checks=True)
 
     @override_settings(

@@ -94,7 +94,7 @@ class NonConcreteField(models.IntegerField):
         return None
 
     def get_attname_column(self):
-        attname, column = super(NonConcreteField, self).get_attname_column()
+        attname, column = super().get_attname_column()
         return attname, None
 
 

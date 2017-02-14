@@ -5,7 +5,7 @@ from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import models, transaction
 from django.db.utils import IntegrityError
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 from .models import (
     Article, Category, Child, City, District, First, Parent, Record, Relation,
@@ -28,9 +28,6 @@ class ManyToOneTests(TestCase):
         # Article objects have access to their related Reporter objects.
         r = self.a.reporter
         self.assertEqual(r.id, self.r.id)
-        # These are strings instead of unicode strings because that's what was used in
-        # the creation of this reporter (and we haven't refreshed the data from the
-        # database, which always returns unicode strings).
         self.assertEqual((r.first_name, self.r.last_name), ('John', 'Smith'))
 
     def test_create(self):
@@ -200,7 +197,7 @@ class ManyToOneTests(TestCase):
                 where=["many_to_one_reporter.last_name='Smith'"]),
             ["<Article: John's second story>", "<Article: This is a test>"]
         )
-        # ... and should work fine with the unicode that comes out of forms.Form.cleaned_data
+        # ... and should work fine with the string that comes out of forms.Form.cleaned_data
         self.assertQuerysetEqual(
             (Article.objects
                 .filter(reporter__first_name__exact='John')
@@ -432,9 +429,9 @@ class ManyToOneTests(TestCase):
         # Same as each other
         self.assertIs(r1.article_set.__class__, r2.article_set.__class__)
 
-    def test_create_relation_with_ugettext_lazy(self):
+    def test_create_relation_with_gettext_lazy(self):
         reporter = Reporter.objects.create(first_name='John', last_name='Smith', email='john.smith@example.com')
-        lazy = ugettext_lazy('test')
+        lazy = gettext_lazy('test')
         reporter.article_set.create(headline=lazy, pub_date=datetime.date(2011, 6, 10))
         notlazy = str(lazy)
         article = reporter.article_set.get()

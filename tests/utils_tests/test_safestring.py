@@ -1,11 +1,8 @@
 from django.template import Context, Template
 from django.test import SimpleTestCase
 from django.utils import html, text
-from django.utils.encoding import force_bytes
 from django.utils.functional import lazy, lazystr
 from django.utils.safestring import SafeData, mark_safe
-
-lazybytes = lazy(force_bytes, bytes)
 
 
 class customescape(str):
@@ -27,6 +24,13 @@ class SafeStringTest(SimpleTestCase):
         self.assertRenderEqual('{{ s }}', 'a&b', s=s)
         self.assertRenderEqual('{{ s|force_escape }}', 'a&amp;b', s=s)
 
+    def test_mark_safe_str(self):
+        """
+        Calling str() on a SafeText instance doesn't lose the safe status.
+        """
+        s = mark_safe('a&b')
+        self.assertIsInstance(str(s), type(s))
+
     def test_mark_safe_object_implementing_dunder_html(self):
         e = customescape('<a&b>')
         s = mark_safe(e)
@@ -37,10 +41,8 @@ class SafeStringTest(SimpleTestCase):
 
     def test_mark_safe_lazy(self):
         s = lazystr('a&b')
-        b = lazybytes(b'a&b')
 
         self.assertIsInstance(mark_safe(s), SafeData)
-        self.assertIsInstance(mark_safe(b), SafeData)
         self.assertRenderEqual('{{ s }}', 'a&b', s=mark_safe(s))
 
     def test_mark_safe_object_implementing_dunder_str(self):

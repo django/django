@@ -23,10 +23,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             c.execute('PRAGMA foreign_keys')
             self._initial_pragma_fk = c.fetchone()[0]
             c.execute('PRAGMA foreign_keys = 0')
-        return super(DatabaseSchemaEditor, self).__enter__()
+        return super().__enter__()
 
     def __exit__(self, exc_type, exc_value, traceback):
-        super(DatabaseSchemaEditor, self).__exit__(exc_type, exc_value, traceback)
+        super().__exit__(exc_type, exc_value, traceback)
         with self.connection.cursor() as c:
             # Restore initial FK setting - PRAGMA values can't be parametrized
             c.execute('PRAGMA foreign_keys = %s' % int(self._initial_pragma_fk))
@@ -216,7 +216,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def delete_model(self, model, handle_autom2m=True):
         if handle_autom2m:
-            super(DatabaseSchemaEditor, self).delete_model(model)
+            super().delete_model(model)
         else:
             # Delete the table (and only that)
             self.execute(self.sql_delete_table % {

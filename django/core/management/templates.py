@@ -1,5 +1,4 @@
 import cgi
-import errno
 import mimetypes
 import os
 import posixpath
@@ -76,12 +75,10 @@ class TemplateCommand(BaseCommand):
             top_dir = path.join(os.getcwd(), name)
             try:
                 os.makedirs(top_dir)
+            except FileExistsError:
+                raise CommandError("'%s' already exists" % top_dir)
             except OSError as e:
-                if e.errno == errno.EEXIST:
-                    message = "'%s' already exists" % top_dir
-                else:
-                    message = e
-                raise CommandError(message)
+                raise CommandError(e)
         else:
             top_dir = os.path.abspath(path.expanduser(target))
             if not os.path.exists(top_dir):

@@ -134,7 +134,7 @@ class Element:
 
 class RootElement(Element):
     def __init__(self):
-        super(RootElement, self).__init__(None, ())
+        super().__init__(None, ())
 
     def __str__(self):
         return ''.join(str(c) for c in self.children)

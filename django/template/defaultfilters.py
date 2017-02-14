@@ -5,21 +5,21 @@ from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
 from operator import itemgetter
 from pprint import pformat
+from urllib.parse import quote
 
 from django.utils import formats
 from django.utils.dateformat import format, time_format
-from django.utils.encoding import force_text, iri_to_uri
+from django.utils.encoding import iri_to_uri
 from django.utils.html import (
     avoid_wrapping, conditional_escape, escape, escapejs, linebreaks,
     strip_tags, urlize as _urlize,
 )
-from django.utils.http import urlquote
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import (
     Truncator, normalize_newlines, phone2numeric, slugify as _slugify, wrap,
 )
 from django.utils.timesince import timesince, timeuntil
-from django.utils.translation import ugettext, ungettext
+from django.utils.translation import gettext, ngettext
 
 from .base import Variable, VariableDoesNotExist
 from .library import Library
@@ -33,14 +33,13 @@ register = Library()
 
 def stringfilter(func):
     """
-    Decorator for filters which should only receive unicode objects. The object
-    passed as the first positional argument will be converted to a unicode
-    object.
+    Decorator for filters which should only receive strings. The object
+    passed as the first positional argument will be converted to a string.
     """
     def _dec(*args, **kwargs):
         if args:
             args = list(args)
-            args[0] = force_text(args[0])
+            args[0] = str(args[0])
             if (isinstance(args[0], SafeData) and
                     getattr(_dec._decorated_function, 'is_safe', False)):
                 return mark_safe(func(*args, **kwargs))
@@ -121,7 +120,7 @@ def floatformat(text, arg=-1):
         d = Decimal(input_val)
     except InvalidOperation:
         try:
-            d = Decimal(force_text(float(text)))
+            d = Decimal(str(float(text)))
         except (ValueError, InvalidOperation, TypeError):
             return ''
     try:
@@ -319,14 +318,14 @@ def urlencode(value, safe=None):
     Escapes a value for use in a URL.
 
     Takes an optional ``safe`` parameter used to determine the characters which
-    should not be escaped by Django's ``urlquote`` method. If not provided, the
+    should not be escaped by Python's quote() function. If not provided, the
     default safe characters will be used (but an empty string can be provided
     when *all* characters should be escaped).
     """
     kwargs = {}
     if safe is not None:
         kwargs['safe'] = safe
-    return urlquote(value, **kwargs)
+    return quote(value, **kwargs)
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
@@ -471,10 +470,10 @@ def safe(value):
 def safeseq(value):
     """
     A "safe" filter for sequences. Marks each element in the sequence,
-    individually, as safe, after converting them to unicode. Returns a list
+    individually, as safe, after converting them to strings. Returns a list
     with the results.
     """
-    return [mark_safe(force_text(obj)) for obj in value]
+    return [mark_safe(str(obj)) for obj in value]
 
 
 @register.filter(is_safe=True)
@@ -552,7 +551,6 @@ def join(value, arg, autoescape=True):
     """
     Joins a list with a string, like Python's ``str.join(list)``.
     """
-    value = map(force_text, value)
     if autoescape:
         value = [conditional_escape(v) for v in value]
     try:
@@ -678,7 +676,7 @@ def unordered_list(value, autoescape=True):
                 sublist = '\n%s<ul>\n%s\n%s</ul>\n%s' % (
                     indent, list_formatter(children, tabs + 1), indent, indent)
             output.append('%s<li>%s%s</li>' % (
-                indent, escaper(force_text(item)), sublist))
+                indent, escaper(item), sublist))
         return '\n'.join(output)
 
     return mark_safe(list_formatter(value))
@@ -818,7 +816,7 @@ def yesno(value, arg=None):
     ==========  ======================  ==================================
     """
     if arg is None:
-        arg = ugettext('yes,no,maybe')
+        arg = gettext('yes,no,maybe')
     bits = arg.split(',')
     if len(bits) < 2:
         return value  # Invalid arg.
@@ -847,7 +845,7 @@ def filesizeformat(bytes_):
     try:
         bytes_ = float(bytes_)
     except (TypeError, ValueError, UnicodeDecodeError):
-        value = ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
+        value = ngettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
         return avoid_wrapping(value)
 
     def filesize_number_format(value):
@@ -864,17 +862,17 @@ def filesizeformat(bytes_):
         bytes_ = -bytes_  # Allow formatting of negative numbers.
 
     if bytes_ < KB:
-        value = ungettext("%(size)d byte", "%(size)d bytes", bytes_) % {'size': bytes_}
+        value = ngettext("%(size)d byte", "%(size)d bytes", bytes_) % {'size': bytes_}
     elif bytes_ < MB:
-        value = ugettext("%s KB") % filesize_number_format(bytes_ / KB)
+        value = gettext("%s KB") % filesize_number_format(bytes_ / KB)
     elif bytes_ < GB:
-        value = ugettext("%s MB") % filesize_number_format(bytes_ / MB)
+        value = gettext("%s MB") % filesize_number_format(bytes_ / MB)
     elif bytes_ < TB:
-        value = ugettext("%s GB") % filesize_number_format(bytes_ / GB)
+        value = gettext("%s GB") % filesize_number_format(bytes_ / GB)
     elif bytes_ < PB:
-        value = ugettext("%s TB") % filesize_number_format(bytes_ / TB)
+        value = gettext("%s TB") % filesize_number_format(bytes_ / TB)
     else:
-        value = ugettext("%s PB") % filesize_number_format(bytes_ / PB)
+        value = gettext("%s PB") % filesize_number_format(bytes_ / PB)
 
     if negative:
         value = "-%s" % value
@@ -938,4 +936,4 @@ def pprint(value):
     try:
         return pformat(value)
     except Exception as e:
-        return "Error in formatting: %s: %s" % (e.__class__.__name__, force_text(e, errors="replace"))
+        return "Error in formatting: %s: %s" % (e.__class__.__name__, e)

@@ -14,7 +14,7 @@ else:
                 # allow assignment of constructed Morsels (e.g. for pickling)
                 dict.__setitem__(self, key, value)
             else:
-                super(SimpleCookie, self).__setitem__(key, value)
+                super().__setitem__(key, value)
 
 
 def parse_cookie(cookie):

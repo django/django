@@ -33,7 +33,7 @@ class TemplateDoesNotExist(Exception):
         if chain is None:
             chain = []
         self.chain = chain
-        super(TemplateDoesNotExist, self).__init__(msg)
+        super().__init__(msg)
 
 
 class TemplateSyntaxError(Exception):

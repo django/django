@@ -8,7 +8,6 @@ import math
 import re
 import types
 import uuid
-from importlib import import_module
 
 from django.db import models
 from django.db.migrations.operations.base import Operation
@@ -136,7 +135,7 @@ class FloatSerializer(BaseSimpleSerializer):
     def serialize(self):
         if math.isnan(self.value) or math.isinf(self.value):
             return 'float("{}")'.format(self.value), set()
-        return super(FloatSerializer, self).serialize()
+        return super().serialize()
 
 
 class FrozensetSerializer(BaseSequenceSerializer):
@@ -155,20 +154,15 @@ class FunctionTypeSerializer(BaseSerializer):
             raise ValueError("Cannot serialize function: lambda")
         if self.value.__module__ is None:
             raise ValueError("Cannot serialize function %r: No module" % self.value)
-        # Python 3 is a lot easier, and only uses this branch if it's not local.
-        if getattr(self.value, "__qualname__", None) and getattr(self.value, "__module__", None):
-            if "<" not in self.value.__qualname__:  # Qualname can include <locals>
-                return "%s.%s" % \
-                    (self.value.__module__, self.value.__qualname__), {"import %s" % self.value.__module__}
-        # Fallback version
+
         module_name = self.value.__module__
-        # Make sure it's actually there
-        module = import_module(module_name)
-        if not hasattr(module, self.value.__name__):
-            raise ValueError(
-                "Could not find function %s in %s.\n" % (self.value.__name__, module_name)
-            )
-        return "%s.%s" % (module_name, self.value.__name__), {"import %s" % module_name}
+
+        if '<' not in self.value.__qualname__:  # Qualname can include <locals>
+            return '%s.%s' % (module_name, self.value.__qualname__), {'import %s' % self.value.__module__}
+
+        raise ValueError(
+            'Could not find function %s in %s.\n' % (self.value.__name__, module_name)
+        )
 
 
 class FunctoolsPartialSerializer(BaseSerializer):

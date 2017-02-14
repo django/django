@@ -9,7 +9,7 @@ from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.inspect import func_supports_parameter
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 __all__ = ('BoundField',)
 

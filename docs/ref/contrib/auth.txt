@@ -47,7 +47,11 @@ Fields
 
     .. attribute:: last_name
 
-        Optional. 30 characters or fewer.
+        Optional. 150 characters or fewer.
+
+        .. versionchanged:: 2.0
+
+            The ``max_length`` increased from 30 to 150 characters.
 
     .. attribute:: email
 

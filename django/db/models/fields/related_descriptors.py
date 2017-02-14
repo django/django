@@ -272,7 +272,7 @@ class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
             if not any(field in fields for field in deferred):
                 kwargs = {field: getattr(instance, field) for field in fields}
                 return rel_model(**kwargs)
-        return super(ForwardOneToOneDescriptor, self).get_object(instance)
+        return super().get_object(instance)
 
 
 class ReverseOneToOneDescriptor:
@@ -502,7 +502,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
     class RelatedManager(superclass):
         def __init__(self, instance):
-            super(RelatedManager, self).__init__()
+            super().__init__()
 
             self.instance = instance
             self.model = rel.related_model
@@ -510,10 +510,8 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
             self.core_filters = {self.field.name: instance}
 
-        def __call__(self, **kwargs):
-            # We use **kwargs rather than a kwarg argument to enforce the
-            # `manager='manager_name'` syntax.
-            manager = getattr(self.model, kwargs.pop('manager'))
+        def __call__(self, *, manager):
+            manager = getattr(self.model, manager)
             manager_class = create_reverse_many_to_one_manager(manager.__class__, rel)
             return manager_class(self.instance)
         do_not_call_in_templates = True
@@ -545,12 +543,12 @@ def create_reverse_many_to_one_manager(superclass, rel):
             try:
                 return self.instance._prefetched_objects_cache[self.field.related_query_name()]
             except (AttributeError, KeyError):
-                queryset = super(RelatedManager, self).get_queryset()
+                queryset = super().get_queryset()
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:
-                queryset = super(RelatedManager, self).get_queryset()
+                queryset = super().get_queryset()
 
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
@@ -569,9 +567,8 @@ def create_reverse_many_to_one_manager(superclass, rel):
             cache_name = self.field.related_query_name()
             return queryset, rel_obj_attr, instance_attr, False, cache_name
 
-        def add(self, *objs, **kwargs):
+        def add(self, *objs, bulk=True):
             self._remove_prefetched_objects()
-            bulk = kwargs.pop('bulk', True)
             objs = list(objs)
             db = router.db_for_write(self.model, instance=self.instance)
 
@@ -622,10 +619,9 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
         # remove() and clear() are only provided if the ForeignKey can have a value of null.
         if rel.field.null:
-            def remove(self, *objs, **kwargs):
+            def remove(self, *objs, bulk=True):
                 if not objs:
                     return
-                bulk = kwargs.pop('bulk', True)
                 val = self.field.get_foreign_related_value(self.instance)
                 old_ids = set()
                 for obj in objs:
@@ -639,8 +635,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 self._clear(self.filter(pk__in=old_ids), bulk)
             remove.alters_data = True
 
-            def clear(self, **kwargs):
-                bulk = kwargs.pop('bulk', True)
+            def clear(self, *, bulk=True):
                 self._clear(self, bulk)
             clear.alters_data = True
 
@@ -658,13 +653,10 @@ def create_reverse_many_to_one_manager(superclass, rel):
                             obj.save(update_fields=[self.field.name])
             _clear.alters_data = True
 
-        def set(self, objs, **kwargs):
+        def set(self, objs, *, bulk=True, clear=False):
             # Force evaluation of `objs` in case it's a queryset whose value
             # could be affected by `manager.clear()`. Refs #19816.
             objs = tuple(objs)
-
-            bulk = kwargs.pop('bulk', True)
-            clear = kwargs.pop('clear', False)
 
             if self.field.null:
                 db = router.db_for_write(self.model, instance=self.instance)
@@ -708,7 +700,7 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor):
     """
 
     def __init__(self, rel, reverse=False):
-        super(ManyToManyDescriptor, self).__init__(rel)
+        super().__init__(rel)
 
         self.reverse = reverse
 
@@ -746,7 +738,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
     class ManyRelatedManager(superclass):
         def __init__(self, instance=None):
-            super(ManyRelatedManager, self).__init__()
+            super().__init__()
 
             self.instance = instance
 
@@ -791,10 +783,8 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                                  "a many-to-many relationship can be used." %
                                  instance.__class__.__name__)
 
-        def __call__(self, **kwargs):
-            # We use **kwargs rather than a kwarg argument to enforce the
-            # `manager='manager_name'` syntax.
-            manager = getattr(self.model, kwargs.pop('manager'))
+        def __call__(self, *, manager):
+            manager = getattr(self.model, manager)
             manager_class = create_forward_many_to_many_manager(manager.__class__, rel, reverse)
             return manager_class(instance=self.instance)
         do_not_call_in_templates = True
@@ -834,12 +824,12 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
             except (AttributeError, KeyError):
-                queryset = super(ManyRelatedManager, self).get_queryset()
+                queryset = super().get_queryset()
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:
-                queryset = super(ManyRelatedManager, self).get_queryset()
+                queryset = super().get_queryset()
 
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
@@ -914,7 +904,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     model=self.model, pk_set=None, using=db,
                 )
                 self._remove_prefetched_objects()
-                filters = self._build_remove_filters(super(ManyRelatedManager, self).get_queryset().using(db))
+                filters = self._build_remove_filters(super().get_queryset().using(db))
                 self.through._default_manager.using(db).filter(filters).delete()
 
                 signals.m2m_changed.send(
@@ -924,7 +914,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 )
         clear.alters_data = True
 
-        def set(self, objs, **kwargs):
+        def set(self, objs, *, clear=False):
             if not rel.through._meta.auto_created:
                 opts = self.through._meta
                 raise AttributeError(
@@ -936,8 +926,6 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             # Force evaluation of `objs` in case it's a queryset whose value
             # could be affected by `manager.clear()`. Refs #19816.
             objs = tuple(objs)
-
-            clear = kwargs.pop('clear', False)
 
             db = router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
@@ -1091,7 +1079,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     instance=self.instance, reverse=self.reverse,
                     model=self.model, pk_set=old_ids, using=db,
                 )
-                target_model_qs = super(ManyRelatedManager, self).get_queryset()
+                target_model_qs = super().get_queryset()
                 if target_model_qs._has_filters():
                     old_vals = target_model_qs.using(db).filter(**{
                         '%s__in' % self.target_field.target_field.attname: old_ids})

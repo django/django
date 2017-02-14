@@ -14,7 +14,7 @@ def prefix_validation_error(error, prefix, code, params):
             # We can't simply concatenate messages since they might require
             # their associated parameters to be expressed correctly which
             # is not something `format_lazy` does. For example, proxied
-            # ungettext calls require a count parameter and are converted
+            # ngettext calls require a count parameter and are converted
             # to an empty string if they are missing it.
             message=format_lazy(
                 '{}{}',

@@ -553,9 +553,6 @@ class Queries1Tests(TestCase):
             s.reverse()
             params.reverse()
 
-        # This slightly odd comparison works around the fact that PostgreSQL will
-        # return 'one' and 'two' as strings, not Unicode objects. It's a side-effect of
-        # using constants here and not a real concern.
         d = Item.objects.extra(select=OrderedDict(s), select_params=params).values('a', 'b')[0]
         self.assertEqual(d, {'a': 'one', 'b': 'two'})
 
@@ -2830,13 +2827,13 @@ class EmptyStringsAsNullTest(TestCase):
 
     def test_direct_exclude(self):
         self.assertQuerysetEqual(
-            NamedCategory.objects.exclude(name__in=['nonexisting']),
+            NamedCategory.objects.exclude(name__in=['nonexistent']),
             [self.nc.pk], attrgetter('pk')
         )
 
     def test_joined_exclude(self):
         self.assertQuerysetEqual(
-            DumbCategory.objects.exclude(namedcategory__name__in=['nonexisting']),
+            DumbCategory.objects.exclude(namedcategory__name__in=['nonexistent']),
             [self.nc.pk], attrgetter('pk')
         )
 
@@ -3149,6 +3146,25 @@ class JoinReuseTest(TestCase):
     def test_revfk_noreuse(self):
         qs = Author.objects.filter(report__name='r4').filter(report__name='r1')
         self.assertEqual(str(qs.query).count('JOIN'), 2)
+
+    def test_inverted_q_across_relations(self):
+        """
+        When a trimmable join is specified in the query (here school__), the
+        ORM detects it and removes unnecessary joins. The set of reusable joins
+        are updated after trimming the query so that other lookups don't
+        consider that the outer query's filters are in effect for the subquery
+        (#26551).
+        """
+        springfield_elementary = School.objects.create()
+        hogward = School.objects.create()
+        Student.objects.create(school=springfield_elementary)
+        hp = Student.objects.create(school=hogward)
+        Classroom.objects.create(school=hogward, name='Potion')
+        Classroom.objects.create(school=springfield_elementary, name='Main')
+        qs = Student.objects.filter(
+            ~(Q(school__classroom__name='Main') & Q(school__classroom__has_blackboard=None))
+        )
+        self.assertSequenceEqual(qs, [hp])
 
 
 class DisjunctionPromotionTests(TestCase):

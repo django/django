@@ -218,7 +218,7 @@ class RemoteUserCustomTest(RemoteUserTest):
         The strings passed in REMOTE_USER should be cleaned and the known users
         should not have been configured with an email address.
         """
-        super(RemoteUserCustomTest, self).test_known_user()
+        super().test_known_user()
         self.assertEqual(User.objects.get(username='knownuser').email, '')
         self.assertEqual(User.objects.get(username='knownuser2').email, '')
 
@@ -226,7 +226,7 @@ class RemoteUserCustomTest(RemoteUserTest):
         """
         The unknown user created should be configured with an email address.
         """
-        super(RemoteUserCustomTest, self).test_unknown_user()
+        super().test_unknown_user()
         newuser = User.objects.get(username='newuser')
         self.assertEqual(newuser.email, 'user@example.com')
 

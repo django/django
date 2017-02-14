@@ -229,11 +229,11 @@ if Image:
         """
         def __init__(self, *args, **kwargs):
             self.was_opened = False
-            super(TestImageFieldFile, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
         def open(self):
             self.was_opened = True
-            super(TestImageFieldFile, self).open()
+            super().open()
 
     class TestImageField(ImageField):
         attr_class = TestImageFieldFile

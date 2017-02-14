@@ -33,7 +33,7 @@ class ModelToValidate(models.Model):
     slug = models.SlugField(blank=True)
 
     def clean(self):
-        super(ModelToValidate, self).clean()
+        super().clean()
         if self.number == 11:
             raise ValidationError('Invalid number supplied!')
 

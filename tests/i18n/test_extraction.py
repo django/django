@@ -16,6 +16,7 @@ from django.core.management.commands.makemessages import \
 from django.core.management.utils import find_command
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
+from django.utils._os import symlinks_supported
 from django.utils.translation import TranslatorCommentWarning
 
 from .utils import POFileAssertionMixin, RunInTmpDirMixin, copytree
@@ -382,7 +383,10 @@ class BasicExtractorTests(ExtractorTests):
             cmd.gettext_version
 
     def test_po_file_encoding_when_updating(self):
-        """Update of PO file doesn't corrupt it with non-UTF-8 encoding on Python3+Windows (#23271)"""
+        """
+        Update of PO file doesn't corrupt it with non-UTF-8 encoding on Windows
+        (#23271).
+        """
         BR_PO_BASE = 'locale/pt_BR/LC_MESSAGES/django'
         shutil.copyfile(BR_PO_BASE + '.pristine', BR_PO_BASE + '.po')
         management.call_command('makemessages', locale=['pt_BR'], verbosity=0)
@@ -468,33 +472,24 @@ class IgnoredExtractorTests(ExtractorTests):
 class SymlinkExtractorTests(ExtractorTests):
 
     def setUp(self):
-        super(SymlinkExtractorTests, self).setUp()
+        super().setUp()
         self.symlinked_dir = os.path.join(self.test_dir, 'templates_symlinked')
 
     def test_symlink(self):
-        # On Python < 3.2 os.symlink() exists only on Unix
-        if hasattr(os, 'symlink'):
-            if os.path.exists(self.symlinked_dir):
-                self.assertTrue(os.path.islink(self.symlinked_dir))
-            else:
-                # On Python >= 3.2) os.symlink() exists always but then can
-                # fail at runtime when user hasn't the needed permissions on
-                # Windows versions that support symbolink links (>= 6/Vista).
-                # See Python issue 9333 (http://bugs.python.org/issue9333).
-                # Skip the test in that case
-                try:
-                    os.symlink(os.path.join(self.test_dir, 'templates'), self.symlinked_dir)
-                except (OSError, NotImplementedError):
-                    self.skipTest("os.symlink() is available on this OS but can't be used by this user.")
-            os.chdir(self.test_dir)
-            management.call_command('makemessages', locale=[LOCALE], verbosity=0, symlinks=True)
-            self.assertTrue(os.path.exists(self.PO_FILE))
-            with open(self.PO_FILE, 'r') as fp:
-                po_contents = fp.read()
-                self.assertMsgId('This literal should be included.', po_contents)
-            self.assertLocationCommentPresent(self.PO_FILE, None, 'templates_symlinked', 'test.html')
+        if os.path.exists(self.symlinked_dir):
+            self.assertTrue(os.path.islink(self.symlinked_dir))
         else:
-            self.skipTest("os.symlink() not available on this OS + Python version combination.")
+            if symlinks_supported():
+                os.symlink(os.path.join(self.test_dir, 'templates'), self.symlinked_dir)
+            else:
+                self.skipTest("os.symlink() not available on this OS + Python version combination.")
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0, symlinks=True)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = fp.read()
+            self.assertMsgId('This literal should be included.', po_contents)
+        self.assertLocationCommentPresent(self.PO_FILE, None, 'templates_symlinked', 'test.html')
 
 
 class CopyPluralFormsExtractorTests(ExtractorTests):
@@ -632,7 +627,7 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
             os.utime(self.PO_FILE % locale, (0, 0))
 
     def setUp(self):
-        super(ExcludedLocaleExtractionTests, self).setUp()
+        super().setUp()
         copytree('canned_locale', 'locale')
         self._set_times_for_all_po_files()
 

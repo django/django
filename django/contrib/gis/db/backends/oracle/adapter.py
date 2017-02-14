@@ -24,7 +24,7 @@ class OracleSpatialAdapter(WKTAdapter):
         self.srid = geom.srid
 
     def _fix_polygon(self, poly):
-        # Fix single polygon orientation as described in __init__()
+        """Fix single polygon orientation as described in __init__()."""
         if self._isClockwise(poly.exterior_ring):
             poly.exterior_ring = list(reversed(poly.exterior_ring))
 
@@ -35,15 +35,19 @@ class OracleSpatialAdapter(WKTAdapter):
         return poly
 
     def _fix_geometry_collection(self, coll):
-        # Fix polygon orientations in geometry collections as described in
-        # __init__()
+        """
+        Fix polygon orientations in geometry collections as described in
+        __init__().
+        """
         for i, geom in enumerate(coll):
             if isinstance(geom, Polygon):
                 coll[i] = self._fix_polygon(geom)
 
     def _isClockwise(self, coords):
-        # A modified shoelace algorithm to determine polygon orientation.
-        # See https://en.wikipedia.org/wiki/Shoelace_formula
+        """
+        A modified shoelace algorithm to determine polygon orientation.
+        See https://en.wikipedia.org/wiki/Shoelace_formula.
+        """
         n = len(coords)
         area = 0.0
         for i in range(n):

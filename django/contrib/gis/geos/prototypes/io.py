@@ -145,7 +145,7 @@ class _WKBReader(IOBase):
     destructor = wkb_reader_destroy
 
     def read(self, wkb):
-        "Returns a _pointer_ to C GEOS Geometry object from the given WKB."
+        "Return a _pointer_ to C GEOS Geometry object from the given WKB."
         if isinstance(wkb, memoryview):
             wkb_s = bytes(wkb)
             return wkb_reader_read(self.ptr, wkb_s, len(wkb_s))
@@ -165,7 +165,7 @@ class WKTWriter(IOBase):
     _precision = None
 
     def __init__(self, dim=2, trim=False, precision=None):
-        super(WKTWriter, self).__init__()
+        super().__init__()
         if bool(trim) != self._trim:
             self.trim = trim
         if precision is not None:
@@ -173,7 +173,7 @@ class WKTWriter(IOBase):
         self.outdim = dim
 
     def write(self, geom):
-        "Returns the WKT representation of the given geometry."
+        "Return the WKT representation of the given geometry."
         return wkt_writer_write(self.ptr, geom.ptr)
 
     @property
@@ -215,7 +215,7 @@ class WKBWriter(IOBase):
     destructor = wkb_writer_destroy
 
     def __init__(self, dim=2):
-        super(WKBWriter, self).__init__()
+        super().__init__()
         self.outdim = dim
 
     def _handle_empty_point(self, geom):
@@ -231,7 +231,7 @@ class WKBWriter(IOBase):
         return geom
 
     def write(self, geom):
-        "Returns the WKB representation of the given geometry."
+        "Return the WKB representation of the given geometry."
         from django.contrib.gis.geos import Polygon
         geom = self._handle_empty_point(geom)
         wkb = wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t()))
@@ -242,7 +242,7 @@ class WKBWriter(IOBase):
         return memoryview(wkb)
 
     def write_hex(self, geom):
-        "Returns the HEXEWKB representation of the given geometry."
+        "Return the HEXEWKB representation of the given geometry."
         from django.contrib.gis.geos.polygon import Polygon
         geom = self._handle_empty_point(geom)
         wkb = wkb_writer_write_hex(self.ptr, geom.ptr, byref(c_size_t()))

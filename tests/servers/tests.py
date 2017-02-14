@@ -5,10 +5,10 @@ import errno
 import os
 import socket
 from urllib.error import HTTPError
+from urllib.parse import urlencode
 from urllib.request import urlopen
 
 from django.test import LiveServerTestCase, override_settings
-from django.utils.http import urlencode
 
 from .models import Person
 
@@ -40,7 +40,7 @@ class LiveServerAddress(LiveServerBase):
 
     @classmethod
     def setUpClass(cls):
-        super(LiveServerAddress, cls).setUpClass()
+        super().setUpClass()
         # put it in a list to prevent descriptor lookups in test
         cls.live_server_url_test = [cls.live_server_url]
 
@@ -130,3 +130,19 @@ class LiveServerPort(LiveServerBase):
         finally:
             if hasattr(TestCase, 'server_thread'):
                 TestCase.server_thread.terminate()
+
+
+class LiverServerThreadedTests(LiveServerBase):
+    """If LiverServerTestCase isn't threaded, these tests will hang."""
+
+    def test_view_calls_subview(self):
+        url = '/subview_calling_view/?%s' % urlencode({'url': self.live_server_url})
+        with self.urlopen(url) as f:
+            self.assertEqual(f.read(), b'subview calling view: subview')
+
+    def test_check_model_instance_from_subview(self):
+        url = '/check_model_instance_from_subview/?%s' % urlencode({
+            'url': self.live_server_url,
+        })
+        with self.urlopen(url) as f:
+            self.assertIn(b'emily', f.read())

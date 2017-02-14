@@ -263,7 +263,7 @@ work::
         def default(self, obj):
             if isinstance(obj, YourCustomType):
                 return force_text(obj)
-            return super(LazyEncoder, self).default(obj)
+            return super().default(obj)
 
 You can then pass ``cls=LazyEncoder`` to the ``serializers.serialize()``
 function::

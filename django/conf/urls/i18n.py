@@ -6,7 +6,7 @@ from django.urls import LocaleRegexURLResolver, get_resolver
 from django.views.i18n import set_language
 
 
-def i18n_patterns(*urls, **kwargs):
+def i18n_patterns(*urls, prefix_default_language=True):
     """
     Adds the language code prefix to every URL pattern within this
     function. This may only be used in the root URLconf, not in an included
@@ -14,8 +14,6 @@ def i18n_patterns(*urls, **kwargs):
     """
     if not settings.USE_I18N:
         return list(urls)
-    prefix_default_language = kwargs.pop('prefix_default_language', True)
-    assert not kwargs, 'Unexpected kwargs for i18n_patterns(): %s' % kwargs
     return [LocaleRegexURLResolver(list(urls), prefix_default_language=prefix_default_language)]
 
 

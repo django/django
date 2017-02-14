@@ -805,7 +805,7 @@ class DependentChild(models.Model):
 
 class _Manager(models.Manager):
     def get_queryset(self):
-        return super(_Manager, self).get_queryset().filter(pk__gt=1)
+        return super().get_queryset().filter(pk__gt=1)
 
 
 class FilteredManager(models.Model):

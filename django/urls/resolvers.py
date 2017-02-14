@@ -9,6 +9,7 @@ import functools
 import re
 import threading
 from importlib import import_module
+from urllib.parse import quote
 
 from django.conf import settings
 from django.core.checks import Warning
@@ -17,7 +18,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
-from django.utils.http import RFC3986_SUBDELIMS, urlquote
+from django.utils.http import RFC3986_SUBDELIMS
 from django.utils.regex_helper import normalize
 from django.utils.translation import get_language
 
@@ -113,7 +114,7 @@ class LocaleRegexProvider:
     """
     def __init__(self, regex):
         # regex is either a string representing a regular expression, or a
-        # translatable string (using ugettext_lazy) representing a regular
+        # translatable string (using gettext_lazy) representing a regular
         # expression.
         self._regex = regex
         self._regex_dict = {}
@@ -455,7 +456,7 @@ class RegexURLResolver(LocaleRegexProvider):
                 candidate_pat = _prefix.replace('%', '%%') + result
                 if re.search('^%s%s' % (re.escape(_prefix), pattern), candidate_pat % candidate_subs):
                     # safe characters from `pchar` definition of RFC 3986
-                    url = urlquote(candidate_pat % candidate_subs, safe=RFC3986_SUBDELIMS + str('/~:@'))
+                    url = quote(candidate_pat % candidate_subs, safe=RFC3986_SUBDELIMS + '/~:@')
                     # Don't allow construction of scheme relative urls.
                     if url.startswith('//'):
                         url = '/%%2F%s' % url[2:]
@@ -500,9 +501,7 @@ class LocaleRegexURLResolver(RegexURLResolver):
         self, urlconf_name, default_kwargs=None, app_name=None, namespace=None,
         prefix_default_language=True,
     ):
-        super(LocaleRegexURLResolver, self).__init__(
-            None, urlconf_name, default_kwargs, app_name, namespace,
-        )
+        super().__init__(None, urlconf_name, default_kwargs, app_name, namespace)
         self.prefix_default_language = prefix_default_language
 
     @property

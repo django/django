@@ -406,7 +406,7 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
 
             def is_ignorable_request(self, request, uri, domain, referer):
                 '''Check user-agent in addition to normal checks.'''
-                if super(SubclassedMiddleware, self).is_ignorable_request(request, uri, domain, referer):
+                if super().is_ignorable_request(request, uri, domain, referer):
                     return True
                 user_agent = request.META['HTTP_USER_AGENT']
                 return any(pattern.search(user_agent) for pattern in self.ignored_user_agent_patterns)
@@ -785,7 +785,7 @@ class GZipMiddlewareTest(SimpleTestCase):
         r = GZipMiddleware().process_response(self.req, self.stream_resp_unicode)
         self.assertEqual(
             self.decompress(b''.join(r)),
-            b''.join(x.encode('utf-8') for x in self.sequence_unicode)
+            b''.join(x.encode() for x in self.sequence_unicode)
         )
         self.assertEqual(r.get('Content-Encoding'), 'gzip')
         self.assertFalse(r.has_header('Content-Length'))

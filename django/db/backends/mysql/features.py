@@ -1,8 +1,6 @@
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.utils.functional import cached_property
 
-from .base import Database
-
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
@@ -48,9 +46,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def supports_microsecond_precision(self):
-        # See https://github.com/farcepest/MySQLdb1/issues/24 for the reason
-        # about requiring MySQLdb 1.2.5
-        return self.connection.mysql_version >= (5, 6, 4) and Database.version_info >= (1, 2, 5)
+        return self.connection.mysql_version >= (5, 6, 4)
 
     @cached_property
     def has_zoneinfo_database(self):

@@ -60,7 +60,10 @@ class FlatpageCSRFTests(TestCase):
         self.assertContains(response, "<p>Isn't it flat!</p>")
 
     def test_view_non_existent_flatpage(self):
-        "A non-existent flatpage raises 404 when served through a view, even when the middleware is in use"
+        """
+        A nonexistent flatpage raises 404 when served through a view, even when
+        the middleware is in use.
+        """
         response = self.client.get('/flatpage_root/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
@@ -79,7 +82,10 @@ class FlatpageCSRFTests(TestCase):
         self.assertContains(response, "<p>Isn't it flat!</p>")
 
     def test_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage raises a 404 when served by the fallback middleware"
+        """
+        A nonexistent flatpage raises a 404 when served by the fallback
+        middleware.
+        """
         response = self.client.get('/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 

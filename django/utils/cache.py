@@ -40,8 +40,8 @@ logger = logging.getLogger('django.request')
 
 def patch_cache_control(response, **kwargs):
     """
-    This function patches the Cache-Control header by adding all
-    keyword arguments to it. The transformation is as follows:
+    Patch the Cache-Control header by adding all keyword arguments to it.
+    The transformation is as follows:
 
     * All keyword parameter names are turned to lowercase, and underscores
       are converted to hyphens.
@@ -89,8 +89,8 @@ def patch_cache_control(response, **kwargs):
 
 def get_max_age(response):
     """
-    Returns the max-age from the response Cache-Control header as an integer
-    (or ``None`` if it wasn't found or wasn't an integer.
+    Return the max-age from the response Cache-Control header as an integer,
+    or None if it wasn't found or wasn't an integer.
     """
     if not response.has_header('Cache-Control'):
         return
@@ -267,7 +267,7 @@ def patch_response_headers(response, cache_timeout=None):
 
 def add_never_cache_headers(response):
     """
-    Adds headers to a response to indicate that a page should never be cached.
+    Add headers to a response to indicate that a page should never be cached.
     """
     patch_response_headers(response, cache_timeout=-1)
     patch_cache_control(response, no_cache=True, no_store=True, must_revalidate=True)
@@ -275,7 +275,7 @@ def add_never_cache_headers(response):
 
 def patch_vary_headers(response, newheaders):
     """
-    Adds (or updates) the "Vary" header in the given HttpResponse object.
+    Add (or update) the "Vary" header in the given HttpResponse object.
     newheaders is a list of header names that should be in "Vary". Existing
     headers in "Vary" aren't removed.
     """
@@ -295,7 +295,7 @@ def patch_vary_headers(response, newheaders):
 
 def has_vary_header(response, header_query):
     """
-    Checks to see if the response has a given header name in its Vary header.
+    Check to see if the response has a given header name in its Vary header.
     """
     if not response.has_header('Vary'):
         return False
@@ -305,7 +305,7 @@ def has_vary_header(response, header_query):
 
 
 def _i18n_cache_key_suffix(request, cache_key):
-    """If necessary, adds the current locale or time zone to the cache key."""
+    """If necessary, add the current locale or time zone to the cache key."""
     if settings.USE_I18N or settings.USE_L10N:
         # first check if LocaleMiddleware or another middleware added
         # LANGUAGE_CODE to request, then fall back to the active language
@@ -322,7 +322,7 @@ def _i18n_cache_key_suffix(request, cache_key):
 
 
 def _generate_cache_key(request, method, headerlist, key_prefix):
-    """Returns a cache key from the headers given in the header list."""
+    """Return a cache key from the headers given in the header list."""
     ctx = hashlib.md5()
     for header in headerlist:
         value = request.META.get(header)
@@ -335,7 +335,7 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
 
 
 def _generate_cache_header_key(key_prefix, request):
-    """Returns a cache key for the header cache."""
+    """Return a cache key for the header cache."""
     url = hashlib.md5(force_bytes(iri_to_uri(request.build_absolute_uri())))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
         key_prefix, url.hexdigest())
@@ -344,13 +344,13 @@ def _generate_cache_header_key(key_prefix, request):
 
 def get_cache_key(request, key_prefix=None, method='GET', cache=None):
     """
-    Returns a cache key based on the request URL and query. It can be used
+    Return a cache key based on the request URL and query. It can be used
     in the request phase because it pulls the list of headers to take into
     account from the global URL registry and uses those to build a cache key
     to check against.
 
-    If there is no headerlist stored, the page needs to be rebuilt, so this
-    function returns None.
+    If there isn't a headerlist stored, return None, indicating that the page
+    needs to be rebuilt.
     """
     if key_prefix is None:
         key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
@@ -366,8 +366,8 @@ def get_cache_key(request, key_prefix=None, method='GET', cache=None):
 
 def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cache=None):
     """
-    Learns what headers to take into account for some request URL from the
-    response object. It stores those headers in a global URL registry so that
+    Learn what headers to take into account for some request URL from the
+    response object. Store those headers in a global URL registry so that
     later access to that URL will know what headers to take into account
     without building the response object itself. The headers are named in the
     Vary header of the response, but we want to prevent response generation.

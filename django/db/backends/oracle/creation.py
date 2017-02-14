@@ -35,11 +35,10 @@ class DatabaseCreation(BaseDatabaseCreation):
             try:
                 self._execute_test_db_creation(cursor, parameters, verbosity, keepdb)
             except Exception as e:
-                # if we want to keep the db, then no need to do any of the below,
-                # just return and skip it all.
-                if keepdb:
-                    return
-                sys.stderr.write("Got an error creating the test database: %s\n" % e)
+                if 'ORA-01543' not in str(e):
+                    # All errors except "tablespace already exists" cancel tests
+                    sys.stderr.write("Got an error creating the test database: %s\n" % e)
+                    sys.exit(2)
                 if not autoclobber:
                     confirm = input(
                         "It appears the test database, %s, already exists. "
@@ -75,7 +74,10 @@ class DatabaseCreation(BaseDatabaseCreation):
             try:
                 self._create_test_user(cursor, parameters, verbosity, keepdb)
             except Exception as e:
-                sys.stderr.write("Got an error creating the test user: %s\n" % e)
+                if 'ORA-01920' not in str(e):
+                    # All errors except "user already exists" cancel tests
+                    sys.stderr.write("Got an error creating the test user: %s\n" % e)
+                    sys.exit(2)
                 if not autoclobber:
                     confirm = input(
                         "It appears the test user, %s, already exists. Type "

@@ -11,8 +11,6 @@ from django.urls import set_script_prefix
 from django.utils.encoding import force_text, repercent_broken_unicode
 from django.utils.functional import cached_property
 
-ISO_8859_1, UTF_8 = 'iso-8859-1', 'utf-8'
-
 _slashes_re = re.compile(br'/+')
 
 
@@ -141,7 +139,7 @@ class WSGIHandler(base.BaseHandler):
     request_class = WSGIRequest
 
     def __init__(self, *args, **kwargs):
-        super(WSGIHandler, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.load_middleware()
 
     def __call__(self, environ, start_response):
@@ -164,11 +162,11 @@ class WSGIHandler(base.BaseHandler):
 
 def get_path_info(environ):
     """
-    Returns the HTTP request's PATH_INFO as a unicode string.
+    Return the HTTP request's PATH_INFO as a string.
     """
     path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '/')
 
-    return repercent_broken_unicode(path_info).decode(UTF_8)
+    return repercent_broken_unicode(path_info).decode()
 
 
 def get_script_name(environ):
@@ -201,7 +199,7 @@ def get_script_name(environ):
     else:
         script_name = get_bytes_from_wsgi(environ, 'SCRIPT_NAME', '')
 
-    return script_name.decode(UTF_8)
+    return script_name.decode()
 
 
 def get_bytes_from_wsgi(environ, key, default):
@@ -214,7 +212,7 @@ def get_bytes_from_wsgi(environ, key, default):
     # Non-ASCII values in the WSGI environ are arbitrarily decoded with
     # ISO-8859-1. This is wrong for Django websites where UTF-8 is the default.
     # Re-encode to recover the original bytestring.
-    return value.encode(ISO_8859_1)
+    return value.encode('iso-8859-1')
 
 
 def get_str_from_wsgi(environ, key, default):
@@ -224,4 +222,4 @@ def get_str_from_wsgi(environ, key, default):
     key and default should be str objects.
     """
     value = get_bytes_from_wsgi(environ, key, default)
-    return value.decode(UTF_8, errors='replace')
+    return value.decode(errors='replace')

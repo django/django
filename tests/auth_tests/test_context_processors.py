@@ -44,9 +44,9 @@ class PermWrapperTests(SimpleTestCase):
         perms = PermWrapper(MockUser())
         # Works for modules and full permissions.
         self.assertIn('mockapp', perms)
-        self.assertNotIn('nonexisting', perms)
+        self.assertNotIn('nonexistent', perms)
         self.assertIn('mockapp.someperm', perms)
-        self.assertNotIn('mockapp.nonexisting', perms)
+        self.assertNotIn('mockapp.nonexistent', perms)
 
     def test_permlookupdict_in(self):
         """
@@ -95,7 +95,7 @@ class AuthContextProcessorTests(TestCase):
         response = self.client.get('/auth_processor_perms/')
         self.assertContains(response, "Has auth permissions")
         self.assertContains(response, "Has auth.add_permission permissions")
-        self.assertNotContains(response, "nonexisting")
+        self.assertNotContains(response, "nonexistent")
 
     def test_perm_in_perms_attrs(self):
         u = User.objects.create_user(username='normal', password='secret')
@@ -107,7 +107,7 @@ class AuthContextProcessorTests(TestCase):
         response = self.client.get('/auth_processor_perm_in_perms/')
         self.assertContains(response, "Has auth permissions")
         self.assertContains(response, "Has auth.add_permission permissions")
-        self.assertNotContains(response, "nonexisting")
+        self.assertNotContains(response, "nonexistent")
 
     def test_message_attrs(self):
         self.client.force_login(self.superuser)

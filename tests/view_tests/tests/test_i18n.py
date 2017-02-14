@@ -214,7 +214,7 @@ class JsI18NTests(SimpleTestCase):
         """
         with override('de'):
             response = self.client.get('/jsoni18n/')
-            data = json.loads(response.content.decode('utf-8'))
+            data = json.loads(response.content.decode())
             self.assertIn('catalog', data)
             self.assertIn('formats', data)
             self.assertIn('plural', data)
@@ -243,7 +243,7 @@ class JsI18NTests(SimpleTestCase):
         """
         with self.settings(LANGUAGE_CODE='es'), override('en-us'):
             response = self.client.get('/jsoni18n/')
-            data = json.loads(response.content.decode('utf-8'))
+            data = json.loads(response.content.decode())
             self.assertIn('catalog', data)
             self.assertIn('formats', data)
             self.assertIn('plural', data)

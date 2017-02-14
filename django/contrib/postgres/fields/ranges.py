@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
@@ -20,7 +21,7 @@ class RangeField(models.Field):
         # Initializing base_field here ensures that its model matches the model for self.
         if hasattr(self, 'base_field'):
             self.base_field = self.base_field()
-        super(RangeField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def model(self):
@@ -56,7 +57,7 @@ class RangeField(models.Field):
         return value
 
     def set_attributes_from_name(self, name):
-        super(RangeField, self).set_attributes_from_name(name)
+        super().set_attributes_from_name(name)
         self.base_field.set_attributes_from_name(name)
 
     def value_to_string(self, obj):
@@ -78,7 +79,7 @@ class RangeField(models.Field):
 
     def formfield(self, **kwargs):
         kwargs.setdefault('form_class', self.form_field)
-        return super(RangeField, self).formfield(**kwargs)
+        return super().formfield(**kwargs)
 
 
 class IntegerRangeField(RangeField):
@@ -129,6 +130,37 @@ class DateRangeField(RangeField):
 RangeField.register_lookup(lookups.DataContains)
 RangeField.register_lookup(lookups.ContainedBy)
 RangeField.register_lookup(lookups.Overlap)
+
+
+class DateTimeRangeContains(models.Lookup):
+    """
+    Lookup for Date/DateTimeRange containment to cast the rhs to the correct
+    type.
+    """
+    lookup_name = 'contains'
+
+    def process_rhs(self, compiler, connection):
+        # Transform rhs value for db lookup.
+        if isinstance(self.rhs, datetime.date):
+            output_field = models.DateTimeField() if isinstance(self.rhs, datetime.datetime) else models.DateField()
+            value = models.Value(self.rhs, output_field=output_field)
+            self.rhs = value.resolve_expression(compiler.query)
+        return super().process_rhs(compiler, connection)
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = lhs_params + rhs_params
+        # Cast the rhs if needed.
+        cast_sql = ''
+        if isinstance(self.rhs, models.Expression) and self.rhs._output_field_or_none:
+            cast_internal_type = self.lhs.output_field.base_field.get_internal_type()
+            cast_sql = '::{}'.format(connection.data_types.get(cast_internal_type))
+        return '%s @> %s%s' % (lhs, rhs, cast_sql), params
+
+
+DateRangeField.register_lookup(DateTimeRangeContains)
+DateTimeRangeField.register_lookup(DateTimeRangeContains)
 
 
 class RangeContainedBy(models.Lookup):

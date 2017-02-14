@@ -1,17 +1,8 @@
 import gzip
-import io
 
 from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
 from django.test import SimpleTestCase
 from django.test.client import conditional_content_removal
-
-
-# based on Python 3.3's gzip.compress
-def gzip_compress(data):
-    buf = io.BytesIO()
-    with gzip.GzipFile(fileobj=buf, mode='wb', compresslevel=0) as f:
-        f.write(data)
-    return buf.getvalue()
 
 
 class ConditionalContentTests(SimpleTestCase):
@@ -43,7 +34,7 @@ class ConditionalContentTests(SimpleTestCase):
             self.assertEqual(b''.join(res), b'')
 
         # Issue #20472
-        abc = gzip_compress(b'abc')
+        abc = gzip.compress(b'abc')
         res = HttpResponse(abc, status=304)
         res['Content-Encoding'] = 'gzip'
         conditional_content_removal(req, res)

@@ -161,14 +161,14 @@ class TestCollectionClear(CollectionTestCase):
         clear_filepath = os.path.join(settings.STATIC_ROOT, 'cleared.txt')
         with open(clear_filepath, 'w') as f:
             f.write('should be cleared')
-        super(TestCollectionClear, self).run_collectstatic(clear=True)
+        super().run_collectstatic(clear=True)
 
     def test_cleared_not_found(self):
         self.assertFileNotFound('cleared.txt')
 
     def test_dir_not_exists(self, **kwargs):
         shutil.rmtree(settings.STATIC_ROOT)
-        super(TestCollectionClear, self).run_collectstatic(clear=True)
+        super().run_collectstatic(clear=True)
 
     @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.PathNotImplementedStorage')
     def test_handle_path_notimplemented(self):
@@ -218,10 +218,9 @@ class TestInteractiveMessages(CollectionTestCase):
 
     def test_no_warning_for_empty_staticdir(self):
         stdout = StringIO()
-        static_dir = tempfile.mkdtemp(prefix='collectstatic_empty_staticdir_test')
-        with override_settings(STATIC_ROOT=static_dir):
-            call_command('collectstatic', interactive=True, stdout=stdout)
-        shutil.rmtree(static_dir)
+        with tempfile.TemporaryDirectory(prefix='collectstatic_empty_staticdir_test') as static_dir:
+            with override_settings(STATIC_ROOT=static_dir):
+                call_command('collectstatic', interactive=True, stdout=stdout)
         output = stdout.getvalue()
         self.assertNotIn(self.overwrite_warning_msg, output)
         self.assertNotIn(self.delete_warning_msg, output)
@@ -234,8 +233,7 @@ class TestCollectionExcludeNoDefaultIgnore(TestDefaults, CollectionTestCase):
     ``collectstatic`` management command.
     """
     def run_collectstatic(self):
-        super(TestCollectionExcludeNoDefaultIgnore, self).run_collectstatic(
-            use_default_ignore_patterns=False)
+        super().run_collectstatic(use_default_ignore_patterns=False)
 
     def test_no_common_ignore_patterns(self):
         """
@@ -266,7 +264,7 @@ class TestCollectionDryRun(TestNoFilesCreated, CollectionTestCase):
     Test ``--dry-run`` option for ``collectstatic`` management command.
     """
     def run_collectstatic(self):
-        super(TestCollectionDryRun, self).run_collectstatic(dry_run=True)
+        super().run_collectstatic(dry_run=True)
 
 
 class TestCollectionFilesOverride(CollectionTestCase):
@@ -308,10 +306,10 @@ class TestCollectionFilesOverride(CollectionTestCase):
         with extend_sys_path(self.temp_dir):
             self.settings_with_test_app.enable()
 
-        super(TestCollectionFilesOverride, self).setUp()
+        super().setUp()
 
     def tearDown(self):
-        super(TestCollectionFilesOverride, self).tearDown()
+        super().tearDown()
         self.settings_with_test_app.disable()
 
     def test_ordering_override(self):
@@ -361,24 +359,22 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
         """
         There is a warning when there are duplicate destinations.
         """
-        static_dir = tempfile.mkdtemp()
-        self.addCleanup(shutil.rmtree, static_dir)
+        with tempfile.TemporaryDirectory() as static_dir:
+            duplicate = os.path.join(static_dir, 'test', 'file.txt')
+            os.mkdir(os.path.dirname(duplicate))
+            with open(duplicate, 'w+') as f:
+                f.write('duplicate of file.txt')
 
-        duplicate = os.path.join(static_dir, 'test', 'file.txt')
-        os.mkdir(os.path.dirname(duplicate))
-        with open(duplicate, 'w+') as f:
-            f.write('duplicate of file.txt')
+            with self.settings(STATICFILES_DIRS=[static_dir]):
+                output = self._collectstatic_output(clear=True)
+            self.assertIn(self.warning_string, output)
 
-        with self.settings(STATICFILES_DIRS=[static_dir]):
-            output = self._collectstatic_output(clear=True)
-        self.assertIn(self.warning_string, output)
+            os.remove(duplicate)
 
-        os.remove(duplicate)
-
-        # Make sure the warning went away again.
-        with self.settings(STATICFILES_DIRS=[static_dir]):
-            output = self._collectstatic_output(clear=True)
-        self.assertNotIn(self.warning_string, output)
+            # Make sure the warning went away again.
+            with self.settings(STATICFILES_DIRS=[static_dir]):
+                output = self._collectstatic_output(clear=True)
+            self.assertNotIn(self.warning_string, output)
 
 
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.DummyStorage')
@@ -422,7 +418,7 @@ class TestCollectionLinks(TestDefaults, CollectionTestCase):
     ``--link`` does not change the file-selection semantics.
     """
     def run_collectstatic(self, clear=False, link=True, **kwargs):
-        super(TestCollectionLinks, self).run_collectstatic(link=link, clear=clear, **kwargs)
+        super().run_collectstatic(link=link, clear=clear, **kwargs)
 
     def test_links_created(self):
         """

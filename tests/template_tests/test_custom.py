@@ -31,7 +31,7 @@ class TagTestCase(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         cls.engine = Engine(app_dirs=True, libraries=LIBRARIES)
-        super(TagTestCase, cls).setUpClass()
+        super().setUpClass()
 
     def verify_tag(self, tag, name):
         self.assertEqual(tag.__name__, name)
@@ -307,7 +307,7 @@ class TemplateTagLoadingTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         cls.egg_dir = os.path.join(ROOT, 'eggs')
-        super(TemplateTagLoadingTests, cls).setUpClass()
+        super().setUpClass()
 
     def test_load_error(self):
         msg = (

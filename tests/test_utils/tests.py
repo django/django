@@ -799,7 +799,7 @@ class SkippingExtraTests(TestCase):
     def __call__(self, result=None):
         # Detect fixture loading by counting SQL queries, should be zero
         with self.assertNumQueries(0):
-            super(SkippingExtraTests, self).__call__(result)
+            super().__call__(result)
 
     @unittest.skip("Fixture loading should not be performed for skipped tests.")
     def test_fixtures_are_skipped(self):
@@ -1017,7 +1017,7 @@ class TestBadSetUpTestData(TestCase):
     @classmethod
     def setUpClass(cls):
         try:
-            super(TestBadSetUpTestData, cls).setUpClass()
+            super().setUpClass()
         except cls.MyException:
             cls._in_atomic_block = connection.in_atomic_block
 

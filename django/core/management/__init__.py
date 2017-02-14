@@ -131,9 +131,6 @@ def call_command(command_name, *args, **options):
 class ManagementUtility:
     """
     Encapsulates the logic of the django-admin and manage.py utilities.
-
-    A ManagementUtility has a number of commands, which can be manipulated
-    by editing the self.commands dictionary.
     """
     def __init__(self, argv=None):
         self.argv = argv or sys.argv[:]

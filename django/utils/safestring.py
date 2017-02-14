@@ -5,13 +5,13 @@ that the producer of the string has already turned characters that should not
 be interpreted by the HTML engine (e.g. '<') into the appropriate entities.
 """
 
-from django.utils.functional import Promise, curry, wraps
+from django.utils.functional import Promise, wraps
 
 
 class SafeData:
     def __html__(self):
         """
-        Returns the html representation of a string for interoperability.
+        Return the html representation of a string for interoperability.
 
         This allows other template engines to understand Django's SafeData.
         """
@@ -22,33 +22,21 @@ class SafeBytes(bytes, SafeData):
     """
     A bytes subclass that has been specifically marked as "safe" (requires no
     further escaping) for HTML output purposes.
+
+    Kept in Django 2.0 for usage by apps supporting Python 2. Shouldn't be used
+    in Django anymore.
     """
     def __add__(self, rhs):
         """
         Concatenating a safe byte string with another safe byte string or safe
-        unicode string is safe. Otherwise, the result is no longer safe.
+        string is safe. Otherwise, the result is no longer safe.
         """
-        t = super(SafeBytes, self).__add__(rhs)
+        t = super().__add__(rhs)
         if isinstance(rhs, SafeText):
             return SafeText(t)
         elif isinstance(rhs, SafeBytes):
             return SafeBytes(t)
         return t
-
-    def _proxy_method(self, *args, **kwargs):
-        """
-        Wrap a call to a normal unicode method up so that we return safe
-        results. The method that is being wrapped is passed in the 'method'
-        argument.
-        """
-        method = kwargs.pop('method')
-        data = method(self, *args, **kwargs)
-        if isinstance(data, bytes):
-            return SafeBytes(data)
-        else:
-            return SafeText(data)
-
-    decode = curry(_proxy_method, method=bytes.decode)
 
 
 class SafeText(str, SafeData):
@@ -58,28 +46,16 @@ class SafeText(str, SafeData):
     """
     def __add__(self, rhs):
         """
-        Concatenating a safe unicode string with another safe byte string or
-        safe unicode string is safe. Otherwise, the result is no longer safe.
+        Concatenating a safe string with another safe byte string or
+        safe string is safe. Otherwise, the result is no longer safe.
         """
-        t = super(SafeText, self).__add__(rhs)
+        t = super().__add__(rhs)
         if isinstance(rhs, SafeData):
             return SafeText(t)
         return t
 
-    def _proxy_method(self, *args, **kwargs):
-        """
-        Wrap a call to a normal unicode method up so that we return safe
-        results. The method that is being wrapped is passed in the 'method'
-        argument.
-        """
-        method = kwargs.pop('method')
-        data = method(self, *args, **kwargs)
-        if isinstance(data, bytes):
-            return SafeBytes(data)
-        else:
-            return SafeText(data)
-
-    encode = curry(_proxy_method, method=str.encode)
+    def __str__(self):
+        return self
 
 
 SafeString = SafeText
@@ -103,10 +79,8 @@ def mark_safe(s):
     """
     if hasattr(s, '__html__'):
         return s
-    if isinstance(s, bytes) or (isinstance(s, Promise) and s._delegate_bytes):
-        return SafeBytes(s)
     if isinstance(s, (str, Promise)):
         return SafeText(s)
     if callable(s):
         return _safety_decorator(mark_safe, s)
-    return SafeString(str(s))
+    return SafeText(str(s))

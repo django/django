@@ -13,7 +13,7 @@ from django.template.defaultfilters import capfirst, linebreaksbr
 from django.utils.encoding import force_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 ACTION_CHECKBOX_NAME = '_selected_action'
 
@@ -290,10 +290,10 @@ class InlineAdminFormSet:
             'name': '#%s' % self.formset.prefix,
             'options': {
                 'prefix': self.formset.prefix,
-                'addText': ugettext('Add another %(verbose_name)s') % {
+                'addText': gettext('Add another %(verbose_name)s') % {
                     'verbose_name': capfirst(verbose_name),
                 },
-                'deleteText': ugettext('Remove'),
+                'deleteText': gettext('Remove'),
             }
         })
 
@@ -324,7 +324,7 @@ class InlineAdminForm(AdminForm):
         self.original = original
         self.show_url = original and view_on_site_url is not None
         self.absolute_url = view_on_site_url
-        super(InlineAdminForm, self).__init__(form, fieldsets, prepopulated_fields, readonly_fields, model_admin)
+        super().__init__(form, fieldsets, prepopulated_fields, readonly_fields, model_admin)
 
     def __iter__(self):
         for name, options in self.fieldsets:
@@ -366,7 +366,7 @@ class InlineAdminForm(AdminForm):
 class InlineFieldset(Fieldset):
     def __init__(self, formset, *args, **kwargs):
         self.formset = formset
-        super(InlineFieldset, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __iter__(self):
         fk = getattr(self.formset, "fk", None)
@@ -377,11 +377,9 @@ class InlineFieldset(Fieldset):
 
 
 class AdminErrorList(forms.utils.ErrorList):
-    """
-    Stores all errors for the form/formsets in an add/change stage view.
-    """
+    """Store errors for the form/formsets in an add/change view."""
     def __init__(self, form, inline_formsets):
-        super(AdminErrorList, self).__init__()
+        super().__init__()
 
         if form.is_bound:
             self.extend(form.errors.values())

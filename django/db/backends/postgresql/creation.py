@@ -41,7 +41,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         with self._nodb_connection.cursor() as cursor:
             try:
                 cursor.execute(creation_sql)
-            except Exception as e:
+            except Exception:
                 if keepdb:
                     return
                 try:

@@ -72,7 +72,9 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new ``distinct`` argument for
+  :class:`~django.contrib.postgres.aggregates.ArrayAgg` determines if
+  concatenated values will be distinct.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -134,11 +136,14 @@ File Uploads
 
 * ...
 
-
 Forms
 ~~~~~
 
-* ...
+* The new ``date_attrs`` and ``time_attrs`` arguments for
+  :class:`~django.forms.SplitDateTimeWidget` and
+  :class:`~django.forms.SplitHiddenDateTimeWidget` allow specifying different
+  HTML attributes for the ``DateInput`` and ``TimeInput`` (or hidden)
+  subwidgets.
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -188,7 +193,7 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* Added threading support to :class:`~django.test.LiveServerTestCase`.
 
 URLs
 ~~~~
@@ -205,10 +210,66 @@ Validators
 Backwards incompatible changes in 2.0
 =====================================
 
+Removed support for bytestrings in some places
+----------------------------------------------
+
+To support native Python 2 strings, older Django versions had to accept both
+bytestrings and unicode strings. Now that Python 2 support is dropped,
+bytestrings should only be encountered around input/output boundaries (handling
+of binary fields or HTTP streams, for example). You might have to update your
+code to limit bytestring usage to a minimum, as Django no longer accepts
+bytestrings in certain code paths.
+
 Database backend API
 --------------------
 
-* ...
+* The ``DatabaseOperations.datetime_cast_date_sql()``,
+  ``datetime_cast_time_sql()``, ``datetime_trunc_sql()``, and
+  ``datetime_extract_sql()`` methods now return only the SQL to perform the
+  operation instead of SQL and a list of parameters.
+
+Dropped support for Oracle 11.2
+-------------------------------
+
+The end of upstream support for Oracle 11.2 is Dec. 2020. Django 1.11 will be
+supported until April 2020 which almost reaches this date. Django 2.0
+officially supports Oracle 12.1+.
+
+Default MySQL isolation level is read committed
+-----------------------------------------------
+
+MySQL's default isolation level, repeatable read, may cause data loss in
+typical Django usage. To prevent that and for consistency with other databases,
+the default isolation level is now read committed. You can use the
+:setting:`DATABASES` setting to :ref:`use a different isolation level
+<mysql-isolation-level>`, if needed.
+
+:attr:`AbstractUser.last_name <django.contrib.auth.models.User.last_name>` ``max_length`` increased to 150
+----------------------------------------------------------------------------------------------------------
+
+A migration for :attr:`django.contrib.auth.models.User.last_name` is included.
+If you have a custom user model inheriting from ``AbstractUser``, you'll need
+to generate and apply a database migration for your user model.
+
+If you want to preserve the 30 character limit for last names, use a custom
+form::
+
+    from django.contrib.auth.forms import UserChangeForm
+
+    class MyUserChangeForm(UserChangeForm):
+        last_name = forms.CharField(max_length=30, required=False)
+
+If you wish to keep this restriction in the admin when editing users, set
+``UserAdmin.form`` to use this form::
+
+    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.models import User
+
+    class MyUserAdmin(UserAdmin):
+        form = MyUserChangeForm
+
+    admin.site.unregister(User)
+    admin.site.register(User, MyUserAdmin)
 
 Miscellaneous
 -------------
@@ -216,6 +277,10 @@ Miscellaneous
 * The ``SessionAuthenticationMiddleware`` class is removed. It provided no
   functionality since session authentication is unconditionally enabled in
   Django 1.10.
+
+* The default HTTP error handlers (``handler404``, etc.) are now callables
+  instead of dotted Python path strings. Django favors callable references
+  since they provide better performance and debugging experience.
 
 .. _deprecated-features-2.0:
 
@@ -225,7 +290,16 @@ Features deprecated in 2.0
 Miscellaneous
 -------------
 
-* ...
+* The ``django.db.backends.postgresql_psycopg2`` module is deprecated in favor
+  of ``django.db.backends.postgresql``. It's been an alias since Django 1.9.
+  This only affects code that imports from the module directly. The
+  ``DATABASES`` setting can still use
+  ``'django.db.backends.postgresql_psycopg2'``, though you can simplify that by
+  using the ``'django.db.backends.postgresql'`` name added in Django 1.9.
+
+* ``django.shortcuts.render_to_response()`` is deprecated in favor of
+  :func:`django.shortcuts.render`. ``render()`` takes the same arguments
+  except that is also requires a ``request``.
 
 .. _removed-features-2.0:
 
@@ -363,7 +437,7 @@ these features.
   ``_apply_rel_filters()`` method is removed.
 
 * Using ``User.is_authenticated()`` and ``User.is_anonymous()`` as methods
-  rather than properties is no longer be supported.
+  rather than properties is no longer supported.
 
 * The  ``Model._meta.virtual_fields`` attribute is removed.
 

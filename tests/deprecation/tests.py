@@ -85,7 +85,7 @@ class RenameMethodsTests(SimpleTestCase):
 
             class Deprecated(Renamed):
                 def old(self):
-                    super(Deprecated, self).old()
+                    super().old()
             warnings.simplefilter('always')
             deprecated = Deprecated()
             deprecated.new()
@@ -115,7 +115,7 @@ class RenameMethodsTests(SimpleTestCase):
 
             class Renamed(Deprecated):
                 def new(self):
-                    super(Renamed, self).new()
+                    super().new()
             warnings.simplefilter('always')
             renamed = Renamed()
             renamed.new()
@@ -140,11 +140,11 @@ class RenameMethodsTests(SimpleTestCase):
 
             class RenamedMixin:
                 def new(self):
-                    super(RenamedMixin, self).new()
+                    super().new()
 
             class DeprecatedMixin:
                 def old(self):
-                    super(DeprecatedMixin, self).old()
+                    super().old()
 
             class Deprecated(DeprecatedMixin, RenamedMixin, Renamed):
                 pass

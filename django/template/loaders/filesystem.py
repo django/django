@@ -2,8 +2,6 @@
 Wrapper for loading templates from the filesystem.
 """
 
-import errno
-
 from django.core.exceptions import SuspiciousFileOperation
 from django.template import Origin, TemplateDoesNotExist
 from django.utils._os import safe_join
@@ -14,7 +12,7 @@ from .base import Loader as BaseLoader
 class Loader(BaseLoader):
 
     def __init__(self, engine, dirs=None):
-        super(Loader, self).__init__(engine)
+        super().__init__(engine)
         self.dirs = dirs
 
     def get_dirs(self):
@@ -24,10 +22,8 @@ class Loader(BaseLoader):
         try:
             with open(origin.name, encoding=self.engine.file_charset) as fp:
                 return fp.read()
-        except IOError as e:
-            if e.errno == errno.ENOENT:
-                raise TemplateDoesNotExist(origin)
-            raise
+        except FileNotFoundError:
+            raise TemplateDoesNotExist(origin)
 
     def get_template_sources(self, template_name):
         """

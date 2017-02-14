@@ -144,7 +144,7 @@ class SerializersTestBase:
             if isinstance(stream, StringIO):
                 self.assertEqual(string_data, stream.getvalue())
             else:
-                self.assertEqual(string_data, stream.content.decode('utf-8'))
+                self.assertEqual(string_data, stream.content.decode())
 
     def test_serialize_specific_fields(self):
         obj = ComplexModel(field1='first', field2='second', field3='third')

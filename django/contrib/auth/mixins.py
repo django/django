@@ -46,20 +46,15 @@ class AccessMixin:
 
 
 class LoginRequiredMixin(AccessMixin):
-    """
-    CBV mixin which verifies that the current user is authenticated.
-    """
+    """Verify that the current user is authenticated."""
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
-        return super(LoginRequiredMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class PermissionRequiredMixin(AccessMixin):
-    """
-    CBV mixin which verifies that the current user has all specified
-    permissions.
-    """
+    """Verify that the current user has all specified permissions."""
     permission_required = None
 
     def get_permission_required(self):
@@ -88,13 +83,13 @@ class PermissionRequiredMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         if not self.has_permission():
             return self.handle_no_permission()
-        return super(PermissionRequiredMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class UserPassesTestMixin(AccessMixin):
     """
-    CBV Mixin that allows you to define a test function which must return True
-    if the current user can access the view.
+    Deny a request with a permission error if the test_func() method returns
+    False.
     """
 
     def test_func(self):
@@ -112,4 +107,4 @@ class UserPassesTestMixin(AccessMixin):
         user_test_result = self.get_test_func()()
         if not user_test_result:
             return self.handle_no_permission()
-        return super(UserPassesTestMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)

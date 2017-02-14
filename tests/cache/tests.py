@@ -83,7 +83,7 @@ class DummyCacheTests(SimpleTestCase):
         self.assertIsNone(cache.get("addkey1"))
 
     def test_non_existent(self):
-        "Non-existent keys aren't found in the dummy cache backend"
+        "Nonexistent keys aren't found in the dummy cache backend"
         self.assertIsNone(cache.get("does_not_exist"))
         self.assertEqual(cache.get("does_not_exist", "bang!"), "bang!")
 
@@ -280,8 +280,7 @@ class BaseCacheTests:
         self.assertEqual(caches['prefix'].get('somekey'), 'value2')
 
     def test_non_existent(self):
-        # Non-existent cache keys return as None/default
-        # get with non-existent keys
+        """Nonexistent cache keys return as None/default."""
         self.assertIsNone(cache.get("does_not_exist"))
         self.assertEqual(cache.get("does_not_exist", "bang!"), "bang!")
 
@@ -887,13 +886,13 @@ class BaseCacheTests:
 
         get_cache_data = fetch_middleware.process_request(request)
         self.assertIsNotNone(get_cache_data)
-        self.assertEqual(get_cache_data.content, content.encode('utf-8'))
+        self.assertEqual(get_cache_data.content, content.encode())
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
         update_middleware.process_response(request, get_cache_data)
         get_cache_data = fetch_middleware.process_request(request)
         self.assertIsNotNone(get_cache_data)
-        self.assertEqual(get_cache_data.content, content.encode('utf-8'))
+        self.assertEqual(get_cache_data.content, content.encode())
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
     def test_add_fail_on_pickleerror(self):
@@ -949,12 +948,12 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
 
     def setUp(self):
         # The super calls needs to happen first for the settings override.
-        super(DBCacheTests, self).setUp()
+        super().setUp()
         self.create_table()
 
     def tearDown(self):
         # The super call needs to happen first because it uses the database.
-        super(DBCacheTests, self).tearDown()
+        super().tearDown()
         self.drop_table()
 
     def create_table(self):
@@ -1074,7 +1073,7 @@ class PicklingSideEffect:
 class LocMemCacheTests(BaseCacheTests, TestCase):
 
     def setUp(self):
-        super(LocMemCacheTests, self).setUp()
+        super().setUp()
 
         # LocMem requires a hack to make the other caches
         # share a data store with the 'normal' cache.
@@ -1321,7 +1320,7 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
     """
 
     def setUp(self):
-        super(FileBasedCacheTests, self).setUp()
+        super().setUp()
         self.dirname = tempfile.mkdtemp()
         # Caches location cannot be modified through override_settings / modify_settings,
         # hence settings are manipulated directly here and the setting_changed signal
@@ -1331,7 +1330,7 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         setting_changed.send(self.__class__, setting='CACHES', enter=False)
 
     def tearDown(self):
-        super(FileBasedCacheTests, self).tearDown()
+        super().tearDown()
         # Call parent first, as cache.clear() may recreate cache base directory
         shutil.rmtree(self.dirname)
 
@@ -1360,7 +1359,7 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         # Returns the default instead of erroring.
         self.assertEqual(cache.get('foo', 'baz'), 'baz')
 
-    def test_get_does_not_ignore_non_enoent_errno_values(self):
+    def test_get_does_not_ignore_non_filenotfound_exceptions(self):
         with mock.patch('builtins.open', side_effect=IOError):
             with self.assertRaises(IOError):
                 cache.get('foo')
@@ -1912,10 +1911,6 @@ class CacheI18nTest(TestCase):
         get_cache_data = FetchFromCacheMiddleware().process_request(request)
         self.assertIsNone(get_cache_data)
 
-        # This test passes on Python < 3.3 even without the corresponding code
-        # in UpdateCacheMiddleware, because pickling a StreamingHttpResponse
-        # fails (http://bugs.python.org/issue14288). LocMemCache silently
-        # swallows the exception and doesn't store the response in cache.
         content = ['Check for cache with streaming content.']
         response = StreamingHttpResponse(content)
         UpdateCacheMiddleware().process_response(request, response)
@@ -1962,7 +1957,7 @@ def csrf_view(request):
 class CacheMiddlewareTest(SimpleTestCase):
 
     def setUp(self):
-        super(CacheMiddlewareTest, self).setUp()
+        super().setUp()
         self.factory = RequestFactory()
         self.default_cache = caches['default']
         self.other_cache = caches['other']
@@ -1970,7 +1965,7 @@ class CacheMiddlewareTest(SimpleTestCase):
     def tearDown(self):
         self.default_cache.clear()
         self.other_cache.clear()
-        super(CacheMiddlewareTest, self).tearDown()
+        super().tearDown()
 
     def test_constructor(self):
         """

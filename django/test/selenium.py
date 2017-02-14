@@ -18,7 +18,7 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
         Dynamically create new classes and add them to the test module when
         multiple browsers specs are provided (e.g. --selenium=firefox,chrome).
         """
-        test_class = super(SeleniumTestCaseBase, cls).__new__(cls, name, bases, attrs)
+        test_class = super().__new__(cls, name, bases, attrs)
         # If the test class is either browser-specific or a test base, return it.
         if test_class.browser or not any(name.startswith('test') and callable(value) for name, value in attrs.items()):
             return test_class
@@ -60,7 +60,7 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
     def setUpClass(cls):
         cls.selenium = cls.create_webdriver()
         cls.selenium.implicitly_wait(cls.implicit_wait)
-        super(SeleniumTestCase, cls).setUpClass()
+        super().setUpClass()
 
     @classmethod
     def _tearDownClassInternal(cls):
@@ -69,7 +69,7 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
         # kept a connection alive.
         if hasattr(cls, 'selenium'):
             cls.selenium.quit()
-        super(SeleniumTestCase, cls)._tearDownClassInternal()
+        super()._tearDownClassInternal()
 
     @contextmanager
     def disable_implicit_wait(self):

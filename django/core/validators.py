@@ -1,3 +1,4 @@
+import ipaddress
 import os
 import re
 from urllib.parse import urlsplit, urlunsplit
@@ -7,7 +8,7 @@ from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_text
 from django.utils.functional import SimpleLazyObject
 from django.utils.ipv6 import is_valid_ipv6_address
-from django.utils.translation import ugettext_lazy as _, ungettext_lazy
+from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, '', [], (), {})
@@ -71,7 +72,7 @@ class RegexValidator:
 
 @deconstructible
 class URLValidator(RegexValidator):
-    ul = '\u00a1-\uffff'  # unicode letters range (must be a unicode string, not a raw string)
+    ul = '\u00a1-\uffff'  # unicode letters range (must not be a raw string)
 
     # IP patterns
     ipv4_re = r'(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}'
@@ -102,7 +103,7 @@ class URLValidator(RegexValidator):
     schemes = ['http', 'https', 'ftp', 'ftps']
 
     def __init__(self, schemes=None, **kwargs):
-        super(URLValidator, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         if schemes is not None:
             self.schemes = schemes
 
@@ -115,7 +116,7 @@ class URLValidator(RegexValidator):
 
         # Then check full URL
         try:
-            super(URLValidator, self).__call__(value)
+            super().__call__(value)
         except ValidationError as e:
             # Trivial case failed. Try for possible IDN domain
             if value:
@@ -128,7 +129,7 @@ class URLValidator(RegexValidator):
                 except UnicodeError:  # invalid domain part
                     raise e
                 url = urlunsplit((scheme, netloc, path, query, fragment))
-                super(URLValidator, self).__call__(url)
+                super().__call__(url)
             else:
                 raise
         else:
@@ -140,7 +141,6 @@ class URLValidator(RegexValidator):
                     validate_ipv6_address(potential_ip)
                 except ValidationError:
                     raise ValidationError(self.message, code=self.code)
-            url = value
 
         # The maximum length of a full host name is 253 characters per RFC 1034
         # section 3.1. It's defined to be 255 bytes or less, but this includes
@@ -248,8 +248,12 @@ validate_unicode_slug = RegexValidator(
     'invalid'
 )
 
-ipv4_re = _lazy_re_compile(r'^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9])){3}\Z')
-validate_ipv4_address = RegexValidator(ipv4_re, _('Enter a valid IPv4 address.'), 'invalid')
+
+def validate_ipv4_address(value):
+    try:
+        ipaddress.IPv4Address(value)
+    except ValueError:
+        raise ValidationError(_('Enter a valid IPv4 address.'), code='invalid')
 
 
 def validate_ipv6_address(value):
@@ -355,7 +359,7 @@ class MinValueValidator(BaseValidator):
 
 @deconstructible
 class MinLengthValidator(BaseValidator):
-    message = ungettext_lazy(
+    message = ngettext_lazy(
         'Ensure this value has at least %(limit_value)d character (it has %(show_value)d).',
         'Ensure this value has at least %(limit_value)d characters (it has %(show_value)d).',
         'limit_value')
@@ -370,7 +374,7 @@ class MinLengthValidator(BaseValidator):
 
 @deconstructible
 class MaxLengthValidator(BaseValidator):
-    message = ungettext_lazy(
+    message = ngettext_lazy(
         'Ensure this value has at most %(limit_value)d character (it has %(show_value)d).',
         'Ensure this value has at most %(limit_value)d characters (it has %(show_value)d).',
         'limit_value')
@@ -390,17 +394,17 @@ class DecimalValidator:
     expected, otherwise raise ValidationError.
     """
     messages = {
-        'max_digits': ungettext_lazy(
+        'max_digits': ngettext_lazy(
             'Ensure that there are no more than %(max)s digit in total.',
             'Ensure that there are no more than %(max)s digits in total.',
             'max'
         ),
-        'max_decimal_places': ungettext_lazy(
+        'max_decimal_places': ngettext_lazy(
             'Ensure that there are no more than %(max)s decimal place.',
             'Ensure that there are no more than %(max)s decimal places.',
             'max'
         ),
-        'max_whole_digits': ungettext_lazy(
+        'max_whole_digits': ngettext_lazy(
             'Ensure that there are no more than %(max)s digit before the decimal point.',
             'Ensure that there are no more than %(max)s digits before the decimal point.',
             'max'

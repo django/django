@@ -1792,6 +1792,12 @@ class SyncOnlyDefaultDatabaseRouter:
 
 class MigrateTestCase(TestCase):
 
+    # Limit memory usage when calling 'migrate'.
+    available_apps = [
+        'multiple_database',
+        'django.contrib.auth',
+        'django.contrib.contenttypes'
+    ]
     multi_db = True
 
     def test_migrate_to_other_database(self):

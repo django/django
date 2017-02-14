@@ -191,7 +191,7 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertContains(response, "The password reset link was invalid")
 
     def test_confirm_invalid_user(self):
-        # We get a 200 response for a non-existent user, not a 404
+        # We get a 200 response for a nonexistent user, not a 404
         response = self.client.get('/reset/123456/1-1/')
         self.assertContains(response, "The password reset link was invalid")
 
@@ -332,7 +332,7 @@ class UUIDUserPasswordResetTest(CustomUserPasswordResetTest):
             username='foo',
             password='foo',
         )
-        return super(UUIDUserPasswordResetTest, self)._test_confirm_start()
+        return super()._test_confirm_start()
 
 
 @ignore_warnings(category=RemovedInDjango21Warning)

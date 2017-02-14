@@ -94,14 +94,14 @@ class Feed:
 
     def feed_extra_kwargs(self, obj):
         """
-        Returns an extra keyword arguments dictionary that is used when
+        Return an extra keyword arguments dictionary that is used when
         initializing the feed generator.
         """
         return {}
 
     def item_extra_kwargs(self, item):
         """
-        Returns an extra keyword arguments dictionary that is used with
+        Return an extra keyword arguments dictionary that is used with
         the `add_item` call of the feed generator.
         """
         return {}
@@ -111,7 +111,7 @@ class Feed:
 
     def get_context_data(self, **kwargs):
         """
-        Returns a dictionary to use as extra context if either
+        Return a dictionary to use as extra context if either
         ``self.description_template`` or ``self.item_template`` are used.
 
         Default implementation preserves the old behavior
@@ -121,8 +121,8 @@ class Feed:
 
     def get_feed(self, obj, request):
         """
-        Returns a feedgenerator.DefaultFeed object, fully populated, for
-        this feed. Raises FeedDoesNotExist for invalid parameters.
+        Return a feedgenerator.DefaultFeed object, fully populated, for
+        this feed. Raise FeedDoesNotExist for invalid parameters.
         """
         current_site = get_current_site(request)
 

@@ -384,10 +384,10 @@ class MethodDecoratorTests(SimpleTestCase):
         """
         msg = (
             "The keyword argument `name` must be the name of a method of the "
-            "decorated class: <class 'Test'>. Got 'non_existing_method' instead"
+            "decorated class: <class 'Test'>. Got 'nonexistent_method' instead"
         )
         with self.assertRaisesMessage(ValueError, msg):
-            @method_decorator(lambda: None, name="non_existing_method")
+            @method_decorator(lambda: None, name='nonexistent_method')
             class Test:
                 @classmethod
                 def __module__(cls):

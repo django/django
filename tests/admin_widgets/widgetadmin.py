@@ -20,7 +20,7 @@ class CarTireAdmin(admin.ModelAdmin):
         if db_field.name == "car":
             kwargs["queryset"] = Car.objects.filter(owner=request.user)
             return db_field.formfield(**kwargs)
-        return super(CarTireAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class EventAdmin(admin.ModelAdmin):

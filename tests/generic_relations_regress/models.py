@@ -138,7 +138,7 @@ class Board(models.Model):
 
 class SpecialGenericRelation(GenericRelation):
     def __init__(self, *args, **kwargs):
-        super(SpecialGenericRelation, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.editable = True
         self.save_form_data_calls = 0
 

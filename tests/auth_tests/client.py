@@ -34,8 +34,8 @@ class PasswordResetConfirmClient(Client):
 
     def get(self, path, *args, **kwargs):
         redirect_url = self._get_password_reset_confirm_redirect_url(path)
-        return super(PasswordResetConfirmClient, self).get(redirect_url, *args, **kwargs)
+        return super().get(redirect_url, *args, **kwargs)
 
     def post(self, path, *args, **kwargs):
         redirect_url = self._get_password_reset_confirm_redirect_url(path)
-        return super(PasswordResetConfirmClient, self).post(redirect_url, *args, **kwargs)
+        return super().post(redirect_url, *args, **kwargs)

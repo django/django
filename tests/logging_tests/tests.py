@@ -68,13 +68,13 @@ class SetupDefaultLoggingMixin:
 
     @classmethod
     def setUpClass(cls):
-        super(SetupDefaultLoggingMixin, cls).setUpClass()
+        super().setUpClass()
         cls._logging = settings.LOGGING
         logging.config.dictConfig(DEFAULT_LOGGING)
 
     @classmethod
     def tearDownClass(cls):
-        super(SetupDefaultLoggingMixin, cls).tearDownClass()
+        super().tearDownClass()
         logging.config.dictConfig(cls._logging)
 
 
@@ -447,7 +447,7 @@ args=(sys.stdout,)
 format=%(message)s
 """
         self.temp_file = NamedTemporaryFile()
-        self.temp_file.write(logging_conf.encode('utf-8'))
+        self.temp_file.write(logging_conf.encode())
         self.temp_file.flush()
         sdict = {'LOGGING_CONFIG': '"logging.config.fileConfig"',
                  'LOGGING': 'r"%s"' % self.temp_file.name}

@@ -119,8 +119,8 @@ class BaseArchive:
 
     def has_leading_dir(self, paths):
         """
-        Returns true if all the paths have the same leading path name
-        (i.e., everything is in one subdirectory in an archive)
+        Return True if all the paths have the same leading path name
+        (i.e., everything is in one subdirectory in an archive).
         """
         common_prefix = None
         for path in paths:

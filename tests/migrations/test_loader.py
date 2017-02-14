@@ -11,6 +11,7 @@ class RecorderTests(TestCase):
     """
     Tests recording migrations as applied or not.
     """
+    multi_db = True
 
     def test_apply(self):
         """
@@ -351,7 +352,7 @@ class LoaderTests(TestCase):
         loader.build_graph()
         self.assertEqual(num_nodes(), 3)
 
-        # However, starting at 3 or 4 we'd need to use non-existing migrations
+        # However, starting at 3 or 4, nonexistent migrations would be needed.
         msg = ("Migration migrations.6_auto depends on nonexistent node ('migrations', '5_auto'). "
                "Django tried to replace migration migrations.5_auto with any of "
                "[migrations.3_squashed_5] but wasn't able to because some of the replaced "

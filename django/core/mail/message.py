@@ -123,7 +123,7 @@ def sanitize_address(addr, encoding):
     return str(address)
 
 
-class MIMEMixin():
+class MIMEMixin:
     def as_string(self, unixfrom=False, linesep='\n'):
         """Return the entire formatted message as a string.
         Optional `unixfrom' when True, means include the Unix From_ envelope
@@ -172,7 +172,7 @@ class SafeMIMEText(MIMEMixin, MIMEText):
     def set_payload(self, payload, charset=None):
         if charset == 'utf-8':
             has_long_lines = any(
-                len(l.encode('utf-8')) > RFC5322_EMAIL_LINE_LENGTH_LIMIT
+                len(l.encode()) > RFC5322_EMAIL_LINE_LENGTH_LIMIT
                 for l in payload.splitlines()
             )
             # Quoted-Printable encoding has the side effect of shortening long
@@ -207,8 +207,8 @@ class EmailMessage:
         Initialize a single email message (which can be sent to multiple
         recipients).
 
-        All strings used to create the message can be unicode strings
-        (or UTF-8 bytestrings). The SafeMIMEText class will handle any
+        All string arguments used to create the message can be strings
+        or UTF-8 bytestrings. The SafeMIMEText class will handle any
         necessary encoding conversions.
         """
         if to:
@@ -322,10 +322,10 @@ class EmailMessage:
             if basetype == 'text':
                 if isinstance(content, bytes):
                     try:
-                        content = content.decode('utf-8')
+                        content = content.decode()
                     except UnicodeDecodeError:
-                        # If mimetype suggests the file is text but it's actually
-                        # binary, read() will raise a UnicodeDecodeError on Python 3.
+                        # If mimetype suggests the file is text but it's
+                        # actually binary, read() raises a UnicodeDecodeError.
                         mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
 
             self.attachments.append((filename, content, mimetype))
@@ -425,11 +425,11 @@ class EmailMultiAlternatives(EmailMessage):
         Initialize a single email message (which can be sent to multiple
         recipients).
 
-        All strings used to create the message can be unicode strings (or UTF-8
-        bytestrings). The SafeMIMEText class will handle any necessary encoding
+        All string arguments used to create the message can be strings or UTF-8
+        bytestrings. The SafeMIMEText class will handle any necessary encoding
         conversions.
         """
-        super(EmailMultiAlternatives, self).__init__(
+        super().__init__(
             subject, body, from_email, to, bcc, connection, attachments,
             headers, cc, reply_to,
         )

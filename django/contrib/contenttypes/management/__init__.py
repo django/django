@@ -8,7 +8,7 @@ class RenameContentType(migrations.RunPython):
         self.app_label = app_label
         self.old_model = old_model
         self.new_model = new_model
-        super(RenameContentType, self).__init__(self.rename_forward, self.rename_backward)
+        super().__init__(self.rename_forward, self.rename_backward)
 
     def _rename(self, apps, schema_editor, old_model, new_model):
         ContentType = apps.get_model('contenttypes', 'ContentType')
@@ -103,7 +103,7 @@ def get_contenttypes_and_models(app_config, using, ContentType):
 
 def create_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, apps=global_apps, **kwargs):
     """
-    Creates content types for models in the given app.
+    Create content types for models in the given app.
     """
     if not app_config.models_module:
         return

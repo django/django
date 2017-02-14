@@ -277,7 +277,7 @@ class ModifyingSaveData(models.Model):
         (#4459).
         """
         self.data = 666
-        super(ModifyingSaveData, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 # Tests for serialization of models using inheritance.
 # Regression for #7202, #7350

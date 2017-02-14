@@ -161,7 +161,7 @@ class IfChangedTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         cls.engine = Engine()
-        super(IfChangedTests, cls).setUpClass()
+        super().setUpClass()
 
     def test_ifchanged_concurrency(self):
         """

@@ -8,7 +8,6 @@ from itertools import cycle as itertools_cycle, groupby
 
 from django.conf import settings
 from django.utils import timezone
-from django.utils.encoding import force_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
 from django.utils.safestring import mark_safe
@@ -96,9 +95,9 @@ class CycleNode(Node):
 class DebugNode(Node):
     def render(self, context):
         from pprint import pformat
-        output = [force_text(pformat(val)) for val in context]
+        output = [pformat(val) for val in context]
         output.append('\n\n')
-        output.append(force_text(pformat(sys.modules)))
+        output.append(pformat(sys.modules))
         return ''.join(output)
 
 
@@ -220,7 +219,7 @@ class ForNode(Node):
                     # don't want to leave any vars from the previous loop on the
                     # context.
                     context.pop()
-        return mark_safe(''.join(force_text(n) for n in nodelist))
+        return mark_safe(''.join(nodelist))
 
 
 class IfChangedNode(Node):
@@ -278,7 +277,7 @@ class IfEqualNode(Node):
         self.negate = negate
 
     def __repr__(self):
-        return "<IfEqualNode>"
+        return '<%s>' % self.__class__.__name__
 
     def render(self, context):
         val1 = self.var1.resolve(context, True)
@@ -294,7 +293,7 @@ class IfNode(Node):
         self.conditions_nodelists = conditions_nodelists
 
     def __repr__(self):
-        return "<IfNode>"
+        return '<%s>' % self.__class__.__name__
 
     def __iter__(self):
         for _, nodelist in self.conditions_nodelists:
@@ -437,10 +436,7 @@ class URLNode(Node):
     def render(self, context):
         from django.urls import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
-        kwargs = {
-            force_text(k, 'ascii'): v.resolve(context)
-            for k, v in self.kwargs.items()
-        }
+        kwargs = {k: v.resolve(context) for k, v in self.kwargs.items()}
         view_name = self.view_name.resolve(context)
         try:
             current_app = context.request.current_app
@@ -518,7 +514,7 @@ class WithNode(Node):
             self.extra_context[name] = var
 
     def __repr__(self):
-        return "<WithNode>"
+        return '<%s>' % self.__class__.__name__
 
     def render(self, context):
         values = {key: val.resolve(context) for key, val in self.extra_context.items()}
@@ -894,7 +890,7 @@ class TemplateIfParser(IfParser):
 
     def __init__(self, parser, *args, **kwargs):
         self.template_parser = parser
-        super(TemplateIfParser, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def create_var(self, value):
         return TemplateLiteral(self.template_parser.compile_filter(value), value)

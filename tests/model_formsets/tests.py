@@ -454,7 +454,7 @@ class ModelFormsetTest(TestCase):
         class PoetForm(forms.ModelForm):
             def save(self, commit=True):
                 # change the name to "Vladimir Mayakovsky" just to be a jerk.
-                author = super(PoetForm, self).save(commit=False)
+                author = super().save(commit=False)
                 author.name = "Vladimir Mayakovsky"
                 if commit:
                     author.save()
@@ -513,7 +513,7 @@ class ModelFormsetTest(TestCase):
 
         class BaseAuthorFormSet(BaseModelFormSet):
             def __init__(self, *args, **kwargs):
-                super(BaseAuthorFormSet, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
                 self.queryset = Author.objects.filter(name__startswith='Charles')
 
         AuthorFormSet = modelformset_factory(Author, fields='__all__', formset=BaseAuthorFormSet)
@@ -864,7 +864,7 @@ class ModelFormsetTest(TestCase):
         class PoemForm(forms.ModelForm):
             def save(self, commit=True):
                 # change the name to "Brooklyn Bridge" just to be a jerk.
-                poem = super(PoemForm, self).save(commit=False)
+                poem = super().save(commit=False)
                 poem.name = "Brooklyn Bridge"
                 if commit:
                     poem.save()
@@ -995,7 +995,7 @@ class ModelFormsetTest(TestCase):
         """
         class PoemForm2(forms.ModelForm):
             def save(self, commit=True):
-                poem = super(PoemForm2, self).save(commit=False)
+                poem = super().save(commit=False)
                 poem.name = "%s by %s" % (poem.name, poem.poet.name)
                 if commit:
                     poem.save()
@@ -1413,7 +1413,7 @@ class ModelFormsetTest(TestCase):
                 fields = "__all__"
 
             def __init__(self, **kwargs):
-                super(MembershipForm, self).__init__(**kwargs)
+                super().__init__(**kwargs)
                 self.fields['date_joined'].widget = forms.SplitDateTimeWidget()
 
         FormSet = inlineformset_factory(

@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 # Minimal Django templates engine to render the error templates
 # regardless of the project's TEMPLATES setting.
@@ -246,11 +246,6 @@ class ExceptionReporter:
         self.template_does_not_exist = False
         self.postmortem = None
 
-        # Handle deprecated string exceptions
-        if isinstance(self.exc_type, str):
-            self.exc_value = Exception('Deprecated String Exception: %r' % self.exc_type)
-            self.exc_type = type(self.exc_value)
-
     def get_traceback_data(self):
         """Return a dictionary containing traceback information."""
         if self.exc_type and issubclass(self.exc_type, TemplateDoesNotExist):
@@ -263,9 +258,6 @@ class ExceptionReporter:
                 frame_vars = []
                 for k, v in frame['vars']:
                     v = pprint(v)
-                    # The force_escape filter assume unicode, make sure that works
-                    if isinstance(v, bytes):
-                        v = v.decode('utf-8', 'replace')  # don't choke on non-utf-8 input
                     # Trim large blobs of data
                     if len(v) > 4096:
                         v = '%s... <trimmed %d bytes string>' % (v[0:4096], len(v))
@@ -360,7 +352,7 @@ class ExceptionReporter:
             return None, [], None, []
 
         # If we just read the source from a file, or if the loader did not
-        # apply tokenize.detect_encoding to decode the source into a Unicode
+        # apply tokenize.detect_encoding to decode the source into a
         # string, then we should do that ourselves.
         if isinstance(source[0], bytes):
             encoding = 'ascii'
@@ -444,18 +436,6 @@ class ExceptionReporter:
                 tb = tb.tb_next
 
         return frames
-
-    def format_exception(self):
-        """
-        Return the same data as from traceback.format_exception.
-        """
-        import traceback
-        frames = self.get_traceback_frames()
-        tb = [(f['filename'], f['lineno'], f['function'], f['context_line']) for f in frames]
-        list = ['Traceback (most recent call last):\n']
-        list += traceback.format_list(tb)
-        list += traceback.format_exception_only(self.exc_type, self.exc_value)
-        return list
 
 
 def technical_404_response(request, exception):

@@ -104,20 +104,20 @@ class DataSource(GDALBase):
         return Layer(layer, self)
 
     def __len__(self):
-        "Returns the number of layers within the data source."
+        "Return the number of layers within the data source."
         return self.layer_count
 
     def __str__(self):
-        "Returns OGR GetName and Driver for the Data Source."
+        "Return OGR GetName and Driver for the Data Source."
         return '%s (%s)' % (self.name, self.driver)
 
     @property
     def layer_count(self):
-        "Returns the number of layers in the data source."
+        "Return the number of layers in the data source."
         return capi.get_layer_count(self._ptr)
 
     @property
     def name(self):
-        "Returns the name of the data source."
+        "Return the name of the data source."
         name = capi.get_ds_name(self._ptr)
         return force_text(name, self.encoding, strings_only=True)

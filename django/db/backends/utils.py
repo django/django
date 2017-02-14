@@ -74,7 +74,7 @@ class CursorDebugWrapper(CursorWrapper):
     def execute(self, sql, params=None):
         start = time()
         try:
-            return super(CursorDebugWrapper, self).execute(sql, params)
+            return super().execute(sql, params)
         finally:
             stop = time()
             duration = stop - start
@@ -91,7 +91,7 @@ class CursorDebugWrapper(CursorWrapper):
     def executemany(self, sql, param_list):
         start = time()
         try:
-            return super(CursorDebugWrapper, self).executemany(sql, param_list)
+            return super().executemany(sql, param_list)
         finally:
             stop = time()
             duration = stop - start

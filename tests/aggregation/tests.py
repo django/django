@@ -1088,7 +1088,7 @@ class AggregateTestCase(TestCase):
         class MyMax(Max):
             def as_sql(self, compiler, connection):
                 self.set_source_expressions(self.get_source_expressions()[0:1])
-                return super(MyMax, self).as_sql(compiler, connection)
+                return super().as_sql(compiler, connection)
 
         with self.assertRaisesMessage(FieldError, "Cannot compute Max('id__max'): 'id__max' is an aggregate"):
             Book.objects.annotate(Max('id')).annotate(my_max=MyMax('id__max', 'price'))
@@ -1097,7 +1097,7 @@ class AggregateTestCase(TestCase):
         class MyMax(Max):
             def as_sql(self, compiler, connection):
                 self.set_source_expressions(self.get_source_expressions()[0:1])
-                return super(MyMax, self).as_sql(compiler, connection)
+                return super().as_sql(compiler, connection)
 
         with self.assertRaisesMessage(TypeError, 'Complex aggregates require an alias'):
             Book.objects.aggregate(MyMax('pages', 'price'))
@@ -1172,7 +1172,7 @@ class AggregateTestCase(TestCase):
             function = 'GREATEST'
 
             def as_sqlite(self, compiler, connection):
-                return super(Greatest, self).as_sql(compiler, connection, function='MAX')
+                return super().as_sql(compiler, connection, function='MAX')
 
         qs = Publisher.objects.annotate(
             price_or_median=Greatest(Avg('book__rating'), Avg('book__price'))

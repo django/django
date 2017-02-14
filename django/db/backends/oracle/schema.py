@@ -33,7 +33,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def delete_model(self, model):
         # Run superclass action
-        super(DatabaseSchemaEditor, self).delete_model(model)
+        super().delete_model(model)
         # Clean up any autoincrement trigger
         self.execute("""
             DECLARE
@@ -49,7 +49,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def alter_field(self, model, old_field, new_field, strict=False):
         try:
-            super(DatabaseSchemaEditor, self).alter_field(model, old_field, new_field, strict)
+            super().alter_field(model, old_field, new_field, strict)
         except DatabaseError as e:
             description = str(e)
             # If we're changing type to an unsupported type we need a
@@ -100,7 +100,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Drop the old field
         self.remove_field(model, old_field)
         # Rename and possibly make the new field NOT NULL
-        super(DatabaseSchemaEditor, self).alter_field(model, new_temp_field, new_field)
+        super().alter_field(model, new_temp_field, new_field)
 
     def normalize_name(self, name):
         """

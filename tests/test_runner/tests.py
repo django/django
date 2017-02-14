@@ -147,7 +147,7 @@ class ManageCommandTests(unittest.TestCase):
 
     def test_bad_test_runner(self):
         with self.assertRaises(AttributeError):
-            call_command('test', 'sites', testrunner='test_runner.NonExistentRunner')
+            call_command('test', 'sites', testrunner='test_runner.NonexistentRunner')
 
 
 class CustomTestRunnerOptionsTests(AdminScriptTestCase):
@@ -202,6 +202,7 @@ class Ticket17477RegressionTests(AdminScriptTestCase):
 
 
 class Sqlite3InMemoryTestDbs(TestCase):
+    multi_db = True
 
     @unittest.skipUnless(all(db.connections[conn].vendor == 'sqlite' for conn in db.connections),
                          "This is an sqlite-specific issue")

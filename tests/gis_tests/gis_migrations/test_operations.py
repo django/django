@@ -28,7 +28,7 @@ class OperationTestCase(TransactionTestCase):
         # Delete table after testing
         if hasattr(self, 'current_state'):
             self.apply_operations('gis', self.current_state, [migrations.DeleteModel('Neighborhood')])
-        super(OperationTestCase, self).tearDown()
+        super().tearDown()
 
     @property
     def has_spatial_indexes(self):
@@ -103,7 +103,7 @@ class OperationTestCase(TransactionTestCase):
 class OperationTests(OperationTestCase):
 
     def setUp(self):
-        super(OperationTests, self).setUp()
+        super().setUp()
         self.set_up_test_model()
 
     def test_add_geom_field(self):

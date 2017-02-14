@@ -21,24 +21,24 @@ class Admin2(admin.AdminSite):
 
     # A custom index view.
     def index(self, request, extra_context=None):
-        return super(Admin2, self).index(request, {'foo': '*bar*'})
+        return super().index(request, {'foo': '*bar*'})
 
     def get_urls(self):
         return [
             url(r'^my_view/$', self.admin_view(self.my_view), name='my_view'),
-        ] + super(Admin2, self).get_urls()
+        ] + super().get_urls()
 
     def my_view(self, request):
         return HttpResponse("Django is a magical pony!")
 
     def password_change(self, request, extra_context=None):
-        return super(Admin2, self).password_change(request, {'spam': 'eggs'})
+        return super().password_change(request, {'spam': 'eggs'})
 
 
 class UserLimitedAdmin(UserAdmin):
     # used for testing password change on a user not in queryset
     def get_queryset(self, request):
-        qs = super(UserLimitedAdmin, self).get_queryset(request)
+        qs = super().get_queryset(request)
         return qs.filter(is_superuser=False)
 
 

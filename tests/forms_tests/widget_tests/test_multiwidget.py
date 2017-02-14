@@ -24,7 +24,7 @@ class ComplexMultiWidget(MultiWidget):
             SelectMultiple(choices=WidgetTest.beatles),
             SplitDateTimeWidget(),
         )
-        super(ComplexMultiWidget, self).__init__(widgets, attrs)
+        super().__init__(widgets, attrs)
 
     def decompress(self, value):
         if value:
@@ -45,9 +45,7 @@ class ComplexField(MultiValueField):
             MultipleChoiceField(choices=WidgetTest.beatles),
             SplitDateTimeField(),
         )
-        super(ComplexField, self).__init__(
-            fields, required, widget, label, initial,
-        )
+        super().__init__(fields, required, widget, label, initial)
 
     def compress(self, data_list):
         if data_list:
@@ -66,7 +64,7 @@ class DeepCopyWidget(MultiWidget):
             RadioSelect(choices=choices),
             TextInput,
         ]
-        super(DeepCopyWidget, self).__init__(widgets)
+        super().__init__(widgets)
 
     def _set_choices(self, choices):
         """

@@ -12,7 +12,7 @@ class CustomTemplateView(generic.TemplateView):
     template_name = 'generic_views/about.html'
 
     def get_context_data(self, **kwargs):
-        context = super(CustomTemplateView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update({'key': 'value'})
         return context
 
@@ -72,22 +72,14 @@ class BookList(generic.ListView):
 
 class CustomPaginator(Paginator):
     def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
-        super(CustomPaginator, self).__init__(
-            queryset,
-            page_size,
-            orphans=2,
-            allow_empty_first_page=allow_empty_first_page)
+        super().__init__(queryset, page_size, orphans=2, allow_empty_first_page=allow_empty_first_page)
 
 
 class AuthorListCustomPaginator(AuthorList):
     paginate_by = 5
 
     def get_paginator(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
-        return super(AuthorListCustomPaginator, self).get_paginator(
-            queryset,
-            page_size,
-            orphans=2,
-            allow_empty_first_page=allow_empty_first_page)
+        return super().get_paginator(queryset, page_size, orphans=2, allow_empty_first_page=allow_empty_first_page)
 
 
 class ContactView(generic.FormView):
@@ -152,7 +144,7 @@ class AuthorUpdate(generic.UpdateView):
 
     def get_form(self, *args, **kwargs):
         self.get_form_called_count += 1
-        return super(AuthorUpdate, self).get_form(*args, **kwargs)
+        return super().get_form(*args, **kwargs)
 
 
 class OneAuthorUpdate(generic.UpdateView):
@@ -231,8 +223,7 @@ class AuthorGetQuerySetFormView(generic.edit.ModelFormMixin):
 
 class BookDetailGetObjectCustomQueryset(BookDetail):
     def get_object(self, queryset=None):
-        return super(BookDetailGetObjectCustomQueryset, self).get_object(
-            queryset=Book.objects.filter(pk=self.kwargs['pk']))
+        return super().get_object(queryset=Book.objects.filter(pk=self.kwargs['pk']))
 
 
 class CustomMultipleObjectMixinView(generic.list.MultipleObjectMixin, generic.View):
@@ -255,7 +246,7 @@ class CustomContextView(generic.detail.SingleObjectMixin, generic.View):
     def get_context_data(self, **kwargs):
         context = {'custom_key': 'custom_value'}
         context.update(kwargs)
-        return super(CustomContextView, self).get_context_data(**context)
+        return super().get_context_data(**context)
 
     def get_context_object_name(self, obj):
         return "test_name"

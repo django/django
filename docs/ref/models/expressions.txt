@@ -300,7 +300,7 @@ The ``Func`` API is as follows:
                 ...
 
                 def as_mysql(self, compiler, connection):
-                    return super(ConcatPair, self).as_sql(
+                    return super().as_sql(
                         compiler, connection,
                         function='CONCAT_WS',
                         template="%(function)s('', %(expressions)s)",
@@ -388,7 +388,7 @@ SQL that is generated. Here's a brief example::
         template = '%(function)s(%(distinct)s%(expressions)s)'
 
         def __init__(self, expression, distinct=False, **extra):
-            super(Count, self).__init__(
+            super().__init__(
                 expression,
                 distinct='DISTINCT ' if distinct else '',
                 output_field=IntegerField(),
@@ -551,7 +551,7 @@ within the last day::
     ...     post=OuterRef('pk'),
     ...     created_at__gte=one_day_ago,
     ... )
-    >>> Post.objects.annotate(recent_comment=Exists(recent_comments)
+    >>> Post.objects.annotate(recent_comment=Exists(recent_comments))
 
 On PostgreSQL, the SQL looks like:
 
@@ -776,7 +776,7 @@ an ``__init__()`` method to set some attributes::
       template = 'COALESCE( %(expressions)s )'
 
       def __init__(self, expressions, output_field):
-        super(Coalesce, self).__init__(output_field=output_field)
+        super().__init__(output_field=output_field)
         if len(expressions) < 2:
             raise ValueError('expressions must have at least 2 elements')
         for expression in expressions:

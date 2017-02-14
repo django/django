@@ -8,7 +8,7 @@ class CallableVariablesTests(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.engine = Engine()
-        super(CallableVariablesTests, cls).setUpClass()
+        super().setUpClass()
 
     def test_callable(self):
 

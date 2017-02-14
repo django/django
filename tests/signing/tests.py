@@ -14,11 +14,11 @@ class TestSigner(SimpleTestCase):
         for s in (
             b'hello',
             b'3098247:529:087:',
-            '\u2019'.encode('utf-8'),
+            '\u2019'.encode(),
         ):
             self.assertEqual(
                 signer.signature(s),
-                signing.base64_hmac(signer.salt + 'signer', s, 'predictable-secret').decode()
+                signing.base64_hmac(signer.salt + 'signer', s, 'predictable-secret')
             )
             self.assertNotEqual(signer.signature(s), signer2.signature(s))
 
@@ -27,7 +27,7 @@ class TestSigner(SimpleTestCase):
         signer = signing.Signer('predictable-secret', salt='extra-salt')
         self.assertEqual(
             signer.signature('hello'),
-            signing.base64_hmac('extra-salt' + 'signer', 'hello', 'predictable-secret').decode()
+            signing.base64_hmac('extra-salt' + 'signer', 'hello', 'predictable-secret')
         )
         self.assertNotEqual(
             signing.Signer('predictable-secret', salt='one').signature('hello'),
@@ -69,7 +69,7 @@ class TestSigner(SimpleTestCase):
         "dumps and loads be reversible for any JSON serializable object"
         objects = [
             ['a', 'list'],
-            'a unicode string \u2019',
+            'a string \u2019',
             {'a': 'dictionary'},
         ]
         for o in objects:

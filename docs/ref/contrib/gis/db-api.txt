@@ -376,7 +376,7 @@ Function                              PostGIS  Oracle          MySQL        Spat
 :class:`AsGML`                        X        X                            X
 :class:`AsKML`                        X                                     X
 :class:`AsSVG`                        X                                     X
-:class:`BoundingCircle`               X        X (≥ 12.1.0.2)
+:class:`BoundingCircle`               X        X
 :class:`Centroid`                     X        X               X            X
 :class:`Difference`                   X        X               X (≥ 5.6.1)  X
 :class:`Distance`                     X        X               X (≥ 5.6.1)  X

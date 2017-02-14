@@ -22,7 +22,7 @@ class Command(BaseCommand):
     requires_migrations_checks = True
 
     def __init__(self, *args, **kwargs):
-        super(Command, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.UserModel = get_user_model()
         self.username_field = self.UserModel._meta.get_field(self.UserModel.USERNAME_FIELD)
 
@@ -56,7 +56,7 @@ class Command(BaseCommand):
 
     def execute(self, *args, **options):
         self.stdin = options.get('stdin', sys.stdin)  # Used for testing
-        return super(Command, self).execute(*args, **options)
+        return super().execute(*args, **options)
 
     def handle(self, *args, **options):
         username = options[self.UserModel.USERNAME_FIELD]

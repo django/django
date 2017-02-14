@@ -13,7 +13,7 @@ class GetAvailableLanguagesNode(Node):
         self.variable = variable
 
     def render(self, context):
-        context[self.variable] = [(k, translation.ugettext(v)) for k, v in settings.LANGUAGES]
+        context[self.variable] = [(k, translation.gettext(v)) for k, v in settings.LANGUAGES]
         return ''
 
 
@@ -142,13 +142,13 @@ class BlockTranslateNode(Node):
                 result = translation.npgettext(message_context, singular,
                                                plural, count)
             else:
-                result = translation.ungettext(singular, plural, count)
+                result = translation.ngettext(singular, plural, count)
             vars.extend(plural_vars)
         else:
             if message_context:
                 result = translation.pgettext(message_context, singular)
             else:
-                result = translation.ugettext(singular)
+                result = translation.gettext(singular)
         default_value = context.template.engine.string_if_invalid
 
         def render_value(key):
@@ -267,7 +267,7 @@ def language_name(lang_code):
 @register.filter
 def language_name_translated(lang_code):
     english_name = translation.get_language_info(lang_code)['name']
-    return translation.ugettext(english_name)
+    return translation.gettext(english_name)
 
 
 @register.filter

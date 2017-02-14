@@ -24,7 +24,7 @@ class MyAutoField(models.CharField):
 
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 10
-        super(MyAutoField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def pre_save(self, instance, add):
         value = getattr(instance, self.attname, None)

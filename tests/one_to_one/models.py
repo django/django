@@ -96,7 +96,7 @@ class ToFieldPointer(models.Model):
 # Test related objects visibility.
 class SchoolManager(models.Manager):
     def get_queryset(self):
-        return super(SchoolManager, self).get_queryset().filter(is_public=True)
+        return super().get_queryset().filter(is_public=True)
 
 
 class School(models.Model):
@@ -106,7 +106,7 @@ class School(models.Model):
 
 class DirectorManager(models.Manager):
     def get_queryset(self):
-        return super(DirectorManager, self).get_queryset().filter(is_temp=False)
+        return super().get_queryset().filter(is_temp=False)
 
 
 class Director(models.Model):

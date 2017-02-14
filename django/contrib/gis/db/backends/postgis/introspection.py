@@ -41,7 +41,7 @@ class PostGISIntrospection(DatabaseIntrospection):
 
     def get_postgis_types(self):
         """
-        Returns a dictionary with keys that are the PostgreSQL object
+        Return a dictionary with keys that are the PostgreSQL object
         identification integers for the PostGIS geometry and/or
         geography types (if supported).
         """
@@ -79,14 +79,14 @@ class PostGISIntrospection(DatabaseIntrospection):
             # performed -- in other words, when this function is called.
             self.postgis_types_reverse = self.get_postgis_types()
             self.data_types_reverse.update(self.postgis_types_reverse)
-        return super(PostGISIntrospection, self).get_field_type(data_type, description)
+        return super().get_field_type(data_type, description)
 
     def get_geometry_type(self, table_name, geo_col):
         """
         The geometry type OID used by PostGIS does not indicate the particular
         type of field that a geometry column is (e.g., whether it's a
         PointField or a PolygonField).  Thus, this routine queries the PostGIS
-        metadata tables to determine the geometry type,
+        metadata tables to determine the geometry type.
         """
         cursor = self.connection.cursor()
         try:

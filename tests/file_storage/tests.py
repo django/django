@@ -1,4 +1,3 @@
-import errno
 import os
 import shutil
 import sys
@@ -45,21 +44,21 @@ class GetStorageClassTests(SimpleTestCase):
         get_storage_class raises an error if the requested import don't exist.
         """
         with self.assertRaisesMessage(ImportError, "No module named 'storage'"):
-            get_storage_class('storage.NonExistingStorage')
+            get_storage_class('storage.NonexistentStorage')
 
-    def test_get_nonexisting_storage_class(self):
+    def test_get_nonexistent_storage_class(self):
         """
         get_storage_class raises an error if the requested class don't exist.
         """
         with self.assertRaises(ImportError):
-            get_storage_class('django.core.files.storage.NonExistingStorage')
+            get_storage_class('django.core.files.storage.NonexistentStorage')
 
-    def test_get_nonexisting_storage_module(self):
+    def test_get_nonexistent_storage_module(self):
         """
         get_storage_class raises an error if the requested module don't exist.
         """
-        with self.assertRaisesMessage(ImportError, "No module named 'django.core.files.non_existing_storage'"):
-            get_storage_class('django.core.files.non_existing_storage.NonExistingStorage')
+        with self.assertRaisesMessage(ImportError, "No module named 'django.core.files.nonexistent_storage'"):
+            get_storage_class('django.core.files.nonexistent_storage.NonexistentStorage')
 
 
 class FileSystemStorageTests(unittest.TestCase):
@@ -416,9 +415,9 @@ class FileStorageTests(SimpleTestCase):
                 real_makedirs(path)
             elif path == os.path.join(self.temp_dir, 'raced'):
                 real_makedirs(path)
-                raise OSError(errno.EEXIST, 'simulated EEXIST')
+                raise FileNotFoundError()
             elif path == os.path.join(self.temp_dir, 'error'):
-                raise OSError(errno.EACCES, 'simulated EACCES')
+                raise FileExistsError()
             else:
                 self.fail('unexpected argument %r' % path)
 
@@ -433,8 +432,8 @@ class FileStorageTests(SimpleTestCase):
             with self.storage.open('raced/test.file') as f:
                 self.assertEqual(f.read(), b'saved with race')
 
-            # OSErrors aside from EEXIST are still raised.
-            with self.assertRaises(OSError):
+            # Exceptions aside from FileNotFoundError are raised.
+            with self.assertRaises(FileExistsError):
                 self.storage.save('error/test.file', ContentFile('not saved'))
         finally:
             os.makedirs = real_makedirs
@@ -452,9 +451,9 @@ class FileStorageTests(SimpleTestCase):
                 real_remove(path)
             elif path == os.path.join(self.temp_dir, 'raced.file'):
                 real_remove(path)
-                raise OSError(errno.ENOENT, 'simulated ENOENT')
+                raise FileNotFoundError()
             elif path == os.path.join(self.temp_dir, 'error.file'):
-                raise OSError(errno.EACCES, 'simulated EACCES')
+                raise PermissionError()
             else:
                 self.fail('unexpected argument %r' % path)
 
@@ -469,9 +468,9 @@ class FileStorageTests(SimpleTestCase):
             self.storage.delete('raced.file')
             self.assertFalse(self.storage.exists('normal.file'))
 
-            # OSErrors aside from ENOENT are still raised.
+            # Exceptions aside from FileNotFoundError are raised.
             self.storage.save('error.file', ContentFile('delete with error'))
-            with self.assertRaises(OSError):
+            with self.assertRaises(PermissionError):
                 self.storage.delete('error.file')
         finally:
             os.remove = real_remove
@@ -565,7 +564,7 @@ class CustomStorageTests(FileStorageTests):
 class DiscardingFalseContentStorage(FileSystemStorage):
     def _save(self, name, content):
         if content:
-            return super(DiscardingFalseContentStorage, self)._save(name, content)
+            return super()._save(name, content)
         return ''
 
 
@@ -805,7 +804,7 @@ class FileFieldStorageTests(TestCase):
 class SlowFile(ContentFile):
     def chunks(self):
         time.sleep(1)
-        return super(ContentFile, self).chunks()
+        return super().chunks()
 
 
 class FileSaveRaceConditionTest(SimpleTestCase):

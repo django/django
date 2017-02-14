@@ -27,7 +27,7 @@ class TestHashedFiles:
 
     def setUp(self):
         self._max_post_process_passes = storage.staticfiles_storage.max_post_process_passes
-        super(TestHashedFiles, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         # Clear hashed files to avoid side effects among tests.
@@ -305,7 +305,7 @@ class TestExtraPatternsCachedStorage(CollectionTestCase):
 
     def setUp(self):
         storage.staticfiles_storage.hashed_files.clear()  # avoid cache interference
-        super(TestExtraPatternsCachedStorage, self).setUp()
+        super().setUp()
 
     def cached_file_path(self, path):
         fullpath = self.render_template(self.static_template_snippet(path))
@@ -338,7 +338,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
     Tests for the Cache busting storage
     """
     def setUp(self):
-        super(TestCollectionManifestStorage, self).setUp()
+        super().setUp()
 
         temp_dir = tempfile.mkdtemp()
         os.makedirs(os.path.join(temp_dir, 'test'))
@@ -359,7 +359,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
             os.unlink(self._clear_filename)
 
         storage.staticfiles_storage.manifest_strict = self._manifest_strict
-        super(TestCollectionManifestStorage, self).tearDown()
+        super().tearDown()
 
     def assertPostCondition(self):
         hashed_files = storage.staticfiles_storage.hashed_files
@@ -446,7 +446,7 @@ class TestCollectionSimpleCachedStorage(CollectionTestCase):
 
     def setUp(self):
         storage.staticfiles_storage.hashed_files.clear()  # avoid cache interference
-        super(TestCollectionSimpleCachedStorage, self).setUp()
+        super().setUp()
 
     def test_template_tag_return(self):
         """
@@ -474,7 +474,7 @@ class CustomStaticFilesStorage(storage.StaticFilesStorage):
     def __init__(self, *args, **kwargs):
         kwargs['file_permissions_mode'] = 0o640
         kwargs['directory_permissions_mode'] = 0o740
-        super(CustomStaticFilesStorage, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 @unittest.skipIf(sys.platform.startswith('win'), "Windows only partially supports chmod.")
@@ -489,11 +489,11 @@ class TestStaticFilePermissions(CollectionTestCase):
     def setUp(self):
         self.umask = 0o027
         self.old_umask = os.umask(self.umask)
-        super(TestStaticFilePermissions, self).setUp()
+        super().setUp()
 
     def tearDown(self):
         os.umask(self.old_umask)
-        super(TestStaticFilePermissions, self).tearDown()
+        super().tearDown()
 
     # Don't run collectstatic command in this test class.
     def run_collectstatic(self, **kwargs):
@@ -551,32 +551,46 @@ class TestCollectionHashedFilesCache(CollectionTestCase):
     hashed_file_path = hashed_file_path
 
     def setUp(self):
-        self.testimage_path = os.path.join(
-            TEST_ROOT, 'project', 'documents', 'cached', 'css', 'img', 'window.png'
-        )
-        with open(self.testimage_path, 'r+b') as f:
-            self._orig_image_content = f.read()
-        super(TestCollectionHashedFilesCache, self).setUp()
+        super().setUp()
+        self._temp_dir = temp_dir = tempfile.mkdtemp()
+        os.makedirs(os.path.join(temp_dir, 'test'))
+        self.addCleanup(shutil.rmtree, temp_dir)
 
-    def tearDown(self):
-        with open(self.testimage_path, 'w+b') as f:
-            f.write(self._orig_image_content)
-        super(TestCollectionHashedFilesCache, self).tearDown()
+    def _get_filename_path(self, filename):
+        return os.path.join(self._temp_dir, 'test', filename)
 
     def test_file_change_after_collectstatic(self):
-        finders.get_finder.cache_clear()
-        err = StringIO()
-        call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
-        with open(self.testimage_path, 'w+b') as f:
-            f.write(b"new content of png file to change it's hash")
+        # Create initial static files.
+        file_contents = (
+            ('foo.png', 'foo'),
+            ('bar.css', 'url("foo.png")\nurl("xyz.png")'),
+            ('xyz.png', 'xyz'),
+        )
+        for filename, content in file_contents:
+            with open(self._get_filename_path(filename), 'w') as f:
+                f.write(content)
 
-        # Change modification time of self.testimage_path to make sure it gets
-        # collected again.
-        mtime = os.path.getmtime(self.testimage_path)
-        atime = os.path.getatime(self.testimage_path)
-        os.utime(self.testimage_path, (mtime + 1, atime + 1))
+        with self.modify_settings(STATICFILES_DIRS={'append': self._temp_dir}):
+            finders.get_finder.cache_clear()
+            err = StringIO()
+            # First collectstatic run.
+            call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
+            relpath = self.hashed_file_path('test/bar.css')
+            with storage.staticfiles_storage.open(relpath) as relfile:
+                content = relfile.read()
+                self.assertIn(b'foo.acbd18db4cc2.png', content)
+                self.assertIn(b'xyz.d16fb36f0911.png', content)
 
-        call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
-        relpath = self.hashed_file_path('cached/css/window.css')
-        with storage.staticfiles_storage.open(relpath) as relfile:
-            self.assertIn(b'window.a836fe39729e.png', relfile.read())
+            # Change the contents of the png files.
+            for filename in ('foo.png', 'xyz.png'):
+                with open(self._get_filename_path(filename), 'w+b') as f:
+                    f.write(b"new content of file to change its hash")
+
+            # The hashes of the png files in the CSS file are updated after
+            # a second collectstatic.
+            call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
+            relpath = self.hashed_file_path('test/bar.css')
+            with storage.staticfiles_storage.open(relpath) as relfile:
+                content = relfile.read()
+                self.assertIn(b'foo.57a5cb9ba68d.png', content)
+                self.assertIn(b'xyz.57a5cb9ba68d.png', content)

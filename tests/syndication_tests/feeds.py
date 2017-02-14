@@ -131,7 +131,7 @@ class TemplateContextFeed(TestRss2Feed):
     description_template = 'syndication/description_context.html'
 
     def get_context_data(self, **kwargs):
-        context = super(TemplateContextFeed, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['foo'] = 'bar'
         return context
 
@@ -164,21 +164,21 @@ class MyCustomAtom1Feed(feedgenerator.Atom1Feed):
     Test of a custom feed generator class.
     """
     def root_attributes(self):
-        attrs = super(MyCustomAtom1Feed, self).root_attributes()
+        attrs = super().root_attributes()
         attrs['django'] = 'rocks'
         return attrs
 
     def add_root_elements(self, handler):
-        super(MyCustomAtom1Feed, self).add_root_elements(handler)
+        super().add_root_elements(handler)
         handler.addQuickElement('spam', 'eggs')
 
     def item_attributes(self, item):
-        attrs = super(MyCustomAtom1Feed, self).item_attributes(item)
+        attrs = super().item_attributes(item)
         attrs['bacon'] = 'yum'
         return attrs
 
     def add_item_elements(self, handler, item):
-        super(MyCustomAtom1Feed, self).add_item_elements(handler, item)
+        super().add_item_elements(handler, item)
         handler.addQuickElement('ministry', 'silly walks')
 
 

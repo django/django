@@ -253,18 +253,15 @@ class BaseDatabaseFeatures:
         except NotImplementedError:
             return False
 
-    def introspected_boolean_field_type(self, field=None, created_separately=False):
+    def introspected_boolean_field_type(self, field=None):
         """
         What is the type returned when the backend introspects a BooleanField?
-        The optional arguments may be used to give further details of the field to be
-        introspected; in particular, they are provided by Django's test suite:
-        field -- the field definition
-        created_separately -- True if the field was added via a SchemaEditor's AddField,
-                              False if the field was created with the model
+        The `field` argument may be used to give further details of the field
+        to be introspected.
 
-        Note that return value from this function is compared by tests against actual
-        introspection results; it should provide expectations, not run an introspection
-        itself.
+        The return value from this function is compared by tests against actual
+        introspection results; it should provide expectations, not run an
+        introspection itself.
         """
         if self.can_introspect_null and field and field.null:
             return 'NullBooleanField'

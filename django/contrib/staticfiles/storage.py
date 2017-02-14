@@ -31,8 +31,7 @@ class StaticFilesStorage(FileSystemStorage):
         if base_url is None:
             base_url = settings.STATIC_URL
         check_settings(base_url)
-        super(StaticFilesStorage, self).__init__(location, base_url,
-                                                 *args, **kwargs)
+        super().__init__(location, base_url, *args, **kwargs)
         # FileSystemStorage fallbacks to MEDIA_ROOT when location
         # is empty, so we restore the empty value.
         if not location:
@@ -44,7 +43,7 @@ class StaticFilesStorage(FileSystemStorage):
             raise ImproperlyConfigured("You're using the staticfiles app "
                                        "without having set the STATIC_ROOT "
                                        "setting to a filesystem path.")
-        return super(StaticFilesStorage, self).path(name)
+        return super().path(name)
 
 
 class HashedFilesMixin:
@@ -58,7 +57,7 @@ class HashedFilesMixin:
     )
 
     def __init__(self, *args, **kwargs):
-        super(HashedFilesMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._patterns = OrderedDict()
         self.hashed_files = {}
         for extension, patterns in self.patterns:
@@ -134,7 +133,7 @@ class HashedFilesMixin:
                     args += (hashed_files,)
                 hashed_name = hashed_name_func(*args)
 
-        final_url = super(HashedFilesMixin, self).url(hashed_name)
+        final_url = super().url(hashed_name)
 
         # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
         # http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax
@@ -376,13 +375,13 @@ class ManifestFilesMixin(HashedFilesMixin):
     manifest_strict = True
 
     def __init__(self, *args, **kwargs):
-        super(ManifestFilesMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.hashed_files = self.load_manifest()
 
     def read_manifest(self):
         try:
             with self.open(self.manifest_name) as manifest:
-                return manifest.read().decode('utf-8')
+                return manifest.read().decode()
         except IOError:
             return None
 
@@ -403,8 +402,7 @@ class ManifestFilesMixin(HashedFilesMixin):
 
     def post_process(self, *args, **kwargs):
         self.hashed_files = OrderedDict()
-        all_post_processed = super(ManifestFilesMixin,
-                                   self).post_process(*args, **kwargs)
+        all_post_processed = super().post_process(*args, **kwargs)
         for post_processed in all_post_processed:
             yield post_processed
         self.save_manifest()
@@ -413,7 +411,7 @@ class ManifestFilesMixin(HashedFilesMixin):
         payload = {'paths': self.hashed_files, 'version': self.manifest_version}
         if self.exists(self.manifest_name):
             self.delete(self.manifest_name)
-        contents = json.dumps(payload).encode('utf-8')
+        contents = json.dumps(payload).encode()
         self._save(self.manifest_name, ContentFile(contents))
 
     def stored_name(self, name):
@@ -465,7 +463,7 @@ class _MappingCache:
 
 class CachedFilesMixin(HashedFilesMixin):
     def __init__(self, *args, **kwargs):
-        super(CachedFilesMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         try:
             self.hashed_files = _MappingCache(caches['staticfiles'])
         except InvalidCacheBackendError:

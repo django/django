@@ -1,4 +1,3 @@
-import errno
 import os
 from datetime import datetime
 from urllib.parse import urljoin
@@ -224,9 +223,6 @@ class FileSystemStorage(Storage):
         full_path = self.path(name)
 
         # Create any intermediate directories that do not exist.
-        # Note that there is a race between os.path.exists and os.makedirs:
-        # if os.makedirs fails with EEXIST, the directory was created
-        # concurrently, and we can continue normally. Refs #16082.
         directory = os.path.dirname(full_path)
         if not os.path.exists(directory):
             try:
@@ -240,9 +236,11 @@ class FileSystemStorage(Storage):
                         os.umask(old_umask)
                 else:
                     os.makedirs(directory)
-            except OSError as e:
-                if e.errno != errno.EEXIST:
-                    raise
+            except FileNotFoundError:
+                # There's a race between os.path.exists() and os.makedirs().
+                # If os.makedirs() fails with FileNotFoundError, the directory
+                # was created concurrently.
+                pass
         if not os.path.isdir(directory):
             raise IOError("%s exists and is not a directory." % directory)
 
@@ -280,13 +278,10 @@ class FileSystemStorage(Storage):
                             _file.close()
                         else:
                             os.close(fd)
-            except OSError as e:
-                if e.errno == errno.EEXIST:
-                    # Ooops, the file exists. We need a new file name.
-                    name = self.get_available_name(name)
-                    full_path = self.path(name)
-                else:
-                    raise
+            except FileExistsError:
+                # A new name is needed if the file exists.
+                name = self.get_available_name(name)
+                full_path = self.path(name)
             else:
                 # OK, the file save worked. Break out of the loop.
                 break
@@ -301,13 +296,12 @@ class FileSystemStorage(Storage):
         assert name, "The name argument is not allowed to be empty."
         name = self.path(name)
         # If the file exists, delete it from the filesystem.
-        # If os.remove() fails with ENOENT, the file may have been removed
-        # concurrently, and it's safe to continue normally.
         try:
             os.remove(name)
-        except OSError as e:
-            if e.errno != errno.ENOENT:
-                raise
+        except FileNotFoundError:
+            # If os.remove() fails with FileNotFoundError, the file may have
+            # been removed concurrently.
+            pass
 
     def exists(self, name):
         return os.path.exists(self.path(name))

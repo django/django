@@ -53,7 +53,7 @@ class Command(BaseCommand):
             import rlcompleter
             readline.set_completer(rlcompleter.Completer(imported_objects).complete)
             # Enable tab completion on systems using libedit (e.g. Mac OSX).
-            # These lines are copied from Lib/site.py on Python 3.4.
+            # These lines are copied from Python's Lib/site.py.
             readline_doc = getattr(readline, '__doc__', '')
             if readline_doc is not None and 'libedit' in readline_doc:
                 readline.parse_and_bind("bind ^I rl_complete")

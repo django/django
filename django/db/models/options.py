@@ -11,7 +11,6 @@ from django.db import connections
 from django.db.models import Manager
 from django.db.models.fields import AutoField
 from django.db.models.fields.proxy import OrderWrt
-from django.db.models.fields.related import OneToOneField
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.deprecation import RemovedInDjango21Warning
@@ -281,11 +280,7 @@ class Options:
     def setup_pk(self, field):
         if not self.pk and field.primary_key:
             self.pk = field
-            # If the field is a OneToOneField and it's been marked as PK, then
-            # this is a multi-table inheritance PK. It needs to be serialized
-            # to relate the subclass instance to the superclass instance.
-            if not isinstance(field, OneToOneField):
-                field.serialize = False
+            field.serialize = False
 
     def setup_proxy(self, target):
         """

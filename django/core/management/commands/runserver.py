@@ -29,6 +29,8 @@ class Command(BaseCommand):
     requires_system_checks = False
     leave_locale_alone = True
 
+    default_addr = '127.0.0.1'
+    default_addr_ipv6 = '::1'
     default_port = '8000'
     protocol = 'http'
     server_cls = WSGIServer
@@ -57,7 +59,7 @@ class Command(BaseCommand):
             # way to reach WSGIRequestHandler. This seems an acceptable
             # compromise considering `runserver` runs indefinitely.
             os.environ["DJANGO_COLORS"] = "nocolor"
-        super(Command, self).execute(*args, **options)
+        super().execute(*args, **options)
 
     def get_handler(self, *args, **options):
         """
@@ -94,7 +96,7 @@ class Command(BaseCommand):
                 elif self.use_ipv6 and not _fqdn:
                     raise CommandError('"%s" is not a valid IPv6 address.' % self.addr)
         if not self.addr:
-            self.addr = '::1' if self.use_ipv6 else '127.0.0.1'
+            self.addr = self.default_addr_ipv6 if self.use_ipv6 else self.default_addr
             self._raw_ipv6 = self.use_ipv6
         self.run(**options)
 

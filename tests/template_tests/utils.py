@@ -169,7 +169,7 @@ class UTF8Class:
         return 'ŠĐĆŽćžšđ'
 
 
-# These two classes are used to test auto-escaping of unicode output.
+# These two classes are used to test auto-escaping of string output.
 class UnsafeClass:
     def __str__(self):
         return 'you & me'

@@ -762,7 +762,7 @@ You can override most of these -- see `overriding predefined model methods`_,
 below -- but there are a couple that you'll almost always want to define:
 
 :meth:`~Model.__str__`
-    A Python "magic method" that returns a unicode "representation" of any
+    A Python "magic method" that returns a string representation of any
     object. This is what Python and Django will use whenever a model
     instance needs to be coerced and displayed as a plain string. Most
     notably, this happens when you display an object in an interactive
@@ -804,7 +804,7 @@ to happen whenever you save an object. For example (see
 
         def save(self, *args, **kwargs):
             do_something()
-            super(Blog, self).save(*args, **kwargs) # Call the "real" save() method.
+            super().save(*args, **kwargs)  # Call the "real" save() method.
             do_something_else()
 
 You can also prevent saving::
@@ -819,10 +819,10 @@ You can also prevent saving::
             if self.name == "Yoko Ono's blog":
                 return # Yoko shall never have her own blog!
             else:
-                super(Blog, self).save(*args, **kwargs) # Call the "real" save() method.
+                super().save(*args, **kwargs)  # Call the "real" save() method.
 
 It's important to remember to call the superclass method -- that's
-that ``super(Blog, self).save(*args, **kwargs)`` business -- to ensure
+that ``super().save(*args, **kwargs)`` business -- to ensure
 that the object still gets saved into the database. If you forget to
 call the superclass method, the default behavior won't happen and the
 database won't get touched.

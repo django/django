@@ -29,7 +29,7 @@ class Tag(models.Model):
 
 class Article(models.Model):
     headline = models.CharField(max_length=100)
-    # Assign a unicode string as name to make sure the intermediary model is
+    # Assign a string as name to make sure the intermediary model is
     # correctly created. Refs #20207
     publications = models.ManyToManyField(Publication, name='publications')
     tags = models.ManyToManyField(Tag, related_name='tags')

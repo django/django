@@ -70,21 +70,30 @@ class DatabaseOperations(BaseDatabaseOperations):
         # cause a collision with a field name).
         return "django_time_trunc('%s', %s)" % (lookup_type.lower(), field_name)
 
+    def _convert_tzname_to_sql(self, tzname):
+        return "'%s'" % tzname if settings.USE_TZ else 'NULL'
+
     def datetime_cast_date_sql(self, field_name, tzname):
-        return "django_datetime_cast_date(%s, %%s)" % field_name, [tzname]
+        return "django_datetime_cast_date(%s, %s)" % (
+            field_name, self._convert_tzname_to_sql(tzname),
+        )
 
     def datetime_cast_time_sql(self, field_name, tzname):
-        return "django_datetime_cast_time(%s, %%s)" % field_name, [tzname]
+        return "django_datetime_cast_time(%s, %s)" % (
+            field_name, self._convert_tzname_to_sql(tzname),
+        )
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         # Same comment as in date_extract_sql.
-        return "django_datetime_extract('%s', %s, %%s)" % (
-            lookup_type.lower(), field_name), [tzname]
+        return "django_datetime_extract('%s', %s, %s)" % (
+            lookup_type.lower(), field_name, self._convert_tzname_to_sql(tzname),
+        )
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         # Same comment as in date_trunc_sql.
-        return "django_datetime_trunc('%s', %s, %%s)" % (
-            lookup_type.lower(), field_name), [tzname]
+        return "django_datetime_trunc('%s', %s, %s)" % (
+            lookup_type.lower(), field_name, self._convert_tzname_to_sql(tzname),
+        )
 
     def time_extract_sql(self, lookup_type, field_name):
         # sqlite doesn't support extract, so we fake it with the user-defined
@@ -195,7 +204,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return str(value)
 
     def get_db_converters(self, expression):
-        converters = super(DatabaseOperations, self).get_db_converters(expression)
+        converters = super().get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
         if internal_type == 'DateTimeField':
             converters.append(self.convert_datetimefield_value)
@@ -256,7 +265,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # user-defined function django_power that's registered in connect().
         if connector == '^':
             return 'django_power(%s)' % ','.join(sub_expressions)
-        return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+        return super().combine_expression(connector, sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):
         if connector not in ['+', '-']:

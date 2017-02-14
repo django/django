@@ -6,7 +6,7 @@ from django.forms.widgets import HiddenInput
 from django.utils.functional import cached_property
 from django.utils.html import html_safe
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _, ungettext
+from django.utils.translation import gettext as _, ngettext
 
 __all__ = ('BaseFormSet', 'formset_factory', 'all_valid')
 
@@ -39,7 +39,7 @@ class ManagementForm(Form):
         # code. The POST value of them returned from the client is not checked.
         self.base_fields[MIN_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
-        super(ManagementForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 @html_safe
@@ -341,14 +341,14 @@ class BaseFormSet:
             if (self.validate_max and
                     self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
                     self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
-                raise ValidationError(ungettext(
+                raise ValidationError(ngettext(
                     "Please submit %d or fewer forms.",
                     "Please submit %d or fewer forms.", self.max_num) % self.max_num,
                     code='too_many_forms',
                 )
             if (self.validate_min and
                     self.total_form_count() - len(self.deleted_forms) - empty_forms_count < self.min_num):
-                raise ValidationError(ungettext(
+                raise ValidationError(ngettext(
                     "Please submit %d or more forms.",
                     "Please submit %d or more forms.", self.min_num) % self.min_num,
                     code='too_few_forms')

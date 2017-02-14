@@ -276,13 +276,13 @@ The functions defined in this module share the following properties:
 
     This is an algorithm from section 3.2 of :rfc:`3987#section-3.2`.
 
-    Takes a URI in ASCII bytes and returns a unicode string containing the
-    encoded result.
+    Takes a URI in ASCII bytes and returns a string containing the encoded
+    result.
 
 .. function:: filepath_to_uri(path)
 
     Convert a file system path to a URI portion that is suitable for inclusion
-    in a URL. The path is assumed to be either UTF-8 or unicode.
+    in a URL. The path is assumed to be either UTF-8 bytes or string.
 
     This method will encode certain characters that would normally be
     recognized as special characters for URIs.  Note that this method does not
@@ -346,13 +346,13 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         Any extra keyword arguments you pass to ``__init__`` will be stored in
         ``self.feed``.
 
-        All parameters should be Unicode objects, except ``categories``, which
-        should be a sequence of Unicode objects.
+        All parameters should be strings, except ``categories``, which should
+        be a sequence of strings.
 
     .. method:: add_item(title, link, description, author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, categories=(), item_copyright=None, ttl=None, updateddate=None, enclosures=None, **kwargs)
 
-        Adds an item to the feed. All args are expected to be Python ``unicode``
-        objects except ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
+        Adds an item to the feed. All args are expected to be strings except
+        ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
         objects, and ``enclosures``, which is a list of ``Enclosure`` instances.
 
     .. method:: num_items()
@@ -684,27 +684,10 @@ escaping HTML.
 .. module:: django.utils.http
    :synopsis: HTTP helper functions. (URL encoding, cookie handling, ...)
 
-.. function:: urlquote(url, safe='/')
-
-    A version of Python's ``urllib.quote()`` function that can operate on
-    unicode strings. The url is first UTF-8 encoded before quoting. The
-    returned string can safely be used as part of an argument to a subsequent
-    ``iri_to_uri()`` call without double-quoting occurring. Employs lazy
-    execution.
-
-.. function:: urlquote_plus(url, safe='')
-
-    A version of Python's urllib.quote_plus() function that can operate on
-    unicode strings. The url is first UTF-8 encoded before quoting. The
-    returned string can safely be used as part of an argument to a subsequent
-    ``iri_to_uri()`` call without double-quoting occurring. Employs lazy
-    execution.
-
 .. function:: urlencode(query, doseq=0)
 
-    A version of Python's urllib.urlencode() function that can operate on
-    unicode strings. The parameters are first cast to UTF-8 encoded strings
-    and then encoded as per normal.
+    A version of Python's :func:`urllib.parse.urlencode` function that can
+    operate on ``MultiValueDict`` and non-string values.
 
 .. function:: cookie_date(epoch_seconds=None)
 
@@ -780,19 +763,11 @@ string" means that the producer of the string has already turned characters
 that should not be interpreted by the HTML engine (e.g. '<') into the
 appropriate entities.
 
-.. class:: SafeBytes
-
-    A ``bytes`` subclass that has been specifically marked as "safe"
-    (requires no further escaping) for HTML output purposes.
-
 .. class:: SafeString
 
     A ``str`` subclass that has been specifically marked as "safe"
     (requires no further escaping) for HTML output purposes. Alias of
     :class:`SafeText`.
-
-    Alias of :class:`SafeBytes` on Python 2 (in older versions of Django that
-    support it).
 
 .. class:: SafeText
 
@@ -802,7 +777,7 @@ appropriate entities.
 .. function:: mark_safe(s)
 
     Explicitly mark a string as safe for (HTML) output purposes. The returned
-    object can be used everywhere a string or unicode object is appropriate.
+    object can be used everywhere a string is appropriate.
 
     Can be called multiple times on a single string.
 
@@ -816,7 +791,7 @@ appropriate entities.
         >>> mystr = '<b>Hello World</b>   '
         >>> mystr = mark_safe(mystr)
         >>> type(mystr)
-        <class 'django.utils.safestring.SafeBytes'>
+        <class 'django.utils.safestring.SafeText'>
 
         >>> mystr = mystr.strip()  # removing whitespace
         >>> type(mystr)
@@ -1009,7 +984,7 @@ appropriate entities.
     ``value`` aware during a DST transition such that the time never occurred
     (when entering into DST). Setting ``is_dst`` to ``True`` or ``False`` will
     avoid the exception by moving the hour backwards or forwards by 1
-    respectively. For example, ``is_dst=True`` would change a non-existent
+    respectively. For example, ``is_dst=True`` would change a nonexistent
     time of 2:30 to 1:30 and ``is_dst=False`` would change the time to 3:30.
 
 .. function:: make_naive(value, timezone=None)
@@ -1028,18 +1003,18 @@ appropriate entities.
 For a complete discussion on the usage of the following see the
 :doc:`translation documentation </topics/i18n/translation>`.
 
+The ``u`` prefix on the functions below comes from a difference in Python 2
+between unicode and bytestrings. If your code doesn't support Python 2, use the
+functions without the ``u``.
+
 .. function:: gettext(message)
-
-    Translates ``message`` and returns it in a UTF-8 bytestring
-
 .. function:: ugettext(message)
 
-    Translates ``message`` and returns it in a unicode string
+    Translates ``message`` and returns it as a string.
 
 .. function:: pgettext(context, message)
 
-    Translates ``message`` given the ``context`` and returns
-    it in a unicode string.
+    Translates ``message`` given the ``context`` and returns it as a string.
 
     For more information, see :ref:`contextual-markers`.
 
@@ -1060,19 +1035,15 @@ For a complete discussion on the usage of the following see the
     later.
 
 .. function:: ngettext(singular, plural, number)
-
-    Translates ``singular`` and ``plural`` and returns the appropriate string
-    based on ``number`` in a UTF-8 bytestring.
-
 .. function:: ungettext(singular, plural, number)
 
     Translates ``singular`` and ``plural`` and returns the appropriate string
-    based on ``number`` in a unicode string.
+    based on ``number``.
 
 .. function:: npgettext(context, singular, plural, number)
 
     Translates ``singular`` and ``plural`` and returns the appropriate string
-    based on ``number`` and the ``context`` in a unicode string.
+    based on ``number`` and the ``context``.
 
 .. function:: ngettext_lazy(singular, plural, number)
 .. function:: ungettext_lazy(singular, plural, number)

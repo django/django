@@ -1111,7 +1111,9 @@ blue.
     be opened with write access. If the input is raw data, the parameters ``width``,
     ``height``, and ``srid`` are required. The following example shows how rasters
     can be created from different input sources (using the sample data from the
-    GeoDjango tests, see also the :ref:`gdal_sample_data` section)::
+    GeoDjango tests, see also the :ref:`gdal_sample_data` section). For a
+    detailed description of how to create rasters using dictionary input, see
+    the :ref:`gdal-raster-ds-input` section.
 
         >>> from django.contrib.gis.gdal import GDALRaster
         >>> rst = GDALRaster('/path/to/your/raster.tif', write=False)
@@ -1536,6 +1538,121 @@ blue.
                    [1, 1, 1, 1],
                    [2, 2, 2, 2],
                    [3, 3, 3, 3]], dtype=uint8)
+
+.. _gdal-raster-ds-input:
+
+Creating rasters from data
+--------------------------
+
+This section describes how to create rasters from scratch using the
+``ds_input`` parameter.
+
+A new raster is created when a ``dict`` is passed to the :class:`GDALRaster`
+constructor. The dictionary contains defining parameters of the new raster,
+such as the origin, size, or spatial reference system. The dictionary can also
+contain pixel data and information about the format of the new raster. The
+resulting raster can therefore be file-based or memory-based, depending on the
+driver specified.
+
+There's no standard for describing raster data in a dictionary or JSON flavor.
+The definition of the dictionary input to the :class:`GDALRaster` class is
+therefore specific to Django. It's inspired by the `geojson`__ format, but the
+``geojson`` standard is currently limited to vector formats.
+
+Examples of using the different keys when creating rasters can be found in the
+documentation of the corresponding attributes and methods of the
+:class:`GDALRaster` and :class:`GDALBand` classes.
+
+__ http://geojson.org
+
+The ``ds_input`` dictionary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Only a few keys are required in the ``ds_input`` dictionary to create a raster:
+``width``, ``height``, and ``srid``. All other parameters have default values
+(see the table below). The list of keys that can be passed in the ``ds_input``
+dictionary is closely related but not identical to the :class:`GDALRaster`
+properties. Many of the parameters are mapped directly to those properties;
+the others are described below.
+
+The following table describes all keys that can be set in the ``ds_input``
+dictionary.
+
+=============== ======== ==================================================
+Key             Default  Usage
+=============== ======== ==================================================
+``srid``        required Mapped to the :attr:`~GDALRaster.srid` attribute
+``width``       required Mapped to the :attr:`~GDALRaster.width` attribute
+``height``      required Mapped to the :attr:`~GDALRaster.height` attribute
+``driver``      ``MEM``  Mapped to the :attr:`~GDALRaster.driver` attribute
+``name``        ``''``   See below
+``origin``      ``0``    Mapped to the :attr:`~GDALRaster.origin` attribute
+``scale``       ``0``    Mapped to the :attr:`~GDALRaster.scale` attribute
+``skew``        ``0``    Mapped to the :attr:`~GDALRaster.width` attribute
+``bands``       ``[]``   See below
+``nr_of_bands`` ``0``    See below
+``datatype``    ``6``    See below
+=============== ======== ==================================================
+
+.. object:: name
+
+    String representing the name of the raster. When creating a file-based
+    raster, this parameter must be the file path for the new raster.
+
+.. object:: datatype
+
+    Integer representing the data type for all the bands. Defaults to ``6``
+    (Float32). All bands of a new raster are required to have the same datatype.
+    The value mapping is:
+
+    ===== =============== ===============================
+    Value GDAL Pixel Type Description
+    ===== =============== ===============================
+    1     GDT_Byte        Eight bit unsigned integer
+    2     GDT_UInt16      Sixteen bit unsigned integer
+    3     GDT_Int16       Sixteen bit signed integer
+    4     GDT_UInt32      Thirty-two bit unsigned integer
+    5     GDT_Int32       Thirty-two bit signed integer
+    6     GDT_Float32     Thirty-two bit floating point
+    7     GDT_Float64     Sixty-four bit floating point
+    ===== =============== ===============================
+
+.. object:: nr_of_bands
+
+    Integer representing the number of bands of the raster. A raster can be
+    created without passing band data upon creation. If the number of bands
+    isn't specified, it's automatically calculated from the length of the
+    ``bands`` input. The number of bands can't be changed after creation.
+
+.. object:: bands
+
+    A list of ``band_input`` dictionaries with band input data. The resulting
+    band indices are the same as in the list provided. The definition of the
+    band input dictionary is given below. If band data isn't provided, the
+    raster bands values are instantiated as an array of zeros and the "no
+    data" value is set to ``None``.
+
+The ``band_input`` dictionary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``bands`` key in the ``ds_input`` dictionary is a list of ``band_input``
+dictionaries. Each ``band_input`` dictionary can contain pixel values and the
+"no data" value to be set on the bands of the new raster. The data array can
+have the full size of the new raster or be smaller. For arrays that are smaller
+than the full raster, the ``size``, ``shape``, and ``offset`` keys  control the
+pixel values. The corresponding keys are passed to the :meth:`~GDALBand.data`
+method. Their functionality is the same as setting the band data with that
+method. The following table describes the keys that can be used.
+
+================ ================================= ======================================================
+Key              Default                           Usage
+================ ================================= ======================================================
+``nodata_value`` ``None``                          Mapped to the :attr:`~GDALBand.nodata_value` attribute
+``data``         Same as ``nodata_value`` or ``0`` Passed to the :meth:`~GDALBand.data` method
+``size``         ``(with, height)`` of raster      Passed to the :meth:`~GDALBand.data` method
+``shape``        Same as size                      Passed to the :meth:`~GDALBand.data` method
+``offset``       ``(0, 0)``                        Passed to the :meth:`~GDALBand.data` method
+================ ================================= ======================================================
 
 Settings
 ========

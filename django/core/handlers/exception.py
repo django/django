@@ -4,7 +4,10 @@ from functools import wraps
 
 from django.conf import settings
 from django.core import signals
-from django.core.exceptions import PermissionDenied, SuspiciousOperation
+from django.core.exceptions import (
+    PermissionDenied, RequestDataTooBig, SuspiciousOperation,
+    TooManyFieldsSent,
+)
 from django.http import Http404
 from django.http.multipartparser import MultiPartParserError
 from django.urls import get_resolver, get_urlconf
@@ -59,6 +62,11 @@ def response_for_exception(request, exc):
         response = get_exception_response(request, get_resolver(get_urlconf()), 400, exc)
 
     elif isinstance(exc, SuspiciousOperation):
+        if isinstance(exc, (RequestDataTooBig, TooManyFieldsSent)):
+            # POST data can't be accessed again, otherwise the original
+            # exception would be raised.
+            request._mark_post_parse_error()
+
         # The request logger receives events for any problematic request
         # The security logger receives events for all SuspiciousOperations
         security_logger = logging.getLogger('django.security.%s' % exc.__class__.__name__)

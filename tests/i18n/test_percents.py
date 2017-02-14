@@ -37,7 +37,7 @@ class ExtractingStringsWithPercentSigns(POFileAssertionMixin, FrenchTestCase):
     """
 
     def setUp(self):
-        super(ExtractingStringsWithPercentSigns, self).setUp()
+        super().setUp()
         with open(self.PO_FILE, 'r') as fp:
             self.po_contents = fp.read()
 

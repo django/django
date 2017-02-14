@@ -2,7 +2,6 @@
 Classes representing uploaded files.
 """
 
-import errno
 import os
 from io import BytesIO
 
@@ -25,7 +24,7 @@ class UploadedFile(File):
     DEFAULT_CHUNK_SIZE = 64 * 2 ** 10
 
     def __init__(self, file=None, name=None, content_type=None, size=None, charset=None, content_type_extra=None):
-        super(UploadedFile, self).__init__(file, name)
+        super().__init__(file, name)
         self.size = size
         self.content_type = content_type
         self.charset = charset
@@ -60,7 +59,7 @@ class TemporaryUploadedFile(UploadedFile):
     """
     def __init__(self, name, content_type, size, charset, content_type_extra=None):
         file = tempfile.NamedTemporaryFile(suffix='.upload', dir=settings.FILE_UPLOAD_TEMP_DIR)
-        super(TemporaryUploadedFile, self).__init__(file, name, content_type, size, charset, content_type_extra)
+        super().__init__(file, name, content_type, size, charset, content_type_extra)
 
     def temporary_file_path(self):
         """
@@ -71,12 +70,11 @@ class TemporaryUploadedFile(UploadedFile):
     def close(self):
         try:
             return self.file.close()
-        except OSError as e:
-            if e.errno != errno.ENOENT:
-                # Means the file was moved or deleted before the tempfile
-                # could unlink it.  Still sets self.file.close_called and
-                # calls self.file.file.close() before the exception
-                raise
+        except FileNotFoundError:
+            # The file was moved or deleted before the tempfile could unlink
+            # it. Still sets self.file.close_called and calls
+            # self.file.file.close() before the exception.
+            pass
 
 
 class InMemoryUploadedFile(UploadedFile):
@@ -84,7 +82,7 @@ class InMemoryUploadedFile(UploadedFile):
     A file uploaded into memory (i.e. stream-to-memory).
     """
     def __init__(self, file, field_name, name, content_type, size, charset, content_type_extra=None):
-        super(InMemoryUploadedFile, self).__init__(file, name, content_type, size, charset, content_type_extra)
+        super().__init__(file, name, content_type, size, charset, content_type_extra)
         self.field_name = field_name
 
     def open(self, mode=None):
@@ -105,8 +103,7 @@ class SimpleUploadedFile(InMemoryUploadedFile):
     """
     def __init__(self, name, content, content_type='text/plain'):
         content = content or b''
-        super(SimpleUploadedFile, self).__init__(BytesIO(content), None, name,
-                                                 content_type, len(content), None, None)
+        super().__init__(BytesIO(content), None, name, content_type, len(content), None, None)
 
     @classmethod
     def from_dict(cls, file_dict):

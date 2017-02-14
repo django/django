@@ -164,7 +164,7 @@ class FormsMediaTestCase(SimpleTestCase):
         # Media properties can reference the media of their parents
         class MyWidget5(MyWidget4):
             def _media(self):
-                return super(MyWidget5, self).media + Media(css={'all': ('/other/path',)}, js=('/other/js',))
+                return super().media + Media(css={'all': ('/other/path',)}, js=('/other/js',))
             media = property(_media)
 
         w5 = MyWidget5()
@@ -185,7 +185,7 @@ class FormsMediaTestCase(SimpleTestCase):
 
         class MyWidget6(MyWidget1):
             def _media(self):
-                return super(MyWidget6, self).media + Media(css={'all': ('/other/path',)}, js=('/other/js',))
+                return super().media + Media(css={'all': ('/other/path',)}, js=('/other/js',))
             media = property(_media)
 
         w6 = MyWidget6()
@@ -405,7 +405,7 @@ class FormsMediaTestCase(SimpleTestCase):
         class MyMultiWidget(MultiWidget):
             def __init__(self, attrs=None):
                 widgets = [MyWidget1, MyWidget2, MyWidget3]
-                super(MyMultiWidget, self).__init__(widgets, attrs)
+                super().__init__(widgets, attrs)
 
         mymulti = MyMultiWidget()
         self.assertEqual(

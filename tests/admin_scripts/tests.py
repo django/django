@@ -38,7 +38,7 @@ class AdminScriptTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(AdminScriptTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.test_dir = os.path.realpath(os.path.join(
             tempfile.gettempdir(),
             cls.__name__,
@@ -52,7 +52,7 @@ class AdminScriptTestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls.test_dir)
-        super(AdminScriptTestCase, cls).tearDownClass()
+        super().tearDownClass()
 
     def write_settings(self, filename, apps=None, is_dir=False, sdict=None, extra=None):
         if is_dir:
@@ -1132,9 +1132,7 @@ class ManageCheck(AdminScriptTestCase):
         self.remove_settings('settings.py')
 
     def test_nonexistent_app(self):
-        """ manage.py check reports an error on a non-existent app in
-        INSTALLED_APPS """
-
+        """check reports an error on a nonexistent app in INSTALLED_APPS."""
         self.write_settings(
             'settings.py',
             apps=['admin_scriptz.broken_app'],
@@ -1310,6 +1308,18 @@ class ManageRunserver(AdminScriptTestCase):
     def test_runner_hostname_ipv6(self):
         call_command(self.cmd, addrport="test.domain.local:7000", use_ipv6=True)
         self.assertServerSettings('test.domain.local', '7000', ipv6=True)
+
+    def test_runner_custom_defaults(self):
+        self.cmd.default_addr = '0.0.0.0'
+        self.cmd.default_port = '5000'
+        call_command(self.cmd)
+        self.assertServerSettings('0.0.0.0', '5000')
+
+    @unittest.skipUnless(socket.has_ipv6, "platform doesn't support IPv6")
+    def test_runner_custom_defaults_ipv6(self):
+        self.cmd.default_addr_ipv6 = '::'
+        call_command(self.cmd, use_ipv6=True)
+        self.assertServerSettings('::', '8000', ipv6=True, raw_ipv6=True)
 
     def test_runner_ambiguous(self):
         # Only 4 characters, all of which could be in an ipv6 address

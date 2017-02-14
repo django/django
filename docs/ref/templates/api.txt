@@ -381,7 +381,7 @@ replaced with the name of the invalid variable.
     idea to turn it on as a 'development default'.
 
     Many templates, including those in the Admin site, rely upon the silence
-    of the template system when a non-existent variable is encountered. If you
+    of the template system when a nonexistent variable is encountered. If you
     assign a value other than ``''`` to ``string_if_invalid``, you will
     experience rendering problems with these templates and sites.
 

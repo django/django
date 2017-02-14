@@ -97,7 +97,7 @@ class Relation(models.Model):
 # Test related objects visibility.
 class SchoolManager(models.Manager):
     def get_queryset(self):
-        return super(SchoolManager, self).get_queryset().filter(is_public=True)
+        return super().get_queryset().filter(is_public=True)
 
 
 class School(models.Model):

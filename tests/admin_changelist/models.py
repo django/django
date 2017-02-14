@@ -94,7 +94,7 @@ class UnorderedObject(models.Model):
 
 class OrderedObjectManager(models.Manager):
     def get_queryset(self):
-        return super(OrderedObjectManager, self).get_queryset().order_by('number')
+        return super().get_queryset().order_by('number')
 
 
 class OrderedObject(models.Model):

@@ -12,7 +12,7 @@ from django.contrib.gis.gdal.field import (
 
 def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
     """
-    Given a DataSource, generates a dictionary that may be used
+    Given a DataSource, generate a dictionary that may be used
     for invoking the LayerMapping utility.
 
     Keyword Arguments:
@@ -92,7 +92,7 @@ def ogrinspect(*args, **kwargs):
      `multi_geom` => Boolean (default: False) - specify as multigeometry.
 
      `name_field` => String - specifies a field name to return for the
-       `__unicode__`/`__str__` function (which will be generated if specified).
+       __str__() method (which will be generated if specified).
 
      `imports` => Boolean (default: True) - set to False to omit the
        `from django.contrib.gis.db import models` code from the
@@ -114,7 +114,7 @@ def ogrinspect(*args, **kwargs):
        give specific fields to have null, then a list/tuple of OGR field
        names may be used.
 
-    Note: This routine calls the _ogrinspect() helper to do the heavy lifting.
+    Note: Call the _ogrinspect() helper to do the heavy lifting.
     """
     return '\n'.join(s for s in _ogrinspect(*args, **kwargs))
 

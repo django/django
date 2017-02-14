@@ -681,7 +681,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             management.call_command('loaddata', 'fixture1', exclude=['fixtures.FooModel'], verbosity=0)
 
 
-class NonExistentFixtureTests(TestCase):
+class NonexistentFixtureTests(TestCase):
     """
     Custom class to limit fixture dirs.
     """

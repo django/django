@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes, force_text
 
 from .base import Database
-from .utils import InsertIdVar, Oracle_datetime
+from .utils import BulkInsertMapper, InsertIdVar, Oracle_datetime
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -34,13 +34,13 @@ BEGIN
     SELECT NVL(last_number - cache_size, 0) INTO seq_value FROM user_sequences
            WHERE sequence_name = '%(sequence)s';
     WHILE table_value > seq_value LOOP
-        SELECT "%(sequence)s".nextval INTO seq_value FROM dual;
+        seq_value := "%(sequence)s".nextval;
     END LOOP;
 END;
 /"""
 
     def __init__(self, *args, **kwargs):
-        super(DatabaseOperations, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.set_operators['difference'] = 'MINUS'
 
     def autoinc_sql(self, table, column):
@@ -69,8 +69,7 @@ BEFORE INSERT ON %(tbl_name)s
 FOR EACH ROW
 WHEN (new.%(col_name)s IS NULL)
     BEGIN
-        SELECT "%(sq_name)s".nextval
-        INTO :new.%(col_name)s FROM dual;
+        :new.%(col_name)s := "%(sq_name)s".nextval;
     END;
 /""" % args
         return sequence_sql, trigger_sql
@@ -123,19 +122,16 @@ WHEN (new.%(col_name)s IS NULL)
 
     def datetime_cast_date_sql(self, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
-        sql = 'TRUNC(%s)' % field_name
-        return sql, []
+        return 'TRUNC(%s)' % field_name
 
     def datetime_cast_time_sql(self, field_name, tzname):
         # Since `TimeField` values are stored as TIMESTAMP where only the date
         # part is ignored, convert the field to the specified timezone.
-        field_name = self._convert_field_to_tz(field_name, tzname)
-        return field_name, []
+        return self._convert_field_to_tz(field_name, tzname)
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
-        sql = self.date_extract_sql(lookup_type, field_name)
-        return sql, []
+        return self.date_extract_sql(lookup_type, field_name)
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
@@ -150,7 +146,7 @@ WHEN (new.%(col_name)s IS NULL)
             sql = "TRUNC(%s, 'MI')" % field_name
         else:
             sql = "CAST(%s AS DATE)" % field_name  # Cast to DATE removes sub-second precision.
-        return sql, []
+        return sql
 
     def time_trunc_sql(self, lookup_type, field_name):
         # The implementation is similar to `datetime_trunc_sql` as both
@@ -165,7 +161,7 @@ WHEN (new.%(col_name)s IS NULL)
         return sql
 
     def get_db_converters(self, expression):
-        converters = super(DatabaseOperations, self).get_db_converters(expression)
+        converters = super().get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
         if internal_type == 'TextField':
             converters.append(self.convert_textfield_value)
@@ -254,11 +250,11 @@ WHEN (new.%(col_name)s IS NULL)
         statement = cursor.statement
         # Unlike Psycopg's `query` and MySQLdb`'s `_last_executed`, CxOracle's
         # `statement` doesn't contain the query parameters. refs #20010.
-        return super(DatabaseOperations, self).last_executed_query(cursor, statement, params)
+        return super().last_executed_query(cursor, statement, params)
 
     def last_insert_id(self, cursor, table_name, pk_name):
         sq_name = self._get_sequence_name(table_name)
-        cursor.execute('SELECT "%s".currval FROM dual' % sq_name)
+        cursor.execute('"%s".currval' % sq_name)
         return cursor.fetchone()[0]
 
     def lookup_cast(self, lookup_type, internal_type=None):
@@ -514,7 +510,7 @@ WHEN (new.%(col_name)s IS NULL)
             return 'FLOOR(%(lhs)s / POWER(2, %(rhs)s))' % {'lhs': lhs, 'rhs': rhs}
         elif connector == '^':
             return 'POWER(%s)' % ','.join(sub_expressions)
-        return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+        return super().combine_expression(connector, sub_expressions)
 
     def _get_sequence_name(self, table):
         name_length = self.max_name_length() - 3
@@ -527,14 +523,22 @@ WHEN (new.%(col_name)s IS NULL)
         return truncate_name(trigger_name, name_length).upper()
 
     def bulk_insert_sql(self, fields, placeholder_rows):
-        return " UNION ALL ".join(
-            "SELECT %s FROM DUAL" % ", ".join(row)
-            for row in placeholder_rows
-        )
+        query = []
+        for row in placeholder_rows:
+            select = []
+            for i, placeholder in enumerate(row):
+                # A model without any fields has fields=[None].
+                if not fields[i]:
+                    select.append(placeholder)
+                else:
+                    internal_type = getattr(fields[i], 'target_field', fields[i]).get_internal_type()
+                    select.append(BulkInsertMapper.types.get(internal_type, '%s') % placeholder)
+            query.append('SELECT %s FROM DUAL' % ', '.join(select))
+        return ' UNION ALL '.join(query)
 
     def subtract_temporals(self, internal_type, lhs, rhs):
         if internal_type == 'DateField':
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
             return "NUMTODSINTERVAL(%s - %s, 'DAY')" % (lhs_sql, rhs_sql), lhs_params + rhs_params
-        return super(DatabaseOperations, self).subtract_temporals(internal_type, lhs, rhs)
+        return super().subtract_temporals(internal_type, lhs, rhs)

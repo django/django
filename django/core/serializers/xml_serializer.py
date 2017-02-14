@@ -157,11 +157,11 @@ class Deserializer(base.Deserializer):
     Deserialize XML.
     """
 
-    def __init__(self, stream_or_string, **options):
-        super(Deserializer, self).__init__(stream_or_string, **options)
+    def __init__(self, stream_or_string, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False, **options):
+        super().__init__(stream_or_string, **options)
         self.event_stream = pulldom.parse(self.stream, self._make_parser())
-        self.db = options.pop('using', DEFAULT_DB_ALIAS)
-        self.ignore = options.pop('ignorenonexistent', False)
+        self.db = using
+        self.ignore = ignorenonexistent
 
     def _make_parser(self):
         """Create a hardened XML parser (no custom/external entities)."""
@@ -356,7 +356,7 @@ class DefusedXmlException(ValueError):
 class DTDForbidden(DefusedXmlException):
     """Document type definition is forbidden."""
     def __init__(self, name, sysid, pubid):
-        super(DTDForbidden, self).__init__()
+        super().__init__()
         self.name = name
         self.sysid = sysid
         self.pubid = pubid
@@ -369,7 +369,7 @@ class DTDForbidden(DefusedXmlException):
 class EntitiesForbidden(DefusedXmlException):
     """Entity definition is forbidden."""
     def __init__(self, name, value, base, sysid, pubid, notation_name):
-        super(EntitiesForbidden, self).__init__()
+        super().__init__()
         self.name = name
         self.value = value
         self.base = base
@@ -385,7 +385,7 @@ class EntitiesForbidden(DefusedXmlException):
 class ExternalReferenceForbidden(DefusedXmlException):
     """Resolving an external reference is forbidden."""
     def __init__(self, context, base, sysid, pubid):
-        super(ExternalReferenceForbidden, self).__init__()
+        super().__init__()
         self.context = context
         self.base = base
         self.sysid = sysid

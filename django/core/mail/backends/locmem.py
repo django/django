@@ -15,7 +15,7 @@ class EmailBackend(BaseEmailBackend):
     The dummy outbox is accessible through the outbox instance attribute.
     """
     def __init__(self, *args, **kwargs):
-        super(EmailBackend, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not hasattr(mail, 'outbox'):
             mail.outbox = []
 

@@ -29,7 +29,7 @@ from django.db.models.utils import make_model_tuple
 from django.utils.encoding import force_text
 from django.utils.functional import curry
 from django.utils.text import capfirst, get_text_list
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.version import get_version
 
 
@@ -73,7 +73,7 @@ class ModelBase(type):
     Metaclass for all models.
     """
     def __new__(cls, name, bases, attrs):
-        super_new = super(ModelBase, cls).__new__
+        super_new = super().__new__
 
         # Also ensure initialization is only performed for subclasses of Model
         # (excluding Model class itself).
@@ -486,7 +486,7 @@ class Model(metaclass=ModelBase):
                     pass
             if kwargs:
                 raise TypeError("'%s' is an invalid keyword argument for this function" % list(kwargs)[0])
-        super(Model, self).__init__()
+        super().__init__()
         post_init.send(sender=cls, instance=self)
 
     @classmethod
@@ -1497,7 +1497,7 @@ class Model(metaclass=ModelBase):
             except KeyError:
                 errors.append(
                     checks.Error(
-                        "'%s' refers to the non-existent field '%s'." % (
+                        "'%s' refers to the nonexistent field '%s'." % (
                             option, field_name,
                         ),
                         obj=cls,
@@ -1570,7 +1570,7 @@ class Model(metaclass=ModelBase):
         # but is an alias and therefore won't be found by opts.get_field.
         fields = {f for f in fields if f != 'pk'}
 
-        # Check for invalid or non-existent fields in ordering.
+        # Check for invalid or nonexistent fields in ordering.
         invalid_fields = []
 
         # Any field name that is not present in field_names does not exist.
@@ -1586,7 +1586,7 @@ class Model(metaclass=ModelBase):
         for invalid_field in invalid_fields:
             errors.append(
                 checks.Error(
-                    "'ordering' refers to the non-existent field '%s'." % invalid_field,
+                    "'ordering' refers to the nonexistent field '%s'." % invalid_field,
                     obj=cls,
                     id='models.E015',
                 )

@@ -653,7 +653,7 @@ for basic values, and doesn't specify import paths).
 
 Django can serialize the following:
 
-- ``int``, ``float``, ``bool``, ``str``, ``unicode``, ``bytes``, ``None``
+- ``int``, ``float``, ``bool``, ``str``, ``bytes``, ``None``
 - ``list``, ``set``, ``tuple``, ``dict``
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
   (include those that are timezone-aware)

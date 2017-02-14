@@ -150,7 +150,7 @@ class LayerMapping:
 
     # #### Checking routines used during initialization ####
     def check_fid_range(self, fid_range):
-        "This checks the `fid_range` keyword."
+        "Check the `fid_range` keyword."
         if fid_range:
             if isinstance(fid_range, (tuple, list)):
                 return slice(*fid_range)
@@ -163,9 +163,9 @@ class LayerMapping:
 
     def check_layer(self):
         """
-        This checks the Layer metadata, and ensures that it is compatible
-        with the mapping information and model.  Unlike previous revisions,
-        there is no need to increment through each feature in the Layer.
+        Check the Layer metadata and ensure that it's compatible with the
+        mapping information and model. Unlike previous revisions, there is no
+        need to increment through each feature in the Layer.
         """
         # The geometry field of the model is set here.
         # TODO: Support more than one geometry field / model.  However, this
@@ -259,7 +259,7 @@ class LayerMapping:
             self.fields[field_name] = fields_val
 
     def check_srs(self, source_srs):
-        "Checks the compatibility of the given spatial reference object."
+        "Check the compatibility of the given spatial reference object."
 
         if isinstance(source_srs, SpatialReference):
             sr = source_srs
@@ -277,7 +277,7 @@ class LayerMapping:
             return sr
 
     def check_unique(self, unique):
-        "Checks the `unique` keyword parameter -- may be a sequence or string."
+        "Check the `unique` keyword parameter -- may be a sequence or string."
         if isinstance(unique, (list, tuple)):
             # List of fields to determine uniqueness with
             for attr in unique:
@@ -293,8 +293,8 @@ class LayerMapping:
     # Keyword argument retrieval routines ####
     def feature_kwargs(self, feat):
         """
-        Given an OGR Feature, this will return a dictionary of keyword arguments
-        for constructing the mapped model.
+        Given an OGR Feature, return a dictionary of keyword arguments for
+        constructing the mapped model.
         """
         # The keyword arguments for model construction.
         kwargs = {}
@@ -326,9 +326,9 @@ class LayerMapping:
 
     def unique_kwargs(self, kwargs):
         """
-        Given the feature keyword arguments (from `feature_kwargs`) this routine
-        will construct and return the uniqueness keyword arguments -- a subset
-        of the feature kwargs.
+        Given the feature keyword arguments (from `feature_kwargs`), construct
+        and return the uniqueness keyword arguments -- a subset of the feature
+        kwargs.
         """
         if isinstance(self.unique, str):
             return {self.unique: kwargs[self.unique]}
@@ -338,9 +338,8 @@ class LayerMapping:
     # #### Verification routines used in constructing model keyword arguments. ####
     def verify_ogr_field(self, ogr_field, model_field):
         """
-        Verifies if the OGR Field contents are acceptable to the Django
-        model field.  If they are, the verified value is returned,
-        otherwise the proper exception is raised.
+        Verify if the OGR Field contents are acceptable to the model field. If
+        they are, return the verified value, otherwise raise an exception.
         """
         if (isinstance(ogr_field, OFTString) and
                 isinstance(model_field, (models.CharField, models.TextField))):
@@ -397,8 +396,7 @@ class LayerMapping:
     def verify_fk(self, feat, rel_model, rel_mapping):
         """
         Given an OGR Feature, the related model and its dictionary mapping,
-        this routine will retrieve the related model for the ForeignKey
-        mapping.
+        retrieve the related model for the ForeignKey mapping.
         """
         # TODO: It is expensive to retrieve a model for every record --
         #  explore if an efficient mechanism exists for caching related
@@ -420,7 +418,7 @@ class LayerMapping:
 
     def verify_geom(self, geom, model_field):
         """
-        Verifies the geometry -- will construct and return a GeometryCollection
+        Verify the geometry -- construct and return a GeometryCollection
         if necessary (for example if the model field is MultiPolygonField while
         the mapped shapefile only contains Polygons).
         """
@@ -447,7 +445,7 @@ class LayerMapping:
 
     # #### Other model methods ####
     def coord_transform(self):
-        "Returns the coordinate transformation object."
+        "Return the coordinate transformation object."
         SpatialRefSys = self.spatial_backend.spatial_ref_sys()
         try:
             # Getting the target spatial reference system
@@ -461,7 +459,7 @@ class LayerMapping:
             ) from exc
 
     def geometry_field(self):
-        "Returns the GeometryField instance associated with the geographic column."
+        "Return the GeometryField instance associated with the geographic column."
         # Use `get_field()` on the model's options so that we
         # get the correct field instance if there's model inheritance.
         opts = self.model._meta
@@ -478,7 +476,7 @@ class LayerMapping:
     def save(self, verbose=False, fid_range=False, step=False,
              progress=False, silent=False, stream=sys.stdout, strict=False):
         """
-        Saves the contents from the OGR DataSource Layer into the database
+        Save the contents from the OGR DataSource Layer into the database
         according to the mapping dictionary given at initialization.
 
         Keyword Parameters:

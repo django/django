@@ -6,18 +6,18 @@ from django.core.validators import (
     MinValueValidator,
 )
 from django.utils.deconstruct import deconstructible
-from django.utils.translation import ugettext_lazy as _, ungettext_lazy
+from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
 
 class ArrayMaxLengthValidator(MaxLengthValidator):
-    message = ungettext_lazy(
+    message = ngettext_lazy(
         'List contains %(show_value)d item, it should contain no more than %(limit_value)d.',
         'List contains %(show_value)d items, it should contain no more than %(limit_value)d.',
         'limit_value')
 
 
 class ArrayMinLengthValidator(MinLengthValidator):
-    message = ungettext_lazy(
+    message = ngettext_lazy(
         'List contains %(show_value)d item, it should contain no fewer than %(limit_value)d.',
         'List contains %(show_value)d items, it should contain no fewer than %(limit_value)d.',
         'limit_value')

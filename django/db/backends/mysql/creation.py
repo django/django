@@ -25,7 +25,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         with self._nodb_connection.cursor() as cursor:
             try:
                 cursor.execute("CREATE DATABASE %s" % qn(target_database_name))
-            except Exception as e:
+            except Exception:
                 if keepdb:
                     return
                 try:

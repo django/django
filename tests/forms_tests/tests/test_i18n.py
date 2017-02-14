@@ -3,13 +3,13 @@ from django.forms import (
 )
 from django.test import SimpleTestCase
 from django.utils import translation
-from django.utils.translation import gettext_lazy, ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 
 class FormsI18nTests(SimpleTestCase):
     def test_lazy_labels(self):
         class SomeForm(Form):
-            username = CharField(max_length=10, label=ugettext_lazy('username'))
+            username = CharField(max_length=10, label=gettext_lazy('username'))
 
         f = SomeForm()
         self.assertHTMLEqual(
@@ -34,10 +34,10 @@ class FormsI18nTests(SimpleTestCase):
 
     def test_non_ascii_label(self):
         class SomeForm(Form):
-            field_1 = CharField(max_length=10, label=ugettext_lazy('field_1'))
+            field_1 = CharField(max_length=10, label=gettext_lazy('field_1'))
             field_2 = CharField(
                 max_length=10,
-                label=ugettext_lazy('field_2'),
+                label=gettext_lazy('field_2'),
                 widget=TextInput(attrs={'id': 'field_2_id'}),
             )
 

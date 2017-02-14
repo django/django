@@ -31,4 +31,4 @@ class Command(TemplateCommand):
         # Create a random SECRET_KEY to put it in the main settings.
         options['secret_key'] = get_random_secret_key()
 
-        super(Command, self).handle('project', project_name, target, **options)
+        super().handle('project', project_name, target, **options)

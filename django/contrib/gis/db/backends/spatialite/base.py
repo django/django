@@ -34,10 +34,10 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
                                        'Make sure it is in your library path, or set '
                                        'SPATIALITE_LIBRARY_PATH in your settings.'
                                        )
-        super(DatabaseWrapper, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_new_connection(self, conn_params):
-        conn = super(DatabaseWrapper, self).get_new_connection(conn_params)
+        conn = super().get_new_connection(conn_params)
         # Enabling extension loading on the SQLite connection.
         try:
             conn.enable_load_extension(True)
@@ -59,7 +59,7 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
         return conn
 
     def prepare_database(self):
-        super(DatabaseWrapper, self).prepare_database()
+        super().prepare_database()
         # Check if spatial metadata have been initialized in the database
         with self.cursor() as cursor:
             cursor.execute("PRAGMA table_info(geometry_columns);")

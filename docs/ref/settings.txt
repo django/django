@@ -1748,11 +1748,11 @@ to restrict language selection to a subset of the Django-provided languages.
 
 If you define a custom :setting:`LANGUAGES` setting, you can mark the
 language names as translation strings using the
-:func:`~django.utils.translation.ugettext_lazy` function.
+:func:`~django.utils.translation.gettext_lazy` function.
 
 Here's a sample settings file::
 
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     LANGUAGES = [
         ('de', _('German')),

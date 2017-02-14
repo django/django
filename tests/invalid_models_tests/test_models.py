@@ -88,7 +88,7 @@ class IndexTogetherTests(SimpleTestCase):
         errors = Model.check()
         expected = [
             Error(
-                "'index_together' refers to the non-existent field 'missing_field'.",
+                "'index_together' refers to the nonexistent field 'missing_field'.",
                 obj=Model,
                 id='models.E012',
             ),
@@ -214,7 +214,7 @@ class UniqueTogetherTests(SimpleTestCase):
         errors = Model.check()
         expected = [
             Error(
-                "'unique_together' refers to the non-existent field 'missing_field'.",
+                "'unique_together' refers to the nonexistent field 'missing_field'.",
                 obj=Model,
                 id='models.E012',
             ),
@@ -631,7 +631,7 @@ class OtherModelTests(SimpleTestCase):
         errors = Model.check()
         expected = [
             Error(
-                "'ordering' refers to the non-existent field 'relation'.",
+                "'ordering' refers to the nonexistent field 'relation'.",
                 obj=Model,
                 id='models.E015',
             ),
@@ -646,7 +646,7 @@ class OtherModelTests(SimpleTestCase):
         errors = Model.check()
         expected = [
             Error(
-                "'ordering' refers to the non-existent field 'missing_field'.",
+                "'ordering' refers to the nonexistent field 'missing_field'.",
                 obj=Model,
                 id='models.E015',
             )
@@ -665,7 +665,7 @@ class OtherModelTests(SimpleTestCase):
         errors = Model.check()
         expected = [
             Error(
-                "'ordering' refers to the non-existent field 'missing_fk_field_id'.",
+                "'ordering' refers to the nonexistent field 'missing_fk_field_id'.",
                 obj=Model,
                 id='models.E015',
             )

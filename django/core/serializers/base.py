@@ -62,19 +62,18 @@ class Serializer:
     progress_class = ProgressBar
     stream_class = StringIO
 
-    def serialize(self, queryset, **options):
+    def serialize(self, queryset, *, stream=None, fields=None, use_natural_foreign_keys=False,
+                  use_natural_primary_keys=False, progress_output=None, object_count=0, **options):
         """
         Serialize a queryset.
         """
         self.options = options
 
-        self.stream = options.pop("stream", self.stream_class())
-        self.selected_fields = options.pop("fields", None)
-        self.use_natural_foreign_keys = options.pop('use_natural_foreign_keys', False)
-        self.use_natural_primary_keys = options.pop('use_natural_primary_keys', False)
-        progress_bar = self.progress_class(
-            options.pop('progress_output', None), options.pop('object_count', 0)
-        )
+        self.stream = stream if stream is not None else self.stream_class()
+        self.selected_fields = fields
+        self.use_natural_foreign_keys = use_natural_foreign_keys
+        self.use_natural_primary_keys = use_natural_primary_keys
+        progress_bar = self.progress_class(progress_output, object_count)
 
         self.start_serialization()
         self.first = True
@@ -89,7 +88,7 @@ class Serializer:
                         if self.selected_fields is None or field.attname in self.selected_fields:
                             self.handle_field(obj, field)
                     else:
-                        if self.field_is_selected(field) and self.output_pk_field(obj, field):
+                        if self.selected_fields is None or field.attname[:-3] in self.selected_fields:
                             self.handle_fk_field(obj, field)
             for field in concrete_model._meta.many_to_many:
                 if field.serialize:
@@ -101,12 +100,6 @@ class Serializer:
                 self.first = False
         self.end_serialization()
         return self.getvalue()
-
-    def field_is_selected(self, field):
-        return self.selected_fields is None or field.attname[:-3] in self.selected_fields
-
-    def output_pk_field(self, obj, pk_field):
-        return self.use_natural_primary_keys or pk_field != obj._meta.pk
 
     def start_serialization(self):
         """

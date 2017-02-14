@@ -24,7 +24,7 @@ from django.utils import datetime_safe
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import FixedOffset, get_default_timezone, utc
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .models import FoodManager, FoodQuerySet
 
@@ -38,6 +38,12 @@ class Money(decimal.Decimal):
             [str(self)],
             {}
         )
+
+
+class TestModel1(object):
+    def upload_to(self):
+        return '/somewhere/dynamic/'
+    thing = models.FileField(upload_to=upload_to)
 
 
 class OperationWriterTests(SimpleTestCase):
@@ -472,21 +478,12 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(string, 'range')
         self.assertEqual(imports, set())
 
-    def test_serialize_local_function_reference(self):
-        """
-        Neither py2 or py3 can serialize a reference in a local scope.
-        """
-        class TestModel2:
-            def upload_to(self):
-                return "somewhere dynamic"
-            thing = models.FileField(upload_to=upload_to)
-        with self.assertRaises(ValueError):
-            self.serialize_round_trip(TestModel2.thing)
+    def test_serialize_unbound_method_reference(self):
+        """An unbound method used within a class body can be serialized."""
+        self.serialize_round_trip(TestModel1.thing)
 
-    def test_serialize_local_function_reference_message(self):
-        """
-        Make sure user is seeing which module/function is the issue
-        """
+    def test_serialize_local_function_reference(self):
+        """A reference in a local scope can't be serialized."""
         class TestModel2:
             def upload_to(self):
                 return "somewhere dynamic"

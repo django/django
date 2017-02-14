@@ -15,7 +15,7 @@ from django.http import (
 )
 from django.template import Context, Engine, TemplateDoesNotExist, loader
 from django.utils.http import http_date, parse_http_date
-from django.utils.translation import ugettext as _, ugettext_lazy
+from django.utils.translation import gettext as _, gettext_lazy
 
 
 def serve(request, path, document_root=None, show_indexes=False):
@@ -95,7 +95,7 @@ DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
   </body>
 </html>
 """
-template_translatable = ugettext_lazy("Index of %(directory)s")
+template_translatable = gettext_lazy("Index of %(directory)s")
 
 
 def directory_index(path, fullpath):
