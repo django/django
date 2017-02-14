@@ -34,6 +34,7 @@ also add the line ``Order deny,allow`` above it.
 .. code-block:: apache
 
     WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
+    WSGIPythonHome /path/to/venv
     WSGIPythonPath /path/to/mysite.com
 
     <Directory /path/to/mysite.com/mysite>
@@ -49,6 +50,10 @@ your project package (``mysite`` in this example). This tells Apache to serve
 any request below the given URL using the WSGI application defined in that
 file.
 
+If you install your project's Python dependencies inside a `virtualenv`_, add
+the path to the virtualenv using ``WSGIPythonHome``. See the `mod_wsgi
+virtualenv guide`_ for more details.
+
 The ``WSGIPythonPath`` line ensures that your project package is available for
 import on the Python path; in other words, that ``import mysite`` works.
 
@@ -60,6 +65,9 @@ exists. As of Django version 1.4, :djadmin:`startproject` will have created one
 for you; otherwise, you'll need to create it. See the :doc:`WSGI overview
 documentation</howto/deployment/wsgi/index>` for the default contents you
 should put in this file, and what else you can add to it.
+
+.. _virtualenv: https://virtualenv.pypa.io/
+.. _mod_wsgi virtualenv guide: https://modwsgi.readthedocs.io/en/develop/user-guides/virtual-environments.html
 
 .. warning::
 
@@ -90,26 +98,6 @@ should put in this file, and what else you can add to it.
     See the :ref:`unicode-files` section of the Unicode reference guide for
     details.
 
-Using a ``virtualenv``
-======================
-
-If you install your project's Python dependencies inside a `virtualenv`_,
-you'll need to add the path to this virtualenv's ``site-packages`` directory to
-your Python path as well. To do this, add an additional path to your
-``WSGIPythonPath`` directive, with multiple paths separated by a colon (``:``)
-if using a UNIX-like system, or a semicolon (``;``) if using Windows. If any
-part of a directory path contains a space character, the complete argument
-string to ``WSGIPythonPath`` must be quoted:
-
-.. code-block:: apache
-
-    WSGIPythonPath /path/to/mysite.com:/path/to/your/venv/lib/python3.X/site-packages
-
-Make sure you give the correct path to your virtualenv, and replace
-``python3.X`` with the correct Python version (e.g. ``python3.4``).
-
-.. _virtualenv: https://virtualenv.pypa.io/
-
 .. _daemon-mode:
 
 Using ``mod_wsgi`` daemon mode
@@ -125,7 +113,7 @@ use ``WSGIPythonPath``; instead you should use the ``python-path`` option to
 
 .. code-block:: apache
 
-    WSGIDaemonProcess example.com python-path=/path/to/mysite.com:/path/to/venv/lib/python2.7/site-packages
+    WSGIDaemonProcess example.com python-home=/path/to/venv python-path=/path/to/mysite.com
     WSGIProcessGroup example.com
 
 If you want to serve your project in a subdirectory
