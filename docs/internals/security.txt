@@ -23,9 +23,8 @@ publicly reported in this fashion.
 
 Instead, if you believe you've found something in Django which has security
 implications, please send a description of the issue via email to
-``security@djangoproject.com``. Mail sent to that address reaches a
-:ref:`subset of the core team <security-team-list>`, who can forward security
-issues into the private team's mailing list for broader discussion if needed.
+``security@djangoproject.com``. Mail sent to that address reaches the `securty
+team <https://www.djangoproject.com/foundation/teams/#security-team>`_.
 
 Once you've submitted an issue via email, you should receive an acknowledgment
 from a member of the security team within 48 hours, and depending on the
@@ -106,7 +105,7 @@ triaging our announcement and upgrade Django as needed. Severity levels are:
 Second, we notify a list of :ref:`people and organizations
 <security-notifications>`, primarily composed of operating-system vendors and
 other distributors of Django. This email is signed with the PGP key of someone
-from :ref:`Django's release team <releasers-list>` and consists of:
+from `Django's release team`_ and consists of:
 
 * A full description of the issue and the affected versions of Django.
 
@@ -149,6 +148,8 @@ theirs.
 
 The Django team also maintains an :doc:`archive of security issues
 disclosed in Django</releases/security>`.
+
+.. _Django's release team: https://www.djangoproject.com/foundation/teams/#releasers-team
 
 .. _security-notifications:
 
