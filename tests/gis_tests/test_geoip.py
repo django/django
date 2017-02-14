@@ -142,7 +142,7 @@ class GeoIPTest(unittest.TestCase):
     def test05_unicode_response(self):
         "Testing that GeoIP strings are properly encoded, see #16553."
         g = GeoIP()
-        fqdn = "hs-duesseldorf.de"
+        fqdn = "messe-duesseldorf.com"
         if self._is_dns_available(fqdn):
             d = g.city(fqdn)
             self.assertEqual('Düsseldorf', d['city'])
