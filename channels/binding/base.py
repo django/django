@@ -120,7 +120,8 @@ class Binding(object):
 
     @classmethod
     def pre_save_receiver(cls, instance, **kwargs):
-        cls.pre_change_receiver(instance, CREATE if instance.pk is None else UPDATE)
+        creating = instance._state.adding
+        cls.pre_change_receiver(instance, CREATE if creating else UPDATE)
 
     @classmethod
     def post_save_receiver(cls, instance, created, **kwargs):

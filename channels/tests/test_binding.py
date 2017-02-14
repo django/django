@@ -6,7 +6,7 @@ from channels import route
 from channels.binding.base import CREATE, DELETE, UPDATE
 from channels.binding.websockets import WebsocketBinding
 from channels.generic.websockets import WebsocketDemultiplexer
-from channels.tests import ChannelTestCase, HttpClient, apply_routes
+from channels.tests import ChannelTestCase, HttpClient, apply_routes, models
 
 User = get_user_model()
 
@@ -51,6 +51,42 @@ class TestsBinding(ChannelTestCase):
         self.assertEqual(received['payload']['data']['username'], 'test')
         self.assertEqual(received['payload']['data']['password'], '')
         self.assertEqual(received['payload']['data']['last_name'], '')
+
+        received = client.receive()
+        self.assertIsNone(received)
+
+    def test_trigger_outbound_create_non_auto_pk(self):
+
+        class TestBinding(WebsocketBinding):
+            model = models.TestUUIDModel
+            stream = 'test'
+            fields = ['name']
+
+            @classmethod
+            def group_names(cls, instance):
+                return ["testuuidmodels"]
+
+            def has_permission(self, user, action, pk):
+                return True
+
+        client = HttpClient()
+        client.join_group('testuuidmodels')
+
+        instance = models.TestUUIDModel.objects.create(name='testname')
+
+        received = client.receive()
+        self.assertTrue('payload' in received)
+        self.assertTrue('action' in received['payload'])
+        self.assertTrue('data' in received['payload'])
+        self.assertTrue('name' in received['payload']['data'])
+        self.assertTrue('model' in received['payload'])
+        self.assertTrue('pk' in received['payload'])
+
+        self.assertEqual(received['payload']['action'], 'create')
+        self.assertEqual(received['payload']['model'], 'tests.testuuidmodel')
+        self.assertEqual(received['payload']['pk'], str(instance.pk))
+
+        self.assertEqual(received['payload']['data']['name'], 'testname')
 
         received = client.receive()
         self.assertIsNone(received)
