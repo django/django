@@ -242,8 +242,7 @@ branches, used for Google Summer of Code projects.
 Tags
 ====
 
-Each Django release is tagged and signed by a :ref:`releaser
-<releasers-list>`.
+Each Django release is tagged and signed by the releaser.
 
 The tags can be found on GitHub's `tags`_ page.
 

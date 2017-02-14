@@ -162,9 +162,8 @@ capacity on non-technical decisions.
 Membership
 ----------
 
-The technical board is an elected group of five committers. They're expected
-to be experienced but there's no formal seniority requirement. Its current
-composition is published :ref:`here <technical-board-list>`.
+`The technical board`_ is an elected group of five committers. They're expected
+to be experienced but there's no formal seniority requirement.
 
 A new board is elected after each feature release of Django. The election
 process is managed by a returns officer nominated by the outgoing technical
@@ -182,6 +181,8 @@ board. The election process works as follows:
 
 Both the application and the voting period last between one and two weeks, at
 the outgoing board's discretion.
+
+.. _the technical board: https://www.djangoproject.com/foundation/teams/#technical-board-team
 
 Changing the organization
 =========================
