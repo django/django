@@ -415,6 +415,22 @@ adds defaults that differ from Jinja2's for a few options:
 
   It defaults to an empty list.
 
+  Use context processors for non-trivial request-dependent values that you want
+  computed only once per template render (and not at all if no template is
+  rendered).
+
+  If a context processor's value isn't used in a majority of your templates or
+  isn't used more than once per template render, it would be more explicit to
+  put the function that you would use as a context processor in the template
+  context (for example, using ``jinja2.Environment`` as described below) and
+  then to call that function in the template::
+
+    {{ function(request) }}
+
+  Since context processors are run for every template that's rendered, think
+  carefully before putting expensive computations in them, especially if the
+  result isn't used in all or most of your templates.
+
 .. versionadded:: 1.11
 
     The ``'context_processors'`` option was added.
