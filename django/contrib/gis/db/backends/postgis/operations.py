@@ -11,6 +11,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql.operations import DatabaseOperations
 from django.db.utils import ProgrammingError
 from django.utils.functional import cached_property
+from django.utils.version import get_version_tuple
 
 from .adapter import PostGISAdapter
 from .models import PostGISGeometryColumns, PostGISSpatialRefSys
@@ -109,7 +110,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     postgis = True
     geography = True
     geom_func_prefix = 'ST_'
-    version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')
 
     Adapter = PostGISAdapter
 
@@ -353,18 +353,8 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         Return the PostGIS version as a tuple (version string, major,
         minor, subminor).
         """
-        # Getting the PostGIS version
         version = self.postgis_lib_version()
-        m = self.version_regex.match(version)
-
-        if m:
-            major = int(m.group('major'))
-            minor1 = int(m.group('minor1'))
-            minor2 = int(m.group('minor2'))
-        else:
-            raise Exception('Could not parse PostGIS version string: %s' % version)
-
-        return (version, major, minor1, minor2)
+        return (version,) + get_version_tuple(version)
 
     def proj_version_tuple(self):
         """

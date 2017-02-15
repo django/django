@@ -1,5 +1,6 @@
 from django import get_version
 from django.test import SimpleTestCase
+from django.utils.version import get_version_tuple
 
 
 class VersionTests(SimpleTestCase):
@@ -22,3 +23,8 @@ class VersionTests(SimpleTestCase):
         )
         for ver_tuple, ver_string in tuples_to_strings:
             self.assertEqual(get_version(ver_tuple), ver_string)
+
+    def test_get_version_tuple(self):
+        self.assertEqual(get_version_tuple('1.2.3'), (1, 2, 3))
+        self.assertEqual(get_version_tuple('1.2.3b2'), (1, 2, 3))
+        self.assertEqual(get_version_tuple('1.2.3b2.dev0'), (1, 2, 3))

@@ -68,6 +68,12 @@ class TestPostGISVersionCheck(unittest.TestCase):
         actual = ops.postgis_version_tuple()
         self.assertEqual(expect, actual)
 
+    def test_version_loose_tuple(self):
+        expect = ('1.2.3b1.dev0', 1, 2, 3)
+        ops = FakePostGISOperations(expect[0])
+        actual = ops.postgis_version_tuple()
+        self.assertEqual(expect, actual)
+
     def test_valid_version_numbers(self):
         versions = [
             ('1.3.0', 1, 3, 0),
@@ -80,15 +86,6 @@ class TestPostGISVersionCheck(unittest.TestCase):
                 ops = FakePostGISOperations(version[0])
                 actual = ops.spatial_version
                 self.assertEqual(version[1:], actual)
-
-    def test_invalid_version_numbers(self):
-        versions = ['nope', '123']
-
-        for version in versions:
-            with self.subTest(version=version):
-                ops = FakePostGISOperations(version)
-                with self.assertRaises(Exception):
-                    ops.spatial_version
 
     def test_no_version_number(self):
         ops = FakePostGISOperations()

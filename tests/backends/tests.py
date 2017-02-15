@@ -323,13 +323,12 @@ class PostgreSQLTests(TestCase):
 
     def test_correct_extraction_psycopg2_version(self):
         from django.db.backends.postgresql.base import psycopg2_version
-        version_path = 'django.db.backends.postgresql.base.Database.__version__'
 
-        with mock.patch(version_path, '2.6.9'):
-            self.assertEqual(psycopg2_version(), (2, 6, 9))
+        with mock.patch('psycopg2.__version__', '4.2.1 (dt dec pq3 ext lo64)'):
+            self.assertEqual(psycopg2_version(), (4, 2, 1))
 
-        with mock.patch(version_path, '2.5.dev0'):
-            self.assertEqual(psycopg2_version(), (2, 5))
+        with mock.patch('psycopg2.__version__', '4.2b0.dev1 (dt dec pq3 ext lo64)'):
+            self.assertEqual(psycopg2_version(), (4, 2))
 
 
 class DateQuotingTest(TestCase):

@@ -14,6 +14,7 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.utils import DatabaseError as WrappedDatabaseError
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeText
+from django.utils.version import get_version_tuple
 
 try:
     import psycopg2 as Database
@@ -25,7 +26,7 @@ except ImportError as e:
 
 def psycopg2_version():
     version = psycopg2.__version__.split(' ', 1)[0]
-    return tuple(int(v) for v in version.split('.') if v.isdigit())
+    return get_version_tuple(version)
 
 
 PSYCOPG2_VERSION = psycopg2_version()

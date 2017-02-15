@@ -12,7 +12,7 @@ from django.contrib.gis.geos import (
     MultiLineString, MultiPoint, MultiPolygon, Point, Polygon, fromfile,
     fromstr,
 )
-from django.contrib.gis.geos.libgeos import geos_version_info
+from django.contrib.gis.geos.libgeos import geos_version_tuple
 from django.contrib.gis.shortcuts import numpy
 from django.template import Context
 from django.template.engine import Engine
@@ -670,11 +670,11 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertFalse(ls_not_closed.closed)
         self.assertTrue(ls_closed.closed)
 
-        if geos_version_info()['version'] >= '3.5':
+        if geos_version_tuple() >= (3, 5):
             self.assertFalse(MultiLineString(ls_closed, ls_not_closed).closed)
             self.assertTrue(MultiLineString(ls_closed, ls_closed).closed)
 
-        with mock.patch('django.contrib.gis.geos.collections.geos_version_info', lambda: {'version': '3.4.9'}):
+        with mock.patch('django.contrib.gis.geos.libgeos.geos_version_info', lambda: {'version': '3.4.9'}):
             with self.assertRaisesMessage(GEOSException, "MultiLineString.closed requires GEOS >= 3.5.0."):
                 MultiLineString().closed
 
@@ -1304,6 +1304,10 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertTrue(m, msg="Unable to parse the version string '%s'" % v_init)
             self.assertEqual(m.group('version'), v_geos)
             self.assertEqual(m.group('capi_version'), v_capi)
+
+    def test_geos_version_tuple(self):
+        with mock.patch('django.contrib.gis.geos.libgeos.geos_version_info', lambda: {'version': '3.4.9'}):
+            self.assertEqual(geos_version_tuple(), (3, 4, 9))
 
     def test_from_gml(self):
         self.assertEqual(

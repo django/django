@@ -15,6 +15,7 @@ from ctypes.util import find_library
 from django.contrib.gis.geos.error import GEOSException
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import SimpleLazyObject
+from django.utils.version import get_version_tuple
 
 logger = logging.getLogger('django.contrib.gis')
 
@@ -199,3 +200,8 @@ def geos_version_info():
         raise GEOSException('Could not parse version info string "%s"' % ver)
     return {key: m.group(key) for key in (
         'version', 'release_candidate', 'capi_version', 'major', 'minor', 'subminor')}
+
+
+def geos_version_tuple():
+    """Return the GEOS version as a tuple (major, minor, subminor)."""
+    return get_version_tuple(geos_version_info()['version'])

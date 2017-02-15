@@ -8,7 +8,7 @@ from ctypes import byref, c_int, c_uint
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
-from django.contrib.gis.geos.libgeos import geos_version_info, get_pointer_arr
+from django.contrib.gis.geos.libgeos import geos_version_tuple, get_pointer_arr
 from django.contrib.gis.geos.linestring import LinearRing, LineString
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.polygon import Polygon
@@ -115,7 +115,7 @@ class MultiLineString(LinearGeometryMixin, GeometryCollection):
 
     @property
     def closed(self):
-        if geos_version_info()['version'] < '3.5':
+        if geos_version_tuple() < (3, 5):
             raise GEOSException("MultiLineString.closed requires GEOS >= 3.5.0.")
         return super().closed
 
