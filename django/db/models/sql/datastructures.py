@@ -87,8 +87,7 @@ class Join:
             join_conditions.append('(%s)' % extra_sql)
             params.extend(extra_params)
         if self.filtered_relation:
-            compilable = self.filtered_relation.get_compilable(self)
-            extra_sql, extra_params = compiler.compile(compilable)
+            extra_sql, extra_params = compiler.compile(self.filtered_relation)
             join_conditions.append('(%s)' % extra_sql)
             params.extend(extra_params)
         if not join_conditions:
@@ -143,6 +142,7 @@ class BaseTable:
     """
     join_type = None
     parent_alias = None
+    filtered_relation = None
 
     def __init__(self, table_name, alias):
         self.table_name = table_name
@@ -157,4 +157,7 @@ class BaseTable:
         return self.__class__(self.table_name, change_map.get(self.table_alias, self.table_alias))
 
     def equals(self, other, with_filtered_relation):
-        return self is other
+        if isinstance(self, other.__class__):
+            return (self.table_name == other.table_name and
+                    self.table_alias == other.table_alias)
+        return False
