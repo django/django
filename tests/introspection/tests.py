@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from unittest import skipUnless
 
 from django.db import connection
+from django.db.models import Index
 from django.db.utils import DatabaseError
 from django.test import TransactionTestCase, mock, skipUnlessDBFeature
 from django.test.utils import ignore_warnings
@@ -193,7 +194,7 @@ class IntrospectionTests(TransactionTestCase):
         for key, val in constraints.items():
             if val['columns'] == ['headline', 'pub_date']:
                 index = val
-        self.assertEqual(index['type'], 'btree')
+        self.assertEqual(index['type'], Index.suffix)
 
     @skipUnlessDBFeature('supports_index_column_ordering')
     def test_get_constraints_indexes_orders(self):

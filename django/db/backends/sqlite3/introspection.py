@@ -4,6 +4,7 @@ import warnings
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
+from django.db.models.indexes import Index
 from django.utils.deprecation import RemovedInDjango21Warning
 
 field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
@@ -262,7 +263,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # Add type and column orders for indexes
             if constraints[index]['index'] and not constraints[index]['unique']:
                 # SQLite doesn't support any index type other than b-tree
-                constraints[index]['type'] = 'btree'
+                constraints[index]['type'] = Index.suffix
                 cursor.execute(
                     "SELECT sql FROM sqlite_master "
                     "WHERE type='index' AND name=%s" % self.connection.ops.quote_name(index)

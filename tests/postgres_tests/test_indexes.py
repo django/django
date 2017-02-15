@@ -9,6 +9,9 @@ from .models import CharFieldModel, IntegerArrayModel
 @skipUnlessDBFeature('has_brin_index_support')
 class BrinIndexTests(PostgreSQLTestCase):
 
+    def test_suffix(self):
+        self.assertEqual(BrinIndex.suffix, 'brin')
+
     def test_repr(self):
         index = BrinIndex(fields=['title'], pages_per_range=4)
         another_index = BrinIndex(fields=['title'])
@@ -40,6 +43,9 @@ class BrinIndexTests(PostgreSQLTestCase):
 
 
 class GinIndexTests(PostgreSQLTestCase):
+
+    def test_suffix(self):
+        self.assertEqual(GinIndex.suffix, 'gin')
 
     def test_repr(self):
         index = GinIndex(fields=['title'])
@@ -84,7 +90,7 @@ class SchemaTests(PostgreSQLTestCase):
             editor.add_index(IntegerArrayModel, index)
         constraints = self.get_constraints(IntegerArrayModel._meta.db_table)
         # Check gin index was added
-        self.assertEqual(constraints[index_name]['type'], 'gin')
+        self.assertEqual(constraints[index_name]['type'], GinIndex.suffix)
         # Drop the index
         with connection.schema_editor() as editor:
             editor.remove_index(IntegerArrayModel, index)
@@ -97,7 +103,7 @@ class SchemaTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.add_index(CharFieldModel, index)
         constraints = self.get_constraints(CharFieldModel._meta.db_table)
-        self.assertEqual(constraints[index_name]['type'], 'brin')
+        self.assertEqual(constraints[index_name]['type'], BrinIndex.suffix)
         self.assertEqual(constraints[index_name]['options'], ['pages_per_range=4'])
         with connection.schema_editor() as editor:
             editor.remove_index(CharFieldModel, index)
