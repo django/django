@@ -5,7 +5,9 @@ from django.db import connection
 from django.db.models import Case, Count, F, Q, When
 from django.test import TestCase
 
-from .models import Author, Book, Borrower, Editor, RentalSession, Reservation
+from .models import (
+    Author, Book, Borrower, Editor, Friend, RentalSession, Reservation,
+)
 
 
 class FilteredRelationTests(TestCase):
@@ -153,6 +155,25 @@ class FilteredRelationTests(TestCase):
     def test_filtered_relation_with_empty_alias_error(self):
         with self.assertRaisesMessage(FieldError, 'FilterRelation expects a non-empty alias'):
             Book.objects.filtered_relation('favourite_books', alias='', condition=Q(blank=''))
+
+
+class FilteredRelationWithLeftJoinTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        for age in range(5, 31, 5):
+            author = Author.objects.create(name='author {}'.format(age))
+            friend = Friend.objects.create(age=age)
+            author.friends.add(friend)
+
+    def test_filtered_relation_with_exclude(self):
+        qs1 = Author.objects.filtered_relation('friends', alias='young_friends', condition=Q(friends__age__lt=21))
+        self.assertQuerysetEqual(
+            qs1.filter(young_friends__age__isnull=False),
+            ['<Author: author 5>', '<Author: author 10>', '<Author: author 15>', '<Author: author 20>'])
+        self.assertQuerysetEqual(
+            qs1.exclude(young_friends__age__gte=10),
+            ['<Author: author 5>', '<Author: author 25>', '<Author: author 30>'])
 
 
 class FilteredRelationWithAggregationTests(TestCase):

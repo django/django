@@ -1554,6 +1554,13 @@ class Query:
         """
         # Generate the inner query.
         query = Query(self.model)
+        if self._filtered_relations:
+            query.alias_map = self.alias_map.copy()
+            query.alias_refcount = self.alias_refcount.copy()
+            query.table_map = self.table_map.copy()
+            query.tables = self.tables[:]
+            query._filtered_relations = self._filtered_relations.copy()
+
         query.add_filter(filter_expr)
         query.clear_ordering(True)
         # Try to have as simple as possible subquery -> trim leading joins from

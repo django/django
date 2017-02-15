@@ -1,12 +1,17 @@
 from django.db import models
 
 
+class Friend(models.Model):
+    age = models.PositiveIntegerField()
+
+
 class Author(models.Model):
     name = models.CharField(max_length=50, unique=True)
     favourite_books = models.ManyToManyField(
         'Book',
         related_name='preferred_by_authors',
         related_query_name='preferred_by_authors')
+    friends = models.ManyToManyField(Friend, related_name='authors', related_query_name='author')
 
     def __str__(self):
         return self.name
