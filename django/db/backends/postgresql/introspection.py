@@ -3,6 +3,7 @@ import warnings
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
+from django.db.models.indexes import Index
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 
@@ -234,7 +235,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "foreign_key": None,
                     "check": False,
                     "index": True,
-                    "type": type_,
+                    "type": Index.suffix if type_ == 'btree' else type_,
                     "definition": definition,
                     "options": options,
                 }

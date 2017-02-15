@@ -1,10 +1,13 @@
 from django.db import models
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .models import Book
 
 
-class IndexesTests(TestCase):
+class IndexesTests(SimpleTestCase):
+
+    def test_suffix(self):
+        self.assertEqual(models.Index.suffix, 'idx')
 
     def test_repr(self):
         index = models.Index(fields=['title'])

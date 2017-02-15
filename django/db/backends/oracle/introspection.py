@@ -274,7 +274,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "foreign_key": None,
                     "check": False,
                     "index": True,
-                    "type": 'btree' if type_ == 'normal' else type_,
+                    "type": 'idx' if type_ == 'normal' else type_,
                 }
             # Record the details
             constraints[constraint]['columns'].append(column)
