@@ -53,6 +53,30 @@ class DjangoTemplates(EngineMixin, BaseRenderer):
     backend = DjangoTemplates
 
 
+class CachedDjangoTemplates(DjangoTemplates):
+    """
+    Load Django templates from the built-in widget templates in
+    django/forms/templates and from apps' 'templates' directory.
+    Once a template is loaded, it is not reloaded until the
+    server restarts.
+    """
+    @cached_property
+    def engine(self):
+        return self.backend({
+            'APP_DIRS': False,
+            'DIRS': [os.path.join(ROOT, self.backend.app_dirname)],
+            'NAME': 'djangoforms',
+            'OPTIONS': {
+                'loaders': [
+                    ('django.template.loaders.cached.Loader', [
+                        'django.template.loaders.filesystem.Loader',
+                        'django.template.loaders.app_directories.Loader',
+                    ]),
+                ],
+            },
+        })
+
+
 class Jinja2(EngineMixin, BaseRenderer):
     """
     Load Jinja2 templates from the built-in widget templates in
