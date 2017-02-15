@@ -5,7 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 def get_site_model():
     """
-    Returns the Site model that is active in this project.
+    Return the Site model that is active in this project.
     """
     try:
         return django_apps.get_model(settings.SITES_SITE_MODEL, require_ready=False)
