@@ -20,11 +20,13 @@ class GenericViewsSitemapTests(SitemapTestsBase):
             },
             priority=0.6,
             changefreq='monthly',
+            protocol='https',
         )
         attr_values = (
             ('date_field', datetime_value),
             ('priority', 0.6),
             ('changefreq', 'monthly'),
+            ('protocol', 'https'),
         )
         for attr_name, expected_value in attr_values:
             with self.subTest(attr_name=attr_name):

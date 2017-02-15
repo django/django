@@ -89,7 +89,8 @@ Minor features
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added the ``protocol`` keyword argument to the
+  :class:`~django.contrib.sitemaps.GenericSitemap` constructor.
 
 :mod:`django.contrib.sites`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

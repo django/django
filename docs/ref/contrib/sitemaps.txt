@@ -259,7 +259,7 @@ Shortcuts
 
 The sitemap framework provides a convenience class for a common case:
 
-.. class:: GenericSitemap
+.. class:: GenericSitemap(info_dict, priority=None, changefreq=None, protocol=None)
 
     The :class:`django.contrib.sitemaps.GenericSitemap` class allows you to
     create a sitemap by passing it a dictionary which has to contain at least
@@ -267,10 +267,15 @@ The sitemap framework provides a convenience class for a common case:
     of the sitemap. It may also have a ``date_field`` entry that
     specifies a date field for objects retrieved from the ``queryset``.
     This will be used for the :attr:`~Sitemap.lastmod` attribute in the
-    generated sitemap. You may also pass :attr:`~Sitemap.priority` and
-    :attr:`~Sitemap.changefreq` keyword arguments to the
-    :class:`~django.contrib.sitemaps.GenericSitemap`  constructor to specify
-    these attributes for all URLs.
+    generated sitemap.
+
+    The :attr:`~Sitemap.priority`, :attr:`~Sitemap.changefreq`,
+    and :attr:`~Sitemap.protocol` keyword arguments allow specifying these
+    attributes for all URLs.
+
+    .. versionadded:: 2.0
+
+        The ``protocol`` keyword argument was added.
 
 Example
 -------
