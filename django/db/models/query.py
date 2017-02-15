@@ -1799,12 +1799,12 @@ def get_related_populators(klass_info, select, db):
 class FilteredRelation(object):
     def __init__(self, relation_name, alias, condition):
         if not relation_name:
-            raise exceptions.FieldError("FilterRelation expects a non empty relation_name")
+            raise exceptions.FieldError("FilterRelation expects a non-empty relation_name")
         if not alias:
-            raise exceptions.FieldError("FilterRelation expects a non empty alias")
+            raise exceptions.FieldError("FilterRelation expects a non-empty alias")
         if relation_name == alias:
             raise exceptions.FieldError("FilterRelation must be used with an alias %r"
-                                        " different as relation_name %r" % (alias, relation_name))
+                                        " different from relation_name %r" % (alias, relation_name))
         self.relation_name = relation_name
         self.alias = alias
         self.condition = condition
@@ -1822,12 +1822,8 @@ class FilteredRelation(object):
         clone.path = self.path[:]
         return clone
 
-    def get_compilable(self, join):
-        return self
-
     def as_sql(self, compiler, connection):
-        # The condition in self.filtered_relation needs to be
-        # resolved.
+        # The condition in self.filtered_relation needs to be resolved.
         query = compiler.query
         where = query.build_filtered_relation_q(self.condition, force_reuse=set(self.path))
         return compiler.compile(where)
