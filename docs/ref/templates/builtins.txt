@@ -1511,7 +1511,7 @@ For example::
 
     {{ value|default_if_none:"nothing" }}
 
-If ``value`` is ``None``, the output will be the string ``"nothing"``.
+If ``value`` is ``None``, the output will be ``nothing``.
 
 .. templatefilter:: dictsort
 
