@@ -5,7 +5,6 @@ HTML Widget classes
 import copy
 import datetime
 import re
-from contextlib import contextmanager
 from itertools import chain
 
 from django.conf import settings
@@ -629,13 +628,6 @@ class ChoiceWidget(Widget):
             except AttributeError:
                 pass
         return getter(name)
-
-    @contextmanager
-    def override_choices(self, choices):
-        old = self.choices
-        self.choices = choices
-        yield
-        self.choices = old
 
     def format_value(self, value):
         """Return selected values as a set."""
