@@ -13,7 +13,7 @@ however, so you can easily write tests and check what your consumers are sending
 ChannelTestCase
 ---------------
 
-If your tests inherit from the ``channels.tests.ChannelTestCase`` base class,
+If your tests inherit from the ``channels.test.ChannelTestCase`` base class,
 whenever you run tests your channel layer will be swapped out for a captive
 in-memory layer, meaning you don't need an external server running to run tests.
 
@@ -24,7 +24,7 @@ To inject a message onto the layer, simply call ``Channel.send()`` inside
 any test method on a ``ChannelTestCase`` subclass, like so::
 
     from channels import Channel
-    from channels.tests import ChannelTestCase
+    from channels.test import ChannelTestCase
 
     class MyTests(ChannelTestCase):
         def test_a_thing(self):
@@ -49,7 +49,7 @@ and post the square of it to the ``"result"`` channel::
 
 
     from channels import Channel
-    from channels.tests import ChannelTestCase
+    from channels.test import ChannelTestCase
 
     class MyTests(ChannelTestCase):
         def test_a_thing(self):
@@ -70,7 +70,7 @@ object from ``get_next_message`` to the constructor of the class. To test replie
 use the ``reply_channel`` property on the ``Message`` object. For example::
 
     from channels import Channel
-    from channels.tests import ChannelTestCase
+    from channels.test import ChannelTestCase
 
     from myapp.consumers import MyConsumer
 
@@ -95,7 +95,7 @@ the entire channel layer is flushed each time a test is run, so it's safe to
 do group adds and sends during a test. For example::
 
     from channels import Group
-    from channels.tests import ChannelTestCase
+    from channels.test import ChannelTestCase
 
     class MyTests(ChannelTestCase):
         def test_a_thing(self):
@@ -118,7 +118,7 @@ to run appointed consumer for the next message, ``receive`` to getting replies f
 Very often you may need to ``send`` and than call a consumer one by one, for this
 purpose use ``send_and_consume`` method::
 
-    from channels.tests import ChannelTestCase, Client
+    from channels.test import ChannelTestCase, Client
 
     class MyTests(ChannelTestCase):
 
@@ -146,7 +146,7 @@ For example::
 
     # tests.py
     from channels import Group
-    from channels.tests import ChannelTestCase, HttpClient
+    from channels.test import ChannelTestCase, HttpClient
 
 
     class RoomsTests(ChannelTestCase):
@@ -196,7 +196,7 @@ want to testing your consumers in more isolate and atomic way, it will be
 simpler with ``apply_routes`` contextmanager and decorator for your ``ChannelTestCase``.
 It takes list of routes that you want to use and overwrite existing routes::
 
-    from channels.tests import ChannelTestCase, HttpClient, apply_routes
+    from channels.test import ChannelTestCase, HttpClient, apply_routes
 
     class MyTests(ChannelTestCase):
 
@@ -220,7 +220,7 @@ make some changes with target model and check received message.
 Lets test ``IntegerValueBinding`` from :doc:`data binding <binding>`
 with creating::
 
-    from channels.tests import ChannelTestCase, HttpClient
+    from channels.test import ChannelTestCase, HttpClient
     from channels.signals import consumer_finished
 
     class TestIntegerValueBinding(ChannelTestCase):

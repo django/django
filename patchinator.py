@@ -121,9 +121,9 @@ global_transforms = [
     Replacement(r"from channels import", r"from django.channels import"),
     Replacement(r"from channels.([a-zA-Z0-9_\.]+) import", r"from django.channels.\1 import"),
     Replacement(r"from .handler import", r"from django.core.handlers.asgi import"),
-    Replacement(r"from django.channels.tests import", r"from django.test.channels import"),
+    Replacement(r"from django.channels.test import", r"from django.test.channels import"),
     Replacement(r"from django.channels.handler import", r"from django.core.handlers.asgi import"),
-    Replacement(r"channels.tests.test_routing", r"channels_tests.test_routing"),
+    Replacement(r"tests.test_routing", r"channels_tests.test_routing"),
     Replacement(r"django.core.urlresolvers", r"django.urls"),
 ]
 
@@ -201,22 +201,22 @@ class Patchinator(object):
         ),
         # Tests
         FileMap(
-            "channels/tests/base.py", "django/test/channels.py", python_transforms,
+            "channels/test/base.py", "django/test/channels.py", python_transforms,
         ),
         NewFile(
             "tests/channels_tests/__init__.py",
         ),
         FileMap(
-            "channels/tests/test_handler.py", "tests/channels_tests/test_handler.py", python_transforms,
+            "tests/test_handler.py", "tests/channels_tests/test_handler.py", python_transforms,
         ),
         FileMap(
-            "channels/tests/test_routing.py", "tests/channels_tests/test_routing.py", python_transforms,
+            "tests/test_routing.py", "tests/channels_tests/test_routing.py", python_transforms,
         ),
         FileMap(
-            "channels/tests/test_request.py", "tests/channels_tests/test_request.py", python_transforms,
+            "tests/test_request.py", "tests/channels_tests/test_request.py", python_transforms,
         ),
         FileMap(
-            "channels/tests/test_sessions.py", "tests/channels_tests/test_sessions.py", python_transforms,
+            "tests/test_sessions.py", "tests/channels_tests/test_sessions.py", python_transforms,
         ),
         # Docs
         FileMap(

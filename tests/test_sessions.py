@@ -8,7 +8,7 @@ from channels.message import Message
 from channels.sessions import (
     channel_and_http_session, channel_session, enforce_ordering, http_session, session_for_reply_channel,
 )
-from channels.tests import ChannelTestCase
+from channels.test import ChannelTestCase
 
 
 @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.cache")

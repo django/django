@@ -5,7 +5,7 @@ from django.test import override_settings
 from channels import route_class
 from channels.exceptions import SendNotAvailableOnDemultiplexer
 from channels.generic import BaseConsumer, websockets
-from channels.tests import ChannelTestCase, Client, HttpClient, apply_routes
+from channels.test import ChannelTestCase, Client, HttpClient, apply_routes
 
 
 @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.cache")

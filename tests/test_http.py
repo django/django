@@ -2,8 +2,7 @@ from __future__ import unicode_literals
 
 from django.http.cookie import parse_cookie
 
-from channels.tests import ChannelTestCase
-from channels.tests.http import HttpClient
+from channels.test import ChannelTestCase, HttpClient
 
 
 class HttpClientTests(ChannelTestCase):

@@ -5,7 +5,7 @@ from django.utils import six
 from channels import Channel
 from channels.exceptions import RequestAborted, RequestTimeout
 from channels.handler import AsgiRequest
-from channels.tests import ChannelTestCase
+from channels.test import ChannelTestCase
 
 
 class RequestTests(ChannelTestCase):

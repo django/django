@@ -6,7 +6,7 @@ from channels import DEFAULT_CHANNEL_LAYER, Channel, route
 from channels.asgi import channel_layers
 from channels.exceptions import ConsumeLater
 from channels.signals import worker_ready
-from channels.tests import ChannelTestCase
+from channels.test import ChannelTestCase
 from channels.worker import Worker, WorkerGroup
 
 try:

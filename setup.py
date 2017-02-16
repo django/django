@@ -9,7 +9,7 @@ setup(
     author_email='foundation@djangoproject.com',
     description="Brings event-driven capabilities to Django with a channel system. Django 1.8 and up only.",
     license='BSD',
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests']),
     include_package_data=True,
     install_requires=[
         'Django>=1.8',
@@ -17,7 +17,12 @@ setup(
         'daphne>=1.0.0',
     ],
     extras_require={
-        'tests': ['coverage', 'mock', 'tox', 'flake8>=2.0,<3.0', 'isort']
+        'tests': [
+            'coverage',
+            'mock ; python_version < "3.0"',
+            'flake8>=2.0,<3.0',
+            'isort',
+        ]
     },
     classifiers=[
         'Development Status :: 5 - Production/Stable',

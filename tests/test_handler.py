@@ -9,7 +9,7 @@ from six import BytesIO
 
 from channels import Channel
 from channels.handler import AsgiHandler
-from channels.tests import ChannelTestCase
+from channels.test import ChannelTestCase
 
 
 class FakeAsgiHandler(AsgiHandler):

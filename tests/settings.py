@@ -7,7 +7,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'channels',
     'channels.delay',
-    'channels.tests'
+    'tests',
 )
 
 DATABASES = {
@@ -22,7 +22,7 @@ CHANNEL_LAYERS = {
         'ROUTING': [],
     },
     'fake_channel': {
-        'BACKEND': 'channels.tests.test_management.FakeChannelLayer',
+        'BACKEND': 'tests.test_management.FakeChannelLayer',
         'ROUTING': [],
     }
 }

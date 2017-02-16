@@ -6,7 +6,8 @@ from channels import route
 from channels.binding.base import CREATE, DELETE, UPDATE
 from channels.binding.websockets import WebsocketBinding
 from channels.generic.websockets import WebsocketDemultiplexer
-from channels.tests import ChannelTestCase, HttpClient, apply_routes, models
+from channels.test import ChannelTestCase, HttpClient, apply_routes
+from tests import models
 
 User = get_user_model()
 

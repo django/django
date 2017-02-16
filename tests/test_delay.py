@@ -8,7 +8,7 @@ from django.utils import timezone
 from channels import DEFAULT_CHANNEL_LAYER, Channel, channel_layers
 from channels.delay.models import DelayedMessage
 from channels.delay.worker import Worker
-from channels.tests import ChannelTestCase
+from channels.test import ChannelTestCase
 
 try:
     from unittest import mock

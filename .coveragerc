@@ -1,12 +1,12 @@
 [run]
 branch = True
 source = channels
-omit = channels/tests/*
+omit = tests/*
 
 [report]
 show_missing = True
 skip_covered = True
-omit = channels/tests/*
+omit = tests/*
 
 [html]
 directory = coverage_html
@@ -21,4 +21,3 @@ django_18 =
     .tox/py27-django-19/lib/python2.7
     .tox/py34-django-19/lib/python3.4
     .tox/py35-django-19/lib/python3.5
-
