@@ -2758,20 +2758,13 @@ class TestCreateModel(SimpleTestCase):
 
 class FieldOperationTests(SimpleTestCase):
     def test_references_model(self):
-        operation = FieldOperation('MoDel', 'field')
-        # When missing a field declaration always assume it's referencing.
-        self.assertIs(operation.references_model('Whatever'), True)
-        operation.field = models.ForeignKey('Other', models.CASCADE)
+        operation = FieldOperation('MoDel', 'field', models.ForeignKey('Other', models.CASCADE))
         # Model name match.
         self.assertIs(operation.references_model('mOdEl'), True)
         # Referenced field.
         self.assertIs(operation.references_model('oTher'), True)
         # Doesn't reference.
         self.assertIs(operation.references_model('Whatever'), False)
-
-    def test_references_field_missing_field(self):
-        operation = FieldOperation('MoDel', 'field')
-        self.assertIs(operation.references_field('Whatever', 'missing'), True)
 
     def test_references_field_by_name(self):
         operation = FieldOperation('MoDel', 'field', models.BooleanField(default=False))

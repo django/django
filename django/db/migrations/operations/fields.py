@@ -34,9 +34,7 @@ class FieldOperation(Operation):
             return True
         if self.field:
             return field_references_model(self.field, ModelTuple(app_label, name_lower))
-        # Refuse the temptation to guess. This operation could be performed on
-        # a field referencing the specified model.
-        return True
+        return False
 
     def references_field(self, model_name, name, app_label=None):
         model_name_lower = model_name.lower()
@@ -60,10 +58,7 @@ class FieldOperation(Operation):
                         (getattr(remote_field, 'through_fields', None) is None or
                             name in remote_field.through_fields)):
                     return True
-            return False
-        # Refuse the temptation to guess. This operation could be performed on
-        # a field referencing the specified model.
-        return True
+        return False
 
     def reduce(self, operation, in_between, app_label=None):
         return (
