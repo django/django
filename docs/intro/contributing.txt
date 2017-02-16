@@ -637,8 +637,8 @@ You can create a pull request by visiting the `Django GitHub page
 <https://github.com/django/django/>`_. You'll see your branch under "Your
 recently pushed branches". Click "Compare & pull request" next to it.
 
-On the next page that displays a preview of the patch, you would click
-"Create pull request".
+Please don't do it for this tutorial, but on the next page that displays a
+preview of the patch, you would click "Create pull request".
 
 Next steps
 ==========
