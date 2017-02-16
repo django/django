@@ -301,6 +301,10 @@ Miscellaneous
   :func:`django.shortcuts.render`. ``render()`` takes the same arguments
   except that is also requires a ``request``.
 
+* The ``DEFAULT_CONTENT_TYPE`` setting is deprecated. It doesn't interact well
+  well with third-party apps and is obsolete since HTML5 has mostly superseded
+  XHTML.
+
 .. _removed-features-2.0:
 
 Features removed in 2.0

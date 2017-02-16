@@ -104,23 +104,6 @@ class DefaultsTests(TestCase):
         self.assertTrue(getattr(article.get_absolute_url, 'purge', False),
                         'The attributes of the original get_absolute_url must be added.')
 
-    @override_settings(DEFAULT_CONTENT_TYPE="text/xml")
-    def test_default_content_type_is_text_html(self):
-        """
-        Content-Type of the default error responses is text/html. Refs #20822.
-        """
-        response = self.client.get('/raises400/')
-        self.assertEqual(response['Content-Type'], 'text/html')
-
-        response = self.client.get('/raises403/')
-        self.assertEqual(response['Content-Type'], 'text/html')
-
-        response = self.client.get('/nonexistent_url/')
-        self.assertEqual(response['Content-Type'], 'text/html')
-
-        response = self.client.get('/server_error/')
-        self.assertEqual(response['Content-Type'], 'text/html')
-
     def test_custom_templates_wrong(self):
         """
         Default error views should raise TemplateDoesNotExist when passed a
