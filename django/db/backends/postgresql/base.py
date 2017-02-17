@@ -4,6 +4,7 @@ PostgreSQL database backend for Django.
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
+import re
 import threading
 import warnings
 
@@ -24,8 +25,11 @@ except ImportError as e:
 
 
 def psycopg2_version():
-    version = psycopg2.__version__.split(' ', 1)[0]
-    return tuple(int(v) for v in version.split('.') if v.isdigit())
+    m = re.match(r'^\d+(?:\.\d+)*', psycopg2.__version__)
+    if m is None:
+        # Failed to parse: it will fail later displaying the version number
+        return ()
+    return tuple(map(int, m.group().split('.')))
 
 
 PSYCOPG2_VERSION = psycopg2_version()
