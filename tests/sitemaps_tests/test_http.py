@@ -4,7 +4,7 @@ from unittest import skipUnless
 
 from django.apps import apps
 from django.conf import settings
-from django.contrib.sitemaps import GenericSitemap, Sitemap
+from django.contrib.sitemaps import Sitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import modify_settings, override_settings
@@ -190,7 +190,8 @@ class HTTPSitemapTests(SitemapTestsBase):
         Check to make sure that the raw item is included with each
         Sitemap.get_url() url result.
         """
-        test_sitemap = GenericSitemap({'queryset': TestModel.objects.order_by('pk').all()})
+        test_sitemap = Sitemap()
+        test_sitemap.items = TestModel.objects.order_by('pk').all
 
         def is_testmodel(url):
             return isinstance(url['item'], TestModel)
