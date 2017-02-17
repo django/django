@@ -262,7 +262,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if internal_type == 'DateField':
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
-            return "age(%s, %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
+            return "(interval '1 day' * (%s - %s))" % (lhs_sql, rhs_sql), lhs_params + rhs_params
         return super(DatabaseOperations, self).subtract_temporals(internal_type, lhs, rhs)
 
     def fulltext_search_sql(self, field_name):
