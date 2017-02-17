@@ -17,3 +17,6 @@ Bugfixes
 
 * Fixed a crash on Oracle and PostgreSQL when subtracting ``DurationField``
   or ``IntegerField`` from ``DateField`` (:ticket:`27828`).
+
+* Fixed query expression date subtraction accuracy on PostgreSQL for
+  differences large an a month (:ticket:`27856`).
