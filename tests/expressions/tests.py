@@ -952,6 +952,7 @@ class FTimeDeltaTests(TestCase):
         delta2 = datetime.timedelta(seconds=44)
         delta3 = datetime.timedelta(hours=21, minutes=8)
         delta4 = datetime.timedelta(days=10)
+        delta5 = datetime.timedelta(days=90)
 
         # Test data is set so that deltas and delays will be
         # strictly increasing.
@@ -1015,6 +1016,18 @@ class FTimeDeltaTests(TestCase):
         cls.deltas.append(delta4)
         cls.delays.append(e4.start - datetime.datetime.combine(e4.assigned, midnight))
         cls.days_long.append(e4.completed - e4.assigned)
+
+        # e5: started a month after assignment, very long duration
+        delay = datetime.timedelta(30)
+        end = stime + delay + delta5
+        e5 = Experiment.objects.create(
+            name='e5', assigned=sday, start=stime + delay, end=end,
+            completed=end.date(), estimated_time=delta5,
+        )
+        cls.deltas.append(delta5)
+        cls.delays.append(e5.start - datetime.datetime.combine(e5.assigned, midnight))
+        cls.days_long.append(e5.completed - e5.assigned)
+
         cls.expnames = [e.name for e in Experiment.objects.all()]
 
     def test_multiple_query_compilation(self):
@@ -1138,7 +1151,10 @@ class FTimeDeltaTests(TestCase):
         )
 
         at_least_5_days = {e.name for e in queryset.filter(completion_duration__gte=datetime.timedelta(days=5))}
-        self.assertEqual(at_least_5_days, {'e3', 'e4'})
+        self.assertEqual(at_least_5_days, {'e3', 'e4', 'e5'})
+
+        at_least_120_days = {e.name for e in queryset.filter(completion_duration__gte=datetime.timedelta(days=120))}
+        self.assertEqual(at_least_120_days, {'e5'})
 
         less_than_5_days = {e.name for e in queryset.filter(completion_duration__lt=datetime.timedelta(days=5))}
         expected = {'e0', 'e2'}
@@ -1182,13 +1198,13 @@ class FTimeDeltaTests(TestCase):
         over_estimate = Experiment.objects.exclude(name='e1').filter(
             completed__gt=self.stime + F('estimated_time'),
         ).order_by('name')
-        self.assertQuerysetEqual(over_estimate, ['e3', 'e4'], lambda e: e.name)
+        self.assertQuerysetEqual(over_estimate, ['e3', 'e4', 'e5'], lambda e: e.name)
 
     def test_date_minus_duration(self):
         more_than_4_days = Experiment.objects.filter(
             assigned__lt=F('completed') - Value(datetime.timedelta(days=4), output_field=models.DurationField())
         )
-        self.assertQuerysetEqual(more_than_4_days, ['e3', 'e4'], lambda e: e.name)
+        self.assertQuerysetEqual(more_than_4_days, ['e3', 'e4', 'e5'], lambda e: e.name)
 
     def test_negative_timedelta_update(self):
         # subtract 30 seconds, 30 minutes, 2 hours and 2 days
