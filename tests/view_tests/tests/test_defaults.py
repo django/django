@@ -64,8 +64,8 @@ class DefaultsTests(TestCase):
         # See ticket #14565
         for url in self.nonexistent_urls:
             response = self.client.get(url)
-            self.assertNotEqual(response.content, 'NOTPROVIDED')
-            self.assertNotEqual(response.content, '')
+            self.assertNotEqual(response.content, b'NOTPROVIDED')
+            self.assertNotEqual(response.content, b'')
 
     def test_server_error(self):
         "The server_error view raises a 500 status"

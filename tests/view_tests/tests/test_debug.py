@@ -140,7 +140,7 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
             id_repr = match.group('id')
             self.assertFalse(
                 re.search(b'[^c0-9]', id_repr),
-                "Numeric IDs in debug response HTML page shouldn't be localized (value: %s)." % id_repr
+                "Numeric IDs in debug response HTML page shouldn't be localized (value: %s)." % id_repr.decode()
             )
 
     def test_template_exceptions(self):
