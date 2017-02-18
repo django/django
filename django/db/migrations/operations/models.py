@@ -31,9 +31,9 @@ class ModelOperation(Operation):
     def references_model(self, name, app_label=None):
         return name.lower() == self.name_lower
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, app_label=None):
         return (
-            super().reduce(operation, in_between, app_label=app_label) or
+            super().reduce(operation, app_label=app_label) or
             not operation.references_model(self.name, app_label)
         )
 
@@ -117,7 +117,7 @@ class CreateModel(ModelOperation):
                 return True
         return False
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, app_label=None):
         if (isinstance(operation, DeleteModel) and
                 self.name_lower == operation.name_lower and
                 not self.options.get("proxy", False)):
@@ -193,7 +193,7 @@ class CreateModel(ModelOperation):
                         managers=self.managers,
                     ),
                 ]
-        return super().reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, app_label=app_label)
 
 
 class DeleteModel(ModelOperation):
@@ -368,7 +368,7 @@ class RenameModel(ModelOperation):
     def describe(self):
         return "Rename model %s to %s" % (self.old_name, self.new_name)
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, app_label=None):
         if (isinstance(operation, RenameModel) and
                 self.new_name_lower == operation.old_name_lower):
             return [
@@ -380,7 +380,7 @@ class RenameModel(ModelOperation):
         # Skip `ModelOperation.reduce` as we want to run `references_model`
         # against self.new_name.
         return (
-            super(ModelOperation, self).reduce(operation, in_between, app_label=app_label) or
+            super(ModelOperation, self).reduce(operation, app_label=app_label) or
             not operation.references_model(self.new_name, app_label)
         )
 
@@ -434,26 +434,26 @@ class AlterModelTable(ModelOperation):
             self.table if self.table is not None else "(default)"
         )
 
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, app_label=None):
         if isinstance(operation, (AlterModelTable, DeleteModel)) and self.name_lower == operation.name_lower:
             return [operation]
-        return super().reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, app_label=app_label)
 
 
 class ModelOptionOperation(ModelOperation):
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, app_label=None):
         if isinstance(operation, (self.__class__, DeleteModel)) and self.name_lower == operation.name_lower:
             return [operation]
-        return super().reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, app_label=app_label)
 
 
 class FieldRelatedOptionOperation(ModelOptionOperation):
-    def reduce(self, operation, in_between, app_label=None):
+    def reduce(self, operation, app_label=None):
         if (isinstance(operation, FieldOperation) and
                 self.name_lower == operation.model_name_lower and
                 not self.references_field(operation.model_name, operation.name)):
             return [operation, self]
-        return super().reduce(operation, in_between, app_label=app_label)
+        return super().reduce(operation, app_label=app_label)
 
 
 class AlterUniqueTogether(FieldRelatedOptionOperation):
