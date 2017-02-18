@@ -2,6 +2,7 @@ import copy
 import inspect
 import warnings
 from itertools import chain
+from contextlib import suppress
 
 from django.apps import apps
 from django.conf import settings
@@ -475,15 +476,13 @@ class Model(metaclass=ModelBase):
         if kwargs:
             property_names = opts._property_names
             for prop in tuple(kwargs):
-                try:
+                with suppress(AttributeError, FieldDoesNotExist):
                     # Any remaining kwargs must correspond to properties or
                     # virtual fields.
                     if prop in property_names or opts.get_field(prop):
                         if kwargs[prop] is not _DEFERRED:
                             _setattr(self, prop, kwargs[prop])
                         del kwargs[prop]
-                except (AttributeError, FieldDoesNotExist):
-                    pass
             if kwargs:
                 raise TypeError("'%s' is an invalid keyword argument for this function" % list(kwargs)[0])
         super().__init__()

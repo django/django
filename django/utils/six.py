@@ -25,6 +25,7 @@ import itertools
 import operator
 import sys
 import types
+from contextlib import suppress
 
 __author__ = "Benjamin Peterson <benjamin@python.org>"
 __version__ = "1.10.0"
@@ -89,12 +90,10 @@ class _LazyDescr:
     def __get__(self, obj, tp):
         result = self._resolve()
         setattr(obj, self.name, result)  # Invokes __set__.
-        try:
+        with suppress(AttributeError):
             # This is a bit ugly, but it avoids running this again by
             # removing this descriptor.
             delattr(obj.__class__, self.name)
-        except AttributeError:
-            pass
         return result
 
 
@@ -191,11 +190,9 @@ class _SixMetaPathImporter:
             raise ImportError("This loader does not know module " + fullname)
 
     def load_module(self, fullname):
-        try:
+        with suppress(KeyError):
             # in case of a reload
             return sys.modules[fullname]
-        except KeyError:
-            pass
         mod = self.__get_module(fullname)
         if isinstance(mod, MovedModule):
             mod = mod._resolve()

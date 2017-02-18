@@ -11,6 +11,7 @@ import uuid
 from decimal import Decimal, DecimalException
 from io import BytesIO
 from urllib.parse import urlsplit, urlunsplit
+from contextlib import suppress
 
 from django.core import validators
 from django.core.exceptions import ValidationError
@@ -1105,7 +1106,7 @@ class FilePathField(ChoiceField):
                             f = os.path.join(root, f)
                             self.choices.append((f, f.replace(path, "", 1)))
         else:
-            try:
+            with suppress(OSError):
                 for f in sorted(os.listdir(self.path)):
                     if f == '__pycache__':
                         continue
@@ -1114,8 +1115,6 @@ class FilePathField(ChoiceField):
                             (self.allow_folders and os.path.isdir(full_file))) and
                             (self.match is None or self.match_re.search(f))):
                         self.choices.append((full_file, f))
-            except OSError:
-                pass
 
         self.widget.choices = self.choices
 

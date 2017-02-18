@@ -4,6 +4,7 @@ MySQL database backend for Django.
 Requires mysqlclient: https://pypi.python.org/pypi/mysqlclient/
 """
 import re
+from contextlib import suppress
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
@@ -258,10 +259,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return CursorWrapper(cursor)
 
     def _rollback(self):
-        try:
+        with suppress(Database.NotSupportedError):
             BaseDatabaseWrapper._rollback(self)
-        except Database.NotSupportedError:
-            pass
 
     def _set_autocommit(self, autocommit):
         with self.wrap_database_errors:

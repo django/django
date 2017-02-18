@@ -2,6 +2,7 @@ import functools
 import re
 import sys
 import types
+from contextlib import suppress
 
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseNotFound
@@ -336,18 +337,14 @@ class ExceptionReporter:
         """
         source = None
         if loader is not None and hasattr(loader, "get_source"):
-            try:
+            with suppress(ImportError):
                 source = loader.get_source(module_name)
-            except ImportError:
-                pass
             if source is not None:
                 source = source.splitlines()
         if source is None:
-            try:
+            with suppress(OSError, IOError):
                 with open(filename, 'rb') as fp:
                     source = fp.read().splitlines()
-            except (OSError, IOError):
-                pass
         if source is None:
             return None, [], None, []
 

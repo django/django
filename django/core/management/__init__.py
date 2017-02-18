@@ -4,6 +4,7 @@ import pkgutil
 import sys
 from collections import OrderedDict, defaultdict
 from importlib import import_module
+from contextlib import suppress
 
 import django
 from django.apps import apps
@@ -295,11 +296,9 @@ class ManagementUtility:
         parser.add_argument('--settings')
         parser.add_argument('--pythonpath')
         parser.add_argument('args', nargs='*')  # catch-all
-        try:
+        with suppress(CommandError):  # Ignore any option errors at this point.
             options, args = parser.parse_known_args(self.argv[2:])
             handle_default_options(options)
-        except CommandError:
-            pass  # Ignore any option errors at this point.
 
         try:
             settings.INSTALLED_APPS

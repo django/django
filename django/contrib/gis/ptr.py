@@ -1,4 +1,5 @@
 from ctypes import c_void_p
+from contextlib import suppress
 
 
 class CPointerBase:
@@ -32,7 +33,5 @@ class CPointerBase:
         Free the memory used by the C++ object.
         """
         if self.destructor and self._ptr:
-            try:
+            with suppress(AttributeError, TypeError):  # Some part might already have been garbage collected
                 self.destructor(self.ptr)
-            except (AttributeError, TypeError):
-                pass  # Some part might already have been garbage collected

@@ -3,7 +3,7 @@ Internationalization support.
 """
 import re
 import warnings
-from contextlib import ContextDecorator
+from contextlib import ContextDecorator, suppress
 
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
@@ -127,11 +127,8 @@ def lazy_number(func, resultclass, number=None, **kwargs):
                     number_value = rhs
                 kwargs['number'] = number_value
                 translated = func(**kwargs)
-                try:
+                with suppress(TypeError):  # String doesn't contain a placeholder for the number
                     translated = translated % rhs
-                except TypeError:
-                    # String doesn't contain a placeholder for the number
-                    pass
                 return translated
 
         proxy = lazy(lambda **kwargs: NumberAwareString(), NumberAwareString)(**kwargs)

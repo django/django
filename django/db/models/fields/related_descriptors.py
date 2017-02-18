@@ -64,6 +64,7 @@ and two directions (forward and reverse) for a total of six combinations.
 """
 
 from operator import attrgetter
+from contextlib import suppress
 
 from django.db import connections, router, transaction
 from django.db.models import Q, signals
@@ -534,10 +535,8 @@ def create_reverse_many_to_one_manager(superclass, rel):
             return queryset
 
         def _remove_prefetched_objects(self):
-            try:
+            with suppress(AttributeError, KeyError):  # nothing to clear from cache
                 self.instance._prefetched_objects_cache.pop(self.field.related_query_name())
-            except (AttributeError, KeyError):
-                pass  # nothing to clear from cache
 
         def get_queryset(self):
             try:
@@ -815,10 +814,8 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             return queryset._next_is_sticky().filter(**self.core_filters)
 
         def _remove_prefetched_objects(self):
-            try:
+            with suppress(AttributeError, KeyError):  # nothing to clear from cache
                 self.instance._prefetched_objects_cache.pop(self.prefetch_cache_name)
-            except (AttributeError, KeyError):
-                pass  # nothing to clear from cache
 
         def get_queryset(self):
             try:

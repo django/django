@@ -5,6 +5,7 @@ and database field objects.
 
 from collections import OrderedDict
 from itertools import chain
+from contextlib import suppress
 
 from django.core.exceptions import (
     NON_FIELD_ERRORS, FieldError, ImproperlyConfigured, ValidationError,
@@ -592,10 +593,8 @@ class BaseModelFormSet(BaseFormSet):
             kwargs['instance'] = self.get_queryset()[i]
         if i >= self.initial_form_count() and self.initial_extra:
             # Set initial values for extra forms
-            try:
+            with suppress(IndexError):
                 kwargs['initial'] = self.initial_extra[i - self.initial_form_count()]
-            except IndexError:
-                pass
         return super()._construct_form(i, **kwargs)
 
     def get_queryset(self):

@@ -1,6 +1,7 @@
 import importlib
 import os
 import sys
+from contextlib import suppress
 
 from django.apps import apps
 from django.db.models.fields import NOT_PROVIDED
@@ -95,12 +96,10 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
             print(" %s) %s" % (i + 1, choice))
         result = input("Select an option: ")
         while True:
-            try:
+            with suppress(ValueError):
                 value = int(result)
                 if 0 < value <= len(choices):
                     return value
-            except ValueError:
-                pass
             result = input("Please select a valid option: ")
 
     def _ask_default(self, default=''):

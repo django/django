@@ -27,6 +27,7 @@
   NAD83 / Texas South Central
 """
 from ctypes import byref, c_char_p, c_int
+from contextlib import suppress
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import SRSException
@@ -55,13 +56,11 @@ class SpatialReference(GDALBase):
             self.import_wkt(srs_input)
             return
         elif isinstance(srs_input, str):
-            try:
+            with suppress(ValueError):
                 # If SRID is a string, e.g., '4326', then make acceptable
                 # as user input.
                 srid = int(srs_input)
                 srs_input = 'EPSG:%d' % srid
-            except ValueError:
-                pass
         elif isinstance(srs_input, int):
             # EPSG integer code was input.
             srs_type = 'epsg'

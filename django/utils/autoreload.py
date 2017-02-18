@@ -34,6 +34,7 @@ import subprocess
 import sys
 import time
 import traceback
+from contextlib import suppress
 
 import _thread
 
@@ -43,10 +44,8 @@ from django.core.signals import request_finished
 
 # This import does nothing, but it's necessary to avoid some race conditions
 # in the threading module. See http://code.djangoproject.com/ticket/2330 .
-try:
+with suppress(ImportError):
     import threading  # NOQA
-except ImportError:
-    pass
 
 try:
     import termios
@@ -54,7 +53,7 @@ except ImportError:
     termios = None
 
 USE_INOTIFY = False
-try:
+with suppress(ImportError):
     # Test whether inotify is enabled and likely to work
     import pyinotify
 
@@ -62,8 +61,6 @@ try:
     if fd >= 0:
         USE_INOTIFY = True
         os.close(fd)
-except ImportError:
-    pass
 
 RUN_RELOADER = True
 
@@ -210,10 +207,8 @@ def code_changed():
             continue
         if mtime != _mtimes[filename]:
             _mtimes = {}
-            try:
+            with suppress(ValueError):
                 del _error_files[_error_files.index(filename)]
-            except ValueError:
-                pass
             return I18N_MODIFIED if filename.endswith('.mo') else FILE_MODIFIED
     return False
 
@@ -292,19 +287,15 @@ def restart_with_reloader():
 def python_reloader(main_func, args, kwargs):
     if os.environ.get("RUN_MAIN") == "true":
         _thread.start_new_thread(main_func, args, kwargs)
-        try:
+        with suppress(KeyboardInterrupt):
             reloader_thread()
-        except KeyboardInterrupt:
-            pass
     else:
-        try:
+        with suppress(KeyboardInterrupt):
             exit_code = restart_with_reloader()
             if exit_code < 0:
                 os.kill(os.getpid(), -exit_code)
             else:
                 sys.exit(exit_code)
-        except KeyboardInterrupt:
-            pass
 
 
 def jython_reloader(main_func, args, kwargs):

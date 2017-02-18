@@ -6,6 +6,7 @@ from functools import wraps
 from operator import itemgetter
 from pprint import pformat
 from urllib.parse import quote
+from contextlib import suppress
 
 from django.utils import formats
 from django.utils.dateformat import format, time_format
@@ -606,7 +607,7 @@ def unordered_list(value, autoescape=True):
 
     def walk_items(item_list):
         item_iterator = iter(item_list)
-        try:
+        with suppress(StopIteration):
             item = next(item_iterator)
             while True:
                 try:
@@ -625,8 +626,6 @@ def unordered_list(value, autoescape=True):
                         continue
                 yield item, None
                 item = next_item
-        except StopIteration:
-            pass
 
     def list_formatter(item_list, tabs=1):
         indent = '\t' * tabs
@@ -876,11 +875,9 @@ def pluralize(value, arg='s'):
     except ValueError:  # Invalid string that's not a number.
         pass
     except TypeError:  # Value isn't a string or a number; maybe it's a list?
-        try:
+        with suppress(TypeError):  # len() of unsized object.
             if len(value) != 1:
                 return plural_suffix
-        except TypeError:  # len() of unsized object.
-            pass
     return singular_suffix
 
 
