@@ -161,7 +161,7 @@ def validate_integer(value):
 
 
 @deconstructible
-class EmailValidator
+class EmailValidator:
     # Matches https://html.spec.whatwg.org/multipage/forms.html#valid-e-mail-address
     message = _('Enter a valid email address.')
     code = 'invalid'
@@ -182,7 +182,7 @@ class EmailValidator
         if code is not None:
             self.code = code
         if whitelist is not None:
-            pass # deprecated
+            pass  # deprecated
 
     def __call__(self, value):
         if not value or '@' not in value:
