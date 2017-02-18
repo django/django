@@ -343,9 +343,7 @@ class URLPattern:
         'path.to.ClassBasedView').
         """
         callback = self.callback
-        # Python 3.5 collapses nested partials, so can change "while" to "if"
-        # when it's the minimum supported version.
-        while isinstance(callback, functools.partial):
+        if isinstance(callback, functools.partial):
             callback = callback.func
         if not hasattr(callback, '__name__'):
             return callback.__module__ + "." + callback.__class__.__name__

@@ -192,7 +192,7 @@ Configurable attributes
 .. attribute:: AppConfig.path
 
     Filesystem path to the application directory, e.g.
-    ``'/usr/lib/python3.4/dist-packages/django/contrib/admin'``.
+    ``'/usr/lib/pythonX.Y/dist-packages/django/contrib/admin'``.
 
     In most cases, Django can automatically detect and set this, but you can
     also provide an explicit override as a class attribute on your

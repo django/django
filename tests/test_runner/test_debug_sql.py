@@ -1,4 +1,3 @@
-import sys
 import unittest
 from io import StringIO
 
@@ -94,18 +93,13 @@ class TestDebugSQL(unittest.TestCase):
     ]
 
     verbose_expected_outputs = [
-        # Output format changed in Python 3.5+
-        x.format('' if sys.version_info < (3, 5) else 'TestDebugSQL.') for x in [
-            'runTest (test_runner.test_debug_sql.{}FailingTest) ... FAIL',
-            'runTest (test_runner.test_debug_sql.{}ErrorTest) ... ERROR',
-            'runTest (test_runner.test_debug_sql.{}PassingTest) ... ok',
-            'runTest (test_runner.test_debug_sql.{}PassingSubTest) ... ok',
-            # If there are errors/failures in subtests but not in test itself,
-            # the status is not written. That behavior comes from Python.
-            'runTest (test_runner.test_debug_sql.{}FailingSubTest) ...',
-            'runTest (test_runner.test_debug_sql.{}ErrorSubTest) ...',
-        ]
-    ] + [
+        'runTest (test_runner.test_debug_sql.TestDebugSQL.FailingTest) ... FAIL',
+        'runTest (test_runner.test_debug_sql.TestDebugSQL.ErrorTest) ... ERROR',
+        'runTest (test_runner.test_debug_sql.TestDebugSQL.PassingTest) ... ok',
+        # If there are errors/failures in subtests but not in test itself,
+        # the status is not written. That behavior comes from Python.
+        'runTest (test_runner.test_debug_sql.TestDebugSQL.FailingSubTest) ...',
+        'runTest (test_runner.test_debug_sql.TestDebugSQL.ErrorSubTest) ...',
         ('''SELECT COUNT(*) AS "__count" '''
             '''FROM "test_runner_person" WHERE '''
             '''"test_runner_person"."first_name" = 'pass';'''),
