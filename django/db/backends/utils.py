@@ -4,6 +4,7 @@ import hashlib
 import logging
 import re
 from time import time
+from contextlib import suppress
 
 from django.conf import settings
 from django.utils.encoding import force_bytes
@@ -38,10 +39,8 @@ class CursorWrapper:
         # Close instead of passing through to avoid backend-specific behavior
         # (#17671). Catch errors liberally because errors in cleanup code
         # aren't useful.
-        try:
+        with suppress(self.db.Database.Error):
             self.close()
-        except self.db.Database.Error:
-            pass
 
     # The following methods cannot be implemented in __getattr__, because the
     # code must run when the method is invoked, not just when it is accessed.

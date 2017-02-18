@@ -2,6 +2,7 @@
 Module for abstract serializer/unserializer base classes.
 """
 from io import StringIO
+from contextlib import suppress
 
 from django.db import models
 
@@ -223,8 +224,6 @@ def build_instance(Model, data, db):
     if (obj.pk is None and hasattr(Model, 'natural_key') and
             hasattr(Model._default_manager, 'get_by_natural_key')):
         natural_key = obj.natural_key()
-        try:
+        with suppress(Model.DoesNotExist):
             obj.pk = Model._default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
-        except Model.DoesNotExist:
-            pass
     return obj

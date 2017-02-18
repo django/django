@@ -7,6 +7,7 @@ import datetime
 import decimal
 import os
 import platform
+from contextlib import suppress
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -486,11 +487,8 @@ class FormatStylePlaceholderCursor:
         return tuple(_rowfactory(r, self.cursor) for r in self.cursor.fetchall())
 
     def close(self):
-        try:
+        with suppress(Database.InterfaceError):  # already closed
             self.cursor.close()
-        except Database.InterfaceError:
-            # already closed
-            pass
 
     def var(self, *args):
         return VariableWrapper(self.cursor.var(*args))

@@ -18,6 +18,7 @@ arguments available in tempfile.NamedTemporaryFile.
 
 import os
 import tempfile
+from contextlib import suppress
 
 from django.core.files.utils import FileProxyMixin
 
@@ -48,14 +49,10 @@ if os.name == 'nt':
         def close(self):
             if not self.close_called:
                 self.close_called = True
-                try:
+                with suppress(OSError, IOError):
                     self.file.close()
-                except (OSError, IOError):
-                    pass
-                try:
+                with suppress(OSError):
                     self.unlink(self.name)
-                except (OSError):
-                    pass
 
         def __del__(self):
             self.close()

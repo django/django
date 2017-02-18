@@ -6,6 +6,7 @@ import copy
 import sys
 import warnings
 from collections import OrderedDict, deque
+from contextlib import suppress
 
 from django.conf import settings
 from django.core import exceptions
@@ -494,10 +495,8 @@ class QuerySet:
             return obj, True
         except IntegrityError:
             exc_info = sys.exc_info()
-            try:
+            with suppress(self.model.DoesNotExist):
                 return self.get(**lookup), False
-            except self.model.DoesNotExist:
-                pass
             raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
 
     def _extract_model_params(self, defaults, **kwargs):
@@ -1263,12 +1262,9 @@ class RawQuerySet:
         columns = self.query.get_columns()
         # Adjust any column names which don't match field names
         for (query_name, model_name) in self.translations.items():
-            try:
+            with suppress(ValueError):  # Ignore translations for nonexistent column names
                 index = columns.index(query_name)
                 columns[index] = model_name
-            except ValueError:
-                # Ignore translations for nonexistent column names
-                pass
         return columns
 
     @cached_property

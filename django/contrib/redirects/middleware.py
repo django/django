@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from django import http
 from django.apps import apps
 from django.conf import settings
@@ -29,18 +31,14 @@ class RedirectFallbackMiddleware(MiddlewareMixin):
         current_site = get_current_site(request)
 
         r = None
-        try:
+        with suppress(Redirect.DoesNotExist):
             r = Redirect.objects.get(site=current_site, old_path=full_path)
-        except Redirect.DoesNotExist:
-            pass
         if r is None and settings.APPEND_SLASH and not request.path.endswith('/'):
-            try:
+            with suppress(Redirect.DoesNotExist):
                 r = Redirect.objects.get(
                     site=current_site,
                     old_path=request.get_full_path(force_append_slash=True),
                 )
-            except Redirect.DoesNotExist:
-                pass
         if r is not None:
             if r.new_path == '':
                 return self.response_gone_class()

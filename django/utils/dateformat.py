@@ -14,6 +14,7 @@ import calendar
 import datetime
 import re
 import time
+from contextlib import suppress
 
 from django.utils.dates import (
     MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR,
@@ -82,11 +83,9 @@ class TimeFormat(Formatter):
         if not self.timezone:
             return ""
 
-        try:
+        with suppress(NotImplementedError):
             if hasattr(self.data, 'tzinfo') and self.data.tzinfo:
                 return self.data.tzname() or ''
-        except NotImplementedError:
-            pass
         return ""
 
     def f(self):

@@ -1,4 +1,5 @@
 import logging
+from contextlib import suppress
 
 from django.contrib.sessions.backends.base import (
     CreateError, SessionBase, UpdateError,
@@ -98,10 +99,8 @@ class SessionStore(SessionBase):
             if self.session_key is None:
                 return
             session_key = self.session_key
-        try:
+        with suppress(self.model.DoesNotExist):
             self.model.objects.get(session_key=session_key).delete()
-        except self.model.DoesNotExist:
-            pass
 
     @classmethod
     def clear_expired(cls):

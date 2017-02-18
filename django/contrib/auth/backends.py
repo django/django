@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 
@@ -147,10 +149,8 @@ class RemoteUserBackend(ModelBackend):
             if created:
                 user = self.configure_user(user)
         else:
-            try:
+            with suppress(UserModel.DoesNotExist):
                 user = UserModel._default_manager.get_by_natural_key(username)
-            except UserModel.DoesNotExist:
-                pass
         return user if self.user_can_authenticate(user) else None
 
     def clean_username(self, username):

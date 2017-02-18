@@ -1,6 +1,7 @@
 import functools
 import re
 from itertools import chain
+from contextlib import suppress
 
 from django.conf import settings
 from django.db import models
@@ -434,7 +435,7 @@ class MigrationAutodetector:
         Sorting key function that places potential swappable models first in
         lists of created models (only real way to solve #22783)
         """
-        try:
+        with suppress(LookupError):
             model = self.new_apps.get_model(item[0], item[1])
             base_names = [base.__name__ for base in model.__bases__]
             string_version = "%s.%s" % (item[0], item[1])
@@ -445,8 +446,6 @@ class MigrationAutodetector:
                 settings.AUTH_USER_MODEL.lower() == string_version.lower()
             ):
                 return ("___" + item[0], "___" + item[1])
-        except LookupError:
-            pass
         return item
 
     def generate_renamed_models(self):

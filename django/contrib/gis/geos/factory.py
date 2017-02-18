@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 from django.contrib.gis.geos.geometry import GEOSGeometry, hex_regex, wkt_regex
 
 
@@ -15,12 +17,10 @@ def fromfile(file_h):
 
     # If we get WKB need to wrap in memoryview(), so run through regexes.
     if isinstance(buf, bytes):
-        try:
+        with suppress(UnicodeDecodeError):
             decoded = buf.decode()
             if wkt_regex.match(decoded) or hex_regex.match(decoded):
                 return GEOSGeometry(decoded)
-        except UnicodeDecodeError:
-            pass
     else:
         return GEOSGeometry(buf)
 

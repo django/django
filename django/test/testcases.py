@@ -5,7 +5,7 @@ import sys
 import threading
 import unittest
 from collections import Counter
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from copy import copy
 from functools import wraps
 from unittest.util import safe_repr
@@ -1165,10 +1165,8 @@ class FSFilesHandler(WSGIHandler):
         from django.http import Http404
 
         if self._should_handle(request.path):
-            try:
+            with suppress(Http404):
                 return self.serve(request)
-            except Http404:
-                pass
         return super().get_response(request)
 
     def serve(self, request):

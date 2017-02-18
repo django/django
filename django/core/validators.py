@@ -2,6 +2,7 @@ import ipaddress
 import os
 import re
 from urllib.parse import urlsplit, urlunsplit
+from contextlib import suppress
 
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
@@ -201,12 +202,10 @@ class EmailValidator:
         if (domain_part not in self.domain_whitelist and
                 not self.validate_domain_part(domain_part)):
             # Try for possible IDN domain-part
-            try:
+            with suppress(UnicodeError):
                 domain_part = domain_part.encode('idna').decode('ascii')
                 if self.validate_domain_part(domain_part):
                     return
-            except UnicodeError:
-                pass
             raise ValidationError(self.message, code=self.code)
 
     def validate_domain_part(self, domain_part):
@@ -216,11 +215,9 @@ class EmailValidator:
         literal_match = self.literal_regex.match(domain_part)
         if literal_match:
             ip_address = literal_match.group(1)
-            try:
+            with suppress(ValidationError):
                 validate_ipv46_address(ip_address)
                 return True
-            except ValidationError:
-                pass
         return False
 
     def __eq__(self, other):

@@ -21,6 +21,7 @@ import logging
 import re
 import time
 import warnings
+from contextlib import suppress
 
 from django.conf import settings
 from django.core.cache import caches
@@ -96,10 +97,8 @@ def get_max_age(response):
         return
     cc = dict(_to_tuple(el) for el in cc_delim_re.split(response['Cache-Control']))
     if 'max-age' in cc:
-        try:
+        with suppress(ValueError, TypeError):
             return int(cc['max-age'])
-        except (ValueError, TypeError):
-            pass
 
 
 def set_response_etag(response):

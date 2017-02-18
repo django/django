@@ -7,6 +7,7 @@ import uuid
 import warnings
 from base64 import b64decode, b64encode
 from functools import total_ordering
+from contextlib import suppress
 
 from django import forms
 from django.apps import apps
@@ -1935,10 +1936,8 @@ class GenericIPAddressField(Field):
         if value is None:
             return None
         if value and ':' in value:
-            try:
+            with suppress(exceptions.ValidationError):
                 return clean_ipv6_address(value, self.unpack_ipv4)
-            except exceptions.ValidationError:
-                pass
         return str(value)
 
     def formfield(self, **kwargs):

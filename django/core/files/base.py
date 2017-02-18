@@ -1,5 +1,6 @@
 import os
 from io import BytesIO, StringIO, UnsupportedOperation
+from contextlib import suppress
 
 from django.core.files.utils import FileProxyMixin
 from django.utils.encoding import force_text
@@ -32,10 +33,8 @@ class File(FileProxyMixin):
         if hasattr(self.file, 'size'):
             return self.file.size
         if hasattr(self.file, 'name'):
-            try:
+            with suppress(OSError, TypeError):
                 return os.path.getsize(self.file.name)
-            except (OSError, TypeError):
-                pass
         if hasattr(self.file, 'tell') and hasattr(self.file, 'seek'):
             pos = self.file.tell()
             self.file.seek(0, os.SEEK_END)
@@ -63,10 +62,8 @@ class File(FileProxyMixin):
         if not chunk_size:
             chunk_size = self.DEFAULT_CHUNK_SIZE
 
-        try:
+        with suppress(AttributeError, UnsupportedOperation):
             self.seek(0)
-        except (AttributeError, UnsupportedOperation):
-            pass
 
         while True:
             data = self.read(chunk_size)

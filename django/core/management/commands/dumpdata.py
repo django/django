@@ -1,5 +1,6 @@
 import warnings
 from collections import OrderedDict
+from contextlib import suppress
 
 from django.apps import apps
 from django.core import serializers
@@ -133,10 +134,8 @@ class Command(BaseCommand):
         # Check that the serialization format exists; this is a shortcut to
         # avoid collating all the objects and _then_ failing.
         if format not in serializers.get_public_serializer_formats():
-            try:
+            with suppress(serializers.SerializerDoesNotExist):
                 serializers.get_serializer(format)
-            except serializers.SerializerDoesNotExist:
-                pass
 
             raise CommandError("Unknown serialization format: %s" % format)
 

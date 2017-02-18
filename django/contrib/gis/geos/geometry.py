@@ -4,6 +4,7 @@
 """
 import json
 from ctypes import addressof, byref, c_double
+from contextlib import suppress
 
 from django.contrib.gis import gdal
 from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
@@ -463,10 +464,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
     def srs(self):
         "Return the OSR SpatialReference for SRID of this Geometry."
         if self.srid:
-            try:
+            with suppress(gdal.SRSException):
                 return gdal.SpatialReference(self.srid)
-            except gdal.SRSException:
-                pass
         return None
 
     @property

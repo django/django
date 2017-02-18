@@ -1,4 +1,5 @@
 from ctypes import byref, c_double
+from contextlib import suppress
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
@@ -78,10 +79,8 @@ class Layer(GDALBase):
         """
         if self._random_read:
             # If the Layer supports random reading, return.
-            try:
+            with suppress(GDALException):
                 return Feature(capi.get_feature(self.ptr, feat_id), self)
-            except GDALException:
-                pass
         else:
             # Random access isn't supported, have to increment through
             # each feature until the given feature ID is encountered.
