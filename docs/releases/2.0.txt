@@ -223,7 +223,8 @@ URLs
 Validators
 ~~~~~~~~~~
 
-* ...
+* The :class:`django.core.validators.EmailValidator` now uses the HTML5 email
+  validation standard.
 
 .. _backwards-incompatible-2.0:
 
@@ -291,6 +292,23 @@ If you wish to keep this restriction in the admin when editing users, set
     admin.site.unregister(User)
     admin.site.register(User, MyUserAdmin)
 
+Relaxes email validation to conform to HTML5 Standards
+------------------------------------------------------
+
+The :class:`django.core.validators.EmailValidator` was implemented with regex
+trying to be continuously improved to get asymptotically closer to
+perfection. This is dropped in favor of implementing the rules that conform to
+the current HTML5 email validation standards.
+
+The two backward incompatible scenarios are:
+
+* You might be able to submit an email address that passes the new regex but not
+  the old one.
+
+* You're not able to submit an email address that does not pass the new
+  validator but the old one. However, your browser will warn you about this
+  before Django anyway.
+
 Miscellaneous
 -------------
 
@@ -327,6 +345,10 @@ Miscellaneous
 * The ``DEFAULT_CONTENT_TYPE`` setting is deprecated. It doesn't interact well
   well with third-party apps and is obsolete since HTML5 has mostly superseded
   XHTML.
+
+* The ``whitelist`` parameter for email validation is deprecated. This is
+  because the HTML5 email validation standard considers domains without a period
+  to be valid.
 
 .. _removed-features-2.0:
 
