@@ -240,19 +240,12 @@ class StrIndex(Func):
 
         super(StrIndex, self).__init__(*expressions, **extra)
 
-    def reversed_expressions(self):
-        """
-        For MySQL's LOCATE function.
-        """
-        return reversed(self.source_expressions)
-
     def as_mysql(self, compiler, connection):
         """
         Argument order is reversed for MySql, e.g. LOCATE(substring, string).
         """
-
-        setattr(self, 'get_source_expressions', self.reversed_expressions)
-        return super(StrIndex, self).as_sql(compiler, connection, function='LOCATE')
+        return super(StrIndex, self).as_sql(
+            compiler, connection, function='LOCATE', expressions=reversed(self.source_expressions))
 
     def as_postgresql (self, compiler, connection):
         return super(StrIndex, self).as_sql(compiler, connection, function='STRPOS')

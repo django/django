@@ -32,7 +32,6 @@ class FunctionTests(TestCase):
         Author.objects.create(name='J. R. R. Tolkien')
         Author.objects.create(name='Terry Pratchett')
         authors = Author.objects.annotate(fullstop=StrIndex('name', '.'))
-        print(authors)
         self.assertQuerysetEqual(
             authors.order_by('name'),
             [2, 2, 0],
