@@ -517,7 +517,7 @@ class Func(Expression):
         connection.ops.check_expression_support(self)
         sql_parts = []
         params = []
-        for arg in self.source_expressions:
+        for arg in self.get_source_expressions():
             arg_sql, arg_params = compiler.compile(arg)
             sql_parts.append(arg_sql)
             params.extend(arg_params)
