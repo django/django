@@ -144,7 +144,7 @@ and configure routing in front of your interface and WSGI servers to route
 requests appropriately.
 
 If you use Daphne for all traffic, it auto-negotiates between HTTP and WebSocket,
-so there's no need to have your WebSockets on a separate port or path (and
+so there's no need to have your WebSockets on a separate domain or path (and
 they'll be able to share cookies with your normal view code, which isn't
 possible if you separate by domain rather than path).
 

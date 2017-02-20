@@ -492,7 +492,7 @@ chat to people with the same first letter of their username::
 
 If you're just using ``runserver`` (and so Daphne), you can just connect
 and your cookies should transfer your auth over. If you were running WebSockets
-on a separate port, you'd have to remember to provide the
+on a separate domain, you'd have to remember to provide the
 Django session ID as part of the URL, like this::
 
     socket = new WebSocket("ws://127.0.0.1:9000/?session_key=abcdefg");
