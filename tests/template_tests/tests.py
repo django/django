@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import sys
 
 from django.contrib.auth.models import Group
@@ -16,7 +13,7 @@ class TemplateTests(SimpleTestCase):
     def test_string_origin(self):
         template = Engine().from_string('string template')
         self.assertEqual(template.origin.name, UNKNOWN_SOURCE)
-        self.assertEqual(template.origin.loader_name, None)
+        self.assertIsNone(template.origin.loader_name)
         self.assertEqual(template.source, 'string template')
 
     @override_settings(SETTINGS_MODULE=None)
@@ -112,6 +109,17 @@ class TemplateTests(SimpleTestCase):
         )
         with self.assertRaises(RuntimeError) as e:
             engine.from_string("{% load bad_tag %}{% badtag %}")
+        self.assertEqual(e.exception.template_debug['during'], '{% badtag %}')
+
+    def test_compile_tag_error_27584(self):
+        engine = Engine(
+            app_dirs=True,
+            debug=True,
+            libraries={'tag_27584': 'template_tests.templatetags.tag_27584'},
+        )
+        t = engine.get_template('27584_parent.html')
+        with self.assertRaises(TemplateSyntaxError) as e:
+            t.render(Context())
         self.assertEqual(e.exception.template_debug['during'], '{% badtag %}')
 
     def test_super_errors(self):

@@ -5,7 +5,7 @@ def topological_sort_as_sets(dependency_graph):
 
     Yields sets of items in topological order, where the first set contains
     all nodes without dependencies, and each following set contains all
-    nodes that depend on the nodes in the previously yielded sets.
+    nodes that may depend on the nodes only in the previously yielded sets.
     """
     todo = dependency_graph.copy()
     while todo:

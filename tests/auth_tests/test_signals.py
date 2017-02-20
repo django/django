@@ -1,4 +1,4 @@
-from django.contrib.auth import signals
+from django.contrib.auth import authenticate, signals
 from django.contrib.auth.models import User
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
@@ -18,8 +18,8 @@ class SignalTestCase(TestCase):
     def listener_logout(self, user, **kwargs):
         self.logged_out.append(user)
 
-    def listener_login_failed(self, sender, credentials, **kwargs):
-        self.login_failed.append(credentials)
+    def listener_login_failed(self, sender, **kwargs):
+        self.login_failed.append(kwargs)
 
     def setUp(self):
         """Set up the listeners and reset the logged in/logged out counters"""
@@ -41,9 +41,10 @@ class SignalTestCase(TestCase):
         self.client.login(username='testclient', password='bad')
         self.assertEqual(len(self.logged_in), 0)
         self.assertEqual(len(self.login_failed), 1)
-        self.assertEqual(self.login_failed[0]['username'], 'testclient')
+        self.assertEqual(self.login_failed[0]['credentials']['username'], 'testclient')
         # verify the password is cleansed
-        self.assertIn('***', self.login_failed[0]['password'])
+        self.assertIn('***', self.login_failed[0]['credentials']['password'])
+        self.assertIn('request', self.login_failed[0])
 
         # Like this:
         self.client.login(username='testclient', password='password')
@@ -58,7 +59,7 @@ class SignalTestCase(TestCase):
         # users.
         self.client.get('/logout/next_page/')
         self.assertEqual(len(self.logged_out), 1)
-        self.assertEqual(self.logged_out[0], None)
+        self.assertIsNone(self.logged_out[0])
 
     def test_logout(self):
         self.client.login(username='testclient', password='password')
@@ -67,7 +68,7 @@ class SignalTestCase(TestCase):
         self.assertEqual(self.logged_out[0].username, 'testclient')
 
     def test_update_last_login(self):
-        """Ensure that only `last_login` is updated in `update_last_login`"""
+        """Only `last_login` is updated in `update_last_login`"""
         user = self.u3
         old_last_login = user.last_login
 
@@ -77,3 +78,7 @@ class SignalTestCase(TestCase):
         user.refresh_from_db()
         self.assertEqual(user.username, 'staff')
         self.assertNotEqual(user.last_login, old_last_login)
+
+    def test_failed_login_without_request(self):
+        authenticate(username='testclient', password='bad')
+        self.assertIsNone(self.login_failed[0]['request'])

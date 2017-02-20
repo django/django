@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.test import TestCase
@@ -113,7 +111,7 @@ class ModelFormsTests(TestCase):
         article = Article(author_id=self.author.id)
         form = ArticleForm(data, instance=article)
         self.assertEqual(list(form.errors), [])
-        self.assertNotEqual(form.instance.pub_date, None)
+        self.assertIsNotNone(form.instance.pub_date)
         article = form.save()
 
     def test_validation_with_invalid_blank_field(self):

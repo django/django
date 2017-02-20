@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
-import warnings
-
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user, get_user_model
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
+from django.http import HttpRequest
 from django.test import TestCase, override_settings
 from django.utils import translation
 
@@ -15,7 +11,7 @@ from .models import CustomUser
 
 class BasicTestCase(TestCase):
     def test_user(self):
-        "Check that users can be created and can set their password"
+        "Users can be created and can set their password"
         u = User.objects.create_user('testuser', 'test@example.com', 'testpw')
         self.assertTrue(u.has_usable_password())
         self.assertFalse(u.check_password('bad'))
@@ -55,28 +51,8 @@ class BasicTestCase(TestCase):
         with self.assertRaises(IntegrityError):
             User.objects.create_user(omega_username)
 
-    def test_is_anonymous_authenticated_method_deprecation(self):
-        deprecation_message = (
-            'Using user.is_authenticated() and user.is_anonymous() as a '
-            'method is deprecated. Remove the parentheses to use it as an '
-            'attribute.'
-        )
-        u = User.objects.create_user('testuser', 'test@example.com', 'testpw')
-        # Backwards-compatibility callables
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            self.assertFalse(u.is_anonymous())
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(str(warns[0].message), deprecation_message)
-
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            self.assertTrue(u.is_authenticated())
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(str(warns[0].message), deprecation_message)
-
     def test_user_no_email(self):
-        "Check that users can be created without an email"
+        "Users can be created without an email"
         u = User.objects.create_user('testuser1')
         self.assertEqual(u.email, '')
 
@@ -89,7 +65,7 @@ class BasicTestCase(TestCase):
     def test_anonymous_user(self):
         "Check the properties of the anonymous user"
         a = AnonymousUser()
-        self.assertEqual(a.pk, None)
+        self.assertIsNone(a.pk)
         self.assertEqual(a.username, '')
         self.assertEqual(a.get_username(), '')
         self.assertTrue(a.is_anonymous)
@@ -99,26 +75,6 @@ class BasicTestCase(TestCase):
         self.assertFalse(a.is_superuser)
         self.assertEqual(a.groups.all().count(), 0)
         self.assertEqual(a.user_permissions.all().count(), 0)
-
-    def test_anonymous_user_is_anonymous_authenticated_method_deprecation(self):
-        a = AnonymousUser()
-        deprecation_message = (
-            'Using user.is_authenticated() and user.is_anonymous() as a '
-            'method is deprecated. Remove the parentheses to use it as an '
-            'attribute.'
-        )
-        # Backwards-compatibility callables
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')  # prevent warnings from appearing as errors
-            self.assertTrue(a.is_anonymous())
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(str(warns[0].message), deprecation_message)
-
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')  # prevent warnings from appearing as errors
-            self.assertFalse(a.is_authenticated())
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(str(warns[0].message), deprecation_message)
 
     def test_superuser(self):
         "Check the creation and properties of a superuser"
@@ -158,3 +114,21 @@ class BasicTestCase(TestCase):
         with translation.override('es'):
             self.assertEqual(User._meta.verbose_name, 'usuario')
             self.assertEqual(User._meta.verbose_name_plural, 'usuarios')
+
+
+class TestGetUser(TestCase):
+
+    def test_get_user_anonymous(self):
+        request = HttpRequest()
+        request.session = self.client.session
+        user = get_user(request)
+        self.assertIsInstance(user, AnonymousUser)
+
+    def test_get_user(self):
+        created_user = User.objects.create_user('testuser', 'test@example.com', 'testpw')
+        self.client.login(username='testuser', password='testpw')
+        request = HttpRequest()
+        request.session = self.client.session
+        user = get_user(request)
+        self.assertIsInstance(user, User)
+        self.assertEqual(user.username, created_user.username)

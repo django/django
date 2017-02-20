@@ -9,7 +9,7 @@ from functools import wraps
 from django.http import HttpResponseNotAllowed
 from django.middleware.http import ConditionalGetMiddleware
 from django.utils.cache import get_conditional_response
-from django.utils.decorators import available_attrs, decorator_from_middleware
+from django.utils.decorators import decorator_from_middleware
 from django.utils.http import http_date, quote_etag
 
 conditional_page = decorator_from_middleware(ConditionalGetMiddleware)
@@ -29,7 +29,7 @@ def require_http_methods(request_method_list):
     Note that request methods should be in uppercase.
     """
     def decorator(func):
-        @wraps(func, assigned=available_attrs(func))
+        @wraps(func)
         def inner(request, *args, **kwargs):
             if request.method not in request_method_list:
                 logger.warning(
@@ -40,6 +40,7 @@ def require_http_methods(request_method_list):
             return func(request, *args, **kwargs)
         return inner
     return decorator
+
 
 require_GET = require_http_methods(["GET"])
 require_GET.__doc__ = "Decorator to require that a view only accepts the GET method."
@@ -58,23 +59,23 @@ def condition(etag_func=None, last_modified_func=None):
 
     The parameters are callables to compute the ETag and last modified time for
     the requested resource, respectively. The callables are passed the same
-    parameters as the view itself. The Etag function should return a string (or
+    parameters as the view itself. The ETag function should return a string (or
     None if the resource doesn't exist), while the last_modified function
     should return a datetime object (or None if the resource doesn't exist).
 
-    If both parameters are provided, all the preconditions must be met before
-    the view is processed.
+    The ETag function should return a complete ETag, including quotes (e.g.
+    '"etag"'), since that's the only way to distinguish between weak and strong
+    ETags. If an unquoted ETag is returned (e.g. 'etag'), it will be converted
+    to a strong ETag by adding quotes.
 
     This decorator will either pass control to the wrapped view function or
-    return an HTTP 304 response (unmodified) or 412 response (preconditions
-    failed), depending upon the request method.
-
-    Any behavior marked as "undefined" in the HTTP spec (e.g. If-none-match
-    plus If-modified-since headers) will result in the view function being
-    called.
+    return an HTTP 304 response (unmodified) or 412 response (precondition
+    failed), depending upon the request method. In either case, it will add the
+    generated ETag and Last-Modified headers to the response if it doesn't
+    already have them.
     """
     def decorator(func):
-        @wraps(func, assigned=available_attrs(func))
+        @wraps(func)
         def inner(request, *args, **kwargs):
             # Compute values (if any) for the requested resource.
             def get_last_modified():
@@ -83,7 +84,9 @@ def condition(etag_func=None, last_modified_func=None):
                     if dt:
                         return timegm(dt.utctimetuple())
 
+            # The value from etag_func() could be quoted or unquoted.
             res_etag = etag_func(request, *args, **kwargs) if etag_func else None
+            res_etag = quote_etag(res_etag) if res_etag is not None else None
             res_last_modified = get_last_modified()
 
             response = get_conditional_response(
@@ -99,7 +102,7 @@ def condition(etag_func=None, last_modified_func=None):
             if res_last_modified and not response.has_header('Last-Modified'):
                 response['Last-Modified'] = http_date(res_last_modified)
             if res_etag and not response.has_header('ETag'):
-                response['ETag'] = quote_etag(res_etag)
+                response['ETag'] = res_etag
 
             return response
 

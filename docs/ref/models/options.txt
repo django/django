@@ -38,10 +38,8 @@ Available ``Meta`` options
 
 .. attribute:: Options.base_manager_name
 
-.. versionadded:: 1.10
-
-The name of the manager to use for the model's
-:attr:`~django.db.models.Model._base_manager`.
+    The name of the manager to use for the model's
+    :attr:`~django.db.models.Model._base_manager`.
 
 ``db_table``
 ------------
@@ -108,10 +106,8 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.default_manager_name
 
-.. versionadded:: 1.10
-
-The name of the manager to use for the model's
-:attr:`~django.db.models.Model._default_manager`.
+    The name of the manager to use for the model's
+    :attr:`~django.db.models.Model._default_manager`.
 
 ``default_related_name``
 ------------------------
@@ -129,30 +125,6 @@ The name of the manager to use for the model's
     replaced respectively by the name of the application the model is in,
     and the name of the model, both lowercased. See the paragraph on
     :ref:`related names for abstract models <abstract-related-name>`.
-
-    .. deprecated:: 1.10
-
-        This attribute now affects ``related_query_name``. The old query lookup
-        name is deprecated::
-
-            from django.db import models
-
-            class Foo(models.Model):
-                pass
-
-            class Bar(models.Model):
-                foo = models.ForeignKey(Foo)
-
-                class Meta:
-                    default_related_name = 'bars'
-
-        ::
-
-            >>> bar = Bar.objects.get(pk=1)
-            >>> # Using model name "bar" as lookup string is deprecated.
-            >>> Foo.objects.get(bar=bar)
-            >>> # You should use default_related_name "bars".
-            >>> Foo.objects.get(bars=bar)
 
 ``get_latest_by``
 -----------------
@@ -300,6 +272,9 @@ The name of the manager to use for the model's
 
         ordering = ['-pub_date', 'author']
 
+    Default ordering also affects :ref:`aggregation queries
+    <aggregation-ordering-interaction>`.
+
 .. warning::
 
     Ordering is not a free operation. Each field you add to the ordering
@@ -386,6 +361,28 @@ The name of the manager to use for the model's
 
     See :meth:`django.db.models.Model.save()` for more about the old and
     new saving algorithm.
+
+``indexes``
+-----------
+
+.. attribute:: Options.indexes
+
+    .. versionadded:: 1.11
+
+    A list of :doc:`indexes </ref/models/indexes>` that you want to define on
+    the model::
+
+        from django.db import models
+
+        class Customer(models.Model):
+            first_name = models.CharField(max_length=100)
+            last_name = models.CharField(max_length=100)
+
+            class Meta:
+                indexes = [
+                    models.Index(fields=['last_name', 'first_name']),
+                    models.Index(fields=['first_name'], name='first_name_idx'),
+                ]
 
 ``unique_together``
 -------------------

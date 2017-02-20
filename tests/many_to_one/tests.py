@@ -4,10 +4,8 @@ from copy import deepcopy
 from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import models, transaction
 from django.db.utils import IntegrityError
-from django.test import TestCase, ignore_warnings
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.translation import ugettext_lazy
+from django.test import TestCase
+from django.utils.translation import gettext_lazy
 
 from .models import (
     Article, Category, Child, City, District, First, Parent, Record, Relation,
@@ -30,9 +28,6 @@ class ManyToOneTests(TestCase):
         # Article objects have access to their related Reporter objects.
         r = self.a.reporter
         self.assertEqual(r.id, self.r.id)
-        # These are strings instead of unicode strings because that's what was used in
-        # the creation of this reporter (and we haven't refreshed the data from the
-        # database, which always returns unicode strings).
         self.assertEqual((r.first_name, self.r.last_name), ('John', 'Smith'))
 
     def test_create(self):
@@ -73,8 +68,7 @@ class ManyToOneTests(TestCase):
 
         # Adding an object of the wrong type raises TypeError.
         with transaction.atomic():
-            with six.assertRaisesRegex(self, TypeError,
-                                       "'Article' instance expected, got <Reporter.*"):
+            with self.assertRaisesMessage(TypeError, "'Article' instance expected, got <Reporter:"):
                 self.r.article_set.add(self.r2)
         self.assertQuerysetEqual(
             self.r.article_set.all(),
@@ -117,10 +111,9 @@ class ManyToOneTests(TestCase):
     def test_reverse_assignment_deprecation(self):
         msg = (
             "Direct assignment to the reverse side of a related set is "
-            "deprecated due to the implicit save() that happens. Use "
-            "article_set.set() instead."
+            "prohibited. Use article_set.set() instead."
         )
-        with self.assertRaisesMessage(RemovedInDjango20Warning, msg):
+        with self.assertRaisesMessage(TypeError, msg):
             self.r2.article_set = []
 
     def test_assign(self):
@@ -183,7 +176,7 @@ class ManyToOneTests(TestCase):
             Article.objects.filter(reporter__first_name__exact='John'),
             ["<Article: John's second story>", "<Article: This is a test>"]
         )
-        # Check that implied __exact also works
+        # Implied __exact also works
         self.assertQuerysetEqual(
             Article.objects.filter(reporter__first_name='John'),
             ["<Article: John's second story>", "<Article: This is a test>"]
@@ -204,7 +197,7 @@ class ManyToOneTests(TestCase):
                 where=["many_to_one_reporter.last_name='Smith'"]),
             ["<Article: John's second story>", "<Article: This is a test>"]
         )
-        # ... and should work fine with the unicode that comes out of forms.Form.cleaned_data
+        # ... and should work fine with the string that comes out of forms.Form.cleaned_data
         self.assertQuerysetEqual(
             (Article.objects
                 .filter(reporter__first_name__exact='John')
@@ -314,7 +307,7 @@ class ManyToOneTests(TestCase):
         )
         self.assertQuerysetEqual(Reporter.objects.filter(article__reporter__exact=self.r).distinct(), john_smith)
 
-        # Check that implied __exact also works.
+        # Implied __exact also works.
         self.assertQuerysetEqual(Reporter.objects.filter(article__reporter=self.r).distinct(), john_smith)
 
         # It's possible to use values() calls across many-to-one relations.
@@ -327,8 +320,8 @@ class ManyToOneTests(TestCase):
         self.assertEqual([d], list(qs))
 
     def test_select_related(self):
-        # Check that Article.objects.select_related().dates() works properly when
-        # there are multiple Articles with the same date but different foreign-key
+        # Article.objects.select_related().dates() works properly when there
+        # are multiple Articles with the same date but different foreign-key
         # objects (Reporters).
         r1 = Reporter.objects.create(first_name='Mike', last_name='Royko', email='royko@suntimes.com')
         r2 = Reporter.objects.create(first_name='John', last_name='Kass', email='jkass@tribune.com')
@@ -436,11 +429,11 @@ class ManyToOneTests(TestCase):
         # Same as each other
         self.assertIs(r1.article_set.__class__, r2.article_set.__class__)
 
-    def test_create_relation_with_ugettext_lazy(self):
+    def test_create_relation_with_gettext_lazy(self):
         reporter = Reporter.objects.create(first_name='John', last_name='Smith', email='john.smith@example.com')
-        lazy = ugettext_lazy('test')
+        lazy = gettext_lazy('test')
         reporter.article_set.create(headline=lazy, pub_date=datetime.date(2011, 6, 10))
-        notlazy = six.text_type(lazy)
+        notlazy = str(lazy)
         article = reporter.article_set.get()
         self.assertEqual(article.headline, notlazy)
 
@@ -567,7 +560,7 @@ class ManyToOneTests(TestCase):
         self.assertEqual('id', cat.remote_field.get_related_field().name)
 
     def test_relation_unsaved(self):
-        # Test that the <field>_set manager does not join on Null value fields (#17541)
+        # The <field>_set manager does not join on Null value fields (#17541)
         Third.objects.create(name='Third 1')
         Third.objects.create(name='Third 2')
         th = Third(name="testing")
@@ -580,7 +573,6 @@ class ManyToOneTests(TestCase):
         with self.assertNumQueries(1):
             self.assertEqual(th.child_set.count(), 0)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)  # for use_for_related_fields deprecation
     def test_related_object(self):
         public_school = School.objects.create(is_public=True)
         public_student = Student.objects.create(school=public_school)
@@ -598,17 +590,6 @@ class ManyToOneTests(TestCase):
         # allow it.
         self.assertEqual(private_student.school, private_school)
 
-        # If the manager is marked "use_for_related_fields", it'll get used instead
-        # of the "bare" queryset. Usually you'd define this as a property on the class,
-        # but this approximates that in a way that's easier in tests.
-        School._default_manager.use_for_related_fields = True
-        try:
-            private_student = Student.objects.get(pk=private_student.pk)
-            with self.assertRaises(School.DoesNotExist):
-                private_student.school
-        finally:
-            School._default_manager.use_for_related_fields = False
-
         School._meta.base_manager_name = 'objects'
         School._meta._expire_cache()
         try:
@@ -624,3 +605,48 @@ class ManyToOneTests(TestCase):
         # doesn't exist should be an instance of a subclass of `AttributeError`
         # refs #21563
         self.assertFalse(hasattr(Article(), 'reporter'))
+
+    def test_clear_after_prefetch(self):
+        c = City.objects.create(name='Musical City')
+        District.objects.create(name='Ladida', city=c)
+        city = City.objects.prefetch_related('districts').get(id=c.id)
+        self.assertQuerysetEqual(city.districts.all(), ['<District: Ladida>'])
+        city.districts.clear()
+        self.assertQuerysetEqual(city.districts.all(), [])
+
+    def test_remove_after_prefetch(self):
+        c = City.objects.create(name='Musical City')
+        d = District.objects.create(name='Ladida', city=c)
+        city = City.objects.prefetch_related('districts').get(id=c.id)
+        self.assertQuerysetEqual(city.districts.all(), ['<District: Ladida>'])
+        city.districts.remove(d)
+        self.assertQuerysetEqual(city.districts.all(), [])
+
+    def test_add_after_prefetch(self):
+        c = City.objects.create(name='Musical City')
+        District.objects.create(name='Ladida', city=c)
+        d2 = District.objects.create(name='Ladidu')
+        city = City.objects.prefetch_related('districts').get(id=c.id)
+        self.assertEqual(city.districts.count(), 1)
+        city.districts.add(d2)
+        self.assertEqual(city.districts.count(), 2)
+
+    def test_set_after_prefetch(self):
+        c = City.objects.create(name='Musical City')
+        District.objects.create(name='Ladida', city=c)
+        d2 = District.objects.create(name='Ladidu')
+        city = City.objects.prefetch_related('districts').get(id=c.id)
+        self.assertEqual(city.districts.count(), 1)
+        city.districts.set([d2])
+        self.assertQuerysetEqual(city.districts.all(), ['<District: Ladidu>'])
+
+    def test_add_then_remove_after_prefetch(self):
+        c = City.objects.create(name='Musical City')
+        District.objects.create(name='Ladida', city=c)
+        d2 = District.objects.create(name='Ladidu')
+        city = City.objects.prefetch_related('districts').get(id=c.id)
+        self.assertEqual(city.districts.count(), 1)
+        city.districts.add(d2)
+        self.assertEqual(city.districts.count(), 2)
+        city.districts.remove(d2)
+        self.assertEqual(city.districts.count(), 1)

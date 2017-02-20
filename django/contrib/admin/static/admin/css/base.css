@@ -187,9 +187,13 @@ p.mini {
     margin-top: -3px;
 }
 
-.help, p.help, form p.help {
+.help, p.help, form p.help, div.help, form div.help, div.help li {
     font-size: 11px;
     color: #999;
+}
+
+div.help ul {
+     margin-bottom: 0;
 }
 
 .help-tooltip {
@@ -409,6 +413,9 @@ input, textarea, select, .form-row p, form .button {
     font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
     font-weight: normal;
     font-size: 13px;
+}
+.form-row div.help {
+    padding: 2px 3px;
 }
 
 textarea {
@@ -731,7 +738,7 @@ a.deletelink:focus, a.deletelink:hover {
 
 .object-tools a.viewsitelink, .object-tools a.golink,.object-tools a.addlink {
     background-repeat: no-repeat;
-    background-position: 93% center;
+    background-position: right 7px center;
     padding-right: 26px;
 }
 

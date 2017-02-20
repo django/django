@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import pickle
 import time
 from datetime import datetime
@@ -11,14 +9,16 @@ from django.template.response import (
 from django.test import (
     RequestFactory, SimpleTestCase, modify_settings, override_settings,
 )
-from django.test.utils import ignore_warnings, require_jinja2
-from django.utils.deprecation import MiddlewareMixin, RemovedInDjango20Warning
+from django.test.utils import require_jinja2
+from django.utils.deprecation import MiddlewareMixin
 
 from .utils import TEMPLATE_DIR
 
 
 def test_processor(request):
     return {'processors': 'yes'}
+
+
 test_processor_name = 'template_tests.test_response.test_processor'
 
 
@@ -120,9 +120,10 @@ class SimpleTemplateResponseTest(SimpleTestCase):
         self.assertEqual(response.content, b'bar')
 
     def test_kwargs(self):
-        response = self._response(content_type='application/json', status=504)
+        response = self._response(content_type='application/json', status=504, charset='ascii')
         self.assertEqual(response['content-type'], 'application/json')
         self.assertEqual(response.status_code, 504)
+        self.assertEqual(response.charset, 'ascii')
 
     def test_args(self):
         response = SimpleTemplateResponse('', {}, 'application/json', 504)
@@ -341,37 +342,6 @@ class CustomURLConfTest(SimpleTestCase):
 @override_settings(CACHE_MIDDLEWARE_SECONDS=2.0, ROOT_URLCONF='template_tests.alternate_urls')
 class CacheMiddlewareTest(SimpleTestCase):
 
-    def test_middleware_caching(self):
-        response = self.client.get('/template_response_view/')
-        self.assertEqual(response.status_code, 200)
-
-        time.sleep(1.0)
-
-        response2 = self.client.get('/template_response_view/')
-        self.assertEqual(response2.status_code, 200)
-
-        self.assertEqual(response.content, response2.content)
-
-        time.sleep(2.0)
-
-        # Let the cache expire and test again
-        response2 = self.client.get('/template_response_view/')
-        self.assertEqual(response2.status_code, 200)
-
-        self.assertNotEqual(response.content, response2.content)
-
-
-@ignore_warnings(category=RemovedInDjango20Warning)
-@override_settings(
-    MIDDLEWARE=None,
-    MIDDLEWARE_CLASSES=[
-        'django.middleware.cache.FetchFromCacheMiddleware',
-        'django.middleware.cache.UpdateCacheMiddleware',
-    ],
-    CACHE_MIDDLEWARE_SECONDS=2.0,
-    ROOT_URLCONF='template_tests.alternate_urls'
-)
-class CacheMiddlewareClassesTest(SimpleTestCase):
     def test_middleware_caching(self):
         response = self.client.get('/template_response_view/')
         self.assertEqual(response.status_code, 200)

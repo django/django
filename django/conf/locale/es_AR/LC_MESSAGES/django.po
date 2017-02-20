@@ -4,13 +4,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lardissone <lardissone@gmail.com>, 2014
 # poli <poli@devartis.com>, 2014
-# Ramiro Morales, 2013-2015
+# Ramiro Morales, 2013-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-30 00:25+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-30 23:44+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -61,6 +61,9 @@ msgstr "danés"
 
 msgid "German"
 msgstr "alemán"
+
+msgid "Lower Sorbian"
+msgstr "bajo sorabo"
 
 msgid "Greek"
 msgstr "griego"
@@ -131,6 +134,9 @@ msgstr "hindi"
 msgid "Croatian"
 msgstr "croata"
 
+msgid "Upper Sorbian"
+msgstr "alto sorabo"
+
 msgid "Hungarian"
 msgstr "húngaro"
 
@@ -191,8 +197,8 @@ msgstr "maratí"
 msgid "Burmese"
 msgstr "burmés"
 
-msgid "Norwegian Bokmal"
-msgstr "bokmål"
+msgid "Norwegian Bokmål"
+msgstr "bokmål noruego"
 
 msgid "Nepali"
 msgstr "nepalés"
@@ -289,9 +295,6 @@ msgstr "Archivos estáticos"
 
 msgid "Syndication"
 msgstr "Sindicación"
-
-msgid "Web Design"
-msgstr "Diseño Web"
 
 msgid "Enter a valid value."
 msgstr "Introduzca un valor válido."
@@ -435,6 +438,9 @@ msgstr "Entero"
 msgid "'%(value)s' value must be an integer."
 msgstr "El valor de '%(value)s' debe ser un número entero."
 
+msgid "Big (8 byte) integer"
+msgstr "Entero grande (8 bytes)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "El valor de '%(value)s' debe ser Verdadero o Falso."
@@ -518,9 +524,6 @@ msgstr "El valor de '%(value)s' debe ser un número de coma flotante."
 msgid "Floating point number"
 msgstr "Número de punto flotante"
 
-msgid "Big (8 byte) integer"
-msgstr "Entero grande (8 bytes)"
-
 msgid "IPv4 address"
 msgstr "Dirección IPv4"
 
@@ -594,6 +597,14 @@ msgstr "Clave foránea (el tipo está determinado por el campo relacionado)"
 
 msgid "One-to-one relationship"
 msgstr "Relación uno-a-uno"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "relación %(from)s-%(to)s"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "relaciones %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Relación muchos-a-muchos"

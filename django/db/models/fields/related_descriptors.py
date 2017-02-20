@@ -23,18 +23,21 @@ reverse many-to-one relation.
 There are three types of relations (many-to-one, one-to-one, and many-to-many)
 and two directions (forward and reverse) for a total of six combinations.
 
-1. Related instance on the forward side of a many-to-one or one-to-one
-   relation: ``ForwardManyToOneDescriptor``.
+1. Related instance on the forward side of a many-to-one relation:
+   ``ForwardManyToOneDescriptor``.
 
    Uniqueness of foreign key values is irrelevant to accessing the related
    instance, making the many-to-one and one-to-one cases identical as far as
    the descriptor is concerned. The constraint is checked upstream (unicity
    validation in forms) or downstream (unique indexes in the database).
 
-   If you're looking for ``ForwardOneToOneDescriptor``, use
-   ``ForwardManyToOneDescriptor`` instead.
+2. Related instance on the forward side of a one-to-one
+   relation: ``ForwardOneToOneDescriptor``.
 
-2. Related instance on the reverse side of a one-to-one relation:
+   It avoids querying the database when accessing the parent link field in
+   a multi-table inheritance scenario.
+
+3. Related instance on the reverse side of a one-to-one relation:
    ``ReverseOneToOneDescriptor``.
 
    One-to-one relations are asymmetrical, despite the apparent symmetry of the
@@ -42,13 +45,13 @@ and two directions (forward and reverse) for a total of six combinations.
    one table to another. As a consequence ``ReverseOneToOneDescriptor`` is
    slightly different from ``ForwardManyToOneDescriptor``.
 
-3. Related objects manager for related instances on the reverse side of a
+4. Related objects manager for related instances on the reverse side of a
    many-to-one relation: ``ReverseManyToOneDescriptor``.
 
    Unlike the previous two classes, this one provides access to a collection
    of objects. It returns a manager rather than an instance.
 
-4. Related objects manager for related instances on the forward or reverse
+5. Related objects manager for related instances on the forward or reverse
    sides of a many-to-many relation: ``ManyToManyDescriptor``.
 
    Many-to-many relations are symmetrical. The syntax of Django models
@@ -60,22 +63,18 @@ and two directions (forward and reverse) for a total of six combinations.
    ``ReverseManyToManyDescriptor``, use ``ManyToManyDescriptor`` instead.
 """
 
-from __future__ import unicode_literals
-
-import warnings
 from operator import attrgetter
 
 from django.db import connections, router, transaction
 from django.db.models import Q, signals
 from django.db.models.query import QuerySet
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 
 
-class ForwardManyToOneDescriptor(object):
+class ForwardManyToOneDescriptor:
     """
     Accessor to the related object on the forward side of a many-to-one or
-    one-to-one relation.
+    one-to-one (via ForwardOneToOneDescriptor subclass) relation.
 
     In the example::
 
@@ -95,7 +94,7 @@ class ForwardManyToOneDescriptor(object):
         # related model might not be resolved yet; `rel.model` might still be
         # a string model reference.
         return type(
-            str('RelatedObjectDoesNotExist'),
+            'RelatedObjectDoesNotExist',
             (self.field.remote_field.model.DoesNotExist, AttributeError),
             {}
         )
@@ -104,21 +103,7 @@ class ForwardManyToOneDescriptor(object):
         return hasattr(instance, self.cache_name)
 
     def get_queryset(self, **hints):
-        related_model = self.field.remote_field.model
-
-        if (not related_model._meta.base_manager_name and
-                getattr(related_model._default_manager, 'use_for_related_fields', False)):
-            if not getattr(related_model._default_manager, 'silence_use_for_related_fields_deprecation', False):
-                warnings.warn(
-                    "use_for_related_fields is deprecated, instead "
-                    "set Meta.base_manager_name on '{}'.".format(related_model._meta.label),
-                    RemovedInDjango20Warning, 2
-                )
-            manager = related_model._default_manager
-        else:
-            manager = related_model._base_manager
-
-        return manager.db_manager(hints=hints).all()
+        return self.field.remote_field.model._base_manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
         if queryset is None:
@@ -151,6 +136,11 @@ class ForwardManyToOneDescriptor(object):
                 setattr(rel_obj, rel_obj_cache_name, instance)
         return queryset, rel_obj_attr, instance_attr, True, self.cache_name
 
+    def get_object(self, instance):
+        qs = self.get_queryset(instance=instance)
+        # Assuming the database enforces foreign keys, this won't fail.
+        return qs.get(self.field.get_reverse_related_filter(instance))
+
     def __get__(self, instance, cls=None):
         """
         Get the related instance through the forward relation.
@@ -174,10 +164,7 @@ class ForwardManyToOneDescriptor(object):
             if None in val:
                 rel_obj = None
             else:
-                qs = self.get_queryset(instance=instance)
-                qs = qs.filter(self.field.get_reverse_related_filter(instance))
-                # Assuming the database enforces foreign keys, this won't fail.
-                rel_obj = qs.get()
+                rel_obj = self.get_object(instance)
                 # If this is a one-to-one relation, set the reverse accessor
                 # cache on the related object to the current instance to avoid
                 # an extra SQL query if it's accessed later on.
@@ -200,7 +187,7 @@ class ForwardManyToOneDescriptor(object):
 
         - ``self`` is the descriptor managing the ``parent`` attribute
         - ``instance`` is the ``child`` instance
-        - ``value`` in the ``parent`` instance on the right of the equal sign
+        - ``value`` is the ``parent`` instance on the right of the equal sign
         """
         # An object must be an instance of the related class.
         if value is not None and not isinstance(value, self.field.remote_field.model._meta.concrete_model):
@@ -259,7 +246,36 @@ class ForwardManyToOneDescriptor(object):
             setattr(value, self.field.remote_field.get_cache_name(), instance)
 
 
-class ReverseOneToOneDescriptor(object):
+class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
+    """
+    Accessor to the related object on the forward side of a one-to-one relation.
+
+    In the example::
+
+        class Restaurant(Model):
+            place = OneToOneField(Place, related_name='restaurant')
+
+    ``restaurant.place`` is a ``ForwardOneToOneDescriptor`` instance.
+    """
+
+    def get_object(self, instance):
+        if self.field.remote_field.parent_link:
+            deferred = instance.get_deferred_fields()
+            # Because it's a parent link, all the data is available in the
+            # instance, so populate the parent model with this data.
+            rel_model = self.field.remote_field.model
+            fields = [field.attname for field in rel_model._meta.concrete_fields]
+
+            # If any of the related model's fields are deferred, fallback to
+            # fetching all fields from the related model. This avoids a query
+            # on the related model for every deferred field.
+            if not any(field in fields for field in deferred):
+                kwargs = {field: getattr(instance, field) for field in fields}
+                return rel_model(**kwargs)
+        return super().get_object(instance)
+
+
+class ReverseOneToOneDescriptor:
     """
     Accessor to the related object on the reverse side of a one-to-one
     relation.
@@ -281,7 +297,7 @@ class ReverseOneToOneDescriptor(object):
         # The exception isn't created at initialization time for the sake of
         # consistency with `ForwardManyToOneDescriptor`.
         return type(
-            str('RelatedObjectDoesNotExist'),
+            'RelatedObjectDoesNotExist',
             (self.related.related_model.DoesNotExist, AttributeError),
             {}
         )
@@ -290,21 +306,7 @@ class ReverseOneToOneDescriptor(object):
         return hasattr(instance, self.cache_name)
 
     def get_queryset(self, **hints):
-        related_model = self.related.related_model
-
-        if (not related_model._meta.base_manager_name and
-                getattr(related_model._default_manager, 'use_for_related_fields', False)):
-            if not getattr(related_model._default_manager, 'silence_use_for_related_fields_deprecation', False):
-                warnings.warn(
-                    "use_for_related_fields is deprecated, instead "
-                    "set Meta.base_manager_name on '{}'.".format(related_model._meta.label),
-                    RemovedInDjango20Warning, 2
-                )
-            manager = related_model._default_manager
-        else:
-            manager = related_model._base_manager
-
-        return manager.db_manager(hints=hints).all()
+        return self.related.related_model._base_manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
         if queryset is None:
@@ -336,7 +338,7 @@ class ReverseOneToOneDescriptor(object):
 
         - ``self`` is the descriptor managing the ``restaurant`` attribute
         - ``instance`` is the ``place`` instance
-        - ``instance_type`` in the ``Place`` class (we don't need it)
+        - ``cls`` is the ``Place`` class (unused)
 
         Keep in mind that ``Restaurant`` holds the foreign key to ``Place``.
         """
@@ -383,7 +385,7 @@ class ReverseOneToOneDescriptor(object):
 
         - ``self`` is the descriptor managing the ``restaurant`` attribute
         - ``instance`` is the ``place`` instance
-        - ``value`` in the ``restaurant`` instance on the right of the equal sign
+        - ``value`` is the ``restaurant`` instance on the right of the equal sign
 
         Keep in mind that ``Restaurant`` holds the foreign key to ``Place``.
         """
@@ -433,7 +435,7 @@ class ReverseOneToOneDescriptor(object):
             setattr(value, self.related.field.get_cache_name(), instance)
 
 
-class ReverseManyToOneDescriptor(object):
+class ReverseManyToOneDescriptor:
     """
     Accessor to the related objects manager on the reverse side of a
     many-to-one relation.
@@ -470,30 +472,24 @@ class ReverseManyToOneDescriptor(object):
 
         - ``self`` is the descriptor managing the ``children`` attribute
         - ``instance`` is the ``parent`` instance
-        - ``instance_type`` in the ``Parent`` class (we don't need it)
+        - ``cls`` is the ``Parent`` class (unused)
         """
         if instance is None:
             return self
 
         return self.related_manager_cls(instance)
 
-    def __set__(self, instance, value):
-        """
-        Set the related objects through the reverse relation.
-
-        With the example above, when setting ``parent.children = children``:
-
-        - ``self`` is the descriptor managing the ``children`` attribute
-        - ``instance`` is the ``parent`` instance
-        - ``value`` in the ``children`` sequence on the right of the equal sign
-        """
-        warnings.warn(
-            'Direct assignment to the reverse side of a related set is '
-            'deprecated due to the implicit save() that happens. Use %s.set() '
-            'instead.' % self.rel.get_accessor_name(), RemovedInDjango20Warning, stacklevel=2,
+    def _get_set_deprecation_msg_params(self):
+        return (
+            'reverse side of a related set',
+            self.rel.get_accessor_name(),
         )
-        manager = self.__get__(instance)
-        manager.set(value)
+
+    def __set__(self, instance, value):
+        raise TypeError(
+            'Direct assignment to the %s is prohibited. Use %s.set() instead.'
+            % self._get_set_deprecation_msg_params(),
+        )
 
 
 def create_reverse_many_to_one_manager(superclass, rel):
@@ -506,7 +502,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
     class RelatedManager(superclass):
         def __init__(self, instance):
-            super(RelatedManager, self).__init__()
+            super().__init__()
 
             self.instance = instance
             self.model = rel.related_model
@@ -514,10 +510,8 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
             self.core_filters = {self.field.name: instance}
 
-        def __call__(self, **kwargs):
-            # We use **kwargs rather than a kwarg argument to enforce the
-            # `manager='manager_name'` syntax.
-            manager = getattr(self.model, kwargs.pop('manager'))
+        def __call__(self, *, manager):
+            manager = getattr(self.model, manager)
             manager_class = create_reverse_many_to_one_manager(manager.__class__, rel)
             return manager_class(self.instance)
         do_not_call_in_templates = True
@@ -539,16 +533,22 @@ def create_reverse_many_to_one_manager(superclass, rel):
             queryset._known_related_objects = {self.field: {self.instance.pk: self.instance}}
             return queryset
 
+        def _remove_prefetched_objects(self):
+            try:
+                self.instance._prefetched_objects_cache.pop(self.field.related_query_name())
+            except (AttributeError, KeyError):
+                pass  # nothing to clear from cache
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.field.related_query_name()]
             except (AttributeError, KeyError):
-                queryset = super(RelatedManager, self).get_queryset()
+                queryset = super().get_queryset()
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:
-                queryset = super(RelatedManager, self).get_queryset()
+                queryset = super().get_queryset()
 
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
@@ -567,8 +567,8 @@ def create_reverse_many_to_one_manager(superclass, rel):
             cache_name = self.field.related_query_name()
             return queryset, rel_obj_attr, instance_attr, False, cache_name
 
-        def add(self, *objs, **kwargs):
-            bulk = kwargs.pop('bulk', True)
+        def add(self, *objs, bulk=True):
+            self._remove_prefetched_objects()
             objs = list(objs)
             db = router.db_for_write(self.model, instance=self.instance)
 
@@ -619,10 +619,9 @@ def create_reverse_many_to_one_manager(superclass, rel):
 
         # remove() and clear() are only provided if the ForeignKey can have a value of null.
         if rel.field.null:
-            def remove(self, *objs, **kwargs):
+            def remove(self, *objs, bulk=True):
                 if not objs:
                     return
-                bulk = kwargs.pop('bulk', True)
                 val = self.field.get_foreign_related_value(self.instance)
                 old_ids = set()
                 for obj in objs:
@@ -636,12 +635,12 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 self._clear(self.filter(pk__in=old_ids), bulk)
             remove.alters_data = True
 
-            def clear(self, **kwargs):
-                bulk = kwargs.pop('bulk', True)
+            def clear(self, *, bulk=True):
                 self._clear(self, bulk)
             clear.alters_data = True
 
             def _clear(self, queryset, bulk):
+                self._remove_prefetched_objects()
                 db = router.db_for_write(self.model, instance=self.instance)
                 queryset = queryset.using(db)
                 if bulk:
@@ -654,13 +653,10 @@ def create_reverse_many_to_one_manager(superclass, rel):
                             obj.save(update_fields=[self.field.name])
             _clear.alters_data = True
 
-        def set(self, objs, **kwargs):
+        def set(self, objs, *, bulk=True, clear=False):
             # Force evaluation of `objs` in case it's a queryset whose value
             # could be affected by `manager.clear()`. Refs #19816.
             objs = tuple(objs)
-
-            bulk = kwargs.pop('bulk', True)
-            clear = kwargs.pop('clear', False)
 
             if self.field.null:
                 db = router.db_for_write(self.model, instance=self.instance)
@@ -704,7 +700,7 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor):
     """
 
     def __init__(self, rel, reverse=False):
-        super(ManyToManyDescriptor, self).__init__(rel)
+        super().__init__(rel)
 
         self.reverse = reverse
 
@@ -725,6 +721,12 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor):
             reverse=self.reverse,
         )
 
+    def _get_set_deprecation_msg_params(self):
+        return (
+            '%s side of a many-to-many set' % ('reverse' if self.reverse else 'forward'),
+            self.rel.get_accessor_name() if self.reverse else self.field.name,
+        )
+
 
 def create_forward_many_to_many_manager(superclass, rel, reverse):
     """
@@ -736,7 +738,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
     class ManyRelatedManager(superclass):
         def __init__(self, instance=None):
-            super(ManyRelatedManager, self).__init__()
+            super().__init__()
 
             self.instance = instance
 
@@ -762,15 +764,17 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             self.target_field = self.through._meta.get_field(self.target_field_name)
 
             self.core_filters = {}
+            self.pk_field_names = {}
             for lh_field, rh_field in self.source_field.related_fields:
                 core_filter_key = '%s__%s' % (self.query_field_name, rh_field.name)
                 self.core_filters[core_filter_key] = getattr(instance, rh_field.attname)
+                self.pk_field_names[lh_field.name] = rh_field.name
 
             self.related_val = self.source_field.get_foreign_related_value(instance)
             if None in self.related_val:
                 raise ValueError('"%r" needs to have a value for field "%s" before '
                                  'this many-to-many relationship can be used.' %
-                                 (instance, self.source_field_name))
+                                 (instance, self.pk_field_names[self.source_field_name]))
             # Even if this relation is not to pk, we require still pk value.
             # The wish is that the instance has been already saved to DB,
             # although having a pk value isn't a guarantee of that.
@@ -779,10 +783,8 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                                  "a many-to-many relationship can be used." %
                                  instance.__class__.__name__)
 
-        def __call__(self, **kwargs):
-            # We use **kwargs rather than a kwarg argument to enforce the
-            # `manager='manager_name'` syntax.
-            manager = getattr(self.model, kwargs.pop('manager'))
+        def __call__(self, *, manager):
+            manager = getattr(self.model, manager)
             manager_class = create_forward_many_to_many_manager(manager.__class__, rel, reverse)
             return manager_class(instance=self.instance)
         do_not_call_in_templates = True
@@ -812,16 +814,22 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 queryset = queryset.using(self._db)
             return queryset._next_is_sticky().filter(**self.core_filters)
 
+        def _remove_prefetched_objects(self):
+            try:
+                self.instance._prefetched_objects_cache.pop(self.prefetch_cache_name)
+            except (AttributeError, KeyError):
+                pass  # nothing to clear from cache
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
             except (AttributeError, KeyError):
-                queryset = super(ManyRelatedManager, self).get_queryset()
+                queryset = super().get_queryset()
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:
-                queryset = super(ManyRelatedManager, self).get_queryset()
+                queryset = super().get_queryset()
 
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
@@ -837,7 +845,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             # For non-autocreated 'through' models, can't assume we are
             # dealing with PK values.
             fk = self.through._meta.get_field(self.source_field_name)
-            join_table = self.through._meta.db_table
+            join_table = fk.model._meta.db_table
             connection = connections[queryset.db]
             qn = connection.ops.quote_name
             queryset = queryset.extra(select={
@@ -865,7 +873,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     "intermediary model. Use %s.%s's Manager instead." %
                     (opts.app_label, opts.object_name)
                 )
-
+            self._remove_prefetched_objects()
             db = router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
                 self._add_items(self.source_field_name, self.target_field_name, *objs)
@@ -883,6 +891,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     "an intermediary model. Use %s.%s's Manager instead." %
                     (opts.app_label, opts.object_name)
                 )
+            self._remove_prefetched_objects()
             self._remove_items(self.source_field_name, self.target_field_name, *objs)
         remove.alters_data = True
 
@@ -894,7 +903,8 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     instance=self.instance, reverse=self.reverse,
                     model=self.model, pk_set=None, using=db,
                 )
-                filters = self._build_remove_filters(super(ManyRelatedManager, self).get_queryset().using(db))
+                self._remove_prefetched_objects()
+                filters = self._build_remove_filters(super().get_queryset().using(db))
                 self.through._default_manager.using(db).filter(filters).delete()
 
                 signals.m2m_changed.send(
@@ -904,7 +914,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 )
         clear.alters_data = True
 
-        def set(self, objs, **kwargs):
+        def set(self, objs, *, clear=False):
             if not rel.through._meta.auto_created:
                 opts = self.through._meta
                 raise AttributeError(
@@ -916,8 +926,6 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             # Force evaluation of `objs` in case it's a queryset whose value
             # could be affected by `manager.clear()`. Refs #19816.
             objs = tuple(objs)
-
-            clear = kwargs.pop('clear', False)
 
             db = router.db_for_write(self.through, instance=self.instance)
             with transaction.atomic(using=db, savepoint=False):
@@ -1071,7 +1079,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     instance=self.instance, reverse=self.reverse,
                     model=self.model, pk_set=old_ids, using=db,
                 )
-                target_model_qs = super(ManyRelatedManager, self).get_queryset()
+                target_model_qs = super().get_queryset()
                 if target_model_qs._has_filters():
                     old_vals = target_model_qs.using(db).filter(**{
                         '%s__in' % self.target_field.target_field.attname: old_ids})

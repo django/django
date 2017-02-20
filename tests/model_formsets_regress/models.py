@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class User(models.Model):
@@ -40,7 +39,6 @@ class Network(models.Model):
     name = models.CharField(max_length=15)
 
 
-@python_2_unicode_compatible
 class Host(models.Model):
     network = models.ForeignKey(Network, models.CASCADE)
     hostname = models.CharField(max_length=25)

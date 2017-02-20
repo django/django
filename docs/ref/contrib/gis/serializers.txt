@@ -8,10 +8,6 @@
 GeoDjango provides a specific serializer for the `GeoJSON`__ format. See
 :doc:`/topics/serialization` for more information on serialization.
 
-The GDAL library is required if any of the serialized geometries need
-coordinate transformations (that is if the geometry's spatial reference system
-differs from the ``srid`` serializer option).
-
 __ http://geojson.org/
 
 The ``geojson`` serializer is not meant for round-tripping data, as it has no
@@ -70,7 +66,3 @@ Would output::
 When the ``fields`` parameter is not specified, the ``geojson`` serializer adds
 a ``pk`` key to the ``properties`` dictionary with the primary key of the
 object as the value.
-
-.. versionchanged:: 1.10
-
-    The ``pk`` key was added to the ``properties`` dictionary.

@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from itertools import chain
+from types import MethodType
 
 from django.apps import apps
 from django.conf import settings
 from django.core import checks
-from django.utils import six
 
 from .management import _get_builtin_permissions
 
@@ -74,7 +71,7 @@ def check_user_model(app_configs=None, **kwargs):
                 )
             )
 
-    if isinstance(cls().is_anonymous, six.types.MethodType):
+    if isinstance(cls().is_anonymous, MethodType):
         errors.append(
             checks.Critical(
                 '%s.is_anonymous must be an attribute or property rather than '
@@ -84,7 +81,7 @@ def check_user_model(app_configs=None, **kwargs):
                 id='auth.C009',
             )
         )
-    if isinstance(cls().is_authenticated, six.types.MethodType):
+    if isinstance(cls().is_authenticated, MethodType):
         errors.append(
             checks.Critical(
                 '%s.is_authenticated must be an attribute or property rather '
@@ -111,7 +108,10 @@ def check_models_permissions(app_configs=None, **kwargs):
         opts = model._meta
         builtin_permissions = dict(_get_builtin_permissions(opts))
         # Check builtin permission name length.
-        max_builtin_permission_name_length = max(len(name) for name in builtin_permissions.values())
+        max_builtin_permission_name_length = (
+            max(len(name) for name in builtin_permissions.values())
+            if builtin_permissions else 0
+        )
         if max_builtin_permission_name_length > permission_name_max_length:
             verbose_name_max_length = (
                 permission_name_max_length - (max_builtin_permission_name_length - len(opts.verbose_name_raw))

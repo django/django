@@ -2,14 +2,14 @@
 #
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011
-# Emin Mastizada <emin@mastizada.com>, 2016
+# Emin Mastizada <emin@linux.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2016-02-17 21:41+0000\n"
-"Last-Translator: Emin Mastizada <emin@mastizada.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-08-05 00:28+0000\n"
+"Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -51,7 +51,7 @@ msgid "No password set."
 msgstr "Parol qurulmayıb."
 
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr ""
+msgstr "Xətalı parol formatı və ya bilinməyən heş alqoritması."
 
 msgid "The two password fields didn't match."
 msgstr "Parollar üst-üstə düşmədi."
@@ -63,7 +63,7 @@ msgid "Password confirmation"
 msgstr "Parolun təsdiqi"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Təsdiqləmək üçün əvvəlki ilə eyni parolu daxil edin."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
@@ -103,19 +103,34 @@ msgid "algorithm"
 msgstr "alqoritm"
 
 msgid "iterations"
-msgstr ""
+msgstr "təkrarlama"
 
 msgid "salt"
-msgstr ""
+msgstr "duz"
 
 msgid "hash"
-msgstr ""
+msgstr "heş"
+
+msgid "variety"
+msgstr "müxtəliflik"
+
+msgid "version"
+msgstr "versiya"
+
+msgid "memory cost"
+msgstr "yaddaş xərci"
+
+msgid "time cost"
+msgstr "vaxt xərci"
+
+msgid "parallelism"
+msgstr "paralellik"
 
 msgid "work factor"
-msgstr ""
+msgstr "iş faktoru"
 
 msgid "checksum"
-msgstr ""
+msgstr "yoxlama dəyəri"
 
 msgid "name"
 msgstr "ad"
@@ -160,14 +175,7 @@ msgstr ""
 msgid "username"
 msgstr "istifadəçi adı"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Vacibdir. 30 simvoldan az olmalıdır. Yalnız hərf, rəqəm və @/./+/-/_ "
-"simvollarından istifadə etmək olar."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 
 msgid "A user with that username already exists."
@@ -245,6 +253,16 @@ msgstr "Parolunuz ancaq rəqəmlərlə ola bilməz."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s, parolun sıfırlanması"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
 
 msgid "Logged out"
 msgstr "Çıxdınız"

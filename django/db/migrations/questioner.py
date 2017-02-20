@@ -1,18 +1,15 @@
-from __future__ import print_function, unicode_literals
-
 import importlib
 import os
 import sys
 
 from django.apps import apps
 from django.db.models.fields import NOT_PROVIDED
-from django.utils import datetime_safe, six, timezone
-from django.utils.six.moves import input
+from django.utils import datetime_safe, timezone
 
 from .loader import MigrationLoader
 
 
-class MigrationQuestioner(object):
+class MigrationQuestioner:
     """
     Gives the autodetector responses to questions it might have.
     This base class has a built-in noninteractive mode, but the
@@ -37,7 +34,7 @@ class MigrationQuestioner(object):
             app_config = apps.get_app_config(app_label)
         except LookupError:         # It's a fake app.
             return self.defaults.get("ask_initial", False)
-        migrations_import_path = MigrationLoader(None, load=False).migrations_module(app_config.label)
+        migrations_import_path, _ = MigrationLoader.migrations_module(app_config.label)
         if migrations_import_path is None:
             # It's an application with migrations disabled.
             return self.defaults.get("ask_initial", False)
@@ -127,13 +124,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 prompt = "[default: {}] >>> ".format(default)
             else:
                 prompt = ">>> "
-            if six.PY3:
-                # Six does not correctly abstract over the fact that
-                # py3 input returns a unicode string, while py2 raw_input
-                # returns a bytestring.
-                code = input(prompt)
-            else:
-                code = input(prompt).decode(sys.stdin.encoding)
+            code = input(prompt)
             if not code and default:
                 code = default
             if not code:

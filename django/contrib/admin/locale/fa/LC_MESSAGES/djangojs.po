@@ -5,15 +5,16 @@
 # Alireza Savand <alireza.savand@gmail.com>, 2012
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Pouya Abbassi, 2016
 # Reza Mohammadi <reza@teeleh.ir>, 2014
 # Sina Cheraghi <sinacher@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-18 21:43+0000\n"
-"Last-Translator: Ali Vakilzade <ali.vakilzade@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-08-16 13:54+0000\n"
+"Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -147,13 +148,69 @@ msgstr "دیروز"
 msgid "Tomorrow"
 msgstr "فردا"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr "ژانویه فوریه مارس آوریل مه ژوئن ژوئیه اوت سپتامبر اکتبر نوامبر دسامبر"
+msgid "January"
+msgstr "ژانویه"
 
-msgid "S M T W T F S"
-msgstr "یکشنبه دوشنبه سه‌شنبه چهارشنبه پنجشنبه جمعه شنبه"
+msgid "February"
+msgstr "فوریه"
+
+msgid "March"
+msgstr "مارس"
+
+msgid "April"
+msgstr "آوریل"
+
+msgid "May"
+msgstr "می"
+
+msgid "June"
+msgstr "ژوئن"
+
+msgid "July"
+msgstr "جولای"
+
+msgid "August"
+msgstr "آگوست"
+
+msgid "September"
+msgstr "سپتامبر"
+
+msgid "October"
+msgstr "اکتبر"
+
+msgid "November"
+msgstr "نوامبر"
+
+msgid "December"
+msgstr "دسامبر"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "ی"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "د"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "س"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "چ"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "پ"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "ج"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "ش"
 
 msgid "Show"
 msgstr "نمایش"

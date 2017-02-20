@@ -2,8 +2,6 @@
 This module holds simple classes to convert geospatial values from the
 database.
 """
-from __future__ import unicode_literals
-
 from decimal import Decimal
 
 from django.contrib.gis.db.models.fields import GeoSelectFormatMixin
@@ -11,7 +9,7 @@ from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
 
 
-class BaseField(object):
+class BaseField:
     empty_strings_allowed = True
 
     def get_db_converters(self, connection):

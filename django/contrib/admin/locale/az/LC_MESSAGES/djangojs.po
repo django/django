@@ -2,14 +2,15 @@
 #
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011-2012
-# Emin Mastizada <emin@mastizada.com>, 2016
+# Emin Mastizada <emin@linux.com>, 2016
+# Emin Mastizada <emin@linux.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-02-17 21:31+0000\n"
-"Last-Translator: Emin Mastizada <emin@mastizada.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-09-16 10:02+0000\n"
+"Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -146,14 +147,69 @@ msgstr "Dünən"
 msgid "Tomorrow"
 msgstr "Sabah"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Yanvar Fevral Mart Aprel May İyun İyul Avqust Sentyabr Oktyabr Noyabr Dekabr"
+msgid "January"
+msgstr "Yanvar"
 
-msgid "S M T W T F S"
-msgstr "B B Ç Ç C C Ş"
+msgid "February"
+msgstr "Fevral"
+
+msgid "March"
+msgstr "Mart"
+
+msgid "April"
+msgstr "Aprel"
+
+msgid "May"
+msgstr "May"
+
+msgid "June"
+msgstr "İyun"
+
+msgid "July"
+msgstr "İyul"
+
+msgid "August"
+msgstr "Avqust"
+
+msgid "September"
+msgstr "Sentyabr"
+
+msgid "October"
+msgstr "Oktyabr"
+
+msgid "November"
+msgstr "Noyabr"
+
+msgid "December"
+msgstr "Dekabr"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "B"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "B"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "Ç"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "Ç"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "C"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "C"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "Ş"
 
 msgid "Show"
 msgstr "Göstər"

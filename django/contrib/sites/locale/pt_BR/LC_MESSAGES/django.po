@@ -2,7 +2,7 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
-# Eduardo Carvalho <eduardocereto@gmail.com>, 2013
+# Eduardo Cereto Carvalho, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""

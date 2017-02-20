@@ -6,7 +6,7 @@ PostgreSQL specific aggregation functions
    :synopsis: PostgreSQL specific aggregation functions
 
 These functions are described in more detail in the `PostgreSQL docs
-<http://www.postgresql.org/docs/current/static/functions-aggregate.html>`_.
+<https://www.postgresql.org/docs/current/static/functions-aggregate.html>`_.
 
 .. note::
 
@@ -22,9 +22,16 @@ General-purpose aggregation functions
 ``ArrayAgg``
 ------------
 
-.. class:: ArrayAgg(expression, **extra)
+.. class:: ArrayAgg(expression, distinct=False, **extra)
 
     Returns a list of values, including nulls, concatenated into an array.
+
+    .. attribute:: distinct
+
+        .. versionadded:: 2.0
+
+        An optional boolean argument that determines if array values
+        will be distinct. Defaults to ``False``.
 
 ``BitAnd``
 ----------
@@ -58,10 +65,19 @@ General-purpose aggregation functions
     Returns ``True`` if at least one input value is true, ``None`` if all
     values are null or if there are no values, otherwise ``False``.
 
+``JSONBAgg``
+------------
+
+.. class:: JSONBAgg(expressions, **extra)
+
+    .. versionadded:: 1.11
+
+    Returns the input values as a ``JSON`` array. Requires PostgreSQL ≥ 9.5.
+
 ``StringAgg``
 -------------
 
-.. class:: StringAgg(expression, delimiter)
+.. class:: StringAgg(expression, delimiter, distinct=False)
 
     Returns the input values concatenated into a string, separated by
     the ``delimiter`` string.
@@ -69,6 +85,13 @@ General-purpose aggregation functions
     .. attribute:: delimiter
 
         Required argument. Needs to be a string.
+
+    .. attribute:: distinct
+
+        .. versionadded:: 1.11
+
+        An optional boolean argument that determines if concatenated values
+        will be distinct. Defaults to ``False``.
 
 Aggregate functions for statistics
 ==================================

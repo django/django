@@ -1,13 +1,20 @@
-from django.contrib.postgres.aggregates import (
-    ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, Corr, CovarPop, RegrAvgX,
-    RegrAvgY, RegrCount, RegrIntercept, RegrR2, RegrSlope, RegrSXX, RegrSXY,
-    RegrSYY, StatAggregate, StringAgg,
-)
+import json
+
 from django.db.models.expressions import F, Value
+from django.test.testcases import skipUnlessDBFeature
 from django.test.utils import Approximate
 
 from . import PostgreSQLTestCase
 from .models import AggregateTestModel, StatTestModel
+
+try:
+    from django.contrib.postgres.aggregates import (
+        ArrayAgg, BitAnd, BitOr, BoolAnd, BoolOr, Corr, CovarPop, JSONBAgg,
+        RegrAvgX, RegrAvgY, RegrCount, RegrIntercept, RegrR2, RegrSlope,
+        RegrSXX, RegrSXY, RegrSYY, StatAggregate, StringAgg,
+    )
+except ImportError:
+    pass  # psycopg2 is not installed
 
 
 class TestGeneralAggregate(PostgreSQLTestCase):
@@ -109,6 +116,42 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         AggregateTestModel.objects.all().delete()
         values = AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter=';'))
         self.assertEqual(values, {'stringagg': ''})
+
+    @skipUnlessDBFeature('has_jsonb_agg')
+    def test_json_agg(self):
+        values = AggregateTestModel.objects.aggregate(jsonagg=JSONBAgg('char_field'))
+        self.assertEqual(values, {'jsonagg': ['Foo1', 'Foo2', 'Foo3', 'Foo4']})
+
+    @skipUnlessDBFeature('has_jsonb_agg')
+    def test_json_agg_empty(self):
+        values = AggregateTestModel.objects.none().aggregate(jsonagg=JSONBAgg('integer_field'))
+        self.assertEqual(values, json.loads('{"jsonagg": []}'))
+
+
+class TestAggregateDistinct(PostgreSQLTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        AggregateTestModel.objects.create(char_field='Foo')
+        AggregateTestModel.objects.create(char_field='Foo')
+        AggregateTestModel.objects.create(char_field='Bar')
+
+    def test_string_agg_distinct_false(self):
+        values = AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter=' ', distinct=False))
+        self.assertEqual(values['stringagg'].count('Foo'), 2)
+        self.assertEqual(values['stringagg'].count('Bar'), 1)
+
+    def test_string_agg_distinct_true(self):
+        values = AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter=' ', distinct=True))
+        self.assertEqual(values['stringagg'].count('Foo'), 1)
+        self.assertEqual(values['stringagg'].count('Bar'), 1)
+
+    def test_array_agg_distinct_false(self):
+        values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('char_field', distinct=False))
+        self.assertEqual(sorted(values['arrayagg']), ['Bar', 'Foo', 'Foo'])
+
+    def test_array_agg_distinct_true(self):
+        values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg('char_field', distinct=True))
+        self.assertEqual(sorted(values['arrayagg']), ['Bar', 'Foo'])
 
 
 class TestStatisticsAggregate(PostgreSQLTestCase):

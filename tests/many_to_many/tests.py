@@ -1,8 +1,5 @@
-from __future__ import unicode_literals
-
 from django.db import transaction
-from django.test import TestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.test import TestCase
 
 from .models import Article, InheritedArticleA, InheritedArticleB, Publication
 
@@ -400,35 +397,21 @@ class ManyToManyTests(TestCase):
         self.a4.publications.set([], clear=True)
         self.assertQuerysetEqual(self.a4.publications.all(), [])
 
-    def test_assign_deprecation(self):
+    def test_assign_forward(self):
         msg = (
-            "Direct assignment to the reverse side of a related set is "
-            "deprecated due to the implicit save() that happens. Use "
-            "article_set.set() instead."
+            "Direct assignment to the reverse side of a many-to-many set is "
+            "prohibited. Use article_set.set() instead."
         )
-        with self.assertRaisesMessage(RemovedInDjango20Warning, msg):
+        with self.assertRaisesMessage(TypeError, msg):
             self.p2.article_set = [self.a4, self.a3]
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_assign_deprecated(self):
-        self.p2.article_set = [self.a4, self.a3]
-        self.assertQuerysetEqual(
-            self.p2.article_set.all(),
-            [
-                '<Article: NASA finds intelligent life on Earth>',
-                '<Article: Oxygen-free diet works wonders>',
-            ]
+    def test_assign_reverse(self):
+        msg = (
+            "Direct assignment to the forward side of a many-to-many "
+            "set is prohibited. Use publications.set() instead."
         )
-        self.assertQuerysetEqual(self.a4.publications.all(), ['<Publication: Science News>'])
-        self.a4.publications = [self.p3.id]
-        self.assertQuerysetEqual(self.p2.article_set.all(), ['<Article: NASA finds intelligent life on Earth>'])
-        self.assertQuerysetEqual(self.a4.publications.all(), ['<Publication: Science Weekly>'])
-
-        # An alternate to calling clear() is to assign the empty set
-        self.p2.article_set = []
-        self.assertQuerysetEqual(self.p2.article_set.all(), [])
-        self.a4.publications = []
-        self.assertQuerysetEqual(self.a4.publications.all(), [])
+        with self.assertRaisesMessage(TypeError, msg):
+            self.a1.publications = [self.p1, self.p2]
 
     def test_assign(self):
         # Relation sets can be assigned using set().
@@ -466,9 +449,9 @@ class ManyToManyTests(TestCase):
         self.assertQuerysetEqual(self.a4.publications.all(), ['<Publication: Science Weekly>'])
 
     def test_forward_assign_with_queryset(self):
-        # Ensure that querysets used in m2m assignments are pre-evaluated
-        # so their value isn't affected by the clearing operation in
-        # ManyRelatedManager.set() (#19816).
+        # Querysets used in m2m assignments are pre-evaluated so their value
+        # isn't affected by the clearing operation in ManyRelatedManager.set()
+        # (#19816).
         self.a1.publications.set([self.p1, self.p2])
 
         qs = self.a1.publications.filter(title='The Python Journal')
@@ -478,9 +461,9 @@ class ManyToManyTests(TestCase):
         self.assertEqual(1, qs.count())
 
     def test_reverse_assign_with_queryset(self):
-        # Ensure that querysets used in M2M assignments are pre-evaluated
-        # so their value isn't affected by the clearing operation in
-        # ManyRelatedManager.set() (#19816).
+        # Querysets used in M2M assignments are pre-evaluated so their value
+        # isn't affected by the clearing operation in ManyRelatedManager.set()
+        # (#19816).
         self.p1.article_set.set([self.a1, self.a2])
 
         qs = self.p1.article_set.filter(headline='Django lets you build Web apps easily')
@@ -508,6 +491,40 @@ class ManyToManyTests(TestCase):
         self.a4.publications.clear()
         self.assertQuerysetEqual(self.a4.publications.all(), [])
         self.assertQuerysetEqual(self.p2.article_set.all(), ['<Article: NASA finds intelligent life on Earth>'])
+
+    def test_clear_after_prefetch(self):
+        a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
+        self.assertQuerysetEqual(a4.publications.all(), ['<Publication: Science News>'])
+        a4.publications.clear()
+        self.assertQuerysetEqual(a4.publications.all(), [])
+
+    def test_remove_after_prefetch(self):
+        a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
+        self.assertQuerysetEqual(a4.publications.all(), ['<Publication: Science News>'])
+        a4.publications.remove(self.p2)
+        self.assertQuerysetEqual(a4.publications.all(), [])
+
+    def test_add_after_prefetch(self):
+        a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
+        self.assertEqual(a4.publications.count(), 1)
+        a4.publications.add(self.p1)
+        self.assertEqual(a4.publications.count(), 2)
+
+    def test_set_after_prefetch(self):
+        a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
+        self.assertEqual(a4.publications.count(), 1)
+        a4.publications.set([self.p2, self.p1])
+        self.assertEqual(a4.publications.count(), 2)
+        a4.publications.set([self.p1])
+        self.assertEqual(a4.publications.count(), 1)
+
+    def test_add_then_remove_after_prefetch(self):
+        a4 = Article.objects.prefetch_related('publications').get(id=self.a4.id)
+        self.assertEqual(a4.publications.count(), 1)
+        a4.publications.add(self.p1)
+        self.assertEqual(a4.publications.count(), 2)
+        a4.publications.remove(self.p1)
+        self.assertQuerysetEqual(a4.publications.all(), ['<Publication: Science News>'])
 
     def test_inherited_models_selects(self):
         """

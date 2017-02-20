@@ -7,22 +7,21 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import force_text, python_2_unicode_compatible
 
 
 class OnlyFred(models.Manager):
     def get_queryset(self):
-        return super(OnlyFred, self).get_queryset().filter(name='fred')
+        return super().get_queryset().filter(name='fred')
 
 
 class OnlyBarney(models.Manager):
     def get_queryset(self):
-        return super(OnlyBarney, self).get_queryset().filter(name='barney')
+        return super().get_queryset().filter(name='barney')
 
 
 class Value42(models.Manager):
     def get_queryset(self):
-        return super(Value42, self).get_queryset().filter(value=42)
+        return super().get_queryset().filter(value=42)
 
 
 class AbstractBase1(models.Model):
@@ -55,7 +54,6 @@ class AbstractBase3(models.Model):
         abstract = True
 
 
-@python_2_unicode_compatible
 class Parent(models.Model):
     name = models.CharField(max_length=50)
 
@@ -68,7 +66,6 @@ class Parent(models.Model):
 # Managers from base classes are inherited and, if no manager is specified
 # *and* the parent has a manager specified, the first one (in the MRO) will
 # become the default.
-@python_2_unicode_compatible
 class Child1(AbstractBase1):
     data = models.CharField(max_length=25)
 
@@ -76,7 +73,6 @@ class Child1(AbstractBase1):
         return self.data
 
 
-@python_2_unicode_compatible
 class Child2(AbstractBase1, AbstractBase2):
     data = models.CharField(max_length=25)
 
@@ -84,7 +80,6 @@ class Child2(AbstractBase1, AbstractBase2):
         return self.data
 
 
-@python_2_unicode_compatible
 class Child3(AbstractBase1, AbstractBase3):
     data = models.CharField(max_length=25)
 
@@ -92,7 +87,6 @@ class Child3(AbstractBase1, AbstractBase3):
         return self.data
 
 
-@python_2_unicode_compatible
 class Child4(AbstractBase1):
     data = models.CharField(max_length=25)
 
@@ -104,7 +98,6 @@ class Child4(AbstractBase1):
         return self.data
 
 
-@python_2_unicode_compatible
 class Child5(AbstractBase3):
     name = models.CharField(max_length=25)
 
@@ -118,25 +111,20 @@ class Child5(AbstractBase3):
 class Child6(Child4):
     value = models.IntegerField()
 
-    class Meta:
-        manager_inheritance_from_future = True
-
 
 class Child7(Parent):
     objects = models.Manager()
 
 
 # RelatedManagers
-@python_2_unicode_compatible
 class RelatedModel(models.Model):
     test_gfk = GenericRelation('RelationModel', content_type_field='gfk_ctype', object_id_field='gfk_id')
     exact = models.NullBooleanField()
 
     def __str__(self):
-        return force_text(self.pk)
+        return str(self.pk)
 
 
-@python_2_unicode_compatible
 class RelationModel(models.Model):
     fk = models.ForeignKey(RelatedModel, models.CASCADE, related_name='test_fk')
 
@@ -147,4 +135,4 @@ class RelationModel(models.Model):
     gfk = GenericForeignKey(ct_field='gfk_ctype', fk_field='gfk_id')
 
     def __str__(self):
-        return force_text(self.pk)
+        return str(self.pk)

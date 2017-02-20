@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import functools
 import re
 from itertools import chain
@@ -14,12 +12,11 @@ from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.utils import (
     COMPILED_REGEX_TYPE, RegexObject, get_migration_name_timestamp,
 )
-from django.utils import six
 
 from .topological_sort import stable_topological_sort
 
 
-class MigrationAutodetector(object):
+class MigrationAutodetector:
     """
     Takes a pair of ProjectStates, and compares them to see what the
     first would need doing to make it match the second (the second
@@ -126,6 +123,7 @@ class MigrationAutodetector(object):
         # We'll then go through that list later and order it and split
         # into migrations to resolve dependencies caused by M2Ms and FKs.
         self.generated_operations = {}
+        self.altered_indexes = {}
 
         # Prepare some old/new state and model lists, separating
         # proxy models and ignoring unmigrated apps.
@@ -175,6 +173,12 @@ class MigrationAutodetector(object):
         self.generate_altered_options()
         self.generate_altered_managers()
 
+        # Create the altered indexes and store them in self.altered_indexes.
+        # This avoids the same computation in generate_removed_indexes()
+        # and generate_added_indexes().
+        self.create_altered_indexes()
+        # Generate index removal operations before field is removed
+        self.generate_removed_indexes()
         # Generate field operations
         self.generate_renamed_fields()
         self.generate_removed_fields()
@@ -182,6 +186,7 @@ class MigrationAutodetector(object):
         self.generate_altered_fields()
         self.generate_altered_unique_together()
         self.generate_altered_index_together()
+        self.generate_added_indexes()
         self.generate_altered_db_table()
         self.generate_altered_order_with_respect_to()
 
@@ -301,7 +306,7 @@ class MigrationAutodetector(object):
                 # Make a migration! Well, only if there's stuff to put in it
                 if dependencies or chopped:
                     if not self.generated_operations[app_label] or chop_mode:
-                        subclass = type(str("Migration"), (Migration,), {"operations": [], "dependencies": []})
+                        subclass = type("Migration", (Migration,), {"operations": [], "dependencies": []})
                         instance = subclass("auto_%i" % (len(self.migrations.get(app_label, [])) + 1), app_label)
                         instance.dependencies = list(dependencies)
                         instance.operations = chopped
@@ -521,7 +526,8 @@ class MigrationAutodetector(object):
                     related_fields[field.name] = field
                 if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
                     related_fields[field.name] = field
-            # Are there unique/index_together to defer?
+            # Are there indexes/unique|index_together to defer?
+            indexes = model_state.options.pop('indexes')
             unique_together = model_state.options.pop('unique_together', None)
             index_together = model_state.options.pop('index_together', None)
             order_with_respect_to = model_state.options.pop('order_with_respect_to', None)
@@ -531,7 +537,7 @@ class MigrationAutodetector(object):
             ]
             # Depend on all bases
             for base in model_state.bases:
-                if isinstance(base, six.string_types) and "." in base:
+                if isinstance(base, str) and "." in base:
                     base_app_label, base_name = base.split(".", 1)
                     dependencies.append((base_app_label, base_name, None, True))
             # Depend on the other end of the primary key if it's a relation
@@ -562,7 +568,7 @@ class MigrationAutodetector(object):
 
             # Generate operations for each related field
             for name, field in sorted(related_fields.items()):
-                dependencies = self._get_dependecies_for_foreign_key(field)
+                dependencies = self._get_dependencies_for_foreign_key(field)
                 # Depend on our own model being created
                 dependencies.append((app_label, model_name, None, True))
                 # Make operation
@@ -581,6 +587,15 @@ class MigrationAutodetector(object):
                 for name, field in sorted(related_fields.items())
             ]
             related_dependencies.append((app_label, model_name, None, True))
+            for index in indexes:
+                self.add_operation(
+                    app_label,
+                    operations.AddIndex(
+                        model_name=model_name,
+                        index=index,
+                    ),
+                    dependencies=related_dependencies,
+                )
             if unique_together:
                 self.add_operation(
                     app_label,
@@ -612,6 +627,20 @@ class MigrationAutodetector(object):
                     ]
                 )
 
+            # Fix relationships if the model changed from a proxy model to a
+            # concrete model.
+            if (app_label, model_name) in self.old_proxy_keys:
+                for related_object in model_opts.related_objects:
+                    self.add_operation(
+                        related_object.related_model._meta.app_label,
+                        operations.AlterField(
+                            model_name=related_object.related_model._meta.object_name,
+                            name=related_object.field.name,
+                            field=related_object.field,
+                        ),
+                        dependencies=[(app_label, model_name, None, True)],
+                    )
+
     def generate_created_proxies(self):
         """
         Makes CreateModel statements for proxy models.
@@ -629,7 +658,7 @@ class MigrationAutodetector(object):
             ]
             # Depend on all bases
             for base in model_state.bases:
-                if isinstance(base, six.string_types) and "." in base:
+                if isinstance(base, str) and "." in base:
                     base_app_label, base_name = base.split(".", 1)
                     dependencies.append((base_app_label, base_name, None, True))
             # Generate creation operation
@@ -799,7 +828,7 @@ class MigrationAutodetector(object):
         # Fields that are foreignkeys/m2ms depend on stuff
         dependencies = []
         if field.remote_field and field.remote_field.model:
-            dependencies.extend(self._get_dependecies_for_foreign_key(field))
+            dependencies.extend(self._get_dependencies_for_foreign_key(field))
         # You can't just add NOT NULL fields with no default or fields
         # which don't allow empty strings as default.
         preserve_default = True
@@ -867,6 +896,13 @@ class MigrationAutodetector(object):
                 )
                 if rename_key in self.renamed_models:
                     new_field.remote_field.model = old_field.remote_field.model
+            if hasattr(new_field, "remote_field") and getattr(new_field.remote_field, "through", None):
+                rename_key = (
+                    new_field.remote_field.through._meta.app_label,
+                    new_field.remote_field.through._meta.model_name,
+                )
+                if rename_key in self.renamed_models:
+                    new_field.remote_field.through = old_field.remote_field.through
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
             if old_field_dec != new_field_dec:
@@ -898,7 +934,47 @@ class MigrationAutodetector(object):
                     self._generate_removed_field(app_label, model_name, field_name)
                     self._generate_added_field(app_label, model_name, field_name)
 
-    def _get_dependecies_for_foreign_key(self, field):
+    def create_altered_indexes(self):
+        option_name = operations.AddIndex.option_name
+        for app_label, model_name in sorted(self.kept_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+
+            old_indexes = old_model_state.options[option_name]
+            new_indexes = new_model_state.options[option_name]
+            add_idx = [idx for idx in new_indexes if idx not in old_indexes]
+            rem_idx = [idx for idx in old_indexes if idx not in new_indexes]
+
+            self.altered_indexes.update({
+                (app_label, model_name): {
+                    'added_indexes': add_idx, 'removed_indexes': rem_idx,
+                }
+            })
+
+    def generate_added_indexes(self):
+        for (app_label, model_name), alt_indexes in self.altered_indexes.items():
+            for index in alt_indexes['added_indexes']:
+                self.add_operation(
+                    app_label,
+                    operations.AddIndex(
+                        model_name=model_name,
+                        index=index,
+                    )
+                )
+
+    def generate_removed_indexes(self):
+        for (app_label, model_name), alt_indexes in self.altered_indexes.items():
+            for index in alt_indexes['removed_indexes']:
+                self.add_operation(
+                    app_label,
+                    operations.RemoveIndex(
+                        model_name=model_name,
+                        name=index.name,
+                    )
+                )
+
+    def _get_dependencies_for_foreign_key(self, field):
         # Account for FKs to swappable models
         swappable_setting = getattr(field, 'swappable_setting', None)
         if swappable_setting is not None:
@@ -945,7 +1021,7 @@ class MigrationAutodetector(object):
                     for field_name in foo_togethers:
                         field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
                         if field.remote_field and field.remote_field.model:
-                            dependencies.extend(self._get_dependecies_for_foreign_key(field))
+                            dependencies.extend(self._get_dependencies_for_foreign_key(field))
 
                 self.add_operation(
                     app_label,

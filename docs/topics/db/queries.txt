@@ -23,14 +23,14 @@ models, which comprise a Weblog application:
         name = models.CharField(max_length=100)
         tagline = models.TextField()
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Author(models.Model):
         name = models.CharField(max_length=200)
         email = models.EmailField()
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Entry(models.Model):
@@ -44,7 +44,7 @@ models, which comprise a Weblog application:
         n_pingbacks = models.IntegerField()
         rating = models.IntegerField()
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.headline
 
 Creating objects
@@ -597,7 +597,7 @@ may not be the same as the entries in the first filter. We are filtering the
     that were published in 2008, you need to make two queries::
 
         Blog.objects.exclude(
-            entry=Entry.objects.filter(
+            entry__in=Entry.objects.filter(
                 headline__contains='Lennon',
                 pub_date__year=2008,
             ),
@@ -652,10 +652,14 @@ that were modified more than 3 days after they were published::
     >>> from datetime import timedelta
     >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
 
-The ``F()`` objects support bitwise operations by ``.bitand()`` and
-``.bitor()``, for example::
+The ``F()`` objects support bitwise operations by ``.bitand()``, ``.bitor()``,
+``.bitrightshift()``, and ``.bitleftshift()``. For example::
 
     >>> F('somefield').bitand(16)
+
+.. versionchanged:: 1.11
+
+    Support for ``.bitrightshift()`` and ``.bitleftshift()`` was added.
 
 The ``pk`` lookup shortcut
 --------------------------
@@ -763,16 +767,16 @@ For example, repeatedly getting a certain index in a queryset object will query
 the database each time::
 
     >>> queryset = Entry.objects.all()
-    >>> print queryset[5] # Queries the database
-    >>> print queryset[5] # Queries the database again
+    >>> print(queryset[5]) # Queries the database
+    >>> print(queryset[5]) # Queries the database again
 
 However, if the entire queryset has already been evaluated, the cache will be
 checked instead::
 
     >>> queryset = Entry.objects.all()
     >>> [entry for entry in queryset] # Queries the database
-    >>> print queryset[5] # Uses cache
-    >>> print queryset[5] # Uses cache
+    >>> print(queryset[5]) # Uses cache
+    >>> print(queryset[5]) # Uses cache
 
 Here are some examples of other actions that will result in the entire queryset
 being evaluated and therefore populate the cache::
@@ -849,14 +853,16 @@ precede the definition of any keyword arguments. For example::
 
     Poll.objects.get(
         Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)),
-        question__startswith='Who')
+        question__startswith='Who',
+    )
 
 ... would be a valid query, equivalent to the previous example; but::
 
     # INVALID QUERY
     Poll.objects.get(
         question__startswith='Who',
-        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)))
+        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
+    )
 
 ... would not be valid.
 
@@ -972,15 +978,25 @@ Due to how inheritance works, you have to set both ``pk`` and ``id`` to None::
     django_blog.id = None
     django_blog.save() # django_blog.pk == 4
 
-This process does not copy related objects. If you want to copy relations,
-you have to write a little bit more code. In our example, ``Entry`` has a many to many
-field to ``Author``::
+This process doesn't copy relations that aren't part of the model's database
+table. For example, ``Entry`` has a ``ManyToManyField`` to ``Author``. After
+duplicating an entry, you must set the many-to-many relations for the new
+entry::
 
     entry = Entry.objects.all()[0] # some previous entry
     old_authors = entry.authors.all()
     entry.pk = None
     entry.save()
-    entry.authors = old_authors # saves new many2many relations
+    entry.authors.set(old_authors)
+
+For a ``OneToOneField``, you must duplicate the related object and assign it
+to the new object's field to avoid violating the one-to-one unique constraint.
+For example, assuming ``entry`` is already duplicated as above::
+
+    detail = EntryDetail.objects.all()[0]
+    detail.pk = None
+    detail.entry = entry
+    detail.save()
 
 .. _topics-db-queries-update:
 
@@ -1043,7 +1059,7 @@ introduce joins when you use ``F()`` objects in an update -- you can only
 reference fields local to the model being updated. If you attempt to introduce
 a join with an ``F()`` object, a ``FieldError`` will be raised::
 
-    # THIS WILL RAISE A FieldError
+    # This will raise a FieldError
     >>> Entry.objects.update(headline=F('blog__name'))
 
 .. _topics-db-queries-related:

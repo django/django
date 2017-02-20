@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import os
 from datetime import date
 from unittest import skipUnless
@@ -10,7 +8,6 @@ from django.contrib.sitemaps import GenericSitemap, Sitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import modify_settings, override_settings
-from django.utils._os import upath
 from django.utils.formats import localize
 from django.utils.translation import activate, deactivate
 
@@ -28,11 +25,11 @@ class HTTPSitemapTests(SitemapTestsBase):
 <sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
 """ % self.base_url
-        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+        self.assertXMLEqual(response.content.decode(), expected_content)
 
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+        'DIRS': [os.path.join(os.path.dirname(__file__), 'templates')],
     }])
     def test_simple_sitemap_custom_index(self):
         "A simple sitemap index can be rendered with a custom template"
@@ -43,7 +40,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 <sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
 """ % self.base_url
-        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+        self.assertXMLEqual(response.content.decode(), expected_content)
 
     def test_simple_sitemap_section(self):
         "A simple sitemap section can be rendered"
@@ -53,7 +50,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % (self.base_url, date.today())
-        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+        self.assertXMLEqual(response.content.decode(), expected_content)
 
     def test_simple_sitemap(self):
         "A simple sitemap can be rendered"
@@ -63,11 +60,11 @@ class HTTPSitemapTests(SitemapTestsBase):
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % (self.base_url, date.today())
-        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+        self.assertXMLEqual(response.content.decode(), expected_content)
 
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+        'DIRS': [os.path.join(os.path.dirname(__file__), 'templates')],
     }])
     def test_simple_custom_sitemap(self):
         "A simple sitemap can be rendered with a custom template"
@@ -78,10 +75,10 @@ class HTTPSitemapTests(SitemapTestsBase):
 <url><loc>%s/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % (self.base_url, date.today())
-        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+        self.assertXMLEqual(response.content.decode(), expected_content)
 
     def test_sitemap_last_modified(self):
-        "Tests that Last-Modified header is set correctly"
+        "Last-Modified header is set correctly"
         response = self.client.get('/lastmod/sitemap.xml')
         self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 10:00:00 GMT')
 
@@ -101,12 +98,12 @@ class HTTPSitemapTests(SitemapTestsBase):
         self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 15:00:00 GMT')
 
     def test_sitemap_last_modified_missing(self):
-        "Tests that Last-Modified header is missing when sitemap has no lastmod"
+        "Last-Modified header is missing when sitemap has no lastmod"
         response = self.client.get('/generic/sitemap.xml')
         self.assertFalse(response.has_header('Last-Modified'))
 
     def test_sitemap_last_modified_mixed(self):
-        "Tests that Last-Modified header is omitted when lastmod not on all items"
+        "Last-Modified header is omitted when lastmod not on all items"
         response = self.client.get('/lastmod-mixed/sitemap.xml')
         self.assertFalse(response.has_header('Last-Modified'))
 
@@ -149,8 +146,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         activate('fr')
         self.assertEqual('0,3', localize(0.3))
 
-        # Retrieve the sitemap. Check that priorities
-        # haven't been rendered in localized format
+        # Priorities haven't been rendered in localized format.
         response = self.client.get('/simple/sitemap.xml')
         self.assertContains(response, '<priority>0.5</priority>')
         self.assertContains(response, '<lastmod>%s</lastmod>' % date.today())
@@ -158,15 +154,15 @@ class HTTPSitemapTests(SitemapTestsBase):
 
     @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
     def test_requestsite_sitemap(self):
-        # Make sure hitting the flatpages sitemap without the sites framework
-        # installed doesn't raise an exception.
+        # Hitting the flatpages sitemap without the sites framework installed
+        # doesn't raise an exception.
         response = self.client.get('/simple/sitemap.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>http://testserver/location/</loc><lastmod>%s</lastmod><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """ % date.today()
-        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+        self.assertXMLEqual(response.content.decode(), expected_content)
 
     @skipUnless(apps.is_installed('django.contrib.sites'),
                 "django.contrib.sites app not installed.")
@@ -194,7 +190,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         Check to make sure that the raw item is included with each
         Sitemap.get_url() url result.
         """
-        test_sitemap = GenericSitemap({'queryset': TestModel.objects.all()})
+        test_sitemap = GenericSitemap({'queryset': TestModel.objects.order_by('pk').all()})
 
         def is_testmodel(url):
             return isinstance(url['item'], TestModel)
@@ -203,7 +199,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 
     def test_cached_sitemap_index(self):
         """
-        Check that a cached sitemap index can be rendered (#2713).
+        A cached sitemap index can be rendered (#2713).
         """
         response = self.client.get('/cached/index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
@@ -211,7 +207,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 <sitemap><loc>%s/cached/sitemap-simple.xml</loc></sitemap>
 </sitemapindex>
 """ % self.base_url
-        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+        self.assertXMLEqual(response.content.decode(), expected_content)
 
     def test_x_robots_sitemap(self):
         response = self.client.get('/simple/index.xml')
@@ -233,7 +229,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 <url><loc>{0}/en/i18n/testmodel/{1}/</loc><changefreq>never</changefreq><priority>0.5</priority></url><url><loc>{0}/pt/i18n/testmodel/{1}/</loc><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
 """.format(self.base_url, self.i18n_model.pk)
-        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+        self.assertXMLEqual(response.content.decode(), expected_content)
 
     def test_sitemap_without_entries(self):
         response = self.client.get('/sitemap-without-entries/sitemap.xml')
@@ -241,4 +237,4 @@ class HTTPSitemapTests(SitemapTestsBase):
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 </urlset>"""
-        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+        self.assertXMLEqual(response.content.decode(), expected_content)

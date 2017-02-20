@@ -115,7 +115,7 @@ a flat surface is a straight line, the shortest path between two points on a cur
 surface (such as the earth) is an *arc* of a `great circle`__. [#fnthematic]_  Thus,
 additional computation is required to obtain distances in planar units (e.g.,
 kilometers and miles).  Using a geographic coordinate system may introduce
-complications for the developer later on. For example, Spatialite does not have
+complications for the developer later on. For example, SpatiaLite does not have
 the capability to perform distance calculations between geometries using
 geographic coordinate systems, e.g. constructing a query to  find all points
 within 5 miles of a county boundary stored as WGS84.
@@ -242,23 +242,7 @@ geography column to a geometry type in the query::
 
 For more information, the PostGIS documentation contains a helpful section on
 determining `when to use geography data type over geometry data type
-<http://postgis.net/docs/manual-2.1/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`_.
-
-``GeoManager``
-==============
-
-.. currentmodule:: django.contrib.gis.db.models
-.. class:: GeoManager
-
-The ``GeoManager`` is required in order to use the legacy
-:ref:`geoqueryset-methods`.
-
-.. deprecated:: 1.9
-
-    All ``GeoQuerySet`` methods have been deprecated and replaced by
-    :doc:`equivalent database functions </ref/contrib/gis/functions>`. As soon
-    as the legacy methods have been replaced in your code, you should be able
-    to remove the special ``GeoManager`` from your GIS-enabled classes.
+<http://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`_.
 
 .. rubric:: Footnotes
 .. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <http://www.opengeospatial.org/standards/sfs>`_.
@@ -266,4 +250,4 @@ The ``GeoManager`` is required in order to use the legacy
 .. [#fnsrid] Typically, SRID integer corresponds to an EPSG (`European Petroleum Survey Group <http://www.epsg.org>`_) identifier.  However, it may also be associated with custom projections defined in spatial database's spatial reference systems table.
 .. [#fnthematic] Terry A. Slocum, Robert B. McMaster, Fritz C. Kessler, & Hugh H. Howard, *Thematic Cartography and Geographic Visualization* (Prentice Hall, 2nd edition), at Ch. 7.1.3.
 .. [#fndist] This limitation does not apply to PostGIS.
-.. [#fngeography] Please refer to the `PostGIS Geography Type <http://postgis.net/docs/manual-2.1/using_postgis_dbmanagement.html#PostGIS_Geography>`_ documentation for more details.
+.. [#fngeography] Please refer to the `PostGIS Geography Type <http://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_Geography>`_ documentation for more details.

@@ -8,7 +8,7 @@ Parser and utilities for the smart 'if' tag
 # 'bp' = binding power (left = lbp, right = rbp)
 
 
-class TokenBase(object):
+class TokenBase:
     """
     Base class for operators and literals, mainly for debugging and for throwing
     syntax errors.
@@ -31,7 +31,7 @@ class TokenBase(object):
 
     def display(self):
         """
-        Returns what to display in error messages for this node
+        Return what to display in error messages for this node
         """
         return self.id
 
@@ -42,8 +42,8 @@ class TokenBase(object):
 
 def infix(bp, func):
     """
-    Creates an infix operator, given a binding power and a function that
-    evaluates the node
+    Create an infix operator, given a binding power and a function that
+    evaluates the node.
     """
     class Operator(TokenBase):
         lbp = bp
@@ -67,7 +67,7 @@ def infix(bp, func):
 
 def prefix(bp, func):
     """
-    Creates a prefix operator, given a binding power and a function that
+    Create a prefix operator, given a binding power and a function that
     evaluates the node.
     """
     class Operator(TokenBase):
@@ -143,23 +143,24 @@ class EndToken(TokenBase):
     def nud(self, parser):
         raise parser.error_class("Unexpected end of expression in if tag.")
 
+
 EndToken = EndToken()
 
 
-class IfParser(object):
+class IfParser:
     error_class = ValueError
 
     def __init__(self, tokens):
         # Turn 'is','not' and 'not','in' into single tokens.
-        l = len(tokens)
+        num_tokens = len(tokens)
         mapped_tokens = []
         i = 0
-        while i < l:
+        while i < num_tokens:
             token = tokens[i]
-            if token == "is" and i + 1 < l and tokens[i + 1] == "not":
+            if token == "is" and i + 1 < num_tokens and tokens[i + 1] == "not":
                 token = "is not"
                 i += 1  # skip 'not'
-            elif token == "not" and i + 1 < l and tokens[i + 1] == "in":
+            elif token == "not" and i + 1 < num_tokens and tokens[i + 1] == "in":
                 token = "not in"
                 i += 1  # skip 'in'
             mapped_tokens.append(self.translate_token(token))

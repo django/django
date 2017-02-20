@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.test import TestCase
 
 from .models import Article, Car, Driver, Reporter
@@ -39,14 +37,14 @@ class ManyToOneNullTests(TestCase):
         self.assertEqual(self.r.article_set.count(), 2)
 
     def test_created_without_related(self):
-        self.assertEqual(self.a3.reporter, None)
+        self.assertIsNone(self.a3.reporter)
         # Need to reget a3 to refresh the cache
         a3 = Article.objects.get(pk=self.a3.pk)
         with self.assertRaises(AttributeError):
             getattr(a3.reporter, 'id')
         # Accessing an article's 'reporter' attribute returns None
         # if the reporter is set to None.
-        self.assertEqual(a3.reporter, None)
+        self.assertIsNone(a3.reporter)
         # To retrieve the articles with no reporters set, use "reporter__isnull=True".
         self.assertQuerysetEqual(Article.objects.filter(reporter__isnull=True), ['<Article: Third>'])
         # We can achieve the same thing by filtering for the case where the
@@ -102,7 +100,7 @@ class ManyToOneNullTests(TestCase):
         )
 
     def test_assign_with_queryset(self):
-        # Ensure that querysets used in reverse FK assignments are pre-evaluated
+        # Querysets used in reverse FK assignments are pre-evaluated
         # so their value isn't affected by the clearing operation in
         # RelatedManager.set() (#19816).
         self.r2.article_set.set([self.a2, self.a3])

@@ -1,10 +1,8 @@
 from django.contrib.sites.models import Site
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
-@python_2_unicode_compatible
 class Redirect(models.Model):
     site = models.ForeignKey(Site, models.CASCADE, verbose_name=_('site'))
     old_path = models.CharField(

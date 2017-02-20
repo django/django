@@ -16,7 +16,7 @@ different types of fields.
 For example, here's a validator that only allows even numbers::
 
     from django.core.exceptions import ValidationError
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     def validate_even(value):
         if value % 2 != 0:
@@ -230,10 +230,6 @@ to, or in lieu of custom ``field.clean()`` methods.
     of integers separated by ``sep``. It allows negative integers when
     ``allow_negative`` is ``True``.
 
-    .. versionchanged:: 1.10
-
-        The ``allow_negative`` parameter was added.
-
 ``MaxValueValidator``
 ---------------------
 
@@ -279,3 +275,30 @@ to, or in lieu of custom ``field.clean()`` methods.
       ``decimal_places``.
     - ``'max_whole_digits'`` if the number of whole digits is larger than
       the difference between ``max_digits`` and ``decimal_places``.
+
+``FileExtensionValidator``
+--------------------------
+
+.. class:: FileExtensionValidator(allowed_extensions, message, code)
+
+    .. versionadded:: 1.11
+
+    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+    ``'invalid_extension'`` if the ``value`` cannot be found in
+    ``allowed_extensions``.
+
+    .. warning::
+
+        Don't rely on validation of the file extension to determine a file's
+        type. Files can be renamed to have any extension no matter what data
+        they contain.
+
+``validate_image_file_extension``
+---------------------------------
+
+.. data:: validate_image_file_extension
+
+    .. versionadded:: 1.11
+
+    Uses Pillow to ensure that the ``value`` is `a valid image extension
+    <https://pillow.readthedocs.org/en/latest/handbook/image-file-formats.html>`_.

@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Alex Gaynor <alex.gaynor@gmail.com>, 2011-2012
+# Alex Gaynor <inactive+Alex@transifex.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Meir Kriheli <mkriheli@gmail.com>, 2011-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-28 16:07+0000\n"
-"Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -59,6 +59,9 @@ msgstr "דנית"
 
 msgid "German"
 msgstr "גרמנית"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "יוונית"
@@ -129,6 +132,9 @@ msgstr "הינדי"
 msgid "Croatian"
 msgstr "קרואטית"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "הונגרית"
 
@@ -189,8 +195,8 @@ msgstr "מראטהי"
 msgid "Burmese"
 msgstr "בּוּרְמֶזִית"
 
-msgid "Norwegian Bokmal"
-msgstr "נורבגית ספרותית"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "נפאלית"
@@ -287,9 +293,6 @@ msgstr "קבצים סטטיים"
 
 msgid "Syndication"
 msgstr "הפצת תכנים"
-
-msgid "Web Design"
-msgstr "עיצוב אתרים"
 
 msgid "Enter a valid value."
 msgstr "יש להזין ערך חוקי."
@@ -421,6 +424,9 @@ msgstr "מספר שלם"
 msgid "'%(value)s' value must be an integer."
 msgstr "הערך '%(value)s' חייב להיות מספר שלם."
 
+msgid "Big (8 byte) integer"
+msgstr "מספר שלם גדול (8 בתים)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "הערך '%(value)s' חייב להיות אמת או שקר."
@@ -501,9 +507,6 @@ msgstr "הערך '%(value)s' חייב להיות מספר עם נקודה צפה
 msgid "Floating point number"
 msgstr "מספר עשרוני"
 
-msgid "Big (8 byte) integer"
-msgstr "מספר שלם גדול (8 בתים)"
-
 msgid "IPv4 address"
 msgstr "כתובת IPv4"
 
@@ -575,6 +578,14 @@ msgstr "Foreign Key (הסוג נקבע לפי השדה המקושר)"
 
 msgid "One-to-one relationship"
 msgstr "יחס של אחד לאחד"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "יחס של רבים לרבים"

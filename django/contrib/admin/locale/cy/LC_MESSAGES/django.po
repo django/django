@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Welsh (http://www.transifex.com/django/django/language/cy/)\n"
 "MIME-Version: 1.0\n"
@@ -64,6 +64,12 @@ msgstr "Mis yma"
 msgid "This year"
 msgstr "Eleni"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -74,6 +80,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Gweithred:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Ychwanegu %(verbose_name)s arall"
+
+msgid "Remove"
+msgstr "Gwaredu"
 
 msgid "action time"
 msgstr "amser y weithred"
@@ -87,6 +100,8 @@ msgstr ""
 msgid "object id"
 msgstr "id gwrthrych"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "repr gwrthrych"
 
@@ -117,6 +132,31 @@ msgstr "Dilëwyd  \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "Gwrthrych LogEntry"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "a"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Ni newidwyd unrhwy feysydd."
+
 msgid "None"
 msgstr "Dim"
 
@@ -124,67 +164,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-msgid "Added."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
-#, python-format
-msgid "Changed %s."
-msgstr "Newidiwyd %s."
-
-msgid "and"
-msgstr "a"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Wedi ychwanegu  %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Wedi newid %(list)s ar gyfer %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Dilëwyd  %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Ni newidwyd unrhwy feysydd."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"Ychwanegwyd %(name)s \"%(obj)s\" yn llwyddianus. Gellir ei olygu eto isod."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"Ychwanegwyd %(name)s \"%(obj)s\" yn llwyddiannus. Gallwch ychwanegu %(name)s "
-"arall isod."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "Ychwanegwyd %(name)s \"%(obj)s\" yn llwyddiannus."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"Ychwanegwyd %(name)s \"%(obj)s\" yn llwyddianus. Gellir ei olygu eto isod."
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
-"Ychwanegwyd %(name)s \"%(obj)s\" yn llwyddiannus. Gallwch ychwanegu %(name)s "
-"arall isod."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "Newidwyd %(name)s \"%(obj)s\" yn llwyddiannus."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -345,18 +353,15 @@ msgstr "Dogfennaeth"
 msgid "Log out"
 msgstr "Allgofnodi"
 
-msgid "Add"
-msgstr "Ychwanegu"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Ychwanegu %(name)s"
 
 msgid "History"
 msgstr "Hanes"
 
 msgid "View on site"
 msgstr "Gweld ar y safle"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Ychwanegu %(name)s"
 
 msgid "Filter"
 msgstr "Hidl"
@@ -397,8 +402,6 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Ydych yn sicr eich bod am ddileu  %(object_name)s \"%(escaped_object)s\"?  "
-"Dilëir yr holl eitemau perthnasol canlynol:"
 
 msgid "Objects"
 msgstr ""
@@ -410,7 +413,7 @@ msgid "No, take me back"
 msgstr ""
 
 msgid "Delete multiple objects"
-msgstr "Dileu mwy nag un gwrthrych"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -418,8 +421,6 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Byddai dileu %(objects_name)s yn golygu dileu'r gwrthrychau sy'n perthyn, "
-"ond nid oes ganddoch ganiatâd i ddileu y mathau canlynol o wrthrychau:"
 
 #, python-format
 msgid ""
@@ -440,13 +441,6 @@ msgstr ""
 msgid "Change"
 msgstr "Newid"
 
-msgid "Remove"
-msgstr "Gwaredu"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Ychwanegu %(verbose_name)s arall"
-
 msgid "Delete?"
 msgstr "Dileu?"
 
@@ -461,14 +455,17 @@ msgstr ""
 msgid "Models in the %(name)s application"
 msgstr "Modelau yn y rhaglen %(name)s "
 
+msgid "Add"
+msgstr "Ychwanegu"
+
 msgid "You don't have permission to edit anything."
 msgstr "Does gennych ddim hawl i olygu unrhywbeth."
 
-msgid "Recent Actions"
-msgstr "Gweithredoedd Diweddar"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "Fy Ngweithredoedd"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Dim ar gael"

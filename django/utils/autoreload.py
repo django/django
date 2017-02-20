@@ -30,16 +30,16 @@
 
 import os
 import signal
+import subprocess
 import sys
 import time
 import traceback
 
+import _thread
+
 from django.apps import apps
 from django.conf import settings
 from django.core.signals import request_finished
-from django.utils import six
-from django.utils._os import npath
-from django.utils.six.moves import _thread as thread
 
 # This import does nothing, but it's necessary to avoid some race conditions
 # in the threading module. See http://code.djangoproject.com/ticket/2330 .
@@ -81,8 +81,7 @@ _cached_filenames = []
 
 def gen_filenames(only_new=False):
     """
-    Returns a list of filenames referenced in sys.modules and translation
-    files.
+    Return a list of filenames referenced in sys.modules and translation files.
     """
     # N.B. ``list(...)`` is needed, because this runs in parallel with
     # application code which might be mutating ``sys.modules``, and this will
@@ -109,7 +108,7 @@ def gen_filenames(only_new=False):
                                  'conf', 'locale'),
                     'locale']
         for app_config in reversed(list(apps.get_app_configs())):
-            basedirs.append(os.path.join(npath(app_config.path), 'locale'))
+            basedirs.append(os.path.join(app_config.path, 'locale'))
         basedirs.extend(settings.LOCALE_PATHS)
         basedirs = [os.path.abspath(basedir) for basedir in basedirs
                     if os.path.isdir(basedir)]
@@ -152,7 +151,7 @@ def reset_translations():
 
 def inotify_code_changed():
     """
-    Checks for changed code using inotify. After being called
+    Check for changed code using inotify. After being called
     it blocks until a change event has been fired.
     """
     class EventHandler(pyinotify.ProcessEvent):
@@ -246,7 +245,7 @@ def check_errors(fn):
 def raise_last_exception():
     global _exception
     if _exception is not None:
-        six.reraise(*_exception)
+        raise _exception[0](_exception[1]).with_traceback(_exception[2])
 
 
 def ensure_echo_on():
@@ -283,18 +282,16 @@ def reloader_thread():
 def restart_with_reloader():
     while True:
         args = [sys.executable] + ['-W%s' % o for o in sys.warnoptions] + sys.argv
-        if sys.platform == "win32":
-            args = ['"%s"' % arg for arg in args]
         new_environ = os.environ.copy()
         new_environ["RUN_MAIN"] = 'true'
-        exit_code = os.spawnve(os.P_WAIT, sys.executable, args, new_environ)
+        exit_code = subprocess.call(args, env=new_environ)
         if exit_code != 3:
             return exit_code
 
 
 def python_reloader(main_func, args, kwargs):
     if os.environ.get("RUN_MAIN") == "true":
-        thread.start_new_thread(main_func, args, kwargs)
+        _thread.start_new_thread(main_func, args, kwargs)
         try:
             reloader_thread()
         except KeyboardInterrupt:
@@ -312,7 +309,7 @@ def python_reloader(main_func, args, kwargs):
 
 def jython_reloader(main_func, args, kwargs):
     from _systemrestart import SystemRestart
-    thread.start_new_thread(main_func, args)
+    _thread.start_new_thread(main_func, args)
     while True:
         if code_changed():
             raise SystemRestart

@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import re
 
 from django.forms import RegexField, ValidationError
 from django.test import SimpleTestCase
-from django.utils import six
 
 
 class RegexFieldTest(SimpleTestCase):
@@ -46,12 +42,12 @@ class RegexFieldTest(SimpleTestCase):
         f = RegexField('^[0-9]+$', min_length=5, max_length=10)
         with self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 5 characters (it has 3).'"):
             f.clean('123')
-        six.assertRaisesRegex(
-            self, ValidationError,
-            "'Ensure this value has at least 5 characters \(it has 3\)\.',"
-            " u?'Enter a valid value\.'",
-            f.clean, 'abc'
-        )
+        with self.assertRaisesMessage(
+            ValidationError,
+            "'Ensure this value has at least 5 characters (it has 3).', "
+            "'Enter a valid value.'",
+        ):
+            f.clean('abc')
         self.assertEqual('12345', f.clean('12345'))
         self.assertEqual('1234567890', f.clean('1234567890'))
         with self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 10 characters (it has 11).'"):
@@ -60,7 +56,7 @@ class RegexFieldTest(SimpleTestCase):
             f.clean('12345a')
 
     def test_regexfield_unicode_characters(self):
-        f = RegexField('^\w+$')
+        f = RegexField(r'^\w+$')
         self.assertEqual('éèøçÎÎ你好', f.clean('éèøçÎÎ你好'))
 
     def test_change_regex_after_init(self):

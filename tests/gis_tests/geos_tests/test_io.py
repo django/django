@@ -1,13 +1,11 @@
-from __future__ import unicode_literals
-
 import binascii
 from unittest import skipUnless
 
 from django.contrib.gis.geos import (
-    HAS_GEOS, GEOSGeometry, Point, WKBReader, WKBWriter, WKTReader, WKTWriter,
+    HAS_GEOS, GEOSGeometry, Point, Polygon, WKBReader, WKBWriter, WKTReader,
+    WKTWriter,
 )
 from django.test import SimpleTestCase
-from django.utils.six import memoryview
 
 
 @skipUnless(HAS_GEOS, "Geos is required.")
@@ -26,7 +24,7 @@ class GEOSIOTest(SimpleTestCase):
         for geom in (g1, g2):
             self.assertEqual(ref, geom)
 
-        # Should only accept six.string_types objects.
+        # Should only accept string objects.
         with self.assertRaises(TypeError):
             wkt_r.read(1)
         with self.assertRaises(TypeError):
@@ -36,7 +34,7 @@ class GEOSIOTest(SimpleTestCase):
         # Creating a WKTWriter instance, testing its ptr property.
         wkt_w = WKTWriter()
         with self.assertRaises(TypeError):
-            wkt_w._set_ptr(WKTReader.ptr_type())
+            wkt_w.ptr = WKTReader.ptr_type()
 
         ref = GEOSGeometry('POINT (5 23)')
         ref_wkt = 'POINT (5.0000000000000000 23.0000000000000000)'
@@ -138,7 +136,7 @@ class GEOSIOTest(SimpleTestCase):
 
     def test_wkt_writer_precision(self):
         wkt_w = WKTWriter()
-        self.assertEqual(wkt_w.precision, None)
+        self.assertIsNone(wkt_w.precision)
         self.assertEqual(wkt_w.write(Point(1. / 3, 2. / 3)), b'POINT (0.3333333333333333 0.6666666666666666)')
 
         wkt_w.precision = 1
@@ -150,8 +148,46 @@ class GEOSIOTest(SimpleTestCase):
         self.assertEqual(wkt_w.write(Point(1. / 3, 2. / 3)), b'POINT (0 1)')
 
         wkt_w.precision = None
-        self.assertEqual(wkt_w.precision, None)
+        self.assertIsNone(wkt_w.precision)
         self.assertEqual(wkt_w.write(Point(1. / 3, 2. / 3)), b'POINT (0.3333333333333333 0.6666666666666666)')
 
         with self.assertRaisesMessage(AttributeError, 'WKT output rounding precision must be '):
             wkt_w.precision = 'potato'
+
+    def test_empty_point_wkb(self):
+        p = Point(srid=4326)
+        wkb_w = WKBWriter()
+
+        wkb_w.srid = False
+        with self.assertRaisesMessage(ValueError, 'Empty point is not representable in WKB.'):
+            wkb_w.write(p)
+        with self.assertRaisesMessage(ValueError, 'Empty point is not representable in WKB.'):
+            wkb_w.write_hex(p)
+
+        wkb_w.srid = True
+        for byteorder, hex in enumerate([
+            b'0020000001000010E67FF80000000000007FF8000000000000',
+            b'0101000020E6100000000000000000F87F000000000000F87F',
+        ]):
+            wkb_w.byteorder = byteorder
+            self.assertEqual(wkb_w.write_hex(p), hex)
+            self.assertEqual(GEOSGeometry(wkb_w.write_hex(p)), p)
+            self.assertEqual(wkb_w.write(p), memoryview(binascii.a2b_hex(hex)))
+            self.assertEqual(GEOSGeometry(wkb_w.write(p)), p)
+
+    def test_empty_polygon_wkb(self):
+        p = Polygon(srid=4326)
+        p_no_srid = Polygon()
+        wkb_w = WKBWriter()
+        wkb_w.srid = True
+        for byteorder, hexes in enumerate([
+            (b'000000000300000000', b'0020000003000010E600000000'),
+            (b'010300000000000000', b'0103000020E610000000000000'),
+        ]):
+            wkb_w.byteorder = byteorder
+            for srid, hex in enumerate(hexes):
+                wkb_w.srid = srid
+                self.assertEqual(wkb_w.write_hex(p), hex)
+                self.assertEqual(GEOSGeometry(wkb_w.write_hex(p)), p if srid else p_no_srid)
+                self.assertEqual(wkb_w.write(p), memoryview(binascii.a2b_hex(hex)))
+                self.assertEqual(GEOSGeometry(wkb_w.write(p)), p if srid else p_no_srid)

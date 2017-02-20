@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from datetime import datetime
 from operator import attrgetter
 
@@ -204,13 +202,13 @@ class M2mThroughTests(TestCase):
         CustomMembership.objects.create(person=self.bob, group=self.rock)
         CustomMembership.objects.create(person=self.jane, group=self.roll)
         CustomMembership.objects.create(person=self.jim, group=self.roll)
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.rock.custom_members.order_by('custom_person_related_name'),
-            [self.jim, self.bob], lambda x: x
+            [self.jim, self.bob]
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             self.roll.custom_members.order_by('custom_person_related_name'),
-            [self.jane, self.jim], lambda x: x
+            [self.jane, self.jim]
         )
 
     def test_query_first_model_by_intermediate_model_attribute(self):
@@ -341,7 +339,7 @@ class M2mThroughTests(TestCase):
 
     def test_through_fields(self):
         """
-        Tests that relations with intermediary tables with multiple FKs
+        Relations with intermediary tables with multiple FKs
         to the M2M's ``to`` model are possible.
         """
         event = Event.objects.create(title='Rockwhale 2014')
@@ -460,10 +458,7 @@ class M2mThroughToFieldsTests(TestCase):
 
     def test_retrieval(self):
         # Forward retrieval
-        self.assertQuerysetEqual(
-            self.curry.ingredients.all(),
-            [self.pea, self.potato, self.tomato], lambda x: x
-        )
+        self.assertSequenceEqual(self.curry.ingredients.all(), [self.pea, self.potato, self.tomato])
         # Backward retrieval
         self.assertEqual(self.tomato.recipes.get(), self.curry)
 

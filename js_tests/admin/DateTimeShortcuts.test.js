@@ -1,10 +1,10 @@
-/* global module, test, DateTimeShortcuts */
+/* global QUnit, DateTimeShortcuts */
 /* eslint global-strict: 0, strict: 0 */
 'use strict';
 
-module('admin.DateTimeShortcuts');
+QUnit.module('admin.DateTimeShortcuts');
 
-test('init', function(assert) {
+QUnit.test('init', function(assert) {
     var $ = django.jQuery;
 
     var dateField = $('<input type="text" class="vDateField" value="2015-03-16"><br>');

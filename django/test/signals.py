@@ -4,11 +4,13 @@ import time
 import warnings
 
 from django.apps import apps
+from django.core.exceptions import ImproperlyConfigured
 from django.core.signals import setting_changed
 from django.db import connections, router
 from django.db.utils import ConnectionRouter
 from django.dispatch import Signal, receiver
 from django.utils import timezone
+from django.utils.formats import FORMAT_SETTINGS, reset_format_cache
 from django.utils.functional import empty
 
 template_rendered = Signal(providing_args=["template", "context"])
@@ -69,10 +71,7 @@ def update_connections_time_zone(**kwargs):
                 del conn.timezone_name
             except AttributeError:
                 pass
-            tz_sql = conn.ops.set_time_zone_sql()
-            if tz_sql and conn.timezone_name:
-                with conn.cursor() as cursor:
-                    cursor.execute(tz_sql, [conn.timezone_name])
+            conn.ensure_timezone()
 
 
 @receiver(setting_changed)
@@ -98,6 +97,8 @@ def reset_template_engines(**kwargs):
         engines._engines = {}
         from django.template.engine import Engine
         Engine.get_default.cache_clear()
+        from django.forms.renderers import get_default_renderer
+        get_default_renderer.cache_clear()
 
 
 @receiver(setting_changed)
@@ -120,6 +121,12 @@ def language_changed(**kwargs):
 
 
 @receiver(setting_changed)
+def localize_settings_changed(**kwargs):
+    if kwargs['setting'] in FORMAT_SETTINGS or kwargs['setting'] == 'USE_THOUSAND_SEPARATOR':
+        reset_format_cache()
+
+
+@receiver(setting_changed)
 def file_storage_changed(**kwargs):
     if kwargs['setting'] == 'DEFAULT_FILE_STORAGE':
         from django.core.files.storage import default_storage
@@ -130,9 +137,9 @@ def file_storage_changed(**kwargs):
 def complex_setting_changed(**kwargs):
     if kwargs['enter'] and kwargs['setting'] in COMPLEX_OVERRIDE_SETTINGS:
         # Considering the current implementation of the signals framework,
-        # stacklevel=5 shows the line containing the override_settings call.
+        # this stacklevel shows the line containing the override_settings call.
         warnings.warn("Overriding setting %s can lead to unexpected behavior."
-                      % kwargs['setting'], stacklevel=5)
+                      % kwargs['setting'], stacklevel=6)
 
 
 @receiver(setting_changed)
@@ -175,3 +182,24 @@ def auth_password_validators_changed(**kwargs):
 def user_model_swapped(**kwargs):
     if kwargs['setting'] == 'AUTH_USER_MODEL':
         apps.clear_cache()
+        try:
+            from django.contrib.auth import get_user_model
+            UserModel = get_user_model()
+        except ImproperlyConfigured:
+            # Some tests set an invalid AUTH_USER_MODEL.
+            pass
+        else:
+            from django.contrib.auth import backends
+            backends.UserModel = UserModel
+
+            from django.contrib.auth import forms
+            forms.UserModel = UserModel
+
+            from django.contrib.auth.handlers import modwsgi
+            modwsgi.UserModel = UserModel
+
+            from django.contrib.auth.management.commands import changepassword
+            changepassword.UserModel = UserModel
+
+            from django.contrib.auth import views
+            views.UserModel = UserModel

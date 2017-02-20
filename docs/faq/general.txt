@@ -27,7 +27,7 @@ thrilled to be able to give something back to the open-source community.
 
 .. _Apache: https://httpd.apache.org/
 .. _Python: https://www.python.org/
-.. _PostgreSQL: http://www.postgresql.org/
+.. _PostgreSQL: https://www.postgresql.org/
 
 What does "Django" mean, and how do you pronounce it?
 =====================================================
@@ -177,18 +177,6 @@ versions of those reST documents, so the docs on the Django site may offer more
 information than the docs that come with the latest Django release.
 
 .. _stored in revision control: https://github.com/django/django/tree/master/docs/
-
-Where can I find Django developers for hire?
-============================================
-
-Consult our `developers for hire page`_ for a list of Django developers who
-would be happy to help you.
-
-You might also be interested in posting a job to https://djangogigs.com/ .
-If you want to find Django-capable people in your local area, try
-https://people.djangoproject.com/ .
-
-.. _developers for hire page: https://code.djangoproject.com/wiki/DevelopersForHire
 
 How do I cite Django?
 =====================

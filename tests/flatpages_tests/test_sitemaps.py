@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.apps import apps
 from django.contrib.sites.models import Site
 from django.test import TestCase
@@ -19,7 +17,7 @@ class FlatpagesSitemapTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(FlatpagesSitemapTests, cls).setUpClass()
+        super().setUpClass()
         # This cleanup is necessary because contrib.sites cache
         # makes tests interfere with each other, see #11505
         Site.objects.clear_cache()

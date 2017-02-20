@@ -3,7 +3,7 @@ Writing your first Django app, part 7
 =====================================
 
 This tutorial begins where :doc:`Tutorial 6 </intro/tutorial06>` left off. We're
-continuing the Web-poll application and will focus on customizing the Django's
+continuing the Web-poll application and will focus on customizing Django's
 automatically-generated admin site that we first explored in :doc:`Tutorial 2
 </intro/tutorial02>`.
 
@@ -327,7 +327,7 @@ when loading Django templates; it's a search path.
 
     Just like the static files, we *could* have all our templates together, in
     one big templates directory, and it would work perfectly well. However,
-    templates that  belongs to a particular application, we should put in the
+    templates that belong to a particular application should be placed in that
     application’s template directory (e.g. ``polls/templates``) rather than the
     project’s (``templates``). We'll discuss in more detail in the
     :doc:`reusable apps tutorial </intro/reusable-apps>` *why* we do this.

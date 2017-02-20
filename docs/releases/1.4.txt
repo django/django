@@ -6,16 +6,12 @@ Django 1.4 release notes
 
 Welcome to Django 1.4!
 
-These release notes cover the `new features`_, as well
-as some `backwards incompatible changes`_ you'll want to be aware of
-when upgrading from Django 1.3 or older versions. We've also dropped some
-features, which are detailed in :ref:`our deprecation plan
-<deprecation-removed-in-1.4>`, and we've `begun the deprecation process for
-some features`_.
-
-.. _`new features`: `What's new in Django 1.4`_
-.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.4`_
-.. _`begun the deprecation process for some features`: `Features deprecated in 1.4`_
+These release notes cover the :ref:`new features <whats-new-1.4>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.4>` you'll
+want to be aware of when upgrading from Django 1.3 or older versions. We've
+also dropped some features, which are detailed in :ref:`our deprecation plan
+<deprecation-removed-in-1.4>`, and we've :ref:`begun the deprecation process
+for some features <deprecated-features-1.4>`.
 
 Overview
 ========
@@ -25,8 +21,8 @@ handling date/times. When enabled, this Django will store date/times in UTC,
 use timezone-aware objects internally, and translate them to users' local
 timezones for display.
 
-If you're upgrading an existing project to Django 1.4, switching to the time-
-zone aware mode may take some care: the new mode disallows some rather sloppy
+If you're upgrading an existing project to Django 1.4, switching to the timezone
+aware mode may take some care: the new mode disallows some rather sloppy
 behavior that used to be accepted. We encourage anyone who's upgrading to check
 out the :ref:`timezone migration guide <time-zones-migration-guide>` and the
 :ref:`timezone FAQ <time-zones-faq>` for useful pointers.
@@ -56,8 +52,8 @@ Other notable new features in Django 1.4 include:
 Wherever possible we try to introduce new features in a backwards-compatible
 manner per :doc:`our API stability policy </misc/api-stability>` policy.
 However, as with previous releases, Django 1.4 ships with some minor
-`backwards incompatible changes`_; people upgrading from previous versions
-of Django should read that list carefully.
+:ref:`backwards incompatible changes <backwards-incompatible-1.4>`; people
+upgrading from previous versions of Django should read that list carefully.
 
 Python compatibility
 ====================
@@ -76,6 +72,8 @@ support until the release of Django 1.5.
 Django does not support Python 3.x at this time. At some point before the
 release of Django 1.4, we plan to publish a document outlining our full
 timeline for deprecating Python 2.x and moving to Python 3.x.
+
+.. _whats-new-1.4:
 
 What's new in Django 1.4
 ========================
@@ -662,6 +660,8 @@ Django 1.4 also includes several smaller improvements worth noting:
   useful in tests that don't need to hit a database. See
   :ref:`testcase_hierarchy_diagram`.
 
+.. _backwards-incompatible-1.4:
+
 Backwards incompatible changes in 1.4
 =====================================
 
@@ -679,8 +679,8 @@ refuse to start. This is slightly accelerated from the usual deprecation path
 due to the severity of the consequences of running Django with no
 :setting:`SECRET_KEY`.
 
-django.contrib.admin
---------------------
+``django.contrib.admin``
+------------------------
 
 The included administration app ``django.contrib.admin`` has for a long time
 shipped with a default set of static files such as JavaScript, images and
@@ -830,8 +830,8 @@ instance:
     well with Django 1.4 and you won't have to roll back to 1.3, enable the new
     password hashes.
 
-django.contrib.flatpages
-------------------------
+``django.contrib.flatpages``
+----------------------------
 
 Starting in 1.4, the
 :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware` only
@@ -929,7 +929,7 @@ comment model manager to exclude the user group, like this::
 
     class BanningCommentManager(CommentManager):
         def get_query_set(self):
-            qs = super(BanningCommentManager, self).get_query_set()
+            qs = super().get_query_set()
             if getattr(settings, 'COMMENTS_BANNED_USERS_GROUP', None):
                 where = ['user_id NOT IN (SELECT user_id FROM auth_user_groups WHERE group_id = %s)']
                 params = [settings.COMMENTS_BANNED_USERS_GROUP]

@@ -4,16 +4,14 @@ django.contrib.staticfiles.testing.StaticLiveServerTestCase instead of
 django.test.LiveServerTestCase.
 """
 
-import contextlib
 import os
+from urllib.request import urlopen
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core.exceptions import ImproperlyConfigured
 from django.test import modify_settings, override_settings
-from django.utils._os import upath
-from django.utils.six.moves.urllib.request import urlopen
 
-TEST_ROOT = os.path.dirname(upath(__file__))
+TEST_ROOT = os.path.dirname(__file__)
 TEST_SETTINGS = {
     'MEDIA_URL': '/media/',
     'STATIC_URL': '/static/',
@@ -31,35 +29,25 @@ class LiveServerBase(StaticLiveServerTestCase):
         # Override settings
         cls.settings_override = override_settings(**TEST_SETTINGS)
         cls.settings_override.enable()
-        super(LiveServerBase, cls).setUpClass()
+        super().setUpClass()
 
     @classmethod
     def tearDownClass(cls):
+        super().tearDownClass()
         # Restore original settings
         cls.settings_override.disable()
-        super(LiveServerBase, cls).tearDownClass()
 
 
 class StaticLiveServerChecks(LiveServerBase):
 
     @classmethod
     def setUpClass(cls):
-        # Backup original environment variable
-        address_predefined = 'DJANGO_LIVE_TEST_SERVER_ADDRESS' in os.environ
-        old_address = os.environ.get('DJANGO_LIVE_TEST_SERVER_ADDRESS')
-
         # If contrib.staticfiles isn't configured properly, the exception
         # should bubble up to the main thread.
         old_STATIC_URL = TEST_SETTINGS['STATIC_URL']
         TEST_SETTINGS['STATIC_URL'] = None
-        cls.raises_exception('localhost:8081', ImproperlyConfigured)
+        cls.raises_exception()
         TEST_SETTINGS['STATIC_URL'] = old_STATIC_URL
-
-        # Restore original environment variable
-        if address_predefined:
-            os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = old_address
-        else:
-            del os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS']
 
     @classmethod
     def tearDownClass(cls):
@@ -67,15 +55,16 @@ class StaticLiveServerChecks(LiveServerBase):
         pass
 
     @classmethod
-    def raises_exception(cls, address, exception):
-        os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = address
+    def raises_exception(cls):
         try:
-            super(StaticLiveServerChecks, cls).setUpClass()
+            super().setUpClass()
             raise Exception("The line above should have raised an exception")
-        except exception:
+        except ImproperlyConfigured:
+            # This raises ImproperlyConfigured("You're using the staticfiles
+            # app without having set the required STATIC_URL setting.")
             pass
         finally:
-            super(StaticLiveServerChecks, cls).tearDownClass()
+            super().tearDownClass()
 
     def test_test_test(self):
         # Intentionally empty method so that the test is picked up by the
@@ -92,8 +81,8 @@ class StaticLiveServerView(LiveServerBase):
     @modify_settings(INSTALLED_APPS={'append': 'staticfiles_tests.apps.test'})
     def test_collectstatic_emulation(self):
         """
-        Test that StaticLiveServerTestCase use of staticfiles' serve() allows it
+        StaticLiveServerTestCase use of staticfiles' serve() allows it
         to discover app's static assets without having to collectstatic first.
         """
-        with contextlib.closing(self.urlopen('/static/test/file.txt')) as f:
+        with self.urlopen('/static/test/file.txt') as f:
             self.assertEqual(f.read().rstrip(b'\r\n'), b'In static directory.')

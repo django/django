@@ -29,6 +29,7 @@ def topology_func(f):
     f.errcheck = lambda result, func, cargs: bool(result)
     return f
 
+
 # ### OGR_G ctypes function prototypes ###
 
 # GeoJSON routines.
@@ -44,6 +45,7 @@ getz = pnt_func(lgdal.OGR_G_GetZ)
 # Geometry creation routines.
 from_wkb = geom_output(lgdal.OGR_G_CreateFromWkb, [c_char_p, c_void_p, POINTER(c_void_p), c_int], offset=-2)
 from_wkt = geom_output(lgdal.OGR_G_CreateFromWkt, [POINTER(c_char_p), c_void_p, POINTER(c_void_p)], offset=-1)
+from_gml = geom_output(lgdal.OGR_G_CreateFromGML, [c_char_p])
 create_geom = geom_output(lgdal.OGR_G_CreateGeometry, [c_int])
 clone_geom = geom_output(lgdal.OGR_G_Clone, [c_void_p])
 get_geom_ref = geom_output(lgdal.OGR_G_GetGeometryRef, [c_void_p, c_int])
@@ -77,6 +79,7 @@ get_centroid = void_output(lgdal.OGR_G_Centroid, [c_void_p, c_void_p])
 get_dims = int_output(lgdal.OGR_G_GetDimension, [c_void_p])
 get_coord_dim = int_output(lgdal.OGR_G_GetCoordinateDimension, [c_void_p])
 set_coord_dim = void_output(lgdal.OGR_G_SetCoordinateDimension, [c_void_p, c_int], errcheck=False)
+is_empty = int_output(lgdal.OGR_G_IsEmpty, [c_void_p], errcheck=lambda result, func, cargs: bool(result))
 
 get_geom_count = int_output(lgdal.OGR_G_GetGeometryCount, [c_void_p])
 get_geom_name = const_string_output(lgdal.OGR_G_GetGeometryName, [c_void_p], decoding='ascii')

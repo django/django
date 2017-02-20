@@ -1,17 +1,16 @@
-from __future__ import unicode_literals
-
 from operator import attrgetter
 
 from django.db import connection
-from django.db.models import Value
+from django.db.models import FileField, Value
 from django.db.models.functions import Lower
 from django.test import (
     TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature,
 )
 
 from .models import (
-    Country, NoFields, Pizzeria, ProxyCountry, ProxyMultiCountry,
-    ProxyMultiProxyCountry, ProxyProxyCountry, Restaurant, State, TwoFields,
+    Country, NoFields, NullableFields, Pizzeria, ProxyCountry,
+    ProxyMultiCountry, ProxyMultiProxyCountry, ProxyProxyCountry, Restaurant,
+    State, TwoFields,
 )
 
 
@@ -171,11 +170,18 @@ class BulkCreateTests(TestCase):
 
     def test_explicit_batch_size(self):
         objs = [TwoFields(f1=i, f2=i) for i in range(0, 4)]
-        TwoFields.objects.bulk_create(objs, 2)
-        self.assertEqual(TwoFields.objects.count(), len(objs))
+        num_objs = len(objs)
+        TwoFields.objects.bulk_create(objs, batch_size=1)
+        self.assertEqual(TwoFields.objects.count(), num_objs)
         TwoFields.objects.all().delete()
-        TwoFields.objects.bulk_create(objs, len(objs))
-        self.assertEqual(TwoFields.objects.count(), len(objs))
+        TwoFields.objects.bulk_create(objs, batch_size=2)
+        self.assertEqual(TwoFields.objects.count(), num_objs)
+        TwoFields.objects.all().delete()
+        TwoFields.objects.bulk_create(objs, batch_size=3)
+        self.assertEqual(TwoFields.objects.count(), num_objs)
+        TwoFields.objects.all().delete()
+        TwoFields.objects.bulk_create(objs, batch_size=num_objs)
+        self.assertEqual(TwoFields.objects.count(), num_objs)
 
     def test_empty_model(self):
         NoFields.objects.bulk_create([NoFields() for i in range(2)])
@@ -199,9 +205,21 @@ class BulkCreateTests(TestCase):
         bbb = Restaurant.objects.filter(name="betty's beetroot bar")
         self.assertEqual(bbb.count(), 1)
 
+    @skipUnlessDBFeature('has_bulk_insert')
+    def test_bulk_insert_nullable_fields(self):
+        # NULL can be mixed with other values in nullable fields
+        nullable_fields = [field for field in NullableFields._meta.get_fields() if field.name != 'id']
+        NullableFields.objects.bulk_create([
+            NullableFields(**{field.name: None}) for field in nullable_fields
+        ])
+        self.assertEqual(NullableFields.objects.count(), len(nullable_fields))
+        for field in nullable_fields:
+            with self.subTest(field=field):
+                field_value = '' if isinstance(field, FileField) else None
+                self.assertEqual(NullableFields.objects.filter(**{field.name: field_value}).count(), 1)
+
     @skipUnlessDBFeature('can_return_ids_from_bulk_insert')
     def test_set_pk_and_insert_single_item(self):
-        countries = []
         with self.assertNumQueries(1):
             countries = Country.objects.bulk_create([self.data[0]])
         self.assertEqual(len(countries), 1)
@@ -209,7 +227,6 @@ class BulkCreateTests(TestCase):
 
     @skipUnlessDBFeature('can_return_ids_from_bulk_insert')
     def test_set_pk_and_query_efficiency(self):
-        countries = []
         with self.assertNumQueries(1):
             countries = Country.objects.bulk_create(self.data)
         self.assertEqual(len(countries), 4)
@@ -217,3 +234,13 @@ class BulkCreateTests(TestCase):
         self.assertEqual(Country.objects.get(pk=countries[1].pk), countries[1])
         self.assertEqual(Country.objects.get(pk=countries[2].pk), countries[2])
         self.assertEqual(Country.objects.get(pk=countries[3].pk), countries[3])
+
+    @skipUnlessDBFeature('can_return_ids_from_bulk_insert')
+    def test_set_state(self):
+        country_nl = Country(name='Netherlands', iso_two_letter='NL')
+        country_be = Country(name='Belgium', iso_two_letter='BE')
+        Country.objects.bulk_create([country_nl])
+        country_be.save()
+        # Objects save via bulk_create() and save() should have equal state.
+        self.assertEqual(country_nl._state.adding, country_be._state.adding)
+        self.assertEqual(country_nl._state.db, country_be._state.db)

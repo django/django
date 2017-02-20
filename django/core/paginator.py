@@ -1,8 +1,13 @@
 import collections
+import warnings
 from math import ceil
 
-from django.utils import six
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
+
+
+class UnorderedObjectListWarning(RuntimeWarning):
+    pass
 
 
 class InvalidPage(Exception):
@@ -17,11 +22,12 @@ class EmptyPage(InvalidPage):
     pass
 
 
-class Paginator(object):
+class Paginator:
 
     def __init__(self, object_list, per_page, orphans=0,
                  allow_empty_first_page=True):
         self.object_list = object_list
+        self._check_object_list_is_ordered()
         self.per_page = int(per_page)
         self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
@@ -33,14 +39,14 @@ class Paginator(object):
         try:
             number = int(number)
         except (TypeError, ValueError):
-            raise PageNotAnInteger('That page number is not an integer')
+            raise PageNotAnInteger(_('That page number is not an integer'))
         if number < 1:
-            raise EmptyPage('That page number is less than 1')
+            raise EmptyPage(_('That page number is less than 1'))
         if number > self.num_pages:
             if number == 1 and self.allow_empty_first_page:
                 pass
             else:
-                raise EmptyPage('That page contains no results')
+                raise EmptyPage(_('That page contains no results'))
         return number
 
     def page(self, number):
@@ -92,7 +98,18 @@ class Paginator(object):
         Returns a 1-based range of pages for iterating through within
         a template for loop.
         """
-        return six.moves.range(1, self.num_pages + 1)
+        return range(1, self.num_pages + 1)
+
+    def _check_object_list_is_ordered(self):
+        """
+        Warn if self.object_list is unordered (typically a QuerySet).
+        """
+        if hasattr(self.object_list, 'ordered') and not self.object_list.ordered:
+            warnings.warn(
+                'Pagination may yield inconsistent results with an unordered '
+                'object_list: {!r}'.format(self.object_list),
+                UnorderedObjectListWarning
+            )
 
 
 QuerySetPaginator = Paginator   # For backwards-compatibility.
@@ -112,7 +129,7 @@ class Page(collections.Sequence):
         return len(self.object_list)
 
     def __getitem__(self, index):
-        if not isinstance(index, (slice,) + six.integer_types):
+        if not isinstance(index, (int, slice)):
             raise TypeError
         # The object_list is converted to a list so that if it was a QuerySet
         # it won't be a database hit per __getitem__.

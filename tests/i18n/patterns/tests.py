@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import os
 
 from django.conf import settings
@@ -12,7 +10,6 @@ from django.test.client import RequestFactory
 from django.test.utils import override_script_prefix
 from django.urls import clear_url_caches, reverse, translate_url
 from django.utils import translation
-from django.utils._os import upath
 
 
 class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
@@ -22,7 +19,7 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
 @override_settings(
     USE_I18N=True,
     LOCALE_PATHS=[
-        os.path.join(os.path.dirname(upath(__file__)), 'locale'),
+        os.path.join(os.path.dirname(__file__), 'locale'),
     ],
     LANGUAGE_CODE='en-us',
     LANGUAGES=[
@@ -37,7 +34,7 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
     ROOT_URLCONF='i18n.patterns.urls.default',
     TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+        'DIRS': [os.path.join(os.path.dirname(__file__), 'templates')],
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.i18n',
@@ -111,8 +108,8 @@ class RequestURLConfTests(SimpleTestCase):
 @override_settings(ROOT_URLCONF='i18n.patterns.urls.path_unused')
 class PathUnusedTests(URLTestCaseBase):
     """
-    Check that if no i18n_patterns is used in root URLconfs, then no
-    language activation happens based on url prefix.
+    If no i18n_patterns is used in root URLconfs, then no language activation
+    activation happens based on url prefix.
     """
 
     def test_no_lang_activate(self):
@@ -153,7 +150,7 @@ class URLTranslationTests(URLTestCaseBase):
 
     def test_translate_url_utility(self):
         with translation.override('en'):
-            self.assertEqual(translate_url('/en/non-existent/', 'nl'), '/en/non-existent/')
+            self.assertEqual(translate_url('/en/nonexistent/', 'nl'), '/en/nonexistent/')
             self.assertEqual(translate_url('/en/users/', 'nl'), '/nl/gebruikers/')
             # Namespaced URL
             self.assertEqual(translate_url('/en/account/register/', 'nl'), '/nl/profiel/registeren/')
@@ -235,8 +232,7 @@ class URLRedirectTests(URLTestCaseBase):
 
 class URLVaryAcceptLanguageTests(URLTestCaseBase):
     """
-    Tests that 'Accept-Language' is not added to the Vary header when using
-    prefixed URLs.
+    'Accept-Language' is not added to the Vary header when using prefixed URLs.
     """
     def test_no_prefix_response(self):
         response = self.client.get('/not-prefixed/')

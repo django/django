@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# GunChleoc, 2015
+# GunChleoc, 2015-2016
 # GunChleoc, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-11-27 09:47+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 10:24+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -143,7 +143,7 @@ msgstr "Modh"
 msgid "Arguments"
 msgstr "Argamaidean"
 
-msgid "Back to Model Documentation"
+msgid "Back to Model documentation"
 msgstr "Till gu docamaideadh modail"
 
 msgid "Model documentation"
@@ -163,6 +163,7 @@ msgstr "Teamplaid: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Teamplaid: “%(name)s”"
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Slighe-luirg airson teamplaid “%(name)s”:"
@@ -217,7 +218,7 @@ msgstr "Co-theacsa:"
 msgid "Templates:"
 msgstr "Teamplaidean:"
 
-msgid "Back to Views Documentation"
+msgid "Back to View documentation"
 msgstr "Till gu docamaideadh nan seallaidhean"
 
 msgid "View documentation"

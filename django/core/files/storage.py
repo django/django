@@ -1,7 +1,6 @@
-import errno
 import os
-import warnings
 from datetime import datetime
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
@@ -9,20 +8,18 @@ from django.core.files import File, locks
 from django.core.files.move import file_move_safe
 from django.core.signals import setting_changed
 from django.utils import timezone
-from django.utils._os import abspathu, safe_join
+from django.utils._os import safe_join
 from django.utils.crypto import get_random_string
 from django.utils.deconstruct import deconstructible
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import filepath_to_uri, force_text
 from django.utils.functional import LazyObject, cached_property
 from django.utils.module_loading import import_string
-from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.text import get_valid_filename
 
 __all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
 
 
-class Storage(object):
+class Storage:
     """
     A base storage class, providing some default behaviors that all other
     storage systems can inherit or override, as necessary.
@@ -146,103 +143,26 @@ class Storage(object):
         """
         raise NotImplementedError('subclasses of Storage must provide a url() method')
 
-    def accessed_time(self, name):
-        """
-        Returns the last accessed time (as datetime object) of the file
-        specified by name. Deprecated: use get_accessed_time() instead.
-        """
-        warnings.warn(
-            'Storage.accessed_time() is deprecated in favor of get_accessed_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        raise NotImplementedError('subclasses of Storage must provide an accessed_time() method')
-
-    def created_time(self, name):
-        """
-        Returns the creation time (as datetime object) of the file
-        specified by name. Deprecated: use get_created_time() instead.
-        """
-        warnings.warn(
-            'Storage.created_time() is deprecated in favor of get_created_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        raise NotImplementedError('subclasses of Storage must provide a created_time() method')
-
-    def modified_time(self, name):
-        """
-        Returns the last modified time (as datetime object) of the file
-        specified by name. Deprecated: use get_modified_time() instead.
-        """
-        warnings.warn(
-            'Storage.modified_time() is deprecated in favor of get_modified_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        raise NotImplementedError('subclasses of Storage must provide a modified_time() method')
-
     def get_accessed_time(self, name):
         """
         Return the last accessed time (as a datetime) of the file specified by
         name. The datetime will be timezone-aware if USE_TZ=True.
         """
-        # At the end of the deprecation:
-        # raise NotImplementedError('subclasses of Storage must provide a get_accessed_time() method')
-        warnings.warn(
-            'Storage.accessed_time() is deprecated. '
-            'Storage backends should implement get_accessed_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        dt = self.accessed_time(name)
-        return _possibly_make_aware(dt)
+        raise NotImplementedError('subclasses of Storage must provide a get_accessed_time() method')
 
     def get_created_time(self, name):
         """
         Return the creation time (as a datetime) of the file specified by name.
         The datetime will be timezone-aware if USE_TZ=True.
         """
-        # At the end of the deprecation:
-        # raise NotImplementedError('subclasses of Storage must provide a get_created_time() method')
-        warnings.warn(
-            'Storage.created_time() is deprecated. '
-            'Storage backends should implement get_created_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        dt = self.created_time(name)
-        return _possibly_make_aware(dt)
+        raise NotImplementedError('subclasses of Storage must provide a get_created_time() method')
 
     def get_modified_time(self, name):
         """
         Return the last modified time (as a datetime) of the file specified by
         name. The datetime will be timezone-aware if USE_TZ=True.
         """
-        # At the end of the deprecation:
-        # raise NotImplementedError('subclasses of Storage must provide a get_modified_time() method')
-        warnings.warn(
-            'Storage.modified_time() is deprecated. '
-            'Storage backends should implement get_modified_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        dt = self.modified_time(name)
-        return _possibly_make_aware(dt)
-
-
-def _possibly_make_aware(dt):
-    """
-    Convert a datetime object in the local timezone to aware
-    in UTC, if USE_TZ is True.
-    """
-    # This function is only needed to help with the deprecations above and can
-    # be removed in Django 2.0, RemovedInDjango20Warning.
-    if settings.USE_TZ:
-        tz = timezone.get_default_timezone()
-        return timezone.make_aware(dt, tz).astimezone(timezone.utc)
-    else:
-        return dt
+        raise NotImplementedError('subclasses of Storage must provide a get_modified_time() method')
 
 
 @deconstructible
@@ -254,8 +174,6 @@ class FileSystemStorage(Storage):
     def __init__(self, location=None, base_url=None, file_permissions_mode=None,
                  directory_permissions_mode=None):
         self._location = location
-        if base_url is not None and not base_url.endswith('/'):
-            base_url += '/'
         self._base_url = base_url
         self._file_permissions_mode = file_permissions_mode
         self._directory_permissions_mode = directory_permissions_mode
@@ -282,10 +200,12 @@ class FileSystemStorage(Storage):
 
     @cached_property
     def location(self):
-        return abspathu(self.base_location)
+        return os.path.abspath(self.base_location)
 
     @cached_property
     def base_url(self):
+        if self._base_url is not None and not self._base_url.endswith('/'):
+            self._base_url += '/'
         return self._value_or_setting(self._base_url, settings.MEDIA_URL)
 
     @cached_property
@@ -303,9 +223,6 @@ class FileSystemStorage(Storage):
         full_path = self.path(name)
 
         # Create any intermediate directories that do not exist.
-        # Note that there is a race between os.path.exists and os.makedirs:
-        # if os.makedirs fails with EEXIST, the directory was created
-        # concurrently, and we can continue normally. Refs #16082.
         directory = os.path.dirname(full_path)
         if not os.path.exists(directory):
             try:
@@ -319,9 +236,11 @@ class FileSystemStorage(Storage):
                         os.umask(old_umask)
                 else:
                     os.makedirs(directory)
-            except OSError as e:
-                if e.errno != errno.EEXIST:
-                    raise
+            except FileNotFoundError:
+                # There's a race between os.path.exists() and os.makedirs().
+                # If os.makedirs() fails with FileNotFoundError, the directory
+                # was created concurrently.
+                pass
         if not os.path.isdir(directory):
             raise IOError("%s exists and is not a directory." % directory)
 
@@ -359,13 +278,10 @@ class FileSystemStorage(Storage):
                             _file.close()
                         else:
                             os.close(fd)
-            except OSError as e:
-                if e.errno == errno.EEXIST:
-                    # Ooops, the file exists. We need a new file name.
-                    name = self.get_available_name(name)
-                    full_path = self.path(name)
-                else:
-                    raise
+            except FileExistsError:
+                # A new name is needed if the file exists.
+                name = self.get_available_name(name)
+                full_path = self.path(name)
             else:
                 # OK, the file save worked. Break out of the loop.
                 break
@@ -380,15 +296,12 @@ class FileSystemStorage(Storage):
         assert name, "The name argument is not allowed to be empty."
         name = self.path(name)
         # If the file exists, delete it from the filesystem.
-        # Note that there is a race between os.path.exists and os.remove:
-        # if os.remove fails with ENOENT, the file was removed
-        # concurrently, and we can continue normally.
-        if os.path.exists(name):
-            try:
-                os.remove(name)
-            except OSError as e:
-                if e.errno != errno.ENOENT:
-                    raise
+        try:
+            os.remove(name)
+        except FileNotFoundError:
+            # If os.remove() fails with FileNotFoundError, the file may have
+            # been removed concurrently.
+            pass
 
     def exists(self, name):
         return os.path.exists(self.path(name))
@@ -416,33 +329,6 @@ class FileSystemStorage(Storage):
         if url is not None:
             url = url.lstrip('/')
         return urljoin(self.base_url, url)
-
-    def accessed_time(self, name):
-        warnings.warn(
-            'FileSystemStorage.accessed_time() is deprecated in favor of '
-            'get_accessed_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        return datetime.fromtimestamp(os.path.getatime(self.path(name)))
-
-    def created_time(self, name):
-        warnings.warn(
-            'FileSystemStorage.created_time() is deprecated in favor of '
-            'get_created_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        return datetime.fromtimestamp(os.path.getctime(self.path(name)))
-
-    def modified_time(self, name):
-        warnings.warn(
-            'FileSystemStorage.modified_time() is deprecated in favor of '
-            'get_modified_time().',
-            RemovedInDjango20Warning,
-            stacklevel=2,
-        )
-        return datetime.fromtimestamp(os.path.getmtime(self.path(name)))
 
     def _datetime_from_timestamp(self, ts):
         """
@@ -472,5 +358,6 @@ def get_storage_class(import_path=None):
 class DefaultStorage(LazyObject):
     def _setup(self):
         self._wrapped = get_storage_class()()
+
 
 default_storage = DefaultStorage()

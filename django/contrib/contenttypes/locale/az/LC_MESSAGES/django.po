@@ -2,14 +2,14 @@
 #
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011
-# Emin Mastizada <emin@mastizada.com>, 2016
+# Emin Mastizada <emin@linux.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2016-02-17 21:42+0000\n"
-"Last-Translator: Emin Mastizada <emin@mastizada.com>\n"
+"PO-Revision-Date: 2016-08-05 00:53+0000\n"
+"Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -32,12 +32,12 @@ msgstr "məzmun tipləri"
 
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
-msgstr ""
+msgstr "%(ct_id)s Məzmun növü obyektinə bağlı model yoxdur"
 
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
-msgstr ""
+msgstr "%(ct_id)s məzmun növü %(obj_id)s obyekti mövcut deyil"
 
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr ""
+msgstr "%(ct_name)s obyektlərinin get_absolute_url() metodu yoxdur"

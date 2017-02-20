@@ -16,16 +16,16 @@ cache keys to prevent delivery of wrong content.
 An example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
-from __future__ import unicode_literals
-
 import hashlib
 import logging
 import re
 import time
+import warnings
 
 from django.conf import settings
 from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseNotModified
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.http import (
     http_date, parse_etags, parse_http_date_safe, quote_etag,
@@ -40,8 +40,8 @@ logger = logging.getLogger('django.request')
 
 def patch_cache_control(response, **kwargs):
     """
-    This function patches the Cache-Control header by adding all
-    keyword arguments to it. The transformation is as follows:
+    Patch the Cache-Control header by adding all keyword arguments to it.
+    The transformation is as follows:
 
     * All keyword parameter names are turned to lowercase, and underscores
       are converted to hyphens.
@@ -89,8 +89,8 @@ def patch_cache_control(response, **kwargs):
 
 def get_max_age(response):
     """
-    Returns the max-age from the response Cache-Control header as an integer
-    (or ``None`` if it wasn't found or wasn't an integer.
+    Return the max-age from the response Cache-Control header as an integer,
+    or None if it wasn't found or wasn't an integer.
     """
     if not response.has_header('Cache-Control'):
         return
@@ -120,87 +120,124 @@ def _precondition_failed(request):
 
 
 def _not_modified(request, response=None):
+    new_response = HttpResponseNotModified()
     if response:
-        # We need to keep the cookies, see ticket #4994.
-        cookies = response.cookies
-        response = HttpResponseNotModified()
-        response.cookies = cookies
-        return response
-    else:
-        return HttpResponseNotModified()
+        # Preserve the headers required by Section 4.1 of RFC 7232, as well as
+        # Last-Modified.
+        for header in ('Cache-Control', 'Content-Location', 'Date', 'ETag', 'Expires', 'Last-Modified', 'Vary'):
+            if header in response:
+                new_response[header] = response[header]
+
+        # Preserve cookies as per the cookie specification: "If a proxy server
+        # receives a response which contains a Set-cookie header, it should
+        # propagate the Set-cookie header to the client, regardless of whether
+        # the response was 304 (Not Modified) or 200 (OK).
+        # https://curl.haxx.se/rfc/cookie_spec.html
+        new_response.cookies = response.cookies
+    return new_response
 
 
 def get_conditional_response(request, etag=None, last_modified=None, response=None):
-    # Get HTTP request headers
-    if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE')
-    if if_modified_since:
-        if_modified_since = parse_http_date_safe(if_modified_since)
+    # Only return conditional responses on successful requests.
+    if response and not (200 <= response.status_code < 300):
+        return response
+
+    # Get HTTP request headers.
+    if_match_etags = parse_etags(request.META.get('HTTP_IF_MATCH', ''))
     if_unmodified_since = request.META.get('HTTP_IF_UNMODIFIED_SINCE')
     if if_unmodified_since:
         if_unmodified_since = parse_http_date_safe(if_unmodified_since)
-    if_none_match = request.META.get('HTTP_IF_NONE_MATCH')
-    if_match = request.META.get('HTTP_IF_MATCH')
-    etags = []
-    if if_none_match or if_match:
-        # There can be more than one ETag in the request, so we
-        # consider the list of values.
-        try:
-            etags = parse_etags(if_none_match or if_match)
-        except ValueError:
-            # In case of an invalid ETag, ignore all ETag headers.
-            # Apparently Opera sends invalidly quoted headers at times
-            # (we should be returning a 400 response, but that's a
-            # little extreme) -- this is bug #10681.
-            if_none_match = None
-            if_match = None
+    if_none_match_etags = parse_etags(request.META.get('HTTP_IF_NONE_MATCH', ''))
+    if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE')
+    if if_modified_since:
+        if_modified_since = parse_http_date_safe(if_modified_since)
 
-    # If-None-Match must be ignored if original result would be anything
-    # other than a 2XX or 304 status. 304 status would result in no change.
-    # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.26
-    if response and not (200 <= response.status_code < 300):
-        if_none_match = None
-        if_match = None
+    # Step 1 of section 6 of RFC 7232: Test the If-Match precondition.
+    if (if_match_etags and not _if_match_passes(etag, if_match_etags)):
+        return _precondition_failed(request)
 
-    # If-Modified-Since must be ignored if the original result was not a 200.
-    # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.25
-    if response and response.status_code != 200:
-        if_modified_since = None
-        if_unmodified_since = None
+    # Step 2: Test the If-Unmodified-Since precondition.
+    if (not if_match_etags and if_unmodified_since and
+            not _if_unmodified_since_passes(last_modified, if_unmodified_since)):
+        return _precondition_failed(request)
 
-    if not ((if_match and if_modified_since) or
-            (if_none_match and if_unmodified_since) or
-            (if_modified_since and if_unmodified_since) or
-            (if_match and if_none_match)):
-        # We only get here if no undefined combinations of headers are
-        # specified.
-        if ((if_none_match and (etag in etags or '*' in etags and etag)) and
-                (not if_modified_since or
-                    (last_modified and if_modified_since and last_modified <= if_modified_since))):
-            if request.method in ('GET', 'HEAD'):
-                return _not_modified(request, response)
-            else:
-                return _precondition_failed(request)
-        elif (if_match and (
-            (not etag and '*' in etags) or (etag and etag not in etags) or
-            (last_modified and if_unmodified_since and last_modified > if_unmodified_since)
-        )):
-            return _precondition_failed(request)
-        elif (not if_none_match and request.method in ('GET', 'HEAD') and
-                last_modified and if_modified_since and
-                last_modified <= if_modified_since):
+    # Step 3: Test the If-None-Match precondition.
+    if (if_none_match_etags and not _if_none_match_passes(etag, if_none_match_etags)):
+        if request.method in ('GET', 'HEAD'):
             return _not_modified(request, response)
-        elif (not if_match and
-                last_modified and if_unmodified_since and
-                last_modified > if_unmodified_since):
+        else:
             return _precondition_failed(request)
 
+    # Step 4: Test the If-Modified-Since precondition.
+    if (not if_none_match_etags and if_modified_since and
+            not _if_modified_since_passes(last_modified, if_modified_since)):
+        if request.method in ('GET', 'HEAD'):
+            return _not_modified(request, response)
+
+    # Step 5: Test the If-Range precondition (not supported).
+    # Step 6: Return original response since there isn't a conditional response.
     return response
+
+
+def _if_match_passes(target_etag, etags):
+    """
+    Test the If-Match comparison as defined in section 3.1 of RFC 7232.
+    """
+    if not target_etag:
+        # If there isn't an ETag, then there can't be a match.
+        return False
+    elif etags == ['*']:
+        # The existence of an ETag means that there is "a current
+        # representation for the target resource", even if the ETag is weak,
+        # so there is a match to '*'.
+        return True
+    elif target_etag.startswith('W/'):
+        # A weak ETag can never strongly match another ETag.
+        return False
+    else:
+        # Since the ETag is strong, this will only return True if there's a
+        # strong match.
+        return target_etag in etags
+
+
+def _if_unmodified_since_passes(last_modified, if_unmodified_since):
+    """
+    Test the If-Unmodified-Since comparison as defined in section 3.4 of
+    RFC 7232.
+    """
+    return last_modified and last_modified <= if_unmodified_since
+
+
+def _if_none_match_passes(target_etag, etags):
+    """
+    Test the If-None-Match comparison as defined in section 3.2 of RFC 7232.
+    """
+    if not target_etag:
+        # If there isn't an ETag, then there isn't a match.
+        return True
+    elif etags == ['*']:
+        # The existence of an ETag means that there is "a current
+        # representation for the target resource", so there is a match to '*'.
+        return False
+    else:
+        # The comparison should be weak, so look for a match after stripping
+        # off any weak indicators.
+        target_etag = target_etag.strip('W/')
+        etags = (etag.strip('W/') for etag in etags)
+        return target_etag not in etags
+
+
+def _if_modified_since_passes(last_modified, if_modified_since):
+    """
+    Test the If-Modified-Since comparison as defined in section 3.3 of RFC 7232.
+    """
+    return not last_modified or last_modified > if_modified_since
 
 
 def patch_response_headers(response, cache_timeout=None):
     """
-    Adds some useful headers to the given HttpResponse object:
-        ETag, Last-Modified, Expires and Cache-Control
+    Add HTTP caching headers to the given HttpResponse: Expires and
+    Cache-Control.
 
     Each header is only added if it isn't already set.
 
@@ -212,12 +249,17 @@ def patch_response_headers(response, cache_timeout=None):
     if cache_timeout < 0:
         cache_timeout = 0  # Can't have max-age negative
     if settings.USE_ETAGS and not response.has_header('ETag'):
+        warnings.warn(
+            "The USE_ETAGS setting is deprecated in favor of "
+            "ConditionalGetMiddleware which sets the ETag regardless of the "
+            "setting. patch_response_headers() won't do ETag processing in "
+            "Django 2.1.",
+            RemovedInDjango21Warning
+        )
         if hasattr(response, 'render') and callable(response.render):
             response.add_post_render_callback(set_response_etag)
         else:
             response = set_response_etag(response)
-    if not response.has_header('Last-Modified'):
-        response['Last-Modified'] = http_date()
     if not response.has_header('Expires'):
         response['Expires'] = http_date(time.time() + cache_timeout)
     patch_cache_control(response, max_age=cache_timeout)
@@ -225,7 +267,7 @@ def patch_response_headers(response, cache_timeout=None):
 
 def add_never_cache_headers(response):
     """
-    Adds headers to a response to indicate that a page should never be cached.
+    Add headers to a response to indicate that a page should never be cached.
     """
     patch_response_headers(response, cache_timeout=-1)
     patch_cache_control(response, no_cache=True, no_store=True, must_revalidate=True)
@@ -233,7 +275,7 @@ def add_never_cache_headers(response):
 
 def patch_vary_headers(response, newheaders):
     """
-    Adds (or updates) the "Vary" header in the given HttpResponse object.
+    Add (or update) the "Vary" header in the given HttpResponse object.
     newheaders is a list of header names that should be in "Vary". Existing
     headers in "Vary" aren't removed.
     """
@@ -253,7 +295,7 @@ def patch_vary_headers(response, newheaders):
 
 def has_vary_header(response, header_query):
     """
-    Checks to see if the response has a given header name in its Vary header.
+    Check to see if the response has a given header name in its Vary header.
     """
     if not response.has_header('Vary'):
         return False
@@ -263,7 +305,7 @@ def has_vary_header(response, header_query):
 
 
 def _i18n_cache_key_suffix(request, cache_key):
-    """If necessary, adds the current locale or time zone to the cache key."""
+    """If necessary, add the current locale or time zone to the cache key."""
     if settings.USE_I18N or settings.USE_L10N:
         # first check if LocaleMiddleware or another middleware added
         # LANGUAGE_CODE to request, then fall back to the active language
@@ -280,7 +322,7 @@ def _i18n_cache_key_suffix(request, cache_key):
 
 
 def _generate_cache_key(request, method, headerlist, key_prefix):
-    """Returns a cache key from the headers given in the header list."""
+    """Return a cache key from the headers given in the header list."""
     ctx = hashlib.md5()
     for header in headerlist:
         value = request.META.get(header)
@@ -293,7 +335,7 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
 
 
 def _generate_cache_header_key(key_prefix, request):
-    """Returns a cache key for the header cache."""
+    """Return a cache key for the header cache."""
     url = hashlib.md5(force_bytes(iri_to_uri(request.build_absolute_uri())))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
         key_prefix, url.hexdigest())
@@ -302,13 +344,13 @@ def _generate_cache_header_key(key_prefix, request):
 
 def get_cache_key(request, key_prefix=None, method='GET', cache=None):
     """
-    Returns a cache key based on the request URL and query. It can be used
+    Return a cache key based on the request URL and query. It can be used
     in the request phase because it pulls the list of headers to take into
     account from the global URL registry and uses those to build a cache key
     to check against.
 
-    If there is no headerlist stored, the page needs to be rebuilt, so this
-    function returns None.
+    If there isn't a headerlist stored, return None, indicating that the page
+    needs to be rebuilt.
     """
     if key_prefix is None:
         key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
@@ -324,8 +366,8 @@ def get_cache_key(request, key_prefix=None, method='GET', cache=None):
 
 def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cache=None):
     """
-    Learns what headers to take into account for some request URL from the
-    response object. It stores those headers in a global URL registry so that
+    Learn what headers to take into account for some request URL from the
+    response object. Store those headers in a global URL registry so that
     later access to that URL will know what headers to take into account
     without building the response object itself. The headers are named in the
     Vary header of the response, but we want to prevent response generation.

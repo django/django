@@ -25,11 +25,11 @@ class DecimalFieldTests(TestCase):
         f = models.DecimalField(max_digits=5, decimal_places=1)
         self.assertEqual(f._format(f.to_python(2)), '2.0')
         self.assertEqual(f._format(f.to_python('2.6')), '2.6')
-        self.assertEqual(f._format(None), None)
+        self.assertIsNone(f._format(None))
 
     def test_get_prep_value(self):
         f = models.DecimalField(max_digits=5, decimal_places=1)
-        self.assertEqual(f.get_prep_value(None), None)
+        self.assertIsNone(f.get_prep_value(None))
         self.assertEqual(f.get_prep_value('2.4'), Decimal('2.4'))
 
     def test_filter_with_strings(self):

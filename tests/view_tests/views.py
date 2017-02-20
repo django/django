@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 import decimal
 import logging
@@ -18,8 +16,6 @@ from django.views.decorators.debug import (
     sensitive_post_parameters, sensitive_variables,
 )
 
-from . import BrokenException, except_args
-
 
 def index_page(request):
     """Dummy index page"""
@@ -32,8 +28,7 @@ def with_parameter(request, parameter):
 
 def raises(request):
     # Make sure that a callable that raises an exception in the stack frame's
-    # local vars won't hijack the technical 500 response. See:
-    # http://code.djangoproject.com/ticket/15025
+    # local vars won't hijack the technical 500 response (#15025).
     def callable():
         raise Exception
     try:
@@ -73,12 +68,8 @@ class Http404View(View):
         raise Http404("Testing class-based technical 404.")
 
 
-def view_exception(request, n):
-    raise BrokenException(except_args[int(n)])
-
-
-def template_exception(request, n):
-    return render(request, 'debug/template_exception.html', {'arg': except_args[int(n)]})
+def template_exception(request):
+    return render(request, 'debug/template_exception.html')
 
 
 def jsi18n(request):
@@ -244,7 +235,7 @@ def custom_exception_reporter_filter_view(request):
         return technical_500_response(request, *exc_info)
 
 
-class Klass(object):
+class Klass:
 
     @sensitive_variables('sauce')
     def method(self, request):

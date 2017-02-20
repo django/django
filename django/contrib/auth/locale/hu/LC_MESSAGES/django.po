@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2016-04-13 09:27+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-19 07:41+0000\n"
 "Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
@@ -117,6 +117,21 @@ msgstr "salt"
 msgid "hash"
 msgstr "hash"
 
+msgid "variety"
+msgstr "változat"
+
+msgid "version"
+msgstr "verzió"
+
+msgid "memory cost"
+msgstr "memória költség"
+
+msgid "time cost"
+msgstr "idő költség"
+
+msgid "parallelism"
+msgstr "párhuzamosság"
+
 msgid "work factor"
 msgstr "erősség"
 
@@ -170,16 +185,9 @@ msgstr "A felhasználó egyedi jogosultságai."
 msgid "username"
 msgstr "felhasználónév"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Kötelező. Legfeljebb 30 karakter. Betűk, számok és @/./+/-/_ karakterek."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Írjon be egy érvényes felhasználónevet, mely csak betűket, számokat és @/./"
-"+/-/_ karaktereket tartalmazhat."
+"Kötelező. Legfeljebb 150 karakter. Betűk, számok és @/./+/-/_ karakterek."
 
 msgid "A user with that username already exists."
 msgstr "Létezik már egy felhasználó ezzel a névvel."
@@ -261,6 +269,20 @@ msgstr "A jelszava nem állhat kizárólag számjegyekből."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Jelszó újragenerálása ezen az oldalon: %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Írjon be egy érvényes felhasználónevet, mely csak ékezetmentes betűket, "
+"számokat és @/./+/-/_ karaktereket tartalmazhat."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Írjon be egy érvényes felhasználónevet, mely csak betűket, számokat és @/./"
+"+/-/_ karaktereket tartalmazhat."
 
 msgid "Logged out"
 msgstr "Kijelentkezve"

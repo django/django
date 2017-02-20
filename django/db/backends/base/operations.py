@@ -1,18 +1,16 @@
 import datetime
 import decimal
-import warnings
 from importlib import import_module
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends import utils
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.dateparse import parse_duration
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 
 
-class BaseDatabaseOperations(object):
+class BaseDatabaseOperations:
     """
     This class encapsulates all backend-specific differences, such as the way
     a backend performs ordering or calculates the ID of a recently-inserted
@@ -28,6 +26,11 @@ class BaseDatabaseOperations(object):
         'BigIntegerField': (-9223372036854775808, 9223372036854775807),
         'PositiveSmallIntegerField': (0, 32767),
         'PositiveIntegerField': (0, 2147483647),
+    }
+    set_operators = {
+        'union': 'UNION',
+        'intersection': 'INTERSECT',
+        'difference': 'EXCEPT',
     }
 
     def __init__(self, connection):
@@ -96,6 +99,12 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_cast_date() method')
 
+    def datetime_cast_time_sql(self, field_name, tzname):
+        """
+        Returns the SQL necessary to cast a datetime value to time value.
+        """
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_cast_time_sql() method')
+
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
         """
         Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute' or
@@ -112,6 +121,14 @@ class BaseDatabaseOperations(object):
         a tuple of parameters.
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_trunk_sql() method')
+
+    def time_trunc_sql(self, lookup_type, field_name):
+        """
+        Given a lookup_type of 'hour', 'minute' or 'second', returns the SQL
+        that truncates the given time field field_name to a time object with
+        only the given specificity.
+        """
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a time_trunc_sql() method')
 
     def time_extract_sql(self, lookup_type, field_name):
         """
@@ -138,19 +155,6 @@ class BaseDatabaseOperations(object):
         else:
             return 'DISTINCT'
 
-    def drop_foreignkey_sql(self):
-        """
-        Returns the SQL command that drops a foreign key.
-        """
-        return "DROP CONSTRAINT"
-
-    def drop_sequence_sql(self, table):
-        """
-        Returns any SQL necessary to drop the sequence for the given table.
-        Returns None if no SQL is necessary.
-        """
-        return None
-
     def fetch_returned_insert_id(self, cursor):
         """
         Given a cursor object that has just performed an INSERT...RETURNING
@@ -176,23 +180,16 @@ class BaseDatabaseOperations(object):
         """
         return []
 
-    def for_update_sql(self, nowait=False):
+    def for_update_sql(self, nowait=False, skip_locked=False):
         """
         Returns the FOR UPDATE SQL clause to lock rows for an update operation.
         """
         if nowait:
             return 'FOR UPDATE NOWAIT'
+        elif skip_locked:
+            return 'FOR UPDATE SKIP LOCKED'
         else:
             return 'FOR UPDATE'
-
-    def fulltext_search_sql(self, field_name):
-        """
-        Returns the SQL WHERE clause to use in order to perform a full-text
-        search of the given field_name. Note that the resulting string should
-        contain a '%s' placeholder for the value being searched against.
-        """
-        # RemovedInDjango20Warning
-        raise NotImplementedError('Full-text search is not implemented for this database backend')
 
     def last_executed_query(self, cursor, sql, params):
         """
@@ -204,17 +201,17 @@ class BaseDatabaseOperations(object):
         exists for database backends to provide a better implementation
         according to their own quoting schemes.
         """
-        # Convert params to contain Unicode values.
-        def to_unicode(s):
+        # Convert params to contain string values.
+        def to_string(s):
             return force_text(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
-            u_params = tuple(to_unicode(val) for val in params)
+            u_params = tuple(to_string(val) for val in params)
         elif params is None:
             u_params = ()
         else:
-            u_params = {to_unicode(k): to_unicode(v) for k, v in params.items()}
+            u_params = {to_string(k): to_string(v) for k, v in params.items()}
 
-        return six.text_type("QUERY = %r - PARAMS = %r") % (sql, u_params)
+        return "QUERY = %r - PARAMS = %r" % (sql, u_params)
 
     def last_insert_id(self, cursor, table_name, pk_name):
         """
@@ -425,7 +422,7 @@ class BaseDatabaseOperations(object):
 
     def prep_for_like_query(self, x):
         """Prepares a value for use in a LIKE query."""
-        return force_text(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
+        return force_text(x).replace("\\", "\\\\").replace("%", r"\%").replace("_", r"\_")
 
     # Same as prep_for_like_query(), but called for "iexact" matches, which
     # need not necessarily be implemented using "LIKE" in the backend.
@@ -465,7 +462,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return six.text_type(value)
+        return str(value)
 
     def adapt_datetimefield_value(self, value):
         """
@@ -474,7 +471,7 @@ class BaseDatabaseOperations(object):
         """
         if value is None:
             return None
-        return six.text_type(value)
+        return str(value)
 
     def adapt_timefield_value(self, value):
         """
@@ -485,7 +482,7 @@ class BaseDatabaseOperations(object):
             return None
         if timezone.is_aware(value):
             raise ValueError("Django does not support timezone-aware times.")
-        return six.text_type(value)
+        return str(value)
 
     def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
         """
@@ -547,13 +544,6 @@ class BaseDatabaseOperations(object):
             value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
             value = parse_duration(value)
         return value
-
-    def check_aggregate_support(self, aggregate_func):
-        warnings.warn(
-            "check_aggregate_support has been deprecated. Use "
-            "check_expression_support instead.",
-            RemovedInDjango20Warning, stacklevel=2)
-        return self.check_expression_support(aggregate_func)
 
     def check_expression_support(self, expression):
         """

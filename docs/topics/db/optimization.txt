@@ -339,14 +339,14 @@ When creating objects, where possible, use the
 number of SQL queries. For example::
 
     Entry.objects.bulk_create([
-        Entry(headline="Python 3.0 Released"),
-        Entry(headline="Python 3.1 Planned")
+        Entry(headline='This is a test'),
+        Entry(headline='This is only a test'),
     ])
 
 ...is preferable to::
 
-    Entry.objects.create(headline="Python 3.0 Released")
-    Entry.objects.create(headline="Python 3.1 Planned")
+    Entry.objects.create(headline='This is a test')
+    Entry.objects.create(headline='This is only a test')
 
 Note that there are a number of :meth:`caveats to this method
 <django.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate

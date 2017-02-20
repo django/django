@@ -6,9 +6,8 @@ from django.contrib.postgres.validators import (
     ArrayMaxLengthValidator, ArrayMinLengthValidator,
 )
 from django.core.exceptions import ValidationError
-from django.utils import six
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from ..utils import prefix_validation_error
 
@@ -21,7 +20,7 @@ class SimpleArrayField(forms.CharField):
     def __init__(self, base_field, delimiter=',', max_length=None, min_length=None, *args, **kwargs):
         self.base_field = base_field
         self.delimiter = delimiter
-        super(SimpleArrayField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if min_length is not None:
             self.min_length = min_length
             self.validators.append(ArrayMinLengthValidator(int(min_length)))
@@ -31,11 +30,13 @@ class SimpleArrayField(forms.CharField):
 
     def prepare_value(self, value):
         if isinstance(value, list):
-            return self.delimiter.join(six.text_type(self.base_field.prepare_value(v)) for v in value)
+            return self.delimiter.join(str(self.base_field.prepare_value(v)) for v in value)
         return value
 
     def to_python(self, value):
-        if value:
+        if isinstance(value, list):
+            items = value
+        elif value:
             items = value.split(self.delimiter)
         else:
             items = []
@@ -56,7 +57,7 @@ class SimpleArrayField(forms.CharField):
         return values
 
     def validate(self, value):
-        super(SimpleArrayField, self).validate(value)
+        super().validate(value)
         errors = []
         for index, item in enumerate(value):
             try:
@@ -72,7 +73,7 @@ class SimpleArrayField(forms.CharField):
             raise ValidationError(errors)
 
     def run_validators(self, value):
-        super(SimpleArrayField, self).run_validators(value)
+        super().run_validators(value)
         errors = []
         for index, item in enumerate(value):
             try:
@@ -93,7 +94,7 @@ class SplitArrayWidget(forms.Widget):
     def __init__(self, widget, size, **kwargs):
         self.widget = widget() if isinstance(widget, type) else widget
         self.size = size
-        super(SplitArrayWidget, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @property
     def is_hidden(self):
@@ -103,13 +104,19 @@ class SplitArrayWidget(forms.Widget):
         return [self.widget.value_from_datadict(data, files, '%s_%s' % (name, index))
                 for index in range(self.size)]
 
+    def value_omitted_from_data(self, data, files, name):
+        return all(
+            self.widget.value_omitted_from_data(data, files, '%s_%s' % (name, index))
+            for index in range(self.size)
+        )
+
     def id_for_label(self, id_):
         # See the comment for RadioSelect.id_for_label()
         if id_:
             id_ += '_0'
         return id_
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         if self.is_localized:
             self.widget.is_localized = self.is_localized
         value = value or []
@@ -123,7 +130,7 @@ class SplitArrayWidget(forms.Widget):
                 widget_value = None
             if id_:
                 final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
-            output.append(self.widget.render(name + '_%s' % i, widget_value, final_attrs))
+            output.append(self.widget.render(name + '_%s' % i, widget_value, final_attrs, renderer))
         return mark_safe(self.format_output(output))
 
     def format_output(self, rendered_widgets):
@@ -134,7 +141,7 @@ class SplitArrayWidget(forms.Widget):
         return self.widget.media
 
     def __deepcopy__(self, memo):
-        obj = super(SplitArrayWidget, self).__deepcopy__(memo)
+        obj = super().__deepcopy__(memo)
         obj.widget = copy.deepcopy(self.widget)
         return obj
 
@@ -154,7 +161,7 @@ class SplitArrayField(forms.Field):
         self.remove_trailing_nulls = remove_trailing_nulls
         widget = SplitArrayWidget(widget=base_field.widget, size=size)
         kwargs.setdefault('widget', widget)
-        super(SplitArrayField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def clean(self, value):
         cleaned_data = []

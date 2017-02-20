@@ -1,5 +1,4 @@
-from __future__ import unicode_literals
-
+import functools
 import re
 import sys
 import types
@@ -9,11 +8,11 @@ from django.http import HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
 from django.urls import Resolver404, resolve
-from django.utils import lru_cache, six, timezone
+from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_bytes, smart_text
+from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 # Minimal Django templates engine to render the error templates
 # regardless of the project's TEMPLATES setting.
@@ -24,7 +23,7 @@ HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGN
 CLEANSED_SUBSTITUTE = '********************'
 
 
-class CallableSettingWrapper(object):
+class CallableSettingWrapper:
     """ Object to wrap callable appearing in settings
 
     * Not to call in the debug page (#21345).
@@ -85,7 +84,7 @@ def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
         return HttpResponse(html, status=status_code, content_type='text/html')
 
 
-@lru_cache.lru_cache()
+@functools.lru_cache()
 def get_default_exception_reporter_filter():
     # Instantiate the default filter for the first time and cache it.
     return import_string(settings.DEFAULT_EXCEPTION_REPORTER_FILTER)()
@@ -96,7 +95,7 @@ def get_exception_reporter_filter(request):
     return getattr(request, 'exception_reporter_filter', default_filter)
 
 
-class ExceptionReporterFilter(object):
+class ExceptionReporterFilter:
     """
     Base for all exception reporter filter classes. All overridable hooks
     contain lenient default behaviors.
@@ -231,7 +230,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         return cleansed.items()
 
 
-class ExceptionReporter(object):
+class ExceptionReporter:
     """
     A class to organize and coordinate reporting on exceptions.
     """
@@ -247,11 +246,6 @@ class ExceptionReporter(object):
         self.template_does_not_exist = False
         self.postmortem = None
 
-        # Handle deprecated string exceptions
-        if isinstance(self.exc_type, six.string_types):
-            self.exc_value = Exception('Deprecated String Exception: %r' % self.exc_type)
-            self.exc_type = type(self.exc_value)
-
     def get_traceback_data(self):
         """Return a dictionary containing traceback information."""
         if self.exc_type and issubclass(self.exc_type, TemplateDoesNotExist):
@@ -264,9 +258,6 @@ class ExceptionReporter(object):
                 frame_vars = []
                 for k, v in frame['vars']:
                     v = pprint(v)
-                    # The force_escape filter assume unicode, make sure that works
-                    if isinstance(v, six.binary_type):
-                        v = v.decode('utf-8', 'replace')  # don't choke on non-utf-8 input
                     # Trim large blobs of data
                     if len(v) > 4096:
                         v = '%s... <trimmed %d bytes string>' % (v[0:4096], len(v))
@@ -280,17 +271,29 @@ class ExceptionReporter(object):
             end = getattr(self.exc_value, 'end', None)
             if start is not None and end is not None:
                 unicode_str = self.exc_value.args[1]
-                unicode_hint = smart_text(
+                unicode_hint = force_text(
                     unicode_str[max(start - 5, 0):min(end + 5, len(unicode_str))],
                     'ascii', errors='replace'
                 )
         from django import get_version
+
+        if self.request is None:
+            user_str = None
+        else:
+            try:
+                user_str = force_text(self.request.user)
+            except Exception:
+                # request.user may raise OperationalError if the database is
+                # unavailable, for example.
+                user_str = '[unable to retrieve the current user]'
+
         c = {
             'is_email': self.is_email,
             'unicode_hint': unicode_hint,
             'frames': frames,
             'request': self.request,
-            'filtered_POST': self.filter.get_post_parameters(self.request),
+            'user_str': user_str,
+            'filtered_POST_items': self.filter.get_post_parameters(self.request).items(),
             'settings': get_safe_settings(),
             'sys_executable': sys.executable,
             'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
@@ -301,11 +304,15 @@ class ExceptionReporter(object):
             'template_does_not_exist': self.template_does_not_exist,
             'postmortem': self.postmortem,
         }
+        if self.request is not None:
+            c['request_GET_items'] = self.request.GET.items()
+            c['request_FILES_items'] = self.request.FILES.items()
+            c['request_COOKIES_items'] = self.request.COOKIES.items()
         # Check whether exception info is available
         if self.exc_type:
             c['exception_type'] = self.exc_type.__name__
         if self.exc_value:
-            c['exception_value'] = smart_text(self.exc_value, errors='replace')
+            c['exception_value'] = force_text(self.exc_value, errors='replace')
         if frames:
             c['lastframe'] = frames[-1]
         return c
@@ -345,9 +352,9 @@ class ExceptionReporter(object):
             return None, [], None, []
 
         # If we just read the source from a file, or if the loader did not
-        # apply tokenize.detect_encoding to decode the source into a Unicode
+        # apply tokenize.detect_encoding to decode the source into a
         # string, then we should do that ourselves.
-        if isinstance(source[0], six.binary_type):
+        if isinstance(source[0], bytes):
             encoding = 'ascii'
             for line in source[:2]:
                 # File coding may be specified. Match pattern from PEP-263
@@ -356,7 +363,7 @@ class ExceptionReporter(object):
                 if match:
                     encoding = match.group(1).decode('ascii')
                     break
-            source = [six.text_type(sline, encoding, 'replace') for sline in source]
+            source = [str(sline, encoding, 'replace') for sline in source]
 
         lower_bound = max(0, lineno - context_lines)
         upper_bound = lineno + context_lines
@@ -385,11 +392,9 @@ class ExceptionReporter(object):
         if not exceptions:
             return frames
 
-        # In case there's just one exception (always in Python 2,
-        # sometimes in Python 3), take the traceback from self.tb (Python 2
-        # doesn't have a __traceback__ attribute on Exception)
+        # In case there's just one exception, take the traceback from self.tb
         exc_value = exceptions.pop()
-        tb = self.tb if six.PY2 or not exceptions else exc_value.__traceback__
+        tb = self.tb if not exceptions else exc_value.__traceback__
 
         while tb is not None:
             # Support for __traceback_hide__ which is used by a few libraries
@@ -424,27 +429,13 @@ class ExceptionReporter(object):
 
             # If the traceback for current exception is consumed, try the
             # other exception.
-            if six.PY2:
-                tb = tb.tb_next
-            elif not tb.tb_next and exceptions:
+            if not tb.tb_next and exceptions:
                 exc_value = exceptions.pop()
                 tb = exc_value.__traceback__
             else:
                 tb = tb.tb_next
 
         return frames
-
-    def format_exception(self):
-        """
-        Return the same data as from traceback.format_exception.
-        """
-        import traceback
-        frames = self.get_traceback_frames()
-        tb = [(f['filename'], f['lineno'], f['function'], f['context_line']) for f in frames]
-        list = ['Traceback (most recent call last):\n']
-        list += traceback.format_list(tb)
-        list += traceback.format_exception_only(self.exc_type, self.exc_value)
-        return list
 
 
 def technical_404_response(request, exception):
@@ -494,7 +485,7 @@ def technical_404_response(request, exception):
         'root_urlconf': settings.ROOT_URLCONF,
         'request_path': error_url,
         'urlpatterns': tried,
-        'reason': force_bytes(exception, errors='replace'),
+        'reason': str(exception),
         'request': request,
         'settings': get_safe_settings(),
         'raising_view_name': caller,
@@ -510,7 +501,6 @@ def default_urlconf(request):
         "heading": _("It worked!"),
         "subheading": _("Congratulations on your first Django-powered page."),
         "instructions": _(
-            "Of course, you haven't actually done any work yet. "
             "Next, start your first app by running <code>python manage.py startapp [app_label]</code>."
         ),
         "explanation": _(
@@ -520,6 +510,7 @@ def default_urlconf(request):
     })
 
     return HttpResponse(t.render(c), content_type='text/html')
+
 
 #
 # Templates are embedded in the file so that we know the error handler will
@@ -533,7 +524,7 @@ TECHNICAL_500_TEMPLATE = ("""
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="robots" content="NONE,NOARCHIVE">
   <title>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}"""
-"""{% if request %} at {{ request.path_info|escape }}{% endif %}</title>
+r"""{% if request %} at {{ request.path_info|escape }}{% endif %}</title>
   <style type="text/css">
     html * { padding:0; margin:0; }
     body * { padding:10px 20px; }
@@ -636,13 +627,13 @@ TECHNICAL_500_TEMPLATE = ("""
       var s = link.getElementsByTagName('span')[0];
       var uarr = String.fromCharCode(0x25b6);
       var darr = String.fromCharCode(0x25bc);
-      s.innerHTML = s.innerHTML == uarr ? darr : uarr;
+      s.textContent = s.textContent == uarr ? darr : uarr;
       return false;
     }
     function switchPastebinFriendly(link) {
       s1 = "Switch to copy-and-paste view";
       s2 = "Switch back to interactive view";
-      link.innerHTML = link.innerHTML.trim() == s1 ? s2: s1;
+      link.textContent = link.textContent.trim() == s1 ? s2: s1;
       toggle('browserTraceback', 'pastebinTraceback');
       return false;
     }
@@ -726,7 +717,6 @@ TECHNICAL_500_TEMPLATE = ("""
                     {% for attempt in entry.tried %}
                         <li><code>{{ attempt.0.loader_name }}</code>: {{ attempt.0.name }} ({{ attempt.1 }})</li>
                     {% endfor %}
-                    </ul>
                 {% else %}
                     <li>This engine did not provide a list of tried templates.</li>
                 {% endif %}
@@ -852,8 +842,8 @@ Python Version: {{ sys_version_info }}
 Installed Applications:
 {{ settings.INSTALLED_APPS|pprint }}
 Installed Middleware:
-{% if settings.MIDDLEWARE is not None %}{{ settings.MIDDLEWARE|pprint }}"""
-"""{% else %}{{ settings.MIDDLEWARE_CLASSES|pprint }}{% endif %}
+{{ settings.MIDDLEWARE|pprint }}"""
+"""
 
 {% if template_does_not_exist %}Template loader postmortem
 {% if postmortem %}Django tried loading these templates, in this order:
@@ -899,9 +889,9 @@ Exception Value: {{ exception_value|force_escape }}
   <h2>Request information</h2>
 
 {% if request %}
-  {% if request.user %}
+  {% if user_str %}
     <h3 id="user-info">USER</h3>
-    <p>{{ request.user }}</p>
+    <p>{{ user_str }}</p>
   {% endif %}
 
   <h3 id="get-info">GET</h3>
@@ -914,10 +904,10 @@ Exception Value: {{ exception_value|force_escape }}
         </tr>
       </thead>
       <tbody>
-        {% for var in request.GET.items %}
+        {% for k, v in request_GET_items %}
           <tr>
-            <td>{{ var.0 }}</td>
-            <td class="code"><pre>{{ var.1|pprint }}</pre></td>
+            <td>{{ k }}</td>
+            <td class="code"><pre>{{ v|pprint }}</pre></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -927,7 +917,7 @@ Exception Value: {{ exception_value|force_escape }}
   {% endif %}
 
   <h3 id="post-info">POST</h3>
-  {% if filtered_POST %}
+  {% if filtered_POST_items %}
     <table class="req">
       <thead>
         <tr>
@@ -936,10 +926,10 @@ Exception Value: {{ exception_value|force_escape }}
         </tr>
       </thead>
       <tbody>
-        {% for var in filtered_POST.items %}
+        {% for k, v in filtered_POST_items %}
           <tr>
-            <td>{{ var.0 }}</td>
-            <td class="code"><pre>{{ var.1|pprint }}</pre></td>
+            <td>{{ k }}</td>
+            <td class="code"><pre>{{ v|pprint }}</pre></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -957,10 +947,10 @@ Exception Value: {{ exception_value|force_escape }}
             </tr>
         </thead>
         <tbody>
-            {% for var in request.FILES.items %}
+            {% for k, v in request_FILES_items %}
                 <tr>
-                    <td>{{ var.0 }}</td>
-                    <td class="code"><pre>{{ var.1|pprint }}</pre></td>
+                    <td>{{ k }}</td>
+                    <td class="code"><pre>{{ v|pprint }}</pre></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -980,10 +970,10 @@ Exception Value: {{ exception_value|force_escape }}
         </tr>
       </thead>
       <tbody>
-        {% for var in request.COOKIES.items %}
+        {% for k, v in request_COOKIES_items %}
           <tr>
-            <td>{{ var.0 }}</td>
-            <td class="code"><pre>{{ var.1|pprint }}</pre></td>
+            <td>{{ k }}</td>
+            <td class="code"><pre>{{ v|pprint }}</pre></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -1060,8 +1050,8 @@ Server time: {{server_time|date:"r"}}
 Installed Applications:
 {{ settings.INSTALLED_APPS|pprint }}
 Installed Middleware:
-{% if settings.MIDDLEWARE is not None %}{{ settings.MIDDLEWARE|pprint }}"""
-"""{% else %}{{ settings.MIDDLEWARE_CLASSES|pprint }}{% endif %}
+{{ settings.MIDDLEWARE|pprint }}"""
+"""
 {% if template_does_not_exist %}Template loader postmortem
 {% if postmortem %}Django tried loading these templates, in this order:
 {% for entry in postmortem %}
@@ -1100,18 +1090,18 @@ File "{{ frame.filename }}" in {{ frame.function }}
 {% if exception_type %}Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
 {% if exception_value %}Exception Value: {{ exception_value }}{% endif %}{% endif %}{% endif %}
 {% if request %}Request information:
-{% if request.user %}USER: {{ request.user }}{% endif %}
+{% if user_str %}USER: {{ user_str }}{% endif %}
 
-GET:{% for k, v in request.GET.items %}
+GET:{% for k, v in request_GET_items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No GET data{% endfor %}
 
-POST:{% for k, v in filtered_POST.items %}
+POST:{% for k, v in filtered_POST_items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No POST data{% endfor %}
 
-FILES:{% for k, v in request.FILES.items %}
+FILES:{% for k, v in request_FILES_items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No FILES data{% endfor %}
 
-COOKIES:{% for k, v in request.COOKIES.items %}
+COOKIES:{% for k, v in request_COOKIES_items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No cookie data{% endfor %}
 
 META:{% for k, v in request.META.items|dictsort:0 %}
@@ -1190,7 +1180,11 @@ TECHNICAL_404_TEMPLATE = """
           </li>
         {% endfor %}
       </ol>
-      <p>The current URL, <code>{{ request_path|escape }}</code>, didn't match any of these.</p>
+      <p>
+        {% if request_path %}
+        The current path, <code>{{ request_path|escape }}</code>,{% else %}
+        The empty path{% endif %} didn't match any of these.
+      </p>
     {% else %}
       <p>{{ reason }}</p>
     {% endif %}

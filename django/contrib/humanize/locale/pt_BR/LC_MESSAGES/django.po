@@ -3,7 +3,7 @@
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
-# Eduardo Carvalho <eduardocereto@gmail.com>, 2012
+# Eduardo Cereto Carvalho, 2012
 # Guilherme Gondim, 2012-2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Sandro <sandrossv@hotmail.com>, 2011

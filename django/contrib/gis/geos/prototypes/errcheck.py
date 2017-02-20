@@ -13,12 +13,12 @@ free.argtypes = [c_void_p]
 
 
 def last_arg_byref(args):
-    "Returns the last C argument's value by reference."
+    "Return the last C argument's value by reference."
     return args[-1]._obj.value
 
 
 def check_dbl(result, func, cargs):
-    "Checks the status code and returns the double value passed in by reference."
+    "Check the status code and returns the double value passed in by reference."
     # Checking the status code
     if result != 1:
         return None

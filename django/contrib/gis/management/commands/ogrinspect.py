@@ -74,7 +74,7 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--name-field', dest='name_field',
-            help='Specifies a field name to return for the `__unicode__`/`__str__` function.',
+            help='Specifies a field name to return for the __str__() method.',
         )
         parser.add_argument(
             '--no-imports', action='store_false', dest='imports', default=True,
@@ -98,8 +98,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         data_source, model_name = options.pop('data_source'), options.pop('model_name')
-        if not gdal.HAS_GDAL:
-            raise CommandError('GDAL is required to inspect geospatial data sources.')
 
         # Getting the OGR DataSource from the string parameter.
         try:

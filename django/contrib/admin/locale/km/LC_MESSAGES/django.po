@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Khmer (http://www.transifex.com/django/django/language/km/)\n"
 "MIME-Version: 1.0\n"
@@ -61,6 +61,12 @@ msgstr "ខែ​នេះ"
 msgid "This year"
 msgstr "ឆ្នាំ​នេះ"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -69,6 +75,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr ""
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr ""
+
+msgid "Remove"
+msgstr "លប់ចេញ"
 
 msgid "action time"
 msgstr "ពេលវេលាប្រតិបត្តិការ"
@@ -82,6 +95,8 @@ msgstr ""
 msgid "object id"
 msgstr "លេខ​សំគាល់​កម្មវិធី (object id)"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "object repr"
 
@@ -112,6 +127,31 @@ msgstr ""
 msgid "LogEntry Object"
 msgstr ""
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "និង"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "ពុំមានទិន្នន័យត្រូវបានផ្លាស់ប្តូរ។"
+
 msgid "None"
 msgstr ""
 
@@ -119,63 +159,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-msgid "Added."
-msgstr ""
-
-#, python-format
-msgid "Changed %s."
-msgstr "បានផ្លាស់ប្តូរ %s"
-
-msgid "and"
-msgstr "និង"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr ""
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr ""
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr ""
-
-msgid "No fields changed."
-msgstr "ពុំមានទិន្នន័យត្រូវបានផ្លាស់ប្តូរ។"
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"ឈ្មោះកម្មវីធី %(name)s \"%(obj)s\" ត្រូវបានបន្ថែមដោយជោគជ័យ។"
-" លោកអ្នកអាចផ្លាស់ប្តូរម្តងទៀតនៅខាងក្រោម។"
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "ឈ្មោះកម្មវិធី %(name)s \"%(obj)s\" បានបញ្ជូលដោយជោគជ័យ​។"
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "កម្មវិធីឈ្មោះ %(name)s \"%(obj)s\" ត្រូវបានផ្លាស់ប្តូរដោយជោគជ័យ។"
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -323,18 +335,15 @@ msgstr "ឯកសារ"
 msgid "Log out"
 msgstr "ចាកចេញ"
 
-msgid "Add"
-msgstr "បន្ថែម"
+#, python-format
+msgid "Add %(name)s"
+msgstr "បន្ថែម %(name)s"
 
 msgid "History"
 msgstr "សកម្មភាព​កន្លង​មក"
 
 msgid "View on site"
 msgstr "មើលនៅលើគេហទំព័រដោយផ្ទាល់"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "បន្ថែម %(name)s"
 
 msgid "Filter"
 msgstr "ស្វែងរកជាមួយ"
@@ -409,13 +418,6 @@ msgstr ""
 msgid "Change"
 msgstr "ផ្លាស់ប្តូរ"
 
-msgid "Remove"
-msgstr "លប់ចេញ"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr ""
-
 msgid "Delete?"
 msgstr ""
 
@@ -430,14 +432,17 @@ msgstr ""
 msgid "Models in the %(name)s application"
 msgstr ""
 
+msgid "Add"
+msgstr "បន្ថែម"
+
 msgid "You don't have permission to edit anything."
 msgstr "លោកអ្នកពុំមានសិទ្ធិ ផ្លាស់​ប្តូរ ទេ។"
 
-msgid "Recent Actions"
-msgstr "សកម្មភាពបច្ចុប្បន្ន"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "សកម្មភាពរបស់ខ្ញុំ"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "គ្មាន"

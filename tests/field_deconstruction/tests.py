@@ -1,10 +1,7 @@
-from __future__ import unicode_literals
-
 from django.apps import apps
 from django.db import models
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import isolate_lru_cache
-from django.utils import six
 
 
 class FieldDeconstructionTests(SimpleTestCase):
@@ -23,7 +20,6 @@ class FieldDeconstructionTests(SimpleTestCase):
         field.set_attributes_from_name("is_awesome_test")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(name, "is_awesome_test")
-        self.assertIsInstance(name, six.text_type)
         # Now try with a ForeignKey
         field = models.ForeignKey("some_fake.ModelName", models.CASCADE)
         name, path, args, kwargs = field.deconstruct()
@@ -158,11 +154,11 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(kwargs, {"upload_to": "foo/bar", "max_length": 200})
 
     def test_file_path_field(self):
-        field = models.FilePathField(match=".*\.txt$")
+        field = models.FilePathField(match=r".*\.txt$")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.FilePathField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"match": ".*\.txt$"})
+        self.assertEqual(kwargs, {"match": r".*\.txt$"})
         field = models.FilePathField(recursive=True, allow_folders=True, max_length=123)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.FilePathField")

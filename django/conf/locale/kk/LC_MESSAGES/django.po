@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-12-15 04:39+0000\n"
-"Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Kazakh (http://www.transifex.com/django/django/language/kk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -60,6 +60,9 @@ msgstr "Дания"
 
 msgid "German"
 msgstr "Неміс"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "Грек"
@@ -130,6 +133,9 @@ msgstr "Хинди"
 msgid "Croatian"
 msgstr "Кроат"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "Венгрия"
 
@@ -190,8 +196,8 @@ msgstr ""
 msgid "Burmese"
 msgstr ""
 
-msgid "Norwegian Bokmal"
-msgstr "Норвегиялық букмол"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr ""
@@ -287,9 +293,6 @@ msgid "Static Files"
 msgstr ""
 
 msgid "Syndication"
-msgstr ""
-
-msgid "Web Design"
 msgstr ""
 
 msgid "Enter a valid value."
@@ -416,6 +419,9 @@ msgstr "Бүтін сан"
 msgid "'%(value)s' value must be an integer."
 msgstr ""
 
+msgid "Big (8 byte) integer"
+msgstr "Ұзын (8 байт) бүтін сан"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr ""
@@ -489,9 +495,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr "Реал сан"
 
-msgid "Big (8 byte) integer"
-msgstr "Ұзын (8 байт) бүтін сан"
-
 msgid "IPv4 address"
 msgstr ""
 
@@ -561,6 +564,14 @@ msgstr "Foreign Key (тип related field арқылы анықталады)"
 
 msgid "One-to-one relationship"
 msgstr "One-to-one қатынас"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "Many-to-many қатынас"

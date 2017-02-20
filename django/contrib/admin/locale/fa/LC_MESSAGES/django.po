@@ -5,14 +5,15 @@
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Pouya Abbassi, 2016
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-29 23:38+0000\n"
-"Last-Translator: Ali Vakilzade <ali.vakilzade@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-08-16 13:50+0000\n"
+"Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -66,6 +67,12 @@ msgstr "این ماه"
 msgid "This year"
 msgstr "امسال"
 
+msgid "No date"
+msgstr "بدون تاریخ"
+
+msgid "Has date"
+msgstr "دارای تاریخ"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -76,6 +83,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "اقدام:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "افزودن یک %(verbose_name)s دیگر"
+
+msgid "Remove"
+msgstr "حذف"
 
 msgid "action time"
 msgstr "زمان اقدام"
@@ -89,6 +103,8 @@ msgstr "نوع محتوی"
 msgid "object id"
 msgstr "شناسهٔ شیء"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "صورت شیء"
 
@@ -119,6 +135,31 @@ msgstr "\"%(object)s\" حدف شد."
 msgid "LogEntry Object"
 msgstr "شئ LogEntry"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "اضافه شد {name} «{object}»."
+
+msgid "Added."
+msgstr "اضافه شد"
+
+msgid "and"
+msgstr "و"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "{fields} برای {name} \"{object}\" تغییر یافتند."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "{fields} تغییر یافتند."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "{name} \"{object}\" حذف شد."
+
+msgid "No fields changed."
+msgstr "فیلدی تغییر نیافته است."
+
 msgid "None"
 msgstr "هیچ"
 
@@ -128,68 +169,43 @@ msgstr ""
 "برای انتخاب بیش از یکی \"Control\"، یا \"Command\" روی Mac، را پایین نگه "
 "دارید."
 
-msgid "Added."
-msgstr "اضافه شد"
-
-#, python-format
-msgid "Changed %s."
-msgstr "%s تغییر یافته."
-
-msgid "and"
-msgstr "و"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "%(name)s «%(object)s» اضافه شد."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "%(list)s %(name)s «%(object)s» تغییر یافت."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "%(name)s «%(object)s» حذف شد."
-
-msgid "No fields changed."
-msgstr "فیلدی تغییر نیافته است."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s·\"%(obj)s\" با موفقیت اضافه شد. می‌توانید در این پایین ویرایشش کنید."
+" {name} \"{obj}\" به موفقیت اضافه شد. شما میتوانید در قسمت پایین، آنرا "
+"ویرایش کنید."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" با موفقیت اضافه شد. شما می‌توانید در ذیل یک %(name)s "
-"دیگر اضافه نمایید."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s «%(obj)s» با موفقیت اضافه شد."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"%(name)s \"%(obj)s\" با موفقیت تغییر یافت. شما می‌توانید در ذیل مجدداُ آنرا "
-"ویرایش نمایید."
+"{name} \"{obj}\" با موفقیت اضافه شد. شما میتوانید {name} دیگری در قسمت پایین "
+"اضافه کنید."
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" با موفقیت اضافه شد."
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" با موفقیت تغییر یافت. شما می‌توانید در ذیل یک %(name)s "
-"دیگر اضافه نمایید."
+"{name} \"{obj}\" با موفقیت تغییر یافت. شما میتوانید دوباره آنرا در قسمت "
+"پایین ویرایش کنید."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s·\"%(obj)s\" با موفقیت تغییر یافت."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"{name} \"{obj}\" با موفقیت تغییر یافت. شما میتوانید {name} دیگری در قسمت "
+"پایین اضافه کنید."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name} \"{obj}\" با موفقیت تغییر یافت."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -344,18 +360,15 @@ msgstr "مستندات"
 msgid "Log out"
 msgstr "خروج"
 
-msgid "Add"
-msgstr "اضافه کردن"
+#, python-format
+msgid "Add %(name)s"
+msgstr "اضافه‌کردن %(name)s"
 
 msgid "History"
 msgstr "تاریخچه"
 
 msgid "View on site"
 msgstr "مشاهده در وب‌گاه"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "اضافه‌کردن %(name)s"
 
 msgid "Filter"
 msgstr "فیلتر"
@@ -438,13 +451,6 @@ msgstr ""
 msgid "Change"
 msgstr "تغییر"
 
-msgid "Remove"
-msgstr "حذف"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "افزودن یک %(verbose_name)s دیگر"
-
 msgid "Delete?"
 msgstr "حذف؟"
 
@@ -459,14 +465,17 @@ msgstr "خلاصه"
 msgid "Models in the %(name)s application"
 msgstr "مدلها در برنامه %(name)s "
 
+msgid "Add"
+msgstr "اضافه کردن"
+
 msgid "You don't have permission to edit anything."
 msgstr "شما اجازهٔ ویرایش چیزی را ندارید."
 
-msgid "Recent Actions"
-msgstr "اعمال اخیر"
+msgid "Recent actions"
+msgstr "فعالیتهای اخیر"
 
-msgid "My Actions"
-msgstr "اعمال من"
+msgid "My actions"
+msgstr "فعالیتهای من"
 
 msgid "None available"
 msgstr "چیزی در دسترس نیست"

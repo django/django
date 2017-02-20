@@ -28,9 +28,7 @@ class TimeInputTest(WidgetTest):
         ))
 
     def test_string(self):
-        """
-        We should be able to initialize from a unicode value.
-        """
+        """Initializing from a string value."""
         self.check_html(self.widget, 'time', '13:12:11', html=(
             '<input type="text" name="time" value="13:12:11" />'
         ))

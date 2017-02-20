@@ -33,7 +33,7 @@ also need a database engine. PostgreSQL_ is recommended, because we're
 PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 
 .. _Python: https://www.python.org/
-.. _PostgreSQL: http://www.postgresql.org/
+.. _PostgreSQL: https://www.postgresql.org/
 .. _MySQL: https://www.mysql.com/
 .. _`SQLite 3`: https://www.sqlite.org/
 .. _Oracle: http://www.oracle.com/
@@ -47,7 +47,9 @@ What Python version can I use with Django?
 Django version Python versions
 ============== ===============
 1.8            2.7, 3.2 (until the end of 2016), 3.3, 3.4, 3.5
-**1.9, 1.10**  **2.7, 3.4, 3.5**
+1.9, 1.10      2.7, 3.4, 3.5
+1.11           2.7, 3.4, 3.5, 3.6
+2.0            3.5+
 ============== ===============
 
 For each version of Python, only the latest micro release (A.B.C) is officially
@@ -63,18 +65,11 @@ is the last version to support Python 3.3.
 What Python version should I use with Django?
 =============================================
 
-As of Django 1.6, Python 3 support is considered stable and you can safely use
-it in production. See also :doc:`/topics/python3`. However, the community is
-still in the process of migrating third-party packages and applications to
-Python 3.
-
-If you're starting a new project, and the dependencies you plan to use work on
-Python 3, you should use Python 3. If they don't, consider contributing to the
-porting efforts, or stick to Python 2.
+Python 3 is recommended. Django 1.11 is the last version to support Python 2.7.
+Support for Python 2.7 and Django 1.11 ends in 2020.
 
 Since newer versions of Python are often faster, have more features, and are
-better supported, all else being equal, we recommend that you use the latest
-2.x.y or 3.x.y release.
+better supported, the latest version of Python 3 is recommended.
 
 You don't lose anything in Django by using an older release, but you don't take
 advantage of the improvements and optimizations in newer Python releases.

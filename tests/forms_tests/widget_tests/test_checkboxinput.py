@@ -18,7 +18,7 @@ class CheckboxInputTest(WidgetTest):
     def test_render_true(self):
         self.check_html(
             self.widget, 'is_cool', True,
-            html='<input checked="checked" type="checkbox" name="is_cool" />'
+            html='<input checked type="checkbox" name="is_cool" />'
         )
 
     def test_render_value(self):
@@ -28,7 +28,7 @@ class CheckboxInputTest(WidgetTest):
         """
         self.check_html(
             self.widget, 'is_cool', 'foo',
-            html='<input checked="checked" type="checkbox" name="is_cool" value="foo" />',
+            html='<input checked type="checkbox" name="is_cool" value="foo" />',
         )
 
     def test_render_int(self):
@@ -37,11 +37,11 @@ class CheckboxInputTest(WidgetTest):
         """
         self.check_html(
             self.widget, 'is_cool', 0,
-            html='<input checked="checked" type="checkbox" name="is_cool" value="0" />',
+            html='<input checked type="checkbox" name="is_cool" value="0" />',
         )
         self.check_html(
             self.widget, 'is_cool', 1,
-            html='<input checked="checked" type="checkbox" name="is_cool" value="1" />',
+            html='<input checked type="checkbox" name="is_cool" value="1" />',
         )
 
     def test_render_check_test(self):
@@ -54,13 +54,13 @@ class CheckboxInputTest(WidgetTest):
             '<input type="checkbox" name="greeting" />'
         ))
         self.check_html(widget, 'greeting', 'hello', html=(
-            '<input checked="checked" type="checkbox" name="greeting" value="hello" />'
+            '<input checked type="checkbox" name="greeting" value="hello" />'
         ))
         self.check_html(widget, 'greeting', 'hello there', html=(
-            '<input checked="checked" type="checkbox" name="greeting" value="hello there" />'
+            '<input checked type="checkbox" name="greeting" value="hello there" />'
         ))
         self.check_html(widget, 'greeting', 'hello & goodbye', html=(
-            '<input checked="checked" type="checkbox" name="greeting" value="hello &amp; goodbye" />'
+            '<input checked type="checkbox" name="greeting" value="hello &amp; goodbye" />'
         ))
 
     def test_render_check_exception(self):
@@ -84,4 +84,8 @@ class CheckboxInputTest(WidgetTest):
 
     def test_value_from_datadict_string_int(self):
         value = self.widget.value_from_datadict({'testing': '0'}, {}, 'testing')
-        self.assertEqual(value, True)
+        self.assertIs(value, True)
+
+    def test_value_omitted_from_data(self):
+        self.assertIs(self.widget.value_omitted_from_data({'field': 'value'}, {}, 'field'), False)
+        self.assertIs(self.widget.value_omitted_from_data({}, {}, 'field'), False)

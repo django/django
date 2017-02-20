@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:34+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Khmer (http://www.transifex.com/django/django/language/km/)\n"
 "MIME-Version: 1.0\n"
@@ -57,6 +57,9 @@ msgstr "ភាសាដាណឺម៉ាក"
 
 msgid "German"
 msgstr "ភាសាអាល្លឺម៉ង់"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "ភាសាហ្កែលិគ"
@@ -127,6 +130,9 @@ msgstr ""
 msgid "Croatian"
 msgstr ""
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "ភាសាហុងគ្រី"
 
@@ -187,7 +193,7 @@ msgstr ""
 msgid "Burmese"
 msgstr ""
 
-msgid "Norwegian Bokmal"
+msgid "Norwegian Bokmål"
 msgstr ""
 
 msgid "Nepali"
@@ -284,9 +290,6 @@ msgid "Static Files"
 msgstr ""
 
 msgid "Syndication"
-msgstr ""
-
-msgid "Web Design"
 msgstr ""
 
 msgid "Enter a valid value."
@@ -408,6 +411,9 @@ msgstr "ចំនួនពិត(Integer)"
 msgid "'%(value)s' value must be an integer."
 msgstr ""
 
+msgid "Big (8 byte) integer"
+msgstr ""
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr ""
@@ -481,9 +487,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr ""
 
-msgid "Big (8 byte) integer"
-msgstr ""
-
 msgid "IPv4 address"
 msgstr ""
 
@@ -552,6 +555,14 @@ msgid "Foreign Key (type determined by related field)"
 msgstr ""
 
 msgid "One-to-one relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
 msgstr ""
 
 msgid "Many-to-many relationship"

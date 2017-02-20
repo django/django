@@ -4,13 +4,14 @@
 # Anivar Aravind <anivar.aravind@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffy <jeffymj@gmail.com>, 2012
+# Rag sagar <ragsagar@gmail.com>, 2016
 # Rajeesh Nair <rajeeshrnair@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Malayalam (http://www.transifex.com/django/django/language/"
 "ml/)\n"
@@ -27,7 +28,7 @@ msgid "Arabic"
 msgstr "അറബിക്"
 
 msgid "Asturian"
-msgstr ""
+msgstr "ആസ്ടൂറിയൻ"
 
 msgid "Azerbaijani"
 msgstr "അസര്‍ബൈജാനി"
@@ -62,6 +63,9 @@ msgstr "ഡാനിഷ്"
 msgid "German"
 msgstr "ജര്‍മന്‍"
 
+msgid "Lower Sorbian"
+msgstr ""
+
 msgid "Greek"
 msgstr "ഗ്രീക്ക്"
 
@@ -69,7 +73,7 @@ msgid "English"
 msgstr "ഇംഗ്ളീഷ്"
 
 msgid "Australian English"
-msgstr ""
+msgstr "ആസ്ട്രേലിയൻ ഇംഗ്ലീഷ്"
 
 msgid "British English"
 msgstr "ബ്രിട്ടീഷ് ഇംഗ്ളീഷ്"
@@ -84,7 +88,7 @@ msgid "Argentinian Spanish"
 msgstr "അര്‍ജന്റീനിയന്‍ സ്പാനിഷ്"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "കൊളംബിയൻ സ്പാനിഷ്"
 
 msgid "Mexican Spanish"
 msgstr "മെക്സിക്കന്‍ സ്പാനിഷ്"
@@ -117,7 +121,7 @@ msgid "Irish"
 msgstr "ഐറിഷ്"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "സ്കോട്ടിഷ് ഗൈലിക്ക്"
 
 msgid "Galician"
 msgstr "ഗലിഷ്യന്‍"
@@ -131,6 +135,9 @@ msgstr "ഹിന്ദി"
 msgid "Croatian"
 msgstr "ക്രൊയേഷ്യന്‍"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "ഹംഗേറിയന്‍"
 
@@ -141,7 +148,7 @@ msgid "Indonesian"
 msgstr "ഇന്തൊനേഷ്യന്‍"
 
 msgid "Ido"
-msgstr ""
+msgstr "ഈടോ"
 
 msgid "Icelandic"
 msgstr "ഐസ്ലാന്‍ഡിക്"
@@ -186,13 +193,13 @@ msgid "Mongolian"
 msgstr "മംഗോളിയന്‍"
 
 msgid "Marathi"
-msgstr ""
+msgstr "മറാത്തി"
 
 msgid "Burmese"
 msgstr "ബര്‍മീസ്"
 
-msgid "Norwegian Bokmal"
-msgstr "നോര്‍വീജിയന്‍ ബൊക്മാല്‍"
+msgid "Norwegian Bokmål"
+msgstr "നോർവേജിയൻ ബുക്ക്മൊൾ"
 
 msgid "Nepali"
 msgstr "നേപ്പാളി"
@@ -279,19 +286,16 @@ msgid "Traditional Chinese"
 msgstr "പരമ്പരാഗത ചൈനീസ്"
 
 msgid "Messages"
-msgstr ""
+msgstr "സന്ദേശങ്ങൾ"
 
 msgid "Site Maps"
-msgstr ""
+msgstr "സൈറ്റ് മാപ്പ്"
 
 msgid "Static Files"
-msgstr ""
+msgstr " സ്റ്റാറ്റിക്ക് ഫയൽസ്"
 
 msgid "Syndication"
-msgstr ""
-
-msgid "Web Design"
-msgstr ""
+msgstr "വിതരണം "
 
 msgid "Enter a valid value."
 msgstr "സാധുതയുള്ള മൂല്യം നല്‍കുക."
@@ -300,7 +304,7 @@ msgid "Enter a valid URL."
 msgstr "സാധുതയുള്ള URL നല്‍കുക"
 
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "സാധുതയുള്ള അക്കം നല്കുക."
 
 msgid "Enter a valid email address."
 msgstr "സാധുതയുള്ള ഇമെയില്‍ വിലാസം നല്‍കുക"
@@ -407,6 +411,7 @@ msgstr "%(field_label)s-ഓടു കൂടിയ %(model_name)s നിലവി
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"%(date_field_label)s %(lookup_type)s-നു %(field_label)s ആവര്‍ത്തിക്കാന്‍ പാടില്ല."
 
 #, python-format
 msgid "Field of type: %(field_type)s"
@@ -417,11 +422,14 @@ msgstr "പൂര്‍ണ്ണസംഖ്യ"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "'%(value)s' ന്റെ മൂല്യം ഒരു പൂർണ്ണസംഖ്യായിരിക്കണം."
+
+msgid "Big (8 byte) integer"
+msgstr "8 ബൈറ്റ് പൂര്‍ണസംഖ്യ."
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "'%(value)s' മൂല്യം True അഥവാ False ആയിരിക്കണം."
 
 msgid "Boolean (Either True or False)"
 msgstr "ശരിയോ തെറ്റോ (True അഥവാ False)"
@@ -438,12 +446,13 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"'%(value)s' മൂല്യം തെറ്റായ മാതൃകയിലാണ്. അത് YYYY-MM-DD എന്ന മാതൃകയിലാണ് നല്കേണ്ടത്."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
-msgstr ""
+msgstr "'%(value)s' മൂല്യം ശരിയായ മാതൃകയിലാണ് (YYYY-MM-DD) പക്ഷേ തീയതി തെറ്റാണ്."
 
 msgid "Date (without time)"
 msgstr "തീയതി (സമയം വേണ്ട)"
@@ -465,7 +474,7 @@ msgstr "തീയതി (സമയത്തോടൊപ്പം)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "'%(value)s' മൂല്യം ഒരു ദശാംശസംഖ്യ decimal ആയിരിക്കണം."
 
 msgid "Decimal number"
 msgstr "ദശാംശസംഖ്യ"
@@ -475,9 +484,11 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"'%(value)s' മൂല്യം തെറ്റായ മാതൃകയിലാണ്. അത്  [DD] [HH:[MM:]]ss[.uuuuuu] എന്ന "
+"മാതൃകയിലാണ് നല്കേണ്ടത്."
 
 msgid "Duration"
-msgstr ""
+msgstr "കാലയളവ്"
 
 msgid "Email address"
 msgstr "ഇ-മെയില്‍ വിലാസം"
@@ -487,13 +498,10 @@ msgstr "ഫയല്‍ സ്ഥാനം"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "'%(value)s' മൂല്യം ഒരു ദശാംശസംഖ്യ float ആയിരിക്കണം."
 
 msgid "Floating point number"
 msgstr "ദശാംശസംഖ്യ"
-
-msgid "Big (8 byte) integer"
-msgstr "8 ബൈറ്റ് പൂര്‍ണസംഖ്യ."
 
 msgid "IPv4 address"
 msgstr "IPv4 വിലാസം"
@@ -503,7 +511,7 @@ msgstr "IP വിലാസം"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "'%(value)s' മൂല്യം None, True, False എന്നിവയില്‍ ഏതെങ്കിലും ഒന്നായിരിക്കണം."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "ശരിയോ തെറ്റോ എന്നു മാത്രം (True, False, None എന്നിവയില്‍ ഏതെങ്കിലും ഒന്ന്)"
@@ -529,12 +537,15 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"'%(value)s' മൂല്യം ശരിയായ മാതൃകയിലല്ല. അത് HH:MM[:ss[.uuuuuu]] എന്ന മാതൃകയിലാവണം."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"'%(value)s' മൂല്യം ശരിയായ മാതൃകയിലാണ് (HH:MM[:ss[.uuuuuu]]) പക്ഷേ തെറ്റായ സമയത്തെ "
+"സൂചിപ്പിക്കുന്നു."
 
 msgid "Time"
 msgstr "സമയം"
@@ -543,11 +554,11 @@ msgid "URL"
 msgstr "URL(വെബ്-വിലാസം)"
 
 msgid "Raw binary data"
-msgstr ""
+msgstr "റോ ബൈനറി ഡാറ്റ"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "'%(value)s' ഒരു സാധുവായ യു യു ഐ ഡി അല്ലാ."
 
 msgid "File"
 msgstr "ഫയല്‍"
@@ -565,6 +576,14 @@ msgstr "ഫോറിന്‍ കീ (ടൈപ്പ് ബന്ധപ്പ�
 msgid "One-to-one relationship"
 msgstr "വണ്‍-ടു-വണ്‍ ബന്ധം"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
+
 msgid "Many-to-many relationship"
 msgstr "മെനി-ടു-മെനി ബന്ധം"
 
@@ -572,7 +591,7 @@ msgstr "മെനി-ടു-മെനി ബന്ധം"
 #. characters will prevent the default label_suffix to be appended to the
 #. label
 msgid ":?.!"
-msgstr ""
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "ഈ കള്ളി(ഫീല്‍ഡ്) നിര്‍ബന്ധമാണ്."
@@ -593,7 +612,7 @@ msgid "Enter a valid date/time."
 msgstr "ശരിയായ തീയതിയും സമയവും നല്കുക."
 
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "സാധുതയുള്ള കാലയളവ് നല്കുക."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "ഫയലൊന്നും ലഭിച്ചിട്ടില്ല. ഫോമിലെ എന്‍-കോഡിംഗ് പരിശോധിക്കുക."
@@ -631,14 +650,14 @@ msgid "Enter a list of values."
 msgstr "മൂല്യങ്ങളുടെ പട്ടിക(ലിസ്റ്റ്) നല്കുക."
 
 msgid "Enter a complete value."
-msgstr ""
+msgstr "പൂർണ്ണമായ വാല്യൂ നല്കുക."
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "സാധുവായ യു യു ഐ ഡി നല്കുക."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
-msgstr ""
+msgstr ":"
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
@@ -978,7 +997,7 @@ msgid "December"
 msgstr "ഡിസംബര്‍"
 
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "ഇതു സാധുവായ IPv6 വിലാസമല്ല."
 
 #, python-format
 msgctxt "String to return when truncating text"
@@ -995,47 +1014,47 @@ msgstr ", "
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d വർഷം"
+msgstr[1] "%d വർഷങ്ങൾ "
 
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d മാസം"
+msgstr[1] "%d മാസങ്ങൾ"
 
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d ആഴ്ച"
+msgstr[1] "%d ആഴ്ചകൾ"
 
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d ദിവസം"
+msgstr[1] "%d ദിവസങ്ങൾ"
 
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d മണിക്കൂർ"
+msgstr[1] "%d മണിക്കൂരുകൾ"
 
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d മിനിറ്റ്"
+msgstr[1] "%d മിനിറ്റുകൾ"
 
 msgid "0 minutes"
-msgstr ""
+msgstr "0 മിനിറ്റ്"
 
 msgid "Forbidden"
-msgstr ""
+msgstr "വിലക്കപ്പെട്ടത്"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr ""
+msgstr "സി എസ് ആർ എഫ് പരിശോധന പരാജയപ്പെട്ടു. റിക്വെസ്റ്റ് റദ്ദാക്കി."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
@@ -1062,16 +1081,16 @@ msgid ""
 msgstr ""
 
 msgid "More information is available with DEBUG=True."
-msgstr ""
+msgstr "Debug=True എന്നു കൊടുത്താൽ കൂടുതൽ കാര്യങ്ങൾ അറിയാൻ കഴിയും."
 
 msgid "Welcome to Django"
-msgstr ""
+msgstr "ജാങ്കോയിലേക്ക് സ്വാഗതം"
 
 msgid "It worked!"
-msgstr ""
+msgstr "ഇതു പ്രവർത്തിക്കിന്നുണ്ട്"
 
 msgid "Congratulations on your first Django-powered page."
-msgstr ""
+msgstr "താങ്കളുടെ ആദ്യത്തെ ജാങ്കോ നിർമ്മിത പേജിന് അഭിനന്ദനങ്ങൾ"
 
 msgid ""
 "Of course, you haven't actually done any work yet. Next, start your first "

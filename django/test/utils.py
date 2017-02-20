@@ -1,3 +1,4 @@
+import collections
 import logging
 import re
 import sys
@@ -5,6 +6,8 @@ import time
 import warnings
 from contextlib import contextmanager
 from functools import wraps
+from io import StringIO
+from types import SimpleNamespace
 from unittest import TestCase, skipIf, skipUnless
 from xml.dom.minidom import Node, parseString
 
@@ -12,16 +15,13 @@ from django.apps import apps
 from django.apps.registry import Apps
 from django.conf import UserSettingsHolder, settings
 from django.core import mail
+from django.core.exceptions import ImproperlyConfigured
 from django.core.signals import request_started
-from django.db import reset_queries
+from django.db import DEFAULT_DB_ALIAS, connections, reset_queries
 from django.db.models.options import Options
-from django.http import request
 from django.template import Template
 from django.test.signals import setting_changed, template_rendered
 from django.urls import get_script_prefix, set_script_prefix
-from django.utils import six
-from django.utils.decorators import available_attrs
-from django.utils.encoding import force_str
 from django.utils.translation import deactivate
 
 try:
@@ -40,7 +40,7 @@ __all__ = (
 TZ_SUPPORT = hasattr(time, 'tzset')
 
 
-class Approximate(object):
+class Approximate:
     def __init__(self, val, places=7):
         self.val = val
         self.places = places
@@ -59,13 +59,19 @@ class ContextList(list):
     in a list of context objects.
     """
     def __getitem__(self, key):
-        if isinstance(key, six.string_types):
+        if isinstance(key, str):
             for subcontext in self:
                 if key in subcontext:
                     return subcontext[key]
             raise KeyError(key)
         else:
-            return super(ContextList, self).__getitem__(key)
+            return super().__getitem__(key)
+
+    def get(self, key, default=None):
+        try:
+            return self.__getitem__(key)
+        except KeyError:
+            return default
 
     def __contains__(self, key):
         try:
@@ -94,24 +100,40 @@ def instrumented_test_render(self, context):
     return self.nodelist.render(context)
 
 
-def setup_test_environment():
-    """Perform any global pre-test setup. This involves:
+class _TestState:
+    pass
 
-        - Installing the instrumented test renderer
-        - Set the email backend to the locmem email backend.
-        - Setting the active locale to match the LANGUAGE_CODE setting.
+
+def setup_test_environment(debug=None):
     """
-    Template._original_render = Template._render
-    Template._render = instrumented_test_render
+    Perform global pre-test setup, such as installing the instrumented template
+    renderer and setting the email backend to the locmem email backend.
+    """
+    if hasattr(_TestState, 'saved_data'):
+        # Executing this function twice would overwrite the saved values.
+        raise RuntimeError(
+            "setup_test_environment() was already called and can't be called "
+            "again without first calling teardown_test_environment()."
+        )
 
-    # Storing previous values in the settings module itself is problematic.
-    # Store them in arbitrary (but related) modules instead. See #20636.
+    if debug is None:
+        debug = settings.DEBUG
 
-    mail._original_email_backend = settings.EMAIL_BACKEND
+    saved_data = SimpleNamespace()
+    _TestState.saved_data = saved_data
+
+    saved_data.allowed_hosts = settings.ALLOWED_HOSTS
+    # Add the default host of the test client.
+    settings.ALLOWED_HOSTS = settings.ALLOWED_HOSTS + ['testserver']
+
+    saved_data.debug = settings.DEBUG
+    settings.DEBUG = debug
+
+    saved_data.email_backend = settings.EMAIL_BACKEND
     settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
-    request._original_allowed_hosts = settings.ALLOWED_HOSTS
-    settings.ALLOWED_HOSTS = ['*']
+    saved_data.template_render = Template._render
+    Template._render = instrumented_test_render
 
     mail.outbox = []
 
@@ -119,21 +141,168 @@ def setup_test_environment():
 
 
 def teardown_test_environment():
-    """Perform any global post-test teardown. This involves:
-
-        - Restoring the original test renderer
-        - Restoring the email sending functions
     """
-    Template._render = Template._original_render
-    del Template._original_render
+    Perform any global post-test teardown, such as restoring the original
+    template renderer and restoring the email sending functions.
+    """
+    saved_data = _TestState.saved_data
 
-    settings.EMAIL_BACKEND = mail._original_email_backend
-    del mail._original_email_backend
+    settings.ALLOWED_HOSTS = saved_data.allowed_hosts
+    settings.DEBUG = saved_data.debug
+    settings.EMAIL_BACKEND = saved_data.email_backend
+    Template._render = saved_data.template_render
 
-    settings.ALLOWED_HOSTS = request._original_allowed_hosts
-    del request._original_allowed_hosts
-
+    del _TestState.saved_data
     del mail.outbox
+
+
+def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, **kwargs):
+    """
+    Create the test databases.
+    """
+    test_databases, mirrored_aliases = get_unique_databases_and_mirrors()
+
+    old_names = []
+
+    for signature, (db_name, aliases) in test_databases.items():
+        first_alias = None
+        for alias in aliases:
+            connection = connections[alias]
+            old_names.append((connection, db_name, first_alias is None))
+
+            # Actually create the database for the first connection
+            if first_alias is None:
+                first_alias = alias
+                connection.creation.create_test_db(
+                    verbosity=verbosity,
+                    autoclobber=not interactive,
+                    keepdb=keepdb,
+                    serialize=connection.settings_dict.get('TEST', {}).get('SERIALIZE', True),
+                )
+                if parallel > 1:
+                    for index in range(parallel):
+                        connection.creation.clone_test_db(
+                            number=index + 1,
+                            verbosity=verbosity,
+                            keepdb=keepdb,
+                        )
+            # Configure all other connections as mirrors of the first one
+            else:
+                connections[alias].creation.set_as_test_mirror(connections[first_alias].settings_dict)
+
+    # Configure the test mirrors.
+    for alias, mirror_alias in mirrored_aliases.items():
+        connections[alias].creation.set_as_test_mirror(
+            connections[mirror_alias].settings_dict)
+
+    if debug_sql:
+        for alias in connections:
+            connections[alias].force_debug_cursor = True
+
+    return old_names
+
+
+def dependency_ordered(test_databases, dependencies):
+    """
+    Reorder test_databases into an order that honors the dependencies
+    described in TEST[DEPENDENCIES].
+    """
+    ordered_test_databases = []
+    resolved_databases = set()
+
+    # Maps db signature to dependencies of all its aliases
+    dependencies_map = {}
+
+    # Check that no database depends on its own alias
+    for sig, (_, aliases) in test_databases:
+        all_deps = set()
+        for alias in aliases:
+            all_deps.update(dependencies.get(alias, []))
+        if not all_deps.isdisjoint(aliases):
+            raise ImproperlyConfigured(
+                "Circular dependency: databases %r depend on each other, "
+                "but are aliases." % aliases
+            )
+        dependencies_map[sig] = all_deps
+
+    while test_databases:
+        changed = False
+        deferred = []
+
+        # Try to find a DB that has all its dependencies met
+        for signature, (db_name, aliases) in test_databases:
+            if dependencies_map[signature].issubset(resolved_databases):
+                resolved_databases.update(aliases)
+                ordered_test_databases.append((signature, (db_name, aliases)))
+                changed = True
+            else:
+                deferred.append((signature, (db_name, aliases)))
+
+        if not changed:
+            raise ImproperlyConfigured("Circular dependency in TEST[DEPENDENCIES]")
+        test_databases = deferred
+    return ordered_test_databases
+
+
+def get_unique_databases_and_mirrors():
+    """
+    Figure out which databases actually need to be created.
+
+    Deduplicate entries in DATABASES that correspond the same database or are
+    configured as test mirrors.
+
+    Return two values:
+    - test_databases: ordered mapping of signatures to (name, list of aliases)
+                      where all aliases share the same underlying database.
+    - mirrored_aliases: mapping of mirror aliases to original aliases.
+    """
+    mirrored_aliases = {}
+    test_databases = {}
+    dependencies = {}
+    default_sig = connections[DEFAULT_DB_ALIAS].creation.test_db_signature()
+
+    for alias in connections:
+        connection = connections[alias]
+        test_settings = connection.settings_dict['TEST']
+
+        if test_settings['MIRROR']:
+            # If the database is marked as a test mirror, save the alias.
+            mirrored_aliases[alias] = test_settings['MIRROR']
+        else:
+            # Store a tuple with DB parameters that uniquely identify it.
+            # If we have two aliases with the same values for that tuple,
+            # we only need to create the test database once.
+            item = test_databases.setdefault(
+                connection.creation.test_db_signature(),
+                (connection.settings_dict['NAME'], set())
+            )
+            item[1].add(alias)
+
+            if 'DEPENDENCIES' in test_settings:
+                dependencies[alias] = test_settings['DEPENDENCIES']
+            else:
+                if alias != DEFAULT_DB_ALIAS and connection.creation.test_db_signature() != default_sig:
+                    dependencies[alias] = test_settings.get('DEPENDENCIES', [DEFAULT_DB_ALIAS])
+
+    test_databases = dependency_ordered(test_databases.items(), dependencies)
+    test_databases = collections.OrderedDict(test_databases)
+    return test_databases, mirrored_aliases
+
+
+def teardown_databases(old_config, verbosity, parallel=0, keepdb=False):
+    """
+    Destroy all the non-mirror databases.
+    """
+    for connection, old_name, destroy in old_config:
+        if destroy:
+            if parallel > 1:
+                for index in range(parallel):
+                    connection.creation.destroy_test_db(
+                        number=index + 1,
+                        verbosity=verbosity,
+                        keepdb=keepdb,
+                    )
+            connection.creation.destroy_test_db(old_name, verbosity, keepdb)
 
 
 def get_runner(settings, test_runner_class=None):
@@ -141,17 +310,17 @@ def get_runner(settings, test_runner_class=None):
         test_runner_class = settings.TEST_RUNNER
 
     test_path = test_runner_class.split('.')
-    # Allow for Python 2.5 relative paths
+    # Allow for relative paths
     if len(test_path) > 1:
         test_module_name = '.'.join(test_path[:-1])
     else:
         test_module_name = '.'
-    test_module = __import__(test_module_name, {}, {}, force_str(test_path[-1]))
+    test_module = __import__(test_module_name, {}, {}, test_path[-1])
     test_runner = getattr(test_module, test_path[-1])
     return test_runner
 
 
-class TestContextDecorator(object):
+class TestContextDecorator:
     """
     A base class that can either be used as a context manager during tests
     or as a test function or unittest.TestCase subclass decorator to perform
@@ -200,7 +369,7 @@ class TestContextDecorator(object):
         raise TypeError('Can only decorate subclasses of unittest.TestCase')
 
     def decorate_callable(self, func):
-        @wraps(func, assigned=available_attrs(func))
+        @wraps(func)
         def inner(*args, **kwargs):
             with self as context:
                 if self.kwarg_name:
@@ -225,7 +394,7 @@ class override_settings(TestContextDecorator):
     """
     def __init__(self, **kwargs):
         self.options = kwargs
-        super(override_settings, self).__init__()
+        super().__init__()
 
     def enable(self):
         # Keep this code at the beginning to leave the settings unchanged
@@ -307,7 +476,7 @@ class modify_settings(override_settings):
                 value = list(getattr(settings, name, []))
             for action, items in operations.items():
                 # items my be a single value or an iterable.
-                if isinstance(items, six.string_types):
+                if isinstance(items, str):
                     items = [items]
                 if action == 'append':
                     value = value + [item for item in items if item not in value]
@@ -318,7 +487,7 @@ class modify_settings(override_settings):
                 else:
                     raise ValueError("Unsupported action: %s" % action)
             self.options[name] = value
-        super(modify_settings, self).enable()
+        super().enable()
 
 
 class override_system_checks(TestContextDecorator):
@@ -332,7 +501,7 @@ class override_system_checks(TestContextDecorator):
         self.registry = registry
         self.new_checks = new_checks
         self.deployment_checks = deployment_checks
-        super(override_system_checks, self).__init__()
+        super().__init__()
 
     def enable(self):
         self.old_checks = self.registry.registered_checks
@@ -352,7 +521,7 @@ def compare_xml(want, got):
     ordering should not be important. Comment nodes are not considered in the
     comparison. Leading and trailing whitespace is ignored on both chunks.
 
-    Based on http://codespeak.net/svn/lxml/trunk/src/lxml/doctestcompare.py
+    Based on https://github.com/lxml/lxml/blob/master/src/lxml/doctestcompare.py
     """
     _norm_whitespace_re = re.compile(r'[ \t\n][ \t\n]+')
 
@@ -425,24 +594,17 @@ def strip_quotes(want, got):
         s = s.strip()
         return len(s) >= 2 and s[0] == s[-1] and s[0] in ('"', "'")
 
-    def is_quoted_unicode(s):
-        s = s.strip()
-        return len(s) >= 3 and s[0] == 'u' and s[1] == s[-1] and s[1] in ('"', "'")
-
     if is_quoted_string(want) and is_quoted_string(got):
         want = want.strip()[1:-1]
         got = got.strip()[1:-1]
-    elif is_quoted_unicode(want) and is_quoted_unicode(got):
-        want = want.strip()[2:-1]
-        got = got.strip()[2:-1]
     return want, got
 
 
 def str_prefix(s):
-    return s % {'_': '' if six.PY3 else 'u'}
+    return s % {'_': ''}
 
 
-class CaptureQueriesContext(object):
+class CaptureQueriesContext:
     """
     Context manager that captures queries executed by the specified connection.
     """
@@ -485,7 +647,7 @@ class ignore_warnings(TestContextDecorator):
             self.filter_func = warnings.filterwarnings
         else:
             self.filter_func = warnings.simplefilter
-        super(ignore_warnings, self).__init__()
+        super().__init__()
 
     def enable(self):
         self.catch_warnings = warnings.catch_warnings()
@@ -557,7 +719,7 @@ def captured_output(stream_name):
     Note: This function and the following ``captured_std*`` are copied
           from CPython's ``test.support`` module."""
     orig_stdout = getattr(sys, stream_name)
-    setattr(sys, stream_name, six.StringIO())
+    setattr(sys, stream_name, StringIO())
     try:
         yield getattr(sys, stream_name)
     finally:
@@ -595,20 +757,6 @@ def captured_stdin():
        self.assertEqual(captured, "hello")
     """
     return captured_output("stdin")
-
-
-def reset_warning_registry():
-    """
-    Clear warning registry for all modules. This is required in some tests
-    because of a bug in Python that prevents warnings.simplefilter("always")
-    from always making warnings appear: http://bugs.python.org/issue4180
-
-    The bug was fixed in Python 3.4.2.
-    """
-    key = "__warningregistry__"
-    for mod in sys.modules.values():
-        if hasattr(mod, key):
-            getattr(mod, key).clear()
 
 
 @contextmanager
@@ -651,7 +799,7 @@ class override_script_prefix(TestContextDecorator):
     """
     def __init__(self, prefix):
         self.prefix = prefix
-        super(override_script_prefix, self).__init__()
+        super().__init__()
 
     def enable(self):
         self.old_prefix = get_script_prefix()
@@ -661,7 +809,7 @@ class override_script_prefix(TestContextDecorator):
         set_script_prefix(self.old_prefix)
 
 
-class LoggingCaptureMixin(object):
+class LoggingCaptureMixin:
     """
     Capture the output from the 'django' logger and store it on the class's
     logger_output attribute.
@@ -669,7 +817,7 @@ class LoggingCaptureMixin(object):
     def setUp(self):
         self.logger = logging.getLogger('django')
         self.old_stream = self.logger.handlers[0].stream
-        self.logger_output = six.StringIO()
+        self.logger_output = StringIO()
         self.logger.handlers[0].stream = self.logger_output
 
     def tearDown(self):
@@ -695,7 +843,7 @@ class isolate_apps(TestContextDecorator):
 
     def __init__(self, *installed_apps, **kwargs):
         self.installed_apps = installed_apps
-        super(isolate_apps, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def enable(self):
         self.old_apps = Options.default_apps

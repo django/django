@@ -26,4 +26,4 @@ class Command(TemplateCommand):
                 "cannot be used as an app name. Please try another name." % app_name
             )
 
-        super(Command, self).handle('app', app_name, target, **options)
+        super().handle('app', app_name, target, **options)

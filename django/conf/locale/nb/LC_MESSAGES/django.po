@@ -5,7 +5,7 @@
 # Eirik Krogstad <eirikkr@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jensadne <jensadne@pvv.ntnu.no>, 2014-2015
-# Jon <jon@funkbit.no>, 2015
+# Jon <jon@funkbit.no>, 2015-2016
 # Jon <jon@funkbit.no>, 2014
 # Jon <jon@funkbit.no>, 2013
 # Jon <jon@funkbit.no>, 2011
@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-27 08:59+0000\n"
+"Last-Translator: Jon <jon@funkbit.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -68,6 +68,9 @@ msgstr "Dansk"
 msgid "German"
 msgstr "Tysk"
 
+msgid "Lower Sorbian"
+msgstr "Lavsorbisk"
+
 msgid "Greek"
 msgstr "Gresk"
 
@@ -90,7 +93,7 @@ msgid "Argentinian Spanish"
 msgstr "Argentinsk spansk"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "Colombiansk spansk"
 
 msgid "Mexican Spanish"
 msgstr "Meksikansk spansk"
@@ -123,7 +126,7 @@ msgid "Irish"
 msgstr "Irsk"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "Skotsk-gælisk"
 
 msgid "Galician"
 msgstr "Galisisk"
@@ -136,6 +139,9 @@ msgstr "Hindi"
 
 msgid "Croatian"
 msgstr "Kroatisk"
+
+msgid "Upper Sorbian"
+msgstr "Høysorbisk"
 
 msgid "Hungarian"
 msgstr "Ungarsk"
@@ -197,7 +203,7 @@ msgstr "Marathi"
 msgid "Burmese"
 msgstr "Burmesisk"
 
-msgid "Norwegian Bokmal"
+msgid "Norwegian Bokmål"
 msgstr "Norsk (bokmål)"
 
 msgid "Nepali"
@@ -295,9 +301,6 @@ msgstr "Statiske filer"
 
 msgid "Syndication"
 msgstr "Syndikering"
-
-msgid "Web Design"
-msgstr "Web-design"
 
 msgid "Enter a valid value."
 msgstr "Oppgi en gyldig verdi."
@@ -434,6 +437,9 @@ msgstr "Heltall"
 msgid "'%(value)s' value must be an integer."
 msgstr "Verdien '%(value)s' må være et heltall."
 
+msgid "Big (8 byte) integer"
+msgstr "Stort (8 byte) heltall"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Verdien '%(value)s' må være enten True eller False."
@@ -516,9 +522,6 @@ msgstr "Verdien '%(value)s' må være et flyttall."
 msgid "Floating point number"
 msgstr "Flyttall"
 
-msgid "Big (8 byte) integer"
-msgstr "Stort (8 byte) heltall"
-
 msgid "IPv4 address"
 msgstr "IPv4-adresse"
 
@@ -592,6 +595,14 @@ msgstr "Fremmednøkkel (type bestemmes av relatert felt)"
 
 msgid "One-to-one relationship"
 msgstr "En-til-en-relasjon"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s-relasjon"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s-relasjoner"
 
 msgid "Many-to-many relationship"
 msgstr "Mange-til-mange-relasjon"

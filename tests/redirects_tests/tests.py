@@ -5,9 +5,6 @@ from django.contrib.redirects.models import Redirect
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, modify_settings, override_settings
-from django.test.utils import ignore_warnings
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
 
 
 @modify_settings(MIDDLEWARE={'append': 'django.contrib.redirects.middleware.RedirectFallbackMiddleware'})
@@ -19,7 +16,7 @@ class RedirectTests(TestCase):
 
     def test_model(self):
         r1 = Redirect.objects.create(site=self.site, old_path='/initial', new_path='/new_target')
-        self.assertEqual(six.text_type(r1), "/initial ---> /new_target")
+        self.assertEqual(str(r1), "/initial ---> /new_target")
 
     def test_redirect(self):
         Redirect.objects.create(site=self.site, old_path='/initial', new_path='/new_target')
@@ -43,20 +40,6 @@ class RedirectTests(TestCase):
         Redirect.objects.create(site=self.site, old_path='/initial', new_path='')
         response = self.client.get('/initial')
         self.assertEqual(response.status_code, 410)
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @override_settings(MIDDLEWARE=None)
-    @modify_settings(MIDDLEWARE_CLASSES={'append': 'django.contrib.redirects.middleware.RedirectFallbackMiddleware'})
-    def test_redirect_middleware_classes(self):
-        self.test_redirect()
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @override_settings(MIDDLEWARE=None)
-    @modify_settings(MIDDLEWARE_CLASSES={'append': 'django.contrib.redirects.middleware.RedirectFallbackMiddleware'})
-    def test_more_redirects_middleware_classes(self):
-        self.test_redirect_with_append_slash()
-        self.test_redirect_with_append_slash_and_query_string()
-        self.test_response_gone()
 
     @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
     def test_sites_not_installed(self):

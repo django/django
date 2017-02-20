@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from psycopg2.extras import Inet
 
 from django.conf import settings
@@ -12,7 +10,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if internal_type in ("GenericIPAddressField", "IPAddressField", "TimeField", "UUIDField"):
             # PostgreSQL will resolve a union as type 'text' if input types are
             # 'unknown'.
-            # http://www.postgresql.org/docs/9.4/static/typeconv-union-case.html
+            # https://www.postgresql.org/docs/current/static/typeconv-union-case.html
             # These fields cannot be implicitly cast back in the default
             # PostgreSQL configuration so we need to explicitly cast them.
             # We must also remove components of the type within brackets:
@@ -21,7 +19,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return '%s'
 
     def date_extract_sql(self, lookup_type, field_name):
-        # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
+        # https://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
         if lookup_type == 'week_day':
             # For consistency across backends, we return Sunday=1, Saturday=7.
             return "EXTRACT('dow' FROM %s) + 1" % field_name
@@ -29,32 +27,33 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
 
     def date_trunc_sql(self, lookup_type, field_name):
-        # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+        # https://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
     def _convert_field_to_tz(self, field_name, tzname):
         if settings.USE_TZ:
-            field_name = "%s AT TIME ZONE %%s" % field_name
-            params = [tzname]
-        else:
-            params = []
-        return field_name, params
+            field_name = "%s AT TIME ZONE '%s'" % (field_name, tzname)
+        return field_name
 
     def datetime_cast_date_sql(self, field_name, tzname):
-        field_name, params = self._convert_field_to_tz(field_name, tzname)
-        sql = '(%s)::date' % field_name
-        return sql, params
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        return '(%s)::date' % field_name
+
+    def datetime_cast_time_sql(self, field_name, tzname):
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        return '(%s)::time' % field_name
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
-        field_name, params = self._convert_field_to_tz(field_name, tzname)
-        sql = self.date_extract_sql(lookup_type, field_name)
-        return sql, params
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        return self.date_extract_sql(lookup_type, field_name)
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        field_name, params = self._convert_field_to_tz(field_name, tzname)
-        # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
-        sql = "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
-        return sql, params
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        # https://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+        return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
+
+    def time_trunc_sql(self, lookup_type, field_name):
+        return "DATE_TRUNC('%s', %s)::time" % (lookup_type, field_name)
 
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
@@ -75,6 +74,8 @@ class DatabaseOperations(BaseDatabaseOperations):
                            'istartswith', 'endswith', 'iendswith', 'regex', 'iregex'):
             if internal_type in ('IPAddressField', 'GenericIPAddressField'):
                 lookup = "HOST(%s)"
+            elif internal_type in ('CharField', 'TextField'):
+                lookup = '%s'
             else:
                 lookup = "%s::text"
 
@@ -223,7 +224,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # http://initd.org/psycopg/docs/cursor.html#cursor.query
         # The query attribute is a Psycopg extension to the DB API 2.0.
         if cursor.query is not None:
-            return cursor.query.decode('utf-8')
+            return cursor.query.decode()
         return None
 
     def return_insert_id(self):
@@ -253,7 +254,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
             return "age(%s, %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
-        return super(DatabaseOperations, self).subtract_temporals(internal_type, lhs, rhs)
+        return super().subtract_temporals(internal_type, lhs, rhs)
 
     def fulltext_search_sql(self, field_name):
         raise NotImplementedError(

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 
 from django.contrib import admin
@@ -11,11 +9,10 @@ from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR, ChangeList
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.template import Context, Template
-from django.test import TestCase, ignore_warnings, override_settings
+from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
-from django.utils import formats, six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils import formats
 
 from .admin import (
     BandAdmin, ChildAdmin, ChordsBandAdmin, ConcertAdmin,
@@ -95,7 +92,7 @@ class ChangeListTests(TestCase):
             request, Child,
             *get_changelist_args(ia, list_select_related=ia.get_list_select_related(request))
         )
-        self.assertEqual(cl.queryset.query.select_related, False)
+        self.assertIs(cl.queryset.query.select_related, False)
 
     def test_get_select_related_custom_method(self):
         class GetListSelectRelatedAdmin(admin.ModelAdmin):
@@ -134,7 +131,7 @@ class ChangeListTests(TestCase):
 
     def test_result_list_set_empty_value_display_on_admin_site(self):
         """
-        Test that empty value display can be set on AdminSite
+        Empty value display can be set on AdminSite.
         """
         new_child = Child.objects.create(name='name', parent=None)
         request = self.factory.get('/child/')
@@ -155,7 +152,7 @@ class ChangeListTests(TestCase):
 
     def test_result_list_set_empty_value_display_in_model_admin(self):
         """
-        Test that empty value display can be set in ModelAdmin or individual fields.
+        Empty value display can be set in ModelAdmin or individual fields.
         """
         new_child = Child.objects.create(name='name', parent=None)
         request = self.factory.get('/child/')
@@ -174,8 +171,8 @@ class ChangeListTests(TestCase):
 
     def test_result_list_html(self):
         """
-        Verifies that inclusion tag result_list generates a table when with
-        default ModelAdmin settings.
+        Inclusion tag result_list generates a table when with default
+        ModelAdmin settings.
         """
         new_parent = Parent.objects.create(name='parent')
         new_child = Child.objects.create(name='name', parent=new_parent)
@@ -252,34 +249,6 @@ class ChangeListTests(TestCase):
         m.list_editable = ['name']
         with self.assertRaises(IncorrectLookupParameters):
             ChangeList(request, Child, *get_changelist_args(m))
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test_result_list_with_allow_tags(self):
-        """
-        Test for deprecation of allow_tags attribute
-        """
-        new_parent = Parent.objects.create(name='parent')
-        for i in range(2):
-            Child.objects.create(name='name %s' % i, parent=new_parent)
-        request = self.factory.get('/child/')
-        m = ChildAdmin(Child, custom_site)
-
-        def custom_method(self, obj=None):
-            return 'Unsafe html <br />'
-        custom_method.allow_tags = True
-
-        # Add custom method with allow_tags attribute
-        m.custom_method = custom_method
-        m.list_display = ['id', 'name', 'parent', 'custom_method']
-
-        cl = ChangeList(request, Child, *get_changelist_args(m))
-        FormSet = m.get_changelist_formset(request)
-        cl.formset = FormSet(queryset=cl.result_list)
-        template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
-        context = Context({'cl': cl})
-        table_output = template.render(context)
-        custom_field_html = '<td class="field-custom_method">Unsafe html <br /></td>'
-        self.assertInHTML(custom_field_html, table_output)
 
     def test_custom_paginator(self):
         new_parent = Parent.objects.create(name='parent')
@@ -445,6 +414,22 @@ class ChangeListTests(TestCase):
         # There's only one Concert instance
         self.assertEqual(cl.queryset.count(), 1)
 
+    def test_no_distinct_for_m2m_in_list_filter_without_params(self):
+        """
+        If a ManyToManyField is in list_filter but isn't in any lookup params,
+        the changelist's query shouldn't have distinct.
+        """
+        m = BandAdmin(Band, custom_site)
+        for lookup_params in ({}, {'name': 'test'}):
+            request = self.factory.get('/band/', lookup_params)
+            cl = ChangeList(request, Band, *get_changelist_args(m))
+            self.assertFalse(cl.queryset.query.distinct)
+
+        # A ManyToManyField in params does have distinct applied.
+        request = self.factory.get('/band/', {'genres': '0'})
+        cl = ChangeList(request, Band, *get_changelist_args(m))
+        self.assertTrue(cl.queryset.query.distinct)
+
     def test_pagination(self):
         """
         Regression tests for #12893: Pagination in admins changelist doesn't
@@ -481,7 +466,7 @@ class ChangeListTests(TestCase):
         event = Event.objects.create(date=datetime.date.today())
         response = self.client.get(reverse('admin:admin_changelist_event_changelist'))
         self.assertContains(response, formats.localize(event.date))
-        self.assertNotContains(response, six.text_type(event.date))
+        self.assertNotContains(response, str(event.date))
 
     def test_dynamic_list_display(self):
         """
@@ -583,10 +568,6 @@ class ChangeListTests(TestCase):
         self.assertNotContains(response, '<a href="%s">' % link)
 
     def test_tuple_list_display(self):
-        """
-        Regression test for #17128
-        (ChangeList failing under Python 2.5 after r16319)
-        """
         swallow = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')
         swallow2 = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')
         swallow_o2o = SwallowOneToOne.objects.create(swallow=swallow2)
@@ -596,9 +577,9 @@ class ChangeListTests(TestCase):
         request = self._mocked_authenticated_request('/swallow/', superuser)
         response = model_admin.changelist_view(request)
         # just want to ensure it doesn't blow up during rendering
-        self.assertContains(response, six.text_type(swallow.origin))
-        self.assertContains(response, six.text_type(swallow.load))
-        self.assertContains(response, six.text_type(swallow.speed))
+        self.assertContains(response, str(swallow.origin))
+        self.assertContains(response, str(swallow.load))
+        self.assertContains(response, str(swallow.speed))
         # Reverse one-to-one relations should work.
         self.assertContains(response, '<td class="field-swallowonetoone">-</td>')
         self.assertContains(response, '<td class="field-swallowonetoone">%s</td>' % swallow_o2o)
@@ -672,10 +653,9 @@ class ChangeListTests(TestCase):
 
     def test_deterministic_order_for_unordered_model(self):
         """
-        Ensure that the primary key is systematically used in the ordering of
-        the changelist's results to guarantee a deterministic order, even
-        when the Model doesn't have any default ordering defined.
-        Refs #17198.
+        The primary key is used in the ordering of the changelist's results to
+        guarantee a deterministic order, even when the model doesn't have any
+        default ordering defined (#17198).
         """
         superuser = self._create_superuser('superuser')
 
@@ -717,10 +697,9 @@ class ChangeListTests(TestCase):
 
     def test_deterministic_order_for_model_ordered_by_its_manager(self):
         """
-        Ensure that the primary key is systematically used in the ordering of
-        the changelist's results to guarantee a deterministic order, even
-        when the Model has a manager that defines a default ordering.
-        Refs #17198.
+        The primary key is used in the ordering of the changelist's results to
+        guarantee a deterministic order, even when the model has a manager that
+        defines a default ordering (#17198).
         """
         superuser = self._create_superuser('superuser')
 
@@ -887,7 +866,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
     def test_add_row_selection(self):
         """
-        Ensure that the status line for selected rows gets updated correctly (#22038)
+        The status line for selected rows gets updated correctly (#22038).
         """
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:auth_user_changelist'))

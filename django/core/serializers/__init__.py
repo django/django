@@ -21,7 +21,6 @@ import importlib
 from django.apps import apps
 from django.conf import settings
 from django.core.serializers.base import SerializerDoesNotExist
-from django.utils import six
 
 # Built-in serializers
 BUILTIN_SERIALIZERS = {
@@ -34,7 +33,7 @@ BUILTIN_SERIALIZERS = {
 _serializers = {}
 
 
-class BadSerializer(object):
+class BadSerializer:
     """
     Stub serializer to hold exception raised during registration
 
@@ -72,7 +71,7 @@ def register_serializer(format, serializer_module, serializers=None):
     except ImportError as exc:
         bad_serializer = BadSerializer(exc)
 
-        module = type('BadSerializerModule', (object,), {
+        module = type('BadSerializerModule', (), {
             'Deserializer': bad_serializer,
             'Serializer': bad_serializer,
         })
@@ -109,7 +108,7 @@ def get_serializer_formats():
 def get_public_serializer_formats():
     if not _serializers:
         _load_serializers()
-    return [k for k, v in six.iteritems(_serializers) if not v.Serializer.internal_use_only]
+    return [k for k, v in _serializers.items() if not v.Serializer.internal_use_only]
 
 
 def get_deserializer(format):

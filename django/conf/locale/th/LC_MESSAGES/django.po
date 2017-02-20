@@ -4,7 +4,7 @@
 # Abhabongse Janthong, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kowit Charoenratchatabhan <kowit.s.c@gmail.com>, 2014
-# Sippakorn Khaimook <sipp11@mycapsules.com>, 2014
+# sipp11 <sipp11@mycapsules.com>, 2014
 # Suteepat Damrongyingsupab <tianissimo@hotmail.com>, 2011-2012
 # Suteepat Damrongyingsupab <tianissimo@hotmail.com>, 2013
 # Vichai Vongvorakul <vongvichai@gmail.com>, 2013
@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Thai (http://www.transifex.com/django/django/language/th/)\n"
 "MIME-Version: 1.0\n"
@@ -63,6 +63,9 @@ msgstr "เดนมาร์ก"
 
 msgid "German"
 msgstr "เยอรมัน"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "กรีก"
@@ -133,6 +136,9 @@ msgstr "ฮินดี"
 msgid "Croatian"
 msgstr "โครเอเชีย"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "ฮังการี"
 
@@ -193,8 +199,8 @@ msgstr ""
 msgid "Burmese"
 msgstr "พม่า"
 
-msgid "Norwegian Bokmal"
-msgstr "นอร์เวย์ - Bokmal"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "เนปาล"
@@ -290,9 +296,6 @@ msgid "Static Files"
 msgstr ""
 
 msgid "Syndication"
-msgstr ""
-
-msgid "Web Design"
 msgstr ""
 
 msgid "Enter a valid value."
@@ -414,6 +417,9 @@ msgstr "จำนวนเต็ม"
 msgid "'%(value)s' value must be an integer."
 msgstr ""
 
+msgid "Big (8 byte) integer"
+msgstr "จำนวนเต็ม (8 byte)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr ""
@@ -487,9 +493,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr "เลขทศนิยม"
 
-msgid "Big (8 byte) integer"
-msgstr "จำนวนเต็ม (8 byte)"
-
 msgid "IPv4 address"
 msgstr "IPv4 address"
 
@@ -560,6 +563,14 @@ msgstr "Foreign Key (ชนิดของข้อมูลจะถูกก�
 
 msgid "One-to-one relationship"
 msgstr "ความสัมพันธ์แบบหนึ่งต่อหนึ่ง"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "ความสัมพันธ์แบบ many-to-many"

@@ -6,15 +6,16 @@
 # Giannis Meletakis <meletakis@gmail.com>, 2015
 # glogiotatidis <seadog@sealabs.net>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Panos Laganakos <panos.laganakos@gmail.com>, 2014
+# Pãnoș <panos.laganakos@gmail.com>, 2014
+# Pãnoș <panos.laganakos@gmail.com>, 2016
 # Yorgos Pagles <y.pagles@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-11 08:53+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-07 08:24+0000\n"
+"Last-Translator: Pãnoș <panos.laganakos@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -33,14 +34,14 @@ msgstr "Σημαντικές ημερομηνίες"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Το αντικείμενο %(name)s με πρωτεύον κλειδί %(key)r δεν υπάρχει."
 
 msgid "Password changed successfully."
-msgstr "Ο κωδικός πρόσβασης αλλάχτηκε με επιτυχία."
+msgstr "Το συνθηματικό αλλάχτηκε με επιτυχία."
 
 #, python-format
 msgid "Change password: %s"
-msgstr "Αλλαγή κωδικού πρόσβασης: %s"
+msgstr "Αλλαγή συνθηματικού: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Πιστοποίηση και Εξουσιοδότηση"
@@ -52,36 +53,39 @@ msgid "last login"
 msgstr "τελευταία σύνδεση"
 
 msgid "No password set."
-msgstr "Δεν έχει τεθεί κωδικός."
+msgstr "Δεν έχει τεθεί συνθηματικό."
 
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Μη έγκυρη μορφή κώδικα ή άγνωστος αλγόριθμος hashing."
+msgstr "Μη έγκυρη μορφή συνθηματικού ή άγνωστος αλγόριθμος hashing."
 
 msgid "The two password fields didn't match."
-msgstr "Τα δύο πεδία κωδικού χρήστη δεν ταιριάζουν."
+msgstr "Τα δύο πεδία συνθηματικού δεν ταιριάζουν."
 
 msgid "Password"
-msgstr "Κωδικός χρήστη"
+msgstr "Συνθηματικό"
 
 msgid "Password confirmation"
-msgstr "Επιβεβαίωση κωδικού χρήστη"
+msgstr "Επιβεβαίωση συνθηματικού"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Εισάγετε το ίδιο συνθηματικό όπως πρίν, για επιβεβαίωση."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"../password/"
 "\">this form</a>."
 msgstr ""
+"Τα ακατέργαστα συνθηματικά δεν αποθηκεύονται, οπότε δεν υπάρχει τρόπος να "
+"δείτε το συνθηματικό αυτού του χρήστη, αλλά μπορείτε να το αλλάξετε "
+"χρησιμοποιόντας <a href=\"password/\">αυτή τη φόρμα</a>."
 
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
-"Παρακαλώ εισάγετε ένα σωστό %(username)s και κωδικό. Σημειώστε ότι και τα "
-"δύο πεδία έχει σημασία αν είναι κεφαλαία-μικρά."
+"Παρακαλώ εισάγετε ένα σωστό %(username)s και κωδικό. Σημειωτέον ότι και τα "
+"δύο πεδία κάνουν διάκριση μεταξύ πεζών-κεφαλαίων."
 
 msgid "This account is inactive."
 msgstr "Αυτός ο λογαριασμός είναι ανενεργός."
@@ -108,13 +112,28 @@ msgid "algorithm"
 msgstr "αλγόριθμος"
 
 msgid "iterations"
-msgstr "Επανάληψη"
+msgstr "Επαναλήψεις"
 
 msgid "salt"
 msgstr "salt"
 
 msgid "hash"
 msgstr "hash"
+
+msgid "variety"
+msgstr "ποικιλία"
+
+msgid "version"
+msgstr "έκδοση"
+
+msgid "memory cost"
+msgstr "κόστος μνήμης"
+
+msgid "time cost"
+msgstr "χρονικό κόστος"
+
+msgid "parallelism"
+msgstr "παραλληλισμός"
 
 msgid "work factor"
 msgstr "work factor"
@@ -126,7 +145,7 @@ msgid "name"
 msgstr "όνομα"
 
 msgid "content type"
-msgstr ""
+msgstr "τύπος περιεχομένου"
 
 msgid "codename"
 msgstr "κωδικό όνομα"
@@ -157,6 +176,8 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"Οι ομάδες που ανοίκει ο χρήστης. Ένας χρήστης θα έχει όλες τις άδειες που "
+"έχουν δωθεί  σε κάθε μια από τις ομάδες."
 
 msgid "user permissions"
 msgstr "δικαιώματα χρήστη"
@@ -167,20 +188,12 @@ msgstr "Συγκεκριμένα δικαιώματα για αυτόν τον �
 msgid "username"
 msgstr "όνομα χρήστη"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Απαραίτητο. Πρέπει να αποτελείται από 30 ή λιγότερους χαρακτήρες. Μπορείτε "
-"να χρησιμοποιήσετε μόνο γράμματα, αριθμούς και τους χαρακτήρες @/./+/-/_."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Εισάγεται ένα έγκυρο όνομα χρήστη. Το όνομα χρήστη θα πρέπει να περιέχει "
-"μόνο γράμματα, αριθμού και τους χαρακτήρες @/./+/-/_"
+"Απαραίτητο. 150 ή λιγότερους χαρακτήρες. Μόνο γράμματα, ψηφία και @/./+/-/_."
 
 msgid "A user with that username already exists."
-msgstr "Αυτό το όνομα χρήστη χρησιμοποιείται ήδη."
+msgstr "Υπάρχει ήδη ένας χρήστης με αυτό το όνομα."
 
 msgid "first name"
 msgstr "όνομα"
@@ -209,7 +222,7 @@ msgstr ""
 "χρήστη."
 
 msgid "date joined"
-msgstr "ημερομηνία σύνδεσης"
+msgstr "ημερομηνία ένταξης"
 
 msgid "user"
 msgstr "χρήστης"
@@ -225,57 +238,78 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"Αυτό το συνθηματικό είναι πολύ μικρό. Πρέπει να περιέχει τουλάχιστον "
+"%(min_length)d χαρακτήρα."
 msgstr[1] ""
+"Αυτό το συνθηματικό είναι πολύ μικρό. Πρέπει να περιέχει τουλάχιστον "
+"%(min_length)d χαρακτήρες."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] ""
+"Το συνθηματικό σας πρέπει να έχει τουλάχιστον %(min_length)d χαρακτήρα."
 msgstr[1] ""
+"Το συνθηματικό σας πρέπει να έχει τουλάχιστον %(min_length)d χαρακτήρες."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Το συνθηματικό μοιάζει πολύ με το %(verbose_name)s."
 
 msgid "Your password can't be too similar to your other personal information."
 msgstr ""
+"Το συνθηματικό σας δεν μπορεί να μοιάζει τόσο με άλλα προσωπικά σας στοιχεία."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Πολύ κοινό συνθηματικό."
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "Το συνθηματικό δεν μπορεί να είναι τόσο συνηθισμένο."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "Αυτό το συνθηματικό αποτελείται μόνο απο αριθμούς."
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "Το συνθηματικό σας δεν μπορεί να ειναι αποκλειστικά αριθμητικό."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
-msgstr "Επαναφοράς κωδικού πρόσβασης για το %(site_name)s "
+msgstr "Επαναφορά συνθηματικού για το %(site_name)s "
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Εισάγετε ένα έγκυρο όνομα χρήστη. Θα πρέπει να περιέχει μόνο Αγγλικούς "
+"χαρακτήρες, αριθμούς και τους χαρακτήρες @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Εισάγετε ένα έγκυρο όνομα χρήστη. Θα πρέπει να περιέχει μόνο γράμματα, "
+"αριθμούς και τους χαρακτήρες @/./+/-/_ characters."
 
 msgid "Logged out"
 msgstr "Έγινε αποσύνδεση"
 
 msgid "Password reset"
-msgstr "Επαναφορά κωδικού"
+msgstr "Επαναφορά συνθηματικού"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "Η επαναφορά συνθηματικού εστάλει"
 
 msgid "Enter new password"
-msgstr "Εισάγετε νεό κωδικό"
+msgstr "Εισάγετε νεό συνθηματικό"
 
 msgid "Password reset unsuccessful"
 msgstr "Ανεπιτυχής επαναφορά κωδικού"
 
 msgid "Password reset complete"
-msgstr "Ολοκλήρωση επαναφοράς κωδικού"
+msgstr "Ολοκλήρωση επαναφοράς συνθηματικού"
 
 msgid "Password change"
-msgstr "Αλλαγή κωδικού"
+msgstr "Αλλαγή συνθηματικού"
 
 msgid "Password change successful"
-msgstr "Αλλαγή κωδικού επιτυχής"
+msgstr "Επιτυχής αλλαγή συνθηματικού"

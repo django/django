@@ -120,10 +120,10 @@ Filtering error reports
 .. warning::
 
     Filtering sensitive data is a hard problem, and it's nearly impossible to
-    guarantee that sensitive won't leak into an error report. Therefore, error
-    reports should only be available to trusted team members and you should
-    avoid transmitting error reports unencrypted over the Internet (such as
-    through email).
+    guarantee that sensitive data won't leak into an error report. Therefore,
+    error reports should only be available to trusted team members and you
+    should avoid transmitting error reports unencrypted over the Internet
+    (such as through email).
 
 Filtering sensitive information
 -------------------------------
@@ -202,10 +202,12 @@ filtered out of error reports in a production environment (that is, where
 
         @sensitive_post_parameters('pass_word', 'credit_card_number')
         def record_user_profile(request):
-            UserProfile.create(user=request.user,
-                               password=request.POST['pass_word'],
-                               credit_card=request.POST['credit_card_number'],
-                               name=request.POST['name'])
+            UserProfile.create(
+                user=request.user,
+                password=request.POST['pass_word'],
+                credit_card=request.POST['credit_card_number'],
+                name=request.POST['name'],
+            )
             ...
 
     In the above example, the values for the ``pass_word`` and

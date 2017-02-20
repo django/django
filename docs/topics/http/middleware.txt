@@ -16,16 +16,6 @@ how to write your own middleware. Django ships with some built-in middleware
 you can use right out of the box. They're documented in the :doc:`built-in
 middleware reference </ref/middleware>`.
 
-.. versionchanged:: 1.10
-
-    A new style of middleware was introduced for use with the new
-    :setting:`MIDDLEWARE` setting. If you're using the old
-    :setting:`MIDDLEWARE_CLASSES` setting, you'll need to :ref:`adapt old,
-    custom middleware <upgrading-middleware>` before using the new setting.
-    This document describes new-style middleware. Refer to this page in older
-    versions of the documentation for a description of how old-style middleware
-    works.
-
 Writing your own middleware
 ===========================
 
@@ -40,14 +30,9 @@ A middleware can be written as a function that looks like this::
 
         def middleware(request):
             # Code to be executed for each request before
-            # the view is called.
+            # the view (and later middleware) are called.
 
-            try:
-                response = get_response(request)
-            except Exception as e:
-                # Code to handle an exception that wasn't caught
-                # further up the chain, if desired.
-                ...
+            response = get_response(request)
 
             # Code to be executed for each request/response after
             # the view is called.
@@ -56,7 +41,7 @@ A middleware can be written as a function that looks like this::
 
         return middleware
 
-Or it can be written as a class with a ``__call__()`` method, like this::
+Or it can be written as a class whose instances are callable, like this::
 
     class SimpleMiddleware(object):
         def __init__(self, get_response):
@@ -65,23 +50,14 @@ Or it can be written as a class with a ``__call__()`` method, like this::
 
         def __call__(self, request):
             # Code to be executed for each request before
-            # the view is called.
+            # the view (and later middleware) are called.
 
-            try:
-                response = self.get_response(request)
-            except Exception as e:
-                # Code to handle an exception that wasn't caught
-                # further up the chain, if desired.
-                ...
+            response = self.get_response(request)
 
             # Code to be executed for each request/response after
             # the view is called.
 
             return response
-
-In both examples, the ``try``/``except`` isn't required if the middleware
-doesn't need to handle any exceptions. If it is included, it should probably
-catch something more specific than ``Exception``.
 
 The ``get_response`` callable provided by Django might be the actual view (if
 this is the last listed middleware) or it might be the next middleware in the
@@ -92,30 +68,23 @@ The above is a slight simplification -- the ``get_response`` callable for the
 last middleware in the chain won't be the actual view but rather a wrapper
 method from the handler which takes care of applying :ref:`view middleware
 <view-middleware>`, calling the view with appropriate URL arguments, and
-applying :ref:`template-response <template-response-middleware>` middleware.
+applying :ref:`template-response <template-response-middleware>` and
+:ref:`exception <exception-middleware>` middleware.
 
 Middleware can live anywhere on your Python path.
 
 ``__init__(get_response)``
 --------------------------
 
-Middleware classes must accept a ``get_response`` argument. You can also
+Middleware factories must accept a ``get_response`` argument. You can also
 initialize some global state for the middleware. Keep in mind a couple of
 caveats:
 
 * Django initializes your middleware with only the ``get_response`` argument,
   so you can't define ``__init__()`` as requiring any other arguments.
 
-* Unlike the ``__call__()`` method which get called once per request,
+* Unlike the ``__call__()`` method which is called once per request,
   ``__init__()`` is called only *once*, when the Web server starts.
-
-.. versionchanged:: 1.10
-
-    In older versions, ``__init__`` was not called until the Web server
-    responded to its first request.
-
-    If you want to allow your middleware to be used in Django 1.9 and earlier,
-    make ``get_response`` an optional argument (``get_response=None``).
 
 Marking middleware as unused
 ----------------------------
@@ -133,9 +102,9 @@ To activate a middleware component, add it to the :setting:`MIDDLEWARE` list in
 your Django settings.
 
 In :setting:`MIDDLEWARE`, each middleware component is represented by a string:
-the full Python path to the middleware's class or function name. For example,
-here's the default value created by :djadmin:`django-admin startproject
-<startproject>`::
+the full Python path to the middleware factory's class or function name. For
+example, here's the default value created by :djadmin:`django-admin
+startproject <startproject>`::
 
     MIDDLEWARE = [
         'django.middleware.security.SecurityMiddleware',
@@ -159,25 +128,29 @@ authenticated user in the session; therefore, it must run after
 :ref:`middleware-ordering` for some common hints about ordering of Django
 middleware classes.
 
-Hooks and application order
-===========================
+Middleware order and layering
+=============================
 
-During the request phase, before calling the view, Django applies middleware
-in the order it's defined in :setting:`MIDDLEWARE`, top-down. You can think of
-it like an onion: each middleware class is a "layer" that wraps the view.
+During the request phase, before calling the view, Django applies middleware in
+the order it's defined in :setting:`MIDDLEWARE`, top-down.
 
-Middleware see only the changes made by middleware that run before it. A
-middleware (and the view) is skipped entirely if a preceding middleware
-short-circuits by returning a response without ever calling ``get_response``.
-That response will only pass through the middleware that have already run.
+You can think of it like an onion: each middleware class is a "layer" that
+wraps the view, which is in the core of the onion. If the request passes
+through all the layers of the onion (each one calls ``get_response`` to pass
+the request in to the next layer), all the way to the view at the core, the
+response will then pass through every layer (in reverse order) on the way back
+out.
 
-Similarly, a middleware that sees the request on the way in and doesn't return
-a response is guaranteed that it will always see the response on the way back
-out. If the middleware also wants to see any uncaught exception on the way out,
-it can wrap its call to ``get_response()`` in a ``try``/``except``.
+If one of the layers decides to short-circuit and return a response without
+ever calling its ``get_response``, none of the layers of the onion inside that
+layer (including the view) will see the request or the response. The response
+will only return through the same layers that the request passed in through.
 
-Besides the middleware pattern described earlier, you can add two other methods
-to class-based middleware:
+Other middleware hooks
+======================
+
+Besides the basic request/response middleware pattern described earlier, you
+can add three other special methods to class-based middleware:
 
 .. _view-middleware:
 
@@ -216,6 +189,28 @@ bother calling the appropriate view; it'll apply response middleware to that
     :func:`~django.views.decorators.csrf.csrf_exempt` and
     :func:`~django.views.decorators.csrf.csrf_protect` decorators which allow
     views to explicitly control at what point the CSRF validation should occur.
+
+.. _exception-middleware:
+
+``process_exception()``
+-----------------------
+
+.. method:: process_exception(request, exception)
+
+``request`` is an :class:`~django.http.HttpRequest` object. ``exception`` is an
+``Exception`` object raised by the view function.
+
+Django calls ``process_exception()`` when a view raises an exception.
+``process_exception()`` should return either ``None`` or an
+:class:`~django.http.HttpResponse` object. If it returns an
+:class:`~django.http.HttpResponse` object, the template response and response
+middleware will be applied and the resulting response returned to the
+browser. Otherwise, :ref:`default exception handling <error-views>` kicks in.
+
+Again, middleware are run in reverse order during the response phase, which
+includes ``process_exception``. If an exception middleware returns a response,
+the ``process_exception`` methods of the middleware classes above that
+middleware won't be called at all.
 
 .. _template-response-middleware:
 
@@ -268,31 +263,24 @@ must test for streaming responses and adjust their behavior accordingly::
             for chunk in content:
                 yield alter_content(chunk)
 
-.. _exception-middleware:
+Exception handling
+==================
 
-Exception middleware
-====================
+Django automatically converts exceptions raised by the view or by middleware
+into an appropriate HTTP response with an error status code. :ref:`Certain
+exceptions <error-views>` are converted to 4xx status codes, while an unknown
+exception is converted to a 500 status code.
 
-A middleware that does some custom exception handling might looks like this::
-
-    class ExceptionMiddleware(object):
-        def __init__(self, get_response):
-            self.get_response = get_response
-
-        def __call__(self, request):
-            try:
-                response = self.get_response(request)
-            except Exception as e:
-                # Do something with the exception and possibly reraise it
-                # unless you wish to silence it.
-                ...
-            return response
-
-Middleware that wants to do something for all exception responses, an HTTP 404
-for example, need to both catch the appropriate exception (e.g. ``Http404``)
-and look for regular responses with the status code of interest. You can
-subclass  :class:`~django.middleware.exception.ExceptionMiddleware` if you want
-to transform exceptions into the appropriate response.
+This conversion takes place before and after each middleware (you can think of
+it as the thin film in between each layer of the onion), so that every
+middleware can always rely on getting some kind of HTTP response back from
+calling its ``get_response`` callable. Middleware don't need to worry about
+wrapping their call to ``get_response`` in a ``try/except`` and handling an
+exception that might have been raised by a later middleware or the view. Even
+if the very next middleware in the chain raises an
+:class:`~django.http.Http404` exception, for example, your middleware won't see
+that exception; instead it will get an :class:`~django.http.HttpResponse`
+object with a :attr:`~django.http.HttpResponse.status_code` of 404.
 
 .. _upgrading-middleware:
 
@@ -302,30 +290,58 @@ Upgrading pre-Django 1.10-style middleware
 .. class:: django.utils.deprecation.MiddlewareMixin
     :module:
 
-Django provides ``django.utils.deprecation.MiddlewareMixin`` to ease providing
-the existing built-in middleware in both new-style and old-style forms and to
-ease similar conversions of third-party middleware.
+Django provides ``django.utils.deprecation.MiddlewareMixin`` to ease creating
+middleware classes that are compatible with both :setting:`MIDDLEWARE` and the
+old ``MIDDLEWARE_CLASSES``. All middleware classes included with Django
+are compatible with both settings.
 
-In most cases, this mixin will be sufficient to convert a middleware with
-sufficient backwards-compatibility; the new short-circuiting semantics will be
-harmless or even beneficial to the existing middleware.
+The mixin provides an ``__init__()`` method that accepts an optional
+``get_response`` argument and stores it in ``self.get_response``.
 
-In a few cases, a middleware class may need more invasive changes to adjust to
-the new semantics.
+The ``__call__()`` method:
 
-For example, in the current request-handling logic, the handler transforms any
-exception that passes through all ``process_exception`` middleware uncaught
-into a response with appropriate status code (e.g. 404, 403, 400, or 500), and
-then passes that response through the full chain of ``process_response``
-middleware.
+#. Calls ``self.process_request(request)`` (if defined).
+#. Calls ``self.get_response(request)`` to get the response from later
+   middleware and the view.
+#. Calls ``self.process_response(request, response)`` (if defined).
+#. Returns the response.
 
-In new-style middleware, a given middleware only gets one shot at a given
-response or uncaught exception "on the way out," and will see either a returned
-response or an uncaught exception, but not both.
+If used with ``MIDDLEWARE_CLASSES``, the ``__call__()`` method will
+never be used; Django calls ``process_request()`` and ``process_response()``
+directly.
 
-This means that certain middleware which want to do something with all 404
-responses (for example, the ``RedirectFallbackMiddleware`` and
-``FlatpageFallbackMiddleware`` in ``django.contrib.redirects`` and
-``django.contrib.flatpages``) now need to watch out for both a 404 response
-and an uncaught ``Http404`` exception. They do this by subclassing
-:class:`~django.middleware.exception.ExceptionMiddleware`.
+In most cases, inheriting from this mixin will be sufficient to make an
+old-style middleware compatible with the new system with sufficient
+backwards-compatibility. The new short-circuiting semantics will be harmless or
+even beneficial to the existing middleware. In a few cases, a middleware class
+may need some changes to adjust to the new semantics.
+
+These are the behavioral differences between using :setting:`MIDDLEWARE` and
+``MIDDLEWARE_CLASSES``:
+
+1. Under ``MIDDLEWARE_CLASSES``, every middleware will always have its
+   ``process_response`` method called, even if an earlier middleware
+   short-circuited by returning a response from its ``process_request``
+   method. Under :setting:`MIDDLEWARE`, middleware behaves more like an onion:
+   the layers that a response goes through on the way out are the same layers
+   that saw the request on the way in. If a middleware short-circuits, only
+   that middleware and the ones before it in :setting:`MIDDLEWARE` will see the
+   response.
+
+2. Under ``MIDDLEWARE_CLASSES``, ``process_exception`` is applied to
+   exceptions raised from a middleware ``process_request`` method. Under
+   :setting:`MIDDLEWARE`, ``process_exception`` applies only to exceptions
+   raised from the view (or from the ``render`` method of a
+   :class:`~django.template.response.TemplateResponse`). Exceptions raised from
+   a middleware are converted to the appropriate HTTP response and then passed
+   to the next middleware.
+
+3. Under ``MIDDLEWARE_CLASSES``, if a ``process_response`` method raises
+   an exception, the ``process_response`` methods of all earlier middleware are
+   skipped and a ``500 Internal Server Error`` HTTP response is always
+   returned (even if the exception raised was e.g. an
+   :class:`~django.http.Http404`). Under :setting:`MIDDLEWARE`, an exception
+   raised from a middleware will immediately be converted to the appropriate
+   HTTP response, and then the next middleware in line will see that
+   response. Middleware are never skipped due to a middleware raising an
+   exception.

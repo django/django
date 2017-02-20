@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase
 
@@ -8,7 +6,7 @@ from .models import (
 )
 
 
-class AssertionMixin(object):
+class AssertionMixin:
     def assert_delayed(self, obj, num):
         """
         Instances with deferred fields look the same as normal instances when
@@ -227,8 +225,7 @@ class TestDefer2(AssertionMixin, TestCase):
         """
         When an inherited model is fetched from the DB, its PK is also fetched.
         When getting the PK of the parent model it is useful to use the already
-        fetched parent model PK if it happens to be available. Tests that this
-        is done.
+        fetched parent model PK if it happens to be available.
         """
         s1 = Secondary.objects.create(first="x1", second="y1")
         bc = BigChild.objects.create(name="b1", value="foo", related=s1,

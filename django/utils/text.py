@@ -1,31 +1,26 @@
-from __future__ import unicode_literals
-
+import html.entities
 import re
 import unicodedata
 from gzip import GzipFile
 from io import BytesIO
 
-from django.utils import six
 from django.utils.encoding import force_text
-from django.utils.functional import SimpleLazyObject, keep_lazy, keep_lazy_text
+from django.utils.functional import (
+    SimpleLazyObject, keep_lazy, keep_lazy_text, lazy,
+)
 from django.utils.safestring import SafeText, mark_safe
-from django.utils.six.moves import html_entities
-from django.utils.translation import pgettext, ugettext as _, ugettext_lazy
-
-if six.PY2:
-    # Import force_unicode even though this module doesn't use it, because some
-    # people rely on it being here.
-    from django.utils.encoding import force_unicode  # NOQA
+from django.utils.translation import gettext as _, gettext_lazy, pgettext
 
 
-# Capitalizes the first letter of a string.
+@keep_lazy_text
 def capfirst(x):
+    """Capitalize the first letter of a string."""
     return x and force_text(x)[0].upper() + force_text(x)[1:]
-capfirst = keep_lazy_text(capfirst)
+
 
 # Set up regular expressions
-re_words = re.compile(r'<.*?>|((?:\w[-\w]*|&.*?;)+)', re.U | re.S)
-re_chars = re.compile(r'<.*?>|(.)', re.U | re.S)
+re_words = re.compile(r'<.*?>|((?:\w[-\w]*|&.*?;)+)', re.S)
+re_chars = re.compile(r'<.*?>|(.)', re.S)
 re_tag = re.compile(r'<(/)?([^ ]+?)(?:(\s*/)| .*?)?>', re.S)
 re_newlines = re.compile(r'\r\n|\r')  # Used in normalize_newlines
 re_camel_case = re.compile(r'(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))')
@@ -37,10 +32,10 @@ def wrap(text, width):
     A word-wrap function that preserves existing line breaks. Expects that
     existing line breaks are posix newlines.
 
-    All white space is preserved except added line breaks consume the space on
+    Preserve all white space except added line breaks consume the space on
     which they break the line.
 
-    Long words are not wrapped, so the output text may have lines longer than
+    Don't wrap long words, thus the output text may have lines longer than
     ``width``.
     """
     text = force_text(text)
@@ -69,7 +64,7 @@ class Truncator(SimpleLazyObject):
     An object used to truncate text, either by characters or words.
     """
     def __init__(self, text):
-        super(Truncator, self).__init__(lambda: force_text(text))
+        super().__init__(lambda: force_text(text))
 
     def add_truncation_text(self, text, truncate=None):
         if truncate is None:
@@ -89,12 +84,12 @@ class Truncator(SimpleLazyObject):
 
     def chars(self, num, truncate=None, html=False):
         """
-        Returns the text truncated to be no longer than the specified number
+        Return the text truncated to be no longer than the specified number
         of characters.
 
-        Takes an optional argument of what should be used to notify that the
-        string has been truncated, defaulting to a translatable string of an
-        ellipsis (...).
+        `truncate` specifies what should be used to notify that the string has
+        been truncated, defaulting to a translatable string of an ellipsis
+        (...).
         """
         self._setup()
         length = int(num)
@@ -112,9 +107,7 @@ class Truncator(SimpleLazyObject):
         return self._text_chars(length, truncate, text, truncate_len)
 
     def _text_chars(self, length, truncate, text, truncate_len):
-        """
-        Truncates a string after a certain number of chars.
-        """
+        """Truncate a string after a certain number of chars."""
         s_len = 0
         end_index = None
         for i, char in enumerate(text):
@@ -135,9 +128,9 @@ class Truncator(SimpleLazyObject):
 
     def words(self, num, truncate=None, html=False):
         """
-        Truncates a string after a certain number of words. Takes an optional
-        argument of what should be used to notify that the string has been
-        truncated, defaulting to ellipsis (...).
+        Truncate a string after a certain number of words. `truncate` specifies
+        what should be used to notify that the string has been truncated,
+        defaulting to ellipsis (...).
         """
         self._setup()
         length = int(num)
@@ -147,9 +140,9 @@ class Truncator(SimpleLazyObject):
 
     def _text_words(self, length, truncate):
         """
-        Truncates a string after a certain number of words.
+        Truncate a string after a certain number of words.
 
-        Newlines in the string will be stripped.
+        Strip newlines in the string.
         """
         words = self._wrapped.split()
         if len(words) > length:
@@ -159,11 +152,11 @@ class Truncator(SimpleLazyObject):
 
     def _truncate_html(self, length, truncate, text, truncate_len, words):
         """
-        Truncates HTML to a certain number of chars (not counting tags and
+        Truncate HTML to a certain number of chars (not counting tags and
         comments), or, if words is True, then to a certain number of words.
-        Closes opened tags if they were correctly closed in the given HTML.
+        Close opened tags if they were correctly closed in the given HTML.
 
-        Newlines in the HTML are preserved.
+        Preserve newlines in the HTML.
         """
         if words and length <= 0:
             return ''
@@ -233,10 +226,10 @@ class Truncator(SimpleLazyObject):
 @keep_lazy_text
 def get_valid_filename(s):
     """
-    Returns the given string converted to a string that can be used for a clean
-    filename. Specifically, leading and trailing spaces are removed; other
-    spaces are converted to underscores; and anything that is not a unicode
-    alphanumeric, dash, underscore, or dot, is removed.
+    Return the given string converted to a string that can be used for a clean
+    filename. Remove leading and trailing spaces; convert other spaces to
+    underscores; and remove anything that is not an alphanumeric, dash,
+    underscore, or dot.
     >>> get_valid_filename("john's portrait in 2004.jpg")
     'johns_portrait_in_2004.jpg'
     """
@@ -245,7 +238,7 @@ def get_valid_filename(s):
 
 
 @keep_lazy_text
-def get_text_list(list_, last_word=ugettext_lazy('or')):
+def get_text_list(list_, last_word=gettext_lazy('or')):
     """
     >>> get_text_list(['a', 'b', 'c', 'd'])
     'a, b, c or d'
@@ -270,14 +263,14 @@ def get_text_list(list_, last_word=ugettext_lazy('or')):
 
 @keep_lazy_text
 def normalize_newlines(text):
-    """Normalizes CRLF and CR newlines to just LF."""
+    """Normalize CRLF and CR newlines to just LF."""
     text = force_text(text)
     return re_newlines.sub('\n', text)
 
 
 @keep_lazy_text
 def phone2numeric(phone):
-    """Converts a phone number with letters into its numeric equivalent."""
+    """Convert a phone number with letters into its numeric equivalent."""
     char2number = {
         'a': '2', 'b': '2', 'c': '2', 'd': '3', 'e': '3', 'f': '3', 'g': '4',
         'h': '4', 'i': '4', 'j': '5', 'k': '5', 'l': '5', 'm': '6', 'n': '6',
@@ -291,13 +284,12 @@ def phone2numeric(phone):
 # Used with permission.
 def compress_string(s):
     zbuf = BytesIO()
-    zfile = GzipFile(mode='wb', compresslevel=6, fileobj=zbuf)
-    zfile.write(s)
-    zfile.close()
+    with GzipFile(mode='wb', compresslevel=6, fileobj=zbuf, mtime=0) as zfile:
+        zfile.write(s)
     return zbuf.getvalue()
 
 
-class StreamingBuffer(object):
+class StreamingBuffer:
     def __init__(self):
         self.vals = []
 
@@ -321,15 +313,14 @@ class StreamingBuffer(object):
 # Like compress_string, but for iterators of strings.
 def compress_sequence(sequence):
     buf = StreamingBuffer()
-    zfile = GzipFile(mode='wb', compresslevel=6, fileobj=buf)
-    # Output headers...
-    yield buf.read()
-    for item in sequence:
-        zfile.write(item)
-        data = buf.read()
-        if data:
-            yield data
-    zfile.close()
+    with GzipFile(mode='wb', compresslevel=6, fileobj=buf, mtime=0) as zfile:
+        # Output headers...
+        yield buf.read()
+        for item in sequence:
+            zfile.write(item)
+            data = buf.read()
+            if data:
+                yield data
     yield buf.read()
 
 
@@ -375,14 +366,15 @@ def _replace_entity(match):
                 c = int(text[1:], 16)
             else:
                 c = int(text)
-            return six.unichr(c)
+            return chr(c)
         except ValueError:
             return match.group(0)
     else:
         try:
-            return six.unichr(html_entities.name2codepoint[text])
+            return chr(html.entities.name2codepoint[text])
         except (ValueError, KeyError):
             return match.group(0)
+
 
 _entity_re = re.compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
 
@@ -413,7 +405,7 @@ def unescape_string_literal(s):
     return s[1:-1].replace(r'\%s' % quote, quote).replace(r'\\', '\\')
 
 
-@keep_lazy(six.text_type, SafeText)
+@keep_lazy(str, SafeText)
 def slugify(value, allow_unicode=False):
     """
     Convert to ASCII if 'allow_unicode' is False. Convert spaces to hyphens.
@@ -423,16 +415,26 @@ def slugify(value, allow_unicode=False):
     value = force_text(value)
     if allow_unicode:
         value = unicodedata.normalize('NFKC', value)
-        value = re.sub('[^\w\s-]', '', value, flags=re.U).strip().lower()
-        return mark_safe(re.sub('[-\s]+', '-', value, flags=re.U))
+        value = re.sub(r'[^\w\s-]', '', value).strip().lower()
+        return mark_safe(re.sub(r'[-\s]+', '-', value))
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
-    value = re.sub('[^\w\s-]', '', value).strip().lower()
-    return mark_safe(re.sub('[-\s]+', '-', value))
+    value = re.sub(r'[^\w\s-]', '', value).strip().lower()
+    return mark_safe(re.sub(r'[-\s]+', '-', value))
 
 
 def camel_case_to_spaces(value):
     """
-    Splits CamelCase and converts to lower case. Also strips leading and
-    trailing whitespace.
+    Split CamelCase and convert to lower case. Strip surrounding whitespace.
     """
     return re_camel_case.sub(r' \1', value).strip().lower()
+
+
+def _format_lazy(format_string, *args, **kwargs):
+    """
+    Apply str.format() on 'format_string' where format_string, args,
+    and/or kwargs might be lazy.
+    """
+    return format_string.format(*args, **kwargs)
+
+
+format_lazy = lazy(_format_lazy, str)

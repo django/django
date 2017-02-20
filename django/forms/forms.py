@@ -2,8 +2,6 @@
 Form classes
 """
 
-from __future__ import unicode_literals
-
 import copy
 from collections import OrderedDict
 
@@ -14,12 +12,13 @@ from django.forms.fields import Field, FileField
 # pretty_name is imported for backwards compatibility in Django 1.9
 from django.forms.utils import ErrorDict, ErrorList, pretty_name  # NOQA
 from django.forms.widgets import Media, MediaDefiningClass
-from django.utils import six
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, html_safe
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
+
+from .renderers import get_default_renderer
 
 __all__ = ('BaseForm', 'Form')
 
@@ -35,7 +34,6 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
             if isinstance(value, Field):
                 current_fields.append((key, value))
                 attrs.pop(key)
-        current_fields.sort(key=lambda x: x[1].creation_counter)
         attrs['declared_fields'] = OrderedDict(current_fields)
 
         new_class = super(DeclarativeFieldsMetaclass, mcs).__new__(mcs, name, bases, attrs)
@@ -57,21 +55,26 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
 
         return new_class
 
+    @classmethod
+    def __prepare__(metacls, name, bases, **kwds):
+        # Remember the order in which form fields are defined.
+        return OrderedDict()
+
 
 @html_safe
-@python_2_unicode_compatible
-class BaseForm(object):
+class BaseForm:
     # This is the main implementation of all the Form logic. Note that this
     # class is different than Form. See the comments by the Form class for more
     # information. Any improvements to the form API should be made to *this*
     # class, not to the Form class.
+    default_renderer = None
     field_order = None
     prefix = None
     use_required_attribute = True
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=None,
-                 empty_permitted=False, field_order=None, use_required_attribute=None):
+                 empty_permitted=False, field_order=None, use_required_attribute=None, renderer=None):
         self.is_bound = data is not None or files is not None
         self.data = data or {}
         self.files = files or {}
@@ -96,6 +99,17 @@ class BaseForm(object):
 
         if use_required_attribute is not None:
             self.use_required_attribute = use_required_attribute
+
+        # Initialize form renderer. Use a global default if not specified
+        # either as an argument or as self.default_renderer.
+        if renderer is None:
+            if self.default_renderer is None:
+                renderer = get_default_renderer()
+            else:
+                renderer = self.default_renderer
+                if isinstance(self.default_renderer, type):
+                    renderer = renderer()
+        self.renderer = renderer
 
     def order_fields(self, field_order):
         """
@@ -198,7 +212,7 @@ class BaseForm(object):
                     top_errors.extend(
                         [_('(Hidden field %(name)s) %(error)s') % {'name': name, 'error': force_text(e)}
                          for e in bf_errors])
-                hidden_fields.append(six.text_type(bf))
+                hidden_fields.append(str(bf))
             else:
                 # Create a 'class="..."' attribute if the row should have any
                 # CSS classes applied.
@@ -223,7 +237,7 @@ class BaseForm(object):
                 output.append(normal_row % {
                     'errors': force_text(bf_errors),
                     'label': force_text(label),
-                    'field': six.text_type(bf),
+                    'field': str(bf),
                     'help_text': help_text,
                     'html_class_attr': html_class_attr,
                     'css_classes': css_classes,
@@ -373,17 +387,16 @@ class BaseForm(object):
 
     def _clean_fields(self):
         for name, field in self.fields.items():
-            if field.disabled:
-                # Initial values are supposed to be clean
-                self.cleaned_data[name] = self.initial.get(name, field.initial)
-                continue
             # value_from_datadict() gets the data from the data dictionaries.
             # Each widget type knows how to retrieve its own data, because some
             # widgets split data over several HTML fields.
-            value = field.widget.value_from_datadict(self.data, self.files, self.add_prefix(name))
+            if field.disabled:
+                value = self.get_initial_for_field(field, name)
+            else:
+                value = field.widget.value_from_datadict(self.data, self.files, self.add_prefix(name))
             try:
                 if isinstance(field, FileField):
-                    initial = self.initial.get(name, field.initial)
+                    initial = self.get_initial_for_field(field, name)
                     value = field.clean(value, initial)
                 else:
                     value = field.clean(value)
@@ -432,9 +445,9 @@ class BaseForm(object):
             prefixed_name = self.add_prefix(name)
             data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
             if not field.show_hidden_initial:
-                initial_value = self.initial.get(name, field.initial)
-                if callable(initial_value):
-                    initial_value = initial_value()
+                # Use the BoundField's initial as this is the value passed to
+                # the widget.
+                initial_value = self[name].initial
             else:
                 initial_prefixed_name = self.add_initial_prefix(name)
                 hidden_widget = field.hidden_widget()
@@ -483,8 +496,18 @@ class BaseForm(object):
         """
         return [field for field in self if not field.is_hidden]
 
+    def get_initial_for_field(self, field, field_name):
+        """
+        Return initial data for field on form. Use initial data from the form
+        or the field, in that order. Evaluate callable values.
+        """
+        value = self.initial.get(field_name, field.initial)
+        if callable(value):
+            value = value()
+        return value
 
-class Form(six.with_metaclass(DeclarativeFieldsMetaclass, BaseForm)):
+
+class Form(BaseForm, metaclass=DeclarativeFieldsMetaclass):
     "A collection of Fields, plus their associated data."
     # This is a separate class from BaseForm in order to abstract the way
     # self.fields is specified. This class (Form) is the one that does the

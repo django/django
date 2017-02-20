@@ -34,11 +34,13 @@ You can pass in either an integer or a string representation of an integer.
 ``intcomma``
 ============
 
-Converts an integer to a string containing commas every three digits.
+Converts an integer or float (or a string representation of either) to a string
+containing commas every three digits.
 
 Examples:
 
 * ``4500`` becomes ``4,500``.
+* ``4500.2`` becomes ``4,500.2``.
 * ``45000`` becomes ``45,000``.
 * ``450000`` becomes ``450,000``.
 * ``4500000`` becomes ``4,500,000``.
@@ -49,15 +51,13 @@ e.g. with the ``'de'`` language:
 * ``45000`` becomes ``'45.000'``.
 * ``450000`` becomes ``'450.000'``.
 
-You can pass in either an integer or a string representation of an integer.
-
 .. templatefilter:: intword
 
 ``intword``
 ===========
 
-Converts a large integer to a friendly text representation. Works best for
-numbers over 1 million.
+Converts a large integer (or a string representation of an integer) to a
+friendly text representation. Works best for numbers over 1 million.
 
 Examples:
 
@@ -73,8 +73,6 @@ e.g. with the ``'de'`` language:
 * ``1000000`` becomes ``'1,0 Million'``.
 * ``1200000`` becomes ``'1,2 Million'``.
 * ``1200000000`` becomes ``'1,2 Milliarden'``.
-
-You can pass in either an integer or a string representation of an integer.
 
 .. templatefilter:: naturalday
 

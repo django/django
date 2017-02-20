@@ -1,7 +1,6 @@
 from django import forms
 from django.db import models
 from django.test import SimpleTestCase, TestCase
-from django.utils.encoding import force_str
 
 from .models import (
     Foo, RenamedField, VerboseNameField, Whiz, WhizIter, WhizIterEmpty,
@@ -43,7 +42,7 @@ class BasicFieldTests(TestCase):
 
     def test_field_verbose_name(self):
         m = VerboseNameField
-        for i in range(1, 24):
+        for i in range(1, 23):
             self.assertEqual(m._meta.get_field('field%d' % i).verbose_name, 'verbose field%d' % i)
 
         self.assertEqual(m._meta.get_field('id').verbose_name, 'verbose pk')
@@ -56,8 +55,20 @@ class BasicFieldTests(TestCase):
         self.assertIsInstance(field.formfield(choices_form_class=klass), klass)
 
     def test_field_str(self):
+        f = models.Field()
+        self.assertEqual(str(f), '<django.db.models.fields.Field>')
         f = Foo._meta.get_field('a')
-        self.assertEqual(force_str(f), 'model_fields.Foo.a')
+        self.assertEqual(str(f), 'model_fields.Foo.a')
+
+    def test_field_ordering(self):
+        """Fields are ordered based on their creation."""
+        f1 = models.Field()
+        f2 = models.Field(auto_created=True)
+        f3 = models.Field()
+        self.assertLess(f2, f1)
+        self.assertGreater(f3, f1)
+        self.assertIsNotNone(f1)
+        self.assertNotIn(f2, (None, 1, ''))
 
 
 class ChoicesTests(SimpleTestCase):
@@ -70,7 +81,7 @@ class ChoicesTests(SimpleTestCase):
         self.assertEqual(Whiz(c=1).get_c_display(), 'First')    # A nested value
         self.assertEqual(Whiz(c=0).get_c_display(), 'Other')    # A top level value
         self.assertEqual(Whiz(c=9).get_c_display(), 9)          # Invalid value
-        self.assertEqual(Whiz(c=None).get_c_display(), None)    # Blank value
+        self.assertIsNone(Whiz(c=None).get_c_display())         # Blank value
         self.assertEqual(Whiz(c='').get_c_display(), '')        # Empty value
 
     def test_iterator_choices(self):
@@ -79,7 +90,7 @@ class ChoicesTests(SimpleTestCase):
         """
         self.assertEqual(WhizIter(c=1).c, 1)          # A nested value
         self.assertEqual(WhizIter(c=9).c, 9)          # Invalid value
-        self.assertEqual(WhizIter(c=None).c, None)    # Blank value
+        self.assertIsNone(WhizIter(c=None).c)         # Blank value
         self.assertEqual(WhizIter(c='').c, '')        # Empty value
 
     def test_empty_iterator_choices(self):
@@ -88,5 +99,5 @@ class ChoicesTests(SimpleTestCase):
         """
         self.assertEqual(WhizIterEmpty(c="a").c, "a")      # A nested value
         self.assertEqual(WhizIterEmpty(c="b").c, "b")      # Invalid value
-        self.assertEqual(WhizIterEmpty(c=None).c, None)    # Blank value
+        self.assertIsNone(WhizIterEmpty(c=None).c)         # Blank value
         self.assertEqual(WhizIterEmpty(c='').c, '')        # Empty value

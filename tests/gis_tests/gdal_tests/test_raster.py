@@ -49,8 +49,6 @@ from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.shortcuts import numpy
 from django.test import SimpleTestCase
-from django.utils import six
-from django.utils._os import upath
 
 from ..data.rasters.textrasters import JSON_RASTER
 
@@ -60,18 +58,17 @@ if HAS_GDAL:
 
 
 @unittest.skipUnless(HAS_GDAL, "GDAL is required")
-class GDALRasterTests(unittest.TestCase):
+class GDALRasterTests(SimpleTestCase):
     """
     Test a GDALRaster instance created from a file (GeoTiff).
     """
     def setUp(self):
-        self.rs_path = os.path.join(os.path.dirname(upath(__file__)),
-                                    '../data/rasters/raster.tif')
+        self.rs_path = os.path.join(os.path.dirname(__file__), '../data/rasters/raster.tif')
         self.rs = GDALRaster(self.rs_path)
 
     def test_rs_name_repr(self):
         self.assertEqual(self.rs_path, self.rs.name)
-        six.assertRegex(self, repr(self.rs), "<Raster object at 0x\w+>")
+        self.assertRegex(repr(self.rs), r"<Raster object at 0x\w+>")
 
     def test_rs_driver(self):
         self.assertEqual(self.rs.driver.name, 'GTiff')
@@ -190,6 +187,64 @@ class GDALRasterTests(unittest.TestCase):
         else:
             self.assertEqual(restored_raster.bands[0].data(), self.rs.bands[0].data())
 
+    def test_offset_size_and_shape_on_raster_creation(self):
+        rast = GDALRaster({
+            'datatype': 1,
+            'width': 4,
+            'height': 4,
+            'srid': 4326,
+            'bands': [{
+                'data': (1,),
+                'offset': (1, 1),
+                'size': (2, 2),
+                'shape': (1, 1),
+                'nodata_value': 2,
+            }],
+        })
+        # Get array from raster.
+        result = rast.bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+        # Band data is equal to nodata value except on input block of ones.
+        self.assertEqual(
+            result,
+            [2, 2, 2, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 2, 2, 2]
+        )
+
+    def test_set_nodata_value_on_raster_creation(self):
+        # Create raster filled with nodata values.
+        rast = GDALRaster({
+            'datatype': 1,
+            'width': 2,
+            'height': 2,
+            'srid': 4326,
+            'bands': [{'nodata_value': 23}],
+        })
+        # Get array from raster.
+        result = rast.bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+        # All band data is equal to nodata value.
+        self.assertEqual(result, [23, ] * 4)
+
+    def test_set_nodata_none_on_raster_creation(self):
+        if GDAL_VERSION < (2, 1):
+            self.skipTest("GDAL >= 2.1 is required for this test.")
+        # Create raster without data and without nodata value.
+        rast = GDALRaster({
+            'datatype': 1,
+            'width': 2,
+            'height': 2,
+            'srid': 4326,
+            'bands': [{'nodata_value': None}],
+        })
+        # Get array from raster.
+        result = rast.bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+        # Band data is equal to zero becaues no nodata value has been specified.
+        self.assertEqual(result, [0] * 4)
+
     def test_raster_warp(self):
         # Create in memory raster
         source = GDALRaster({
@@ -246,9 +301,30 @@ class GDALRasterTests(unittest.TestCase):
              12.0, 13.0, 14.0, 15.0]
         )
 
+    def test_raster_warp_nodata_zone(self):
+        # Create in memory raster.
+        source = GDALRaster({
+            'datatype': 1,
+            'driver': 'MEM',
+            'width': 4,
+            'height': 4,
+            'srid': 3086,
+            'origin': (500000, 400000),
+            'scale': (100, -100),
+            'skew': (0, 0),
+            'bands': [{
+                'data': range(16),
+                'nodata_value': 23,
+            }],
+        })
+        # Warp raster onto a location that does not cover any pixels of the original.
+        result = source.warp({'origin': (200000, 200000)}).bands[0].data()
+        if numpy:
+            result = result.flatten().tolist()
+        # The result is an empty raster filled with the correct nodata value.
+        self.assertEqual(result, [23] * 16)
+
     def test_raster_transform(self):
-        if GDAL_VERSION < (1, 8, 1):
-            self.skipTest("GDAL >= 1.8.1 is required for this test")
         # Prepare tempfile and nodata value
         rstfile = tempfile.NamedTemporaryFile(suffix='.tif')
         ndv = 99
@@ -281,8 +357,10 @@ class GDALRasterTests(unittest.TestCase):
         self.assertEqual(target.width, 7)
         self.assertEqual(target.height, 7)
         self.assertEqual(target.bands[0].datatype(), source.bands[0].datatype())
-        self.assertEqual(target.origin, [9124842.791079799, 1589911.6476407414])
-        self.assertEqual(target.scale, [223824.82664250192, -223824.82664250192])
+        self.assertAlmostEqual(target.origin[0], 9124842.791079799)
+        self.assertAlmostEqual(target.origin[1], 1589911.6476407414)
+        self.assertAlmostEqual(target.scale[0], 223824.82664250192)
+        self.assertAlmostEqual(target.scale[1], -223824.82664250192)
         self.assertEqual(target.skew, [0, 0])
 
         result = target.bands[0].data()
@@ -308,7 +386,7 @@ class GDALRasterTests(unittest.TestCase):
 @unittest.skipUnless(HAS_GDAL, "GDAL is required")
 class GDALBandTests(SimpleTestCase):
     def setUp(self):
-        self.rs_path = os.path.join(os.path.dirname(upath(__file__)), '../data/rasters/raster.tif')
+        self.rs_path = os.path.join(os.path.dirname(__file__), '../data/rasters/raster.tif')
         rs = GDALRaster(self.rs_path)
         self.band = rs.bands[0]
 
@@ -323,7 +401,7 @@ class GDALBandTests(SimpleTestCase):
         if numpy:
             data = self.band.data()
             assert_array = numpy.loadtxt(
-                os.path.join(os.path.dirname(upath(__file__)), '../data/rasters/raster.numpy.txt')
+                os.path.join(os.path.dirname(__file__), '../data/rasters/raster.numpy.txt')
             )
             numpy.testing.assert_equal(data, assert_array)
             self.assertEqual(data.shape, (self.band.height, self.band.width))
@@ -345,7 +423,7 @@ class GDALBandTests(SimpleTestCase):
             self.assertAlmostEqual(self.band.mean, 2.828326634228898)
             self.assertAlmostEqual(self.band.std, 2.4260526986669095)
 
-            # Check that statistics are persisted into PAM file on band close
+            # Statistics are persisted into PAM file on band close
             self.band = None
             self.assertTrue(os.path.isfile(pam_file))
         finally:
@@ -424,7 +502,7 @@ class GDALBandTests(SimpleTestCase):
             self.assertEqual(result, block)
 
         # Set data from memoryview
-        bandmem.data(six.memoryview(packed_block), (1, 1), (2, 2))
+        bandmem.data(memoryview(packed_block), (1, 1), (2, 2))
         result = bandmem.data(offset=(1, 1), size=(2, 2))
         if numpy:
             numpy.testing.assert_equal(result, numpy.array(block).reshape(2, 2))

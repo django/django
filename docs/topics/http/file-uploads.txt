@@ -19,9 +19,11 @@ and in memory, and how to customize the default behavior.
 Basic file uploads
 ==================
 
-Consider a simple form containing a :class:`~django.forms.FileField`::
+Consider a simple form containing a :class:`~django.forms.FileField`:
 
-    # In forms.py...
+.. snippet::
+    :filename: forms.py
+
     from django import forms
 
     class UploadFileForm(forms.Form):
@@ -42,7 +44,10 @@ the request has the attribute ``enctype="multipart/form-data"``. Otherwise,
 
 Most of the time, you'll simply pass the file data from ``request`` into the
 form as described in :ref:`binding-uploaded-files`. This would look
-something like::
+something like:
+
+.. snippet::
+    :filename: views.py
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
@@ -122,6 +127,46 @@ field in the model::
             form = UploadFileForm()
         return render(request, 'upload.html', {'form': form})
 
+Uploading multiple files
+------------------------
+
+If you want to upload multiple files using one form field, set the ``multiple``
+HTML attribute of field's widget:
+
+.. snippet::
+    :filename: forms.py
+
+    from django import forms
+
+    class FileFieldForm(forms.Form):
+        file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+
+Then override the ``post`` method of your
+:class:`~django.views.generic.edit.FormView` subclass to handle multiple file
+uploads:
+
+.. snippet::
+    :filename: views.py
+
+    from django.views.generic.edit import FormView
+    from .forms import FileFieldForm
+
+    class FileFieldView(FormView):
+        form_class = FileFieldForm
+        template_name = 'upload.html'  # Replace with your template.
+        success_url = '...'  # Replace with your URL or reverse().
+
+        def post(self, request, *args, **kwargs):
+            form_class = self.get_form_class()
+            form = self.get_form(form_class)
+            files = request.FILES.getlist('file_field')
+            if form.is_valid():
+                for f in files:
+                    ...  # Do something with each file.
+                return self.form_valid(form)
+            else:
+                return self.form_invalid(form)
+
 Upload Handlers
 ===============
 
@@ -184,7 +229,7 @@ For instance, suppose you've written a ``ProgressBarUploadHandler`` that
 provides feedback on upload progress to some sort of AJAX widget. You'd add this
 handler to your upload handlers like this::
 
-    request.upload_handlers.insert(0, ProgressBarUploadHandler())
+    request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
 
 You'd probably want to use ``list.insert()`` in this case (instead of
 ``append()``) because a progress bar handler would need to run *before* any
@@ -193,7 +238,7 @@ other handlers. Remember, the upload handlers are processed in order.
 If you want to replace the upload handlers completely, you can just assign a new
 list::
 
-   request.upload_handlers = [ProgressBarUploadHandler()]
+   request.upload_handlers = [ProgressBarUploadHandler(request)]
 
 .. note::
 
@@ -221,7 +266,7 @@ list::
 
         @csrf_exempt
         def upload_file_view(request):
-            request.upload_handlers.insert(0, ProgressBarUploadHandler())
+            request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
             return _upload_file_view(request)
 
         @csrf_protect

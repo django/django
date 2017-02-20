@@ -80,9 +80,9 @@ In a class-based view, this would become::
 
 Because Django's URL resolver expects to send the request and associated
 arguments to a callable function, not a class, class-based views have an
-:meth:`~django.views.generic.base.View.as_view` class method which serves as
-the callable entry point to your class. The ``as_view`` entry point creates an
-instance of your class and calls its
+:meth:`~django.views.generic.base.View.as_view` class method which returns a
+function that can be called when a request arrives for a URL matching the
+associated pattern. The function creates an instance of the class and calls its
 :meth:`~django.views.generic.base.View.dispatch` method. ``dispatch`` looks at
 the request to determine whether it is a ``GET``, ``POST``, etc, and relays the
 request to a matching method if one is defined, or raises
@@ -93,7 +93,7 @@ request to a matching method if one is defined, or raises
     from myapp.views import MyView
 
     urlpatterns = [
-        url(r'^about/', MyView.as_view()),
+        url(r'^about/$', MyView.as_view()),
     ]
 
 
@@ -130,7 +130,7 @@ Another option is to configure class attributes as keyword arguments to the
 :meth:`~django.views.generic.base.View.as_view` call in the URLconf::
 
     urlpatterns = [
-        url(r'^about/', GreetingView.as_view(greeting="G'day")),
+        url(r'^about/$', GreetingView.as_view(greeting="G'day")),
     ]
 
 .. note::
@@ -245,8 +245,8 @@ The easiest place to do this is in the URLconf where you deploy your view::
     from .views import VoteView
 
     urlpatterns = [
-        url(r'^about/', login_required(TemplateView.as_view(template_name="secret.html"))),
-        url(r'^vote/', permission_required('polls.can_vote')(VoteView.as_view())),
+        url(r'^about/$', login_required(TemplateView.as_view(template_name="secret.html"))),
+        url(r'^vote/$', permission_required('polls.can_vote')(VoteView.as_view())),
     ]
 
 This approach applies the decorator on a per-instance basis. If you
@@ -277,7 +277,7 @@ that it can be used on an instance method. For example::
 
         @method_decorator(login_required)
         def dispatch(self, *args, **kwargs):
-            return super(ProtectedView, self).dispatch(*args, **kwargs)
+            return super().dispatch(*args, **kwargs)
 
 Or, more succinctly, you can decorate the class instead and pass the name
 of the method to be decorated as the keyword argument ``name``::

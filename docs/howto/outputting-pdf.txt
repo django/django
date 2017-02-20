@@ -141,21 +141,6 @@ Here's the above "Hello World" example rewritten to use :mod:`io`::
         response.write(pdf)
         return response
 
-Further resources
-=================
-
-* PDFlib_ is another PDF-generation library that has Python bindings. To
-  use it with Django, just use the same concepts explained in this article.
-* `XHTML2PDF`_ is yet another PDF-generation library. It ships with an example
-  of how to integrate it with Django.
-* HTMLdoc_ is a command-line script that can convert HTML to PDF. It
-  doesn't have a Python interface, but you can escape out to the shell
-  using ``system`` or ``popen`` and retrieve the output in Python.
-
-.. _PDFlib: http://www.pdflib.org/
-.. _XHTML2PDF: https://github.com/xhtml2pdf/xhtml2pdf
-.. _HTMLdoc: https://www.msweet.org/projects.php?Z1
-
 Other formats
 =============
 
@@ -164,3 +149,9 @@ bits using ``reportlab``. You can use a similar technique to generate any
 arbitrary format that you can find a Python library for. Also see
 :doc:`/howto/outputting-csv` for another example and some techniques you can use
 when generated text-based formats.
+
+.. seealso::
+
+    Django Packages provides a `comparison of packages
+    <https://djangopackages.org/grids/g/pdf/>`_ that help generate PDF files
+    from Django.

@@ -1,8 +1,6 @@
 """
 Management utility to create superusers.
 """
-from __future__ import unicode_literals
-
 import getpass
 import sys
 
@@ -12,8 +10,6 @@ from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS
-from django.utils.encoding import force_str
-from django.utils.six.moves import input
 from django.utils.text import capfirst
 
 
@@ -26,7 +22,7 @@ class Command(BaseCommand):
     requires_migrations_checks = True
 
     def __init__(self, *args, **kwargs):
-        super(Command, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.UserModel = get_user_model()
         self.username_field = self.UserModel._meta.get_field(self.UserModel.USERNAME_FIELD)
 
@@ -60,7 +56,7 @@ class Command(BaseCommand):
 
     def execute(self, *args, **options):
         self.stdin = options.get('stdin', sys.stdin)  # Used for testing
-        return super(Command, self).execute(*args, **options)
+        return super().execute(*args, **options)
 
     def handle(self, *args, **options):
         username = options[self.UserModel.USERNAME_FIELD]
@@ -106,12 +102,12 @@ class Command(BaseCommand):
                     if default_username:
                         input_msg += " (leave blank to use '%s')" % default_username
                     username_rel = self.username_field.remote_field
-                    input_msg = force_str('%s%s: ' % (
+                    input_msg = '%s%s: ' % (
                         input_msg,
                         ' (%s.%s)' % (
                             username_rel.model._meta.object_name,
                             username_rel.field_name
-                        ) if username_rel else '')
+                        ) if username_rel else ''
                     )
                     username = self.get_input_data(self.username_field, input_msg, default_username)
                     if not username:
@@ -129,13 +125,13 @@ class Command(BaseCommand):
                     field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = options[field_name]
                     while user_data[field_name] is None:
-                        message = force_str('%s%s: ' % (
+                        message = '%s%s: ' % (
                             capfirst(field.verbose_name),
                             ' (%s.%s)' % (
                                 field.remote_field.model._meta.object_name,
                                 field.remote_field.field_name,
                             ) if field.remote_field else '',
-                        ))
+                        )
                         input_value = self.get_input_data(field, message)
                         user_data[field_name] = input_value
                         fake_user_data[field_name] = input_value
@@ -147,7 +143,7 @@ class Command(BaseCommand):
                 # Get a password
                 while password is None:
                     password = getpass.getpass()
-                    password2 = getpass.getpass(force_str('Password (again): '))
+                    password2 = getpass.getpass('Password (again): ')
                     if password != password2:
                         self.stderr.write("Error: Your passwords didn't match.")
                         password = None

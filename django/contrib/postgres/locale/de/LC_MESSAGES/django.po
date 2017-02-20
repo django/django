@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2015
+# Jannis Leidel <jannis@leidel.info>, 2015-2016
+# Jens Neuhaus <kontakt@jensneuhaus.de>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-12 12:29+0000\n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-07-26 11:18+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -42,9 +43,12 @@ msgstr "Wert muss gültiges JSON sein."
 msgid "Could not load JSON data."
 msgstr "Konnte JSON-Daten nicht laden."
 
+msgid "Input must be a JSON dictionary."
+msgstr "Eingabe muss ein JSON-Dictionary sein."
+
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' Wert muss gültiges JSON sein."
+msgstr "‚%(value)s‛ Wert muss gültiges JSON sein."
 
 msgid "Enter two valid values."
 msgstr "Bitte zwei gültige Werte eingeben."

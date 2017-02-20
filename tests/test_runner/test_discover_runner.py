@@ -1,4 +1,5 @@
 import os
+from argparse import ArgumentParser
 from contextlib import contextmanager
 from unittest import TestSuite, TextTestRunner, defaultTestLoader
 
@@ -19,6 +20,19 @@ def change_cwd(directory):
 
 
 class DiscoverRunnerTest(TestCase):
+
+    def test_init_debug_mode(self):
+        runner = DiscoverRunner()
+        self.assertFalse(runner.debug_mode)
+
+    def test_add_arguments_debug_mode(self):
+        parser = ArgumentParser()
+        DiscoverRunner.add_arguments(parser)
+
+        ns = parser.parse_args([])
+        self.assertFalse(ns.debug_mode)
+        ns = parser.parse_args(["--debug-mode"])
+        self.assertTrue(ns.debug_mode)
 
     def test_dotted_test_module(self):
         count = DiscoverRunner().build_suite(
@@ -156,6 +170,9 @@ class DiscoverRunnerTest(TestCase):
                       msg="Methods of simple cases should be reversed.")
         self.assertIn('test_2', suite[8].id(),
                       msg="Methods of unittest cases should be reversed.")
+
+    def test_overridable_get_test_runner_kwargs(self):
+        self.assertIsInstance(DiscoverRunner().get_test_runner_kwargs(), dict)
 
     def test_overridable_test_suite(self):
         self.assertEqual(DiscoverRunner().test_suite, TestSuite)

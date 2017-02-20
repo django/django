@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import pickle
 
 from django.forms import BooleanField, ValidationError
@@ -27,18 +25,18 @@ class BooleanFieldTest(SimpleTestCase):
 
     def test_booleanfield_clean_2(self):
         f = BooleanField(required=False)
-        self.assertEqual(False, f.clean(''))
-        self.assertEqual(False, f.clean(None))
-        self.assertEqual(True, f.clean(True))
-        self.assertEqual(False, f.clean(False))
-        self.assertEqual(True, f.clean(1))
-        self.assertEqual(False, f.clean(0))
-        self.assertEqual(True, f.clean('1'))
-        self.assertEqual(False, f.clean('0'))
-        self.assertEqual(True, f.clean('Django rocks'))
-        self.assertEqual(False, f.clean('False'))
-        self.assertEqual(False, f.clean('false'))
-        self.assertEqual(False, f.clean('FaLsE'))
+        self.assertIs(f.clean(''), False)
+        self.assertIs(f.clean(None), False)
+        self.assertIs(f.clean(True), True)
+        self.assertIs(f.clean(False), False)
+        self.assertIs(f.clean(1), True)
+        self.assertIs(f.clean(0), False)
+        self.assertIs(f.clean('1'), True)
+        self.assertIs(f.clean('0'), False)
+        self.assertIs(f.clean('Django rocks'), True)
+        self.assertIs(f.clean('False'), False)
+        self.assertIs(f.clean('false'), False)
+        self.assertIs(f.clean('FaLsE'), False)
 
     def test_boolean_picklable(self):
         self.assertIsInstance(pickle.loads(pickle.dumps(BooleanField())), BooleanField)

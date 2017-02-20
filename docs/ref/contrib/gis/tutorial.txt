@@ -216,7 +216,7 @@ model to represent this data::
         mpoly = models.MultiPolygonField()
 
         # Returns the string representation of the model.
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
 Note that the ``models`` module is imported from ``django.contrib.gis.db``.
@@ -303,7 +303,7 @@ besides the tools included within GeoDjango, you may also use the following:
   PostGIS.
 
 .. _ogr2ogr: http://www.gdal.org/ogr2ogr.html
-.. _shp2pgsql: http://postgis.net/docs/manual-1.5/ch04.html#shp2pgsql_usage
+.. _shp2pgsql: http://postgis.net/docs/using_postgis_dbmanagement.html#shp2pgsql_usage
 
 .. _gdalinterface:
 
@@ -452,12 +452,15 @@ with the following code::
         'mpoly' : 'MULTIPOLYGON',
     }
 
-    world_shp = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data', 'TM_WORLD_BORDERS-0.3.shp'))
+    world_shp = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), 'data', 'TM_WORLD_BORDERS-0.3.shp'),
+    )
 
     def run(verbose=True):
-        lm = LayerMapping(WorldBorder, world_shp, world_mapping,
-                          transform=False, encoding='iso-8859-1')
-
+        lm = LayerMapping(
+            WorldBorder, world_shp, world_mapping,
+            transform=False, encoding='iso-8859-1',
+        )
         lm.save(strict=True, verbose=verbose)
 
 A few notes about what's going on:
@@ -665,7 +668,7 @@ for popular geospatial formats::
     MULTIPOLYGON (((12.4157980000000006 43.9579540000000009, 12.4505540000000003 43.9797209999999978, ...
     >>> sm.mpoly.wkb # WKB (as Python binary buffer)
     <read-only buffer for 0x1fe2c70, size -1, offset 0 at 0x2564c40>
-    >>> sm.mpoly.geojson # GeoJSON (requires GDAL)
+    >>> sm.mpoly.geojson # GeoJSON
     '{ "type": "MultiPolygon", "coordinates": [ [ [ [ 12.415798, 43.957954 ], [ 12.450554, 43.979721 ], ...
 
 This includes access to all of the advanced geometric operations provided by
@@ -750,13 +753,8 @@ This provides more context (including street and thoroughfare details) than
 available with the :class:`~django.contrib.gis.admin.GeoModelAdmin`
 (which uses the `Vector Map Level 0`_ WMS dataset hosted at `OSGeo`_).
 
-First, there are some important requirements:
-
-* :class:`~django.contrib.gis.admin.OSMGeoAdmin` requires that
-  :doc:`GDAL <gdal>` is installed.
-
-* The PROJ.4 datum shifting files must be installed (see the
-  :ref:`PROJ.4 installation instructions <proj4>` for more details).
+The PROJ.4 datum shifting files must be installed (see the :ref:`PROJ.4
+installation instructions <proj4>` for more details).
 
 If you meet this requirement, then just substitute the ``OSMGeoAdmin``
 option class in your ``admin.py`` file::

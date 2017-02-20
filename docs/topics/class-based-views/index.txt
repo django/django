@@ -42,7 +42,7 @@ you can simply pass them into the
     from django.views.generic import TemplateView
 
     urlpatterns = [
-        url(r'^about/', TemplateView.as_view(template_name="about.html")),
+        url(r'^about/$', TemplateView.as_view(template_name="about.html")),
     ]
 
 Any arguments passed to :meth:`~django.views.generic.base.View.as_view` will
@@ -79,7 +79,7 @@ views::
     from some_app.views import AboutView
 
     urlpatterns = [
-        url(r'^about/', AboutView.as_view()),
+        url(r'^about/$', AboutView.as_view()),
     ]
 
 

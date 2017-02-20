@@ -13,6 +13,7 @@ class TestSRS:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+
 WGS84_proj = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
 
 # Some Spatial Reference examples
@@ -259,3 +260,25 @@ class SpatialRefTest(unittest.TestCase):
         self.assertEqual('EPSG', s1['AUTHORITY'])
         self.assertEqual(4326, int(s1['AUTHORITY', 1]))
         self.assertIsNone(s1['FOOBAR'])
+
+    def test_unicode(self):
+        wkt = (
+            'PROJCS["DHDN / Soldner 39 Langschoß",'
+            'GEOGCS["DHDN",DATUM["Deutsches_Hauptdreiecksnetz",'
+            'SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6314"]],'
+            'PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],'
+            'UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],'
+            'AUTHORITY["EPSG","4314"]],UNIT["metre",1,AUTHORITY["EPSG","9001"]],'
+            'PROJECTION["Cassini_Soldner"],PARAMETER["latitude_of_origin",50.66738711],'
+            'PARAMETER["central_meridian",6.28935703],PARAMETER["false_easting",0],'
+            'PARAMETER["false_northing",0],AUTHORITY["mj10777.de","187939"],AXIS["x",NORTH],AXIS["y",EAST]]'
+        )
+        srs = SpatialReference(wkt)
+        srs_list = [srs, srs.clone()]
+        srs.import_wkt(wkt)
+
+        for srs in srs_list:
+            self.assertEqual(srs.name, 'DHDN / Soldner 39 Langschoß')
+            self.assertEqual(srs.wkt, wkt)
+            self.assertIn('Langschoß', srs.pretty_wkt)
+            self.assertIn('Langschoß', srs.xml)

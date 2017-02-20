@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.core import signing
 from django.http import HttpRequest, HttpResponse
 from django.test import SimpleTestCase, override_settings
@@ -41,7 +39,7 @@ class SignedCookieTest(SimpleTestCase):
         response.set_signed_cookie('c', 'hello')
         request = HttpRequest()
         request.COOKIES['c'] = response.cookies['c'].value[:-2] + '$$'
-        self.assertEqual(request.get_signed_cookie('c', default=None), None)
+        self.assertIsNone(request.get_signed_cookie('c', default=None))
 
     def test_max_age_argument(self):
         value = 'hello'

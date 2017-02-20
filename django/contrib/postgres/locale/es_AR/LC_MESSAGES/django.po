@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ramiro Morales, 2015
+# Ramiro Morales, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-30 00:21+0000\n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-07-30 23:46+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -42,6 +42,9 @@ msgstr "El valor debe ser JSON valido."
 
 msgid "Could not load JSON data."
 msgstr "No se han podido cargar los datos JSON."
+
+msgid "Input must be a JSON dictionary."
+msgstr "debe ser un diccionario JSON."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."

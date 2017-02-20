@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Vajen, 2013
-# Jannis Leidel <jannis@leidel.info>, 2013-2015
+# Jannis, 2013
+# Jannis Leidel <jannis@leidel.info>, 2013-2016
+# Jannis, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-12 12:23+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-26 11:57+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -37,8 +38,8 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
-"Um Bookmarklets zu installieren, muss dieser Link in die Browser-"
-"Werkzeugleiste gezogen werden oder mittels rechter Maustaste in die "
+"Um die Bookmarklets zu installieren, muss dieser Link in die Browser-"
+"Werkzeugleiste gezogen werden oder mittels rechter Maustaste in den "
 "Bookmarks gespeichert werden. Danach können die Bookmarklets von jeder Seite "
 "aufgerufen werden."
 
@@ -140,8 +141,8 @@ msgstr "Methode"
 msgid "Arguments"
 msgstr "Argumente"
 
-msgid "Back to Model Documentation"
-msgstr "Zurück zur Modell-Dokumentation"
+msgid "Back to Model documentation"
+msgstr "Zurück zur Model-Dokumentation"
 
 msgid "Model documentation"
 msgstr "Model-Dokumentation"
@@ -160,6 +161,7 @@ msgstr "Template: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Template: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Suchpfade für Template „%(name)s“"
@@ -214,8 +216,8 @@ msgstr "Kontext:"
 msgid "Templates:"
 msgstr "Templates:"
 
-msgid "Back to Views Documentation"
-msgstr "Zurück zur Dokumentation der Views."
+msgid "Back to View documentation"
+msgstr "Zurück zur View-Dokumentation"
 
 msgid "View documentation"
 msgstr "View Dokumentation"

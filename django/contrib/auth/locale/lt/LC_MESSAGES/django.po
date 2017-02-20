@@ -3,7 +3,7 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lauris <lauris@runbox.com>, 2011
-# Matas Dailyda <matas@dailyda.com>, 2015
+# Matas Dailyda <matas@dailyda.com>, 2015-2016
 # naktinis <naktinis@gmail.com>, 2012
 # Nikolajus Krauklis <nikolajus@gmail.com>, 2013
 # Simonas Kazlauskas <simonas@kazlauskas.me>, 2012-2013
@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-12 10:18+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-23 12:06+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
@@ -120,6 +120,21 @@ msgstr "druska"
 msgid "hash"
 msgstr "maiša"
 
+msgid "variety"
+msgstr "įvairovė"
+
+msgid "version"
+msgstr "versija"
+
+msgid "memory cost"
+msgstr "atminties sąnaudos"
+
+msgid "time cost"
+msgstr "laiko sąnaudos"
+
+msgid "parallelism"
+msgstr "paralelizmas"
+
 msgid "work factor"
 msgstr "darbo faktorius"
 
@@ -171,17 +186,10 @@ msgstr "Specifiniai šio vartotojo leidimai."
 msgid "username"
 msgstr "vartotojo vardas"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Privalomas. 30 arba mažiau simbolių. Raidės, skaičiai bei @/./+/-/_ "
+"Privalomas. 150 arba mažiau simbolių. Raidės, skaičiai bei @/./+/-/_ "
 "simboliai."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Įveskite korektišką vartotojo vardą. Ši reikšmė gali turėti tik raides, "
-"skaičius  ir @/./+/-/_ simbolius."
 
 msgid "A user with that username already exists."
 msgstr "Jau egzistuoja vartotojas su tokiu vardu."
@@ -268,6 +276,20 @@ msgstr "Jūsų slaptažodis negali būti sudarytas tik iš skaitmenų."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Slaptažodis atkurtas ant %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Įveskite korektišką vartotojo vardą. Ši reikšmė gali turėti tik angliško "
+"alfabeto raides, skaičius  ir @/./+/-/_ simbolius."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Įveskite korektišką vartotojo vardą. Ši reikšmė gali turėti tik raides, "
+"skaičius  ir @/./+/-/_ simbolius."
 
 msgid "Logged out"
 msgstr "Atsijungęs"

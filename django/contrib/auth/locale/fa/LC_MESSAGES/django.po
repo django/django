@@ -5,14 +5,15 @@
 # Eric Hamiter <ehamiter@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # ka7eh, 2015
+# Pouya Abbassi, 2016
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-12-12 23:43+0000\n"
-"Last-Translator: ka7eh\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-08-16 13:54+0000\n"
+"Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -118,6 +119,21 @@ msgstr "salt"
 msgid "hash"
 msgstr "hash"
 
+msgid "variety"
+msgstr "تنوع"
+
+msgid "version"
+msgstr "نسخه"
+
+msgid "memory cost"
+msgstr "هزینه‌ی حافظه"
+
+msgid "time cost"
+msgstr "هزینه‌ی زمان"
+
+msgid "parallelism"
+msgstr "موازات"
+
 msgid "work factor"
 msgstr "عامل کار"
 
@@ -171,15 +187,8 @@ msgstr "اجازه‌های خاص این کاربر."
 msgid "username"
 msgstr "نام کاربری"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "الزامی. ۳۰ کاراکتر یا کمتر. فقط حروف الفبا، ارقام و @/./+/-/_."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"یک نام کاربری معتبر وارد کنید. نام کاربری می‌تواند شامل حروف، اعداد، و "
-"کاراکترهای @/./+/-/_ باشد."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "الزامی. 150 کاراکتر یا کمتر. فقط شامل حروف، اعداد، و علامات @/./+/-/_"
 
 msgid "A user with that username already exists."
 msgstr "کاربری با آن نام کاربری وجود دارد."
@@ -256,6 +265,20 @@ msgstr "رمز شما نمی تواند کلا عدد باشد"
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "بازیابی گذرواژه در %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"یک نام کاربری معتبر وارد کنید. این مقدار میتواند فقط شامل حروف الفبای "
+"انگلیسی، اعداد، و علامات @/./+/-/_ باشد."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"یک نام کاربری معتبر وارد کنید. این مقدار میتواند فقط شامل حروف، اعداد، و "
+"علامات @/./+/-/_ باشد."
 
 msgid "Logged out"
 msgstr "خارج شدید"

@@ -1,12 +1,11 @@
-from __future__ import unicode_literals
-
 from django import forms
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
-from django.db import IntegrityError
+from django.db import IntegrityError, models
 from django.db.models import Q
 from django.test import SimpleTestCase, TestCase
+from django.test.utils import isolate_apps
 
 from .models import (
     AllowsNullGFK, Animal, Carrot, Comparison, ConcreteRelatedModel,
@@ -274,6 +273,11 @@ class GenericRelationsTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             self.bacon.tags.add(t1)
 
+    def test_add_rejects_wrong_instances(self):
+        msg = "'TaggedItem' instance expected, got <Animal: Lion>"
+        with self.assertRaisesMessage(TypeError, msg):
+            self.bacon.tags.add(self.lion)
+
     def test_set(self):
         bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
         fatty = bacon.tags.create(tag="fatty")
@@ -327,9 +331,9 @@ class GenericRelationsTests(TestCase):
         self.assertQuerysetEqual(bacon.tags.all(), [])
 
     def test_assign_with_queryset(self):
-        # Ensure that querysets used in reverse GFK assignments are pre-evaluated
-        # so their value isn't affected by the clearing operation in
-        # ManyRelatedManager.set() (#19816).
+        # Querysets used in reverse GFK assignments are pre-evaluated so their
+        # value isn't affected by the clearing operation
+        # in ManyRelatedManager.set() (#19816).
         bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
         bacon.tags.create(tag="fatty")
         bacon.tags.create(tag="salty")
@@ -342,8 +346,7 @@ class GenericRelationsTests(TestCase):
         self.assertEqual(1, qs.count())
 
     def test_generic_relation_related_name_default(self):
-        # Test that GenericRelation by default isn't usable from
-        # the reverse side.
+        # GenericRelation isn't usable from the reverse side by default.
         with self.assertRaises(FieldError):
             TaggedItem.objects.filter(vegetable__isnull=True)
 
@@ -489,7 +492,7 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tag
 
     def test_subclasses_with_gen_rel(self):
         """
-        Test that concrete model subclasses with generic relations work
+        Concrete model subclasses with generic relations work
         correctly (ticket 11263).
         """
         granite = Rock.objects.create(name='granite', hardness=5)
@@ -599,6 +602,15 @@ class GenericInlineFormsetTest(TestCase):
         form = Formset().forms[0]
         self.assertIsInstance(form['tag'].field.widget, CustomWidget)
 
+    @isolate_apps('generic_relations')
+    def test_incorrect_content_type(self):
+        class BadModel(models.Model):
+            content_type = models.PositiveIntegerField()
+
+        msg = "fk_name 'generic_relations.BadModel.content_type' is not a ForeignKey to ContentType"
+        with self.assertRaisesMessage(Exception, msg):
+            generic_inlineformset_factory(BadModel, TaggedItemForm)
+
     def test_save_new_uses_form_save(self):
         """
         Regression for #16260: save_new should call form.save()
@@ -606,7 +618,7 @@ class GenericInlineFormsetTest(TestCase):
         class SaveTestForm(forms.ModelForm):
             def save(self, *args, **kwargs):
                 self.instance.saved_by = "custom method"
-                return super(SaveTestForm, self).save(*args, **kwargs)
+                return super().save(*args, **kwargs)
 
         Formset = generic_inlineformset_factory(ForProxyModelModel, fields='__all__', form=SaveTestForm)
 

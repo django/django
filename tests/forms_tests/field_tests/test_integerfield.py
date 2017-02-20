@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.forms import IntegerField, Textarea, ValidationError
 from django.test import SimpleTestCase
 
@@ -122,6 +119,10 @@ class IntegerFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(9223372036854775808, f.clean(9223372036854775808))
         self.assertEqual(9223372036854775808, f.clean('9223372036854775808'))
         self.assertEqual(9223372036854775808, f.clean('9223372036854775808.0'))
+
+    def test_integerfield_unicode_number(self):
+        f = IntegerField()
+        self.assertEqual(50, f.clean('５０'))
 
     def test_integerfield_subclass(self):
         """

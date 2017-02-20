@@ -3,7 +3,6 @@ import subprocess
 
 from django.core.files.temp import NamedTemporaryFile
 from django.db.backends.base.client import BaseDatabaseClient
-from django.utils.six import print_
 
 
 def _escape_pgpass(txt):
@@ -17,14 +16,14 @@ class DatabaseClient(BaseDatabaseClient):
     executable_name = 'psql'
 
     @classmethod
-    def runshell_db(cls, settings_dict):
+    def runshell_db(cls, conn_params):
         args = [cls.executable_name]
 
-        host = settings_dict.get('HOST', '')
-        port = settings_dict.get('PORT', '')
-        name = settings_dict.get('NAME', '')
-        user = settings_dict.get('USER', '')
-        passwd = settings_dict.get('PASSWORD', '')
+        host = conn_params.get('host', '')
+        port = conn_params.get('port', '')
+        dbname = conn_params.get('database', '')
+        user = conn_params.get('user', '')
+        passwd = conn_params.get('password', '')
 
         if user:
             args += ['-U', user]
@@ -32,7 +31,7 @@ class DatabaseClient(BaseDatabaseClient):
             args += ['-h', host]
         if port:
             args += ['-p', str(port)]
-        args += [name]
+        args += [dbname]
 
         temp_pgpass = None
         try:
@@ -40,10 +39,10 @@ class DatabaseClient(BaseDatabaseClient):
                 # Create temporary .pgpass file.
                 temp_pgpass = NamedTemporaryFile(mode='w+')
                 try:
-                    print_(
+                    print(
                         _escape_pgpass(host) or '*',
                         str(port) or '*',
-                        _escape_pgpass(name) or '*',
+                        _escape_pgpass(dbname) or '*',
                         _escape_pgpass(user) or '*',
                         _escape_pgpass(passwd),
                         file=temp_pgpass,
@@ -55,7 +54,7 @@ class DatabaseClient(BaseDatabaseClient):
                     # If the current locale can't encode the data, we let
                     # the user input the password manually.
                     pass
-            subprocess.call(args)
+            subprocess.check_call(args)
         finally:
             if temp_pgpass:
                 temp_pgpass.close()
@@ -63,4 +62,4 @@ class DatabaseClient(BaseDatabaseClient):
                     del os.environ['PGPASSFILE']
 
     def runshell(self):
-        DatabaseClient.runshell_db(self.connection.settings_dict)
+        DatabaseClient.runshell_db(self.connection.get_connection_params())

@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Eugene MechanisM <contact@mechanism.name>, 2012
+# Eugene MechanisM <eugene@mechanism.pro>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Алексей Борискин <sun.void@gmail.com>, 2012-2015
+# Андрей Щуров <shurov9009@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-22 13:30+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-23 16:38+0000\n"
+"Last-Translator: Андрей Щуров <shurov9009@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -144,8 +145,8 @@ msgstr "Метод"
 msgid "Arguments"
 msgstr "Аргументы"
 
-msgid "Back to Model Documentation"
-msgstr "Назад, к списку моделей"
+msgid "Back to Model documentation"
+msgstr "Назад к документации моделей"
 
 msgid "Model documentation"
 msgstr "Документация моделей"
@@ -164,6 +165,7 @@ msgstr "Шаблон: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Шаблон: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Пути, по которым будет произведён поиск шаблона \"%(name)s\":"
@@ -218,8 +220,8 @@ msgstr "Контекст:"
 msgid "Templates:"
 msgstr "Шаблоны:"
 
-msgid "Back to Views Documentation"
-msgstr "Назад к документации о view"
+msgid "Back to View documentation"
+msgstr "Назад к документации о представлений"
 
 msgid "View documentation"
 msgstr "Документация о view"

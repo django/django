@@ -188,10 +188,10 @@ For example, the static definition for our Calendar Widget could also
 be defined in a dynamic fashion::
 
     class CalendarWidget(forms.TextInput):
-        def _media(self):
+        @property
+        def media(self):
             return forms.Media(css={'all': ('pretty.css',)},
                                js=('animations.js', 'actions.js'))
-        media = property(_media)
 
 See the section on `Media objects`_ for more details on how to construct
 return values for dynamic ``media`` properties.
@@ -248,10 +248,6 @@ Or if :mod:`~django.contrib.staticfiles` is configured using the
     <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" />
     <script type="text/javascript" src="https://static.example.com/animations.27e20196a850.js"></script>
     <script type="text/javascript" src="http://othersite.com/actions.js"></script>
-
-.. versionchanged:: 1.10
-
-    Older versions didn't serve assets using :mod:`django.contrib.staticfiles`.
 
 ``Media`` objects
 =================

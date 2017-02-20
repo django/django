@@ -1,12 +1,8 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from datetime import datetime
 from operator import attrgetter
 
 from django.db.models import Q
 from django.test import TestCase
-from django.utils.encoding import force_str
 
 from .models import Article
 
@@ -127,9 +123,9 @@ class OrLookupsTests(TestCase):
 
     def test_q_repr(self):
         or_expr = Q(baz=Article(headline="Foö"))
-        self.assertEqual(repr(or_expr), force_str("<Q: (AND: ('baz', <Article: Foö>))>"))
+        self.assertEqual(repr(or_expr), "<Q: (AND: ('baz', <Article: Foö>))>")
         negated_or = ~Q(baz=Article(headline="Foö"))
-        self.assertEqual(repr(negated_or), force_str("<Q: (NOT (AND: ('baz', <Article: Foö>)))>"))
+        self.assertEqual(repr(negated_or), "<Q: (NOT (AND: ('baz', <Article: Foö>)))>")
 
     def test_q_negated(self):
         # Q objects can be negated
@@ -231,11 +227,10 @@ class OrLookupsTests(TestCase):
             3
         )
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(Q(headline__startswith='Hello'), Q(headline__contains='bye')).values(), [
                 {"headline": "Hello and goodbye", "id": self.a3, "pub_date": datetime(2005, 11, 29)},
             ],
-            lambda o: o,
         )
 
         self.assertEqual(

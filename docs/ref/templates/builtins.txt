@@ -185,6 +185,9 @@ call to ``{% cycle %}`` doesn't specify ``silent``::
     {% cycle 'row1' 'row2' as rowcolors silent %}
     {% cycle rowcolors %}
 
+You can use the :ttag:`resetcycle` tag to make a ``{% cycle %}`` tag restart
+from its first value when it's next encountered.
+
 .. templatetag:: debug
 
 ``debug``
@@ -227,10 +230,6 @@ In ``template.html``, the following paths would be valid::
     {% extends "./base2.html" %}
     {% extends "../base1.html" %}
     {% extends "./my/base3.html" %}
-
-.. versionadded:: 1.10
-
-   The ability to use relative paths was added.
 
 .. templatetag:: filter
 
@@ -535,8 +534,6 @@ Not contained within. This is the negation of the ``in`` operator.
 ``is`` operator
 ^^^^^^^^^^^^^^^
 
-.. versionadded:: 1.10
-
 Object identity. Tests if two values are the same object. Example::
 
     {% if somevar is True %}
@@ -549,8 +546,6 @@ Object identity. Tests if two values are the same object. Example::
 
 ``is not`` operator
 ^^^^^^^^^^^^^^^^^^^
-
-.. versionadded:: 1.10
 
 Negated object identity. Tests if two values are not the same object. This is
 the negation of the ``is`` operator. Example::
@@ -682,10 +677,6 @@ This example includes the contents of the template ``"foo/bar.html"``::
 A string argument may be a relative path starting with ``./`` or ``../`` as
 described in the :ttag:`extends` tag.
 
-.. versionadded:: 1.10
-
-   The ability to use a relative path was added.
-
 This example includes the contents of the template whose name is contained in
 the variable ``template_name``::
 
@@ -727,6 +718,11 @@ turned on, an exception like :exc:`~django.template.TemplateDoesNotExist` or
 is turned off, ``{% include %}`` logs a warning to the ``django.template``
 logger with the exception that happens while rendering the included template
 and returns an empty string.
+
+.. deprecated:: 1.11
+
+    Silencing exceptions raised while rendering the ``{% include %}`` template
+    tag is deprecated. In Django 2.1, the exception will be raised.
 
 .. note::
     The :ttag:`include` tag should be considered as an implementation of
@@ -842,8 +838,8 @@ output (as a string) inside a variable. This is useful if you want to use
 
 Regroups a list of alike objects by a common attribute.
 
-This complex tag is best illustrated by way of an example: say that "places" is
-a list of cities represented by dictionaries containing ``"name"``,
+This complex tag is best illustrated by way of an example: say that ``cities``
+is a list of cities represented by dictionaries containing ``"name"``,
 ``"population"``, and ``"country"`` keys:
 
 .. code-block:: python
@@ -882,8 +878,8 @@ The following snippet of template code would accomplish this::
     {% for country in country_list %}
         <li>{{ country.grouper }}
         <ul>
-            {% for item in country.list %}
-              <li>{{ item.name }}: {{ item.population }}</li>
+            {% for city in country.list %}
+              <li>{{ city.name }}: {{ city.population }}</li>
             {% endfor %}
         </ul>
         </li>
@@ -896,12 +892,35 @@ resulting list. Here, we're regrouping the ``cities`` list by the ``country``
 attribute and calling the result ``country_list``.
 
 ``{% regroup %}`` produces a list (in this case, ``country_list``) of
-**group objects**. Each group object has two attributes:
+**group objects**. Group objects are instances of
+:py:func:`~collections.namedtuple` with two fields:
 
 * ``grouper`` -- the item that was grouped by (e.g., the string "India" or
   "Japan").
 * ``list`` -- a list of all items in this group (e.g., a list of all cities
   with country='India').
+
+.. versionchanged:: 1.11
+
+    The group object was changed from a dictionary to a
+    :py:func:`~collections.namedtuple`.
+
+Because ``{% regroup %}`` produces :py:func:`~collections.namedtuple` objects,
+you can also write the previous example as::
+
+    {% regroup cities by country as country_list %}
+
+    <ul>
+    {% for country, local_cities in country_list %}
+        <li>{{ country }}
+        <ul>
+            {% for city in local_cities %}
+              <li>{{ city.name }}: {{ city.population }}</li>
+            {% endfor %}
+        </ul>
+        </li>
+    {% endfor %}
+    </ul>
 
 Note that ``{% regroup %}`` does not order its input! Our example relies on
 the fact that the ``cities`` list was ordered by ``country`` in the first place.
@@ -970,6 +989,57 @@ attribute, allowing  you to group on the display string rather than the
 
 ``{{ country.grouper }}`` will now display the value fields from the
 ``choices`` set rather than the keys.
+
+.. templatetag:: resetcycle
+
+``resetcycle``
+--------------
+
+.. versionadded:: 1.11
+
+Resets a previous `cycle`_ so that it restarts from its first item at its next
+encounter. Without arguments, ``{% resetcycle %}`` will reset the last
+``{% cycle %}`` defined in the template.
+
+Example usage::
+
+    {% for coach in coach_list %}
+        <h1>{{ coach.name }}</h1>
+        {% for athlete in coach.athlete_set.all %}
+            <p class="{% cycle 'odd' 'even' %}">{{ athlete.name }}</p>
+        {% endfor %}
+        {% resetcycle %}
+    {% endfor %}
+
+This example would return this HTML::
+
+    <h1>José Mourinho</h1>
+    <p class="odd">Thibaut Courtois</p>
+    <p class="even">John Terry</p>
+    <p class="odd">Eden Hazard</p>
+
+    <h1>Carlo Ancelotti</h1>
+    <p class="odd">Manuel Neuer</p>
+    <p class="even">Thomas Müller</p>
+
+Notice how the first block ends with ``class="odd"`` and the new one starts
+with ``class="odd"``. Without the ``{% resetcycle %}`` tag, the second block
+would start with ``class="even"``.
+
+You can also reset named cycle tags::
+
+    {% for item in list %}
+        <p class="{% cycle 'odd' 'even' as stripe %} {% cycle 'major' 'minor' 'minor' 'minor' 'minor' as tick %}">
+            {{ item.data }}
+        </p>
+        {% ifchanged item.category %}
+            <h1>{{ item.category }}</h1>
+            {% if not forloop.first %}{% resetcycle tick %}{% endif %}
+        {% endifchanged %}
+    {% endfor %}
+
+In this example, we have both the alternating odd/even rows and a "major" row
+every fifth row. Only the five-row cycle is reset when a category changes.
 
 .. templatetag:: spaceless
 
@@ -1429,7 +1499,7 @@ For example::
 
     {{ value|default_if_none:"nothing" }}
 
-If ``value`` is ``None``, the output will be the string ``"nothing"``.
+If ``value`` is ``None``, the output will be ``nothing``.
 
 .. templatefilter:: dictsort
 
@@ -1515,10 +1585,6 @@ produce empty output::
 
     {{ values|dictsort:"0" }}
 
-.. versionchanged:: 1.10
-
-    The ability to order a list of lists was added.
-
 .. templatefilter:: dictsortreversed
 
 ``dictsortreversed``
@@ -1554,11 +1620,6 @@ Escapes a string's HTML. Specifically, it makes these replacements:
 * ``"`` (double quote) is converted to ``&quot;``
 * ``&`` is converted to ``&amp;``
 
-The escaping is only applied when the string is output, so it does not matter
-where in a chained sequence of filters you put ``escape``: it will always be
-applied as though it were the last filter. If you want escaping to be applied
-immediately, use the :tfilter:`force_escape` filter.
-
 Applying ``escape`` to a variable that would normally have auto-escaping
 applied to the result will only result in one round of escaping being done. So
 it is safe to use this function even in auto-escaping environments. If you want
@@ -1569,12 +1630,6 @@ For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off::
     {% autoescape off %}
         {{ title|escape }}
     {% endautoescape %}
-
-.. deprecated:: 1.10
-
-    The "lazy" behavior of the ``escape`` filter is deprecated. It will change
-    to immediately apply :func:`~django.utils.html.conditional_escape` in
-    Django 2.0.
 
 .. templatefilter:: escapejs
 
@@ -1879,8 +1934,7 @@ If ``value`` is ``Totally LOVING this Album!``, the output will be
 -------------
 
 Returns the value turned into a list. For a string, it's a list of characters.
-For an integer, the argument is cast into an unicode string before creating a
-list.
+For an integer, the argument is cast to a string before creating a list.
 
 For example::
 
@@ -2513,12 +2567,6 @@ slightly different call::
 
     See :class:`~django.template.backends.jinja2.Jinja2` for information on
     using the ``static`` tag with Jinja2.
-
-.. versionchanged:: 1.10
-
-    In older versions, you had to use ``{% load static from staticfiles %}`` in
-    your template to serve files from the storage defined in
-    :setting:`STATICFILES_STORAGE`. This is no longer required.
 
 .. templatetag:: get_static_prefix
 

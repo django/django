@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
@@ -18,7 +15,7 @@ from .admin import MediaInline, MediaPermanentInline, site as admin_site
 from .models import Category, Episode, EpisodePermanent, Media, PhoneNumber
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):
@@ -389,13 +386,14 @@ class NoInlineDeletionTest(SimpleTestCase):
         self.assertFalse(formset.can_delete)
 
 
-class MockRequest(object):
+class MockRequest:
     pass
 
 
-class MockSuperUser(object):
+class MockSuperUser:
     def has_perm(self, perm):
         return True
+
 
 request = MockRequest()
 request.user = MockSuperUser()
@@ -413,16 +411,16 @@ class GenericInlineModelAdminTest(SimpleTestCase):
         # Create a formset with default arguments
         formset = media_inline.get_formset(request)
         self.assertEqual(formset.max_num, DEFAULT_MAX_NUM)
-        self.assertEqual(formset.can_order, False)
+        self.assertIs(formset.can_order, False)
 
         # Create a formset with custom keyword arguments
         formset = media_inline.get_formset(request, max_num=100, can_order=True)
         self.assertEqual(formset.max_num, 100)
-        self.assertEqual(formset.can_order, True)
+        self.assertIs(formset.can_order, True)
 
     def test_custom_form_meta_exclude_with_readonly(self):
         """
-        Ensure that the custom ModelForm's `Meta.exclude` is respected when
+        The custom ModelForm's `Meta.exclude` is respected when
         used in conjunction with `GenericInlineModelAdmin.readonly_fields`
         and when no `ModelAdmin.exclude` is defined.
         """
@@ -449,7 +447,7 @@ class GenericInlineModelAdminTest(SimpleTestCase):
 
     def test_custom_form_meta_exclude(self):
         """
-        Ensure that the custom ModelForm's `Meta.exclude` is respected by
+        The custom ModelForm's `Meta.exclude` is respected by
         `GenericInlineModelAdmin.get_formset`, and overridden if
         `ModelAdmin.exclude` or `GenericInlineModelAdmin.exclude` are defined.
         Refs #15907.
@@ -494,7 +492,7 @@ class GenericInlineModelAdminTest(SimpleTestCase):
             ['description', 'keywords', 'id', 'DELETE'])
 
     def test_get_fieldsets(self):
-        # Test that get_fieldsets is called when figuring out form fields.
+        # get_fieldsets is called when figuring out form fields.
         # Refs #18681.
         class MediaForm(ModelForm):
             class Meta:
@@ -515,7 +513,7 @@ class GenericInlineModelAdminTest(SimpleTestCase):
 
     def test_get_formsets_with_inlines_returns_tuples(self):
         """
-        Ensure that get_formsets_with_inlines() returns the correct tuples.
+        get_formsets_with_inlines() returns the correct tuples.
         """
         class MediaForm(ModelForm):
             class Meta:

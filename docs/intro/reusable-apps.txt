@@ -185,7 +185,7 @@ this. For a small app like polls, this process isn't too difficult.
 5. Next we'll create a ``setup.py`` file which provides details about how to
    build and install the app.  A full explanation of this file is beyond the
    scope of this tutorial, but the `setuptools docs
-   <https://pythonhosted.org/setuptools/setuptools.html>`_ have a good
+   <https://setuptools.readthedocs.io/en/latest/>`_ have a good
    explanation. Create a file ``django-polls/setup.py`` with the following
    contents:
 
@@ -220,10 +220,8 @@ this. For a small app like polls, this process isn't too difficult.
                'License :: OSI Approved :: BSD License',  # example license
                'Operating System :: OS Independent',
                'Programming Language :: Python',
-               # Replace these appropriately if you are stuck on Python 2.
-               'Programming Language :: Python :: 3',
-               'Programming Language :: Python :: 3.4',
                'Programming Language :: Python :: 3.5',
+               'Programming Language :: Python :: 3.6',
                'Topic :: Internet :: WWW/HTTP',
                'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
            ],
@@ -321,6 +319,6 @@ disadvantages:
 
 Typically, these situations only arise once you're maintaining several Django
 projects. When they do, the best solution is to use `virtualenv
-<http://www.virtualenv.org/>`_. This tool allows you to maintain multiple
+<https://virtualenv.pypa.io/>`_. This tool allows you to maintain multiple
 isolated Python environments, each with its own copy of the libraries and
 package namespace.

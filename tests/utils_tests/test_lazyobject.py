@@ -1,18 +1,15 @@
-from __future__ import unicode_literals
-
 import copy
 import pickle
 import sys
 import warnings
 from unittest import TestCase
 
-from django.utils import six
 from django.utils.functional import LazyObject, SimpleLazyObject, empty
 
 from .models import Category, CategoryInfo
 
 
-class Foo(object):
+class Foo:
     """
     A simple class with just one attribute.
     """
@@ -75,7 +72,7 @@ class LazyObjectTestCase(TestCase):
 
     def test_text(self):
         obj = self.lazy_wrap('foo')
-        self.assertEqual(six.text_type(obj), 'foo')
+        self.assertEqual(str(obj), 'foo')
 
     def test_bool(self):
         # Refs #21840
@@ -103,8 +100,7 @@ class LazyObjectTestCase(TestCase):
 
     def test_hash(self):
         obj = self.lazy_wrap('foo')
-        d = {}
-        d[obj] = 'bar'
+        d = {obj: 'bar'}
         self.assertIn('foo', d)
         self.assertEqual(d['foo'], 'bar')
 
@@ -171,7 +167,7 @@ class LazyObjectTestCase(TestCase):
         # Tests whether an object's custom `__iter__` method is being
         # used when iterating over it.
 
-        class IterObject(object):
+        class IterObject:
 
             def __init__(self, values):
                 self.values = values
@@ -200,10 +196,10 @@ class LazyObjectTestCase(TestCase):
 
     def test_copy_list(self):
         # Copying a list works and returns the correct objects.
-        l = [1, 2, 3]
+        lst = [1, 2, 3]
 
-        obj = self.lazy_wrap(l)
-        len(l)  # forces evaluation
+        obj = self.lazy_wrap(lst)
+        len(lst)  # forces evaluation
         obj2 = copy.copy(obj)
 
         self.assertIsNot(obj, obj2)
@@ -212,9 +208,9 @@ class LazyObjectTestCase(TestCase):
 
     def test_copy_list_no_evaluation(self):
         # Copying a list doesn't force evaluation.
-        l = [1, 2, 3]
+        lst = [1, 2, 3]
 
-        obj = self.lazy_wrap(l)
+        obj = self.lazy_wrap(lst)
         obj2 = copy.copy(obj)
 
         self.assertIsNot(obj, obj2)
@@ -246,10 +242,10 @@ class LazyObjectTestCase(TestCase):
 
     def test_deepcopy_list(self):
         # Deep copying a list works and returns the correct objects.
-        l = [1, 2, 3]
+        lst = [1, 2, 3]
 
-        obj = self.lazy_wrap(l)
-        len(l)  # forces evaluation
+        obj = self.lazy_wrap(lst)
+        len(lst)  # forces evaluation
         obj2 = copy.deepcopy(obj)
 
         self.assertIsNot(obj, obj2)
@@ -258,9 +254,9 @@ class LazyObjectTestCase(TestCase):
 
     def test_deepcopy_list_no_evaluation(self):
         # Deep copying doesn't force evaluation.
-        l = [1, 2, 3]
+        lst = [1, 2, 3]
 
-        obj = self.lazy_wrap(l)
+        obj = self.lazy_wrap(lst)
         obj2 = copy.deepcopy(obj)
 
         self.assertIsNot(obj, obj2)
@@ -303,7 +299,7 @@ class SimpleLazyObjectTestCase(LazyObjectTestCase):
         obj = self.lazy_wrap(42)
         # __repr__ contains __repr__ of setup function and does not evaluate
         # the SimpleLazyObject
-        six.assertRegex(self, repr(obj), '^<SimpleLazyObject:')
+        self.assertRegex(repr(obj), '^<SimpleLazyObject:')
         self.assertIs(obj._wrapped, empty)  # make sure evaluation hasn't been triggered
 
         self.assertEqual(obj, 42)  # evaluate the lazy object
@@ -360,7 +356,7 @@ class SimpleLazyObjectTestCase(LazyObjectTestCase):
         self.assertEqual(len(lazy_set), 4)
 
 
-class BaseBaz(object):
+class BaseBaz:
     """
     A base class with a funky __reduce__ method, meant to simulate the
     __reduce__ method of Model, which sets self._django_version.
@@ -370,7 +366,7 @@ class BaseBaz(object):
 
     def __reduce__(self):
         self.baz = 'right'
-        return super(BaseBaz, self).__reduce__()
+        return super().__reduce__()
 
     def __eq__(self, other):
         if self.__class__ != other.__class__:
@@ -389,11 +385,11 @@ class Baz(BaseBaz):
     """
     def __init__(self, bar):
         self.bar = bar
-        super(Baz, self).__init__()
+        super().__init__()
 
     def __reduce_ex__(self, proto):
         self.quux = 'quux'
-        return super(Baz, self).__reduce_ex__(proto)
+        return super().__reduce_ex__(proto)
 
 
 class BazProxy(Baz):
@@ -405,6 +401,7 @@ class BazProxy(Baz):
     def __init__(self, baz):
         self.__dict__ = baz.__dict__
         self._baz = baz
+        # Grandparent super
         super(BaseBaz, self).__init__()
 
 

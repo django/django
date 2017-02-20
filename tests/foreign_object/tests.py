@@ -153,16 +153,22 @@ class MultiColumnFKTests(TestCase):
                                        group_id=self.cia.id)
         Friendship.objects.create(from_friend_country_id=self.usa.id, from_friend_id=self.bob.id,
                                   to_friend_country_id=self.usa.id, to_friend_id=self.jim.id)
-        self.assertQuerysetEqual(Membership.objects.filter(
-            person__in=Person.objects.filter(
-                from_friend__in=Friendship.objects.filter(
-                    to_friend__in=Person.objects.all()))),
-            [m1], lambda x: x)
-        self.assertQuerysetEqual(Membership.objects.exclude(
-            person__in=Person.objects.filter(
-                from_friend__in=Friendship.objects.filter(
-                    to_friend__in=Person.objects.all()))),
-            [m2], lambda x: x)
+        self.assertSequenceEqual(
+            Membership.objects.filter(
+                person__in=Person.objects.filter(
+                    from_friend__in=Friendship.objects.filter(to_friend__in=Person.objects.all())
+                )
+            ),
+            [m1]
+        )
+        self.assertSequenceEqual(
+            Membership.objects.exclude(
+                person__in=Person.objects.filter(
+                    from_friend__in=Friendship.objects.filter(to_friend__in=Person.objects.all())
+                )
+            ),
+            [m2]
+        )
 
     def test_select_related_foreignkey_forward_works(self):
         Membership.objects.create(membership_country=self.usa, person=self.bob, group=self.cia)
@@ -380,9 +386,9 @@ class MultiColumnFKTests(TestCase):
         na = NewsArticle.objects.create(pub_date=datetime.date.today())
         ArticleTranslation.objects.create(
             article=na, lang="fi", title="foo", body="bar")
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             NewsArticle.objects.select_related('active_translation'),
-            [na], lambda x: x
+            [na]
         )
         with self.assertNumQueries(1):
             self.assertEqual(
@@ -392,7 +398,6 @@ class MultiColumnFKTests(TestCase):
 
     @skipUnlessDBFeature('has_bulk_insert')
     def test_batch_create_foreign_object(self):
-        """ See: https://code.djangoproject.com/ticket/21566 """
         objs = [Person(name="abcd_%s" % i, person_country=self.usa) for i in range(0, 5)]
         Person.objects.bulk_create(objs, 10)
 

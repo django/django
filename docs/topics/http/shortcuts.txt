@@ -66,8 +66,9 @@ MIME type :mimetype:`application/xhtml+xml`::
 
     def my_view(request):
         # View code here...
-        return render(request, 'myapp/index.html', {"foo": "bar"},
-            content_type="application/xhtml+xml")
+        return render(request, 'myapp/index.html', {
+            'foo': 'bar',
+        }, content_type='application/xhtml+xml')
 
 This example is equivalent to::
 
@@ -78,17 +79,18 @@ This example is equivalent to::
         # View code here...
         t = loader.get_template('myapp/index.html')
         c = {'foo': 'bar'}
-        return HttpResponse(t.render(c, request),
-            content_type="application/xhtml+xml")
+        return HttpResponse(t.render(c, request), content_type='application/xhtml+xml')
 
 ``render_to_response()``
 ========================
 
 .. function:: render_to_response(template_name, context=None, content_type=None, status=None, using=None)
 
+   .. deprecated:: 2.0
+
    This function preceded the introduction of :func:`render` and works
    similarly except that it doesn't make the ``request`` available in the
-   response. It's not recommended and is likely to be deprecated in the future.
+   response.
 
 ``redirect()``
 ==============

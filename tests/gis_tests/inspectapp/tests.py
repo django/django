@@ -1,17 +1,15 @@
-from __future__ import unicode_literals
-
 import os
 import re
-from unittest import skipUnless
+from io import StringIO
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.core.management import call_command
 from django.db import connection, connections
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import modify_settings
-from django.utils.six import StringIO
 
 from ..test_data import TEST_DATA
+from ..utils import postgis
 
 if HAS_GDAL:
     from django.contrib.gis.gdal import Driver, GDALException, GDAL_VERSION
@@ -20,9 +18,8 @@ if HAS_GDAL:
     from .models import AllOGRFields
 
 
-@skipUnless(HAS_GDAL, "InspectDbTests needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class InspectDbTests(TestCase):
-    @skipUnlessDBFeature("gis_enabled")
     def test_geom_columns(self):
         """
         Test the geo-enabled inspectdb command.
@@ -52,15 +49,19 @@ class InspectDbTests(TestCase):
         output = out.getvalue()
         if connection.features.supports_geometry_field_introspection:
             self.assertIn('point = models.PointField(dim=3)', output)
+            if postgis:
+                # Geography type is specific to PostGIS
+                self.assertIn('pointg = models.PointField(geography=True, dim=3)', output)
             self.assertIn('line = models.LineStringField(dim=3)', output)
             self.assertIn('poly = models.PolygonField(dim=3)', output)
         else:
             self.assertIn('point = models.GeometryField(', output)
+            self.assertIn('pointg = models.GeometryField(', output)
             self.assertIn('line = models.GeometryField(', output)
             self.assertIn('poly = models.GeometryField(', output)
 
 
-@skipUnless(HAS_GDAL, "OGRInspectTest needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 @modify_settings(
     INSTALLED_APPS={'append': 'django.contrib.gis'},
 )
@@ -184,7 +185,7 @@ def get_ogr_db_string():
     except GDALException:
         return None
 
-    # SQLite/Spatialite in-memory databases
+    # SQLite/SpatiaLite in-memory databases
     if db['NAME'] == ":memory:":
         return None
 

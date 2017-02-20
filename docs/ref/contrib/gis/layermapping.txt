@@ -58,7 +58,7 @@ Example
         name = models.CharField(max_length=25) # corresponds to the 'str' field
         poly = models.PolygonField(srid=4269) # we want our model in a different SRID
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return 'Name: %s' % self.name
 
 3. Use :class:`LayerMapping` to extract all the features and place them in the

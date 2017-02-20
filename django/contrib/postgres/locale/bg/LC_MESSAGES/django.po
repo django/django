@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 15:57+0000\n"
-"Last-Translator: Venelin Stoykov <vkstoykov@gmail.com>\n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-07-15 09:52+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
 "MIME-Version: 1.0\n"
@@ -43,6 +43,9 @@ msgstr "Стойността трябва да е валиден JSON"
 
 msgid "Could not load JSON data."
 msgstr "Не можа да зареди JSON данни ."
+
+msgid "Input must be a JSON dictionary."
+msgstr ""
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."

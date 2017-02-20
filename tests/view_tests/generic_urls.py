@@ -1,6 +1,3 @@
-# -*- coding:utf-8 -*-
-from __future__ import unicode_literals
-
 from django.conf.urls import url
 from django.contrib.auth import views as auth_views
 from django.views.generic import RedirectView
@@ -28,8 +25,8 @@ numeric_days_info_dict = dict(date_based_info_dict, day_format='%d')
 date_based_datefield_info_dict = dict(date_based_info_dict, queryset=DateArticle.objects.all())
 
 urlpatterns = [
-    url(r'^accounts/login/$', auth_views.login, {'template_name': 'login.html'}),
-    url(r'^accounts/logout/$', auth_views.logout),
+    url(r'^accounts/login/$', auth_views.LoginView.as_view(template_name='login.html')),
+    url(r'^accounts/logout/$', auth_views.LogoutView.as_view()),
 
     # Special URLs for particular regression cases.
     url('^中文/target/$', views.index_page),

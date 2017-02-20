@@ -4,17 +4,16 @@ PostgreSQL database backend for Django.
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
+import threading
 import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.utils import DatabaseError as WrappedDatabaseError
-from django.utils.encoding import force_str
 from django.utils.functional import cached_property
-from django.utils.safestring import SafeBytes, SafeText
+from django.utils.safestring import SafeText
 
 try:
     import psycopg2 as Database
@@ -27,6 +26,7 @@ except ImportError as e:
 def psycopg2_version():
     version = psycopg2.__version__.split(' ', 1)[0]
     return tuple(int(v) for v in version.split('.') if v.isdigit())
+
 
 PSYCOPG2_VERSION = psycopg2_version()
 
@@ -44,12 +44,6 @@ from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
 from .utils import utc_tzinfo_factory                       # NOQA isort:skip
 from .version import get_version                            # NOQA isort:skip
 
-DatabaseError = Database.DatabaseError
-IntegrityError = Database.IntegrityError
-
-psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
-psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
-psycopg2.extensions.register_adapter(SafeBytes, psycopg2.extensions.QuotedString)
 psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
 psycopg2.extras.register_uuid()
 
@@ -76,7 +70,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'BinaryField': 'bytea',
         'BooleanField': 'boolean',
         'CharField': 'varchar(%(max_length)s)',
-        'CommaSeparatedIntegerField': 'varchar(%(max_length)s)',
         'DateField': 'date',
         'DateTimeField': 'timestamp with time zone',
         'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
@@ -139,16 +132,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     Database = Database
     SchemaEditorClass = DatabaseSchemaEditor
+    # Classes instantiated in __init__().
+    client_class = DatabaseClient
+    creation_class = DatabaseCreation
+    features_class = DatabaseFeatures
+    introspection_class = DatabaseIntrospection
+    ops_class = DatabaseOperations
 
     def __init__(self, *args, **kwargs):
-        super(DatabaseWrapper, self).__init__(*args, **kwargs)
-
-        self.features = DatabaseFeatures(self)
-        self.ops = DatabaseOperations(self)
-        self.client = DatabaseClient(self)
-        self.creation = DatabaseCreation(self)
-        self.introspection = DatabaseIntrospection(self)
-        self.validation = BaseDatabaseValidation(self)
+        super().__init__(*args, **kwargs)
+        self._named_cursor_idx = 0
 
     def get_connection_params(self):
         settings_dict = self.settings_dict
@@ -165,7 +158,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if settings_dict['USER']:
             conn_params['user'] = settings_dict['USER']
         if settings_dict['PASSWORD']:
-            conn_params['password'] = force_str(settings_dict['PASSWORD'])
+            conn_params['password'] = settings_dict['PASSWORD']
         if settings_dict['HOST']:
             conn_params['host'] = settings_dict['HOST']
         if settings_dict['PORT']:
@@ -192,25 +185,44 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         return connection
 
+    def ensure_timezone(self):
+        self.ensure_connection()
+        conn_timezone_name = self.connection.get_parameter_status('TimeZone')
+        timezone_name = self.timezone_name
+        if timezone_name and conn_timezone_name != timezone_name:
+            with self.connection.cursor() as cursor:
+                cursor.execute(self.ops.set_time_zone_sql(), [timezone_name])
+            return True
+        return False
+
     def init_connection_state(self):
         self.connection.set_client_encoding('UTF8')
 
-        conn_timezone_name = self.connection.get_parameter_status('TimeZone')
-
-        if self.timezone_name and conn_timezone_name != self.timezone_name:
-            cursor = self.connection.cursor()
-            try:
-                cursor.execute(self.ops.set_time_zone_sql(), [self.timezone_name])
-            finally:
-                cursor.close()
+        timezone_changed = self.ensure_timezone()
+        if timezone_changed:
             # Commit after setting the time zone (see #17062)
             if not self.get_autocommit():
                 self.connection.commit()
 
-    def create_cursor(self):
-        cursor = self.connection.cursor()
+    def create_cursor(self, name=None):
+        if name:
+            # In autocommit mode, the cursor will be used outside of a
+            # transaction, hence use a holdable cursor.
+            cursor = self.connection.cursor(name, scrollable=False, withhold=self.connection.autocommit)
+        else:
+            cursor = self.connection.cursor()
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return cursor
+
+    def chunked_cursor(self):
+        self._named_cursor_idx += 1
+        return self._cursor(
+            name='_django_curs_%d_%d' % (
+                # Avoid reusing name in other threads
+                threading.current_thread().ident,
+                self._named_cursor_idx,
+            )
+        )
 
     def _set_autocommit(self, autocommit):
         with self.wrap_database_errors:
@@ -235,10 +247,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @property
     def _nodb_connection(self):
-        nodb_connection = super(DatabaseWrapper, self)._nodb_connection
+        nodb_connection = super()._nodb_connection
         try:
             nodb_connection.ensure_connection()
-        except (DatabaseError, WrappedDatabaseError):
+        except (Database.DatabaseError, WrappedDatabaseError):
             warnings.warn(
                 "Normally Django will use a connection to the 'postgres' database "
                 "to avoid running initialization queries against the production "

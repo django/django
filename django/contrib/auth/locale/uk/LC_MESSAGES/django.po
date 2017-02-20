@@ -10,13 +10,14 @@
 # Mykola Zamkovoi <nickzam@gmail.com>, 2014
 # Oleksandr Bolotov <oleksandr.bolotov@gmail.com>, 2013
 # Vitaliy Kozlovskyi <ubombi@gmail.com>, 2015
+# Zoriana Zaiats, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-12-03 13:45+0000\n"
-"Last-Translator: Vitaliy Kozlovskyi <ubombi@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-25 11:46+0000\n"
+"Last-Translator: Zoriana Zaiats\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -124,6 +125,21 @@ msgstr "сіль"
 msgid "hash"
 msgstr "хеш"
 
+msgid "variety"
+msgstr "різноманітність"
+
+msgid "version"
+msgstr "версія"
+
+msgid "memory cost"
+msgstr "витрати пам’яті"
+
+msgid "time cost"
+msgstr "витрати часу"
+
+msgid "parallelism"
+msgstr "паралелізм"
+
 msgid "work factor"
 msgstr "робочий фактор"
 
@@ -175,17 +191,9 @@ msgstr "Особливі права доступу для цього корис�
 msgid "username"
 msgstr "ім'я користувача"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Обов'язкове поле. 30 або менше символів . Тільки букви, цифри, а також "
-"символи: @/./+/-/_"
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Введіть коректне ім'я користувача. Значення цього поля може складатися лише "
-"з літер, цифр, а також з символів: @/./+/-/_."
+"Необхідно: 150 або менше символів. тільки букви, цифри та  знаки @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Користувач з таким ім'ям вже існує."
@@ -267,6 +275,20 @@ msgstr "Ваш пароль не може складається лише із �
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Скидання пароля на %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Введіть коректне ім'я користувача. Значення цього поля може складатися лише "
+"з англійських літер, цифр, а також з символів: @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Введіть коректне ім'я користувача. Значення цього поля може складатися лише "
+"з літер, цифр, а також з символів: @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Вихід"

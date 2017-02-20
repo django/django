@@ -1,21 +1,17 @@
-from __future__ import unicode_literals
-
-from unittest import skipIf
-
-from django.db import ConnectionHandler, connection, connections
+from django.db import connection, connections
 from django.db.migrations.exceptions import (
     AmbiguityError, InconsistentMigrationHistory, NodeNotFoundError,
 )
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, modify_settings, override_settings
-from django.utils import six
 
 
 class RecorderTests(TestCase):
     """
     Tests recording migrations as applied or not.
     """
+    multi_db = True
 
     def test_apply(self):
         """
@@ -172,7 +168,6 @@ class LoaderTests(TestCase):
                 "App with migrations module file not in unmigrated apps."
             )
 
-    @skipIf(six.PY2, "PY2 doesn't load empty dirs.")
     def test_load_empty_dir(self):
         with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.namespace"}):
             loader = MigrationLoader(connection)
@@ -206,18 +201,17 @@ class LoaderTests(TestCase):
 
     @override_settings(
         INSTALLED_APPS=['migrations.migrations_test_apps.migrated_app'],
+        MIGRATION_MODULES={'migrated_app': 'missing-module'},
     )
-    def test_disable_migrations(self):
-        connections = ConnectionHandler({
-            'default': {
-                'NAME': ':memory:',
-                'ENGINE': 'django.db.backends.sqlite3',
-                'TEST': {
-                    'MIGRATE': False,
-                },
-            },
-        })
-        migration_loader = MigrationLoader(connections['default'])
+    def test_explicit_missing_module(self):
+        """
+        If a MIGRATION_MODULES override points to a missing module, the error
+        raised during the importation attempt should be propagated unless
+        `ignore_no_migrations=True`.
+        """
+        with self.assertRaisesMessage(ImportError, 'missing-module'):
+            migration_loader = MigrationLoader(connection)
+        migration_loader = MigrationLoader(connection, ignore_no_migrations=True)
         self.assertEqual(migration_loader.migrated_apps, set())
         self.assertEqual(migration_loader.unmigrated_apps, {'migrated_app'})
 
@@ -358,7 +352,7 @@ class LoaderTests(TestCase):
         loader.build_graph()
         self.assertEqual(num_nodes(), 3)
 
-        # However, starting at 3 or 4 we'd need to use non-existing migrations
+        # However, starting at 3 or 4, nonexistent migrations would be needed.
         msg = ("Migration migrations.6_auto depends on nonexistent node ('migrations', '5_auto'). "
                "Django tried to replace migration migrations.5_auto with any of "
                "[migrations.3_squashed_5] but wasn't able to because some of the replaced "
@@ -394,9 +388,29 @@ class LoaderTests(TestCase):
         loader.check_consistent_history(connection)
         recorder = MigrationRecorder(connection)
         recorder.record_applied('migrations', '0002_second')
-        msg = "Migration migrations.0002_second is applied before its dependency migrations.0001_initial"
+        msg = (
+            "Migration migrations.0002_second is applied before its dependency "
+            "migrations.0001_initial on database 'default'."
+        )
         with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
             loader.check_consistent_history(connection)
+
+    @override_settings(
+        MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed_extra'},
+        INSTALLED_APPS=['migrations'],
+    )
+    def test_check_consistent_history_squashed(self):
+        """
+        MigrationLoader.check_consistent_history() should ignore unapplied
+        squashed migrations that have all of their `replaces` applied.
+        """
+        loader = MigrationLoader(connection=None)
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied('migrations', '0001_initial')
+        recorder.record_applied('migrations', '0002_second')
+        loader.check_consistent_history(connection)
+        recorder.record_applied('migrations', '0003_third')
+        loader.check_consistent_history(connection)
 
     @override_settings(MIGRATION_MODULES={
         "app1": "migrations.test_migrations_squashed_ref_squashed.app1",
@@ -408,8 +422,8 @@ class LoaderTests(TestCase):
     ]})
     def test_loading_squashed_ref_squashed(self):
         "Tests loading a squashed migration with a new migration referencing it"
-        """
-        The sample migrations are structred like this:
+        r"""
+        The sample migrations are structured like this:
 
         app_1       1 --> 2 ---------------------*--> 3        *--> 4
                      \                          /             /

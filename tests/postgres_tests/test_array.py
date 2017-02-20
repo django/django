@@ -5,6 +5,7 @@ import uuid
 
 from django import forms
 from django.core import exceptions, serializers, validators
+from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
 from django.test import TransactionTestCase, override_settings
@@ -20,7 +21,9 @@ from .models import (
 
 try:
     from django.contrib.postgres.fields import ArrayField
-    from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
+    from django.contrib.postgres.forms import (
+        SimpleArrayField, SplitArrayField, SplitArrayWidget,
+    )
 except ImportError:
     pass
 
@@ -68,7 +71,7 @@ class TestSaveLoad(PostgreSQLTestCase):
         instance = NullableIntegerArrayModel()
         instance.save()
         loaded = NullableIntegerArrayModel.objects.get(pk=instance.pk)
-        self.assertEqual(loaded.field, None)
+        self.assertIsNone(loaded.field)
         self.assertEqual(instance.field, loaded.field)
 
     def test_null_handling(self):
@@ -173,9 +176,37 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:2]
         )
 
+    @unittest.expectedFailure
+    def test_in_including_F_object(self):
+        # This test asserts that Array objects passed to filters can be
+        # constructed to contain F objects. This currently doesn't work as the
+        # psycopg2 mogrify method that generates the ARRAY() syntax is
+        # expecting literals, not column references (#27095).
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__in=[[models.F('id')]]),
+            self.objs[:2]
+        )
+
+    def test_in_as_F_object(self):
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__in=[models.F('field')]),
+            self.objs[:4]
+        )
+
     def test_contained_by(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__contained_by=[1, 2]),
+            self.objs[:2]
+        )
+
+    @unittest.expectedFailure
+    def test_contained_by_including_F_object(self):
+        # This test asserts that Array objects passed to filters can be
+        # constructed to contain F objects. This currently doesn't work as the
+        # psycopg2 mogrify method that generates the ARRAY() syntax is
+        # expecting literals, not column references (#27095).
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__contained_by=[models.F('id'), 2]),
             self.objs[:2]
         )
 
@@ -276,6 +307,15 @@ class TestQuerying(PostgreSQLTestCase):
             ),
             [self.objs[3]]
         )
+
+    def test_unsupported_lookup(self):
+        msg = "Unsupported lookup '0_bar' for ArrayField or join on the field not permitted."
+        with self.assertRaisesMessage(FieldError, msg):
+            list(NullableIntegerArrayModel.objects.filter(field__0_bar=[2]))
+
+        msg = "Unsupported lookup '0bar' for ArrayField or join on the field not permitted."
+        with self.assertRaisesMessage(FieldError, msg):
+            list(NullableIntegerArrayModel.objects.filter(field__0bar=[2]))
 
 
 class TestDateTimeExactQuerying(PostgreSQLTestCase):
@@ -401,6 +441,7 @@ class TestMigrations(TransactionTestCase):
         name, path, args, kwargs = field.deconstruct()
         new = ArrayField(*args, **kwargs)
         self.assertEqual(type(new.base_field), type(field.base_field))
+        self.assertIsNot(new.base_field, field.base_field)
 
     def test_deconstruct_with_size(self):
         field = ArrayField(models.IntegerField(), size=3)
@@ -448,16 +489,20 @@ class TestMigrations(TransactionTestCase):
         table_name = 'postgres_tests_chartextarrayindexmodel'
         call_command('migrate', 'postgres_tests', verbosity=0)
         with connection.cursor() as cursor:
-            like_constraint_field_names = [
-                c.rsplit('_', 2)[0][len(table_name) + 1:]
-                for c in connection.introspection.get_constraints(cursor, table_name)
-                if c.endswith('_like')
+            like_constraint_columns_list = [
+                v['columns']
+                for k, v in list(connection.introspection.get_constraints(cursor, table_name).items())
+                if k.endswith('_like')
             ]
         # Only the CharField should have a LIKE index.
-        self.assertEqual(like_constraint_field_names, ['char2'])
-        with connection.cursor() as cursor:
-            indexes = connection.introspection.get_indexes(cursor, table_name)
+        self.assertEqual(like_constraint_columns_list, [['char2']])
         # All fields should have regular indexes.
+        with connection.cursor() as cursor:
+            indexes = [
+                c['columns'][0]
+                for c in connection.introspection.get_constraints(cursor, table_name).values()
+                if c['index'] and len(c['columns']) == 1
+            ]
         self.assertIn('char', indexes)
         self.assertIn('char2', indexes)
         self.assertIn('text', indexes)
@@ -633,6 +678,11 @@ class TestSimpleFormField(PostgreSQLTestCase):
         self.assertIsInstance(form_field, SimpleArrayField)
         self.assertEqual(form_field.max_length, 4)
 
+    def test_already_converted_value(self):
+        field = SimpleArrayField(forms.CharField())
+        vals = ['a', 'b', 'c']
+        self.assertEqual(field.clean(vals), vals)
+
 
 class TestSplitFormField(PostgreSQLTestCase):
 
@@ -714,3 +764,26 @@ class TestSplitFormField(PostgreSQLTestCase):
             'Item 0 in the array did not validate: Ensure this value has at most 2 characters (it has 3).',
             'Item 2 in the array did not validate: Ensure this value has at most 2 characters (it has 4).',
         ])
+
+    def test_splitarraywidget_value_omitted_from_data(self):
+        class Form(forms.ModelForm):
+            field = SplitArrayField(forms.IntegerField(), required=False, size=2)
+
+            class Meta:
+                model = IntegerArrayModel
+                fields = ('field',)
+
+        form = Form({'field_0': '1', 'field_1': '2'})
+        self.assertEqual(form.errors, {})
+        obj = form.save(commit=False)
+        self.assertEqual(obj.field, [1, 2])
+
+
+class TestSplitFormWidget(PostgreSQLTestCase):
+
+    def test_value_omitted_from_data(self):
+        widget = SplitArrayWidget(forms.TextInput(), size=2)
+        self.assertIs(widget.value_omitted_from_data({}, {}, 'field'), True)
+        self.assertIs(widget.value_omitted_from_data({'field_0': 'value'}, {}, 'field'), False)
+        self.assertIs(widget.value_omitted_from_data({'field_1': 'value'}, {}, 'field'), False)
+        self.assertIs(widget.value_omitted_from_data({'field_0': 'value', 'field_1': 'value'}, {}, 'field'), False)

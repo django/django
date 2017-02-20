@@ -2,13 +2,13 @@
 #
 # Translators:
 # Christopher Penkin <chris.penkin@gmail.com>, 2012
-# Piet Delport <pjdelport@gmail.com>, 2012
+# Pi Delport <pjdelport@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
 "af/)\n"
@@ -63,6 +63,12 @@ msgstr "Hierdie maand"
 msgid "This year"
 msgstr "Hierdie jaar"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -71,6 +77,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Aksie:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Voeg nog 'n %(verbose_name)s by"
+
+msgid "Remove"
+msgstr "Verwyder"
 
 msgid "action time"
 msgstr "aksie tyd"
@@ -84,6 +97,8 @@ msgstr ""
 msgid "object id"
 msgstr "objek id"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "objek repr"
 
@@ -114,6 +129,31 @@ msgstr "Het \"%(object)s\" geskrap."
 msgid "LogEntry Object"
 msgstr ""
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "en"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Geen velde verander nie."
+
 msgid "None"
 msgstr "None"
 
@@ -121,63 +161,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-msgid "Added."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
-#, python-format
-msgid "Changed %s."
-msgstr "Het %s verander."
-
-msgid "and"
-msgstr "en"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Het %(name)s \"%(object)s\" bygevoeg."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Het %(list)s vir %(name)s \"%(object)s\" verander."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Het %(name)s \"%(object)s\" geskrap."
-
-msgid "No fields changed."
-msgstr "Geen velde verander nie."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"Die %(name)s \"%(obj)s\" was suksesvol verander. Jy mag dit weereens "
-"hieronder wysig."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "Die %(name)s \"%(obj)s\" was suksesvol bygevoeg."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "Die %(name)s \"%(obj)s\" was suksesvol verander."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -330,18 +342,15 @@ msgstr "Dokumentasie"
 msgid "Log out"
 msgstr "Teken uit"
 
-msgid "Add"
-msgstr "Voeg by"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Voeg %(name)s by"
 
 msgid "History"
 msgstr "Geskiedenis"
 
 msgid "View on site"
 msgstr "Bekyk op werf"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Voeg %(name)s by"
 
 msgid "Filter"
 msgstr "Filter"
@@ -420,13 +429,6 @@ msgstr ""
 msgid "Change"
 msgstr "Verander"
 
-msgid "Remove"
-msgstr "Verwyder"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Voeg nog 'n %(verbose_name)s by"
-
 msgid "Delete?"
 msgstr "Skrap?"
 
@@ -441,14 +443,17 @@ msgstr ""
 msgid "Models in the %(name)s application"
 msgstr ""
 
+msgid "Add"
+msgstr "Voeg by"
+
 msgid "You don't have permission to edit anything."
 msgstr "Jy het nie toestemming om enigiets te wysig nie."
 
-msgid "Recent Actions"
-msgstr "Onlangse Aksies"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "My Aksies"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Niks beskikbaar nie"

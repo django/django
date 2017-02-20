@@ -1,16 +1,14 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
+from collections import Counter
+from unittest import mock
 
 from django.forms import (
-    CharField, DateField, FileField, Form, IntegerField, SplitDateTimeField,
-    ValidationError, formsets,
+    BaseForm, CharField, DateField, FileField, Form, IntegerField,
+    SplitDateTimeField, ValidationError, formsets,
 )
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
 from django.test import SimpleTestCase
-from django.utils.encoding import force_text
 
 
 class Choice(Form):
@@ -53,13 +51,14 @@ FavoriteDrinksFormSet = formset_factory(FavoriteDrinkForm, formset=BaseFavoriteD
 class SplitDateTimeForm(Form):
     when = SplitDateTimeField(initial=datetime.datetime.now)
 
+
 SplitDateTimeFormSet = formset_factory(SplitDateTimeForm)
 
 
 class CustomKwargForm(Form):
-    def __init__(self, *args, **kwargs):
-        self.custom_kwarg = kwargs.pop('custom_kwarg')
-        super(CustomKwargForm, self).__init__(*args, **kwargs)
+    def __init__(self, *args, custom_kwarg, **kwargs):
+        self.custom_kwarg = custom_kwarg
+        super().__init__(*args, **kwargs)
 
 
 class FormsFormsetTestCase(SimpleTestCase):
@@ -128,7 +127,7 @@ class FormsFormsetTestCase(SimpleTestCase):
 
     def test_form_kwargs_formset(self):
         """
-        Test that custom kwargs set on the formset instance are passed to the
+        Custom kwargs set on the formset instance are passed to the
         underlying forms.
         """
         FormSet = formset_factory(CustomKwargForm, extra=2)
@@ -139,7 +138,7 @@ class FormsFormsetTestCase(SimpleTestCase):
 
     def test_form_kwargs_formset_dynamic(self):
         """
-        Test that form kwargs can be passed dynamically in a formset.
+        Form kwargs can be passed dynamically in a formset.
         """
         class DynamicBaseFormSet(BaseFormSet):
             def get_form_kwargs(self, index):
@@ -163,6 +162,32 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = self.make_choiceformset([('Calexico', '')])
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset.errors, [{'votes': ['This field is required.']}])
+
+    def test_formset_validation_count(self):
+        """
+        A formset's ManagementForm is validated once per FormSet.is_valid()
+        call and each form of the formset is cleaned once.
+        """
+        def make_method_counter(func):
+            """Add a counter to func for the number of times it's called."""
+            counter = Counter()
+            counter.call_count = 0
+
+            def mocked_func(*args, **kwargs):
+                counter.call_count += 1
+                return func(*args, **kwargs)
+
+            return mocked_func, counter
+
+        mocked_is_valid, is_valid_counter = make_method_counter(formsets.ManagementForm.is_valid)
+        mocked_full_clean, full_clean_counter = make_method_counter(BaseForm.full_clean)
+        formset = self.make_choiceformset([('Calexico', '100'), ('Any1', '42'), ('Any2', '101')])
+
+        with mock.patch('django.forms.formsets.ManagementForm.is_valid', mocked_is_valid), \
+                mock.patch('django.forms.forms.BaseForm.full_clean', mocked_full_clean):
+            self.assertTrue(formset.is_valid())
+        self.assertEqual(is_valid_counter.call_count, 1)
+        self.assertEqual(full_clean_counter.call_count, 4)
 
     def test_formset_has_changed(self):
         # FormSet instances has_changed method will be True if any data is
@@ -376,6 +401,17 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertFalse(formset.is_valid())
         self.assertEqual(formset.non_form_errors(), ['Please submit 3 or more forms.'])
+
+    def test_formset_validate_min_excludes_empty_forms(self):
+        data = {
+            'choices-TOTAL_FORMS': '2',
+            'choices-INITIAL_FORMS': '0',
+        }
+        ChoiceFormSet = formset_factory(Choice, extra=2, min_num=1, validate_min=True, can_delete=True)
+        formset = ChoiceFormSet(data, prefix='choices')
+        self.assertFalse(formset.has_changed())
+        self.assertFalse(formset.is_valid())
+        self.assertEqual(formset.non_form_errors(), ['Please submit 1 or more forms.'])
 
     def test_second_form_partially_filled_2(self):
         # And once again, if we try to partially complete a form, validation will fail.
@@ -845,8 +881,7 @@ class FormsFormsetTestCase(SimpleTestCase):
 <td><input type="text" name="form-1-name" id="id_form-1-name" /></td></tr>"""
         )
 
-        # Ensure that max_num has no effect when extra is less than max_num.
-
+        # max_num has no effect when extra is less than max_num.
         LimitedFavoriteDrinkFormSet = formset_factory(FavoriteDrinkForm, extra=1, max_num=2)
         formset = LimitedFavoriteDrinkFormSet()
         form_output = []
@@ -1012,11 +1047,8 @@ class FormsFormsetTestCase(SimpleTestCase):
 
         # confirm indexing of formset
         self.assertEqual(formset[0], forms[0])
-        try:
+        with self.assertRaises(IndexError):
             formset[3]
-            self.fail('Requesting an invalid formset index should raise an exception')
-        except IndexError:
-            pass
 
         # Formsets can override the default iteration order
         class BaseReverseFormSet(BaseFormSet):
@@ -1024,7 +1056,7 @@ class FormsFormsetTestCase(SimpleTestCase):
                 return reversed(self.forms)
 
             def __getitem__(self, idx):
-                return super(BaseReverseFormSet, self).__getitem__(len(self) - idx - 1)
+                return super().__getitem__(len(self) - idx - 1)
 
         ReverseChoiceFormset = formset_factory(Choice, BaseReverseFormSet, extra=3)
         reverse_formset = ReverseChoiceFormset()
@@ -1074,7 +1106,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         class AnotherChoice(Choice):
             def is_valid(self):
                 self.is_valid_called = True
-                return super(AnotherChoice, self).is_valid()
+                return super().is_valid()
 
         AnotherChoiceFormSet = formset_factory(AnotherChoice)
         data = {
@@ -1218,7 +1250,7 @@ class FormsFormsetTestCase(SimpleTestCase):
     def test_html_safe(self):
         formset = self.make_choiceformset()
         self.assertTrue(hasattr(formset, '__html__'))
-        self.assertEqual(force_text(formset), formset.__html__())
+        self.assertEqual(str(formset), formset.__html__())
 
 
 data = {
@@ -1274,6 +1306,7 @@ class ArticleForm(Form):
     title = CharField()
     pub_date = DateField()
 
+
 ArticleFormSet = formset_factory(ArticleForm)
 
 
@@ -1319,10 +1352,10 @@ class TestIsBoundBehavior(SimpleTestCase):
         unbound_formset = ArticleFormSet()
         bound_formset = ArticleFormSet(data)
 
-        empty_forms = []
-
-        empty_forms.append(unbound_formset.empty_form)
-        empty_forms.append(bound_formset.empty_form)
+        empty_forms = [
+            unbound_formset.empty_form,
+            bound_formset.empty_form
+        ]
 
         # Empty forms should be unbound
         self.assertFalse(empty_forms[0].is_bound)
@@ -1334,7 +1367,7 @@ class TestIsBoundBehavior(SimpleTestCase):
 
 class TestEmptyFormSet(SimpleTestCase):
     def test_empty_formset_is_valid(self):
-        """Test that an empty formset still calls clean()"""
+        """An empty formset still calls clean()"""
         EmptyFsetWontValidateFormset = formset_factory(FavoriteDrinkForm, extra=0, formset=EmptyFsetWontValidate)
         formset = EmptyFsetWontValidateFormset(
             data={'form-INITIAL_FORMS': '0', 'form-TOTAL_FORMS': '0'},

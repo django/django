@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import json
 
 from django.test import SimpleTestCase
-from django.utils import six, text
+from django.utils import text
 from django.utils.functional import lazystr
-from django.utils.translation import override
+from django.utils.text import format_lazy
+from django.utils.translation import gettext_lazy, override
 
 IS_WIDE_BUILD = (len('\U0001F4A9') == 1)
 
@@ -55,14 +53,11 @@ class TestUtilsText(SimpleTestCase):
             self.assertEqual(list(text.smart_split(test)), expected)
 
     def test_truncate_chars(self):
-        truncator = text.Truncator(
-            'The quick brown fox jumped over the lazy dog.'
-        )
+        truncator = text.Truncator('The quick brown fox jumped over the lazy dog.')
         self.assertEqual('The quick brown fox jumped over the lazy dog.', truncator.chars(100)),
         self.assertEqual('The quick brown fox ...', truncator.chars(23)),
         self.assertEqual('The quick brown fo.....', truncator.chars(23, '.....')),
 
-        # Ensure that we normalize our unicode data first
         nfc = text.Truncator('o\xfco\xfco\xfco\xfc')
         nfd = text.Truncator('ou\u0308ou\u0308ou\u0308ou\u0308')
         self.assertEqual('oüoüoüoü', nfc.chars(8))
@@ -87,7 +82,7 @@ class TestUtilsText(SimpleTestCase):
         # Make a best effort to shorten to the desired length, but requesting
         # a length shorter than the ellipsis shouldn't break
         self.assertEqual('...', text.Truncator('asdf').chars(1))
-        # Ensure that lazy strings are handled correctly
+        # lazy strings are handled correctly
         self.assertEqual(text.Truncator(lazystr('The quick brown fox')).chars(12), 'The quick...')
 
     def test_truncate_words(self):
@@ -95,7 +90,7 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual('The quick brown fox jumped over the lazy dog.', truncator.words(10))
         self.assertEqual('The quick brown fox...', truncator.words(4))
         self.assertEqual('The quick brown fox[snip]', truncator.words(4, '[snip]'))
-        # Ensure that lazy strings are handled correctly
+        # lazy strings are handled correctly
         truncator = text.Truncator(lazystr('The quick brown fox jumped over the lazy dog.'))
         self.assertEqual('The quick brown fox...', truncator.words(4))
 
@@ -166,7 +161,6 @@ class TestUtilsText(SimpleTestCase):
         """normalize_newlines should be able to handle bytes too"""
         normalized = text.normalize_newlines(b"abc\ndef\rghi\r\n")
         self.assertEqual(normalized, "abc\ndef\nghi\n")
-        self.assertIsInstance(normalized, six.text_type)
 
     def test_phone2numeric(self):
         numeric = text.phone2numeric('0800 flowers')
@@ -220,8 +214,29 @@ class TestUtilsText(SimpleTestCase):
     def test_compress_sequence(self):
         data = [{'key': i} for i in range(10)]
         seq = list(json.JSONEncoder().iterencode(data))
-        seq = [s.encode('utf-8') for s in seq]
+        seq = [s.encode() for s in seq]
         actual_length = len(b''.join(seq))
         out = text.compress_sequence(seq)
         compressed_length = len(b''.join(out))
         self.assertTrue(compressed_length < actual_length)
+
+    def test_format_lazy(self):
+        self.assertEqual('django/test', format_lazy('{}/{}', 'django', lazystr('test')))
+        self.assertEqual('django/test', format_lazy('{0}/{1}', *('django', 'test')))
+        self.assertEqual('django/test', format_lazy('{a}/{b}', **{'a': 'django', 'b': 'test'}))
+        self.assertEqual('django/test', format_lazy('{a[0]}/{a[1]}', a=('django', 'test')))
+
+        t = {}
+        s = format_lazy('{0[a]}-{p[a]}', t, p=t)
+        t['a'] = lazystr('django')
+        self.assertEqual('django-django', s)
+        t['a'] = 'update'
+        self.assertEqual('update-update', s)
+
+        # The format string can be lazy. (string comes from contrib.admin)
+        s = format_lazy(
+            gettext_lazy("Added {name} \"{object}\"."),
+            name='article', object='My first try',
+        )
+        with override('fr'):
+            self.assertEqual('article «\xa0My first try\xa0» ajouté.', s)

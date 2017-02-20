@@ -1,3 +1,4 @@
+from django.template.defaulttags import IfEqualNode
 from django.test import SimpleTestCase
 
 from ..utils import setup
@@ -98,7 +99,7 @@ class IfEqualTagTests(SimpleTestCase):
 
     @setup({'ifequal-split09': r"{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}"})
     def test_ifequal_split09(self):
-        output = self.engine.render_to_string('ifequal-split09', {'a': 'slash\man'})
+        output = self.engine.render_to_string('ifequal-split09', {'a': r'slash\man'})
         self.assertEqual(output, 'yes')
 
     @setup({'ifequal-split10': r"{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}"})
@@ -215,3 +216,9 @@ class IfNotEqualTagTests(SimpleTestCase):
     def test_ifnotequal04(self):
         output = self.engine.render_to_string('ifnotequal04', {'a': 1, 'b': 1})
         self.assertEqual(output, 'no')
+
+
+class IfEqualTests(SimpleTestCase):
+    def test_repr(self):
+        node = IfEqualNode(var1='a', var2='b', nodelist_true=[], nodelist_false=[], negate=False)
+        self.assertEqual(repr(node), '<IfEqualNode>')

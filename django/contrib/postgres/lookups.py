@@ -58,7 +58,7 @@ class SearchLookup(SearchVectorExact):
     def process_lhs(self, qn, connection):
         if not isinstance(self.lhs.output_field, SearchVectorField):
             self.lhs = SearchVector(self.lhs)
-        lhs, lhs_params = super(SearchLookup, self).process_lhs(qn, connection)
+        lhs, lhs_params = super().process_lhs(qn, connection)
         return lhs, lhs_params
 
 

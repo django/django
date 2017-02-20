@@ -363,7 +363,8 @@ Here's what the relevant URLconf lines would look like for the example above::
 
     urlpatterns = [
         url(r'^sitemap\.xml$', views.index, {'sitemaps': sitemaps}),
-        url(r'^sitemap-(?P<section>.+)\.xml$', views.sitemap, {'sitemaps': sitemaps}),
+        url(r'^sitemap-(?P<section>.+)\.xml$', views.sitemap, {'sitemaps': sitemaps},
+            name='django.contrib.sitemaps.views.sitemap'),
     ]
 
 This will automatically generate a :file:`sitemap.xml` file that references
@@ -409,7 +410,7 @@ parameter to the ``sitemap`` and ``index`` views via the URLconf::
         url(r'^custom-sitemap-(?P<section>.+)\.xml$', views.sitemap, {
             'sitemaps': sitemaps,
             'template_name': 'custom_sitemap.html'
-        }),
+        }, name='django.contrib.sitemaps.views.sitemap'),
     ]
 
 
@@ -455,7 +456,7 @@ generate a Google News compatible sitemap:
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset
       xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-      xmlns:news="https://www.google.com/schemas/sitemap-news/0.9">
+      xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
     {% spaceless %}
     {% for url in urlset %}
       <url>
@@ -508,7 +509,7 @@ method::
     class Entry(models.Model):
         # ...
         def save(self, force_insert=False, force_update=False):
-            super(Entry, self).save(force_insert, force_update)
+            super().save(force_insert, force_update)
             try:
                 ping_google()
             except Exception:

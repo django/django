@@ -13,10 +13,10 @@ class MessageMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         """
-        Updates the storage backend (i.e., saves the messages).
+        Update the storage backend (i.e., save the messages).
 
-        If not all messages could not be stored and ``DEBUG`` is ``True``, a
-        ``ValueError`` is raised.
+        If not all messages could not be stored and ``DEBUG`` is ``True``,
+        raise ValueError.
         """
         # A higher middleware layer may return a request which does not contain
         # messages storage, so make no assumption that it will be there.

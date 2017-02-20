@@ -28,8 +28,6 @@ allows the field to have two "empty values", but it's important for the
 
 .. class:: Cast(expression, output_field)
 
-.. versionadded:: 1.10
-
 Forces the result type of ``expression`` to be the one from ``output_field``.
 
 Usage example::
@@ -37,7 +35,7 @@ Usage example::
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Cast
     >>> Value.objects.create(integer=4)
-    >>> value = Value.objects.annotate(as_float=Cast('integer', FloatField)).get()
+    >>> value = Value.objects.annotate(as_float=Cast('integer', FloatField())).get()
     >>> print(value.as_float)
     4.0
 
@@ -76,11 +74,11 @@ Usage examples::
     A Python value passed to ``Coalesce`` on MySQL may be converted to an
     incorrect type unless explicitly cast to the correct database type:
 
-    >>> from django.db.models.expressions import RawSQL
+    >>> from django.db.models import DateTimeField
+    >>> from django.db.models.functions import Cast, Coalesce
     >>> from django.utils import timezone
     >>> now = timezone.now()
-    >>> now_sql = RawSQL("cast(%s as datetime)", (now,))
-    >>> Coalesce('updated', now_sql)
+    >>> Coalesce('updated', Cast(now, DateTimeField()))
 
 ``Concat``
 ==========
@@ -281,15 +279,15 @@ Date Functions
 
 .. module:: django.db.models.functions.datetime
 
-.. versionadded:: 1.10
-
 We'll be using the following model in examples of each function::
 
     class Experiment(models.Model):
-        start_time = models.DateTimeField()
+        start_datetime = models.DateTimeField()
         start_date = models.DateField(null=True, blank=True)
-        end_time = models.DateTimeField(null=True, blank=True)
+        start_time = models.TimeField(null=True, blank=True)
+        end_datetime = models.DateTimeField(null=True, blank=True)
         end_date = models.DateField(null=True, blank=True)
+        end_time = models.TimeField(null=True, blank=True)
 
 ``Extract``
 -----------
@@ -311,6 +309,7 @@ Given the datetime ``2015-06-15 23:30:01.000321+00:00``, the built-in
 * "year": 2015
 * "month": 6
 * "day": 15
+* "week": 25
 * "week_day": 2
 * "hour": 23
 * "minute": 30
@@ -338,6 +337,14 @@ returned when this timezone is active will be the same as above except for:
         >>> (dt.isoweekday() % 7) + 1
         2
 
+.. admonition:: ``week`` values
+
+    The ``week`` ``lookup_type`` is calculated based on `ISO-8601
+    <https://en.wikipedia.org/wiki/ISO-8601>`_, i.e.,
+    a week starts on a Monday. The first week is the one with the majority
+    of the days, i.e., a week that starts on or before Thursday. The value
+    returned is in the range 1 to 52 or 53.
+
 Each ``lookup_name`` above has a corresponding ``Extract`` subclass (listed
 below) that should typically be used instead of the more verbose equivalent,
 e.g. use ``ExtractYear(...)`` rather than ``Extract(..., lookup_name='year')``.
@@ -349,16 +356,16 @@ Usage example::
     >>> start = datetime(2015, 6, 15)
     >>> end = datetime(2015, 7, 2)
     >>> Experiment.objects.create(
-    ...    start_time=start, start_date=start.date(),
-    ...    end_time=end, end_date=end.date())
+    ...    start_datetime=start, start_date=start.date(),
+    ...    end_datetime=end, end_date=end.date())
     >>> # Add the experiment start year as a field in the QuerySet.
     >>> experiment = Experiment.objects.annotate(
-    ...    start_year=Extract('start_time', 'year')).get()
+    ...    start_year=Extract('start_datetime', 'year')).get()
     >>> experiment.start_year
     2015
     >>> # How many experiments completed in the same year in which they started?
     >>> Experiment.objects.filter(
-    ...    start_time__year=Extract('end_time', 'year')).count()
+    ...    start_datetime__year=Extract('end_datetime', 'year')).count()
     1
 
 ``DateField`` extracts
@@ -380,6 +387,12 @@ Usage example::
 
     .. attribute:: lookup_name = 'week_day'
 
+.. class:: ExtractWeek(expression, tzinfo=None, **extra)
+
+    .. versionadded:: 1.11
+
+    .. attribute:: lookup_name = 'week'
+
 These are logically equivalent to ``Extract('date_field', lookup_name)``. Each
 class is also a ``Transform`` registered on ``DateField`` and ``DateTimeField``
 as ``__(lookup_name)``, e.g. ``__year``.
@@ -395,8 +408,8 @@ that deal with date-parts can be used with ``DateField``::
     >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=timezone.utc)
     >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=timezone.utc)
     >>> Experiment.objects.create(
-    ...    start_time=start_2015, start_date=start_2015.date(),
-    ...    end_time=end_2015, end_date=end_2015.date())
+    ...    start_datetime=start_2015, start_date=start_2015.date(),
+    ...    end_datetime=end_2015, end_date=end_2015.date())
     >>> Experiment.objects.annotate(
     ...     year=ExtractYear('start_date'),
     ...     month=ExtractMonth('start_date'),
@@ -440,19 +453,19 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
     >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=timezone.utc)
     >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=timezone.utc)
     >>> Experiment.objects.create(
-    ...    start_time=start_2015, start_date=start_2015.date(),
-    ...    end_time=end_2015, end_date=end_2015.date())
+    ...    start_datetime=start_2015, start_date=start_2015.date(),
+    ...    end_datetime=end_2015, end_date=end_2015.date())
     >>> Experiment.objects.annotate(
-    ...     year=ExtractYear('start_time'),
-    ...     month=ExtractMonth('start_time'),
-    ...     day=ExtractDay('start_time'),
-    ...     weekday=ExtractWeekDay('start_time'),
-    ...     hour=ExtractHour('start_time'),
-    ...     minute=ExtractMinute('start_time'),
-    ...     second=ExtractSecond('start_time'),
+    ...     year=ExtractYear('start_datetime'),
+    ...     month=ExtractMonth('start_datetime'),
+    ...     day=ExtractDay('start_datetime'),
+    ...     weekday=ExtractWeekDay('start_datetime'),
+    ...     hour=ExtractHour('start_datetime'),
+    ...     minute=ExtractMinute('start_datetime'),
+    ...     second=ExtractSecond('start_datetime'),
     ... ).values(
     ...     'year', 'month', 'day', 'weekday', 'hour', 'minute', 'second',
-    ... ).get(end_time__year=ExtractYear('start_time'))
+    ... ).get(end_datetime__year=ExtractYear('start_datetime'))
     {'year': 2015, 'month': 6, 'day': 15, 'weekday': 2, 'hour': 23, 'minute': 30, 'second': 1}
 
 When :setting:`USE_TZ` is ``True`` then datetimes are stored in the database
@@ -465,11 +478,11 @@ values that are returned::
     >>> tzinfo = pytz.timezone('Australia/Melbourne')  # UTC+10:00
     >>> with timezone.override(tzinfo):
     ...    Experiment.objects.annotate(
-    ...        day=ExtractDay('start_time'),
-    ...        weekday=ExtractWeekDay('start_time'),
-    ...        hour=ExtractHour('start_time'),
+    ...        day=ExtractDay('start_datetime'),
+    ...        weekday=ExtractWeekDay('start_datetime'),
+    ...        hour=ExtractHour('start_datetime'),
     ...    ).values('day', 'weekday', 'hour').get(
-    ...        end_time__year=ExtractYear('start_time'),
+    ...        end_datetime__year=ExtractYear('start_datetime'),
     ...    )
     {'day': 16, 'weekday': 3, 'hour': 9}
 
@@ -479,11 +492,11 @@ way, and takes priority over an active timezone::
     >>> import pytz
     >>> tzinfo = pytz.timezone('Australia/Melbourne')
     >>> Experiment.objects.annotate(
-    ...     day=ExtractDay('start_time', tzinfo=melb),
-    ...     weekday=ExtractWeekDay('start_time', tzinfo=melb),
-    ...     hour=ExtractHour('start_time', tzinfo=melb),
+    ...     day=ExtractDay('start_datetime', tzinfo=melb),
+    ...     weekday=ExtractWeekDay('start_datetime', tzinfo=melb),
+    ...     hour=ExtractHour('start_datetime', tzinfo=melb),
     ... ).values('day', 'weekday', 'hour').get(
-    ...     end_time__year=ExtractYear('start_time'),
+    ...     end_datetime__year=ExtractYear('start_datetime'),
     ... )
     {'day': 16, 'weekday': 3, 'hour': 9}
 
@@ -500,13 +513,14 @@ but not the exact second, then ``Trunc`` (and its subclasses) can be useful to
 filter or aggregate your data. For example, you can use ``Trunc`` to calculate
 the number of sales per day.
 
-``Trunc`` takes a single ``expression``, representing a ``DateField`` or
-``DateTimeField``, a ``kind`` representing a date part, and an ``output_field``
-that's either ``DateTimeField()`` or ``DateField()``. It returns a datetime or
-date, depending on ``output_field``, with fields up to ``kind`` set to their
-minimum value. If ``output_field`` is omitted, it will default to the
-``output_field`` of ``expression``. A ``tzinfo`` subclass, usually provided by
-``pytz``, can be passed to truncate a value in a specific timezone.
+``Trunc`` takes a single ``expression``, representing a ``DateField``,
+``TimeField``, or ``DateTimeField``, a ``kind`` representing a date or time
+part, and an ``output_field`` that's either ``DateTimeField()``,
+``TimeField()``, or ``DateField()``. It returns a datetime, date, or time
+depending on ``output_field``, with fields up to ``kind`` set to their minimum
+value. If ``output_field`` is omitted, it will default to the ``output_field``
+of ``expression``. A ``tzinfo`` subclass, usually provided by ``pytz``, can be
+passed to truncate a value in a specific timezone.
 
 Given the datetime ``2015-06-15 14:30:50.000321+00:00``, the built-in ``kind``\s
 return:
@@ -546,11 +560,11 @@ Usage example::
     >>> from datetime import datetime
     >>> from django.db.models import Count, DateTimeField
     >>> from django.db.models.functions import Trunc
-    >>> Experiment.objects.create(start_time=datetime(2015, 6, 15, 14, 30, 50, 321))
-    >>> Experiment.objects.create(start_time=datetime(2015, 6, 15, 14, 40, 2, 123))
-    >>> Experiment.objects.create(start_time=datetime(2015, 12, 25, 10, 5, 27, 999))
+    >>> Experiment.objects.create(start_datetime=datetime(2015, 6, 15, 14, 30, 50, 321))
+    >>> Experiment.objects.create(start_datetime=datetime(2015, 6, 15, 14, 40, 2, 123))
+    >>> Experiment.objects.create(start_datetime=datetime(2015, 12, 25, 10, 5, 27, 999))
     >>> experiments_per_day = Experiment.objects.annotate(
-    ...    start_day=Trunc('start_time', 'day', output_field=DateTimeField())
+    ...    start_day=Trunc('start_datetime', 'day', output_field=DateTimeField())
     ... ).values('start_day').annotate(experiments=Count('id'))
     >>> for exp in experiments_per_day:
     ...     print(exp['start_day'], exp['experiments'])
@@ -558,10 +572,10 @@ Usage example::
     2015-06-15 00:00:00 2
     2015-12-25 00:00:00 1
     >>> experiments = Experiment.objects.annotate(
-    ...    start_day=Trunc('start_time', 'day', output_field=DateTimeField())
+    ...    start_day=Trunc('start_datetime', 'day', output_field=DateTimeField())
     ... ).filter(start_day=datetime(2015, 6, 15))
     >>> for exp in experiments:
-    ...     print(exp.start_time)
+    ...     print(exp.start_datetime)
     ...
     2015-06-15 14:30:50.000321
     2015-06-15 14:40:02.000123
@@ -592,9 +606,9 @@ that deal with date-parts can be used with ``DateField``::
     >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
     >>> start2 = datetime(2015, 6, 15, 14, 40, 2, 123, tzinfo=timezone.utc)
     >>> start3 = datetime(2015, 12, 31, 17, 5, 27, 999, tzinfo=timezone.utc)
-    >>> Experiment.objects.create(start_time=start1, start_date=start1.date())
-    >>> Experiment.objects.create(start_time=start2, start_date=start2.date())
-    >>> Experiment.objects.create(start_time=start3, start_date=start3.date())
+    >>> Experiment.objects.create(start_datetime=start1, start_date=start1.date())
+    >>> Experiment.objects.create(start_datetime=start2, start_date=start2.date())
+    >>> Experiment.objects.create(start_datetime=start3, start_date=start3.date())
     >>> experiments_per_year = Experiment.objects.annotate(
     ...    year=TruncYear('start_date')).values('year').annotate(
     ...    experiments=Count('id'))
@@ -607,7 +621,7 @@ that deal with date-parts can be used with ``DateField``::
     >>> import pytz
     >>> melb = pytz.timezone('Australia/Melbourne')
     >>> experiments_per_month = Experiment.objects.annotate(
-    ...    month=TruncMonth('start_time', tzinfo=melb)).values('month').annotate(
+    ...    month=TruncMonth('start_datetime', tzinfo=melb)).values('month').annotate(
     ...    experiments=Count('id'))
     >>> for exp in experiments_per_month:
     ...     print(exp['month'], exp['experiments'])
@@ -615,6 +629,61 @@ that deal with date-parts can be used with ``DateField``::
     2015-06-01 00:00:00+10:00 1
     2016-01-01 00:00:00+11:00 1
     2014-06-01 00:00:00+10:00 1
+
+``TimeField`` truncation
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.11
+
+.. class:: TruncHour(expression, output_field=None, tzinfo=None, **extra)
+
+    .. attribute:: kind = 'hour'
+
+.. class:: TruncMinute(expression, output_field=None, tzinfo=None, **extra)
+
+    .. attribute:: kind = 'minute'
+
+.. class:: TruncSecond(expression, output_field=None, tzinfo=None, **extra)
+
+    .. attribute:: kind = 'second'
+
+These are logically equivalent to ``Trunc('time_field', kind)``. They truncate
+all parts of the time up to ``kind`` which allows grouping or filtering times
+with less precision. ``expression`` can have an ``output_field`` of either
+``TimeField`` or ``DateTimeField``.
+
+Since ``TimeField``\s don't have a date component, only ``Trunc`` subclasses
+that deal with time-parts can be used with ``TimeField``::
+
+    >>> from datetime import datetime
+    >>> from django.db.models import Count, TimeField
+    >>> from django.db.models.functions import TruncHour
+    >>> from django.utils import timezone
+    >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
+    >>> start2 = datetime(2014, 6, 15, 14, 40, 2, 123, tzinfo=timezone.utc)
+    >>> start3 = datetime(2015, 12, 31, 17, 5, 27, 999, tzinfo=timezone.utc)
+    >>> Experiment.objects.create(start_datetime=start1, start_time=start1.time())
+    >>> Experiment.objects.create(start_datetime=start2, start_time=start2.time())
+    >>> Experiment.objects.create(start_datetime=start3, start_time=start3.time())
+    >>> experiments_per_hour = Experiment.objects.annotate(
+    ...    hour=TruncHour('start_datetime', output_field=TimeField()),
+    ... ).values('hour').annotate(experiments=Count('id'))
+    >>> for exp in experiments_per_hour:
+    ...     print(exp['hour'], exp['experiments'])
+    ...
+    14:00:00 2
+    17:00:00 1
+
+    >>> import pytz
+    >>> melb = pytz.timezone('Australia/Melbourne')
+    >>> experiments_per_hour = Experiment.objects.annotate(
+    ...    hour=TruncHour('start_datetime', tzinfo=melb),
+    ... ).values('hour').annotate(experiments=Count('id'))
+    >>> for exp in experiments_per_hour:
+    ...     print(exp['hour'], exp['experiments'])
+    ...
+    2014-06-16 00:00:00+10:00 2
+    2016-01-01 04:00:00+11:00 1
 
 ``DateTimeField`` truncation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -627,6 +696,17 @@ that deal with date-parts can be used with ``DateField``::
 ``TruncDate`` casts ``expression`` to a date rather than using the built-in SQL
 truncate function. It's also registered as a transform on  ``DateTimeField`` as
 ``__date``.
+
+.. class:: TruncTime(expression, **extra)
+
+.. versionadded:: 1.11
+
+    .. attribute:: lookup_name = 'time'
+    .. attribute:: output_field = TimeField()
+
+``TruncTime`` casts ``expression`` to a time rather than using the built-in SQL
+truncate function. It's also registered as a transform on ``DateTimeField`` as
+``__time``.
 
 .. class:: TruncDay(expression, output_field=None, tzinfo=None, **extra)
 
@@ -659,14 +739,14 @@ Usage example::
     >>> from django.utils import timezone
     >>> import pytz
     >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
-    >>> Experiment.objects.create(start_time=start1, start_date=start1.date())
+    >>> Experiment.objects.create(start_datetime=start1, start_date=start1.date())
     >>> melb = pytz.timezone('Australia/Melbourne')
     >>> Experiment.objects.annotate(
-    ...     date=TruncDate('start_time'),
-    ...     day=TruncDay('start_time', tzinfo=melb),
-    ...     hour=TruncHour('start_time', tzinfo=melb),
-    ...     minute=TruncMinute('start_time'),
-    ...     second=TruncSecond('start_time'),
+    ...     date=TruncDate('start_datetime'),
+    ...     day=TruncDay('start_datetime', tzinfo=melb),
+    ...     hour=TruncHour('start_datetime', tzinfo=melb),
+    ...     minute=TruncMinute('start_datetime'),
+    ...     second=TruncSecond('start_datetime'),
     ... ).values('date', 'day', 'hour', 'minute', 'second').get()
     {'date': datetime.date(2014, 6, 15),
      'day': datetime.datetime(2014, 6, 16, 0, 0, tzinfo=<DstTzInfo 'Australia/Melbourne' AEST+10:00:00 STD>),

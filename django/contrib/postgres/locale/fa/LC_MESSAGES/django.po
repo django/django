@@ -2,13 +2,15 @@
 #
 # Translators:
 # Ali Nikneshan <ali@nikneshan.com>, 2015
+# Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2016
+# Pouya Abbassi, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-22 06:14+0000\n"
-"Last-Translator: Ali Nikneshan <ali@nikneshan.com>\n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-08-16 14:19+0000\n"
+"Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -42,6 +44,9 @@ msgstr "مقدار باید JSON معتبر باشد."
 
 msgid "Could not load JSON data."
 msgstr "امکان بارگزاری  داده های JSON  نیست."
+
+msgid "Input must be a JSON dictionary."
+msgstr "مقدار ورودی باید یک دیکشنری JSON باشد."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
@@ -84,22 +89,23 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no fewer than "
 "%(limit_value)d."
 msgstr[0] ""
+"لیست شامل %(show_value)d است، نباید کمتر از %(limit_value)d را شامل شود."
 
 #, python-format
 msgid "Some keys were missing: %(keys)s"
-msgstr ""
+msgstr "برخی کلیدها یافت نشدند: %(keys)s"
 
 #, python-format
 msgid "Some unknown keys were provided: %(keys)s"
-msgstr ""
+msgstr "برخی کلیدهای ارائه شده ناشناخته‌اند: %(keys)s"
 
 #, python-format
 msgid ""
 "Ensure that this range is completely less than or equal to %(limit_value)s."
-msgstr ""
+msgstr "اطمیمنان حاصل کنید که این رنج، کوچکتر یا برابر با %(limit_value)s است."
 
 #, python-format
 msgid ""
 "Ensure that this range is completely greater than or equal to "
 "%(limit_value)s."
-msgstr ""
+msgstr "اطمینان حاصل کنید که رنج، بزرگتر یا برابر با %(limit_value)s است."

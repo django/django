@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib import auth
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.signals import user_logged_in
@@ -8,12 +6,10 @@ from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.db import models
 from django.db.models.manager import EmptyManager
-from django.utils import six, timezone
-from django.utils.deprecation import CallableFalse, CallableTrue
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
-from .validators import ASCIIUsernameValidator, UnicodeUsernameValidator
+from .validators import UnicodeUsernameValidator
 
 
 def update_last_login(sender, user, **kwargs):
@@ -23,6 +19,8 @@ def update_last_login(sender, user, **kwargs):
     """
     user.last_login = timezone.now()
     user.save(update_fields=['last_login'])
+
+
 user_logged_in.connect(update_last_login)
 
 
@@ -36,7 +34,6 @@ class PermissionManager(models.Manager):
         )
 
 
-@python_2_unicode_compatible
 class Permission(models.Model):
     """
     The permissions system provides a way to assign permissions to specific
@@ -78,9 +75,10 @@ class Permission(models.Model):
 
     def __str__(self):
         return "%s | %s | %s" % (
-            six.text_type(self.content_type.app_label),
-            six.text_type(self.content_type),
-            six.text_type(self.name))
+            self.content_type.app_label,
+            self.content_type,
+            self.name,
+        )
 
     def natural_key(self):
         return (self.codename,) + self.content_type.natural_key()
@@ -97,7 +95,6 @@ class GroupManager(models.Manager):
         return self.get(name=name)
 
 
-@python_2_unicode_compatible
 class Group(models.Model):
     """
     Groups are a generic way of categorizing users to apply permissions, or
@@ -105,7 +102,7 @@ class Group(models.Model):
     groups.
 
     A user in a group automatically has all the permissions granted to that
-    group. For example, if the group Site editors has the permission
+    group. For example, if the group 'Site editors' has the permission
     can_edit_home_page, any user in that group will have that permission.
 
     Beyond permissions, groups are a convenient way to categorize users to
@@ -140,12 +137,12 @@ class UserManager(BaseUserManager):
 
     def _create_user(self, username, email, password, **extra_fields):
         """
-        Creates and saves a User with the given username, email and password.
+        Create and save a user with the given username, email, and password.
         """
         if not username:
             raise ValueError('The given username must be set')
         email = self.normalize_email(email)
-        username = self.normalize_username(username)
+        username = self.model.normalize_username(username)
         user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -209,8 +206,8 @@ def _user_has_module_perms(user, app_label):
 
 class PermissionsMixin(models.Model):
     """
-    A mixin class that adds the fields and methods necessary to support
-    Django's Group and Permission model using the ModelBackend.
+    Add the fields and methods necessary to support the Group and Permission
+    models using the ModelBackend.
     """
     is_superuser = models.BooleanField(
         _('superuser status'),
@@ -245,9 +242,9 @@ class PermissionsMixin(models.Model):
 
     def get_group_permissions(self, obj=None):
         """
-        Returns a list of permission strings that this user has through their
-        groups. This method queries all available auth backends. If an object
-        is passed in, only permissions matching this object are returned.
+        Return a list of permission strings that this user has through their
+        groups. Query all available auth backends. If an object is passed in,
+        return only permissions matching this object.
         """
         permissions = set()
         for backend in auth.get_backends():
@@ -260,13 +257,12 @@ class PermissionsMixin(models.Model):
 
     def has_perm(self, perm, obj=None):
         """
-        Returns True if the user has the specified permission. This method
-        queries all available auth backends, but returns immediately if any
-        backend returns True. Thus, a user who has permission from a single
-        auth backend is assumed to have permission in general. If an object is
-        provided, permissions for this specific object are checked.
+        Return True if the user has the specified permission. Query all
+        available auth backends, but return immediately if any backend returns
+        True. Thus, a user who has permission from a single auth backend is
+        assumed to have permission in general. If an object is provided, check
+        permissions for that object.
         """
-
         # Active superusers have all permissions.
         if self.is_active and self.is_superuser:
             return True
@@ -276,19 +272,15 @@ class PermissionsMixin(models.Model):
 
     def has_perms(self, perm_list, obj=None):
         """
-        Returns True if the user has each of the specified permissions. If
-        object is passed, it checks if the user has all required perms for this
-        object.
+        Return True if the user has each of the specified permissions. If
+        object is passed, check if the user has all required perms for it.
         """
-        for perm in perm_list:
-            if not self.has_perm(perm, obj):
-                return False
-        return True
+        return all(self.has_perm(perm, obj) for perm in perm_list)
 
     def has_module_perms(self, app_label):
         """
-        Returns True if the user has any permissions in the given app label.
-        Uses pretty much the same logic as has_perm, above.
+        Return True if the user has any permissions in the given app label.
+        Use simlar logic as has_perm(), above.
         """
         # Active superusers have all permissions.
         if self.is_active and self.is_superuser:
@@ -304,7 +296,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
     Username and password are required. Other fields are optional.
     """
-    username_validator = UnicodeUsernameValidator() if six.PY3 else ASCIIUsernameValidator()
+    username_validator = UnicodeUsernameValidator()
 
     username = models.CharField(
         _('username'),
@@ -317,7 +309,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         },
     )
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
-    last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    last_name = models.CharField(_('last name'), max_length=150, blank=True)
     email = models.EmailField(_('email address'), blank=True)
     is_staff = models.BooleanField(
         _('staff status'),
@@ -336,6 +328,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
+    EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
@@ -344,21 +337,23 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = _('users')
         abstract = True
 
+    def clean(self):
+        super().clean()
+        self.email = self.__class__.objects.normalize_email(self.email)
+
     def get_full_name(self):
         """
-        Returns the first_name plus the last_name, with a space in between.
+        Return the first_name plus the last_name, with a space in between.
         """
         full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
 
     def get_short_name(self):
-        "Returns the short name for the user."
+        """Return the short name for the user."""
         return self.first_name
 
     def email_user(self, subject, message, from_email=None, **kwargs):
-        """
-        Sends an email to this User.
-        """
+        """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
@@ -373,8 +368,7 @@ class User(AbstractUser):
         swappable = 'AUTH_USER_MODEL'
 
 
-@python_2_unicode_compatible
-class AnonymousUser(object):
+class AnonymousUser:
     id = None
     pk = None
     username = ''
@@ -393,9 +387,6 @@ class AnonymousUser(object):
     def __eq__(self, other):
         return isinstance(other, self.__class__)
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
     def __hash__(self):
         return 1  # instances always return the same hash value
 
@@ -411,13 +402,13 @@ class AnonymousUser(object):
     def check_password(self, raw_password):
         raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
 
-    def _get_groups(self):
+    @property
+    def groups(self):
         return self._groups
-    groups = property(_get_groups)
 
-    def _get_user_permissions(self):
+    @property
+    def user_permissions(self):
         return self._user_permissions
-    user_permissions = property(_get_user_permissions)
 
     def get_group_permissions(self, obj=None):
         return set()
@@ -439,11 +430,11 @@ class AnonymousUser(object):
 
     @property
     def is_anonymous(self):
-        return CallableTrue
+        return True
 
     @property
     def is_authenticated(self):
-        return CallableFalse
+        return False
 
     def get_username(self):
         return self.username

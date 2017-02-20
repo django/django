@@ -1,7 +1,6 @@
 from django.conf import settings
 
 from .. import Tags, Warning, register
-from ..utils import patch_middleware_message
 
 SECRET_KEY_MIN_LENGTH = 50
 SECRET_KEY_MIN_UNIQUE_CHARACTERS = 5
@@ -101,27 +100,31 @@ W020 = Warning(
     id='security.W020',
 )
 
+W021 = Warning(
+    "You have not set the SECURE_HSTS_PRELOAD setting to True. Without this, "
+    "your site cannot be submitted to the browser preload list.",
+    id='security.W021',
+)
+
 
 def _security_middleware():
-    return ("django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE_CLASSES or
-            settings.MIDDLEWARE and "django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE)
+    return 'django.middleware.security.SecurityMiddleware' in settings.MIDDLEWARE
 
 
 def _xframe_middleware():
-    return ("django.middleware.clickjacking.XFrameOptionsMiddleware" in settings.MIDDLEWARE_CLASSES or
-            settings.MIDDLEWARE and "django.middleware.clickjacking.XFrameOptionsMiddleware" in settings.MIDDLEWARE)
+    return 'django.middleware.clickjacking.XFrameOptionsMiddleware' in settings.MIDDLEWARE
 
 
 @register(Tags.security, deploy=True)
 def check_security_middleware(app_configs, **kwargs):
     passed_check = _security_middleware()
-    return [] if passed_check else [patch_middleware_message(W001)]
+    return [] if passed_check else [W001]
 
 
 @register(Tags.security, deploy=True)
 def check_xframe_options_middleware(app_configs, **kwargs):
     passed_check = _xframe_middleware()
-    return [] if passed_check else [patch_middleware_message(W002)]
+    return [] if passed_check else [W002]
 
 
 @register(Tags.security, deploy=True)
@@ -138,6 +141,16 @@ def check_sts_include_subdomains(app_configs, **kwargs):
         settings.SECURE_HSTS_INCLUDE_SUBDOMAINS is True
     )
     return [] if passed_check else [W005]
+
+
+@register(Tags.security, deploy=True)
+def check_sts_preload(app_configs, **kwargs):
+    passed_check = (
+        not _security_middleware() or
+        not settings.SECURE_HSTS_SECONDS or
+        settings.SECURE_HSTS_PRELOAD is True
+    )
+    return [] if passed_check else [W021]
 
 
 @register(Tags.security, deploy=True)
@@ -189,7 +202,7 @@ def check_xframe_deny(app_configs, **kwargs):
         not _xframe_middleware() or
         settings.X_FRAME_OPTIONS == 'DENY'
     )
-    return [] if passed_check else [patch_middleware_message(W019)]
+    return [] if passed_check else [W019]
 
 
 @register(Tags.security, deploy=True)

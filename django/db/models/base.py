@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import copy
 import inspect
 import warnings
@@ -13,40 +11,35 @@ from django.core.exceptions import (
     ObjectDoesNotExist, ValidationError,
 )
 from django.db import (
-    DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY, DatabaseError, connections,
-    router, transaction,
+    DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY, DatabaseError, connection,
+    connections, router, transaction,
 )
-from django.db.models import signals
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, Collector
-from django.db.models.fields import AutoField
 from django.db.models.fields.related import (
-    ForeignObjectRel, ManyToOneRel, OneToOneField, lazy_related_operation,
-    resolve_relation,
+    ForeignObjectRel, OneToOneField, lazy_related_operation, resolve_relation,
 )
 from django.db.models.manager import Manager
 from django.db.models.options import Options
 from django.db.models.query import Q
-from django.db.models.utils import make_model_tuple
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import (
-    force_str, force_text, python_2_unicode_compatible,
+from django.db.models.signals import (
+    class_prepared, post_init, post_save, pre_init, pre_save,
 )
+from django.db.models.utils import make_model_tuple
+from django.utils.encoding import force_text
 from django.utils.functional import curry
-from django.utils.six.moves import zip
 from django.utils.text import capfirst, get_text_list
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.version import get_version
 
 
-@python_2_unicode_compatible
-class Deferred(object):
+class Deferred:
     def __repr__(self):
-        return str('<Deferred field>')
+        return '<Deferred field>'
 
     def __str__(self):
-        return str('<Deferred field>')
+        return '<Deferred field>'
+
 
 DEFERRED = Deferred()
 
@@ -80,7 +73,7 @@ class ModelBase(type):
     Metaclass for all models.
     """
     def __new__(cls, name, bases, attrs):
-        super_new = super(ModelBase, cls).__new__
+        super_new = super().__new__
 
         # Also ensure initialization is only performed for subclasses of Model
         # (excluding Model class itself).
@@ -90,7 +83,11 @@ class ModelBase(type):
 
         # Create the class.
         module = attrs.pop('__module__')
-        new_class = super_new(cls, name, bases, {'__module__': module})
+        new_attrs = {'__module__': module}
+        classcell = attrs.pop('__classcell__', None)
+        if classcell is not None:
+            new_attrs['__classcell__'] = classcell
+        new_class = super_new(cls, name, bases, new_attrs)
         attr_meta = attrs.pop('Meta', None)
         abstract = getattr(attr_meta, 'abstract', False)
         if not attr_meta:
@@ -121,7 +118,7 @@ class ModelBase(type):
             new_class.add_to_class(
                 'DoesNotExist',
                 subclass_exception(
-                    str('DoesNotExist'),
+                    'DoesNotExist',
                     tuple(
                         x.DoesNotExist for x in parents if hasattr(x, '_meta') and not x._meta.abstract
                     ) or (ObjectDoesNotExist,),
@@ -130,7 +127,7 @@ class ModelBase(type):
             new_class.add_to_class(
                 'MultipleObjectsReturned',
                 subclass_exception(
-                    str('MultipleObjectsReturned'),
+                    'MultipleObjectsReturned',
                     tuple(
                         x.MultipleObjectsReturned for x in parents if hasattr(x, '_meta') and not x._meta.abstract
                     ) or (MultipleObjectsReturned,),
@@ -298,6 +295,13 @@ class ModelBase(type):
                 else:
                     new_class.add_to_class(field.name, copy.deepcopy(field))
 
+        # Set the name of _meta.indexes. This can't be done in
+        # Options.contribute_to_class() because fields haven't been added to
+        # the model at that point.
+        for index in new_class._meta.indexes:
+            if not index.name:
+                index.set_name_with_model(new_class)
+
         if abstract:
             # Abstract base models can't be instantiated and don't appear in
             # the list of models for an app. We do the final setup for them a
@@ -346,7 +350,7 @@ class ModelBase(type):
         if get_absolute_url_override:
             setattr(cls, 'get_absolute_url', get_absolute_url_override)
 
-        if not opts.managers or cls._requires_legacy_default_manager():
+        if not opts.managers:
             if any(f.name == 'objects' for f in opts.fields):
                 raise ValueError(
                     "Model %s must specify a custom Manager, because it has a "
@@ -356,80 +360,7 @@ class ModelBase(type):
             manager.auto_created = True
             cls.add_to_class('objects', manager)
 
-        signals.class_prepared.send(sender=cls)
-
-    def _requires_legacy_default_manager(cls):  # RemovedInDjango20Warning
-        opts = cls._meta
-
-        if opts.manager_inheritance_from_future:
-            return False
-
-        future_default_manager = opts.default_manager
-
-        # Step 1: Locate a manager that would have been promoted
-        # to default manager with the legacy system.
-        for manager in opts.managers:
-            originating_model = manager._originating_model
-            if (cls is originating_model or cls._meta.proxy or
-                    originating_model._meta.abstract):
-
-                if manager is not cls._default_manager and not opts.default_manager_name:
-                    warnings.warn(
-                        "Managers from concrete parents will soon qualify as default "
-                        "managers if they appear before any other managers in the "
-                        "MRO. As a result, '{legacy_default_manager}' declared on "
-                        "'{legacy_default_manager_model}' will no longer be the "
-                        "default manager for '{model}' in favor of "
-                        "'{future_default_manager}' declared on "
-                        "'{future_default_manager_model}'. "
-                        "You can redeclare '{legacy_default_manager}' on '{cls}' "
-                        "to keep things the way they are or you can switch to the new "
-                        "behavior right away by setting "
-                        "`Meta.manager_inheritance_from_future` to `True`.".format(
-                            cls=cls.__name__,
-                            model=opts.label,
-                            legacy_default_manager=manager.name,
-                            legacy_default_manager_model=manager._originating_model._meta.label,
-                            future_default_manager=future_default_manager.name,
-                            future_default_manager_model=future_default_manager._originating_model._meta.label,
-                        ),
-                        RemovedInDjango20Warning, 2
-                    )
-
-                    opts.default_manager_name = manager.name
-                    opts._expire_cache()
-
-                break
-
-        # Step 2: Since there are managers but none of them qualified as
-        # default managers under the legacy system (meaning that there are
-        # managers from concrete parents that would be promoted under the
-        # new system), we need to create a new Manager instance for the
-        # 'objects' attribute as a deprecation shim.
-        else:
-            # If the "future" default manager was auto created there is no
-            # point warning the user since it's basically the same manager.
-            if not future_default_manager.auto_created:
-                warnings.warn(
-                    "Managers from concrete parents will soon qualify as "
-                    "default managers. As a result, the 'objects' manager "
-                    "won't be created (or recreated) automatically "
-                    "anymore on '{model}' and '{future_default_manager}' "
-                    "declared on '{future_default_manager_model}' will be "
-                    "promoted to default manager. You can declare "
-                    "explicitly `objects = models.Manager()` on '{cls}' "
-                    "to keep things the way they are or you can switch "
-                    "to the new behavior right away by setting "
-                    "`Meta.manager_inheritance_from_future` to `True`.".format(
-                        cls=cls.__name__,
-                        model=opts.label,
-                        future_default_manager=future_default_manager.name,
-                        future_default_manager_model=future_default_manager._originating_model._meta.label,
-                    ),
-                    RemovedInDjango20Warning, 2
-                )
-
-            return True
+        class_prepared.send(sender=cls)
 
     @property
     def _base_manager(cls):
@@ -440,7 +371,7 @@ class ModelBase(type):
         return cls._meta.default_manager
 
 
-class ModelState(object):
+class ModelState:
     """
     A class for storing instance state
     """
@@ -452,10 +383,16 @@ class ModelState(object):
         self.adding = True
 
 
-class Model(six.with_metaclass(ModelBase)):
+class Model(metaclass=ModelBase):
 
     def __init__(self, *args, **kwargs):
-        signals.pre_init.send(sender=self.__class__, args=args, kwargs=kwargs)
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
 
         # Set up the storage for instance state
         self._state = ModelState()
@@ -464,32 +401,28 @@ class Model(six.with_metaclass(ModelBase)):
         # overrides it. It should be one or the other; don't duplicate the work
         # The reason for the kwargs check is that standard iterator passes in by
         # args, and instantiation for iteration is 33% faster.
-        args_len = len(args)
-        if args_len > len(self._meta.concrete_fields):
+        if len(args) > len(opts.concrete_fields):
             # Daft, but matches old exception sans the err msg.
             raise IndexError("Number of args exceeds number of fields")
 
         if not kwargs:
-            fields_iter = iter(self._meta.concrete_fields)
+            fields_iter = iter(opts.concrete_fields)
             # The ordering of the zip calls matter - zip throws StopIteration
             # when an iter throws it. So if the first iter throws it, the second
             # is *not* consumed. We rely on this, so don't change the order
             # without changing the logic.
             for val, field in zip(args, fields_iter):
-                if val is DEFERRED:
+                if val is _DEFERRED:
                     continue
-                setattr(self, field.attname, val)
+                _setattr(self, field.attname, val)
         else:
             # Slower, kwargs-ready version.
-            fields_iter = iter(self._meta.fields)
+            fields_iter = iter(opts.fields)
             for val, field in zip(args, fields_iter):
-                if val is DEFERRED:
+                if val is _DEFERRED:
                     continue
-                setattr(self, field.attname, val)
+                _setattr(self, field.attname, val)
                 kwargs.pop(field.name, None)
-                # Maintain compatibility with existing calls.
-                if isinstance(field.remote_field, ManyToOneRel):
-                    kwargs.pop(field.attname, None)
 
         # Now we're left with the unprocessed fields that *must* come from
         # keywords, or default.
@@ -533,28 +466,28 @@ class Model(six.with_metaclass(ModelBase)):
                 # field.name instead of field.attname (e.g. "user" instead of
                 # "user_id") so that the object gets properly cached (and type
                 # checked) by the RelatedObjectDescriptor.
-                if rel_obj is not DEFERRED:
-                    setattr(self, field.name, rel_obj)
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
             else:
-                if val is not DEFERRED:
-                    setattr(self, field.attname, val)
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
 
         if kwargs:
-            for prop in list(kwargs):
+            property_names = opts._property_names
+            for prop in tuple(kwargs):
                 try:
                     # Any remaining kwargs must correspond to properties or
                     # virtual fields.
-                    if (isinstance(getattr(self.__class__, prop), property) or
-                            self._meta.get_field(prop)):
-                        if kwargs[prop] is not DEFERRED:
-                            setattr(self, prop, kwargs[prop])
+                    if prop in property_names or opts.get_field(prop):
+                        if kwargs[prop] is not _DEFERRED:
+                            _setattr(self, prop, kwargs[prop])
                         del kwargs[prop]
                 except (AttributeError, FieldDoesNotExist):
                     pass
             if kwargs:
                 raise TypeError("'%s' is an invalid keyword argument for this function" % list(kwargs)[0])
-        super(Model, self).__init__()
-        signals.post_init.send(sender=self.__class__, instance=self)
+        super().__init__()
+        post_init.send(sender=cls, instance=self)
 
     @classmethod
     def from_db(cls, db, field_names, values):
@@ -569,15 +502,13 @@ class Model(six.with_metaclass(ModelBase)):
 
     def __repr__(self):
         try:
-            u = six.text_type(self)
+            u = str(self)
         except (UnicodeEncodeError, UnicodeDecodeError):
             u = '[Bad Unicode data]'
-        return force_str('<%s: %s>' % (self.__class__.__name__, u))
+        return '<%s: %s>' % (self.__class__.__name__, u)
 
     def __str__(self):
-        if six.PY2 and hasattr(self, '__unicode__'):
-            return force_text(self).encode('utf-8')
-        return str('%s object' % self.__class__.__name__)
+        return '%s object' % self.__class__.__name__
 
     def __eq__(self, other):
         if not isinstance(other, Model):
@@ -589,21 +520,12 @@ class Model(six.with_metaclass(ModelBase)):
             return self is other
         return my_pk == other._get_pk_val()
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
     def __hash__(self):
         if self._get_pk_val() is None:
             raise TypeError("Model instances without primary key value are unhashable")
         return hash(self._get_pk_val())
 
     def __reduce__(self):
-        """
-        Provides pickling support. Normally, this just dispatches to Python's
-        standard handling. However, for models with deferred field loading, we
-        need to do things manually, as they're dynamically created classes and
-        only module-level classes can be pickled by the default path.
-        """
         data = self.__dict__
         data[DJANGO_VERSION_PICKLE_KEY] = get_version()
         class_id = self._meta.app_label, self._meta.object_name
@@ -816,8 +738,10 @@ class Model(six.with_metaclass(ModelBase)):
             cls = cls._meta.concrete_model
         meta = cls._meta
         if not meta.auto_created:
-            signals.pre_save.send(sender=origin, instance=self, raw=raw, using=using,
-                                  update_fields=update_fields)
+            pre_save.send(
+                sender=origin, instance=self, raw=raw, using=using,
+                update_fields=update_fields,
+            )
         with transaction.atomic(using=using, savepoint=False):
             if not raw:
                 self._save_parents(cls, using, update_fields)
@@ -829,8 +753,10 @@ class Model(six.with_metaclass(ModelBase)):
 
         # Signal that the save is complete
         if not meta.auto_created:
-            signals.post_save.send(sender=origin, instance=self, created=(not updated),
-                                   update_fields=update_fields, raw=raw, using=using)
+            post_save.send(
+                sender=origin, instance=self, created=(not updated),
+                update_fields=update_fields, raw=raw, using=using,
+            )
 
     save_base.alters_data = True
 
@@ -902,9 +828,9 @@ class Model(six.with_metaclass(ModelBase)):
 
             fields = meta.local_concrete_fields
             if not pk_set:
-                fields = [f for f in fields if not isinstance(f, AutoField)]
+                fields = [f for f in fields if f is not meta.auto_field]
 
-            update_pk = bool(meta.has_auto_field and not pk_set)
+            update_pk = meta.auto_field and not pk_set
             result = self._do_insert(cls._base_manager, using, fields, update_pk, raw)
             if update_pk:
                 setattr(self, meta.pk.attname, result)
@@ -1087,7 +1013,9 @@ class Model(six.with_metaclass(ModelBase)):
             for field_name in unique_check:
                 f = self._meta.get_field(field_name)
                 lookup_value = getattr(self, f.attname)
-                if lookup_value is None:
+                # TODO: Handle multiple backends with different feature flags.
+                if (lookup_value is None or
+                        (lookup_value == '' and connection.features.interprets_empty_strings_as_nulls)):
                     # no value, skip the lookup
                     continue
                 if f.primary_key and not self._state.adding:
@@ -1156,12 +1084,12 @@ class Model(six.with_metaclass(ModelBase)):
             code='unique_for_date',
             params={
                 'model': self,
-                'model_name': six.text_type(capfirst(opts.verbose_name)),
+                'model_name': capfirst(opts.verbose_name),
                 'lookup_type': lookup_type,
                 'field': field_name,
-                'field_label': six.text_type(capfirst(field.verbose_name)),
+                'field_label': capfirst(field.verbose_name),
                 'date_field': unique_for,
-                'date_field_label': six.text_type(capfirst(opts.get_field(unique_for).verbose_name)),
+                'date_field_label': capfirst(opts.get_field(unique_for).verbose_name),
             }
         )
 
@@ -1171,14 +1099,14 @@ class Model(six.with_metaclass(ModelBase)):
         params = {
             'model': self,
             'model_class': model_class,
-            'model_name': six.text_type(capfirst(opts.verbose_name)),
+            'model_name': capfirst(opts.verbose_name),
             'unique_check': unique_check,
         }
 
         # A unique field
         if len(unique_check) == 1:
             field = opts.get_field(unique_check[0])
-            params['field_label'] = six.text_type(capfirst(field.verbose_name))
+            params['field_label'] = capfirst(field.verbose_name)
             return ValidationError(
                 message=field.error_messages['unique'],
                 code='unique',
@@ -1188,7 +1116,7 @@ class Model(six.with_metaclass(ModelBase)):
         # unique_together
         else:
             field_labels = [capfirst(opts.get_field(f).verbose_name) for f in unique_check]
-            params['field_labels'] = six.text_type(get_text_list(field_labels, _('and')))
+            params['field_labels'] = get_text_list(field_labels, _('and'))
             return ValidationError(
                 message=_("%(model_name)s with this %(field_labels)s already exists."),
                 code='unique_together',
@@ -1266,7 +1194,11 @@ class Model(six.with_metaclass(ModelBase)):
             errors.extend(cls._check_fields(**kwargs))
             errors.extend(cls._check_m2m_through_same_relationship())
             errors.extend(cls._check_long_column_names())
-            clash_errors = cls._check_id_field() + cls._check_field_name_clashes()
+            clash_errors = (
+                cls._check_id_field() +
+                cls._check_field_name_clashes() +
+                cls._check_model_name_db_lookup_clashes()
+            )
             errors.extend(clash_errors)
             # If there are field name clashes, hide consequent column name
             # clashes.
@@ -1471,6 +1403,30 @@ class Model(six.with_metaclass(ModelBase)):
         return errors
 
     @classmethod
+    def _check_model_name_db_lookup_clashes(cls):
+        errors = []
+        model_name = cls.__name__
+        if model_name.startswith('_') or model_name.endswith('_'):
+            errors.append(
+                checks.Error(
+                    "The model name '%s' cannot start or end with an underscore "
+                    "as it collides with the query lookup syntax." % model_name,
+                    obj=cls,
+                    id='models.E023'
+                )
+            )
+        elif LOOKUP_SEP in model_name:
+            errors.append(
+                checks.Error(
+                    "The model name '%s' cannot contain double underscores as "
+                    "it collides with the query lookup syntax." % model_name,
+                    obj=cls,
+                    id='models.E024'
+                )
+            )
+        return errors
+
+    @classmethod
     def _check_index_together(cls):
         """ Check the value of "index_together" option. """
         if not isinstance(cls._meta.index_together, (tuple, list)):
@@ -1541,7 +1497,7 @@ class Model(six.with_metaclass(ModelBase)):
             except KeyError:
                 errors.append(
                     checks.Error(
-                        "'%s' refers to the non-existent field '%s'." % (
+                        "'%s' refers to the nonexistent field '%s'." % (
                             option, field_name,
                         ),
                         obj=cls,
@@ -1608,13 +1564,13 @@ class Model(six.with_metaclass(ModelBase)):
 
         # Skip ordering in the format field1__field2 (FIXME: checking
         # this format would be nice, but it's a little fiddly).
-        fields = (f for f in fields if '__' not in f)
+        fields = (f for f in fields if LOOKUP_SEP not in f)
 
         # Skip ordering on pk. This is always a valid order_by field
         # but is an alias and therefore won't be found by opts.get_field.
         fields = {f for f in fields if f != 'pk'}
 
-        # Check for invalid or non-existent fields in ordering.
+        # Check for invalid or nonexistent fields in ordering.
         invalid_fields = []
 
         # Any field name that is not present in field_names does not exist.
@@ -1630,7 +1586,7 @@ class Model(six.with_metaclass(ModelBase)):
         for invalid_field in invalid_fields:
             errors.append(
                 checks.Error(
-                    "'ordering' refers to the non-existent field '%s'." % invalid_field,
+                    "'ordering' refers to the nonexistent field '%s'." % invalid_field,
                     obj=cls,
                     id='models.E015',
                 )
@@ -1685,6 +1641,10 @@ class Model(six.with_metaclass(ModelBase)):
                 )
 
         for f in cls._meta.local_many_to_many:
+            # Skip nonexistent models.
+            if isinstance(f.remote_field.through, str):
+                continue
+
             # Check if auto-generated name for the M2M field is too long
             # for the database.
             for m2m in f.remote_field.through._meta.local_fields:
@@ -1759,6 +1719,8 @@ def model_unpickle(model_id):
         # Backwards compat - the model was cached directly in earlier versions.
         model = model_id
     return model.__new__(model)
+
+
 model_unpickle.__safe_for_unpickle__ = True
 
 

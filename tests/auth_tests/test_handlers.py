@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib.auth.handlers.modwsgi import (
     check_password, groups_for_user,
 )
@@ -24,7 +22,7 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
 
     def test_check_password(self):
         """
-        Verify that check_password returns the correct values as per
+        check_password() returns the correct values as per
         https://modwsgi.readthedocs.io/en/develop/user-guides/access-control-mechanisms.html#apache-authentication-provider
         """
         User.objects.create_user('test', 'test@example.com', 'test')
@@ -45,11 +43,10 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
     @override_settings(AUTH_USER_MODEL='auth_tests.CustomUser')
     def test_check_password_custom_user(self):
         """
-        Verify that check_password returns the correct values as per
+        check_password() returns the correct values as per
         https://modwsgi.readthedocs.io/en/develop/user-guides/access-control-mechanisms.html#apache-authentication-provider
-        with custom user installed
+        with a custom user installed.
         """
-
         CustomUser._default_manager.create_user('test@example.com', '1990-01-01', 'test')
 
         # User not in database
@@ -63,7 +60,7 @@ class ModWsgiHandlerTestCase(TransactionTestCase):
 
     def test_groups_for_user(self):
         """
-        Check that groups_for_user returns correct values as per
+        groups_for_user() returns correct values as per
         https://modwsgi.readthedocs.io/en/develop/user-guides/access-control-mechanisms.html#apache-group-authorisation
         """
         user1 = User.objects.create_user('test', 'test@example.com', 'test')

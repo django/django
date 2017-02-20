@@ -2,11 +2,9 @@
 Useful auxiliary data structures for query construction. Not useful outside
 the SQL domain.
 """
+# for backwards-compatibility in Django 1.11
+from django.core.exceptions import EmptyResultSet  # NOQA: F401
 from django.db.models.sql.constants import INNER, LOUTER
-
-
-class EmptyResultSet(Exception):
-    pass
 
 
 class MultiJoin(Exception):
@@ -21,11 +19,11 @@ class MultiJoin(Exception):
         self.names_with_path = path_with_names
 
 
-class Empty(object):
+class Empty:
     pass
 
 
-class Join(object):
+class Join:
     """
     Used by sql.Query and sql.SQLCompiler to generate JOIN clauses into the
     FROM entry. For example, the SQL generated could be
@@ -127,7 +125,7 @@ class Join(object):
         return new
 
 
-class BaseTable(object):
+class BaseTable:
     """
     The BaseTable class is used for base table references in FROM clause. For
     example, the SQL "foo" in

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.core import serializers
 from django.db import connection
 from django.test import TestCase
@@ -66,7 +64,7 @@ def natural_key_test(format, self):
     self.assertEqual(books[0].object.title, book1['title'])
     self.assertEqual(books[0].object.pk, adrian.pk)
     self.assertEqual(books[1].object.title, book2['title'])
-    self.assertEqual(books[1].object.pk, None)
+    self.assertIsNone(books[1].object.pk)
 
 
 # Dynamically register tests for each serializer

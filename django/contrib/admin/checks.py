@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from itertools import chain
 
 from django.apps import apps
@@ -11,16 +8,19 @@ from django.contrib.admin.utils import (
 from django.core import checks
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
+from django.db.models.constants import LOOKUP_SEP
 from django.forms.models import (
     BaseModelForm, BaseModelFormSet, _get_foreign_key,
 )
 from django.template.engine import Engine
 
 
-def check_admin_app(**kwargs):
-    from django.contrib.admin.sites import system_check_errors
-
-    return system_check_errors
+def check_admin_app(app_configs, **kwargs):
+    from django.contrib.admin.sites import all_sites
+    errors = []
+    for site in all_sites:
+        errors.extend(site.check(app_configs))
+    return errors
 
 
 def check_dependencies(**kwargs):
@@ -62,7 +62,7 @@ def check_dependencies(**kwargs):
     return errors
 
 
-class BaseModelAdminChecks(object):
+class BaseModelAdminChecks:
 
     def check(self, admin_obj, **kwargs):
         errors = []
@@ -217,10 +217,11 @@ class BaseModelAdminChecks(object):
                 # be an extra field on the form.
                 return []
             else:
-                if field.many_to_many and not field.remote_field.through._meta.auto_created:
+                if (isinstance(field, models.ManyToManyField) and
+                        not field.remote_field.through._meta.auto_created):
                     return [
                         checks.Error(
-                            "The value of '%s' cannot include the many-to-many field '%s' "
+                            "The value of '%s' cannot include the ManyToManyField '%s', "
                             "because that field manually specifies a relationship model."
                             % (label, field_name),
                             obj=obj.__class__,
@@ -393,11 +394,11 @@ class BaseModelAdminChecks(object):
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=obj, id='admin.E027')
         else:
-            if field.many_to_many or isinstance(field, (models.DateTimeField, models.ForeignKey)):
+            if isinstance(field, (models.DateTimeField, models.ForeignKey, models.ManyToManyField)):
                 return [
                     checks.Error(
                         "The value of '%s' refers to '%s', which must not be a DateTimeField, "
-                        "a foreign key, or a many-to-many field." % (label, field_name),
+                        "a ForeignKey, a OneToOneField, or a ManyToManyField." % (label, field_name),
                         obj=obj.__class__,
                         id='admin.E028',
                     )
@@ -457,7 +458,7 @@ class BaseModelAdminChecks(object):
             ]
         elif field_name == '?':
             return []
-        elif '__' in field_name:
+        elif LOOKUP_SEP in field_name:
             # Skip ordering in the format field1__field2 (FIXME: checking
             # this format would be nice, but it's a little fiddly).
             return []
@@ -512,7 +513,7 @@ class BaseModelAdminChecks(object):
 class ModelAdminChecks(BaseModelAdminChecks):
 
     def check(self, admin_obj, **kwargs):
-        errors = super(ModelAdminChecks, self).check(admin_obj)
+        errors = super().check(admin_obj)
         errors.extend(self._check_save_as(admin_obj))
         errors.extend(self._check_save_on_top(admin_obj))
         errors.extend(self._check_inlines(admin_obj))
@@ -560,12 +561,12 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """ Check one inline model admin. """
         inline_label = '.'.join([inline.__module__, inline.__name__])
 
-        from django.contrib.admin.options import BaseModelAdmin
+        from django.contrib.admin.options import InlineModelAdmin
 
-        if not issubclass(inline, BaseModelAdmin):
+        if not issubclass(inline, InlineModelAdmin):
             return [
                 checks.Error(
-                    "'%s' must inherit from 'BaseModelAdmin'." % inline_label,
+                    "'%s' must inherit from 'InlineModelAdmin'." % inline_label,
                     obj=obj.__class__,
                     id='admin.E104',
                 )
@@ -621,10 +622,10 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         id='admin.E108',
                     )
                 ]
-            elif getattr(field, 'many_to_many', False):
+            elif isinstance(field, models.ManyToManyField):
                 return [
                     checks.Error(
-                        "The value of '%s' must not be a many-to-many field." % label,
+                        "The value of '%s' must not be a ManyToManyField." % label,
                         obj=obj.__class__,
                         id='admin.E109',
                     )
@@ -653,16 +654,21 @@ class ModelAdminChecks(BaseModelAdminChecks):
     def _check_list_display_links(self, obj):
         """ Check that list_display_links is a unique subset of list_display.
         """
+        from django.contrib.admin.options import ModelAdmin
 
         if obj.list_display_links is None:
             return []
         elif not isinstance(obj.list_display_links, (list, tuple)):
             return must_be('a list, a tuple, or None', option='list_display_links', obj=obj, id='admin.E110')
-        else:
+        # Check only if ModelAdmin.get_list_display() isn't overridden.
+        elif obj.get_list_display.__code__ is ModelAdmin.get_list_display.__code__:
+            # Use obj.get_list_display.__func__ is ModelAdmin.get_list_display
+            # when dropping PY2.
             return list(chain(*[
                 self._check_list_display_links_item(obj, field_name, "list_display_links[%d]" % index)
                 for index, field_name in enumerate(obj.list_display_links)
             ]))
+        return []
 
     def _check_list_display_links_item(self, obj, field_name, label):
         if field_name not in obj.list_display:
@@ -840,12 +846,16 @@ class ModelAdminChecks(BaseModelAdminChecks):
             return []
         else:
             try:
-                field = obj.model._meta.get_field(obj.date_hierarchy)
-            except FieldDoesNotExist:
-                return refer_to_missing_field(
-                    option='date_hierarchy', field=obj.date_hierarchy,
-                    model=obj.model, obj=obj, id='admin.E127',
-                )
+                field = get_fields_from_path(obj.model, obj.date_hierarchy)[-1]
+            except (NotRelationField, FieldDoesNotExist):
+                return [
+                    checks.Error(
+                        "The value of 'date_hierarchy' refers to '%s', which "
+                        "does not refer to a Field." % obj.date_hierarchy,
+                        obj=obj.__class__,
+                        id='admin.E127',
+                    )
+                ]
             else:
                 if not isinstance(field, (models.DateField, models.DateTimeField)):
                     return must_be('a DateField or DateTimeField', option='date_hierarchy', obj=obj, id='admin.E128')
@@ -856,7 +866,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
 class InlineModelAdminChecks(BaseModelAdminChecks):
 
     def check(self, inline_obj, **kwargs):
-        errors = super(InlineModelAdminChecks, self).check(inline_obj)
+        errors = super().check(inline_obj)
         parent_model = inline_obj.parent_model
         errors.extend(self._check_relation(inline_obj, parent_model))
         errors.extend(self._check_exclude_of_parent_model(inline_obj, parent_model))
@@ -869,7 +879,7 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
     def _check_exclude_of_parent_model(self, obj, parent_model):
         # Do not perform more specific checks if the base checks result in an
         # error.
-        errors = super(InlineModelAdminChecks, self)._check_exclude(obj)
+        errors = super()._check_exclude(obj)
         if errors:
             return []
 

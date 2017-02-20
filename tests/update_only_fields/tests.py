@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db.models.signals import post_save, pre_save
 from django.test import TestCase
 
@@ -72,8 +70,7 @@ class UpdateOnlyFieldsTests(TestCase):
         s1.gender = 'M'
         with self.assertNumQueries(1):
             s1.save()
-        # Test that the deferred class does not remember that gender was
-        # set, instead the instance should remember this.
+        # save() should not fetch deferred fields
         s1 = Person.objects.only('name').get(pk=s.pk)
         with self.assertNumQueries(1):
             s1.save()

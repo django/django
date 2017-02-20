@@ -28,8 +28,7 @@ In your custom ``change_form.html`` template, extend the
 
     {% block admin_change_form_document_ready %}
     {{ block.super }}
-    <script type="text/javascript" src="{% static 'app/formset_handlers.js' %}></script>
-    </script>
+    <script type="text/javascript" src="{% static 'app/formset_handlers.js' %}"></script>
     {% endblock %}
 
 .. snippet:: javascript
@@ -67,7 +66,7 @@ namespace, just listen to the event triggered from there. For example:
 
     {% block admin_change_form_document_ready %}
     {{ block.super }}
-    <script type="text/javascript" src="{% static 'app/unregistered_handlers.js' %}></script>
+    <script type="text/javascript" src="{% static 'app/unregistered_handlers.js' %}"></script>
     {% endblock %}
 
 .. snippet:: javascript

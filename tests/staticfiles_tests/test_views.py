@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import posixpath
 
 from django.conf import settings

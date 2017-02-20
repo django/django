@@ -3,6 +3,7 @@
 # Translators:
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
 # Andriy Sokolovskiy <me@asokolovskiy.com>, 2015
+# Denis Podlesniy <haos616@gmail.com>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # Sergey Lysach <sergikoff88@gmail.com>, 2012
@@ -10,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-16 08:34+0000\n"
-"Last-Translator: Andriy Sokolovskiy <me@asokolovskiy.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-07 22:52+0000\n"
+"Last-Translator: Denis Podlesniy <haos616@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -42,6 +43,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"Щоб встановити bookmarklets, перетягніть посилання на вашу bookmarklets або "
+"клацніть правою кнопкою миші по посиланню і додайте його в bookmarklets. "
+"Тепер ви можете вибрати bookmarklets з будь-якої сторінки сайту."
 
 msgid "Documentation for this page"
 msgstr "Документація для цієї сторінки"
@@ -89,6 +93,9 @@ msgid ""
 "template is used to generate the page and which objects are available to "
 "that template."
 msgstr ""
+"Кожна сторінка для відкритого сайту створена за допомогою вигляду. Вигляд "
+"визначає, який шаблон використовується для генерації сторінки та об'єкти, "
+"які доступні для цього шаблону."
 
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
@@ -138,8 +145,8 @@ msgstr "Метод"
 msgid "Arguments"
 msgstr "Аргументи"
 
-msgid "Back to Model Documentation"
-msgstr "Назад до документації моделі"
+msgid "Back to Model documentation"
+msgstr "Назад до Документація моделі"
 
 msgid "Model documentation"
 msgstr "Документація моделі"
@@ -158,6 +165,7 @@ msgstr "Шаблон: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Шаблон: «%(name)s»"
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Шляхи для пошуку шаблону «%(name)s»:"
@@ -212,8 +220,8 @@ msgstr "Контекст:"
 msgid "Templates:"
 msgstr "Шаблони:"
 
-msgid "Back to Views Documentation"
-msgstr "Назад до Документації Відображень"
+msgid "Back to View documentation"
+msgstr "Назад до Переглянути документацію"
 
 msgid "View documentation"
 msgstr "Переглянути документацію"

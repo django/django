@@ -2,7 +2,7 @@
 #
 # Translators:
 # Antoni Aloy <aaloy@apsl.net>, 2011-2012
-# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
+# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015-2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011
@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 15:42+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-08-03 15:39+0000\n"
 "Last-Translator: Ernesto Avilés Vázquez <whippiii@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
@@ -153,15 +153,69 @@ msgstr "Ayer"
 msgid "Tomorrow"
 msgstr "Mañana"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Enero Febrero Marzo Abril Mayo Junio Julio Agosto Septiembre Octubre "
-"Noviembre Diciembre"
+msgid "January"
+msgstr "Enero"
 
-msgid "S M T W T F S"
-msgstr "D L M M J V S"
+msgid "February"
+msgstr "Febrero"
+
+msgid "March"
+msgstr "Marzo"
+
+msgid "April"
+msgstr "Abril"
+
+msgid "May"
+msgstr "Mayo"
+
+msgid "June"
+msgstr "Junio"
+
+msgid "July"
+msgstr "Julio"
+
+msgid "August"
+msgstr "Agosto"
+
+msgid "September"
+msgstr "Septiembre"
+
+msgid "October"
+msgstr "Octubre"
+
+msgid "November"
+msgstr "Noviembre"
+
+msgid "December"
+msgstr "Diciembre"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "D"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "L"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "M"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "M"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "J"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "V"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "S"
 
 msgid "Show"
 msgstr "Mostrar"

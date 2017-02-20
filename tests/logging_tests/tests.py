@@ -1,21 +1,19 @@
-# -*- coding:utf-8 -*-
-from __future__ import unicode_literals
-
 import logging
-import warnings
+from contextlib import contextmanager
+from io import StringIO
 
 from admin_scripts.tests import AdminScriptTestCase
 
 from django.conf import settings
 from django.core import mail
 from django.core.files.temp import NamedTemporaryFile
+from django.core.management import color
 from django.db import connection
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
-from django.utils.deprecation import RemovedInNextVersionWarning
 from django.utils.log import (
     DEFAULT_LOGGING, AdminEmailHandler, CallbackFilter, RequireDebugFalse,
-    RequireDebugTrue,
+    RequireDebugTrue, ServerFormatter,
 )
 
 from .logconfig import MyEmailBackend
@@ -48,10 +46,10 @@ class LoggingFiltersTest(SimpleTestCase):
         filter_ = RequireDebugFalse()
 
         with self.settings(DEBUG=True):
-            self.assertEqual(filter_.filter("record is not used"), False)
+            self.assertIs(filter_.filter("record is not used"), False)
 
         with self.settings(DEBUG=False):
-            self.assertEqual(filter_.filter("record is not used"), True)
+            self.assertIs(filter_.filter("record is not used"), True)
 
     def test_require_debug_true_filter(self):
         """
@@ -60,23 +58,23 @@ class LoggingFiltersTest(SimpleTestCase):
         filter_ = RequireDebugTrue()
 
         with self.settings(DEBUG=True):
-            self.assertEqual(filter_.filter("record is not used"), True)
+            self.assertIs(filter_.filter("record is not used"), True)
 
         with self.settings(DEBUG=False):
-            self.assertEqual(filter_.filter("record is not used"), False)
+            self.assertIs(filter_.filter("record is not used"), False)
 
 
-class SetupDefaultLoggingMixin(object):
+class SetupDefaultLoggingMixin:
 
     @classmethod
     def setUpClass(cls):
-        super(SetupDefaultLoggingMixin, cls).setUpClass()
+        super().setUpClass()
         cls._logging = settings.LOGGING
         logging.config.dictConfig(DEFAULT_LOGGING)
 
     @classmethod
     def tearDownClass(cls):
-        super(SetupDefaultLoggingMixin, cls).tearDownClass()
+        super().tearDownClass()
         logging.config.dictConfig(cls._logging)
 
 
@@ -144,35 +142,6 @@ class I18nLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleTest
         self.assertEqual(self.logger_output.getvalue(), 'Not Found: /this_does_not/\nNot Found: /en/nor_this/\n')
 
 
-class WarningLoggerTests(SimpleTestCase):
-    """
-    Tests that warnings output for RemovedInDjangoXXWarning (XX being the next
-    Django version) is enabled and captured to the logging system
-    """
-    def setUp(self):
-        # If tests are invoke with "-Wall" (or any -W flag actually) then
-        # warning logging gets disabled (see configure_logging in django/utils/log.py).
-        # However, these tests expect warnings to be logged, so manually force warnings
-        # to the logs. Use getattr() here because the logging capture state is
-        # undocumented and (I assume) brittle.
-        self._old_capture_state = bool(getattr(logging, '_warnings_showwarning', False))
-        logging.captureWarnings(True)
-
-    def tearDown(self):
-        # Reset warnings state.
-        logging.captureWarnings(self._old_capture_state)
-
-    @override_settings(DEBUG=True)
-    def test_error_filter_still_raises(self):
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                'error',
-                category=RemovedInNextVersionWarning
-            )
-            with self.assertRaises(RemovedInNextVersionWarning):
-                warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
-
-
 class CallbackFilterTest(SimpleTestCase):
     def test_sense(self):
         f_false = CallbackFilter(lambda r: False)
@@ -198,7 +167,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
     logger = logging.getLogger('django')
 
     def get_admin_email_handler(self, logger):
-        # Ensure that AdminEmailHandler does not get filtered out
+        # AdminEmailHandler does not get filtered out
         # even with DEBUG=True.
         admin_email_handler = [
             h for h in logger.handlers
@@ -216,9 +185,8 @@ class AdminEmailHandlerTest(SimpleTestCase):
     )
     def test_accepts_args(self):
         """
-        Ensure that user-supplied arguments and the EMAIL_SUBJECT_PREFIX
-        setting are used to compose the email subject.
-        Refs #16736.
+        User-supplied arguments and the EMAIL_SUBJECT_PREFIX setting are used
+        to compose the email subject (#16736).
         """
         message = "Custom message that says '%s' and '%s'"
         token1 = 'ping'
@@ -247,8 +215,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
     )
     def test_accepts_args_and_request(self):
         """
-        Ensure that the subject is also handled if being
-        passed a request object.
+        The subject is also handled if being passed a request object.
         """
         message = "Custom message that says '%s' and '%s'"
         token1 = 'ping'
@@ -283,9 +250,8 @@ class AdminEmailHandlerTest(SimpleTestCase):
     )
     def test_subject_accepts_newlines(self):
         """
-        Ensure that newlines in email reports' subjects are escaped to avoid
-        AdminErrorHandler to fail.
-        Refs #17281.
+        Newlines in email reports' subjects are escaped to prevent
+        AdminErrorHandler from failing (#17281).
         """
         message = 'Message \r\n with newlines'
         expected_subject = 'ERROR: Message \\r\\n with newlines'
@@ -389,7 +355,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
 
 class SettingsConfigTest(AdminScriptTestCase):
     """
-    Test that accessing settings in a custom logging handler does not trigger
+    Accessing settings in a custom logging handler does not trigger
     a circular import error.
     """
     def setUp(self):
@@ -416,12 +382,14 @@ class SettingsConfigTest(AdminScriptTestCase):
 
 def dictConfig(config):
     dictConfig.called = True
+
+
 dictConfig.called = False
 
 
 class SetupConfigureLogging(SimpleTestCase):
     """
-    Test that calling django.setup() initializes the logging configuration.
+    Calling django.setup() initializes the logging configuration.
     """
     @override_settings(LOGGING_CONFIG='logging_tests.tests.dictConfig',
                        LOGGING=OLD_LOGGING)
@@ -458,7 +426,7 @@ class SecurityLoggerTest(SimpleTestCase):
 
 class SettingsCustomLoggingTest(AdminScriptTestCase):
     """
-    Test that using a logging defaults are still applied when using a custom
+    Using a logging defaults are still applied when using a custom
     callable in LOGGING_CONFIG (i.e., logging.config.fileConfig).
     """
     def setUp(self):
@@ -479,7 +447,7 @@ args=(sys.stdout,)
 format=%(message)s
 """
         self.temp_file = NamedTemporaryFile()
-        self.temp_file.write(logging_conf.encode('utf-8'))
+        self.temp_file.write(logging_conf.encode())
         self.temp_file.flush()
         sdict = {'LOGGING_CONFIG': '"logging.config.fileConfig"',
                  'LOGGING': 'r"%s"' % self.temp_file.name}
@@ -513,3 +481,47 @@ class SchemaLoggerTests(SimpleTestCase):
                 }},
             )]
         )
+
+
+class LogFormattersTests(SimpleTestCase):
+
+    def test_server_formatter_styles(self):
+        color_style = color.make_style('')
+        formatter = ServerFormatter()
+        formatter.style = color_style
+        log_msg = 'log message'
+        status_code_styles = [
+            (200, 'HTTP_SUCCESS'),
+            (100, 'HTTP_INFO'),
+            (304, 'HTTP_NOT_MODIFIED'),
+            (300, 'HTTP_REDIRECT'),
+            (404, 'HTTP_NOT_FOUND'),
+            (400, 'HTTP_BAD_REQUEST'),
+            (500, 'HTTP_SERVER_ERROR'),
+        ]
+        for status_code, style in status_code_styles:
+            record = logging.makeLogRecord({'msg': log_msg, 'status_code': status_code})
+            self.assertEqual(formatter.format(record), getattr(color_style, style)(log_msg))
+        record = logging.makeLogRecord({'msg': log_msg})
+        self.assertEqual(formatter.format(record), log_msg)
+
+    def test_server_formatter_default_format(self):
+        server_time = '2016-09-25 10:20:30'
+        log_msg = 'log message'
+        logger = logging.getLogger('django.server')
+
+        @contextmanager
+        def patch_django_server_logger():
+            old_stream = logger.handlers[0].stream
+            new_stream = StringIO()
+            logger.handlers[0].stream = new_stream
+            yield new_stream
+            logger.handlers[0].stream = old_stream
+
+        with patch_django_server_logger() as logger_output:
+            logger.info(log_msg, extra={'server_time': server_time})
+            self.assertEqual('[%s] %s\n' % (server_time, log_msg), logger_output.getvalue())
+
+        with patch_django_server_logger() as logger_output:
+            logger.info(log_msg)
+            self.assertRegex(logger_output.getvalue(), r'^\[[-:,.\s\d]+\] %s' % log_msg)

@@ -2,15 +2,15 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2012
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2014-2015
-# Jaffa McNeill <jaffa.mcneill@gmail.com>, 2011
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2014-2016
+# Jaffa McNeill <inactive+jaffamcneill@transifex.com>, 2011
 # Adamo Mesha <adam.raizen@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-20 13:21+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-09-28 11:14+0000\n"
 "Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
@@ -149,15 +149,69 @@ msgstr "Hieraŭ"
 msgid "Tomorrow"
 msgstr "Morgaŭ"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Januaro Februaro Marto Aprilo Majo Junio Julio Aŭgusto Septembro Oktobro "
-"Novembro Decembro"
+msgid "January"
+msgstr "januaro"
 
-msgid "S M T W T F S"
-msgstr "D L M M Ĵ V S"
+msgid "February"
+msgstr "februaro"
+
+msgid "March"
+msgstr "marto"
+
+msgid "April"
+msgstr "aprilo"
+
+msgid "May"
+msgstr "majo"
+
+msgid "June"
+msgstr "junio"
+
+msgid "July"
+msgstr "julio"
+
+msgid "August"
+msgstr "aŭgusto"
+
+msgid "September"
+msgstr "septembro"
+
+msgid "October"
+msgstr "oktobro"
+
+msgid "November"
+msgstr "novembro"
+
+msgid "December"
+msgstr "decembro"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "d"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "l"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "m"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "m"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "ĵ"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "v"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "s"
 
 msgid "Show"
 msgstr "Montru"

@@ -3,10 +3,8 @@ Regression tests for defer() / only() behavior.
 """
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Item(models.Model):
     name = models.CharField(max_length=15)
     text = models.TextField(default="xyzzy")
@@ -31,7 +29,6 @@ class Child(models.Model):
     value = models.IntegerField()
 
 
-@python_2_unicode_compatible
 class Leaf(models.Model):
     name = models.CharField(max_length=10)
     child = models.ForeignKey(Child, models.CASCADE)
@@ -52,7 +49,6 @@ class Proxy(Item):
         proxy = True
 
 
-@python_2_unicode_compatible
 class SimpleItem(models.Model):
     name = models.CharField(max_length=15)
     value = models.IntegerField()

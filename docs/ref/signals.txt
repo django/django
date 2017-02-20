@@ -125,8 +125,8 @@ Arguments sent with this signal:
     The database alias being used.
 
 ``update_fields``
-    The set of fields to update explicitly specified in the ``save()`` method.
-    ``None`` if this argument was not used in the ``save()`` call.
+    The set of fields to update as passed to :meth:`.Model.save`, or ``None``
+    if ``update_fields`` wasn't passed to ``save()``.
 
 ``post_save``
 -------------
@@ -158,8 +158,8 @@ Arguments sent with this signal:
     The database alias being used.
 
 ``update_fields``
-    The set of fields to update explicitly specified in the ``save()`` method.
-    ``None`` if this argument was not used in the ``save()`` call.
+    The set of fields to update as passed to :meth:`.Model.save`, or ``None``
+    if ``update_fields`` wasn't passed to ``save()``.
 
 ``pre_delete``
 --------------
@@ -407,8 +407,6 @@ Arguments sent with this signal:
     The alias of database on which a command will operate.
 
 ``plan``
-    .. versionadded:: 1.10
-
     The migration plan that is going to be used for the migration run. While
     the plan is not public API, this allows for the rare cases when it is
     necessary to know the plan. A plan is a list of two-tuples with the first
@@ -416,8 +414,6 @@ Arguments sent with this signal:
     if the migration was rolled back (``True``) or applied (``False``).
 
 ``apps``
-    .. versionadded:: 1.10
-
     An instance of :data:`Apps <django.apps>` containing the state of the
     project before the migration run. It should be used instead of the global
     :attr:`apps <django.apps.apps>` registry to retrieve the models you
@@ -429,13 +425,13 @@ Arguments sent with this signal:
 .. data:: django.db.models.signals.post_migrate
    :module:
 
-Sent by the :djadmin:`migrate` command after it installs an application, and the
-:djadmin:`flush` command. It's not emitted for applications that lack a
+Sent at the end of the :djadmin:`migrate` (even if no migrations are run) and
+:djadmin:`flush` commands. It's not emitted for applications that lack a
 ``models`` module.
 
-It is important that handlers of this signal perform idempotent changes (e.g.
-no database alterations) as this may cause the :djadmin:`flush` management
-command to fail if it also ran during the :djadmin:`migrate` command.
+Handlers of this signal must not perform database schema alterations as doing
+so may cause the :djadmin:`flush` command to fail if it runs during the
+:djadmin:`migrate` command.
 
 Arguments sent with this signal:
 
@@ -466,8 +462,6 @@ Arguments sent with this signal:
     database.
 
 ``plan``
-    .. versionadded:: 1.10
-
     The migration plan that was used for the migration run. While the plan is
     not public API, this allows for the rare cases when it is necessary to
     know the plan. A plan is a list of two-tuples with the first item being
@@ -475,8 +469,6 @@ Arguments sent with this signal:
     migration was rolled back (``True``) or applied (``False``).
 
 ``apps``
-    .. versionadded:: 1.10
-
     An instance of :data:`Apps <django.apps.apps>` containing the state of the
     project after the migration run. It should be used instead of the global
     :attr:`apps <django.apps.apps>` registry to retrieve the models you

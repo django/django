@@ -4,7 +4,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kostas <tamosiunas@gmail.com>, 2011
 # lauris <lauris@runbox.com>, 2011
-# Matas Dailyda <matas@dailyda.com>, 2015
+# Matas Dailyda <matas@dailyda.com>, 2015-2016
 # naktinis <naktinis@gmail.com>, 2012
 # Nikolajus Krauklis <nikolajus@gmail.com>, 2013
 # Povilas Balzaravičius <pavvka@gmail.com>, 2011-2012
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-29 11:14+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-18 09:11+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
@@ -67,6 +67,9 @@ msgstr "Danų"
 
 msgid "German"
 msgstr "Vokiečių"
+
+msgid "Lower Sorbian"
+msgstr "Žemutinė Sorbų"
 
 msgid "Greek"
 msgstr "Graikų"
@@ -137,6 +140,9 @@ msgstr "Hindi"
 msgid "Croatian"
 msgstr "Kroatų"
 
+msgid "Upper Sorbian"
+msgstr "Aukštutinė Sorbų"
+
 msgid "Hungarian"
 msgstr "Vengrų"
 
@@ -197,7 +203,7 @@ msgstr "Marati"
 msgid "Burmese"
 msgstr "Mjanmų"
 
-msgid "Norwegian Bokmal"
+msgid "Norwegian Bokmål"
 msgstr "Norvegų Bokmal"
 
 msgid "Nepali"
@@ -295,9 +301,6 @@ msgstr "Statiniai failai"
 
 msgid "Syndication"
 msgstr "Sindikacija"
-
-msgid "Web Design"
-msgstr "Puslapio dizainas"
 
 msgid "Enter a valid value."
 msgstr "Įveskite tinkamą reikšmę."
@@ -449,6 +452,9 @@ msgstr "Sveikas skaičius"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' turi būti sveikas skaičius."
 
+msgid "Big (8 byte) integer"
+msgstr "Didelis (8 baitų) sveikas skaičius"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' reikšmė turi būti arba True, arba False."
@@ -532,9 +538,6 @@ msgstr "'%(value)s' reikšmė turi būti realus skaičius."
 msgid "Floating point number"
 msgstr "Realus skaičius"
 
-msgid "Big (8 byte) integer"
-msgstr "Didelis (8 baitų) sveikas skaičius"
-
 msgid "IPv4 address"
 msgstr "IPv4 adresas"
 
@@ -608,6 +611,14 @@ msgstr "Išorinis raktas (tipas nustatomas susijusiame lauke)"
 
 msgid "One-to-one relationship"
 msgstr "Sąryšis vienas su vienu"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s sąryšis"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s sąryšiai"
 
 msgid "Many-to-many relationship"
 msgstr "Sąryšis daug su daug"

@@ -1,3 +1,4 @@
+from urllib.parse import urlencode
 from xml.dom.minidom import parseString
 
 from django.contrib.auth.decorators import login_required, permission_required
@@ -13,7 +14,6 @@ from django.shortcuts import render
 from django.template import Context, Template
 from django.test import Client
 from django.utils.decorators import method_decorator
-from django.utils.six.moves.urllib.parse import urlencode
 
 
 def get_view(request):
@@ -116,6 +116,7 @@ def bad_view(request):
     "A view that returns a 404 with some error content"
     return HttpResponseNotFound('Not found!. This page contains some MAGIC content')
 
+
 TestChoices = (
     ('a', 'First Choice'),
     ('b', 'Second Choice'),
@@ -176,7 +177,7 @@ def form_view_with_template(request):
 
 class BaseTestFormSet(BaseFormSet):
     def clean(self):
-        """Checks that no two email addresses are the same."""
+        """No two email addresses are the same."""
         if any(self.errors):
             # Don't bother validating the formset unless each form is valid
             return
@@ -190,6 +191,7 @@ class BaseTestFormSet(BaseFormSet):
                     "Forms in a set must have distinct email addresses."
                 )
             emails.append(email)
+
 
 TestFormSet = formset_factory(TestForm, BaseTestFormSet)
 
@@ -213,24 +215,21 @@ def formset_view(request):
     return HttpResponse(t.render(c))
 
 
+@login_required
 def login_protected_view(request):
     "A simple view that is login protected."
     t = Template('This is a login protected test. Username is {{ user.username }}.', name='Login Template')
     c = Context({'user': request.user})
 
     return HttpResponse(t.render(c))
-login_protected_view = login_required(login_protected_view)
 
 
+@login_required(redirect_field_name='redirect_to')
 def login_protected_view_changed_redirect(request):
     "A simple view that is login protected with a custom redirect field set"
     t = Template('This is a login protected test. Username is {{ user.username }}.', name='Login Template')
     c = Context({'user': request.user})
-
     return HttpResponse(t.render(c))
-login_protected_view_changed_redirect = (
-    login_required(redirect_field_name="redirect_to")(login_protected_view_changed_redirect)
-)
 
 
 def _permission_protected_view(request):
@@ -241,13 +240,15 @@ def _permission_protected_view(request):
                  name='Permissions Template')
     c = Context({'user': request.user})
     return HttpResponse(t.render(c))
+
+
 permission_protected_view = permission_required('permission_not_granted')(_permission_protected_view)
 permission_protected_view_exception = (
     permission_required('permission_not_granted', raise_exception=True)(_permission_protected_view)
 )
 
 
-class _ViewManager(object):
+class _ViewManager:
     @method_decorator(login_required)
     def login_protected_view(self, request):
         t = Template('This is a login protected test using a method. '
@@ -264,6 +265,7 @@ class _ViewManager(object):
                      name='Permissions Template')
         c = Context({'user': request.user})
         return HttpResponse(t.render(c))
+
 
 _view_manager = _ViewManager()
 login_protected_method_view = _view_manager.login_protected_view
@@ -324,3 +326,8 @@ def nesting_exception_view(request):
 
 def django_project_redirect(request):
     return HttpResponseRedirect('https://www.djangoproject.com/')
+
+
+def upload_view(request):
+    """Prints keys of request.FILES to the response."""
+    return HttpResponse(', '.join(request.FILES.keys()))

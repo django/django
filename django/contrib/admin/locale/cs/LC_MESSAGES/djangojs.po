@@ -4,13 +4,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
 # Vláďa Macek <macek@sandbox.cz>, 2012,2014
-# Vláďa Macek <macek@sandbox.cz>, 2015
+# Vláďa Macek <macek@sandbox.cz>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-15 17:31+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-09-16 22:17+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -151,15 +151,69 @@ msgstr "Včera"
 msgid "Tomorrow"
 msgstr "Zítra"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"leden únor březen duben květen červen červenec srpen září říjen listopad "
-"prosinec"
+msgid "January"
+msgstr "leden"
 
-msgid "S M T W T F S"
-msgstr "n p ú s č p s"
+msgid "February"
+msgstr "únor"
+
+msgid "March"
+msgstr "březen"
+
+msgid "April"
+msgstr "duben"
+
+msgid "May"
+msgstr "květen"
+
+msgid "June"
+msgstr "červen"
+
+msgid "July"
+msgstr "červenec"
+
+msgid "August"
+msgstr "srpen"
+
+msgid "September"
+msgstr "září"
+
+msgid "October"
+msgstr "říjen"
+
+msgid "November"
+msgstr "listopad"
+
+msgid "December"
+msgstr "prosinec"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "N"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "P"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "Ú"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "S"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "Č"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "P"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "S"
 
 msgid "Show"
 msgstr "Zobrazit"

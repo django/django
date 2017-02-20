@@ -1,8 +1,8 @@
-/* global module, test */
+/* global QUnit */
 /* eslint global-strict: 0, strict: 0 */
 'use strict';
 
-module('admin.inlines: tabular formsets', {
+QUnit.module('admin.inlines: tabular formsets', {
     beforeEach: function() {
         var $ = django.jQuery;
         var that = this;
@@ -19,19 +19,19 @@ module('admin.inlines: tabular formsets', {
     }
 });
 
-test('no forms', function(assert) {
+QUnit.test('no forms', function(assert) {
     assert.ok(this.inlineRow.hasClass('dynamic-first'));
     assert.equal(this.table.find('.add-row a').text(), this.addText);
 });
 
-test('add form', function(assert) {
+QUnit.test('add form', function(assert) {
     var addButton = this.table.find('.add-row a');
     assert.equal(addButton.text(), this.addText);
     addButton.click();
     assert.ok(this.table.find('#first-1').hasClass('row2'));
 });
 
-test('add/remove form events', function(assert) {
+QUnit.test('add/remove form events', function(assert) {
     assert.expect(6);
     var $ = django.jQuery;
     var $document = $(document);
@@ -50,4 +50,22 @@ test('add/remove form events', function(assert) {
         assert.equal(formsetName, 'first');
     });
     deleteLink.click();
+});
+
+QUnit.test('existing add button', function(assert) {
+    var $ = django.jQuery;
+    $('#qunit-fixture').empty();  // Clear the table added in beforeEach
+    $('#qunit-fixture').append($('#tabular-formset').text());
+    this.table = $('table.inline');
+    this.inlineRow = this.table.find('tr');
+    this.table.append('<i class="add-button"></i>');
+    var addButton = this.table.find('.add-button');
+    this.inlineRow.tabularFormset({
+        prefix: 'first',
+        deleteText: 'Remove',
+        addButton: addButton
+    });
+    assert.equal(this.table.find('.add-row a').length, 0);
+    addButton.click();
+    assert.ok(this.table.find('#first-1').hasClass('row2'));
 });

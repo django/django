@@ -3,14 +3,13 @@ import json
 from django.conf import settings
 from django.contrib.messages.storage.base import BaseStorage, Message
 from django.http import SimpleCookie
-from django.utils import six
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.safestring import SafeData, mark_safe
 
 
 class MessageEncoder(json.JSONEncoder):
     """
-    Compactly serializes instances of the ``Message`` class as JSON.
+    Compactly serialize instances of the ``Message`` class as JSON.
     """
     message_key = '__json_message'
 
@@ -22,12 +21,12 @@ class MessageEncoder(json.JSONEncoder):
             if obj.extra_tags:
                 message.append(obj.extra_tags)
             return message
-        return super(MessageEncoder, self).default(obj)
+        return super().default(obj)
 
 
 class MessageDecoder(json.JSONDecoder):
     """
-    Decodes JSON that includes serialized ``Message`` instances.
+    Decode JSON that includes serialized ``Message`` instances.
     """
 
     def process_messages(self, obj):
@@ -42,17 +41,17 @@ class MessageDecoder(json.JSONDecoder):
             return [self.process_messages(item) for item in obj]
         if isinstance(obj, dict):
             return {key: self.process_messages(value)
-                    for key, value in six.iteritems(obj)}
+                    for key, value in obj.items()}
         return obj
 
     def decode(self, s, **kwargs):
-        decoded = super(MessageDecoder, self).decode(s, **kwargs)
+        decoded = super().decode(s, **kwargs)
         return self.process_messages(decoded)
 
 
 class CookieStorage(BaseStorage):
     """
-    Stores messages in a cookie.
+    Store messages in a cookie.
     """
     cookie_name = 'messages'
     # uwsgi's default configuration enforces a maximum size of 4kb for all the
@@ -63,7 +62,7 @@ class CookieStorage(BaseStorage):
 
     def _get(self, *args, **kwargs):
         """
-        Retrieves a list of messages from the messages cookie.  If the
+        Retrieve a list of messages from the messages cookie. If the
         not_finished sentinel value is found at the end of the message list,
         remove it and return a result indicating that not all messages were
         retrieved by this storage.
@@ -78,8 +77,8 @@ class CookieStorage(BaseStorage):
 
     def _update_cookie(self, encoded_data, response):
         """
-        Either sets the cookie with the encoded data if there is any data to
-        store, or deletes the cookie.
+        Either set the cookie with the encoded data if there is any data to
+        store, or delete the cookie.
         """
         if encoded_data:
             response.set_cookie(
@@ -93,10 +92,10 @@ class CookieStorage(BaseStorage):
 
     def _store(self, messages, response, remove_oldest=True, *args, **kwargs):
         """
-        Stores the messages to a cookie, returning a list of any messages which
+        Store the messages to a cookie and return a list of any messages which
         could not be stored.
 
-        If the encoded data is larger than ``max_cookie_size``, removes
+        If the encoded data is larger than ``max_cookie_size``, remove
         messages until the data fits (these are the messages which are
         returned), and add the not_finished sentinel value to indicate as much.
         """
@@ -122,7 +121,7 @@ class CookieStorage(BaseStorage):
 
     def _hash(self, value):
         """
-        Creates an HMAC/SHA1 hash based on the value and the project setting's
+        Create an HMAC/SHA1 hash based on the value and the project setting's
         SECRET_KEY, modified to make it unique for the present purpose.
         """
         key_salt = 'django.contrib.messages'
@@ -130,7 +129,7 @@ class CookieStorage(BaseStorage):
 
     def _encode(self, messages, encode_empty=False):
         """
-        Returns an encoded version of the messages list which can be stored as
+        Return an encoded version of the messages list which can be stored as
         plain text.
 
         Since the data will be retrieved from the client-side, the encoded data
@@ -143,10 +142,10 @@ class CookieStorage(BaseStorage):
 
     def _decode(self, data):
         """
-        Safely decodes an encoded text stream back into a list of messages.
+        Safely decode an encoded text stream back into a list of messages.
 
         If the encoded text stream contained an invalid hash or was in an
-        invalid format, ``None`` is returned.
+        invalid format, return None.
         """
         if not data:
             return None

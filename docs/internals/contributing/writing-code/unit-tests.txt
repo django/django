@@ -21,29 +21,107 @@ Running the unit tests
 Quickstart
 ----------
 
-If you are on Python 2, you'll first need to install a backport of the
-``unittest.mock`` module that's available in Python 3. See
-:ref:`running-unit-tests-dependencies` for details on installing `mock`_ and
-the other optional test dependencies.
+First, `fork Django on GitHub <https://github.com/django/django/fork>`__.
 
-Running the tests requires a Django settings module that defines the
-databases to use. To make it easy to get started, Django provides and uses a
-sample settings module that uses the SQLite database. To run the tests::
+Second, create and activate a virtual environment. If you're not familiar with
+how to do that, read our :doc:`contributing tutorial </intro/contributing>`.
 
-   $ git clone https://github.com/django/django.git django-repo
+Next, clone your fork, install some requirements, and run the tests::
+
+   $ git clone git@github.com:YourGitHubName/django.git django-repo
    $ cd django-repo/tests
-   $ PYTHONPATH=..:$PYTHONPATH ./runtests.py
+   $ pip install -e ..
+   $ pip install -r requirements/py3.txt
+   $ ./runtests.py
+
+Installing the requirements will likely require some operating system packages
+that your computer doesn't have installed. You can usually figure out which
+package to install by doing a Web search for the last line or so of the error
+message. Try adding your operating system to the search query if needed.
+
+If you have trouble installing the requirements, you can skip that step. See
+:ref:`running-unit-tests-dependencies` for details on installing the optional
+test dependencies. If you don't have an optional dependency installed, the
+tests that require it will be skipped.
+
+Running the tests requires a Django settings module that defines the databases
+to use. To make it easy to get started, Django provides and uses a sample
+settings module that uses the SQLite database. See
+:ref:`running-unit-tests-settings` to learn how to use a different settings
+module to run the tests with a different database.
 
 .. admonition:: Windows users
 
     We recommend something like `Git Bash <https://msysgit.github.io/>`_ to run
     the tests using the above approach.
 
-You can avoid typing the ``PYTHONPATH`` bit each time by adding your Django
-checkout to your ``PYTHONPATH`` or by installing the source checkout using pip.
-See :ref:`installing-development-version`.
-
 Having problems? See :ref:`troubleshooting-unit-tests` for some common issues.
+
+Running tests using ``tox``
+---------------------------
+
+`Tox <http://tox.testrun.org/>`_ is a tool for running tests in different
+virtual environments. Django includes a basic ``tox.ini`` that automates some
+checks that our build server performs on pull requests. To run the unit tests
+and other checks (such as :ref:`import sorting <coding-style-imports>`, the
+:ref:`documentation spelling checker <documentation-spelling-check>`, and
+:ref:`code formatting <coding-style-python>`), install and run the ``tox``
+command from any place in the Django source tree::
+
+    $ pip install tox
+    $ tox
+
+By default, ``tox`` runs the test suite with the bundled test settings file for
+SQLite, ``flake8``, ``isort``, and the documentation spelling checker. In
+addition to the system dependencies noted elsewhere in this documentation,
+the command ``python3`` must be on your path and linked to the appropriate
+version of Python. A list of default environments can be seen as follows::
+
+    $ tox -l
+    py3
+    flake8
+    docs
+    isort
+
+Testing other Python versions and database backends
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In addition to the default environments, ``tox`` supports running unit tests
+for other versions of Python and other database backends. Since Django's test
+suite doesn't bundle a settings file for database backends other than SQLite,
+however, you must :ref:`create and provide your own test settings
+<running-unit-tests-settings>`. For example, to run the tests on Python 3.5
+using PostgreSQL::
+
+    $ tox -e py35-postgres -- --settings=my_postgres_settings
+
+This command sets up a Python 3.5 virtual environment, installs Django's
+test suite dependencies (including those for PostgreSQL), and calls
+``runtests.py`` with the supplied arguments (in this case,
+``--settings=my_postgres_settings``).
+
+The remainder of this documentation shows commands for running tests without
+``tox``, however, any option passed to ``runtests.py`` can also be passed to
+``tox`` by prefixing the argument list with ``--``, as above.
+
+Tox also respects the ``DJANGO_SETTINGS_MODULE`` environment variable, if set.
+For example, the following is equivalent to the command above::
+
+    $ DJANGO_SETTINGS_MODULE=my_postgres_settings tox -e py35-postgres
+
+Running the JavaScript tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django includes a set of :ref:`JavaScript unit tests <javascript-tests>` for
+functions in certain contrib apps. The JavaScript tests aren't run by default
+using ``tox`` because they require `Node.js` to be installed and aren't
+necessary for the majority of patches. To run the JavaScript tests using
+``tox``::
+
+    $ tox -e javascript
+
+This command runs ``npm install`` to ensure test requirements are up to
+date and then runs ``npm test``.
 
 .. _running-unit-tests-settings:
 
@@ -145,16 +223,14 @@ dependencies:
 *  argon2-cffi_ 16.1.0+
 *  bcrypt_
 *  docutils_
-*  enum34_ (Python 2 only)
 *  geoip2_
 *  jinja2_ 2.7+
 *  numpy_
 *  Pillow_
 *  PyYAML_
-*  pytz_
+*  pytz_ (required)
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
-*  mock_ (for Python 2)
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
 *  sqlparse_
@@ -163,7 +239,12 @@ You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
 like so::
 
-   $ pip install -r tests/requirements/py3.txt  # Python 2: py2.txt
+   $ pip install -r tests/requirements/py3.txt
+
+If you encounter an error during the installation, your system might be missing
+a dependency for one or more of the Python packages. Consult the failing
+package's documentation or search the Web with the error message that you
+encounter.
 
 You can also install the database adapter(s) of your choice using
 ``oracle.txt``, ``mysql.txt``, or ``postgres.txt``.
@@ -180,7 +261,6 @@ associated tests will be skipped.
 .. _argon2-cffi: https://pypi.python.org/pypi/argon2_cffi
 .. _bcrypt: https://pypi.python.org/pypi/bcrypt
 .. _docutils: https://pypi.python.org/pypi/docutils
-.. _enum34: https://pypi.python.org/pypi/enum34
 .. _geoip2: https://pypi.python.org/pypi/geoip2
 .. _jinja2: https://pypi.python.org/pypi/jinja2
 .. _numpy: https://pypi.python.org/pypi/numpy
@@ -189,7 +269,6 @@ associated tests will be skipped.
 .. _pytz: https://pypi.python.org/pypi/pytz/
 .. _setuptools: https://pypi.python.org/pypi/setuptools/
 .. _memcached: http://memcached.org/
-.. _mock: https://pypi.python.org/pypi/mock
 .. _gettext: https://www.gnu.org/software/gettext/manual/gettext.html
 .. _selenium: https://pypi.python.org/pypi/selenium
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
@@ -240,6 +319,15 @@ You can resolve this on Debian-based systems, for example, by running::
 
     $ apt-get install locales
     $ dpkg-reconfigure locales
+
+You can resolve this for macOS systems by configuring your shell's locale::
+
+    $ export LANG="en_US.UTF-8"
+    $ export LC_ALL="en_US.UTF-8"
+
+Run the ``locale`` command to confirm the change. Optionally, add those export
+commands to your shell's startup file (e.g. ``~/.bashrc`` for Bash) to avoid
+having to retype them.
 
 Tests that only fail in combination
 -----------------------------------
@@ -333,8 +421,6 @@ a temporary ``Apps`` instance::
             ...
 
 .. function:: django.test.utils.isolate_apps(*app_labels, attr_name=None, kwarg_name=None)
-
-.. versionadded:: 1.10
 
 Since this pattern involves a lot of boilerplate, Django provides the
 :func:`~django.test.utils.isolate_apps` decorator. It's used like this::

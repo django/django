@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 import unittest
 
 from django.core.checks import Error, Warning as DjangoWarning
@@ -157,6 +154,27 @@ class CharFieldTests(TestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_iterable_of_iterable_choices(self):
+        class ThingItem:
+            def __init__(self, value, display):
+                self.value = value
+                self.display = display
+
+            def __iter__(self):
+                return (x for x in [self.value, self.display])
+
+            def __len__(self):
+                return 2
+
+        class Things:
+            def __iter__(self):
+                return (x for x in [ThingItem(1, 2), ThingItem(3, 4)])
+
+        class ThingWithIterableChoices(models.Model):
+            thing = models.CharField(max_length=100, blank=True, choices=Things())
+
+        self.assertEqual(ThingWithIterableChoices._meta.get_field('thing').check(), [])
+
     def test_choices_containing_non_pairs(self):
         class Model(models.Model):
             field = models.CharField(max_length=10, choices=[(1, 2, 3), (1, 2, 3)])
@@ -196,7 +214,7 @@ class CharFieldTests(TestCase):
             field = models.CharField(unique=True, max_length=256)
 
         field = Model._meta.get_field('field')
-        validator = DatabaseValidation(connection=None)
+        validator = DatabaseValidation(connection=connection)
         errors = validator.check_field(field)
         expected = [
             Error(
@@ -410,6 +428,12 @@ class DecimalFieldTests(SimpleTestCase):
 @isolate_apps('invalid_models_tests')
 class FileFieldTests(SimpleTestCase):
 
+    def test_valid_default_case(self):
+        class Model(models.Model):
+            field = models.FileField()
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])
+
     def test_valid_case(self):
         class Model(models.Model):
             field = models.FileField(upload_to='somewhere')
@@ -417,21 +441,6 @@ class FileFieldTests(SimpleTestCase):
         field = Model._meta.get_field('field')
         errors = field.check()
         expected = []
-        self.assertEqual(errors, expected)
-
-    def test_unique(self):
-        class Model(models.Model):
-            field = models.FileField(unique=False, upload_to='somewhere')
-
-        field = Model._meta.get_field('field')
-        errors = field.check()
-        expected = [
-            Error(
-                "'unique' is not a valid argument for a FileField.",
-                obj=field,
-                id='fields.E200',
-            )
-        ]
         self.assertEqual(errors, expected)
 
     def test_primary_key(self):
@@ -448,6 +457,31 @@ class FileFieldTests(SimpleTestCase):
             )
         ]
         self.assertEqual(errors, expected)
+
+    def test_upload_to_starts_with_slash(self):
+        class Model(models.Model):
+            field = models.FileField(upload_to='/somewhere')
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(), [
+            Error(
+                "FileField's 'upload_to' argument must be a relative path, not "
+                "an absolute path.",
+                obj=field,
+                id='fields.E202',
+                hint='Remove the leading slash.',
+            )
+        ])
+
+    def test_upload_to_callable_not_checked(self):
+        def callable(instance, filename):
+            return '/' + filename
+
+        class Model(models.Model):
+            field = models.FileField(upload_to=callable)
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(), [])
 
 
 @isolate_apps('invalid_models_tests')

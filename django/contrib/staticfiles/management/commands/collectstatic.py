@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import os
 from collections import OrderedDict
 
@@ -9,21 +7,20 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
-from django.utils.encoding import smart_text
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
-from django.utils.six.moves import input
 
 
 class Command(BaseCommand):
     """
-    Command that allows to copy or symlink static files from different
-    locations to the settings.STATIC_ROOT.
+    Copies or symlinks static files from different locations to the
+    settings.STATIC_ROOT.
     """
     help = "Collect static files in a single location."
     requires_system_checks = False
 
     def __init__(self, *args, **kwargs):
-        super(Command, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.copied_files = []
         self.symlinked_files = []
         self.unmodified_files = []
@@ -173,22 +170,28 @@ class Command(BaseCommand):
         if self.is_local_storage() and self.storage.location:
             destination_path = self.storage.location
             message.append(':\n\n    %s\n\n' % destination_path)
+            should_warn_user = (
+                self.storage.exists(destination_path) and
+                any(self.storage.listdir(destination_path))
+            )
         else:
             destination_path = None
             message.append('.\n\n')
+            # Destination files existence not checked; play it safe and warn.
+            should_warn_user = True
 
-        if self.clear:
-            message.append('This will DELETE ALL FILES in this location!\n')
-        else:
-            message.append('This will overwrite existing files!\n')
+        if self.interactive and should_warn_user:
+            if self.clear:
+                message.append('This will DELETE ALL FILES in this location!\n')
+            else:
+                message.append('This will overwrite existing files!\n')
 
-        message.append(
-            'Are you sure you want to do this?\n\n'
-            "Type 'yes' to continue, or 'no' to cancel: "
-        )
-
-        if self.interactive and input(''.join(message)) != 'yes':
-            raise CommandError("Collecting static files cancelled.")
+            message.append(
+                'Are you sure you want to do this?\n\n'
+                "Type 'yes' to continue, or 'no' to cancel: "
+            )
+            if input(''.join(message)) != 'yes':
+                raise CommandError("Collecting static files cancelled.")
 
         collected = self.collect()
         modified_count = len(collected['modified'])
@@ -222,7 +225,7 @@ class Command(BaseCommand):
 
     def clear_dir(self, path):
         """
-        Deletes the given relative path using the destination storage backend.
+        Delete the given relative path using the destination storage backend.
         """
         if not self.storage.exists(path):
             return
@@ -231,10 +234,9 @@ class Command(BaseCommand):
         for f in files:
             fpath = os.path.join(path, f)
             if self.dry_run:
-                self.log("Pretending to delete '%s'" %
-                         smart_text(fpath), level=1)
+                self.log("Pretending to delete '%s'" % force_text(fpath), level=1)
             else:
-                self.log("Deleting '%s'" % smart_text(fpath), level=1)
+                self.log("Deleting '%s'" % force_text(fpath), level=1)
                 try:
                     full_path = self.storage.path(fpath)
                 except NotImplementedError:
@@ -250,7 +252,7 @@ class Command(BaseCommand):
 
     def delete_file(self, path, prefixed_path, source_storage):
         """
-        Checks if the target file should be deleted if it already exists
+        Check if the target file should be deleted if it already exists.
         """
         if self.storage.exists(prefixed_path):
             try:
@@ -269,12 +271,24 @@ class Command(BaseCommand):
                     # The full path of the target file
                     if self.local:
                         full_path = self.storage.path(prefixed_path)
+                        # If it's --link mode and the path isn't a link (i.e.
+                        # the previous collectstatic wasn't with --link) or if
+                        # it's non-link mode and the path is a link (i.e. the
+                        # previous collectstatic was with --link), the old
+                        # links/files must be deleted so it's not safe to skip
+                        # unmodified files.
+                        can_skip_unmodified_files = not (self.symlink ^ os.path.islink(full_path))
                     else:
                         full_path = None
-                    # Skip the file if the source file is younger
+                        # In remote storages, skipping is only based on the
+                        # modified times since symlinks aren't relevant.
+                        can_skip_unmodified_files = True
                     # Avoid sub-second precision (see #14665, #19540)
-                    if (target_last_modified.replace(microsecond=0) >= source_last_modified.replace(microsecond=0) and
-                            full_path and not (self.symlink ^ os.path.islink(full_path))):
+                    file_is_unmodified = (
+                        target_last_modified.replace(microsecond=0) >=
+                        source_last_modified.replace(microsecond=0)
+                    )
+                    if file_is_unmodified and can_skip_unmodified_files:
                         if prefixed_path not in self.unmodified_files:
                             self.unmodified_files.append(prefixed_path)
                         self.log("Skipping '%s' (not modified)" % path)

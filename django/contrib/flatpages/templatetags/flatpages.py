@@ -45,18 +45,17 @@ class FlatpageNode(template.Node):
 @register.tag
 def get_flatpages(parser, token):
     """
-    Retrieves all flatpage objects available for the current site and
+    Retrieve all flatpage objects available for the current site and
     visible to the specific user (or visible to all users if no user is
-    specified). Populates the template context with them in a variable
+    specified). Populate the template context with them in a variable
     whose name is defined by the ``as`` clause.
 
-    An optional ``for`` clause can be used to control the user whose
-    permissions are to be used in determining which flatpages are visible.
+    An optional ``for`` clause controls the user whose permissions are used in
+    determining which flatpages are visible.
 
-    An optional argument, ``starts_with``, can be applied to limit the
-    returned flatpages to those beginning with a particular base URL.
-    This argument can be passed as a variable or a string, as it resolves
-    from the template context.
+    An optional argument, ``starts_with``, limits the returned flatpages to
+    those beginning with a particular base URL. This argument can be a variable
+    or a string, as it resolves from the template context.
 
     Syntax::
 

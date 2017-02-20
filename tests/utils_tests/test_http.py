@@ -1,12 +1,10 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
-import sys
 import unittest
 from datetime import datetime
 
-from django.utils import http, six
+from django.test import ignore_warnings
+from django.utils import http
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango21Warning
 
 
 class TestUtilsHttp(unittest.TestCase):
@@ -52,15 +50,10 @@ class TestUtilsHttp(unittest.TestCase):
         # reciprocity works
         for n in [0, 1, 1000, 1000000]:
             self.assertEqual(n, http.base36_to_int(http.int_to_base36(n)))
-        if six.PY2:
-            self.assertEqual(sys.maxint, http.base36_to_int(http.int_to_base36(sys.maxint)))
 
         # bad input
         with self.assertRaises(ValueError):
             http.int_to_base36(-1)
-        if six.PY2:
-            with self.assertRaises(ValueError):
-                http.int_to_base36(sys.maxint + 1)
         for n in ['1', 'foo', {1: 2}, (1, 2, 3), 3.141]:
             with self.assertRaises(TypeError):
                 http.int_to_base36(n)
@@ -93,9 +86,9 @@ class TestUtilsHttp(unittest.TestCase):
             r'\/example.com',
             r'/\example.com',
             'http:///example.com',
-            'http:/\//example.com',
-            'http:\/example.com',
-            'http:/\example.com',
+            r'http:/\//example.com',
+            r'http:\/example.com',
+            r'http:/\example.com',
             'javascript:alert("XSS")',
             '\njavascript:alert(x)',
             '\x08//example.com',
@@ -107,7 +100,12 @@ class TestUtilsHttp(unittest.TestCase):
             '\n',
         )
         for bad_url in bad_urls:
-            self.assertFalse(http.is_safe_url(bad_url, host='testserver'), "%s should be blocked" % bad_url)
+            with ignore_warnings(category=RemovedInDjango21Warning):
+                self.assertFalse(http.is_safe_url(bad_url, host='testserver'), "%s should be blocked" % bad_url)
+            self.assertFalse(
+                http.is_safe_url(bad_url, allowed_hosts={'testserver', 'testserver2'}),
+                "%s should be blocked" % bad_url,
+            )
 
         good_urls = (
             '/view/?param=http://example.com',
@@ -121,24 +119,37 @@ class TestUtilsHttp(unittest.TestCase):
             '/url%20with%20spaces/',
         )
         for good_url in good_urls:
-            self.assertTrue(http.is_safe_url(good_url, host='testserver'), "%s should be allowed" % good_url)
-
-        if six.PY2:
-            # Check binary URLs, regression tests for #26308
+            with ignore_warnings(category=RemovedInDjango21Warning):
+                self.assertTrue(http.is_safe_url(good_url, host='testserver'), "%s should be allowed" % good_url)
             self.assertTrue(
-                http.is_safe_url(b'https://testserver/', host='testserver'),
-                "binary URLs should be allowed on Python 2"
+                http.is_safe_url(good_url, allowed_hosts={'otherserver', 'testserver'}),
+                "%s should be allowed" % good_url,
             )
-            self.assertFalse(http.is_safe_url(b'\x08//example.com', host='testserver'))
-            self.assertTrue(http.is_safe_url('àview/'.encode('utf-8'), host='testserver'))
-            self.assertFalse(http.is_safe_url('àview'.encode('latin-1'), host='testserver'))
 
         # Valid basic auth credentials are allowed.
-        self.assertTrue(http.is_safe_url(r'http://user:pass@testserver/', host='user:pass@testserver'))
+        self.assertTrue(http.is_safe_url(r'http://user:pass@testserver/', allowed_hosts={'user:pass@testserver'}))
         # A path without host is allowed.
         self.assertTrue(http.is_safe_url('/confirm/me@example.com'))
         # Basic auth without host is not allowed.
         self.assertFalse(http.is_safe_url(r'http://testserver\@example.com'))
+
+    def test_is_safe_url_secure_param_https_urls(self):
+        secure_urls = (
+            'https://example.com/p',
+            'HTTPS://example.com/p',
+            '/view/?param=http://example.com',
+        )
+        for url in secure_urls:
+            self.assertTrue(http.is_safe_url(url, allowed_hosts={'example.com'}, require_https=True))
+
+    def test_is_safe_url_secure_param_non_https_urls(self):
+        not_secure_urls = (
+            'http://example.com/p',
+            'ftp://example.com/p',
+            '//example.com/p',
+        )
+        for url in not_secure_urls:
+            self.assertFalse(http.is_safe_url(url, allowed_hosts={'example.com'}, require_https=True))
 
     def test_urlsafe_base64_roundtrip(self):
         bytestring = b'foo'
@@ -178,14 +189,19 @@ class TestUtilsHttp(unittest.TestCase):
 
 class ETagProcessingTests(unittest.TestCase):
     def test_parsing(self):
-        etags = http.parse_etags(r'"", "etag", "e\"t\"ag", "e\\tag", W/"weak"')
-        self.assertEqual(etags, ['', 'etag', 'e"t"ag', r'e\tag', 'weak'])
+        self.assertEqual(
+            http.parse_etags(r'"" ,  "etag", "e\\tag", W/"weak"'),
+            ['""', '"etag"', r'"e\\tag"', 'W/"weak"']
+        )
+        self.assertEqual(http.parse_etags('*'), ['*'])
+
+        # Ignore RFC 2616 ETags that are invalid according to RFC 7232.
+        self.assertEqual(http.parse_etags(r'"etag", "e\"t\"ag"'), ['"etag"'])
 
     def test_quoting(self):
-        original_etag = r'e\t"ag'
-        quoted_etag = http.quote_etag(original_etag)
-        self.assertEqual(quoted_etag, r'"e\\t\"ag"')
-        self.assertEqual(http.unquote_etag(quoted_etag), original_etag)
+        self.assertEqual(http.quote_etag('etag'), '"etag"')  # unquoted
+        self.assertEqual(http.quote_etag('"etag"'), '"etag"')  # quoted
+        self.assertEqual(http.quote_etag('W/"etag"'), 'W/"etag"')  # quoted, weak
 
 
 class HttpDateProcessingTests(unittest.TestCase):

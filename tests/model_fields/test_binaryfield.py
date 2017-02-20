@@ -1,6 +1,5 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django.utils import six
 
 from .models import DataModel
 
@@ -9,7 +8,7 @@ class BinaryFieldTests(TestCase):
     binary_data = b'\x00\x46\xFE'
 
     def test_set_and_retrieve(self):
-        data_set = (self.binary_data, six.memoryview(self.binary_data))
+        data_set = (self.binary_data, memoryview(self.binary_data))
         for bdata in data_set:
             dm = DataModel(data=bdata)
             dm.save()

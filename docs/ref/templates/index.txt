@@ -14,7 +14,6 @@ material, see :doc:`/topics/templates` topic guide.
    language
    builtins
    api
-   upgrading
 
 .. seealso::
 

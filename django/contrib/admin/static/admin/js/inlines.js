@@ -44,17 +44,19 @@
             $(this).not("." + options.emptyCssClass).addClass(options.formCssClass);
         });
         if ($this.length && showAddButton) {
-            var addButton;
-            if ($this.prop("tagName") === "TR") {
-                // If forms are laid out as table rows, insert the
-                // "add" button in a new table row:
-                var numCols = this.eq(-1).children().length;
-                $parent.append('<tr class="' + options.addCssClass + '"><td colspan="' + numCols + '"><a href="#">' + options.addText + "</a></tr>");
-                addButton = $parent.find("tr:last a");
-            } else {
-                // Otherwise, insert it immediately after the last form:
-                $this.filter(":last").after('<div class="' + options.addCssClass + '"><a href="#">' + options.addText + "</a></div>");
-                addButton = $this.filter(":last").next().find("a");
+            var addButton = options.addButton;
+            if (addButton === null) {
+                if ($this.prop("tagName") === "TR") {
+                    // If forms are laid out as table rows, insert the
+                    // "add" button in a new table row:
+                    var numCols = this.eq(-1).children().length;
+                    $parent.append('<tr class="' + options.addCssClass + '"><td colspan="' + numCols + '"><a href="#">' + options.addText + "</a></tr>");
+                    addButton = $parent.find("tr:last a");
+                } else {
+                    // Otherwise, insert it immediately after the last form:
+                    $this.filter(":last").after('<div class="' + options.addCssClass + '"><a href="#">' + options.addText + "</a></div>");
+                    addButton = $this.filter(":last").next().find("a");
+                }
             }
             addButton.click(function(e) {
                 e.preventDefault();
@@ -137,7 +139,8 @@
         emptyCssClass: "empty-row",    // CSS class applied to the empty row
         formCssClass: "dynamic-form",  // CSS class applied to each form in a formset
         added: null,          // Function called each time a new form is added
-        removed: null          // Function called each time a form is deleted
+        removed: null,          // Function called each time a form is deleted
+        addButton: null       // Existing add button to use
     };
 
 
@@ -201,7 +204,8 @@
                 reinitDateTimeShortCuts();
                 updateSelectFilter();
                 alternatingRows(row);
-            }
+            },
+            addButton: options.addButton
         });
 
         return $rows;
@@ -267,7 +271,8 @@
                 reinitDateTimeShortCuts();
                 updateSelectFilter();
                 updateInlineLabel(row);
-            }
+            },
+            addButton: options.addButton
         });
 
         return $rows;

@@ -1,4 +1,5 @@
 import json
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -8,8 +9,6 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.test import Client
 from django.test.client import CONTENT_TYPE_RE
-from django.test.utils import setup_test_environment
-from django.utils.six.moves.urllib.parse import urlencode
 
 
 class CustomTestException(Exception):
@@ -29,10 +28,10 @@ def staff_only_view(request):
         raise CustomTestException()
 
 
+@login_required
 def get_view(request):
     "A simple login protected view"
     return HttpResponse("Hello world")
-get_view = login_required(get_view)
 
 
 def request_data(request, template='base.html', data='sausage'):
@@ -63,16 +62,15 @@ def nested_view(request):
     """
     A view that uses test client to call another view.
     """
-    setup_test_environment()
     c = Client()
     c.get("/no_template_view/")
     return render(request, 'base.html', {'nested': 'yes'})
 
 
+@login_required
 def login_protected_redirect_view(request):
     "A view that redirects all requests to the GET view"
     return HttpResponseRedirect('/get_view/')
-login_protected_redirect_view = login_required(login_protected_redirect_view)
 
 
 def redirect_to_self_with_changing_query_view(request):
@@ -108,7 +106,9 @@ def return_undecodable_binary(request):
 
 
 def return_json_response(request):
-    return JsonResponse({'key': 'value'})
+    content_type = request.GET.get('content_type')
+    kwargs = {'content_type': content_type} if content_type else {}
+    return JsonResponse({'key': 'value'}, **kwargs)
 
 
 def return_json_file(request):

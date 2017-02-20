@@ -21,7 +21,7 @@ Backwards incompatible changes
 Restricted filters in admin interface
 -------------------------------------
 
-The Django administrative interface, django.contrib.admin, supports
+The Django administrative interface, ``django.contrib.admin``, supports
 filtering of displayed lists of objects by fields on the corresponding
 models, including across database-level relationships. This is
 implemented by passing lookup arguments in the querystring portion of
@@ -42,7 +42,7 @@ with repeated use of regular-expression lookups supported by the
 Django database API -- expose sensitive information such as users'
 password hashes.
 
-To remedy this, django.contrib.admin will now validate that
+To remedy this, ``django.contrib.admin`` will now validate that
 querystring lookup arguments either specify only fields on the model
 being viewed, or cross relations which have been explicitly
 whitelisted by the application developer using the pre-existing

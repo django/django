@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from django.db import migrations, models
 from django.db.migrations import operations
 from django.db.migrations.optimizer import MigrationOptimizer
@@ -13,15 +11,15 @@ class OptimizerTests(SimpleTestCase):
     Tests the migration autodetector.
     """
 
-    def optimize(self, operations):
+    def optimize(self, operations, app_label):
         """
         Handy shortcut for getting results + number of loops
         """
         optimizer = MigrationOptimizer()
-        return optimizer.optimize(operations), optimizer._iterations
+        return optimizer.optimize(operations, app_label), optimizer._iterations
 
-    def assertOptimizesTo(self, operations, expected, exact=None, less_than=None):
-        result, iterations = self.optimize(operations)
+    def assertOptimizesTo(self, operations, expected, exact=None, less_than=None, app_label=None):
+        result, iterations = self.optimize(operations, app_label)
         result = [repr(f.deconstruct()) for f in result]
         expected = [repr(f.deconstruct()) for f in expected]
         self.assertEqual(expected, result)
@@ -34,12 +32,12 @@ class OptimizerTests(SimpleTestCase):
                 "Optimization did not take less than %s iterations (it took %s)" % (less_than, iterations)
             )
 
-    def assertDoesNotOptimize(self, operations):
-        self.assertOptimizesTo(operations, operations)
+    def assertDoesNotOptimize(self, operations, **kwargs):
+        self.assertOptimizesTo(operations, operations, **kwargs)
 
     def test_single(self):
         """
-        Tests that the optimizer does nothing on a single operation,
+        The optimizer does nothing on a single operation,
         and that it does it in just one pass.
         """
         self.assertOptimizesTo(
@@ -99,6 +97,17 @@ class OptimizerTests(SimpleTestCase):
             [
                 migrations.RenameModel("Foo", "Bar"),
             ],
+        )
+
+    def test_create_alter_model_options(self):
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel('Foo', fields=[]),
+                migrations.AlterModelOptions(name='Foo', options={'verbose_name_plural': 'Foozes'}),
+            ],
+            [
+                migrations.CreateModel('Foo', fields=[], options={'verbose_name_plural': 'Foozes'}),
+            ]
         )
 
     def _test_create_alter_foo_delete_model(self, alter_foo):
@@ -200,19 +209,46 @@ class OptimizerTests(SimpleTestCase):
             [],
         )
         # This should not work - FK should block it
-        self.assertOptimizesTo(
-            [
-                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo", models.CASCADE))]),
-                migrations.DeleteModel("Foo"),
-            ],
+        self.assertDoesNotOptimize(
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo", models.CASCADE))]),
                 migrations.DeleteModel("Foo"),
             ],
         )
+        # The same operations should be optimized if app_label is specified and
+        # a FK references a model from the other app.
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo", models.CASCADE))]),
+                migrations.DeleteModel("Foo"),
+            ],
+            [
+                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo", models.CASCADE))]),
+            ],
+            app_label="otherapp",
+        )
+        # But it shouldn't work if a FK references a model with the same
+        # app_label.
+        self.assertDoesNotOptimize(
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo", models.CASCADE))]),
+                migrations.DeleteModel("Foo"),
+            ],
+            app_label="testapp",
+        )
         # This should not work - bases should block it
+        self.assertDoesNotOptimize(
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo", )),
+                migrations.DeleteModel("Foo"),
+            ],
+        )
+        # The same operations should be optimized if app_label and none of
+        # bases belong to that app.
         self.assertOptimizesTo(
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
@@ -220,10 +256,18 @@ class OptimizerTests(SimpleTestCase):
                 migrations.DeleteModel("Foo"),
             ],
             [
+                migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo", )),
+            ],
+            app_label="otherapp",
+        )
+        # But it shouldn't work if some of bases belongs to the specified app.
+        self.assertDoesNotOptimize(
+            [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("Bar", [("size", models.IntegerField())], bases=("testapp.Foo", )),
                 migrations.DeleteModel("Foo"),
             ],
+            app_label="testapp",
         )
 
     def test_create_model_add_field(self):
@@ -261,12 +305,7 @@ class OptimizerTests(SimpleTestCase):
         AddField should NOT optimize into CreateModel if it's an FK to a model
         that's between them.
         """
-        self.assertOptimizesTo(
-            [
-                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("Link", [("url", models.TextField())]),
-                migrations.AddField("Foo", "link", models.ForeignKey("migrations.Link", models.CASCADE)),
-            ],
+        self.assertDoesNotOptimize(
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("Link", [("url", models.TextField())]),
@@ -281,14 +320,7 @@ class OptimizerTests(SimpleTestCase):
         """
         # Note: The middle model is not actually a valid through model,
         # but that doesn't matter, as we never render it.
-        self.assertOptimizesTo(
-            [
-                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("LinkThrough", []),
-                migrations.AddField(
-                    "Foo", "link", models.ManyToManyField("migrations.Link", through="migrations.LinkThrough")
-                ),
-            ],
+        self.assertDoesNotOptimize(
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("LinkThrough", []),
@@ -610,9 +642,9 @@ class OptimizerTests(SimpleTestCase):
 
     def test_optimize_through_fields(self):
         """
-        Checks that field-level through checking is working.
-        This should manage to collapse model Foo to nonexistence,
-        and model Bar to a single IntegerField called "width".
+        field-level through checking is working. This should manage to collapse
+        model Foo to nonexistence, and model Bar to a single IntegerField
+        called "width".
         """
         self.assertOptimizesTo(
             [

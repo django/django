@@ -2,14 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# zejn <zejn@kiberpipa.org>, 2016
 # zejn <zejn@kiberpipa.org>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-05-14 13:47+0000\n"
+"Last-Translator: zejn <zejn@kiberpipa.org>\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
@@ -20,14 +21,15 @@ msgstr ""
 "%100==4 ? 2 : 3);\n"
 
 msgid "GIS"
-msgstr ""
+msgstr "GIS"
 
 msgid "The base GIS field."
-msgstr ""
+msgstr "Osnovno GIS polje"
 
 msgid ""
 "The base Geometry field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
+"Osnovno polje GIS -- se preslika v vrsto Geometry po določilih OpenGIS."
 
 msgid "Point"
 msgstr "Točka"
@@ -51,10 +53,10 @@ msgid "Geometry collection"
 msgstr "Zbirka likov"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "Polje z agregiranim območjem"
 
 msgid "Raster Field"
-msgstr ""
+msgstr "Rastersko polje"
 
 msgid "No geometry value provided."
 msgstr "Ni navdene geometrijske vrednosti."
@@ -73,16 +75,16 @@ msgstr ""
 "prišlo do napake."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "Pobriši vse atribute"
 
 msgid "WKT debugging window:"
-msgstr ""
+msgstr "Okno za razhroščanje WKT"
 
 msgid "Google Maps via GeoDjango"
-msgstr ""
+msgstr "Google Maps prek GeoDjango"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "Okno za razhroščevanje (serializirana vrednost)"
 
 msgid "No feeds are registered."
 msgstr "Ni vpisanih virov."

@@ -71,23 +71,44 @@ class ForTagTests(SimpleTestCase):
 
     @setup({'for-tag-unpack06': '{% for key value in items %}{{ key }}:{{ value }}/{% endfor %}'})
     def test_for_tag_unpack06(self):
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "'for' tag received an invalid argument: for key value in items"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('for-tag-unpack06', {'items': (('one', 1), ('two', 2))})
 
     @setup({'for-tag-unpack07': '{% for key,,value in items %}{{ key }}:{{ value }}/{% endfor %}'})
     def test_for_tag_unpack07(self):
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "'for' tag received an invalid argument: for key,,value in items"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('for-tag-unpack07', {'items': (('one', 1), ('two', 2))})
 
     @setup({'for-tag-unpack08': '{% for key,value, in items %}{{ key }}:{{ value }}/{% endfor %}'})
     def test_for_tag_unpack08(self):
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "'for' tag received an invalid argument: for key,value, in items"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('for-tag-unpack08', {'items': (('one', 1), ('two', 2))})
+
+    @setup({'double-quote': '{% for "k" in items %}{{ "k" }}/{% endfor %}'})
+    def test_unpack_double_quote(self):
+        msg = """'for' tag received an invalid argument: for "k" in items"""
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('double-quote', {'items': (1, 2)})
+
+    @setup({'single-quote': "{% for 'k' in items %}{{ k }}/{% endfor %}"})
+    def test_unpack_single_quote(self):
+        msg = """'for' tag received an invalid argument: for 'k' in items"""
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('single-quote', {'items': (1, 2)})
+
+    @setup({'vertical-bar': '{% for k|upper in items %}{{ k|upper }}/{% endfor %}'})
+    def test_unpack_vertical_bar(self):
+        msg = "'for' tag received an invalid argument: for k|upper in items"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('vertical-bar', {'items': (1, 2)})
 
     @setup({'for-tag-unpack09': '{% for val in items %}{{ val.0 }}:{{ val.1 }}/{% endfor %}'})
     def test_for_tag_unpack09(self):
         """
-        Ensure that a single loopvar doesn't truncate the list in val.
+        A single loopvar doesn't truncate the list in val.
         """
         output = self.engine.render_to_string('for-tag-unpack09', {'items': (('one', 1), ('two', 2))})
         self.assertEqual(output, 'one:1/two:2/')
@@ -125,6 +146,11 @@ class ForTagTests(SimpleTestCase):
         """
         output = self.engine.render_to_string('for-tag-filter-ws', {'s': 'abc'})
         self.assertEqual(output, 'abc')
+
+    @setup({'for-tag-unpack-strs': '{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}'})
+    def test_for_tag_unpack_strs(self):
+        output = self.engine.render_to_string('for-tag-unpack-strs', {'items': ('ab', 'ac')})
+        self.assertEqual(output, 'a:b/a:c/')
 
     @setup({'for-tag-unpack10': '{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}'})
     def test_for_tag_unpack10(self):

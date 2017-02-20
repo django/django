@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.forms import ChoiceField, Form, ValidationError
 from django.test import SimpleTestCase
 
@@ -81,6 +79,6 @@ class ChoiceFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = ChoiceField(choices=[('J', 'John'), ('P', 'Paul')], disabled=True)
         self.assertWidgetRendersTo(
             f,
-            '<select id="id_f" name="f" disabled required><option value="J">John</option>'
+            '<select id="id_f" name="f" disabled><option value="J">John</option>'
             '<option value="P">Paul</option></select>'
         )

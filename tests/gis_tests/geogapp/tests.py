@@ -1,22 +1,17 @@
 """
 Tests for geography support in PostGIS
 """
-from __future__ import unicode_literals
-
 import os
-from unittest import skipUnless
+from unittest import skipIf, skipUnless
 
 from django.contrib.gis.db import models
 from django.contrib.gis.db.models.functions import Area, Distance
-from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.measure import D
 from django.db import connection
 from django.db.models.functions import Cast
-from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
-from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from ..utils import oracle, postgis
+from ..utils import oracle, postgis, spatialite
 from .models import City, County, Zipcode
 
 
@@ -28,9 +23,10 @@ class GeographyTest(TestCase):
         "Ensure geography features loaded properly."
         self.assertEqual(8, City.objects.count())
 
+    @skipIf(spatialite, "SpatiaLite doesn't support distance lookups with Distance objects.")
     @skipUnlessDBFeature("supports_distances_lookups", "supports_distance_geodetic")
     def test02_distance_lookup(self):
-        "Testing GeoQuerySet distance lookup support on non-point geography fields."
+        "Testing distance lookup support on non-point geography fields."
         z = Zipcode.objects.get(code='77002')
         cities1 = list(City.objects
                        .filter(point__distance_lte=(z.poly, D(mi=500)))
@@ -42,14 +38,6 @@ class GeographyTest(TestCase):
                        .values_list('name', flat=True))
         for cities in [cities1, cities2]:
             self.assertEqual(['Dallas', 'Houston', 'Oklahoma City'], cities)
-
-    @skipUnlessDBFeature("has_distance_method", "supports_distance_geodetic")
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test03_distance_method(self):
-        "Testing GeoQuerySet.distance() support on non-point geography fields."
-        # `GeoQuerySet.distance` is not allowed geometry fields.
-        htown = City.objects.get(name='Houston')
-        Zipcode.objects.distance(htown.point)
 
     @skipUnless(postgis, "This is a PostGIS-specific test")
     def test04_invalid_operators_functions(self):
@@ -70,7 +58,6 @@ class GeographyTest(TestCase):
         with self.assertRaises(ValueError):
             City.objects.get(point__exact=htown.point)
 
-    @skipUnless(HAS_GDAL, "GDAL is required.")
     def test05_geography_layermapping(self):
         "Testing LayerMapping support on models with geography fields."
         # There is a similar test in `layermap` that uses the same data set,
@@ -78,7 +65,7 @@ class GeographyTest(TestCase):
         from django.contrib.gis.utils import LayerMapping
 
         # Getting the shapefile and mapping dictionary.
-        shp_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), '..', 'data'))
+        shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
         co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
         co_mapping = {'name': 'Name',
                       'state': 'State',
@@ -98,18 +85,6 @@ class GeographyTest(TestCase):
             self.assertEqual(num_poly, len(c.mpoly))
             self.assertEqual(name, c.name)
             self.assertEqual(state, c.state)
-
-    @skipUnlessDBFeature("has_area_method", "supports_distance_geodetic")
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    def test06_geography_area(self):
-        "Testing that Area calculations work on geography columns."
-        # SELECT ST_Area(poly) FROM geogapp_zipcode WHERE code='77002';
-        z = Zipcode.objects.area().get(code='77002')
-        # Round to the nearest thousand as possible values (depending on
-        # the database and geolib) include 5439084, 5439100, 5439101.
-        rounded_value = z.area.sq_m
-        rounded_value -= z.area.sq_m % 1000
-        self.assertEqual(rounded_value, 5439000)
 
 
 @skipUnlessDBFeature("gis_enabled")
@@ -138,14 +113,22 @@ class GeographyFunctionTests(TestCase):
         """
         if oracle:
             ref_dists = [0, 4899.68, 8081.30, 9115.15]
+        elif spatialite:
+            # SpatiaLite returns non-zero distance for polygons and points
+            # covered by that polygon.
+            ref_dists = [326.61, 4899.68, 8081.30, 9115.15]
         else:
             ref_dists = [0, 4891.20, 8071.64, 9123.95]
         htown = City.objects.get(name='Houston')
         qs = Zipcode.objects.annotate(distance=Distance('poly', htown.point))
         for z, ref in zip(qs, ref_dists):
             self.assertAlmostEqual(z.distance.m, ref, 2)
+        if not spatialite:
+            # Distance function combined with a lookup.
+            hzip = Zipcode.objects.get(code='77002')
+            self.assertEqual(qs.get(distance__lte=0), hzip)
 
-    @skipUnlessDBFeature("has_Area_function", "supports_distance_geodetic")
+    @skipUnlessDBFeature("has_Area_function", "supports_area_geodetic")
     def test_geography_area(self):
         """
         Testing that Area calculations work on geography columns.
@@ -157,3 +140,9 @@ class GeographyFunctionTests(TestCase):
         rounded_value = z.area.sq_m
         rounded_value -= z.area.sq_m % 1000
         self.assertEqual(rounded_value, 5439000)
+
+    @skipUnlessDBFeature("has_Area_function")
+    @skipIfDBFeature("supports_area_geodetic")
+    def test_geodetic_area_raises_if_not_supported(self):
+        with self.assertRaisesMessage(NotImplementedError, 'Area on geodetic coordinate systems not supported.'):
+            Zipcode.objects.annotate(area=Area('poly')).get(code='77002')

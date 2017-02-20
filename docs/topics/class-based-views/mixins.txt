@@ -321,10 +321,10 @@ Now we can write a new ``PublisherDetail``::
 
         def get(self, request, *args, **kwargs):
             self.object = self.get_object(queryset=Publisher.objects.all())
-            return super(PublisherDetail, self).get(request, *args, **kwargs)
+            return super().get(request, *args, **kwargs)
 
         def get_context_data(self, **kwargs):
-            context = super(PublisherDetail, self).get_context_data(**kwargs)
+            context = super().get_context_data(**kwargs)
             context['publisher'] = self.object
             return context
 
@@ -461,7 +461,7 @@ Our new ``AuthorDetail`` looks like this::
             return reverse('author-detail', kwargs={'pk': self.object.pk})
 
         def get_context_data(self, **kwargs):
-            context = super(AuthorDetail, self).get_context_data(**kwargs)
+            context = super().get_context_data(**kwargs)
             context['form'] = self.get_form()
             return context
 
@@ -478,7 +478,7 @@ Our new ``AuthorDetail`` looks like this::
         def form_valid(self, form):
             # Here, we would record the user's interest using the message
             # passed in form.cleaned_data['message']
-            return super(AuthorDetail, self).form_valid(form)
+            return super().form_valid(form)
 
 ``get_success_url()`` is just providing somewhere to redirect to,
 which gets used in the default implementation of
@@ -531,7 +531,7 @@ write our own ``get_context_data()`` to make the
         model = Author
 
         def get_context_data(self, **kwargs):
-            context = super(AuthorDisplay, self).get_context_data(**kwargs)
+            context = super().get_context_data(**kwargs)
             context['form'] = AuthorInterestForm()
             return context
 
@@ -555,7 +555,7 @@ template as ``AuthorDisplay`` is using on ``GET``::
             if not request.user.is_authenticated:
                 return HttpResponseForbidden()
             self.object = self.get_object()
-            return super(AuthorInterest, self).post(request, *args, **kwargs)
+            return super().post(request, *args, **kwargs)
 
         def get_success_url(self):
             return reverse('author-detail', kwargs={'pk': self.object.pk})
@@ -679,10 +679,9 @@ that the user requested::
             if self.request.GET.get('format') == 'json':
                 return self.render_to_json_response(context)
             else:
-                return super(HybridDetailView, self).render_to_response(context)
+                return super().render_to_response(context)
 
 Because of the way that Python resolves method overloading, the call to
-``super(HybridDetailView, self).render_to_response(context)`` ends up
-calling the
+``super().render_to_response(context)`` ends up calling the
 :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 implementation of :class:`~django.views.generic.base.TemplateResponseMixin`.

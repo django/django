@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Welsh (http://www.transifex.com/django/django/language/cy/)\n"
 "MIME-Version: 1.0\n"
@@ -59,6 +59,9 @@ msgstr "Daneg"
 
 msgid "German"
 msgstr "Almaeneg"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "Groegedd"
@@ -129,6 +132,9 @@ msgstr "Hindi"
 msgid "Croatian"
 msgstr "Croasieg"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "Hwngareg"
 
@@ -189,8 +195,8 @@ msgstr "Marathi"
 msgid "Burmese"
 msgstr "Byrmaneg"
 
-msgid "Norwegian Bokmal"
-msgstr "Bocmal Norwyeg "
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Nepaleg"
@@ -287,9 +293,6 @@ msgstr "Ffeiliau Statig"
 
 msgid "Syndication"
 msgstr "Syndicetiad"
-
-msgid "Web Design"
-msgstr "Dylunio Gwe"
 
 msgid "Enter a valid value."
 msgstr "Rhowch werth dilys."
@@ -444,6 +447,9 @@ msgstr "cyfanrif"
 msgid "'%(value)s' value must be an integer."
 msgstr "Rhaid i'r gwerth '%(value)s' fod yn gyfanrif."
 
+msgid "Big (8 byte) integer"
+msgstr "Cyfanrif mawr (8 beit)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Rhaid i werth '%(value)s' for unai'n True neu False."
@@ -525,9 +531,6 @@ msgstr "Rhaid i '%(value)s' fod yn rif pwynt arnawf."
 msgid "Floating point number"
 msgstr "Rhif pwynt symudol"
 
-msgid "Big (8 byte) integer"
-msgstr "Cyfanrif mawr (8 beit)"
-
 msgid "IPv4 address"
 msgstr "Cyfeiriad IPv4"
 
@@ -601,6 +604,14 @@ msgstr "Allwedd Estron (math yn ddibynol ar y maes cysylltiedig)"
 
 msgid "One-to-one relationship"
 msgstr "Perthynas un-i-un"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "Perthynas llawer-i-lawer"

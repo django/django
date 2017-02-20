@@ -108,14 +108,14 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
 
     @classmethod
     def setUpClass(cls):
-        super(ClassDecoratedTestCase, cls).setUpClass()
+        super().setUpClass()
         cls.foo = getattr(settings, 'TEST', 'BUG')
 
     def test_override(self):
         self.assertEqual(settings.TEST, 'override')
 
     def test_setupclass_override(self):
-        """Test that settings are overridden within setUpClass -- refs #21281"""
+        """Settings are overridden within setUpClass (#21281)."""
         self.assertEqual(self.foo, 'override')
 
     @override_settings(TEST='override2')
@@ -127,10 +127,7 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
         Overriding a method on a super class and then calling that method on
         the super class should not trigger infinite recursion. See #17011.
         """
-        try:
-            super(ClassDecoratedTestCase, self).test_max_recursion_error()
-        except RuntimeError:
-            self.fail()
+        super().test_max_recursion_error()
 
 
 @modify_settings(ITEMS={'append': 'mother'})
@@ -221,7 +218,7 @@ class SettingsTests(SimpleTestCase):
             getattr(settings, 'TEST')
         with self.settings(TEST='override'):
             self.assertEqual(self.testvalue, 'override')
-        self.assertEqual(self.testvalue, None)
+        self.assertIsNone(self.testvalue)
 
     @override_settings(TEST='override')
     def test_signal_callback_decorator(self):
@@ -263,7 +260,7 @@ class SettingsTests(SimpleTestCase):
 
     def test_override_settings_nested(self):
         """
-        Test that override_settings uses the actual _wrapped attribute at
+        override_settings uses the actual _wrapped attribute at
         runtime, not when it was instantiated.
         """
 
@@ -308,119 +305,33 @@ class TestComplexSettingOverride(SimpleTestCase):
                 self.assertEqual(settings.TEST_WARN, 'override')
 
             self.assertEqual(len(w), 1)
-            # File extension may by .py, .pyc, etc. Compare only basename.
-            self.assertEqual(os.path.splitext(w[0].filename)[0], os.path.splitext(__file__)[0])
+            self.assertEqual(w[0].filename, __file__)
             self.assertEqual(str(w[0].message), 'Overriding setting TEST_WARN can lead to unexpected behavior.')
 
 
-class TrailingSlashURLTests(SimpleTestCase):
-    """
-    Tests for the MEDIA_URL and STATIC_URL settings.
-
-    They must end with a slash to ensure there's a deterministic way to build
-    paths in templates.
-    """
-    settings_module = settings
-
-    def setUp(self):
-        self._original_media_url = self.settings_module.MEDIA_URL
-        self._original_static_url = self.settings_module.STATIC_URL
-
-    def tearDown(self):
-        self.settings_module.MEDIA_URL = self._original_media_url
-        self.settings_module.STATIC_URL = self._original_static_url
-
-    def test_blank(self):
-        """
-        The empty string is accepted, even though it doesn't end in a slash.
-        """
-        self.settings_module.MEDIA_URL = ''
-        self.assertEqual('', self.settings_module.MEDIA_URL)
-
-        self.settings_module.STATIC_URL = ''
-        self.assertEqual('', self.settings_module.STATIC_URL)
-
-    def test_end_slash(self):
-        """
-        It works if the value ends in a slash.
-        """
-        self.settings_module.MEDIA_URL = '/foo/'
-        self.assertEqual('/foo/', self.settings_module.MEDIA_URL)
-
-        self.settings_module.MEDIA_URL = 'http://media.foo.com/'
-        self.assertEqual('http://media.foo.com/', self.settings_module.MEDIA_URL)
-
-        self.settings_module.STATIC_URL = '/foo/'
-        self.assertEqual('/foo/', self.settings_module.STATIC_URL)
-
-        self.settings_module.STATIC_URL = 'http://static.foo.com/'
-        self.assertEqual('http://static.foo.com/', self.settings_module.STATIC_URL)
-
-    def test_no_end_slash(self):
-        """
-        An ImproperlyConfigured exception is raised if the value doesn't end
-        in a slash.
-        """
-        with self.assertRaises(ImproperlyConfigured):
-            self.settings_module.MEDIA_URL = '/foo'
-
-        with self.assertRaises(ImproperlyConfigured):
-            self.settings_module.MEDIA_URL = 'http://media.foo.com'
-
-        with self.assertRaises(ImproperlyConfigured):
-            self.settings_module.STATIC_URL = '/foo'
-
-        with self.assertRaises(ImproperlyConfigured):
-            self.settings_module.STATIC_URL = 'http://static.foo.com'
-
-    def test_double_slash(self):
-        """
-        If the value ends in more than one slash, presume they know what
-        they're doing.
-        """
-        self.settings_module.MEDIA_URL = '/wrong//'
-        self.assertEqual('/wrong//', self.settings_module.MEDIA_URL)
-
-        self.settings_module.MEDIA_URL = 'http://media.foo.com/wrong//'
-        self.assertEqual('http://media.foo.com/wrong//', self.settings_module.MEDIA_URL)
-
-        self.settings_module.STATIC_URL = '/wrong//'
-        self.assertEqual('/wrong//', self.settings_module.STATIC_URL)
-
-        self.settings_module.STATIC_URL = 'http://static.foo.com/wrong//'
-        self.assertEqual('http://static.foo.com/wrong//', self.settings_module.STATIC_URL)
-
-
 class SecureProxySslHeaderTest(SimpleTestCase):
-    settings_module = settings
 
-    def setUp(self):
-        self._original_setting = self.settings_module.SECURE_PROXY_SSL_HEADER
-
-    def tearDown(self):
-        self.settings_module.SECURE_PROXY_SSL_HEADER = self._original_setting
-
+    @override_settings(SECURE_PROXY_SSL_HEADER=None)
     def test_none(self):
-        self.settings_module.SECURE_PROXY_SSL_HEADER = None
         req = HttpRequest()
-        self.assertEqual(req.is_secure(), False)
+        self.assertIs(req.is_secure(), False)
 
+    @override_settings(SECURE_PROXY_SSL_HEADER=('HTTP_X_FORWARDED_PROTOCOL', 'https'))
     def test_set_without_xheader(self):
-        self.settings_module.SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
         req = HttpRequest()
-        self.assertEqual(req.is_secure(), False)
+        self.assertIs(req.is_secure(), False)
 
+    @override_settings(SECURE_PROXY_SSL_HEADER=('HTTP_X_FORWARDED_PROTOCOL', 'https'))
     def test_set_with_xheader_wrong(self):
-        self.settings_module.SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
         req = HttpRequest()
         req.META['HTTP_X_FORWARDED_PROTOCOL'] = 'wrongvalue'
-        self.assertEqual(req.is_secure(), False)
+        self.assertIs(req.is_secure(), False)
 
+    @override_settings(SECURE_PROXY_SSL_HEADER=('HTTP_X_FORWARDED_PROTOCOL', 'https'))
     def test_set_with_xheader_right(self):
-        self.settings_module.SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
         req = HttpRequest()
         req.META['HTTP_X_FORWARDED_PROTOCOL'] = 'https'
-        self.assertEqual(req.is_secure(), True)
+        self.assertIs(req.is_secure(), True)
 
 
 class IsOverriddenTest(SimpleTestCase):

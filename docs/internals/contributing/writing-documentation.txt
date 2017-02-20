@@ -56,6 +56,11 @@ Primer <sphinx:rst-primer>`. After that, you'll want to read about the
 :ref:`Sphinx-specific markup <sphinx:sphinxmarkup>` that's used to manage
 metadata, indexing, and cross-references.
 
+Your locally-built documentation will be themed differently than the
+documentation at `docs.djangoproject.com <https://docs.djangoproject.com>`_.
+This is OK! If your changes look good on your local machine, they'll look good
+on the website.
+
 How the documentation is organized
 ==================================
 

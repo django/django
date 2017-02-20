@@ -4,8 +4,6 @@ The following classes are for testing basic data marshalling, including
 NULL values, where allowed.
 The basic idea is to have a model for each Django data type.
 """
-from __future__ import unicode_literals
-
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
@@ -44,7 +42,7 @@ class EmailData(models.Model):
 
 
 class FileData(models.Model):
-    data = models.FileField(null=True, upload_to='/foo/bar')
+    data = models.FileField(null=True)
 
 
 class FilePathData(models.Model):
@@ -205,7 +203,7 @@ class EmailPKData(models.Model):
     data = models.EmailField(primary_key=True)
 
 # class FilePKData(models.Model):
-#    data = models.FileField(primary_key=True, upload_to='/foo/bar')
+#    data = models.FileField(primary_key=True)
 
 
 class FilePathPKData(models.Model):
@@ -275,11 +273,11 @@ class ModifyingSaveData(models.Model):
     def save(self, *args, **kwargs):
         """
         A save method that modifies the data in the object.
-        Verifies that a user-defined save() method isn't called when objects
-        are deserialized (#4459).
+        A user-defined save() method isn't called when objects are deserialized
+        (#4459).
         """
         self.data = 666
-        super(ModifyingSaveData, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 # Tests for serialization of models using inheritance.
 # Regression for #7202, #7350

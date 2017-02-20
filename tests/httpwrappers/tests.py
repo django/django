@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 import copy
 import json
 import os
@@ -8,7 +5,7 @@ import pickle
 import unittest
 import uuid
 
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import DisallowedRedirect, SuspiciousOperation
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.signals import request_finished
 from django.db import close_old_connections
@@ -19,15 +16,12 @@ from django.http import (
     StreamingHttpResponse, parse_cookie,
 )
 from django.test import SimpleTestCase
-from django.utils import six
-from django.utils._os import upath
-from django.utils.encoding import force_str
 from django.utils.functional import lazystr
 
 
-class QueryDictTests(unittest.TestCase):
+class QueryDictTests(SimpleTestCase):
     def test_create_with_no_args(self):
-        self.assertEqual(QueryDict(), QueryDict(str('')))
+        self.assertEqual(QueryDict(), QueryDict(''))
 
     def test_missing_key(self):
         q = QueryDict()
@@ -58,20 +52,18 @@ class QueryDictTests(unittest.TestCase):
     def test_immutable_basic_operations(self):
         q = QueryDict()
         self.assertEqual(q.getlist('foo'), [])
-        if six.PY2:
-            self.assertEqual(q.has_key('foo'), False)
-        self.assertEqual('foo' in q, False)
-        self.assertEqual(list(six.iteritems(q)), [])
-        self.assertEqual(list(six.iterlists(q)), [])
-        self.assertEqual(list(six.iterkeys(q)), [])
-        self.assertEqual(list(six.itervalues(q)), [])
+        self.assertNotIn('foo', q)
+        self.assertEqual(list(q.items()), [])
+        self.assertEqual(list(q.lists()), [])
+        self.assertEqual(list(q.keys()), [])
+        self.assertEqual(list(q.values()), [])
         self.assertEqual(len(q), 0)
         self.assertEqual(q.urlencode(), '')
 
     def test_single_key_value(self):
         """Test QueryDict with one key/value pair"""
 
-        q = QueryDict(str('foo=bar'))
+        q = QueryDict('foo=bar')
         self.assertEqual(q['foo'], 'bar')
         with self.assertRaises(KeyError):
             q.__getitem__('bar')
@@ -88,17 +80,13 @@ class QueryDictTests(unittest.TestCase):
         with self.assertRaises(AttributeError):
             q.appendlist('foo', ['bar'])
 
-        if six.PY2:
-            self.assertTrue(q.has_key('foo'))
         self.assertIn('foo', q)
-        if six.PY2:
-            self.assertFalse(q.has_key('bar'))
         self.assertNotIn('bar', q)
 
-        self.assertEqual(list(six.iteritems(q)), [('foo', 'bar')])
-        self.assertEqual(list(six.iterlists(q)), [('foo', ['bar'])])
-        self.assertEqual(list(six.iterkeys(q)), ['foo'])
-        self.assertEqual(list(six.itervalues(q)), ['bar'])
+        self.assertEqual(list(q.items()), [('foo', 'bar')])
+        self.assertEqual(list(q.lists()), [('foo', ['bar'])])
+        self.assertEqual(list(q.keys()), ['foo'])
+        self.assertEqual(list(q.values()), ['bar'])
         self.assertEqual(len(q), 1)
 
         with self.assertRaises(AttributeError):
@@ -153,18 +141,12 @@ class QueryDictTests(unittest.TestCase):
         q.appendlist('foo', 'another')
         self.assertEqual(q.getlist('foo'), ['bar', 'baz', 'another'])
         self.assertEqual(q['foo'], 'another')
-        if six.PY2:
-            self.assertTrue(q.has_key('foo'))
         self.assertIn('foo', q)
 
-        self.assertListEqual(sorted(six.iteritems(q)),
-                             [('foo', 'another'), ('name', 'john')])
-        self.assertListEqual(sorted(six.iterlists(q)),
-                             [('foo', ['bar', 'baz', 'another']), ('name', ['john'])])
-        self.assertListEqual(sorted(six.iterkeys(q)),
-                             ['foo', 'name'])
-        self.assertListEqual(sorted(six.itervalues(q)),
-                             ['another', 'john'])
+        self.assertListEqual(sorted(q.items()), [('foo', 'another'), ('name', 'john')])
+        self.assertListEqual(sorted(q.lists()), [('foo', ['bar', 'baz', 'another']), ('name', ['john'])])
+        self.assertListEqual(sorted(q.keys()), ['foo', 'name'])
+        self.assertListEqual(sorted(q.values()), ['another', 'john'])
 
         q.update({'foo': 'hello'})
         self.assertEqual(q['foo'], 'hello')
@@ -184,7 +166,7 @@ class QueryDictTests(unittest.TestCase):
     def test_multiple_keys(self):
         """Test QueryDict with two key/value pairs with same keys."""
 
-        q = QueryDict(str('vote=yes&vote=no'))
+        q = QueryDict('vote=yes&vote=no')
 
         self.assertEqual(q['vote'], 'no')
         with self.assertRaises(AttributeError):
@@ -202,16 +184,12 @@ class QueryDictTests(unittest.TestCase):
         with self.assertRaises(AttributeError):
             q.appendlist('foo', ['bar'])
 
-        if six.PY2:
-            self.assertEqual(q.has_key('vote'), True)
-        self.assertEqual('vote' in q, True)
-        if six.PY2:
-            self.assertEqual(q.has_key('foo'), False)
-        self.assertEqual('foo' in q, False)
-        self.assertEqual(list(six.iteritems(q)), [('vote', 'no')])
-        self.assertEqual(list(six.iterlists(q)), [('vote', ['yes', 'no'])])
-        self.assertEqual(list(six.iterkeys(q)), ['vote'])
-        self.assertEqual(list(six.itervalues(q)), ['no'])
+        self.assertIn('vote', q)
+        self.assertNotIn('foo', q)
+        self.assertEqual(list(q.items()), [('vote', 'no')])
+        self.assertEqual(list(q.lists()), [('vote', ['yes', 'no'])])
+        self.assertEqual(list(q.keys()), ['vote'])
+        self.assertEqual(list(q.values()), ['no'])
         self.assertEqual(len(q), 1)
 
         with self.assertRaises(AttributeError):
@@ -227,49 +205,74 @@ class QueryDictTests(unittest.TestCase):
         with self.assertRaises(AttributeError):
             q.__delitem__('vote')
 
-    if six.PY2:
-        def test_invalid_input_encoding(self):
-            """
-            QueryDicts must be able to handle invalid input encoding (in this
-            case, bad UTF-8 encoding), falling back to ISO-8859-1 decoding.
-
-            This test doesn't apply under Python 3 because the URL is a string
-            and not a bytestring.
-            """
-            q = QueryDict(str(b'foo=bar&foo=\xff'))
-            self.assertEqual(q['foo'], '\xff')
-            self.assertEqual(q.getlist('foo'), ['bar', '\xff'])
-
     def test_pickle(self):
         q = QueryDict()
         q1 = pickle.loads(pickle.dumps(q, 2))
-        self.assertEqual(q == q1, True)
-        q = QueryDict(str('a=b&c=d'))
+        self.assertEqual(q, q1)
+        q = QueryDict('a=b&c=d')
         q1 = pickle.loads(pickle.dumps(q, 2))
-        self.assertEqual(q == q1, True)
-        q = QueryDict(str('a=b&c=d&a=1'))
+        self.assertEqual(q, q1)
+        q = QueryDict('a=b&c=d&a=1')
         q1 = pickle.loads(pickle.dumps(q, 2))
-        self.assertEqual(q == q1, True)
+        self.assertEqual(q, q1)
 
     def test_update_from_querydict(self):
         """Regression test for #8278: QueryDict.update(QueryDict)"""
-        x = QueryDict(str("a=1&a=2"), mutable=True)
-        y = QueryDict(str("a=3&a=4"))
+        x = QueryDict("a=1&a=2", mutable=True)
+        y = QueryDict("a=3&a=4")
         x.update(y)
         self.assertEqual(x.getlist('a'), ['1', '2', '3', '4'])
 
     def test_non_default_encoding(self):
         """#13572 - QueryDict with a non-default encoding"""
-        q = QueryDict(str('cur=%A4'), encoding='iso-8859-15')
+        q = QueryDict('cur=%A4', encoding='iso-8859-15')
         self.assertEqual(q.encoding, 'iso-8859-15')
-        self.assertEqual(list(six.iteritems(q)), [('cur', '€')])
+        self.assertEqual(list(q.items()), [('cur', '€')])
         self.assertEqual(q.urlencode(), 'cur=%A4')
         q = q.copy()
         self.assertEqual(q.encoding, 'iso-8859-15')
-        self.assertEqual(list(six.iteritems(q)), [('cur', '€')])
+        self.assertEqual(list(q.items()), [('cur', '€')])
         self.assertEqual(q.urlencode(), 'cur=%A4')
         self.assertEqual(copy.copy(q).encoding, 'iso-8859-15')
         self.assertEqual(copy.deepcopy(q).encoding, 'iso-8859-15')
+
+    def test_querydict_fromkeys(self):
+        self.assertEqual(QueryDict.fromkeys(['key1', 'key2', 'key3']), QueryDict('key1&key2&key3'))
+
+    def test_fromkeys_with_nonempty_value(self):
+        self.assertEqual(
+            QueryDict.fromkeys(['key1', 'key2', 'key3'], value='val'),
+            QueryDict('key1=val&key2=val&key3=val')
+        )
+
+    def test_fromkeys_is_immutable_by_default(self):
+        # Match behavior of __init__() which is also immutable by default.
+        q = QueryDict.fromkeys(['key1', 'key2', 'key3'])
+        with self.assertRaisesMessage(AttributeError, 'This QueryDict instance is immutable'):
+            q['key4'] = 'nope'
+
+    def test_fromkeys_mutable_override(self):
+        q = QueryDict.fromkeys(['key1', 'key2', 'key3'], mutable=True)
+        q['key4'] = 'yep'
+        self.assertEqual(q, QueryDict('key1&key2&key3&key4=yep'))
+
+    def test_duplicates_in_fromkeys_iterable(self):
+        self.assertEqual(QueryDict.fromkeys('xyzzy'), QueryDict('x&y&z&z&y'))
+
+    def test_fromkeys_with_nondefault_encoding(self):
+        key_utf16 = b'\xff\xfe\x8e\x02\xdd\x01\x9e\x02'
+        value_utf16 = b'\xff\xfe\xdd\x01n\x00l\x00P\x02\x8c\x02'
+        q = QueryDict.fromkeys([key_utf16], value=value_utf16, encoding='utf-16')
+        expected = QueryDict('', mutable=True)
+        expected['ʎǝʞ'] = 'ǝnlɐʌ'
+        self.assertEqual(q, expected)
+
+    def test_fromkeys_empty_iterable(self):
+        self.assertEqual(QueryDict.fromkeys([]), QueryDict(''))
+
+    def test_fromkeys_noniterable(self):
+        with self.assertRaises(TypeError):
+            QueryDict.fromkeys(0)
 
 
 class HttpResponseTests(unittest.TestCase):
@@ -277,56 +280,44 @@ class HttpResponseTests(unittest.TestCase):
     def test_headers_type(self):
         r = HttpResponse()
 
-        # The following tests explicitly test types in addition to values
-        # because in Python 2 u'foo' == b'foo'.
-
-        # ASCII unicode or bytes values are converted to native strings.
+        # ASCII strings or bytes values are converted to strings.
         r['key'] = 'test'
-        self.assertEqual(r['key'], str('test'))
-        self.assertIsInstance(r['key'], str)
+        self.assertEqual(r['key'], 'test')
         r['key'] = 'test'.encode('ascii')
-        self.assertEqual(r['key'], str('test'))
-        self.assertIsInstance(r['key'], str)
+        self.assertEqual(r['key'], 'test')
         self.assertIn(b'test', r.serialize_headers())
 
-        # Latin-1 unicode or bytes values are also converted to native strings.
+        # Non-ASCII values are serialized to Latin-1.
         r['key'] = 'café'
-        self.assertEqual(r['key'], force_str('café', 'latin-1'))
-        self.assertIsInstance(r['key'], str)
-        r['key'] = 'café'.encode('latin-1')
-        self.assertEqual(r['key'], force_str('café', 'latin-1'))
-        self.assertIsInstance(r['key'], str)
         self.assertIn('café'.encode('latin-1'), r.serialize_headers())
 
         # Other unicode values are MIME-encoded (there's no way to pass them as bytes).
         r['key'] = '†'
-        self.assertEqual(r['key'], str('=?utf-8?b?4oCg?='))
-        self.assertIsInstance(r['key'], str)
+        self.assertEqual(r['key'], '=?utf-8?b?4oCg?=')
         self.assertIn(b'=?utf-8?b?4oCg?=', r.serialize_headers())
 
-        # The response also converts unicode or bytes keys to strings, but requires
+        # The response also converts string or bytes keys to strings, but requires
         # them to contain ASCII
         r = HttpResponse()
         del r['Content-Type']
         r['foo'] = 'bar'
-        l = list(r.items())
-        self.assertEqual(len(l), 1)
-        self.assertEqual(l[0], ('foo', 'bar'))
-        self.assertIsInstance(l[0][0], str)
+        headers = list(r.items())
+        self.assertEqual(len(headers), 1)
+        self.assertEqual(headers[0], ('foo', 'bar'))
 
         r = HttpResponse()
         del r['Content-Type']
         r[b'foo'] = 'bar'
-        l = list(r.items())
-        self.assertEqual(len(l), 1)
-        self.assertEqual(l[0], ('foo', 'bar'))
-        self.assertIsInstance(l[0][0], str)
+        headers = list(r.items())
+        self.assertEqual(len(headers), 1)
+        self.assertEqual(headers[0], ('foo', 'bar'))
+        self.assertIsInstance(headers[0][0], str)
 
         r = HttpResponse()
         with self.assertRaises(UnicodeError):
             r.__setitem__('føø', 'bar')
         with self.assertRaises(UnicodeError):
-            r.__setitem__('føø'.encode('utf-8'), 'bar')
+            r.__setitem__('føø'.encode(), 'bar')
 
     def test_long_line(self):
         # Bug #20889: long lines trigger newlines to be added to headers
@@ -352,7 +343,7 @@ class HttpResponseTests(unittest.TestCase):
         Test for bug #14020: Make HttpResponse.get work like dict.get
         """
         r = HttpResponse()
-        self.assertEqual(r.get('test'), None)
+        self.assertIsNone(r.get('test'))
 
     def test_non_string_content(self):
         # Bug 16494: HttpResponse should behave consistently with non-strings
@@ -380,7 +371,7 @@ class HttpResponseTests(unittest.TestCase):
         # test odd inputs
         r = HttpResponse()
         r.content = ['1', '2', 3, '\u079e']
-        # '\xde\x9e' == unichr(1950).encode('utf-8')
+        # '\xde\x9e' == unichr(1950).encode()
         self.assertEqual(r.content, b'123\xde\x9e')
 
         # .content can safely be accessed multiple times.
@@ -439,7 +430,7 @@ class HttpResponseTests(unittest.TestCase):
         self.assertEqual(r.getvalue(), b'asdf')
 
         r = HttpResponse()
-        self.assertEqual(r.writable(), True)
+        self.assertIs(r.writable(), True)
         r.writelines(['foo\n', 'bar\n', 'baz\n'])
         self.assertEqual(r.content, b'foo\nbar\nbaz\n')
 
@@ -460,14 +451,13 @@ class HttpResponseSubclassesTests(SimpleTestCase):
     def test_redirect(self):
         response = HttpResponseRedirect('/redirected/')
         self.assertEqual(response.status_code, 302)
-        # Test that standard HttpResponse init args can be used
+        # Standard HttpResponse init args can be used
         response = HttpResponseRedirect(
             '/redirected/',
             content='The resource has temporarily moved',
             content_type='text/html',
         )
         self.assertContains(response, 'The resource has temporarily moved', status_code=302)
-        # Test that url attribute is right
         self.assertEqual(response.url, response['Location'])
 
     def test_redirect_lazy(self):
@@ -480,6 +470,17 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         expected = '<HttpResponseRedirect status_code=302, "text/html; charset=utf-8", url="/redirected/">'
         self.assertEqual(repr(response), expected)
 
+    def test_invalid_redirect_repr(self):
+        """
+        If HttpResponseRedirect raises DisallowedRedirect, its __repr__()
+        should work (in the debug view, for example).
+        """
+        response = HttpResponseRedirect.__new__(HttpResponseRedirect)
+        with self.assertRaisesMessage(DisallowedRedirect, "Unsafe redirect to URL with protocol 'ssh'"):
+            HttpResponseRedirect.__init__(response, 'ssh://foo')
+        expected = '<HttpResponseRedirect status_code=302, "text/html; charset=utf-8", url="ssh://foo">'
+        self.assertEqual(repr(response), expected)
+
     def test_not_modified(self):
         response = HttpResponseNotModified()
         self.assertEqual(response.status_code, 304)
@@ -488,10 +489,14 @@ class HttpResponseSubclassesTests(SimpleTestCase):
             response.content = "Hello dear"
         self.assertNotIn('content-type', response)
 
+    def test_not_modified_repr(self):
+        response = HttpResponseNotModified()
+        self.assertEqual(repr(response), '<HttpResponseNotModified status_code=304>')
+
     def test_not_allowed(self):
         response = HttpResponseNotAllowed(['GET'])
         self.assertEqual(response.status_code, 405)
-        # Test that standard HttpResponse init args can be used
+        # Standard HttpResponse init args can be used
         response = HttpResponseNotAllowed(['GET'], content='Only the GET method is allowed', content_type='text/html')
         self.assertContains(response, 'Only the GET method is allowed', status_code=405)
 
@@ -499,6 +504,11 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         response = HttpResponseNotAllowed(['GET', 'OPTIONS'], content_type='text/plain')
         expected = '<HttpResponseNotAllowed [GET, OPTIONS] status_code=405, "text/plain">'
         self.assertEqual(repr(response), expected)
+
+    def test_not_allowed_repr_no_content_type(self):
+        response = HttpResponseNotAllowed(('GET', 'POST'))
+        del response['Content-Type']
+        self.assertEqual(repr(response), '<HttpResponseNotAllowed [GET, POST] status_code=405>')
 
 
 class JsonResponseTests(SimpleTestCase):
@@ -549,7 +559,7 @@ class StreamingHttpResponseTests(SimpleTestCase):
         chunks = list(r)
         self.assertEqual(chunks, [b'hello', b'world'])
         for chunk in chunks:
-            self.assertIsInstance(chunk, six.binary_type)
+            self.assertIsInstance(chunk, bytes)
 
         # and the response can only be iterated once.
         self.assertEqual(list(r), [])
@@ -560,13 +570,13 @@ class StreamingHttpResponseTests(SimpleTestCase):
         self.assertEqual(list(r), [b'abc', b'def'])
         self.assertEqual(list(r), [])
 
-        # iterating over Unicode strings still yields bytestring chunks.
+        # iterating over strings still yields bytestring chunks.
         r.streaming_content = iter(['hello', 'café'])
         chunks = list(r)
-        # '\xc3\xa9' == unichr(233).encode('utf-8')
+        # '\xc3\xa9' == unichr(233).encode()
         self.assertEqual(chunks, [b'hello', b'caf\xc3\xa9'])
         for chunk in chunks:
-            self.assertIsInstance(chunk, six.binary_type)
+            self.assertIsInstance(chunk, bytes)
 
         # streaming responses don't have a `content` attribute.
         self.assertFalse(hasattr(r, 'content'))
@@ -587,8 +597,7 @@ class StreamingHttpResponseTests(SimpleTestCase):
         # coercing a streaming response to bytes doesn't return a complete HTTP
         # message like a regular response does. it only gives us the headers.
         r = StreamingHttpResponse(iter(['hello', 'world']))
-        self.assertEqual(
-            six.binary_type(r), b'Content-Type: text/html; charset=utf-8')
+        self.assertEqual(bytes(r), b'Content-Type: text/html; charset=utf-8')
 
         # and this won't consume its content.
         self.assertEqual(list(r), [b'hello', b'world'])
@@ -617,7 +626,7 @@ class FileCloseTests(SimpleTestCase):
         request_finished.connect(close_old_connections)
 
     def test_response(self):
-        filename = os.path.join(os.path.dirname(upath(__file__)), 'abc.txt')
+        filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
 
         # file isn't closed until we close the response.
         file1 = open(filename)
@@ -635,7 +644,7 @@ class FileCloseTests(SimpleTestCase):
         self.assertTrue(file2.closed)
 
     def test_streaming_response(self):
-        filename = os.path.join(os.path.dirname(upath(__file__)), 'abc.txt')
+        filename = os.path.join(os.path.dirname(__file__), 'abc.txt')
 
         # file isn't closed until we close the response.
         file1 = open(filename)
@@ -659,18 +668,14 @@ class FileCloseTests(SimpleTestCase):
 
 class CookieTests(unittest.TestCase):
     def test_encode(self):
-        """
-        Test that we don't output tricky characters in encoded value
-        """
+        """Semicolons and commas are encoded."""
         c = SimpleCookie()
         c['test'] = "An,awkward;value"
         self.assertNotIn(";", c.output().rstrip(';'))  # IE compat
         self.assertNotIn(",", c.output().rstrip(';'))  # Safari compat
 
     def test_decode(self):
-        """
-        Test that we can still preserve semi-colons and commas
-        """
+        """Semicolons and commas are decoded."""
         c = SimpleCookie()
         c['test'] = "An,awkward;value"
         c2 = SimpleCookie()
@@ -680,9 +685,6 @@ class CookieTests(unittest.TestCase):
         self.assertEqual(c['test'].value, c3['test'])
 
     def test_decode_2(self):
-        """
-        Test that we haven't broken normal encoding
-        """
         c = SimpleCookie()
         c['test'] = b"\xf0"
         c2 = SimpleCookie()
@@ -693,13 +695,13 @@ class CookieTests(unittest.TestCase):
 
     def test_nonstandard_keys(self):
         """
-        Test that a single non-standard cookie name doesn't affect all cookies. Ticket #13007.
+        A single non-standard cookie name doesn't affect all cookies (#13007).
         """
         self.assertIn('good_cookie', parse_cookie('good_cookie=yes;bad:cookie=yes').keys())
 
     def test_repeated_nonstandard_keys(self):
         """
-        Test that a repeated non-standard name doesn't affect all cookies. Ticket #15852
+        A repeated non-standard name doesn't affect all cookies (#15852).
         """
         self.assertIn('good_cookie', parse_cookie('a:=b; a:=c; good_cookie=yes').keys())
 
@@ -743,16 +745,13 @@ class CookieTests(unittest.TestCase):
         # More characters the spec forbids.
         self.assertEqual(parse_cookie('a   b,c<>@:/[]?{}=d  "  =e,f g'), {'a   b,c<>@:/[]?{}': 'd  "  =e,f g'})
         # Unicode characters. The spec only allows ASCII.
-        self.assertEqual(parse_cookie('saint=André Bessette'), {'saint': force_str('André Bessette')})
+        self.assertEqual(parse_cookie('saint=André Bessette'), {'saint': 'André Bessette'})
         # Browsers don't send extra whitespace or semicolons in Cookie headers,
         # but parse_cookie() should parse whitespace the same way
         # document.cookie parses whitespace.
         self.assertEqual(parse_cookie('  =  b  ;  ;  =  ;   c  =  ;  '), {'': 'b', 'c': ''})
 
     def test_httponly_after_load(self):
-        """
-        Test that we can use httponly attribute on cookies that we load
-        """
         c = SimpleCookie()
         c.load("name=val")
         c['name']['httponly'] = True
@@ -762,15 +761,6 @@ class CookieTests(unittest.TestCase):
         c = SimpleCookie()
         c.load({'name': 'val'})
         self.assertEqual(c['name'].value, 'val')
-
-    @unittest.skipUnless(six.PY2, "PY3 throws an exception on invalid cookie keys.")
-    def test_bad_cookie(self):
-        """
-        Regression test for #18403
-        """
-        r = HttpResponse()
-        r.set_cookie("a:.b/", 1)
-        self.assertEqual(len(r.cookies.bad_cookies), 1)
 
     def test_pickle(self):
         rawdata = 'Customer="WILE_E_COYOTE"; Path=/acme; Version=1'

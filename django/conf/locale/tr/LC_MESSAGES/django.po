@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015
+# BouRock, 2015-2016
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 10:11+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 09:50+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -68,6 +68,9 @@ msgstr "Danca"
 
 msgid "German"
 msgstr "Almanca"
+
+msgid "Lower Sorbian"
+msgstr "Aşağı Sorb dili"
 
 msgid "Greek"
 msgstr "Yunanca"
@@ -138,6 +141,9 @@ msgstr "Hintçe"
 msgid "Croatian"
 msgstr "Hırvatça"
 
+msgid "Upper Sorbian"
+msgstr "Yukarı Sorb dili"
+
 msgid "Hungarian"
 msgstr "Macarca"
 
@@ -198,7 +204,7 @@ msgstr "Marathi dili"
 msgid "Burmese"
 msgstr "Birmanca"
 
-msgid "Norwegian Bokmal"
+msgid "Norwegian Bokmål"
 msgstr "Norveççe Bokmal"
 
 msgid "Nepali"
@@ -296,9 +302,6 @@ msgstr "Sabit Dosyalar"
 
 msgid "Syndication"
 msgstr "Dağıtım"
-
-msgid "Web Design"
-msgstr "Web Tasarımı"
 
 msgid "Enter a valid value."
 msgstr "Geçerli bir değer girin."
@@ -441,6 +444,9 @@ msgstr "Tamsayı"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' değeri bir tamsayı olmak zorundadır."
 
+msgid "Big (8 byte) integer"
+msgstr "Büyük (8 bayt) tamsayı"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' değeri ya True ya da False olmak zorundadır."
@@ -524,9 +530,6 @@ msgstr "'%(value)s' değeri kesirli olmak zorundadır."
 msgid "Floating point number"
 msgstr "Kayan noktalı sayı"
 
-msgid "Big (8 byte) integer"
-msgstr "Büyük (8 bayt) tamsayı"
-
 msgid "IPv4 address"
 msgstr "IPv4 adresi"
 
@@ -600,6 +603,14 @@ msgstr "Dış Anahtar (türü ilgili alana göre belirlenir)"
 
 msgid "One-to-one relationship"
 msgstr "Bire-bir ilişki"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s ilişkisi"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s ilişkileri"
 
 msgid "Many-to-many relationship"
 msgstr "Çoka-çok ilişki"

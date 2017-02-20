@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
 """
 Base classes for writing management commands (named commands which can
 be executed through ``django-admin`` or ``manage.py``).
 """
-from __future__ import unicode_literals
-
 import os
 import sys
 from argparse import ArgumentParser
+from io import TextIOBase
 
 import django
 from django.core import checks
@@ -15,7 +13,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.exceptions import MigrationSchemaMissing
-from django.utils.encoding import force_str
 
 
 class CommandError(Exception):
@@ -48,18 +45,18 @@ class CommandParser(ArgumentParser):
     """
     def __init__(self, cmd, **kwargs):
         self.cmd = cmd
-        super(CommandParser, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def parse_args(self, args=None, namespace=None):
         # Catch missing argument for a better error message
         if (hasattr(self.cmd, 'missing_args_message') and
                 not (args or any(not arg.startswith('-') for arg in args))):
             self.error(self.cmd.missing_args_message)
-        return super(CommandParser, self).parse_args(args, namespace)
+        return super().parse_args(args, namespace)
 
     def error(self, message):
         if self.cmd._called_from_command_line:
-            super(CommandParser, self).error(message)
+            super().error(message)
         else:
             raise CommandError("Error: %s" % message)
 
@@ -76,7 +73,7 @@ def handle_default_options(options):
         sys.path.insert(0, options.pythonpath)
 
 
-class OutputWrapper(object):
+class OutputWrapper(TextIOBase):
     """
     Wrapper around stdout/stderr
     """
@@ -107,10 +104,10 @@ class OutputWrapper(object):
         if ending and not msg.endswith(ending):
             msg += ending
         style_func = style_func or self.style_func
-        self._out.write(force_str(style_func(msg)))
+        self._out.write(style_func(msg))
 
 
-class BaseCommand(object):
+class BaseCommand:
     """
     The base class from which all management commands ultimately
     derive.
@@ -151,12 +148,6 @@ class BaseCommand(object):
 
     Several attributes affect behavior at various steps along the way:
 
-    ``can_import_settings``
-        A boolean indicating whether the command needs to be able to
-        import Django settings; if ``True``, ``execute()`` will verify
-        that this is possible before proceeding. Default value is
-        ``True``.
-
     ``help``
         A short description of the command, which will be printed in
         help messages.
@@ -192,17 +183,12 @@ class BaseCommand(object):
         that is locale-sensitive and such content shouldn't contain any
         translations (like it happens e.g. with django.contrib.auth
         permissions) as activating any locale might cause unintended effects.
-
-        This option can't be False when the can_import_settings option is set
-        to False too because attempting to deactivate translations needs access
-        to settings. This condition will generate a CommandError.
     """
     # Metadata about this command.
     help = ''
 
     # Configuration shortcuts that alter various logic.
     _called_from_command_line = False
-    can_import_settings = True
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
     leave_locale_alone = False
     requires_migrations_checks = False
@@ -224,17 +210,6 @@ class BaseCommand(object):
         return their own version.
         """
         return django.get_version()
-
-    def usage(self, subcommand):
-        """
-        Return a brief description of how to use this command, by
-        default from the attribute ``self.help``.
-        """
-        usage = '%%prog %s [options] %s' % (subcommand, self.args)
-        if self.help:
-            return '%s\n\n%s' % (usage, self.help)
-        else:
-            return usage
 
     def create_parser(self, prog_name, subcommand):
         """
@@ -314,7 +289,12 @@ class BaseCommand(object):
                 self.stderr.write('%s: %s' % (e.__class__.__name__, e))
             sys.exit(1)
         finally:
-            connections.close_all()
+            try:
+                connections.close_all()
+            except ImproperlyConfigured:
+                # Ignore if connections aren't setup at this point (e.g. no
+                # configured settings).
+                pass
 
     def execute(self, *args, **options):
         """
@@ -332,15 +312,6 @@ class BaseCommand(object):
 
         saved_locale = None
         if not self.leave_locale_alone:
-            # Only mess with locales if we can assume we have a working
-            # settings file, because django.utils.translation requires settings
-            # (The final saying about whether the i18n machinery is active will be
-            # found in the value of the USE_I18N setting)
-            if not self.can_import_settings:
-                raise CommandError("Incompatible values of 'leave_locale_alone' "
-                                   "(%s) and 'can_import_settings' (%s) command "
-                                   "options." % (self.leave_locale_alone,
-                                                 self.can_import_settings))
             # Deactivate translations, because django-admin creates database
             # content like permissions, and those shouldn't contain any
             # translations.
@@ -406,9 +377,9 @@ class BaseCommand(object):
                 if issues:
                     visible_issue_count += len(issues)
                     formatted = (
-                        self.style.ERROR(force_str(e))
+                        self.style.ERROR(str(e))
                         if e.is_serious()
-                        else self.style.WARNING(force_str(e))
+                        else self.style.WARNING(str(e))
                         for e in issues)
                     formatted = "\n".join(sorted(formatted))
                     body += '\n%s:\n%s\n' % (group_name, formatted)

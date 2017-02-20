@@ -17,19 +17,20 @@ from django.test import TestCase, TransactionTestCase
 from django.test.runner import default_test_processes
 from django.test.selenium import SeleniumTestCaseBase
 from django.test.utils import get_runner
-from django.utils import six
-from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango21Warning, RemovedInDjango30Warning,
+)
 from django.utils.log import DEFAULT_LOGGING
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
-warnings.simplefilter("error", RemovedInDjango20Warning)
+warnings.simplefilter("error", RemovedInDjango30Warning)
+warnings.simplefilter("error", RemovedInDjango21Warning)
 # Make runtime warning errors to ensure no usage of error prone patterns.
 warnings.simplefilter("error", RuntimeWarning)
 # Ignore known warnings in test dependencies.
 warnings.filterwarnings("ignore", "'U' mode is deprecated", DeprecationWarning, module='docutils.io')
 
-RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
+RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 
 TEMPLATE_DIR = os.path.join(RUNTESTS_DIR, 'templates')
 
@@ -39,10 +40,8 @@ TMPDIR = tempfile.mkdtemp(prefix='django_')
 # so that children processes inherit it.
 tempfile.tempdir = os.environ['TMPDIR'] = TMPDIR
 
-# Removing the temporary TMPDIR. Ensure we pass in unicode so that it will
-# successfully remove temp trees containing non-ASCII filenames on Windows.
-# (We're assuming the temp dir name itself only contains ASCII characters.)
-atexit.register(shutil.rmtree, six.text_type(TMPDIR))
+# Removing the temporary TMPDIR.
+atexit.register(shutil.rmtree, TMPDIR)
 
 
 SUBDIRS_TO_SKIP = [
@@ -160,12 +159,9 @@ def setup(verbosity, test_labels, parallel):
     # tests.
     log_config['loggers']['django']['level'] = 'ERROR'
     settings.LOGGING = log_config
-
-    warnings.filterwarnings(
-        'ignore',
-        'The GeoManager class is deprecated.',
-        RemovedInDjango20Warning
-    )
+    settings.SILENCED_SYSTEM_CHECKS = [
+        'fields.W342',  # ForeignKey(unique=True) -> OneToOneField
+    ]
 
     # Load all the ALWAYS_INSTALLED_APPS.
     django.setup()
@@ -279,7 +275,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
 
 def get_subprocess_args(options):
     subprocess_args = [
-        sys.executable, upath(__file__), '--settings=%s' % options.settings
+        sys.executable, __file__, '--settings=%s' % options.settings
     ]
     if options.failfast:
         subprocess_args.append('--failfast')
@@ -327,11 +323,11 @@ def bisect_tests(bisection_label, options, test_labels, parallel):
 
         if failures_a and not failures_b:
             print("***** Problem found in first half. Bisecting again...")
-            iteration = iteration + 1
+            iteration += 1
             test_labels = test_labels_a[:-1]
         elif failures_b and not failures_a:
             print("***** Problem found in second half. Bisecting again...")
-            iteration = iteration + 1
+            iteration += 1
             test_labels = test_labels_b[:-1]
         elif failures_a and failures_b:
             print("***** Multiple sources of failure found")
@@ -418,12 +414,6 @@ if __name__ == "__main__":
              'test side effects not apparent with normal execution lineup.',
     )
     parser.add_argument(
-        '--liveserver',
-        help='Overrides the default address where the live server (used with '
-             'LiveServerTestCase) is expected to run from. The default value '
-             'is localhost:8081-8179.',
-    )
-    parser.add_argument(
         '--selenium', dest='selenium', action=ActionSelenium, metavar='BROWSERS',
         help='A comma-separated list of browsers to run the Selenium tests against.',
     )
@@ -447,16 +437,6 @@ if __name__ == "__main__":
 
     options = parser.parse_args()
 
-    # mock is a required dependency
-    try:
-        from django.test import mock  # NOQA
-    except ImportError:
-        print(
-            "Please install test dependencies first: \n"
-            "$ pip install -r requirements/py%s.txt" % sys.version_info.major
-        )
-        sys.exit(1)
-
     # Allow including a trailing slash on app_labels for tab completion convenience
     options.modules = [os.path.normpath(labels) for labels in options.modules]
 
@@ -466,9 +446,6 @@ if __name__ == "__main__":
         if "DJANGO_SETTINGS_MODULE" not in os.environ:
             os.environ['DJANGO_SETTINGS_MODULE'] = 'test_sqlite'
         options.settings = os.environ['DJANGO_SETTINGS_MODULE']
-
-    if options.liveserver is not None:
-        os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = options.liveserver
 
     if options.selenium:
         if not options.tags:
@@ -489,4 +466,4 @@ if __name__ == "__main__":
             options.exclude_tags,
         )
         if failures:
-            sys.exit(bool(failures))
+            sys.exit(1)

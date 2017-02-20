@@ -27,6 +27,7 @@ class OGRIndexError(GDALException, KeyError):
     """
     silent_variable_failure = True
 
+
 # #### GDAL/OGR error checking codes and routine ####
 
 # OGR Error Codes
@@ -61,7 +62,7 @@ ERR_NONE = 0
 
 def check_err(code, cpl=False):
     """
-    Checks the given CPL/OGRERR, and raises an exception where appropriate.
+    Check the given CPL/OGRERR and raise an exception where appropriate.
     """
     err_dict = CPLERR_DICT if cpl else OGRERR_DICT
 

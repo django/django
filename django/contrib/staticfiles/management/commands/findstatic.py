@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import os
 
 from django.contrib.staticfiles import finders
@@ -12,7 +10,7 @@ class Command(LabelCommand):
     label = 'staticfile'
 
     def add_arguments(self, parser):
-        super(Command, self).add_arguments(parser)
+        super().add_arguments(parser)
         parser.add_argument(
             '--first', action='store_false', dest='all',
             default=True,

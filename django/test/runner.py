@@ -1,4 +1,3 @@
-import collections
 import ctypes
 import itertools
 import logging
@@ -7,15 +6,19 @@ import os
 import pickle
 import textwrap
 import unittest
+import warnings
 from importlib import import_module
+from io import StringIO
 
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS, connections
+from django.core.management import call_command
+from django.db import connections
 from django.test import SimpleTestCase, TestCase
-from django.test.utils import setup_test_environment, teardown_test_environment
+from django.test.utils import (
+    setup_databases as _setup_databases, setup_test_environment,
+    teardown_databases as _teardown_databases, teardown_test_environment,
+)
 from django.utils.datastructures import OrderedSet
-from django.utils.six import StringIO
+from django.utils.deprecation import RemovedInDjango21Warning
 
 try:
     import tblib.pickling_support
@@ -27,16 +30,16 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
     def __init__(self, stream, descriptions, verbosity):
         self.logger = logging.getLogger('django.db.backends')
         self.logger.setLevel(logging.DEBUG)
-        super(DebugSQLTextTestResult, self).__init__(stream, descriptions, verbosity)
+        super().__init__(stream, descriptions, verbosity)
 
     def startTest(self, test):
         self.debug_sql_stream = StringIO()
         self.handler = logging.StreamHandler(self.debug_sql_stream)
         self.logger.addHandler(self.handler)
-        super(DebugSQLTextTestResult, self).startTest(test)
+        super().startTest(test)
 
     def stopTest(self, test):
-        super(DebugSQLTextTestResult, self).stopTest(test)
+        super().stopTest(test)
         self.logger.removeHandler(self.handler)
         if self.showAll:
             self.debug_sql_stream.seek(0)
@@ -44,12 +47,12 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln(self.separator2)
 
     def addError(self, test, err):
-        super(DebugSQLTextTestResult, self).addError(test, err)
+        super().addError(test, err)
         self.debug_sql_stream.seek(0)
         self.errors[-1] = self.errors[-1] + (self.debug_sql_stream.read(),)
 
     def addFailure(self, test, err):
-        super(DebugSQLTextTestResult, self).addFailure(test, err)
+        super().addFailure(test, err)
         self.debug_sql_stream.seek(0)
         self.failures[-1] = self.failures[-1] + (self.debug_sql_stream.read(),)
 
@@ -63,7 +66,7 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln("%s" % sql_debug)
 
 
-class RemoteTestResult(object):
+class RemoteTestResult:
     """
     Record information about which tests have succeeded and which have failed.
 
@@ -75,6 +78,9 @@ class RemoteTestResult(object):
     """
 
     def __init__(self):
+        if tblib is not None:
+            tblib.pickling_support.install()
+
         self.events = []
         self.failfast = False
         self.shouldStop = False
@@ -84,6 +90,30 @@ class RemoteTestResult(object):
     def test_index(self):
         return self.testsRun - 1
 
+    def _confirm_picklable(self, obj):
+        """
+        Confirm that obj can be pickled and unpickled as multiprocessing will
+        need to pickle the exception in the child process and unpickle it in
+        the parent process. Let the exception rise, if not.
+        """
+        pickle.loads(pickle.dumps(obj))
+
+    def _print_unpicklable_subtest(self, test, subtest, pickle_exc):
+        print("""
+Subtest failed:
+
+    test: {}
+ subtest: {}
+
+Unfortunately, the subtest that failed cannot be pickled, so the parallel
+test runner cannot handle it cleanly. Here is the pickling error:
+
+> {}
+
+You should re-run this test with --parallel=1 to reproduce the failure
+with a cleaner failure message.
+""".format(test, subtest, pickle_exc))
+
     def check_picklable(self, test, err):
         # Ensure that sys.exc_info() tuples are picklable. This displays a
         # clear multiprocessing.pool.RemoteTraceback generated in the child
@@ -92,7 +122,7 @@ class RemoteTestResult(object):
         # with the multiprocessing module. Since we're in a forked process,
         # our best chance to communicate with them is to print to stdout.
         try:
-            pickle.dumps(err)
+            self._confirm_picklable(err)
         except Exception as exc:
             original_exc_txt = repr(err[1])
             original_exc_txt = textwrap.fill(original_exc_txt, 75, initial_indent='    ', subsequent_indent='    ')
@@ -126,9 +156,16 @@ Here's the error encountered while trying to pickle the exception:
 
 {}
 
-You should re-run this test without the --parallel option to reproduce the
+You should re-run this test with the --parallel=1 option to reproduce the
 failure and get a correct traceback.
 """.format(test, original_exc_txt, pickle_exc_txt))
+            raise
+
+    def check_subtest_picklable(self, test, subtest):
+        try:
+            self._confirm_picklable(subtest)
+        except Exception as exc:
+            self._print_unpicklable_subtest(test, subtest, exc)
             raise
 
     def stop_if_failfast(self):
@@ -162,7 +199,15 @@ failure and get a correct traceback.
         self.stop_if_failfast()
 
     def addSubTest(self, test, subtest, err):
-        raise NotImplementedError("subtests aren't supported at this time")
+        # Follow Python 3.5's implementation of unittest.TestResult.addSubTest()
+        # by not doing anything when a subtest is successful.
+        if err is not None:
+            # Call check_picklable() before check_subtest_picklable() since
+            # check_picklable() performs the tblib check.
+            self.check_picklable(test, err)
+            self.check_subtest_picklable(test, subtest)
+            self.events.append(('addSubTest', self.test_index, subtest, err))
+            self.stop_if_failfast()
 
     def addSuccess(self, test):
         self.events.append(('addSuccess', self.test_index))
@@ -185,7 +230,7 @@ failure and get a correct traceback.
         self.stop_if_failfast()
 
 
-class RemoteTestRunner(object):
+class RemoteTestRunner:
     """
     Run tests and record everything but don't display anything.
 
@@ -213,8 +258,7 @@ def default_test_processes():
     """
     # The current implementation of the parallel test runner requires
     # multiprocessing to start subprocesses with fork().
-    # On Python 3.4+: if multiprocessing.get_start_method() != 'fork':
-    if not hasattr(os, 'fork'):
+    if multiprocessing.get_start_method() != 'fork':
         return 1
     try:
         return int(os.environ['DJANGO_TEST_PROCESSES'])
@@ -257,8 +301,8 @@ def _run_subsuite(args):
     This helper lives at module-level and its arguments are wrapped in a tuple
     because of the multiprocessing module's requirements.
     """
-    subsuite_index, subsuite, failfast = args
-    runner = RemoteTestRunner(failfast=failfast)
+    runner_class, subsuite_index, subsuite, failfast = args
+    runner = runner_class(failfast=failfast)
     result = runner.run(subsuite)
     return subsuite_index, result.events
 
@@ -282,12 +326,13 @@ class ParallelTestSuite(unittest.TestSuite):
     # In case someone wants to modify these in a subclass.
     init_worker = _init_worker
     run_subsuite = _run_subsuite
+    runner_class = RemoteTestRunner
 
     def __init__(self, suite, processes, failfast=False):
         self.subsuites = partition_suite_by_case(suite)
         self.processes = processes
         self.failfast = failfast
-        super(ParallelTestSuite, self).__init__()
+        super().__init__()
 
     def run(self, result):
         """
@@ -304,16 +349,13 @@ class ParallelTestSuite(unittest.TestSuite):
         Even with tblib, errors may still occur for dynamically created
         exception classes such Model.DoesNotExist which cannot be unpickled.
         """
-        if tblib is not None:
-            tblib.pickling_support.install()
-
         counter = multiprocessing.Value(ctypes.c_int, 0)
         pool = multiprocessing.Pool(
             processes=self.processes,
             initializer=self.init_worker.__func__,
             initargs=[counter])
         args = [
-            (index, subsuite, self.failfast)
+            (self.runner_class, index, subsuite, self.failfast)
             for index, subsuite in enumerate(self.subsuites)
         ]
         test_results = pool.imap_unordered(self.run_subsuite.__func__, args)
@@ -346,7 +388,7 @@ class ParallelTestSuite(unittest.TestSuite):
         return result
 
 
-class DiscoverRunner(object):
+class DiscoverRunner:
     """
     A Django test runner that uses unittest2 test discovery.
     """
@@ -359,7 +401,7 @@ class DiscoverRunner(object):
 
     def __init__(self, pattern=None, top_level=None, verbosity=1,
                  interactive=True, failfast=False, keepdb=False,
-                 reverse=False, debug_sql=False, parallel=0,
+                 reverse=False, debug_mode=False, debug_sql=False, parallel=0,
                  tags=None, exclude_tags=None, **kwargs):
 
         self.pattern = pattern
@@ -369,6 +411,7 @@ class DiscoverRunner(object):
         self.failfast = failfast
         self.keepdb = keepdb
         self.reverse = reverse
+        self.debug_mode = debug_mode
         self.debug_sql = debug_sql
         self.parallel = parallel
         self.tags = set(tags or [])
@@ -393,6 +436,10 @@ class DiscoverRunner(object):
             help='Reverses test cases order.',
         )
         parser.add_argument(
+            '--debug-mode', action='store_true', dest='debug_mode', default=False,
+            help='Sets settings.DEBUG to True.',
+        )
+        parser.add_argument(
             '-d', '--debug-sql', action='store_true', dest='debug_sql', default=False,
             help='Prints logged SQL queries on failure.',
         )
@@ -411,8 +458,7 @@ class DiscoverRunner(object):
         )
 
     def setup_test_environment(self, **kwargs):
-        setup_test_environment()
-        settings.DEBUG = False
+        setup_test_environment(debug=self.debug_mode)
         unittest.installHandler()
 
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
@@ -494,7 +540,7 @@ class DiscoverRunner(object):
         return suite
 
     def setup_databases(self, **kwargs):
-        return setup_databases(
+        return _setup_databases(
             self.verbosity, self.interactive, self.keepdb, self.debug_sql,
             self.parallel, **kwargs
         )
@@ -502,28 +548,33 @@ class DiscoverRunner(object):
     def get_resultclass(self):
         return DebugSQLTextTestResult if self.debug_sql else None
 
+    def get_test_runner_kwargs(self):
+        return {
+            'failfast': self.failfast,
+            'resultclass': self.get_resultclass(),
+            'verbosity': self.verbosity,
+        }
+
+    def run_checks(self):
+        # Checks are run after database creation since some checks require
+        # database access.
+        call_command('check', verbosity=self.verbosity)
+
     def run_suite(self, suite, **kwargs):
-        resultclass = self.get_resultclass()
-        return self.test_runner(
-            verbosity=self.verbosity,
-            failfast=self.failfast,
-            resultclass=resultclass,
-        ).run(suite)
+        kwargs = self.get_test_runner_kwargs()
+        runner = self.test_runner(**kwargs)
+        return runner.run(suite)
 
     def teardown_databases(self, old_config, **kwargs):
         """
         Destroys all the non-mirror databases.
         """
-        for connection, old_name, destroy in old_config:
-            if destroy:
-                if self.parallel > 1:
-                    for index in range(self.parallel):
-                        connection.creation.destroy_test_db(
-                            number=index + 1,
-                            verbosity=self.verbosity,
-                            keepdb=self.keepdb,
-                        )
-                connection.creation.destroy_test_db(old_name, self.verbosity, self.keepdb)
+        _teardown_databases(
+            old_config,
+            verbosity=self.verbosity,
+            parallel=self.parallel,
+            keepdb=self.keepdb,
+        )
 
     def teardown_test_environment(self, **kwargs):
         unittest.removeHandler()
@@ -547,6 +598,7 @@ class DiscoverRunner(object):
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
         old_config = self.setup_databases()
+        self.run_checks()
         result = self.run_suite(suite)
         self.teardown_databases(old_config)
         self.teardown_test_environment()
@@ -567,48 +619,6 @@ def is_discoverable(label):
         return hasattr(mod, '__path__')
 
     return os.path.isdir(os.path.abspath(label))
-
-
-def dependency_ordered(test_databases, dependencies):
-    """
-    Reorder test_databases into an order that honors the dependencies
-    described in TEST[DEPENDENCIES].
-    """
-    ordered_test_databases = []
-    resolved_databases = set()
-
-    # Maps db signature to dependencies of all it's aliases
-    dependencies_map = {}
-
-    # sanity check - no DB can depend on its own alias
-    for sig, (_, aliases) in test_databases:
-        all_deps = set()
-        for alias in aliases:
-            all_deps.update(dependencies.get(alias, []))
-        if not all_deps.isdisjoint(aliases):
-            raise ImproperlyConfigured(
-                "Circular dependency: databases %r depend on each other, "
-                "but are aliases." % aliases)
-        dependencies_map[sig] = all_deps
-
-    while test_databases:
-        changed = False
-        deferred = []
-
-        # Try to find a DB that has all it's dependencies met
-        for signature, (db_name, aliases) in test_databases:
-            if dependencies_map[signature].issubset(resolved_databases):
-                resolved_databases.update(aliases)
-                ordered_test_databases.append((signature, (db_name, aliases)))
-                changed = True
-            else:
-                deferred.append((signature, (db_name, aliases)))
-
-        if not changed:
-            raise ImproperlyConfigured(
-                "Circular dependency in TEST[DEPENDENCIES]")
-        test_databases = deferred
-    return ordered_test_databases
 
 
 def reorder_suite(suite, classes, reverse=False):
@@ -674,96 +684,14 @@ def partition_suite_by_case(suite):
     return groups
 
 
-def get_unique_databases_and_mirrors():
-    """
-    Figure out which databases actually need to be created.
-
-    Deduplicate entries in DATABASES that correspond the same database or are
-    configured as test mirrors.
-
-    Return two values:
-    - test_databases: ordered mapping of signatures to (name, list of aliases)
-                      where all aliases share the same underlying database.
-    - mirrored_aliases: mapping of mirror aliases to original aliases.
-    """
-    mirrored_aliases = {}
-    test_databases = {}
-    dependencies = {}
-    default_sig = connections[DEFAULT_DB_ALIAS].creation.test_db_signature()
-
-    for alias in connections:
-        connection = connections[alias]
-        test_settings = connection.settings_dict['TEST']
-
-        if test_settings['MIRROR']:
-            # If the database is marked as a test mirror, save the alias.
-            mirrored_aliases[alias] = test_settings['MIRROR']
-        else:
-            # Store a tuple with DB parameters that uniquely identify it.
-            # If we have two aliases with the same values for that tuple,
-            # we only need to create the test database once.
-            item = test_databases.setdefault(
-                connection.creation.test_db_signature(),
-                (connection.settings_dict['NAME'], set())
-            )
-            item[1].add(alias)
-
-            if 'DEPENDENCIES' in test_settings:
-                dependencies[alias] = test_settings['DEPENDENCIES']
-            else:
-                if alias != DEFAULT_DB_ALIAS and connection.creation.test_db_signature() != default_sig:
-                    dependencies[alias] = test_settings.get('DEPENDENCIES', [DEFAULT_DB_ALIAS])
-
-    test_databases = dependency_ordered(test_databases.items(), dependencies)
-    test_databases = collections.OrderedDict(test_databases)
-    return test_databases, mirrored_aliases
-
-
-def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, **kwargs):
-    """
-    Creates the test databases.
-    """
-    test_databases, mirrored_aliases = get_unique_databases_and_mirrors()
-
-    old_names = []
-
-    for signature, (db_name, aliases) in test_databases.items():
-        first_alias = None
-        for alias in aliases:
-            connection = connections[alias]
-            old_names.append((connection, db_name, first_alias is None))
-
-            # Actually create the database for the first connection
-            if first_alias is None:
-                first_alias = alias
-                connection.creation.create_test_db(
-                    verbosity=verbosity,
-                    autoclobber=not interactive,
-                    keepdb=keepdb,
-                    serialize=connection.settings_dict.get("TEST", {}).get("SERIALIZE", True),
-                )
-                if parallel > 1:
-                    for index in range(parallel):
-                        connection.creation.clone_test_db(
-                            number=index + 1,
-                            verbosity=verbosity,
-                            keepdb=keepdb,
-                        )
-            # Configure all other connections as mirrors of the first one
-            else:
-                connections[alias].creation.set_as_test_mirror(
-                    connections[first_alias].settings_dict)
-
-    # Configure the test mirrors.
-    for alias, mirror_alias in mirrored_aliases.items():
-        connections[alias].creation.set_as_test_mirror(
-            connections[mirror_alias].settings_dict)
-
-    if debug_sql:
-        for alias in connections:
-            connections[alias].force_debug_cursor = True
-
-    return old_names
+def setup_databases(*args, **kwargs):
+    warnings.warn(
+        '`django.test.runner.setup_databases()` has moved to '
+        '`django.test.utils.setup_databases()`.',
+        RemovedInDjango21Warning,
+        stacklevel=2,
+    )
+    return _setup_databases(*args, **kwargs)
 
 
 def filter_tests_by_tags(suite, tags, exclude_tags):

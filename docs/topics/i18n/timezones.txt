@@ -26,14 +26,12 @@ to this problem is to use UTC in the code and use local time only when
 interacting with end users.
 
 Time zone support is disabled by default. To enable it, set :setting:`USE_TZ =
-True <USE_TZ>` in your settings file. Installing pytz_ is highly recommended,
-but may not be mandatory depending on your particular database backend,
-operating system and time zone. If you encounter an exception querying dates
-or times, please try installing it before filing a bug. It's as simple as:
+True <USE_TZ>` in your settings file. Time zone support uses pytz_, which is
+installed when you install Django.
 
-.. code-block:: console
+.. versionchanged:: 1.11
 
-    $ pip install pytz
+    Older versions don't require ``pytz`` or install it automatically.
 
 .. note::
 
@@ -113,11 +111,8 @@ receives one, it attempts to make it aware by interpreting it in the
 :ref:`default time zone <default-current-time-zone>` and raises a warning.
 
 Unfortunately, during DST transitions, some datetimes don't exist or are
-ambiguous. In such situations, pytz_ raises an exception. Other
-:class:`~datetime.tzinfo` implementations, such as the local time zone used as
-a fallback when pytz_ isn't installed, may raise an exception or return
-inaccurate results. That's why you should always create aware datetime objects
-when time zone support is enabled.
+ambiguous. In such situations, pytz_ raises an exception. That's why you should
+always create aware datetime objects when time zone support is enabled.
 
 In practice, this is rarely an issue. Django gives you aware datetime objects
 in the models and forms, and most often, new datetime objects are created from
@@ -151,10 +146,8 @@ used.
     backwards-compatibility with applications that still rely on local time.
     However, :ref:`as explained above <naive-datetime-objects>`, this isn't
     entirely reliable, and you should always work with aware datetimes in UTC
-    in your own code. For instance, use
-    :meth:`~datetime.datetime.utcfromtimestamp` instead of
-    :meth:`~datetime.datetime.fromtimestamp` -- and don't forget to set
-    ``tzinfo`` to :data:`~django.utils.timezone.utc`.
+    in your own code. For instance, use :meth:`~datetime.datetime.fromtimestamp`
+    and set the ``tz`` parameter to :data:`~django.utils.timezone.utc`.
 
 Selecting the current time zone
 -------------------------------
@@ -180,7 +173,7 @@ Add the following middleware to :setting:`MIDDLEWARE`::
     import pytz
 
     from django.utils import timezone
-    from django.django.utils.deprecation import MiddlewareMixin
+    from django.utils.deprecation import MiddlewareMixin
 
     class TimezoneMiddleware(MiddlewareMixin):
         def process_request(self, request):
@@ -212,7 +205,7 @@ Include a form in ``template.html`` that will ``POST`` to this view:
         <label for="timezone">Time zone:</label>
         <select name="timezone">
             {% for tz in timezones %}
-            <option value="{{ tz }}"{% if tz == TIME_ZONE %} selected="selected"{% endif %}>{{ tz }}</option>
+            <option value="{{ tz }}"{% if tz == TIME_ZONE %} selected{% endif %}>{{ tz }}</option>
             {% endfor %}
         </select>
         <input type="submit" value="Set" />
@@ -252,6 +245,8 @@ Conversion to local time isn't always appropriate -- you may be generating
 output for computers rather than for humans. The following filters and tags,
 provided by the ``tz`` template tag library, allow you to control the time zone
 conversions.
+
+.. highlight:: html+django
 
 Template tags
 -------------
@@ -315,9 +310,9 @@ You can get the name of the current time zone using the
 
     {% get_current_timezone as TIME_ZONE %}
 
-If you enable the ``django.template.context_processors.tz`` context processor,
-each :class:`~django.template.RequestContext` will contain a ``TIME_ZONE``
-variable with the value of ``get_current_timezone()``.
+Alternatively, you can activate the
+:func:`~django.template.context_processors.tz` context processor and
+use the ``TIME_ZONE`` context variable.
 
 Template filters
 ----------------
@@ -360,13 +355,15 @@ For example::
 Forces conversion of a single value to an arbitrary timezone.
 
 The argument must be an instance of a :class:`~datetime.tzinfo` subclass or a
-time zone name. If it is a time zone name, pytz_ is required.
+time zone name.
 
 For example::
 
     {% load tz %}
 
     {{ value|timezone:"Europe/Paris" }}
+
+.. highlight:: python
 
 .. _time-zones-migration-guide:
 
@@ -403,9 +400,8 @@ Code
 ----
 
 The first step is to add :setting:`USE_TZ = True <USE_TZ>` to your settings
-file and install pytz_ (if possible). At this point, things should mostly
-work. If you create naive datetime objects in your code, Django makes them
-aware when necessary.
+file. At this point, things should mostly work. If you create naive datetime
+objects in your code, Django makes them aware when necessary.
 
 However, these conversions may fail around DST transitions, which means you
 aren't getting the full benefits of time zone support yet. Also, you're likely
@@ -434,8 +430,9 @@ traceback by adding the following to your settings file::
 
     import warnings
     warnings.filterwarnings(
-            'error', r"DateTimeField .* received a naive datetime",
-            RuntimeWarning, r'django\.db\.models\.fields')
+        'error', r"DateTimeField .* received a naive datetime",
+        RuntimeWarning, r'django\.db\.models\.fields',
+    )
 
 Fixtures
 --------
@@ -474,11 +471,6 @@ Setup
    Yes. When time zone support is enabled, Django uses a more accurate model
    of local time. This shields you from subtle and unreproducible bugs around
    Daylight Saving Time (DST) transitions.
-
-   In this regard, time zones are comparable to ``unicode`` in Python. At first
-   it's hard. You get encoding and decoding errors. Then you learn the rules.
-   And some problems disappear -- you never get mangled output again when your
-   application receives non-ASCII input.
 
    When you enable time zone support, you'll encounter some errors because
    you're using naive datetimes where Django expects aware datetimes. Such
@@ -520,22 +512,7 @@ Setup
    one year is 2011-02-28 or 2011-03-01, which depends on your business
    requirements.)
 
-3. **Should I install pytz?**
-
-   Yes. Django has a policy of not requiring external dependencies, and for
-   this reason pytz_ is optional. However, it's much safer to install it.
-
-   As soon as you activate time zone support, Django needs a definition of the
-   default time zone. When pytz is available, Django loads this definition
-   from the `tz database`_. This is the most accurate solution. Otherwise, it
-   relies on the difference between local time and UTC, as reported by the
-   operating system, to compute conversions. This is less reliable, especially
-   around DST transitions.
-
-   Furthermore, if you want to support users in more than one time zone, pytz
-   is the reference for time zone definitions.
-
-4. **How do I interact with a database that stores datetimes in local time?**
+3. **How do I interact with a database that stores datetimes in local time?**
 
    Set the :setting:`TIME_ZONE <DATABASE-TIME_ZONE>` option to the appropriate
    time zone for this database in the :setting:`DATABASES` setting.
@@ -650,8 +627,8 @@ Troubleshooting
        >>> local.date()
        datetime.date(2012, 3, 3)
 
-4. **I get an error** "``Are time zone definitions for your database and pytz
-   installed?``" **pytz is installed, so I guess the problem is my database?**
+4. **I get an error** "``Are time zone definitions for your database
+   installed?``"
 
    If you are using MySQL, see the :ref:`mysql-time-zone-definitions` section
    of the MySQL notes for instructions on loading time zone definitions.
@@ -697,8 +674,7 @@ Usage
        >>> timezone.localtime(timezone.now())
        datetime.datetime(2012, 3, 3, 20, 10, 53, 873365, tzinfo=<DstTzInfo 'Europe/Paris' CET+1:00:00 STD>)
 
-   In this example, pytz_ is installed and the current time zone is
-   ``"Europe/Paris"``.
+   In this example, the current time zone is ``"Europe/Paris"``.
 
 3. **How can I see all available time zones?**
 

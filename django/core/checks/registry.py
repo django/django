@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from itertools import chain
 
 from django.utils.itercompat import is_iterable
 
 
-class Tags(object):
+class Tags:
     """
     Built-in tags for internal checks.
     """
@@ -21,7 +18,7 @@ class Tags(object):
     urls = 'urls'
 
 
-class CheckRegistry(object):
+class CheckRegistry:
 
     def __init__(self):
         self.registered_checks = []

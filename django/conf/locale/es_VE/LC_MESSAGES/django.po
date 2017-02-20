@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-03-31 00:58+0000\n"
-"Last-Translator: Leonardo J. Caballero G. <leonardocaballero@gmail.com>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Spanish (Venezuela) (http://www.transifex.com/django/django/"
 "language/es_VE/)\n"
 "MIME-Version: 1.0\n"
@@ -59,6 +59,9 @@ msgstr "Danés"
 
 msgid "German"
 msgstr "Alemán"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "Griego"
@@ -129,6 +132,9 @@ msgstr "Hindi"
 msgid "Croatian"
 msgstr "Croata"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "Húngaro"
 
@@ -189,8 +195,8 @@ msgstr "Maratí"
 msgid "Burmese"
 msgstr "Birmano"
 
-msgid "Norwegian Bokmal"
-msgstr "Noruego Bokmål"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Nepalí"
@@ -287,9 +293,6 @@ msgstr "Archivos estáticos"
 
 msgid "Syndication"
 msgstr "Sindicación"
-
-msgid "Web Design"
-msgstr "Diseño web"
 
 msgid "Enter a valid value."
 msgstr "Introduzca un valor válido."
@@ -430,6 +433,9 @@ msgstr "Entero"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' debe ser un valor entero."
 
+msgid "Big (8 byte) integer"
+msgstr "Entero grande (8 bytes)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' debe ser Verdadero o Falso."
@@ -513,9 +519,6 @@ msgstr "el valor '%(value)s' debe ser un número real."
 msgid "Floating point number"
 msgstr "Número de punto flotante"
 
-msgid "Big (8 byte) integer"
-msgstr "Entero grande (8 bytes)"
-
 msgid "IPv4 address"
 msgstr "Dirección IPv4"
 
@@ -589,6 +592,14 @@ msgstr "Clave foránea (tipo determinado por el campo relacionado)"
 
 msgid "One-to-one relationship"
 msgstr "Relación uno a uno"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "Relación muchos a muchos"

@@ -251,9 +251,6 @@ Foreign keys just have the PK of the linked object as property value.
 ManyToMany-relations are serialized for the model that defines them and are
 represented as a list of PKs.
 
-Date and datetime related types are treated in a special way by the JSON
-serializer to make the format compatible with `ECMA-262`_.
-
 Be aware that not all Django output can be passed unmodified to :mod:`json`.
 For example, if you have some custom type in an object to be serialized, you'll
 have to write a custom :mod:`json` encoder for it. Something like this will
@@ -266,10 +263,51 @@ work::
         def default(self, obj):
             if isinstance(obj, YourCustomType):
                 return force_text(obj)
-            return super(LazyEncoder, self).default(obj)
+            return super().default(obj)
+
+You can then pass ``cls=LazyEncoder`` to the ``serializers.serialize()``
+function::
+
+    from django.core.serializers import serialize
+
+    serialize('json', SomeModel.objects.all(), cls=LazyEncoder)
+
+.. versionchanged:: 1.11
+
+    The ability to use a custom encoder using ``cls=...`` was added.
 
 Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
 </ref/contrib/gis/serializers>`.
+
+``DjangoJSONEncoder``
+~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: django.core.serializers.json.DjangoJSONEncoder
+
+The JSON serializer uses ``DjangoJSONEncoder`` for encoding. A subclass of
+:class:`~json.JSONEncoder`, it handles these additional types:
+
+:class:`~datetime.datetime`
+   A string of the form ``YYYY-MM-DDTHH:mm:ss.sssZ`` or
+   ``YYYY-MM-DDTHH:mm:ss.sss+HH:MM`` as defined in `ECMA-262`_.
+
+:class:`~datetime.date`
+   A string of the form ``YYYY-MM-DD`` as defined in `ECMA-262`_.
+
+:class:`~datetime.time`
+   A string of the form ``HH:MM:ss.sss`` as defined in `ECMA-262`_.
+
+:class:`~datetime.timedelta`
+   A string representing a duration as defined in ISO-8601. For example,
+   ``timedelta(days=1, hours=2, seconds=3.4)`` is represented as
+   ``'P1DT02H00M03.400000S'``.
+
+:class:`~decimal.Decimal`, ``Promise`` (``django.utils.functional.lazy()`` objects), :class:`~uuid.UUID`
+   A string representation of the object.
+
+.. versionchanged:: 1.11
+
+    Support for :class:`~datetime.timedelta` was added.
 
 .. _ecma-262: http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
 

@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015
+# BouRock, 2015-2016
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-11 09:22+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:23+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -123,6 +123,21 @@ msgstr "tuz"
 msgid "hash"
 msgstr "adresleme"
 
+msgid "variety"
+msgstr "çeşitlilik"
+
+msgid "version"
+msgstr "sürüm"
+
+msgid "memory cost"
+msgstr "bellek maliyeti"
+
+msgid "time cost"
+msgstr "zaman maliyeti"
+
+msgid "parallelism"
+msgstr "paralellik"
+
 msgid "work factor"
 msgstr "iş faktörü"
 
@@ -176,17 +191,10 @@ msgstr "Bu kullanıcı için belirli izinler."
 msgid "username"
 msgstr "kullanıcı adı"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Zorunlu. 30 karakter ya da daha az olmalı. Sadece harfler, rakamlar ve @/./"
+"Zorunlu. 150 karakter ya da daha az olmalı. Sadece harfler, rakamlar ve @/./"
 "+/-/_ karakterleri kullanılabilir."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Geçerli bir kullanıcı adı girin. Bu değer sadece harfleri, sayıları ve @/./"
-"+/-/_ karakterlerini içerebilir."
 
 msgid "A user with that username already exists."
 msgstr "Bu kullanıcı adında bir kullanıcı zaten mevcut."
@@ -263,6 +271,20 @@ msgstr "Parolanız tamamıyla sayısal olamaz."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s sitesinde parola sıfırlama"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Geçerli bir kullanıcı adı girin. Bu değer sadece İngilizce harfleri, "
+"sayıları, ve @/./+/-/_ karakterlerini içerebilir."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Geçerli bir kullanıcı adı girin. Bu değer sadece harfleri, sayıları, ve @/./"
+"+/-/_ karakterlerini içerebilir."
 
 msgid "Logged out"
 msgstr "Oturum kapatıldı"

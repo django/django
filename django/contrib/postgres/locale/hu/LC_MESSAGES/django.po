@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-04-13 10:47+0000\n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-07-19 07:41+0000\n"
 "Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
@@ -42,6 +42,9 @@ msgstr "Az érték érvényes JSON kell legyen."
 
 msgid "Could not load JSON data."
 msgstr "JSON adat betöltése sikertelen."
+
+msgid "Input must be a JSON dictionary."
+msgstr "A bemenetnek JSON szótárnak kell lennie."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."

@@ -1,7 +1,4 @@
-from __future__ import unicode_literals
-
 import os
-from unittest import skipUnless
 
 from django.apps import AppConfig, apps
 from django.apps.registry import Apps
@@ -10,8 +7,6 @@ from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.db import models
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import extend_sys_path, isolate_apps
-from django.utils import six
-from django.utils._os import upath
 
 from .default_config_app.apps import CustomConfig
 from .models import SoAlternative, TotallyNormal, new_apps
@@ -33,14 +28,14 @@ SOME_INSTALLED_APPS_NAMES = [
     'django.contrib.auth',
 ] + SOME_INSTALLED_APPS[2:]
 
-HERE = os.path.dirname(upath(__file__))
+HERE = os.path.dirname(__file__)
 
 
 class AppsTests(SimpleTestCase):
 
     def test_singleton_master(self):
         """
-        Ensures that only one master registry can exist.
+        Only one master registry can exist.
         """
         with self.assertRaises(RuntimeError):
             Apps(installed_apps=None)
@@ -78,7 +73,8 @@ class AppsTests(SimpleTestCase):
         with self.assertRaises(ImportError):
             with self.settings(INSTALLED_APPS=['there is no such app']):
                 pass
-        with self.assertRaises(ImportError):
+        msg = "Cannot import 'there is no such app'. Check that 'apps.apps.NoSuchApp.name' is correct."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             with self.settings(INSTALLED_APPS=['apps.apps.NoSuchApp']):
                 pass
 
@@ -178,7 +174,7 @@ class AppsTests(SimpleTestCase):
 
     def test_models_py(self):
         """
-        Tests that the models in the models.py file were loaded correctly.
+        The models in the models.py file were loaded correctly.
         """
         self.assertEqual(apps.get_model("apps", "TotallyNormal"), TotallyNormal)
         with self.assertRaises(LookupError):
@@ -200,10 +196,10 @@ class AppsTests(SimpleTestCase):
             'app_label': "apps",
             'apps': new_apps,
         }
-        meta = type(str("Meta"), tuple(), meta_contents)
+        meta = type("Meta", tuple(), meta_contents)
         body['Meta'] = meta
         body['__module__'] = TotallyNormal.__module__
-        temp_model = type(str("SouthPonies"), (models.Model,), body)
+        temp_model = type("SouthPonies", (models.Model,), body)
         # Make sure it appeared in the right place!
         self.assertListEqual(list(apps.get_app_config("apps").get_models()), old_models)
         with self.assertRaises(LookupError):
@@ -221,15 +217,15 @@ class AppsTests(SimpleTestCase):
         }
 
         body = {}
-        body['Meta'] = type(str("Meta"), tuple(), meta_contents)
+        body['Meta'] = type("Meta", tuple(), meta_contents)
         body['__module__'] = TotallyNormal.__module__
-        type(str("SouthPonies"), (models.Model,), body)
+        type("SouthPonies", (models.Model,), body)
 
         # When __name__ and __module__ match we assume the module
         # was reloaded and issue a warning. This use-case is
         # useful for REPL. Refs #23621.
         body = {}
-        body['Meta'] = type(str("Meta"), tuple(), meta_contents)
+        body['Meta'] = type("Meta", tuple(), meta_contents)
         body['__module__'] = TotallyNormal.__module__
         msg = (
             "Model 'apps.southponies' was already registered. "
@@ -237,15 +233,15 @@ class AppsTests(SimpleTestCase):
             "most notably with related models."
         )
         with self.assertRaisesMessage(RuntimeWarning, msg):
-            type(str("SouthPonies"), (models.Model,), body)
+            type("SouthPonies", (models.Model,), body)
 
         # If it doesn't appear to be a reloaded module then we expect
         # a RuntimeError.
         body = {}
-        body['Meta'] = type(str("Meta"), tuple(), meta_contents)
+        body['Meta'] = type("Meta", tuple(), meta_contents)
         body['__module__'] = TotallyNormal.__module__ + '.whatever'
         with self.assertRaisesMessage(RuntimeError, "Conflicting 'southponies' models in application 'apps':"):
-            type(str("SouthPonies"), (models.Model,), body)
+            type("SouthPonies", (models.Model,), body)
 
     def test_get_containing_app_config_apps_not_ready(self):
         """
@@ -281,7 +277,7 @@ class AppsTests(SimpleTestCase):
         # and LazyModelC shouldn't be waited on until LazyModelB exists.
         self.assertSetEqual(set(apps._pending_operations) - initial_pending, {('apps', 'lazyb')})
 
-        # Test that multiple operations can wait on the same model
+        # Multiple operations can wait on the same model
         apps.lazy_model_operation(test_func, ('apps', 'lazyb'))
 
         class LazyB(models.Model):
@@ -299,7 +295,7 @@ class AppsTests(SimpleTestCase):
         self.assertListEqual(model_classes, [LazyA, LazyB, LazyB, LazyC, LazyA])
 
 
-class Stub(object):
+class Stub:
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
@@ -371,8 +367,11 @@ class AppConfigTests(SimpleTestCase):
         ac = AppConfig('label', Stub(__path__=['a', 'a']))
         self.assertEqual(ac.path, 'a')
 
+    def test_repr(self):
+        ac = AppConfig('label', Stub(__path__=['a']))
+        self.assertEqual(repr(ac), '<AppConfig: label>')
 
-@skipUnless(six.PY3, "Namespace packages sans __init__.py were added in Python 3.3")
+
 class NamespacePackageAppTests(SimpleTestCase):
     # We need nsapp to be top-level so our multiple-paths tests can add another
     # location for it (if its inside a normal package with an __init__.py that
@@ -389,7 +388,7 @@ class NamespacePackageAppTests(SimpleTestCase):
         with extend_sys_path(self.base_location):
             with self.settings(INSTALLED_APPS=['nsapp']):
                 app_config = apps.get_app_config('nsapp')
-                self.assertEqual(app_config.path, upath(self.app_path))
+                self.assertEqual(app_config.path, self.app_path)
 
     def test_multiple_paths(self):
         """
@@ -414,4 +413,4 @@ class NamespacePackageAppTests(SimpleTestCase):
         with extend_sys_path(self.base_location, self.other_location):
             with self.settings(INSTALLED_APPS=['nsapp.apps.NSAppConfig']):
                 app_config = apps.get_app_config('nsapp')
-                self.assertEqual(app_config.path, upath(self.app_path))
+                self.assertEqual(app_config.path, self.app_path)

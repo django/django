@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-03-21 11:58+0000\n"
-"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -63,6 +63,9 @@ msgstr "danès"
 
 msgid "German"
 msgstr "alemany"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "grec"
@@ -133,6 +136,9 @@ msgstr "hindi"
 msgid "Croatian"
 msgstr "croat"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "hongarès"
 
@@ -193,8 +199,8 @@ msgstr "Maratí"
 msgid "Burmese"
 msgstr "Burmès"
 
-msgid "Norwegian Bokmal"
-msgstr "noruec bokmal"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Nepalí"
@@ -291,9 +297,6 @@ msgstr "Arxius estàtics"
 
 msgid "Syndication"
 msgstr "Sindicació"
-
-msgid "Web Design"
-msgstr "Disseny web"
 
 msgid "Enter a valid value."
 msgstr "Introduïu un valor vàlid."
@@ -436,6 +439,9 @@ msgstr "Enter"
 msgid "'%(value)s' value must be an integer."
 msgstr "El valor '%(value)s' ha de ser un nombre enter."
 
+msgid "Big (8 byte) integer"
+msgstr "Enter gran (8 bytes)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "El valor '%(value)s' ha de ser \"True\" o \"False\"."
@@ -519,9 +525,6 @@ msgstr "El valor '%(value)s' ha de ser un número de coma flotant."
 msgid "Floating point number"
 msgstr "Número de coma flotant"
 
-msgid "Big (8 byte) integer"
-msgstr "Enter gran (8 bytes)"
-
 msgid "IPv4 address"
 msgstr "Adreça IPv4"
 
@@ -595,6 +598,14 @@ msgstr "Clau forana (tipus determinat pel camp relacionat)"
 
 msgid "One-to-one relationship"
 msgstr "Inter-relació un-a-un"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "Inter-relació molts-a-molts"

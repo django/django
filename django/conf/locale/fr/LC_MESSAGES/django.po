@@ -2,7 +2,7 @@
 #
 # Translators:
 # charettes <charette.s@gmail.com>, 2012
-# Claude Paroz <claude@2xlibre.net>, 2013-2015
+# Claude Paroz <claude@2xlibre.net>, 2013-2016
 # Claude Paroz <claude@2xlibre.net>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jean-Baptiste Mora, 2014
@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-28 08:57+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-05 14:01+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -63,6 +63,9 @@ msgstr "Dannois"
 
 msgid "German"
 msgstr "Allemand"
+
+msgid "Lower Sorbian"
+msgstr "Bas-sorabe"
 
 msgid "Greek"
 msgstr "Grec"
@@ -133,6 +136,9 @@ msgstr "Hindi"
 msgid "Croatian"
 msgstr "Croate"
 
+msgid "Upper Sorbian"
+msgstr "Haut-sorabe"
+
 msgid "Hungarian"
 msgstr "Hongrois"
 
@@ -193,7 +199,7 @@ msgstr "Marathi"
 msgid "Burmese"
 msgstr "Birman"
 
-msgid "Norwegian Bokmal"
+msgid "Norwegian Bokmål"
 msgstr "Norvégien Bokmal"
 
 msgid "Nepali"
@@ -291,9 +297,6 @@ msgstr "Fichiers statiques"
 
 msgid "Syndication"
 msgstr "Syndication"
-
-msgid "Web Design"
-msgstr "Conception Web"
 
 msgid "Enter a valid value."
 msgstr "Saisissez une valeur valide."
@@ -441,6 +444,9 @@ msgstr "Entier"
 msgid "'%(value)s' value must be an integer."
 msgstr "La valeur « %(value)s » doit être un nombre entier."
 
+msgid "Big (8 byte) integer"
+msgstr "Grand entier (8 octets)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "La valeur « %(value)s » doit être soit True (vrai), soit False (faux)."
@@ -524,9 +530,6 @@ msgstr "La valeur « %(value)s » doit être un nombre à virgule flottante."
 msgid "Floating point number"
 msgstr "Nombre à virgule flottante"
 
-msgid "Big (8 byte) integer"
-msgstr "Grand entier (8 octets)"
-
 msgid "IPv4 address"
 msgstr "Adresse IPv4"
 
@@ -602,6 +605,14 @@ msgstr "Clé étrangère (type défini par le champ lié)"
 
 msgid "One-to-one relationship"
 msgstr "Relation un à un"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "Relation %(from)s-%(to)s"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "Relations %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Relation plusieurs à plusieurs"

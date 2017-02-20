@@ -1,14 +1,14 @@
-from unittest import skipUnless
+import json
+import re
 
 from django.contrib.gis import forms
-from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import GEOSGeometry
 from django.forms import ValidationError
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
+from django.test.utils import patch_logger
 from django.utils.html import escape
 
 
-@skipUnless(HAS_GDAL, "GeometryFieldTest needs GDAL support")
 @skipUnlessDBFeature("gis_enabled")
 class GeometryFieldTest(SimpleTestCase):
 
@@ -51,12 +51,17 @@ class GeometryFieldTest(SimpleTestCase):
         # By default, all geometry types are allowed.
         fld = forms.GeometryField()
         for wkt in ('POINT(5 23)', 'MULTIPOLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'LINESTRING(0 0, 1 1)'):
-            self.assertEqual(GEOSGeometry(wkt), fld.clean(wkt))
+            # `to_python` uses the SRID of OpenLayersWidget if the converted
+            # value doesn't have an SRID itself.
+            self.assertEqual(GEOSGeometry(wkt, srid=fld.widget.map_srid), fld.clean(wkt))
 
         pnt_fld = forms.GeometryField(geom_type='POINT')
-        self.assertEqual(GEOSGeometry('POINT(5 23)'), pnt_fld.clean('POINT(5 23)'))
+        self.assertEqual(GEOSGeometry('POINT(5 23)', srid=pnt_fld.widget.map_srid), pnt_fld.clean('POINT(5 23)'))
         # a WKT for any other geom_type will be properly transformed by `to_python`
-        self.assertEqual(GEOSGeometry('LINESTRING(0 0, 1 1)'), pnt_fld.to_python('LINESTRING(0 0, 1 1)'))
+        self.assertEqual(
+            GEOSGeometry('LINESTRING(0 0, 1 1)', srid=pnt_fld.widget.map_srid),
+            pnt_fld.to_python('LINESTRING(0 0, 1 1)')
+        )
         # but rejected by `clean`
         with self.assertRaises(forms.ValidationError):
             pnt_fld.clean('LINESTRING(0 0, 1 1)')
@@ -69,7 +74,7 @@ class GeometryFieldTest(SimpleTestCase):
         fld = forms.GeometryField()
         # to_python returns the same GEOSGeometry for a WKT
         for wkt in ('POINT(5 23)', 'MULTIPOLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'LINESTRING(0 0, 1 1)'):
-            self.assertEqual(GEOSGeometry(wkt), fld.to_python(wkt))
+            self.assertEqual(GEOSGeometry(wkt, srid=fld.widget.map_srid), fld.to_python(wkt))
         # but raises a ValidationError for any other string
         for wkt in ('POINT(5)', 'MULTI   POLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'BLAH(0 0, 1 1)'):
             with self.assertRaises(forms.ValidationError):
@@ -81,15 +86,57 @@ class GeometryFieldTest(SimpleTestCase):
 
         form = PointForm()
         cleaned_pt = form.fields['pt'].clean('POINT(5 23)')
-        self.assertEqual(cleaned_pt, GEOSGeometry('POINT(5 23)'))
+        self.assertEqual(cleaned_pt, GEOSGeometry('POINT(5 23)', srid=4326))
         self.assertEqual(4326, cleaned_pt.srid)
 
         point = GEOSGeometry('SRID=4326;POINT(5 23)')
         form = PointForm(data={'pt': 'POINT(5 23)'}, initial={'pt': point})
         self.assertFalse(form.has_changed())
 
+    def test_field_string_value(self):
+        """
+        Initialization of a geometry field with a valid/empty/invalid string.
+        Only the invalid string should trigger an error log entry.
+        """
+        class PointForm(forms.Form):
+            pt1 = forms.PointField(srid=4326)
+            pt2 = forms.PointField(srid=4326)
+            pt3 = forms.PointField(srid=4326)
 
-@skipUnless(HAS_GDAL, "SpecializedFieldTest needs GDAL support")
+        form = PointForm({
+            'pt1': 'SRID=4326;POINT(7.3 44)',  # valid
+            'pt2': '',  # empty
+            'pt3': 'PNT(0)',  # invalid
+        })
+
+        with patch_logger('django.contrib.gis', 'error') as logger_calls:
+            output = str(form)
+
+        # The first point can't use assertInHTML() due to non-deterministic
+        # ordering of the rendered dictionary.
+        pt1_serialized = re.search(r'<textarea [^>]*>({[^<]+})<', output).groups()[0]
+        pt1_json = json.loads(pt1_serialized.replace('&quot;', '"'))
+        self.assertEqual(pt1_json, {'coordinates': [7.3, 44.0], 'type': 'Point'})
+
+        self.assertInHTML(
+            '<textarea id="id_pt2" class="vSerializedField required" cols="150"'
+            ' rows="10" name="pt2"></textarea>',
+            output
+        )
+        self.assertInHTML(
+            '<textarea id="id_pt3" class="vSerializedField required" cols="150"'
+            ' rows="10" name="pt3"></textarea>',
+            output
+        )
+        # Only the invalid PNT(0) should trigger an error log entry
+        self.assertEqual(len(logger_calls), 1)
+        self.assertEqual(
+            logger_calls[0],
+            "Error creating geometry from value 'PNT(0)' (String input "
+            "unrecognized as WKT EWKT, and HEXEWKB.)"
+        )
+
+
 @skipUnlessDBFeature("gis_enabled")
 class SpecializedFieldTest(SimpleTestCase):
     def setUp(self):
@@ -161,7 +208,7 @@ class SpecializedFieldTest(SimpleTestCase):
 
         self.assertIn('<textarea ', rendered)
         self.assertIn('required', rendered)
-        self.assertIn(geom.wkt, rendered)
+        self.assertIn(escape(geom.json), rendered)
 
     # map_srid in operlayers.html template must not be localized.
     @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
@@ -196,10 +243,10 @@ class SpecializedFieldTest(SimpleTestCase):
 
     def test_linestringfield(self):
         class LineStringForm(forms.Form):
-            l = forms.LineStringField()
+            f = forms.LineStringField()
 
         geom = self.geometries['linestring']
-        form = LineStringForm(data={'l': geom})
+        form = LineStringForm(data={'f': geom})
         self.assertTextarea(geom, form.as_p())
         self.assertMapWidget(form)
         self.assertFalse(LineStringForm().is_valid())
@@ -209,10 +256,10 @@ class SpecializedFieldTest(SimpleTestCase):
 
     def test_multilinestringfield(self):
         class LineStringForm(forms.Form):
-            l = forms.MultiLineStringField()
+            f = forms.MultiLineStringField()
 
         geom = self.geometries['multilinestring']
-        form = LineStringForm(data={'l': geom})
+        form = LineStringForm(data={'f': geom})
         self.assertTextarea(geom, form.as_p())
         self.assertMapWidget(form)
         self.assertFalse(LineStringForm().is_valid())
@@ -260,7 +307,6 @@ class SpecializedFieldTest(SimpleTestCase):
             self.assertFalse(GeometryForm(data={'g': invalid.wkt}).is_valid())
 
 
-@skipUnless(HAS_GDAL, "OSMWidgetTest needs GDAL support")
 @skipUnlessDBFeature("gis_enabled")
 class OSMWidgetTest(SimpleTestCase):
     def setUp(self):
@@ -276,7 +322,7 @@ class OSMWidgetTest(SimpleTestCase):
         form = PointForm(data={'p': geom})
         rendered = form.as_p()
 
-        self.assertIn("OpenStreetMap (Mapnik)", rendered)
+        self.assertIn("ol.source.OSM()", rendered)
         self.assertIn("id: 'id_p',", rendered)
 
     def test_default_lat_lon(self):
@@ -302,7 +348,6 @@ class OSMWidgetTest(SimpleTestCase):
                 rendered)
 
 
-@skipUnless(HAS_GDAL, "CustomGeometryWidgetTest needs GDAL support")
 @skipUnlessDBFeature("gis_enabled")
 class CustomGeometryWidgetTest(SimpleTestCase):
 
@@ -333,5 +378,4 @@ class CustomGeometryWidgetTest(SimpleTestCase):
 
         form = PointForm(data={'p': point.json})
         self.assertTrue(form.is_valid())
-        # Ensure that resulting geometry has srid set
         self.assertEqual(form.cleaned_data['p'].srid, 4326)

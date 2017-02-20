@@ -134,11 +134,11 @@ class CommonAncestor(models.Model):
 
 
 class FirstParent(CommonAncestor):
-    first_ancestor = models.OneToOneField(CommonAncestor, models.SET_NULL, primary_key=True, parent_link=True)
+    first_ancestor = models.OneToOneField(CommonAncestor, models.CASCADE, primary_key=True, parent_link=True)
 
 
 class SecondParent(CommonAncestor):
-    second_ancestor = models.OneToOneField(CommonAncestor, models.SET_NULL, primary_key=True, parent_link=True)
+    second_ancestor = models.OneToOneField(CommonAncestor, models.CASCADE, primary_key=True, parent_link=True)
 
 
 class Child(FirstParent, SecondParent):

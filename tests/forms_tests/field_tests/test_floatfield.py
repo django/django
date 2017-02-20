@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.forms import FloatField, NumberInput, ValidationError
 from django.test import SimpleTestCase
 from django.utils import formats, translation

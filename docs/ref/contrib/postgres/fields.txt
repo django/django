@@ -104,7 +104,7 @@ We will use the following example model::
         name = models.CharField(max_length=200)
         tags = ArrayField(models.CharField(max_length=200), blank=True)
 
-        def __str__(self):  # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
 .. fieldlookup:: arrayfield.contains
@@ -250,41 +250,57 @@ At present using :attr:`~django.db.models.Field.db_index` will create a
 A more useful index is a ``GIN`` index, which you should create using a
 :class:`~django.db.migrations.operations.RunSQL` operation.
 
+``CIText`` fields
+=================
+
+.. class:: CIText(**options)
+
+    .. versionadded:: 1.11
+
+    A mixin to create case-insensitive text fields backed by the citext_ type.
+    Read about `the performance considerations`_ prior to using it.
+
+    To use ``citext``, use the :class:`.CITextExtension` operation to
+    :ref:`setup the citext extension <create-postgresql-extensions>` in
+    PostgreSQL before the first ``CreateModel`` migration operation.
+
+    Several fields that use the mixin are provided:
+
+.. class:: CICharField(**options)
+.. class:: CIEmailField(**options)
+.. class:: CITextField(**options)
+
+    These fields subclass :class:`~django.db.models.CharField`,
+    :class:`~django.db.models.EmailField`, and
+    :class:`~django.db.models.TextField`, respectively.
+
+    ``max_length`` won't be enforced in the database since ``citext`` behaves
+    similar to PostgreSQL's ``text`` type.
+
+    .. _citext: https://www.postgresql.org/docs/current/static/citext.html
+    .. _the performance considerations: https://www.postgresql.org/docs/current/static/citext.html#AEN169274
+
 ``HStoreField``
 ===============
 
 .. class:: HStoreField(**options)
 
-    A field for storing mappings of strings to strings. The Python data type
-    used is a ``dict``.
+    A field for storing key-value pairs. The Python data type used is a
+    ``dict``. Keys must be strings, and values may be either strings or nulls
+    (``None`` in Python).
 
     To use this field, you'll need to:
 
     1. Add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
-    2. Setup the hstore extension in PostgreSQL before the first ``CreateModel``
-       or ``AddField`` operation by adding a migration with the
-       :class:`~django.contrib.postgres.operations.HStoreExtension` operation.
-       For example::
-
-            from django.contrib.postgres.operations import HStoreExtension
-
-            class Migration(migrations.Migration):
-                ...
-
-                operations = [
-                    HStoreExtension(),
-                    ...
-                ]
-
-       Creating the extension requires a database user with superuser
-       privileges. If the Django database user doesn't have superuser
-       privileges, you'll have to create the extension outside of Django
-       migrations with a user that has the appropriate privileges. In that
-       case, connect to your Django database and run the query
-       ``CREATE EXTENSION IF NOT EXISTS hstore;``
+    2. :ref:`Setup the hstore extension <create-postgresql-extensions>` in
+       PostgreSQL.
 
     You'll see an error like ``can't adapt type 'dict'`` if you skip the first
     step, or ``type "hstore" does not exist`` if you skip the second.
+
+    .. versionchanged:: 1.11
+
+        Added the ability to store nulls. Previously, they were cast to strings.
 
 .. note::
 
@@ -307,7 +323,7 @@ We will use the following example model::
         name = models.CharField(max_length=200)
         data = HStoreField()
 
-        def __str__(self):  # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
 .. fieldlookup:: hstorefield.key
@@ -458,17 +474,32 @@ using in conjunction with lookups on
 ``JSONField``
 =============
 
-.. class:: JSONField(**options)
+.. class:: JSONField(encoder=None, **options)
 
     A field for storing JSON encoded data. In Python the data is represented in
     its Python native format: dictionaries, lists, strings, numbers, booleans
     and ``None``.
 
-    If you want to store other data types, you'll need to serialize them first.
-    For example, you might cast a ``datetime`` to a string. You might also want
-    to convert the string back to a ``datetime`` when you retrieve the data
-    from the database. There are some third-party ``JSONField`` implementations
-    which do this sort of thing automatically.
+    .. attribute:: encoder
+
+        .. versionadded:: 1.11
+
+        An optional JSON-encoding class to serialize data types not supported
+        by the standard JSON serializer (``datetime``, ``uuid``, etc.). For
+        example, you can use the
+        :class:`~django.core.serializers.json.DjangoJSONEncoder` class or any
+        other :py:class:`json.JSONEncoder` subclass.
+
+        When the value is retrieved from the database, it will be in the format
+        chosen by the custom encoder (most often a string), so you'll need to
+        take extra steps to convert the value back to the initial data type
+        (:meth:`Model.from_db() <django.db.models.Model.from_db>` and
+        :meth:`Field.from_db_value() <django.db.models.Field.from_db_value>`
+        are two possible hooks for that purpose). Your deserialization may need
+        to account for the fact that you can't be certain of the input type.
+        For example, you run the risk of returning a ``datetime`` that was
+        actually a string that just happened to be in the same format chosen
+        for ``datetime``\s.
 
     If you give the field a :attr:`~django.db.models.Field.default`, ensure
     it's a callable such as ``dict`` (for an empty default) or a callable that
@@ -500,7 +531,7 @@ We will use the following example model::
         name = models.CharField(max_length=200)
         data = JSONField()
 
-        def __str__(self):  # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
 .. fieldlookup:: jsonfield.key
@@ -659,7 +690,7 @@ model::
         ages = IntegerRangeField()
         start = models.DateTimeField()
 
-        def __str__(self):  # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
 We will also use the following example objects::
@@ -697,14 +728,11 @@ operators ``@>``, ``<@``, and ``&&`` respectively.
     >>> Event.objects.filter(ages__contained_by=NumericRange(0, 15))
     <QuerySet [<Event: Soft play>]>
 
-.. versionadded 1.9
-
-    The `contained_by` lookup is also available on the non-range field types:
-    :class:`~django.db.models.fields.IntegerField`,
-    :class:`~django.db.models.fields.BigIntegerField`,
-    :class:`~django.db.models.fields.FloatField`,
-    :class:`~django.db.models.fields.DateField`, and
-    :class:`~django.db.models.fields.DateTimeField`. For example::
+The ``contained_by`` lookup is also available on the non-range field types:
+:class:`~django.db.models.IntegerField`,
+:class:`~django.db.models.BigIntegerField`,
+:class:`~django.db.models.FloatField`, :class:`~django.db.models.DateField`,
+and :class:`~django.db.models.DateTimeField`. For example::
 
     >>> from psycopg2.extras import DateTimeTZRange
     >>> Event.objects.filter(start__contained_by=DateTimeTZRange(

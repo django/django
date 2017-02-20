@@ -3,13 +3,13 @@
 from django.conf import settings
 from django.conf.urls.i18n import is_language_prefix_patterns_used
 from django.http import HttpResponseRedirect
-from django.middleware.exception import ExceptionMiddleware
 from django.urls import get_script_prefix, is_valid_path
 from django.utils import translation
 from django.utils.cache import patch_vary_headers
+from django.utils.deprecation import MiddlewareMixin
 
 
-class LocaleMiddleware(ExceptionMiddleware):
+class LocaleMiddleware(MiddlewareMixin):
     """
     This is a very simple middleware that parses a request
     and decides what translation object to install in the current
@@ -18,17 +18,6 @@ class LocaleMiddleware(ExceptionMiddleware):
     is available, of course).
     """
     response_redirect_class = HttpResponseRedirect
-
-    def __init__(self, get_response=None):
-        # This override makes get_response optional during the
-        # MIDDLEWARE_CLASSES deprecation.
-        super(LocaleMiddleware, self).__init__(get_response)
-
-    def __call__(self, request):
-        response = self.process_request(request)
-        if not response:
-            response = super(LocaleMiddleware, self).__call__(request)
-        return self.process_response(request, response)
 
     def process_request(self, request):
         urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
@@ -46,7 +35,10 @@ class LocaleMiddleware(ExceptionMiddleware):
         urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
         i18n_patterns_used, prefixed_default_language = is_language_prefix_patterns_used(urlconf)
 
-        if response.status_code == 404 and not language_from_path and i18n_patterns_used:
+        if (response.status_code == 404 and not language_from_path and
+                i18n_patterns_used and prefixed_default_language):
+            # Maybe the language code is missing in the URL? Try adding the
+            # language prefix and redirecting to that URL.
             language_path = '/%s%s' % (language, request.path_info)
             path_valid = is_valid_path(language_path, urlconf)
             path_needs_slash = (

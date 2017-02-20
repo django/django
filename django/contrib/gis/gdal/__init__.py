@@ -24,12 +24,6 @@
  library name for the current OS. The default library path may be overridden
  by setting `GDAL_LIBRARY_PATH` in your settings with the path to the GDAL C
  library on your system.
-
- GDAL links to a large number of external libraries that consume RAM when
- loaded.  Thus, it may desirable to disable GDAL on systems with limited
- RAM resources -- this may be accomplished by setting `GDAL_LIBRARY_PATH`
- to a non-existent file location (e.g., `GDAL_LIBRARY_PATH='/null/path'`;
- setting to None/False/'' will not work as a string must be given).
 """
 from django.contrib.gis.gdal.envelope import Envelope
 from django.contrib.gis.gdal.error import (  # NOQA

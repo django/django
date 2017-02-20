@@ -5,14 +5,15 @@
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Eric Hamiter <ehamiter@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Pouya Abbassi, 2016
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-11-18 21:44+0000\n"
-"Last-Translator: Ali Vakilzade <ali.vakilzade@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-08-16 13:54+0000\n"
+"Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -25,7 +26,7 @@ msgid "Administrative Documentation"
 msgstr "مستندات مدیریت"
 
 msgid "Home"
-msgstr "آغازه"
+msgstr "خانه"
 
 msgid "Documentation"
 msgstr "مستندات"
@@ -41,6 +42,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"برای نصب بوکمارکلت‌ها، لینک را به نوار‌ابزار بوکمارک خود بکشید، یا راست‌کلیک "
+"کنید و به بوکمارکهای خود اضافه کنید. حالا شما میتوانید از هر صفحه ای در سایت "
+"بوکمارکلت انتخاب کنید."
 
 msgid "Documentation for this page"
 msgstr "مستندات این صفحه"
@@ -64,6 +68,8 @@ msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
 msgstr ""
+"فیلترها عملیاتی هستند که میتوان روی متغیرها و قالب‌ها اعمال شود تا خروجی را "
+"تغییر دهند."
 
 msgid "Models"
 msgstr "مدل‌ها"
@@ -73,6 +79,9 @@ msgid ""
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
 msgstr ""
+"مدلها توضحاتی هستند از اشیایی در سیستم و فیلدهای مرتبط. هر مدل یک لیست از "
+"فیلد یک لیست از فیلدها را دارد که میتواند از طریق متغیرهای قالب در دسترس "
+"قرار بگیرد."
 
 msgid "Views"
 msgstr "نمایش ها"
@@ -82,6 +91,8 @@ msgid ""
 "template is used to generate the page and which objects are available to "
 "that template."
 msgstr ""
+"هر صفحه در وبسایت عمومی با یک نمایش ساخته میشود. نمایش تعیین میکند کدام قالب "
+"برای ساخت صفحه استفاده شود و کدام شیء برای قالب در دسترس باشد."
 
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr "ابزار مرورگر خود را به سرعت قابلیت اداری دسترسی داشته باشید."
@@ -94,11 +105,15 @@ msgid ""
 "The admin documentation system requires Python's <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
+"سیستم مستندات ادمین نیازمند کتابخانه‌ی <a href=\"%(link)s\">docutils</a> "
+"پایتون است."
 
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
 msgstr ""
+"لطفا از مدیر خود درخواست کنید تا کتابخانه‌ی <a href=\"%(link)s\">docutils</a> "
+"را نصب کند."
 
 #, python-format
 msgid "Model: %(name)s"
@@ -117,15 +132,15 @@ msgid "Description"
 msgstr "توضیحات"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "متدهایی با آرگومانها"
 
 msgid "Method"
-msgstr ""
+msgstr "متد"
 
 msgid "Arguments"
-msgstr ""
+msgstr "آرکومانها"
 
-msgid "Back to Model Documentation"
+msgid "Back to Model documentation"
 msgstr "برگشت به مستندات مدل"
 
 msgid "Model documentation"
@@ -145,9 +160,10 @@ msgstr "قالب: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "قالب: «%(name)s»"
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
-msgstr ""
+msgstr "مسیر جستجو برای قالب \"%(name)s\":"
 
 msgid "(does not exist)"
 msgstr "(وجود ندارد)"
@@ -159,7 +175,7 @@ msgid "Template filters"
 msgstr "فیلترهای قالب"
 
 msgid "Template filter documentation"
-msgstr ""
+msgstr "مستندات فیلتر قالب"
 
 msgid "Built-in filters"
 msgstr "فیلترهای از اول موجود"
@@ -169,6 +185,8 @@ msgid ""
 "To use these filters, put <code>%(code)s</code> in your template before "
 "using the filter."
 msgstr ""
+"برای استفاده از این فیلترها، کد <code>%(code)s</code> را قبل از استفاده از "
+"فیلتر، در قالب قرار دهید."
 
 msgid "Template tags"
 msgstr "برچسب‌های قالب"
@@ -184,10 +202,12 @@ msgid ""
 "To use these tags, put <code>%(code)s</code> in your template before using "
 "the tag."
 msgstr ""
+"برای استفاده از این تگ‌ها، کد <code>%(code)s</code> را قبل از استفاده از تگ، "
+"در قالب قرار دهید."
 
 #, python-format
 msgid "View: %(name)s"
-msgstr ""
+msgstr "نمایش: %(name)s"
 
 msgid "Context:"
 msgstr "زمینه:"
@@ -195,24 +215,24 @@ msgstr "زمینه:"
 msgid "Templates:"
 msgstr "قالب‌ها:"
 
-msgid "Back to Views Documentation"
-msgstr ""
+msgid "Back to View documentation"
+msgstr "برگشت به مستندات نمایش"
 
 msgid "View documentation"
 msgstr "مشاهده مستندات"
 
 msgid "Jump to namespace"
-msgstr ""
+msgstr "پرش به فضای نام"
 
 msgid "Empty namespace"
-msgstr ""
+msgstr "فضای نام خالی"
 
 #, python-format
 msgid "Views by namespace %(name)s"
-msgstr ""
+msgstr "نمایشها بر اساس فضای نام %(name)s"
 
 msgid "Views by empty namespace"
-msgstr ""
+msgstr "نمایشها بر اساس فضای نام خالی"
 
 #, python-format
 msgid ""
@@ -220,6 +240,8 @@ msgid ""
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
+"\n"
+"نمایش تابع: <code>%(full_name)s</code>. نام: <code>%(url_name)s</code>.\n"
 
 msgid "Boolean (Either True or False)"
 msgstr "بولی (درست یا غلط)"
@@ -239,7 +261,7 @@ msgstr "نمایش:"
 
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr ""
+msgstr "برنامه‌ی %(app_label)r پیدا نشد"
 
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"

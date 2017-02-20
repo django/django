@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.core.management import call_command
 from django.db import connection
 from django.test import TransactionTestCase, skipUnlessDBFeature
@@ -27,15 +25,13 @@ class MigrateTests(TransactionTestCase):
     def test_migrate_gis(self):
         """
         Tests basic usage of the migrate command when a model uses Geodjango
-        fields. Regression test for ticket #22001:
-        https://code.djangoproject.com/ticket/22001
+        fields (#22001).
 
         It's also used to showcase an error in migrations where spatialite is
         enabled and geo tables are renamed resulting in unique constraint
-        failure on geometry_columns. Regression for ticket #23030:
-        https://code.djangoproject.com/ticket/23030
+        failure on geometry_columns (#23030).
         """
-        # Make sure the right tables exist
+        # The right tables exist
         self.assertTableExists("gis_migrations_neighborhood")
         self.assertTableExists("gis_migrations_household")
         self.assertTableExists("gis_migrations_family")
@@ -43,7 +39,7 @@ class MigrateTests(TransactionTestCase):
             self.assertTableExists("gis_migrations_heatmap")
         # Unmigrate everything
         call_command("migrate", "gis_migrations", "zero", verbosity=0)
-        # Make sure it's all gone
+        # All tables are gone
         self.assertTableNotExists("gis_migrations_neighborhood")
         self.assertTableNotExists("gis_migrations_household")
         self.assertTableNotExists("gis_migrations_family")

@@ -128,7 +128,7 @@ rather than asking broad tech-support questions. If you need help with your
 particular Django setup, try the |django-users| mailing list or the `#django
 IRC channel`_ instead.
 
-.. _ticket system: https://code.djangoproject.com/newticket?component=Documentation
+.. _ticket system: https://code.djangoproject.com/
 .. _#django IRC channel: irc://irc.freenode.net/django
 
 In plain text
@@ -185,11 +185,6 @@ You can get a local copy of the HTML documentation following a few easy steps:
         make.bat html
 
 * The HTML documentation will be placed in ``docs/_build/html``.
-
-.. note::
-
-    Generation of the Django documentation will work with Sphinx version 0.6
-    or newer, but we recommend going straight to Sphinx 1.0.2 or newer.
 
 __ http://sphinx-doc.org/
 __ https://www.gnu.org/software/make/

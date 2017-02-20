@@ -116,6 +116,7 @@ checkin
 Checkin
 checksum
 checksums
+Cheltenham
 clearable
 clearsessions
 clickable
@@ -206,7 +207,7 @@ discoverable
 Disqus
 distro
 divisibleby
-django
+Django
 djangojs
 djangonaut
 djangoproject
@@ -239,7 +240,6 @@ environ
 escapejs
 esque
 Ess
-Etag
 ETag
 ETags
 exe
@@ -254,6 +254,7 @@ fallback
 fallbacks
 faq
 FastCGI
+favicon
 fieldset
 fieldsets
 filename
@@ -333,12 +334,12 @@ hoc
 Hoerner
 Holovaty
 Holscher
+Holtermann
 Homebrew
 honeypot
 Honza
 hostname
 hostnames
-howto
 hstore
 html
 http
@@ -451,6 +452,7 @@ lowercasing
 lt
 lte
 Luhn
+macOS
 Magee
 makemessages
 makemigrations
@@ -461,6 +463,7 @@ Marczewski
 Marino
 Markus
 MBR
+Meetup
 memcache
 memcached
 mentorship
@@ -498,6 +501,7 @@ multiline
 multilinestring
 multipart
 multipolygon
+multitenancy
 multithreaded
 multithreading
 Mumbai
@@ -593,6 +597,7 @@ prefetches
 prefetching
 prefork
 preforked
+preload
 prepend
 prepended
 prepending
@@ -668,6 +673,7 @@ releasers
 reloader
 removetags
 renderer
+renderers
 repo
 reportable
 reprojection
@@ -840,6 +846,7 @@ Tomek
 toolbar
 toolkits
 toolset
+Tox
 trac
 tracebacks
 transactional
@@ -946,13 +953,7 @@ virtualenv
 virtualenvs
 virtualized
 Votizen
-webapps
-webkit
-WebKit
 Weblog
-webpages
-webserver
-webservers
 whatsnext
 whitelist
 whitelisted

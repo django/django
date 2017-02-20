@@ -1,34 +1,31 @@
-from __future__ import unicode_literals
-
 import difflib
-import errno
 import json
-import os
 import posixpath
-import socket
 import sys
 import threading
 import unittest
-import warnings
 from collections import Counter
 from contextlib import contextmanager
 from copy import copy
 from functools import wraps
 from unittest.util import safe_repr
+from urllib.parse import unquote, urljoin, urlparse, urlsplit
+from urllib.request import url2pathname
 
 from django.apps import apps
 from django.conf import settings
 from django.core import mail
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import ValidationError
 from django.core.files import locks
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.management.sql import emit_post_migrate_signal
-from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
+from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
+from django.http.request import split_domain_port, validate_host
 from django.test.client import Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import setting_changed, template_rendered
@@ -36,14 +33,8 @@ from django.test.utils import (
     CaptureQueriesContext, ContextList, compare_xml, modify_settings,
     override_settings,
 )
-from django.utils import six
 from django.utils.decorators import classproperty
-from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
-from django.utils.six.moves.urllib.parse import (
-    unquote, urljoin, urlparse, urlsplit, urlunsplit,
-)
-from django.utils.six.moves.urllib.request import url2pathname
 from django.views.static import serve
 
 __all__ = ('TestCase', 'TransactionTestCase',
@@ -66,7 +57,7 @@ def assert_and_parse_html(self, html, user_msg, msg):
     try:
         dom = parse_html(html)
     except HTMLParseError as e:
-        standardMsg = '%s\n%s' % (msg, e.msg)
+        standardMsg = '%s\n%s' % (msg, e)
         self.fail(self._formatMessage(user_msg, standardMsg))
     return dom
 
@@ -75,10 +66,10 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
     def __init__(self, test_case, num, connection):
         self.test_case = test_case
         self.num = num
-        super(_AssertNumQueriesContext, self).__init__(connection)
+        super().__init__(connection)
 
     def __exit__(self, exc_type, exc_value, traceback):
-        super(_AssertNumQueriesContext, self).__exit__(exc_type, exc_value, traceback)
+        super().__exit__(exc_type, exc_value, traceback)
         if exc_type is not None:
             return
         executed = len(self)
@@ -93,7 +84,7 @@ class _AssertNumQueriesContext(CaptureQueriesContext):
         )
 
 
-class _AssertTemplateUsedContext(object):
+class _AssertTemplateUsedContext:
     def __init__(self, test_case, template_name):
         self.test_case = test_case
         self.template_name = template_name
@@ -139,7 +130,7 @@ class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
         return '%s was rendered.' % self.template_name
 
 
-class _CursorFailure(object):
+class _CursorFailure:
     def __init__(self, cls_name, wrapped):
         self.cls_name = cls_name
         self.wrapped = wrapped
@@ -166,7 +157,7 @@ class SimpleTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(SimpleTestCase, cls).setUpClass()
+        super().setUpClass()
         if cls._overridden_settings:
             cls._cls_overridden_context = override_settings(**cls._overridden_settings)
             cls._cls_overridden_context.enable()
@@ -177,6 +168,7 @@ class SimpleTestCase(unittest.TestCase):
             for alias in connections:
                 connection = connections[alias]
                 connection.cursor = _CursorFailure(cls.__name__, connection.cursor)
+                connection.chunked_cursor = _CursorFailure(cls.__name__, connection.chunked_cursor)
 
     @classmethod
     def tearDownClass(cls):
@@ -184,13 +176,14 @@ class SimpleTestCase(unittest.TestCase):
             for alias in connections:
                 connection = connections[alias]
                 connection.cursor = connection.cursor.wrapped
+                connection.chunked_cursor = connection.chunked_cursor.wrapped
         if hasattr(cls, '_cls_modified_context'):
             cls._cls_modified_context.disable()
             delattr(cls, '_cls_modified_context')
         if hasattr(cls, '_cls_overridden_context'):
             cls._cls_overridden_context.disable()
             delattr(cls, '_cls_overridden_context')
-        super(SimpleTestCase, cls).tearDownClass()
+        super().tearDownClass()
 
     def __call__(self, result=None):
         """
@@ -210,7 +203,7 @@ class SimpleTestCase(unittest.TestCase):
             except Exception:
                 result.addError(self, sys.exc_info())
                 return
-        super(SimpleTestCase, self).__call__(result)
+        super().__call__(result)
         if not skipped:
             try:
                 self._post_teardown()
@@ -245,7 +238,7 @@ class SimpleTestCase(unittest.TestCase):
         return modify_settings(**kwargs)
 
     def assertRedirects(self, response, expected_url, status_code=302,
-                        target_status_code=200, host=None, msg_prefix='',
+                        target_status_code=200, msg_prefix='',
                         fetch_redirect_response=True):
         """Asserts that a response redirected to a specific URL, and that the
         redirect URL can be loaded.
@@ -254,12 +247,6 @@ class SimpleTestCase(unittest.TestCase):
         TestClient to do a request (use fetch_redirect_response=False to check
         such links without fetching them).
         """
-        if host is not None:
-            warnings.warn(
-                "The host argument is deprecated and no longer used by assertRedirects",
-                RemovedInDjango20Warning, stacklevel=2
-            )
-
         if msg_prefix:
             msg_prefix += ": "
 
@@ -303,6 +290,17 @@ class SimpleTestCase(unittest.TestCase):
                 path = urljoin(response.request['PATH_INFO'], path)
 
             if fetch_redirect_response:
+                # netloc might be empty, or in cases where Django tests the
+                # HTTP scheme, the convention is for netloc to be 'testserver'.
+                # Trust both as "internal" URLs here.
+                domain, port = split_domain_port(netloc)
+                if domain and not validate_host(domain, settings.ALLOWED_HOSTS):
+                    raise ValueError(
+                        "The test client is unable to fetch remote URLs (got %s). "
+                        "If the host is served by Django, add '%s' to ALLOWED_HOSTS. "
+                        "Otherwise, use assertRedirects(..., fetch_redirect_response=False)."
+                        % (url, domain)
+                    )
                 redirect_response = response.client.get(path, QueryDict(query), secure=(scheme == 'https'))
 
                 # Get the redirection page, using the same client that was used
@@ -312,19 +310,6 @@ class SimpleTestCase(unittest.TestCase):
                     msg_prefix + "Couldn't retrieve redirection page '%s': response code was %d (expected %d)"
                     % (path, redirect_response.status_code, target_status_code)
                 )
-
-        if url != expected_url:
-            # For temporary backwards compatibility, try to compare with a relative url
-            e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
-            relative_url = urlunsplit(('', '', e_path, e_query, e_fragment))
-            if url == relative_url:
-                warnings.warn(
-                    "assertRedirects had to strip the scheme and domain from the "
-                    "expected URL, as it was always added automatically to URLs "
-                    "before Django 1.9. Please update your expected URLs by "
-                    "removing the scheme and domain.",
-                    RemovedInDjango20Warning, stacklevel=2)
-                expected_url = relative_url
 
         self.assertEqual(
             url, expected_url,
@@ -614,14 +599,8 @@ class SimpleTestCase(unittest.TestCase):
             args: Function to be called and extra positional args.
             kwargs: Extra kwargs.
         """
-        # callable_obj was a documented kwarg in Django 1.8 and older.
-        callable_obj = kwargs.pop('callable_obj', None)
-        if callable_obj:
-            warnings.warn(
-                'The callable_obj kwarg is deprecated. Pass the callable '
-                'as a positional argument instead.', RemovedInDjango20Warning
-            )
-        elif len(args):
+        callable_obj = None
+        if len(args):
             callable_obj = args[0]
             args = args[1:]
 
@@ -692,8 +671,7 @@ class SimpleTestCase(unittest.TestCase):
             standardMsg = '%s != %s' % (
                 safe_repr(dom1, True), safe_repr(dom2, True))
             diff = ('\n' + '\n'.join(difflib.ndiff(
-                six.text_type(dom1).splitlines(),
-                six.text_type(dom2).splitlines(),
+                str(dom1).splitlines(), str(dom2).splitlines(),
             )))
             standardMsg = self._truncateMessage(standardMsg, diff)
             self.fail(self._formatMessage(msg, standardMsg))
@@ -730,7 +708,7 @@ class SimpleTestCase(unittest.TestCase):
             data = json.loads(raw)
         except ValueError:
             self.fail("First argument is not valid JSON: %r" % raw)
-        if isinstance(expected_data, six.string_types):
+        if isinstance(expected_data, str):
             try:
                 expected_data = json.loads(expected_data)
             except ValueError:
@@ -747,7 +725,7 @@ class SimpleTestCase(unittest.TestCase):
             data = json.loads(raw)
         except ValueError:
             self.fail("First argument is not valid JSON: %r" % raw)
-        if isinstance(expected_data, six.string_types):
+        if isinstance(expected_data, str):
             try:
                 expected_data = json.loads(expected_data)
             except ValueError:
@@ -769,10 +747,7 @@ class SimpleTestCase(unittest.TestCase):
             if not result:
                 standardMsg = '%s != %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
                 diff = ('\n' + '\n'.join(
-                    difflib.ndiff(
-                        six.text_type(xml1).splitlines(),
-                        six.text_type(xml2).splitlines(),
-                    )
+                    difflib.ndiff(xml1.splitlines(), xml2.splitlines())
                 ))
                 standardMsg = self._truncateMessage(standardMsg, diff)
                 self.fail(self._formatMessage(msg, standardMsg))
@@ -806,6 +781,9 @@ class TransactionTestCase(SimpleTestCase):
     # Subclasses can define fixtures which will be automatically installed.
     fixtures = None
 
+    # Do the tests in this class query non-default databases?
+    multi_db = False
+
     # If transactions aren't available, Django will serialize the database
     # contents into a fixture during setup and flush and reload them
     # during teardown (as flush does not restore data from migrations).
@@ -824,7 +802,7 @@ class TransactionTestCase(SimpleTestCase):
           run with the correct set of applications for the test case.
         * If the class has a 'fixtures' attribute, installing these fixtures.
         """
-        super(TransactionTestCase, self)._pre_setup()
+        super()._pre_setup()
         if self.available_apps is not None:
             apps.set_available_apps(self.available_apps)
             setting_changed.send(
@@ -852,7 +830,7 @@ class TransactionTestCase(SimpleTestCase):
     def _databases_names(cls, include_mirrors=True):
         # If the test case has a multi_db=True flag, act on all databases,
         # including mirrors or not. Otherwise, just on the default DB.
-        if getattr(cls, 'multi_db', False):
+        if cls.multi_db:
             return [
                 alias for alias in connections
                 if include_mirrors or not connections[alias].settings_dict['TEST']['MIRROR']
@@ -906,7 +884,7 @@ class TransactionTestCase(SimpleTestCase):
         """
         try:
             self._fixture_teardown()
-            super(TransactionTestCase, self)._post_teardown()
+            super()._post_teardown()
             if self._should_reload_connections():
                 # Some DB cursors include SQL statements as part of cursor
                 # creation. If you have a test that does a rollback, the effect
@@ -943,7 +921,7 @@ class TransactionTestCase(SimpleTestCase):
                          inhibit_post_migrate=inhibit_post_migrate)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
-        items = six.moves.map(transform, qs)
+        items = map(transform, qs)
         if not ordered:
             return self.assertEqual(Counter(items), Counter(values), msg=msg)
         values = list(values)
@@ -954,8 +932,7 @@ class TransactionTestCase(SimpleTestCase):
                              "against more than one ordered values")
         return self.assertEqual(list(items), values, msg=msg)
 
-    def assertNumQueries(self, num, func=None, *args, **kwargs):
-        using = kwargs.pop("using", DEFAULT_DB_ALIAS)
+    def assertNumQueries(self, num, func=None, *args, using=DEFAULT_DB_ALIAS, **kwargs):
         conn = connections[using]
 
         context = _AssertNumQueriesContext(self, num, conn)
@@ -1005,7 +982,7 @@ class TestCase(TransactionTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestCase, cls).setUpClass()
+        super().setUpClass()
         if not connections_support_transactions():
             return
         cls.cls_atomics = cls._enter_atomics()
@@ -1033,7 +1010,7 @@ class TestCase(TransactionTestCase):
             cls._rollback_atomics(cls.cls_atomics)
             for conn in connections.all():
                 conn.close()
-        super(TestCase, cls).tearDownClass()
+        super().tearDownClass()
 
     @classmethod
     def setUpTestData(cls):
@@ -1043,21 +1020,21 @@ class TestCase(TransactionTestCase):
     def _should_reload_connections(self):
         if connections_support_transactions():
             return False
-        return super(TestCase, self)._should_reload_connections()
+        return super()._should_reload_connections()
 
     def _fixture_setup(self):
         if not connections_support_transactions():
             # If the backend does not support transactions, we should reload
             # class data before each test
             self.setUpTestData()
-            return super(TestCase, self)._fixture_setup()
+            return super()._fixture_setup()
 
         assert not self.reset_sequences, 'reset_sequences cannot be used on TestCase instances'
         self.atomics = self._enter_atomics()
 
     def _fixture_teardown(self):
         if not connections_support_transactions():
-            return super(TestCase, self)._fixture_teardown()
+            return super()._fixture_teardown()
         try:
             for db_name in reversed(self._databases_names()):
                 if self._should_check_constraints(connections[db_name]):
@@ -1072,13 +1049,25 @@ class TestCase(TransactionTestCase):
         )
 
 
-class CheckCondition(object):
+class CheckCondition:
     """Descriptor class for deferred condition checking"""
-    def __init__(self, cond_func):
-        self.cond_func = cond_func
+    def __init__(self, *conditions):
+        self.conditions = conditions
+
+    def add_condition(self, condition, reason):
+        return self.__class__(*self.conditions + ((condition, reason),))
 
     def __get__(self, instance, cls=None):
-        return self.cond_func()
+        # Trigger access for all bases.
+        if any(getattr(base, '__unittest_skip__', False) for base in cls.__bases__):
+            return True
+        for condition, reason in self.conditions:
+            if condition():
+                # Override this descriptor's value and set the skip reason.
+                cls.__unittest_skip__ = True
+                cls.__unittest_skip_why__ = reason
+                return True
+        return False
 
 
 def _deferredSkip(condition, reason):
@@ -1094,8 +1083,13 @@ def _deferredSkip(condition, reason):
         else:
             # Assume a class is decorated
             test_item = test_func
-            test_item.__unittest_skip__ = CheckCondition(condition)
-        test_item.__unittest_skip_why__ = reason
+            # Retrieve the possibly existing value from the class's dict to
+            # avoid triggering the descriptor.
+            skip = test_func.__dict__.get('__unittest_skip__')
+            if isinstance(skip, CheckCondition):
+                test_item.__unittest_skip__ = skip.add_condition(condition, reason)
+            elif skip is not True:
+                test_item.__unittest_skip__ = CheckCondition((condition, reason))
         return test_item
     return decorator
 
@@ -1149,7 +1143,7 @@ class FSFilesHandler(WSGIHandler):
     def __init__(self, application):
         self.application = application
         self.base_url = urlparse(self.get_base_url())
-        super(FSFilesHandler, self).__init__()
+        super().__init__()
 
     def _should_handle(self, path):
         """
@@ -1175,7 +1169,7 @@ class FSFilesHandler(WSGIHandler):
                 return self.serve(request)
             except Http404:
                 pass
-        return super(FSFilesHandler, self).get_response(request)
+        return super().get_response(request)
 
     def serve(self, request):
         os_rel_path = self.file_path(request.path)
@@ -1189,7 +1183,7 @@ class FSFilesHandler(WSGIHandler):
     def __call__(self, environ, start_response):
         if not self._should_handle(get_path_info(environ)):
             return self.application(environ, start_response)
-        return super(FSFilesHandler, self).__call__(environ, start_response)
+        return super().__call__(environ, start_response)
 
 
 class _StaticFilesHandler(FSFilesHandler):
@@ -1223,15 +1217,14 @@ class LiveServerThread(threading.Thread):
     Thread for running a live http server while the tests are running.
     """
 
-    def __init__(self, host, possible_ports, static_handler, connections_override=None):
+    def __init__(self, host, static_handler, connections_override=None):
         self.host = host
         self.port = None
-        self.possible_ports = possible_ports
         self.is_ready = threading.Event()
         self.error = None
         self.static_handler = static_handler
         self.connections_override = connections_override
-        super(LiveServerThread, self).__init__()
+        super().__init__()
 
     def run(self):
         """
@@ -1246,43 +1239,26 @@ class LiveServerThread(threading.Thread):
         try:
             # Create the handler for serving static and media files
             handler = self.static_handler(_MediaFilesHandler(WSGIHandler()))
-
-            # Go through the list of possible ports, hoping that we can find
-            # one that is free to use for the WSGI server.
-            for index, port in enumerate(self.possible_ports):
-                try:
-                    self.httpd = self._create_server(port)
-                except socket.error as e:
-                    if (index + 1 < len(self.possible_ports) and
-                            e.errno == errno.EADDRINUSE):
-                        # This port is already in use, so we go on and try with
-                        # the next one in the list.
-                        continue
-                    else:
-                        # Either none of the given ports are free or the error
-                        # is something else than "Address already in use". So
-                        # we let that error bubble up to the main thread.
-                        raise
-                else:
-                    # A free port was found.
-                    self.port = port
-                    break
-
+            self.httpd = self._create_server(0)
+            self.port = self.httpd.server_address[1]
             self.httpd.set_app(handler)
             self.is_ready.set()
             self.httpd.serve_forever()
         except Exception as e:
             self.error = e
             self.is_ready.set()
+        finally:
+            connections.close_all()
 
     def _create_server(self, port):
-        return WSGIServer((self.host, port), QuietWSGIRequestHandler, allow_reuse_address=False)
+        return ThreadedWSGIServer((self.host, port), QuietWSGIRequestHandler, allow_reuse_address=False)
 
     def terminate(self):
         if hasattr(self, 'httpd'):
             # Stop the WSGI server
             self.httpd.shutdown()
             self.httpd.server_close()
+        self.join()
 
 
 class LiveServerTestCase(TransactionTestCase):
@@ -1296,51 +1272,31 @@ class LiveServerTestCase(TransactionTestCase):
     sqlite) and each thread needs to commit all their transactions so that the
     other thread can see the changes.
     """
-
+    host = 'localhost'
+    server_thread_class = LiveServerThread
     static_handler = _StaticFilesHandler
 
     @classproperty
     def live_server_url(cls):
-        return 'http://%s:%s' % (
-            cls.server_thread.host, cls.server_thread.port)
+        return 'http://%s:%s' % (cls.host, cls.server_thread.port)
 
     @classmethod
     def setUpClass(cls):
-        super(LiveServerTestCase, cls).setUpClass()
+        super().setUpClass()
         connections_override = {}
         for conn in connections.all():
             # If using in-memory sqlite databases, pass the connections to
             # the server thread.
-            if conn.vendor == 'sqlite' and conn.is_in_memory_db(conn.settings_dict['NAME']):
+            if conn.vendor == 'sqlite' and conn.is_in_memory_db():
                 # Explicitly enable thread-shareability for this connection
                 conn.allow_thread_sharing = True
                 connections_override[conn.alias] = conn
 
-        # Launch the live server's thread
-        specified_address = os.environ.get(
-            'DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:8081-8179')
-
-        # The specified ports may be of the form '8000-8010,8080,9200-9300'
-        # i.e. a comma-separated list of ports or ranges of ports, so we break
-        # it down into a detailed list of all possible ports.
-        possible_ports = []
-        try:
-            host, port_ranges = specified_address.split(':')
-            for port_range in port_ranges.split(','):
-                # A port range can be of either form: '8000' or '8000-8010'.
-                extremes = list(map(int, port_range.split('-')))
-                assert len(extremes) in [1, 2]
-                if len(extremes) == 1:
-                    # Port range of the form '8000'
-                    possible_ports.append(extremes[0])
-                else:
-                    # Port range of the form '8000-8010'
-                    for port in range(extremes[0], extremes[1] + 1):
-                        possible_ports.append(port)
-        except Exception:
-            msg = 'Invalid address ("%s") for live server.' % specified_address
-            six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg), sys.exc_info()[2])
-        cls.server_thread = cls._create_server_thread(host, possible_ports, connections_override)
+        cls._live_server_modified_settings = modify_settings(
+            ALLOWED_HOSTS={'append': cls.host},
+        )
+        cls._live_server_modified_settings.enable()
+        cls.server_thread = cls._create_server_thread(connections_override)
         cls.server_thread.daemon = True
         cls.server_thread.start()
 
@@ -1353,10 +1309,9 @@ class LiveServerTestCase(TransactionTestCase):
             raise cls.server_thread.error
 
     @classmethod
-    def _create_server_thread(cls, host, possible_ports, connections_override):
-        return LiveServerThread(
-            host,
-            possible_ports,
+    def _create_server_thread(cls, connections_override):
+        return cls.server_thread_class(
+            cls.host,
             cls.static_handler,
             connections_override=connections_override,
         )
@@ -1368,20 +1323,20 @@ class LiveServerTestCase(TransactionTestCase):
         if hasattr(cls, 'server_thread'):
             # Terminate the live server's thread
             cls.server_thread.terminate()
-            cls.server_thread.join()
 
         # Restore sqlite in-memory database connections' non-shareability
         for conn in connections.all():
-            if conn.vendor == 'sqlite' and conn.is_in_memory_db(conn.settings_dict['NAME']):
+            if conn.vendor == 'sqlite' and conn.is_in_memory_db():
                 conn.allow_thread_sharing = False
 
     @classmethod
     def tearDownClass(cls):
         cls._tearDownClassInternal()
-        super(LiveServerTestCase, cls).tearDownClass()
+        cls._live_server_modified_settings.disable()
+        super().tearDownClass()
 
 
-class SerializeMixin(object):
+class SerializeMixin:
     """
     Mixin to enforce serialization of TestCases that share a common resource.
 
@@ -1401,9 +1356,9 @@ class SerializeMixin(object):
                 "in the base class.".format(cls.__name__))
         cls._lockfile = open(cls.lockfile)
         locks.lock(cls._lockfile, locks.LOCK_EX)
-        super(SerializeMixin, cls).setUpClass()
+        super().setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        super(SerializeMixin, cls).tearDownClass()
+        super().tearDownClass()
         cls._lockfile.close()

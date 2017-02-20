@@ -1,5 +1,6 @@
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.utils import InterfaceError
+from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
@@ -9,7 +10,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_real_datatype = True
     has_native_uuid_field = True
     has_native_duration_field = True
-    driver_supports_timedelta_args = True
     can_defer_constraint_checks = True
     has_select_for_update = True
     has_select_for_update_nowait = True
@@ -31,3 +31,20 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     greatest_least_ignores_nulls = True
     can_clone_databases = True
     supports_temporal_subtraction = True
+    supports_slicing_ordering_in_compound = True
+
+    @cached_property
+    def has_select_for_update_skip_locked(self):
+        return self.connection.pg_version >= 90500
+
+    @cached_property
+    def has_brin_index_support(self):
+        return self.connection.pg_version >= 90500
+
+    @cached_property
+    def has_jsonb_datatype(self):
+        return self.connection.pg_version >= 90400
+
+    @cached_property
+    def has_jsonb_agg(self):
+        return self.connection.pg_version >= 90500

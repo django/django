@@ -1,8 +1,5 @@
-from __future__ import unicode_literals
-
 from django.db.models import Max
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import str_prefix
 
 from .models import Celebrity, Fan, Staff, StaffTag, Tag
 
@@ -80,8 +77,7 @@ class DistinctOnTests(TestCase):
             (
                 (Staff.objects.distinct('id').order_by('id', 'coworkers__name').
                     values_list('id', 'coworkers__name')),
-                [str_prefix("(1, %(_)s'p2')"), str_prefix("(2, %(_)s'p1')"),
-                 str_prefix("(3, %(_)s'p1')"), "(4, None)"]
+                ["(1, 'p2')", "(2, 'p1')", "(3, 'p1')", "(4, None)"]
             ),
         )
         for qset, expected in qsets:
@@ -116,16 +112,10 @@ class DistinctOnTests(TestCase):
     def test_distinct_on_in_ordered_subquery(self):
         qs = Staff.objects.distinct('name').order_by('name', 'id')
         qs = Staff.objects.filter(pk__in=qs).order_by('name')
-        self.assertQuerysetEqual(
-            qs, [self.p1_o1, self.p2_o1, self.p3_o1],
-            lambda x: x
-        )
+        self.assertSequenceEqual(qs, [self.p1_o1, self.p2_o1, self.p3_o1])
         qs = Staff.objects.distinct('name').order_by('name', '-id')
         qs = Staff.objects.filter(pk__in=qs).order_by('name')
-        self.assertQuerysetEqual(
-            qs, [self.p1_o2, self.p2_o1, self.p3_o1],
-            lambda x: x
-        )
+        self.assertSequenceEqual(qs, [self.p1_o2, self.p2_o1, self.p3_o1])
 
     def test_distinct_on_get_ordering_preserved(self):
         """

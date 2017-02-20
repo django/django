@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Irish (http://www.transifex.com/django/django/language/ga/)\n"
 "MIME-Version: 1.0\n"
@@ -63,6 +63,12 @@ msgstr "Táim cinnte"
 msgid "This year"
 msgstr "An blian seo"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -73,6 +79,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Aicsean:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Cuir eile %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Tóg amach"
 
 msgid "action time"
 msgstr "am aicsean"
@@ -86,6 +99,8 @@ msgstr ""
 msgid "object id"
 msgstr "id oibiacht"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "repr oibiacht"
 
@@ -116,6 +131,31 @@ msgstr "\"%(object)s.\" scrioste"
 msgid "LogEntry Object"
 msgstr "Oibiacht LogEntry"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "agus"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Dada réimse aithraithe"
+
 msgid "None"
 msgstr "Dada"
 
@@ -125,69 +165,35 @@ msgstr ""
 "Coinnigh síos \"Control\", nó \"Command\" ar Mac chun níos mó ná ceann "
 "amháin a roghnú."
 
-msgid "Added."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
-#, python-format
-msgid "Changed %s."
-msgstr "Athraithe %s"
-
-msgid "and"
-msgstr "agus"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Suimithe %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Athraithe %(list)s le %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Scriosaithe %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Dada réimse aithraithe"
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"Chuir an %(name)s·\"%(obj)s\"·go rathúil.·Is féidir leat é a cuir in eagar "
-"thíos."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"Bhí %(name)s \"%(obj)s\" cuireadh go rathúil. Is féidir leat %(name)s eile a "
-"chur thíos."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "Bhí  %(name)s \"%(obj)s\" breisithe go rathúil"
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"Bhí an %(name)s \"%(obj)s\" athraithe go rathúil. Is féidir leat é a cuir in "
-"eagar arís thíos."
 
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
 msgstr ""
-"Bhí an %(name)s \"%(obj)s\" athraithe go rathúil. Is féidir leat ceann eile "
-"%(name)s a cuir thíos."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "Bhí an %(name)s \"%(obj)s\" aithraithe to rathúil"
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -353,18 +359,15 @@ msgstr "Doiciméadúchán"
 msgid "Log out"
 msgstr "Logáil amach"
 
-msgid "Add"
-msgstr "Cuir le"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Cuir %(name)s le"
 
 msgid "History"
 msgstr "Stair"
 
 msgid "View on site"
 msgstr "Breath ar suíomh"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Cuir %(name)s le"
 
 msgid "Filter"
 msgstr "Scagaire"
@@ -448,13 +451,6 @@ msgstr ""
 msgid "Change"
 msgstr "Athraigh"
 
-msgid "Remove"
-msgstr "Tóg amach"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Cuir eile %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Cealaigh?"
 
@@ -469,14 +465,17 @@ msgstr "Achoimre"
 msgid "Models in the %(name)s application"
 msgstr "Samhlacha ins an %(name)s iarratais"
 
+msgid "Add"
+msgstr "Cuir le"
+
 msgid "You don't have permission to edit anything."
 msgstr "Níl cead agat aon rud a cuir in eagar."
 
-msgid "Recent Actions"
-msgstr "Aicsean úrnua"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "Mo Aicseain"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Dada ar fáil"

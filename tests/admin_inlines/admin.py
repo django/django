@@ -192,6 +192,10 @@ class SomeChildModelForm(forms.ModelForm):
             'position': forms.HiddenInput,
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['name'].label = 'new label'
+
 
 class SomeChildModelInline(admin.TabularInline):
     model = SomeChildModel

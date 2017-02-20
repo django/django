@@ -4,15 +4,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013,2015
 # madisvain <madisvain@gmail.com>, 2011
-# Martin <martinpajuste@gmail.com>, 2015
-# Marti Raudsepp <marti@juffo.org>, 2014
+# Martin Pajuste <martinpajuste@gmail.com>, 2015
+# Martin Pajuste <martinpajuste@gmail.com>, 2016
+# Marti Raudsepp <marti@juffo.org>, 2014,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-11 20:40+0000\n"
-"Last-Translator: Janno Liivak <jannolii@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-18 21:34+0000\n"
+"Last-Translator: Marti Raudsepp <marti@juffo.org>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -119,6 +120,21 @@ msgstr "sool"
 msgid "hash"
 msgstr "räsi"
 
+msgid "variety"
+msgstr "liik"
+
+msgid "version"
+msgstr "versioon"
+
+msgid "memory cost"
+msgstr "mälukasutus"
+
+msgid "time cost"
+msgstr "ajakulu"
+
+msgid "parallelism"
+msgstr "parallelism"
+
 msgid "work factor"
 msgstr "töötegur"
 
@@ -170,16 +186,9 @@ msgstr "Spetsiaalsed õigused sellele kasutajale."
 msgid "username"
 msgstr "kasutajatunnus"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Nõutav. 30 märki või vähem. Ainult tähed, numbrid ja /./+/-/_ tähemärgid."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Sisesta korrektne kasutajatunnus. See väärtus võib sisaldada ainult tähti, "
-"numbreid ja @/./+/-/_ tähemärke."
+"Nõutav. 150 märki või vähem. Ainult tähed, numbrid ja @/./+/-/_ tähemärgid."
 
 msgid "A user with that username already exists."
 msgstr "Sama kasutajatunnusega kasutaja on juba olemas."
@@ -259,6 +268,20 @@ msgstr "Salasõna ei tohi koosneda ainult numbritest."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Uue salasõna loomine saidil %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Sisesta korrektne kasutajatunnus. See väärtus võib sisaldada ainult "
+"ingliskeelseid tähti, numbreid ja @/./+/-/_ tähemärke."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Sisesta korrektne kasutajatunnus. See väärtus võib sisaldada ainult tähti, "
+"numbreid ja @/./+/-/_ tähemärke."
 
 msgid "Logged out"
 msgstr "Välja logitud"

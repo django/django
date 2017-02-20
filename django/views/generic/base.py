@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 from functools import update_wrapper
 
@@ -7,13 +5,12 @@ from django import http
 from django.core.exceptions import ImproperlyConfigured
 from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch, reverse
-from django.utils import six
 from django.utils.decorators import classonlymethod
 
 logger = logging.getLogger('django.request')
 
 
-class ContextMixin(object):
+class ContextMixin:
     """
     A default context mixin that passes the keyword arguments received by
     get_context_data as the template context.
@@ -25,7 +22,7 @@ class ContextMixin(object):
         return kwargs
 
 
-class View(object):
+class View:
     """
     Intentionally simple parent class for all views. Only implements
     dispatch-by-method and simple sanity checking.
@@ -40,7 +37,7 @@ class View(object):
         """
         # Go through keyword arguments, and either save their values to our
         # instance, or raise an error.
-        for key, value in six.iteritems(kwargs):
+        for key, value in kwargs.items():
             setattr(self, key, value)
 
     @classonlymethod
@@ -107,7 +104,7 @@ class View(object):
         return [m.upper() for m in self.http_method_names if hasattr(self, m)]
 
 
-class TemplateResponseMixin(object):
+class TemplateResponseMixin:
     """
     A mixin that can be used to render a template.
     """

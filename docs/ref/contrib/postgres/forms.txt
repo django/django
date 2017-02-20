@@ -144,8 +144,8 @@ Fields
 .. class:: HStoreField
 
     A field which accepts JSON encoded data for an
-    :class:`~django.contrib.postgres.fields.HStoreField`. It will cast all the
-    values to strings. It is represented by an HTML ``<textarea>``.
+    :class:`~django.contrib.postgres.fields.HStoreField`. It casts all values
+    (except nulls) to strings. It is represented by an HTML ``<textarea>``.
 
     .. admonition:: User friendly forms
 
@@ -158,6 +158,10 @@ Fields
         On occasions it may be useful to require or restrict the keys which are
         valid for a given field. This can be done using the
         :class:`~django.contrib.postgres.validators.KeysValidator`.
+
+    .. versionchanged:: 1.11
+
+        Added the ability to store nulls.
 
 ``JSONField``
 -------------

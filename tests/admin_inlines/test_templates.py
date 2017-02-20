@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import json
 
 from django.template.loader import render_to_string

@@ -25,13 +25,13 @@ class PostGISIntrospection(DatabaseIntrospection):
     # So the default query has to be adapted to include raster indices.
     _get_indexes_query = """
         SELECT DISTINCT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
-        FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
-            pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
-        LEFT JOIN pg_catalog.pg_type t ON t.oid = attr.atttypid
+        FROM pg_catalog.pg_class c, pg_catalog.pg_class c2, pg_catalog.pg_index idx,
+            pg_catalog.pg_attribute attr, pg_catalog.pg_type t
         WHERE
             c.oid = idx.indrelid
             AND idx.indexrelid = c2.oid
             AND attr.attrelid = c.oid
+            AND t.oid = attr.atttypid
             AND (
                 attr.attnum = idx.indkey[0] OR
                 (t.typname LIKE 'raster' AND idx.indkey = '0')
@@ -41,7 +41,7 @@ class PostGISIntrospection(DatabaseIntrospection):
 
     def get_postgis_types(self):
         """
-        Returns a dictionary with keys that are the PostgreSQL object
+        Return a dictionary with keys that are the PostgreSQL object
         identification integers for the PostGIS geometry and/or
         geography types (if supported).
         """
@@ -79,14 +79,14 @@ class PostGISIntrospection(DatabaseIntrospection):
             # performed -- in other words, when this function is called.
             self.postgis_types_reverse = self.get_postgis_types()
             self.data_types_reverse.update(self.postgis_types_reverse)
-        return super(PostGISIntrospection, self).get_field_type(data_type, description)
+        return super().get_field_type(data_type, description)
 
     def get_geometry_type(self, table_name, geo_col):
         """
         The geometry type OID used by PostGIS does not indicate the particular
         type of field that a geometry column is (e.g., whether it's a
         PointField or a PolygonField).  Thus, this routine queries the PostGIS
-        metadata tables to determine the geometry type,
+        metadata tables to determine the geometry type.
         """
         cursor = self.connection.cursor()
         try:

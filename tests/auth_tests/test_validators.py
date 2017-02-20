@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import os
 
 from django.contrib.auth import validators
@@ -13,8 +10,9 @@ from django.contrib.auth.password_validation import (
     validate_password,
 )
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.test import TestCase, override_settings
-from django.utils._os import upath
+from django.test.utils import isolate_apps
 
 
 @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -122,10 +120,38 @@ class UserAttributeSimilarityValidatorTest(TestCase):
                 max_similarity=0.3,
             ).validate('testclient', user=user)
         self.assertEqual(cm.exception.messages, [expected_error % "first name"])
-
+        # max_similarity=1 doesn't allow passwords that are identical to the
+        # attribute's value.
+        with self.assertRaises(ValidationError) as cm:
+            UserAttributeSimilarityValidator(
+                user_attributes=['first_name'],
+                max_similarity=1,
+            ).validate(user.first_name, user=user)
+        self.assertEqual(cm.exception.messages, [expected_error % "first name"])
+        # max_similarity=0 rejects all passwords.
+        with self.assertRaises(ValidationError) as cm:
+            UserAttributeSimilarityValidator(
+                user_attributes=['first_name'],
+                max_similarity=0,
+            ).validate('XXX', user=user)
+        self.assertEqual(cm.exception.messages, [expected_error % "first name"])
+        # Passes validation.
         self.assertIsNone(
             UserAttributeSimilarityValidator(user_attributes=['first_name']).validate('testclient', user=user)
         )
+
+    @isolate_apps('auth_tests')
+    def test_validate_property(self):
+        class TestUser(models.Model):
+            pass
+
+            @property
+            def username(self):
+                return 'foobar'
+
+        with self.assertRaises(ValidationError) as cm:
+            UserAttributeSimilarityValidator().validate('foobar', user=TestUser()),
+        self.assertEqual(cm.exception.messages, ['The password is too similar to the username.'])
 
     def test_help_text(self):
         self.assertEqual(
@@ -144,7 +170,7 @@ class CommonPasswordValidatorTest(TestCase):
         self.assertEqual(cm.exception.messages, [expected_error])
 
     def test_validate_custom_list(self):
-        path = os.path.join(os.path.dirname(os.path.realpath(upath(__file__))), 'common-passwords-custom.txt')
+        path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'common-passwords-custom.txt')
         validator = CommonPasswordValidator(password_list_path=path)
         expected_error = "This password is too common."
         self.assertIsNone(validator.validate('a-safe-password'))

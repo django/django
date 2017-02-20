@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# GunChleoc, 2015
+# GunChleoc, 2015-2016
 # GunChleoc, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-26 21:56+0000\n"
+"PO-Revision-Date: 2016-06-11 06:45+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -75,7 +75,7 @@ msgstr ""
 "a’ gheomatrais."
 
 msgid "Delete all Features"
-msgstr "Sguab às a h-uile feart"
+msgstr "Sguab às a h-uile gleus"
 
 msgid "WKT debugging window:"
 msgstr "Uinneag dì-bhugachadh WKT:"

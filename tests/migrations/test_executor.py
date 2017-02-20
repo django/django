@@ -133,7 +133,7 @@ class ExecutorTests(MigrationTestBase):
     })
     def test_empty_plan(self):
         """
-        Tests that re-planning a full migration of a fully-migrated set doesn't
+        Re-planning a full migration of a fully-migrated set doesn't
         perform spurious unmigrations and remigrations.
 
         There was previously a bug where the executor just always performed the
@@ -168,6 +168,14 @@ class ExecutorTests(MigrationTestBase):
             ("migrations2", "0001_initial"),
         ])
         self.assertEqual(plan, [])
+        # The resulting state should include applied migrations.
+        state = executor.migrate([
+            ("migrations", "0002_second"),
+            ("migrations2", "0001_initial"),
+        ])
+        self.assertIn(('migrations', 'book'), state.models)
+        self.assertIn(('migrations', 'author'), state.models)
+        self.assertIn(('migrations2', 'otherauthor'), state.models)
         # Erase all the fake records
         executor.recorder.record_unapplied("migrations2", "0001_initial")
         executor.recorder.record_unapplied("migrations", "0002_second")
@@ -256,7 +264,7 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableExists("migrations_author")
         self.assertTableExists("migrations_tribble")
         # We shouldn't have faked that one
-        self.assertEqual(state["faked"], False)
+        self.assertIs(state["faked"], False)
         # Rebuild the graph to reflect the new DB state
         executor.loader.build_graph()
         # Fake-reverse that
@@ -265,7 +273,7 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableExists("migrations_author")
         self.assertTableExists("migrations_tribble")
         # Make sure that was faked
-        self.assertEqual(state["faked"], True)
+        self.assertIs(state["faked"], True)
         # Finally, migrate forwards; this should fake-apply our initial migration
         executor.loader.build_graph()
         self.assertEqual(
@@ -282,7 +290,7 @@ class ExecutorTests(MigrationTestBase):
         state = {"faked": None}
         # Allow faking of initial CreateModel operations
         executor.migrate([("migrations", "0001_initial")], fake_initial=True)
-        self.assertEqual(state["faked"], True)
+        self.assertIs(state["faked"], True)
         # And migrate back to clean up the database
         executor.loader.build_graph()
         executor.migrate([("migrations", None)])
@@ -318,7 +326,7 @@ class ExecutorTests(MigrationTestBase):
         global_apps.get_app_config("migrations").models["author"] = migrations_apps.get_model("migrations", "author")
         try:
             migration = executor.loader.get_migration("auth", "0001_initial")
-            self.assertEqual(executor.detect_soft_applied(None, migration)[0], True)
+            self.assertIs(executor.detect_soft_applied(None, migration)[0], True)
         finally:
             connection.introspection.table_names = old_table_names
             del global_apps.get_app_config("migrations").models["author"]
@@ -357,9 +365,9 @@ class ExecutorTests(MigrationTestBase):
             self.assertTableExists(table)
         # Table detection sees 0001 is applied but not 0002.
         migration = executor.loader.get_migration("migrations", "0001_initial")
-        self.assertEqual(executor.detect_soft_applied(None, migration)[0], True)
+        self.assertIs(executor.detect_soft_applied(None, migration)[0], True)
         migration = executor.loader.get_migration("migrations", "0002_initial")
-        self.assertEqual(executor.detect_soft_applied(None, migration)[0], False)
+        self.assertIs(executor.detect_soft_applied(None, migration)[0], False)
 
         # Create the tables for both migrations but make it look like neither
         # has been applied.
@@ -370,7 +378,7 @@ class ExecutorTests(MigrationTestBase):
         executor.migrate([("migrations", None)], fake=True)
         # Table detection sees 0002 is applied.
         migration = executor.loader.get_migration("migrations", "0002_initial")
-        self.assertEqual(executor.detect_soft_applied(None, migration)[0], True)
+        self.assertIs(executor.detect_soft_applied(None, migration)[0], True)
 
         # Leave the tables for 0001 except the many-to-many table. That missing
         # table should cause detect_soft_applied() to return False.
@@ -378,7 +386,7 @@ class ExecutorTests(MigrationTestBase):
             for table in tables[2:]:
                 editor.execute(editor.sql_delete_table % {"table": table})
         migration = executor.loader.get_migration("migrations", "0001_initial")
-        self.assertEqual(executor.detect_soft_applied(None, migration)[0], False)
+        self.assertIs(executor.detect_soft_applied(None, migration)[0], False)
 
         # Cleanup by removing the remaining tables.
         with connection.schema_editor() as editor:
@@ -396,7 +404,7 @@ class ExecutorTests(MigrationTestBase):
     )
     def test_unrelated_model_lookups_forwards(self):
         """
-        #24123 - Tests that all models of apps already applied which are
+        #24123 - All models of apps already applied which are
         unrelated to the first app being applied are part of the initial model
         state.
         """
@@ -441,7 +449,7 @@ class ExecutorTests(MigrationTestBase):
     )
     def test_unrelated_model_lookups_backwards(self):
         """
-        #24123 - Tests that all models of apps being unapplied which are
+        #24123 - All models of apps being unapplied which are
         unrelated to the first app being unapplied are part of the initial
         model state.
         """
@@ -504,6 +512,9 @@ class ExecutorTests(MigrationTestBase):
             ('mutate_state_a', None),
         ])
         self.assertIn('added', dict(state.models['mutate_state_b', 'b'].fields))
+        executor.migrate([
+            ('mutate_state_b', None),
+        ])
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_process_callback(self):
@@ -584,6 +595,7 @@ class ExecutorTests(MigrationTestBase):
                 editor.execute(editor.sql_delete_table % {"table": "author_app_author"})
             self.assertTableNotExists("author_app_author")
             self.assertTableNotExists("book_app_book")
+            executor.migrate([("author_app", None)], fake=True)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_apply_all_replaced_marks_replacement_as_applied(self):
@@ -630,13 +642,13 @@ class ExecutorTests(MigrationTestBase):
         )
 
 
-class FakeLoader(object):
+class FakeLoader:
     def __init__(self, graph, applied):
         self.graph = graph
         self.applied_migrations = applied
 
 
-class FakeMigration(object):
+class FakeMigration:
     """Really all we need is any object with a debug-useful repr."""
     def __init__(self, name):
         self.name = name
@@ -678,7 +690,7 @@ class ExecutorUnitTests(TestCase):
         self.assertEqual(plan, [(a2_impl, True)])
 
     def test_minimize_rollbacks_branchy(self):
-        """
+        r"""
         Minimize rollbacks when target has multiple in-app children.
 
         a: 1 <---- 3 <--\
@@ -723,7 +735,7 @@ class ExecutorUnitTests(TestCase):
         self.assertEqual(plan, exp)
 
     def test_backwards_nothing_to_do(self):
-        """
+        r"""
         If the current state satisfies the given target, do nothing.
 
         a: 1 <--- 2

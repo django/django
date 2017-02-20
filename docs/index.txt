@@ -82,6 +82,7 @@ manipulating the data of your Web application. Learn more about it below:
 * **Models:**
   :doc:`Introduction to models <topics/db/models>` |
   :doc:`Field types <ref/models/fields>` |
+  :doc:`Indexes <ref/models/indexes>` |
   :doc:`Meta options <ref/models/options>` |
   :doc:`Model class <ref/models/class>`
 
@@ -281,7 +282,6 @@ Django aims to be compatible with multiple different flavors and versions of
 Python:
 
 * :doc:`Jython support <howto/jython>`
-* :doc:`Python 3 compatibility <topics/python3>`
 
 Geographic framework
 ====================
@@ -339,7 +339,6 @@ you can contribute:
   :doc:`The release process <internals/release-process>` |
   :doc:`Team organization <internals/organization>` |
   :doc:`Meet the team <internals/team>` |
-  :doc:`Current roles <internals/roles>` |
   :doc:`The Django source code repository <internals/git>` |
   :doc:`Security policies <internals/security>` |
   :doc:`Mailing lists <internals/mailing-lists>`

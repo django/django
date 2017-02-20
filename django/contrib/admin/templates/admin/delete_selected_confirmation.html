@@ -2,6 +2,7 @@
 {% load i18n l10n admin_urls static %}
 
 {% block extrahead %}
+    {{ block.super }}
     {{ media }}
     <script type="text/javascript" src="{% static 'admin/js/cancel.js' %}"></script>
 {% endblock %}

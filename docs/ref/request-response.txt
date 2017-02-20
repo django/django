@@ -86,14 +86,10 @@ All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.content_type
 
-    .. versionadded:: 1.10
-
     A string representing the MIME type of the request, parsed from the
     ``CONTENT_TYPE`` header.
 
 .. attribute:: HttpRequest.content_params
-
-    .. versionadded:: 1.10
 
     A dictionary of key/value parameters included in the ``CONTENT_TYPE``
     header.
@@ -252,7 +248,7 @@ Methods
         behind multiple proxies. One solution is to use middleware to rewrite
         the proxy headers, as in the following example::
 
-            from django.django.utils.deprecation import MiddlewareMixin
+            from django.utils.deprecation import MiddlewareMixin
 
             class MultipleProxyMiddleware(MiddlewareMixin):
                 FORWARDED_FOR_FIELDS = [
@@ -305,7 +301,7 @@ Methods
         Mixing HTTP and HTTPS on the same site is discouraged, therefore
         :meth:`~HttpRequest.build_absolute_uri()` will always generate an
         absolute URI with the same scheme the current request has. If you need
-        to redirect users to HTTPS, it's best to let your webserver redirect
+        to redirect users to HTTPS, it's best to let your Web server redirect
         all HTTP traffic to HTTPS.
 
 .. method:: HttpRequest.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
@@ -327,10 +323,10 @@ Methods
         'Tony'
         >>> request.get_signed_cookie('name', salt='name-salt')
         'Tony' # assuming cookie was set using the same salt
-        >>> request.get_signed_cookie('non-existing-cookie')
+        >>> request.get_signed_cookie('nonexistent-cookie')
         ...
-        KeyError: 'non-existing-cookie'
-        >>> request.get_signed_cookie('non-existing-cookie', False)
+        KeyError: 'nonexistent-cookie'
+        >>> request.get_signed_cookie('nonexistent-cookie', False)
         False
         >>> request.get_signed_cookie('cookie-that-was-tampered-with')
         ...
@@ -359,7 +355,7 @@ Methods
     If a response varies on whether or not it's requested via AJAX and you are
     using some form of caching like Django's :mod:`cache middleware
     <django.middleware.cache>`, you should decorate the view with
-    :func:`vary_on_headers('HTTP_X_REQUESTED_WITH')
+    :func:`vary_on_headers('X-Requested-With')
     <django.views.decorators.vary.vary_on_headers>` so that the responses are
     properly cached.
 
@@ -420,7 +416,17 @@ a subclass of dictionary. Exceptions are outlined here:
     ``mutable=True`` to its ``__init__()``.
 
     Strings for setting both keys and values will be converted from ``encoding``
-    to unicode. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
+    to ``str``. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
+
+.. classmethod:: QueryDict.fromkeys(iterable, value='', mutable=False, encoding=None)
+
+    .. versionadded:: 1.11
+
+    Creates a new ``QueryDict`` with keys from ``iterable`` and each value
+    equal to ``value``. For example::
+
+        >>> QueryDict.fromkeys(['a', 'a', 'b'], value='val')
+        <QueryDict: {'a': ['val', 'val'], 'b': ['val']}>
 
 .. method:: QueryDict.__getitem__(key)
 
@@ -474,17 +480,6 @@ a subclass of dictionary. Exceptions are outlined here:
         >>> q.items()
         [('a', '3')]
 
-.. method:: QueryDict.iteritems()
-
-    Just like the standard dictionary ``iteritems()`` method. Like
-    :meth:`QueryDict.items()` this uses the same last-value logic as
-    :meth:`QueryDict.__getitem__()`.
-
-.. method:: QueryDict.iterlists()
-
-    Like :meth:`QueryDict.iteritems()` except it includes all values, as a list,
-    for each member of the dictionary.
-
 .. method:: QueryDict.values()
 
     Just like the standard dictionary ``values()`` method, except this uses the
@@ -493,10 +488,6 @@ a subclass of dictionary. Exceptions are outlined here:
         >>> q = QueryDict('a=1&a=2&a=3')
         >>> q.values()
         ['3']
-
-.. method:: QueryDict.itervalues()
-
-    Just like :meth:`QueryDict.values()`, except an iterator.
 
 In addition, ``QueryDict`` has the following methods:
 
@@ -623,11 +614,6 @@ generators are immediately closed.
 If you need the response to be streamed from the iterator to the client, you
 must use the :class:`StreamingHttpResponse` class instead.
 
-.. versionchanged:: 1.10
-
-    Objects with a ``close()`` method used to be closed when the WSGI server
-    called ``close()`` on the response.
-
 Setting header fields
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -668,8 +654,7 @@ Attributes
 
 .. attribute:: HttpResponse.content
 
-    A bytestring representing the content, encoded from a Unicode
-    object if necessary.
+    A bytestring representing the content, encoded from a string if necessary.
 
 .. attribute:: HttpResponse.charset
 
@@ -830,14 +815,10 @@ Methods
 
 .. method:: HttpResponse.readable()
 
-   .. versionadded:: 1.10
-
     Always ``False``. This method makes an :class:`HttpResponse` instance a
     stream-like object.
 
 .. method:: HttpResponse.seekable()
-
-   .. versionadded:: 1.10
 
     Always ``False``. This method makes an :class:`HttpResponse` instance a
     stream-like object.
@@ -936,7 +917,7 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     JSON-serializable object.
 
     The ``encoder``, which defaults to
-    ``django.core.serializers.json.DjangoJSONEncoder``, will be used to
+    :class:`django.core.serializers.json.DjangoJSONEncoder`, will be used to
     serialize the data. See :ref:`JSON serialization
     <serialization-formats-json>` for more details about this serializer.
 
@@ -1025,8 +1006,8 @@ with the following notable differences:
 :class:`StreamingHttpResponse` should only be used in situations where it is
 absolutely required that the whole content isn't iterated before transferring
 the data to the client. Because the content can't be accessed, many
-middlewares can't function normally. For example the ``ETag`` and ``Content-
-Length`` headers can't be generated for streaming responses.
+middlewares can't function normally. For example the ``ETag`` and
+``Content-Length`` headers can't be generated for streaming responses.
 
 Attributes
 ----------

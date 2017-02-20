@@ -12,7 +12,7 @@ class NullBooleanSelectTest(WidgetTest):
         self.check_html(self.widget, 'is_cool', True, html=(
             """<select name="is_cool">
             <option value="1">Unknown</option>
-            <option value="2" selected="selected">Yes</option>
+            <option value="2" selected>Yes</option>
             <option value="3">No</option>
             </select>"""
         ))
@@ -22,14 +22,14 @@ class NullBooleanSelectTest(WidgetTest):
             """<select name="is_cool">
             <option value="1">Unknown</option>
             <option value="2">Yes</option>
-            <option value="3" selected="selected">No</option>
+            <option value="3" selected>No</option>
             </select>"""
         ))
 
     def test_render_none(self):
         self.check_html(self.widget, 'is_cool', None, html=(
             """<select name="is_cool">
-            <option value="1" selected="selected">Unknown</option>
+            <option value="1" selected>Unknown</option>
             <option value="2">Yes</option>
             <option value="3">No</option>
             </select>"""
@@ -39,7 +39,7 @@ class NullBooleanSelectTest(WidgetTest):
         self.check_html(self.widget, 'is_cool', '2', html=(
             """<select name="is_cool">
             <option value="1">Unknown</option>
-            <option value="2" selected="selected">Yes</option>
+            <option value="2" selected>Yes</option>
             <option value="3">No</option>
             </select>"""
         ))
@@ -47,8 +47,7 @@ class NullBooleanSelectTest(WidgetTest):
     @override_settings(USE_L10N=True)
     def test_l10n(self):
         """
-        Ensure that the NullBooleanSelect widget's options are lazily
-        localized (#17190).
+        The NullBooleanSelect widget's options are lazily localized (#17190).
         """
         widget = NullBooleanSelect()
 
@@ -57,7 +56,7 @@ class NullBooleanSelectTest(WidgetTest):
                 """
                 <select name="id_bool">
                     <option value="1">Unbekannt</option>
-                    <option value="2" selected="selected">Ja</option>
+                    <option value="2" selected>Ja</option>
                     <option value="3">Nein</option>
                 </select>
                 """

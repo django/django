@@ -1,8 +1,5 @@
-import warnings
 from contextlib import contextmanager
 from copy import copy
-
-from django.utils.deprecation import RemovedInDjango20Warning
 
 # Hard-coded processor for easier use of CSRF protection.
 _builtin_context_processors = ('django.template.context_processors.csrf',)
@@ -15,7 +12,7 @@ class ContextPopException(Exception):
 
 class ContextDict(dict):
     def __init__(self, context, *args, **kwargs):
-        super(ContextDict, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         context.dicts.append(self)
         self.context = context
@@ -27,7 +24,7 @@ class ContextDict(dict):
         self.context.pop()
 
 
-class BaseContext(object):
+class BaseContext:
     def __init__(self, dict_=None):
         self._reset_dicts(dict_)
 
@@ -38,7 +35,7 @@ class BaseContext(object):
             self.dicts.append(value)
 
     def __copy__(self):
-        duplicate = copy(super(BaseContext, self))
+        duplicate = copy(super())
         duplicate.dicts = self.dicts[:]
         return duplicate
 
@@ -67,6 +64,18 @@ class BaseContext(object):
         "Set a variable in the current context"
         self.dicts[-1][key] = value
 
+    def set_upward(self, key, value):
+        """
+        Set a variable in one of the higher contexts if it exists there,
+        otherwise in the current context.
+        """
+        context = self.dicts[-1]
+        for d in reversed(self.dicts):
+            if key in d.keys():
+                context = d
+                break
+        context[key] = value
+
     def __getitem__(self, key):
         "Get a variable's value, starting at the current context and going upward"
         for d in reversed(self.dicts):
@@ -77,13 +86,6 @@ class BaseContext(object):
     def __delitem__(self, key):
         "Delete a variable from the current context"
         del self.dicts[-1][key]
-
-    def has_key(self, key):
-        warnings.warn(
-            "%s.has_key() is deprecated in favor of the 'in' operator." % self.__class__.__name__,
-            RemovedInDjango20Warning
-        )
-        return key in self
 
     def __contains__(self, key):
         for d in self.dicts:
@@ -106,7 +108,7 @@ class BaseContext(object):
 
     def new(self, values=None):
         """
-        Returns a new context with the same properties, but with only the
+        Return a new context with the same properties, but with only the
         values given in 'values' stored.
         """
         new_context = copy(self)
@@ -115,7 +117,7 @@ class BaseContext(object):
 
     def flatten(self):
         """
-        Returns self.dicts as one dictionary
+        Return self.dicts as one dictionary.
         """
         flat = {}
         for d in self.dicts:
@@ -124,7 +126,7 @@ class BaseContext(object):
 
     def __eq__(self, other):
         """
-        Compares two contexts by comparing theirs 'dicts' attributes.
+        Compare two contexts by comparing theirs 'dicts' attributes.
         """
         if isinstance(other, BaseContext):
             # because dictionaries can be put in different order
@@ -146,7 +148,7 @@ class Context(BaseContext):
         # Set to the original template -- as opposed to extended or included
         # templates -- during rendering, see bind_template.
         self.template = None
-        super(Context, self).__init__(dict_)
+        super().__init__(dict_)
 
     @contextmanager
     def bind_template(self, template):
@@ -159,12 +161,12 @@ class Context(BaseContext):
             self.template = None
 
     def __copy__(self):
-        duplicate = super(Context, self).__copy__()
+        duplicate = super().__copy__()
         duplicate.render_context = copy(self.render_context)
         return duplicate
 
     def update(self, other_dict):
-        "Pushes other_dict to the stack of dictionaries in the Context"
+        "Push other_dict to the stack of dictionaries in the Context"
         if not hasattr(other_dict, '__getitem__'):
             raise TypeError('other_dict must be a mapping (dictionary-like) object.')
         if isinstance(other_dict, BaseContext):
@@ -187,6 +189,8 @@ class RenderContext(BaseContext):
     rendering of other templates as they would if they were stored in the normal
     template context.
     """
+    template = None
+
     def __iter__(self):
         for d in self.dicts[-1]:
             yield d
@@ -200,6 +204,17 @@ class RenderContext(BaseContext):
     def __getitem__(self, key):
         return self.dicts[-1][key]
 
+    @contextmanager
+    def push_state(self, template):
+        initial = self.template
+        self.template = template
+        self.push()
+        try:
+            yield
+        finally:
+            self.template = initial
+            self.pop()
+
 
 class RequestContext(Context):
     """
@@ -209,8 +224,7 @@ class RequestContext(Context):
     using the "processors" keyword argument.
     """
     def __init__(self, request, dict_=None, processors=None, use_l10n=None, use_tz=None, autoescape=True):
-        super(RequestContext, self).__init__(
-            dict_, use_l10n=use_l10n, use_tz=use_tz, autoescape=autoescape)
+        super().__init__(dict_, use_l10n=use_l10n, use_tz=use_tz, autoescape=autoescape)
         self.request = request
         self._processors = () if processors is None else tuple(processors)
         self._processors_index = len(self.dicts)
@@ -244,7 +258,7 @@ class RequestContext(Context):
             self.dicts[self._processors_index] = {}
 
     def new(self, values=None):
-        new_context = super(RequestContext, self).new(values)
+        new_context = super().new(values)
         # This is for backwards-compatibility: RequestContexts created via
         # Context.new don't include values from context processors.
         if hasattr(new_context, '_processors_index'):
@@ -256,6 +270,8 @@ def make_context(context, request=None, **kwargs):
     """
     Create a suitable Context from a plain dict and optionally an HttpRequest.
     """
+    if context is not None and not isinstance(context, dict):
+        raise TypeError('context must be a dict rather than %s.' % context.__class__.__name__)
     if request is None:
         context = Context(context, **kwargs)
     else:

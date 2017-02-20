@@ -3,13 +3,13 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Vláďa Macek <macek@sandbox.cz>, 2012-2014
-# Vláďa Macek <macek@sandbox.cz>, 2015
+# Vláďa Macek <macek@sandbox.cz>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-15 17:30+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-09-16 22:15+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -138,8 +138,8 @@ msgstr "Metoda"
 msgid "Arguments"
 msgstr "Argumenty"
 
-msgid "Back to Model Documentation"
-msgstr "Zpět na dokumentaci modelu"
+msgid "Back to Model documentation"
+msgstr "Zpět na popis modelů"
 
 msgid "Model documentation"
 msgstr "Dokumentace modelů"
@@ -158,6 +158,7 @@ msgstr "Šablona: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Šablona: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Vyhledávací cesta pro šablonu \"%(name)s\":"
@@ -212,8 +213,8 @@ msgstr "Kontext:"
 msgid "Templates:"
 msgstr "Šablony:"
 
-msgid "Back to Views Documentation"
-msgstr "Zpět na dokumentaci pohledů"
+msgid "Back to View documentation"
+msgstr "Zpět na popis pohledů"
 
 msgid "View documentation"
 msgstr "Dokumentace pohledů"

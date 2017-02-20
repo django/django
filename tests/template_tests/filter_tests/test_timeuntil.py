@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from datetime import datetime, timedelta
 
 from django.template.defaultfilters import timeuntil_filter
@@ -70,7 +68,7 @@ class TimeuntilTests(TimezoneTestCase):
         output = self.engine.render_to_string('timeuntil09', {'now': self.now, 'later': self.now + timedelta(days=7)})
         self.assertEqual(output, '1\xa0week')
 
-    # Ensures that differing timezones are calculated correctly.
+    # Differing timezones are calculated correctly.
     @requires_tz_support
     @setup({'timeuntil10': '{{ a|timeuntil }}'})
     def test_timeuntil10(self):

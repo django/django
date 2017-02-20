@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-04-16 09:15+0000\n"
-"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -60,6 +60,9 @@ msgstr "Daneze"
 
 msgid "German"
 msgstr "Gjermane"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "Greke"
@@ -130,6 +133,9 @@ msgstr "Indiane"
 msgid "Croatian"
 msgstr "Kroate"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "Hungareze"
 
@@ -190,8 +196,8 @@ msgstr "Marati"
 msgid "Burmese"
 msgstr "Burmeze"
 
-msgid "Norwegian Bokmal"
-msgstr "Norvegjeze Bokmal"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "Nepaleze"
@@ -288,9 +294,6 @@ msgstr "Kartela Statike"
 
 msgid "Syndication"
 msgstr ""
-
-msgid "Web Design"
-msgstr "Hartim Grafik Web"
 
 msgid "Enter a valid value."
 msgstr "Jepni vlerë të vlefshme."
@@ -433,6 +436,9 @@ msgstr "Numër i plotë"
 msgid "'%(value)s' value must be an integer."
 msgstr "Vlera '%(value)s' duhet të jetë një numër i plotë."
 
+msgid "Big (8 byte) integer"
+msgstr "Numër i plotë i madh (8 bajte)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Vlera '%(value)s' duhet të jetë True ose False."
@@ -516,9 +522,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr ""
 
-msgid "Big (8 byte) integer"
-msgstr "Numër i plotë i madh (8 bajte)"
-
 msgid "IPv4 address"
 msgstr "Adresë IPv4"
 
@@ -592,6 +595,14 @@ msgstr "Kyç i Jashtëm (lloj i përcaktuar nga fusha përkatëse)"
 
 msgid "One-to-one relationship"
 msgstr "Marrëdhënie një-për-një"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "Marrëdhënie shumë-për-shumë"

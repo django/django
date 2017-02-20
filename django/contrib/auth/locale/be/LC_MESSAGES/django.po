@@ -2,13 +2,14 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
+# znotdead <zhirafchik@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-11 08:53+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-09-15 10:02+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -64,13 +65,16 @@ msgid "Password confirmation"
 msgstr "Пацьвердзіце пароль"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Дзеля пэўнасьці набярыце такі самы пароль яшчэ раз."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"../password/"
 "\">this form</a>."
 msgstr ""
+"Паролі не захоўваюцца ў такім выглядзе, як іх набралі, таму ўбачыць пароль "
+"карыстальніка нельга, але яго можна зьмяніць выкарыстоўваючы <a href=\"../"
+"password/\">гэту форму</a>."
 
 #, python-format
 msgid ""
@@ -113,6 +117,21 @@ msgstr "соль"
 msgid "hash"
 msgstr "скарот"
 
+msgid "variety"
+msgstr "мноства"
+
+msgid "version"
+msgstr "версія"
+
+msgid "memory cost"
+msgstr "кошт памяці"
+
+msgid "time cost"
+msgstr "кошт часу"
+
+msgid "parallelism"
+msgstr "паралелізм"
+
 msgid "work factor"
 msgstr "множнік працы"
 
@@ -123,7 +142,7 @@ msgid "name"
 msgstr "назва"
 
 msgid "content type"
-msgstr ""
+msgstr "від змесціва"
 
 msgid "codename"
 msgstr "найменьне"
@@ -165,17 +184,8 @@ msgstr "Адмысловыя правы для гэтага карыстальн
 msgid "username"
 msgstr "імя карыстальніка"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Абавязковае поле. Да трыццаці знакаў. Толькі лічбы, літары ды знакі «@», "
-"«.» (кропка), «+», «-», «_»."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Увядзіце імя карыстальніка. Гэта значэнне можа ўтрымліваць толькі літары, "
-"лічбы і сімвалы @/./+/-/_."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Абавязковае поле. Да 150 знакаў. Толькі літары, лічбы ды @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Карыстальнік з такім іменем ужо існуе."
@@ -222,40 +232,59 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"Гэты пароль занадта кароткі. Ён павінен мець не менш %(min_length)d сімвал."
 msgstr[1] ""
+"Гэты пароль занадта кароткі. Ён павінен мець не менш %(min_length)d сімвала."
 msgstr[2] ""
+"Гэты пароль занадта кароткі. Ён павінен мець не менш %(min_length)d сімвалаў."
 msgstr[3] ""
+"Гэты пароль занадта кароткі. Ён павінен мець не менш %(min_length)d сімвалаў."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Ваш пароль павінен мець не менш %(min_length)d сімвал."
+msgstr[1] "Ваш пароль павінен мець не менш %(min_length)d сімвала."
+msgstr[2] "Ваш пароль павінен мець не менш %(min_length)d сімвалаў."
+msgstr[3] "Ваш пароль павінен мець не менш %(min_length)d сімвалаў."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Пароль занадта падобны да %(verbose_name)s."
 
 msgid "Your password can't be too similar to your other personal information."
 msgstr ""
+"Ваш пароль ня можа быць занадта падобным да вашай іншай асабістай інфармацыі."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Гэты пароль занадта распаўсюджаны."
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "Ваш пароль ня можа быць адным з шырока распаўсюджаных пароляў."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "Гэты пароль цалкам лікавы."
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "Ваш пароль ня можа быць цалкам лікавым."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Узнавіць пароль на %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Увядзіце імя карыстальніка. Гэта значэнне можа ўтрымліваць толькі Ангельскія "
+"літары, лічбы і сімвалы @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Увядзіце імя карыстальніка. Гэта значэнне можа ўтрымліваць толькі літары, "
+"лічбы і сімвалы @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Не ўвайшоў"

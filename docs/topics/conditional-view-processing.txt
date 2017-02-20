@@ -11,7 +11,7 @@ used for all HTTP methods (``POST``, ``PUT``, ``DELETE``, etc.).
 For each page (response) that Django sends back from a view, it might provide
 two HTTP headers: the ``ETag`` header and the ``Last-Modified`` header. These
 headers are optional on HTTP responses. They can be set by your view function,
-or you can rely on the :class:`~django.middleware.common.CommonMiddleware`
+or you can rely on the :class:`~django.middleware.http.ConditionalGetMiddleware`
 middleware to set the ``ETag`` header.
 
 When the client next requests the same resource, it might send along a header
@@ -64,7 +64,15 @@ order, as the view function they are helping to wrap. The function passed
 ``last_modified_func`` should return a standard datetime value specifying the
 last time the resource was modified, or ``None`` if the resource doesn't
 exist. The function passed to the ``etag`` decorator should return a string
-representing the `Etag`_ for the resource, or ``None`` if it doesn't exist.
+representing the `ETag`_ for the resource, or ``None`` if it doesn't exist.
+
+.. versionchanged:: 1.11
+
+    In older versions, the return value from ``etag_func()`` was interpreted as
+    the unquoted part of the ETag. That prevented the use of weak ETags, which
+    have the format ``W/"<string>"``. The return value is now expected to be
+    an ETag as defined by the specification (including the quotes), although
+    the unquoted format is also accepted for backwards compatibility.
 
 Using this feature usefully is probably best explained with an example.
 Suppose you have this pair of models, representing a simple blog system::
@@ -96,6 +104,18 @@ for your front page view::
     @condition(last_modified_func=latest_entry)
     def front_page(request, blog_id):
         ...
+
+.. admonition:: Be careful with the order of decorators
+
+    When ``condition()`` returns a conditional response, any decorators below
+    it will be skipped and won't apply to the response. Therefore, any
+    decorators that need to apply to both the regular view response and a
+    conditional response must be above ``condition()``. In particular,
+    :func:`~django.views.decorators.vary.vary_on_cookie`,
+    :func:`~django.views.decorators.vary.vary_on_headers`, and
+    :func:`~django.views.decorators.cache.cache_control` should come first
+    because :rfc:`RFC 7232 <7232#section-4.1>` requires that the headers they
+    set be present on 304 responses.
 
 Shortcuts for only computing one value
 ======================================
@@ -181,17 +201,14 @@ every time.
 Comparison with middleware conditional processing
 =================================================
 
-You may notice that Django already provides simple and straightforward
-conditional ``GET`` handling via the
-:class:`django.middleware.http.ConditionalGetMiddleware` and
-:class:`~django.middleware.common.CommonMiddleware`. While certainly being
-easy to use and suitable for many situations, those pieces of middleware
-functionality have limitations for advanced usage:
+Django provides simple and straightforward conditional ``GET`` handling via
+:class:`django.middleware.http.ConditionalGetMiddleware`. While being easy to
+use and suitable for many situations, the middleware has limitations for
+advanced usage:
 
-* They are applied globally to all views in your project
-* They don't save you from generating the response itself, which may be
-  expensive
-* They are only appropriate for HTTP ``GET`` requests.
+* It's applied globally to all views in your project.
+* It doesn't save you from generating the response, which may be expensive.
+* It's only appropriate for HTTP ``GET`` requests.
 
 You should choose the most appropriate tool for your particular problem here.
 If you have a way to compute ETags and modification times quickly and if some

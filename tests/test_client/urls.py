@@ -5,6 +5,7 @@ from django.views.generic import RedirectView
 from . import views
 
 urlpatterns = [
+    url(r'^upload_view/$', views.upload_view, name='upload_view'),
     url(r'^get_view/$', views.get_view, name='get_view'),
     url(r'^post_view/$', views.post_view),
     url(r'^trace_view/$', views.trace_view),
@@ -36,6 +37,6 @@ urlpatterns = [
 
     url(r'^accounts/$', RedirectView.as_view(url='login/')),
     url(r'^accounts/no_trailing_slash$', RedirectView.as_view(url='login/')),
-    url(r'^accounts/login/$', auth_views.login, {'template_name': 'login.html'}),
-    url(r'^accounts/logout/$', auth_views.logout),
+    url(r'^accounts/login/$', auth_views.LoginView.as_view(template_name='login.html')),
+    url(r'^accounts/logout/$', auth_views.LogoutView.as_view()),
 ]

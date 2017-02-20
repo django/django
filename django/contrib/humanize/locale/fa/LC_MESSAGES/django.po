@@ -5,14 +5,15 @@
 # Alireza Savand <alireza.savand@gmail.com>, 2012
 # Claude Paroz <claude@2xlibre.net>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2016
 # Reza Mohammadi <reza@teeleh.ir>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:12+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2016-08-16 13:51+0000\n"
+"Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +29,7 @@ msgid "th"
 msgstr "اُم"
 
 msgid "st"
-msgstr "اُم"
+msgstr "ین"
 
 msgid "nd"
 msgstr "اُم"

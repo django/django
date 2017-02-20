@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 """
 LANG_INFO is a dictionary structure to provide meta information about languages.
 
@@ -94,6 +91,12 @@ LANG_INFO = {
         'code': 'de',
         'name': 'German',
         'name_local': 'Deutsch',
+    },
+    'dsb': {
+        'bidi': False,
+        'code': 'dsb',
+        'name': 'Lower Sorbian',
+        'name_local': 'dolnoserbski',
     },
     'el': {
         'bidi': False,
@@ -232,6 +235,12 @@ LANG_INFO = {
         'code': 'hr',
         'name': 'Croatian',
         'name_local': 'Hrvatski',
+    },
+    'hsb': {
+        'bidi': False,
+        'code': 'hsb',
+        'name': 'Upper Sorbian',
+        'name_local': 'hornjoserbsce',
     },
     'hu': {
         'bidi': False,

@@ -1,18 +1,15 @@
-from __future__ import unicode_literals
-
 import threading
 from datetime import datetime, timedelta
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
-from django.db.models.fields import Field
 from django.db.models.manager import BaseManager
 from django.db.models.query import EmptyQuerySet, QuerySet
 from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import gettext_lazy
 
 from .models import Article, ArticleSelectOnSave, SelfRef
 
@@ -85,7 +82,7 @@ class ModelInstanceCreationTests(TestCase):
         a = Article(headline='Article 5', pub_date=datetime(2005, 7, 31))
         a.save()
         self.assertEqual(a.headline, 'Article 5')
-        self.assertNotEqual(a.id, None)
+        self.assertIsNotNone(a.id)
 
     def test_leaving_off_a_field_with_default_set_the_default_will_be_saved(self):
         a = Article(pub_date=datetime(2005, 7, 31))
@@ -268,22 +265,6 @@ class ModelTest(TestCase):
         s = {a10, a11, a12}
         self.assertIn(Article.objects.get(headline='Article 11'), s)
 
-    def test_field_ordering(self):
-        """
-        Field instances have a `__lt__` comparison function to define an
-        ordering based on their creation. Prior to #17851 this ordering
-        comparison relied on the now unsupported `__cmp__` and was assuming
-        compared objects were both Field instances raising `AttributeError`
-        when it should have returned `NotImplemented`.
-        """
-        f1 = Field()
-        f2 = Field(auto_created=True)
-        f3 = Field()
-        self.assertLess(f2, f1)
-        self.assertGreater(f3, f1)
-        self.assertIsNotNone(f1)
-        self.assertNotIn(f2, (None, 1, ''))
-
     def test_extra_method_select_argument_with_dashes_and_values(self):
         # The 'select' argument to extra() supports names with dashes in
         # them, as long as you use values().
@@ -329,13 +310,13 @@ class ModelTest(TestCase):
             pub_date__year=2008).extra(select={'dashed-value': '1', 'undashedvalue': '2'})
         self.assertEqual(articles[0].undashedvalue, 2)
 
-    def test_create_relation_with_ugettext_lazy(self):
+    def test_create_relation_with_gettext_lazy(self):
         """
-        Test that ugettext_lazy objects work when saving model instances
+        gettext_lazy objects work when saving model instances
         through various methods. Refs #10498.
         """
         notlazy = 'test'
-        lazy = ugettext_lazy(notlazy)
+        lazy = gettext_lazy(notlazy)
         Article.objects.create(headline=lazy, pub_date=datetime.now())
         article = Article.objects.get()
         self.assertEqual(article.headline, notlazy)
@@ -358,7 +339,7 @@ class ModelTest(TestCase):
         with self.assertRaises(TypeError):
             EmptyQuerySet()
         self.assertIsInstance(Article.objects.none(), EmptyQuerySet)
-        self.assertFalse(isinstance('', EmptyQuerySet))
+        self.assertNotIsInstance('', EmptyQuerySet)
 
     def test_emptyqs_values(self):
         # test for #15959
@@ -420,6 +401,19 @@ class ModelTest(TestCase):
             # No PK value -> unhashable (because save() would then change
             # hash)
             hash(Article())
+
+    def test_delete_and_access_field(self):
+        # Accessing a field after it's deleted from a model reloads its value.
+        pub_date = datetime.now()
+        article = Article.objects.create(headline='foo', pub_date=pub_date)
+        new_pub_date = article.pub_date + timedelta(days=10)
+        article.headline = 'bar'
+        article.pub_date = new_pub_date
+        del article.headline
+        with self.assertNumQueries(1):
+            self.assertEqual(article.headline, 'foo')
+        # Fields that weren't deleted aren't reloaded.
+        self.assertEqual(article.pub_date, new_pub_date)
 
 
 class ModelLookupTest(TestCase):
@@ -593,6 +587,9 @@ class ManagerTest(SimpleTestCase):
         '_insert',
         '_update',
         'raw',
+        'union',
+        'intersection',
+        'difference',
     ]
 
     def test_manager_methods(self):
@@ -627,9 +624,8 @@ class SelectOnSaveTests(TestCase):
 
     def test_select_on_save_lying_update(self):
         """
-        Test that select_on_save works correctly if the database
-        doesn't return correct information about matched rows from
-        UPDATE.
+        select_on_save works correctly if the database doesn't return correct
+        information about matched rows from UPDATE.
         """
         # Change the manager to not return "row matched" for update().
         # We are going to change the Article's _base_manager class
@@ -645,7 +641,7 @@ class SelectOnSaveTests(TestCase):
 
             def _update(self, *args, **kwargs):
                 FakeQuerySet.called = True
-                super(FakeQuerySet, self)._update(*args, **kwargs)
+                super()._update(*args, **kwargs)
                 return 0
 
         try:

@@ -138,8 +138,6 @@ make it part of your integration test suite.
 
 .. django-admin-option:: --fail-level {CRITICAL,ERROR,WARNING,INFO,DEBUG}
 
-.. versionadded:: 1.10
-
 Specifies the message level that will cause the command to exit with a non-zero
 status. Default is ``ERROR``.
 
@@ -223,7 +221,7 @@ Specifies the database onto which to open a shell. Defaults to ``default``.
 .. django-admin:: diffsettings
 
 Displays differences between the current settings file and Django's default
-settings.
+settings (or another settings file specified by :option:`--default`).
 
 Settings that don't appear in the defaults are followed by ``"###"``. For
 example, the default settings don't define :setting:`ROOT_URLCONF`, so
@@ -234,6 +232,13 @@ example, the default settings don't define :setting:`ROOT_URLCONF`, so
 
 Displays all settings, even if they have Django's default value. Such settings
 are prefixed by ``"###"``.
+
+.. django-admin-option:: --default MODULE
+
+.. versionadded:: 1.11
+
+The settings module to compare the current settings against. Leave empty to
+compare against Django's default settings.
 
 ``dumpdata``
 ------------
@@ -386,11 +391,6 @@ table's lifecycle, you'll need to change the
 :attr:`~django.db.models.Options.managed` option to ``True`` (or simply remove
 it because ``True`` is its default value).
 
-.. versionadded:: 1.10
-
-    Support for the ``table`` argument(s) to choose what tables should be
-    inspected was added.
-
 .. django-admin-option:: --database DATABASE
 
 Specifies the database to introspect. Defaults to ``default``.
@@ -415,6 +415,14 @@ originally generated.
 .. django-admin-option:: --app APP_LABEL
 
 Specifies a single app to look for fixtures in rather than looking in all apps.
+
+.. django-admin-option:: --exclude EXCLUDE, -e EXCLUDE
+
+.. versionadded:: 1.11
+
+Excludes loading the fixtures from the given applications and/or models (in the
+form of ``app_label`` or ``app_label.ModelName``). Use the option multiple
+times to exclude more than one app or model.
 
 What's a "fixture"?
 ~~~~~~~~~~~~~~~~~~~
@@ -556,6 +564,11 @@ directory. After making changes to the messages files you need to compile them
 with :djadmin:`compilemessages` for use with the builtin gettext support. See
 the :ref:`i18n documentation <how-to-create-language-files>` for details.
 
+This command doesn't require configured settings. However, when settings aren't
+configured, the command can't ignore the :setting:`MEDIA_ROOT` and
+:setting:`STATIC_ROOT` directories or include :setting:`LOCALE_PATHS`. It will
+also write files in UTF-8 rather than in :setting:`FILE_CHARSET`.
+
 .. django-admin-option:: --all, -a
 
 Updates the message files for all available languages.
@@ -684,18 +697,10 @@ Enables fixing of migration conflicts.
 
 Allows naming the generated migration(s) instead of using a generated name.
 
-.. django-admin-option:: --exit, -e
-
-.. deprecated:: 1.10
-
-   Use the ``--check`` option instead.
-
 Makes ``makemigrations`` exit with error code 1 when no migrations are created
 (or would have been created, if combined with ``--dry-run``).
 
 .. django-admin-option:: --check
-
-.. versionadded:: 1.10
 
 Makes ``makemigrations`` exit with a non-zero status when model changes without
 migrations are detected.
@@ -821,11 +826,6 @@ history of migrations is created at first run of ``runserver``.
 Logging of each request and response of the server is sent to the
 :ref:`django-server-logger` logger.
 
-.. versionchanged:: 1.10
-
-    In older versions, log messages were written to ``sys.stderr`` instead of
-    being handled through Python logging.
-
 .. django-admin-option:: --noreload
 
 Disables the auto-reloader. This means any Python code changes you make while
@@ -937,12 +937,7 @@ Python interpreter, use ``python`` as the interface name, like so::
 
     django-admin shell -i python
 
-.. deprecated:: 1.10
-
-   In older versions, use the ``--plain`` option instead of ``-i python``. This
-   is deprecated and will be removed in Django 2.0.
-
-.. _IPython: http://ipython.scipy.org/
+.. _IPython: https://ipython.org/
 .. _bpython: http://bpython-interpreter.org/
 
 .. django-admin-option:: --nostartup
@@ -953,11 +948,25 @@ variable or the ``~/.pythonrc.py`` script is read.
 
 .. django-admin-option:: --command COMMAND, -c COMMAND
 
-.. versionadded:: 1.10
-
 Lets you pass a command as a string to execute it as Django, like so::
 
     django-admin shell --command="import django; print(django.__version__)"
+
+You can also pass code in on standard input to execute it. For example:
+
+.. code-block:: console
+
+    $ django-admin shell <<EOF
+    > import django
+    > print(django.__version__)
+    > EOF
+
+On Windows, the REPL is output due to implementation limits of
+:func:`select.select` on that platform.
+
+.. versionchanged:: 1.11
+
+    In older versions, the REPL is also output on UNIX systems.
 
 ``showmigrations``
 ------------------
@@ -979,10 +988,16 @@ This is the default output format.
 
 .. django-admin-option:: --plan, -p
 
-Shows the migration plan Django will follow to apply migrations. Any supplied
-app labels are ignored because the plan might go beyond those apps. Like
+Shows the migration plan Django will follow to apply migrations. Like
 ``--list``, applied migrations are marked by an ``[X]``. For a ``--verbosity``
 of 2 and above, all dependencies of a migration will also be shown.
+
+``app_label``\s arguments limit the output, however, dependencies of provided
+apps may also be included.
+
+.. versionchanged:: 1.11
+
+    In older versions, ``showmigrations --plan`` ignores app labels.
 
 .. django-admin-option:: --database DATABASE
 
@@ -1219,12 +1234,6 @@ Stops running tests and reports the failure immediately after a test fails.
 Controls the test runner class that is used to execute tests. This value
 overrides the value provided by the :setting:`TEST_RUNNER` setting.
 
-.. django-admin-option:: --liveserver LIVESERVER
-
-Overrides the default address where the live server (used with
-:class:`~django.test.LiveServerTestCase`) is expected to run from. The default
-value is ``localhost:8081-8179``.
-
 .. django-admin-option:: --noinput, --no-input
 
 Suppresses all user prompts. A typical prompt is a warning about deleting an
@@ -1251,6 +1260,13 @@ database before running the test suite.
 Sorts test cases in the opposite execution order. This may help in debugging
 the side effects of tests that aren't properly isolated. :ref:`Grouping by test
 class <order-of-tests>` is preserved when using this option.
+
+.. django-admin-option:: --debug-mode
+
+.. versionadded:: 1.11
+
+Sets the :setting:`DEBUG` setting to ``True`` prior to running tests. This may
+help troubleshoot test failures.
 
 .. django-admin-option:: --debug-sql, -d
 
@@ -1302,14 +1318,10 @@ don't.
 
 .. option:: --tag TAGS
 
-.. versionadded:: 1.10
-
 Runs only tests :ref:`marked with the specified tags <topics-tagging-tests>`.
 May be specified multiple times and combined with :option:`test --exclude-tag`.
 
 .. option:: --exclude-tag EXCLUDE_TAGS
-
-.. versionadded:: 1.10
 
 Excludes tests :ref:`marked with the specified tags <topics-tagging-tests>`.
 May be specified multiple times and combined with :option:`test --tag`.
@@ -1446,6 +1458,28 @@ it could be useful if you have a ``ForeignKey`` in
 :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` and want to
 allow creating an instance instead of entering the primary key of an existing
 instance.
+
+``django.contrib.contenttypes``
+-------------------------------
+
+``remove_stale_contenttypes``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. django-admin:: remove_stale_contenttypes
+
+.. versionadded:: 1.11
+
+This command is only available if Django's :doc:`contenttypes app
+</ref/contrib/contenttypes>` (:mod:`django.contrib.contenttypes`) is installed.
+
+Deletes stale content types (from deleted models) in your database. Any objects
+that depend on the deleted content types will also be deleted. A list of
+deleted objects will be displayed before you confirm it's okay to proceed with
+the deletion.
+
+.. django-admin-option:: --database DATABASE
+
+Specifies the database to use. Defaults to ``default``.
 
 ``django.contrib.gis``
 ----------------------
@@ -1742,18 +1776,19 @@ Named arguments can be passed by using either one of the following syntaxes::
       # `use_natural_foreign_keys` is the option destination variable
       management.call_command('dumpdata', use_natural_foreign_keys=True)
 
+Some command options have different names when using ``call_command()`` instead
+of ``django-admin`` or ``manage.py``. For example, ``django-admin
+createsuperuser --no-input`` translates to ``call_command('createsuperuser',
+interactive=False)``. To find what keyword argument name to use for
+``call_command()``, check the command's source code for the ``dest`` argument
+passed to ``parser.add_argument()``.
+
 Command options which take multiple options are passed a list::
 
       management.call_command('dumpdata', exclude=['contenttypes', 'auth'])
 
 The return value of the ``call_command()`` function is the same as the return
 value of the ``handle()`` method of the command.
-
-.. versionchanged:: 1.10
-
-    ``call_command()`` now returns the value received from the
-    ``command.handle()`` method. It now also accepts a command object as the
-    first argument.
 
 Output redirection
 ==================

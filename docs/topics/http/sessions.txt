@@ -348,6 +348,9 @@ Bundled serializers
         >>> request.session['0']
         'bar'
 
+    Similarly, data that can't be encoded in JSON, such as non-UTF8 bytes like
+    ``'\xd9'`` (which raises :exc:`UnicodeDecodeError`), can't be stored.
+
     See the :ref:`custom-serializers` section for more details on limitations
     of JSON serialization.
 
@@ -370,7 +373,7 @@ including ``datetime`` and ``Decimal`` in JSON backed sessions, you will need
 to write a custom serializer (or convert such values to a JSON serializable
 object before storing them in ``request.session``). While serializing these
 values is fairly straightforward
-(``django.core.serializers.json.DateTimeAwareJSONEncoder`` may be helpful),
+(:class:`~django.core.serializers.json.DjangoJSONEncoder` may be helpful),
 writing a decoder that can reliably get back the same thing that you put in is
 more fragile. For example, you run the risk of returning a ``datetime`` that
 was actually a string that just happened to be in the same format chosen for
@@ -484,22 +487,19 @@ An API is available to manipulate session data outside of a view::
     >>> s = SessionStore()
     >>> # stored as seconds since epoch since datetimes are not serializable in JSON.
     >>> s['last_login'] = 1376587691
-    >>> s.save()
+    >>> s.create()
     >>> s.session_key
     '2b1189a188b44ad18c35e113ac6ceead'
-
     >>> s = SessionStore(session_key='2b1189a188b44ad18c35e113ac6ceead')
     >>> s['last_login']
     1376587691
 
-In order to mitigate session fixation attacks, sessions keys that don't exist
-are regenerated::
-
-    >>> from django.contrib.sessions.backends.db import SessionStore
-    >>> s = SessionStore(session_key='no-such-session-here')
-    >>> s.save()
-    >>> s.session_key
-    'ff882814010ccbc3c870523934fee5a2'
+``SessionStore.create()`` is designed to create a new session (i.e. one not
+loaded from the session store and with ``session_key=None``). ``save()`` is
+designed to save an existing session (i.e. one loaded from the session store).
+Calling ``save()`` on a new session may also work but has a small chance of
+generating a ``session_key`` that collides with an existing one. ``create()``
+calls ``save()`` and loops until an unused ``session_key`` is generated.
 
 If you're using the ``django.contrib.sessions.backends.db`` backend, each
 session is just a normal Django model. The ``Session`` model is defined in
@@ -810,7 +810,7 @@ to query the database for all active sessions for an account)::
             return CustomSession
 
         def create_model_instance(self, data):
-            obj = super(SessionStore, self).create_model_instance(data)
+            obj = super().create_model_instance(data)
             try:
                 account_id = int(data.get('_auth_user_id'))
             except (ValueError, TypeError):

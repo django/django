@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from datetime import datetime
 from decimal import Decimal
 
@@ -72,7 +70,7 @@ class NestedObjectsTests(TestCase):
 
     def test_on_delete_do_nothing(self):
         """
-        Check that the nested collector doesn't query for DO_NOTHING objects.
+        The nested collector doesn't query for DO_NOTHING objects.
         """
         n = NestedObjects(using=DEFAULT_DB_ALIAS)
         objs = [Event.objects.create()]
@@ -83,9 +81,9 @@ class NestedObjectsTests(TestCase):
 
     def test_relation_on_abstract(self):
         """
-        #21846 -- Check that `NestedObjects.collect()` doesn't trip
-        (AttributeError) on the special notation for relations on abstract
-        models (related_name that contains %(app_label)s and/or %(class)s).
+        NestedObjects.collect() doesn't trip (AttributeError) on the special
+        notation for relations on abstract models (related_name that contains
+        %(app_label)s and/or %(class)s) (#21846).
         """
         n = NestedObjects(using=DEFAULT_DB_ALIAS)
         Car.objects.create()
@@ -107,7 +105,7 @@ class UtilsTests(SimpleTestCase):
         SIMPLE_FUNCTION = 'function'
         INSTANCE_ATTRIBUTE = 'attr'
 
-        class MockModelAdmin(object):
+        class MockModelAdmin:
             def get_admin_value(self, obj):
                 return ADMIN_METHOD
 
@@ -220,12 +218,8 @@ class UtilsTests(SimpleTestCase):
         )
 
         self.assertEqual(
-            label_for_field("__unicode__", Article),
-            "article"
-        )
-        self.assertEqual(
             label_for_field("__str__", Article),
-            str("article")
+            "article"
         )
 
         with self.assertRaises(AttributeError):
@@ -259,8 +253,9 @@ class UtilsTests(SimpleTestCase):
             label_for_field(lambda x: "nothing", Article),
             "--"
         )
+        self.assertEqual(label_for_field('site_id', Article), 'Site id')
 
-        class MockModelAdmin(object):
+        class MockModelAdmin:
             def test_from_model(self, obj):
                 return "nothing"
             test_from_model.short_description = "not Really the Model"
@@ -277,7 +272,7 @@ class UtilsTests(SimpleTestCase):
     def test_label_for_property(self):
         # NOTE: cannot use @property decorator, because of
         # AttributeError: 'property' object has no attribute 'short_description'
-        class MockModelAdmin(object):
+        class MockModelAdmin:
             def my_property(self):
                 return "this if from property"
             my_property.short_description = 'property short description'

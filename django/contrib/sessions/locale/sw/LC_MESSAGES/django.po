@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Emil <bmachaku@gmail.com>, 2014
+# Machaku <bmachaku@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"

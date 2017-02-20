@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-12-30 19:23+0000\n"
-"Last-Translator: Alex Dzul <alexexc2@gmail.com>\n"
+"POT-Creation-Date: 2016-07-15 09:44+0200\n"
+"PO-Revision-Date: 2016-07-15 09:52+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Spanish (Mexico) (http://www.transifex.com/django/django/"
 "language/es_MX/)\n"
 "MIME-Version: 1.0\n"
@@ -41,6 +41,9 @@ msgid "Value must be valid JSON."
 msgstr "El valor debe ser JSON válido"
 
 msgid "Could not load JSON data."
+msgstr ""
+
+msgid "Input must be a JSON dictionary."
 msgstr ""
 
 #, python-format

@@ -1,5 +1,4 @@
 from django.http import HttpResponse
-from django.utils import six
 
 from .loader import get_template, select_template
 
@@ -34,7 +33,7 @@ class SimpleTemplateResponse(HttpResponse):
         # content argument doesn't make sense here because it will be replaced
         # with rendered template so we always pass empty string in order to
         # prevent errors and provide shorter signature.
-        super(SimpleTemplateResponse, self).__init__('', content_type, status, charset)
+        super().__init__('', content_type, status, charset=charset)
 
         # _is_rendered tracks whether the template and context has been baked
         # into a final response.
@@ -44,11 +43,9 @@ class SimpleTemplateResponse(HttpResponse):
         self._is_rendered = False
 
     def __getstate__(self):
-        """Pickling support function.
-
-        Ensures that the object can't be pickled before it has been
-        rendered, and that the pickled state only includes rendered
-        data, not the data used to construct the response.
+        """
+        Raise an exception if trying to pickle an unrendered response. Pickle
+        only rendered data, not the data used to construct the response.
         """
         obj_dict = self.__dict__.copy()
         if not self._is_rendered:
@@ -61,10 +58,10 @@ class SimpleTemplateResponse(HttpResponse):
         return obj_dict
 
     def resolve_template(self, template):
-        "Accepts a template object, path-to-template or list of paths"
+        """Accept a template object, path-to-template, or list of paths."""
         if isinstance(template, (list, tuple)):
             return select_template(template, using=self.using)
-        elif isinstance(template, six.string_types):
+        elif isinstance(template, str):
             return get_template(template, using=self.using)
         else:
             return template
@@ -74,7 +71,7 @@ class SimpleTemplateResponse(HttpResponse):
 
     @property
     def rendered_content(self):
-        """Returns the freshly rendered content for the template and context
+        """Return the freshly rendered content for the template and context
         described by the TemplateResponse.
 
         This *does not* set the final content of the response. To set the
@@ -87,7 +84,7 @@ class SimpleTemplateResponse(HttpResponse):
         return content
 
     def add_post_render_callback(self, callback):
-        """Adds a new post-rendering callback.
+        """Add a new post-rendering callback.
 
         If the response has already been rendered,
         invoke the callback immediately.
@@ -98,11 +95,11 @@ class SimpleTemplateResponse(HttpResponse):
             self._post_render_callbacks.append(callback)
 
     def render(self):
-        """Renders (thereby finalizing) the content of the response.
+        """Render (thereby finalizing) the content of the response.
 
         If the content has already been rendered, this is a no-op.
 
-        Returns the baked response instance.
+        Return the baked response instance.
         """
         retval = self
         if not self._is_rendered:
@@ -122,7 +119,7 @@ class SimpleTemplateResponse(HttpResponse):
             raise ContentNotRenderedError(
                 'The response content must be rendered before it can be iterated over.'
             )
-        return super(SimpleTemplateResponse, self).__iter__()
+        return super().__iter__()
 
     @property
     def content(self):
@@ -130,12 +127,11 @@ class SimpleTemplateResponse(HttpResponse):
             raise ContentNotRenderedError(
                 'The response content must be rendered before it can be accessed.'
             )
-        return super(SimpleTemplateResponse, self).content
+        return super().content
 
     @content.setter
     def content(self, value):
-        """Sets the content for the response
-        """
+        """Set the content for the response."""
         HttpResponse.content.fset(self, value)
         self._is_rendered = True
 
@@ -145,6 +141,5 @@ class TemplateResponse(SimpleTemplateResponse):
 
     def __init__(self, request, template, context=None, content_type=None,
                  status=None, charset=None, using=None):
-        super(TemplateResponse, self).__init__(
-            template, context, content_type, status, charset, using)
+        super().__init__(template, context, content_type, status, charset, using)
         self._request = request

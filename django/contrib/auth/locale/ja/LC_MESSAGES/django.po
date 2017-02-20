@@ -2,13 +2,13 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Shinya Okano <tokibito@gmail.com>, 2013-2015
+# Shinya Okano <tokibito@gmail.com>, 2013-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-31 12:40+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-26 16:41+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
@@ -115,6 +115,21 @@ msgstr "ソルト"
 msgid "hash"
 msgstr "ハッシュ"
 
+msgid "variety"
+msgstr "多様性"
+
+msgid "version"
+msgstr "バージョン"
+
+msgid "memory cost"
+msgstr "メモリーコスト"
+
+msgid "time cost"
+msgstr "時間コスト"
+
+msgid "parallelism"
+msgstr "並行性"
+
 msgid "work factor"
 msgstr "ワークファクター"
 
@@ -166,17 +181,10 @@ msgstr "このユーザーの持つ権限です。"
 msgid "username"
 msgstr "ユーザー名"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"この項目は必須です。半角アルファベット、半角数字、@/./+/-/_ で30文字以下にし"
+"この項目は必須です。半角アルファベット、半角数字、@/./+/-/_ で150文字以下にし"
 "てください。"
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"有効なユーザー名を入力してください。半角英数、「@.+-_」\n"
-"を使用できます。"
 
 msgid "A user with that username already exists."
 msgstr "同じユーザー名が既に登録済みです。"
@@ -251,6 +259,18 @@ msgstr "数字だけのパスワードにはできません。"
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s のパスワードリセット"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"有効なユーザー名を入力してください。半角英数、 @/./+/-/_ を使用できます。"
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"有効なユーザー名を入力してください。半角英数、 @/./+/-/_ を使用できます。"
 
 msgid "Logged out"
 msgstr "ログアウト"

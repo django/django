@@ -28,7 +28,7 @@ MySQL Spatial Limitations
 MySQL's spatial extensions only support bounding box operations
 (what MySQL calls minimum bounding rectangles, or MBR).  Specifically,
 `MySQL does not conform to the OGC standard
-<https://dev.mysql.com/doc/refman/5.6/en/spatial-relation-functions.html>`_:
+<https://dev.mysql.com/doc/refman/en/spatial-relation-functions.html>`_:
 
     Currently, MySQL does not implement these functions
     [``Contains``, ``Crosses``, ``Disjoint``, ``Intersects``, ``Overlaps``,
@@ -55,10 +55,6 @@ Raster Support
 ``RasterField`` is currently only implemented for the PostGIS backend. Spatial
 lookups are available for raster fields, but spatial database functions and
 aggregates aren't implemented for raster fields.
-
-.. versionchanged:: 1.10
-
-    ``RasterField`` now supports spatial lookups.
 
 Creating and Saving Models with Geometry Fields
 ===============================================
@@ -91,9 +87,9 @@ transform procedure::
 
 Thus, geometry parameters may be passed in using the ``GEOSGeometry`` object, WKT
 (Well Known Text [#fnwkt]_), HEXEWKB (PostGIS specific -- a WKB geometry in
-hexadecimal [#fnewkb]_), and GeoJSON [#fngeojson]_ (requires GDAL). Essentially,
-if the input is not a ``GEOSGeometry`` object, the geometry field will attempt to
-create a ``GEOSGeometry`` instance from the input.
+hexadecimal [#fnewkb]_), and GeoJSON [#fngeojson]_. Essentially, if the input is
+not a ``GEOSGeometry`` object, the geometry field will attempt to create a
+``GEOSGeometry`` instance from the input.
 
 For more information creating :class:`~django.contrib.gis.geos.GEOSGeometry`
 objects, refer to the :ref:`GEOS tutorial <geos-tutorial>`.
@@ -120,7 +116,7 @@ raster models::
 
     >>> from django.contrib.gis.gdal import GDALRaster
     >>> rast = GDALRaster({'width': 10, 'height': 10, 'name': 'Canyon', 'srid': 4326,
-    ...                    'scale': [0.1, -0.1]'bands': [{"data": range(100)}]}
+    ...                    'scale': [0.1, -0.1], 'bands': [{"data": range(100)}]})
     >>> dem = Elevation(name='Canyon', rast=rast)
     >>> dem.save()
 
@@ -129,7 +125,7 @@ Note that this equivalent to::
     >>> dem = Elevation.objects.create(
     ...     name='Canyon',
     ...     rast={'width': 10, 'height': 10, 'name': 'Canyon', 'srid': 4326,
-    ...           'scale': [0.1, -0.1]'bands': [{"data": range(100)}]}
+    ...           'scale': [0.1, -0.1], 'bands': [{"data": range(100)}]},
     ... )
 
 .. _spatial-lookups-intro:
@@ -173,10 +169,8 @@ GeoJSON , WKT, or HEXEWKB), and ``rst`` is a
 Raster Lookups
 --------------
 
-.. versionadded:: 1.10
-
 The raster lookup syntax is similar to the syntax for geometries. The only
-difference is that a band index can specified as additional input. If no band
+difference is that a band index can be specified as additional input. If no band
 index is specified, the first band is used by default (index ``0``). In that
 case the syntax is identical to the syntax for geometry lookups.
 
@@ -192,7 +186,7 @@ This results in the following general form for lookups involving rasters
     >>> qs = Elevation.objects.filter(<field>__<band_index>__<lookup_type>=<parameter>)
     >>> qs = Elevation.objects.filter(<field>__<lookup_type>=(<raster_input, <band_index>)
 
-Fore example::
+For example::
 
     >>> qs = Elevation.objects.filter(rast__contains=geom)
     >>> qs = Elevation.objects.filter(rast__contains=rst)
@@ -343,11 +337,11 @@ Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite 
 :lookup:`distance_gte`             X          X                      X          N
 :lookup:`distance_lt`              X          X                      X          N
 :lookup:`distance_lte`             X          X                      X          N
-:lookup:`dwithin`                  X          X                                 B
+:lookup:`dwithin`                  X          X                      X          B
 :lookup:`equals`                   X          X         X            X          C
 :lookup:`exact`                    X          X         X            X          B
 :lookup:`intersects`               X          X         X            X          B
-:lookup:`isvalid`                  X
+:lookup:`isvalid`                  X          X                      X (LWGEOM)
 :lookup:`overlaps`                 X          X         X            X          B
 :lookup:`relate`                   X          X                      X          C
 :lookup:`same_as`                  X          X         X            X          B
@@ -374,38 +368,38 @@ Database functions
 The following table provides a summary of what geography-specific database
 functions are available on each spatial backend.
 
-====================================  =======  ======  ===========  ==========
-Function                              PostGIS  Oracle  MySQL        SpatiaLite
-====================================  =======  ======  ===========  ==========
-:class:`Area`                         X        X       X            X
-:class:`AsGeoJSON`                    X                             X
-:class:`AsGML`                        X        X                    X
-:class:`AsKML`                        X                             X
-:class:`AsSVG`                        X                             X
-:class:`BoundingCircle`               X
-:class:`Centroid`                     X        X       X            X
-:class:`Difference`                   X        X       X (≥ 5.6.1)  X
-:class:`Distance`                     X        X       X (≥ 5.6.1)  X
-:class:`Envelope`                     X                X            X
+====================================  =======  ==============  ===========  ==========
+Function                              PostGIS  Oracle          MySQL        SpatiaLite
+====================================  =======  ==============  ===========  ==========
+:class:`Area`                         X        X               X            X
+:class:`AsGeoJSON`                    X                                     X
+:class:`AsGML`                        X        X                            X
+:class:`AsKML`                        X                                     X
+:class:`AsSVG`                        X                                     X
+:class:`BoundingCircle`               X        X
+:class:`Centroid`                     X        X               X            X
+:class:`Difference`                   X        X               X (≥ 5.6.1)  X
+:class:`Distance`                     X        X               X (≥ 5.6.1)  X
+:class:`Envelope`                     X                        X            X
 :class:`ForceRHR`                     X
-:class:`GeoHash`                      X                             X (≥ 4.0, LWGEOM)
-:class:`Intersection`                 X        X       X (≥ 5.6.1)  X
-:class:`IsValid`                      X
-:class:`Length`                       X        X       X            X
-:class:`MakeValid`                    X
+:class:`GeoHash`                      X                                     X (LWGEOM)
+:class:`Intersection`                 X        X               X (≥ 5.6.1)  X
+:class:`IsValid`                      X        X                            X (LWGEOM)
+:class:`Length`                       X        X               X            X
+:class:`MakeValid`                    X                                     X (LWGEOM)
 :class:`MemSize`                      X
-:class:`NumGeometries`                X        X       X            X
-:class:`NumPoints`                    X        X       X            X
-:class:`Perimeter`                    X        X                    X (≥ 4.0)
-:class:`PointOnSurface`               X        X                    X
-:class:`Reverse`                      X        X                    X (≥ 4.0)
-:class:`Scale`                        X                             X
-:class:`SnapToGrid`                   X                             X (≥ 3.1)
-:class:`SymDifference`                X        X       X (≥ 5.6.1)  X
-:class:`Transform`                    X        X                    X
-:class:`Translate`                    X                             X
-:class:`Union`                        X        X       X (≥ 5.6.1)  X
-====================================  =======  ======  ===========  ==========
+:class:`NumGeometries`                X        X               X            X
+:class:`NumPoints`                    X        X               X            X
+:class:`Perimeter`                    X        X                            X
+:class:`PointOnSurface`               X        X                            X
+:class:`Reverse`                      X        X                            X
+:class:`Scale`                        X                                     X
+:class:`SnapToGrid`                   X                                     X
+:class:`SymDifference`                X        X               X (≥ 5.6.1)  X
+:class:`Transform`                    X        X                            X
+:class:`Translate`                    X                                     X
+:class:`Union`                        X        X               X (≥ 5.6.1)  X
+====================================  =======  ==============  ===========  ==========
 
 Aggregate Functions
 -------------------
@@ -428,10 +422,10 @@ Aggregate                PostGIS  Oracle  SpatiaLite
 
 .. rubric:: Footnotes
 .. [#fnwkt] *See* Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, Document 99-049 (May 5, 1999), at  Ch. 3.2.5, p. 3-11 (SQL Textual Representation of Geometry).
-.. [#fnewkb] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.net/docs/manual-2.1/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
+.. [#fnewkb] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
 .. [#fngeojson] *See* Howard Butler, Martin Daly, Allan Doyle, Tim Schaub, & Christopher Schmidt, `The GeoJSON Format Specification <http://geojson.org/geojson-spec.html>`_, Revision 1.0 (June 16, 2008).
-.. [#fndistsphere15] *See* `PostGIS documentation <http://postgis.net/docs/manual-2.1/ST_Distance_Sphere.html>`_ on ``ST_distance_sphere``.
-.. [#fnmysqlidx] *See* `Creating Spatial Indexes <https://dev.mysql.com/doc/refman/5.6/en/creating-spatial-indexes.html>`_
+.. [#fndistsphere15] *See* `PostGIS documentation <http://postgis.net/docs/ST_DistanceSphere.html>`_ on ``ST_DistanceSphere``.
+.. [#fnmysqlidx] *See* `Creating Spatial Indexes <https://dev.mysql.com/doc/refman/en/creating-spatial-indexes.html>`_
    in the MySQL Reference Manual:
 
         For MyISAM tables, ``SPATIAL INDEX`` creates an R-tree index. For storage

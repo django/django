@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import uuid
 
 from django.forms import UUIDField, ValidationError
@@ -16,7 +14,7 @@ class UUIDFieldTest(SimpleTestCase):
     def test_uuidfield_2(self):
         field = UUIDField(required=False)
         value = field.clean('')
-        self.assertEqual(value, None)
+        self.assertIsNone(value)
 
     def test_uuidfield_3(self):
         field = UUIDField()

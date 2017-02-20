@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.forms import EmailField, ValidationError
 from django.test import SimpleTestCase
 
@@ -51,3 +48,12 @@ class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual('alf@foo.com', f.clean('alf@foo.com'))
         with self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 15 characters (it has 20).'"):
             f.clean('alf123456788@foo.com')
+
+    def test_emailfield_strip_on_none_value(self):
+        f = EmailField(required=False, empty_value=None)
+        self.assertIsNone(f.clean(None))
+
+    def test_emailfield_unable_to_set_strip_kwarg(self):
+        msg = "__init__() got multiple values for keyword argument 'strip'"
+        with self.assertRaisesMessage(TypeError, msg):
+            EmailField(strip=False)

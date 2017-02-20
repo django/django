@@ -56,6 +56,6 @@ class DatetimeTests(unittest.TestCase):
         """
         Regression for #12524
 
-        Check that pre-1000AD dates are padded with zeros if necessary
+        Pre-1000AD dates are padded with zeros if necessary
         """
         self.assertEqual(date(1, 1, 1).strftime("%Y/%m/%d was a %A"), '0001/01/01 was a Monday')

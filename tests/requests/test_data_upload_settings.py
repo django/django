@@ -104,6 +104,10 @@ class DataUploadMaxMemorySizeGetTests(SimpleTestCase):
         with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=None):
             self.request.body
 
+    def test_empty_content_length(self):
+        self.request.environ['CONTENT_LENGTH'] = ''
+        self.request.body
+
 
 class DataUploadMaxNumberOfFieldsGet(SimpleTestCase):
 

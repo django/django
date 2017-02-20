@@ -5,15 +5,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
 # madisvain <madisvain@gmail.com>, 2011
-# Martin <martinpajuste@gmail.com>, 2014-2015
-# Marti Raudsepp <marti@juffo.org>, 2014
+# Martin Pajuste <martinpajuste@gmail.com>, 2014-2015
+# Martin Pajuste <martinpajuste@gmail.com>, 2016
+# Marti Raudsepp <marti@juffo.org>, 2014,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:41+0000\n"
-"Last-Translator: Janno Liivak <jannolii@gmail.com>\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-07-18 21:42+0000\n"
+"Last-Translator: Marti Raudsepp <marti@juffo.org>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -63,6 +64,9 @@ msgstr "taani"
 
 msgid "German"
 msgstr "saksa"
+
+msgid "Lower Sorbian"
+msgstr " alamsorbi"
 
 msgid "Greek"
 msgstr "kreeka"
@@ -133,6 +137,9 @@ msgstr "hindi"
 msgid "Croatian"
 msgstr "horvaatia"
 
+msgid "Upper Sorbian"
+msgstr "ülemsorbi"
+
 msgid "Hungarian"
 msgstr "ungari"
 
@@ -193,8 +200,8 @@ msgstr "marathi"
 msgid "Burmese"
 msgstr "birma"
 
-msgid "Norwegian Bokmal"
-msgstr "norra (bokmal)"
+msgid "Norwegian Bokmål"
+msgstr "norra bokmål"
 
 msgid "Nepali"
 msgstr "nepali"
@@ -291,9 +298,6 @@ msgstr "Staatilised failid"
 
 msgid "Syndication"
 msgstr "Sündikeerimine"
-
-msgid "Web Design"
-msgstr "Veebidisain"
 
 msgid "Enter a valid value."
 msgstr "Sisestage korrektne väärtus."
@@ -434,6 +438,9 @@ msgstr "Täisarv"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' väärtus peab olema täisarv."
 
+msgid "Big (8 byte) integer"
+msgstr "Suur (8 baiti) täisarv"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' väärtus peab olema kas Tõene või Väär."
@@ -516,9 +523,6 @@ msgstr "'%(value)s' väärtus peab olema ujukomaarv."
 msgid "Floating point number"
 msgstr "Ujukomaarv"
 
-msgid "Big (8 byte) integer"
-msgstr "Suur (8 baiti) täisarv"
-
 msgid "IPv4 address"
 msgstr "IPv4 aadress"
 
@@ -592,6 +596,14 @@ msgstr "Välisvõti (tüübi määrab seotud väli) "
 
 msgid "One-to-one relationship"
 msgstr "Üks-ühele seos"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s seos"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s seosed"
 
 msgid "Many-to-many relationship"
 msgstr "Mitu-mitmele seos"

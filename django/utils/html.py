@@ -1,17 +1,14 @@
 """HTML utilities suitable for global use."""
 
-from __future__ import unicode_literals
-
 import re
-
-from django.utils import six
-from django.utils.encoding import force_str, force_text
-from django.utils.functional import keep_lazy, keep_lazy_text
-from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
-from django.utils.safestring import SafeData, SafeText, mark_safe
-from django.utils.six.moves.urllib.parse import (
+from urllib.parse import (
     parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit,
 )
+
+from django.utils.encoding import force_text
+from django.utils.functional import Promise, keep_lazy, keep_lazy_text
+from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
+from django.utils.safestring import SafeData, SafeText, mark_safe
 from django.utils.text import normalize_newlines
 
 from .html_parser import HTMLParseError, HTMLParser
@@ -33,30 +30,23 @@ word_split_re = re.compile(r'''([\s<>"']+)''')
 simple_url_re = re.compile(r'^https?://\[?\w', re.IGNORECASE)
 simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)($|/.*)$', re.IGNORECASE)
 simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
-link_target_attribute_re = re.compile(r'(<a [^>]*?)target=[^\s>]+')
-html_gunk_re = re.compile(
-    r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|'
-    '<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
-hard_coded_bullets_re = re.compile(
-    r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join(re.escape(x) for x in DOTS), re.DOTALL
-)
-trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
 
 
-@keep_lazy(six.text_type, SafeText)
+@keep_lazy(str, SafeText)
 def escape(text):
     """
-    Returns the given text with ampersands, quotes and angle brackets encoded
+    Return the given text with ampersands, quotes and angle brackets encoded
     for use in HTML.
 
-    This function always escapes its input, even if it's already escaped and
-    marked as such. This may result in double-escaping. If this is a concern,
-    use conditional_escape() instead.
+    Always escape input, even if it's already escaped and marked as such.
+    This may result in double-escaping. If this is a concern, use
+    conditional_escape() instead.
     """
     return mark_safe(
         force_text(text).replace('&', '&amp;').replace('<', '&lt;')
         .replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
     )
+
 
 _js_escapes = {
     ord('\\'): '\\u005C',
@@ -76,9 +66,9 @@ _js_escapes = {
 _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 
 
-@keep_lazy(six.text_type, SafeText)
+@keep_lazy(str, SafeText)
 def escapejs(value):
-    """Hex encodes characters for use in JavaScript strings."""
+    """Hex encode characters for use in JavaScript strings."""
     return mark_safe(force_text(value).translate(_js_escapes))
 
 
@@ -89,6 +79,8 @@ def conditional_escape(text):
     This function relies on the __html__ convention used both by Django's
     SafeData class and by third-party libraries like markupsafe.
     """
+    if isinstance(text, Promise):
+        text = str(text)
     if hasattr(text, '__html__'):
         return text.__html__()
     else:
@@ -97,12 +89,12 @@ def conditional_escape(text):
 
 def format_html(format_string, *args, **kwargs):
     """
-    Similar to str.format, but passes all arguments through conditional_escape,
-    and calls 'mark_safe' on the result. This function should be used instead
+    Similar to str.format, but pass all arguments through conditional_escape(),
+    and call mark_safe() on the result. This function should be used instead
     of str.format or % interpolation to build up small HTML fragments.
     """
     args_safe = map(conditional_escape, args)
-    kwargs_safe = {k: conditional_escape(v) for (k, v) in six.iteritems(kwargs)}
+    kwargs_safe = {k: conditional_escape(v) for (k, v) in kwargs.items()}
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
 
 
@@ -127,7 +119,7 @@ def format_html_join(sep, format_string, args_generator):
 
 @keep_lazy_text
 def linebreaks(value, autoescape=False):
-    """Converts newlines into <p> and <br />s."""
+    """Convert newlines into <p> and <br />s."""
     value = normalize_newlines(force_text(value))
     paras = re.split('\n{2,}', value)
     if autoescape:
@@ -175,16 +167,14 @@ def _strip_once(value):
 
 @keep_lazy_text
 def strip_tags(value):
-    """Returns the given HTML with all tags stripped."""
+    """Return the given HTML with all tags stripped."""
     # Note: in typical case this loop executes _strip_once once. Loop condition
     # is redundant, but helps to reduce number of executions of _strip_once.
     value = force_text(value)
     while '<' in value and '>' in value:
         new_value = _strip_once(value)
         if len(new_value) >= len(value):
-            # _strip_once was not able to detect more tags or length increased
-            # due to http://bugs.python.org/issue20288
-            # (affects Python 2 < 2.7.7 and Python 3 < 3.3.5)
+            # _strip_once was not able to detect more tags
             break
         value = new_value
     return value
@@ -192,18 +182,18 @@ def strip_tags(value):
 
 @keep_lazy_text
 def strip_spaces_between_tags(value):
-    """Returns the given HTML with spaces between tags removed."""
+    """Return the given HTML with spaces between tags removed."""
     return re.sub(r'>\s+<', '><', force_text(value))
 
 
 def smart_urlquote(url):
-    "Quotes a URL if it isn't already quoted."
+    """Quote a URL if it isn't already quoted."""
     def unquote_quote(segment):
-        segment = unquote(force_str(segment))
+        segment = unquote(segment)
         # Tilde is part of RFC3986 Unreserved Characters
         # http://tools.ietf.org/html/rfc3986#section-2.3
         # See also http://bugs.python.org/issue16285
-        segment = quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + str('~'))
+        segment = quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + '~')
         return force_text(segment)
 
     # Handle IDN before quoting.
@@ -221,7 +211,7 @@ def smart_urlquote(url):
     if query:
         # Separately unquoting key/value, so as to not mix querystring separators
         # included in query values. See #22267.
-        query_parts = [(unquote(force_str(q[0])), unquote(force_str(q[1])))
+        query_parts = [(unquote(q[0]), unquote(q[1]))
                        for q in parse_qsl(query, keep_blank_values=True)]
         # urlencode will take care of quoting
         query = urlencode(query_parts)
@@ -235,20 +225,19 @@ def smart_urlquote(url):
 @keep_lazy_text
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
-    Converts any URLs in text into clickable links.
+    Convert any URLs in text into clickable links.
 
     Works on http://, https://, www. links, and also on links ending in one of
     the original seven gTLDs (.com, .edu, .gov, .int, .mil, .net, and .org).
     Links can have trailing punctuation (periods, commas, close-parens) and
     leading punctuation (opening parens) and it'll still do the right thing.
 
-    If trim_url_limit is not None, the URLs in the link text longer than this
-    limit will be truncated to trim_url_limit-3 characters and appended with
-    an ellipsis.
+    If trim_url_limit is not None, truncate the URLs in the link text longer
+    than this limit to trim_url_limit-3 characters and append an ellipsis.
 
-    If nofollow is True, the links will get a rel="nofollow" attribute.
+    If nofollow is True, give the links a rel="nofollow" attribute.
 
-    If autoescape is True, the link text and URLs will be autoescaped.
+    If autoescape is True, autoescape the link text and URLs.
     """
     safe_input = isinstance(text, SafeData)
 
@@ -259,8 +248,8 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
 
     def unescape(text, trail):
         """
-        If input URL is HTML-escaped, unescape it so as we can safely feed it to
-        smart_urlquote. For example:
+        If input URL is HTML-escaped, unescape it so that it can be safely fed
+        to smart_urlquote. For example:
         http://example.com?x=1&amp;y=&lt;2&gt; => http://example.com?x=1&y=<2>
         """
         unescaped = (text + trail).replace(
@@ -372,22 +361,12 @@ def html_safe(klass):
             "can't apply @html_safe to %s because it defines "
             "__html__()." % klass.__name__
         )
-    if six.PY2:
-        if '__unicode__' not in klass.__dict__:
-            raise ValueError(
-                "can't apply @html_safe to %s because it doesn't "
-                "define __unicode__()." % klass.__name__
-            )
-        klass_unicode = klass.__unicode__
-        klass.__unicode__ = lambda self: mark_safe(klass_unicode(self))
-        klass.__html__ = lambda self: unicode(self)  # NOQA: unicode undefined on PY3
-    else:
-        if '__str__' not in klass.__dict__:
-            raise ValueError(
-                "can't apply @html_safe to %s because it doesn't "
-                "define __str__()." % klass.__name__
-            )
-        klass_str = klass.__str__
-        klass.__str__ = lambda self: mark_safe(klass_str(self))
-        klass.__html__ = lambda self: str(self)
+    if '__str__' not in klass.__dict__:
+        raise ValueError(
+            "can't apply @html_safe to %s because it doesn't "
+            "define __str__()." % klass.__name__
+        )
+    klass_str = klass.__str__
+    klass.__str__ = lambda self: mark_safe(klass_str(self))
+    klass.__html__ = lambda self: str(self)
     return klass

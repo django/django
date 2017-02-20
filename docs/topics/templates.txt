@@ -36,6 +36,13 @@ For historical reasons, both the generic support for template engines and the
 implementation of the Django template language live in the ``django.template``
 namespace.
 
+.. warning::
+
+    The template system isn't safe against untrusted template authors. For
+    example, a site shouldn't allow its users to provide their own templates,
+    since template authors can do things like perform XSS attacks and access
+    properties of template variables that may contain sensitive information.
+
 .. _template-engines:
 
 Support for template engines
@@ -252,6 +259,10 @@ templates, Django provides a shortcut function which automates the process.
         An optional :class:`~django.http.HttpRequest` that will be available
         during the template's rendering process.
 
+    ``using``
+        An optional template engine :setting:`NAME <TEMPLATES-NAME>`. The
+        search for the template will be restricted to that engine.
+
     Usage example::
 
         from django.template.loader import render_to_string
@@ -303,10 +314,6 @@ applications. This generic name was kept for backwards-compatibility.
   .. warning::
 
       Only set it to ``False`` if you're rendering non-HTML templates!
-
-  .. versionadded:: 1.10
-
-      The ``autoescape`` option was added.
 
 * ``'context_processors'``: a list of dotted Python paths to callables that
   are used to populate the context when a template is rendered with a request.
@@ -398,17 +405,29 @@ adds defaults that differ from Jinja2's for a few options:
 * ``'auto_reload'``: ``settings.DEBUG``
 * ``'undefined'``: ``DebugUndefined if settings.DEBUG else Undefined``
 
+``Jinja2`` engines also accept the following :setting:`OPTIONS
+<TEMPLATES-OPTIONS>`:
+
+* ``'context_processors'``: a list of dotted Python paths to callables that
+  are used to populate the context when a template is rendered with a request.
+  These callables take a request object as their argument and return a
+  :class:`dict` of items to be merged into the context.
+
+  It defaults to an empty list.
+
+.. versionadded:: 1.11
+
+    The ``'context_processors'`` option was added.
+
 The default configuration is purposefully kept to a minimum. If a template is
 rendered with a request (e.g. when using :py:func:`~django.shortcuts.render`),
 the ``Jinja2`` backend adds the globals ``request``, ``csrf_input``, and
 ``csrf_token`` to the context. Apart from that, this backend doesn't create a
-Django-flavored environment. It doesn't know about Django context processors,
-filters, and tags. In order to use Django-specific APIs, you must configure
-them into the environment.
+Django-flavored environment. It doesn't know about Django filters and tags.
+In order to use Django-specific APIs, you must configure them into the
+environment.
 
 For example, you can create ``myproject/jinja2.py`` with this content::
-
-    from __future__ import absolute_import  # Python 2 only
 
     from django.contrib.staticfiles.storage import staticfiles_storage
     from django.urls import reverse
@@ -467,7 +486,7 @@ fictional ``foobar`` template library::
         def __init__(self, params):
             params = params.copy()
             options = params.pop('OPTIONS').copy()
-            super(FooBar, self).__init__(params)
+            super().__init__(params)
 
             self.engine = foobar.Engine(**options)
 

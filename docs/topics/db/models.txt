@@ -445,14 +445,14 @@ something like this::
     class Person(models.Model):
         name = models.CharField(max_length=128)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Group(models.Model):
         name = models.CharField(max_length=128)
         members = models.ManyToManyField(Person, through='Membership')
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Membership(models.Model):
@@ -513,11 +513,9 @@ the intermediate model::
 Unlike normal many-to-many fields, you *can't* use ``add()``, ``create()``,
 or ``set()`` to create relationships::
 
-    >>> # THIS WILL NOT WORK
+    >>> # The following statements will not work
     >>> beatles.members.add(john)
-    >>> # NEITHER WILL THIS
     >>> beatles.members.create(name="George Harrison")
-    >>> # AND NEITHER WILL THIS
     >>> beatles.members.set([john, paul, ringo, george])
 
 Why? You can't just create a relationship between a ``Person`` and a ``Group``
@@ -539,7 +537,7 @@ information as to which intermediate model instance should be deleted::
     ...     invite_reason="You've been gone for a month and we miss you.")
     >>> beatles.members.all()
     <QuerySet [<Person: Ringo Starr>, <Person: Paul McCartney>, <Person: Ringo Starr>]>
-    >>> # THIS WILL NOT WORK BECAUSE IT CANNOT TELL WHICH MEMBERSHIP TO REMOVE
+    >>> # This will not work because it cannot tell which membership to remove
     >>> beatles.members.remove(ringo)
 
 However, the :meth:`~django.db.models.fields.related.RelatedManager.clear`
@@ -751,10 +749,10 @@ For example, this model has a few custom methods::
             else:
                 return "Post-boomer"
 
-        def _get_full_name(self):
+        @property
+        def full_name(self):
             "Returns the person's full name."
             return '%s %s' % (self.first_name, self.last_name)
-        full_name = property(_get_full_name)
 
 The last method in this example is a :term:`property`.
 
@@ -763,8 +761,8 @@ of :ref:`methods automatically given to each model <model-instance-methods>`.
 You can override most of these -- see `overriding predefined model methods`_,
 below -- but there are a couple that you'll almost always want to define:
 
-:meth:`~Model.__str__` (Python 3)
-    A Python "magic method" that returns a unicode "representation" of any
+:meth:`~Model.__str__`
+    A Python "magic method" that returns a string representation of any
     object. This is what Python and Django will use whenever a model
     instance needs to be coerced and displayed as a plain string. Most
     notably, this happens when you display an object in an interactive
@@ -772,9 +770,6 @@ below -- but there are a couple that you'll almost always want to define:
 
     You'll always want to define this method; the default isn't very helpful
     at all.
-
-``__unicode__()`` (Python 2)
-    Python 2 equivalent of ``__str__()``.
 
 :meth:`~Model.get_absolute_url`
     This tells Django how to calculate the URL for an object. Django uses
@@ -809,7 +804,7 @@ to happen whenever you save an object. For example (see
 
         def save(self, *args, **kwargs):
             do_something()
-            super(Blog, self).save(*args, **kwargs) # Call the "real" save() method.
+            super().save(*args, **kwargs)  # Call the "real" save() method.
             do_something_else()
 
 You can also prevent saving::
@@ -824,10 +819,10 @@ You can also prevent saving::
             if self.name == "Yoko Ono's blog":
                 return # Yoko shall never have her own blog!
             else:
-                super(Blog, self).save(*args, **kwargs) # Call the "real" save() method.
+                super().save(*args, **kwargs)  # Call the "real" save() method.
 
 It's important to remember to call the superclass method -- that's
-that ``super(Blog, self).save(*args, **kwargs)`` business -- to ensure
+that ``super().save(*args, **kwargs)`` business -- to ensure
 that the object still gets saved into the database. If you forget to
 call the superclass method, the default behavior won't happen and the
 database won't get touched.
@@ -1022,8 +1017,8 @@ The reverse name of the ``common.ChildB.m2m`` field will be
 ``common_childb_related`` and the reverse query name will be
 ``common_childbs``. Finally, the reverse name of the ``rare.ChildB.m2m`` field
 will be ``rare_childb_related`` and the reverse query name will be
-``rare_childbs``. It's up to you how you use the `'%(class)s'`` and
-``'%(app_label)s`` portion to construct your related name or related query name
+``rare_childbs``. It's up to you how you use the ``'%(class)s'`` and
+``'%(app_label)s'`` portion to construct your related name or related query name
 but if you forget to use it, Django will raise errors when you perform system
 checks (or run :djadmin:`migrate`).
 
@@ -1035,11 +1030,6 @@ in the above code, if the :attr:`~django.db.models.ForeignKey.related_name`
 attribute was omitted, the reverse name for the ``m2m`` field would be
 ``childa_set`` in the ``ChildA`` case and ``childb_set`` for the ``ChildB``
 field.
-
-.. versionchanged:: 1.10
-
-   Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` for
-   ``related_query_name`` was added.
 
 .. _multi-table-inheritance:
 
@@ -1083,6 +1073,8 @@ However, if ``p`` in the above example was *not* a ``Restaurant`` (it had been
 created directly as a ``Place`` object or was the parent of some other class),
 referring to ``p.restaurant`` would raise a ``Restaurant.DoesNotExist``
 exception.
+
+.. _meta-and-multi-table-inheritance:
 
 ``Meta`` and multi-table inheritance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1212,6 +1204,9 @@ order by the ``last_name`` attribute when you use the proxy. This is easy::
 Now normal ``Person`` queries will be unordered
 and ``OrderedPerson`` queries will be ordered by ``last_name``.
 
+Proxy models inherit ``Meta`` attributes :ref:`in the same way as regular
+models <meta-and-multi-table-inheritance>`.
+
 ``QuerySet``\s still return the model that was requested
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1232,11 +1227,6 @@ provide any connection between the rows in the different database tables. A
 proxy model can inherit from any number of abstract model classes, providing
 they do *not* define any model fields. A proxy model may also inherit from any
 number of proxy models that share a common non-abstract parent class.
-
-.. versionchanged:: 1.10
-
-    In earlier versions, a proxy model couldn't inherit more than one proxy
-    model that shared the same parent class.
 
 Proxy model managers
 ~~~~~~~~~~~~~~~~~~~~
@@ -1371,10 +1361,6 @@ This restriction doesn't apply to model fields inherited from an abstract
 model. Such fields may be overridden with another field or value, or be removed
 by setting ``field_name = None``.
 
-.. versionchanged:: 1.10
-
-    The ability to override abstract fields was added.
-
 .. warning::
 
     Model managers are inherited from abstract base classes. Overriding an
@@ -1409,6 +1395,30 @@ different database tables).
 
 Django will raise a :exc:`~django.core.exceptions.FieldError` if you override
 any model field in any ancestor model.
+
+Organizing models in a package
+==============================
+
+The :djadmin:`manage.py startapp <startapp>` command creates an application
+structure that includes a ``models.py`` file. If you have many models,
+organizing them in separate files may be useful.
+
+To do so, create a ``models`` package. Remove ``models.py`` and create a
+``myapp/models/`` directory with an ``__init__.py`` file and the files to
+store your models. You must import the models in the ``__init__.py`` file.
+
+For example, if you had ``organic.py`` and ``synthetic.py`` in the ``models``
+directory:
+
+.. snippet::
+    :filename: myapp/models/__init__.py
+
+    from .organic import Person
+    from .synthetic import Robot
+
+Explicitly importing each model rather than using ``from .models import *``
+has the advantages of not cluttering the namespace, making code more readable,
+and keeping code analysis tools useful.
 
 .. seealso::
 

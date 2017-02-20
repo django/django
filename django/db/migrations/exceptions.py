@@ -1,7 +1,4 @@
-from __future__ import unicode_literals
-
 from django.db.utils import DatabaseError
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class AmbiguityError(Exception):
@@ -46,7 +43,6 @@ class IrreversibleError(RuntimeError):
     pass
 
 
-@python_2_unicode_compatible
 class NodeNotFoundError(LookupError):
     """
     Raised when an attempt on a node is made that is not available in the graph.

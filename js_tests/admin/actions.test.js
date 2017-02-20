@@ -1,8 +1,8 @@
-/* global module, test */
+/* global QUnit */
 /* eslint global-strict: 0, strict: 0 */
 'use strict';
 
-module('admin.actions', {
+QUnit.module('admin.actions', {
     beforeEach: function() {
         // Number of results shown on page
         /* eslint-disable */
@@ -16,7 +16,7 @@ module('admin.actions', {
     }
 });
 
-test('check', function(assert) {
+QUnit.test('check', function(assert) {
     var $ = django.jQuery;
     assert.notOk($('.action-select').is(':checked'));
     $('#action-toggle').click();

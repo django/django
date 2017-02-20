@@ -24,15 +24,12 @@
 
 Welcome to Django 1.6!
 
-These release notes cover the `new features`_, as well as some `backwards
-incompatible changes`_ you'll want to be aware of when upgrading from Django
-1.5 or older versions. We've also dropped some features, which are detailed in
-:ref:`our deprecation plan <deprecation-removed-in-1.6>`, and we've `begun the
-deprecation process for some features`_.
-
-.. _`new features`: `What's new in Django 1.6`_
-.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.6`_
-.. _`begun the deprecation process for some features`: `Features deprecated in 1.6`_
+These release notes cover the :ref:`new features <whats-new-1.6>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.6>` you'll
+want to be aware of when upgrading from Django 1.5 or older versions. We've
+also dropped some features, which are detailed in :ref:`our deprecation plan
+<deprecation-removed-in-1.6>`, and we've :ref:`begun the deprecation process
+for some features <deprecated-features-1.6>`.
 
 Python compatibility
 ====================
@@ -45,6 +42,8 @@ Django 1.6 will be the final release series to support Python 2.6; beginning
 with Django 1.7, the minimum supported Python version will be 2.7.
 
 Python 3.4 is not supported, but support will be added in Django 1.7.
+
+.. _whats-new-1.6:
 
 What's new in Django 1.6
 ========================
@@ -190,7 +189,7 @@ Minor features
 
 * For custom management commands: Verification of the presence of valid
   settings in commands that ask for it by using the
-  :attr:`~django.core.management.BaseCommand.can_import_settings` internal
+  ``BaseCommand.can_import_settings`` internal
   option is now performed independently from handling of the locale that
   should be active during the execution of the command. The latter can now be
   influenced by the new
@@ -369,6 +368,8 @@ Minor features
   default value. Passwords :ref:`will be upgraded <password-upgrades>` to use
   the new iteration count as necessary.
 
+.. _backwards-incompatible-1.6:
+
 Backwards incompatible changes in 1.6
 =====================================
 
@@ -447,7 +448,7 @@ removed and the standalone GeoDjango tests execution setup it implemented isn't
 supported anymore. To run the GeoDjango tests simply use the new
 ``DiscoverRunner`` and specify the ``django.contrib.gis`` app.
 
-Custom User models in tests
+Custom user models in tests
 ---------------------------
 
 The introduction of the new test runner has also slightly changed the way that
@@ -483,7 +484,7 @@ pytz_. If you're using MySQL, you must install pytz_ and load the time zone
 tables with `mysql_tzinfo_to_sql`_.
 
 .. _pytz: http://pytz.sourceforge.net/
-.. _mysql_tzinfo_to_sql: https://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
+.. _mysql_tzinfo_to_sql: https://dev.mysql.com/doc/refman/en/mysql-tzinfo-to-sql.html
 
 Addition of ``QuerySet.datetimes()``
 ------------------------------------
@@ -584,7 +585,7 @@ be at the end of a line. If they are not, the comments are ignored and
 Quoting in ``reverse()``
 ------------------------
 
-When reversing URLs, Django didn't apply :func:`~django.utils.http.urlquote`
+When reversing URLs, Django didn't apply ``django.utils.http.urlquote``
 to arguments before interpolating them in URL patterns. This bug is fixed in
 Django 1.6. If you worked around this bug by applying URL quoting before
 passing arguments to ``reverse()``, this may result in double-quoting. If this
@@ -786,7 +787,7 @@ the ``name`` argument so it doesn't conflict with the new url::
     url(r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
         'django.contrib.auth.views.password_reset_confirm_uidb36'),
 
-You can remove this url pattern after your app has been deployed with Django
+You can remove this URL pattern after your app has been deployed with Django
 1.6 for :setting:`PASSWORD_RESET_TIMEOUT_DAYS`.
 
 Default session serialization switched to JSON
@@ -1059,7 +1060,7 @@ out into a new middleware:
 
 If you're relying on this feature, you should add
 ``'django.middleware.common.BrokenLinkEmailsMiddleware'`` to your
-:setting:`MIDDLEWARE_CLASSES` setting and remove ``SEND_BROKEN_LINK_EMAILS``
+``MIDDLEWARE_CLASSES`` setting and remove ``SEND_BROKEN_LINK_EMAILS``
 from your settings.
 
 ``_has_changed`` method on widgets

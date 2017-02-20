@@ -1,21 +1,22 @@
 import os
-import warnings
+import select
+import sys
 
-from django.core.management.base import BaseCommand
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.core.management import BaseCommand, CommandError
+from django.utils.datastructures import OrderedSet
 
 
 class Command(BaseCommand):
-    help = "Runs a Python interactive interpreter. Tries to use IPython or bpython, if one of them is available."
+    help = (
+        "Runs a Python interactive interpreter. Tries to use IPython or "
+        "bpython, if one of them is available. Any standard input is executed "
+        "as code."
+    )
+
     requires_system_checks = False
     shells = ['ipython', 'bpython', 'python']
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            '--plain', action='store_true', dest='plain',
-            help='Tells Django to use plain Python, not IPython or bpython. '
-                 'Deprecated, use the `-i python` or `--interface python` option instead.',
-        )
         parser.add_argument(
             '--no-startup', action='store_true', dest='no_startup',
             help='When using plain Python, ignore the PYTHONSTARTUP environment variable and ~/.pythonrc.py script.',
@@ -29,35 +30,9 @@ class Command(BaseCommand):
             help='Instead of opening an interactive shell, run a command as Django and exit.',
         )
 
-    def _ipython_pre_011(self):
-        """Start IPython pre-0.11"""
-        from IPython.Shell import IPShell
-        shell = IPShell(argv=[])
-        shell.mainloop()
-
-    def _ipython_pre_100(self):
-        """Start IPython pre-1.0.0"""
-        from IPython.frontend.terminal.ipapp import TerminalIPythonApp
-        app = TerminalIPythonApp.instance()
-        app.initialize(argv=[])
-        app.start()
-
-    def _ipython(self):
-        """Start IPython >= 1.0"""
+    def ipython(self, options):
         from IPython import start_ipython
         start_ipython(argv=[])
-
-    def ipython(self, options):
-        """Start any version of IPython"""
-        for ip in (self._ipython, self._ipython_pre_100, self._ipython_pre_011):
-            try:
-                ip()
-            except ImportError:
-                pass
-            else:
-                return
-        # no IPython, raise ImportError
-        raise ImportError("No IPython")
 
     def bpython(self, options):
         import bpython
@@ -78,7 +53,7 @@ class Command(BaseCommand):
             import rlcompleter
             readline.set_completer(rlcompleter.Completer(imported_objects).complete)
             # Enable tab completion on systems using libedit (e.g. Mac OSX).
-            # These lines are copied from Lib/site.py on Python 3.4.
+            # These lines are copied from Python's Lib/site.py.
             readline_doc = getattr(readline, '__doc__', '')
             if readline_doc is not None and 'libedit' in readline_doc:
                 readline.parse_and_bind("bind ^I rl_complete")
@@ -88,10 +63,9 @@ class Command(BaseCommand):
         # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow system
         # conventions and get $PYTHONSTARTUP first then .pythonrc.py.
         if not options['no_startup']:
-            for pythonrc in (os.environ.get("PYTHONSTARTUP"), '~/.pythonrc.py'):
+            for pythonrc in OrderedSet([os.environ.get("PYTHONSTARTUP"), os.path.expanduser('~/.pythonrc.py')]):
                 if not pythonrc:
                     continue
-                pythonrc = os.path.expanduser(pythonrc)
                 if not os.path.isfile(pythonrc):
                     continue
                 try:
@@ -102,16 +76,15 @@ class Command(BaseCommand):
         code.interact(local=imported_objects)
 
     def handle(self, **options):
-        if options['plain']:
-            warnings.warn(
-                "The --plain option is deprecated in favor of the -i python or --interface python option.",
-                RemovedInDjango20Warning
-            )
-            options['interface'] = 'python'
-
         # Execute the command and exit.
         if options['command']:
             exec(options['command'])
+            return
+
+        # Execute stdin if it has anything to read and exit.
+        # Not supported on Windows due to select.select() limitations.
+        if sys.platform != 'win32' and select.select([sys.stdin], [], [], 0)[0]:
+            exec(sys.stdin.read())
             return
 
         available_shells = [options['interface']] if options['interface'] else self.shells
@@ -121,4 +94,4 @@ class Command(BaseCommand):
                 return getattr(self, shell)(options)
             except ImportError:
                 pass
-        raise ImportError("Couldn't load any of the specified interfaces.")
+        raise CommandError("Couldn't import {} interface.".format(shell))

@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-11 08:53+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-09-15 15:52+0000\n"
+"Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,7 +20,7 @@ msgid "Personal info"
 msgstr "व्यक्तिगत विवरण"
 
 msgid "Permissions"
-msgstr "अनुमति"
+msgstr "अनुमतिहरु"
 
 msgid "Important dates"
 msgstr "महत्वपूर्ण मितिहरु"
@@ -61,7 +61,7 @@ msgid "Password confirmation"
 msgstr "पासवर्ड पुष्टि"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "प्रमाणित गर्न पुन: उही पासवर्ड राख्नु होस ।"
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
@@ -108,6 +108,21 @@ msgstr "साल्ट"
 msgid "hash"
 msgstr "ह्यास"
 
+msgid "variety"
+msgstr ""
+
+msgid "version"
+msgstr "भर्जन"
+
+msgid "memory cost"
+msgstr ""
+
+msgid "time cost"
+msgstr ""
+
+msgid "parallelism"
+msgstr ""
+
 msgid "work factor"
 msgstr "वर्क फ्याक्टर"
 
@@ -118,7 +133,7 @@ msgid "name"
 msgstr "नाम"
 
 msgid "content type"
-msgstr ""
+msgstr "कन्टेन्ट टाइप"
 
 msgid "codename"
 msgstr "कोडनेम"
@@ -157,12 +172,7 @@ msgstr "यो प्रयोगकर्ताको लागि तोकि
 msgid "username"
 msgstr "प्रयोगकर्ता नाम"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "आवश्यक । ३० अक्षर वा कम । अंक, वर्ण र  @/./+/-/_  मात्र उपयुक्त ।"
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 
 msgid "A user with that username already exists."
@@ -224,7 +234,7 @@ msgid "Your password can't be too similar to your other personal information."
 msgstr ""
 
 msgid "This password is too common."
-msgstr ""
+msgstr "यो पासवर्ड साधारण भयो ।"
 
 msgid "Your password can't be a commonly used password."
 msgstr ""
@@ -238,6 +248,16 @@ msgstr ""
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s को पासवर्ड पून: राख्नु "
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
 
 msgid "Logged out"
 msgstr "लग आउट "

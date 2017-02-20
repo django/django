@@ -3,13 +3,15 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Алексей Борискин <sun.void@gmail.com>, 2012-2015
+# Андрей Щуров <shurov9009@gmail.com>, 2016
+# Дмитрий Шатера <mr.bobsans@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-22 18:05+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-06-24 20:40+0000\n"
+"Last-Translator: Дмитрий Шатера <mr.bobsans@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -117,6 +119,21 @@ msgstr "соль"
 msgid "hash"
 msgstr "хэш"
 
+msgid "variety"
+msgstr "множество"
+
+msgid "version"
+msgstr "версия"
+
+msgid "memory cost"
+msgstr "затраты памяти"
+
+msgid "time cost"
+msgstr "затраты времени"
+
+msgid "parallelism"
+msgstr "параллелизм"
+
 msgid "work factor"
 msgstr "рабочий фактор"
 
@@ -168,17 +185,10 @@ msgstr "Индивидуальные права данного пользова�
 msgid "username"
 msgstr "имя пользователя"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Обязательное поле. Не более 30 символов. Только буквы, цифры и символы @/./"
+"Обязательное поле. Не более 150 символов. Только буквы, цифры и символы @/./"
 "+/-/_."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Введите правильное имя пользователя. Оно может содержать только буквы, цифры "
-"и знаки @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Пользователь с таким именем уже существует."
@@ -270,6 +280,20 @@ msgstr "Ваш пароль не может состоять только из �
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Сброс пароля на %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Введите правильное имя пользователя. Это значение может содержать только "
+"английские буквы, цифры и знаки @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Введите правильное имя пользователя. Оно может содержать только буквы, цифры "
+"и знаки @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Не авторизован"

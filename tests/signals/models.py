@@ -1,13 +1,9 @@
 """
 Testing signals before/after saving and deleting.
 """
-from __future__ import unicode_literals
-
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Person(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
@@ -16,7 +12,6 @@ class Person(models.Model):
         return "%s %s" % (self.first_name, self.last_name)
 
 
-@python_2_unicode_compatible
 class Car(models.Model):
     make = models.CharField(max_length=20)
     model = models.CharField(max_length=20)
@@ -25,7 +20,6 @@ class Car(models.Model):
         return "%s %s" % (self.make, self.model)
 
 
-@python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=20)
 
@@ -33,7 +27,6 @@ class Author(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Book(models.Model):
     name = models.CharField(max_length=20)
     authors = models.ManyToManyField(Author)

@@ -5,7 +5,6 @@ Tests for stuff in django.utils.datastructures.
 import copy
 
 from django.test import SimpleTestCase
-from django.utils import six
 from django.utils.datastructures import (
     DictWrapper, ImmutableList, MultiValueDict, MultiValueDictKeyError,
     OrderedSet,
@@ -40,19 +39,19 @@ class MultiValueDictTests(SimpleTestCase):
         self.assertEqual(d.get('name'), 'Simon')
         self.assertEqual(d.getlist('name'), ['Adrian', 'Simon'])
         self.assertEqual(
-            sorted(six.iteritems(d)),
+            sorted(d.items()),
             [('name', 'Simon'), ('position', 'Developer')]
         )
 
         self.assertEqual(
-            sorted(six.iterlists(d)),
+            sorted(d.lists()),
             [('name', ['Adrian', 'Simon']), ('position', ['Developer'])]
         )
 
         with self.assertRaisesMessage(MultiValueDictKeyError, 'lastname'):
             d.__getitem__('lastname')
 
-        self.assertEqual(d.get('lastname'), None)
+        self.assertIsNone(d.get('lastname'))
         self.assertEqual(d.get('lastname', 'nonexistent'), 'nonexistent')
         self.assertEqual(d.getlist('lastname'), [])
         self.assertEqual(d.getlist('doesnotexist', ['Adrian', 'Simon']),
@@ -60,8 +59,7 @@ class MultiValueDictTests(SimpleTestCase):
 
         d.setlist('lastname', ['Holovaty', 'Willison'])
         self.assertEqual(d.getlist('lastname'), ['Holovaty', 'Willison'])
-        self.assertEqual(sorted(six.itervalues(d)),
-                         ['Developer', 'Simon', 'Willison'])
+        self.assertEqual(sorted(d.values()), ['Developer', 'Simon', 'Willison'])
 
     def test_appendlist(self):
         d = MultiValueDict()
@@ -95,11 +93,34 @@ class MultiValueDictTests(SimpleTestCase):
             'pm': ['Rory'],
         })
         d = mvd.dict()
-        self.assertEqual(sorted(six.iterkeys(d)), sorted(six.iterkeys(mvd)))
-        for key in six.iterkeys(mvd):
+        self.assertEqual(sorted(d.keys()), sorted(mvd.keys()))
+        for key in mvd.keys():
             self.assertEqual(d[key], mvd[key])
 
         self.assertEqual({}, MultiValueDict().dict())
+
+    def test_getlist_doesnt_mutate(self):
+        x = MultiValueDict({'a': ['1', '2'], 'b': ['3']})
+        values = x.getlist('a')
+        values += x.getlist('b')
+        self.assertEqual(x.getlist('a'), ['1', '2'])
+
+    def test_internal_getlist_does_mutate(self):
+        x = MultiValueDict({'a': ['1', '2'], 'b': ['3']})
+        values = x._getlist('a')
+        values += x._getlist('b')
+        self.assertEqual(x._getlist('a'), ['1', '2', '3'])
+
+    def test_getlist_default(self):
+        x = MultiValueDict({'a': [1]})
+        MISSING = object()
+        values = x.getlist('b', default=MISSING)
+        self.assertIs(values, MISSING)
+
+    def test_getlist_none_empty_values(self):
+        x = MultiValueDict({'a': None, 'b': []})
+        self.assertIsNone(x.getlist('a'))
+        self.assertEqual(x.getlist('b'), [])
 
 
 class ImmutableListTests(SimpleTestCase):

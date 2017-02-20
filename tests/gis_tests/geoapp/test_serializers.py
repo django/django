@@ -1,11 +1,8 @@
-from __future__ import unicode_literals
-
 import json
 
 from django.contrib.gis.geos import LinearRing, Point, Polygon
 from django.core import serializers
-from django.test import TestCase, mock, skipUnlessDBFeature
-from django.utils import six
+from django.test import TestCase, skipUnlessDBFeature
 
 from .models import City, MultiFields, PennsylvaniaCity
 
@@ -26,10 +23,7 @@ class GeoJSONSerializerTests(TestCase):
 
     def test_serialization_base(self):
         geojson = serializers.serialize('geojson', City.objects.all().order_by('name'))
-        try:
-            geodata = json.loads(geojson)
-        except Exception:
-            self.fail("Serialized output is not valid JSON")
+        geodata = json.loads(geojson)
         self.assertEqual(len(geodata['features']), len(City.objects.all()))
         self.assertEqual(geodata['features'][0]['geometry']['type'], 'Point')
         self.assertEqual(geodata['features'][0]['properties']['name'], 'Chicago')
@@ -88,14 +82,6 @@ class GeoJSONSerializerTests(TestCase):
             [int(c) for c in geodata['features'][0]['geometry']['coordinates']],
             [1564802, 5613214]
         )
-
-    @mock.patch('django.contrib.gis.serializers.geojson.HAS_GDAL', False)
-    def test_without_gdal(self):
-        # Without coordinate transformation, the serialization should succeed:
-        serializers.serialize('geojson', City.objects.all())
-        with six.assertRaisesRegex(self, serializers.base.SerializationError, '.*GDAL is not installed'):
-            # Coordinate transformations need GDAL
-            serializers.serialize('geojson', City.objects.all(), srid=2847)
 
     def test_deserialization_exception(self):
         """

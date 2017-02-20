@@ -149,7 +149,7 @@ when all the tests have been executed.
 You can prevent the test databases from being destroyed by using the
 :option:`test --keepdb` option. This will preserve the test database between
 runs. If the database does not exist, it will first be created. Any migrations
-will also be applied in order to keep it p to date.
+will also be applied in order to keep it up to date.
 
 The default test database names are created by prepending ``test_`` to the
 value of each :setting:`NAME` in :setting:`DATABASES`. When using SQLite, the
@@ -177,9 +177,9 @@ control the particular collation used by the test database. See the
 :doc:`settings documentation </ref/settings>` for details of these
 and other advanced settings.
 
-If using an SQLite in-memory database with Python 3.4+ and SQLite 3.7.13+,
-`shared cache <https://www.sqlite.org/sharedcache.html>`_ will be enabled, so
-you can write tests with ability to share the database between threads.
+If using an SQLite in-memory database with SQLite 3.7.13+, `shared cache
+<https://www.sqlite.org/sharedcache.html>`_ is enabled, so you can write tests
+with ability to share the database between threads.
 
 .. admonition:: Finding data from your production database when running tests?
 
@@ -302,8 +302,8 @@ failed::
     ----------------------------------------------------------------------
     Traceback (most recent call last):
       File "/dev/mysite/polls/tests.py", line 16, in test_was_published_recently_with_future_poll
-        self.assertEqual(future_poll.was_published_recently(), False)
-    AssertionError: True != False
+        self.assertIs(future_poll.was_published_recently(), False)
+    AssertionError: True is not False
 
     ----------------------------------------------------------------------
     Ran 1 test in 0.003s
@@ -324,10 +324,18 @@ need to test for success or failure at that level.
 Speeding up the tests
 ---------------------
 
-In recent versions of Django, the default password hasher is rather slow by
-design. If during your tests you are authenticating many users, you may want
-to use a custom settings file and set the :setting:`PASSWORD_HASHERS` setting
-to a faster hashing algorithm::
+Running tests in parallel
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As long as your tests are properly isolated, you can run them in parallel to
+gain a speed up on multi-core hardware. See :option:`test --parallel`.
+
+Password hashing
+~~~~~~~~~~~~~~~~
+
+The default password hasher is rather slow by design. If you're authenticating
+many users in your tests, you may want to use a custom settings file and set
+the :setting:`PASSWORD_HASHERS` setting to a faster hashing algorithm::
 
     PASSWORD_HASHERS = [
         'django.contrib.auth.hashers.MD5PasswordHasher',

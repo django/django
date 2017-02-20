@@ -1,17 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Chen Chun-Chia <ccc.larc@gmail.com>, 2015
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # quantum9876 <quantum9876@gmail.com>, 2011
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:35+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/django/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2016-08-19 08:08+0000\n"
+"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,10 +22,14 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "GIS"
-msgstr ""
+msgstr "GIS"
 
-msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr "將基本的 GIS 平面以OpenGIS  Specification Geometry type對應。"
+msgid "The base GIS field."
+msgstr "基礎 GIS 欄位。"
+
+msgid ""
+"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+msgstr "基本的 Geometry 欄位——對應於 OpenGIS 規格的 Geometry 類型。"
 
 msgid "Point"
 msgstr "Point 類別"
@@ -47,7 +53,10 @@ msgid "Geometry collection"
 msgstr "Geometry collection (幾何型別之叢集) 類別"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "聚集程度欄位"
+
+msgid "Raster Field"
+msgstr "柵格欄位"
 
 msgid "No geometry value provided."
 msgstr "沒有幾何資訊。"
@@ -64,16 +73,16 @@ msgid ""
 msgstr "當把目前地理資訊-GIS，轉成空間參考識別碼-SRID時發生錯誤。"
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "刪除所有特徵"
 
 msgid "WKT debugging window:"
-msgstr ""
+msgstr "WKT 除錯視窗："
 
 msgid "Google Maps via GeoDjango"
 msgstr ""
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "除錯視窗 (序列化值)"
 
 msgid "No feeds are registered."
 msgstr "沒有已註冊的 feed。"

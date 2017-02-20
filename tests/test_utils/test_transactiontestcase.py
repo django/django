@@ -1,4 +1,6 @@
-from django.test import TransactionTestCase, mock
+from unittest import mock
+
+from django.test import TransactionTestCase
 
 
 class TestSerializedRollbackInhibitsPostMigrate(TransactionTestCase):

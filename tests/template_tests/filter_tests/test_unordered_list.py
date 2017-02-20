@@ -1,6 +1,5 @@
 from django.template.defaultfilters import unordered_list
 from django.test import SimpleTestCase
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -88,8 +87,7 @@ class FunctionTests(SimpleTestCase):
         )
 
     def test_ulitem(self):
-        @python_2_unicode_compatible
-        class ULItem(object):
+        class ULItem:
             def __init__(self, title):
                 self.title = title
 
@@ -115,8 +113,7 @@ class FunctionTests(SimpleTestCase):
         )
 
     def test_ulitem_autoescape_off(self):
-        @python_2_unicode_compatible
-        class ULItem(object):
+        class ULItem:
             def __init__(self, title):
                 self.title = title
 

@@ -1,12 +1,10 @@
-from __future__ import unicode_literals
-
 import re
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Expression
-from django.db.models.lookups import BuiltinLookup, Lookup, Transform
-from django.utils import six
+from django.db.models.lookups import Lookup, Transform
+from django.db.models.sql.query import Query
 
 gis_lookups = {}
 
@@ -24,19 +22,19 @@ class GISLookup(Lookup):
     band_lhs = None
 
     def __init__(self, *args, **kwargs):
-        super(GISLookup, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.template_params = {}
 
     @classmethod
     def _check_geo_field(cls, opts, lookup):
         """
-        Utility for checking the given lookup with the given model options.
+        Check the given lookup with the given model options.
         The lookup is a string either specifying the geographic field, e.g.
         'point, 'the_geom', or a related lookup on a geographic field like
         'address__point'.
 
-        If a BaseSpatialField exists according to the given lookup on the model
-        options, it will be returned. Otherwise return None.
+        Return a BaseSpatialField if one exists according to the given lookup
+        on the model options, otherwise return None.
         """
         from django.contrib.gis.db.models.fields import BaseSpatialField
         # This takes into account the situation where the lookup is a
@@ -100,9 +98,9 @@ class GISLookup(Lookup):
         return ('%s', params)
 
     def process_rhs(self, compiler, connection):
-        if hasattr(self.rhs, '_as_sql'):
-            # If rhs is some QuerySet, don't touch it
-            return super(GISLookup, self).process_rhs(compiler, connection)
+        if isinstance(self.rhs, Query):
+            # If rhs is some Query, don't touch it.
+            return super().process_rhs(compiler, connection)
 
         geom = self.rhs
         if isinstance(self.rhs, Col):
@@ -126,7 +124,7 @@ class GISLookup(Lookup):
         elif isinstance(self.lhs, RasterBandTransform):
             self.process_band_indices(only_lhs=True)
 
-        rhs, rhs_params = super(GISLookup, self).process_rhs(compiler, connection)
+        rhs, rhs_params = super().process_rhs(compiler, connection)
         rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, geom, compiler)
         return rhs, rhs_params
 
@@ -157,6 +155,8 @@ class OverlapsLeftLookup(GISLookup):
     left of B's bounding box.
     """
     lookup_name = 'overlaps_left'
+
+
 gis_lookups['overlaps_left'] = OverlapsLeftLookup
 
 
@@ -166,6 +166,8 @@ class OverlapsRightLookup(GISLookup):
     right of B's bounding box.
     """
     lookup_name = 'overlaps_right'
+
+
 gis_lookups['overlaps_right'] = OverlapsRightLookup
 
 
@@ -175,6 +177,8 @@ class OverlapsBelowLookup(GISLookup):
     B's bounding box.
     """
     lookup_name = 'overlaps_below'
+
+
 gis_lookups['overlaps_below'] = OverlapsBelowLookup
 
 
@@ -184,6 +188,8 @@ class OverlapsAboveLookup(GISLookup):
     B's bounding box.
     """
     lookup_name = 'overlaps_above'
+
+
 gis_lookups['overlaps_above'] = OverlapsAboveLookup
 
 
@@ -193,6 +199,8 @@ class LeftLookup(GISLookup):
     of B's bounding box.
     """
     lookup_name = 'left'
+
+
 gis_lookups['left'] = LeftLookup
 
 
@@ -202,6 +210,8 @@ class RightLookup(GISLookup):
     of B's bounding box.
     """
     lookup_name = 'right'
+
+
 gis_lookups['right'] = RightLookup
 
 
@@ -211,6 +221,8 @@ class StrictlyBelowLookup(GISLookup):
     bounding box.
     """
     lookup_name = 'strictly_below'
+
+
 gis_lookups['strictly_below'] = StrictlyBelowLookup
 
 
@@ -220,6 +232,8 @@ class StrictlyAboveLookup(GISLookup):
     bounding box.
     """
     lookup_name = 'strictly_above'
+
+
 gis_lookups['strictly_above'] = StrictlyAboveLookup
 
 
@@ -230,12 +244,16 @@ class SameAsLookup(GISLookup):
     vertex-by-vertex, the operator returns true.
     """
     lookup_name = 'same_as'
+
+
 gis_lookups['same_as'] = SameAsLookup
 
 
 class ExactLookup(SameAsLookup):
     # Alias of same_as
     lookup_name = 'exact'
+
+
 gis_lookups['exact'] = ExactLookup
 
 
@@ -245,6 +263,8 @@ class BBContainsLookup(GISLookup):
     by B's bounding box.
     """
     lookup_name = 'bbcontains'
+
+
 gis_lookups['bbcontains'] = BBContainsLookup
 
 
@@ -253,6 +273,8 @@ class BBOverlapsLookup(GISLookup):
     The 'bboverlaps' operator returns true if A's bounding box overlaps B's bounding box.
     """
     lookup_name = 'bboverlaps'
+
+
 gis_lookups['bboverlaps'] = BBOverlapsLookup
 
 
@@ -262,6 +284,8 @@ class ContainedLookup(GISLookup):
     by B's bounding box.
     """
     lookup_name = 'contained'
+
+
 gis_lookups['contained'] = ContainedLookup
 
 
@@ -271,61 +295,82 @@ gis_lookups['contained'] = ContainedLookup
 
 class ContainsLookup(GISLookup):
     lookup_name = 'contains'
+
+
 gis_lookups['contains'] = ContainsLookup
 
 
 class ContainsProperlyLookup(GISLookup):
     lookup_name = 'contains_properly'
+
+
 gis_lookups['contains_properly'] = ContainsProperlyLookup
 
 
 class CoveredByLookup(GISLookup):
     lookup_name = 'coveredby'
+
+
 gis_lookups['coveredby'] = CoveredByLookup
 
 
 class CoversLookup(GISLookup):
     lookup_name = 'covers'
+
+
 gis_lookups['covers'] = CoversLookup
 
 
 class CrossesLookup(GISLookup):
     lookup_name = 'crosses'
+
+
 gis_lookups['crosses'] = CrossesLookup
 
 
 class DisjointLookup(GISLookup):
     lookup_name = 'disjoint'
+
+
 gis_lookups['disjoint'] = DisjointLookup
 
 
 class EqualsLookup(GISLookup):
     lookup_name = 'equals'
+
+
 gis_lookups['equals'] = EqualsLookup
 
 
 class IntersectsLookup(GISLookup):
     lookup_name = 'intersects'
+
+
 gis_lookups['intersects'] = IntersectsLookup
 
 
-class IsValidLookup(BuiltinLookup):
+class IsValidLookup(GISLookup):
     lookup_name = 'isvalid'
+    sql_template = '%(func)s(%(lhs)s)'
 
     def as_sql(self, compiler, connection):
         if self.lhs.field.geom_type == 'RASTER':
             raise ValueError('The isvalid lookup is only available on geometry fields.')
         gis_op = connection.ops.gis_operators[self.lookup_name]
         sql, params = self.process_lhs(compiler, connection)
-        sql = '%(func)s(%(lhs)s)' % {'func': gis_op.func, 'lhs': sql}
+        sql, params = gis_op.as_sql(connection, self, {'func': gis_op.func, 'lhs': sql}, params)
         if not self.rhs:
             sql = 'NOT ' + sql
         return sql, params
+
+
 gis_lookups['isvalid'] = IsValidLookup
 
 
 class OverlapsLookup(GISLookup):
     lookup_name = 'overlaps'
+
+
 gis_lookups['overlaps'] = OverlapsLookup
 
 
@@ -343,19 +388,25 @@ class RelateLookup(GISLookup):
             backend_op.check_relate_argument(value[1])
         else:
             pattern = value[1]
-            if not isinstance(pattern, six.string_types) or not self.pattern_regex.match(pattern):
+            if not isinstance(pattern, str) or not self.pattern_regex.match(pattern):
                 raise ValueError('Invalid intersection matrix pattern "%s".' % pattern)
-        return super(RelateLookup, self).get_db_prep_lookup(value, connection)
+        return super().get_db_prep_lookup(value, connection)
+
+
 gis_lookups['relate'] = RelateLookup
 
 
 class TouchesLookup(GISLookup):
     lookup_name = 'touches'
+
+
 gis_lookups['touches'] = TouchesLookup
 
 
 class WithinLookup(GISLookup):
     lookup_name = 'within'
+
+
 gis_lookups['within'] = WithinLookup
 
 
@@ -385,7 +436,7 @@ class DistanceLookupBase(GISLookup):
         else:
             params += connection.ops.get_distance(
                 self.lhs.output_field, (dist_param,) + self.rhs[2:],
-                self.lookup_name, handle_spheroid=False
+                self.lookup_name,
             )
         rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, params[0], compiler)
         return (rhs, params)
@@ -394,24 +445,34 @@ class DistanceLookupBase(GISLookup):
 class DWithinLookup(DistanceLookupBase):
     lookup_name = 'dwithin'
     sql_template = '%(func)s(%(lhs)s, %(rhs)s, %%s)'
+
+
 gis_lookups['dwithin'] = DWithinLookup
 
 
 class DistanceGTLookup(DistanceLookupBase):
     lookup_name = 'distance_gt'
+
+
 gis_lookups['distance_gt'] = DistanceGTLookup
 
 
 class DistanceGTELookup(DistanceLookupBase):
     lookup_name = 'distance_gte'
+
+
 gis_lookups['distance_gte'] = DistanceGTELookup
 
 
 class DistanceLTLookup(DistanceLookupBase):
     lookup_name = 'distance_lt'
+
+
 gis_lookups['distance_lt'] = DistanceLTLookup
 
 
 class DistanceLTELookup(DistanceLookupBase):
     lookup_name = 'distance_lte'
+
+
 gis_lookups['distance_lte'] = DistanceLTELookup

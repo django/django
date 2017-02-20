@@ -30,7 +30,7 @@ class LoaderTests(SimpleTestCase):
 
     def test_loader_priority(self):
         """
-        #21460 -- Check that the order of template loader works.
+        #21460 -- The order of template loader works.
         """
         loaders = [
             'django.template.loaders.filesystem.Loader',
@@ -42,7 +42,7 @@ class LoaderTests(SimpleTestCase):
 
     def test_cached_loader_priority(self):
         """
-        Check that the order of template loader works. Refs #21460.
+        The order of template loader works. Refs #21460.
         """
         loaders = [
             ('django.template.loaders.cached.Loader', [

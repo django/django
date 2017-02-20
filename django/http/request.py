@@ -1,10 +1,8 @@
-from __future__ import unicode_literals
-
 import copy
 import re
-import sys
 from io import BytesIO
 from itertools import chain
+from urllib.parse import quote, urlencode, urljoin, urlsplit
 
 from django.conf import settings
 from django.core import signing
@@ -13,18 +11,12 @@ from django.core.exceptions import (
 )
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
-from django.utils import six
 from django.utils.datastructures import ImmutableList, MultiValueDict
-from django.utils.encoding import (
-    escape_uri_path, force_bytes, force_str, force_text, iri_to_uri,
-)
+from django.utils.encoding import escape_uri_path, force_bytes, iri_to_uri
 from django.utils.http import is_same_domain, limited_parse_qsl
-from django.utils.six.moves.urllib.parse import (
-    quote, urlencode, urljoin, urlsplit,
-)
 
 RAISE_ERROR = object()
-host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9:]+\])(:\d+)?$")
+host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
 
 
 class UnreadablePostError(IOError):
@@ -40,7 +32,7 @@ class RawPostDataException(Exception):
     pass
 
 
-class HttpRequest(object):
+class HttpRequest:
     """A basic HTTP request."""
 
     # The encoding used in GET/POST dicts. None means use default setting.
@@ -68,10 +60,8 @@ class HttpRequest(object):
 
     def __repr__(self):
         if self.method is None or not self.get_full_path():
-            return force_str('<%s>' % self.__class__.__name__)
-        return force_str(
-            '<%s: %s %r>' % (self.__class__.__name__, self.method, force_str(self.get_full_path()))
-        )
+            return '<%s>' % self.__class__.__name__
+        return '<%s: %s %r>' % (self.__class__.__name__, self.method, self.get_full_path())
 
     def _get_raw_host(self):
         """
@@ -96,12 +86,13 @@ class HttpRequest(object):
         """Return the HTTP host using the environment or request headers."""
         host = self._get_raw_host()
 
-        # There is no hostname validation when DEBUG=True
-        if settings.DEBUG:
-            return host
+        # Allow variants of localhost if ALLOWED_HOSTS is empty and DEBUG=True.
+        allowed_hosts = settings.ALLOWED_HOSTS
+        if settings.DEBUG and not allowed_hosts:
+            allowed_hosts = ['localhost', '127.0.0.1', '[::1]']
 
         domain, port = split_domain_port(host)
-        if domain and validate_host(domain, settings.ALLOWED_HOSTS):
+        if domain and validate_host(domain, allowed_hosts):
             return host
         else:
             msg = "Invalid HTTP_HOST header: %r." % host
@@ -225,8 +216,8 @@ class HttpRequest(object):
         next access (so that it is decoded correctly).
         """
         self._encoding = val
-        if hasattr(self, '_get'):
-            del self._get
+        if hasattr(self, 'GET'):
+            del self.GET
         if hasattr(self, '_post'):
             del self._post
 
@@ -264,13 +255,13 @@ class HttpRequest(object):
 
             # Limit the maximum request data size that will be handled in-memory.
             if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None and
-                    int(self.META.get('CONTENT_LENGTH', 0)) > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
+                    int(self.META.get('CONTENT_LENGTH') or 0) > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
                 raise RequestDataTooBig('Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.')
 
             try:
                 self._body = self.read()
             except IOError as e:
-                six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
+                raise UnreadablePostError(*e.args) from e
             self._stream = BytesIO(self._body)
         return self._body
 
@@ -329,14 +320,14 @@ class HttpRequest(object):
         try:
             return self._stream.read(*args, **kwargs)
         except IOError as e:
-            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
+            raise UnreadablePostError(*e.args) from e
 
     def readline(self, *args, **kwargs):
         self._read_started = True
         try:
             return self._stream.readline(*args, **kwargs)
         except IOError as e:
-            six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
+            raise UnreadablePostError(*e.args) from e
 
     def xreadlines(self):
         while True:
@@ -363,7 +354,7 @@ class QueryDict(MultiValueDict):
     will always return a mutable copy.
 
     Both keys and values set on this class are converted from the given encoding
-    (DEFAULT_CHARSET by default) to unicode.
+    (DEFAULT_CHARSET by default) to str.
     """
 
     # These are both reset in __init__, but is specified here at the class
@@ -372,7 +363,7 @@ class QueryDict(MultiValueDict):
     _encoding = None
 
     def __init__(self, query_string=None, mutable=False, encoding=None):
-        super(QueryDict, self).__init__()
+        super().__init__()
         if not encoding:
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
@@ -382,25 +373,29 @@ class QueryDict(MultiValueDict):
             'fields_limit': settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
             'encoding': encoding,
         }
-        if six.PY3:
-            if isinstance(query_string, bytes):
-                # query_string normally contains URL-encoded data, a subset of ASCII.
-                try:
-                    query_string = query_string.decode(encoding)
-                except UnicodeDecodeError:
-                    # ... but some user agents are misbehaving :-(
-                    query_string = query_string.decode('iso-8859-1')
-            for key, value in limited_parse_qsl(query_string, **parse_qsl_kwargs):
-                self.appendlist(key, value)
-        else:
-            for key, value in limited_parse_qsl(query_string, **parse_qsl_kwargs):
-                try:
-                    value = value.decode(encoding)
-                except UnicodeDecodeError:
-                    value = value.decode('iso-8859-1')
-                self.appendlist(force_text(key, encoding, errors='replace'),
-                                value)
+        if isinstance(query_string, bytes):
+            # query_string normally contains URL-encoded data, a subset of ASCII.
+            try:
+                query_string = query_string.decode(encoding)
+            except UnicodeDecodeError:
+                # ... but some user agents are misbehaving :-(
+                query_string = query_string.decode('iso-8859-1')
+        for key, value in limited_parse_qsl(query_string, **parse_qsl_kwargs):
+            self.appendlist(key, value)
         self._mutable = mutable
+
+    @classmethod
+    def fromkeys(cls, iterable, value='', mutable=False, encoding=None):
+        """
+        Return a new QueryDict with keys (may be repeated) from an iterable and
+        values from value.
+        """
+        q = cls('', mutable=True, encoding=encoding)
+        for key in iterable:
+            q.appendlist(key, value)
+        if not mutable:
+            q._mutable = False
+        return q
 
     @property
     def encoding(self):
@@ -420,22 +415,22 @@ class QueryDict(MultiValueDict):
         self._assert_mutable()
         key = bytes_to_text(key, self.encoding)
         value = bytes_to_text(value, self.encoding)
-        super(QueryDict, self).__setitem__(key, value)
+        super().__setitem__(key, value)
 
     def __delitem__(self, key):
         self._assert_mutable()
-        super(QueryDict, self).__delitem__(key)
+        super().__delitem__(key)
 
     def __copy__(self):
         result = self.__class__('', mutable=True, encoding=self.encoding)
-        for key, value in six.iterlists(self):
+        for key, value in self.lists():
             result.setlist(key, value)
         return result
 
     def __deepcopy__(self, memo):
         result = self.__class__('', mutable=True, encoding=self.encoding)
         memo[id(self)] = result
-        for key, value in six.iterlists(self):
+        for key, value in self.lists():
             result.setlist(copy.deepcopy(key, memo), copy.deepcopy(value, memo))
         return result
 
@@ -443,35 +438,35 @@ class QueryDict(MultiValueDict):
         self._assert_mutable()
         key = bytes_to_text(key, self.encoding)
         list_ = [bytes_to_text(elt, self.encoding) for elt in list_]
-        super(QueryDict, self).setlist(key, list_)
+        super().setlist(key, list_)
 
     def setlistdefault(self, key, default_list=None):
         self._assert_mutable()
-        return super(QueryDict, self).setlistdefault(key, default_list)
+        return super().setlistdefault(key, default_list)
 
     def appendlist(self, key, value):
         self._assert_mutable()
         key = bytes_to_text(key, self.encoding)
         value = bytes_to_text(value, self.encoding)
-        super(QueryDict, self).appendlist(key, value)
+        super().appendlist(key, value)
 
     def pop(self, key, *args):
         self._assert_mutable()
-        return super(QueryDict, self).pop(key, *args)
+        return super().pop(key, *args)
 
     def popitem(self):
         self._assert_mutable()
-        return super(QueryDict, self).popitem()
+        return super().popitem()
 
     def clear(self):
         self._assert_mutable()
-        super(QueryDict, self).clear()
+        super().clear()
 
     def setdefault(self, key, default=None):
         self._assert_mutable()
         key = bytes_to_text(key, self.encoding)
         default = bytes_to_text(default, self.encoding)
-        return super(QueryDict, self).setdefault(key, default)
+        return super().setdefault(key, default)
 
     def copy(self):
         """Returns a mutable copy of this object."""
@@ -508,18 +503,18 @@ class QueryDict(MultiValueDict):
 
 
 # It's neither necessary nor appropriate to use
-# django.utils.encoding.smart_text for parsing URLs and form inputs. Thus,
+# django.utils.encoding.force_text for parsing URLs and form inputs. Thus,
 # this slightly more restricted function, used by QueryDict.
 def bytes_to_text(s, encoding):
     """
-    Converts basestring objects to unicode, using the given encoding. Illegally
+    Convert bytes objects to strings, using the given encoding. Illegally
     encoded input characters are replaced with Unicode "unknown" codepoint
     (\ufffd).
 
-    Returns any non-basestring objects without change.
+    Return any non-bytes objects without change.
     """
     if isinstance(s, bytes):
-        return six.text_type(s, encoding, 'replace')
+        return str(s, encoding, 'replace')
     else:
         return s
 
@@ -540,9 +535,10 @@ def split_domain_port(host):
         # It's an IPv6 address without a port.
         return host, ''
     bits = host.rsplit(':', 1)
-    if len(bits) == 2:
-        return tuple(bits)
-    return bits[0], ''
+    domain, port = bits if len(bits) == 2 else (bits[0], '')
+    # Remove a trailing dot (if present) from the domain.
+    domain = domain[:-1] if domain.endswith('.') else domain
+    return domain, port
 
 
 def validate_host(host, allowed_hosts):
@@ -560,8 +556,6 @@ def validate_host(host, allowed_hosts):
 
     Return ``True`` for a valid host, ``False`` otherwise.
     """
-    host = host[:-1] if host.endswith('.') else host
-
     for pattern in allowed_hosts:
         if pattern == '*' or is_same_domain(host, pattern):
             return True

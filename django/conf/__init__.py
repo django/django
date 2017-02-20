@@ -9,9 +9,11 @@ a list of all possible variables.
 import importlib
 import os
 import time
+import warnings
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -49,9 +51,32 @@ class LazySettings(LazyObject):
         }
 
     def __getattr__(self, name):
+        """
+        Return the value of a setting and cache it in self.__dict__.
+        """
         if self._wrapped is empty:
             self._setup(name)
-        return getattr(self._wrapped, name)
+        val = getattr(self._wrapped, name)
+        self.__dict__[name] = val
+        return val
+
+    def __setattr__(self, name, value):
+        """
+        Set the value of setting. Clear all cached values if _wrapped changes
+        (@override_settings does this) or clear single values when set.
+        """
+        if name == '_wrapped':
+            self.__dict__.clear()
+        else:
+            self.__dict__.pop(name, None)
+        super().__setattr__(name, value)
+
+    def __delattr__(self, name):
+        """
+        Delete a setting and clear it from cache if needed.
+        """
+        super().__delattr__(name)
+        self.__dict__.pop(name, None)
 
     def configure(self, default_settings=global_settings, **options):
         """
@@ -74,17 +99,7 @@ class LazySettings(LazyObject):
         return self._wrapped is not empty
 
 
-class BaseSettings(object):
-    """
-    Common logic for settings whether set by a module or by the user.
-    """
-    def __setattr__(self, name, value):
-        if name in ("MEDIA_URL", "STATIC_URL") and value and not value.endswith('/'):
-            raise ImproperlyConfigured("If set, %s must end with a slash" % name)
-        object.__setattr__(self, name, value)
-
-
-class Settings(BaseSettings):
+class Settings:
     def __init__(self, settings_module):
         # update this dict from global settings (but only for ALL_CAPS settings)
         for setting in dir(global_settings):
@@ -115,6 +130,9 @@ class Settings(BaseSettings):
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
 
+        if self.is_overridden('DEFAULT_CONTENT_TYPE'):
+            warnings.warn('The DEFAULT_CONTENT_TYPE setting is deprecated.', RemovedInDjango30Warning)
+
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
@@ -137,7 +155,7 @@ class Settings(BaseSettings):
         }
 
 
-class UserSettingsHolder(BaseSettings):
+class UserSettingsHolder:
     """
     Holder for user configured settings.
     """
@@ -160,12 +178,14 @@ class UserSettingsHolder(BaseSettings):
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        super(UserSettingsHolder, self).__setattr__(name, value)
+        if name == 'DEFAULT_CONTENT_TYPE':
+            warnings.warn('The DEFAULT_CONTENT_TYPE setting is deprecated.', RemovedInDjango30Warning)
+        super().__setattr__(name, value)
 
     def __delattr__(self, name):
         self._deleted.add(name)
         if hasattr(self, name):
-            super(UserSettingsHolder, self).__delattr__(name)
+            super().__delattr__(name)
 
     def __dir__(self):
         return sorted(
@@ -183,5 +203,6 @@ class UserSettingsHolder(BaseSettings):
         return '<%(cls)s>' % {
             'cls': self.__class__.__name__,
         }
+
 
 settings = LazySettings()

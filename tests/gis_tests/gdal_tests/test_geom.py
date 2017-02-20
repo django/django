@@ -1,23 +1,17 @@
 import json
+import pickle
 import unittest
 from binascii import b2a_hex
 from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
-from django.utils.six.moves import range
 
 from ..test_data import TestDataMixin
 
-try:
-    from django.utils.six.moves import cPickle as pickle
-except ImportError:
-    import pickle
-
-
 if HAS_GDAL:
     from django.contrib.gis.gdal import (
-        OGRGeometry, OGRGeomType, GDALException, OGRIndexError,
-        SpatialReference, CoordTransform, GDAL_VERSION,
+        CoordTransform, GDALException, OGRGeometry, OGRGeomType, OGRIndexError,
+        SpatialReference,
     )
 
 
@@ -94,10 +88,6 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
         for g in self.geometries.wkt_out:
             geom = OGRGeometry(g.wkt)
             exp_gml = g.gml
-            if GDAL_VERSION >= (1, 8):
-                # In GDAL 1.8, the non-conformant GML tag  <gml:GeometryCollection> was
-                # replaced with <gml:MultiGeometry>.
-                exp_gml = exp_gml.replace('GeometryCollection', 'MultiGeometry')
             self.assertEqual(exp_gml, geom.gml)
 
     def test_hex(self):
@@ -543,3 +533,21 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
             OGRGeometry('POINT(0.5 0.5)').within(OGRGeometry('POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))')), True
         )
         self.assertIs(OGRGeometry('POINT(0 0)').within(OGRGeometry('POINT(0 1)')), False)
+
+    def test_from_gml(self):
+        self.assertEqual(
+            OGRGeometry('POINT(0 0)'),
+            OGRGeometry.from_gml(
+                '<gml:Point gml:id="p21" srsName="http://www.opengis.net/def/crs/EPSG/0/4326">'
+                '    <gml:pos srsDimension="2">0 0</gml:pos>'
+                '</gml:Point>'
+            ),
+        )
+
+    def test_empty(self):
+        self.assertIs(OGRGeometry('POINT (0 0)').empty, False)
+        self.assertIs(OGRGeometry('POINT EMPTY').empty, True)
+
+    def test_empty_point_to_geos(self):
+        p = OGRGeometry('POINT EMPTY', srs=4326)
+        self.assertEqual(p.geos.ewkt, p.ewkt)

@@ -14,18 +14,18 @@ undefined -- not random, just undefined.
 """
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class Author(models.Model):
+    name = models.CharField(max_length=63, null=True, blank=True)
+
     class Meta:
         ordering = ('-pk',)
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     author = models.ForeignKey(Author, models.SET_NULL, null=True)
-    second_author = models.ForeignKey(Author, models.SET_NULL, null=True)
+    second_author = models.ForeignKey(Author, models.SET_NULL, null=True, related_name='+')
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
 

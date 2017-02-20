@@ -1,7 +1,6 @@
-from __future__ import unicode_literals
-
 from django.forms import (
-    CharField, PasswordInput, Textarea, TextInput, ValidationError,
+    CharField, HiddenInput, PasswordInput, Textarea, TextInput,
+    ValidationError,
 )
 from django.test import SimpleTestCase
 
@@ -79,7 +78,9 @@ class CharFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
     def test_charfield_widget_attrs(self):
         """
-        CharField.widget_attrs() always returns a dictionary (#15912).
+        CharField.widget_attrs() always returns a dictionary and includes
+        minlength/maxlength if min_length/max_length are defined on the field
+        and the widget is not hidden.
         """
         # Return an empty dictionary if max_length and min_length are both None.
         f = CharField()
@@ -104,6 +105,7 @@ class CharFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(f.widget_attrs(TextInput()), {'maxlength': '10', 'minlength': '5'})
         self.assertEqual(f.widget_attrs(PasswordInput()), {'maxlength': '10', 'minlength': '5'})
         self.assertEqual(f.widget_attrs(Textarea()), {'maxlength': '10', 'minlength': '5'})
+        self.assertEqual(f.widget_attrs(HiddenInput()), {})
 
     def test_charfield_strip(self):
         """

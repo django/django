@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 from collections import OrderedDict
 
@@ -169,10 +167,9 @@ class ExtraRegressTests(TestCase):
             when=datetime.datetime(2008, 9, 28, 10, 30, 0)
         )
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             RevisionableModel.objects.extra(select={"the_answer": 'id'}).datetimes('when', 'month'),
             [datetime.datetime(2008, 9, 1, 0, 0)],
-            transform=lambda d: d,
         )
 
     def test_values_with_extra(self):
@@ -396,7 +393,7 @@ class ExtraRegressTests(TestCase):
 
     def test_regression_17877(self):
         """
-        Ensure that extra WHERE clauses get correctly ANDed, even when they
+        Extra WHERE clauses get correctly ANDed, even when they
         contain OR operations.
         """
         # Test Case 1: should appear in queryset.
@@ -432,12 +429,8 @@ class ExtraRegressTests(TestCase):
         qs = TestObject.objects.extra(
             select={'second_extra': 'second'}
         ).values_list('id', flat=True).distinct()
-        self.assertQuerysetEqual(
-            qs.order_by('second_extra'), [t1.pk, t2.pk], lambda x: x)
-        self.assertQuerysetEqual(
-            qs.order_by('-second_extra'), [t2.pk, t1.pk], lambda x: x)
+        self.assertSequenceEqual(qs.order_by('second_extra'), [t1.pk, t2.pk])
+        self.assertSequenceEqual(qs.order_by('-second_extra'), [t2.pk, t1.pk])
         # Note: the extra ordering must appear in select clause, so we get two
         # non-distinct results here (this is on purpose, see #7070).
-        self.assertQuerysetEqual(
-            qs.order_by('-second_extra').values_list('first', flat=True),
-            ['a', 'a'], lambda x: x)
+        self.assertSequenceEqual(qs.order_by('-second_extra').values_list('first', flat=True), ['a', 'a'])

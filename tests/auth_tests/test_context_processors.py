@@ -4,13 +4,11 @@ from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.test import SimpleTestCase, TestCase, override_settings
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
 
 from .settings import AUTH_MIDDLEWARE, AUTH_TEMPLATES
 
 
-class MockUser(object):
+class MockUser:
     def has_module_perms(self, perm):
         if perm == 'mockapp':
             return True
@@ -26,7 +24,7 @@ class PermWrapperTests(SimpleTestCase):
     """
     Test some details of the PermWrapper implementation.
     """
-    class EQLimiterObject(object):
+    class EQLimiterObject:
         """
         This object makes sure __eq__ will not be called endlessly.
         """
@@ -41,14 +39,14 @@ class PermWrapperTests(SimpleTestCase):
 
     def test_permwrapper_in(self):
         """
-        Test that 'something' in PermWrapper works as expected.
+        'something' in PermWrapper works as expected.
         """
         perms = PermWrapper(MockUser())
         # Works for modules and full permissions.
         self.assertIn('mockapp', perms)
-        self.assertNotIn('nonexisting', perms)
+        self.assertNotIn('nonexistent', perms)
         self.assertIn('mockapp.someperm', perms)
-        self.assertNotIn('mockapp.nonexisting', perms)
+        self.assertNotIn('mockapp.nonexistent', perms)
 
     def test_permlookupdict_in(self):
         """
@@ -72,30 +70,18 @@ class AuthContextProcessorTests(TestCase):
     @override_settings(MIDDLEWARE=AUTH_MIDDLEWARE)
     def test_session_not_accessed(self):
         """
-        Tests that the session is not accessed simply by including
+        The session is not accessed simply by including
         the auth context processor
         """
-        response = self.client.get('/auth_processor_no_attr_access/')
-        self.assertContains(response, "Session not accessed")
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @override_settings(MIDDLEWARE_CLASSES=AUTH_MIDDLEWARE, MIDDLEWARE=None)
-    def test_session_not_accessed_middleware_classes(self):
         response = self.client.get('/auth_processor_no_attr_access/')
         self.assertContains(response, "Session not accessed")
 
     @override_settings(MIDDLEWARE=AUTH_MIDDLEWARE)
     def test_session_is_accessed(self):
         """
-        Tests that the session is accessed if the auth context processor
+        The session is accessed if the auth context processor
         is used and relevant attributes accessed.
         """
-        response = self.client.get('/auth_processor_attr_access/')
-        self.assertContains(response, "Session accessed")
-
-    @ignore_warnings(category=RemovedInDjango20Warning)
-    @override_settings(MIDDLEWARE_CLASSES=AUTH_MIDDLEWARE, MIDDLEWARE=None)
-    def test_session_is_accessed_middleware_classes(self):
         response = self.client.get('/auth_processor_attr_access/')
         self.assertContains(response, "Session accessed")
 
@@ -109,7 +95,7 @@ class AuthContextProcessorTests(TestCase):
         response = self.client.get('/auth_processor_perms/')
         self.assertContains(response, "Has auth permissions")
         self.assertContains(response, "Has auth.add_permission permissions")
-        self.assertNotContains(response, "nonexisting")
+        self.assertNotContains(response, "nonexistent")
 
     def test_perm_in_perms_attrs(self):
         u = User.objects.create_user(username='normal', password='secret')
@@ -121,7 +107,7 @@ class AuthContextProcessorTests(TestCase):
         response = self.client.get('/auth_processor_perm_in_perms/')
         self.assertContains(response, "Has auth permissions")
         self.assertContains(response, "Has auth.add_permission permissions")
-        self.assertNotContains(response, "nonexisting")
+        self.assertNotContains(response, "nonexistent")
 
     def test_message_attrs(self):
         self.client.force_login(self.superuser)
@@ -130,7 +116,7 @@ class AuthContextProcessorTests(TestCase):
 
     def test_user_attrs(self):
         """
-        Test that the lazy objects returned behave just like the wrapped objects.
+        The lazy objects returned behave just like the wrapped objects.
         """
         # These are 'functional' level tests for common use cases.  Direct
         # testing of the implementation (SimpleLazyObject) is in the 'utils'
@@ -144,21 +130,7 @@ class AuthContextProcessorTests(TestCase):
         # bug #12037 is tested by the {% url %} in the template:
         self.assertContains(response, "url: /userpage/super/")
 
-        # See if this object can be used for queries where a Q() comparing
-        # a user can be used with another Q() (in an AND or OR fashion).
-        # This simulates what a template tag might do with the user from the
-        # context. Note that we don't need to execute a query, just build it.
-        #
-        # The failure case (bug #12049) on Python 2.4 with a LazyObject-wrapped
-        # User is a fatal TypeError: "function() takes at least 2 arguments
-        # (0 given)" deep inside deepcopy().
-        #
-        # Python 2.5 and 2.6 succeeded, but logged internally caught exception
-        # spew:
-        #
-        #    Exception RuntimeError: 'maximum recursion depth exceeded while
-        #    calling a Python object' in <type 'exceptions.AttributeError'>
-        #    ignored"
+        # A Q() comparing a user and with another Q() (in an AND or OR fashion).
         Q(user=response.context['user']) & Q(someflag=True)
 
         # Tests for user equality.  This is hard because User defines

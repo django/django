@@ -3,15 +3,15 @@
 # Translators:
 # Eirik Krogstad <eirikkr@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jon <jon@funkbit.no>, 2015
+# Jon <jon@funkbit.no>, 2015-2016
 # Jon <jon@funkbit.no>, 2014
 # Jon <jon@funkbit.no>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-17 10:13+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-27 09:11+0000\n"
 "Last-Translator: Jon <jon@funkbit.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
@@ -149,15 +149,69 @@ msgstr "I går"
 msgid "Tomorrow"
 msgstr "I morgen"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Januar Februar Mars April Mai Juni Juli August September Oktober November "
-"Desember"
+msgid "January"
+msgstr "Januar"
 
-msgid "S M T W T F S"
-msgstr "S M T O T F L"
+msgid "February"
+msgstr "Februar"
+
+msgid "March"
+msgstr "Mars"
+
+msgid "April"
+msgstr "April"
+
+msgid "May"
+msgstr "Mai"
+
+msgid "June"
+msgstr "Juni"
+
+msgid "July"
+msgstr "Juli"
+
+msgid "August"
+msgstr "August"
+
+msgid "September"
+msgstr "September"
+
+msgid "October"
+msgstr "Oktober"
+
+msgid "November"
+msgstr "November"
+
+msgid "December"
+msgstr "Desember"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "S"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "M"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "T"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "O"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "T"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "F"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "L"
 
 msgid "Show"
 msgstr "Vis"

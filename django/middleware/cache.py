@@ -77,7 +77,7 @@ class UpdateCacheMiddleware(MiddlewareMixin):
             # We don't need to update the cache, just return.
             return response
 
-        if response.streaming or response.status_code != 200:
+        if response.streaming or response.status_code not in (200, 304):
             return response
 
         # Don't cache responses that set a user-specific (and maybe security
@@ -95,7 +95,7 @@ class UpdateCacheMiddleware(MiddlewareMixin):
             # max-age was set to 0, don't bother caching.
             return response
         patch_response_headers(response, timeout)
-        if timeout:
+        if timeout and response.status_code == 200:
             cache_key = learn_cache_key(request, response, timeout, self.key_prefix, cache=self.cache)
             if hasattr(response, 'render') and callable(response.render):
                 response.add_post_render_callback(

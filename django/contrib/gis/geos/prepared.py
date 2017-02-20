@@ -9,6 +9,7 @@ class PreparedGeometry(GEOSBase):
     operations.
     """
     ptr_type = capi.PREPGEOM_PTR
+    destructor = capi.prepared_destroy
 
     def __init__(self, geom):
         # Keeping a reference to the original geometry object to prevent it
@@ -19,12 +20,6 @@ class PreparedGeometry(GEOSBase):
         if not isinstance(geom, GEOSGeometry):
             raise TypeError
         self.ptr = capi.geos_prepare(geom.ptr)
-
-    def __del__(self):
-        try:
-            capi.prepared_destroy(self._ptr)
-        except (AttributeError, TypeError):
-            pass  # Some part might already have been garbage collected
 
     def contains(self, other):
         return capi.prepared_contains(self.ptr, other.ptr)

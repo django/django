@@ -37,29 +37,32 @@ class TestSaveLoad(TestCase):
     def test_null_handling(self):
         NullableUUIDModel.objects.create(field=None)
         loaded = NullableUUIDModel.objects.get()
-        self.assertEqual(loaded.field, None)
+        self.assertIsNone(loaded.field)
 
     def test_pk_validated(self):
-        with self.assertRaisesMessage(TypeError, 'is not a valid UUID'):
+        with self.assertRaisesMessage(exceptions.ValidationError, 'is not a valid UUID'):
             PrimaryKeyUUIDModel.objects.get(pk={})
 
-        with self.assertRaisesMessage(TypeError, 'is not a valid UUID'):
+        with self.assertRaisesMessage(exceptions.ValidationError, 'is not a valid UUID'):
             PrimaryKeyUUIDModel.objects.get(pk=[])
 
     def test_wrong_value(self):
-        with self.assertRaisesMessage(ValueError, 'badly formed hexadecimal UUID string'):
+        with self.assertRaisesMessage(exceptions.ValidationError, 'is not a valid UUID'):
             UUIDModel.objects.get(field='not-a-uuid')
 
-        with self.assertRaisesMessage(ValueError, 'badly formed hexadecimal UUID string'):
+        with self.assertRaisesMessage(exceptions.ValidationError, 'is not a valid UUID'):
             UUIDModel.objects.create(field='not-a-uuid')
 
 
-class TestMigrations(SimpleTestCase):
+class TestMethods(SimpleTestCase):
 
     def test_deconstruct(self):
         field = models.UUIDField()
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(kwargs, {})
+
+    def test_to_python(self):
+        self.assertIsNone(models.UUIDField().to_python(None))
 
 
 class TestQuerying(TestCase):
@@ -88,6 +91,10 @@ class TestSerialization(SimpleTestCase):
         '[{"fields": {"field": "550e8400-e29b-41d4-a716-446655440000"}, '
         '"model": "model_fields.uuidmodel", "pk": null}]'
     )
+    nullable_test_data = (
+        '[{"fields": {"field": null}, '
+        '"model": "model_fields.nullableuuidmodel", "pk": null}]'
+    )
 
     def test_dumping(self):
         instance = UUIDModel(field=uuid.UUID('550e8400e29b41d4a716446655440000'))
@@ -97,6 +104,10 @@ class TestSerialization(SimpleTestCase):
     def test_loading(self):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
         self.assertEqual(instance.field, uuid.UUID('550e8400-e29b-41d4-a716-446655440000'))
+
+    def test_nullable_loading(self):
+        instance = list(serializers.deserialize('json', self.nullable_test_data))[0].object
+        self.assertIsNone(instance.field)
 
 
 class TestValidation(SimpleTestCase):
@@ -128,7 +139,7 @@ class TestAsPrimaryKey(TestCase):
         u1 = PrimaryKeyUUIDModel()
         u2 = PrimaryKeyUUIDModel(id=None)
         PrimaryKeyUUIDModel.objects.bulk_create([u1, u2])
-        # Check that the two objects were correctly created.
+        # The two objects were correctly created.
         u1_found = PrimaryKeyUUIDModel.objects.filter(id=u1.id).exists()
         u2_found = PrimaryKeyUUIDModel.objects.exclude(id=u1.id).exists()
         self.assertTrue(u1_found)

@@ -2,13 +2,14 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2014-2015
+# znotdead <zhirafchik@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-11 10:05+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-09-15 10:26+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +21,7 @@ msgstr ""
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "Адміністратыўная дакументацыя"
 
 msgid "Home"
 msgstr "Пачатак"
@@ -39,6 +40,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"Каб паставіць закладку, перацягніце спасылку на паліцу закладак або "
+"пстрыкніце па спасылцы праваю кнопкаю і дадайце яе да закладак. Цяпер можна "
+"абраць закладку з якой пажадаеце бачыны."
 
 msgid "Documentation for this page"
 msgstr "Дакумэнтацыя па бачыне"
@@ -61,6 +65,8 @@ msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
 msgstr ""
+"Фільтры гэта дзеянні, якія могуць быць выкананы над пераменнымі ў шаблоне "
+"каб змяніць вынік."
 
 msgid "Models"
 msgstr "Мадэлі"
@@ -70,6 +76,8 @@ msgid ""
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
 msgstr ""
+"Мадэлі - гэта апісанне ўсіх аб'ектаў у сістэме і іх асацыіраваныя палі. "
+"Кожная мадэль мае спіс палёў, якія могуць быць даступны як пераменная шаблону"
 
 msgid "Views"
 msgstr "Прагляды"
@@ -79,9 +87,14 @@ msgid ""
 "template is used to generate the page and which objects are available to "
 "that template."
 msgstr ""
+"Кожная бачына сайту генерыруеца праглядам. Прагляд вызначае які шаблон "
+"выкарыстоўваць для генерацыі бачыны і якія аб'екты даступны для гэтага "
+"шаблону."
 
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
+"Інструмент для вашага браўзэра для хуткага доступу да кіраўнічай "
+"функцыянальнасці. "
 
 msgid "Please install docutils"
 msgstr "Калі ласка, усталюйце Docutils"
@@ -91,18 +104,22 @@ msgid ""
 "The admin documentation system requires Python's <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
+"Дакументацыя кіраўнічай сістэмы патрабуе бібліятэку Python <a href=\"%(link)s"
+"\">docutils</a>."
 
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
 msgstr ""
+"Калі ласка, спытайцу вашых адміністратараў усталяваць <a href=\"%(link)s"
+"\">docutils</a>."
 
 #, python-format
 msgid "Model: %(name)s"
 msgstr "Мадэль: %(name)s"
 
 msgid "Fields"
-msgstr ""
+msgstr "Палі"
 
 msgid "Field"
 msgstr "Поле"
@@ -114,15 +131,15 @@ msgid "Description"
 msgstr "Апісаньне"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "Метад з аргументамі"
 
 msgid "Method"
-msgstr ""
+msgstr "Метад"
 
 msgid "Arguments"
-msgstr ""
+msgstr "Аргументы"
 
-msgid "Back to Model Documentation"
+msgid "Back to Model documentation"
 msgstr "Вярнуцца да дакументацыі мадэлі"
 
 msgid "Model documentation"
@@ -142,9 +159,10 @@ msgstr "Шаблон: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Шаблон: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
-msgstr ""
+msgstr "Шлях пошуку для шаблону \"%(name)s\":"
 
 msgid "(does not exist)"
 msgstr "(не існуе)"
@@ -156,7 +174,7 @@ msgid "Template filters"
 msgstr "Фільтры шаблону"
 
 msgid "Template filter documentation"
-msgstr ""
+msgstr "Дакументацыя фільтраў шаблону"
 
 msgid "Built-in filters"
 msgstr "Убудаваныя фільтры"
@@ -166,12 +184,14 @@ msgid ""
 "To use these filters, put <code>%(code)s</code> in your template before "
 "using the filter."
 msgstr ""
+"Каб карыстаць гэтыя фільтры, трэба памясціць  <code>%(code)s</code> у ваш "
+"шаблон перад тым як карыстаць гэты фільтр."
 
 msgid "Template tags"
 msgstr "Тэгі шаблону"
 
 msgid "Template tag documentation"
-msgstr ""
+msgstr "Дакументацыя тэгаў шаблону"
 
 msgid "Built-in tags"
 msgstr "Убудаваныя тэгі"
@@ -181,10 +201,12 @@ msgid ""
 "To use these tags, put <code>%(code)s</code> in your template before using "
 "the tag."
 msgstr ""
+"Каб карыстаць гэтыя тэгі, трэба памясціць  <code>%(code)s</code> у ваш "
+"шаблон перад тым як карыстаць гэты тэг."
 
 #, python-format
 msgid "View: %(name)s"
-msgstr ""
+msgstr "Прагляд: %(name)s"
 
 msgid "Context:"
 msgstr "Кантэкст:"
@@ -192,8 +214,8 @@ msgstr "Кантэкст:"
 msgid "Templates:"
 msgstr "Шаблоны:"
 
-msgid "Back to Views Documentation"
-msgstr ""
+msgid "Back to View documentation"
+msgstr "Вярнуцца да дакументацыі прагляду"
 
 msgid "View documentation"
 msgstr "Паглядзець дакументацыю"
@@ -206,10 +228,10 @@ msgstr "Ачысціць прастору імёнаў"
 
 #, python-format
 msgid "Views by namespace %(name)s"
-msgstr ""
+msgstr "Прагляды ў просторы імёнаў %(name)s"
 
 msgid "Views by empty namespace"
-msgstr ""
+msgstr "Прагляды ў пустым просторы імёнаў"
 
 #, python-format
 msgid ""
@@ -217,6 +239,9 @@ msgid ""
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
+"\n"
+"Функцыя прагляду: <code>%(full_name)s</code>. Імя: <code>%(url_name)s</"
+"code>.\n"
 
 msgid "Boolean (Either True or False)"
 msgstr "Ляґічнае («сапраўдна» або «не сапраўдна»)"
@@ -236,7 +261,7 @@ msgstr "прагляд:"
 
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr ""
+msgstr "Праграму %(app_label)r не знайшлі"
 
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"

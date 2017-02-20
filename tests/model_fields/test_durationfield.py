@@ -20,7 +20,7 @@ class TestSaveLoad(TestCase):
     def test_create_empty(self):
         NullDurationModel.objects.create()
         loaded = NullDurationModel.objects.get()
-        self.assertEqual(loaded.field, None)
+        self.assertIsNone(loaded.field)
 
     def test_fractional_seconds(self):
         value = datetime.timedelta(seconds=2.05)

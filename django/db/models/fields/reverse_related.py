@@ -9,19 +9,14 @@ They also act as reverse fields for the purposes of the Meta API because
 they're the closest concept currently available.
 """
 
-from __future__ import unicode_literals
-
-import warnings
-
 from django.core import exceptions
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import smart_text
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 
 from . import BLANK_CHOICE_DASH
 
 
-class ForeignObjectRel(object):
+class ForeignObjectRel:
     """
     Used by ForeignObject to store information about the relation.
 
@@ -56,14 +51,6 @@ class ForeignObjectRel(object):
     # __init__ as the field doesn't have its model yet. Calling these methods
     # before field.contribute_to_class() has been called will result in
     # AttributeError
-    @property
-    def to(self):
-        warnings.warn(
-            "Usage of ForeignObjectRel.to attribute has been deprecated. "
-            "Use the model attribute instead.",
-            RemovedInDjango20Warning, 2)
-        return self.model
-
     @cached_property
     def hidden(self):
         return self.is_hidden()
@@ -136,7 +123,7 @@ class ForeignObjectRel(object):
         initially for utilization by RelatedFieldListFilter.
         """
         return (blank_choice if include_blank else []) + [
-            (x._get_pk_val(), smart_text(x)) for x in self.related_model._default_manager.all()
+            (x._get_pk_val(), force_text(x)) for x in self.related_model._default_manager.all()
         ]
 
     def is_hidden(self):
@@ -200,7 +187,7 @@ class ManyToOneRel(ForeignObjectRel):
 
     def __init__(self, field, to, field_name, related_name=None, related_query_name=None,
                  limit_choices_to=None, parent_link=False, on_delete=None):
-        super(ManyToOneRel, self).__init__(
+        super().__init__(
             field, to,
             related_name=related_name,
             related_query_name=related_query_name,
@@ -239,7 +226,7 @@ class OneToOneRel(ManyToOneRel):
 
     def __init__(self, field, to, field_name, related_name=None, related_query_name=None,
                  limit_choices_to=None, parent_link=False, on_delete=None):
-        super(OneToOneRel, self).__init__(
+        super().__init__(
             field, to, field_name,
             related_name=related_name,
             related_query_name=related_query_name,
@@ -262,7 +249,7 @@ class ManyToManyRel(ForeignObjectRel):
     def __init__(self, field, to, related_name=None, related_query_name=None,
                  limit_choices_to=None, symmetrical=True, through=None,
                  through_fields=None, db_constraint=True):
-        super(ManyToManyRel, self).__init__(
+        super().__init__(
             field, to,
             related_name=related_name,
             related_query_name=related_query_name,

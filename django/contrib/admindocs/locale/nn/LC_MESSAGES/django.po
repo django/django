@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-11 10:05+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:51+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Norwegian Nynorsk (http://www.transifex.com/django/django/"
 "language/nn/)\n"
@@ -122,7 +122,7 @@ msgstr ""
 msgid "Arguments"
 msgstr ""
 
-msgid "Back to Model Documentation"
+msgid "Back to Model documentation"
 msgstr ""
 
 msgid "Model documentation"
@@ -142,6 +142,7 @@ msgstr ""
 msgid "Template: \"%(name)s\""
 msgstr ""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr ""
@@ -192,7 +193,7 @@ msgstr ""
 msgid "Templates:"
 msgstr ""
 
-msgid "Back to Views Documentation"
+msgid "Back to View documentation"
 msgstr ""
 
 msgid "View documentation"

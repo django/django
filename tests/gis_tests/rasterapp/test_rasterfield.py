@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.db.models.lookups import (
     DistanceLookupBase, gis_lookups,
 )
@@ -7,18 +8,14 @@ from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.contrib.gis.shortcuts import numpy
-from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
-from django.test import (
-    TestCase, TransactionTestCase, mock, skipUnlessDBFeature,
-)
+from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from ..data.rasters.textrasters import JSON_RASTER
-from ..models import models
-from .models import RasterModel, RasterRelatedModel
 
 if HAS_GDAL:
     from django.contrib.gis.gdal import GDALRaster
+    from .models import RasterModel, RasterRelatedModel
 
 
 @skipUnlessDBFeature('supports_raster')
@@ -102,11 +99,12 @@ class RasterFieldTest(TransactionTestCase):
         # Confirm raster has been transformed to the default srid
         self.assertEqual(r.rast.srs.srid, 4326)
         # Confirm geotransform is in lat/lon
-        self.assertEqual(
-            r.rast.geotransform,
-            [-87.9298551266551, 9.459646421449934e-06, 0.0,
-             23.94249275457565, 0.0, -9.459646421449934e-06]
-        )
+        expected = [
+            -87.9298551266551, 9.459646421449934e-06, 0.0, 23.94249275457565,
+            0.0, -9.459646421449934e-06,
+        ]
+        for val, exp in zip(r.rast.geotransform, expected):
+            self.assertAlmostEqual(exp, val)
 
     def test_verbose_name_arg(self):
         """
@@ -185,11 +183,11 @@ class RasterFieldTest(TransactionTestCase):
                 qs = RasterModel.objects.filter(**combo)
 
                 # Evaluate normal filter qs.
-                self.assertTrue(qs.count() in [0, 1])
+                self.assertIn(qs.count(), [0, 1])
 
             # Evaluate on conditional Q expressions.
             qs = RasterModel.objects.filter(Q(**combos[0]) & Q(**combos[1]))
-            self.assertTrue(qs.count() in [0, 1])
+            self.assertIn(qs.count(), [0, 1])
 
     def test_dwithin_gis_lookup_ouptut_with_rasters(self):
         """
@@ -331,11 +329,17 @@ class RasterFieldTest(TransactionTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             RasterModel.objects.filter(geom__intersects=obj)
 
-
-@mock.patch('django.contrib.gis.db.models.fields.HAS_GDAL', False)
-class RasterFieldWithoutGDALTest(TestCase):
-
-    def test_raster_field_without_gdal_exception(self):
-        msg = 'RasterField requires GDAL.'
-        with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            models.OriginalRasterField()
+    def test_db_function_errors(self):
+        """
+        Errors are raised when using DB functions with raster content.
+        """
+        point = GEOSGeometry("SRID=3086;POINT (-697024.9213808845 683729.1705516104)")
+        rast = GDALRaster(json.loads(JSON_RASTER))
+        msg = "Please provide a geometry object."
+        with self.assertRaisesMessage(TypeError, msg):
+            RasterModel.objects.annotate(distance_from_point=Distance("geom", rast))
+        with self.assertRaisesMessage(TypeError, msg):
+            RasterModel.objects.annotate(distance_from_point=Distance("rastprojected", rast))
+        msg = "Geometry functions not supported for raster fields."
+        with self.assertRaisesMessage(TypeError, msg):
+            RasterModel.objects.annotate(distance_from_point=Distance("rastprojected", point)).count()

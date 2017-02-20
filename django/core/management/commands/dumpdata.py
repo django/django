@@ -4,6 +4,7 @@ from collections import OrderedDict
 from django.apps import apps
 from django.core import serializers
 from django.core.management.base import BaseCommand, CommandError
+from django.core.management.utils import parse_apps_and_model_labels
 from django.db import DEFAULT_DB_ALIAS, router
 
 
@@ -77,25 +78,11 @@ class Command(BaseCommand):
         pks = options['primary_keys']
 
         if pks:
-            primary_keys = pks.split(',')
+            primary_keys = [pk.strip() for pk in pks.split(',')]
         else:
             primary_keys = []
 
-        excluded_apps = set()
-        excluded_models = set()
-        for exclude in excludes:
-            if '.' in exclude:
-                try:
-                    model = apps.get_model(exclude)
-                except LookupError:
-                    raise CommandError('Unknown model in excludes: %s' % exclude)
-                excluded_models.add(model)
-            else:
-                try:
-                    app_config = apps.get_app_config(exclude)
-                except LookupError as e:
-                    raise CommandError(str(e))
-                excluded_apps.add(app_config)
+        excluded_models, excluded_apps = parse_apps_and_model_labels(excludes)
 
         if len(app_labels) == 0:
             if primary_keys:

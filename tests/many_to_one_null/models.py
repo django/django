@@ -6,10 +6,8 @@ To define a many-to-one relationship that can have a null foreign key, use
 """
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Reporter(models.Model):
     name = models.CharField(max_length=30)
 
@@ -17,7 +15,6 @@ class Reporter(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     reporter = models.ForeignKey(Reporter, models.SET_NULL, null=True)

@@ -24,6 +24,12 @@ Code style
   JSHint will be run when you run the JavaScript tests. We also recommended
   installing a JSHint plugin in your text editor.
 
+* Where possible, write code that will work even if the page structure is later
+  changed with JavaScript. For instance, when binding a click handler, use
+  ``$('body').on('click', selector, func)`` instead of
+  ``$(selector).click(func)``. This makes it easier for projects to extend
+  Django's default behavior with JavaScript.
+
 .. _javascript-patches:
 
 JavaScript patches
@@ -59,6 +65,8 @@ Closure Compiler library requires `Java`_ 7 or higher.
 
 Please don't forget to run ``compress.py`` and include the ``diff`` of the
 minified scripts when submitting patches for Django's JavaScript.
+
+.. _javascript-tests:
 
 JavaScript tests
 ================
@@ -114,8 +122,8 @@ browser.
 To measure code coverage when running the tests, you need to view that file
 over HTTP. To view code coverage:
 
-* Execute ``python -m http.server`` (or ``python -m SimpleHTTPServer`` on
-  Python 2) from the root directory (not from inside ``js_tests``).
+* Execute ``python -m http.server`` from the root directory (not from inside
+  ``js_tests``).
 * Open http://localhost:8000/js_tests/tests.html in your web browser.
 
 Testing from the command line

@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.conf.urls import url
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
 
-from . import models, views
+from . import views
+from .models import Book
 
 urlpatterns = [
     # TemplateView
@@ -134,7 +132,7 @@ urlpatterns = [
     url(r'^dates/books/paginated/$',
         views.BookArchive.as_view(paginate_by=10)),
     url(r'^dates/books/reverse/$',
-        views.BookArchive.as_view(queryset=models.Book.objects.order_by('pubdate'))),
+        views.BookArchive.as_view(queryset=Book.objects.order_by('pubdate'))),
     url(r'^dates/books/by_month/$',
         views.BookArchive.as_view(date_list_period='month')),
     url(r'^dates/booksignings/$',
@@ -207,7 +205,7 @@ urlpatterns = [
     url(r'^dates/books/no_year/$',
         views.BookYearArchive.as_view()),
     url(r'^dates/books/(?P<year>[0-9]{4})/reverse/$',
-        views.BookYearArchive.as_view(queryset=models.Book.objects.order_by('pubdate'))),
+        views.BookYearArchive.as_view(queryset=Book.objects.order_by('pubdate'))),
     url(r'^dates/booksignings/(?P<year>[0-9]{4})/$',
         views.BookSigningYearArchive.as_view()),
 
@@ -292,5 +290,5 @@ urlpatterns = [
         views.BookSigningDetail.as_view()),
 
     # Useful for testing redirects
-    url(r'^accounts/login/$', auth_views.login)
+    url(r'^accounts/login/$', auth_views.LoginView.as_view())
 ]

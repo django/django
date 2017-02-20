@@ -3,7 +3,7 @@
 # Translators:
 # albertoalcolea <albertoalcolea@gmail.com>, 2014
 # Antoni Aloy <aaloy@apsl.net>, 2012-2013,2015-2016
-# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
+# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015-2016
 # guillem <serra.guillem@gmail.com>, 2012
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2016-01-04 19:52+0000\n"
-"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-08-03 15:40+0000\n"
+"Last-Translator: Ernesto Avilés Vázquez <whippiii@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -123,6 +123,21 @@ msgstr "sal"
 msgid "hash"
 msgstr "función resumen"
 
+msgid "variety"
+msgstr "variedad"
+
+msgid "version"
+msgstr "versión"
+
+msgid "memory cost"
+msgstr "coste de memoria"
+
+msgid "time cost"
+msgstr "coste de tiempo"
+
+msgid "parallelism"
+msgstr "paralelismo"
+
 msgid "work factor"
 msgstr "factor trabajo"
 
@@ -176,16 +191,8 @@ msgstr "Permisos específicos para este usuario."
 msgid "username"
 msgstr "nombre de usuario"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Requerido. 30 caracteres o menos. Letras, dígitos y @/./+/-/_ solamente."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Introduzca un nombre de usuario válido. Este valor sólo puede contener "
-"letras, números y los caracteres @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Ya existe un usuario con este nombre."
@@ -267,6 +274,16 @@ msgstr "Su contraseña no puede ser completamente numérica."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Contraseña restablecida en %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
 
 msgid "Logged out"
 msgstr "Sesión terminada"

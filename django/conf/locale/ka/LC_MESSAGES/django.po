@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
+"POT-Creation-Date: 2016-06-29 20:57+0200\n"
+"PO-Revision-Date: 2016-06-30 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Georgian (http://www.transifex.com/django/django/language/"
 "ka/)\n"
@@ -60,6 +60,9 @@ msgstr "დანიური"
 
 msgid "German"
 msgstr "გერმანული"
+
+msgid "Lower Sorbian"
+msgstr ""
 
 msgid "Greek"
 msgstr "ბერძნული"
@@ -130,6 +133,9 @@ msgstr "ჰინდი"
 msgid "Croatian"
 msgstr "ხორვატიული"
 
+msgid "Upper Sorbian"
+msgstr ""
+
 msgid "Hungarian"
 msgstr "უნგრული"
 
@@ -190,8 +196,8 @@ msgstr "მარათული"
 msgid "Burmese"
 msgstr "ბირმული"
 
-msgid "Norwegian Bokmal"
-msgstr "ნორვეგიული-ბოკმალი"
+msgid "Norwegian Bokmål"
+msgstr ""
 
 msgid "Nepali"
 msgstr "ნეპალური"
@@ -288,9 +294,6 @@ msgstr "სტატიკური ფაილები"
 
 msgid "Syndication"
 msgstr "სინდიკაცია"
-
-msgid "Web Design"
-msgstr "ვებ-დიზაინი"
 
 msgid "Enter a valid value."
 msgstr "შეიყვანეთ სწორი მნიშვნელობა."
@@ -419,6 +422,9 @@ msgstr "მთელი"
 msgid "'%(value)s' value must be an integer."
 msgstr "მნიშვნელობა '%(value)s' უნდა იყოს მთელი რიცხვი."
 
+msgid "Big (8 byte) integer"
+msgstr "დიდი მთელი (8-ბაიტიანი)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "მნიშვნელობა '%(value)s' უნდა იყოს True ან False."
@@ -502,9 +508,6 @@ msgstr ""
 msgid "Floating point number"
 msgstr "რიცხვი მცოცავი წერტილით"
 
-msgid "Big (8 byte) integer"
-msgstr "დიდი მთელი (8-ბაიტიანი)"
-
 msgid "IPv4 address"
 msgstr "IPv4 მისამართი"
 
@@ -574,6 +577,14 @@ msgstr "გარე გასაღები (ტიპი განისა�
 
 msgid "One-to-one relationship"
 msgstr "კავშირი ერთი-ერთტან"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr ""
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr ""
 
 msgid "Many-to-many relationship"
 msgstr "კავშირი მრავალი-მრავალთან"

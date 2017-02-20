@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015
+# BouRock, 2015-2016
 # BouRock, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Metin Amiroff <amiroff@gmail.com>, 2011
@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 11:07+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 11:20+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -150,14 +150,69 @@ msgstr "Dün"
 msgid "Tomorrow"
 msgstr "Yarın"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Ocak Şubat Mart Nisan Mayıs Haziran Temmuz Ağustos Eylül Ekim Kasım Aralık"
+msgid "January"
+msgstr "Ocak"
 
-msgid "S M T W T F S"
-msgstr "P P S Ç P C C"
+msgid "February"
+msgstr "Şubat"
+
+msgid "March"
+msgstr "Mart"
+
+msgid "April"
+msgstr "Nisan"
+
+msgid "May"
+msgstr "Mayıs"
+
+msgid "June"
+msgstr "Haziran"
+
+msgid "July"
+msgstr "Temmuz"
+
+msgid "August"
+msgstr "Ağustos"
+
+msgid "September"
+msgstr "Eylül"
+
+msgid "October"
+msgstr "Ekim"
+
+msgid "November"
+msgstr "Kasım"
+
+msgid "December"
+msgstr "Aralık"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "P"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "P"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "S"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "Ç"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "P"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "C"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "C"
 
 msgid "Show"
 msgstr "Göster"

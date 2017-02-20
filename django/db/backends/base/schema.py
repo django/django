@@ -2,9 +2,9 @@ import hashlib
 import logging
 from datetime import datetime
 
-from django.db.backends.utils import truncate_name
-from django.db.transaction import atomic
-from django.utils import six, timezone
+from django.db.backends.utils import strip_quotes
+from django.db.transaction import TransactionManagementError, atomic
+from django.utils import timezone
 from django.utils.encoding import force_bytes
 
 logger = logging.getLogger('django.db.backends.schema')
@@ -19,7 +19,7 @@ def _related_non_m2m_objects(old_field, new_field):
     )
 
 
-class BaseDatabaseSchemaEditor(object):
+class BaseDatabaseSchemaEditor:
     """
     This class (and its subclasses) are responsible for emitting schema-changing
     statements to the databases - model creation/removal/alteration, field
@@ -95,10 +95,17 @@ class BaseDatabaseSchemaEditor(object):
 
     # Core utility functions
 
-    def execute(self, sql, params=[]):
+    def execute(self, sql, params=()):
         """
         Executes the given SQL statement, with optional parameters.
         """
+        # Don't perform the transactional DDL check if SQL is being collected
+        # as it's not going to be executed anyway.
+        if not self.collect_sql and self.connection.in_atomic_block and not self.connection.features.can_rollback_ddl:
+            raise TransactionManagementError(
+                "Executing DDL statements while in a transaction on databases "
+                "that can't perform a rollback is prohibited."
+            )
         # Log the command we're running, then run it
         logger.debug("%s; (params %r)", sql, params, extra={'params': params, 'sql': sql})
         if self.collect_sql:
@@ -199,9 +206,9 @@ class BaseDatabaseSchemaEditor(object):
             default = field.get_default()
         elif not field.null and field.blank and field.empty_strings_allowed:
             if field.get_internal_type() == "BinaryField":
-                default = six.binary_type()
+                default = bytes()
             else:
-                default = six.text_type()
+                default = str()
         elif getattr(field, 'auto_now', False) or getattr(field, 'auto_now_add', False):
             default = datetime.now()
             internal_type = field.get_internal_type()
@@ -316,6 +323,18 @@ class BaseDatabaseSchemaEditor(object):
             "table": self.quote_name(model._meta.db_table),
         })
 
+    def add_index(self, model, index):
+        """
+        Add an index on a model.
+        """
+        self.execute(index.create_sql(model, self))
+
+    def remove_index(self, model, index):
+        """
+        Remove an index from a model.
+        """
+        self.execute(index.remove_sql(model, self))
+
     def alter_unique_together(self, model, old_unique_together, new_unique_together):
         """
         Deals with a model changing its unique_together.
@@ -363,7 +382,9 @@ class BaseDatabaseSchemaEditor(object):
         """
         Renames the table a model points to.
         """
-        if old_db_table == new_db_table:
+        if (old_db_table == new_db_table or
+            (self.connection.features.ignores_table_name_case and
+                old_db_table.lower() == new_db_table.lower())):
             return
         self.execute(self.sql_rename_table % {
             "old_table": self.quote_name(old_db_table),
@@ -407,7 +428,7 @@ class BaseDatabaseSchemaEditor(object):
         self.execute(sql, params)
         # Drop the default if we need to
         # (Django usually does not use in-database defaults)
-        if not self.skip_default(field) and field.default is not None:
+        if not self.skip_default(field) and self.effective_default(field) is not None:
             sql = self.sql_alter_column % {
                 "table": self.quote_name(model._meta.db_table),
                 "changes": self.sql_alter_column_no_default % {
@@ -416,8 +437,7 @@ class BaseDatabaseSchemaEditor(object):
             }
             self.execute(sql)
         # Add an index, if required
-        if field.db_index and not field.unique:
-            self.deferred_sql.append(self._create_index_sql(model, [field]))
+        self.deferred_sql.extend(self._field_indexes_sql(model, field))
         # Add any FK constraints later
         if field.remote_field and self.connection.features.supports_foreign_keys and field.db_constraint:
             self.deferred_sql.append(self._create_fk_sql(model, field, "_fk_%(to_table)s_%(to_column)s"))
@@ -533,9 +553,16 @@ class BaseDatabaseSchemaEditor(object):
                 for fk_name in rel_fk_names:
                     self.execute(self._delete_constraint_sql(self.sql_delete_fk, new_rel.related_model, fk_name))
         # Removed an index? (no strict check, as multiple indexes are possible)
-        if (old_field.db_index and not new_field.db_index and
-                not old_field.unique and not
-                (not new_field.unique and old_field.unique)):
+        # Remove indexes if db_index switched to False or a unique constraint
+        # will now be used in lieu of an index. The following lines from the
+        # truth table show all True cases; the rest are False:
+        #
+        # old_field.db_index | old_field.unique | new_field.db_index | new_field.unique
+        # ------------------------------------------------------------------------------
+        # True               | False            | False              | False
+        # True               | False            | False              | True
+        # True               | False            | True               | True
+        if old_field.db_index and not old_field.unique and (not new_field.db_index or new_field.unique):
             # Find the index for this field
             index_names = self._constraint_names(model, [old_field.column], index=True)
             for index_name in index_names:
@@ -674,11 +701,17 @@ class BaseDatabaseSchemaEditor(object):
             old_field.primary_key and not new_field.primary_key and new_field.unique
         ):
             self.execute(self._create_unique_sql(model, [new_field.column]))
-        # Added an index?
-        if (not old_field.db_index and new_field.db_index and
-                not new_field.unique and not
-                (not old_field.unique and new_field.unique)):
-            self.execute(self._create_index_sql(model, [new_field], suffix="_uniq"))
+        # Added an index? Add an index if db_index switched to True or a unique
+        # constraint will no longer be used in lieu of an index. The following
+        # lines from the truth table show all True cases; the rest are False:
+        #
+        # old_field.db_index | old_field.unique | new_field.db_index | new_field.unique
+        # ------------------------------------------------------------------------------
+        # False              | False            | True               | False
+        # False              | True             | True               | False
+        # True               | True             | True               | False
+        if (not old_field.db_index or old_field.unique) and new_field.db_index and not new_field.unique:
+            self.execute(self._create_index_sql(model, [new_field]))
         # Type alteration on primary key? Then we need to alter the column
         # referring to us.
         rels_to_update = []
@@ -805,41 +838,34 @@ class BaseDatabaseSchemaEditor(object):
     def _create_index_name(self, model, column_names, suffix=""):
         """
         Generates a unique name for an index/unique constraint.
+
+        The name is divided into 3 parts: the table name, the column names,
+        and a unique digest and suffix.
         """
-        # If there is just one column in the index, use a default algorithm from Django
-        if len(column_names) == 1 and not suffix:
-            return truncate_name(
-                '%s_%s' % (model._meta.db_table, self._digest(column_names[0])),
-                self.connection.ops.max_name_length()
-            )
-        # Else generate the name for the index using a different algorithm
-        table_name = model._meta.db_table.replace('"', '').replace('.', '_')
-        index_unique_name = '_%s' % self._digest(table_name, *column_names)
+        table_name = strip_quotes(model._meta.db_table)
+        hash_data = [table_name] + list(column_names)
+        hash_suffix_part = '%s%s' % (self._digest(*hash_data), suffix)
         max_length = self.connection.ops.max_name_length() or 200
-        # If the index name is too long, truncate it
-        index_name = ('%s_%s%s%s' % (
-            table_name, column_names[0], index_unique_name, suffix,
-        )).replace('"', '').replace('.', '_')
-        if len(index_name) > max_length:
-            part = ('_%s%s%s' % (column_names[0], index_unique_name, suffix))
-            index_name = '%s%s' % (table_name[:(max_length - len(part))], part)
-        # It shouldn't start with an underscore (Oracle hates this)
-        if index_name[0] == "_":
-            index_name = index_name[1:]
-        # If it's STILL too long, just hash it down
-        if len(index_name) > max_length:
-            index_name = hashlib.md5(force_bytes(index_name)).hexdigest()[:max_length]
-        # It can't start with a number on Oracle, so prepend D if we need to
-        if index_name[0].isdigit():
+        # If everything fits into max_length, use that name.
+        index_name = '%s_%s_%s' % (table_name, '_'.join(column_names), hash_suffix_part)
+        if len(index_name) <= max_length:
+            return index_name
+        # Shorten a long suffix.
+        if len(hash_suffix_part) > max_length / 3:
+            hash_suffix_part = hash_suffix_part[:max_length // 3]
+        other_length = (max_length - len(hash_suffix_part)) // 2 - 1
+        index_name = '%s_%s_%s' % (
+            table_name[:other_length],
+            '_'.join(column_names)[:other_length],
+            hash_suffix_part,
+        )
+        # Prepend D if needed to prevent the name from starting with an
+        # underscore or a number (not permitted on Oracle).
+        if index_name[0] == "_" or index_name[0].isdigit():
             index_name = "D%s" % index_name[:-1]
         return index_name
 
-    def _create_index_sql(self, model, fields, suffix="", sql=None):
-        """
-        Return the SQL statement to create the index for one or several fields.
-        `sql` can be specified if the syntax differs from the standard (GIS
-        indexes, ...).
-        """
+    def _get_index_tablespace_sql(self, model, fields):
         if len(fields) == 1 and fields[0].db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(fields[0].db_tablespace)
         elif model._meta.db_tablespace:
@@ -848,32 +874,55 @@ class BaseDatabaseSchemaEditor(object):
             tablespace_sql = ""
         if tablespace_sql:
             tablespace_sql = " " + tablespace_sql
+        return tablespace_sql
 
+    def _create_index_sql(self, model, fields, suffix="", sql=None):
+        """
+        Return the SQL statement to create the index for one or several fields.
+        `sql` can be specified if the syntax differs from the standard (GIS
+        indexes, ...).
+        """
+        tablespace_sql = self._get_index_tablespace_sql(model, fields)
         columns = [field.column for field in fields]
         sql_create_index = sql or self.sql_create_index
         return sql_create_index % {
             "table": self.quote_name(model._meta.db_table),
             "name": self.quote_name(self._create_index_name(model, columns, suffix=suffix)),
+            "using": "",
             "columns": ", ".join(self.quote_name(column) for column in columns),
             "extra": tablespace_sql,
         }
 
     def _model_indexes_sql(self, model):
         """
-        Return all index SQL statements (field indexes, index_together) for the
-        specified model, as a list.
+        Return all index SQL statements (field indexes, index_together,
+        Meta.indexes) for the specified model, as a list.
         """
         if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
         output = []
         for field in model._meta.local_fields:
-            if field.db_index and not field.unique:
-                output.append(self._create_index_sql(model, [field], suffix=""))
+            output.extend(self._field_indexes_sql(model, field))
 
         for field_names in model._meta.index_together:
             fields = [model._meta.get_field(field) for field in field_names]
             output.append(self._create_index_sql(model, fields, suffix="_idx"))
+
+        for index in model._meta.indexes:
+            output.append(index.create_sql(model, self))
         return output
+
+    def _field_indexes_sql(self, model, field):
+        """
+        Return a list of all index SQL statements for the specified field.
+        """
+        output = []
+        if self._field_should_be_indexed(model, field):
+            output.append(self._create_index_sql(model, [field]))
+        return output
+
+    def _field_should_be_indexed(self, model, field):
+        return field.db_index and not field.unique
 
     def _rename_field_sql(self, table, old_field, new_field, new_type):
         return self.sql_rename_column % {
@@ -921,7 +970,11 @@ class BaseDatabaseSchemaEditor(object):
         """
         Returns all constraint names matching the columns and conditions
         """
-        column_names = list(column_names) if column_names else None
+        if column_names is not None:
+            column_names = [
+                self.connection.introspection.column_name_converter(name)
+                for name in column_names
+            ]
         with self.connection.cursor() as cursor:
             constraints = self.connection.introspection.get_constraints(cursor, model._meta.db_table)
         result = []

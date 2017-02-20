@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.forms import URLField, ValidationError
 from django.test import SimpleTestCase
 
@@ -151,3 +148,12 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
     def test_urlfield_normalization(self):
         f = URLField()
         self.assertEqual(f.clean('http://example.com/     '), 'http://example.com/')
+
+    def test_urlfield_strip_on_none_value(self):
+        f = URLField(required=False, empty_value=None)
+        self.assertIsNone(f.clean(None))
+
+    def test_urlfield_unable_to_set_strip_kwarg(self):
+        msg = "__init__() got multiple values for keyword argument 'strip'"
+        with self.assertRaisesMessage(TypeError, msg):
+            URLField(strip=False)

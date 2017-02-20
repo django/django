@@ -1,12 +1,13 @@
-from __future__ import unicode_literals
-
-from unittest import skipUnless
+from unittest import mock, skipUnless
 
 from django.db import connection
+from django.db.models import Index
 from django.db.utils import DatabaseError
-from django.test import TransactionTestCase, mock, skipUnlessDBFeature
+from django.test import TransactionTestCase, skipUnlessDBFeature
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango21Warning
 
-from .models import Article, ArticleReporter, City, Reporter
+from .models import Article, ArticleReporter, City, District, Reporter
 
 
 class IntrospectionTests(TransactionTestCase):
@@ -81,9 +82,6 @@ class IntrospectionTests(TransactionTestCase):
              'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField']
         )
 
-    # The following test fails on Oracle due to #17202 (can't correctly
-    # inspect the length of character columns).
-    @skipUnlessDBFeature('can_introspect_max_length')
     def test_get_table_description_col_lengths(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
@@ -141,17 +139,19 @@ class IntrospectionTests(TransactionTestCase):
 
     @skipUnless(connection.vendor == 'sqlite', "This is an sqlite-specific issue")
     def test_get_relations_alt_format(self):
-        """With SQLite, foreign keys can be added with different syntaxes."""
-        with connection.cursor() as cursor:
-            cursor.fetchone = mock.Mock(
-                return_value=[
-                    "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY(art_id) REFERENCES {}(id));".format(
-                        Article._meta.db_table
-                    )
-                ]
-            )
-            relations = connection.introspection.get_relations(cursor, 'mocked_table')
-        self.assertEqual(relations, {'art_id': ('id', Article._meta.db_table)})
+        """
+        With SQLite, foreign keys can be added with different syntaxes and
+        formatting.
+        """
+        create_table_statements = [
+            "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY(art_id) REFERENCES {}(id));",
+            "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY (art_id) REFERENCES {}(id));"
+        ]
+        for statement in create_table_statements:
+            with connection.cursor() as cursor:
+                cursor.fetchone = mock.Mock(return_value=[statement.format(Article._meta.db_table)])
+                relations = connection.introspection.get_relations(cursor, 'mocked_table')
+            self.assertEqual(relations, {'art_id': ('id', Article._meta.db_table)})
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_get_key_columns(self):
@@ -165,22 +165,54 @@ class IntrospectionTests(TransactionTestCase):
     def test_get_primary_key_column(self):
         with connection.cursor() as cursor:
             primary_key_column = connection.introspection.get_primary_key_column(cursor, Article._meta.db_table)
+            pk_fk_column = connection.introspection.get_primary_key_column(cursor, District._meta.db_table)
         self.assertEqual(primary_key_column, 'id')
+        self.assertEqual(pk_fk_column, 'city_id')
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_get_indexes(self):
         with connection.cursor() as cursor:
             indexes = connection.introspection.get_indexes(cursor, Article._meta.db_table)
         self.assertEqual(indexes['reporter_id'], {'unique': False, 'primary_key': False})
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_get_indexes_multicol(self):
         """
-        Test that multicolumn indexes are not included in the introspection
-        results.
+        Multicolumn indexes are not included in the introspection results.
         """
         with connection.cursor() as cursor:
             indexes = connection.introspection.get_indexes(cursor, Reporter._meta.db_table)
         self.assertNotIn('first_name', indexes)
         self.assertIn('id', indexes)
+
+    def test_get_constraints_index_types(self):
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(cursor, Article._meta.db_table)
+        index = {}
+        for key, val in constraints.items():
+            if val['columns'] == ['headline', 'pub_date']:
+                index = val
+        self.assertEqual(index['type'], Index.suffix)
+
+    @skipUnlessDBFeature('supports_index_column_ordering')
+    def test_get_constraints_indexes_orders(self):
+        """
+        Indexes have the 'orders' key with a list of 'ASC'/'DESC' values.
+        """
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(cursor, Article._meta.db_table)
+        indexes_verified = 0
+        expected_columns = [
+            ['reporter_id'],
+            ['headline', 'pub_date'],
+            ['response_to_id'],
+        ]
+        for key, val in constraints.items():
+            if val['index'] and not (val['primary_key'] or val['unique']):
+                self.assertIn(val['columns'], expected_columns)
+                self.assertEqual(val['orders'], ['ASC'] * len(val['columns']))
+                indexes_verified += 1
+        self.assertEqual(indexes_verified, 3)
 
 
 def datatype(dbtype, description):

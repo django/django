@@ -1,14 +1,11 @@
-from __future__ import unicode_literals
-
 import os
 import sys
-from importlib import import_module
+from importlib import import_module, reload
 
 from django.apps import apps
 from django.conf import settings
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
-from django.utils import six
 
 from .exceptions import (
     AmbiguityError, BadMigrationError, InconsistentMigrationHistory,
@@ -18,7 +15,7 @@ from .exceptions import (
 MIGRATIONS_MODULE_NAME = 'migrations'
 
 
-class MigrationLoader(object):
+class MigrationLoader:
     """
     Loads migration files from disk, and their status from the database.
 
@@ -51,15 +48,18 @@ class MigrationLoader(object):
         if load:
             self.build_graph()
 
-    def migrations_module(self, app_label):
-        if (self.connection is not None and
-                not self.connection.settings_dict.get('TEST', {}).get('MIGRATE', True)):
-            return None
+    @classmethod
+    def migrations_module(cls, app_label):
+        """
+        Return the path to the migrations module for the specified app_label
+        and a boolean indicating if the module is specified in
+        settings.MIGRATION_MODULE.
+        """
         if app_label in settings.MIGRATION_MODULES:
-            return settings.MIGRATION_MODULES[app_label]
+            return settings.MIGRATION_MODULES[app_label], True
         else:
             app_package_name = apps.get_app_config(app_label).name
-            return '%s.%s' % (app_package_name, MIGRATIONS_MODULE_NAME)
+            return '%s.%s' % (app_package_name, MIGRATIONS_MODULE_NAME), False
 
     def load_disk(self):
         """
@@ -70,7 +70,7 @@ class MigrationLoader(object):
         self.migrated_apps = set()
         for app_config in apps.get_app_configs():
             # Get the migrations module directory
-            module_name = self.migrations_module(app_config.label)
+            module_name, explicit = self.migrations_module(app_config.label)
             if module_name is None:
                 self.unmigrated_apps.add(app_config.label)
                 continue
@@ -80,7 +80,8 @@ class MigrationLoader(object):
             except ImportError as e:
                 # I hate doing this, but I don't want to squash other import errors.
                 # Might be better to try a directory check directly.
-                if "No module named" in str(e) and MIGRATIONS_MODULE_NAME in str(e):
+                if ((explicit and self.ignore_no_migrations) or (
+                        not explicit and "No module named" in str(e) and MIGRATIONS_MODULE_NAME in str(e))):
                     self.unmigrated_apps.add(app_config.label)
                     continue
                 raise
@@ -95,7 +96,7 @@ class MigrationLoader(object):
                     continue
                 # Force a reload if it's already loaded (tests need this)
                 if was_loaded:
-                    six.moves.reload_module(module)
+                    reload(module)
             self.migrated_apps.add(app_config.label)
             directory = os.path.dirname(module.__file__)
             # Scan for .py files
@@ -125,9 +126,9 @@ class MigrationLoader(object):
         "Returns the migration(s) which match the given app label and name _prefix_"
         # Do the search
         results = []
-        for l, n in self.disk_migrations:
-            if l == app_label and n.startswith(name_prefix):
-                results.append((l, n))
+        for migration_app_label, migration_name in self.disk_migrations:
+            if migration_app_label == app_label and migration_name.startswith(name_prefix):
+                results.append((migration_app_label, migration_name))
         if len(results) > 1:
             raise AmbiguityError(
                 "There is more than one migration for '%s' with the prefix '%s'" % (app_label, name_prefix)
@@ -254,7 +255,7 @@ class MigrationLoader(object):
                 is_replaced = any(candidate in self.graph.nodes for candidate in candidates)
                 if not is_replaced:
                     tries = ', '.join('%s.%s' % c for c in candidates)
-                    exc_value = NodeNotFoundError(
+                    raise NodeNotFoundError(
                         "Migration {0} depends on nonexistent node ('{1}', '{2}'). "
                         "Django tried to replace migration {1}.{2} with any of [{3}] "
                         "but wasn't able to because some of the replaced migrations "
@@ -262,11 +263,7 @@ class MigrationLoader(object):
                             exc.origin, exc.node[0], exc.node[1], tries
                         ),
                         exc.node
-                    )
-                    exc_value.__cause__ = exc
-                    if not hasattr(exc, '__traceback__'):
-                        exc.__traceback__ = sys.exc_info()[2]
-                    six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
+                    ) from exc
             raise exc
 
     def check_consistent_history(self, connection):
@@ -282,9 +279,16 @@ class MigrationLoader(object):
                 continue
             for parent in self.graph.node_map[migration].parents:
                 if parent not in applied:
+                    # Skip unapplied squashed migrations that have all of their
+                    # `replaces` applied.
+                    if parent in self.replacements:
+                        if all(m in applied for m in self.replacements[parent].replaces):
+                            continue
                     raise InconsistentMigrationHistory(
-                        "Migration {}.{} is applied before its dependency {}.{}".format(
+                        "Migration {}.{} is applied before its dependency "
+                        "{}.{} on database '{}'.".format(
                             migration[0], migration[1], parent[0], parent[1],
+                            connection.alias,
                         )
                     )
 

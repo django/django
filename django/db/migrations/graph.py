@@ -1,14 +1,9 @@
-from __future__ import unicode_literals
-
-import sys
 import warnings
 from collections import deque
 from functools import total_ordering
 
 from django.db.migrations.state import ProjectState
-from django.utils import six
 from django.utils.datastructures import OrderedSet
-from django.utils.encoding import python_2_unicode_compatible
 
 from .exceptions import CircularDependencyError, NodeNotFoundError
 
@@ -20,9 +15,8 @@ RECURSION_DEPTH_WARNING = (
 )
 
 
-@python_2_unicode_compatible
 @total_ordering
-class Node(object):
+class Node:
     """
     A single node in the migration graph. Contains direct links to adjacent
     nodes in either direction.
@@ -48,7 +42,7 @@ class Node(object):
         return str(self.key)
 
     def __repr__(self):
-        return '<Node: (%r, %r)>' % self.key
+        return '<%s: (%r, %r)>' % (self.__class__.__name__, self.key[0], self.key[1])
 
     def add_child(self, child):
         self.children.add(child)
@@ -83,12 +77,9 @@ class Node(object):
 
 class DummyNode(Node):
     def __init__(self, key, origin, error_message):
-        super(DummyNode, self).__init__(key)
+        super().__init__(key)
         self.origin = origin
         self.error_message = error_message
-
-    def __repr__(self):
-        return '<DummyNode: (%r, %r)>' % self.key
 
     def promote(self):
         """
@@ -104,8 +95,7 @@ class DummyNode(Node):
         raise NodeNotFoundError(self.error_message, self.key, origin=self.origin)
 
 
-@python_2_unicode_compatible
-class MigrationGraph(object):
+class MigrationGraph:
     """
     Represents the digraph of all migrations in a project.
 
@@ -183,16 +173,12 @@ class MigrationGraph(object):
         replaced = set(replaced)
         try:
             replacement_node = self.node_map[replacement]
-        except KeyError as exc:
-            exc_value = NodeNotFoundError(
+        except KeyError as err:
+            raise NodeNotFoundError(
                 "Unable to find replacement node %r. It was either never added"
                 " to the migration graph, or has been removed." % (replacement, ),
                 replacement
-            )
-            exc_value.__cause__ = exc
-            if not hasattr(exc, '__traceback__'):
-                exc.__traceback__ = sys.exc_info()[2]
-            six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
+            ) from err
         for replaced_key in replaced:
             self.nodes.pop(replaced_key, None)
             replaced_node = self.node_map.pop(replaced_key, None)
@@ -223,16 +209,12 @@ class MigrationGraph(object):
         self.nodes.pop(replacement, None)
         try:
             replacement_node = self.node_map.pop(replacement)
-        except KeyError as exc:
-            exc_value = NodeNotFoundError(
+        except KeyError as err:
+            raise NodeNotFoundError(
                 "Unable to remove replacement node %r. It was either never added"
                 " to the migration graph, or has been removed already." % (replacement, ),
                 replacement
-            )
-            exc_value.__cause__ = exc
-            if not hasattr(exc, '__traceback__'):
-                exc.__traceback__ = sys.exc_info()[2]
-            six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
+            ) from err
         replaced_nodes = set()
         replaced_nodes_parents = set()
         for key in replaced:

@@ -7,10 +7,10 @@ during the development of Django applications.
 
 .. _troubleshooting-django-admin:
 
-Problems running django-admin
-=============================
+Problems running ``django-admin``
+=================================
 
-"command not found: django-admin"
+"command not found: `django-admin`"
 ------------------------------------
 
 :doc:`django-admin </ref/django-admin>` should be on your system path if you
@@ -54,15 +54,6 @@ pitfalls producing this error:
   UNIX-like systems (can be checked by the ``locale`` command). If it's the
   case, please refer to your system documentation to learn how you can change
   this to a UTF-8 locale.
-
-* You created raw bytestrings, which is easy to do on Python 2::
-
-      my_string = 'café'
-
-  Either use the ``u''`` prefix or even better, add the
-  ``from __future__ import unicode_literals`` line at the top of your file
-  so that your code will be compatible with Python 3.2 which doesn't support
-  the ``u''`` prefix.
 
 Related resources:
 

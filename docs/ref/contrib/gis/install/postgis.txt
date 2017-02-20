@@ -2,56 +2,29 @@
 Installing PostGIS
 ==================
 
-`PostGIS`__ adds geographic object support to PostgreSQL, turning it
+`PostGIS`_ adds geographic object support to PostgreSQL, turning it
 into a spatial database. :ref:`geosbuild`, :ref:`proj4` and
 :ref:`gdalbuild` should be installed prior to building PostGIS. You
 might also need additional libraries, see `PostGIS requirements`_.
 
-.. note::
-
-    The `psycopg2`_ module is required for use as the database adapter
-    when using GeoDjango with PostGIS.
-
-.. _psycopg2: http://initd.org/psycopg/
-.. _PostGIS requirements: http://postgis.net/docs/manual-2.1/postgis_installation.html#install_requirements
+The `psycopg2`_ module is required for use as the database adapter when using
+GeoDjango with PostGIS.
 
 On Debian/Ubuntu, you are advised to install the following packages:
 postgresql-x.x, postgresql-x.x-postgis, postgresql-server-dev-x.x,
 python-psycopg2 (x.x matching the PostgreSQL version you want to install).
-Please also consult platform-specific instructions if you are on :ref:`macosx`
-or :ref:`windows`.
+Alternately, you can `build from source`_. Consult the platform-specific
+instructions if you are on :ref:`macosx` or :ref:`windows`.
 
-Building from source
-====================
-
-First download the source archive, and extract::
-
-    $ wget http://download.osgeo.org/postgis/source/postgis-2.1.5.tar.gz
-    $ tar xzf postgis-2.1.5.tar.gz
-    $ cd postgis-2.1.5
-
-Next, configure, make and install PostGIS::
-
-    $ ./configure
-
-Finally, make and install::
-
-    $ make
-    $ sudo make install
-    $ cd ..
-
-.. note::
-
-    GeoDjango does not automatically create a spatial database.  Please consult
-    the section on :ref:`spatialdb_template91` for more information.
-
-__ http://postgis.net/
+.. _PostGIS: http://postgis.net/
+.. _psycopg2: http://initd.org/psycopg/
+.. _PostGIS requirements: http://postgis.net/docs/postgis_installation.html#install_requirements
+.. _build from source: http://postgis.net/docs/postgis_installation.html#install_short_version
 
 Post-installation
 =================
 
 .. _spatialdb_template:
-.. _spatialdb_template91:
 
 Creating a spatial database
 ---------------------------
@@ -65,7 +38,17 @@ functionality::
 
 The database user must be a superuser in order to run
 ``CREATE EXTENSION postgis;``. The command is run during the :djadmin:`migrate`
-process.
+process. An alternative is to use a migration operation in your project::
+
+    from django.contrib.postgres.operations import CreateExtension
+    from django.db import migrations
+
+    class Migration(migrations.Migration):
+
+        operations = [
+            CreateExtension('postgis'),
+            ...
+        ]
 
 GeoDjango does not currently leverage any `PostGIS topology functionality`__.
 If you plan to use those features at some point, you can also install the

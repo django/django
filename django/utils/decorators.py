@@ -1,25 +1,20 @@
 "Functions that help with dynamically creating decorators for views."
 
-try:
-    from contextlib import ContextDecorator
-except ImportError:
-    ContextDecorator = None
-
+# For backwards compatibility in Django 2.0.
+from contextlib import ContextDecorator  # noqa
 from functools import WRAPPER_ASSIGNMENTS, update_wrapper, wraps
-
-from django.utils import six
 
 
 class classonlymethod(classmethod):
     def __get__(self, instance, cls=None):
         if instance is not None:
             raise AttributeError("This method is available only on the class, not on instances.")
-        return super(classonlymethod, self).__get__(instance, cls)
+        return super().__get__(instance, cls)
 
 
 def method_decorator(decorator, name=''):
     """
-    Converts a function decorator into a method decorator
+    Convert a function decorator into a method decorator
     """
     # 'obj' can be a class or a function. If 'obj' is a function at the time it
     # is passed to _dec,  it will eventually be a method of the class it is
@@ -84,7 +79,7 @@ def method_decorator(decorator, name=''):
     # Don't worry about making _dec look similar to a list/tuple as it's rather
     # meaningless.
     if not hasattr(decorator, '__iter__'):
-        update_wrapper(_dec, decorator, assigned=available_attrs(decorator))
+        update_wrapper(_dec, decorator)
     # Change the name to aid debugging.
     if hasattr(decorator, '__name__'):
         _dec.__name__ = 'method_decorator(%s)' % decorator.__name__
@@ -95,7 +90,7 @@ def method_decorator(decorator, name=''):
 
 def decorator_from_middleware_with_args(middleware_class):
     """
-    Like decorator_from_middleware, but returns a function
+    Like decorator_from_middleware, but return a function
     that accepts the arguments to be passed to the middleware_class.
     Use like::
 
@@ -111,23 +106,21 @@ def decorator_from_middleware_with_args(middleware_class):
 
 def decorator_from_middleware(middleware_class):
     """
-    Given a middleware class (not an instance), returns a view decorator. This
+    Given a middleware class (not an instance), return a view decorator. This
     lets you use middleware functionality on a per-view basis. The middleware
     is created with no params passed.
     """
     return make_middleware_decorator(middleware_class)()
 
 
+# Unused, for backwards compatibility in Django 2.0.
 def available_attrs(fn):
     """
     Return the list of functools-wrappable attributes on a callable.
-    This is required as a workaround for http://bugs.python.org/issue3445
+    This was required as a workaround for http://bugs.python.org/issue3445
     under Python 2.
     """
-    if six.PY3:
-        return WRAPPER_ASSIGNMENTS
-    else:
-        return tuple(a for a in WRAPPER_ASSIGNMENTS if hasattr(fn, a))
+    return WRAPPER_ASSIGNMENTS
 
 
 def make_middleware_decorator(middleware_class):
@@ -135,7 +128,7 @@ def make_middleware_decorator(middleware_class):
         middleware = middleware_class(*m_args, **m_kwargs)
 
         def _decorator(view_func):
-            @wraps(view_func, assigned=available_attrs(view_func))
+            @wraps(view_func)
             def _wrapped_view(request, *args, **kwargs):
                 if hasattr(middleware, 'process_request'):
                     result = middleware.process_request(request)
@@ -171,22 +164,7 @@ def make_middleware_decorator(middleware_class):
     return _make_decorator
 
 
-if ContextDecorator is None:
-    # ContextDecorator was introduced in Python 3.2
-    # See https://docs.python.org/3/library/contextlib.html#contextlib.ContextDecorator
-    class ContextDecorator(object):
-        """
-        A base class that enables a context manager to also be used as a decorator.
-        """
-        def __call__(self, func):
-            @wraps(func, assigned=available_attrs(func))
-            def inner(*args, **kwargs):
-                with self:
-                    return func(*args, **kwargs)
-            return inner
-
-
-class classproperty(object):
+class classproperty:
     def __init__(self, method=None):
         self.fget = method
 

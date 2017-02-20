@@ -1,4 +1,6 @@
 import os
+from io import StringIO
+from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -7,11 +9,9 @@ from django.core import management
 from django.core.management import BaseCommand, CommandError, find_commands
 from django.core.management.utils import find_command, popen_wrapper
 from django.db import connection
-from django.test import SimpleTestCase, mock, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
-from django.utils._os import upath
-from django.utils.six import StringIO
 
 from .management.commands import dance
 
@@ -45,7 +45,7 @@ class CommandTests(SimpleTestCase):
             self.assertEqual(translation.get_language(), 'fr')
 
     def test_explode(self):
-        """ Test that an unknown command raises CommandError """
+        """ An unknown command raises CommandError """
         with self.assertRaises(CommandError):
             management.call_command(('explode',))
 
@@ -55,8 +55,12 @@ class CommandTests(SimpleTestCase):
         """
         with self.assertRaises(CommandError):
             management.call_command('dance', example="raise")
-        with captured_stderr() as stderr, self.assertRaises(SystemExit):
-            management.ManagementUtility(['manage.py', 'dance', '--example=raise']).execute()
+        dance.Command.requires_system_checks = False
+        try:
+            with captured_stderr() as stderr, self.assertRaises(SystemExit):
+                management.ManagementUtility(['manage.py', 'dance', '--example=raise']).execute()
+        finally:
+            dance.Command.requires_system_checks = True
         self.assertIn("CommandError", stderr.getvalue())
 
     def test_deactivate_locale_set(self):
@@ -86,9 +90,9 @@ class CommandTests(SimpleTestCase):
 
     def test_discover_commands_in_eggs(self):
         """
-        Test that management commands can also be loaded from Python eggs.
+        Management commands can also be loaded from Python eggs.
         """
-        egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
+        egg_dir = '%s/eggs' % os.path.dirname(__file__)
         egg_name = '%s/basic.egg' % egg_dir
         with extend_sys_path(egg_name):
             with self.settings(INSTALLED_APPS=['commandegg']):
@@ -146,7 +150,7 @@ class CommandTests(SimpleTestCase):
         self.counter = 0
 
         def patched_check(self_, **kwargs):
-            self.counter = self.counter + 1
+            self.counter += 1
 
         saved_check = BaseCommand.check
         BaseCommand.check = patched_check
@@ -160,7 +164,7 @@ class CommandTests(SimpleTestCase):
 
     def test_check_migrations(self):
         requires_migrations_checks = dance.Command.requires_migrations_checks
-        self.assertEqual(requires_migrations_checks, False)
+        self.assertIs(requires_migrations_checks, False)
         try:
             with mock.patch.object(BaseCommand, 'check_migrations') as check_migrations:
                 management.call_command('dance', verbosity=0)

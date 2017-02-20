@@ -1,13 +1,10 @@
-from __future__ import unicode_literals
-
 from django.db import IntegrityError, connection, transaction
-from django.test import TestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.test import TestCase
 
 from .models import (
     Bar, Director, Favorites, HiddenPointer, ManualPrimaryKey, MultiModel,
-    Place, Pointer, RelatedModel, Restaurant, School, Target, UndergroundBar,
-    Waiter,
+    Place, Pointer, RelatedModel, Restaurant, School, Target, ToFieldPointer,
+    UndergroundBar, Waiter,
 )
 
 
@@ -165,10 +162,8 @@ class OneToOneTests(TestCase):
 
     def test_create_models_m2m(self):
         """
-        Regression test for #1064 and #1506
-
-        Check that we create models via the m2m relation if the remote model
-        has a OneToOneField.
+        Modles are created via the m2m relation if the remote model has a
+        OneToOneField (#1064, #1506).
         """
         f = Favorites(name='Fred')
         f.save()
@@ -180,9 +175,7 @@ class OneToOneTests(TestCase):
 
     def test_reverse_object_cache(self):
         """
-        Regression test for #7173
-
-        Check that the name of the cache for the reverse object is correct.
+        The name of the cache for the reverse object is correct (#7173).
         """
         self.assertEqual(self.p1.restaurant, self.r1)
         self.assertEqual(self.p1.bar, self.b1)
@@ -423,7 +416,6 @@ class OneToOneTests(TestCase):
             hasattr(Target, HiddenPointer._meta.get_field('target').remote_field.get_accessor_name())
         )
 
-    @ignore_warnings(category=RemovedInDjango20Warning)  # for use_for_related_fields deprecation
     def test_related_object(self):
         public_school = School.objects.create(is_public=True)
         public_director = Director.objects.create(school=public_school, is_temp=False)
@@ -455,25 +447,6 @@ class OneToOneTests(TestCase):
         # its related school even if the default manager doesn't normally
         # allow it.
         self.assertEqual(private_school.director, private_director)
-
-        # If the manager is marked "use_for_related_fields", it'll get used instead
-        # of the "bare" queryset. Usually you'd define this as a property on the class,
-        # but this approximates that in a way that's easier in tests.
-        School._default_manager.use_for_related_fields = True
-        try:
-            private_director = Director._base_manager.get(pk=private_director.pk)
-            with self.assertRaises(School.DoesNotExist):
-                private_director.school
-        finally:
-            School._default_manager.use_for_related_fields = False
-
-        Director._default_manager.use_for_related_fields = True
-        try:
-            private_school = School._base_manager.get(pk=private_school.pk)
-            with self.assertRaises(Director.DoesNotExist):
-                private_school.director
-        finally:
-            Director._default_manager.use_for_related_fields = False
 
         School._meta.base_manager_name = 'objects'
         School._meta._expire_cache()
@@ -516,17 +489,23 @@ class OneToOneTests(TestCase):
     def test_rel_pk_subquery(self):
         r = Restaurant.objects.first()
         q1 = Restaurant.objects.filter(place_id=r.pk)
-        # Test that subquery using primary key and a query against the
+        # Subquery using primary key and a query against the
         # same model works correctly.
         q2 = Restaurant.objects.filter(place_id__in=q1)
-        self.assertQuerysetEqual(q2, [r], lambda x: x)
-        # Test that subquery using 'pk__in' instead of 'place_id__in' work, too.
+        self.assertSequenceEqual(q2, [r])
+        # Subquery using 'pk__in' instead of 'place_id__in' work, too.
         q2 = Restaurant.objects.filter(
             pk__in=Restaurant.objects.filter(place__id=r.place.pk)
         )
-        self.assertQuerysetEqual(q2, [r], lambda x: x)
+        self.assertSequenceEqual(q2, [r])
 
     def test_rel_pk_exact(self):
         r = Restaurant.objects.first()
         r2 = Restaurant.objects.filter(pk__exact=r).first()
         self.assertEqual(r, r2)
+
+    def test_primary_key_to_field_filter(self):
+        target = Target.objects.create(name='foo')
+        pointer = ToFieldPointer.objects.create(target=target)
+        self.assertSequenceEqual(ToFieldPointer.objects.filter(target=target), [pointer])
+        self.assertSequenceEqual(ToFieldPointer.objects.filter(pk__exact=pointer), [pointer])

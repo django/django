@@ -83,7 +83,7 @@ form ul.inline li {
     height: 26px;
 }
 
-.aligned label + p {
+.aligned label + p, .aligned label + div.help, .aligned label + div.readonly {
     padding: 6px 0;
     margin-top: 0;
     margin-bottom: 0;
@@ -115,26 +115,32 @@ form .aligned ul.radiolist {
     padding: 0;
 }
 
-form .aligned p.help {
+form .aligned p.help,
+form .aligned div.help {
     clear: left;
     margin-top: 0;
     margin-left: 160px;
     padding-left: 10px;
 }
 
-form .aligned label + p.help {
+form .aligned label + p.help,
+form .aligned label + div.help {
     margin-left: 0;
     padding-left: 0;
 }
 
-form .aligned p.help:last-child {
+form .aligned p.help:last-child,
+form .aligned div.help:last-child {
     margin-bottom: 0;
     padding-bottom: 0;
 }
 
 form .aligned input + p.help,
 form .aligned textarea + p.help,
-form .aligned select + p.help {
+form .aligned select + p.help,
+form .aligned input + div.help,
+form .aligned textarea + div.help,
+form .aligned select + div.help {
     margin-left: 160px;
     padding-left: 10px;
 }
@@ -156,7 +162,8 @@ form .aligned table p {
     padding: 0 0 5px 5px;
 }
 
-.aligned .vCheckboxLabel + p.help {
+.aligned .vCheckboxLabel + p.help,
+.aligned .vCheckboxLabel + div.help {
     margin-top: -4px;
 }
 
@@ -164,7 +171,8 @@ form .aligned table p {
     width: 610px;
 }
 
-.checkbox-row p.help {
+.checkbox-row p.help,
+.checkbox-row div.help {
     margin-left: 0;
     padding-left: 0;
 }
@@ -180,12 +188,20 @@ fieldset .field-box {
     width: 200px;
 }
 
-form .wide p, form .wide input + p.help {
+form .wide p,
+form .wide input + p.help,
+form .wide input + div.help {
     margin-left: 200px;
 }
 
-form .wide p.help {
+form .wide p.help,
+form .wide div.help {
     padding-left: 38px;
+}
+
+form div.help ul {
+    padding-left: 0;
+    margin-left: 0;
 }
 
 .colM fieldset.wide .vLargeTextField, .colM fieldset.wide .vXMLLargeTextField {

@@ -23,7 +23,7 @@ class RequestContextProcessorTests(SimpleTestCase):
 
     def test_request_attributes(self):
         """
-        Test that the request object is available in the template and that its
+        The request object is available in the template and that its
         attributes can't be overridden by GET and POST parameters (#3828).
         """
         url = '/request_attrs/'
@@ -64,6 +64,7 @@ class DebugContextProcessorTests(TestCase):
     """
     Tests for the ``django.template.context_processors.debug`` processor.
     """
+    multi_db = True
 
     def test_debug(self):
         url = '/debug/'

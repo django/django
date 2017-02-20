@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-05-21 09:09+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Ossetic (http://www.transifex.com/django/django/language/"
 "os/)\n"
@@ -63,6 +63,12 @@ msgstr "Ацы мӕй"
 msgid "This year"
 msgstr "Ацы аз"
 
+msgid "No date"
+msgstr ""
+
+msgid "Has date"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -73,6 +79,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Ми:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Бафтауын ӕндӕр %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Схафын"
 
 msgid "action time"
 msgstr "мийы рӕстӕг"
@@ -86,6 +99,8 @@ msgstr ""
 msgid "object id"
 msgstr "объекты бӕрӕггӕнӕн"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "объекты хуыз"
 
@@ -116,6 +131,31 @@ msgstr "Хафт ӕрцыд \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "ЛогыИуӕг Объект"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr ""
+
+msgid "Added."
+msgstr ""
+
+msgid "and"
+msgstr "ӕмӕ"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr ""
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr ""
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr ""
+
+msgid "No fields changed."
+msgstr "Ивд бынат нӕй."
+
 msgid "None"
 msgstr "Никӕцы"
 
@@ -123,63 +163,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-msgid "Added."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
-#, python-format
-msgid "Changed %s."
-msgstr "Ивд %s."
-
-msgid "and"
-msgstr "ӕмӕ"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Бафтыдта %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Changed %(name)s \"%(object)s\"-ы %(list)s."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Схафта %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Ивд бынат нӕй."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" ӕфтыд ӕрцыд. Дӕ бон у бындӕр та йӕ ивай."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" ӕфтыд ӕрцыд. Дӕ бон у ӕндӕр %(name)s бындӕр бафтауын."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" ӕфтыд ӕрцыд."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr "%(name)s \"%(obj)s\" ивд ӕрцыд. Дӕ бон у бындӕ ӕй ногӕй ивай."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
 msgstr ""
-"%(name)s \"%(obj)s\" ивд ӕрцыд. Дӕ бон у ӕндӕр %(name)s бындӕр бафтауын."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" ивд ӕрцыд."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -333,18 +345,15 @@ msgstr "Документаци"
 msgid "Log out"
 msgstr "Рахизын"
 
-msgid "Add"
-msgstr "Бафтауын"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Бафтауын %(name)s"
 
 msgid "History"
 msgstr "Истори"
 
 msgid "View on site"
 msgstr "Сайты фенын"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Бафтауын %(name)s"
 
 msgid "Filter"
 msgstr "Фӕрсудзӕн"
@@ -426,13 +435,6 @@ msgstr ""
 msgid "Change"
 msgstr "Фӕивын"
 
-msgid "Remove"
-msgstr "Схафын"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Бафтауын ӕндӕр %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Хъӕуы схафын?"
 
@@ -447,14 +449,17 @@ msgstr ""
 msgid "Models in the %(name)s application"
 msgstr "Моделтӕ %(name)s ӕфтуаны"
 
+msgid "Add"
+msgstr "Бафтауын"
+
 msgid "You don't have permission to edit anything."
 msgstr "Нӕй дын бар исты ивын."
 
-msgid "Recent Actions"
-msgstr "Фӕстаг митӕ"
+msgid "Recent actions"
+msgstr ""
 
-msgid "My Actions"
-msgstr "Фылдӕр митӕ"
+msgid "My actions"
+msgstr ""
 
 msgid "None available"
 msgstr "Ницы ис"

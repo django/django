@@ -2,10 +2,11 @@
 Sets up the terminal color scheme.
 """
 
+import functools
 import os
 import sys
 
-from django.utils import lru_cache, termcolors
+from django.utils import termcolors
 
 
 def supports_color():
@@ -23,7 +24,7 @@ def supports_color():
     return True
 
 
-class Style(object):
+class Style:
     pass
 
 
@@ -57,7 +58,7 @@ def make_style(config_string=''):
     return style
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def no_style():
     """
     Returns a Style object with no color scheme.

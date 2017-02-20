@@ -4,26 +4,24 @@ import warnings
 from collections import deque
 from contextlib import contextmanager
 
+import _thread
+import pytz
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends import utils
+from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.signals import connection_created
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.six.moves import _thread as thread
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 NO_DB_ALIAS = '__no_db__'
 
 
-class BaseDatabaseWrapper(object):
+class BaseDatabaseWrapper:
     """
     Represents a database connection.
     """
@@ -36,6 +34,13 @@ class BaseDatabaseWrapper(object):
     ops = None
     vendor = 'unknown'
     SchemaEditorClass = None
+    # Classes instantiated in __init__().
+    client_class = None
+    creation_class = None
+    features_class = None
+    introspection_class = None
+    ops_class = None
+    validation_class = BaseDatabaseValidation
 
     queries_limit = 9000
 
@@ -77,7 +82,7 @@ class BaseDatabaseWrapper(object):
 
         # Thread-safety related attributes.
         self.allow_thread_sharing = allow_thread_sharing
-        self._thread_ident = thread.get_ident()
+        self._thread_ident = _thread.get_ident()
 
         # A list of no-argument functions to run when the transaction commits.
         # Each entry is an (sids, func) tuple, where sids is a set of the
@@ -87,6 +92,20 @@ class BaseDatabaseWrapper(object):
         # Should we run the on-commit hooks the next time set_autocommit(True)
         # is called?
         self.run_commit_hooks_on_set_autocommit_on = False
+
+        self.client = self.client_class(self)
+        self.creation = self.creation_class(self)
+        self.features = self.features_class(self)
+        self.introspection = self.introspection_class(self)
+        self.ops = self.ops_class(self)
+        self.validation = self.validation_class(self)
+
+    def ensure_timezone(self):
+        """
+        Ensure the connection's timezone is set to `self.timezone_name` and
+        return whether it changed or not.
+        """
+        return False
 
     @cached_property
     def timezone(self):
@@ -106,7 +125,6 @@ class BaseDatabaseWrapper(object):
         elif self.settings_dict['TIME_ZONE'] is None:
             return timezone.utc
         else:
-            # Only this branch requires pytz.
             return pytz.timezone(self.settings_dict['TIME_ZONE'])
 
     @cached_property
@@ -147,7 +165,7 @@ class BaseDatabaseWrapper(object):
         """Initializes the database connection settings."""
         raise NotImplementedError('subclasses of BaseDatabaseWrapper may require an init_connection_state() method')
 
-    def create_cursor(self):
+    def create_cursor(self, name=None):
         """Creates a cursor. Assumes that a connection is established."""
         raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a create_cursor() method')
 
@@ -185,10 +203,6 @@ class BaseDatabaseWrapper(object):
                 raise ImproperlyConfigured(
                     "Connection '%s' cannot set TIME_ZONE because its engine "
                     "handles time zones conversions natively." % self.alias)
-            elif pytz is None:
-                raise ImproperlyConfigured(
-                    "Connection '%s' cannot set TIME_ZONE because pytz isn't "
-                    "installed." % self.alias)
 
     def ensure_connection(self):
         """
@@ -200,10 +214,21 @@ class BaseDatabaseWrapper(object):
 
     # ##### Backend-specific wrappers for PEP-249 connection methods #####
 
-    def _cursor(self):
+    def _prepare_cursor(self, cursor):
+        """
+        Validate the connection is usable and perform database cursor wrapping.
+        """
+        self.validate_thread_sharing()
+        if self.queries_logged:
+            wrapped_cursor = self.make_debug_cursor(cursor)
+        else:
+            wrapped_cursor = self.make_cursor(cursor)
+        return wrapped_cursor
+
+    def _cursor(self, name=None):
         self.ensure_connection()
         with self.wrap_database_errors:
-            return self.create_cursor()
+            return self._prepare_cursor(self.create_cursor(name))
 
     def _commit(self):
         if self.connection is not None:
@@ -226,12 +251,7 @@ class BaseDatabaseWrapper(object):
         """
         Creates a cursor, opening a connection if necessary.
         """
-        self.validate_thread_sharing()
-        if self.queries_logged:
-            cursor = self.make_debug_cursor(self._cursor())
-        else:
-            cursor = self.make_cursor(self._cursor())
-        return cursor
+        return self._cursor()
 
     def commit(self):
         """
@@ -253,7 +273,7 @@ class BaseDatabaseWrapper(object):
         self._rollback()
         # A successful rollback means that the database connection works.
         self.errors_occurred = False
-
+        self.needs_rollback = False
         self.run_on_commit = []
 
     def close(self):
@@ -306,7 +326,7 @@ class BaseDatabaseWrapper(object):
         if not self._savepoint_allowed():
             return
 
-        thread_ident = thread.get_ident()
+        thread_ident = _thread.get_ident()
         tid = str(thread_ident).replace('-', '')
 
         self.savepoint_state += 1
@@ -513,13 +533,13 @@ class BaseDatabaseWrapper(object):
         authorized to be shared between threads (via the `allow_thread_sharing`
         property). Raises an exception if the validation fails.
         """
-        if not (self.allow_thread_sharing or self._thread_ident == thread.get_ident()):
+        if not (self.allow_thread_sharing or self._thread_ident == _thread.get_ident()):
             raise DatabaseError(
                 "DatabaseWrapper objects created in a "
                 "thread can only be used in that same thread. The object "
                 "with alias '%s' was created in thread id %s and this is "
                 "thread id %s."
-                % (self.alias, self._thread_ident, thread.get_ident())
+                % (self.alias, self._thread_ident, _thread.get_ident())
             )
 
     # ##### Miscellaneous #####
@@ -538,6 +558,13 @@ class BaseDatabaseWrapper(object):
         exceptions using Django's common wrappers.
         """
         return DatabaseErrorWrapper(self)
+
+    def chunked_cursor(self):
+        """
+        Return a cursor that tries to avoid caching in the database (if
+        supported by the database), otherwise return a regular cursor.
+        """
+        return self.cursor()
 
     def make_debug_cursor(self, cursor):
         """

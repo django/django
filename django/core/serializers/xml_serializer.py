@@ -2,8 +2,6 @@
 XML serializer.
 """
 
-from __future__ import unicode_literals
-
 from collections import OrderedDict
 from xml.dom import pulldom
 from xml.sax import handler
@@ -13,7 +11,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
-from django.utils.encoding import smart_text
+from django.utils.encoding import force_text
 from django.utils.xmlutils import (
     SimplerXMLGenerator, UnserializableContentError,
 )
@@ -52,11 +50,11 @@ class Serializer(base.Serializer):
             raise base.SerializationError("Non-model object (%s) encountered during serialization" % type(obj))
 
         self.indent(1)
-        attrs = OrderedDict([("model", smart_text(obj._meta))])
+        attrs = OrderedDict([("model", force_text(obj._meta))])
         if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
             obj_pk = obj._get_pk_val()
             if obj_pk is not None:
-                attrs['pk'] = smart_text(obj_pk)
+                attrs['pk'] = force_text(obj_pk)
 
         self.xml.startElement("object", attrs)
 
@@ -105,10 +103,10 @@ class Serializer(base.Serializer):
                 # Iterable natural keys are rolled out as subelements
                 for key_value in related:
                     self.xml.startElement("natural", {})
-                    self.xml.characters(smart_text(key_value))
+                    self.xml.characters(force_text(key_value))
                     self.xml.endElement("natural")
             else:
-                self.xml.characters(smart_text(related_att))
+                self.xml.characters(force_text(related_att))
         else:
             self.xml.addQuickElement("None")
         self.xml.endElement("field")
@@ -129,13 +127,13 @@ class Serializer(base.Serializer):
                     self.xml.startElement("object", {})
                     for key_value in natural:
                         self.xml.startElement("natural", {})
-                        self.xml.characters(smart_text(key_value))
+                        self.xml.characters(force_text(key_value))
                         self.xml.endElement("natural")
                     self.xml.endElement("object")
             else:
                 def handle_m2m(value):
                     self.xml.addQuickElement("object", attrs={
-                        'pk': smart_text(value._get_pk_val())
+                        'pk': force_text(value._get_pk_val())
                     })
             for relobj in getattr(obj, field.name).iterator():
                 handle_m2m(relobj)
@@ -150,7 +148,7 @@ class Serializer(base.Serializer):
         self.xml.startElement("field", OrderedDict([
             ("name", field.name),
             ("rel", field.remote_field.__class__.__name__),
-            ("to", smart_text(field.remote_field.model._meta)),
+            ("to", force_text(field.remote_field.model._meta)),
         ]))
 
 
@@ -159,11 +157,11 @@ class Deserializer(base.Deserializer):
     Deserialize XML.
     """
 
-    def __init__(self, stream_or_string, **options):
-        super(Deserializer, self).__init__(stream_or_string, **options)
+    def __init__(self, stream_or_string, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False, **options):
+        super().__init__(stream_or_string, **options)
         self.event_stream = pulldom.parse(self.stream, self._make_parser())
-        self.db = options.pop('using', DEFAULT_DB_ALIAS)
-        self.ignore = options.pop('ignorenonexistent', False)
+        self.db = using
+        self.ignore = ignorenonexistent
 
     def _make_parser(self):
         """Create a hardened XML parser (no custom/external entities)."""
@@ -358,7 +356,7 @@ class DefusedXmlException(ValueError):
 class DTDForbidden(DefusedXmlException):
     """Document type definition is forbidden."""
     def __init__(self, name, sysid, pubid):
-        super(DTDForbidden, self).__init__()
+        super().__init__()
         self.name = name
         self.sysid = sysid
         self.pubid = pubid
@@ -371,7 +369,7 @@ class DTDForbidden(DefusedXmlException):
 class EntitiesForbidden(DefusedXmlException):
     """Entity definition is forbidden."""
     def __init__(self, name, value, base, sysid, pubid, notation_name):
-        super(EntitiesForbidden, self).__init__()
+        super().__init__()
         self.name = name
         self.value = value
         self.base = base
@@ -387,7 +385,7 @@ class EntitiesForbidden(DefusedXmlException):
 class ExternalReferenceForbidden(DefusedXmlException):
     """Resolving an external reference is forbidden."""
     def __init__(self, context, base, sysid, pubid):
-        super(ExternalReferenceForbidden, self).__init__()
+        super().__init__()
         self.context = context
         self.base = base
         self.sysid = sysid

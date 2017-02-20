@@ -9,8 +9,8 @@ def normal_view(request):
 
 
 def template_response(request):
-    template = engines['django'].from_string('OK')
-    return TemplateResponse(request, template)
+    template = engines['django'].from_string('template_response OK{% for m in mw %}\n{{ m }}{% endfor %}')
+    return TemplateResponse(request, template, context={'mw': []})
 
 
 def template_response_error(request):

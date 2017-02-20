@@ -3,7 +3,6 @@ from unittest import TestCase
 from django.utils.baseconv import (
     BaseConverter, base2, base16, base36, base56, base62, base64,
 )
-from django.utils.six.moves import range
 
 
 class TestBaseConv(TestCase):
@@ -45,3 +44,7 @@ class TestBaseConv(TestCase):
         with self.assertRaises(ValueError):
             BaseConverter('abc', sign='a')
         self.assertIsInstance(BaseConverter('abc', sign='d'), BaseConverter)
+
+    def test_repr(self):
+        base7 = BaseConverter('cjdhel3', sign='g')
+        self.assertEqual(repr(base7), '<BaseConverter: base7 (cjdhel3)>')

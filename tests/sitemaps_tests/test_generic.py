@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.test import override_settings
 
 from .base import SitemapTestsBase
@@ -20,4 +18,4 @@ class GenericViewsSitemapTests(SitemapTestsBase):
 %s
 </urlset>
 """ % expected
-        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
+        self.assertXMLEqual(response.content.decode(), expected_content)

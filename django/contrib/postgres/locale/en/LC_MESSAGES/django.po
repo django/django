@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
 "PO-Revision-Date: 2015-01-18 20:56+0100\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -28,13 +28,13 @@ msgstr ""
 msgid "Nested arrays must have the same length."
 msgstr ""
 
-#: contrib/postgres/fields/hstore.py:15
-msgid "Map of strings to strings"
+#: contrib/postgres/fields/hstore.py:16
+msgid "Map of strings to strings/nulls"
 msgstr ""
 
 #: contrib/postgres/fields/hstore.py:17
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
+msgid "The value of \"%(key)s\" is not a string or null."
 msgstr ""
 
 #: contrib/postgres/fields/jsonb.py:15
@@ -49,7 +49,11 @@ msgstr ""
 msgid "Could not load JSON data."
 msgstr ""
 
-#: contrib/postgres/forms/jsonb.py:11
+#: contrib/postgres/forms/hstore.py:18
+msgid "Input must be a JSON dictionary."
+msgstr ""
+
+#: contrib/postgres/forms/jsonb.py:16
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
 msgstr ""

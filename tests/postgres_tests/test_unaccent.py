@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.test import modify_settings
 
 from . import PostgreSQLTestCase
@@ -29,8 +26,8 @@ class UnaccentTest(PostgreSQLTestCase):
 
     def test_unaccent_chained(self):
         """
-        Check that unaccent can be used chained with a lookup (which should be
-        the case since unaccent implements the Transform API)
+        Unaccent can be used chained with a lookup (which should be the case
+        since unaccent implements the Transform API)
         """
         self.assertQuerysetEqual(
             self.Model.objects.filter(field__unaccent__iexact="aeO"),

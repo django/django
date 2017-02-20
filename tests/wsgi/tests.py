@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import ImproperlyConfigured
 from django.core.servers.basehttp import get_internal_wsgi_application
 from django.core.signals import request_started
@@ -20,8 +18,7 @@ class WSGITest(SimpleTestCase):
 
     def test_get_wsgi_application(self):
         """
-        Verify that ``get_wsgi_application`` returns a functioning WSGI
-        callable.
+        get_wsgi_application() returns a functioning WSGI callable.
         """
         application = get_wsgi_application()
 
@@ -41,17 +38,18 @@ class WSGITest(SimpleTestCase):
 
         self.assertEqual(response_data["status"], "200 OK")
         self.assertEqual(
-            response_data["headers"],
-            [('Content-Type', 'text/html; charset=utf-8')])
-        self.assertEqual(
-            bytes(response),
-            b"Content-Type: text/html; charset=utf-8\r\n\r\nHello World!")
+            set(response_data["headers"]),
+            {('Content-Length', '12'), ('Content-Type', 'text/html; charset=utf-8')})
+        self.assertIn(bytes(response), [
+            b"Content-Length: 12\r\nContent-Type: text/html; charset=utf-8\r\n\r\nHello World!",
+            b"Content-Type: text/html; charset=utf-8\r\nContent-Length: 12\r\n\r\nHello World!"
+        ])
 
     def test_file_wrapper(self):
         """
-        Verify that FileResponse uses wsgi.file_wrapper.
+        FileResponse uses wsgi.file_wrapper.
         """
-        class FileWrapper(object):
+        class FileWrapper:
             def __init__(self, filelike, blksize=8192):
                 filelike.close()
         application = get_wsgi_application()

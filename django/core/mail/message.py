@@ -1,24 +1,21 @@
-from __future__ import unicode_literals
-
 import mimetypes
 import os
-import random
-import time
 from email import (
     charset as Charset, encoders as Encoders, generator, message_from_string,
 )
+from email.errors import InvalidHeaderDefect, NonASCIILocalPartDefect
 from email.header import Header
+from email.headerregistry import Address
 from email.message import Message
 from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.utils import formatdate, getaddresses, parseaddr
-from io import BytesIO
+from email.utils import formatdate, getaddresses, make_msgid, parseaddr
+from io import BytesIO, StringIO
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
-from django.utils import six
 from django.utils.encoding import force_text
 
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
@@ -37,35 +34,6 @@ RFC5322_EMAIL_LINE_LENGTH_LIMIT = 998
 
 class BadHeaderError(ValueError):
     pass
-
-
-# Copied from Python 3.2+ standard library, with the following modifications:
-# * Used cached hostname for performance.
-# TODO: replace with email.utils.make_msgid(.., domain=DNS_NAME) when dropping
-# Python 2 (Python 2's version doesn't have domain parameter) (#23905).
-def make_msgid(idstring=None, domain=None):
-    """Returns a string suitable for RFC 5322 compliant Message-ID, e.g:
-
-    <20020201195627.33539.96671@nightshade.la.mastaler.com>
-
-    Optional idstring if given is a string used to strengthen the
-    uniqueness of the message id.  Optional domain if given provides the
-    portion of the message id after the '@'.  It defaults to the locally
-    defined hostname.
-    """
-    timeval = time.time()
-    utcdate = time.strftime('%Y%m%d%H%M%S', time.gmtime(timeval))
-    pid = os.getpid()
-    randint = random.randrange(100000)
-    if idstring is None:
-        idstring = ''
-    else:
-        idstring = '.' + idstring
-    if domain is None:
-        # stdlib uses socket.getfqdn() here instead
-        domain = DNS_NAME
-    msgid = '<%s.%s.%s%s@%s>' % (utcdate, pid, randint, idstring, domain)
-    return msgid
 
 
 # Header names that contain structured address data (RFC #5322)
@@ -100,7 +68,7 @@ def forbid_multi_line_headers(name, val, encoding):
     else:
         if name.lower() == 'subject':
             val = Header(val).encode()
-    return str(name), val
+    return name, val
 
 
 def split_addr(addr, encoding):
@@ -141,18 +109,8 @@ def sanitize_address(addr, encoding):
     except UnicodeEncodeError:  # IDN or non-ascii in the local part
         localpart, domain = split_addr(addr, encoding)
 
-    if six.PY2:
-        # On Python 2, use the stdlib since `email.headerregistry` doesn't exist.
-        from email.utils import formataddr
-        if localpart and domain:
-            addr = '@'.join([localpart, domain])
-        return formataddr((nm, addr))
-
-    # On Python 3, an `email.headerregistry.Address` object is used since
+    # An `email.headerregistry.Address` object is used since
     # email.utils.formataddr() naively encodes the name as ascii (see #25986).
-    from email.headerregistry import Address
-    from email.errors import InvalidHeaderDefect, NonASCIILocalPartDefect
-
     if localpart and domain:
         address = Address(nm, username=localpart, domain=domain)
         return str(address)
@@ -165,7 +123,7 @@ def sanitize_address(addr, encoding):
     return str(address)
 
 
-class MIMEMixin():
+class MIMEMixin:
     def as_string(self, unixfrom=False, linesep='\n'):
         """Return the entire formatted message as a string.
         Optional `unixfrom' when True, means include the Unix From_ envelope
@@ -174,29 +132,23 @@ class MIMEMixin():
         This overrides the default as_string() implementation to not mangle
         lines that begin with 'From '. See bug #13433 for details.
         """
-        fp = six.StringIO()
+        fp = StringIO()
         g = generator.Generator(fp, mangle_from_=False)
-        if six.PY2:
-            g.flatten(self, unixfrom=unixfrom)
-        else:
-            g.flatten(self, unixfrom=unixfrom, linesep=linesep)
+        g.flatten(self, unixfrom=unixfrom, linesep=linesep)
         return fp.getvalue()
 
-    if six.PY2:
-        as_bytes = as_string
-    else:
-        def as_bytes(self, unixfrom=False, linesep='\n'):
-            """Return the entire formatted message as bytes.
-            Optional `unixfrom' when True, means include the Unix From_ envelope
-            header.
+    def as_bytes(self, unixfrom=False, linesep='\n'):
+        """Return the entire formatted message as bytes.
+        Optional `unixfrom' when True, means include the Unix From_ envelope
+        header.
 
-            This overrides the default as_bytes() implementation to not mangle
-            lines that begin with 'From '. See bug #13433 for details.
-            """
-            fp = BytesIO()
-            g = generator.BytesGenerator(fp, mangle_from_=False)
-            g.flatten(self, unixfrom=unixfrom, linesep=linesep)
-            return fp.getvalue()
+        This overrides the default as_bytes() implementation to not mangle
+        lines that begin with 'From '. See bug #13433 for details.
+        """
+        fp = BytesIO()
+        g = generator.BytesGenerator(fp, mangle_from_=False)
+        g.flatten(self, unixfrom=unixfrom, linesep=linesep)
+        return fp.getvalue()
 
 
 class SafeMIMEMessage(MIMEMixin, MIMEMessage):
@@ -211,26 +163,22 @@ class SafeMIMEText(MIMEMixin, MIMEText):
 
     def __init__(self, _text, _subtype='plain', _charset=None):
         self.encoding = _charset
-        if _charset == 'utf-8':
-            # Unfortunately, Python < 3.5 doesn't support setting a Charset instance
-            # as MIMEText init parameter (http://bugs.python.org/issue16324).
-            # We do it manually and trigger re-encoding of the payload.
-            MIMEText.__init__(self, _text, _subtype, None)
-            del self['Content-Transfer-Encoding']
-            has_long_lines = any(len(l) > RFC5322_EMAIL_LINE_LENGTH_LIMIT for l in _text.splitlines())
-            # Quoted-Printable encoding has the side effect of shortening long
-            # lines, if any (#22561).
-            self.set_payload(_text, utf8_charset_qp if has_long_lines else utf8_charset)
-            self.replace_header('Content-Type', 'text/%s; charset="%s"' % (_subtype, _charset))
-        elif _charset is None:
-            # the default value of '_charset' is 'us-ascii' on Python 2
-            MIMEText.__init__(self, _text, _subtype)
-        else:
-            MIMEText.__init__(self, _text, _subtype, _charset)
+        MIMEText.__init__(self, _text, _subtype=_subtype, _charset=_charset)
 
     def __setitem__(self, name, val):
         name, val = forbid_multi_line_headers(name, val, self.encoding)
         MIMEText.__setitem__(self, name, val)
+
+    def set_payload(self, payload, charset=None):
+        if charset == 'utf-8':
+            has_long_lines = any(
+                len(l.encode()) > RFC5322_EMAIL_LINE_LENGTH_LIMIT
+                for l in payload.splitlines()
+            )
+            # Quoted-Printable encoding has the side effect of shortening long
+            # lines, if any (#22561).
+            charset = utf8_charset_qp if has_long_lines else utf8_charset
+        MIMEText.set_payload(self, payload, charset=charset)
 
 
 class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
@@ -244,7 +192,7 @@ class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
         MIMEMultipart.__setitem__(self, name, val)
 
 
-class EmailMessage(object):
+class EmailMessage:
     """
     A container for email information.
     """
@@ -259,30 +207,30 @@ class EmailMessage(object):
         Initialize a single email message (which can be sent to multiple
         recipients).
 
-        All strings used to create the message can be unicode strings
-        (or UTF-8 bytestrings). The SafeMIMEText class will handle any
+        All string arguments used to create the message can be strings
+        or UTF-8 bytestrings. The SafeMIMEText class will handle any
         necessary encoding conversions.
         """
         if to:
-            if isinstance(to, six.string_types):
+            if isinstance(to, str):
                 raise TypeError('"to" argument must be a list or tuple')
             self.to = list(to)
         else:
             self.to = []
         if cc:
-            if isinstance(cc, six.string_types):
+            if isinstance(cc, str):
                 raise TypeError('"cc" argument must be a list or tuple')
             self.cc = list(cc)
         else:
             self.cc = []
         if bcc:
-            if isinstance(bcc, six.string_types):
+            if isinstance(bcc, str):
                 raise TypeError('"bcc" argument must be a list or tuple')
             self.bcc = list(bcc)
         else:
             self.bcc = []
         if reply_to:
-            if isinstance(reply_to, six.string_types):
+            if isinstance(reply_to, str):
                 raise TypeError('"reply_to" argument must be a list or tuple')
             self.reply_to = list(reply_to)
         else:
@@ -316,7 +264,11 @@ class EmailMessage(object):
         # accommodate that when doing comparisons.
         header_names = [key.lower() for key in self.extra_headers]
         if 'date' not in header_names:
-            msg['Date'] = formatdate()
+            # formatdate() uses stdlib methods to format the date, which use
+            # the stdlib/OS concept of a timezone, however, Django sets the
+            # TZ environment variable based on the TIME_ZONE setting which
+            # will get picked up by formatdate().
+            msg['Date'] = formatdate(localtime=settings.EMAIL_USE_LOCALTIME)
         if 'message-id' not in header_names:
             # Use cached DNS_NAME for performance
             msg['Message-ID'] = make_msgid(domain=DNS_NAME)
@@ -331,7 +283,7 @@ class EmailMessage(object):
         Returns a list of all recipients of the email (includes direct
         addressees as well as Cc and Bcc entries).
         """
-        return self.to + self.cc + self.bcc
+        return [email for email in (self.to + self.cc + self.bcc) if email]
 
     def send(self, fail_silently=False):
         """Sends the email message."""
@@ -348,6 +300,11 @@ class EmailMessage(object):
 
         If the first parameter is a MIMEBase subclass it is inserted directly
         into the resulting message attachments.
+
+        For a text/* mimetype (guessed or specified), when a bytes object is
+        specified as content, it will be decoded as UTF-8. If that fails,
+        the mimetype will be set to DEFAULT_ATTACHMENT_MIME_TYPE and the
+        content is not decoded.
         """
         if isinstance(filename, MIMEBase):
             assert content is None
@@ -355,6 +312,22 @@ class EmailMessage(object):
             self.attachments.append(filename)
         else:
             assert content is not None
+
+            if not mimetype:
+                mimetype, _ = mimetypes.guess_type(filename)
+                if not mimetype:
+                    mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
+            basetype, subtype = mimetype.split('/', 1)
+
+            if basetype == 'text':
+                if isinstance(content, bytes):
+                    try:
+                        content = content.decode()
+                    except UnicodeDecodeError:
+                        # If mimetype suggests the file is text but it's
+                        # actually binary, read() raises a UnicodeDecodeError.
+                        mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
+
             self.attachments.append((filename, content, mimetype))
 
     def attach_file(self, path, mimetype=None):
@@ -362,33 +335,17 @@ class EmailMessage(object):
         Attaches a file from the filesystem.
 
         The mimetype will be set to the DEFAULT_ATTACHMENT_MIME_TYPE if it is
-        not specified and cannot be guessed or (PY3 only) if it suggests
-        text/* for a binary file.
+        not specified and cannot be guessed.
+
+        For a text/* mimetype (guessed or specified), the file's content
+        will be decoded as UTF-8. If that fails, the mimetype will be set to
+        DEFAULT_ATTACHMENT_MIME_TYPE and the content is not decoded.
         """
         filename = os.path.basename(path)
-        if not mimetype:
-            mimetype, _ = mimetypes.guess_type(filename)
-            if not mimetype:
-                mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
-        basetype, subtype = mimetype.split('/', 1)
-        read_mode = 'r' if basetype == 'text' else 'rb'
-        content = None
 
-        with open(path, read_mode) as f:
-            try:
-                content = f.read()
-            except UnicodeDecodeError:
-                # If mimetype suggests the file is text but it's actually
-                # binary, read() will raise a UnicodeDecodeError on Python 3.
-                pass
-
-        # If the previous read in text mode failed, try binary mode.
-        if content is None:
-            with open(path, 'rb') as f:
-                content = f.read()
-                mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
-
-        self.attach(filename, content, mimetype)
+        with open(path, 'rb') as file:
+            content = file.read()
+            self.attach(filename, content, mimetype)
 
     def _create_message(self, msg):
         return self._create_attachments(msg)
@@ -442,17 +399,11 @@ class EmailMessage(object):
         Converts the filename, content, mimetype triple into a MIME attachment
         object.
         """
-        if mimetype is None:
-            mimetype, _ = mimetypes.guess_type(filename)
-            if mimetype is None:
-                mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
         attachment = self._create_mime_attachment(content, mimetype)
         if filename:
             try:
                 filename.encode('ascii')
             except UnicodeEncodeError:
-                if six.PY2:
-                    filename = filename.encode('utf-8')
                 filename = ('utf-8', '', filename)
             attachment.add_header('Content-Disposition', 'attachment',
                                   filename=filename)
@@ -474,11 +425,11 @@ class EmailMultiAlternatives(EmailMessage):
         Initialize a single email message (which can be sent to multiple
         recipients).
 
-        All strings used to create the message can be unicode strings (or UTF-8
-        bytestrings). The SafeMIMEText class will handle any necessary encoding
+        All string arguments used to create the message can be strings or UTF-8
+        bytestrings. The SafeMIMEText class will handle any necessary encoding
         conversions.
         """
-        super(EmailMultiAlternatives, self).__init__(
+        super().__init__(
             subject, body, from_email, to, bcc, connection, attachments,
             headers, cc, reply_to,
         )

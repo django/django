@@ -3,7 +3,7 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kowit Charoenratchatabhan <kowit.s.c@gmail.com>, 2012
-# Sippakorn Khaimook <sipp11@mycapsules.com>, 2014
+# sipp11 <sipp11@mycapsules.com>, 2014
 # Vichai Vongvorakul <vongvichai@gmail.com>, 2012
 msgid ""
 msgstr ""

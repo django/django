@@ -3,6 +3,7 @@
 # Translators:
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
 # Boryslav Larin <brabadu@gmail.com>, 2011
+# Denis Podlesniy <haos616@gmail.com>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Panasoft <cc072aa3@opayq.com>, 2016
 # Sergey Lysach <sergikoff88@gmail.com>, 2011-2012
@@ -10,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2016-03-17 23:05+0000\n"
-"Last-Translator: Panasoft <cc072aa3@opayq.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-07 22:59+0000\n"
+"Last-Translator: Denis Podlesniy <haos616@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -153,15 +154,69 @@ msgstr "Вчора"
 msgid "Tomorrow"
 msgstr "Завтра"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Січень Лютий Березень Квітень Травень Червень Липень Серпень Вересень "
-"Жовтень Листопад Грудень"
+msgid "January"
+msgstr "січня"
 
-msgid "S M T W T F S"
-msgstr "Нд Пн Вт Ср Чт Пт Сб"
+msgid "February"
+msgstr "лютого"
+
+msgid "March"
+msgstr "березня"
+
+msgid "April"
+msgstr "квітня"
+
+msgid "May"
+msgstr "травня"
+
+msgid "June"
+msgstr "червня"
+
+msgid "July"
+msgstr "липня"
+
+msgid "August"
+msgstr "серпня"
+
+msgid "September"
+msgstr "вересня"
+
+msgid "October"
+msgstr "жовтня"
+
+msgid "November"
+msgstr "листопада"
+
+msgid "December"
+msgstr "грудня"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "Н"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "П"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "В"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "С"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "Ч"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "П"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "С"
 
 msgid "Show"
 msgstr "Показати"

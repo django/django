@@ -4,14 +4,16 @@
 # eallik <eallik@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
-# Martin <martinpajuste@gmail.com>, 2015
+# Martin Pajuste <martinpajuste@gmail.com>, 2015
+# Martin Pajuste <martinpajuste@gmail.com>, 2016
+# Marti Raudsepp <marti@juffo.org>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 09:05+0000\n"
-"Last-Translator: Martin <martinpajuste@gmail.com>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2016-07-18 21:25+0000\n"
+"Last-Translator: Marti Raudsepp <marti@juffo.org>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -65,6 +67,12 @@ msgstr "Käesolev kuu"
 msgid "This year"
 msgstr "Käesolev aasta"
 
+msgid "No date"
+msgstr "Kuupäev puudub"
+
+msgid "Has date"
+msgstr "Kuupäev olemas"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -75,6 +83,13 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Toiming:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Lisa veel üks %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Eemalda"
 
 msgid "action time"
 msgstr "toimingu aeg"
@@ -88,6 +103,8 @@ msgstr "sisutüüp"
 msgid "object id"
 msgstr "objekti id"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "objekti esitus"
 
@@ -118,6 +135,31 @@ msgstr "Kustutatud \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "Objekt LogEntry"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "Lisatud {name} \"{object}\"."
+
+msgid "Added."
+msgstr "Lisatud."
+
+msgid "and"
+msgstr "ja"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "Muudetud {fields} objektil {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Muudetud {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Kustutatud {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "Ühtegi välja ei muudetud."
+
 msgid "None"
 msgstr "Puudub"
 
@@ -125,64 +167,35 @@ msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "Et valida mitu, hoidke all \"Control\"-nuppu (Maci puhul \"Command\")."
 
-msgid "Added."
-msgstr "Lisatud."
-
-#, python-format
-msgid "Changed %s."
-msgstr "Muutsin %s."
-
-msgid "and"
-msgstr "ja"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Lisatud %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Muudetud %(list)s objektil %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Kustutatud %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Ühtegi välja ei muudetud."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" lisamine õnnestus. Te võite seda muuta."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" lisamine õnnestus. Allpool saate seda uuesti muuta."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" lisamine õnnestus. Allpool saate lisada uue %(name)s."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" lisamine õnnestus."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr ""
-"%(name)s \"%(obj)s\" muutmine õnnestus. Allpool saate seda uuesti muuta."
+msgstr "{name} \"{obj}\" lisamine õnnestus. Allpool saate lisada uue {name}."
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" lisamine õnnestus."
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" muutmine õnnestus. Allpool saate lisada uue %(name)s."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" muutmine õnnestus. Allpool saate seda uuesti muuta."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" muutmine õnnestus."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr "{name} \"{obj}\" muutmine õnnestus. Allpool saate lisada uue {name}."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name} \"{obj}\" muutmine õnnestus."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -339,18 +352,15 @@ msgstr "Dokumentatsioon"
 msgid "Log out"
 msgstr "Logi välja"
 
-msgid "Add"
-msgstr "Lisa"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Lisa %(name)s"
 
 msgid "History"
 msgstr "Ajalugu"
 
 msgid "View on site"
 msgstr "Näita lehel"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Lisa %(name)s"
 
 msgid "Filter"
 msgstr "Filtreeri"
@@ -435,13 +445,6 @@ msgstr ""
 msgid "Change"
 msgstr "Muuda"
 
-msgid "Remove"
-msgstr "Eemalda"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Lisa veel üks %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Kustutan?"
 
@@ -456,14 +459,17 @@ msgstr "Kokkuvõte"
 msgid "Models in the %(name)s application"
 msgstr "Rakenduse %(name)s moodulid"
 
+msgid "Add"
+msgstr "Lisa"
+
 msgid "You don't have permission to edit anything."
 msgstr "Teil ei ole õigust midagi muuta."
 
-msgid "Recent Actions"
-msgstr "Hiljutised Toimingud"
+msgid "Recent actions"
+msgstr "Hiljutised toimingud"
 
-msgid "My Actions"
-msgstr "Minu Toimingud"
+msgid "My actions"
+msgstr "Minu toimingud"
 
 msgid "None available"
 msgstr "Ei leitud ühtegi"

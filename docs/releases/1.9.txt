@@ -6,16 +6,15 @@ Django 1.9 release notes
 
 Welcome to Django 1.9!
 
-These release notes cover the `new features`_, as well as some `backwards
-incompatible changes`_ you'll want to be aware of when upgrading from Django
-1.8 or older versions. We've :ref:`dropped some features<removed-features-1.9>`
-that have reached the end of their deprecation cycle, and we've `begun the
-deprecation process for some features`_.
+These release notes cover the :ref:`new features <whats-new-1.9>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.9>` you'll
+want to be aware of when upgrading from Django 1.8 or older versions. We've
+:ref:`dropped some features<removed-features-1.9>` that have reached the end of
+their deprecation cycle, and we've :ref:`begun the deprecation process for some
+features <deprecated-features-1.9>`.
 
-.. _`new features`: `What's new in Django 1.9`_
-.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.9`_
-.. _`dropped some features`: `Features removed in 1.9`_
-.. _`begun the deprecation process for some features`: `Features deprecated in 1.9`_
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
 
 Python compatibility
 ====================
@@ -24,6 +23,8 @@ Django 1.9 requires Python 2.7, 3.4, or 3.5. We **highly recommend** and only
 officially support the latest release of each series.
 
 The Django 1.8 series is the last to support Python 3.2 and 3.3.
+
+.. _whats-new-1.9:
 
 What's new in Django 1.9
 ========================
@@ -93,8 +94,8 @@ functionality of the ``django.contrib.auth.decorators`` for class-based views.
 These mixins have been taken from, or are at least inspired by, the
 `django-braces`_ project.
 
-There are a few differences between Django's and django-braces' implementation,
-though:
+There are a few differences between Django's and ``django-braces``\'
+implementation, though:
 
 * The :attr:`~django.contrib.auth.mixins.AccessMixin.raise_exception` attribute
   can only be ``True`` or ``False``. Custom exceptions or callables are not
@@ -383,7 +384,7 @@ Internationalization
 * The :func:`django.views.i18n.set_language` view now properly redirects to
   :ref:`translated URLs <url-internationalization>`, when available.
 
-* The :func:`django.views.i18n.javascript_catalog` view now works correctly
+* The ``django.views.i18n.javascript_catalog()`` view now works correctly
   if used multiple times with different configurations on the same page.
 
 * The :func:`django.utils.timezone.make_aware` function gained an ``is_dst``
@@ -393,7 +394,7 @@ Internationalization
   for languages which can be written in different scripts, for example Latin
   and Cyrillic (e.g. ``be@latin``).
 
-* Added the :func:`django.views.i18n.json_catalog` view to help build a custom
+* Added the ``django.views.i18n.json_catalog()`` view to help build a custom
   client-side i18n library upon Django translations. It returns a JSON object
   containing a translations catalog, formatting settings, and a plural rule.
 
@@ -672,6 +673,8 @@ Validators
 * Added :func:`~django.core.validators.validate_unicode_slug` to validate slugs
   that may contain Unicode characters.
 
+.. _backwards-incompatible-1.9:
+
 Backwards incompatible changes in 1.9
 =====================================
 
@@ -791,6 +794,16 @@ no longer include the scheme and domain part of the URLs. For example,
 replaced by ``self.assertRedirects(response, '/some-url/')`` (unless the
 redirection specifically contained an absolute URL, of course).
 
+In the rare case that you need the old behavior (discovered with an ancient
+version of Apache with ``mod_scgi`` that interprets a relative redirect as an
+"internal redirect"), you can restore it by writing a custom middleware::
+
+    class LocationHeaderFix(object):
+        def process_response(self, request, response):
+            if 'Location' in response:
+                response['Location'] = request.build_absolute_uri(response['Location'])
+            return response
+
 Dropped support for PostgreSQL 9.0
 ----------------------------------
 
@@ -830,12 +843,12 @@ Changes to the default logging configuration
 --------------------------------------------
 
 To make it easier to write custom logging configurations, Django's default
-logging configuration no longer defines 'django.request' and 'django.security'
-loggers. Instead, it defines a single 'django' logger, filtered at the ``INFO``
-level, with two handlers:
+logging configuration no longer defines ``django.request`` and
+``django.security`` loggers. Instead, it defines a single ``django`` logger,
+filtered at the ``INFO`` level, with two handlers:
 
-* 'console': filtered at the ``INFO`` level and only active if ``DEBUG=True``.
-* 'mail_admins': filtered at the ``ERROR`` level and only active if
+* ``console``: filtered at the ``INFO`` level and only active if ``DEBUG=True``.
+* ``mail_admins``: filtered at the ``ERROR`` level and only active if
   ``DEBUG=False``.
 
 If you aren't overriding Django's default logging, you should see minimal
@@ -925,9 +938,8 @@ define built-in libraries via the ``'builtins'`` key of :setting:`OPTIONS
 In general, template tags do not autoescape their contents, and this behavior is
 :ref:`documented <tags-auto-escaping>`. For tags like
 :class:`~django.template.Library.inclusion_tag`, this is not a problem because
-the included template will perform autoescaping. For
-:class:`~django.template.Library.assignment_tag`, the output will be escaped
-when it is used as a variable in the template.
+the included template will perform autoescaping. For ``assignment_tag()``,
+the output will be escaped when it is used as a variable in the template.
 
 For the intended use cases of :class:`~django.template.Library.simple_tag`,
 however, it is very easy to end up with incorrect HTML and possibly an XSS
@@ -1387,9 +1399,9 @@ Miscellaneous
 Features removed in 1.9
 =======================
 
-These features have reached the end of their deprecation cycle and so have been
-removed in Django 1.9 (please see the :ref:`deprecation timeline
-<deprecation-removed-in-1.9>` for more details):
+These features have reached the end of their deprecation cycle and are removed
+in Django 1.9. See :ref:`deprecated-features-1.7` for details, including how to
+remove usage of these features.
 
 * ``django.utils.dictconfig`` is removed.
 

@@ -1,12 +1,13 @@
 import re
-from collections import namedtuple
+import warnings
 
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo, TableInfo,
 )
+from django.db.models.indexes import Index
+from django.utils.deprecation import RemovedInDjango21Warning
 
 field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
-FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('default',))
 
 
 def get_field_size(name):
@@ -18,7 +19,7 @@ def get_field_size(name):
 # This light wrapper "fakes" a dictionary interface, because some SQLite data
 # types include variables in them -- e.g. "varchar(30)" -- and can't be matched
 # as a simple dictionary lookup.
-class FlexibleFieldLookupDict(object):
+class FlexibleFieldLookupDict:
     # Maps SQL types to Django Field types. Some of the SQL types have multiple
     # entries here because SQLite allows for anything and doesn't normalize the
     # field type; it uses whatever was given.
@@ -123,14 +124,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             if field_desc.startswith("UNIQUE"):
                 continue
 
-            m = re.search('references (\S*) ?\(["|]?(.*)["|]?\)', field_desc, re.I)
+            m = re.search(r'references (\S*) ?\(["|]?(.*)["|]?\)', field_desc, re.I)
             if not m:
                 continue
             table, column = [s.strip('"') for s in m.groups()]
 
             if field_desc.startswith("FOREIGN KEY"):
                 # Find name of the target FK field
-                m = re.match('FOREIGN KEY\(([^\)]*)\).*', field_desc, re.I)
+                m = re.match(r'FOREIGN KEY\s*\(([^\)]*)\).*', field_desc, re.I)
                 field_name = m.groups()[0].strip('"')
             else:
                 field_name = field_desc.split()[0].strip('"')
@@ -173,7 +174,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             if field_desc.startswith("UNIQUE"):
                 continue
 
-            m = re.search('"(.*)".*references (.*) \(["|](.*)["|]\)', field_desc, re.I)
+            m = re.search(r'"(.*)".*references (.*) \(["|](.*)["|]\)', field_desc, re.I)
             if not m:
                 continue
 
@@ -183,6 +184,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return key_columns
 
     def get_indexes(self, cursor, table_name):
+        warnings.warn(
+            "get_indexes() is deprecated in favor of get_constraints().",
+            RemovedInDjango21Warning, stacklevel=2
+        )
         indexes = {}
         for info in self._table_info(cursor, table_name):
             if info['pk'] != 0:
@@ -214,7 +219,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         results = results[results.index('(') + 1:results.rindex(')')]
         for field_desc in results.split(','):
             field_desc = field_desc.strip()
-            m = re.search('"(.*)".*PRIMARY KEY( AUTOINCREMENT)?$', field_desc)
+            m = re.search('"(.*)".*PRIMARY KEY( AUTOINCREMENT)?', field_desc)
             if m:
                 return m.groups()[0]
         return None
@@ -255,6 +260,20 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                         "index": True,
                     }
                 constraints[index]['columns'].append(column)
+            # Add type and column orders for indexes
+            if constraints[index]['index'] and not constraints[index]['unique']:
+                # SQLite doesn't support any index type other than b-tree
+                constraints[index]['type'] = Index.suffix
+                cursor.execute(
+                    "SELECT sql FROM sqlite_master "
+                    "WHERE type='index' AND name=%s" % self.connection.ops.quote_name(index)
+                )
+                orders = []
+                # There would be only 1 row to loop over
+                for sql, in cursor.fetchall():
+                    order_info = sql.split('(')[-1].split(')')[0].split(',')
+                    orders = ['DESC' if info.endswith('DESC') else 'ASC' for info in order_info]
+                constraints[index]['orders'] = orders
         # Get the PK
         pk_column = self.get_primary_key_column(cursor, table_name)
         if pk_column:

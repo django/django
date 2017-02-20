@@ -1,0 +1,476 @@
+============================================
+Django 2.0 release notes - UNDER DEVELOPMENT
+============================================
+
+Welcome to Django 2.0!
+
+These release notes cover the :ref:`new features <whats-new-2.0>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-2.0>` you'll
+want to be aware of when upgrading from Django 1.11 or earlier. We've
+:ref:`dropped some features<removed-features-2.0>` that have reached the end of
+their deprecation cycle, and we've :ref:`begun the deprecation process for some
+features <deprecated-features-2.0>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Python compatibility
+====================
+
+Django 2.0 supports Python 3.5+. Since Django 1.11, support for Python 2.7 and
+3.4 is removed. We **highly recommend** and only officially support the latest
+release of each series.
+
+Third-party library support for older version of Django
+=======================================================
+
+Following the release of Django 2.0, we suggest that third-party app authors
+drop support for all versions of Django prior to 1.11. At that time, you should
+be able run your package's tests using ``python -Wd`` so that deprecation
+warnings do appear. After making the deprecation warning fixes, your app should
+be compatible with Django 2.0.
+
+.. _whats-new-2.0:
+
+What's new in Django 2.0
+========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  36,000 to 100,000.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new ``distinct`` argument for
+  :class:`~django.contrib.postgres.aggregates.ArrayAgg` determines if
+  concatenated values will be distinct.
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* ...
+
+Email
+~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+Forms
+~~~~~
+
+* The new ``date_attrs`` and ``time_attrs`` arguments for
+  :class:`~django.forms.SplitDateTimeWidget` and
+  :class:`~django.forms.SplitHiddenDateTimeWidget` allow specifying different
+  HTML attributes for the ``DateInput`` and ``TimeInput`` (or hidden)
+  subwidgets.
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* ...
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* ...
+
+Signals
+~~~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* Added threading support to :class:`~django.test.LiveServerTestCase`.
+
+URLs
+~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-2.0:
+
+Backwards incompatible changes in 2.0
+=====================================
+
+Removed support for bytestrings in some places
+----------------------------------------------
+
+To support native Python 2 strings, older Django versions had to accept both
+bytestrings and unicode strings. Now that Python 2 support is dropped,
+bytestrings should only be encountered around input/output boundaries (handling
+of binary fields or HTTP streams, for example). You might have to update your
+code to limit bytestring usage to a minimum, as Django no longer accepts
+bytestrings in certain code paths.
+
+Database backend API
+--------------------
+
+* The ``DatabaseOperations.datetime_cast_date_sql()``,
+  ``datetime_cast_time_sql()``, ``datetime_trunc_sql()``, and
+  ``datetime_extract_sql()`` methods now return only the SQL to perform the
+  operation instead of SQL and a list of parameters.
+
+Dropped support for Oracle 11.2
+-------------------------------
+
+The end of upstream support for Oracle 11.2 is Dec. 2020. Django 1.11 will be
+supported until April 2020 which almost reaches this date. Django 2.0
+officially supports Oracle 12.1+.
+
+Default MySQL isolation level is read committed
+-----------------------------------------------
+
+MySQL's default isolation level, repeatable read, may cause data loss in
+typical Django usage. To prevent that and for consistency with other databases,
+the default isolation level is now read committed. You can use the
+:setting:`DATABASES` setting to :ref:`use a different isolation level
+<mysql-isolation-level>`, if needed.
+
+:attr:`AbstractUser.last_name <django.contrib.auth.models.User.last_name>` ``max_length`` increased to 150
+----------------------------------------------------------------------------------------------------------
+
+A migration for :attr:`django.contrib.auth.models.User.last_name` is included.
+If you have a custom user model inheriting from ``AbstractUser``, you'll need
+to generate and apply a database migration for your user model.
+
+If you want to preserve the 30 character limit for last names, use a custom
+form::
+
+    from django.contrib.auth.forms import UserChangeForm
+
+    class MyUserChangeForm(UserChangeForm):
+        last_name = forms.CharField(max_length=30, required=False)
+
+If you wish to keep this restriction in the admin when editing users, set
+``UserAdmin.form`` to use this form::
+
+    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.models import User
+
+    class MyUserAdmin(UserAdmin):
+        form = MyUserChangeForm
+
+    admin.site.unregister(User)
+    admin.site.register(User, MyUserAdmin)
+
+Miscellaneous
+-------------
+
+* The ``SessionAuthenticationMiddleware`` class is removed. It provided no
+  functionality since session authentication is unconditionally enabled in
+  Django 1.10.
+
+* The default HTTP error handlers (``handler404``, etc.) are now callables
+  instead of dotted Python path strings. Django favors callable references
+  since they provide better performance and debugging experience.
+
+.. _deprecated-features-2.0:
+
+Features deprecated in 2.0
+==========================
+
+Miscellaneous
+-------------
+
+* The ``django.db.backends.postgresql_psycopg2`` module is deprecated in favor
+  of ``django.db.backends.postgresql``. It's been an alias since Django 1.9.
+  This only affects code that imports from the module directly. The
+  ``DATABASES`` setting can still use
+  ``'django.db.backends.postgresql_psycopg2'``, though you can simplify that by
+  using the ``'django.db.backends.postgresql'`` name added in Django 1.9.
+
+* ``django.shortcuts.render_to_response()`` is deprecated in favor of
+  :func:`django.shortcuts.render`. ``render()`` takes the same arguments
+  except that is also requires a ``request``.
+
+* The ``DEFAULT_CONTENT_TYPE`` setting is deprecated. It doesn't interact well
+  well with third-party apps and is obsolete since HTML5 has mostly superseded
+  XHTML.
+
+.. _removed-features-2.0:
+
+Features removed in 2.0
+=======================
+
+These features have reached the end of their deprecation cycle and are removed
+in Django 2.0. See :ref:`deprecated-features-1.9` and
+:ref:`deprecated-features-1.10` for details, including how to remove usage of
+these features.
+
+* The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` is
+  removed.
+
+* ``django.db.backends.base.BaseDatabaseOperations.check_aggregate_support()``
+  is removed.
+
+* The ``django.forms.extras`` package is removed.
+
+* The ``assignment_tag`` helper is removed.
+
+* The ``host`` argument to ``SimpleTestCase.assertsRedirects()`` is removed.
+  The compatibility layer which allows absolute URLs to be considered equal to
+  relative ones when the path is identical is also removed.
+
+* ``Field.rel`` and ``Field.remote_field.to`` are removed.
+
+* The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField`` are now
+  required.
+
+* ``django.db.models.fields.add_lazy_relation()`` is removed.
+
+* When time zone support is enabled, database backends that don't support time
+  zones no longer convert aware datetimes to naive values in UTC anymore when
+  such values are passed as parameters to SQL queries executed outside of the
+  ORM, e.g. with ``cursor.execute()``.
+
+* ``django.contrib.auth.tests.utils.skipIfCustomUser()`` is removed.
+
+* The ``GeoManager`` and ``GeoQuerySet`` classes are removed.
+
+* The ``django.contrib.gis.geoip`` module is removed.
+
+* The ``supports_recursion`` check for template loaders is removed from:
+
+  * ``django.template.engine.Engine.find_template()``
+  * ``django.template.loader_tags.ExtendsNode.find_template()``
+  * ``django.template.loaders.base.Loader.supports_recursion()``
+  * ``django.template.loaders.cached.Loader.supports_recursion()``
+
+* The ``load_template`` and ``load_template_sources`` template loader methods
+  are removed.
+
+* The ``template_dirs`` argument for template loaders is removed:
+
+  * ``django.template.loaders.base.Loader.get_template()``
+  * ``django.template.loaders.cached.Loader.cache_key()``
+  * ``django.template.loaders.cached.Loader.get_template()``
+  * ``django.template.loaders.cached.Loader.get_template_sources()``
+  * ``django.template.loaders.filesystem.Loader.get_template_sources()``
+
+* ``django.template.loaders.base.Loader.__call__()`` is removed.
+
+* Support for custom error views that don't accept an ``exception`` parameter
+  is removed.
+
+* The ``mime_type`` attribute of ``django.utils.feedgenerator.Atom1Feed`` and
+  ``django.utils.feedgenerator.RssFeed`` is removed.
+
+* The ``app_name`` argument to ``include()`` is removed.
+
+* Support for passing a 3-tuple as the first argument to ``include()`` is
+  removed.
+
+* Support for setting a URL instance namespace without an application namespace
+  is removed.
+
+* ``Field._get_val_from_obj()`` is removed.
+
+* ``django.template.loaders.eggs.Loader`` is removed.
+
+* The ``current_app`` parameter to the ``contrib.auth`` function-based views is
+  removed.
+
+* The ``callable_obj`` keyword argument to
+  ``SimpleTestCase.assertRaisesMessage()`` is removed.
+
+* Support for the ``allow_tags`` attribute on ``ModelAdmin`` methods is
+  removed.
+
+* The ``enclosure`` keyword argument to ``SyndicationFeed.add_item()`` is
+  removed.
+
+* The ``django.template.loader.LoaderOrigin`` and
+  ``django.template.base.StringOrigin`` aliases for
+  ``django.template.base.Origin`` are removed.
+
+* The ``makemigrations --exit`` option is removed.
+
+* Support for direct assignment to a reverse foreign key or many-to-many
+  relation is removed.
+
+* The ``get_srid()`` and ``set_srid()`` methods of
+  ``django.contrib.gis.geos.GEOSGeometry`` are removed.
+
+* The ``get_x()``, ``set_x()``, ``get_y()``, ``set_y()``, ``get_z()``, and
+  ``set_z()`` methods of ``django.contrib.gis.geos.Point`` are removed.
+
+* The ``get_coords()`` and ``set_coords()`` methods of
+  ``django.contrib.gis.geos.Point`` are removed.
+
+* The ``cascaded_union`` property of ``django.contrib.gis.geos.MultiPolygon``
+  is removed.
+
+* ``django.utils.functional.allow_lazy()`` is removed.
+
+* The ``shell --plain`` option is removed.
+
+* The ``django.core.urlresolvers`` module is removed.
+
+* ``CommaSeparatedIntegerField`` is removed, except for support in historical
+  migrations.
+
+* The template ``Context.has_key()`` method is removed.
+
+* Support for the ``django.core.files.storage.Storage.accessed_time()``,
+  ``created_time()``, and ``modified_time()`` methods is removed.
+
+* Support for query lookups using the model name when
+  ``Meta.default_related_name`` is set is removed.
+
+* The MySQL ``__search`` lookup is removed.
+
+* The shim for supporting custom related manager classes without a
+  ``_apply_rel_filters()`` method is removed.
+
+* Using ``User.is_authenticated()`` and ``User.is_anonymous()`` as methods
+  rather than properties is no longer supported.
+
+* The  ``Model._meta.virtual_fields`` attribute is removed.
+
+* The keyword arguments ``virtual_only`` in ``Field.contribute_to_class()`` and
+  ``virtual`` in ``Model._meta.add_field()`` are removed.
+
+* The ``javascript_catalog()`` and ``json_catalog()`` views are removed.
+
+* ``django.contrib.gis.utils.precision_wkt()`` is removed.
+
+* In multi-table inheritance, implicit promotion of a ``OneToOneField`` to a
+  ``parent_link`` is removed.
+
+* Support for ``Widget._format_value()`` is removed.
+
+* ``FileField`` methods ``get_directory_name()`` and ``get_filename()`` are
+  removed.
+
+* The ``mark_for_escaping()`` function and the classes it uses: ``EscapeData``,
+  ``EscapeBytes``, ``EscapeText``, ``EscapeString``, and ``EscapeUnicode`` are
+  removed.
+
+* The ``escape`` filter now uses ``django.utils.html.conditional_escape()``.
+
+* ``Manager.use_for_related_fields`` is removed.
+
+* Model ``Manager`` inheritance follows MRO inheritance rules. The requirement
+  to use ``Meta.manager_inheritance_from_future`` to opt-in to the behavior is
+  removed.
+
+* Support for old-style middleware using ``settings.MIDDLEWARE_CLASSES`` is
+  removed.

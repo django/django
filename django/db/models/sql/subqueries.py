@@ -9,7 +9,6 @@ from django.db.models.sql.constants import (
     CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS,
 )
 from django.db.models.sql.query import Query
-from django.utils import six
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'AggregateQuery']
 
@@ -28,7 +27,7 @@ class DeleteQuery(Query):
         cursor = self.get_compiler(using).execute_sql(CURSOR)
         return cursor.rowcount if cursor else 0
 
-    def delete_batch(self, pk_list, using, field=None):
+    def delete_batch(self, pk_list, using):
         """
         Set up and execute delete queries for all the objects in pk_list.
 
@@ -37,8 +36,7 @@ class DeleteQuery(Query):
         """
         # number of objects deleted
         num_deleted = 0
-        if not field:
-            field = self.get_meta().pk
+        field = self.get_meta().pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
             self.add_q(Q(
@@ -90,7 +88,7 @@ class UpdateQuery(Query):
     compiler = 'SQLUpdateCompiler'
 
     def __init__(self, *args, **kwargs):
-        super(UpdateQuery, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._setup_query()
 
     def _setup_query(self):
@@ -105,7 +103,7 @@ class UpdateQuery(Query):
             self.related_updates = {}
 
     def clone(self, klass=None, **kwargs):
-        return super(UpdateQuery, self).clone(klass, related_updates=self.related_updates.copy(), **kwargs)
+        return super().clone(klass, related_updates=self.related_updates.copy(), **kwargs)
 
     def update_batch(self, pk_list, values, using):
         self.add_update_values(values)
@@ -121,7 +119,7 @@ class UpdateQuery(Query):
         querysets.
         """
         values_seq = []
-        for name, val in six.iteritems(values):
+        for name, val in values.items():
             field = self.get_meta().get_field(name)
             direct = not (field.auto_created and not field.concrete) or not field.concrete
             model = field.model._meta.concrete_model
@@ -142,7 +140,11 @@ class UpdateQuery(Query):
         that will be used to generate the UPDATE query. Might be more usefully
         called add_update_targets() to hint at the extra information here.
         """
-        self.values.extend(values_seq)
+        for field, model, val in values_seq:
+            if hasattr(val, 'resolve_expression'):
+                # Resolve expressions here so that annotations are no longer needed
+                val = val.resolve_expression(self, allow_joins=False, for_save=True)
+            self.values.append((field, model, val))
 
     def add_related_update(self, model, field, value):
         """
@@ -161,7 +163,7 @@ class UpdateQuery(Query):
         if not self.related_updates:
             return []
         result = []
-        for model, values in six.iteritems(self.related_updates):
+        for model, values in self.related_updates.items():
             query = UpdateQuery(model)
             query.values = values
             if self.related_ids is not None:
@@ -174,18 +176,9 @@ class InsertQuery(Query):
     compiler = 'SQLInsertCompiler'
 
     def __init__(self, *args, **kwargs):
-        super(InsertQuery, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields = []
         self.objs = []
-
-    def clone(self, klass=None, **kwargs):
-        extras = {
-            'fields': self.fields[:],
-            'objs': self.objs[:],
-            'raw': self.raw,
-        }
-        extras.update(kwargs)
-        return super(InsertQuery, self).clone(klass, **extras)
 
     def insert_values(self, fields, objs, raw=False):
         """
@@ -211,7 +204,5 @@ class AggregateQuery(Query):
     compiler = 'SQLAggregateCompiler'
 
     def add_subquery(self, query, using):
-        self.subquery, self.sub_params = query.get_compiler(using).as_sql(
-            with_col_aliases=True,
-            subquery=True,
-        )
+        query.subquery = True
+        self.subquery, self.sub_params = query.get_compiler(using).as_sql(with_col_aliases=True)

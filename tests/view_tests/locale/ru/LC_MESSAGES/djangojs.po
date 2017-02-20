@@ -22,3 +22,16 @@ msgstr "перевод"
 
 msgid "Choose a time"
 msgstr "Выберите время"
+
+
+msgid "{count} plural2"
+msgid_plural "{count} plural2s"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+msgid "{count} plural3"
+msgid_plural "{count} plural3s"
+msgstr[0] "{count} plural3 p3"
+msgstr[1] "{count} plural3 p3s"
+msgstr[2] "{count} plural3 p3t"

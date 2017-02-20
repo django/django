@@ -1,13 +1,9 @@
-from __future__ import unicode_literals
-
 from django.db.transaction import atomic
-from django.utils.encoding import python_2_unicode_compatible
 
 from .exceptions import IrreversibleError
 
 
-@python_2_unicode_compatible
-class Migration(object):
+class Migration:
     """
     The base class for all migrations.
 
@@ -65,9 +61,6 @@ class Migration(object):
         if not isinstance(other, Migration):
             return False
         return (self.name == other.name) and (self.app_label == other.app_label)
-
-    def __ne__(self, other):
-        return not (self == other)
 
     def __repr__(self):
         return "<Migration %s.%s>" % (self.app_label, self.name)

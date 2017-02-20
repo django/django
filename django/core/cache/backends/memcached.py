@@ -1,19 +1,20 @@
 "Memcached cache backend"
 
 import pickle
+import re
 import time
+import warnings
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
-from django.utils import six
-from django.utils.encoding import force_str
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.functional import cached_property
 
 
 class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
-        super(BaseMemcachedCache, self).__init__(params)
-        if isinstance(server, six.string_types):
-            self._servers = server.split(';')
+        super().__init__(params)
+        if isinstance(server, str):
+            self._servers = re.split('[;,]', server)
         else:
             self._servers = server
 
@@ -24,7 +25,7 @@ class BaseMemcachedCache(BaseCache):
         self.LibraryValueNotFoundException = value_not_found_exception
 
         self._lib = library
-        self._options = params.get('OPTIONS')
+        self._options = params.get('OPTIONS') or {}
 
     @property
     def _cache(self):
@@ -32,7 +33,7 @@ class BaseMemcachedCache(BaseCache):
         Implements transparent thread-safe access to a memcached client.
         """
         if getattr(self, '_client', None) is None:
-            self._client = self._lib.Client(self._servers)
+            self._client = self._lib.Client(self._servers, **self._options)
 
         return self._client
 
@@ -53,7 +54,7 @@ class BaseMemcachedCache(BaseCache):
             timeout = -1
 
         if timeout > 2592000:  # 60*60*24*30, 30 days
-            # See http://code.google.com/p/memcached/wiki/NewProgramming#Expiration
+            # See https://github.com/memcached/memcached/wiki/Programming#expiration
             # "Expiration times can be set from 0, meaning "never expire", to
             # 30 days. Any time higher than 30 days is interpreted as a Unix
             # timestamp date. If you want to expire an object on January 1st of
@@ -62,10 +63,6 @@ class BaseMemcachedCache(BaseCache):
             # This means that we have to switch to absolute timestamps.
             timeout += int(time.time())
         return int(timeout)
-
-    def make_key(self, key, version=None):
-        # Python 2 memcache requires the key to be a byte string.
-        return force_str(super(BaseMemcachedCache, self).make_key(key, version))
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
@@ -100,6 +97,7 @@ class BaseMemcachedCache(BaseCache):
         return ret
 
     def close(self, **kwargs):
+        # Many clients don't clean up connections properly.
         self._cache.disconnect_all()
 
     def incr(self, key, delta=1, version=None):
@@ -110,7 +108,7 @@ class BaseMemcachedCache(BaseCache):
         try:
             val = self._cache.incr(key, delta)
 
-        # python-memcache responds to incr on non-existent keys by
+        # python-memcache responds to incr on nonexistent keys by
         # raising a ValueError, pylibmc by raising a pylibmc.NotFound
         # and Cmemcache returns None. In all cases,
         # we should raise a ValueError though.
@@ -128,7 +126,7 @@ class BaseMemcachedCache(BaseCache):
         try:
             val = self._cache.decr(key, delta)
 
-        # python-memcache responds to incr on non-existent keys by
+        # python-memcache responds to incr on nonexistent keys by
         # raising a ValueError, pylibmc by raising a pylibmc.NotFound
         # and Cmemcache returns None. In all cases,
         # we should raise a ValueError though.
@@ -156,14 +154,14 @@ class MemcachedCache(BaseMemcachedCache):
     "An implementation of a cache binding using python-memcached"
     def __init__(self, server, params):
         import memcache
-        super(MemcachedCache, self).__init__(server, params,
-                                             library=memcache,
-                                             value_not_found_exception=ValueError)
+        super().__init__(server, params, library=memcache, value_not_found_exception=ValueError)
 
     @property
     def _cache(self):
         if getattr(self, '_client', None) is None:
-            self._client = self._lib.Client(self._servers, pickleProtocol=pickle.HIGHEST_PROTOCOL)
+            client_kwargs = dict(pickleProtocol=pickle.HIGHEST_PROTOCOL)
+            client_kwargs.update(self._options)
+            self._client = self._lib.Client(self._servers, **client_kwargs)
         return self._client
 
 
@@ -171,14 +169,32 @@ class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"
     def __init__(self, server, params):
         import pylibmc
-        super(PyLibMCCache, self).__init__(server, params,
-                                           library=pylibmc,
-                                           value_not_found_exception=pylibmc.NotFound)
+        super().__init__(server, params, library=pylibmc, value_not_found_exception=pylibmc.NotFound)
+
+        # The contents of `OPTIONS` was formerly only used to set the behaviors
+        # attribute, but is now passed directly to the Client constructor. As such,
+        # any options that don't match a valid keyword argument are removed and set
+        # under the `behaviors` key instead, to maintain backwards compatibility.
+        legacy_behaviors = {}
+        for option in list(self._options):
+            if option not in ('behaviors', 'binary', 'username', 'password'):
+                warnings.warn(
+                    "Specifying pylibmc cache behaviors as a top-level property "
+                    "within `OPTIONS` is deprecated. Move `%s` into a dict named "
+                    "`behaviors` inside `OPTIONS` instead." % option,
+                    RemovedInDjango21Warning,
+                    stacklevel=2,
+                )
+                legacy_behaviors[option] = self._options.pop(option)
+
+        if legacy_behaviors:
+            self._options.setdefault('behaviors', {}).update(legacy_behaviors)
 
     @cached_property
     def _cache(self):
-        client = self._lib.Client(self._servers)
-        if self._options:
-            client.behaviors = self._options
+        return self._lib.Client(self._servers, **self._options)
 
-        return client
+    def close(self, **kwargs):
+        # libmemcached manages its own connections. Don't call disconnect_all()
+        # as it resets the failover state and creates unnecessary reconnects.
+        pass

@@ -4,16 +4,14 @@ from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.prototypes import raster as capi
 from django.contrib.gis.shortcuts import numpy
-from django.utils import six
 from django.utils.encoding import force_text
-from django.utils.six.moves import range
 
 from .const import GDAL_INTEGER_TYPES, GDAL_PIXEL_TYPES, GDAL_TO_CTYPES
 
 
 class GDALBand(GDALBase):
     """
-    Wraps a GDAL raster band, needs to be obtained from a GDALRaster object.
+    Wrap a GDAL raster band, needs to be obtained from a GDALRaster object.
     """
     def __init__(self, source, index):
         self.source = source
@@ -30,7 +28,7 @@ class GDALBand(GDALBase):
     @property
     def description(self):
         """
-        Returns the description string of the band.
+        Return the description string of the band.
         """
         return force_text(capi.get_band_description(self._ptr))
 
@@ -51,7 +49,7 @@ class GDALBand(GDALBase):
     @property
     def pixel_count(self):
         """
-        Returns the total number of pixels in this band.
+        Return the total number of pixels in this band.
         """
         return self.width * self.height
 
@@ -134,7 +132,7 @@ class GDALBand(GDALBase):
     @property
     def nodata_value(self):
         """
-        Returns the nodata value for this band, or None if it isn't set.
+        Return the nodata value for this band, or None if it isn't set.
         """
         # Get value and nodata exists flag
         nodata_exists = c_int()
@@ -149,7 +147,7 @@ class GDALBand(GDALBase):
     @nodata_value.setter
     def nodata_value(self, value):
         """
-        Sets the nodata value for this band.
+        Set the nodata value for this band.
         """
         if value is None:
             if not capi.delete_band_nodata_value:
@@ -163,7 +161,7 @@ class GDALBand(GDALBase):
 
     def datatype(self, as_string=False):
         """
-        Returns the GDAL Pixel Datatype for this band.
+        Return the GDAL Pixel Datatype for this band.
         """
         dtype = capi.get_band_datatype(self._ptr)
         if as_string:
@@ -172,7 +170,7 @@ class GDALBand(GDALBase):
 
     def data(self, data=None, offset=None, size=None, shape=None, as_memoryview=False):
         """
-        Reads or writes pixel values for this band. Blocks of data can
+        Read or writes pixel values for this band. Blocks of data can
         be accessed by specifying the width, height and offset of the
         desired block. The same specification can be used to update
         parts of a raster by providing an array of values.
@@ -207,7 +205,7 @@ class GDALBand(GDALBase):
             access_flag = 1
 
             # Instantiate ctypes array holding the input data
-            if isinstance(data, (bytes, six.memoryview)) or (numpy and isinstance(data, numpy.ndarray)):
+            if isinstance(data, (bytes, memoryview)) or (numpy and isinstance(data, numpy.ndarray)):
                 data_array = ctypes_array.from_buffer_copy(data)
             else:
                 data_array = ctypes_array(*data)

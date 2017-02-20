@@ -1,3 +1,4 @@
+from django import forms
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models, transaction
 from django.test import SimpleTestCase, TestCase
@@ -7,13 +8,13 @@ from .models import BooleanModel, FksToBooleans, NullBooleanModel
 
 class BooleanFieldTests(TestCase):
     def _test_get_prep_value(self, f):
-        self.assertEqual(f.get_prep_value(True), True)
-        self.assertEqual(f.get_prep_value('1'), True)
-        self.assertEqual(f.get_prep_value(1), True)
-        self.assertEqual(f.get_prep_value(False), False)
-        self.assertEqual(f.get_prep_value('0'), False)
-        self.assertEqual(f.get_prep_value(0), False)
-        self.assertEqual(f.get_prep_value(None), None)
+        self.assertIs(f.get_prep_value(True), True)
+        self.assertIs(f.get_prep_value('1'), True)
+        self.assertIs(f.get_prep_value(1), True)
+        self.assertIs(f.get_prep_value(False), False)
+        self.assertIs(f.get_prep_value('0'), False)
+        self.assertIs(f.get_prep_value(0), False)
+        self.assertIsNone(f.get_prep_value(None))
 
     def _test_to_python(self, f):
         self.assertIs(f.to_python(1), True)
@@ -40,22 +41,26 @@ class BooleanFieldTests(TestCase):
         f = models.BooleanField(choices=choices, default=1, null=False)
         self.assertEqual(f.formfield().choices, choices)
 
+    def test_nullbooleanfield_formfield(self):
+        f = models.NullBooleanField()
+        self.assertIsInstance(f.formfield(), forms.NullBooleanField)
+
     def test_return_type(self):
         b = BooleanModel.objects.create(bfield=True)
         b.refresh_from_db()
-        self.assertEqual(b.bfield, True)
+        self.assertIs(b.bfield, True)
 
         b2 = BooleanModel.objects.create(bfield=False)
         b2.refresh_from_db()
-        self.assertEqual(b2.bfield, False)
+        self.assertIs(b2.bfield, False)
 
         b3 = NullBooleanModel.objects.create(nbfield=True)
         b3.refresh_from_db()
-        self.assertEqual(b3.nbfield, True)
+        self.assertIs(b3.nbfield, True)
 
         b4 = NullBooleanModel.objects.create(nbfield=False)
         b4.refresh_from_db()
-        self.assertEqual(b4.nbfield, False)
+        self.assertIs(b4.nbfield, False)
 
         # When an extra clause exists, the boolean conversions are applied with
         # an offset (#13293).
@@ -75,16 +80,16 @@ class BooleanFieldTests(TestCase):
 
         # select_related('fk_field_name')
         ma = FksToBooleans.objects.select_related('bf').get(pk=m1.id)
-        self.assertEqual(ma.bf.bfield, True)
-        self.assertEqual(ma.nbf.nbfield, True)
+        self.assertIs(ma.bf.bfield, True)
+        self.assertIs(ma.nbf.nbfield, True)
 
         # select_related()
         mb = FksToBooleans.objects.select_related().get(pk=m1.id)
         mc = FksToBooleans.objects.select_related().get(pk=m2.id)
-        self.assertEqual(mb.bf.bfield, True)
-        self.assertEqual(mb.nbf.nbfield, True)
-        self.assertEqual(mc.bf.bfield, False)
-        self.assertEqual(mc.nbf.nbfield, False)
+        self.assertIs(mb.bf.bfield, True)
+        self.assertIs(mb.nbf.nbfield, True)
+        self.assertIs(mc.bf.bfield, False)
+        self.assertIs(mc.nbf.nbfield, False)
 
     def test_null_default(self):
         """
