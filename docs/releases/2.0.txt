@@ -219,7 +219,8 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* The new :option:`squashmigrations --squashed-name`  option allows naming
+  the squashed migration.
 
 Models
 ~~~~~~
