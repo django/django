@@ -1571,7 +1571,7 @@ class DecimalField(Field):
 class DurationField(Field):
     """Stores timedelta objects.
 
-    Uses interval on postgres, INVERAL DAY TO SECOND on Oracle, and bigint of
+    Uses interval on postgres, INTERVAL DAY TO SECOND on Oracle, and bigint of
     microseconds on other databases.
     """
     empty_strings_allowed = False
