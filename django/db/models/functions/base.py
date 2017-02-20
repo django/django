@@ -223,7 +223,7 @@ class Substr(Func):
 class StrIndex(Func):
     """
     Returns a positive integer corresponding to the 1-indexed position of the
-    first occurrence ofa substring inside another string.
+    first occurrence of a substring inside another string.
     If the substring is not found, 0 is returned.
     """
     function = 'INSTR'

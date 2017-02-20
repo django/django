@@ -112,7 +112,9 @@ CSRF
 Database backends
 ~~~~~~~~~~~~~~~~~
 
-* ...
+* Modified `Func.as_sql()` so that `**extra_context` is applied later, making it more useful.
+* Added the StrIndex function.
+
 
 Email
 ~~~~~
