@@ -509,11 +509,9 @@ class DurationField(Field):
 
 
 class RegexField(CharField):
-    def __init__(self, regex, max_length=None, min_length=None, error_message=None, *args, **kwargs):
+    def __init__(self, regex, max_length=None, min_length=None, *args, **kwargs):
         """
         regex can be either a string or a compiled regular expression object.
-        error_message is an optional error message to use, if
-        'Enter a valid value' is too generic for you.
         """
         kwargs.setdefault('strip', False)
         super(RegexField, self).__init__(max_length, min_length, *args, **kwargs)
