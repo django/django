@@ -628,16 +628,10 @@ class ChoiceWidget(Widget):
         return getter(name)
 
     def format_value(self, value):
-        """Return selected values as a set."""
+        """Return selected values as a list."""
         if not isinstance(value, (tuple, list)):
             value = [value]
-        values = set()
-        for v in value:
-            if v is None:
-                values.add('')
-            else:
-                values.add(force_text(v))
-        return values
+        return [str(v) if v is not None else '' for v in value]
 
 
 class Select(ChoiceWidget):
