@@ -187,6 +187,29 @@ class Now(Func):
         return self.as_sql(compiler, connection, template='STATEMENT_TIMESTAMP()')
 
 
+class StrIndex(Func):
+    """
+    Return a positive integer corresponding to the 1-indexed position of the
+    first occurrence of a substring inside another string, or 0 if the
+    substring is not found.
+    """
+    function = 'INSTR'
+    arity = 2
+
+    def __init__(self, expression, substring, **extra):
+        """
+        expression: the name of a field, or an expression returning a string
+        substring: a string to find inside expression
+        """
+        if not hasattr(substring, 'resolve_expression'):
+            substring = Value(substring)
+        expressions = [expression, substring]
+        super().__init__(*expressions, output_field=fields.IntegerField(), **extra)
+
+    def as_postgresql(self, compiler, connection):
+        return super().as_sql(compiler, connection, function='STRPOS')
+
+
 class Substr(Func):
     function = 'SUBSTRING'
 

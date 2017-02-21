@@ -170,7 +170,8 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The new :class:`~django.db.models.functions.StrIndex` database function
+  finds the starting index of a string inside another string.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
