@@ -37,7 +37,7 @@ def delete_selected(modeladmin, request, queryset):
         queryset, opts, request.user, modeladmin.admin_site, using)
 
     # The user has already confirmed the deletion.
-    # Do the deletion and return a None to display the change list view again.
+    # Do the deletion and return None to display the change list view again.
     if request.POST.get('post') and not protected:
         if perms_needed:
             raise PermissionDenied
