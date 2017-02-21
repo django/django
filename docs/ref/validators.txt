@@ -162,10 +162,20 @@ to, or in lieu of custom ``field.clean()`` methods.
     .. attribute:: schemes
 
         URL/URI scheme list to validate against. If not provided, the default
-        list is ``['http', 'https', 'ftp', 'ftps']``. As a reference, the IANA
-        website provides a full list of `valid URI schemes`_.
+        list is ``['http', 'https', 'ftp', 'ftps']``.
+
+        If ``schemes='__all__'``, they must meet the basic character
+        requirements of a scheme. Per :rfc:`3986#section-3.1`, schemes must
+        start with a letter, consist of alphanumeric characters, and
+        optionally contain a ``+`` or ``-`` or ``.`` e.g. ``git+ssh``.
+
+        As a reference, IANA provides a list of `valid URI schemes`_.
 
         .. _valid URI schemes: https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
+
+        .. versionchanged:: 1.10
+
+           Support for the ``'__all__'`` value was added.
 
 ``validate_email``
 ------------------

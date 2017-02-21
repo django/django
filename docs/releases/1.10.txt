@@ -509,7 +509,9 @@ Validators
 
 * :class:`~django.core.validators.URLValidator` now limits the length of
   domain name labels to 63 characters and the total length of domain
-  names to 253 characters per :rfc:`1034`.
+  names to 253 characters per :rfc:`1034`. It also accepts ``'__all__'`` for
+  the optional ``schemes`` parameter, which skips validation against the
+  ``schemes`` list.
 
 * :func:`~django.core.validators.int_list_validator` now accepts an optional
   ``allow_negative`` boolean parameter, defaulting to ``False``, to allow

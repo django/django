@@ -99,6 +99,10 @@ class URLValidator(RegexValidator):
         r'(?::\d{2,5})?'  # port
         r'(?:[/?#][^\s]*)?'  # resource path
         r'\Z', re.IGNORECASE)
+    # A simple check for valid schemes: letters and numbers possibly followed
+    # by either a plus sign, a dash or dot and one or more letters or numbers.
+    # Per https://tools.ietf.org/html/rfc3986#section-3.1.
+    scheme_regex = _lazy_re_compile(r'^[a-z][a-z0-9]+([-.+][a-z0-9]+)?\Z')
     message = _('Enter a valid URL.')
     schemes = ['http', 'https', 'ftp', 'ftps']
 
@@ -109,9 +113,13 @@ class URLValidator(RegexValidator):
 
     def __call__(self, value):
         value = force_text(value)
-        # Check first if the scheme is valid
         scheme = value.split('://')[0].lower()
-        if scheme not in self.schemes:
+        # If all schemes are accepted, do a basic check that the scheme meets
+        # the character requirements of a scheme.
+        if self.schemes == '__all__':
+            if not self.scheme_regex.match(scheme):
+                raise ValidationError(self.message, code=self.code)
+        elif scheme not in self.schemes:
             raise ValidationError(self.message, code=self.code)
 
         # Then check full URL
