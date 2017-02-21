@@ -17,10 +17,10 @@ def static(prefix, view=serve, **kwargs):
         # ... the rest of your URLconf goes here ...
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     """
-    # No-op if not in debug mode or an non-local prefix
     if not prefix:
         raise ImproperlyConfigured("Empty static prefix not permitted")
     elif not settings.DEBUG or '://' in prefix:
+        # No-op if not in debug mode or a non-local prefix.
         return []
     return [
         url(r'^%s(?P<path>.*)$' % re.escape(prefix.lstrip('/')), view, kwargs=kwargs),
