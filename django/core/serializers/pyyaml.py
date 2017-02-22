@@ -70,8 +70,7 @@ def Deserializer(stream_or_string, **options):
     else:
         stream = stream_or_string
     try:
-        for obj in PythonDeserializer(yaml.load(stream, Loader=SafeLoader), **options):
-            yield obj
+        yield from PythonDeserializer(yaml.load(stream, Loader=SafeLoader), **options)
     except (GeneratorExit, DeserializationError):
         raise
     except Exception as exc:

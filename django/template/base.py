@@ -162,8 +162,7 @@ class Template:
 
     def __iter__(self):
         for node in self.nodelist:
-            for subnode in node:
-                yield subnode
+            yield from node
 
     def _render(self, context):
         return self.nodelist.render(context)

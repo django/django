@@ -337,8 +337,7 @@ class BaseExpression:
         yield self
         for expr in self.get_source_expressions():
             if expr:
-                for inner_expr in expr.flatten():
-                    yield inner_expr
+                yield from expr.flatten()
 
 
 class Expression(BaseExpression, Combinable):

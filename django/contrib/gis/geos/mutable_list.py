@@ -312,8 +312,7 @@ class ListMixin:
         def newItems():
             for i in range(origLen + 1):
                 if i == start:
-                    for val in valueList:
-                        yield val
+                    yield from valueList
 
                 if i < origLen:
                     if i < start or i >= stop:

@@ -402,9 +402,7 @@ class ManifestFilesMixin(HashedFilesMixin):
 
     def post_process(self, *args, **kwargs):
         self.hashed_files = OrderedDict()
-        all_post_processed = super().post_process(*args, **kwargs)
-        for post_processed in all_post_processed:
-            yield post_processed
+        yield from super().post_process(*args, **kwargs)
         self.save_manifest()
 
     def save_manifest(self):

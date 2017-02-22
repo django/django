@@ -742,8 +742,7 @@ class CallableChoiceIterator:
         self.choices_func = choices_func
 
     def __iter__(self):
-        for e in self.choices_func():
-            yield e
+        yield from self.choices_func()
 
 
 class ChoiceField(Field):

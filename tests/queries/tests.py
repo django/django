@@ -787,8 +787,7 @@ class Queries1Tests(TestCase):
         n_obj = Note.objects.all()[0]
 
         def g():
-            for i in [n_obj.pk]:
-                yield i
+            yield n_obj.pk
         self.assertQuerysetEqual(Note.objects.filter(pk__in=f()), [])
         self.assertEqual(list(Note.objects.filter(pk__in=g())), [n_obj])
 

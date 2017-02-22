@@ -37,8 +37,7 @@ def get_files(storage, ignore_patterns=None, location=''):
             continue
         if location:
             dir = os.path.join(location, dir)
-        for fn in get_files(storage, ignore_patterns, dir):
-            yield fn
+        yield from get_files(storage, ignore_patterns, dir)
 
 
 def check_settings(base_url=None):

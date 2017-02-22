@@ -148,10 +148,8 @@ class ForNode(Node):
              reversed_text)
 
     def __iter__(self):
-        for node in self.nodelist_loop:
-            yield node
-        for node in self.nodelist_empty:
-            yield node
+        yield from self.nodelist_loop
+        yield from self.nodelist_empty
 
     def render(self, context):
         if 'forloop' in context:
@@ -297,8 +295,7 @@ class IfNode(Node):
 
     def __iter__(self):
         for _, nodelist in self.conditions_nodelists:
-            for node in nodelist:
-                yield node
+            yield from nodelist
 
     @property
     def nodelist(self):

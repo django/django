@@ -539,14 +539,12 @@ class ChoiceWidget(Widget):
         options from a BoundField for choice widgets.
         """
         value = self.format_value(value)
-        for option in self.options(name, value, attrs):
-            yield option
+        yield from self.options(name, value, attrs)
 
     def options(self, name, value, attrs=None):
         """Yield a flat list of options for this widgets."""
         for group in self.optgroups(name, value, attrs):
-            for option in group[1]:
-                yield option
+            yield from group[1]
 
     def optgroups(self, name, value, attrs=None):
         """Return a list of optgroups for this widget."""

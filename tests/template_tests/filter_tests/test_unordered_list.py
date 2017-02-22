@@ -103,9 +103,7 @@ class FunctionTests(SimpleTestCase):
         )
 
         def item_generator():
-            yield a
-            yield b
-            yield c
+            yield from (a, b, c)
 
         self.assertEqual(
             unordered_list(item_generator()),
@@ -129,9 +127,7 @@ class FunctionTests(SimpleTestCase):
         )
 
         def item_generator():
-            yield a
-            yield b
-            yield c
+            yield from (a, b, c)
 
         self.assertEqual(
             unordered_list(item_generator(), autoescape=False),
