@@ -25,6 +25,6 @@ class AcceptsRequestBackendTest(SimpleTestCase):
         self.assertEqual(len(warns), 1)
         self.assertEqual(
             str(warns[0].message),
-            "Update authentication backend %s to accept a positional `request` "
+            "Update %s.authenticate() to accept a positional `request` "
             "argument." % self.no_request_backend
         )

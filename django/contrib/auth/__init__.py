@@ -78,8 +78,8 @@ def authenticate(request=None, **credentials):
             else:
                 args = ()
                 warnings.warn(
-                    "Update authentication backend %s to accept a "
-                    "positional `request` argument." % backend_path,
+                    "Update %s.authenticate() to accept a positional `request` "
+                    "argument." % backend_path,
                     RemovedInDjango21Warning
                 )
         try:
