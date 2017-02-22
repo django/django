@@ -428,8 +428,7 @@ class GenericRelation(ForeignObject):
         Return the content type associated with this field's model.
         """
         return ContentType.objects.get_for_model(
-            self.model,
-            for_concrete_model=self.for_concrete_model
+            self.model, for_concrete_model=self.for_concrete_model
         )
 
     def get_extra_restriction(self, where_class, alias, remote_alias):
@@ -502,10 +501,7 @@ def create_generic_related_manager(superclass, rel):
 
         def __call__(self, *, manager):
             manager = getattr(self.model, manager)
-            manager_class = create_generic_related_manager(
-                manager.__class__,
-                rel
-            )
+            manager_class = create_generic_related_manager(manager.__class__, rel)
             return manager_class(instance=self.instance)
         do_not_call_in_templates = True
 
