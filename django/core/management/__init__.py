@@ -112,7 +112,7 @@ def call_command(command_name, *args, **options):
     parser = command.create_parser('', command_name)
     # Use the `dest` option name from the parser option
     opt_mapping = {
-        sorted(s_opt.option_strings)[0].lstrip('-').replace('-', '_'): s_opt.dest
+        min(s_opt.option_strings).lstrip('-').replace('-', '_'): s_opt.dest
         for s_opt in parser._actions if s_opt.option_strings
     }
     arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
@@ -254,19 +254,18 @@ class ManagementUtility:
                     pass
             parser = subcommand_cls.create_parser('', cwords[0])
             options.extend(
-                (sorted(s_opt.option_strings)[0], s_opt.nargs != 0)
+                (min(s_opt.option_strings), s_opt.nargs != 0)
                 for s_opt in parser._actions if s_opt.option_strings
             )
             # filter out previously specified options from available options
-            prev_opts = [x.split('=')[0] for x in cwords[1:cword - 1]]
-            options = [opt for opt in options if opt[0] not in prev_opts]
+            prev_opts = {x.split('=')[0] for x in cwords[1:cword - 1]}
+            options = (opt for opt in options if opt[0] not in prev_opts)
 
             # filter options by current input
             options = sorted((k, v) for k, v in options if k.startswith(curr))
-            for option in options:
-                opt_label = option[0]
+            for opt_label, require_arg in options:
                 # append '=' to options which require args
-                if option[1]:
+                if require_arg:
                     opt_label += '='
                 print(opt_label)
         # Exit code of the bash completion function is never passed back to
