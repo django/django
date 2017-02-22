@@ -173,16 +173,17 @@ It worked!
 
         $ python manage.py runserver 8080
 
-    If you want to change the server's IP, pass it along with the port. So to
-    listen on all public IPs (useful if you want to show off your work on other
-    computers on your network), use:
+    If you want to change the server's IP, pass it along with the port. For
+    example, to listen on all available public IPs (which is useful if you are
+    running Vagrant or want to show off your work on other computers on the
+    network), use:
 
     .. code-block:: console
 
-        $ python manage.py runserver 0.0.0.0:8000
+        $ python manage.py runserver 0:8000
 
-    Full docs for the development server can be found in the
-    :djadmin:`runserver` reference.
+    **0** is a shortcut for **0.0.0.0**. Full docs for the development server
+    can be found in the :djadmin:`runserver` reference.
 
 .. admonition:: Automatic reloading of :djadmin:`runserver`
 
