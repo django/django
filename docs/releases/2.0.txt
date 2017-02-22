@@ -375,8 +375,8 @@ these features.
 
 * The ``app_name`` argument to ``include()`` is removed.
 
-* Support for passing a 3-tuple as the first argument to ``include()`` is
-  removed.
+* Support for passing a 3-tuple (including ``admin.site.urls``) as the first
+  argument to ``include()`` is removed.
 
 * Support for setting a URL instance namespace without an application namespace
   is removed.
