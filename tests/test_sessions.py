@@ -10,6 +10,11 @@ from channels.sessions import (
 )
 from channels.test import ChannelTestCase
 
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
 
 @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.cache")
 class SessionTests(ChannelTestCase):
@@ -223,3 +228,58 @@ class SessionTests(ChannelTestCase):
 
         with self.assertRaises(ValueError):
             inner(message0)
+
+    def test_enforce_ordering_concurrent(self):
+        """
+        Tests that strict mode of enforce_ordering puts messages in the correct queue after
+        the current message number changes while the message is being processed
+        """
+        # Construct messages to send
+        message0 = Message(
+            {"reply_channel": "test-reply-e", "order": 0},
+            "websocket.connect",
+            channel_layers[DEFAULT_CHANNEL_LAYER]
+        )
+        message2 = Message(
+            {"reply_channel": "test-reply-e", "order": 2},
+            "websocket.receive",
+            channel_layers[DEFAULT_CHANNEL_LAYER]
+        )
+        message3 = Message(
+            {"reply_channel": "test-reply-e", "order": 3},
+            "websocket.receive",
+            channel_layers[DEFAULT_CHANNEL_LAYER]
+        )
+
+        @channel_session
+        def add_session(message):
+            pass
+
+        # Run them in an acceptable strict order
+        @enforce_ordering
+        def inner(message):
+            pass
+
+        inner(message0)
+        inner(message3)
+
+        # Add the session now so it can be mocked
+        add_session(message2)
+
+        with mock.patch.object(message2.channel_session, 'load', return_value={'__channels_next_order': 2}):
+            inner(message2)
+
+        # Ensure wait channel is empty
+        wait_channel = "__wait__.%s" % "test-reply-e"
+        next_message = self.get_next_message(wait_channel)
+        self.assertEqual(next_message, None)
+
+        # Ensure messages 3 and 2 both ended up back on the original channel
+        expected = {
+            2: message2,
+            3: message3
+        }
+        for m in range(2):
+            message = self.get_next_message("websocket.receive")
+            expected.pop(message.content['order'])
+        self.assertEqual(expected, {})

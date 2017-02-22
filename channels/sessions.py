@@ -75,6 +75,26 @@ def channel_session(func):
     return inner
 
 
+def requeue_messages(message):
+    """
+    Requeue any pending wait channel messages for this socket connection back onto it's original channel
+    """
+    while True:
+        wait_channel = "__wait__.%s" % message.reply_channel.name
+        channel, content = message.channel_layer.receive_many([wait_channel], block=False)
+        if channel:
+            original_channel = content.pop("original_channel")
+            try:
+                message.channel_layer.send(original_channel, content)
+            except message.channel_layer.ChannelFull:
+                raise message.channel_layer.ChannelFull(
+                    "Cannot requeue pending __wait__ channel message " +
+                    "back on to already full channel %s" % original_channel
+                )
+        else:
+            break
+
+
 def enforce_ordering(func=None, slight=False):
     """
     Enforces strict (all messages exactly ordered) ordering against a reply_channel.
@@ -106,21 +126,7 @@ def enforce_ordering(func=None, slight=False):
                 message.channel_session["__channels_next_order"] = order + 1
                 message.channel_session.save()
                 message.channel_session.modified = False
-                # Requeue any pending wait channel messages for this socket connection back onto it's original channel
-                while True:
-                    wait_channel = "__wait__.%s" % message.reply_channel.name
-                    channel, content = message.channel_layer.receive_many([wait_channel], block=False)
-                    if channel:
-                        original_channel = content.pop("original_channel")
-                        try:
-                            message.channel_layer.send(original_channel, content)
-                        except message.channel_layer.ChannelFull:
-                            raise message.channel_layer.ChannelFull(
-                                "Cannot requeue pending __wait__ channel message " +
-                                "back on to already full channel %s" % original_channel
-                            )
-                    else:
-                        break
+                requeue_messages(message)
             else:
                 # Since out of order, enqueue message temporarily to wait channel for this socket connection
                 wait_channel = "__wait__.%s" % message.reply_channel.name
@@ -132,6 +138,11 @@ def enforce_ordering(func=None, slight=False):
                         "Cannot add unordered message to already " +
                         "full __wait__ channel for socket %s" % message.reply_channel.name
                     )
+                # Next order may have changed while this message was being processed
+                # Requeue messages if this has happened
+                if order == message.channel_session.load().get("__channels_next_order", 0):
+                    requeue_messages(message)
+
         return inner
     if func is not None:
         return decorator(func)
