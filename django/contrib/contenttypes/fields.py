@@ -427,9 +427,7 @@ class GenericRelation(ForeignObject):
         """
         Return the content type associated with this field's model.
         """
-        return ContentType.objects.get_for_model(
-            self.model, for_concrete_model=self.for_concrete_model
-        )
+        return ContentType.objects.get_for_model(self.model, for_concrete_model=self.for_concrete_model)
 
     def get_extra_restriction(self, where_class, alias, remote_alias):
         field = self.remote_field.model._meta.get_field(self.content_type_field_name)

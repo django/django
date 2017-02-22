@@ -90,8 +90,6 @@ def shortcut(request, content_type_id, object_id):
     # to whatever get_absolute_url() returned.
     if object_domain is not None:
         protocol = request.scheme
-        return HttpResponseRedirect(
-            '%s://%s%s' % (protocol, object_domain, absurl)
-        )
+        return HttpResponseRedirect('%s://%s%s' % (protocol, object_domain, absurl))
     else:
         return HttpResponseRedirect(absurl)

@@ -77,7 +77,7 @@ def inject_rename_contenttypes_operations(plan=None, apps=global_apps, using=DEF
         for index, operation in enumerate(migration.operations):
             if isinstance(operation, migrations.RenameModel):
                 operation = RenameContentType(
-                    migration.app_label, operation.old_name_lower, operation.new_name_lower,
+                    migration.app_label, operation.old_name_lower, operation.new_name_lower
                 )
                 inserts.append((index + 1, operation))
         for inserted, (index, operation) in enumerate(inserts):
