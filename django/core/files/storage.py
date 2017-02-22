@@ -293,12 +293,15 @@ class FileSystemStorage(Storage):
     def delete(self, name):
         assert name, "The name argument is not allowed to be empty."
         name = self.path(name)
-        # If the file exists, delete it from the filesystem.
+        # If the file or directory exists, delete it from the filesystem.
         try:
-            os.remove(name)
+            if os.path.isdir(name):
+                os.rmdir(name)
+            else:
+                os.remove(name)
         except FileNotFoundError:
-            # If os.remove() fails with FileNotFoundError, the file may have
-            # been removed concurrently.
+            # If removal fails, the file or directory may have been removed
+            # concurrently.
             pass
 
     def exists(self, name):
