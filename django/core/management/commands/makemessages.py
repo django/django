@@ -337,8 +337,12 @@ class Command(BaseCommand):
                     os.makedirs(self.default_locale_path)
 
         # Build locale list
+        looks_like_locale = re.compile(r'[a-z]{2}')
         locale_dirs = filter(os.path.isdir, glob.glob('%s/*' % self.default_locale_path))
-        all_locales = map(os.path.basename, locale_dirs)
+        all_locales = [
+            lang_code for lang_code in map(os.path.basename, locale_dirs)
+            if looks_like_locale.match(lang_code)
+        ]
 
         # Account for excluded locales
         if process_all:
