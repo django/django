@@ -485,3 +485,17 @@ class SelectDateWidgetTest(WidgetTest):
         self.assertIs(self.widget.value_omitted_from_data({'field_day': '1'}, {}, 'field'), False)
         data = {'field_day': '1', 'field_month': '12', 'field_year': '2000'}
         self.assertIs(self.widget.value_omitted_from_data(data, {}, 'field'), False)
+
+    def test_regexp_date_re(self):
+        # valid formats
+        self.assertIsNotNone(self.widget.date_re.match('2000-1-1'))  # 1 digit for (day & month)
+        self.assertIsNotNone(self.widget.date_re.match('2000-10-15'))  # 2 digit for (day & month)
+        self.assertIsNotNone(self.widget.date_re.match('2000-01-01'))  # 2 digit for (day & month) starting on 0
+        # invalid formats
+        self.assertIsNone(self.widget.date_re.match('2000-01-001'))  # invalid day
+        self.assertIsNone(self.widget.date_re.match('2000-001-01'))  # invalid month
+        # invalid year formats (year accept only 4 digits)
+        self.assertIsNone(self.widget.date_re.match('2-01-01'))
+        self.assertIsNone(self.widget.date_re.match('20-01-01'))
+        self.assertIsNone(self.widget.date_re.match('200-01-01'))
+        self.assertIsNone(self.widget.date_re.match('20000-01-01'))
