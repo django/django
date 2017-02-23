@@ -50,17 +50,18 @@ def check_url_namespaces_unique(app_configs, **kwargs):
     return errors
 
 
-def _load_all_namespaces(resolver):
+def _load_all_namespaces(resolver, parents=()):
     """
     Recursively load all namespaces from URL patterns.
     """
     url_patterns = getattr(resolver, 'url_patterns', [])
     namespaces = [
-        url.namespace for url in url_patterns
+        ':'.join(parents + (url.namespace,)) for url in url_patterns
         if getattr(url, 'namespace', None) is not None
     ]
     for pattern in url_patterns:
-        namespaces.extend(_load_all_namespaces(pattern))
+        current = parents + (getattr(pattern, 'namespace', ()),)
+        namespaces.extend(_load_all_namespaces(pattern, current))
     return namespaces
 
 
