@@ -349,3 +349,29 @@ class TestsBinding(ChannelTestCase):
 
         self.assertIsNone(User.objects.filter(pk=user.pk).first())
         self.assertIsNone(client.receive())
+
+    def test_route_params_saved_in_kwargs(self):
+
+        class UserBinding(WebsocketBinding):
+            model = User
+            stream = 'users'
+            fields = ['username', 'email', 'password', 'last_name']
+
+            @classmethod
+            def group_names(cls, instance):
+                return ['users_outbound']
+
+            def has_permission(self, user, action, pk):
+                return True
+
+        class Demultiplexer(WebsocketDemultiplexer):
+            consumers = {
+                'users': UserBinding.consumer,
+            }
+
+            groups = ['inbound']
+
+        with apply_routes([Demultiplexer.as_route(path='/path/(?P<id>\d+)')]):
+            client = HttpClient()
+            consumer = client.send_and_consume('websocket.connect', path='/path/789')
+            self.assertEqual(consumer.kwargs['id'], '789')

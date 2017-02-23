@@ -214,6 +214,7 @@ class Binding(object):
         from django.contrib.auth.models import AnonymousUser
         self = cls()
         self.message = message
+        self.kwargs = kwargs
         # Deserialize message
         self.action, self.pk, self.data = self.deserialize(self.message)
         self.user = getattr(self.message, "user", AnonymousUser())
