@@ -16,7 +16,7 @@ __all__ = ('BoundField',)
 
 @html_safe
 class BoundField:
-    "A Field plus data"
+    """A Field plus data"""
     def __init__(self, form, field, name):
         self.form = form
         self.field = field
@@ -124,7 +124,7 @@ class BoundField:
         return self.as_widget(TextInput(), attrs, **kwargs)
 
     def as_textarea(self, attrs=None, **kwargs):
-        "Returns a string of HTML for representing this as a <textarea>."
+        """Returns a string of HTML for representing this as a <textarea>."""
         return self.as_widget(Textarea(), attrs, **kwargs)
 
     def as_hidden(self, attrs=None, **kwargs):
@@ -202,7 +202,7 @@ class BoundField:
 
     @property
     def is_hidden(self):
-        "Returns True if this BoundField's widget is hidden."
+        """Returns True if this BoundField's widget is hidden."""
         return self.field.widget.is_hidden
 
     @property
