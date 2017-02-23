@@ -74,6 +74,7 @@ class BaseFormSet:
     def __len__(self):
         return len(self.forms)
 
+    @staticmethod
     def __bool__(self):
         """All formsets have a management form which is not included in the length"""
         return True
