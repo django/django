@@ -84,7 +84,7 @@ class Media:
         return static(path)
 
     def __getitem__(self, name):
-        "Returns a Media object that only contains media of the given type"
+        """Returns a Media object that only contains media of the given type"""
         if name in MEDIA_TYPES:
             return Media(**{str(name): getattr(self, '_' + name)})
         raise KeyError('Unknown media type "%s"' % name)
@@ -210,7 +210,7 @@ class Widget(metaclass=MediaDefiningClass):
         return mark_safe(renderer.render(template_name, context))
 
     def build_attrs(self, base_attrs, extra_attrs=None):
-        "Helper function for building an attribute dictionary."
+        """Helper function for building an attribute dictionary."""
         attrs = base_attrs.copy()
         if extra_attrs is not None:
             attrs.update(extra_attrs)

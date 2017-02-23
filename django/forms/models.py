@@ -254,8 +254,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
                               set(new_class.declared_fields.keys()))
             if missing_fields:
                 message = 'Unknown field(s) (%s) specified for %s'
-                message = message % (', '.join(missing_fields),
-                                     opts.model.__name__)
+                message = message % (', '.join(missing_fields), opts.model.__name__)
                 raise FieldError(message)
             # Override default model fields with any custom declared ones
             # (plus, include all the other declared fields).
