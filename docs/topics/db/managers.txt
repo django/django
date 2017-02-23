@@ -369,8 +369,10 @@ Here's how Django handles custom managers and :ref:`model inheritance
 
 .. versionchanged:: 1.10
 
-    In older versions, manager inheritance varied depending on the type of
-    model inheritance (i.e. :ref:`abstract-base-classes`,
+    Some inheritance behaviors described above don't apply unless you set
+    ``manager_inheritance_from_future = True`` on the model's ``Meta`` class.
+    In older versions and if you don't set that attribute, manager inheritance
+    varies depending on the type of model inheritance (:ref:`abstract-base-classes`,
     :ref:`multi-table-inheritance`, or :ref:`proxy-models`), especially
     with regards to electing the default manager.
 
