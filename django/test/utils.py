@@ -124,7 +124,7 @@ def setup_test_environment(debug=None):
 
     saved_data.allowed_hosts = settings.ALLOWED_HOSTS
     # Add the default host of the test client.
-    settings.ALLOWED_HOSTS = settings.ALLOWED_HOSTS + ['testserver']
+    settings.ALLOWED_HOSTS = list(settings.ALLOWED_HOSTS) + ['testserver']
 
     saved_data.debug = settings.DEBUG
     settings.DEBUG = debug
