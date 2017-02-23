@@ -796,7 +796,8 @@ Miscellaneous
 
 * :func:`~django.contrib.auth.authenticate` now passes a ``request`` argument
   to the ``authenticate()`` method of authentication backends. Support for
-  methods that don't accept ``request`` will be removed in Django 2.1.
+  methods that don't accept ``request`` as the first positional argument will
+  be removed in Django 2.1.
 
 * The ``USE_ETAGS`` setting is deprecated in favor of
   :class:`~django.middleware.http.ConditionalGetMiddleware` which now adds the
