@@ -491,10 +491,18 @@ class SelectDateWidgetTest(WidgetTest):
         self.assertIsNotNone(self.widget.date_re.match('2000-1-1'))  # 1 digit for (day & month)
         self.assertIsNotNone(self.widget.date_re.match('2000-10-15'))  # 2 digit for (day & month)
         self.assertIsNotNone(self.widget.date_re.match('2000-01-01'))  # 2 digit for (day & month) starting on 0
+        # valid formats with empty values
+        self.assertIsNotNone(self.widget.date_re.match('2000-01-0'))  # day not provided
+        self.assertIsNotNone(self.widget.date_re.match('2000-0-01'))  # month not provided
+        self.assertIsNotNone(self.widget.date_re.match('0-01-01'))  # year not provided
+        self.assertIsNotNone(self.widget.date_re.match('2000-0-0'))  # day & month not provided
+        self.assertIsNotNone(self.widget.date_re.match('0-01-0'))  # day & year not provided
+        self.assertIsNotNone(self.widget.date_re.match('0-0-01'))  # month & year not provided
+        self.assertIsNotNone(self.widget.date_re.match('0-0-0'))  # day, month & year not provided
         # invalid formats
         self.assertIsNone(self.widget.date_re.match('2000-01-001'))  # invalid day
         self.assertIsNone(self.widget.date_re.match('2000-001-01'))  # invalid month
-        # invalid year formats (year accept only 4 digits)
+        # invalid year formats (year accept only 4 digits or 0)
         self.assertIsNone(self.widget.date_re.match('2-01-01'))
         self.assertIsNone(self.widget.date_re.match('20-01-01'))
         self.assertIsNone(self.widget.date_re.match('200-01-01'))
