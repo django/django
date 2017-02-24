@@ -52,8 +52,8 @@ details on these changes.
 
 * ``DatabaseIntrospection.get_indexes()`` will be removed.
 
-* The ``authenticate()`` method of authentication backends will require a
-  ``request`` argument.
+* The ``authenticate()`` method of authentication backends will require
+  ``request`` as the first positional argument.
 
 * The ``django.db.models.permalink()`` decorator will be removed.
 

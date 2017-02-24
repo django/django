@@ -3,11 +3,20 @@ import warnings
 from django.contrib.auth import authenticate
 from django.test import SimpleTestCase, override_settings
 
+mock_request = object()
+
 
 class NoRequestBackend:
     def authenticate(self, username=None, password=None):
         # Doesn't accept a request parameter.
         pass
+
+
+class RequestNotPositionArgBackend:
+    def authenticate(self, username=None, password=None, request=None):
+        assert username == 'username'
+        assert password == 'pass'
+        assert request is mock_request
 
 
 class AcceptsRequestBackendTest(SimpleTestCase):
@@ -16,6 +25,7 @@ class AcceptsRequestBackendTest(SimpleTestCase):
     method without a request parameter.
     """
     no_request_backend = '%s.NoRequestBackend' % __name__
+    request_not_positional_backend = '%s.RequestNotPositionArgBackend' % __name__
 
     @override_settings(AUTHENTICATION_BACKENDS=[no_request_backend])
     def test_no_request_deprecation_warning(self):
@@ -25,6 +35,18 @@ class AcceptsRequestBackendTest(SimpleTestCase):
         self.assertEqual(len(warns), 1)
         self.assertEqual(
             str(warns[0].message),
-            "Update authentication backend %s to accept a positional `request` "
+            "Update %s.authenticate() to accept a positional `request` "
             "argument." % self.no_request_backend
+        )
+
+    @override_settings(AUTHENTICATION_BACKENDS=[request_not_positional_backend])
+    def test_request_keyword_arg_deprecation_warning(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            authenticate(username='username', password='pass', request=mock_request)
+        self.assertEqual(len(warns), 1)
+        self.assertEqual(
+            str(warns[0].message),
+            "In %s.authenticate(), move the `request` keyword argument to the "
+            "first positional argument." % self.request_not_positional_backend
         )
