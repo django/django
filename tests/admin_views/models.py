@@ -590,6 +590,7 @@ class WorkHour(models.Model):
 class Question(models.Model):
     question = models.CharField(max_length=20)
     posted = models.DateField(default=datetime.date.today)
+    expires = models.DateTimeField(null=True, blank=True)
 
 
 class Answer(models.Model):
@@ -598,6 +599,11 @@ class Answer(models.Model):
 
     def __str__(self):
         return self.answer
+
+
+class Answer2(Answer):
+    class Meta:
+        proxy = True
 
 
 class Reservation(models.Model):

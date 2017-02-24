@@ -2,8 +2,7 @@ import datetime
 
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
-    display_for_field, display_for_value, get_fields_from_path,
-    label_for_field, lookup_field,
+    display_for_field, display_for_value, label_for_field, lookup_field,
 )
 from django.contrib.admin.views.main import (
     ALL_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
@@ -335,8 +334,6 @@ def date_hierarchy(cl):
     """
     if cl.date_hierarchy:
         field_name = cl.date_hierarchy
-        field = get_fields_from_path(cl.model, field_name)[-1]
-        dates_or_datetimes = 'datetimes' if isinstance(field, models.DateTimeField) else 'dates'
         year_field = '%s__year' % field_name
         month_field = '%s__month' % field_name
         day_field = '%s__day' % field_name
@@ -370,7 +367,7 @@ def date_hierarchy(cl):
             }
         elif year_lookup and month_lookup:
             days = cl.queryset.filter(**{year_field: year_lookup, month_field: month_lookup})
-            days = getattr(days, dates_or_datetimes)(field_name, 'day')
+            days = getattr(days, 'dates')(field_name, 'day')
             return {
                 'show': True,
                 'back': {
@@ -384,7 +381,7 @@ def date_hierarchy(cl):
             }
         elif year_lookup:
             months = cl.queryset.filter(**{year_field: year_lookup})
-            months = getattr(months, dates_or_datetimes)(field_name, 'month')
+            months = getattr(months, 'dates')(field_name, 'month')
             return {
                 'show': True,
                 'back': {
@@ -397,7 +394,7 @@ def date_hierarchy(cl):
                 } for month in months]
             }
         else:
-            years = getattr(cl.queryset, dates_or_datetimes)(field_name, 'year')
+            years = getattr(cl.queryset, 'dates')(field_name, 'year')
             return {
                 'show': True,
                 'choices': [{

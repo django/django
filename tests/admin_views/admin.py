@@ -22,7 +22,7 @@ from django.utils.safestring import mark_safe
 from .forms import MediaActionForm
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
-    AdminOrderedModelMethod, Album, Answer, Article, BarAccount, Book,
+    AdminOrderedModelMethod, Album, Answer, Answer2, Article, BarAccount, Book,
     Bookmark, Category, Chapter, ChapterXtra1, Child, ChildOfReferer, Choice,
     City, Collector, Color, Color2, ComplexSortedPerson, CoverLetter,
     CustomArticle, CyclicOne, CyclicTwo, DependentChild, DooHickey, EmptyModel,
@@ -971,6 +971,7 @@ site.register(Topping, ToppingAdmin)
 site.register(Album, AlbumAdmin)
 site.register(Question)
 site.register(Answer, date_hierarchy='question__posted')
+site.register(Answer2, date_hierarchy='question__expires')
 site.register(PrePopulatedPost, PrePopulatedPostAdmin)
 site.register(ComplexSortedPerson, ComplexSortedPersonAdmin)
 site.register(FilteredManager, CustomManagerAdmin)

@@ -5,6 +5,8 @@ import re
 import unittest
 from urllib.parse import parse_qsl, urljoin, urlparse
 
+import pytz
+
 from django.contrib.admin import AdminSite, ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import ADDITION, DELETION, LogEntry
@@ -42,15 +44,16 @@ from .admin import CityAdmin, site, site2
 from .forms import MediaActionForm
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
-    AdminOrderedModelMethod, Answer, Article, BarAccount, Book, Bookmark,
-    Category, Chapter, ChapterXtra1, ChapterXtra2, Character, Child, Choice,
-    City, Collector, Color, ComplexSortedPerson, CoverLetter, CustomArticle,
-    CyclicOne, CyclicTwo, DooHickey, Employee, EmptyModel, ExternalSubscriber,
-    Fabric, FancyDoodad, FieldOverridePost, FilteredManager, FooAccount,
-    FoodDelivery, FunkyTag, Gallery, Grommet, Inquisition, Language, Link,
-    MainPrepopulated, Media, ModelWithStringPrimaryKey, OtherStory, Paper,
-    Parent, ParentWithDependentChildren, ParentWithUUIDPK, Person, Persona,
-    Picture, Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
+    AdminOrderedModelMethod, Answer, Answer2, Article, BarAccount, Book,
+    Bookmark, Category, Chapter, ChapterXtra1, ChapterXtra2, Character, Child,
+    Choice, City, Collector, Color, ComplexSortedPerson, CoverLetter,
+    CustomArticle, CyclicOne, CyclicTwo, DooHickey, Employee, EmptyModel,
+    ExternalSubscriber, Fabric, FancyDoodad, FieldOverridePost,
+    FilteredManager, FooAccount, FoodDelivery, FunkyTag, Gallery, Grommet,
+    Inquisition, Language, Link, MainPrepopulated, Media,
+    ModelWithStringPrimaryKey, OtherStory, Paper, Parent,
+    ParentWithDependentChildren, ParentWithUUIDPK, Person, Persona, Picture,
+    Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
     PrePopulatedPost, Promo, Question, Recommendation, Recommender,
     RelatedPrepopulated, RelatedWithUUIDPKModel, Report, Restaurant,
     RowLevelChangePermissionModel, SecretHideout, Section, ShortMessage,
@@ -917,6 +920,18 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(url)
         self.assertEqual(response.context['site_url'], '/my-site-url/')
         self.assertContains(response, '<a href="/my-site-url/">View site</a>')
+
+    @override_settings(TIME_ZONE='America/Sao_Paulo', USE_TZ=True)
+    def test_date_hierarchy_timezone_dst(self):
+        # This datetime doesn't exist in this timezone due to DST.
+        date = pytz.timezone('America/Sao_Paulo').localize(datetime.datetime(2016, 10, 16, 15), is_dst=None)
+        q = Question.objects.create(question='Why?', expires=date)
+        Answer2.objects.create(question=q, answer='Because.')
+        response = self.client.get(reverse('admin:admin_views_answer2_changelist'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'question__expires__day=16')
+        self.assertContains(response, 'question__expires__month=10')
+        self.assertContains(response, 'question__expires__year=2016')
 
 
 @override_settings(TEMPLATES=[{
