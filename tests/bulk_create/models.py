@@ -14,6 +14,7 @@ except ImportError:
 class Country(models.Model):
     name = models.CharField(max_length=255)
     iso_two_letter = models.CharField(max_length=2)
+    description = models.TextField()
 
 
 class ProxyCountry(Country):
