@@ -83,8 +83,7 @@ class FakePayload:
 
 def closing_iterator_wrapper(iterable, close):
     try:
-        for item in iterable:
-            yield item
+        yield from iterable
     finally:
         request_finished.disconnect(close_old_connections)
         close()                                 # will fire request_finished

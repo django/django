@@ -43,8 +43,7 @@ class BaseContext:
         return repr(self.dicts)
 
     def __iter__(self):
-        for d in reversed(self.dicts):
-            yield d
+        yield from reversed(self.dicts)
 
     def push(self, *args, **kwargs):
         dicts = []
@@ -192,8 +191,7 @@ class RenderContext(BaseContext):
     template = None
 
     def __iter__(self):
-        for d in self.dicts[-1]:
-            yield d
+        yield from self.dicts[-1]
 
     def __contains__(self, key):
         return key in self.dicts[-1]

@@ -348,8 +348,7 @@ class Colour(models.Model):
     name = models.CharField(max_length=50)
 
     def __iter__(self):
-        for number in range(5):
-            yield number
+        yield from range(5)
 
     def __str__(self):
         return self.name

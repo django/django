@@ -63,8 +63,7 @@ class Loader(BaseLoader):
 
     def get_template_sources(self, template_name):
         for loader in self.loaders:
-            for origin in loader.get_template_sources(template_name):
-                yield origin
+            yield from loader.get_template_sources(template_name)
 
     def cache_key(self, template_name, skip=None):
         """

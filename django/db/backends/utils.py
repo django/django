@@ -28,8 +28,7 @@ class CursorWrapper:
 
     def __iter__(self):
         with self.db.wrap_database_errors:
-            for item in self.cursor:
-                yield item
+            yield from self.cursor
 
     def __enter__(self):
         return self

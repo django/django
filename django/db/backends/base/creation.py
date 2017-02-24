@@ -113,8 +113,7 @@ class BaseDatabaseCreation:
                 if (model._meta.can_migrate(self.connection) and
                         router.allow_migrate_model(self.connection.alias, model)):
                     queryset = model._default_manager.using(self.connection.alias).order_by(model._meta.pk.name)
-                    for obj in queryset.iterator():
-                        yield obj
+                    yield from queryset.iterator()
         # Serialize to a string
         out = StringIO()
         serializers.serialize("json", get_objects(), indent=None, stream=out)
