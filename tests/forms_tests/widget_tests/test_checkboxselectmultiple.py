@@ -85,7 +85,7 @@ class CheckboxSelectMultipleTest(WidgetTest):
             ('Video', (('vhs', 'VHS'), ('dvd', 'DVD'))),
         )
         html = """
-        <ul>
+        <ul data-wrap-label="true" data-multiple="true">
         <li>
         <label><input name="nestchoice" type="checkbox" value="unknown" /> Unknown</label>
         </li>

@@ -1734,7 +1734,7 @@ class ModelChoiceFieldTests(TestCase):
         field = CustomModelMultipleChoiceField(Category.objects.all())
         self.assertHTMLEqual(
             field.widget.render('name', []),
-            '''<ul>
+            '''<ul data-wrap-label="true" data-multiple="true">
 <li><label><input type="checkbox" name="name" value="%d" data-slug="entertainment" />Entertainment</label></li>
 <li><label><input type="checkbox" name="name" value="%d" data-slug="its-test" />It&#39;s a test</label></li>
 <li><label><input type="checkbox" name="name" value="%d" data-slug="third-test" />Third</label></li>

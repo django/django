@@ -154,7 +154,6 @@ class Profile(models.Model):
         return self.user.username
 
 
-@python_2_unicode_compatible
 class Manager(models.Model):
     name = models.CharField(max_length=255)
 
@@ -162,7 +161,6 @@ class Manager(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Team(models.Model):
     name = models.CharField(max_length=255)
     team_manager = models.ForeignKey(Manager, models.CASCADE, null=True, blank=True)
@@ -171,7 +169,6 @@ class Team(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class City(models.Model):
     name = models.CharField(max_length=255)
     teams = models.ManyToManyField(Team)
@@ -180,7 +177,6 @@ class City(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Player(models.Model):
     """
     This model will be used to test ForeignKey widget relation field as
@@ -194,7 +190,6 @@ class Player(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Fan(models.Model):
     """
     This model will be used to test ManyToMany widget relation field as
