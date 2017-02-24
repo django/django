@@ -2,6 +2,7 @@
 Utilities for XML generation/parsing.
 """
 
+import collections
 import re
 from xml.sax.saxutils import XMLGenerator
 
@@ -26,3 +27,9 @@ class SimplerXMLGenerator(XMLGenerator):
             # See http://www.w3.org/International/questions/qa-controls
             raise UnserializableContentError("Control characters are not supported in XML 1.0")
         XMLGenerator.characters(self, content)
+
+    # without sorting the attribute order is random
+    # which complicates e.g. caching and creating diffs
+    def startElement(self, name, attrs):
+        xs = collections.OrderedDict(sorted(attrs.items())) if attrs else attrs
+        super().startElement(name, xs)
