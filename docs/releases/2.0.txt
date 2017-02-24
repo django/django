@@ -122,7 +122,9 @@ Minor features
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Class :class:`~django.utils.feedgenerator.Category` allows
+  specifying categories with ``scheme`` (for Atom feeds), ``domain``
+  (for RSS), and ``label`` (for Atom or RSS).
 
 Cache
 ~~~~~

@@ -87,7 +87,7 @@ class SyndicationFeed:
         def to_str(s):
             return force_text(s, strings_only=True)
         if categories:
-            categories = [force_text(c) for c in categories]
+            categories = self._convert_categories(categories)
         if ttl is not None:
             # Force ints to str
             ttl = force_text(ttl)
@@ -109,19 +109,27 @@ class SyndicationFeed:
         self.feed.update(kwargs)
         self.items = []
 
+    def _convert_categories(self, categories):
+        return [
+            cat if isinstance(cat, Category) else str(cat)
+            for cat in categories
+        ]
+
     def add_item(self, title, link, description, author_email=None,
                  author_name=None, author_link=None, pubdate=None, comments=None,
                  unique_id=None, unique_id_is_permalink=None, categories=(),
                  item_copyright=None, ttl=None, updateddate=None, enclosures=None, **kwargs):
         """
         Add an item to the feed. All args are expected to be strings except
-        pubdate and updateddate, which are datetime.datetime objects, and
-        enclosures, which is an iterable of instances of the Enclosure class.
+        pubdate and updateddate, which are datetime.datetime objects;
+        enclosures, which is an iterable of instances of the Enclosure class;
+        categories, which is an iterable of strings or instances of the
+        Category class.
         """
         def to_str(s):
             return force_text(s, strings_only=True)
         if categories:
-            categories = [to_str(c) for c in categories]
+            categories = self._convert_categories(categories)
         if ttl is not None:
             # Force ints to str
             ttl = force_text(ttl)
@@ -216,8 +224,33 @@ class Enclosure:
         self.url = iri_to_uri(url)
 
 
+class Category:
+    "Represents an Atom or RSS category"
+    def __init__(self, term, label=None, scheme=None, domain=None):
+        self.term = str(term)
+        self.label = str(label) if label is not None else None
+        scheme = scheme or domain
+        if scheme is not None:
+            scheme = str(scheme)
+        self.scheme = self.domain = scheme
+
+
 class RssFeed(SyndicationFeed):
     content_type = 'application/rss+xml; charset=utf-8'
+
+    def _add_categories(self, handler, categories):
+        for cat in categories:
+            if isinstance(cat, Category):
+                term = cat.term
+                attrs = {}
+                if cat.label:
+                    attrs["atom:label"] = cat.label
+                if cat.domain:
+                    attrs["domain"] = cat.domain
+            else:
+                term = cat
+                attrs = {}
+            handler.addQuickElement("category", term, attrs)
 
     def write(self, outfile, encoding):
         handler = SimplerXMLGenerator(outfile, encoding)
@@ -247,8 +280,7 @@ class RssFeed(SyndicationFeed):
             handler.addQuickElement("atom:link", None, {"rel": "self", "href": self.feed['feed_url']})
         if self.feed['language'] is not None:
             handler.addQuickElement("language", self.feed['language'])
-        for cat in self.feed['categories']:
-            handler.addQuickElement("category", cat)
+        self._add_categories(handler, self.feed['categories'])
         if self.feed['feed_copyright'] is not None:
             handler.addQuickElement("copyright", self.feed['feed_copyright'])
         handler.addQuickElement("lastBuildDate", rfc2822_date(self.latest_post_date()))
@@ -317,14 +349,25 @@ class Rss201rev2Feed(RssFeed):
             })
 
         # Categories.
-        for cat in item['categories']:
-            handler.addQuickElement("category", cat)
+        self._add_categories(handler, item['categories'])
 
 
 class Atom1Feed(SyndicationFeed):
     # Spec: https://tools.ietf.org/html/rfc4287
     content_type = 'application/atom+xml; charset=utf-8'
     ns = "http://www.w3.org/2005/Atom"
+
+    def _add_categories(self, handler, categories):
+        for cat in categories:
+            if isinstance(cat, Category):
+                attrs = {"term": cat.term}
+                if cat.label:
+                    attrs['label'] = cat.label
+                if cat.scheme:
+                    attrs['scheme'] = cat.scheme
+            else:
+                attrs = {"term": cat}
+            handler.addQuickElement("category", "", attrs)
 
     def write(self, outfile, encoding):
         handler = SimplerXMLGenerator(outfile, encoding)
@@ -357,8 +400,7 @@ class Atom1Feed(SyndicationFeed):
             handler.endElement("author")
         if self.feed['subtitle'] is not None:
             handler.addQuickElement("subtitle", self.feed['subtitle'])
-        for cat in self.feed['categories']:
-            handler.addQuickElement("category", "", {"term": cat})
+        self._add_categories(handler, self.feed['categories'])
         if self.feed['feed_copyright'] is not None:
             handler.addQuickElement("rights", self.feed['feed_copyright'])
 
@@ -409,8 +451,7 @@ class Atom1Feed(SyndicationFeed):
             })
 
         # Categories.
-        for cat in item['categories']:
-            handler.addQuickElement("category", "", {"term": cat})
+        self._add_categories(handler, item['categories'])
 
         # Rights.
         if item['item_copyright'] is not None:

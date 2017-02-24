@@ -941,7 +941,8 @@ They share this interface:
     ``self.feed`` for use with `custom feed generators`_.
 
     All parameters should be strings, except ``categories``, which should be a
-    sequence of strings. Beware that some control characters
+    sequence of strings or :class:`~django.utils.feedgenerator.Category`
+    instances. Beware that some control characters
     are `not allowed <http://www.w3.org/International/questions/qa-controls>`_
     in XML documents. If your content has some of them, you might encounter a
     :exc:`ValueError` when producing the feed.
@@ -977,7 +978,8 @@ They share this interface:
     * ``updateddate`` should be a Python  :class:`~datetime.datetime` object.
     * ``enclosures`` should be a list of
       :class:`django.utils.feedgenerator.Enclosure` instances.
-    * ``categories`` should be a sequence of strings.
+    * ``categories`` should be a sequence of strings or
+      :class:`django.utils.feedgenerator.Category` instances.
 
 :meth:`.SyndicationFeed.write`
     Outputs the feed in the given encoding to outfile, which is a file-like object.
