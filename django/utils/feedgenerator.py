@@ -137,7 +137,7 @@ class SyndicationFeed:
             'comments': to_str(comments),
             'unique_id': to_str(unique_id),
             'unique_id_is_permalink': unique_id_is_permalink,
-            'enclosures': enclosures,
+            'enclosures': enclosures or (),
             'categories': categories or (),
             'item_copyright': to_str(item_copyright),
             'ttl': ttl,
