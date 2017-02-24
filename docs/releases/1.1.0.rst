@@ -1,0 +1,30 @@
+1.1.0 Release Notes
+===================
+
+.. note::
+    The 1.1.0 release is still in development.
+
+Channels 1.1.0 introduces a couple of major but backwards-compatible changes.
+It was released on UNKNOWN.
+
+Major Changes
+-------------
+
+* Test classes have been moved from ``channels.tests`` to ``channels.test``
+  to better match Django. Old imports from ``channels.tests`` will continue to
+  work but will trigger a deprecation warning, and ``channels.tests`` will be
+  removed completely in version 1.3.
+
+Minor Changes & Bugfixes
+------------------------
+
+* Bindings now support non-integer fields for primary keys on models
+
+* The ``enforce_ordering`` decorator no longer suffers a race condition where
+  it would drop messages under high load
+
+
+Backwards Incompatible Changes
+------------------------------
+
+None.
